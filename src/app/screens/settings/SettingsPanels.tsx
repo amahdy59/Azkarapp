@@ -34,7 +34,7 @@ export function SettingsRootPanel({ onNav, language, darkMode, languageLabel, is
         <SettingsRowItem
           iconBg="var(--muted)" icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke="currentColor" className="text-foreground" strokeWidth="1.5" /><path d="M10 3v14M3 10h14" stroke="currentColor" className="text-foreground" strokeWidth="1.5" strokeLinecap="round" /></svg>}
           label={t(language, "settings.displayTheme")}
-          right={<div className="flex items-center gap-2"><p className="text-[14px] text-muted-foreground font-sans">{darkMode ? t(language, "common.dark") : t(language, "common.light")}</p><RowToggle checked={darkMode} onChange={onToggleDark} /></div>}
+          right={<div className="flex items-center gap-2"><p className="text-[14px] text-foreground/90 font-sans">{darkMode ? t(language, "common.dark") : t(language, "common.light")}</p><RowToggle checked={darkMode} onChange={onToggleDark} label={t(language, "settings.displayTheme")} /></div>}
           onPress={() => {}} />
         <SettingsRowItem
           iconBg="var(--muted)" icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M7 7h6M7 13h4" stroke="currentColor" className="text-foreground" strokeWidth="1.5" strokeLinecap="round" /></svg>}
@@ -134,9 +134,9 @@ export function AccessibilityPanel({ onBack }: { onBack: () => void }) {
 
         <div className="mx-4 rounded-xl overflow-hidden bg-card border border-border">
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="var(--primary)" strokeWidth="1.5"/><path d="M9 2A7 7 0 0 1 9 16V2Z" fill="var(--primary)"/></svg>}
-            label="High Contrast Mode" right={<RowToggle checked={highContrast} onChange={() => setHighContrast(v => !v)} />} onPress={() => setHighContrast(v => !v)} />
+            label="High Contrast Mode" right={<RowToggle checked={highContrast} onChange={() => setHighContrast(v => !v)} label="High Contrast Mode" />} onPress={() => setHighContrast(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 4H9C11 4 11 7 9 7H5V4ZM5 7H10C12 7 12 11 10 11H5V7Z" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>}
-            label="Bold Text" right={<RowToggle checked={boldText} onChange={() => setBoldText(v => !v)} />} onPress={() => setBoldText(v => !v)} />
+            label="Bold Text" right={<RowToggle checked={boldText} onChange={() => setBoldText(v => !v)} label="Bold Text" />} onPress={() => setBoldText(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 2C5.1 2 2 5.1 2 9s3.1 7 7 7c1 0 1.5-.8 1.5-1.5S10 13 9 13c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" /><circle cx="5.5" cy="8.5" r="1.5" fill="var(--primary)"/><circle cx="8.5" cy="5.5" r="1.5" fill="var(--primary)"/><circle cx="12.5" cy="7.5" r="1.5" fill="var(--primary)"/></svg>}
             label="Color Blind Support" right={<RowValue value="None" />} onPress={() => {}} hasDivider={false} />
         </div>
@@ -144,17 +144,17 @@ export function AccessibilityPanel({ onBack }: { onBack: () => void }) {
         <SectionLabel label="Motion" />
         <div className="mx-4 rounded-xl overflow-hidden border border-border bg-card">
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M6 14V4M6 4L3 7M6 4L9 7M12 14V4M12 4L9 7M12 4L15 7" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-            label="Reduce Motion" right={<RowToggle checked={reduceMotion} onChange={() => setReduceMotion(v => !v)} />} onPress={() => setReduceMotion(v => !v)} />
+            label="Reduce Motion" right={<RowToggle checked={reduceMotion} onChange={() => setReduceMotion(v => !v)} label="Reduce Motion" />} onPress={() => setReduceMotion(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="6" y="2" width="6" height="14" rx="1" stroke="var(--primary)" strokeWidth="1.5"/><path d="M3 6V12M15 6V12" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/></svg>}
-            label="Haptic Feedback" right={<RowToggle checked={haptic} onChange={() => setHaptic(v => !v)} />} onPress={() => setHaptic(v => !v)} hasDivider={false} />
+            label="Haptic Feedback" right={<RowToggle checked={haptic} onChange={() => setHaptic(v => !v)} label="Haptic Feedback" />} onPress={() => setHaptic(v => !v)} hasDivider={false} />
         </div>
 
         <SectionLabel label="Reading" />
         <div className="mx-4 rounded-xl overflow-hidden border border-border bg-card">
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M15 5H6M15 9H9M15 13H6M3 5H3.01M3 9H3.01M3 13H3.01" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" /></svg>}
-            label="Right-to-Left Layout" right={<RowToggle checked={rtl} onChange={() => setRtl(v => !v)} />} onPress={() => setRtl(v => !v)} />
+            label="Right-to-Left Layout" right={<RowToggle checked={rtl} onChange={() => setRtl(v => !v)} label="Right-to-Left Layout" />} onPress={() => setRtl(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" stroke="var(--primary)" strokeWidth="1.5"/><path d="M9 13V8M9 5H9.01" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" /></svg>}
-            label="VoiceOver Compatible" right={<RowToggle checked={voiceOver} onChange={() => setVoiceOver(v => !v)} />} onPress={() => setVoiceOver(v => !v)} hasDivider={false} />
+            label="VoiceOver Compatible" right={<RowToggle checked={voiceOver} onChange={() => setVoiceOver(v => !v)} label="VoiceOver Compatible" />} onPress={() => setVoiceOver(v => !v)} hasDivider={false} />
         </div>
 
         <SectionLabel label="Audio" />
@@ -278,7 +278,7 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
         <p className="flex-1 text-[17px] font-semibold text-foreground font-sans">{label}</p>
         <div className="flex items-center gap-3">
           <p className="text-[14px] text-muted-foreground font-sans">{enabled ? time : "Not set"}</p>
-          <RowToggle checked={enabled} onChange={onToggle} />
+          <RowToggle checked={enabled} onChange={onToggle} label={label} />
         </div>
       </div>
       {hasDivider && <div className="h-px mx-4 bg-border" style={{ marginLeft: 56 }} />}
@@ -324,9 +324,9 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
         <SectionLabel label="General" />
         <div className="mx-4 rounded-xl overflow-hidden border border-border bg-card">
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary"><path d="M9 1l2 5 5 .5-3.5 3.5 1 5L9 13l-4.5 2 1-5L2 6.5 7 6z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-            label="Completion Celebration" right={<RowToggle checked={celebration} onChange={() => setCelebration(v => !v)} />} onPress={() => setCelebration(v => !v)} />
+            label="Completion Celebration" right={<RowToggle checked={celebration} onChange={() => setCelebration(v => !v)} label="Completion Celebration" />} onPress={() => setCelebration(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary"><path d="M3 14h12M4 10l3-3 3 3 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-            label="Daily Streak Reminder" right={<RowToggle checked={streak} onChange={() => setStreak(v => !v)} />} onPress={() => setStreak(v => !v)} />
+            label="Daily Streak Reminder" right={<RowToggle checked={streak} onChange={() => setStreak(v => !v)} label="Daily Streak Reminder" />} onPress={() => setStreak(v => !v)} />
           <SettingsRowItem iconBg="var(--muted)" icon={<svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary"><path d="M4 9h2v4H4V9zm4-4h2v8H8V5zm4 2h2v6h-2V7z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
             label="Notification Sound" right={<RowValue value="Gentle Chime" />} onPress={() => {}} hasDivider={false} />
         </div>

@@ -9,7 +9,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   return (
-    <div className="flex flex-col items-center justify-between h-full bg-background">
+    <div className="flex flex-col items-center justify-between h-full bg-background" role="status" aria-live="polite" aria-label="Loading Azkar">
       <motion.div
         className="flex flex-col items-center w-full flex-1 pt-20"
         initial={{ opacity: 0, y: 16 }}
@@ -31,8 +31,8 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           </div>
         </div>
 
-        <p className="mt-10 text-[14px] text-muted-foreground font-sans">
-          Daily Remembrance
+        <p className="mt-10 text-[15px] text-muted-foreground font-sans">
+          Daily remembrance
         </p>
       </motion.div>
 
@@ -42,11 +42,11 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4, delay: 0.5, ease: [0, 0, 0.58, 1] }}
       >
-        <div className="rounded-full overflow-hidden w-[160px] h-[3px] bg-muted">
+        <div className="rounded-full overflow-hidden w-[160px] h-1 bg-card-foreground/25" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: 96 }} />
         </div>
-        <p className="text-[10px] font-medium text-muted-foreground font-sans opacity-50">
-          v2.0.1
+        <p className="text-[11px] font-medium text-muted-foreground font-sans">
+          Version 2.0.1
         </p>
       </motion.div>
     </div>
