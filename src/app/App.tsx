@@ -36,7 +36,7 @@ import { isSupabaseConfigured } from "../lib/supabase";
 // ─── Design tokens (match Azkar/Colors Figma vars) ────────────────────────────
 // ─── Types ────────────────────────────────────────────────────────────────────
 type View =
-  | "home" | "category" | "reader" | "counter" | "completion"
+  | "home" | "category" | "reader" | "completion"
   // Phase 2 — English onboarding
   | "splash" | "onboard1" | "onboard2" | "onboard3" | "language" | "login" | "phone" | "otp"
   // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
@@ -52,7 +52,6 @@ import { BottomNav } from "./components/LayoutShells";
 import { HomeScreen } from "./screens/HomeScreen";
 import { CategoryScreen } from "./screens/CategoryScreen";
 import { ReaderScreen } from "./screens/ReaderScreen";
-import { CounterScreen } from "./screens/CounterScreen";
 import { CompletionScreen } from "./screens/CompletionScreen";
 import { SettingsScreen } from "./screens/settings/SettingsScreen";
 import { SearchScreen } from "./screens/SearchScreen";
@@ -336,10 +335,9 @@ export default function App() {
   const openReader = (catId: CategoryId, i: number) => {
     setActiveCat(catId);
     setActiveIdx(i);
+    setSessionStart(Date.now());
     push("reader");
   };
-
-  const openCounter = () => push("counter");
 
   const markComplete = (idx: number) => {
     setCompleted(prev => {
@@ -351,7 +349,6 @@ export default function App() {
     const azkar = getAzkarByCategory(activeCat);
     if (idx + 1 < azkar.length) {
       setActiveIdx(idx + 1);
-      // stay on counter
     } else {
       setSessions(prev => [
         {
@@ -619,32 +616,21 @@ export default function App() {
           {view === "reader" && (
             <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
               isDone={completed[activeCat]?.has(activeIdx) ?? false}
+              completedCount={completed[activeCat]?.size ?? 0}
               showTransliteration={showTransliteration}
               showTranslation={showTranslation}
               onBack={pop}
-              onCounter={() => { setSessionStart(Date.now()); openCounter(); }}
+              onComplete={markComplete}
               onToggleTransliteration={() => setShowTransliteration(value => !value)}
               onToggleTranslation={() => setShowTranslation(value => !value)}
               onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}
               onPrev={() => { if (activeIdx > 0) setActiveIdx(i => i - 1); }}
             />
           )}
-          {view === "counter" && (
-            <CounterScreen catId={activeCat} idx={activeIdx}
-              initialCount={completed[activeCat]?.has(activeIdx) ? azkar[activeIdx]?.repetitionCount ?? 0 : 0}
-              onBack={pop}
-              onComplete={markComplete}
-              onPrev={() => { if (activeIdx > 0) setActiveIdx(i => i - 1); }}
-              onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}
-              showTransliteration={showTransliteration}
-              showTranslation={showTranslation}
-              isArabic={isArabic}
-            />
-          )}
           {view === "completion" && (
             <CompletionScreen catId={activeCat} sessionStart={sessionStart}
               currentStreak={currentStreak}
-              onHome={goHome} onRepeat={() => { setView("category"); setHistory([]); }} />
+              onHome={goHome} onRepeat={() => { setView("category"); setHistory([]); }} language={selectedLang} />
           )}
           {view === "settings" && (
             <SettingsScreen

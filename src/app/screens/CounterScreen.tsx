@@ -1,9 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { ChevronLeft, RotateCcw, Check, SkipBack, SkipForward } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import type { AppLanguage, CategoryId } from "../types";
+import { formatNumerals, formatRatio, numeralFontFamily } from "../formatting";
 import { PulseRings, CounterRing } from "../components/ZikrComponents";
 
 export function CounterScreen({
@@ -50,6 +51,12 @@ export function CounterScreen({
   }
 
   const displayCount = z.countLabel ?? String(z.repetitionCount);
+  const remaining = z.repetitionCount - count;
+  const localizedCount = formatNumerals(count, language);
+  const localizedDisplayCount = formatNumerals(displayCount, language);
+  const localizedRemaining = formatNumerals(remaining, language);
+  const localizedRatio = formatRatio(count, z.repetitionCount, language);
+
   const handleTap = () => {
     if (complete) {
       return;
@@ -59,7 +66,7 @@ export function CounterScreen({
     setCount(next);
     setPulse((value) => value + 1);
     setFlash(true);
-    setTimeout(() => setFlash(false), 120);
+    setTimeout(() => setFlash(false), 100);
 
     if (next >= z.repetitionCount) {
       setComplete(true);
@@ -72,7 +79,7 @@ export function CounterScreen({
       setCount(0);
       setComplete(false);
       setPulse((value) => value + 1);
-    }, 600);
+    }, 700);
   };
 
   const handleLongPressEnd = () => {
@@ -97,8 +104,6 @@ export function CounterScreen({
       onNext();
     }
   };
-
-  const remaining = z.repetitionCount - count;
 
   return (
     <div
@@ -126,11 +131,14 @@ export function CounterScreen({
           </button>
 
           <div className="text-center">
-            <p className="font-sans text-[12px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+            <p className="font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
               {isArabic ? category?.nameArabic : category?.name}
             </p>
-            <p className="font-sans text-[14px] font-semibold text-secondary-foreground">
-              {t(language, "reader.title", { index: idx + 1, total: azkar.length })}
+            <p className="font-sans text-[15px] font-semibold text-card-foreground">
+              {t(language, "reader.title", {
+                index: formatNumerals(idx + 1, language),
+                total: formatNumerals(azkar.length, language),
+              })}
             </p>
           </div>
 
@@ -156,12 +164,12 @@ export function CounterScreen({
             {z.arabicText}
           </p>
           {showTransliteration && (
-            <p className="mt-3 text-center font-sans text-[12px] italic leading-[18px] text-muted-foreground">
+            <p className="mt-3 text-center font-sans text-[13px] italic leading-[20px] text-muted-foreground">
               {z.transliteration}
             </p>
           )}
           {showTranslation && (
-            <p className="mt-3 text-center font-sans text-[13px] leading-[20px] text-secondary-foreground">
+            <p className="mt-3 text-center font-sans text-[14px] leading-[22px] text-card-foreground">
               {z.translation}
             </p>
           )}
@@ -169,9 +177,9 @@ export function CounterScreen({
       </div>
 
       <div
-      role="button"
-      tabIndex={0}
-      aria-label={`${t(language, "reader.tapAnywhere")} ${count} / ${z.repetitionCount}${displayCount !== String(z.repetitionCount) ? `. ${displayCount}` : ""}`}
+        role="button"
+        tabIndex={0}
+        aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}${displayCount !== String(z.repetitionCount) ? `. ${localizedDisplayCount}` : ""}`}
         className="relative mx-4 flex flex-1 cursor-pointer flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
         onClick={handleTap}
         onKeyDown={(event) => {
@@ -185,13 +193,13 @@ export function CounterScreen({
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
         style={{
-          background: flash ? "color-mix(in srgb, var(--primary) 8%, transparent)" : "transparent",
-          transition: "background 80ms",
+          background: flash ? "color-mix(in srgb, var(--primary) 6%, transparent)" : "transparent",
+          transition: "background 100ms ease-out",
         }}
       >
-        <PulseRings trigger={pulse} />
+        <PulseRings trigger={pulse} size={200} />
 
-        <div className="relative z-10 flex items-center justify-center pointer-events-none">
+        <div className="pointer-events-none relative z-10 flex items-center justify-center">
           <CounterRing count={count} total={z.repetitionCount} size={200} />
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {complete ? (
@@ -203,11 +211,19 @@ export function CounterScreen({
               </>
             ) : (
               <>
-                <p className="text-[56px] font-extrabold leading-[60px] text-primary" style={{ fontFamily: "DM Mono, monospace" }}>
-                  {count}
+                <p
+                  className="text-[64px] font-extrabold leading-[64px] text-primary"
+                  dir="ltr"
+                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                >
+                  {localizedCount}
                 </p>
-                <p className="max-w-[220px] text-center text-[16px] text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>
-                  / {displayCount}
+                <p
+                  className="max-w-[220px] text-center text-[18px] font-semibold text-card-foreground"
+                  dir="ltr"
+                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                >
+                  {localizedRatio}
                 </p>
               </>
             )}
@@ -215,17 +231,17 @@ export function CounterScreen({
         </div>
 
         {!complete && (
-          <p className="z-10 mt-8 font-sans text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground pointer-events-none">
+          <p className="pointer-events-none z-10 mt-8 font-sans text-[12px] font-bold uppercase tracking-[0.12em] text-card-foreground">
             {t(language, "reader.tapAnywhere")}
           </p>
         )}
         {!complete && remaining <= 5 && remaining > 0 && (
-          <p className="z-10 mt-2 font-sans text-[13px] font-semibold text-primary pointer-events-none">
-            {t(language, "reader.remaining", { count: remaining })}
+          <p className="pointer-events-none z-10 mt-2 font-sans text-[14px] font-semibold text-primary">
+            {t(language, "reader.remaining", { count: localizedRemaining })}
           </p>
         )}
         {!complete && (
-          <p className="absolute bottom-4 z-10 font-sans text-[10px] text-muted pointer-events-none">
+          <p className="pointer-events-none absolute bottom-4 z-10 font-sans text-[12px] leading-[18px] text-muted-foreground">
             {t(language, "reader.holdToReset")}
           </p>
         )}
@@ -236,10 +252,10 @@ export function CounterScreen({
           onClick={onPrev}
           disabled={idx === 0}
           aria-label="Previous Zikr"
-          className="flex items-center gap-2 rounded-xl bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <SkipBack size={16} className="text-secondary-foreground rtl:-scale-x-100" />
-          <span className="font-sans text-[13px] font-semibold text-secondary-foreground">{t(language, "reader.prev")}</span>
+          <SkipBack size={16} className="text-card-foreground rtl:-scale-x-100" />
+          <span className="font-sans text-[14px] font-semibold text-card-foreground">{t(language, "reader.prev")}</span>
         </button>
 
         <div className="flex gap-1.5" aria-hidden="true">
@@ -262,10 +278,10 @@ export function CounterScreen({
           onClick={onNext}
           disabled={idx === azkar.length - 1}
           aria-label="Next Zikr"
-          className="flex items-center gap-2 rounded-xl bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="font-sans text-[13px] font-semibold text-secondary-foreground">{t(language, "reader.next")}</span>
-          <SkipForward size={16} className="text-secondary-foreground rtl:-scale-x-100" />
+          <span className="font-sans text-[14px] font-semibold text-card-foreground">{t(language, "reader.next")}</span>
+          <SkipForward size={16} className="text-card-foreground rtl:-scale-x-100" />
         </button>
       </div>
     </div>

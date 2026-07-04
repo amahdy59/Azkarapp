@@ -7,6 +7,7 @@ import type { CategoryId } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { RepBadge } from "../components/ZikrComponents";
+import { formatNumerals, numeralFontFamily } from "../formatting";
 
 export function CategoryScreen({
   catId,
@@ -27,20 +28,26 @@ export function CategoryScreen({
   const resumeIdx = azkar.findIndex((_, i) => !completed.has(i));
   const pct = Math.round((done / azkar.length) * 100);
   const language = isArabic ? "ar" : "en";
+  const doneLabel = formatNumerals(done, language);
+  const totalLabel = formatNumerals(azkar.length, language);
 
   return (
     <div className="flex h-full flex-col bg-background">
       <Header
         title={isArabic ? cat.nameArabic : cat.name}
-        subtitle={isArabic ? `${done} / ${azkar.length}` : `${done} of ${azkar.length} complete`}
+        subtitle={isArabic ? `${doneLabel} / ${totalLabel}` : `${doneLabel} of ${totalLabel} complete`}
         onBack={onBack}
       />
 
       <div className="shrink-0 border-b border-border px-5 py-4">
         <div className="mb-2 flex items-center justify-between">
           <p className="font-sans text-[12px] text-muted-foreground">{isArabic ? "التقدم" : "Progress"}</p>
-          <p className="text-[12px] font-bold text-primary" style={{ fontFamily: "DM Mono, monospace" }}>
-            {pct}%
+          <p
+            className="text-[12px] font-bold text-primary"
+            dir="ltr"
+            style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+          >
+            {formatNumerals(pct, language)}%
           </p>
         </div>
         <ProgressBar value={done} max={azkar.length} height={8} />
@@ -52,7 +59,7 @@ export function CategoryScreen({
           >
             {done === 0
               ? t(language, "category.startSession")
-              : t(language, "category.resumeZikr", { index: resumeIdx + 1 })}
+              : t(language, "category.resumeZikr", { index: formatNumerals(resumeIdx + 1, language) })}
             <ChevronRight size={18} className="rtl:-scale-x-100" />
           </button>
         )}
@@ -73,7 +80,7 @@ export function CategoryScreen({
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-5 py-3">
         {azkar.map((z, i) => {
           const isDone = completed.has(i);
-          const countLabel = z.countLabel ?? String(z.repetitionCount);
+          const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
 
           return (
             <button
@@ -92,8 +99,11 @@ export function CategoryScreen({
                 {isDone ? (
                   <Check size={15} className="text-primary-foreground" />
                 ) : (
-                  <span className="text-[12px] font-bold text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>
-                    {i + 1}
+                  <span
+                    className="text-[12px] font-bold text-muted-foreground"
+                    style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                  >
+                    {formatNumerals(i + 1, language)}
                   </span>
                 )}
               </div>
@@ -109,12 +119,12 @@ export function CategoryScreen({
                 >
                   {z.arabicText.split("\n")[0]}
                 </p>
-                <p className="truncate font-sans text-[11px] italic text-muted-foreground">
+                <p className="truncate font-sans text-[12px] italic leading-[18px] text-muted-foreground">
                   {z.transliteration.slice(0, 50)}...
                 </p>
               </div>
 
-              <RepBadge label={countLabel} done={isDone} />
+              <RepBadge label={countLabel} done={isDone} language={language} />
             </button>
           );
         })}

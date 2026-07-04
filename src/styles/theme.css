@@ -5,7 +5,7 @@
   --background: #081026;
   --foreground: #F2F2EA;
   --card: #101832;
-  --card-foreground: #C7CBD8;
+  --card-foreground: #E3E8F2;
   --popover: #101832;
   --popover-foreground: #F2F2EA;
   --primary: #D7A528;
@@ -13,7 +13,7 @@
   --secondary: #C5F2E5;
   --secondary-foreground: #081026;
   --muted: #182040;
-  --muted-foreground: #C7CBD8;
+  --muted-foreground: #D8DFEC;
   --accent: #D7A528;
   --accent-foreground: #000000;
   --destructive: #C0392B;
@@ -45,7 +45,7 @@
   --background: #081026;
   --foreground: #F2F2EA;
   --card: #101832;
-  --card-foreground: #C7CBD8;
+  --card-foreground: #E3E8F2;
   --popover: #101832;
   --popover-foreground: #F2F2EA;
   --primary: #D7A528;
@@ -53,7 +53,7 @@
   --secondary: #C5F2E5;
   --secondary-foreground: #081026;
   --muted: #182040;
-  --muted-foreground: #C7CBD8;
+  --muted-foreground: #D8DFEC;
   --accent: #D7A528;
   --accent-foreground: #000000;
   --destructive: #C0392B;
@@ -84,7 +84,7 @@
   --background: #F8F5F0;
   --foreground: #1A1228;
   --card: #FFFFFF;
-  --card-foreground: #4A4570;
+  --card-foreground: #2F3850;
   --popover: #FFFFFF;
   --popover-foreground: #1A1228;
   --primary: #D7A528;
@@ -92,7 +92,7 @@
   --secondary: #9EE5D3;
   --secondary-foreground: #102038;
   --muted: #F2EEE9;
-  --muted-foreground: #5D6474;
+  --muted-foreground: #495264;
   --accent: #D7A528;
   --accent-foreground: #000000;
   --destructive: #C0392B;
@@ -253,8 +253,8 @@
 }
 
 @keyframes pulse-ring {
-  0%   { transform: scale(1);   opacity: 0.7; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0%   { transform: scale(0.98); opacity: 0.18; }
+  100% { transform: scale(1.08); opacity: 0; }
 }
 
 @keyframes fade-in {

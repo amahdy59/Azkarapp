@@ -6,6 +6,7 @@ import type { AppLanguage, CategoryId } from "../types";
 import { MaleAvatar } from "../components/Avatars";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
+import { formatNumerals, numeralFontFamily } from "../formatting";
 
 export function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onSearch, language }:
   {
@@ -21,6 +22,8 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
   const timeLabel = h < 12 ? t(language, "home.goodMorning") : h < 17 ? t(language, "home.goodAfternoon") : t(language, "home.goodEvening");
   const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
   const totalAll  = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
+  const localizedTotalDone = formatNumerals(totalDone, language);
+  const localizedTotalAll = formatNumerals(totalAll, language);
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -29,7 +32,7 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         <div className="flex items-center gap-3">
           <MaleAvatar size={44} />
           <div>
-            <p className="text-[11px] text-muted-foreground font-sans font-bold tracking-[0.08em] uppercase">{timeLabel}</p>
+            <p className="text-[12px] text-muted-foreground font-sans font-bold tracking-[0.08em] uppercase">{timeLabel}</p>
             <p className="text-[20px] text-foreground font-sans font-extrabold leading-[26px]">{displayName}</p>
           </div>
         </div>
@@ -52,7 +55,13 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
             <div className="mt-3">
               <div className="flex justify-between mb-1.5">
                 <span className="text-[11px] text-muted-foreground font-sans">{t(language, "home.todaysProgress")}</span>
-                <span className="text-[11px] text-primary font-bold" style={{ fontFamily: "DM Mono, monospace" }}>{totalDone}/{totalAll}</span>
+                <span
+                  className="text-[12px] font-bold text-primary"
+                  dir="ltr"
+                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                >
+                  {localizedTotalDone}/{localizedTotalAll}
+                </span>
               </div>
               <ProgressBar value={totalDone} max={totalAll} height={6} />
             </div>
@@ -84,7 +93,7 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
                       ? <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] text-primary font-sans font-bold" style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}>
                           <Check size={10} /> Done
                         </span>
-                      : <span className="text-[12px] text-muted-foreground font-sans">{done}/{cat.totalCount}</span>
+                      : <span className="text-[12px] text-muted-foreground font-sans">{formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}</span>
                     }
                   </div>
                   <p className="mb-2 text-[14px] text-muted-foreground" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>{cat.nameArabic}</p>
@@ -104,12 +113,24 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
             <Flame size={24} className="text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-[12px] text-muted-foreground font-sans">{t(language, "home.currentStreak")}</p>
-            <p className="text-[20px] font-extrabold text-primary" style={{ fontFamily: "DM Mono, monospace" }}>{currentStreak} {t(language, currentStreak === 1 ? "home.daySuffix" : "home.daysSuffix")}</p>
+            <p className="text-[13px] text-muted-foreground font-sans">{t(language, "home.currentStreak")}</p>
+            <p
+              className="text-[20px] font-extrabold text-primary"
+              dir="ltr"
+              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+            >
+              {formatNumerals(currentStreak, language)} {t(language, currentStreak === 1 ? "home.daySuffix" : "home.daysSuffix")}
+            </p>
           </div>
           <div className="text-end">
-            <p className="text-[11px] text-muted-foreground font-sans">{t(language, "home.best")}</p>
-            <p className="text-[16px] font-bold text-secondary-foreground" style={{ fontFamily: "DM Mono, monospace" }}>{longestStreak}</p>
+            <p className="text-[12px] text-muted-foreground font-sans">{t(language, "home.best")}</p>
+            <p
+              className="text-[16px] font-bold text-card-foreground"
+              dir="ltr"
+              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+            >
+              {formatNumerals(longestStreak, language)}
+            </p>
           </div>
         </div>
       </div>

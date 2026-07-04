@@ -17,7 +17,7 @@ export function Header({ title, subtitle, onBack, right }:
       )}
       <div className="flex-1 min-w-0">
         <p className="font-semibold truncate text-[17px] leading-6 text-foreground font-sans">{title}</p>
-        {subtitle && <p className="text-[11px] text-muted-foreground font-sans">{subtitle}</p>}
+        {subtitle && <p className="text-[12px] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}
     </div>
@@ -45,7 +45,7 @@ export function BottomNav({ active, onChange, isArabic = false }: {
             aria-current={on ? "page" : undefined}
             className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
             <Icon size={22} className={on ? "text-primary" : "text-muted-foreground"} />
-            <span className={`text-[10px] font-medium font-sans ${on ? "text-primary" : "text-muted-foreground"}`}>
+            <span className={`text-[12px] font-medium font-sans leading-[16px] ${on ? "text-primary" : "text-muted-foreground"}`}>
               {label}
             </span>
             {on && <div className="rounded-full w-1 h-1 bg-primary -mt-[2px]" />}

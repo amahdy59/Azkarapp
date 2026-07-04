@@ -34,6 +34,7 @@ const en = {
   },
   reader: {
     title: "Zikr {index} of {total}",
+    groupProgress: "Group progress",
     completed: "Completed",
     benefit: "Details & Source",
     timing: "Recommended timing",
@@ -49,6 +50,7 @@ const en = {
     counterReady: "Ready to count",
     counterReadyComplete: "Already completed",
     tapAnywhere: "Tap anywhere to count",
+    autoAdvance: "Completes this zikr and moves to the next one automatically.",
     openCounterHint: "Open the larger counter view for distraction-free counting.",
     tapToRedo: "This zikr is complete. Tap to count it again.",
     complete: "Complete!",

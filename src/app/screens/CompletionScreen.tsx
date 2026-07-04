@@ -2,10 +2,11 @@ import React from "react";
 import { Check, Flame, Share2 } from "lucide-react";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import type { CategoryId } from "../types";
+import { formatNumerals, numeralFontFamily } from "../formatting";
+import type { AppLanguage, CategoryId } from "../types";
 
-export function CompletionScreen({ catId, sessionStart, currentStreak, onHome, onRepeat }:
-  { catId: CategoryId; sessionStart: number; currentStreak: number; onHome: () => void; onRepeat: () => void }) {
+export function CompletionScreen({ catId, sessionStart, currentStreak, onHome, onRepeat, language }:
+  { catId: CategoryId; sessionStart: number; currentStreak: number; onHome: () => void; onRepeat: () => void; language: AppLanguage }) {
   const cat = CATEGORIES.find(c => c.id === catId)!;
   const azkar = getAzkarByCategory(catId);
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
@@ -49,8 +50,14 @@ export function CompletionScreen({ catId, sessionStart, currentStreak, onHome, o
             { value: elapsedMin,   label: "minutes" },
           ].map(({ value, label }) => (
             <div key={label} className="rounded-xl p-4 text-center bg-card border border-border">
-              <p className="text-[26px] font-extrabold text-primary leading-[32px]" style={{ fontFamily: "DM Mono, monospace" }}>{value}</p>
-              <p className="text-[10px] text-muted-foreground font-sans mt-1">{label}</p>
+              <p
+                className="text-[26px] font-extrabold text-primary leading-[32px]"
+                dir="ltr"
+                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              >
+                {formatNumerals(value, language)}
+              </p>
+              <p className="mt-1 text-[12px] text-muted-foreground font-sans">{label}</p>
             </div>
           ))}
         </div>
@@ -61,9 +68,9 @@ export function CompletionScreen({ catId, sessionStart, currentStreak, onHome, o
           <Flame size={20} className="text-primary" />
           <div>
             <p className="text-[13px] font-bold text-primary font-sans">
-              {currentStreak}-day streak maintained!
+              {formatNumerals(currentStreak, language)}-day streak maintained!
             </p>
-            <p className="text-[11px] text-muted-foreground font-sans">Consistency is a form of worship.</p>
+            <p className="text-[12px] text-muted-foreground font-sans">Consistency is a form of worship.</p>
           </div>
         </div>
       </div>
@@ -74,7 +81,7 @@ export function CompletionScreen({ catId, sessionStart, currentStreak, onHome, o
           disabled
           aria-label="Share Progress Soon"
           className="w-full rounded-xl flex items-center justify-center gap-2 h-12 bg-card border border-border text-[15px] font-sans font-semibold opacity-50 cursor-not-allowed">
-          <Share2 size={16} className="text-secondary-foreground" /> <span className="text-secondary-foreground">Share Progress Soon</span>
+          <Share2 size={16} className="text-card-foreground" /> <span className="text-card-foreground">Share Progress Soon</span>
         </button>
         <button onClick={onHome}
           className="w-full rounded-xl font-bold transition-all active:scale-95 h-[52px] bg-primary text-background text-[16px] font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">

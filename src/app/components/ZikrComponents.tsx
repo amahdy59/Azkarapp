@@ -1,34 +1,32 @@
 import React from "react";
+import { numeralFontFamily } from "../formatting";
+import type { AppLanguage } from "../types";
 
-export function RepBadge({ label, done }: { label: string; done: boolean }) {
+export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
     <span
-      className={`shrink-0 rounded-full border px-2 py-0.5 text-center text-[11px] font-bold leading-[14px] ${done ? "border-primary/40 bg-primary/20 text-primary" : "border-secondary/50 bg-secondary/25 text-secondary"}`}
-      style={{ fontFamily: "DM Mono, monospace" }}
+      className={`shrink-0 rounded-full border px-2.5 py-1 text-center text-[12px] font-bold leading-[14px] ${done ? "border-primary/40 bg-primary/20 text-primary" : "border-secondary/50 bg-secondary/25 text-secondary-foreground"}`}
+      style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
     >
       x{label}
     </span>
   );
 }
 
-export function PulseRings({ trigger }: { trigger: number }) {
+export function PulseRings({ trigger, size = 200 }: { trigger: number; size?: number }) {
   return (
     <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">
-      {[0, 120, 240].map((delay, i) => (
-        <div
-          key={i}
-          className="absolute rounded-full border-2 border-primary pulse-ring"
-          style={{
-            width: `${148 + i * 44}px`,
-            height: `${148 + i * 44}px`,
-            animationDuration: "700ms",
-            animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
-            animationFillMode: "forwards",
-            animationDelay: `${delay}ms`,
-            opacity: 0,
-          }}
-        />
-      ))}
+      <div
+        className="absolute rounded-full border border-primary/60 pulse-ring"
+        style={{
+          width: `${size - 8}px`,
+          height: `${size - 8}px`,
+          animationDuration: "260ms",
+          animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
+          animationFillMode: "forwards",
+          opacity: 0,
+        }}
+      />
     </div>
   );
 }
