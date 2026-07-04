@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { AppLanguage } from "../../types";
 
-const LANGUAGES_LIST = [
+export const LANGUAGES_LIST = [
   { code: "en", flag: "🇬🇧", native: "English",          name: "English" },
   { code: "ar", flag: "🇸🇦", native: "العربية",         name: "Arabic" },
   { code: "fr", flag: "🇫🇷", native: "Français",          name: "French" },

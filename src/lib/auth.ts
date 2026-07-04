@@ -131,10 +131,7 @@ type RemoteProfileRow = {
 
 type RemoteSettingsRow = {
   dark_mode: boolean;
-  settings_json?: {
-    showTransliteration?: boolean;
-    showTranslation?: boolean;
-  } | null;
+  settings_json?: Partial<AppStateSnapshot["settings"]> | null;
 };
 
 type RemoteProgressRow = {
@@ -173,6 +170,15 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       darkMode: settings?.dark_mode ?? localState.settings.darkMode,
       showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
       showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
+      textSize: settings?.settings_json?.textSize ?? localState.settings.textSize,
+      highContrast: settings?.settings_json?.highContrast ?? localState.settings.highContrast,
+      boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
+      reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
+      hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
+      forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
+      voiceOver: settings?.settings_json?.voiceOver ?? localState.settings.voiceOver,
+      audioQuality: settings?.settings_json?.audioQuality ?? localState.settings.audioQuality,
+      colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
     },
     profile: {
       displayName: profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
@@ -213,6 +219,15 @@ export async function syncRemoteState(session: Session, state: AppStateSnapshot,
       language: state.settings.language,
       showTransliteration: state.settings.showTransliteration,
       showTranslation: state.settings.showTranslation,
+      textSize: state.settings.textSize,
+      highContrast: state.settings.highContrast,
+      boldText: state.settings.boldText,
+      reduceMotion: state.settings.reduceMotion,
+      hapticFeedback: state.settings.hapticFeedback,
+      forceRtl: state.settings.forceRtl,
+      voiceOver: state.settings.voiceOver,
+      audioQuality: state.settings.audioQuality,
+      colorBlindSupport: state.settings.colorBlindSupport,
     },
     updated_at: new Date().toISOString(),
   };

@@ -18,7 +18,7 @@ import { t } from "./i18n";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "./content/azkar";
 import { CATEGORIES } from "./content/categories";
 import { T } from "./theme";
-import type { AppLanguage, CategoryId } from "./types";
+import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "./types";
 import {
   getCurrentSession,
   loadRemoteState,
@@ -83,6 +83,15 @@ export default function App() {
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
+  const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
+  const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
+  const [boldText, setBoldText] = useState(initialState.settings.boldText);
+  const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
+  const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
+  const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
+  const [voiceOver, setVoiceOver] = useState(initialState.settings.voiceOver);
+  const [audioQuality, setAudioQuality] = useState<AudioQuality>(initialState.settings.audioQuality);
+  const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(initialState.settings.colorBlindSupport);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -98,14 +107,29 @@ export default function App() {
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
+  const useRtlLayout = isArabic || forceRtl;
 
   // Apply theme class to root
   useEffect(() => {
+    const fontSizeMap: Record<TextSizeOption, string> = {
+      small: "14px",
+      medium: "16px",
+      large: "18px",
+    };
+
     document.documentElement.classList.toggle("dark", darkMode);
     document.documentElement.classList.toggle("light-mode", !darkMode);
+    document.documentElement.classList.toggle("high-contrast", highContrast);
+    document.documentElement.classList.toggle("bold-text", boldText);
+    document.documentElement.classList.toggle("reduce-motion", reduceMotion);
+    document.documentElement.classList.toggle("screen-reader-mode", voiceOver);
     document.documentElement.lang = selectedLang;
-    document.documentElement.dir = selectedLang === "ar" ? "rtl" : "ltr";
-  }, [darkMode, selectedLang]);
+    document.documentElement.dir = useRtlLayout ? "rtl" : "ltr";
+    document.documentElement.style.setProperty("--font-size", fontSizeMap[textSize]);
+    document.documentElement.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
+    document.documentElement.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
+    document.documentElement.dataset.colorBlindSupport = colorBlindSupport;
+  }, [boldText, colorBlindSupport, darkMode, highContrast, reduceMotion, selectedLang, textSize, useRtlLayout, voiceOver]);
 
   useEffect(() => {
     saveAppState({
@@ -114,6 +138,15 @@ export default function App() {
         darkMode,
         showTransliteration,
         showTranslation,
+        textSize,
+        highContrast,
+        boldText,
+        reduceMotion,
+        hapticFeedback,
+        forceRtl,
+        voiceOver,
+        audioQuality,
+        colorBlindSupport,
       },
       profile: {
         displayName,
@@ -123,7 +156,7 @@ export default function App() {
       completed: fromCompletedSets(completed),
       sessions,
     });
-  }, [completed, darkMode, displayName, isGuest, lastPhoneNumber, selectedLang, sessions, showTranslation, showTransliteration]);
+  }, [audioQuality, boldText, colorBlindSupport, completed, darkMode, displayName, forceRtl, hapticFeedback, highContrast, isGuest, lastPhoneNumber, reduceMotion, selectedLang, sessions, showTranslation, showTransliteration, textSize, voiceOver]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -147,6 +180,15 @@ export default function App() {
               darkMode,
               showTransliteration,
               showTranslation,
+              textSize,
+              highContrast,
+              boldText,
+              reduceMotion,
+              hapticFeedback,
+              forceRtl,
+              voiceOver,
+              audioQuality,
+              colorBlindSupport,
             },
             profile: {
               displayName,
@@ -161,6 +203,15 @@ export default function App() {
           setDarkMode(mergedState.settings.darkMode);
           setShowTransliteration(mergedState.settings.showTransliteration);
           setShowTranslation(mergedState.settings.showTranslation);
+          setTextSize(mergedState.settings.textSize);
+          setHighContrast(mergedState.settings.highContrast);
+          setBoldText(mergedState.settings.boldText);
+          setReduceMotion(mergedState.settings.reduceMotion);
+          setHapticFeedback(mergedState.settings.hapticFeedback);
+          setForceRtl(mergedState.settings.forceRtl);
+          setVoiceOver(mergedState.settings.voiceOver);
+          setAudioQuality(mergedState.settings.audioQuality);
+          setColorBlindSupport(mergedState.settings.colorBlindSupport);
           setDisplayName(mergedState.profile.displayName);
           setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
           setIsGuest(false);
@@ -224,6 +275,15 @@ export default function App() {
               darkMode,
               showTransliteration,
               showTranslation,
+              textSize,
+              highContrast,
+              boldText,
+              reduceMotion,
+              hapticFeedback,
+              forceRtl,
+              voiceOver,
+              audioQuality,
+              colorBlindSupport,
             },
             profile: {
               displayName,
@@ -251,7 +311,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [authSessionLoaded, completed, currentStreak, darkMode, displayName, isGuest, lastPhoneNumber, longestStreak, selectedLang, sessions, showTranslation, showTransliteration]);
+  }, [audioQuality, authSessionLoaded, boldText, colorBlindSupport, completed, currentStreak, darkMode, displayName, forceRtl, hapticFeedback, highContrast, isGuest, lastPhoneNumber, longestStreak, reduceMotion, selectedLang, sessions, showTranslation, showTransliteration, textSize, voiceOver]);
 
   const push = useCallback((to: View) => {
     setHistory(h => [...h, view]);
@@ -337,6 +397,15 @@ export default function App() {
           darkMode,
           showTransliteration,
           showTranslation,
+          textSize,
+          highContrast,
+          boldText,
+          reduceMotion,
+          hapticFeedback,
+          forceRtl,
+          voiceOver,
+          audioQuality,
+          colorBlindSupport,
         },
         profile: {
           displayName,
@@ -351,6 +420,15 @@ export default function App() {
       setDarkMode(mergedState.settings.darkMode);
       setShowTransliteration(mergedState.settings.showTransliteration);
       setShowTranslation(mergedState.settings.showTranslation);
+      setTextSize(mergedState.settings.textSize);
+      setHighContrast(mergedState.settings.highContrast);
+      setBoldText(mergedState.settings.boldText);
+      setReduceMotion(mergedState.settings.reduceMotion);
+      setHapticFeedback(mergedState.settings.hapticFeedback);
+      setForceRtl(mergedState.settings.forceRtl);
+      setVoiceOver(mergedState.settings.voiceOver);
+      setAudioQuality(mergedState.settings.audioQuality);
+      setColorBlindSupport(mergedState.settings.colorBlindSupport);
       setDisplayName(mergedState.profile.displayName);
       setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
       setCompleted(toCompletedSets(mergedState.completed));
@@ -573,10 +651,28 @@ export default function App() {
               darkMode={darkMode}
               languageLabel={languageLabel}
               language={selectedLang}
-              isArabic={isArabic}
               isGuest={isGuest}
               isSyncing={isSyncingRemote}
+              textSize={textSize}
+              highContrast={highContrast}
+              boldText={boldText}
+              reduceMotion={reduceMotion}
+              hapticFeedback={hapticFeedback}
+              forceRtl={forceRtl}
+              voiceOver={voiceOver}
+              audioQuality={audioQuality}
+              colorBlindSupport={colorBlindSupport}
+              onLanguageChange={setSelectedLang}
               onToggleDark={() => setDarkMode(d => !d)}
+              onTextSizeChange={setTextSize}
+              onHighContrastChange={setHighContrast}
+              onBoldTextChange={setBoldText}
+              onReduceMotionChange={setReduceMotion}
+              onHapticFeedbackChange={setHapticFeedback}
+              onForceRtlChange={setForceRtl}
+              onVoiceOverChange={setVoiceOver}
+              onAudioQualityChange={setAudioQuality}
+              onColorBlindSupportChange={setColorBlindSupport}
               onSignOut={handleSignOut}
               onBack={pop}
             />

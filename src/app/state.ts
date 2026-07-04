@@ -1,4 +1,4 @@
-import type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
+import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, StoredSession } from "./types";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
@@ -10,6 +10,15 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     darkMode: true,
     showTransliteration: false,
     showTranslation: false,
+    textSize: "medium",
+    highContrast: false,
+    boldText: false,
+    reduceMotion: false,
+    hapticFeedback: true,
+    forceRtl: false,
+    voiceOver: false,
+    audioQuality: "high",
+    colorBlindSupport: "none",
   },
   profile: {
     displayName: "Guest",
@@ -26,6 +35,18 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
 
 function isLanguage(value: string): value is AppLanguage {
   return ["en", "ar", "fr", "ur", "tr", "id", "ml", "ha"].includes(value);
+}
+
+function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
+  return ["small", "medium", "large"].includes(value);
+}
+
+function isAudioQuality(value: string): value is AppStateSnapshot["settings"]["audioQuality"] {
+  return ["standard", "high"].includes(value);
+}
+
+function isColorBlindSupport(value: string): value is ColorBlindSupport {
+  return ["none", "deuteranopia", "protanopia", "tritanopia"].includes(value);
 }
 
 function dedupeAndSort(values: unknown): number[] {
@@ -61,6 +82,42 @@ export function loadAppState(): AppStateSnapshot {
           typeof parsed.settings?.showTranslation === "boolean"
             ? parsed.settings.showTranslation
             : DEFAULT_APP_STATE.settings.showTranslation,
+        textSize:
+          parsed.settings?.textSize && isTextSize(parsed.settings.textSize)
+            ? parsed.settings.textSize
+            : DEFAULT_APP_STATE.settings.textSize,
+        highContrast:
+          typeof parsed.settings?.highContrast === "boolean"
+            ? parsed.settings.highContrast
+            : DEFAULT_APP_STATE.settings.highContrast,
+        boldText:
+          typeof parsed.settings?.boldText === "boolean"
+            ? parsed.settings.boldText
+            : DEFAULT_APP_STATE.settings.boldText,
+        reduceMotion:
+          typeof parsed.settings?.reduceMotion === "boolean"
+            ? parsed.settings.reduceMotion
+            : DEFAULT_APP_STATE.settings.reduceMotion,
+        hapticFeedback:
+          typeof parsed.settings?.hapticFeedback === "boolean"
+            ? parsed.settings.hapticFeedback
+            : DEFAULT_APP_STATE.settings.hapticFeedback,
+        forceRtl:
+          typeof parsed.settings?.forceRtl === "boolean"
+            ? parsed.settings.forceRtl
+            : DEFAULT_APP_STATE.settings.forceRtl,
+        voiceOver:
+          typeof parsed.settings?.voiceOver === "boolean"
+            ? parsed.settings.voiceOver
+            : DEFAULT_APP_STATE.settings.voiceOver,
+        audioQuality:
+          parsed.settings?.audioQuality && isAudioQuality(parsed.settings.audioQuality)
+            ? parsed.settings.audioQuality
+            : DEFAULT_APP_STATE.settings.audioQuality,
+        colorBlindSupport:
+          parsed.settings?.colorBlindSupport && isColorBlindSupport(parsed.settings.colorBlindSupport)
+            ? parsed.settings.colorBlindSupport
+            : DEFAULT_APP_STATE.settings.colorBlindSupport,
       },
       profile: {
         displayName: parsed.profile?.displayName?.trim() || DEFAULT_APP_STATE.profile.displayName,
@@ -136,6 +193,15 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       darkMode: incoming.settings?.darkMode ?? base.settings.darkMode,
       showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
       showTranslation: incoming.settings?.showTranslation ?? base.settings.showTranslation,
+      textSize: incoming.settings?.textSize ?? base.settings.textSize,
+      highContrast: incoming.settings?.highContrast ?? base.settings.highContrast,
+      boldText: incoming.settings?.boldText ?? base.settings.boldText,
+      reduceMotion: incoming.settings?.reduceMotion ?? base.settings.reduceMotion,
+      hapticFeedback: incoming.settings?.hapticFeedback ?? base.settings.hapticFeedback,
+      forceRtl: incoming.settings?.forceRtl ?? base.settings.forceRtl,
+      voiceOver: incoming.settings?.voiceOver ?? base.settings.voiceOver,
+      audioQuality: incoming.settings?.audioQuality ?? base.settings.audioQuality,
+      colorBlindSupport: incoming.settings?.colorBlindSupport ?? base.settings.colorBlindSupport,
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || base.profile.displayName,

@@ -1,36 +1,74 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
+import type { AppLanguage, AudioQuality, ColorBlindSupport, TextSizeOption } from "../../types";
 import { t } from "../../i18n";
-import type { AppLanguage } from "../../types";
-import { 
-  SettingsRootPanel, 
-  AccessibilityPanel, 
-  DownloadsPanel, 
-  NotificationsPanel, 
-  ProgressPanel, 
+import {
   AboutPanel,
-  SettingsSubScreen
+  AccessibilityPanel,
+  AudioPanel,
+  DownloadsPanel,
+  LanguagePanel,
+  NotificationsPanel,
+  ProgressPanel,
+  SettingsRootPanel,
+  type SettingsSubScreen,
 } from "./SettingsPanels";
 
 export function SettingsScreen({
   darkMode,
   languageLabel,
   language,
-  isArabic,
   isGuest,
   isSyncing,
+  textSize,
+  highContrast,
+  boldText,
+  reduceMotion,
+  hapticFeedback,
+  forceRtl,
+  voiceOver,
+  audioQuality,
+  colorBlindSupport,
+  onLanguageChange,
   onToggleDark,
+  onTextSizeChange,
+  onHighContrastChange,
+  onBoldTextChange,
+  onReduceMotionChange,
+  onHapticFeedbackChange,
+  onForceRtlChange,
+  onVoiceOverChange,
+  onAudioQualityChange,
+  onColorBlindSupportChange,
   onSignOut,
   onBack,
 }: {
   darkMode: boolean;
   languageLabel: string;
   language: AppLanguage;
-  isArabic: boolean;
   isGuest: boolean;
   isSyncing: boolean;
+  textSize: TextSizeOption;
+  highContrast: boolean;
+  boldText: boolean;
+  reduceMotion: boolean;
+  hapticFeedback: boolean;
+  forceRtl: boolean;
+  voiceOver: boolean;
+  audioQuality: AudioQuality;
+  colorBlindSupport: ColorBlindSupport;
+  onLanguageChange: (value: AppLanguage) => void;
   onToggleDark: () => void;
+  onTextSizeChange: (value: TextSizeOption) => void;
+  onHighContrastChange: (value: boolean) => void;
+  onBoldTextChange: (value: boolean) => void;
+  onReduceMotionChange: (value: boolean) => void;
+  onHapticFeedbackChange: (value: boolean) => void;
+  onForceRtlChange: (value: boolean) => void;
+  onVoiceOverChange: (value: boolean) => void;
+  onAudioQualityChange: (value: AudioQuality) => void;
+  onColorBlindSupportChange: (value: ColorBlindSupport) => void;
   onSignOut: () => void;
   onBack: () => void;
 }) {
@@ -38,16 +76,21 @@ export function SettingsScreen({
   const goBack = () => setSub("root");
 
   return (
-    <div className="flex flex-col h-full bg-background relative overflow-hidden">
+    <div className="relative flex h-full flex-col overflow-hidden bg-background">
       {sub === "root" && (
-        <motion.div className="flex flex-col h-full w-full absolute inset-0"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+        <motion.div
+          className="absolute inset-0 flex h-full w-full flex-col"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+        >
           <Header title={t(language, "common.settings")} onBack={onBack} />
           <SettingsRootPanel
             onNav={setSub}
             language={language}
             darkMode={darkMode}
             languageLabel={languageLabel}
+            audioQuality={audioQuality}
+            textSize={textSize}
             isGuest={isGuest}
             isSyncing={isSyncing}
             onToggleDark={onToggleDark}
@@ -55,11 +98,38 @@ export function SettingsScreen({
           />
         </motion.div>
       )}
-      {sub === "accessibility"  && <AccessibilityPanel  onBack={goBack} />}
-      {sub === "downloads"      && <DownloadsPanel       onBack={goBack} />}
-      {sub === "notifications"  && <NotificationsPanel  onBack={goBack} />}
-      {sub === "progress"       && <ProgressPanel        onBack={goBack} />}
-      {sub === "about"          && <AboutPanel           onBack={goBack} />}
+      {sub === "language" && (
+        <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
+      )}
+      {sub === "audio" && (
+        <AudioPanel language={language} audioQuality={audioQuality} onChange={onAudioQualityChange} onBack={goBack} />
+      )}
+      {sub === "accessibility" && (
+        <AccessibilityPanel
+          language={language}
+          textSize={textSize}
+          highContrast={highContrast}
+          boldText={boldText}
+          reduceMotion={reduceMotion}
+          hapticFeedback={hapticFeedback}
+          forceRtl={forceRtl}
+          voiceOver={voiceOver}
+          colorBlindSupport={colorBlindSupport}
+          onTextSizeChange={onTextSizeChange}
+          onHighContrastChange={onHighContrastChange}
+          onBoldTextChange={onBoldTextChange}
+          onReduceMotionChange={onReduceMotionChange}
+          onHapticFeedbackChange={onHapticFeedbackChange}
+          onForceRtlChange={onForceRtlChange}
+          onVoiceOverChange={onVoiceOverChange}
+          onColorBlindSupportChange={onColorBlindSupportChange}
+          onBack={goBack}
+        />
+      )}
+      {sub === "downloads" && <DownloadsPanel onBack={goBack} />}
+      {sub === "notifications" && <NotificationsPanel onBack={goBack} />}
+      {sub === "progress" && <ProgressPanel onBack={goBack} />}
+      {sub === "about" && <AboutPanel onBack={goBack} />}
     </div>
   );
 }

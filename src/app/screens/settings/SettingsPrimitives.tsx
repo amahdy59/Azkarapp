@@ -31,18 +31,30 @@ export interface SettingsRowProps {
 }
 
 export function SettingsRowItem({ icon, iconBg = "var(--muted)", label, right, onPress, hasDivider = true }: SettingsRowProps) {
+  const content = (
+    <>
+      <div className="flex items-center justify-center rounded-xl shrink-0" style={{ width: 36, height: 36, background: iconBg }}>
+        {icon}
+      </div>
+      <p className="flex-1 text-start text-[16px] font-semibold text-foreground font-sans">{label}</p>
+      {right}
+    </>
+  );
+
   return (
     <div className="relative">
-      <button
-        onClick={onPress}
-        className="w-full flex items-center gap-4 px-4 transition-all active:opacity-70 bg-card h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
-      >
-        <div className="flex items-center justify-center rounded-xl shrink-0" style={{ width: 36, height: 36, background: iconBg }}>
-          {icon}
+      {onPress ? (
+        <button
+          onClick={onPress}
+          className="w-full flex items-center gap-4 px-4 transition-all active:opacity-70 bg-card h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        >
+          {content}
+        </button>
+      ) : (
+        <div className="w-full flex items-center gap-4 px-4 bg-card h-[60px]">
+          {content}
         </div>
-        <p className="flex-1 text-start text-[16px] font-semibold text-foreground font-sans">{label}</p>
-        {right}
-      </button>
+      )}
       {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 68 }} />}
     </div>
   );
@@ -56,11 +68,11 @@ export function RowChevron() {
   );
 }
 
-export function RowValue({ value }: { value: string }) {
+export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
   return (
     <div className="flex items-center gap-1.5">
       <p className="text-[15px] text-foreground/90 font-sans">{value}</p>
-      <RowChevron />
+      {withChevron && <RowChevron />}
     </div>
   );
 }
