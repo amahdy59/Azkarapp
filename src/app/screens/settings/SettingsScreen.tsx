@@ -41,7 +41,7 @@ export function SettingsScreen({
     <div className="flex flex-col h-full bg-background relative overflow-hidden">
       {sub === "root" && (
         <motion.div className="flex flex-col h-full w-full absolute inset-0"
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
           <Header title={t(language, "common.settings")} onBack={onBack} />
           <SettingsRootPanel
             onNav={setSub}
