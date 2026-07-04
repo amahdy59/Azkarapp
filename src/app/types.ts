@@ -26,6 +26,8 @@ export interface StoredSession {
 export interface UserSettingsState {
   language: AppLanguage;
   darkMode: boolean;
+  showTransliteration: boolean;
+  showTranslation: boolean;
 }
 
 export interface UserProfileState {

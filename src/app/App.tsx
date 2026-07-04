@@ -81,6 +81,8 @@ export default function App() {
   const [darkMode, setDarkMode]     = useState(initialState.settings.darkMode);
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
+  const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
+  const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -110,6 +112,8 @@ export default function App() {
       settings: {
         language: selectedLang,
         darkMode,
+        showTransliteration,
+        showTranslation,
       },
       profile: {
         displayName,
@@ -119,7 +123,7 @@ export default function App() {
       completed: fromCompletedSets(completed),
       sessions,
     });
-  }, [completed, darkMode, displayName, isGuest, lastPhoneNumber, selectedLang, sessions]);
+  }, [completed, darkMode, displayName, isGuest, lastPhoneNumber, selectedLang, sessions, showTranslation, showTransliteration]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -141,6 +145,8 @@ export default function App() {
             settings: {
               language: selectedLang,
               darkMode,
+              showTransliteration,
+              showTranslation,
             },
             profile: {
               displayName,
@@ -153,6 +159,8 @@ export default function App() {
 
           setSelectedLang(mergedState.settings.language);
           setDarkMode(mergedState.settings.darkMode);
+          setShowTransliteration(mergedState.settings.showTransliteration);
+          setShowTranslation(mergedState.settings.showTranslation);
           setDisplayName(mergedState.profile.displayName);
           setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
           setIsGuest(false);
@@ -214,6 +222,8 @@ export default function App() {
             settings: {
               language: selectedLang,
               darkMode,
+              showTransliteration,
+              showTranslation,
             },
             profile: {
               displayName,
@@ -241,7 +251,7 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [authSessionLoaded, completed, currentStreak, darkMode, displayName, isGuest, lastPhoneNumber, longestStreak, selectedLang, sessions]);
+  }, [authSessionLoaded, completed, currentStreak, darkMode, displayName, isGuest, lastPhoneNumber, longestStreak, selectedLang, sessions, showTranslation, showTransliteration]);
 
   const push = useCallback((to: View) => {
     setHistory(h => [...h, view]);
@@ -325,6 +335,8 @@ export default function App() {
         settings: {
           language: selectedLang,
           darkMode,
+          showTransliteration,
+          showTranslation,
         },
         profile: {
           displayName,
@@ -337,6 +349,8 @@ export default function App() {
 
       setSelectedLang(mergedState.settings.language);
       setDarkMode(mergedState.settings.darkMode);
+      setShowTransliteration(mergedState.settings.showTransliteration);
+      setShowTranslation(mergedState.settings.showTranslation);
       setDisplayName(mergedState.profile.displayName);
       setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
       setCompleted(toCompletedSets(mergedState.completed));
@@ -527,8 +541,12 @@ export default function App() {
           {view === "reader" && (
             <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
               isDone={completed[activeCat]?.has(activeIdx) ?? false}
+              showTransliteration={showTransliteration}
+              showTranslation={showTranslation}
               onBack={pop}
               onCounter={() => { setSessionStart(Date.now()); openCounter(); }}
+              onToggleTransliteration={() => setShowTransliteration(value => !value)}
+              onToggleTranslation={() => setShowTranslation(value => !value)}
               onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}
               onPrev={() => { if (activeIdx > 0) setActiveIdx(i => i - 1); }}
             />
@@ -540,6 +558,9 @@ export default function App() {
               onComplete={markComplete}
               onPrev={() => { if (activeIdx > 0) setActiveIdx(i => i - 1); }}
               onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}
+              showTransliteration={showTransliteration}
+              showTranslation={showTranslation}
+              isArabic={isArabic}
             />
           )}
           {view === "completion" && (

@@ -1,14 +1,34 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronLeft, RotateCcw, Check, SkipBack, SkipForward } from "lucide-react";
+import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import type { CategoryId } from "../types";
+import type { AppLanguage, CategoryId } from "../types";
 import { PulseRings, CounterRing } from "../components/ZikrComponents";
 
-export function CounterScreen({ catId, idx, initialCount, onBack, onComplete, onPrev, onNext, isArabic }:
-  { catId: CategoryId; idx: number; initialCount: number;
-    onBack: () => void; onComplete: (idx: number) => void;
-    onPrev: () => void; onNext: () => void; isArabic?: boolean }) {
+export function CounterScreen({
+  catId,
+  idx,
+  initialCount,
+  onBack,
+  onComplete,
+  onPrev,
+  onNext,
+  isArabic = false,
+  showTransliteration,
+  showTranslation,
+}: {
+  catId: CategoryId;
+  idx: number;
+  initialCount: number;
+  onBack: () => void;
+  onComplete: (idx: number) => void;
+  onPrev: () => void;
+  onNext: () => void;
+  isArabic?: boolean;
+  showTransliteration: boolean;
+  showTranslation: boolean;
+}) {
   const azkar = getAzkarByCategory(catId);
   const z = azkar[idx];
   const [count, setCount] = useState(initialCount);
@@ -17,22 +37,29 @@ export function CounterScreen({ catId, idx, initialCount, onBack, onComplete, on
   const [complete, setComplete] = useState(initialCount >= (z?.repetitionCount ?? 1));
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartX = useRef<number | null>(null);
+  const language: AppLanguage = isArabic ? "ar" : "en";
+  const category = CATEGORIES.find((item) => item.id === catId);
 
-  // Reset when zikr changes
   useEffect(() => {
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
   }, [idx, initialCount, z?.repetitionCount]);
 
-  if (!z) return null;
+  if (!z) {
+    return null;
+  }
 
   const handleTap = () => {
-    if (complete) return;
+    if (complete) {
+      return;
+    }
+
     const next = count + 1;
     setCount(next);
-    setPulse(p => p + 1);
+    setPulse((value) => value + 1);
     setFlash(true);
     setTimeout(() => setFlash(false), 120);
+
     if (next >= z.repetitionCount) {
       setComplete(true);
       setTimeout(() => onComplete(idx), 500);
@@ -43,140 +70,200 @@ export function CounterScreen({ catId, idx, initialCount, onBack, onComplete, on
     longPressTimer.current = setTimeout(() => {
       setCount(0);
       setComplete(false);
-      setPulse(p => p + 1);
+      setPulse((value) => value + 1);
     }, 600);
   };
 
   const handleLongPressEnd = () => {
-    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+    }
   };
 
   const handleSwipe = (dx: number) => {
     if (isArabic) {
-      if (dx > 60) onNext();
-      else if (dx < -60) onPrev();
-    } else {
-      if (dx > 60) onPrev();
-      else if (dx < -60) onNext();
+      if (dx > 60) {
+        onNext();
+      } else if (dx < -60) {
+        onPrev();
+      }
+      return;
+    }
+
+    if (dx > 60) {
+      onPrev();
+    } else if (dx < -60) {
+      onNext();
     }
   };
 
   const remaining = z.repetitionCount - count;
 
   return (
-    <div className="flex flex-col h-full select-none bg-background"
-      onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
-      onTouchEnd={e => { if (touchStartX.current !== null) { handleSwipe(e.changedTouches[0].clientX - touchStartX.current); touchStartX.current = null; } }}>
+    <div
+      className="flex h-full select-none flex-col bg-background"
+      onTouchStart={(event) => {
+        touchStartX.current = event.touches[0].clientX;
+      }}
+      onTouchEnd={(event) => {
+        if (touchStartX.current === null) {
+          return;
+        }
 
-      {/* Top bar — thin, non-interactive feel */}
-      <div className="flex items-center justify-between px-5 pt-4 pb-3 shrink-0">
-        <button onClick={onBack}
-          aria-label="Go back"
-          className="flex items-center justify-center rounded-full bg-card hover:bg-muted active:bg-muted w-11 h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <ChevronLeft size={20} className="text-foreground rtl:-scale-x-100" />
-        </button>
-        <div className="text-center">
-          <p className="text-[12px] text-muted-foreground font-sans font-bold uppercase tracking-[0.08em]">
-            {CATEGORIES.find(c => c.id === catId)?.name}
-          </p>
-          <p className="text-[14px] text-secondary-foreground font-sans font-semibold">
-            Zikr {idx + 1} of {azkar.length}
-          </p>
+        handleSwipe(event.changedTouches[0].clientX - touchStartX.current);
+        touchStartX.current = null;
+      }}
+    >
+      <div className="shrink-0 px-5 pb-3 pt-4">
+        <div className="flex items-center justify-between">
+          <button
+            onClick={onBack}
+            aria-label="Go back"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronLeft size={20} className="text-foreground rtl:-scale-x-100" />
+          </button>
+
+          <div className="text-center">
+            <p className="font-sans text-[12px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+              {isArabic ? category?.nameArabic : category?.name}
+            </p>
+            <p className="font-sans text-[14px] font-semibold text-secondary-foreground">
+              {t(language, "reader.title", { index: idx + 1, total: azkar.length })}
+            </p>
+          </div>
+
+          <button
+            onClick={() => {
+              setCount(0);
+              setComplete(false);
+            }}
+            aria-label={t(language, "reader.resetCounter")}
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <RotateCcw size={16} className="text-muted-foreground" />
+          </button>
         </div>
-        <button onClick={() => { setCount(0); setComplete(false); }}
-          aria-label="Reset counter"
-          className="flex items-center justify-center rounded-full bg-card hover:bg-muted active:bg-muted w-11 h-11 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <RotateCcw size={16} className="text-muted-foreground" />
-        </button>
       </div>
 
-      {/* Arabic snippet */}
-      <div className="px-6 pb-4 shrink-0">
-        <p className="text-center text-[18px] text-muted-foreground leading-[32px]"
-          style={{ fontFamily: "'Noto Naskh Arabic', serif", direction: "rtl" }}>
-          {z.arabicText.split("\n")[0]}
-        </p>
+      <div className="shrink-0 px-6 pb-4">
+        <div className="rounded-2xl border border-border bg-card px-4 py-4">
+          <p
+            className="text-center text-[18px] leading-[32px] text-foreground"
+            style={{ fontFamily: "'Noto Naskh Arabic', serif", direction: "rtl" }}
+          >
+            {z.arabicText}
+          </p>
+          {showTransliteration && (
+            <p className="mt-3 text-center font-sans text-[12px] italic leading-[18px] text-muted-foreground">
+              {z.transliteration}
+            </p>
+          )}
+          {showTranslation && (
+            <p className="mt-3 text-center font-sans text-[13px] leading-[20px] text-secondary-foreground">
+              {z.translation}
+            </p>
+          )}
+        </div>
       </div>
 
-      {/* Full-screen tap zone */}
       <div
         role="button"
         tabIndex={0}
-        aria-label={`Tap to count. Current count ${count} of ${z.repetitionCount}`}
-        className="flex-1 flex flex-col items-center justify-center relative cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring inset-ring-0 rounded-3xl mx-4"
+        aria-label={`${t(language, "reader.tapAnywhere")} ${count} / ${z.repetitionCount}`}
+        className="relative mx-4 flex flex-1 cursor-pointer flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
         onClick={handleTap}
-        onKeyDown={(e) => { if (e.key === ' ' || e.key === 'Enter') handleTap(); }}
+        onKeyDown={(event) => {
+          if (event.key === " " || event.key === "Enter") {
+            handleTap();
+          }
+        }}
         onMouseDown={handleLongPressStart}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
         onTouchStart={handleLongPressStart}
         onTouchEnd={handleLongPressEnd}
-        style={{ background: flash ? "color-mix(in srgb, var(--primary) 8%, transparent)" : "transparent", transition: "background 80ms" }}>
-
+        style={{
+          background: flash ? "color-mix(in srgb, var(--primary) 8%, transparent)" : "transparent",
+          transition: "background 80ms",
+        }}
+      >
         <PulseRings trigger={pulse} />
 
-        {/* Ring + count */}
-        <div className="relative flex items-center justify-center z-10 pointer-events-none">
+        <div className="relative z-10 flex items-center justify-center pointer-events-none">
           <CounterRing count={count} total={z.repetitionCount} size={200} />
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {complete ? (
               <>
-                <div className="flex items-center justify-center rounded-full mb-2 w-[52px] h-[52px] bg-primary">
+                <div className="mb-2 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary">
                   <Check size={26} className="text-primary-foreground" />
                 </div>
-                <p className="text-[14px] text-primary font-sans font-bold">Complete!</p>
+                <p className="font-sans text-[14px] font-bold text-primary">{t(language, "reader.complete")}</p>
               </>
             ) : (
               <>
-                <p className="text-[56px] font-extrabold text-primary leading-[60px]" style={{ fontFamily: "DM Mono, monospace" }}>{count}</p>
-                <p className="text-[16px] text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>of {z.repetitionCount}</p>
+                <p className="text-[56px] font-extrabold leading-[60px] text-primary" style={{ fontFamily: "DM Mono, monospace" }}>
+                  {count}
+                </p>
+                <p className="text-[16px] text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>
+                  / {z.repetitionCount}
+                </p>
               </>
             )}
           </div>
         </div>
 
-        {/* Tap hint */}
         {!complete && (
-          <p className="mt-8 z-10 text-[10px] text-muted-foreground font-sans font-bold uppercase tracking-[0.15em] pointer-events-none">
-            Tap anywhere to count
+          <p className="z-10 mt-8 font-sans text-[10px] font-bold uppercase tracking-[0.15em] text-muted-foreground pointer-events-none">
+            {t(language, "reader.tapAnywhere")}
           </p>
         )}
         {!complete && remaining <= 5 && remaining > 0 && (
-          <p className="mt-2 z-10 text-[13px] text-primary font-sans font-semibold pointer-events-none">
-            {remaining} more {remaining === 1 ? "time" : "times"}
+          <p className="z-10 mt-2 font-sans text-[13px] font-semibold text-primary pointer-events-none">
+            {t(language, "reader.remaining", { count: remaining })}
           </p>
         )}
         {!complete && (
-          <p className="absolute bottom-4 z-10 text-[10px] text-muted font-sans pointer-events-none">
-            Hold to reset
+          <p className="absolute bottom-4 z-10 font-sans text-[10px] text-muted pointer-events-none">
+            {t(language, "reader.holdToReset")}
           </p>
         )}
       </div>
 
-      {/* Bottom prev/next nav */}
-      <div className="flex items-center justify-between px-6 py-4 shrink-0 border-t border-border mt-4">
-        <button onClick={onPrev} disabled={idx === 0}
+      <div className="mt-4 flex shrink-0 items-center justify-between border-t border-border px-6 py-4">
+        <button
+          onClick={onPrev}
+          disabled={idx === 0}
           aria-label="Previous Zikr"
-          className="flex items-center gap-2 rounded-xl px-4 py-3 transition-all active:scale-95 bg-card disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+          className="flex items-center gap-2 rounded-xl bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
           <SkipBack size={16} className="text-secondary-foreground rtl:-scale-x-100" />
-          <span className="text-[13px] text-secondary-foreground font-sans font-semibold">Prev</span>
+          <span className="font-sans text-[13px] font-semibold text-secondary-foreground">{t(language, "reader.prev")}</span>
         </button>
 
-        {/* Dot indicators */}
         <div className="flex gap-1.5" aria-hidden="true">
-          {azkar.slice(Math.max(0, idx - 2), Math.min(azkar.length, idx + 3)).map((_, di) => {
-            const absIdx = Math.max(0, idx - 2) + di;
+          {azkar.slice(Math.max(0, idx - 2), Math.min(azkar.length, idx + 3)).map((_, indicatorIndex) => {
+            const absoluteIndex = Math.max(0, idx - 2) + indicatorIndex;
             return (
-              <div key={absIdx} className="rounded-full transition-all h-[6px]"
-                style={{ width: absIdx === idx ? 16 : 6, background: absIdx === idx ? "var(--primary)" : "var(--muted)" }} />
+              <div
+                key={absoluteIndex}
+                className="h-[6px] rounded-full transition-all"
+                style={{
+                  width: absoluteIndex === idx ? 16 : 6,
+                  background: absoluteIndex === idx ? "var(--primary)" : "var(--muted)",
+                }}
+              />
             );
           })}
         </div>
 
-        <button onClick={onNext} disabled={idx === azkar.length - 1}
+        <button
+          onClick={onNext}
+          disabled={idx === azkar.length - 1}
           aria-label="Next Zikr"
-          className="flex items-center gap-2 rounded-xl px-4 py-3 transition-all active:scale-95 bg-card disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
-          <span className="text-[13px] text-secondary-foreground font-sans font-semibold">Next</span>
+          className="flex items-center gap-2 rounded-xl bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <span className="font-sans text-[13px] font-semibold text-secondary-foreground">{t(language, "reader.next")}</span>
           <SkipForward size={16} className="text-secondary-foreground rtl:-scale-x-100" />
         </button>
       </div>

@@ -131,6 +131,10 @@ type RemoteProfileRow = {
 
 type RemoteSettingsRow = {
   dark_mode: boolean;
+  settings_json?: {
+    showTransliteration?: boolean;
+    showTranslation?: boolean;
+  } | null;
 };
 
 type RemoteProgressRow = {
@@ -153,7 +157,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
 
   const [{ data: profile }, { data: settings }, { data: progress }, { data: sessions }] = await Promise.all([
     client.from("profiles").select("display_name, phone, preferred_language").eq("id", userId).maybeSingle<RemoteProfileRow>(),
-    client.from("user_settings").select("dark_mode").eq("user_id", userId).maybeSingle<RemoteSettingsRow>(),
+    client.from("user_settings").select("dark_mode, settings_json").eq("user_id", userId).maybeSingle<RemoteSettingsRow>(),
     client.from("user_progress").select("completed").eq("user_id", userId).maybeSingle<RemoteProgressRow>(),
     client
       .from("session_history")
@@ -167,6 +171,8 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
     settings: {
       language: profile?.preferred_language ?? localState.settings.language,
       darkMode: settings?.dark_mode ?? localState.settings.darkMode,
+      showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
+      showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
     },
     profile: {
       displayName: profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
@@ -205,6 +211,8 @@ export async function syncRemoteState(session: Session, state: AppStateSnapshot,
     dark_mode: state.settings.darkMode,
     settings_json: {
       language: state.settings.language,
+      showTransliteration: state.settings.showTransliteration,
+      showTranslation: state.settings.showTranslation,
     },
     updated_at: new Date().toISOString(),
   };

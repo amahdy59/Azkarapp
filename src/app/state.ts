@@ -8,6 +8,8 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
     language: "en",
     darkMode: true,
+    showTransliteration: false,
+    showTranslation: false,
   },
   profile: {
     displayName: "Guest",
@@ -51,6 +53,14 @@ export function loadAppState(): AppStateSnapshot {
       settings: {
         language: parsed.settings?.language && isLanguage(parsed.settings.language) ? parsed.settings.language : DEFAULT_APP_STATE.settings.language,
         darkMode: typeof parsed.settings?.darkMode === "boolean" ? parsed.settings.darkMode : DEFAULT_APP_STATE.settings.darkMode,
+        showTransliteration:
+          typeof parsed.settings?.showTransliteration === "boolean"
+            ? parsed.settings.showTransliteration
+            : DEFAULT_APP_STATE.settings.showTransliteration,
+        showTranslation:
+          typeof parsed.settings?.showTranslation === "boolean"
+            ? parsed.settings.showTranslation
+            : DEFAULT_APP_STATE.settings.showTranslation,
       },
       profile: {
         displayName: parsed.profile?.displayName?.trim() || DEFAULT_APP_STATE.profile.displayName,
@@ -124,6 +134,8 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     settings: {
       language: incoming.settings?.language ?? base.settings.language,
       darkMode: incoming.settings?.darkMode ?? base.settings.darkMode,
+      showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
+      showTranslation: incoming.settings?.showTranslation ?? base.settings.showTranslation,
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || base.profile.displayName,
