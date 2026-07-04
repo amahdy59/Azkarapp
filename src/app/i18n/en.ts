@@ -35,6 +35,7 @@ const en = {
   reader: {
     title: "Zikr {index} of {total}",
     groupProgress: "Group progress",
+    progressSummary: "{done} of {total} zikr",
     completed: "Completed",
     benefit: "Details & Source",
     timing: "Recommended timing",

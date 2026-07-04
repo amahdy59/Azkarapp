@@ -292,3 +292,13 @@
 .waveform-bar {
   animation: waveform 1s ease-in-out infinite;
 }
+
+.zikr-scroll [data-slot="scroll-area-scrollbar"] {
+  width: 10px;
+  padding: 2px;
+}
+
+.zikr-scroll [data-slot="scroll-area-thumb"] {
+  background: color-mix(in srgb, var(--primary) 82%, var(--card));
+  border-radius: 9999px;
+}
