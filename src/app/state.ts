@@ -1,33 +1,6 @@
-export type AppLanguage = "en" | "ar" | "fr" | "ur" | "tr" | "id" | "ml" | "ha";
-export type CategoryId = "morning" | "evening" | "before_sleep";
+import type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
-export interface StoredSession {
-  id: string;
-  category: CategoryId;
-  completedAt: string;
-  completedCount: number;
-  totalCount: number;
-  durationSeconds: number;
-  isComplete: boolean;
-}
-
-export interface UserSettingsState {
-  language: AppLanguage;
-  darkMode: boolean;
-}
-
-export interface UserProfileState {
-  displayName: string;
-  lastPhoneNumber: string;
-  isGuest: boolean;
-}
-
-export interface AppStateSnapshot {
-  settings: UserSettingsState;
-  profile: UserProfileState;
-  completed: Record<CategoryId, number[]>;
-  sessions: StoredSession[];
-}
+export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
 const STORAGE_KEY = "azkarapp.state.v1";
 

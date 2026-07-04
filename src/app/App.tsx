@@ -3,7 +3,7 @@ import { motion } from "motion/react";
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   Home, BookOpen, Settings, Search, Check, Play, Pause,
-  Info, Flame, Share2, RotateCcw, X, Volume2, Wifi,
+  Info, Flame, Share2, RotateCcw, X, Volume2, Wifi, Bell, Download,
   SkipForward, SkipBack,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
@@ -13,9 +13,13 @@ import {
   loadAppState,
   saveAppState,
   toCompletedSets,
-  type AppLanguage,
   type StoredSession,
 } from "./state";
+import { t } from "./i18n";
+import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "./content/azkar";
+import { CATEGORIES } from "./content/categories";
+import { T } from "./theme";
+import type { AppLanguage, CategoryId } from "./types";
 import {
   getCurrentSession,
   loadRemoteState,
@@ -31,31 +35,6 @@ import {
 import { isSupabaseConfigured } from "../lib/supabase";
 
 // ─── Design tokens (match Azkar/Colors Figma vars) ────────────────────────────
-const T = {
-  bg:          "#0A1228",
-  surface:     "#111B35",
-  surfaceEl:   "#182040",
-  gold:        "#C8941A",
-  goldLight:   "#E8B420",
-  teal:        "#1A7060",
-  tealBg:      "#0A2B25",
-  textPrimary: "#F5F0E8",
-  textSec:     "#D4D0E0",
-  textMuted:   "#9290B0",
-  border:      "#182040",
-  success:     "#2D7A50",
-  danger:      "#C0392B",
-  // light mode
-  bgLight:     "#F8F5F0",
-  surfLight:   "#FFFFFF",
-  surfElLight: "#F2EEE9",
-  goldDark:    "#A87614",
-  textDarkL:   "#1A1228",
-  textSecL:    "#4A4570",
-  textMutedL:  "#8E8AAA",
-  borderLight: "#E5E0D8",
-};
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 type View =
   | "home" | "category" | "reader" | "counter" | "completion"
@@ -68,1057 +47,25 @@ type View =
   // Phase 4
   | "search";
 
-type CategoryId = "morning" | "evening" | "before_sleep";
 
-interface Zikr {
-  id: string;
-  arabicText: string;
-  transliteration: string;
-  translation: string;
-  benefit: string;
-  repetitionCount: number;
-  sourceReference: string;
-  category: CategoryId;
-  orderIndex: number;
-}
 
-// ─── Azkar content (Hisnul Muslim) ────────────────────────────────────────────
-const MORNING_AZKAR: Zikr[] = [
-  { id:"m1", category:"morning", orderIndex:0,
-    arabicText:"اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ\nلَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ",
-    transliteration:"Allahu la ilaha illa huwal-hayyul-qayyum, la ta'khudhuhu sinatun wa la nawm",
-    translation:"Allah — there is no deity except Him, the Ever-Living, the Sustainer of existence. Neither drowsiness overtakes Him nor sleep.",
-    benefit:"Whoever recites Ayat al-Kursi in the morning will be protected by Allah until evening, and whoever recites it in the evening will be protected until morning.",
-    repetitionCount:1, sourceReference:"Bukhari · 5010" },
-  { id:"m2", category:"morning", orderIndex:1,
-    arabicText:"أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ\nوَالْحَمْدُ لِلَّهِ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
-    transliteration:"Asbahna wa asbahal mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la shareeka lah",
-    translation:"We have reached the morning and at this very time unto Allah belongs all sovereignty, and all praise is for Allah.",
-    benefit:"The Prophet ﷺ used to say this every morning. It is a declaration of Allah's ownership of all things at the start of the day.",
-    repetitionCount:1, sourceReference:"Muslim · 2723" },
-  { id:"m3", category:"morning", orderIndex:2,
-    arabicText:"اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا\nوَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ النُّشُورُ",
-    transliteration:"Allahumma bika asbahna, wa bika amsayna, wa bika nahya, wa bika namutu, wa ilaykan-nushur",
-    translation:"O Allah, by Your leave we have reached the morning and by Your leave we reach the evening, by You we live and by You we die, and unto You is our resurrection.",
-    benefit:"This supplication acknowledges Allah's complete control over our lives — morning, evening, life and death.",
-    repetitionCount:1, sourceReference:"Tirmidhi · 3391" },
-  { id:"m4", category:"morning", orderIndex:3,
-    arabicText:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-    transliteration:"Subhanallahi wa bihamdih",
-    translation:"Glory is to Allah and praise is to Him.",
-    benefit:"Whoever says this 100 times in the morning will have his sins forgiven even if they are like the foam of the sea.",
-    repetitionCount:100, sourceReference:"Bukhari · 6405" },
-  { id:"m5", category:"morning", orderIndex:4,
-    arabicText:"اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
-    transliteration:"Allahumma salli wa sallim 'ala nabiyyina Muhammad",
-    translation:"O Allah, send prayers and peace upon our Prophet Muhammad.",
-    benefit:"Whoever sends blessings upon me once, Allah sends blessings upon him tenfold and erases ten sins from him.",
-    repetitionCount:10, sourceReference:"Muslim · 408" },
-  { id:"m6", category:"morning", orderIndex:5,
-    arabicText:"رَضِيتُ بِاللَّهِ رَبًّا وَبِالإِسْلَامِ دِينًا\nوَبِمُحَمَّدٍ ﷺ نَبِيًّا",
-    transliteration:"Radeetu billahi rabban, wa bil-islami deenan, wa bi-muhammadin sallallahu 'alayhi wa sallama nabiyya",
-    translation:"I am pleased with Allah as my Lord, with Islam as my religion, and with Muhammad ﷺ as my Prophet.",
-    benefit:"It is the right of Allah upon every Muslim who says this three times each morning and evening that He should please them on the Day of Resurrection.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5072" },
-  { id:"m7", category:"morning", orderIndex:6,
-    arabicText:"يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\nأَصْلِحْ لِي شَأْنِي كُلَّهُ",
-    transliteration:"Ya Hayyu ya Qayyumu, birahmatika astaghith, aslih li sha'ni kullahu",
-    translation:"O Ever-Living, O Self-Sustaining, by Your mercy I seek assistance. Rectify for me all of my affairs.",
-    benefit:"The Prophet ﷺ taught this to Fatimah (may Allah be pleased with her) to recite every morning and evening.",
-    repetitionCount:1, sourceReference:"Hakim · 1/545" },
-  { id:"m8", category:"morning", orderIndex:7,
-    arabicText:"أَصْبَحْتُ أُشْهِدُ اللَّهَ وَحَمَلَةَ عَرْشِهِ\nوَمَلَائِكَتَهُ وَجَمِيعَ خَلْقِهِ أَنَّهُ لَا إِلَهَ إِلَّا هُوَ",
-    transliteration:"Asbahtu ushhidullaha wa hamalata 'arshih, wa mala'ikatahu wa jami'a khalqih, annahu la ilaha illa hu",
-    translation:"I take as witness Allah and His angels who carry the Throne, and all of His creation: that there is no deity except Him.",
-    benefit:"Whoever says this four times in the morning, Allah frees a quarter of them from the Fire for each recitation.",
-    repetitionCount:4, sourceReference:"Abu Dawud · 5069" },
-  { id:"m9", category:"morning", orderIndex:8,
-    arabicText:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ\nفِي الدُّنْيَا وَالْآخِرَةِ",
-    transliteration:"Allahumma inni as'alukal-'afiyata fid-dunya wal-akhirah",
-    translation:"O Allah, I ask You for well-being in this world and in the Hereafter.",
-    benefit:"No one has been given anything better than well-being and certainty, so ask Allah for them.",
-    repetitionCount:1, sourceReference:"Ibn Majah · 3871" },
-  { id:"m10", category:"morning", orderIndex:9,
-    arabicText:"سُبْحَانَ اللَّهِ وَالْحَمْدُ لِلَّهِ\nوَلَا إِلَهَ إِلَّا اللَّهُ وَاللَّهُ أَكْبَرُ",
-    transliteration:"Subhanallah, walhamdu lillah, wa la ilaha illallah, wallahu akbar",
-    translation:"Glory is to Allah, and praise is to Allah, and none has the right to be worshipped except Allah, and Allah is the Greatest.",
-    benefit:"These four phrases are the most beloved words to Allah. It does not matter which one you start with.",
-    repetitionCount:33, sourceReference:"Muslim · 2137" },
-  { id:"m11", category:"morning", orderIndex:10,
-    arabicText:"اللَّهُمَّ عَافِنِي فِي بَدَنِي\nاللَّهُمَّ عَافِنِي فِي سَمْعِي وَبَصَرِي",
-    transliteration:"Allahumma 'afini fi badani, Allahumma 'afini fi sam'i wa basari",
-    translation:"O Allah, grant me health in my body. O Allah, grant me health in my hearing and sight.",
-    benefit:"Abu Bakr (may Allah be pleased with him) used to recite this supplication every morning and evening.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5090" },
-  { id:"m12", category:"morning", orderIndex:11,
-    arabicText:"اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ\nوَأَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ",
-    transliteration:"Allahumma inni a'udhu bika minal-kufri wal-faqr, wa a'udhu bika min 'adhabil-qabr",
-    translation:"O Allah, I seek refuge with You from disbelief and poverty, and I seek refuge with You from the punishment of the grave.",
-    benefit:"This supplication protects against three of the greatest trials: disbelief, poverty, and punishment in the grave.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5090" },
-  { id:"m13", category:"morning", orderIndex:12,
-    arabicText:"حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ\nعَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
-    transliteration:"Hasbiyallahu la ilaha illa huwa 'alayhi tawakkaltu wa huwa rabbul-'arshil-'azim",
-    translation:"Allah is sufficient for me. None has the right to be worshipped except Him. Upon Him I rely and He is the Lord of the Exalted Throne.",
-    benefit:"Whoever says this seven times each morning and evening, Allah will take care of whatever concerns them.",
-    repetitionCount:7, sourceReference:"Abu Dawud · 5081" },
-  { id:"m14", category:"morning", orderIndex:13,
-    arabicText:"بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ\nفِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-    transliteration:"Bismillahil-ladhi la yadurru ma'asmihi shay'un fil-ardi wa la fis-sama'i wa huwas-sami'ul-'alim",
-    translation:"In the name of Allah with whose name nothing is harmed on earth nor in the heavens, and He is the All-Hearing, the All-Knowing.",
-    benefit:"Whoever says this three times in the morning will not be struck by any affliction until the evening.",
-    repetitionCount:3, sourceReference:"Tirmidhi · 3388" },
-  { id:"m15", category:"morning", orderIndex:14,
-    arabicText:"اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ\nخَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ",
-    transliteration:"Allahumma anta rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't",
-    translation:"O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant.",
-    benefit:"Sayyidul Istighfar — the master supplication for forgiveness. Whoever says it with conviction in the morning and dies that day enters Paradise.",
-    repetitionCount:1, sourceReference:"Bukhari · 6306" },
-];
-
-const EVENING_AZKAR: Zikr[] = [
-  { id:"e1", category:"evening", orderIndex:0,
-    arabicText:"أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ\nوَالْحَمْدُ لِلَّهِ لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ",
-    transliteration:"Amsayna wa amsal mulku lillah, walhamdu lillah, la ilaha illallahu wahdahu la shareeka lah",
-    translation:"We have reached the evening and at this very time unto Allah belongs all sovereignty, and all praise is for Allah.",
-    benefit:"The evening version of the morning supplication, declaring Allah's sovereignty as the day draws to a close.",
-    repetitionCount:1, sourceReference:"Muslim · 2723" },
-  { id:"e2", category:"evening", orderIndex:1,
-    arabicText:"اللَّهُمَّ بِكَ أَمْسَيْنَا وَبِكَ أَصْبَحْنَا\nوَبِكَ نَحْيَا وَبِكَ نَمُوتُ وَإِلَيْكَ الْمَصِيرُ",
-    transliteration:"Allahumma bika amsayna, wa bika asbahna, wa bika nahya, wa bika namutu, wa ilaykal-masir",
-    translation:"O Allah, by Your leave we have reached the evening and by Your leave we reach the morning, by You we live and by You we die, and unto You is the final return.",
-    benefit:"A reminder at day's end that all affairs belong to Allah, and we return to Him.",
-    repetitionCount:1, sourceReference:"Tirmidhi · 3391" },
-  { id:"e3", category:"evening", orderIndex:2,
-    arabicText:"أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ\nمِنْ شَرِّ مَا خَلَقَ",
-    transliteration:"A'udhu bikalimatillahit-tammati min sharri ma khalaq",
-    translation:"I seek refuge in the perfect words of Allah from the evil of what He has created.",
-    benefit:"Whoever says this three times in the evening will be protected from snake bites and scorpion stings that night.",
-    repetitionCount:3, sourceReference:"Muslim · 2709" },
-  { id:"e4", category:"evening", orderIndex:3,
-    arabicText:"اللَّهُمَّ إِنِّي أَمْسَيْتُ أُشْهِدُكَ\nوَحَمَلَةَ عَرْشِكَ وَمَلَائِكَتَكَ وَجَمِيعَ خَلْقِكَ أَنَّكَ اللَّهُ",
-    transliteration:"Allahumma inni amsaytu ushhiduka wa hamalata 'arshika wa mala'ikataka wa jami'a khalqika annakallah",
-    translation:"O Allah, I have reached the evening taking You as witness, and the bearers of Your Throne, Your angels, and all Your creation, that You are Allah.",
-    benefit:"Whoever says this four times in the evening, Allah will free a quarter of him from the Fire for each recitation.",
-    repetitionCount:4, sourceReference:"Abu Dawud · 5069" },
-  { id:"e5", category:"evening", orderIndex:4,
-    arabicText:"سُبْحَانَ اللَّهِ وَبِحَمْدِهِ",
-    transliteration:"Subhanallahi wa bihamdih",
-    translation:"Glory is to Allah and praise is to Him.",
-    benefit:"Whoever says this 100 times in the evening will have his sins forgiven even if they are like the foam of the sea.",
-    repetitionCount:100, sourceReference:"Bukhari · 6405" },
-  { id:"e6", category:"evening", orderIndex:5,
-    arabicText:"اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ\nفَمِنْكَ وَحْدَكَ لَا شَرِيكَ لَكَ فَلَكَ الْحَمْدُ وَلَكَ الشُّكْرُ",
-    transliteration:"Allahumma ma amsa bi min ni'matin faminka wahdaka la shareeka lak, falakal-hamdu wa lakash-shukr",
-    translation:"O Allah, what blessing I have reached this evening is from You alone, without partner, so for You is all praise and unto You all thanks.",
-    benefit:"Whoever says this in the evening has given thanks for that day.",
-    repetitionCount:1, sourceReference:"Abu Dawud · 5073" },
-  { id:"e7", category:"evening", orderIndex:6,
-    arabicText:"اللَّهُمَّ فَاطِرَ السَّمَوَاتِ وَالأَرْضِ\nعَالِمَ الغَيْبِ وَالشَّهَادَةِ رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ",
-    transliteration:"Allahumma fatiras-samawati wal-ard, 'alimal-ghaybi wash-shahadah, rabba kulli shay'in wa malikah",
-    translation:"O Allah, Creator of the heavens and earth, Knower of the seen and unseen, Lord and Sovereign of all things.",
-    benefit:"The Prophet ﷺ taught this to be recited each morning and evening to renew one's submission to Allah.",
-    repetitionCount:1, sourceReference:"Abu Dawud · 5070" },
-  { id:"e8", category:"evening", orderIndex:7,
-    arabicText:"اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ\nفِي الدُّنْيَا وَالآخِرَةِ",
-    transliteration:"Allahumma inni as'alukal-'afwa wal-'afiyata fid-dunya wal-akhirah",
-    translation:"O Allah, I ask You for pardon and well-being in this world and the Hereafter.",
-    benefit:"Ibn Umar (may Allah be pleased with him) never left these words morning or evening. They gather for you the good of this world and the Hereafter.",
-    repetitionCount:1, sourceReference:"Ibn Majah · 3871" },
-  { id:"e9", category:"evening", orderIndex:8,
-    arabicText:"بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ\nفِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ",
-    transliteration:"Bismillahil-ladhi la yadurru ma'asmihi shay'un fil-ardi wa la fis-sama'i wa huwas-sami'ul-'alim",
-    translation:"In the name of Allah with whose name nothing is harmed on earth nor in the heavens, and He is the All-Hearing, the All-Knowing.",
-    benefit:"Whoever says this three times in the evening will not be struck by any affliction until the morning.",
-    repetitionCount:3, sourceReference:"Tirmidhi · 3388" },
-  { id:"e10", category:"evening", orderIndex:9,
-    arabicText:"حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ\nعَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ",
-    transliteration:"Hasbiyallahu la ilaha illa huwa 'alayhi tawakkaltu wa huwa rabbul-'arshil-'azim",
-    translation:"Allah is sufficient for me. None has the right to be worshipped except Him. Upon Him I rely and He is the Lord of the Exalted Throne.",
-    benefit:"Whoever says this seven times each evening, Allah will take care of whatever concerns them.",
-    repetitionCount:7, sourceReference:"Abu Dawud · 5081" },
-  { id:"e11", category:"evening", orderIndex:10,
-    arabicText:"اللَّهُمَّ عَافِنِي فِي بَدَنِي\nاللَّهُمَّ عَافِنِي فِي سَمْعِي وَبَصَرِي",
-    transliteration:"Allahumma 'afini fi badani, Allahumma 'afini fi sam'i wa basari",
-    translation:"O Allah, grant me health in my body. O Allah, grant me health in my hearing and sight.",
-    benefit:"A supplication for comprehensive wellbeing recited by the righteous every evening.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5090" },
-  { id:"e12", category:"evening", orderIndex:11,
-    arabicText:"اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
-    transliteration:"Allahumma salli wa sallim 'ala nabiyyina Muhammad",
-    translation:"O Allah, send prayers and peace upon our Prophet Muhammad.",
-    benefit:"Sending blessings upon the Prophet ﷺ in the evening is from the Sunnah and brings abundant reward.",
-    repetitionCount:10, sourceReference:"Muslim · 408" },
-  { id:"e13", category:"evening", orderIndex:12,
-    arabicText:"يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ\nأَصْلِحْ لِي شَأْنِي كُلَّهُ وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ",
-    transliteration:"Ya Hayyu ya Qayyumu, birahmatika astaghith, aslih li sha'ni kullahu, wa la takilni ila nafsi tarfata 'ayn",
-    translation:"O Ever-Living, O Self-Sustaining, by Your mercy I seek assistance. Rectify for me all of my affairs and do not leave me to myself, even for the blink of an eye.",
-    benefit:"The Prophet ﷺ taught Fatimah (may Allah be pleased with her) to say this morning and evening as her daily protection.",
-    repetitionCount:1, sourceReference:"Hakim · 1/545" },
-  { id:"e14", category:"evening", orderIndex:13,
-    arabicText:"أَعُوذُ بِاللَّهِ السَّمِيعِ الْعَلِيمِ\nمِنَ الشَّيْطَانِ الرَّجِيمِ",
-    transliteration:"A'udhu billahis-sami'il-'alimi minash-shaytanir-rajim",
-    translation:"I seek refuge in Allah, the All-Hearing, the All-Knowing, from the outcast Shaytan.",
-    benefit:"Seeking refuge from Shaytan in the evening protects one through the night from his whispers and plots.",
-    repetitionCount:3, sourceReference:"Tirmidhi · 3392" },
-  { id:"e15", category:"evening", orderIndex:14,
-    arabicText:"اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ\nخَلَقْتَنِي وَأَنَا عَبْدُكَ وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ",
-    transliteration:"Allahumma anta rabbi la ilaha illa ant, khalaqtani wa ana 'abduk, wa ana 'ala 'ahdika wa wa'dika mastata't",
-    translation:"O Allah, You are my Lord, none has the right to be worshipped except You. You created me and I am Your servant.",
-    benefit:"Sayyidul Istighfar — the master supplication for forgiveness. Whoever says it with conviction in the evening and dies that night enters Paradise.",
-    repetitionCount:1, sourceReference:"Bukhari · 6306" },
-];
-
-const SLEEP_AZKAR: Zikr[] = [
-  { id:"s1", category:"before_sleep", orderIndex:0,
-    arabicText:"بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا",
-    transliteration:"Bismika Allahumma amutu wa ahya",
-    translation:"In Your name O Allah, I die and I live.",
-    benefit:"The Prophet ﷺ would say this when lying down to sleep, acknowledging that sleep is a minor form of death.",
-    repetitionCount:1, sourceReference:"Bukhari · 6312" },
-  { id:"s2", category:"before_sleep", orderIndex:1,
-    arabicText:"اللَّهُمَّ قِنِي عَذَابَكَ\nyَوْمَ تَبْعَثُ عِبَادَكَ",
-    transliteration:"Allahumma qini 'adhabaka yawma tab'athu 'ibadak",
-    translation:"O Allah, protect me from Your punishment on the Day when You resurrect Your servants.",
-    benefit:"The Prophet ﷺ would say this three times before sleeping, seeking protection from the punishment of the grave.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5045" },
-  { id:"s3", category:"before_sleep", orderIndex:2,
-    arabicText:"سُبْحَانَ اللَّهِ",
-    transliteration:"Subhanallah",
-    translation:"Glory is to Allah.",
-    benefit:"The Prophet ﷺ told Ali and Fatimah to say SubhanAllah 33 times, Alhamdulillah 33 times, and Allahu Akbar 34 times before sleeping — this is better than a servant for you.",
-    repetitionCount:33, sourceReference:"Bukhari · 5362" },
-  { id:"s4", category:"before_sleep", orderIndex:3,
-    arabicText:"الْحَمْدُ لِلَّهِ",
-    transliteration:"Alhamdulillah",
-    translation:"All praise is for Allah.",
-    benefit:"Part of the pre-sleep tasbih taught by the Prophet ﷺ to his daughter Fatimah. Saying Alhamdulillah 33 times before sleep brings immense blessings.",
-    repetitionCount:33, sourceReference:"Bukhari · 5362" },
-  { id:"s5", category:"before_sleep", orderIndex:4,
-    arabicText:"اللَّهُ أَكْبَرُ",
-    transliteration:"Allahu Akbar",
-    translation:"Allah is the Greatest.",
-    benefit:"The final part of the pre-sleep tasbih: 34 times Allahu Akbar. Better than a servant to help you with your needs.",
-    repetitionCount:34, sourceReference:"Bukhari · 5362" },
-  { id:"s6", category:"before_sleep", orderIndex:5,
-    arabicText:"اللَّهُمَّ بِاسْمِكَ أَحْيَا وَأَمُوتُ",
-    transliteration:"Allahumma bismika ahya wa amut",
-    translation:"O Allah, with Your name I live and with Your name I die.",
-    benefit:"Beginning one's sleep with the name of Allah is a Sunnah act that brings blessings and protection throughout the night.",
-    repetitionCount:1, sourceReference:"Bukhari · 6324" },
-  { id:"s7", category:"before_sleep", orderIndex:6,
-    arabicText:"اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ\nوَفَوَّضْتُ أَمْرِي إِلَيْكَ وَوَجَّهْتُ وَجْهِي إِلَيْكَ",
-    transliteration:"Allahumma aslamtu nafsi ilayk, wa fawwadtu amri ilayk, wa wajjahtu wajhi ilayk",
-    translation:"O Allah, I submit myself to You, entrust my affairs to You, and turn my face toward You.",
-    benefit:"The Prophet ﷺ instructed: If you die this night, you die upon the fitrah.",
-    repetitionCount:1, sourceReference:"Bukhari · 247" },
-  { id:"s8", category:"before_sleep", orderIndex:7,
-    arabicText:"قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ\nلَمْ يَلِدْ وَلَمْ يُولَدْ ۝ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ",
-    transliteration:"Qul huwa Allahu ahad, Allahus-samad, lam yalid wa lam yulad, wa lam yakun lahu kufuwan ahad",
-    translation:"Say: He is Allah, the One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
-    benefit:"The Prophet ﷺ used to recite Al-Ikhlas, Al-Falaq, and An-Nas three times each before sleeping, then wipe over his body.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5056" },
-  { id:"s9", category:"before_sleep", orderIndex:8,
-    arabicText:"قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ۝ مِن شَرِّ مَا خَلَقَ\nوَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ",
-    transliteration:"Qul a'udhu biraббil-falaq, min sharri ma khalaq, wa min sharri ghasiqin idha waqab",
-    translation:"Say: I seek refuge in the Lord of daybreak from the evil of that which He created, and from the evil of darkness when it settles.",
-    benefit:"Surah Al-Falaq, recited three times before sleep. The Prophet ﷺ said there is no protection like it.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5056" },
-  { id:"s10", category:"before_sleep", orderIndex:9,
-    arabicText:"قُلْ أَعُوذُ بِرَبِّ النَّاسِ ۝ مَلِكِ النَّاسِ ۝ إِلَهِ النَّاسِ\nمِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ",
-    transliteration:"Qul a'udhu birabbin-nas, malikin-nas, ilahin-nas, min sharril-waswasil-khannas",
-    translation:"Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer.",
-    benefit:"Surah An-Nas, the final protection before sleep. Reciting the last two surahs creates a shield through the night.",
-    repetitionCount:3, sourceReference:"Abu Dawud · 5056" },
-];
-
-const ALL_AZKAR = [...MORNING_AZKAR, ...EVENING_AZKAR, ...SLEEP_AZKAR];
-
-const CATEGORIES = [
-  { id: "morning" as CategoryId,      name: "Morning Azkar",  nameArabic: "أذكار الصباح", icon: "sun",      totalCount: 15 },
-  { id: "evening" as CategoryId,      name: "Evening Azkar",  nameArabic: "أذكار المساء", icon: "crescent", totalCount: 15 },
-  { id: "before_sleep" as CategoryId, name: "Before Sleep",   nameArabic: "أذكار النوم",  icon: "stars",    totalCount: 10 },
-];
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-const getAzkarByCategory = (cat: CategoryId) =>
-  ALL_AZKAR.filter(z => z.category === cat).sort((a, b) => a.orderIndex - b.orderIndex);
-
-// ─── Primitive components ─────────────────────────────────────────────────────
-
-function CatIcon({ type, size = 22, color = T.gold }: { type: string; size?: number; color?: string }) {
-  if (type === "sun") return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="3.8" fill={color} />
-      {[0,45,90,135,180,225,270,315].map((deg, i) => (
-        <line key={i}
-          x1={12 + 6 * Math.cos(deg * Math.PI / 180)} y1={12 + 6 * Math.sin(deg * Math.PI / 180)}
-          x2={12 + 8.8 * Math.cos(deg * Math.PI / 180)} y2={12 + 8.8 * Math.sin(deg * Math.PI / 180)}
-          stroke={color} strokeWidth="1.8" strokeLinecap="round"
-        />
-      ))}
-    </svg>
-  );
-  if (type === "crescent") return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path d="M20.4 13.4A8.4 8.4 0 1 1 10.6 3.6 6.5 6.5 0 0 0 20.4 13.4z" fill={color} />
-    </svg>
-  );
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="5"  r="1.4" fill={color} />
-      <circle cx="6"  cy="9"  r="1.2" fill={color} opacity=".7" />
-      <circle cx="18" cy="9"  r="1.2" fill={color} opacity=".7" />
-      <circle cx="8"  cy="15" r="1.4" fill={color} />
-      <circle cx="16" cy="15" r="1.4" fill={color} />
-      <circle cx="12" cy="19" r="1.2" fill={color} opacity=".7" />
-      <circle cx="12" cy="11" r="2.4" fill={color} />
-    </svg>
-  );
-}
-
-function MaleAvatar({ size = 40 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      <circle cx="20" cy="20" r="20" fill={T.surfaceEl} />
-      <circle cx="20" cy="15" r="7" fill={T.gold} opacity=".9" />
-      <path d="M6 38c0-7.7 6.3-14 14-14s14 6.3 14 14" fill={T.gold} opacity=".6" />
-    </svg>
-  );
-}
-
-function Toggle({ checked, onChange }: { checked: boolean; onChange: () => void }) {
-  return (
-    <button onClick={onChange}
-      className="relative inline-flex h-[31px] w-[51px] items-center rounded-full transition-colors duration-300 focus:outline-none shrink-0"
-      style={{ background: checked ? T.gold : T.surfaceEl }}
-    >
-      <span className={`inline-block h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ${checked ? "translate-x-[22px]" : "translate-x-[2px]"}`} />
-    </button>
-  );
-}
-
-function ProgressBar({ value, max, height = 8, trackColor, fillColor }:
-  { value: number; max: number; height?: number; trackColor?: string; fillColor?: string }) {
-  const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
-  return (
-    <div className="w-full rounded-full overflow-hidden" style={{ height, background: trackColor ?? T.surfaceEl }}>
-      <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: fillColor ?? T.gold }} />
-    </div>
-  );
-}
-
-function RepBadge({ count, done }: { count: number; done: boolean }) {
-  return (
-    <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold"
-      style={{
-        fontFamily: "DM Mono, monospace",
-        background: done ? `${T.gold}20` : `${T.teal}25`,
-        color: done ? T.gold : T.teal,
-        border: `1px solid ${done ? T.gold + "40" : T.teal + "50"}`,
-      }}>
-      ×{count}
-    </span>
-  );
-}
-
-function PulseRings({ trigger }: { trigger: number }) {
-  return (
-    <div key={trigger} className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      {[0, 120, 240].map((delay, i) => (
-        <div key={i} className="absolute rounded-full pulse-ring"
-          style={{
-            width: `${148 + i * 44}px`, height: `${148 + i * 44}px`,
-            border: `2px solid ${T.gold}`,
-            animationDuration: "700ms",
-            animationTimingFunction: "cubic-bezier(0, 0, 0.2, 1)",
-            animationFillMode: "forwards",
-            animationDelay: `${delay}ms`,
-            opacity: 0,
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-function CounterRing({ count, total, size = 160 }: { count: number; total: number; size?: number }) {
-  const r = size / 2 - 10;
-  const circ = 2 * Math.PI * r;
-  const pct = total > 0 ? count / total : 0;
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }}>
-      <circle cx={size/2} cy={size/2} r={r} stroke={T.surfaceEl} strokeWidth="10" fill="none" />
-      <circle cx={size/2} cy={size/2} r={r} stroke={T.gold} strokeWidth="10" fill="none"
-        strokeLinecap="round"
-        strokeDasharray={circ}
-        strokeDashoffset={circ * (1 - pct)}
-        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1)" }}
-      />
-    </svg>
-  );
-}
-
-function WaveformBars({ active }: { active: boolean }) {
-  const heights = [0.35, 0.75, 0.55, 1, 0.6, 0.8, 0.4];
-  return (
-    <div className="flex items-center gap-[2px]" style={{ height: 20 }}>
-      {heights.map((h, i) => (
-        <div key={i} className="w-[3px] rounded-full"
-          style={{
-            height: "100%", background: "rgba(255,255,255,0.7)",
-            transform: `scaleY(${h})`, transformOrigin: "center",
-            animation: active ? `waveform ${0.5 + i * 0.08}s ease-in-out ${i * 0.07}s infinite` : "none",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// ─── Layout shells ────────────────────────────────────────────────────────────
-
-function Header({ title, subtitle, onBack, right }:
-  { title: string; subtitle?: string; onBack?: () => void; right?: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-2 px-4 shrink-0 border-b"
-      style={{ height: 56, borderColor: T.border }}>
-      {onBack && (
-        <button onClick={onBack}
-          className="flex items-center justify-center rounded-full transition-colors"
-          style={{ width: 44, height: 44, minWidth: 44 }}
-          onMouseEnter={e => (e.currentTarget.style.background = T.surfaceEl)}
-          onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-          <ChevronLeft size={22} style={{ color: T.textPrimary }} />
-        </button>
-      )}
-      <div className="flex-1 min-w-0">
-        <p className="font-semibold truncate" style={{ fontSize: 17, lineHeight: "24px", color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>{title}</p>
-        {subtitle && <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>{subtitle}</p>}
-      </div>
-      {right}
-    </div>
-  );
-}
-
-function BottomNav({ active, onChange }: {
-  active: "home" | "azkar" | "settings";
-  onChange: (t: "home" | "azkar" | "settings") => void;
-}) {
-  const tabs = [
-    { id: "home" as const,     label: "Home",     Icon: Home },
-    { id: "azkar" as const,    label: "Azkar",    Icon: BookOpen },
-    { id: "settings" as const, label: "Settings", Icon: Settings },
-  ];
-  return (
-    <div className="flex shrink-0 border-t" style={{ height: 83, paddingBottom: 20, borderColor: T.border, background: T.surface }}>
-      {tabs.map(({ id, label, Icon }) => {
-        const on = active === id;
-        return (
-          <button key={id} onClick={() => onChange(id)}
-            className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70">
-            <Icon size={22} style={{ color: on ? T.gold : T.textMuted }} />
-            <span style={{ fontSize: 10, fontFamily: "Inter, sans-serif", fontWeight: 500, color: on ? T.gold : T.textMuted }}>
-              {label}
-            </span>
-            {on && <div className="rounded-full" style={{ width: 4, height: 4, background: T.gold, marginTop: -2 }} />}
-          </button>
-        );
-      })}
-    </div>
-  );
-}
-
-// ─── Screen 1: Home ───────────────────────────────────────────────────────────
-
-function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onSearch }:
-  {
-    completed: Record<CategoryId, Set<number>>;
-    displayName: string;
-    currentStreak: number;
-    longestStreak: number;
-    onCategory: (c: CategoryId) => void;
-    onSearch: () => void;
-  }) {
-  const h = new Date().getHours();
-  const timeLabel = h < 12 ? "Good Morning" : h < 17 ? "Good Afternoon" : "Good Evening";
-  const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
-  const totalAll  = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
-
-  return (
-    <div className="flex flex-col h-full" style={{ background: T.bg }}>
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <MaleAvatar size={44} />
-          <div>
-            <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{timeLabel}</p>
-            <p style={{ fontSize: 20, color: T.textPrimary, fontFamily: "Inter, sans-serif", fontWeight: 800, lineHeight: "26px" }}>{displayName}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={onSearch}
-            className="flex items-center justify-center rounded-full transition-colors"
-            style={{ width: 44, height: 44, background: T.surface }}>
-            <Search size={18} style={{ color: T.textPrimary }} />
-          </button>
-        </div>
-      </div>
-
-      {/* Arabic greeting */}
-      <div className="px-5 mb-4">
-        <div className="rounded-2xl px-5 py-4" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-          <p className="text-center" style={{ fontSize: 24, color: T.gold, fontFamily: "'Noto Naskh Arabic', serif", fontWeight: 700, lineHeight: "38px" }}>
-            السَّلَامُ عَلَيْكُم وَرَحْمَةُ اللَّهِ
-          </p>
-          {totalDone > 0 && (
-            <div className="mt-3">
-              <div className="flex justify-between mb-1.5">
-                <span style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Today's progress</span>
-                <span style={{ fontSize: 11, color: T.gold, fontFamily: "DM Mono, monospace", fontWeight: 700 }}>{totalDone}/{totalAll}</span>
-              </div>
-              <ProgressBar value={totalDone} max={totalAll} height={6} />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Category cards */}
-      <div className="flex-1 overflow-y-auto px-5 flex flex-col gap-3 pb-4">
-        {CATEGORIES.map(cat => {
-          const done = completed[cat.id]?.size ?? 0;
-          const complete = done === cat.totalCount;
-          return (
-            <button key={cat.id} onClick={() => onCategory(cat.id)}
-              className="w-full text-left rounded-2xl p-4 transition-all active:scale-[0.98]"
-              style={{ background: T.surface, border: `1px solid ${complete ? T.gold + "50" : T.border}` }}>
-              <div className="flex items-center gap-4">
-                {/* Icon circle */}
-                <div className="flex items-center justify-center rounded-xl shrink-0"
-                  style={{ width: 52, height: 52, background: complete ? `${T.gold}20` : T.surfaceEl }}>
-                  <CatIcon type={cat.icon} size={26} color={complete ? T.gold : T.gold} />
-                </div>
-
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <p style={{ fontSize: 16, fontWeight: 700, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>{cat.name}</p>
-                    {complete
-                      ? <span className="flex items-center gap-1 rounded-full px-2 py-0.5" style={{ background: `${T.gold}20`, fontSize: 10, color: T.gold, fontFamily: "Inter, sans-serif", fontWeight: 700 }}>
-                          <Check size={10} /> Done
-                        </span>
-                      : <span style={{ fontSize: 12, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>{done}/{cat.totalCount}</span>
-                    }
-                  </div>
-                  <p className="mb-2" style={{ fontSize: 14, color: T.textMuted, fontFamily: "'Noto Naskh Arabic', serif" }}>{cat.nameArabic}</p>
-                  <ProgressBar value={done} max={cat.totalCount} height={7} />
-                </div>
-
-                <ChevronRight size={16} style={{ color: T.textMuted, flexShrink: 0 }} />
-              </div>
-            </button>
-          );
-        })}
-
-        {/* Streak card */}
-        <div className="rounded-2xl p-4 flex items-center gap-4"
-          style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-          <div className="flex items-center justify-center rounded-xl shrink-0"
-            style={{ width: 52, height: 52, background: `${T.gold}15` }}>
-            <Flame size={24} style={{ color: T.gold }} />
-          </div>
-          <div className="flex-1">
-            <p style={{ fontSize: 12, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Current Streak</p>
-            <p style={{ fontSize: 20, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace" }}>{currentStreak} day{currentStreak === 1 ? "" : "s"}</p>
-          </div>
-          <div className="text-right">
-            <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Best</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: T.textSec, fontFamily: "DM Mono, monospace" }}>{longestStreak}</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ─── Screen 2: Category list ──────────────────────────────────────────────────
-
-function CategoryScreen({ catId, completed, onZikr, onBack }:
-  { catId: CategoryId; completed: Set<number>; onZikr: (i: number) => void; onBack: () => void }) {
-  const azkar = getAzkarByCategory(catId);
-  const cat   = CATEGORIES.find(c => c.id === catId)!;
-  const done  = completed.size;
-  const resumeIdx = azkar.findIndex((_, i) => !completed.has(i));
-  const pct = Math.round((done / azkar.length) * 100);
-
-  return (
-    <div className="flex flex-col h-full" style={{ background: T.bg }}>
-      <Header title={cat.name} subtitle={`${done} of ${azkar.length} complete`} onBack={onBack} />
-
-      {/* Progress strip */}
-      <div className="px-5 py-4 shrink-0" style={{ borderBottom: `1px solid ${T.border}` }}>
-        <div className="flex items-center justify-between mb-2">
-          <p style={{ fontSize: 12, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Progress</p>
-          <p style={{ fontSize: 12, fontWeight: 700, color: T.gold, fontFamily: "DM Mono, monospace" }}>{pct}%</p>
-        </div>
-        <ProgressBar value={done} max={azkar.length} height={8} />
-
-        {done < azkar.length && (
-          <button onClick={() => onZikr(Math.max(0, resumeIdx))}
-            className="w-full mt-3 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2"
-            style={{ height: 48, background: T.gold, color: T.bg, fontSize: 15, fontFamily: "Inter, sans-serif" }}>
-            {done === 0 ? "Start Session" : `Resume · Zikr ${resumeIdx + 1}`}
-            <ChevronRight size={18} />
-          </button>
-        )}
-        {done === azkar.length && (
-          <div className="w-full mt-3 rounded-xl flex items-center justify-center gap-2"
-            style={{ height: 48, background: `${T.gold}15`, border: `1px solid ${T.gold}40` }}>
-            <Check size={18} style={{ color: T.gold }} />
-            <span style={{ color: T.gold, fontSize: 15, fontWeight: 700, fontFamily: "Inter, sans-serif" }}>Session Complete</span>
-          </div>
-        )}
-      </div>
-
-      {/* Zikr list */}
-      <div className="flex-1 overflow-y-auto px-5 py-3 flex flex-col gap-2">
-        {azkar.map((z, i) => {
-          const isDone = completed.has(i);
-          return (
-            <button key={z.id} onClick={() => onZikr(i)}
-              className="w-full text-left rounded-xl p-4 flex items-center gap-3 transition-all active:scale-[0.98]"
-              style={{ background: T.surface, border: `1px solid ${isDone ? T.gold + "30" : T.border}` }}>
-              {/* Status circle */}
-              <div className="flex items-center justify-center rounded-full shrink-0"
-                style={{ width: 36, height: 36,
-                  background: isDone ? T.gold : "transparent",
-                  border: `2px solid ${isDone ? T.gold : T.surfaceEl}` }}>
-                {isDone
-                  ? <Check size={15} style={{ color: T.bg }} />
-                  : <span style={{ fontSize: 12, fontWeight: 700, color: T.textMuted, fontFamily: "DM Mono, monospace" }}>{i + 1}</span>
-                }
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="mb-0.5 truncate" dir="rtl"
-                  style={{ fontSize: 16, color: isDone ? T.textMuted : T.textPrimary, fontFamily: "'Noto Naskh Arabic', serif", lineHeight: "26px" }}>
-                  {z.arabicText.split("\n")[0]}
-                </p>
-                <p className="truncate" style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif", fontStyle: "italic" }}>
-                  {z.transliteration.slice(0, 50)}…
-                </p>
-              </div>
-
-              <RepBadge count={z.repetitionCount} done={isDone} />
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-// ─── Screen 3: Zikr Reader ────────────────────────────────────────────────────
-
-function ReaderScreen({ catId, idx, isDone, onBack, onCounter, onNext, onPrev }:
-  { catId: CategoryId; idx: number; isDone: boolean;
-    onBack: () => void; onCounter: () => void; onNext: () => void; onPrev: () => void }) {
-  const azkar = getAzkarByCategory(catId);
-  const z = azkar[idx];
-  const [benefitOpen, setBenefitOpen] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [speed, setSpeed] = useState<0.75 | 1 | 1.25>(1);
-  const touchStartX = useRef<number | null>(null);
-
-  if (!z) return null;
-
-  const handleSwipe = (dx: number) => {
-    if (dx > 60) onPrev();
-    else if (dx < -60) onNext();
-  };
-
-  return (
-    <div className="flex flex-col h-full" style={{ background: T.bg }}
-      onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
-      onTouchEnd={e => { if (touchStartX.current !== null) { handleSwipe(e.changedTouches[0].clientX - touchStartX.current); touchStartX.current = null; } }}>
-
-      {/* Header */}
-      <Header title={`Zikr ${idx + 1} of ${azkar.length}`} subtitle={CATEGORIES.find(c=>c.id===catId)?.name}
-        onBack={onBack}
-        right={
-          <div className="flex items-center gap-1">
-            <button onClick={onPrev} disabled={idx === 0}
-              className="flex items-center justify-center rounded-full transition-colors"
-              style={{ width: 36, height: 36, opacity: idx === 0 ? 0.3 : 1 }}>
-              <SkipBack size={16} style={{ color: T.textMuted }} />
-            </button>
-            <button onClick={onNext} disabled={idx === azkar.length - 1}
-              className="flex items-center justify-center rounded-full transition-colors"
-              style={{ width: 36, height: 36, opacity: idx === azkar.length - 1 ? 0.3 : 1 }}>
-              <SkipForward size={16} style={{ color: T.textMuted }} />
-            </button>
-          </div>
-        }
-      />
-
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto px-5 py-5 flex flex-col gap-4">
-        {/* Arabic text card */}
-        <div className="rounded-2xl px-5 py-6" style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-          {isDone && (
-            <div className="flex items-center gap-2 mb-4 pb-3" style={{ borderBottom: `1px solid ${T.border}` }}>
-              <Check size={14} style={{ color: T.gold }} />
-              <span style={{ fontSize: 11, color: T.gold, fontFamily: "Inter, sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Completed</span>
-            </div>
-          )}
-          {/* Arabic */}
-          <p className="text-center mb-4" dir="rtl"
-            style={{ fontSize: 28, fontWeight: 700, color: T.textPrimary, fontFamily: "'Noto Naskh Arabic', serif", lineHeight: "52px" }}>
-            {z.arabicText}
-          </p>
-          {/* Transliteration */}
-          <p className="text-center mb-3"
-            style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", fontStyle: "italic", lineHeight: "20px" }}>
-            {z.transliteration}
-          </p>
-          {/* Translation */}
-          <p className="text-center"
-            style={{ fontSize: 14, color: T.textSec, fontFamily: "Inter, sans-serif", lineHeight: "22px" }}>
-            {z.translation}
-          </p>
-        </div>
-
-        {/* Benefit accordion */}
-        <button onClick={() => setBenefitOpen(o => !o)}
-          className="w-full rounded-xl text-left transition-colors"
-          style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-          <div className="flex items-center gap-3 p-4">
-            <div className="flex items-center justify-center rounded-lg shrink-0"
-              style={{ width: 32, height: 32, background: `${T.gold}15` }}>
-              <Info size={14} style={{ color: T.gold }} />
-            </div>
-            <p style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif", flex: 1 }}>Benefit & Virtue</p>
-            <div style={{ color: T.textMuted }}>
-              {benefitOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-            </div>
-          </div>
-          {benefitOpen && (
-            <div className="px-4 pb-4 fade-in" style={{ borderTop: `1px solid ${T.border}` }}>
-              <p className="pt-3" style={{ fontSize: 13, color: T.textSec, fontFamily: "Inter, sans-serif", lineHeight: "21px" }}>
-                {z.benefit}
-              </p>
-              <span className="inline-block mt-3 rounded-full px-3 py-1"
-                style={{ fontSize: 11, color: T.teal, background: `${T.teal}15`, border: `1px solid ${T.teal}40`, fontFamily: "Inter, sans-serif", fontWeight: 500 }}>
-                {z.sourceReference}
-              </span>
-            </div>
-          )}
-        </button>
-
-        {/* Audio player */}
-        <div className="rounded-xl px-4 py-3 flex items-center gap-3" style={{ background: T.tealBg, border: `1px solid ${T.teal}40` }}>
-          <button onClick={() => setPlaying(p => !p)}
-            className="flex items-center justify-center rounded-full shrink-0 transition-all active:scale-90"
-            style={{ width: 40, height: 40, background: T.teal }}>
-            {playing ? <Pause size={15} color="white" /> : <Play size={15} color="white" style={{ marginLeft: 2 }} />}
-          </button>
-          <WaveformBars active={playing} />
-          <div className="flex-1" />
-          <button onClick={() => setSpeed(s => s === 0.75 ? 1 : s === 1 ? 1.25 : 0.75)}
-            className="rounded-lg px-2 py-1"
-            style={{ background: `${T.teal}30`, border: `1px solid ${T.teal}50`, fontSize: 11, color: T.teal, fontFamily: "DM Mono, monospace", fontWeight: 700 }}>
-            {speed}×
-          </button>
-        </div>
-      </div>
-
-      {/* Counter zone — bottom tap strip */}
-      <button onClick={onCounter}
-        className="shrink-0 flex flex-col items-center justify-center gap-2 w-full transition-all active:opacity-80"
-        style={{ height: 100, background: T.surface, borderTop: `1px solid ${T.border}` }}>
-        <div className="flex items-center gap-3">
-          <CounterRing count={isDone ? z.repetitionCount : 0} total={z.repetitionCount} size={52} />
-          <div className="text-left">
-            <p style={{ fontSize: 22, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace", lineHeight: "28px" }}>
-              {isDone ? z.repetitionCount : 0}
-              <span style={{ fontSize: 13, color: T.textMuted, fontWeight: 400 }}> / {z.repetitionCount}</span>
-            </p>
-            <p style={{ fontSize: 10, color: T.textMuted, fontFamily: "Inter, sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>
-              {isDone ? "✓ Complete — tap to redo" : "Tap to count"}
-            </p>
-          </div>
-        </div>
-      </button>
-    </div>
-  );
-}
-
-// ─── Screen 4: Full-screen Counter ────────────────────────────────────────────
-
-function CounterScreen({ catId, idx, initialCount, onBack, onComplete, onPrev, onNext }:
-  { catId: CategoryId; idx: number; initialCount: number;
-    onBack: () => void; onComplete: (idx: number) => void;
-    onPrev: () => void; onNext: () => void }) {
-  const azkar = getAzkarByCategory(catId);
-  const z = azkar[idx];
-  const [count, setCount] = useState(initialCount);
-  const [pulse, setPulse] = useState(0);
-  const [flash, setFlash] = useState(false);
-  const [complete, setComplete] = useState(initialCount >= (z?.repetitionCount ?? 1));
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const touchStartX = useRef<number | null>(null);
-
-  // Reset when zikr changes
-  useEffect(() => {
-    setCount(initialCount);
-    setComplete(initialCount >= (z?.repetitionCount ?? 1));
-  }, [idx]);
-
-  if (!z) return null;
-
-  const handleTap = () => {
-    if (complete) return;
-    const next = count + 1;
-    setCount(next);
-    setPulse(p => p + 1);
-    setFlash(true);
-    setTimeout(() => setFlash(false), 120);
-    if (next >= z.repetitionCount) {
-      setComplete(true);
-      setTimeout(() => onComplete(idx), 500);
-    }
-  };
-
-  const handleLongPressStart = () => {
-    longPressTimer.current = setTimeout(() => {
-      setCount(0);
-      setComplete(false);
-      setPulse(p => p + 1);
-    }, 600);
-  };
-
-  const handleLongPressEnd = () => {
-    if (longPressTimer.current) clearTimeout(longPressTimer.current);
-  };
-
-  const handleSwipe = (dx: number) => {
-    if (dx > 60) onPrev();
-    else if (dx < -60) onNext();
-  };
-
-  const remaining = z.repetitionCount - count;
-
-  return (
-    <div className="flex flex-col h-full select-none" style={{ background: T.bg }}
-      onTouchStart={e => { touchStartX.current = e.touches[0].clientX; }}
-      onTouchEnd={e => { if (touchStartX.current !== null) { handleSwipe(e.changedTouches[0].clientX - touchStartX.current); touchStartX.current = null; } }}>
-
-      {/* Top bar — thin, non-interactive feel */}
-      <div className="flex items-center justify-between px-5 pt-4 pb-3 shrink-0">
-        <button onClick={onBack}
-          className="flex items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, background: T.surface }}>
-          <ChevronLeft size={20} style={{ color: T.textPrimary }} />
-        </button>
-        <div className="text-center">
-          <p style={{ fontSize: 12, color: T.textMuted, fontFamily: "Inter, sans-serif", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            {CATEGORIES.find(c => c.id === catId)?.name}
-          </p>
-          <p style={{ fontSize: 14, color: T.textSec, fontFamily: "Inter, sans-serif", fontWeight: 600 }}>
-            Zikr {idx + 1} of {azkar.length}
-          </p>
-        </div>
-        <button onClick={() => { setCount(0); setComplete(false); }}
-          className="flex items-center justify-center rounded-full"
-          style={{ width: 44, height: 44, background: T.surface }}>
-          <RotateCcw size={16} style={{ color: T.textMuted }} />
-        </button>
-      </div>
-
-      {/* Arabic snippet */}
-      <div className="px-6 pb-4 shrink-0">
-        <p className="text-center"
-          style={{ fontSize: 18, color: T.textMuted, fontFamily: "'Noto Naskh Arabic', serif", lineHeight: "32px", direction: "rtl" }}>
-          {z.arabicText.split("\n")[0]}
-        </p>
-      </div>
-
-      {/* Full-screen tap zone */}
-      <div
-        className="flex-1 flex flex-col items-center justify-center relative cursor-pointer"
-        onClick={handleTap}
-        onMouseDown={handleLongPressStart}
-        onMouseUp={handleLongPressEnd}
-        onMouseLeave={handleLongPressEnd}
-        onTouchStart={handleLongPressStart}
-        onTouchEnd={handleLongPressEnd}
-        style={{ background: flash ? `${T.gold}08` : "transparent", transition: "background 80ms" }}>
-
-        <PulseRings trigger={pulse} />
-
-        {/* Ring + count */}
-        <div className="relative flex items-center justify-center z-10">
-          <CounterRing count={count} total={z.repetitionCount} size={200} />
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            {complete ? (
-              <>
-                <div className="flex items-center justify-center rounded-full mb-2"
-                  style={{ width: 52, height: 52, background: T.gold }}>
-                  <Check size={26} style={{ color: T.bg }} />
-                </div>
-                <p style={{ fontSize: 14, color: T.gold, fontFamily: "Inter, sans-serif", fontWeight: 700 }}>Complete!</p>
-              </>
-            ) : (
-              <>
-                <p style={{ fontSize: 56, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace", lineHeight: "60px" }}>{count}</p>
-                <p style={{ fontSize: 16, color: T.textMuted, fontFamily: "DM Mono, monospace" }}>of {z.repetitionCount}</p>
-              </>
-            )}
-          </div>
-        </div>
-
-        {/* Tap hint */}
-        {!complete && (
-          <p className="mt-8 z-10"
-            style={{ fontSize: 10, color: T.textMuted, fontFamily: "Inter, sans-serif", fontWeight: 700,
-              textTransform: "uppercase", letterSpacing: "0.15em" }}>
-            Tap anywhere to count
-          </p>
-        )}
-        {!complete && remaining <= 5 && remaining > 0 && (
-          <p className="mt-2 z-10"
-            style={{ fontSize: 13, color: T.gold, fontFamily: "Inter, sans-serif", fontWeight: 600 }}>
-            {remaining} more {remaining === 1 ? "time" : "times"}
-          </p>
-        )}
-        {!complete && (
-          <p className="absolute bottom-4 z-10"
-            style={{ fontSize: 10, color: T.surfaceEl, fontFamily: "Inter, sans-serif" }}>
-            Hold to reset
-          </p>
-        )}
-      </div>
-
-      {/* Bottom prev/next nav */}
-      <div className="flex items-center justify-between px-6 py-4 shrink-0" style={{ borderTop: `1px solid ${T.border}` }}>
-        <button onClick={onPrev} disabled={idx === 0}
-          className="flex items-center gap-2 rounded-xl px-4 py-3 transition-all active:scale-95"
-          style={{ background: T.surface, opacity: idx === 0 ? 0.3 : 1 }}>
-          <SkipBack size={16} style={{ color: T.textSec }} />
-          <span style={{ fontSize: 13, color: T.textSec, fontFamily: "Inter, sans-serif", fontWeight: 600 }}>Prev</span>
-        </button>
-
-        {/* Dot indicators */}
-        <div className="flex gap-1.5">
-          {azkar.slice(Math.max(0, idx - 2), Math.min(azkar.length, idx + 3)).map((_, di) => {
-            const absIdx = Math.max(0, idx - 2) + di;
-            return (
-              <div key={absIdx} className="rounded-full transition-all"
-                style={{ width: absIdx === idx ? 16 : 6, height: 6, background: absIdx === idx ? T.gold : T.surfaceEl }} />
-            );
-          })}
-        </div>
-
-        <button onClick={onNext} disabled={idx === azkar.length - 1}
-          className="flex items-center gap-2 rounded-xl px-4 py-3 transition-all active:scale-95"
-          style={{ background: T.surface, opacity: idx === azkar.length - 1 ? 0.3 : 1 }}>
-          <span style={{ fontSize: 13, color: T.textSec, fontFamily: "Inter, sans-serif", fontWeight: 600 }}>Next</span>
-          <SkipForward size={16} style={{ color: T.textSec }} />
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ─── Screen 5: Completion ─────────────────────────────────────────────────────
-
-function CompletionScreen({ catId, sessionStart, currentStreak, onHome, onRepeat }:
-  { catId: CategoryId; sessionStart: number; currentStreak: number; onHome: () => void; onRepeat: () => void }) {
-  const cat = CATEGORIES.find(c => c.id === catId)!;
-  const azkar = getAzkarByCategory(catId);
-  const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
-  const totalReps = azkar.reduce((s, z) => s + z.repetitionCount, 0);
-
-  return (
-    <div className="flex flex-col h-full items-center justify-between px-6 py-8 slide-up" style={{ background: T.bg }}>
-      <div />
-
-      <div className="flex flex-col items-center gap-6 w-full">
-        {/* Gold checkmark circle */}
-        <div className="relative flex items-center justify-center" style={{ width: 120, height: 120 }}>
-          <svg className="absolute inset-0" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="56" stroke={T.gold} strokeWidth="2" fill="none" opacity=".15" />
-            <circle cx="60" cy="60" r="56" stroke={T.gold} strokeWidth="2.5" fill="none"
-              strokeDasharray="352" strokeDashoffset="0" />
-          </svg>
-          <div className="flex items-center justify-center rounded-full"
-            style={{ width: 80, height: 80, background: T.gold }}>
-            <Check size={36} style={{ color: T.bg, strokeWidth: 3 }} />
-          </div>
-        </div>
-
-        {/* Arabic celebration */}
-        <div className="text-center">
-          <p style={{ fontSize: 34, color: T.gold, fontFamily: "'Noto Naskh Arabic', serif", fontWeight: 700, lineHeight: "48px" }}>
-            مَاشَاءَ اللَّه
-          </p>
-          <p style={{ fontSize: 22, color: T.textPrimary, fontFamily: "Inter, sans-serif", fontWeight: 800, marginTop: 4 }}>
-            Masha&apos;Allah!
-          </p>
-          <p style={{ fontSize: 14, color: T.textMuted, fontFamily: "Inter, sans-serif", marginTop: 6 }}>
-            You completed {cat.name}
-          </p>
-        </div>
-
-        {/* Stats grid */}
-        <div className="w-full grid grid-cols-3 gap-3">
-          {[
-            { value: azkar.length, label: "azkar" },
-            { value: totalReps,    label: "repetitions" },
-            { value: elapsedMin,   label: "minutes" },
-          ].map(({ value, label }) => (
-            <div key={label} className="rounded-xl p-4 text-center"
-              style={{ background: T.surface, border: `1px solid ${T.border}` }}>
-              <p style={{ fontSize: 26, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace", lineHeight: "32px" }}>{value}</p>
-              <p style={{ fontSize: 10, color: T.textMuted, fontFamily: "Inter, sans-serif", marginTop: 4 }}>{label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Streak callout */}
-        <div className="w-full rounded-xl px-4 py-3 flex items-center gap-3"
-          style={{ background: `${T.gold}10`, border: `1px solid ${T.gold}30` }}>
-          <Flame size={20} style={{ color: T.gold }} />
-          <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: T.gold, fontFamily: "Inter, sans-serif" }}>
-              {currentStreak}-day streak maintained!
-            </p>
-            <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Consistency is a form of worship.</p>
-          </div>
-        </div>
-      </div>
-
-      {/* Actions */}
-      <div className="w-full flex flex-col gap-3">
-        <button
-          disabled
-          className="w-full rounded-xl flex items-center justify-center gap-2"
-          style={{ height: 48, background: T.surface, border: `1px solid ${T.border}`, color: T.textSec, fontSize: 15, fontFamily: "Inter, sans-serif", fontWeight: 600, opacity: 0.5, cursor: "not-allowed" }}>
-          <Share2 size={16} /> Share Progress Soon
-        </button>
-        <button onClick={onHome}
-          className="w-full rounded-xl font-bold transition-all active:scale-95"
-          style={{ height: 52, background: T.gold, color: T.bg, fontSize: 16, fontFamily: "Inter, sans-serif" }}>
-          Return Home
-        </button>
-      </div>
-    </div>
-  );
-}
-
+import { CatIcon } from "./components/CatIcon";
+import { MaleAvatar } from "./components/Avatars";
+import { Toggle } from "./components/ToggleSwitch";
+import { ProgressBar } from "./components/ProgressBar";
+import { Header, BottomNav } from "./components/LayoutShells";
+import { RepBadge, PulseRings, CounterRing, WaveformBars } from "./components/ZikrComponents";
+import { HomeScreen } from "./screens/HomeScreen";
+import { CategoryScreen } from "./screens/CategoryScreen";
+import { ReaderScreen } from "./screens/ReaderScreen";
+import { CounterScreen } from "./screens/CounterScreen";
+import { CompletionScreen } from "./screens/CompletionScreen";
 // ─── Settings Screen — orchestrates all sub-screens via local state ───────────
 function SettingsScreen({
   darkMode,
   languageLabel,
+  language,
+  isArabic,
   isGuest,
   isSyncing,
   onToggleDark,
@@ -1127,6 +74,8 @@ function SettingsScreen({
 }: {
   darkMode: boolean;
   languageLabel: string;
+  language: AppLanguage;
+  isArabic: boolean;
   isGuest: boolean;
   isSyncing: boolean;
   onToggleDark: () => void;
@@ -1140,9 +89,10 @@ function SettingsScreen({
     <div className="flex flex-col h-full" style={{ background: T.bg }}>
       {sub === "root" && (
         <>
-          <Header title="Settings" onBack={onBack} />
+          <Header title={t(language, "common.settings")} onBack={onBack} />
           <SettingsRootPanel
             onNav={setSub}
+            language={language}
             darkMode={darkMode}
             languageLabel={languageLabel}
             isGuest={isGuest}
@@ -1408,8 +358,9 @@ function RowToggle({ checked, onChange }: { checked: boolean; onChange: () => vo
 }
 
 // Settings Root screen
-function SettingsRootPanel({ onNav, darkMode, languageLabel, isGuest, isSyncing, onToggleDark, onSignOut }: {
+function SettingsRootPanel({ onNav, language, darkMode, languageLabel, isGuest, isSyncing, onToggleDark, onSignOut }: {
   onNav: (s: SettingsSubScreen) => void;
+  language: AppLanguage;
   darkMode: boolean;
   languageLabel: string;
   isGuest: boolean;
@@ -1423,66 +374,66 @@ function SettingsRootPanel({ onNav, darkMode, languageLabel, isGuest, isSyncing,
       animate={{ opacity: [0, 1, 1], y: [8, 0, 0] }}
       transition={{ opacity: { duration: 0.61, times: [0, 0.7377, 1], ease: "easeOut" }, y: { duration: 0.61, times: [0, 0.7377, 1], ease: "easeOut" } }}>
 
-      <SectionLabel label="PREFERENCES" />
+      <SectionLabel label={t(language, "settings.preferences")} />
       <div className="mx-4 rounded-xl overflow-hidden">
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke={T.textPrimary} strokeWidth="1.5" /><path d="M10 2C10 2 7 6 7 10s3 8 3 8M10 2c0 0 3 4 3 8s-3 8-3 8M2 10h16" stroke={T.textPrimary} strokeWidth="1.5" strokeLinecap="round" /></svg>}
-          label="Language" right={<RowValue value={languageLabel} />} onPress={() => {}} />
+          label={t(language, "settings.language")} right={<RowValue value={languageLabel} />} onPress={() => {}} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke={T.textPrimary} strokeWidth="1.5" /><path d="M10 3v14M3 10h14" stroke={T.textPrimary} strokeWidth="1.5" strokeLinecap="round" /></svg>}
-          label="Display Theme"
-          right={<div className="flex items-center gap-2"><p style={{ fontSize: 14, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>{darkMode ? "Dark" : "Light"}</p><RowToggle checked={darkMode} onChange={onToggleDark} /></div>}
+          label={t(language, "settings.displayTheme")}
+          right={<div className="flex items-center gap-2"><p style={{ fontSize: 14, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>{darkMode ? t(language, "common.dark") : t(language, "common.light")}</p><RowToggle checked={darkMode} onChange={onToggleDark} /></div>}
           onPress={() => {}} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M10 4v12M7 7h6M7 13h4" stroke={T.textPrimary} strokeWidth="1.5" strokeLinecap="round" /></svg>}
-          label="Text Size" right={<RowValue value="Medium" />} onPress={() => onNav("accessibility")} hasDivider={false} />
+          label={t(language, "settings.textSize")} right={<RowValue value={t(language, "settings.medium")} />} onPress={() => onNav("accessibility")} hasDivider={false} />
       </div>
 
-      <SectionLabel label="CONTENT" />
+      <SectionLabel label={t(language, "settings.content")} />
       <div className="mx-4 rounded-xl overflow-hidden">
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Volume2 size={18} style={{ color: T.textPrimary }} />}
-          label="Audio Quality" right={<RowValue value="High" />} onPress={() => {}} />
+          label={t(language, "settings.audioQuality")} right={<RowValue value={t(language, "settings.high")} />} onPress={() => {}} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Download size={18} style={{ color: T.textPrimary }} />}
-          label="Offline Downloads" right={<RowChevron />} onPress={() => onNav("downloads")} hasDivider={false} />
+          label={t(language, "settings.offlineDownloads")} right={<RowChevron />} onPress={() => onNav("downloads")} hasDivider={false} />
       </div>
 
-      <SectionLabel label="ACCESSIBILITY" />
+      <SectionLabel label={t(language, "settings.accessibility")} />
       <div className="mx-4 rounded-xl overflow-hidden">
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Settings size={18} style={{ color: T.textPrimary }} />}
-          label="Accessibility" right={<RowChevron />} onPress={() => onNav("accessibility")} hasDivider={false} />
+          label={t(language, "settings.accessibility")} right={<RowChevron />} onPress={() => onNav("accessibility")} hasDivider={false} />
       </div>
 
-      <SectionLabel label="ACCOUNT" />
+      <SectionLabel label={t(language, "settings.account")} />
       <div className="mx-4 rounded-xl overflow-hidden">
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Bell size={18} style={{ color: T.textPrimary }} />}
-          label="Notifications" right={<RowChevron />} onPress={() => onNav("notifications")} />
+          label={t(language, "settings.notifications")} right={<RowChevron />} onPress={() => onNav("notifications")} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Flame size={18} style={{ color: T.textPrimary }} />}
-          label="My Progress" right={<RowChevron />} onPress={() => onNav("progress")} />
+          label={t(language, "settings.myProgress")} right={<RowChevron />} onPress={() => onNav("progress")} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<Info size={18} style={{ color: T.textPrimary }} />}
-          label="About & Help" right={<RowChevron />} onPress={() => onNav("about")} hasDivider={false} />
+          label={t(language, "settings.aboutHelp")} right={<RowChevron />} onPress={() => onNav("about")} hasDivider={false} />
       </div>
 
       {!isGuest && (
         <>
-          <SectionLabel label="SYNC" />
+          <SectionLabel label={t(language, "settings.sync")} />
           <div className="mx-4 rounded-xl overflow-hidden">
             <SettingsRowItem
               iconBg={T.surfaceEl}
               icon={<Wifi size={18} style={{ color: T.textPrimary }} />}
-              label="Account Sync"
-              right={<RowValue value={isSyncing ? "Syncing" : "Connected"} />}
+              label={t(language, "settings.accountSync")}
+              right={<RowValue value={isSyncing ? t(language, "common.syncing") : t(language, "common.connected")} />}
               onPress={() => {}}
             />
             <SettingsRowItem
               iconBg="#3A1F23"
               icon={<X size={18} style={{ color: "#FCA5A5" }} />}
-              label="Sign Out"
+              label={t(language, "common.signOut")}
               right={<RowChevron />}
               onPress={onSignOut}
               hasDivider={false}
@@ -2774,10 +1725,12 @@ function LanguageScreen({ initialLanguage, onContinue }: { initialLanguage: AppL
 
 // ─── Phase 2 Screen: Login ────────────────────────────────────────────────────
 function LoginScreen({
+  language,
   phoneAuthEnabled,
   onPhone,
   onGuest,
 }: {
+  language: AppLanguage;
   phoneAuthEnabled: boolean;
   onPhone: () => void;
   onGuest: () => void;
@@ -2794,14 +1747,14 @@ function LoginScreen({
             <line x1="25" y1="9" x2="31" y2="9" stroke={T.gold} strokeWidth="2" strokeLinecap="round" />
           </svg>
           <p style={{ fontSize: 28, fontWeight: 800, color: T.textPrimary, fontFamily: "Inter, sans-serif", lineHeight: "36px", letterSpacing: "-0.28px", textAlign: "center" }}>
-            Welcome to Azkar
+            {t(language, "auth.welcome")}
           </p>
           <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px", textAlign: "center" }}>
-            Sign in to sync your progress across all your devices
+            {t(language, "auth.syncSubtitle")}
           </p>
           {!phoneAuthEnabled && (
             <p style={{ fontSize: 12, color: T.gold, fontFamily: "Inter, sans-serif", lineHeight: "18px", textAlign: "center" }}>
-              Add Supabase env vars to enable phone sign-in.
+              {t(language, "auth.phoneDisabled")}
             </p>
           )}
         </div>
@@ -2816,21 +1769,21 @@ function LoginScreen({
               <path fill="#FBBC05" d="M10.1 28.8c-.4-1.2-.6-2.5-.6-3.8 0-1.7.3-3.3.7-4.8L2.8 13.5A24 24 0 0 0 0 24c0 3.8.9 7.5 2.8 10.5l7.3-5.7z"/>
               <path fill="#34A853" d="M24 48c6 0 11-2 14.7-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.2 2.2-6.5 0-12-4.4-14-10.2l-7.3 5.7C6.6 42.5 14.6 48 24 48z"/>
             </svg>
-            <span style={{ fontSize: 16, fontWeight: 600, color: "#1A1228", fontFamily: "Inter, sans-serif" }}>Google Coming Soon</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: "#1A1228", fontFamily: "Inter, sans-serif" }}>{t(language, "auth.googleSoon")}</span>
           </button>
           <button disabled className="w-full flex items-center justify-center gap-3 rounded-lg h-[52px]"
             style={{ background: "#1C1C2E", border: `1.5px solid #3A3A5C`, opacity: 0.6, cursor: "not-allowed" }}>
             <svg width="16" height="20" viewBox="0 0 16 20" fill={T.textPrimary} style={{ flexShrink: 0 }}>
               <path d="M13.2 10.6c0-2.7 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.4 1-4.2 1-.8 0-2.2-1-3.6-.9-1.8 0-3.5 1.1-4.4 2.7C-1.6 10.2-.2 15.2 1.6 18c.9 1.3 1.9 2.7 3.3 2.7s1.8-.8 3.4-.8c1.6 0 2 .8 3.5.8 1.4 0 2.3-1.3 3.2-2.6.6-.9 1.1-1.8 1.4-2.1-.1-.1-2.2-.9-2.2-3.4zM10.5 2.9c.7-.9 1.3-2.2 1.1-3.4-1.1.1-2.4.7-3.1 1.6-.7.8-1.3 2.1-1.1 3.3 1.2.1 2.4-.6 3.1-1.5z"/>
             </svg>
-            <span style={{ fontSize: 16, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>Apple Coming Soon</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>{t(language, "auth.appleSoon")}</span>
           </button>
         </div>
 
         {/* Divider */}
         <div className="flex items-center gap-3">
           <div className="flex-1 h-px" style={{ background: T.surface }} />
-          <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>or</p>
+          <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>{t(language, "auth.or")}</p>
           <div className="flex-1 h-px" style={{ background: T.surface }} />
         </div>
 
@@ -2847,10 +1800,10 @@ function LoginScreen({
           </div>
           <div className="flex flex-col items-start flex-1 min-w-0">
             <p style={{ fontSize: 15, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif", lineHeight: "20px" }}>
-              Continue with Phone Number
+              {t(language, "auth.continueWithPhone")}
             </p>
             <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "16px" }}>
-              We&apos;ll send a one-time verification code
+              {t(language, "auth.otpSubtitle")}
             </p>
           </div>
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style={{ flexShrink: 0 }}>
@@ -2863,10 +1816,10 @@ function LoginScreen({
           className="w-full flex flex-col items-center justify-center transition-all active:scale-95"
           style={{ padding: "14px 16px", background: "transparent", border: `1.5px dashed ${T.gold}`, borderRadius: 8 }}>
           <p style={{ fontSize: 17, fontWeight: 600, color: T.gold, fontFamily: "Inter, sans-serif", lineHeight: "24px" }}>
-            Continue as Guest
+            {t(language, "auth.continueAsGuest")}
           </p>
           <p style={{ fontSize: 10, fontWeight: 500, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "14px" }}>
-            ⚠ Your progress won&apos;t sync across devices
+            {t(language, "auth.guestWarning")}
           </p>
         </button>
 
@@ -2884,6 +1837,7 @@ function LoginScreen({
 
 // ─── Phase 2 Screen: Phone Input ─────────────────────────────────────────────
 function PhoneInputScreen({
+  language,
   initialPhone,
   errorMessage,
   isSending,
@@ -2891,6 +1845,7 @@ function PhoneInputScreen({
   onBack,
   onSkip,
 }: {
+  language: AppLanguage;
   initialPhone: string;
   errorMessage: string;
   isSending: boolean;
@@ -2911,19 +1866,23 @@ function PhoneInputScreen({
               <path d="M15 18L9 12L15 6" stroke={T.textPrimary} strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
-          <p style={{ fontSize: 17, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>Sign In</p>
+          <p style={{ fontSize: 17, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>
+            {t(language, "auth.signIn")}
+          </p>
           <button onClick={onSkip}>
-            <p style={{ fontSize: 17, fontWeight: 600, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Skip</p>
+            <p style={{ fontSize: 17, fontWeight: 600, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>
+              {t(language, "auth.skip")}
+            </p>
           </button>
         </div>
 
         <div className="px-6 pt-6 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p style={{ fontSize: 22, fontWeight: 700, color: T.textPrimary, fontFamily: "Inter, sans-serif", lineHeight: "30px", letterSpacing: "-0.11px" }}>
-              Enter Your Number
+              {t(language, "auth.enterNumber")}
             </p>
             <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px" }}>
-              We&apos;ll send a one-time code to verify
+              {t(language, "auth.phoneHelp")}
             </p>
           </div>
 
@@ -2950,7 +1909,7 @@ function PhoneInputScreen({
               <circle cx="7" cy="7" r="6" stroke={T.textMuted} strokeWidth="1.4" />
               <path d="M7 3.5C5.3 4.2 4.5 5.5 4.5 7s.8 2.8 2.5 3.5M7 3.5C8.7 4.2 9.5 5.5 9.5 7s-.8 2.8-2.5 3.5M3.5 7h7M7 3.5v7" stroke={T.textMuted} strokeWidth="1.4" strokeLinecap="round" />
             </svg>
-            <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>We support 190+ countries</p>
+            <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>+190 countries supported</p>
           </div>
           {errorMessage && (
             <p style={{ fontSize: 12, color: "#FCA5A5", fontFamily: "Inter, sans-serif", lineHeight: "18px" }}>
@@ -2966,7 +1925,7 @@ function PhoneInputScreen({
           className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95"
           style={{ height: 52, background: T.gold, opacity: canSend ? 1 : 0.5,
             fontSize: 17, fontWeight: 600, color: T.bg, fontFamily: "Inter, sans-serif" }}>
-          {isSending ? "Sending..." : "Send Verification Code"}
+          {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
         <p className="text-center" style={{ fontSize: 10, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "14px" }}>
           By continuing you agree to our{" "}
@@ -2984,6 +1943,7 @@ function PhoneInputScreen({
 
 // ─── Phase 2 Screen: OTP Verification ────────────────────────────────────────
 function OTPScreen({
+  language,
   maskedPhone,
   errorMessage,
   isVerifying,
@@ -2993,6 +1953,7 @@ function OTPScreen({
   onBack,
   onDifferent,
 }: {
+  language: AppLanguage;
   maskedPhone: string;
   errorMessage: string;
   isVerifying: boolean;
@@ -3040,14 +2001,16 @@ function OTPScreen({
               <path d="M15 18L9 12L15 6" stroke={T.textPrimary} strokeWidth="2" strokeLinecap="round" />
             </svg>
           </button>
-          <p style={{ fontSize: 17, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>Verify Number</p>
+          <p style={{ fontSize: 17, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>
+            {t(language, "auth.verifyNumber")}
+          </p>
           <div style={{ width: 44 }} />
         </div>
 
         <div className="px-6 pt-4 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px" }}>
-              Enter the 6-digit code sent to{" "}
+              {t(language, "auth.codeSentTo")}{" "}
               <span style={{ color: T.textPrimary }}>{maskedPhone}</span>
             </p>
             <div className="flex items-center gap-1.5">
@@ -3056,7 +2019,7 @@ function OTPScreen({
                 <path d="M7 4V7.5L9 9.5" stroke={T.gold} strokeWidth="1.4" strokeLinecap="round" />
               </svg>
               <p style={{ fontSize: 13, color: T.gold, fontFamily: "Inter, sans-serif", lineHeight: "20px" }}>
-                Code expires in {mins}:{secs}
+                {t(language, "auth.codeExpiresIn")} {mins}:{secs}
               </p>
             </div>
           </div>
@@ -3094,10 +2057,10 @@ function OTPScreen({
           </div>
 
           <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px", textAlign: "center" }}>
-            Didn&apos;t receive a code?{" "}
+            {t(language, "auth.didntReceive")}{" "}
             {countdown === 0
-              ? <span style={{ color: T.gold, fontWeight: 600, cursor: isResending ? "wait" : "pointer" }} onClick={() => { if (!isResending) { setCountdown(60); onResend(); } }}>{isResending ? "Resending..." : "Resend"}</span>
-              : <span>Resend in {countdown}s</span>
+              ? <span style={{ color: T.gold, fontWeight: 600, cursor: isResending ? "wait" : "pointer" }} onClick={() => { if (!isResending) { setCountdown(60); onResend(); } }}>{isResending ? t(language, "common.resending") : t(language, "common.resend")}</span>
+              : <span>{t(language, "auth.resendIn", { seconds: countdown })}</span>
             }
           </p>
           {errorMessage && (
@@ -3114,12 +2077,12 @@ function OTPScreen({
           className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95"
           style={{ height: 52, background: T.gold, opacity: isComplete ? 1 : 0.4,
             fontSize: 17, fontWeight: 600, color: T.bg, fontFamily: "Inter, sans-serif" }}>
-          {isVerifying ? "Verifying..." : "Verify"}
+          {isVerifying ? t(language, "common.verifying") : t(language, "common.verify")}
         </button>
         <button onClick={onDifferent}
           className="w-full flex items-center justify-center rounded-xl h-[52px]"
           style={{ background: "transparent", fontSize: 17, fontWeight: 600, color: T.gold, fontFamily: "Inter, sans-serif" }}>
-          Try a different number
+          {t(language, "auth.tryDifferentNumber")}
         </button>
         <div className="flex justify-center pt-1">
           <div className="rounded-full" style={{ width: 134, height: 5, background: T.textPrimary }} />
@@ -3154,6 +2117,7 @@ export default function App() {
 
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
+  const isArabic = selectedLang === "ar";
 
   // Apply theme class to root
   useEffect(() => {
@@ -3479,7 +2443,7 @@ export default function App() {
           {/* Phase 2 — onboarding flow */}
           {view === "splash" && (
             <SplashScreen onDone={() => {
-              setView("onboard1");
+              setView(isArabic ? "ar_onboard1" : "onboard1");
             }} />
           )}
           {view === "onboard1" && (
@@ -3529,6 +2493,7 @@ export default function App() {
           )}
           {view === "login" && (
             <LoginScreen
+              language={selectedLang}
               phoneAuthEnabled={isSupabaseConfigured}
               onPhone={() => { setAuthError(""); setView("phone"); }}
               onGuest={() => {
@@ -3542,6 +2507,7 @@ export default function App() {
           )}
           {view === "phone" && (
             <PhoneInputScreen
+              language={selectedLang}
               initialPhone={lastPhoneNumber}
               errorMessage={authError}
               isSending={isSendingOtp}
@@ -3552,6 +2518,7 @@ export default function App() {
           )}
           {view === "otp" && (
             <OTPScreen
+              language={selectedLang}
               maskedPhone={maskPhoneNumber(lastPhoneNumber)}
               errorMessage={authError}
               isVerifying={isVerifyingOtp}
@@ -3572,14 +2539,15 @@ export default function App() {
               longestStreak={longestStreak}
               onCategory={openCategory}
               onSearch={() => push("search")}
+              language={selectedLang}
             />
           )}
           {view === "category" && (
-            <CategoryScreen catId={activeCat} completed={completed[activeCat]}
+            <CategoryScreen catId={activeCat} completed={completed[activeCat]} isArabic={isArabic}
               onZikr={i => openReader(activeCat, i)} onBack={pop} />
           )}
           {view === "reader" && (
-            <ReaderScreen catId={activeCat} idx={activeIdx}
+            <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
               isDone={completed[activeCat]?.has(activeIdx) ?? false}
               onBack={pop}
               onCounter={() => { setSessionStart(Date.now()); openCounter(); }}
@@ -3605,6 +2573,8 @@ export default function App() {
             <SettingsScreen
               darkMode={darkMode}
               languageLabel={languageLabel}
+              language={selectedLang}
+              isArabic={isArabic}
               isGuest={isGuest}
               isSyncing={isSyncingRemote}
               onToggleDark={() => setDarkMode(d => !d)}
@@ -3618,8 +2588,9 @@ export default function App() {
         </div>
 
         {/* Bottom nav */}
-        {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} />}
+        {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
       </div>
     </div>
   );
 }
+
