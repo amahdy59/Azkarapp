@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { SkipBack, SkipForward, Check, Info, ChevronUp, ChevronDown, Play, Pause, RotateCcw } from "lucide-react";
+import { SkipBack, SkipForward, Check, Info, ChevronUp, ChevronDown, Play, Pause, RotateCcw, Expand, X } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -8,6 +8,7 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings, WaveformBars } from "../components/ZikrComponents";
 import { formatNumerals, formatRatio, numeralFontFamily } from "../formatting";
+import { ScrollArea } from "../components/ui/scroll-area";
 
 function TogglePill({
   active,
@@ -76,6 +77,7 @@ export function ReaderScreen({
   const [pulse, setPulse] = useState(0);
   const [flash, setFlash] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [expandedReading, setExpandedReading] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const language: AppLanguage = isArabic ? "ar" : "en";
@@ -157,9 +159,182 @@ export function ReaderScreen({
     }
   };
 
+  const detailPanel = (
+    <>
+      <div className="rounded-2xl border border-border bg-background/70 px-4 py-4">
+        <p
+          className="text-center text-[28px] font-bold leading-[52px] text-foreground"
+          dir="rtl"
+          style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+        >
+          {z.arabicText}
+        </p>
+
+        <div className="mt-5 flex flex-wrap justify-center gap-2">
+          <TogglePill
+            active={showTranslation}
+            label="EN"
+            onClick={onToggleTranslation}
+            ariaLabel={t(language, "reader.toggleTranslation")}
+          />
+          <TogglePill
+            active={showTransliteration}
+            label="TR"
+            onClick={onToggleTransliteration}
+            ariaLabel={t(language, "reader.toggleTransliteration")}
+          />
+        </div>
+
+        {showTransliteration && (
+          <p className="mt-4 text-center font-sans text-[13px] italic leading-[21px] text-card-foreground">
+            {z.transliteration}
+          </p>
+        )}
+
+        {showTranslation && (
+          <p className="mt-4 text-center font-sans text-[14px] leading-[23px] text-card-foreground">
+            {z.translation}
+          </p>
+        )}
+      </div>
+
+      <div className="rounded-2xl border border-border bg-background/55">
+        <button
+          onClick={() => setBenefitOpen((open) => !open)}
+          aria-expanded={benefitOpen}
+          aria-controls="benefit-content"
+          className="flex w-full items-center gap-3 p-4 text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+            style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}
+          >
+            <Info size={14} className="text-primary" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="font-sans text-[13px] font-semibold text-card-foreground">
+              {t(language, "reader.benefit")}
+            </p>
+            <p className="mt-1 font-sans text-[12px] leading-[18px] text-muted-foreground">
+              {t(language, "reader.scrollHint")}
+            </p>
+          </div>
+          <div className="text-card-foreground">
+            {benefitOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </div>
+        </button>
+
+        {benefitOpen && (
+          <div id="benefit-content" className="fade-in border-t border-border px-4 pb-4">
+            <p className="pt-3 font-sans text-[13px] leading-[21px] text-card-foreground">
+              {z.benefit}
+            </p>
+            {extraNotes && (
+              <div className="mt-4">
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  {t(language, "reader.notes")}
+                </p>
+                <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{extraNotes}</p>
+              </div>
+            )}
+            {z.preferredTiming && (
+              <div className="mt-4">
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  {t(language, "reader.timing")}
+                </p>
+                <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{z.preferredTiming}</p>
+              </div>
+            )}
+            {displayCount !== String(z.repetitionCount) && (
+              <div className="mt-4">
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  {t(language, "reader.count")}
+                </p>
+                <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{localizedDisplayCount}</p>
+              </div>
+            )}
+            {authenticityNote && (
+              <div className="mt-4">
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  {t(language, "reader.authenticity")}
+                </p>
+                <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{authenticityNote}</p>
+              </div>
+            )}
+            {z.hadithText && (
+              <div className="mt-4">
+                <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                  {t(language, "reader.evidence")}
+                </p>
+                <p
+                  className="mt-1 rounded-xl border border-border bg-card px-3 py-3 text-[15px] leading-[28px] text-foreground"
+                  dir="auto"
+                  style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+                >
+                  {z.hadithText}
+                </p>
+              </div>
+            )}
+            <div className="mt-4 flex flex-wrap items-center gap-2">
+              <span
+                className="inline-block rounded-full border px-3 py-1 font-sans text-[11px] font-medium text-card-foreground"
+                style={{
+                  background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
+                  borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
+                }}
+              >
+                {z.sourceReference}
+              </span>
+              {z.sourceUrl && (
+                <a
+                  href={z.sourceUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center rounded-full border border-border px-3 py-1 font-sans text-[11px] font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {t(language, "reader.openSource")}
+                </a>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div
+        className="flex items-center gap-3 rounded-2xl border px-4 py-3"
+        style={{
+          background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
+          borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
+        }}
+      >
+        <button
+          onClick={() => setPlaying((value) => !value)}
+          aria-label={playing ? "Pause" : "Play"}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {playing ? <Pause size={15} color="white" /> : <Play size={15} color="white" className="ms-0.5" />}
+        </button>
+        <WaveformBars active={playing} />
+        <div className="flex-1" />
+        <button
+          onClick={() => setSpeed((value) => (value === 0.75 ? 1 : value === 1 ? 1.25 : 0.75))}
+          aria-label={t(language, "reader.audioSpeed")}
+          className="rounded-lg border px-2 py-1 text-[11px] font-bold text-secondary"
+          style={{
+            fontFamily: "DM Mono, monospace",
+            background: "color-mix(in srgb, var(--secondary) 30%, transparent)",
+            borderColor: "color-mix(in srgb, var(--secondary) 50%, transparent)",
+          }}
+        >
+          {speed}x
+        </button>
+      </div>
+    </>
+  );
+
   return (
     <div
-      className="flex h-full flex-col bg-background"
+      className="relative flex h-full flex-col bg-background"
       onTouchStart={(event) => {
         touchStartX.current = event.touches[0].clientX;
       }}
@@ -234,195 +409,52 @@ export function ReaderScreen({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
-          <div className="flex flex-col gap-4 pb-4">
-            <div className="rounded-2xl border border-border bg-card px-5 py-5">
-              <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-                <span className="rounded-full border border-border bg-background px-3 py-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-card-foreground">
-                  {t(language, "reader.title", {
-                    index: formatNumerals(idx + 1, language),
-                    total: formatNumerals(azkar.length, language),
-                  })}
-                </span>
-                <span
-                  className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary"
-                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-                >
-                  {t(language, "reader.count")}: {localizedDisplayCount}
-                </span>
-              </div>
-
-              {isDone && (
-                <div className="mb-4 flex items-center gap-2 border-b border-border pb-3">
-                  <Check size={14} className="text-primary" />
-                  <span className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
-                    {t(language, "reader.completed")}
+      <div className="flex flex-1 min-h-0 flex-col overflow-hidden px-5 pb-4">
+        <div className="flex min-h-0 flex-1 flex-col gap-4">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[30px] border border-border bg-card shadow-[0_14px_36px_rgba(0,0,0,0.16)]">
+            <div className="flex flex-wrap items-start justify-between gap-3 px-5 pb-4 pt-5">
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="rounded-full border border-border bg-background px-3 py-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-card-foreground">
+                    {t(language, "reader.title", {
+                      index: formatNumerals(idx + 1, language),
+                      total: formatNumerals(azkar.length, language),
+                    })}
                   </span>
-                </div>
-              )}
-
-              <p
-                className="mb-5 text-center text-[28px] font-bold leading-[52px] text-foreground"
-                dir="rtl"
-                style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-              >
-                {z.arabicText}
-              </p>
-
-              <div className="mb-4 flex flex-wrap justify-center gap-2">
-                <TogglePill
-                  active={showTranslation}
-                  label="EN"
-                  onClick={onToggleTranslation}
-                  ariaLabel={t(language, "reader.toggleTranslation")}
-                />
-                <TogglePill
-                  active={showTransliteration}
-                  label="TR"
-                  onClick={onToggleTransliteration}
-                  ariaLabel={t(language, "reader.toggleTransliteration")}
-                />
-              </div>
-
-              {showTransliteration && (
-                <p className="mb-3 text-center font-sans text-[13px] italic leading-[20px] text-card-foreground">
-                  {z.transliteration}
-                </p>
-              )}
-
-              {showTranslation && (
-                <p className="text-center font-sans text-[14px] leading-[22px] text-card-foreground">
-                  {z.translation}
-                </p>
-              )}
-            </div>
-
-            <button
-              onClick={() => setBenefitOpen((open) => !open)}
-              aria-expanded={benefitOpen}
-              aria-controls="benefit-content"
-              className="w-full rounded-xl border border-border bg-card text-start transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <div className="flex items-center gap-3 p-4">
-                <div
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                  style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}
-                >
-                  <Info size={14} className="text-primary" />
-                </div>
-                <p className="flex-1 font-sans text-[13px] font-semibold text-card-foreground">
-                  {t(language, "reader.benefit")}
-                </p>
-                <div className="text-card-foreground">
-                  {benefitOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                </div>
-              </div>
-              {benefitOpen && (
-                <div id="benefit-content" className="fade-in border-t border-border px-4 pb-4">
-                  <p className="pt-3 font-sans text-[13px] leading-[21px] text-card-foreground">
-                    {z.benefit}
-                  </p>
-                  {extraNotes && (
-                    <div className="mt-4">
-                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                        {t(language, "reader.notes")}
-                      </p>
-                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{extraNotes}</p>
-                    </div>
-                  )}
-                  {z.preferredTiming && (
-                    <div className="mt-4">
-                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                        {t(language, "reader.timing")}
-                      </p>
-                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{z.preferredTiming}</p>
-                    </div>
-                  )}
-                  {displayCount !== String(z.repetitionCount) && (
-                    <div className="mt-4">
-                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                        {t(language, "reader.count")}
-                      </p>
-                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{localizedDisplayCount}</p>
-                    </div>
-                  )}
-                  {authenticityNote && (
-                    <div className="mt-4">
-                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                        {t(language, "reader.authenticity")}
-                      </p>
-                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-card-foreground">{authenticityNote}</p>
-                    </div>
-                  )}
-                  {z.hadithText && (
-                    <div className="mt-4">
-                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                        {t(language, "reader.evidence")}
-                      </p>
-                      <p
-                        className="mt-1 rounded-xl border border-border bg-background px-3 py-3 text-[15px] leading-[28px] text-foreground"
-                        dir="auto"
-                        style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-                      >
-                        {z.hadithText}
-                      </p>
-                    </div>
-                  )}
-                  <div className="mt-4 flex flex-wrap items-center gap-2">
-                    <span
-                      className="inline-block rounded-full border px-3 py-1 font-sans text-[11px] font-medium text-card-foreground"
-                      style={{
-                        background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
-                        borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
-                      }}
-                    >
-                      {z.sourceReference}
+                  <span
+                    className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[12px] font-bold text-primary"
+                    style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                  >
+                    {t(language, "reader.count")}: {localizedDisplayCount}
+                  </span>
+                  {isDone && (
+                    <span className="rounded-full border border-primary/30 bg-primary/12 px-3 py-1.5 font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-primary">
+                      {t(language, "reader.completed")}
                     </span>
-                    {z.sourceUrl && (
-                      <a
-                        href={z.sourceUrl}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="inline-flex items-center rounded-full border border-border px-3 py-1 font-sans text-[11px] font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        {t(language, "reader.openSource")}
-                      </a>
-                    )}
-                  </div>
+                  )}
                 </div>
-              )}
-            </button>
+                <p className="mt-3 font-sans text-[12px] leading-[18px] text-muted-foreground">
+                  {t(language, "reader.scrollHint")}
+                </p>
+              </div>
 
-            <div
-              className="flex items-center gap-3 rounded-xl border px-4 py-3"
-              style={{
-                background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
-                borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
-              }}
-            >
               <button
-                onClick={() => setPlaying((value) => !value)}
-                aria-label={playing ? "Pause" : "Play"}
-                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-secondary transition-all active:scale-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                type="button"
+                onClick={() => setExpandedReading(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-2 font-sans text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
-                {playing ? <Pause size={15} color="white" /> : <Play size={15} color="white" className="ms-0.5" />}
-              </button>
-              <WaveformBars active={playing} />
-              <div className="flex-1" />
-              <button
-                onClick={() => setSpeed((value) => (value === 0.75 ? 1 : value === 1 ? 1.25 : 0.75))}
-                aria-label={t(language, "reader.audioSpeed")}
-                className="rounded-lg border px-2 py-1 text-[11px] font-bold text-secondary"
-                style={{
-                  fontFamily: "DM Mono, monospace",
-                  background: "color-mix(in srgb, var(--secondary) 30%, transparent)",
-                  borderColor: "color-mix(in srgb, var(--secondary) 50%, transparent)",
-                }}
-              >
-                {speed}x
+                <Expand size={14} />
+                <span>{t(language, "reader.fullView")}</span>
               </button>
             </div>
+
+            <div className="border-t border-border/70" />
+
+            <ScrollArea className="min-h-0 flex-1">
+              <div className="space-y-4 px-5 py-5">
+                {detailPanel}
+              </div>
+            </ScrollArea>
           </div>
         </div>
 
@@ -431,7 +463,7 @@ export function ReaderScreen({
             role="button"
             tabIndex={0}
             aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-            className="relative rounded-[28px] border border-border bg-card px-4 py-4 shadow-[0_10px_24px_rgba(0,0,0,0.12)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
+            className="relative min-h-[240px] rounded-[28px] border border-border bg-card px-4 py-4 shadow-[0_10px_24px_rgba(0,0,0,0.12)] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
             onClick={handleTap}
             onKeyDown={(event) => {
               if (event.key === " " || event.key === "Enter") {
@@ -518,6 +550,37 @@ export function ReaderScreen({
           </div>
         </div>
       </div>
+
+      {expandedReading && (
+        <div className="absolute inset-0 z-30 flex flex-col bg-background">
+          <div className="flex items-center gap-3 border-b border-border px-4 py-4">
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-sans text-[17px] font-semibold text-foreground">
+                {t(language, "reader.fullView")}
+              </p>
+              <p className="mt-1 font-sans text-[12px] leading-[18px] text-muted-foreground">
+                {t(language, "reader.fullViewHint")}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setExpandedReading(false)}
+              aria-label={t(language, "reader.closeReader")}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border bg-card text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          <ScrollArea className="min-h-0 flex-1">
+            <div className="space-y-4 px-5 py-5">
+              <div className="rounded-[30px] border border-border bg-card px-5 py-5 shadow-[0_14px_36px_rgba(0,0,0,0.16)]">
+                {detailPanel}
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      )}
     </div>
   );
 }
