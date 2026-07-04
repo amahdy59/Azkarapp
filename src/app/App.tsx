@@ -431,20 +431,20 @@ export default function App() {
             }} />
           )}
           {view === "onboard1" && (
-            <Onboarding1Screen
+            <EnglishOnboarding1Screen
               onNext={() => setView("onboard2")}
               onSkip={() => { setView("home"); setActiveTab("home"); }}
             />
           )}
           {view === "onboard2" && (
-            <Onboarding2Screen
+            <EnglishOnboarding2Screen
               onNext={() => setView("onboard3")}
               onBack={() => setView("onboard1")}
             />
           )}
           {view === "onboard3" && (
-            <Onboarding3Screen
-              onNext={() => setView("language")}
+            <EnglishOnboarding3Screen
+              onNext={() => { setView("language"); setActiveTab("home"); }}
               onBack={() => setView("onboard2")}
             />
           )}
