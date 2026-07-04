@@ -7,6 +7,28 @@ import {
   SkipForward, SkipBack,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import {
+  fromCompletedSets,
+  getStreakSummary,
+  loadAppState,
+  saveAppState,
+  toCompletedSets,
+  type AppLanguage,
+  type StoredSession,
+} from "./state";
+import {
+  getCurrentSession,
+  loadRemoteState,
+  normalizePhoneNumber,
+  profileFromSession,
+  requestPhoneOtp,
+  resendPhoneOtp,
+  signOutSupabase,
+  subscribeToAuthChanges,
+  syncRemoteState,
+  verifyPhoneOtp,
+} from "../lib/auth";
+import { isSupabaseConfigured } from "../lib/supabase";
 
 // ─── Design tokens (match Azkar/Colors Figma vars) ────────────────────────────
 const T = {
@@ -47,8 +69,6 @@ type View =
   | "search";
 
 type CategoryId = "morning" | "evening" | "before_sleep";
-type SettingsPanel = "theme" | "accessibility" | "downloads" | "notifications" | "progress";
-type FontSize = "small" | "medium" | "large" | "extra_large";
 
 interface Zikr {
   id: string;
@@ -60,16 +80,6 @@ interface Zikr {
   sourceReference: string;
   category: CategoryId;
   orderIndex: number;
-}
-
-interface Session {
-  id: string;
-  category: CategoryId;
-  date: string;
-  completedCount: number;
-  totalCount: number;
-  durationSeconds: number;
-  isComplete: boolean;
 }
 
 // ─── Azkar content (Hisnul Muslim) ────────────────────────────────────────────
@@ -330,17 +340,6 @@ const CATEGORIES = [
   { id: "before_sleep" as CategoryId, name: "Before Sleep",   nameArabic: "أذكار النوم",  icon: "stars",    totalCount: 10 },
 ];
 
-const WEEK_DATA = [
-  { day: "Mon", count: 28 }, { day: "Tue", count: 40 }, { day: "Wed", count: 15 },
-  { day: "Thu", count: 40 }, { day: "Fri", count: 38 }, { day: "Sat", count: 40 }, { day: "Sun", count: 22 },
-];
-
-const SESSIONS: Session[] = [
-  { id:"1", category:"morning",      date:"Today",      completedCount:15, totalCount:15, durationSeconds:480, isComplete:true },
-  { id:"2", category:"evening",      date:"Yesterday",  completedCount:12, totalCount:15, durationSeconds:390, isComplete:false },
-  { id:"3", category:"before_sleep", date:"2 days ago", completedCount:10, totalCount:10, durationSeconds:300, isComplete:true },
-];
-
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const getAzkarByCategory = (cat: CategoryId) =>
   ALL_AZKAR.filter(z => z.category === cat).sort((a, b) => a.orderIndex - b.orderIndex);
@@ -532,8 +531,15 @@ function BottomNav({ active, onChange }: {
 
 // ─── Screen 1: Home ───────────────────────────────────────────────────────────
 
-function HomeScreen({ completed, onCategory, onSearch }:
-  { completed: Record<CategoryId, Set<number>>; onCategory: (c: CategoryId) => void; onSearch: () => void }) {
+function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onSearch }:
+  {
+    completed: Record<CategoryId, Set<number>>;
+    displayName: string;
+    currentStreak: number;
+    longestStreak: number;
+    onCategory: (c: CategoryId) => void;
+    onSearch: () => void;
+  }) {
   const h = new Date().getHours();
   const timeLabel = h < 12 ? "Good Morning" : h < 17 ? "Good Afternoon" : "Good Evening";
   const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
@@ -547,7 +553,7 @@ function HomeScreen({ completed, onCategory, onSearch }:
           <MaleAvatar size={44} />
           <div>
             <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase" }}>{timeLabel}</p>
-            <p style={{ fontSize: 20, color: T.textPrimary, fontFamily: "Inter, sans-serif", fontWeight: 800, lineHeight: "26px" }}>Ahmad</p>
+            <p style={{ fontSize: 20, color: T.textPrimary, fontFamily: "Inter, sans-serif", fontWeight: 800, lineHeight: "26px" }}>{displayName}</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -622,11 +628,11 @@ function HomeScreen({ completed, onCategory, onSearch }:
           </div>
           <div className="flex-1">
             <p style={{ fontSize: 12, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Current Streak</p>
-            <p style={{ fontSize: 20, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace" }}>7 days</p>
+            <p style={{ fontSize: 20, fontWeight: 800, color: T.gold, fontFamily: "DM Mono, monospace" }}>{currentStreak} day{currentStreak === 1 ? "" : "s"}</p>
           </div>
           <div className="text-right">
             <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Best</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: T.textSec, fontFamily: "DM Mono, monospace" }}>14</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: T.textSec, fontFamily: "DM Mono, monospace" }}>{longestStreak}</p>
           </div>
         </div>
       </div>
@@ -1025,8 +1031,8 @@ function CounterScreen({ catId, idx, initialCount, onBack, onComplete, onPrev, o
 
 // ─── Screen 5: Completion ─────────────────────────────────────────────────────
 
-function CompletionScreen({ catId, sessionStart, onHome, onRepeat }:
-  { catId: CategoryId; sessionStart: number; onHome: () => void; onRepeat: () => void }) {
+function CompletionScreen({ catId, sessionStart, currentStreak, onHome, onRepeat }:
+  { catId: CategoryId; sessionStart: number; currentStreak: number; onHome: () => void; onRepeat: () => void }) {
   const cat = CATEGORIES.find(c => c.id === catId)!;
   const azkar = getAzkarByCategory(catId);
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
@@ -1083,7 +1089,9 @@ function CompletionScreen({ catId, sessionStart, onHome, onRepeat }:
           style={{ background: `${T.gold}10`, border: `1px solid ${T.gold}30` }}>
           <Flame size={20} style={{ color: T.gold }} />
           <div>
-            <p style={{ fontSize: 13, fontWeight: 700, color: T.gold, fontFamily: "Inter, sans-serif" }}>7-day streak maintained!</p>
+            <p style={{ fontSize: 13, fontWeight: 700, color: T.gold, fontFamily: "Inter, sans-serif" }}>
+              {currentStreak}-day streak maintained!
+            </p>
             <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>Consistency is a form of worship.</p>
           </div>
         </div>
@@ -1091,10 +1099,11 @@ function CompletionScreen({ catId, sessionStart, onHome, onRepeat }:
 
       {/* Actions */}
       <div className="w-full flex flex-col gap-3">
-        <button onClick={() => {}}
-          className="w-full rounded-xl flex items-center justify-center gap-2 transition-all active:scale-95"
-          style={{ height: 48, background: T.surface, border: `1px solid ${T.border}`, color: T.textSec, fontSize: 15, fontFamily: "Inter, sans-serif", fontWeight: 600 }}>
-          <Share2 size={16} /> Share Progress
+        <button
+          disabled
+          className="w-full rounded-xl flex items-center justify-center gap-2"
+          style={{ height: 48, background: T.surface, border: `1px solid ${T.border}`, color: T.textSec, fontSize: 15, fontFamily: "Inter, sans-serif", fontWeight: 600, opacity: 0.5, cursor: "not-allowed" }}>
+          <Share2 size={16} /> Share Progress Soon
         </button>
         <button onClick={onHome}
           className="w-full rounded-xl font-bold transition-all active:scale-95"
@@ -1107,7 +1116,23 @@ function CompletionScreen({ catId, sessionStart, onHome, onRepeat }:
 }
 
 // ─── Settings Screen — orchestrates all sub-screens via local state ───────────
-function SettingsScreen({ darkMode, onToggleDark, onBack }: { darkMode: boolean; onToggleDark: () => void; onBack: () => void }) {
+function SettingsScreen({
+  darkMode,
+  languageLabel,
+  isGuest,
+  isSyncing,
+  onToggleDark,
+  onSignOut,
+  onBack,
+}: {
+  darkMode: boolean;
+  languageLabel: string;
+  isGuest: boolean;
+  isSyncing: boolean;
+  onToggleDark: () => void;
+  onSignOut: () => void;
+  onBack: () => void;
+}) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
   const goBack = () => setSub("root");
 
@@ -1116,7 +1141,15 @@ function SettingsScreen({ darkMode, onToggleDark, onBack }: { darkMode: boolean;
       {sub === "root" && (
         <>
           <Header title="Settings" onBack={onBack} />
-          <SettingsRootPanel onNav={setSub} darkMode={darkMode} onToggleDark={onToggleDark} />
+          <SettingsRootPanel
+            onNav={setSub}
+            darkMode={darkMode}
+            languageLabel={languageLabel}
+            isGuest={isGuest}
+            isSyncing={isSyncing}
+            onToggleDark={onToggleDark}
+            onSignOut={onSignOut}
+          />
           <motion.div className="flex justify-center py-5"
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: [0, 0, 1, 1], y: [8, 8, 0, 0] }}
@@ -1375,10 +1408,14 @@ function RowToggle({ checked, onChange }: { checked: boolean; onChange: () => vo
 }
 
 // Settings Root screen
-function SettingsRootPanel({ onNav, darkMode, onToggleDark }: {
+function SettingsRootPanel({ onNav, darkMode, languageLabel, isGuest, isSyncing, onToggleDark, onSignOut }: {
   onNav: (s: SettingsSubScreen) => void;
   darkMode: boolean;
+  languageLabel: string;
+  isGuest: boolean;
+  isSyncing: boolean;
   onToggleDark: () => void;
+  onSignOut: () => void;
 }) {
   return (
     <motion.div className="flex-1 overflow-y-auto"
@@ -1390,7 +1427,7 @@ function SettingsRootPanel({ onNav, darkMode, onToggleDark }: {
       <div className="mx-4 rounded-xl overflow-hidden">
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke={T.textPrimary} strokeWidth="1.5" /><path d="M10 2C10 2 7 6 7 10s3 8 3 8M10 2c0 0 3 4 3 8s-3 8-3 8M2 10h16" stroke={T.textPrimary} strokeWidth="1.5" strokeLinecap="round" /></svg>}
-          label="Language" right={<RowValue value="English" />} onPress={() => {}} />
+          label="Language" right={<RowValue value={languageLabel} />} onPress={() => {}} />
         <SettingsRowItem
           iconBg={T.surfaceEl} icon={<svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="7" stroke={T.textPrimary} strokeWidth="1.5" /><path d="M10 3v14M3 10h14" stroke={T.textPrimary} strokeWidth="1.5" strokeLinecap="round" /></svg>}
           label="Display Theme"
@@ -1430,6 +1467,29 @@ function SettingsRootPanel({ onNav, darkMode, onToggleDark }: {
           iconBg={T.surfaceEl} icon={<Info size={18} style={{ color: T.textPrimary }} />}
           label="About & Help" right={<RowChevron />} onPress={() => onNav("about")} hasDivider={false} />
       </div>
+
+      {!isGuest && (
+        <>
+          <SectionLabel label="SYNC" />
+          <div className="mx-4 rounded-xl overflow-hidden">
+            <SettingsRowItem
+              iconBg={T.surfaceEl}
+              icon={<Wifi size={18} style={{ color: T.textPrimary }} />}
+              label="Account Sync"
+              right={<RowValue value={isSyncing ? "Syncing" : "Connected"} />}
+              onPress={() => {}}
+            />
+            <SettingsRowItem
+              iconBg="#3A1F23"
+              icon={<X size={18} style={{ color: "#FCA5A5" }} />}
+              label="Sign Out"
+              right={<RowChevron />}
+              onPress={onSignOut}
+              hasDivider={false}
+            />
+          </div>
+        </>
+      )}
 
       <div style={{ height: 32 }} />
     </motion.div>
@@ -2624,8 +2684,31 @@ const LANGUAGES_LIST = [
   { code: "ha", flag: "🇳🇬", native: "Hausa",             name: "Hausa" },
 ];
 
-function LanguageScreen({ onContinue }: { onContinue: (lang: string) => void }) {
-  const [selected, setSelected] = useState("en");
+const LANGUAGE_LABELS: Record<AppLanguage, string> = {
+  en: "English",
+  ar: "Arabic",
+  fr: "French",
+  ur: "Urdu",
+  tr: "Turkish",
+  id: "Indonesian",
+  ml: "Malayalam",
+  ha: "Hausa",
+};
+
+function maskPhoneNumber(phone: string) {
+  const digits = phone.replace(/\D/g, "");
+  if (!digits) {
+    return "+966 ••• ••• 789";
+  }
+
+  const withCountryCode = digits.startsWith("966") ? digits : `966${digits}`;
+  const localDigits = withCountryCode.slice(3);
+  const lastThree = localDigits.slice(-3).padStart(3, "•");
+  return `+966 ••• ••• ${lastThree}`;
+}
+
+function LanguageScreen({ initialLanguage, onContinue }: { initialLanguage: AppLanguage; onContinue: (lang: AppLanguage) => void }) {
+  const [selected, setSelected] = useState<AppLanguage>(initialLanguage);
   return (
     <div className="flex flex-col h-full" style={{ background: T.bg }}>
       {/* Header — logo + titles */}
@@ -2652,7 +2735,7 @@ function LanguageScreen({ onContinue }: { onContinue: (lang: string) => void }) 
         {LANGUAGES_LIST.map(lang => {
           const active = selected === lang.code;
           return (
-            <button key={lang.code} onClick={() => setSelected(lang.code)}
+            <button key={lang.code} onClick={() => setSelected(lang.code as AppLanguage)}
               className="flex items-center gap-3 rounded-xl px-4 w-full transition-all active:scale-[0.98]"
               style={{
                 height: 64,
@@ -2690,7 +2773,15 @@ function LanguageScreen({ onContinue }: { onContinue: (lang: string) => void }) 
 }
 
 // ─── Phase 2 Screen: Login ────────────────────────────────────────────────────
-function LoginScreen({ onPhone, onGuest }: { onPhone: () => void; onGuest: () => void }) {
+function LoginScreen({
+  phoneAuthEnabled,
+  onPhone,
+  onGuest,
+}: {
+  phoneAuthEnabled: boolean;
+  onPhone: () => void;
+  onGuest: () => void;
+}) {
   return (
     <div className="flex flex-col h-full" style={{ background: T.bg }}>
       <div className="flex flex-col flex-1 px-7 pt-6 pb-6 gap-7">
@@ -2708,26 +2799,31 @@ function LoginScreen({ onPhone, onGuest }: { onPhone: () => void; onGuest: () =>
           <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px", textAlign: "center" }}>
             Sign in to sync your progress across all your devices
           </p>
+          {!phoneAuthEnabled && (
+            <p style={{ fontSize: 12, color: T.gold, fontFamily: "Inter, sans-serif", lineHeight: "18px", textAlign: "center" }}>
+              Add Supabase env vars to enable phone sign-in.
+            </p>
+          )}
         </div>
 
         {/* Social auth */}
         <div className="flex flex-col gap-3">
-          <button className="w-full flex items-center justify-center gap-3 rounded-lg h-12 transition-all active:scale-95"
-            style={{ background: "#FFFFFF" }}>
+          <button disabled className="w-full flex items-center justify-center gap-3 rounded-lg h-12"
+            style={{ background: "#FFFFFF", opacity: 0.6, cursor: "not-allowed" }}>
             <svg width="18" height="18" viewBox="0 0 48 48" style={{ flexShrink: 0 }}>
               <path fill="#EA4335" d="M24 9.5c3.6 0 6.4 1.4 8.4 3.2l6.3-6.3C34.8 2.8 29.8 0 24 0 14.6 0 6.6 5.5 2.8 13.5l7.3 5.7C11.9 13 17.5 9.5 24 9.5z"/>
               <path fill="#4285F4" d="M46.6 24.5c0-1.6-.2-3.2-.5-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.9 7.2l7.5 5.8c4.4-4 7.3-10 7.3-17z"/>
               <path fill="#FBBC05" d="M10.1 28.8c-.4-1.2-.6-2.5-.6-3.8 0-1.7.3-3.3.7-4.8L2.8 13.5A24 24 0 0 0 0 24c0 3.8.9 7.5 2.8 10.5l7.3-5.7z"/>
               <path fill="#34A853" d="M24 48c6 0 11-2 14.7-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.2 2.2-6.5 0-12-4.4-14-10.2l-7.3 5.7C6.6 42.5 14.6 48 24 48z"/>
             </svg>
-            <span style={{ fontSize: 16, fontWeight: 600, color: "#1A1228", fontFamily: "Inter, sans-serif" }}>Continue with Google</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: "#1A1228", fontFamily: "Inter, sans-serif" }}>Google Coming Soon</span>
           </button>
-          <button className="w-full flex items-center justify-center gap-3 rounded-lg h-[52px] transition-all active:scale-95"
-            style={{ background: "#1C1C2E", border: `1.5px solid #3A3A5C` }}>
+          <button disabled className="w-full flex items-center justify-center gap-3 rounded-lg h-[52px]"
+            style={{ background: "#1C1C2E", border: `1.5px solid #3A3A5C`, opacity: 0.6, cursor: "not-allowed" }}>
             <svg width="16" height="20" viewBox="0 0 16 20" fill={T.textPrimary} style={{ flexShrink: 0 }}>
               <path d="M13.2 10.6c0-2.7 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.4 1-4.2 1-.8 0-2.2-1-3.6-.9-1.8 0-3.5 1.1-4.4 2.7C-1.6 10.2-.2 15.2 1.6 18c.9 1.3 1.9 2.7 3.3 2.7s1.8-.8 3.4-.8c1.6 0 2 .8 3.5.8 1.4 0 2.3-1.3 3.2-2.6.6-.9 1.1-1.8 1.4-2.1-.1-.1-2.2-.9-2.2-3.4zM10.5 2.9c.7-.9 1.3-2.2 1.1-3.4-1.1.1-2.4.7-3.1 1.6-.7.8-1.3 2.1-1.1 3.3 1.2.1 2.4-.6 3.1-1.5z"/>
             </svg>
-            <span style={{ fontSize: 16, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>Continue with Apple</span>
+            <span style={{ fontSize: 16, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>Apple Coming Soon</span>
           </button>
         </div>
 
@@ -2739,9 +2835,10 @@ function LoginScreen({ onPhone, onGuest }: { onPhone: () => void; onGuest: () =>
         </div>
 
         {/* Phone option */}
-        <button onClick={onPhone}
+        <button onClick={phoneAuthEnabled ? onPhone : undefined}
+          disabled={!phoneAuthEnabled}
           className="w-full flex items-center gap-3 rounded-lg transition-all active:scale-95"
-          style={{ height: 56, background: T.surface, border: `1px solid ${T.border}`, padding: "0 16px" }}>
+          style={{ height: 56, background: T.surface, border: `1px solid ${T.border}`, padding: "0 16px", opacity: phoneAuthEnabled ? 1 : 0.5, cursor: phoneAuthEnabled ? "pointer" : "not-allowed" }}>
           <div className="flex items-center justify-center rounded-[18px] shrink-0"
             style={{ width: 36, height: 36, background: T.teal }}>
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -2786,8 +2883,22 @@ function LoginScreen({ onPhone, onGuest }: { onPhone: () => void; onGuest: () =>
 }
 
 // ─── Phase 2 Screen: Phone Input ─────────────────────────────────────────────
-function PhoneInputScreen({ onSend, onBack, onSkip }: { onSend: () => void; onBack: () => void; onSkip: () => void }) {
-  const [phone, setPhone] = useState("");
+function PhoneInputScreen({
+  initialPhone,
+  errorMessage,
+  isSending,
+  onSend,
+  onBack,
+  onSkip,
+}: {
+  initialPhone: string;
+  errorMessage: string;
+  isSending: boolean;
+  onSend: (phone: string) => void;
+  onBack: () => void;
+  onSkip: () => void;
+}) {
+  const [phone, setPhone] = useState(initialPhone);
   const canSend = phone.replace(/\s/g, "").length >= 7;
 
   return (
@@ -2841,16 +2952,21 @@ function PhoneInputScreen({ onSend, onBack, onSkip }: { onSend: () => void; onBa
             </svg>
             <p style={{ fontSize: 11, color: T.textMuted, fontFamily: "Inter, sans-serif" }}>We support 190+ countries</p>
           </div>
+          {errorMessage && (
+            <p style={{ fontSize: 12, color: "#FCA5A5", fontFamily: "Inter, sans-serif", lineHeight: "18px" }}>
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Bottom */}
       <div className="px-6 pb-6 flex flex-col gap-3">
-        <button onClick={canSend ? onSend : undefined}
+        <button onClick={canSend && !isSending ? () => onSend(phone.trim()) : undefined}
           className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95"
           style={{ height: 52, background: T.gold, opacity: canSend ? 1 : 0.5,
             fontSize: 17, fontWeight: 600, color: T.bg, fontFamily: "Inter, sans-serif" }}>
-          Send Verification Code
+          {isSending ? "Sending..." : "Send Verification Code"}
         </button>
         <p className="text-center" style={{ fontSize: 10, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "14px" }}>
           By continuing you agree to our{" "}
@@ -2867,7 +2983,25 @@ function PhoneInputScreen({ onSend, onBack, onSkip }: { onSend: () => void; onBa
 }
 
 // ─── Phase 2 Screen: OTP Verification ────────────────────────────────────────
-function OTPScreen({ onVerify, onBack, onDifferent }: { onVerify: () => void; onBack: () => void; onDifferent: () => void }) {
+function OTPScreen({
+  maskedPhone,
+  errorMessage,
+  isVerifying,
+  isResending,
+  onVerify,
+  onResend,
+  onBack,
+  onDifferent,
+}: {
+  maskedPhone: string;
+  errorMessage: string;
+  isVerifying: boolean;
+  isResending: boolean;
+  onVerify: (token: string) => void;
+  onResend: () => void;
+  onBack: () => void;
+  onDifferent: () => void;
+}) {
   const [digits, setDigits] = useState(["", "", "", "", "", ""]);
   const [countdown, setCountdown] = useState(272);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -2888,12 +3022,13 @@ function OTPScreen({ onVerify, onBack, onDifferent }: { onVerify: () => void; on
     next[i] = val;
     setDigits(next);
     if (val && i < 5) inputRefs.current[i + 1]?.focus();
-    if (next.every(d => d !== "")) setTimeout(onVerify, 300);
   };
 
   const handleKey = (i: number, e: React.KeyboardEvent) => {
     if (e.key === "Backspace" && !digits[i] && i > 0) inputRefs.current[i - 1]?.focus();
   };
+
+  const token = digits.join("");
 
   return (
     <div className="flex flex-col h-full justify-between" style={{ background: T.bg }}>
@@ -2913,7 +3048,7 @@ function OTPScreen({ onVerify, onBack, onDifferent }: { onVerify: () => void; on
           <div className="flex flex-col gap-2">
             <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px" }}>
               Enter the 6-digit code sent to{" "}
-              <span style={{ color: T.textPrimary }}>+966 ●●● ●●● 789</span>
+              <span style={{ color: T.textPrimary }}>{maskedPhone}</span>
             </p>
             <div className="flex items-center gap-1.5">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -2961,20 +3096,25 @@ function OTPScreen({ onVerify, onBack, onDifferent }: { onVerify: () => void; on
           <p style={{ fontSize: 13, color: T.textMuted, fontFamily: "Inter, sans-serif", lineHeight: "20px", textAlign: "center" }}>
             Didn&apos;t receive a code?{" "}
             {countdown === 0
-              ? <span style={{ color: T.gold, fontWeight: 600, cursor: "pointer" }} onClick={() => setCountdown(60)}>Resend</span>
+              ? <span style={{ color: T.gold, fontWeight: 600, cursor: isResending ? "wait" : "pointer" }} onClick={() => { if (!isResending) { setCountdown(60); onResend(); } }}>{isResending ? "Resending..." : "Resend"}</span>
               : <span>Resend in {countdown}s</span>
             }
           </p>
+          {errorMessage && (
+            <p style={{ fontSize: 12, color: "#FCA5A5", fontFamily: "Inter, sans-serif", lineHeight: "18px", textAlign: "center" }}>
+              {errorMessage}
+            </p>
+          )}
         </div>
       </div>
 
       {/* Bottom CTAs */}
       <div className="px-6 pb-6 flex flex-col gap-3">
-        <button onClick={isComplete ? onVerify : undefined}
+        <button onClick={isComplete && !isVerifying ? () => onVerify(token) : undefined}
           className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95"
           style={{ height: 52, background: T.gold, opacity: isComplete ? 1 : 0.4,
             fontSize: 17, fontWeight: 600, color: T.bg, fontFamily: "Inter, sans-serif" }}>
-          Verify
+          {isVerifying ? "Verifying..." : "Verify"}
         </button>
         <button onClick={onDifferent}
           className="w-full flex items-center justify-center rounded-xl h-[52px]"
@@ -2991,27 +3131,175 @@ function OTPScreen({ onVerify, onBack, onDifferent }: { onVerify: () => void; on
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
+  const initialState = useRef(loadAppState()).current;
   const [view, setView]             = useState<View>("splash");
   const [history, setHistory]       = useState<View[]>([]);
   const [activeTab, setActiveTab]   = useState<"home" | "azkar" | "settings">("home");
   const [activeCat, setActiveCat]   = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx]   = useState(0);
-  const [darkMode, setDarkMode]     = useState(true);
+  const [darkMode, setDarkMode]     = useState(initialState.settings.darkMode);
   const [sessionStart, setSessionStart] = useState(Date.now());
-  const [selectedLang, setSelectedLang] = useState("en");
+  const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
+  const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
+  const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
+  const [displayName, setDisplayName] = useState(initialState.profile.displayName);
+  const [lastPhoneNumber, setLastPhoneNumber] = useState(initialState.profile.lastPhoneNumber);
+  const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
+  const [authSessionLoaded, setAuthSessionLoaded] = useState(false);
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [isResendingOtp, setIsResendingOtp] = useState(false);
+  const [authError, setAuthError] = useState("");
+  const [isSyncingRemote, setIsSyncingRemote] = useState(false);
 
-  // completed[cat] = Set of zikr indices that have been tapped to completion
-  const [completed, setCompleted]   = useState<Record<CategoryId, Set<number>>>({
-    morning:      new Set<number>([0, 1, 2]),
-    evening:      new Set<number>([0]),
-    before_sleep: new Set<number>(),
-  });
+  const { currentStreak, longestStreak } = getStreakSummary(sessions);
+  const languageLabel = LANGUAGE_LABELS[selectedLang];
 
   // Apply theme class to root
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
     document.documentElement.classList.toggle("light-mode", !darkMode);
-  }, [darkMode]);
+    document.documentElement.lang = selectedLang;
+    document.documentElement.dir = selectedLang === "ar" ? "rtl" : "ltr";
+  }, [darkMode, selectedLang]);
+
+  useEffect(() => {
+    saveAppState({
+      settings: {
+        language: selectedLang,
+        darkMode,
+      },
+      profile: {
+        displayName,
+        lastPhoneNumber,
+        isGuest,
+      },
+      completed: fromCompletedSets(completed),
+      sessions,
+    });
+  }, [completed, darkMode, displayName, isGuest, lastPhoneNumber, selectedLang, sessions]);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) {
+      setAuthSessionLoaded(true);
+      return;
+    }
+
+    let active = true;
+
+    const hydrateSession = async () => {
+      try {
+        const session = await getCurrentSession();
+        if (!active) {
+          return;
+        }
+
+        if (session) {
+          const mergedState = await loadRemoteState(session, {
+            settings: {
+              language: selectedLang,
+              darkMode,
+            },
+            profile: {
+              displayName,
+              lastPhoneNumber,
+              isGuest,
+            },
+            completed: fromCompletedSets(completed),
+            sessions,
+          });
+
+          setSelectedLang(mergedState.settings.language);
+          setDarkMode(mergedState.settings.darkMode);
+          setDisplayName(mergedState.profile.displayName);
+          setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
+          setIsGuest(false);
+          setCompleted(toCompletedSets(mergedState.completed));
+          setSessions(mergedState.sessions);
+        }
+      } catch (error) {
+        if (active) {
+          setAuthError(error instanceof Error ? error.message : "Could not restore your session.");
+        }
+      } finally {
+        if (active) {
+          setAuthSessionLoaded(true);
+        }
+      }
+    };
+
+    void hydrateSession();
+
+    const unsubscribe = subscribeToAuthChanges((session) => {
+      if (!active) {
+        return;
+      }
+
+      const profile = profileFromSession(session, lastPhoneNumber);
+      setDisplayName(profile.displayName);
+      setLastPhoneNumber(profile.lastPhoneNumber);
+      setIsGuest(profile.isGuest);
+      if (!session) {
+        setAuthSessionLoaded(true);
+      }
+    });
+
+    return () => {
+      active = false;
+      unsubscribe();
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (!isSupabaseConfigured || !authSessionLoaded || isGuest) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const pushRemoteState = async () => {
+      try {
+        setIsSyncingRemote(true);
+        const session = await getCurrentSession();
+        if (!session || cancelled) {
+          return;
+        }
+
+        await syncRemoteState(
+          session,
+          {
+            settings: {
+              language: selectedLang,
+              darkMode,
+            },
+            profile: {
+              displayName,
+              lastPhoneNumber,
+              isGuest,
+            },
+            completed: fromCompletedSets(completed),
+            sessions,
+          },
+          { currentStreak, longestStreak },
+        );
+      } catch (error) {
+        if (!cancelled) {
+          setAuthError(error instanceof Error ? error.message : "Could not sync your account.");
+        }
+      } finally {
+        if (!cancelled) {
+          setIsSyncingRemote(false);
+        }
+      }
+    };
+
+    void pushRemoteState();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [authSessionLoaded, completed, currentStreak, darkMode, displayName, isGuest, lastPhoneNumber, longestStreak, selectedLang, sessions]);
 
   const push = useCallback((to: View) => {
     setHistory(h => [...h, view]);
@@ -3053,12 +3341,102 @@ export default function App() {
       setActiveIdx(idx + 1);
       // stay on counter
     } else {
+      setSessions(prev => [
+        {
+          id: `${activeCat}-${Date.now()}`,
+          category: activeCat,
+          completedAt: new Date().toISOString(),
+          completedCount: azkar.length,
+          totalCount: azkar.length,
+          durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
+          isComplete: true,
+        },
+        ...prev,
+      ]);
       setView("completion");
       setHistory([]);
     }
   };
 
   const goHome = () => { setView("home"); setActiveTab("home"); setHistory([]); };
+
+  const handleSendOtp = async (phone: string) => {
+    try {
+      setAuthError("");
+      setIsSendingOtp(true);
+      const normalizedPhone = isSupabaseConfigured ? await requestPhoneOtp(phone) : normalizePhoneNumber(phone);
+      setLastPhoneNumber(normalizedPhone);
+      setView("otp");
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not send the verification code.");
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
+  const handleVerifyOtp = async (token: string) => {
+    try {
+      setAuthError("");
+      setIsVerifyingOtp(true);
+      const session = await verifyPhoneOtp(lastPhoneNumber, token);
+      const mergedState = await loadRemoteState(session, {
+        settings: {
+          language: selectedLang,
+          darkMode,
+        },
+        profile: {
+          displayName,
+          lastPhoneNumber,
+          isGuest,
+        },
+        completed: fromCompletedSets(completed),
+        sessions,
+      });
+
+      setSelectedLang(mergedState.settings.language);
+      setDarkMode(mergedState.settings.darkMode);
+      setDisplayName(mergedState.profile.displayName);
+      setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
+      setCompleted(toCompletedSets(mergedState.completed));
+      setSessions(mergedState.sessions);
+      setIsGuest(false);
+      setView("home");
+      setActiveTab("home");
+      setHistory([]);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not verify the code.");
+    } finally {
+      setIsVerifyingOtp(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      setAuthError("");
+      setIsResendingOtp(true);
+      await resendPhoneOtp(lastPhoneNumber);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not resend the verification code.");
+    } finally {
+      setIsResendingOtp(false);
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      setAuthError("");
+      if (isSupabaseConfigured) {
+        await signOutSupabase();
+      }
+      setDisplayName("Guest");
+      setIsGuest(true);
+      setView("login");
+      setActiveTab("home");
+      setHistory([]);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not sign out.");
+    }
+  };
 
   const handleNavTab = (tab: "home" | "azkar" | "settings") => {
     setActiveTab(tab);
@@ -3101,8 +3479,7 @@ export default function App() {
           {/* Phase 2 — onboarding flow */}
           {view === "splash" && (
             <SplashScreen onDone={() => {
-              const isArabic = navigator.language.startsWith("ar");
-              setView(isArabic ? "ar_onboard1" : "onboard1");
+              setView("onboard1");
             }} />
           )}
           {view === "onboard1" && (
@@ -3146,33 +3523,56 @@ export default function App() {
 
           {view === "language" && (
             <LanguageScreen
+              initialLanguage={selectedLang}
               onContinue={(lang) => { setSelectedLang(lang); setView("login"); }}
             />
           )}
           {view === "login" && (
             <LoginScreen
-              onPhone={() => setView("phone")}
-              onGuest={() => { setView("home"); setActiveTab("home"); setHistory([]); }}
+              phoneAuthEnabled={isSupabaseConfigured}
+              onPhone={() => { setAuthError(""); setView("phone"); }}
+              onGuest={() => {
+                setDisplayName("Guest");
+                setIsGuest(true);
+                setView("home");
+                setActiveTab("home");
+                setHistory([]);
+              }}
             />
           )}
           {view === "phone" && (
             <PhoneInputScreen
-              onSend={() => setView("otp")}
-              onBack={() => setView("login")}
+              initialPhone={lastPhoneNumber}
+              errorMessage={authError}
+              isSending={isSendingOtp}
+              onSend={handleSendOtp}
+              onBack={() => { setAuthError(""); setView("login"); }}
               onSkip={() => { setView("home"); setActiveTab("home"); setHistory([]); }}
             />
           )}
           {view === "otp" && (
             <OTPScreen
-              onVerify={() => { setView("home"); setActiveTab("home"); setHistory([]); }}
-              onBack={() => setView("phone")}
-              onDifferent={() => setView("phone")}
+              maskedPhone={maskPhoneNumber(lastPhoneNumber)}
+              errorMessage={authError}
+              isVerifying={isVerifyingOtp}
+              isResending={isResendingOtp}
+              onVerify={handleVerifyOtp}
+              onResend={handleResendOtp}
+              onBack={() => { setAuthError(""); setView("phone"); }}
+              onDifferent={() => { setAuthError(""); setView("phone"); }}
             />
           )}
 
           {/* Phase 1 — core app */}
           {view === "home" && (
-            <HomeScreen completed={completed} onCategory={openCategory} onSearch={() => push("search")} />
+            <HomeScreen
+              completed={completed}
+              displayName={displayName}
+              currentStreak={currentStreak}
+              longestStreak={longestStreak}
+              onCategory={openCategory}
+              onSearch={() => push("search")}
+            />
           )}
           {view === "category" && (
             <CategoryScreen catId={activeCat} completed={completed[activeCat]}
@@ -3198,10 +3598,19 @@ export default function App() {
           )}
           {view === "completion" && (
             <CompletionScreen catId={activeCat} sessionStart={sessionStart}
+              currentStreak={currentStreak}
               onHome={goHome} onRepeat={() => { setView("category"); setHistory([]); }} />
           )}
           {view === "settings" && (
-            <SettingsScreen darkMode={darkMode} onToggleDark={() => setDarkMode(d => !d)} onBack={pop} />
+            <SettingsScreen
+              darkMode={darkMode}
+              languageLabel={languageLabel}
+              isGuest={isGuest}
+              isSyncing={isSyncingRemote}
+              onToggleDark={() => setDarkMode(d => !d)}
+              onSignOut={handleSignOut}
+              onBack={pop}
+            />
           )}
           {view === "search" && (
             <SearchScreen onBack={pop} onZikr={(catId, i) => { openReader(catId, i); }} />
