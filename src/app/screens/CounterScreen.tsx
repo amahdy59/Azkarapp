@@ -49,6 +49,7 @@ export function CounterScreen({
     return null;
   }
 
+  const displayCount = z.countLabel ?? String(z.repetitionCount);
   const handleTap = () => {
     if (complete) {
       return;
@@ -168,9 +169,9 @@ export function CounterScreen({
       </div>
 
       <div
-        role="button"
-        tabIndex={0}
-        aria-label={`${t(language, "reader.tapAnywhere")} ${count} / ${z.repetitionCount}`}
+      role="button"
+      tabIndex={0}
+      aria-label={`${t(language, "reader.tapAnywhere")} ${count} / ${z.repetitionCount}${displayCount !== String(z.repetitionCount) ? `. ${displayCount}` : ""}`}
         className="relative mx-4 flex flex-1 cursor-pointer flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
         onClick={handleTap}
         onKeyDown={(event) => {
@@ -205,8 +206,8 @@ export function CounterScreen({
                 <p className="text-[56px] font-extrabold leading-[60px] text-primary" style={{ fontFamily: "DM Mono, monospace" }}>
                   {count}
                 </p>
-                <p className="text-[16px] text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>
-                  / {z.repetitionCount}
+                <p className="max-w-[220px] text-center text-[16px] text-muted-foreground" style={{ fontFamily: "DM Mono, monospace" }}>
+                  / {displayCount}
                 </p>
               </>
             )}

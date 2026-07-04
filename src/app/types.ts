@@ -11,7 +11,13 @@ export interface Zikr {
   translation: string;
   benefit: string;
   repetitionCount: number;
+  countLabel?: string;
   sourceReference: string;
+  preferredTiming?: string;
+  hadithText?: string;
+  authenticityNote?: string;
+  notes?: string;
+  sourceUrl?: string;
   category: CategoryId;
   orderIndex: number;
 }

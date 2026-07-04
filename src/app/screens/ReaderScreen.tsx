@@ -76,6 +76,10 @@ export function ReaderScreen({
     return null;
   }
 
+  const displayCount = z.countLabel ?? String(z.repetitionCount);
+  const extraNotes = z.notes && z.notes !== z.benefit ? z.notes : "";
+  const authenticityNote = z.authenticityNote && z.authenticityNote !== z.benefit ? z.authenticityNote : "";
+
   const handleSwipe = (dx: number) => {
     if (isArabic) {
       if (dx > 60) {
@@ -208,15 +212,73 @@ export function ReaderScreen({
                   <p className="pt-3 font-sans text-[13px] leading-[21px] text-secondary-foreground">
                     {z.benefit}
                   </p>
-                  <span
-                    className="mt-3 inline-block rounded-full border px-3 py-1 font-sans text-[11px] font-medium text-secondary"
-                    style={{
-                      background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
-                      borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
-                    }}
-                  >
-                    {z.sourceReference}
-                  </span>
+                  {extraNotes && (
+                    <div className="mt-4">
+                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                        {t(language, "reader.notes")}
+                      </p>
+                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-secondary-foreground">{extraNotes}</p>
+                    </div>
+                  )}
+                  {z.preferredTiming && (
+                    <div className="mt-4">
+                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                        {t(language, "reader.timing")}
+                      </p>
+                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-secondary-foreground">{z.preferredTiming}</p>
+                    </div>
+                  )}
+                  {displayCount !== String(z.repetitionCount) && (
+                    <div className="mt-4">
+                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                        {t(language, "reader.count")}
+                      </p>
+                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-secondary-foreground">{displayCount}</p>
+                    </div>
+                  )}
+                  {authenticityNote && (
+                    <div className="mt-4">
+                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                        {t(language, "reader.authenticity")}
+                      </p>
+                      <p className="mt-1 font-sans text-[13px] leading-[21px] text-secondary-foreground">{authenticityNote}</p>
+                    </div>
+                  )}
+                  {z.hadithText && (
+                    <div className="mt-4">
+                      <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                        {t(language, "reader.evidence")}
+                      </p>
+                      <p
+                        className="mt-1 rounded-xl border border-border bg-background px-3 py-3 text-[15px] leading-[28px] text-foreground"
+                        dir="auto"
+                        style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+                      >
+                        {z.hadithText}
+                      </p>
+                    </div>
+                  )}
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <span
+                      className="inline-block rounded-full border px-3 py-1 font-sans text-[11px] font-medium text-secondary"
+                      style={{
+                        background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
+                        borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
+                      }}
+                    >
+                      {z.sourceReference}
+                    </span>
+                    {z.sourceUrl && (
+                      <a
+                        href={z.sourceUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center rounded-full border border-border px-3 py-1 font-sans text-[11px] font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        {t(language, "reader.openSource")}
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
             </button>
@@ -281,7 +343,7 @@ export function ReaderScreen({
                   >
                     {isDone ? z.repetitionCount : 0}
                   </p>
-                  <p className="font-sans text-[12px] text-muted-foreground">/ {z.repetitionCount}</p>
+                  <p className="max-w-[120px] font-sans text-[12px] text-muted-foreground">/ {displayCount}</p>
                 </div>
               </div>
             </div>
