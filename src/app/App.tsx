@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { motion } from "motion/react";
 import {
   ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
   Home, BookOpen, Settings, Search, Check, Play, Pause,
@@ -49,12 +48,7 @@ type View =
 
 
 
-import { CatIcon } from "./components/CatIcon";
-import { MaleAvatar } from "./components/Avatars";
-import { Toggle } from "./components/ToggleSwitch";
-import { ProgressBar } from "./components/ProgressBar";
-import { Header, BottomNav } from "./components/LayoutShells";
-import { RepBadge, PulseRings, CounterRing, WaveformBars } from "./components/ZikrComponents";
+import { BottomNav } from "./components/LayoutShells";
 import { HomeScreen } from "./screens/HomeScreen";
 import { CategoryScreen } from "./screens/CategoryScreen";
 import { ReaderScreen } from "./screens/ReaderScreen";
