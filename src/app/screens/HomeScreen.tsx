@@ -89,32 +89,6 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         </div>
       )}
 <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
-        <button
-          type="button"
-          onClick={() => onFeaturedZikr(featuredZikr.category, Math.max(0, featuredIndex))}
-          className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-primary">{t(language, "home.dailyReflection")}</p>
-              <p className="mt-2 text-[14px] leading-[22px] text-muted-foreground">{t(language, "home.reflectionHint")}</p>
-            </div>
-            <span className="rounded-full bg-primary/12 px-3 py-1 text-[11px] font-bold text-primary">
-              {language === "ar" ? featuredCategory.nameArabic : featuredCategory.name}
-            </span>
-          </div>
-          <p
-            className="mt-4 text-right text-[20px] font-bold leading-[34px] text-foreground"
-            dir="rtl"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-          >
-            {featuredExcerpt}
-          </p>
-          <div className="mt-4 flex items-center justify-between gap-3">
-            <p className="line-clamp-2 text-[12px] leading-[18px] text-muted-foreground">{featuredZikr.sourceReference}</p>
-            <span className="shrink-0 text-[12px] font-semibold text-primary">{t(language, "home.openReflection")}</span>
-          </div>
-        </button>
 
         {CATEGORIES.map((cat) => {
           const done = completed[cat.id]?.size ?? 0;

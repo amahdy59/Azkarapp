@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ChevronRight } from "lucide-react";
+import { Check, ChevronRight, RotateCcw } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -14,12 +14,14 @@ export function CategoryScreen({
   completed,
   isArabic,
   onZikr,
+  onReset,
   onBack,
 }: {
   catId: CategoryId;
   completed: Set<number>;
   isArabic: boolean;
   onZikr: (i: number) => void;
+  onReset: () => void;
   onBack: () => void;
 }) {
   const azkar = getAzkarByCategory(catId);
@@ -55,29 +57,39 @@ export function CategoryScreen({
         </div>
         <ProgressBar value={done} max={azkar.length} height={8} />
 
-        {done < azkar.length && (
-          <button
-            onClick={() => onZikr(Math.max(0, resumeIdx))}
-            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-[15px] font-bold text-primary-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {done === 0
-              ? t(language, "category.startSession")
-              : t(language, "category.resumeZikr", { index: formatNumerals(resumeIdx + 1, language) })}
-            <ChevronRight size={18} className="rtl:-scale-x-100" />
-          </button>
-        )}
-        {done === azkar.length && (
-          <div
-            className="mt-3 flex h-12 w-full items-center justify-center gap-2 rounded-xl"
-            style={{
-              background: "color-mix(in srgb, var(--primary) 15%, transparent)",
-              border: "1px solid color-mix(in srgb, var(--primary) 40%, transparent)",
-            }}
-          >
-            <Check size={18} className="text-primary" />
-            <span className="text-[15px] font-bold text-primary">{t(language, "category.sessionComplete")}</span>
-          </div>
-        )}
+        <div className="mt-3 flex gap-2 w-full">
+          {done < azkar.length ? (
+            <button
+              onClick={() => onZikr(Math.max(0, resumeIdx))}
+              className="flex flex-1 h-12 items-center justify-center gap-2 rounded-xl bg-primary text-[15px] font-bold text-primary-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {done === 0
+                ? t(language, "category.startSession")
+                : t(language, "category.resumeZikr", { index: formatNumerals(resumeIdx + 1, language) })}
+              <ChevronRight size={18} className="rtl:-scale-x-100" />
+            </button>
+          ) : (
+            <div
+              className="flex flex-1 h-12 items-center justify-center gap-2 rounded-xl"
+              style={{
+                background: "color-mix(in srgb, var(--primary) 15%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--primary) 40%, transparent)",
+              }}
+            >
+              <Check size={18} className="text-primary" />
+              <span className="text-[15px] font-bold text-primary">{t(language, "category.sessionComplete")}</span>
+            </div>
+          )}
+          {done > 0 && (
+            <button
+              onClick={onReset}
+              className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label="Reset Progress"
+            >
+              <RotateCcw size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-5 py-3">

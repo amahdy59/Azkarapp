@@ -12,6 +12,8 @@ import {
   Play,
   RotateCcw,
   Share2,
+  Languages,
+  Type,
   Volume2,
   VolumeX,
   X,
@@ -30,11 +32,13 @@ const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 function TogglePill({
   active,
   label,
+  icon: Icon,
   onClick,
   ariaLabel,
 }: {
   active: boolean;
   label: string;
+  icon?: React.ElementType;
   onClick: () => void;
   ariaLabel: string;
 }) {
@@ -51,6 +55,7 @@ function TogglePill({
         color: active ? "var(--primary)" : "var(--muted-foreground)",
       }}
     >
+      {Icon && <Icon size={14} className="me-1.5" />}
       {label}
     </button>
   );
@@ -78,6 +83,7 @@ function ModePill({
         color: active ? "var(--secondary)" : "var(--muted-foreground)",
       }}
     >
+      {Icon && <Icon size={14} className="me-1.5" />}
       {label}
     </button>
   );
@@ -156,11 +162,12 @@ export function ReaderScreen({
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [listenMode, setListenMode] = useState(false);
   const [playing, setPlaying] = useState(false);
+  const [autoPlayNext, setAutoPlayNext] = useState(true);
+  const [audioProgress, setAudioProgress] = useState(0);
   const [muted, setMuted] = useState(false);
   const [speed, setSpeed] = useState<0.75 | 1 | 1.25>(1);
   const [count, setCount] = useState(0);
   const [pulse, setPulse] = useState(0);
-  const [flash, setFlash] = useState(false);
   const [complete, setComplete] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
@@ -171,6 +178,37 @@ export function ReaderScreen({
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval>;
+    if (playing && !muted) {
+      interval = setInterval(() => {
+        setAudioProgress(p => {
+          if (p >= 100) {
+            setPlaying(false);
+            if (autoPlayNext) {
+              onAdvance(idx);
+            }
+            return 0;
+          }
+          // Assuming each zikr audio takes approx 4 seconds on 1x speed
+          return p + (speed * 1.25);
+        });
+      }, 50);
+    }
+    return () => clearInterval(interval);
+  }, [playing, muted, speed, autoPlayNext, idx, onAdvance]);
+
+  // Reset progress when zikr changes
+  useEffect(() => {
+    setAudioProgress(0);
+    if (listenMode && autoPlayNext) {
+      setPlaying(true);
+    } else {
+      setPlaying(false);
+    }
+  }, [idx, listenMode]);
 
   useEffect(() => {
     const initialCount = isDone && z ? z.repetitionCount : 0;
@@ -239,15 +277,12 @@ export function ReaderScreen({
     const next = count + 1;
     setCount(next);
     setPulse((value) => value + 1);
-    setFlash(true);
 
     if (resetTimer.current) {
       clearTimeout(resetTimer.current);
     }
 
-    resetTimer.current = setTimeout(() => {
-      setFlash(false);
-    }, 140);
+    resetTimer.current =
 
     if (next >= z.repetitionCount) {
       setComplete(true);
@@ -448,7 +483,7 @@ export function ReaderScreen({
       </div>
 
       <p
-        className="text-center text-[26px] font-bold leading-[46px] text-foreground"
+        className="text-center text-[24px] font-bold leading-[42px] text-foreground"
         dir="rtl"
         lang="ar"
         style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
@@ -460,18 +495,21 @@ export function ReaderScreen({
         <TogglePill
           active={showTranslation}
           label="EN"
+          icon={Languages}
           onClick={onToggleTranslation}
           ariaLabel={t(language, "reader.toggleTranslation")}
         />
         <TogglePill
           active={showTransliteration}
           label="TR"
+          icon={Type}
           onClick={onToggleTransliteration}
           ariaLabel={t(language, "reader.toggleTransliteration")}
         />
         <TogglePill
           active={listenMode}
           label="Listen"
+          icon={Volume2}
           onClick={() => setListenMode((value) => !value)}
           ariaLabel={t(language, "reader.listenModeToggle")}
         />
@@ -514,11 +552,7 @@ export function ReaderScreen({
   const renderCounterPanel = () => (
     <div
       className="border-t border-border/70 px-3 pb-3 pt-2.5"
-      style={{
-        background: flash
-          ? "linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--background)), var(--background))"
-          : "linear-gradient(180deg, rgba(8,16,38,0.98), rgba(8,16,38,1))",
-      }}
+
     >
       <div className="flex h-full flex-col">
         <div
@@ -582,14 +616,20 @@ export function ReaderScreen({
     const renderListeningPanel = () => (
     <div
       className="border-t border-border/70 px-4 pb-4 pt-3"
-      style={{
-        background: "linear-gradient(180deg, rgba(8,16,38,0.98), rgba(8,16,38,1))",
-      }}
+
     >
       <div className="flex h-full flex-col justify-between rounded-[24px] border border-secondary/20 bg-secondary/5 px-4 py-3">
-        <div className="text-center mt-1">
+        <div className="flex items-center justify-between mt-1 px-2">
           <p className="text-[15px] font-bold text-secondary">{t(language, "reader.listenMode")}</p>
-          <p className="mt-1 text-[13px] font-medium leading-[20px] text-muted-foreground">{t(language, "reader.listenModeHint")}</p>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <span className="text-[12px] font-semibold text-secondary">Auto-Play</span>
+            <input 
+               type="checkbox" 
+               checked={autoPlayNext} 
+               onChange={(e) => setAutoPlayNext(e.target.checked)}
+               className="h-4 w-4 rounded-sm border-secondary text-secondary focus:ring-secondary/50" 
+            />
+          </label>
         </div>
 
         <div className="flex flex-1 flex-col items-center justify-center">
@@ -607,7 +647,7 @@ export function ReaderScreen({
             <div className="h-[4px] flex-1 rounded-full bg-secondary/20 overflow-hidden" aria-hidden="true">
               <div
                 className="h-full rounded-full bg-secondary"
-                style={{ width: playing ? "44%" : "18%", transition: "width 220ms ease" }}
+                style={{ width: `${audioProgress}%`, transition: "width 50ms linear" }}
               />
             </div>
           </div>
