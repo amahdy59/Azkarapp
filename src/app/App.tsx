@@ -311,7 +311,7 @@ export default function App() {
   const handleResetCategory = (catId: CategoryId) => {
     setCompleted(prev => {
       const next = { ...prev };
-      delete next[catId];
+      next[catId] = new Set();
       return next;
     });
   };
@@ -603,7 +603,7 @@ export default function App() {
           {view === "category" && (
             <CategoryScreen 
               catId={activeCat} 
-              completed={completed[activeCat]} 
+              completed={completed[activeCat] ?? new Set()} 
               isArabic={isArabic}
               onZikr={i => openReader(activeCat, i)} 
               onReset={() => handleResetCategory(activeCat)}
