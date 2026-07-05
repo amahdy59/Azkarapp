@@ -80,16 +80,17 @@ export function CategoryScreen({
               <span className="text-[15px] font-bold text-primary">{t(language, "category.sessionComplete")}</span>
             </div>
           )}
-          {done > 0 && (
-            <button
-              onClick={onReset}
-              className="flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              aria-label="Reset Progress"
-            >
-              <RotateCcw size={18} />
-            </button>
-          )}
         </div>
+        
+        {done > 0 && (
+          <button
+            onClick={onReset}
+            className="mt-2 flex w-full h-12 items-center justify-center gap-2 rounded-xl bg-destructive/10 text-[15px] font-bold text-destructive transition-all hover:bg-destructive/15 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
+          >
+            <RotateCcw size={18} />
+            <span>{isArabic ? "إعادة تعيين" : "Reset Progress"}</span>
+          </button>
+        )}
       </div>
 
       <div className="flex flex-1 flex-col gap-2 overflow-y-auto px-5 py-3">

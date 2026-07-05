@@ -308,6 +308,14 @@ export default function App() {
     setView(to);
   }, [view]);
 
+  const handleResetCategory = (catId: CategoryId) => {
+    setCompleted(prev => {
+      const next = { ...prev };
+      delete next[catId];
+      return next;
+    });
+  };
+
   const pop = useCallback(() => {
     setHistory(h => {
       const prev = h[h.length - 1] ?? "home";
@@ -593,8 +601,14 @@ export default function App() {
             />
           )}
           {view === "category" && (
-            <CategoryScreen catId={activeCat} completed={completed[activeCat]} isArabic={isArabic}
-              onZikr={i => openReader(activeCat, i)} onBack={pop} />
+            <CategoryScreen 
+              catId={activeCat} 
+              completed={completed[activeCat]} 
+              isArabic={isArabic}
+              onZikr={i => openReader(activeCat, i)} 
+              onReset={() => handleResetCategory(activeCat)}
+              onBack={pop} 
+            />
           )}
           {view === "reader" && (
             <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
