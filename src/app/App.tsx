@@ -345,7 +345,9 @@ export default function App() {
       updated.add(idx);
       return { ...prev, [activeCat]: updated };
     });
-    // auto advance to next or completion
+  };
+
+  const advanceAfterCompletion = (idx: number) => {
     const azkar = getAzkarByCategory(activeCat);
     if (idx + 1 < azkar.length) {
       setActiveIdx(idx + 1);
@@ -617,10 +619,12 @@ export default function App() {
             <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
               isDone={completed[activeCat]?.has(activeIdx) ?? false}
               completedCount={completed[activeCat]?.size ?? 0}
+              currentStreak={currentStreak}
               showTransliteration={showTransliteration}
               showTranslation={showTranslation}
               onBack={pop}
               onComplete={markComplete}
+              onAdvance={advanceAfterCompletion}
               onToggleTransliteration={() => setShowTransliteration(value => !value)}
               onToggleTranslation={() => setShowTranslation(value => !value)}
               onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}

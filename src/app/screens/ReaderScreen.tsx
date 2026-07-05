@@ -5,7 +5,6 @@ import {
   ChevronLeft,
   ChevronRight,
   ChevronUp,
-  Expand,
   MoreHorizontal,
   Pause,
   Play,
@@ -60,10 +59,12 @@ export function ReaderScreen({
   isArabic,
   isDone,
   completedCount,
+  currentStreak,
   showTransliteration,
   showTranslation,
   onBack,
   onComplete,
+  onAdvance,
   onToggleTransliteration,
   onToggleTranslation,
   onNext,
@@ -74,10 +75,12 @@ export function ReaderScreen({
   isArabic: boolean;
   isDone: boolean;
   completedCount: number;
+  currentStreak: number;
   showTransliteration: boolean;
   showTranslation: boolean;
   onBack: () => void;
   onComplete: (idx: number) => void;
+  onAdvance: (idx: number) => void;
   onToggleTransliteration: () => void;
   onToggleTranslation: () => void;
   onNext: () => void;
@@ -85,6 +88,7 @@ export function ReaderScreen({
 }) {
   const azkar = getAzkarByCategory(catId);
   const z = azkar[idx];
+  const nextZikr = idx < azkar.length - 1 ? azkar[idx + 1] : null;
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
 
@@ -97,23 +101,68 @@ export function ReaderScreen({
   const [pulse, setPulse] = useState(0);
   const [flash, setFlash] = useState(false);
   const [complete, setComplete] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const [autoAdvanceCancelled, setAutoAdvanceCancelled] = useState(false);
+  const [countdown, setCountdown] = useState(2);
 
   const touchStartX = useRef<number | null>(null);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const initialCount = isDone && z ? z.repetitionCount : 0;
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
-  }, [idx, isDone, z]);
+    setShowCelebration(false);
+    setAutoAdvanceCancelled(false);
+    setCountdown(2);
+    setBenefitOpen(false);
+  }, [idx, isDone, z?.id]);
 
   useEffect(() => {
     return () => {
       if (resetTimer.current) {
         clearTimeout(resetTimer.current);
       }
+      if (advanceTimer.current) {
+        clearTimeout(advanceTimer.current);
+      }
+      if (countdownTimer.current) {
+        clearInterval(countdownTimer.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!showCelebration || autoAdvanceCancelled) {
+      if (advanceTimer.current) {
+        clearTimeout(advanceTimer.current);
+      }
+      if (countdownTimer.current) {
+        clearInterval(countdownTimer.current);
+      }
+      return;
+    }
+
+    setCountdown(2);
+    countdownTimer.current = setInterval(() => {
+      setCountdown((value) => (value > 0 ? value - 1 : 0));
+    }, 1000);
+
+    advanceTimer.current = setTimeout(() => {
+      onAdvance(idx);
+    }, 2200);
+
+    return () => {
+      if (advanceTimer.current) {
+        clearTimeout(advanceTimer.current);
+      }
+      if (countdownTimer.current) {
+        clearInterval(countdownTimer.current);
+      }
+    };
+  }, [autoAdvanceCancelled, idx, onAdvance, showCelebration]);
 
   if (!z || !category) {
     return null;
@@ -127,10 +176,15 @@ export function ReaderScreen({
   const localizedDisplayCount = formatNumerals(displayCount, language);
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
-  const completedIncludingActive = completedCount + (complete && !isDone ? 1 : 0);
+  const completedIncludingActive = completedCount + (showCelebration && !isDone ? 1 : 0);
   const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
+  const nextExcerpt = nextZikr?.arabicText.slice(0, 42).trim();
 
   const handleSwipe = (dx: number) => {
+    if (showCelebration) {
+      return;
+    }
+
     if (isArabic) {
       if (dx > 60) {
         onNext();
@@ -148,7 +202,7 @@ export function ReaderScreen({
   };
 
   const handleTap = () => {
-    if (complete) {
+    if (complete || showCelebration) {
       return;
     }
 
@@ -167,14 +221,23 @@ export function ReaderScreen({
 
     if (next >= z.repetitionCount) {
       setComplete(true);
-      setTimeout(() => onComplete(idx), 650);
+      setShowCelebration(true);
+      setAutoAdvanceCancelled(false);
+      onComplete(idx);
     }
   };
 
   const handleReset = () => {
     setCount(0);
     setComplete(false);
+    setShowCelebration(false);
+    setAutoAdvanceCancelled(true);
     setPulse((value) => value + 1);
+  };
+
+  const handleContinue = () => {
+    setAutoAdvanceCancelled(true);
+    onAdvance(idx);
   };
 
   const cycleSpeed = (direction: -1 | 1) => {
@@ -184,55 +247,42 @@ export function ReaderScreen({
     setSpeed(speeds[nextIndex]);
   };
 
-  const renderReadingContent = (fullPage: boolean) => (
-    <div className={`relative space-y-5 ${fullPage ? "px-5 py-5" : "px-5 py-4"}`}>
-      {!fullPage && (
-        <button
-          type="button"
-          onClick={() => setExpandedReading(true)}
-          aria-label={t(language, "reader.fullView")}
-          className="absolute end-0 top-0 inline-flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card text-muted-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <Expand size={16} />
-        </button>
+  const renderExpandedContent = () => (
+    <div className="space-y-5 px-5 py-5">
+      <p
+        className="text-center text-[30px] font-bold leading-[52px] text-foreground"
+        dir="rtl"
+        style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+      >
+        {z.arabicText}
+      </p>
+
+      <div className="flex justify-center gap-3">
+        <TogglePill
+          active={showTranslation}
+          label="EN"
+          onClick={onToggleTranslation}
+          ariaLabel={t(language, "reader.toggleTranslation")}
+        />
+        <TogglePill
+          active={showTransliteration}
+          label="TR"
+          onClick={onToggleTransliteration}
+          ariaLabel={t(language, "reader.toggleTransliteration")}
+        />
+      </div>
+
+      {showTransliteration && (
+        <p className="text-center font-sans text-[14px] italic leading-[22px] text-card-foreground">
+          {z.transliteration}
+        </p>
       )}
 
-      <div className={`space-y-5 ${fullPage ? "" : "pt-10"}`}>
-        <p
-          className="text-center text-[29px] font-bold leading-[50px] text-foreground"
-          dir="rtl"
-          style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-        >
-          {z.arabicText}
+      {showTranslation && (
+        <p className="text-center font-sans text-[15px] leading-[24px] text-card-foreground">
+          {z.translation}
         </p>
-
-        <div className="flex justify-center gap-3">
-          <TogglePill
-            active={showTranslation}
-            label="EN"
-            onClick={onToggleTranslation}
-            ariaLabel={t(language, "reader.toggleTranslation")}
-          />
-          <TogglePill
-            active={showTransliteration}
-            label="TR"
-            onClick={onToggleTransliteration}
-            ariaLabel={t(language, "reader.toggleTransliteration")}
-          />
-        </div>
-
-        {showTransliteration && (
-          <p className="text-center font-sans text-[14px] italic leading-[22px] text-card-foreground">
-            {z.transliteration}
-          </p>
-        )}
-
-        {showTranslation && (
-          <p className="text-center font-sans text-[15px] leading-[24px] text-card-foreground">
-            {z.translation}
-          </p>
-        )}
-      </div>
+      )}
 
       <div className="rounded-[22px] border border-border bg-card/40">
         <button
@@ -248,9 +298,6 @@ export function ReaderScreen({
           <p className="flex-1 font-sans text-[16px] font-semibold text-foreground">
             {t(language, "reader.benefit")}
           </p>
-          <div className="text-muted-foreground">
-            <Expand size={16} />
-          </div>
         </button>
 
         {benefitOpen && (
@@ -328,55 +375,6 @@ export function ReaderScreen({
           </div>
         )}
       </div>
-
-      <div
-        className="flex items-center justify-between gap-2 rounded-[20px] px-4 py-3"
-        style={{
-          background: "color-mix(in srgb, var(--secondary) 30%, #116f5a)",
-          color: "var(--secondary-foreground)",
-        }}
-      >
-        <button
-          type="button"
-          onClick={() => setMuted((value) => !value)}
-          aria-label={muted ? "Unmute audio" : "Mute audio"}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {muted ? <VolumeX size={21} /> : <Volume2 size={21} />}
-        </button>
-        <button
-          type="button"
-          onClick={() => cycleSpeed(-1)}
-          aria-label="Decrease audio speed"
-          className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <SkipBack size={21} />
-        </button>
-        <button
-          type="button"
-          onClick={() => setPlaying((value) => !value)}
-          aria-label={playing ? "Pause" : "Play"}
-          className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F5EEDF] text-[#1C5B4C] shadow-[0_6px_18px_rgba(0,0,0,0.18)] transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {playing ? <Pause size={24} /> : <Play size={24} className="ms-1" />}
-        </button>
-        <button
-          type="button"
-          onClick={() => cycleSpeed(1)}
-          aria-label="Increase audio speed"
-          className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <SkipForward size={21} />
-        </button>
-        <button
-          type="button"
-          onClick={() => setExpandedReading(true)}
-          aria-label={t(language, "reader.fullView")}
-          className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <MoreHorizontal size={21} />
-        </button>
-      </div>
     </div>
   );
 
@@ -395,12 +393,22 @@ export function ReaderScreen({
         touchStartX.current = null;
       }}
     >
+      {showCelebration && (
+        <div className="sr-only" aria-live="assertive">
+          {t(language, "reader.completionAnnouncement", {
+            index: formatNumerals(idx + 1, language),
+            total: formatNumerals(azkar.length, language),
+            percent: formatNumerals(progressPercent, language),
+          })}
+        </div>
+      )}
+
       <div className="shrink-0 border-b border-border/70 px-4 py-4">
         <div className="grid grid-cols-[44px_1fr_88px] items-center gap-2">
           <button
             onClick={onBack}
             aria-label="Go back"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card/60 text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ChevronLeft size={22} className="rtl:-scale-x-100" />
           </button>
@@ -432,11 +440,11 @@ export function ReaderScreen({
         </div>
       </div>
 
-      <div className="shrink-0 border-b border-border/70 bg-card px-5 py-4">
+      <div className="shrink-0 border-b border-border/70 bg-card px-5 py-3">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <p className="font-sans text-[15px] font-medium text-muted-foreground">
+          <p className="font-sans text-[14px] font-medium text-muted-foreground">
             {t(language, "reader.progressSummary", {
-              done: formatNumerals(completedIncludingActive, language),
+              done: formatNumerals(idx + 1, language),
               total: formatNumerals(azkar.length, language),
             })}
           </p>
@@ -459,33 +467,291 @@ export function ReaderScreen({
       </div>
 
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <ScrollArea className="zikr-scroll min-h-0 flex-1">
-          {renderReadingContent(false)}
-        </ScrollArea>
+        {showCelebration ? (
+          <div className="shrink-0 border-b border-border/70 bg-card/30 px-5 py-4 opacity-70">
+            <p
+              className="text-right text-[24px] font-bold leading-[42px] text-foreground"
+              dir="rtl"
+              style={{
+                fontFamily: "'Noto Naskh Arabic', serif",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+              }}
+            >
+              {z.arabicText}
+            </p>
+          </div>
+        ) : (
+          <ScrollArea className="zikr-scroll min-h-0 flex-1">
+            <div className="space-y-5 px-5 py-5">
+              <p
+                className="text-right text-[30px] font-bold leading-[52px] text-foreground"
+                dir="rtl"
+                style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              >
+                {z.arabicText}
+              </p>
+
+              <div className="flex justify-center gap-3">
+                <TogglePill
+                  active={showTranslation}
+                  label="EN"
+                  onClick={onToggleTranslation}
+                  ariaLabel={t(language, "reader.toggleTranslation")}
+                />
+                <TogglePill
+                  active={showTransliteration}
+                  label="TR"
+                  onClick={onToggleTransliteration}
+                  ariaLabel={t(language, "reader.toggleTransliteration")}
+                />
+              </div>
+
+              {showTransliteration && (
+                <p className="text-center font-sans text-[14px] italic leading-[22px] text-card-foreground">
+                  {z.transliteration}
+                </p>
+              )}
+
+              {showTranslation && (
+                <p className="text-center font-sans text-[15px] leading-[24px] text-card-foreground">
+                  {z.translation}
+                </p>
+              )}
+
+              <div className="rounded-[22px] border border-border bg-card/40">
+                <button
+                  type="button"
+                  onClick={() => setBenefitOpen((open) => !open)}
+                  aria-expanded={benefitOpen}
+                  aria-controls="benefit-content"
+                  className="flex w-full items-center gap-3 px-4 py-4 text-start focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <div className="text-muted-foreground">
+                    {benefitOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                  </div>
+                  <p className="flex-1 font-sans text-[16px] font-semibold text-foreground">
+                    {t(language, "reader.benefit")}
+                  </p>
+                </button>
+
+                {benefitOpen && (
+                  <div id="benefit-content" className="fade-in border-t border-border px-4 pb-4">
+                    <p className="pt-3 font-sans text-[14px] leading-[23px] text-card-foreground">
+                      {z.benefit}
+                    </p>
+                    {extraNotes && (
+                      <div className="mt-4">
+                        <p className="font-sans text-[11px] font-bold tracking-[0.08em] text-muted-foreground">
+                          {t(language, "reader.notes")}
+                        </p>
+                        <p className="mt-1 font-sans text-[14px] leading-[23px] text-card-foreground">{extraNotes}</p>
+                      </div>
+                    )}
+                    {z.preferredTiming && (
+                      <div className="mt-4">
+                        <p className="font-sans text-[11px] font-bold tracking-[0.08em] text-muted-foreground">
+                          {t(language, "reader.timing")}
+                        </p>
+                        <p className="mt-1 font-sans text-[14px] leading-[23px] text-card-foreground">{z.preferredTiming}</p>
+                      </div>
+                    )}
+                    {displayCount !== String(z.repetitionCount) && (
+                      <div className="mt-4">
+                        <p className="font-sans text-[11px] font-bold tracking-[0.08em] text-muted-foreground">
+                          {t(language, "reader.count")}
+                        </p>
+                        <p className="mt-1 font-sans text-[14px] leading-[23px] text-card-foreground">{localizedDisplayCount}</p>
+                      </div>
+                    )}
+                    {authenticityNote && (
+                      <div className="mt-4">
+                        <p className="font-sans text-[11px] font-bold tracking-[0.08em] text-muted-foreground">
+                          {t(language, "reader.authenticity")}
+                        </p>
+                        <p className="mt-1 font-sans text-[14px] leading-[23px] text-card-foreground">{authenticityNote}</p>
+                      </div>
+                    )}
+                    {z.hadithText && (
+                      <div className="mt-4">
+                        <p className="font-sans text-[11px] font-bold tracking-[0.08em] text-muted-foreground">
+                          {t(language, "reader.evidence")}
+                        </p>
+                        <p
+                          className="mt-1 rounded-xl border border-border bg-background px-3 py-3 text-[15px] leading-[28px] text-foreground"
+                          dir="auto"
+                          style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+                        >
+                          {z.hadithText}
+                        </p>
+                      </div>
+                    )}
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
+                      <span
+                        className="inline-block rounded-full border px-3 py-1 font-sans text-[11px] font-medium text-card-foreground"
+                        style={{
+                          background: "color-mix(in srgb, var(--secondary) 15%, transparent)",
+                          borderColor: "color-mix(in srgb, var(--secondary) 40%, transparent)",
+                        }}
+                      >
+                        {z.sourceReference}
+                      </span>
+                      {z.sourceUrl && (
+                        <a
+                          href={z.sourceUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="inline-flex items-center rounded-full border border-border px-3 py-1 font-sans text-[11px] font-semibold text-primary underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                        >
+                          {t(language, "reader.openSource")}
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <div
+                className="flex items-center justify-between gap-2 rounded-[20px] px-4 py-3"
+                style={{
+                  background: "color-mix(in srgb, var(--secondary) 30%, #116f5a)",
+                  color: "var(--secondary-foreground)",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => setMuted((value) => !value)}
+                  aria-label={muted ? "Unmute audio" : "Mute audio"}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {muted ? <VolumeX size={21} /> : <Volume2 size={21} />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => cycleSpeed(-1)}
+                  aria-label="Decrease audio speed"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <SkipBack size={21} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPlaying((value) => !value)}
+                  aria-label={playing ? "Pause" : "Play"}
+                  className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F5EEDF] text-[#1C5B4C] shadow-[0_6px_18px_rgba(0,0,0,0.18)] transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {playing ? <Pause size={24} /> : <Play size={24} className="ms-1" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => cycleSpeed(1)}
+                  aria-label="Increase audio speed"
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <SkipForward size={21} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setExpandedReading(true)}
+                  aria-label={t(language, "reader.fullView")}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-secondary-foreground/90 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  <MoreHorizontal size={21} />
+                </button>
+              </div>
+            </div>
+          </ScrollArea>
+        )}
 
         <div
-          className="shrink-0 border-t border-border/70 bg-[linear-gradient(180deg,rgba(8,16,38,0.98),rgba(8,16,38,1))] px-5 pb-6 pt-5"
+          className="shrink-0 border-t border-border/70 px-5 pb-6 pt-5"
           style={{
-            minHeight: 316,
+            minHeight: showCelebration ? 420 : 316,
             background: flash
               ? "linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--background)), var(--background))"
-              : undefined,
+              : "linear-gradient(180deg, rgba(8,16,38,0.98), rgba(8,16,38,1))",
           }}
         >
-          {complete ? (
+          {showCelebration ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
-              <div className="mb-8 flex h-[224px] w-[224px] items-center justify-center rounded-full bg-primary shadow-[0_0_38px_rgba(215,165,40,0.22)]">
-                <Check size={68} className="text-primary-foreground" strokeWidth={2.4} />
+              <div className="celebration-glow relative mb-6 flex h-[210px] w-[210px] items-center justify-center">
+                <div className="celebration-pop flex h-[168px] w-[168px] items-center justify-center rounded-full bg-primary shadow-[0_0_42px_rgba(215,165,40,0.22)]">
+                  <Check size={62} className="text-primary-foreground" strokeWidth={2.4} />
+                </div>
               </div>
+
               <p
-                className="text-[44px] font-bold leading-none text-primary"
+                className="text-[40px] font-bold leading-none text-primary"
                 style={isArabic ? { fontFamily: "'Noto Naskh Arabic', serif" } : undefined}
               >
                 {t(language, "reader.complete")}
               </p>
               <p className="mt-3 font-sans text-[16px] leading-[24px] text-card-foreground">
-                {t(language, "reader.autoAdvance")}
+                {t(language, "reader.completionContext", {
+                  count: formatNumerals(z.repetitionCount, language),
+                })}
               </p>
+
+              {currentStreak > 0 && (
+                <div className="mt-4 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 font-sans text-[14px] font-bold text-primary">
+                  {t(language, "reader.streakBadge", {
+                    count: formatNumerals(currentStreak, language),
+                  })}
+                </div>
+              )}
+
+              <p className="mt-5 font-sans text-[14px] font-semibold text-card-foreground">
+                {t(language, "reader.keepGoing", {
+                  done: formatNumerals(completedIncludingActive, language),
+                  total: formatNumerals(azkar.length, language),
+                })}
+              </p>
+
+              {nextZikr && (
+                <div className="mt-5 w-full rounded-[20px] border border-border bg-card/45 px-4 py-3 text-start">
+                  <p className="font-sans text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+                    {t(language, "reader.nextPreview")}
+                  </p>
+                  <p
+                    className="mt-2 text-right text-[18px] leading-[30px] text-foreground"
+                    dir="rtl"
+                    style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+                  >
+                    {nextExcerpt}
+                    {nextExcerpt && nextExcerpt.length >= 42 ? "..." : ""}
+                  </p>
+                  <p className="mt-2 font-sans text-[13px] text-muted-foreground">
+                    {t(language, "reader.count")}: {formatNumerals(nextZikr.countLabel ?? String(nextZikr.repetitionCount), language)}
+                  </p>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={handleContinue}
+                className="mt-6 h-[52px] min-w-[220px] rounded-full bg-primary px-6 font-sans text-[16px] font-bold text-primary-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                {nextZikr
+                  ? t(language, "reader.nextCta", { index: formatNumerals(idx + 2, language) })
+                  : t(language, "reader.finishSession")}
+              </button>
+
+              {!autoAdvanceCancelled && (
+                <div className="mt-3 flex items-center gap-3">
+                  <p className="font-sans text-[13px] text-muted-foreground">
+                    {t(language, "reader.autoAdvanceCountdown", { seconds: formatNumerals(countdown, language) })}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setAutoAdvanceCancelled(true)}
+                    className="rounded-full border border-border px-3 py-1.5 font-sans text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    {t(language, "reader.stayHere")}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div
@@ -573,7 +839,7 @@ export function ReaderScreen({
           </div>
 
           <ScrollArea className="zikr-scroll min-h-0 flex-1">
-            {renderReadingContent(true)}
+            {renderExpandedContent()}
           </ScrollArea>
         </div>
       )}
