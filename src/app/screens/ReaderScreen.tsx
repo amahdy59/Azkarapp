@@ -169,7 +169,6 @@ export function ReaderScreen({
   const suppressTap = useRef(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -177,8 +176,6 @@ export function ReaderScreen({
     const initialCount = isDone && z ? z.repetitionCount : 0;
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
-    setAutoAdvanceCancelled(false);
-    setCountdown(2);
     setBenefitOpen(false);
     setListenMode(false);
     setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
@@ -282,12 +279,10 @@ export function ReaderScreen({
   const handleReset = () => {
     setCount(0);
     setComplete(false);
-    setAutoAdvanceCancelled(true);
     setPulse((value) => value + 1);
   };
 
   const handleContinue = () => {
-    setAutoAdvanceCancelled(true);
     onAdvance(idx);
   };
 
