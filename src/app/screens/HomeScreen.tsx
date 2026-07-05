@@ -1,5 +1,5 @@
 import React from "react";
-import { Search, Check, ChevronRight, Flame } from "lucide-react";
+import { Search, Check, ChevronRight, Flame, BookOpen } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { ALL_AZKAR } from "../content/azkar";
