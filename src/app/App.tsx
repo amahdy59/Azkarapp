@@ -371,6 +371,13 @@ export default function App() {
 
   const goHome = () => { setView("home"); setActiveTab("home"); setHistory([]); };
 
+  const handleOpenAccountAuth = () => {
+    setAuthError("");
+    setView("login");
+    setActiveTab("settings");
+    setHistory([]);
+  };
+
   const handleSendOtp = async (phone: string) => {
     try {
       setAuthError("");
@@ -480,9 +487,6 @@ export default function App() {
   };
 
   const showBottomNav = ["home", "category", "settings"].includes(view);
-  // Arabic onboarding screens manage their own status bar; English onboarding is full-bleed
-  const onboardViews: View[] = ["splash", "onboard1", "onboard2", "onboard3"];
-  const showStatusBar = !onboardViews.includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
@@ -492,21 +496,6 @@ export default function App() {
         style={{ width: 390, height: 844, borderRadius: 44, background: T.bg }}>
 
         {/* iOS status bar — hidden on splash/onboarding (they manage their own) */}
-        {showStatusBar && (
-          <div className="flex items-center justify-between px-6 shrink-0" style={{ height: 44, paddingTop: 12 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: T.textPrimary, fontFamily: "Inter, sans-serif" }}>9:41</span>
-            <div className="flex items-center gap-1.5">
-              <Wifi size={12} style={{ color: T.textPrimary }} />
-              <Volume2 size={12} style={{ color: T.textPrimary }} />
-              <div className="relative" style={{ width: 22, height: 11 }}>
-                <div className="absolute inset-0 rounded-sm" style={{ border: `1.5px solid ${T.textPrimary}`, opacity: 0.6 }} />
-                <div className="absolute rounded-sm" style={{ top: 2, left: 2, right: 4, bottom: 2, background: T.textPrimary }} />
-                <div className="absolute rounded-r-sm" style={{ right: -3, top: 3.5, width: 2, height: 4, background: T.textPrimary, opacity: 0.5 }} />
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Screen */}
         <div className="flex-1 overflow-hidden flex flex-col">
           {/* Phase 2 — onboarding flow */}
@@ -607,6 +596,7 @@ export default function App() {
               currentStreak={currentStreak}
               longestStreak={longestStreak}
               onCategory={openCategory}
+              onFeaturedZikr={(catId, i) => openReader(catId, i)}
               onSearch={() => push("search")}
               language={selectedLang}
             />
@@ -641,6 +631,7 @@ export default function App() {
               darkMode={darkMode}
               languageLabel={languageLabel}
               language={selectedLang}
+              phoneAuthEnabled={isSupabaseConfigured}
               isGuest={isGuest}
               isSyncing={isSyncingRemote}
               textSize={textSize}
@@ -663,6 +654,7 @@ export default function App() {
               onVoiceOverChange={setVoiceOver}
               onAudioQualityChange={setAudioQuality}
               onColorBlindSupportChange={setColorBlindSupport}
+              onActivateAccount={handleOpenAccountAuth}
               onSignOut={handleSignOut}
               onBack={pop}
             />

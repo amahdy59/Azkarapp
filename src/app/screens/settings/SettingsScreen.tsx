@@ -19,6 +19,7 @@ export function SettingsScreen({
   darkMode,
   languageLabel,
   language,
+  phoneAuthEnabled,
   isGuest,
   isSyncing,
   textSize,
@@ -41,12 +42,14 @@ export function SettingsScreen({
   onVoiceOverChange,
   onAudioQualityChange,
   onColorBlindSupportChange,
+  onActivateAccount,
   onSignOut,
   onBack,
 }: {
   darkMode: boolean;
   languageLabel: string;
   language: AppLanguage;
+  phoneAuthEnabled: boolean;
   isGuest: boolean;
   isSyncing: boolean;
   textSize: TextSizeOption;
@@ -69,6 +72,7 @@ export function SettingsScreen({
   onVoiceOverChange: (value: boolean) => void;
   onAudioQualityChange: (value: AudioQuality) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
+  onActivateAccount: () => void;
   onSignOut: () => void;
   onBack: () => void;
 }) {
@@ -89,11 +93,13 @@ export function SettingsScreen({
             language={language}
             darkMode={darkMode}
             languageLabel={languageLabel}
+            phoneAuthEnabled={phoneAuthEnabled}
             audioQuality={audioQuality}
             textSize={textSize}
             isGuest={isGuest}
             isSyncing={isSyncing}
             onToggleDark={onToggleDark}
+            onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
           />
         </motion.div>

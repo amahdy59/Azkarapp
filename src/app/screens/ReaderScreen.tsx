@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Bookmark,
   Check,
   ChevronDown,
   ChevronLeft,
+  ChevronRight,
   ChevronUp,
   ExternalLink,
   Globe,
@@ -22,7 +22,7 @@ import { getAzkarByCategory } from "../content/azkar";
 import type { AppLanguage, CategoryId } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings, WaveformBars } from "../components/ZikrComponents";
-import { formatNumerals, formatRatio, numeralFontFamily } from "../formatting";
+import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
@@ -345,6 +345,8 @@ export function ReaderScreen({
   const completedIncludingActive = completedCount + (showCelebration && !isDone ? 1 : 0);
   const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
   const nextExcerpt = nextZikr?.arabicText.slice(0, 42).trim();
+  const prevDisabled = idx === 0;
+  const nextDisabled = idx === azkar.length - 1;
 
   const handleSwipe = (dx: number) => {
     if (showCelebration) {
@@ -706,14 +708,14 @@ export function ReaderScreen({
               <p
                 className="text-[42px] font-extrabold leading-[42px] text-primary"
                 dir="ltr"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
                 {localizedCount}
               </p>
               <p
                 className="mt-1.5 text-[15px] font-semibold text-card-foreground"
                 dir="ltr"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
                 {localizedRatio}
               </p>
@@ -839,7 +841,7 @@ export function ReaderScreen({
         )}
 
         <div className="shrink-0 border-b border-border/70 px-4 py-3">
-          <div className="grid grid-cols-[44px_1fr_44px] items-center gap-3">
+          <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3">
             <button
               onClick={onBack}
               aria-label="Go back"
@@ -852,16 +854,26 @@ export function ReaderScreen({
               {isArabic ? category.nameArabic : category.name}
             </p>
 
-            <button
-              type="button"
-              onClick={handleToggleSaved}
-              aria-label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-              aria-pressed={isSaved}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ color: isSaved ? "var(--primary)" : undefined }}
-            >
-              <Bookmark size={22} className={isSaved ? "fill-current" : ""} />
-            </button>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={onPrev}
+                disabled={prevDisabled}
+                aria-label={t(language, "reader.prev")}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <ChevronLeft size={20} className="rtl:-scale-x-100" />
+              </button>
+              <button
+                type="button"
+                onClick={onNext}
+                disabled={nextDisabled}
+                aria-label={t(language, "reader.next")}
+                className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <ChevronRight size={20} className="rtl:-scale-x-100" />
+              </button>
+            </div>
           </div>
         </div>
 

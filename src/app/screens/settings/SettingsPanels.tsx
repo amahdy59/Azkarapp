@@ -85,22 +85,26 @@ export function SettingsRootPanel({
   language,
   darkMode,
   languageLabel,
+  phoneAuthEnabled,
   audioQuality,
   textSize,
   isGuest,
   isSyncing,
   onToggleDark,
+  onActivateAccount,
   onSignOut,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
   darkMode: boolean;
   languageLabel: string;
+  phoneAuthEnabled: boolean;
   audioQuality: AudioQuality;
   textSize: TextSizeOption;
   isGuest: boolean;
   isSyncing: boolean;
   onToggleDark: () => void;
+  onActivateAccount: () => void;
   onSignOut: () => void;
 }) {
   return (
@@ -221,7 +225,25 @@ export function SettingsRootPanel({
         />
       </div>
 
-      {!isGuest && (
+      {isGuest ? (
+        <>
+          <SectionLabel label={t(language, "settings.sync")} />
+          <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+            <SettingsRowItem
+              iconBg="color-mix(in srgb, var(--primary) 18%, transparent)"
+              icon={<Wifi size={18} className="text-primary" />}
+              label={t(language, "settings.activateAccount")}
+              right={<RowChevron />}
+              onPress={onActivateAccount}
+            />
+            <div className="px-4 pb-4 pt-3">
+              <p className="font-sans text-[13px] leading-[20px] text-muted-foreground">
+                {phoneAuthEnabled ? t(language, "settings.syncHint") : t(language, "auth.phoneDisabled")}
+              </p>
+            </div>
+          </div>
+        </>
+      ) : (
         <>
           <SectionLabel label={t(language, "settings.sync")} />
           <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">

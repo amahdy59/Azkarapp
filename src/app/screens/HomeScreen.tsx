@@ -2,59 +2,69 @@ import React from "react";
 import { Search, Check, ChevronRight, Flame } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
+import { ALL_AZKAR } from "../content/azkar";
 import type { AppLanguage, CategoryId } from "../types";
 import { MaleAvatar } from "../components/Avatars";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 
-export function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onSearch, language }:
+export function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onFeaturedZikr, onSearch, language }:
   {
     completed: Record<CategoryId, Set<number>>;
     displayName: string;
     currentStreak: number;
     longestStreak: number;
     onCategory: (c: CategoryId) => void;
+    onFeaturedZikr: (catId: CategoryId, index: number) => void;
     onSearch: () => void;
     language: AppLanguage;
   }) {
   const h = new Date().getHours();
   const timeLabel = h < 12 ? t(language, "home.goodMorning") : h < 17 ? t(language, "home.goodAfternoon") : t(language, "home.goodEvening");
   const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
-  const totalAll  = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
+  const totalAll = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
   const localizedTotalDone = formatNumerals(totalDone, language);
   const localizedTotalAll = formatNumerals(totalAll, language);
+  const startOfYear = new Date(new Date().getFullYear(), 0, 0);
+  const today = new Date();
+  const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / 86_400_000);
+  const featuredZikr = ALL_AZKAR[dayOfYear % ALL_AZKAR.length];
+  const featuredCategory = CATEGORIES.find((item) => item.id === featuredZikr.category)!;
+  const featuredText = featuredZikr.hadithText || featuredZikr.arabicText;
+  const featuredExcerpt = featuredText.length > 140 ? `${featuredText.slice(0, 140).trim()}...` : featuredText;
+  const featuredIndex = ALL_AZKAR.filter((item) => item.category === featuredZikr.category).findIndex((item) => item.id === featuredZikr.id);
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-5 pt-5 pb-4 shrink-0">
-        <div className="flex items-center gap-3">
-          <MaleAvatar size={44} />
-          <div>
-            <p className="text-[12px] text-muted-foreground font-sans font-bold tracking-[0.08em] uppercase">{timeLabel}</p>
-            <p className="text-[20px] text-foreground font-sans font-extrabold leading-[26px]">{displayName}</p>
+    <div className="flex h-full flex-col bg-background">
+      <div className="shrink-0 px-5 pb-4 pt-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <MaleAvatar size={44} />
+            <div>
+              <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-muted-foreground">{timeLabel}</p>
+              <p className="text-[20px] font-extrabold leading-[26px] text-foreground">{displayName}</p>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-2">
-          <button onClick={onSearch}
+          <button
+            onClick={onSearch}
             aria-label="Search"
-            className="flex items-center justify-center rounded-full transition-colors w-11 h-11 bg-card hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-card transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
             <Search size={18} className="text-foreground" />
           </button>
         </div>
       </div>
 
-      {/* Arabic greeting */}
-      <div className="px-5 mb-4">
-        <div className="rounded-2xl px-5 py-4 bg-card border border-border">
-          <p className="text-center text-[24px] text-primary font-bold leading-[38px]" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>
-            السَّلَامُ عَلَيْكُم وَرَحْمَةُ اللَّهِ
+      <div className="mb-4 px-5">
+        <div className="rounded-2xl border border-border bg-card px-5 py-4">
+          <p className="text-center text-[24px] font-bold leading-[38px] text-primary" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>
+            السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ
           </p>
           {totalDone > 0 && (
             <div className="mt-3">
-              <div className="flex justify-between mb-1.5">
-                <span className="text-[11px] text-muted-foreground font-sans">{t(language, "home.todaysProgress")}</span>
+              <div className="mb-1.5 flex justify-between">
+                <span className="text-[11px] text-muted-foreground">{t(language, "home.todaysProgress")}</span>
                 <span
                   className="text-[12px] font-bold text-primary"
                   dir="ltr"
@@ -69,51 +79,80 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         </div>
       </div>
 
-      {/* Category cards */}
-      <div className="flex-1 overflow-y-auto px-5 flex flex-col gap-3 pb-4">
-        {CATEGORIES.map(cat => {
+      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
+        <button
+          type="button"
+          onClick={() => onFeaturedZikr(featuredZikr.category, Math.max(0, featuredIndex))}
+          className="w-full rounded-2xl border border-border bg-card px-5 py-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-primary">{t(language, "home.dailyReflection")}</p>
+              <p className="mt-2 text-[14px] leading-[22px] text-muted-foreground">{t(language, "home.reflectionHint")}</p>
+            </div>
+            <span className="rounded-full bg-primary/12 px-3 py-1 text-[11px] font-bold text-primary">
+              {language === "ar" ? featuredCategory.nameArabic : featuredCategory.name}
+            </span>
+          </div>
+          <p
+            className="mt-4 text-right text-[20px] font-bold leading-[34px] text-foreground"
+            dir="rtl"
+            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+          >
+            {featuredExcerpt}
+          </p>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <p className="line-clamp-2 text-[12px] leading-[18px] text-muted-foreground">{featuredZikr.sourceReference}</p>
+            <span className="shrink-0 text-[12px] font-semibold text-primary">{t(language, "home.openReflection")}</span>
+          </div>
+        </button>
+
+        {CATEGORIES.map((cat) => {
           const done = completed[cat.id]?.size ?? 0;
           const complete = done === cat.totalCount;
           return (
-            <button key={cat.id} onClick={() => onCategory(cat.id)}
+            <button
+              key={cat.id}
+              onClick={() => onCategory(cat.id)}
               aria-label={`${cat.name}, ${done} of ${cat.totalCount} completed`}
-              className="w-full text-start rounded-2xl p-4 transition-all active:scale-[0.98] bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ border: `1px solid ${complete ? "color-mix(in srgb, var(--primary) 50%, transparent)" : "var(--border)"}` }}>
+              className="w-full rounded-2xl bg-card p-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              style={{ border: `1px solid ${complete ? "color-mix(in srgb, var(--primary) 50%, transparent)" : "var(--border)"}` }}
+            >
               <div className="flex items-center gap-4">
-                {/* Icon circle */}
-                <div className="flex items-center justify-center rounded-xl shrink-0 w-[52px] h-[52px]"
-                  style={{ background: complete ? "color-mix(in srgb, var(--primary) 20%, transparent)" : "var(--muted)" }}>
+                <div
+                  className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl"
+                  style={{ background: complete ? "color-mix(in srgb, var(--primary) 20%, transparent)" : "var(--muted)" }}
+                >
                   <CatIcon type={cat.icon} size={26} color="var(--primary)" />
                 </div>
 
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between mb-0.5">
-                    <p className="text-[16px] font-bold text-foreground font-sans">{cat.name}</p>
-                    {complete
-                      ? <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] text-primary font-sans font-bold" style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}>
-                          <Check size={10} /> Done
-                        </span>
-                      : <span className="text-[12px] text-muted-foreground font-sans">{formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}</span>
-                    }
+                <div className="min-w-0 flex-1">
+                  <div className="mb-0.5 flex items-center justify-between">
+                    <p className="text-[16px] font-bold text-foreground">{cat.name}</p>
+                    {complete ? (
+                      <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-primary" style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}>
+                        <Check size={10} /> Done
+                      </span>
+                    ) : (
+                      <span className="text-[12px] text-muted-foreground">{formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}</span>
+                    )}
                   </div>
                   <p className="mb-2 text-[14px] text-muted-foreground" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>{cat.nameArabic}</p>
                   <ProgressBar value={done} max={cat.totalCount} height={7} />
                 </div>
 
-                <ChevronRight size={16} className="text-muted-foreground shrink-0 rtl:-scale-x-100" />
+                <ChevronRight size={16} className="shrink-0 text-muted-foreground rtl:-scale-x-100" />
               </div>
             </button>
           );
         })}
 
-        {/* Streak card */}
-        <div className="rounded-2xl p-4 flex items-center gap-4 bg-card border border-border">
-          <div className="flex items-center justify-center rounded-xl shrink-0 w-[52px] h-[52px]"
-            style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
+        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
+          <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl" style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
             <Flame size={24} className="text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-[13px] text-muted-foreground font-sans">{t(language, "home.currentStreak")}</p>
+            <p className="text-[13px] text-muted-foreground">{t(language, "home.currentStreak")}</p>
             <p
               className="text-[20px] font-extrabold text-primary"
               dir="ltr"
@@ -123,7 +162,7 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
             </p>
           </div>
           <div className="text-end">
-            <p className="text-[12px] text-muted-foreground font-sans">{t(language, "home.best")}</p>
+            <p className="text-[12px] text-muted-foreground">{t(language, "home.best")}</p>
             <p
               className="text-[16px] font-bold text-card-foreground"
               dir="ltr"

@@ -18,6 +18,12 @@ export function numeralFontFamily(language: AppLanguage) {
     : "'Atkinson Hyperlegible', 'Inter', sans-serif";
 }
 
+export function counterNumeralFontFamily(language: AppLanguage) {
+  return language === "ar"
+    ? "'Noto Sans Arabic', 'Noto Naskh Arabic', sans-serif"
+    : "'DM Mono', 'Atkinson Hyperlegible', monospace";
+}
+
 export function formatRatio(current: number | string, total: number | string, language: AppLanguage) {
   return `${formatNumerals(current, language)} / ${formatNumerals(total, language)}`;
 }

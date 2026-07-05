@@ -21,6 +21,9 @@ const en = {
     goodAfternoon: "Good Afternoon",
     goodEvening: "Good Evening",
     todaysProgress: "Today's progress",
+    dailyReflection: "Today's reflection",
+    reflectionHint: "A verse, hadith, or zikr to keep close today.",
+    openReflection: "Open this zikr",
     currentStreak: "Current Streak",
     best: "Best",
     daysSuffix: "days",
@@ -29,7 +32,7 @@ const en = {
   category: {
     completeSubtitle: "{done} of {total} complete",
     startSession: "Start Session",
-    resumeZikr: "Resume · Zikr {index}",
+    resumeZikr: "Resume - Zikr {index}",
     sessionComplete: "Session Complete",
   },
   reader: {
@@ -73,7 +76,7 @@ const en = {
     autoAdvance: "Completes this zikr and moves to the next one automatically.",
     autoAdvanceCountdown: "Auto-advancing in {seconds}s",
     completionAnnouncement: "Zikr complete. {index} of {total}. {percent} percent progress.",
-    completionContext: "Masha'Allah · {count} repetitions completed",
+    completionContext: "Masha'Allah - {count} repetitions completed",
     streakBadge: "{count} days in a row",
     keepGoing: "{done} of {total} complete - keep going!",
     nextPreview: "Next zikr",
@@ -99,7 +102,7 @@ const en = {
     continueWithPhone: "Continue with phone",
     otpSubtitle: "We'll send a one-time verification code",
     continueAsGuest: "Continue as Guest",
-    guestWarning: "⚠ Your progress won't sync across devices",
+    guestWarning: "Your progress won't sync across devices",
     enterNumber: "Enter your phone number",
     phoneHelp: "We'll send a 6-digit code to verify your account.",
     sendVerificationCode: "Send code",
@@ -132,6 +135,8 @@ const en = {
     aboutHelp: "About & Help",
     sync: "Sync",
     accountSync: "Account sync",
+    activateAccount: "Activate account",
+    syncHint: "Sign in to keep your progress, streaks, and settings across devices.",
   },
 } as const;
 
