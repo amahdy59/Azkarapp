@@ -1,12 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
-  ChevronLeft, ChevronRight, ChevronDown, ChevronUp,
-  Home, BookOpen, Settings, Search, Check, Play, Pause,
-  Info, Flame, Share2, RotateCcw, X, Volume2, Wifi, Bell, Download,
-  SkipForward, SkipBack,
-} from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
-import {
   fromCompletedSets,
   getStreakSummary,
   loadAppState,
@@ -14,9 +7,7 @@ import {
   toCompletedSets,
   type StoredSession,
 } from "./state";
-import { t } from "./i18n";
-import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "./content/azkar";
-import { CATEGORIES } from "./content/categories";
+import { getAzkarByCategory } from "./content/azkar";
 import { T } from "./theme";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "./types";
 import {
