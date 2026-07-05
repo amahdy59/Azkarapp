@@ -174,7 +174,6 @@ export function ReaderScreen({
 
   const touchStartX = useRef<number | null>(null);
   const suppressTap = useRef(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -221,9 +220,6 @@ export function ReaderScreen({
 
   useEffect(() => {
     return () => {
-      if (resetTimer.current) {
-        clearTimeout(resetTimer.current);
-      }
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
       }
@@ -277,12 +273,6 @@ export function ReaderScreen({
     const next = count + 1;
     setCount(next);
     setPulse((value) => value + 1);
-
-    if (resetTimer.current) {
-      clearTimeout(resetTimer.current);
-    }
-
-    resetTimer.current =
 
     if (next >= z.repetitionCount) {
       setComplete(true);
