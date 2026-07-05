@@ -24,7 +24,6 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings, WaveformBars } from "../components/ZikrComponents";
 import { formatNumerals, formatRatio, numeralFontFamily } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "../components/ui/sheet";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 
@@ -113,6 +112,60 @@ function ModePill({
     >
       {label}
     </button>
+  );
+}
+
+function ReaderBottomSheet({
+  open,
+  title,
+  description,
+  onClose,
+  children,
+}: {
+  open: boolean;
+  title: string;
+  description: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <div
+      className="absolute inset-0 z-50 flex items-end bg-black/45"
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[72%] w-full rounded-t-[28px] border-t border-border bg-background shadow-[0_-18px_48px_rgba(0,0,0,0.34)]"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex justify-center pt-2.5">
+          <div className="h-1.5 w-12 rounded-full bg-border" aria-hidden="true" />
+        </div>
+
+        <div className="flex items-start gap-3 border-b border-border px-4 pb-3 pt-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[17px] font-bold text-foreground">{title}</p>
+            <p className="mt-1 text-[13px] leading-[20px] text-muted-foreground">{description}</p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        {children}
+      </div>
+    </div>
   );
 }
 
@@ -283,7 +336,6 @@ export function ReaderScreen({
   const localizedDisplayCount = formatNumerals(displayCount, language);
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
-  const localizedPosition = formatRatio(idx + 1, azkar.length, language);
   const readingProgressValue = idx + 1;
   const completedIncludingActive = completedCount + (showCelebration && !isDone ? 1 : 0);
   const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
@@ -539,16 +591,16 @@ export function ReaderScreen({
   );
 
   const renderCounterActions = () => (
-    <div className="flex items-center justify-between gap-2 rounded-[26px] border border-border bg-card/80 p-3 shadow-[0_16px_34px_rgba(0,0,0,0.16)] backdrop-blur">
+    <div className="flex items-center justify-between gap-2 rounded-[24px] border border-border bg-card/78 p-2.5 shadow-[0_12px_28px_rgba(0,0,0,0.14)] backdrop-blur">
       <button
         type="button"
         onClick={() => {
           void handleShare();
         }}
         aria-label={t(language, "reader.share")}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        <Share2 size={18} />
+        <Share2 size={16} />
       </button>
 
       <div className="grid flex-1 grid-cols-2 gap-2">
@@ -571,41 +623,44 @@ export function ReaderScreen({
         onClick={handleToggleSaved}
         aria-label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         aria-pressed={isSaved}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-border transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-9 w-9 items-center justify-center rounded-full border border-border transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ color: isSaved ? "var(--primary)" : "var(--card-foreground)" }}
       >
-        <Heart size={18} className={isSaved ? "fill-current" : ""} />
+        <Heart size={16} className={isSaved ? "fill-current" : ""} />
       </button>
     </div>
   );
 
   const renderReadingContent = () => (
-    <div className="px-5 pb-5 pt-4">
-      <div className="mb-4 flex justify-center">
-        <span className="rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-[12px] font-semibold text-primary">
+    <div className="px-3 pb-3 pt-2">
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <span className="text-[12px] font-semibold text-muted-foreground">
           {t(language, "reader.count")}: {localizedDisplayCount}
+        </span>
+        <span className="text-[12px] font-semibold text-primary">
+          {formatNumerals(readingProgressValue, language)} / {formatNumerals(azkar.length, language)}
         </span>
       </div>
 
       <p
-        className="mx-auto max-w-[330px] text-center text-[22px] font-bold leading-[42px] text-foreground"
+        className="text-center text-[22px] font-bold leading-[36px] text-foreground"
         dir="rtl"
         style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
       >
         {z.arabicText}
       </p>
 
-      <div className="mt-6 flex items-center gap-3 text-card-foreground">
+      <div className="mt-4 flex items-center gap-2.5 text-card-foreground">
         <button
           type="button"
           onClick={() => setPlaying((value) => !value)}
           aria-label={playing ? "Pause" : "Play"}
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-border text-card-foreground transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border text-card-foreground transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {playing ? <Pause size={20} /> : <Play size={20} className="ms-0.5" />}
+          {playing ? <Pause size={18} /> : <Play size={18} className="ms-0.5" />}
         </button>
 
-        <div className="flex min-w-0 flex-1 items-center gap-3">
+        <div className="flex min-w-0 flex-1 items-center gap-2.5">
           <WaveformBars active={playing && !muted} />
           <div className="h-[2px] flex-1 rounded-full bg-border" aria-hidden="true">
             <div
@@ -619,7 +674,7 @@ export function ReaderScreen({
           type="button"
           onClick={cycleSpeed}
           aria-label={t(language, "reader.audioSpeed")}
-          className="rounded-full border border-border px-3 py-1 text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {speed}x
         </button>
@@ -628,9 +683,9 @@ export function ReaderScreen({
           type="button"
           onClick={() => setMuted((value) => !value)}
           aria-label={muted ? "Unmute audio" : "Mute audio"}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
         </button>
       </div>
     </div>
@@ -638,7 +693,7 @@ export function ReaderScreen({
 
   const renderCounterPanel = () => (
     <div
-      className="border-t border-border/70 px-5 pb-5 pt-4"
+      className="border-t border-border/70 px-4 pb-4 pt-3"
       style={{
         background: flash
           ? "linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--background)), var(--background))"
@@ -659,19 +714,19 @@ export function ReaderScreen({
             }
           }}
         >
-          <div className="pointer-events-none relative flex h-[214px] w-[214px] items-center justify-center">
-            <PulseRings trigger={pulse} size={214} />
-            <CounterRing count={count} total={z.repetitionCount} size={214} />
+          <div className="pointer-events-none relative flex h-[182px] w-[182px] items-center justify-center">
+            <PulseRings trigger={pulse} size={182} />
+            <CounterRing count={count} total={z.repetitionCount} size={182} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <p
-                className="text-[62px] font-extrabold leading-[62px] text-primary"
+                className="text-[52px] font-extrabold leading-[52px] text-primary"
                 dir="ltr"
                 style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
                 {localizedCount}
               </p>
               <p
-                className="mt-2 text-[20px] font-semibold text-card-foreground"
+                className="mt-2 text-[18px] font-semibold text-card-foreground"
                 dir="ltr"
                 style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
@@ -680,9 +735,9 @@ export function ReaderScreen({
             </div>
           </div>
 
-          <p className="mt-4 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+          <p className="mt-3 text-[17px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           {remaining > 0 ? (
-            <p className="mt-2 text-[15px] font-semibold text-primary">
+            <p className="mt-1.5 text-[15px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
             </p>
           ) : (
@@ -690,13 +745,13 @@ export function ReaderScreen({
           )}
         </div>
 
-        <div className="mt-4">{renderCounterActions()}</div>
+        <div className="mt-3">{renderCounterActions()}</div>
 
         <button
           type="button"
           onClick={handleReset}
           aria-label={t(language, "reader.resetCounter")}
-          className="mx-auto mt-4 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <RotateCcw size={14} />
           <span>{t(language, "reader.resetCounter")}</span>
@@ -706,8 +761,8 @@ export function ReaderScreen({
   );
 
   const renderListeningPanel = () => (
-    <div className="border-t border-border/70 px-5 pb-5 pt-4">
-      <div className="flex h-full flex-col justify-between rounded-[28px] border border-border bg-card/35 px-4 py-4">
+    <div className="border-t border-border/70 px-4 pb-4 pt-3">
+      <div className="flex h-full flex-col justify-between rounded-[24px] border border-border bg-card/35 px-4 py-3">
         <div className="text-center">
           <p className="text-[14px] font-semibold text-secondary">{t(language, "reader.listenMode")}</p>
           <p className="mt-1 text-[13px] leading-[20px] text-muted-foreground">{t(language, "reader.listenModeHint")}</p>
@@ -718,9 +773,9 @@ export function ReaderScreen({
             type="button"
             onClick={() => setPlaying((value) => !value)}
             aria-label={playing ? "Pause" : "Play"}
-            className="flex h-16 w-16 items-center justify-center rounded-full border border-secondary/35 bg-secondary/14 text-secondary transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-secondary/35 bg-secondary/14 text-secondary transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {playing ? <Pause size={26} /> : <Play size={26} className="ms-1" />}
+            {playing ? <Pause size={24} /> : <Play size={24} className="ms-1" />}
           </button>
 
           <div className="mt-5 flex w-full max-w-[260px] items-center gap-3">
@@ -753,13 +808,12 @@ export function ReaderScreen({
           </div>
         </div>
 
-        <div className="mt-4">{renderCounterActions()}</div>
+        <div className="mt-3">{renderCounterActions()}</div>
       </div>
     </div>
   );
 
   return (
-    <>
       <div
         className="relative flex h-full flex-col bg-background"
         onTouchStart={(event) => {
@@ -815,8 +869,8 @@ export function ReaderScreen({
           </div>
         </div>
 
-        <div className="shrink-0 border-b border-border/70 px-5 py-2.5">
-          <div className="mb-2 flex items-center justify-between gap-3">
+        <div className="shrink-0 border-b border-border/70 px-3 py-2">
+          <div className="flex items-center justify-between gap-3">
             <p className="text-[13px] font-medium text-muted-foreground">
               {t(language, "reader.progressSummary", {
                 done: formatNumerals(readingProgressValue, language),
@@ -834,14 +888,16 @@ export function ReaderScreen({
               <ModePill active={listenMode} label={t(language, "reader.listenModeToggle")} onClick={() => setListenMode((value) => !value)} />
             </div>
           </div>
-          <ProgressBar
-            value={readingProgressValue}
-            max={azkar.length}
-            height={4}
-            trackColor="color-mix(in srgb, var(--muted) 78%, var(--card))"
-            fillColor="var(--primary)"
-            aria-label={t(language, "reader.groupProgress")}
-          />
+          <div className="mt-2">
+            <ProgressBar
+              value={readingProgressValue}
+              max={azkar.length}
+              height={3}
+              trackColor="color-mix(in srgb, var(--muted) 78%, var(--card))"
+              fillColor="var(--primary)"
+              aria-label={t(language, "reader.groupProgress")}
+            />
+          </div>
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
@@ -937,8 +993,8 @@ export function ReaderScreen({
               className="grid min-h-0 flex-1"
               style={{
                 gridTemplateRows: listenMode
-                  ? "minmax(0, 1fr) 228px"
-                  : "minmax(0, 1fr) clamp(320px, 48%, 396px)",
+                  ? "minmax(0, 1fr) 210px"
+                  : "minmax(0, 1fr) clamp(250px, 42%, 320px)",
               }}
             >
               <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
@@ -967,19 +1023,14 @@ export function ReaderScreen({
             <ScrollArea className="zikr-scroll min-h-0 flex-1">{renderExpandedContent()}</ScrollArea>
           </div>
         )}
-      </div>
-
-      <Sheet open={translationOpen} onOpenChange={setTranslationOpen}>
-        <SheetContent side="bottom" className="rounded-t-[30px] border-border bg-background p-0">
-          <SheetHeader className="border-b border-border px-5 pb-4 pt-5">
-            <SheetTitle className="text-[18px] font-bold text-foreground">{t(language, "reader.translationSheet")}</SheetTitle>
-            <SheetDescription className="text-[14px] leading-[22px] text-muted-foreground">
-              {t(language, "reader.translationSheetHint")}
-            </SheetDescription>
-          </SheetHeader>
-
-          <ScrollArea className="zikr-scroll max-h-[68vh] px-5 py-5">
-            <div className="space-y-5 pb-6">
+        <ReaderBottomSheet
+          open={translationOpen}
+          title={t(language, "reader.translationSheet")}
+          description={t(language, "reader.translationSheetHint")}
+          onClose={() => setTranslationOpen(false)}
+        >
+          <ScrollArea className="zikr-scroll max-h-[56vh] px-4 py-4">
+            <div className="space-y-4 pb-5">
               <div className="flex justify-center gap-3">
                 <TogglePill
                   active={showTranslation}
@@ -996,43 +1047,38 @@ export function ReaderScreen({
               </div>
 
               {showTranslation && (
-                <section className="rounded-[22px] border border-border bg-card/55 p-4">
+                <section className="rounded-[18px] border border-border bg-card/55 p-4">
                   <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">ENGLISH</p>
                   <p className="mt-3 text-[16px] leading-[28px] text-card-foreground">{z.translation}</p>
                 </section>
               )}
 
               {showTransliteration && (
-                <section className="rounded-[22px] border border-border bg-card/55 p-4">
+                <section className="rounded-[18px] border border-border bg-card/55 p-4">
                   <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">TRANSLITERATION</p>
                   <p className="mt-3 text-[15px] italic leading-[26px] text-card-foreground">{z.transliteration}</p>
                 </section>
               )}
 
               {!showTranslation && !showTransliteration && (
-                <p className="rounded-[22px] border border-border bg-card/40 px-4 py-5 text-center text-[15px] leading-[24px] text-muted-foreground">
+                <p className="rounded-[18px] border border-border bg-card/40 px-4 py-5 text-center text-[15px] leading-[24px] text-muted-foreground">
                   {t(language, "reader.translationEmpty")}
                 </p>
               )}
             </div>
           </ScrollArea>
-        </SheetContent>
-      </Sheet>
+        </ReaderBottomSheet>
 
-      <Sheet open={referencesOpen} onOpenChange={setReferencesOpen}>
-        <SheetContent side="bottom" className="rounded-t-[30px] border-border bg-background p-0">
-          <SheetHeader className="border-b border-border px-5 pb-4 pt-5">
-            <SheetTitle className="text-[18px] font-bold text-foreground">{t(language, "reader.referencesSheet")}</SheetTitle>
-            <SheetDescription className="text-[14px] leading-[22px] text-muted-foreground">
-              {t(language, "reader.referencesSheetHint")}
-            </SheetDescription>
-          </SheetHeader>
-
-          <ScrollArea className="zikr-scroll max-h-[68vh] px-5 py-5">
-            <div className="pb-6">{renderReferenceContent()}</div>
+        <ReaderBottomSheet
+          open={referencesOpen}
+          title={t(language, "reader.referencesSheet")}
+          description={t(language, "reader.referencesSheetHint")}
+          onClose={() => setReferencesOpen(false)}
+        >
+          <ScrollArea className="zikr-scroll max-h-[56vh] px-4 py-4">
+            <div className="pb-5">{renderReferenceContent()}</div>
           </ScrollArea>
-        </SheetContent>
-      </Sheet>
-    </>
+        </ReaderBottomSheet>
+      </div>
   );
 }
