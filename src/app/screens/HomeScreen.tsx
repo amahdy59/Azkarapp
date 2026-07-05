@@ -56,13 +56,10 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         </div>
       </div>
 
-      <div className="mb-4 px-5">
-        <div className="rounded-2xl border border-border bg-card px-5 py-4">
-          <p className="text-center text-[24px] font-bold leading-[38px] text-primary" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>
-            السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللَّهِ
-          </p>
-          {totalDone > 0 && (
-            <div className="mt-3">
+      {totalDone > 0 && (
+        <div className="mb-4 px-5">
+          <div className="rounded-2xl border border-border bg-card px-5 py-4">
+            <div>
               <div className="mb-1.5 flex justify-between">
                 <span className="text-[11px] text-muted-foreground">{t(language, "home.todaysProgress")}</span>
                 <span
@@ -75,11 +72,23 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
               </div>
               <ProgressBar value={totalDone} max={totalAll} height={6} />
             </div>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
+      
+      {totalDone === 0 && (
+        <div className="mb-4 px-5">
+          <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-5 py-6 text-center">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              <BookOpen size={24} className="text-primary" />
+            </div>
+            <p className="text-[16px] font-bold text-foreground">{t(language, "home.startJourney")}</p>
+            <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "home.startJourneyDesc")}</p>
+          </div>
+        </div>
+      )}
+<div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
         <button
           type="button"
           onClick={() => onFeaturedZikr(featuredZikr.category, Math.max(0, featuredIndex))}

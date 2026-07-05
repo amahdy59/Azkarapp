@@ -21,6 +21,8 @@ const en = {
     goodAfternoon: "Good Afternoon",
     goodEvening: "Good Evening",
     todaysProgress: "Today's progress",
+    startJourney: "Start Your Journey",
+    startJourneyDesc: "Complete your first Zikr to begin your progress",
     dailyReflection: "Today's reflection",
     reflectionHint: "A verse, hadith, or zikr to keep close today.",
     openReflection: "Open this zikr",

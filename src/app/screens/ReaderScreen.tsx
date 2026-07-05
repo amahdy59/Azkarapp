@@ -162,9 +162,6 @@ export function ReaderScreen({
   const [pulse, setPulse] = useState(0);
   const [flash, setFlash] = useState(false);
   const [complete, setComplete] = useState(false);
-  const [showCelebration, setShowCelebration] = useState(false);
-  const [autoAdvanceCancelled, setAutoAdvanceCancelled] = useState(false);
-  const [countdown, setCountdown] = useState(2);
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
 
@@ -180,7 +177,6 @@ export function ReaderScreen({
     const initialCount = isDone && z ? z.repetitionCount : 0;
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
-    setShowCelebration(false);
     setAutoAdvanceCancelled(false);
     setCountdown(2);
     setBenefitOpen(false);
@@ -193,12 +189,6 @@ export function ReaderScreen({
       if (resetTimer.current) {
         clearTimeout(resetTimer.current);
       }
-      if (advanceTimer.current) {
-        clearTimeout(advanceTimer.current);
-      }
-      if (countdownTimer.current) {
-        clearInterval(countdownTimer.current);
-      }
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
       }
@@ -207,36 +197,6 @@ export function ReaderScreen({
       }
     };
   }, []);
-
-  useEffect(() => {
-    if (!showCelebration || autoAdvanceCancelled) {
-      if (advanceTimer.current) {
-        clearTimeout(advanceTimer.current);
-      }
-      if (countdownTimer.current) {
-        clearInterval(countdownTimer.current);
-      }
-      return;
-    }
-
-    setCountdown(2);
-    countdownTimer.current = setInterval(() => {
-      setCountdown((value) => (value > 0 ? value - 1 : 0));
-    }, 1000);
-
-    advanceTimer.current = setTimeout(() => {
-      onAdvance(idx);
-    }, 2200);
-
-    return () => {
-      if (advanceTimer.current) {
-        clearTimeout(advanceTimer.current);
-      }
-      if (countdownTimer.current) {
-        clearInterval(countdownTimer.current);
-      }
-    };
-  }, [autoAdvanceCancelled, idx, onAdvance, showCelebration]);
 
   if (!z || !category) {
     return null;
@@ -251,17 +211,13 @@ export function ReaderScreen({
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
-  const completedIncludingActive = completedCount + (showCelebration && !isDone ? 1 : 0);
+  const completedIncludingActive = completedCount + (false ? 1 : 0);
   const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
   const nextExcerpt = nextZikr?.arabicText.slice(0, 42).trim();
   const prevDisabled = idx === 0;
   const nextDisabled = idx === azkar.length - 1;
 
   const handleSwipe = (dx: number) => {
-    if (showCelebration) {
-      return;
-    }
-
     if (isArabic) {
       if (dx > 60) {
         onNext();
@@ -279,7 +235,7 @@ export function ReaderScreen({
   };
 
   const handleTap = () => {
-    if (listenMode || complete || showCelebration) {
+    if (listenMode || complete) {
       return;
     }
 
@@ -298,9 +254,8 @@ export function ReaderScreen({
 
     if (next >= z.repetitionCount) {
       setComplete(true);
-      setShowCelebration(true);
-      setAutoAdvanceCancelled(false);
       onComplete(idx);
+      onAdvance(idx);
     }
   };
 
@@ -327,7 +282,6 @@ export function ReaderScreen({
   const handleReset = () => {
     setCount(0);
     setComplete(false);
-    setShowCelebration(false);
     setAutoAdvanceCancelled(true);
     setPulse((value) => value + 1);
   };
@@ -437,6 +391,7 @@ export function ReaderScreen({
           <p
             className="mt-2 rounded-[18px] border border-border bg-background/65 px-4 py-4 text-[16px] leading-[30px] text-foreground"
             dir="auto"
+            lang="ar"
             style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
           >
             {z.hadithText}
@@ -500,6 +455,7 @@ export function ReaderScreen({
       <p
         className="text-center text-[26px] font-bold leading-[46px] text-foreground"
         dir="rtl"
+        lang="ar"
         style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
       >
         {z.arabicText}
@@ -716,16 +672,6 @@ export function ReaderScreen({
           {shareMessage}
         </div>
 
-        {showCelebration && (
-          <div className="sr-only" aria-live="assertive">
-            {t(language, "reader.completionAnnouncement", {
-              index: formatNumerals(idx + 1, language),
-              total: formatNumerals(azkar.length, language),
-              percent: formatNumerals(progressPercent, language),
-            })}
-          </div>
-        )}
-
         <div className="shrink-0 border-b border-border/70 px-4 py-3">
           <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3">
             <button
@@ -785,95 +731,7 @@ export function ReaderScreen({
         </div>
 
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          {showCelebration ? (
-            <div
-              className="border-t border-border/70 px-5 pb-6 pt-5"
-              style={{
-                background: "linear-gradient(180deg, rgba(8,16,38,0.98), rgba(8,16,38,1))",
-                minHeight: 420,
-              }}
-            >
-              <div className="flex h-full flex-col items-center justify-center text-center">
-                <div className="celebration-glow relative mb-6 flex h-[210px] w-[210px] items-center justify-center">
-                  <div className="celebration-pop flex h-[168px] w-[168px] items-center justify-center rounded-full bg-primary shadow-[0_0_42px_rgba(215,165,40,0.22)]">
-                    <Check size={62} className="text-primary-foreground" strokeWidth={2.4} />
-                  </div>
-                </div>
-
-                <p
-                  className="text-[40px] font-bold leading-none text-primary"
-                  style={isArabic ? { fontFamily: "'Noto Naskh Arabic', serif" } : undefined}
-                >
-                  {t(language, "reader.complete")}
-                </p>
-                <p className="mt-3 text-[16px] leading-[24px] text-card-foreground">
-                  {t(language, "reader.completionContext", {
-                    count: formatNumerals(z.repetitionCount, language),
-                  })}
-                </p>
-
-                {currentStreak > 0 && (
-                  <div className="mt-4 rounded-full border border-primary/35 bg-primary/10 px-4 py-2 text-[14px] font-bold text-primary">
-                    {t(language, "reader.streakBadge", {
-                      count: formatNumerals(currentStreak, language),
-                    })}
-                  </div>
-                )}
-
-                <p className="mt-5 text-[14px] font-semibold text-card-foreground">
-                  {t(language, "reader.keepGoing", {
-                    done: formatNumerals(completedIncludingActive, language),
-                    total: formatNumerals(azkar.length, language),
-                  })}
-                </p>
-
-                {nextZikr && (
-                  <div className="mt-5 w-full rounded-[20px] border border-border bg-card/45 px-4 py-3 text-start">
-                    <p className="text-[11px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
-                      {t(language, "reader.nextPreview")}
-                    </p>
-                    <p
-                      className="mt-2 text-right text-[18px] leading-[30px] text-foreground"
-                      dir="rtl"
-                      style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-                    >
-                      {nextExcerpt}
-                      {nextExcerpt && nextExcerpt.length >= 42 ? "..." : ""}
-                    </p>
-                    <p className="mt-2 text-[13px] text-muted-foreground">
-                      {t(language, "reader.count")}: {formatNumerals(nextZikr.countLabel ?? String(nextZikr.repetitionCount), language)}
-                    </p>
-                  </div>
-                )}
-
-                <button
-                  type="button"
-                  onClick={handleContinue}
-                  className="mt-6 h-[52px] min-w-[220px] rounded-full bg-primary px-6 text-[16px] font-bold text-primary-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                >
-                  {nextZikr
-                    ? t(language, "reader.nextCta", { index: formatNumerals(idx + 2, language) })
-                    : t(language, "reader.finishSession")}
-                </button>
-
-                {!autoAdvanceCancelled && (
-                  <div className="mt-3 flex items-center gap-3">
-                    <p className="text-[13px] text-muted-foreground">
-                      {t(language, "reader.autoAdvanceCountdown", { seconds: formatNumerals(countdown, language) })}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setAutoAdvanceCancelled(true)}
-                      className="rounded-full border border-border px-3 py-1.5 text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      {t(language, "reader.stayHere")}
-                    </button>
-                  </div>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div
+                      <div
               className="grid min-h-0 flex-1"
               onClick={handleSurfaceTap}
               style={{
@@ -883,7 +741,6 @@ export function ReaderScreen({
               <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
               {listenMode ? renderListeningPanel() : renderCounterPanel()}
             </div>
-          )}
         </div>
       </div>
   );
