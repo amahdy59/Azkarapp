@@ -257,10 +257,12 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
 
   const touchStartX = useRef<number | null>(null);
+  const suppressTap = useRef(false);
   const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const countdownTimer = useRef<ReturnType<typeof setInterval> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const initialCount = isDone && z ? z.repetitionCount : 0;
@@ -290,6 +292,9 @@ export function ReaderScreen({
       }
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
+      }
+      if (tapSuppressTimer.current) {
+        clearTimeout(tapSuppressTimer.current);
       }
     };
   }, []);
@@ -386,6 +391,26 @@ export function ReaderScreen({
       setAutoAdvanceCancelled(false);
       onComplete(idx);
     }
+  };
+
+  const shouldIgnoreCountTap = (target: EventTarget | null) => {
+    if (!(target instanceof Element)) {
+      return false;
+    }
+
+    return Boolean(
+      target.closest(
+        "button, a, input, textarea, select, summary, [role='dialog'], [data-radix-scroll-area-thumb], [data-radix-scroll-area-scrollbar], [data-prevent-count='true']",
+      ),
+    );
+  };
+
+  const handleSurfaceTap = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (suppressTap.current || expandedReading || translationOpen || referencesOpen || shouldIgnoreCountTap(event.target)) {
+      return;
+    }
+
+    handleTap();
   };
 
   const handleReset = () => {
@@ -632,8 +657,8 @@ export function ReaderScreen({
   );
 
   const renderReadingContent = () => (
-    <div className="px-3 pb-3 pt-2">
-      <div className="mb-2 flex items-center justify-between gap-3">
+    <div className="px-2.5 pb-2 pt-1.5">
+      <div className="mb-1.5 flex items-center justify-between gap-3">
         <span className="text-[12px] font-semibold text-muted-foreground">
           {t(language, "reader.count")}: {localizedDisplayCount}
         </span>
@@ -649,51 +674,12 @@ export function ReaderScreen({
       >
         {z.arabicText}
       </p>
-
-      <div className="mt-4 flex items-center gap-2.5 text-card-foreground">
-        <button
-          type="button"
-          onClick={() => setPlaying((value) => !value)}
-          aria-label={playing ? "Pause" : "Play"}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-border text-card-foreground transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {playing ? <Pause size={18} /> : <Play size={18} className="ms-0.5" />}
-        </button>
-
-        <div className="flex min-w-0 flex-1 items-center gap-2.5">
-          <WaveformBars active={playing && !muted} />
-          <div className="h-[2px] flex-1 rounded-full bg-border" aria-hidden="true">
-            <div
-              className="h-full rounded-full bg-secondary"
-              style={{ width: playing ? "44%" : "18%", transition: "width 220ms ease" }}
-            />
-          </div>
-        </div>
-
-        <button
-          type="button"
-          onClick={cycleSpeed}
-          aria-label={t(language, "reader.audioSpeed")}
-          className="rounded-full border border-border px-2.5 py-1 text-[11px] font-semibold text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {speed}x
-        </button>
-
-        <button
-          type="button"
-          onClick={() => setMuted((value) => !value)}
-          aria-label={muted ? "Unmute audio" : "Mute audio"}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-        </button>
-      </div>
     </div>
   );
 
   const renderCounterPanel = () => (
     <div
-      className="border-t border-border/70 px-4 pb-4 pt-3"
+      className="border-t border-border/70 px-3 pb-3 pt-2.5"
       style={{
         background: flash
           ? "linear-gradient(180deg, color-mix(in srgb, var(--primary) 8%, var(--background)), var(--background))"
@@ -705,8 +691,7 @@ export function ReaderScreen({
           role="button"
           tabIndex={0}
           aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className="flex flex-1 cursor-pointer flex-col items-center justify-center rounded-[32px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
-          onClick={handleTap}
+          className="flex flex-1 flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
               event.preventDefault();
@@ -714,19 +699,19 @@ export function ReaderScreen({
             }
           }}
         >
-          <div className="pointer-events-none relative flex h-[182px] w-[182px] items-center justify-center">
-            <PulseRings trigger={pulse} size={182} />
-            <CounterRing count={count} total={z.repetitionCount} size={182} />
+          <div className="pointer-events-none relative flex h-[138px] w-[138px] items-center justify-center">
+            <PulseRings trigger={pulse} size={138} />
+            <CounterRing count={count} total={z.repetitionCount} size={138} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <p
-                className="text-[52px] font-extrabold leading-[52px] text-primary"
+                className="text-[42px] font-extrabold leading-[42px] text-primary"
                 dir="ltr"
                 style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
                 {localizedCount}
               </p>
               <p
-                className="mt-2 text-[18px] font-semibold text-card-foreground"
+                className="mt-1.5 text-[15px] font-semibold text-card-foreground"
                 dir="ltr"
                 style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
@@ -735,23 +720,23 @@ export function ReaderScreen({
             </div>
           </div>
 
-          <p className="mt-3 text-[17px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+          <p className="mt-2 text-[15px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           {remaining > 0 ? (
-            <p className="mt-1.5 text-[15px] font-semibold text-primary">
+            <p className="mt-1 text-[13px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
             </p>
           ) : (
-            <p className="mt-2 text-[14px] text-muted-foreground">{t(language, "reader.completed")}</p>
+            <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "reader.completed")}</p>
           )}
         </div>
 
-        <div className="mt-3">{renderCounterActions()}</div>
+        <div className="mt-2.5">{renderCounterActions()}</div>
 
         <button
           type="button"
           onClick={handleReset}
           aria-label={t(language, "reader.resetCounter")}
-          className="mx-auto mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-[13px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mx-auto mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <RotateCcw size={14} />
           <span>{t(language, "reader.resetCounter")}</span>
@@ -824,7 +809,18 @@ export function ReaderScreen({
             return;
           }
 
-          handleSwipe(event.changedTouches[0].clientX - touchStartX.current);
+          const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+          if (Math.abs(deltaX) > 14) {
+            suppressTap.current = true;
+            if (tapSuppressTimer.current) {
+              clearTimeout(tapSuppressTimer.current);
+            }
+            tapSuppressTimer.current = setTimeout(() => {
+              suppressTap.current = false;
+            }, 220);
+          }
+
+          handleSwipe(deltaX);
           touchStartX.current = null;
         }}
       >
@@ -869,9 +865,9 @@ export function ReaderScreen({
           </div>
         </div>
 
-        <div className="shrink-0 border-b border-border/70 px-3 py-2">
+        <div className="shrink-0 border-b border-border/70 px-3 py-1.5">
           <div className="flex items-center justify-between gap-3">
-            <p className="text-[13px] font-medium text-muted-foreground">
+            <p className="text-[12px] font-medium text-muted-foreground">
               {t(language, "reader.progressSummary", {
                 done: formatNumerals(readingProgressValue, language),
                 total: formatNumerals(azkar.length, language),
@@ -881,14 +877,14 @@ export function ReaderScreen({
               <button
                 type="button"
                 onClick={() => setExpandedReading(true)}
-                className="text-[13px] font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="text-[12px] font-semibold text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {t(language, "reader.viewAll")}
               </button>
               <ModePill active={listenMode} label={t(language, "reader.listenModeToggle")} onClick={() => setListenMode((value) => !value)} />
             </div>
           </div>
-          <div className="mt-2">
+          <div className="mt-1.5">
             <ProgressBar
               value={readingProgressValue}
               max={azkar.length}
@@ -991,10 +987,11 @@ export function ReaderScreen({
           ) : (
             <div
               className="grid min-h-0 flex-1"
+              onClick={handleSurfaceTap}
               style={{
                 gridTemplateRows: listenMode
-                  ? "minmax(0, 1fr) 210px"
-                  : "minmax(0, 1fr) clamp(250px, 42%, 320px)",
+                  ? "minmax(0, 1fr) 188px"
+                  : "minmax(0, 1fr) clamp(208px, 27%, 248px)",
               }}
             >
               <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
