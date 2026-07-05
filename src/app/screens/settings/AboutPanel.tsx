@@ -182,3 +182,71 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
+
+function AboutRow({
+  icon,
+  label,
+  sub,
+  right = <RowChevron />,
+  hasDivider = true,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  sub?: string;
+  right?: React.ReactNode;
+  hasDivider?: boolean;
+  onPress?: () => void;
+}) {
+  const content = (
+    <>
+      {icon}
+      <div className="flex flex-1 flex-col items-start gap-0.5">
+        <p className="font-sans text-[15px] font-medium leading-[22px] text-foreground">{label}</p>
+        {sub && <p className="font-sans text-[14px] text-muted-foreground">{sub}</p>}
+      </div>
+      {right}
+    </>
+  );
+
+  return (
+    <div className="relative">
+      {onPress ? (
+        <button type="button" onClick={onPress} className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70">
+          {content}
+        </button>
+      ) : (
+        <div className="flex h-[72px] w-full items-center gap-4 bg-card px-4">
+          {content}
+        </div>
+      )}
+      {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 64 }} />}
+    </div>
+  );
+}
+
+function SupportRow({
+  icon,
+  label,
+  right = <RowChevron />,
+  hasDivider = true,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  right?: React.ReactNode;
+  hasDivider?: boolean;
+  onPress?: () => void;
+}) {
+  return (
+    <div className="relative">
+      <button type="button" onClick={onPress} className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
+        <p className="flex-1 font-sans text-[15px] font-medium text-foreground">{label}</p>
+        {right}
+      </button>
+      {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 64 }} />}
+    </div>
+  );
+}
+
