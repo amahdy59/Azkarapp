@@ -109,14 +109,20 @@ export function CounterScreen({
     <div
       className="flex h-full select-none flex-col bg-background"
       onTouchStart={(event) => {
-        touchStartX.current = event.touches[0].clientX;
+        const touch = event.touches[0];
+        if (touch) {
+          touchStartX.current = touch.clientX;
+        }
       }}
       onTouchEnd={(event) => {
         if (touchStartX.current === null) {
           return;
         }
 
-        handleSwipe(event.changedTouches[0].clientX - touchStartX.current);
+        const touch = event.changedTouches[0];
+        if (touch) {
+          handleSwipe(touch.clientX - touchStartX.current);
+        }
         touchStartX.current = null;
       }}
     >
@@ -176,17 +182,11 @@ export function CounterScreen({
         </div>
       </div>
 
-      <div
-        role="button"
-        tabIndex={0}
+      <button
+        type="button"
         aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}${displayCount !== String(z.repetitionCount) ? `. ${localizedDisplayCount}` : ""}`}
-        className="relative mx-4 flex flex-1 cursor-pointer flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
+        className="relative mx-4 flex flex-1 cursor-pointer flex-col items-center justify-center rounded-3xl bg-transparent p-0 text-inherit focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
         onClick={handleTap}
-        onKeyDown={(event) => {
-          if (event.key === " " || event.key === "Enter") {
-            handleTap();
-          }
-        }}
         onMouseDown={handleLongPressStart}
         onMouseUp={handleLongPressEnd}
         onMouseLeave={handleLongPressEnd}
@@ -245,7 +245,7 @@ export function CounterScreen({
             {t(language, "reader.holdToReset")}
           </p>
         )}
-      </div>
+      </button>
 
       <div className="mt-4 flex shrink-0 items-center justify-between border-t border-border px-6 py-4">
         <button

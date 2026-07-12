@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function AccessibilityPanel({
   language,
@@ -129,7 +126,12 @@ export function AccessibilityPanel({
         <SectionLabel label="Visual" />
         <div className="mx-4 mb-4 flex gap-3">
           {(["small", "medium", "large"] as TextSizeOption[]).map((size) => (
-            <PanelOptionButton key={size} active={textSize === size} label={formatTextSize(size)} onClick={() => onTextSizeChange(size)} />
+            <PanelOptionButton
+              key={size}
+              active={textSize === size}
+              label={formatTextSize(size)}
+              onClick={() => onTextSizeChange(size)}
+            />
           ))}
         </div>
 
@@ -143,14 +145,26 @@ export function AccessibilityPanel({
               </svg>
             }
             label="High Contrast Mode"
-            right={<RowToggle checked={highContrast} onChange={() => onHighContrastChange(!highContrast)} label="High Contrast Mode" />}
+            right={
+              <RowToggle
+                checked={highContrast}
+                onChange={() => onHighContrastChange(!highContrast)}
+                label="High Contrast Mode"
+              />
+            }
             onPress={() => onHighContrastChange(!highContrast)}
           />
           <SettingsRowItem
             iconBg="var(--muted)"
             icon={
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M5 4H9C11 4 11 7 9 7H5V4ZM5 7H10C12 7 12 11 10 11H5V7Z" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M5 4H9C11 4 11 7 9 7H5V4ZM5 7H10C12 7 12 11 10 11H5V7Z"
+                  stroke="var(--primary)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             }
             label="Bold Text"
@@ -178,11 +192,23 @@ export function AccessibilityPanel({
             iconBg="var(--muted)"
             icon={
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M6 14V4M6 4L3 7M6 4L9 7M12 14V4M12 4L9 7M12 4L15 7" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path
+                  d="M6 14V4M6 4L3 7M6 4L9 7M12 14V4M12 4L9 7M12 4L15 7"
+                  stroke="var(--primary)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
               </svg>
             }
             label="Reduce Motion"
-            right={<RowToggle checked={reduceMotion} onChange={() => onReduceMotionChange(!reduceMotion)} label="Reduce Motion" />}
+            right={
+              <RowToggle
+                checked={reduceMotion}
+                onChange={() => onReduceMotionChange(!reduceMotion)}
+                label="Reduce Motion"
+              />
+            }
             onPress={() => onReduceMotionChange(!reduceMotion)}
           />
           <SettingsRowItem
@@ -194,7 +220,13 @@ export function AccessibilityPanel({
               </svg>
             }
             label="Haptic Feedback"
-            right={<RowToggle checked={hapticFeedback} onChange={() => onHapticFeedbackChange(!hapticFeedback)} label="Haptic Feedback" />}
+            right={
+              <RowToggle
+                checked={hapticFeedback}
+                onChange={() => onHapticFeedbackChange(!hapticFeedback)}
+                label="Haptic Feedback"
+              />
+            }
             onPress={() => onHapticFeedbackChange(!hapticFeedback)}
             hasDivider={false}
           />
@@ -206,11 +238,18 @@ export function AccessibilityPanel({
             iconBg="var(--muted)"
             icon={
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path d="M15 5H6M15 9H9M15 13H6M3 5H3.01M3 9H3.01M3 13H3.01" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" />
+                <path
+                  d="M15 5H6M15 9H9M15 13H6M3 5H3.01M3 9H3.01M3 13H3.01"
+                  stroke="var(--primary)"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
               </svg>
             }
             label="Right-to-Left Layout"
-            right={<RowToggle checked={forceRtl} onChange={() => onForceRtlChange(!forceRtl)} label="Right-to-Left Layout" />}
+            right={
+              <RowToggle checked={forceRtl} onChange={() => onForceRtlChange(!forceRtl)} label="Right-to-Left Layout" />
+            }
             onPress={() => onForceRtlChange(!forceRtl)}
           />
           <SettingsRowItem
@@ -222,7 +261,13 @@ export function AccessibilityPanel({
               </svg>
             }
             label="Screen Reader Hints"
-            right={<RowToggle checked={voiceOver} onChange={() => onVoiceOverChange(!voiceOver)} label="Screen Reader Hints" />}
+            right={
+              <RowToggle
+                checked={voiceOver}
+                onChange={() => onVoiceOverChange(!voiceOver)}
+                label="Screen Reader Hints"
+              />
+            }
             onPress={() => onVoiceOverChange(!voiceOver)}
             hasDivider={false}
           />
@@ -238,4 +283,3 @@ export function AccessibilityPanel({
     </div>
   );
 }
-

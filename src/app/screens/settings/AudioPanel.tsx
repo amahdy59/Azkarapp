@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function AudioPanel({
   language,
@@ -98,7 +95,11 @@ export function AudioPanel({
       <div className="flex-1 overflow-y-auto px-4 pb-8 pt-4">
         <SectionLabel label="Streaming Quality" />
         <div className="mx-0 flex gap-3">
-          <PanelOptionButton active={audioQuality === "standard"} label="Standard" onClick={() => onChange("standard")} />
+          <PanelOptionButton
+            active={audioQuality === "standard"}
+            label="Standard"
+            onClick={() => onChange("standard")}
+          />
           <PanelOptionButton active={audioQuality === "high"} label="High" onClick={() => onChange("high")} />
         </div>
         <div className="mt-4 rounded-xl border border-border bg-card p-4">
@@ -113,4 +114,3 @@ export function AudioPanel({
     </div>
   );
 }
-

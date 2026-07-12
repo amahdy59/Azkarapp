@@ -9,7 +9,12 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
   }, [onDone]);
 
   return (
-    <div className="flex flex-col items-center justify-between h-full bg-background" role="status" aria-live="polite" aria-label="Loading Azkar">
+    <div
+      className="flex flex-col items-center justify-between h-full bg-background"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Azkar"
+    >
       <motion.div
         className="flex flex-col items-center w-full flex-1 pt-20"
         initial={{ opacity: 0, y: 16 }}
@@ -19,21 +24,21 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <div className="flex flex-col items-center gap-5">
           <CrescentMark size={80} />
           <div className="flex flex-col items-center gap-2">
-            <p className="text-[40px] font-extrabold text-primary leading-[44px]" style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }} dir="auto">
+            <p
+              className="text-[40px] font-extrabold text-primary leading-[44px]"
+              style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+              dir="auto"
+            >
               أذكار
             </p>
-            <p className="text-[18px] font-bold text-foreground font-sans tracking-[1.44px]">
-              Azkar
-            </p>
+            <p className="text-[18px] font-bold text-foreground font-sans tracking-[1.44px]">Azkar</p>
             <svg width="60" height="1" viewBox="0 0 60 1" fill="none">
               <line x1="0" y1="0.5" x2="60" y2="0.5" stroke="var(--primary)" />
             </svg>
           </div>
         </div>
 
-        <p className="mt-10 text-[15px] text-muted-foreground font-sans">
-          Daily remembrance
-        </p>
+        <p className="mt-10 text-[15px] text-muted-foreground font-sans">Daily remembrance</p>
       </motion.div>
 
       <motion.div
@@ -45,9 +50,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <div className="rounded-full overflow-hidden w-[160px] h-1 bg-card-foreground/25" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: 96 }} />
         </div>
-        <p className="text-[11px] font-medium text-muted-foreground font-sans">
-          Version 2.0.1
-        </p>
+        <p className="text-[11px] font-medium text-muted-foreground font-sans">Version 2.0.1</p>
       </motion.div>
     </div>
   );

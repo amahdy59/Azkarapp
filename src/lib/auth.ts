@@ -153,8 +153,16 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
   const userId = session.user.id;
 
   const [{ data: profile }, { data: settings }, { data: progress }, { data: sessions }] = await Promise.all([
-    client.from("profiles").select("display_name, phone, preferred_language").eq("id", userId).maybeSingle<RemoteProfileRow>(),
-    client.from("user_settings").select("dark_mode, settings_json").eq("user_id", userId).maybeSingle<RemoteSettingsRow>(),
+    client
+      .from("profiles")
+      .select("display_name, phone, preferred_language")
+      .eq("id", userId)
+      .maybeSingle<RemoteProfileRow>(),
+    client
+      .from("user_settings")
+      .select("dark_mode, settings_json")
+      .eq("user_id", userId)
+      .maybeSingle<RemoteSettingsRow>(),
     client.from("user_progress").select("completed").eq("user_id", userId).maybeSingle<RemoteProgressRow>(),
     client
       .from("session_history")
@@ -181,7 +189,8 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
     },
     profile: {
-      displayName: profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
+      displayName:
+        profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
       lastPhoneNumber: profile?.phone ?? session.user.phone ?? localState.profile.lastPhoneNumber,
       isGuest: false,
     },
@@ -200,7 +209,11 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
   return mergeAppStates(localState, remoteState);
 }
 
-export async function syncRemoteState(session: Session, state: AppStateSnapshot, streaks: { currentStreak: number; longestStreak: number }) {
+export async function syncRemoteState(
+  session: Session,
+  state: AppStateSnapshot,
+  streaks: { currentStreak: number; longestStreak: number },
+) {
   const client = assertSupabase();
   const userId = session.user.id;
 

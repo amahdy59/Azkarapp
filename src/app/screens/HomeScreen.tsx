@@ -9,19 +9,32 @@ import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 
-export function HomeScreen({ completed, displayName, currentStreak, longestStreak, onCategory, onFeaturedZikr, onSearch, language }:
-  {
-    completed: Record<CategoryId, Set<number>>;
-    displayName: string;
-    currentStreak: number;
-    longestStreak: number;
-    onCategory: (c: CategoryId) => void;
-    onFeaturedZikr: (catId: CategoryId, index: number) => void;
-    onSearch: () => void;
-    language: AppLanguage;
-  }) {
+export function HomeScreen({
+  completed,
+  displayName,
+  currentStreak,
+  longestStreak,
+  onCategory,
+  onFeaturedZikr,
+  onSearch,
+  language,
+}: {
+  completed: Record<CategoryId, Set<number>>;
+  displayName: string;
+  currentStreak: number;
+  longestStreak: number;
+  onCategory: (c: CategoryId) => void;
+  onFeaturedZikr: (catId: CategoryId, index: number) => void;
+  onSearch: () => void;
+  language: AppLanguage;
+}) {
   const h = new Date().getHours();
-  const timeLabel = h < 12 ? t(language, "home.goodMorning") : h < 17 ? t(language, "home.goodAfternoon") : t(language, "home.goodEvening");
+  const timeLabel =
+    h < 12
+      ? t(language, "home.goodMorning")
+      : h < 17
+        ? t(language, "home.goodAfternoon")
+        : t(language, "home.goodEvening");
   const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
   const totalAll = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
   const localizedTotalDone = formatNumerals(totalDone, language);
@@ -29,11 +42,17 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
   const startOfYear = new Date(new Date().getFullYear(), 0, 0);
   const today = new Date();
   const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / 86_400_000);
-  const featuredZikr = ALL_AZKAR[dayOfYear % ALL_AZKAR.length];
-  const featuredCategory = CATEGORIES.find((item) => item.id === featuredZikr.category)!;
+  const featuredZikr = ALL_AZKAR[dayOfYear % ALL_AZKAR.length] ?? ALL_AZKAR[0];
+  if (!featuredZikr) {
+    throw new Error("Azkar content is empty.");
+  }
+
+  const featuredCategory = CATEGORIES.find((item) => item.id === featuredZikr.category) ?? CATEGORIES[0];
   const featuredText = featuredZikr.hadithText || featuredZikr.arabicText;
   const featuredExcerpt = featuredText.length > 140 ? `${featuredText.slice(0, 140).trim()}...` : featuredText;
-  const featuredIndex = ALL_AZKAR.filter((item) => item.category === featuredZikr.category).findIndex((item) => item.id === featuredZikr.id);
+  const featuredIndex = ALL_AZKAR.filter((item) => item.category === featuredZikr.category).findIndex(
+    (item) => item.id === featuredZikr.id,
+  );
 
   return (
     <div className="flex h-full flex-col bg-background">
@@ -76,7 +95,6 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         </div>
       )}
 
-      
       {totalDone === 0 && (
         <div className="mb-4 px-5">
           <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-5 py-6 text-center">
@@ -88,8 +106,7 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
           </div>
         </div>
       )}
-<div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
-
+      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
         {CATEGORIES.map((cat) => {
           const done = completed[cat.id]?.size ?? 0;
           const complete = done === cat.totalCount;
@@ -99,12 +116,16 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
               onClick={() => onCategory(cat.id)}
               aria-label={`${cat.name}, ${done} of ${cat.totalCount} completed`}
               className="w-full rounded-2xl bg-card p-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ border: `1px solid ${complete ? "color-mix(in srgb, var(--primary) 50%, transparent)" : "var(--border)"}` }}
+              style={{
+                border: `1px solid ${complete ? "color-mix(in srgb, var(--primary) 50%, transparent)" : "var(--border)"}`,
+              }}
             >
               <div className="flex items-center gap-4">
                 <div
                   className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl"
-                  style={{ background: complete ? "color-mix(in srgb, var(--primary) 20%, transparent)" : "var(--muted)" }}
+                  style={{
+                    background: complete ? "color-mix(in srgb, var(--primary) 20%, transparent)" : "var(--muted)",
+                  }}
                 >
                   <CatIcon type={cat.icon} size={26} color="var(--primary)" />
                 </div>
@@ -113,14 +134,24 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
                   <div className="mb-0.5 flex items-center justify-between">
                     <p className="text-[16px] font-bold text-foreground">{cat.name}</p>
                     {complete ? (
-                      <span className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-primary" style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}>
+                      <span
+                        className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-primary"
+                        style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}
+                      >
                         <Check size={10} /> Done
                       </span>
                     ) : (
-                      <span className="text-[12px] text-muted-foreground">{formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}</span>
+                      <span className="text-[12px] text-muted-foreground">
+                        {formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}
+                      </span>
                     )}
                   </div>
-                  <p className="mb-2 text-[14px] text-muted-foreground" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>{cat.nameArabic}</p>
+                  <p
+                    className="mb-2 text-[14px] text-muted-foreground"
+                    style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+                  >
+                    {cat.nameArabic}
+                  </p>
                   <ProgressBar value={done} max={cat.totalCount} height={7} />
                 </div>
 
@@ -131,7 +162,10 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
         })}
 
         <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
-          <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl" style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}>
+          <div
+            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl"
+            style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}
+          >
             <Flame size={24} className="text-primary" />
           </div>
           <div className="flex-1">
@@ -141,7 +175,8 @@ export function HomeScreen({ completed, displayName, currentStreak, longestStrea
               dir="ltr"
               style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
             >
-              {formatNumerals(currentStreak, language)} {t(language, currentStreak === 1 ? "home.daySuffix" : "home.daysSuffix")}
+              {formatNumerals(currentStreak, language)}{" "}
+              {t(language, currentStreak === 1 ? "home.daySuffix" : "home.daysSuffix")}
             </p>
           </div>
           <div className="text-end">

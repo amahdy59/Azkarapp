@@ -1,21 +1,21 @@
-import fs from 'fs';
-import path from 'path';
-import { JSDOM } from 'jsdom';
+import fs from "fs";
+import path from "path";
+import { JSDOM } from "jsdom";
 
-const distDir = path.join(process.cwd(), 'dist', 'assets');
+const distDir = path.join(process.cwd(), "dist", "assets");
 const files = fs.readdirSync(distDir);
-const jsFile = files.find(f => f.endsWith('.js'));
+const jsFile = files.find((f) => f.endsWith(".js"));
 
 if (!jsFile) {
   console.error("No JS file found");
   process.exit(1);
 }
 
-const code = fs.readFileSync(path.join(distDir, jsFile), 'utf-8');
+const code = fs.readFileSync(path.join(distDir, jsFile), "utf-8");
 
 const dom = new JSDOM(`<!DOCTYPE html><div id="root"></div>`, {
   url: "http://localhost/",
-  runScripts: "dangerously"
+  runScripts: "dangerously",
 });
 
 // Polyfill minimal browser APIs that might be needed before react mounts

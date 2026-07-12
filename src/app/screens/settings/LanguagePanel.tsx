@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function LanguagePanel({
   language,
@@ -115,11 +112,19 @@ export function LanguagePanel({
                   <p className="font-sans text-[16px] font-semibold text-foreground" dir="auto">
                     {item.native}
                   </p>
-                  <p className="font-sans text-[12px] text-muted-foreground">{LANGUAGE_LABELS[item.code as AppLanguage]}</p>
+                  <p className="font-sans text-[12px] text-muted-foreground">
+                    {LANGUAGE_LABELS[item.code as AppLanguage]}
+                  </p>
                 </div>
                 {active && (
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 text-primary">
-                    <path d="M4 10L8.5 14.5L16 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M4 10L8.5 14.5L16 7"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 )}
               </button>
@@ -130,4 +135,3 @@ export function LanguagePanel({
     </div>
   );
 }
-

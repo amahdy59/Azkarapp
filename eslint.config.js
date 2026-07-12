@@ -1,0 +1,33 @@
+import js from "@eslint/js";
+import jsxA11y from "eslint-plugin-jsx-a11y";
+import reactHooks from "eslint-plugin-react-hooks";
+import tseslint from "typescript-eslint";
+
+export default tseslint.config(
+  {
+    ignores: ["dist/**", "node_modules/**", "src/imports/**", "src/app/components/ui/**"],
+  },
+  js.configs.recommended,
+  ...tseslint.configs.recommended,
+  {
+    files: ["**/*.{ts,tsx}"],
+    plugins: {
+      "jsx-a11y": jsxA11y,
+      "react-hooks": reactHooks,
+    },
+    rules: {
+      ...jsxA11y.configs.recommended.rules,
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "error",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-explicit-any": "error",
+    },
+  },
+  {
+    files: ["**/*.{js,mjs}"],
+    languageOptions: {
+      globals: { console: "readonly", process: "readonly", setTimeout: "readonly" },
+    },
+  },
+);

@@ -19,7 +19,12 @@ export function LoginScreen({
       <div className="flex flex-col flex-1 px-7 pt-6 pb-6 gap-7">
         <div className="flex flex-col items-center gap-4">
           <svg width="40" height="40" viewBox="0 0 40 40" fill="none" className="text-primary">
-            <path d="M35 21.3A14 14 0 1 1 18.7 5 10.8 10.8 0 0 0 35 21.3z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M35 21.3A14 14 0 1 1 18.7 5 10.8 10.8 0 0 0 35 21.3z"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
             <line x1="28" y1="6" x2="28" y2="12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             <line x1="25" y1="9" x2="31" y2="9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
           </svg>
@@ -37,16 +42,34 @@ export function LoginScreen({
         </div>
 
         <div className="flex flex-col gap-3">
-          <button disabled className="w-full flex items-center justify-center gap-3 rounded-lg h-12 bg-white opacity-60 cursor-not-allowed">
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-3 rounded-lg h-12 bg-white opacity-60 cursor-not-allowed"
+          >
             <svg width="18" height="18" viewBox="0 0 48 48" className="shrink-0">
-              <path fill="#EA4335" d="M24 9.5c3.6 0 6.4 1.4 8.4 3.2l6.3-6.3C34.8 2.8 29.8 0 24 0 14.6 0 6.6 5.5 2.8 13.5l7.3 5.7C11.9 13 17.5 9.5 24 9.5z" />
-              <path fill="#4285F4" d="M46.6 24.5c0-1.6-.2-3.2-.5-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.9 7.2l7.5 5.8c4.4-4 7.3-10 7.3-17z" />
-              <path fill="#FBBC05" d="M10.1 28.8c-.4-1.2-.6-2.5-.6-3.8 0-1.7.3-3.3.7-4.8L2.8 13.5A24 24 0 0 0 0 24c0 3.8.9 7.5 2.8 10.5l7.3-5.7z" />
-              <path fill="#34A853" d="M24 48c6 0 11-2 14.7-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.2 2.2-6.5 0-12-4.4-14-10.2l-7.3 5.7C6.6 42.5 14.6 48 24 48z" />
+              <path
+                fill="#EA4335"
+                d="M24 9.5c3.6 0 6.4 1.4 8.4 3.2l6.3-6.3C34.8 2.8 29.8 0 24 0 14.6 0 6.6 5.5 2.8 13.5l7.3 5.7C11.9 13 17.5 9.5 24 9.5z"
+              />
+              <path
+                fill="#4285F4"
+                d="M46.6 24.5c0-1.6-.2-3.2-.5-4.5H24v8.5h12.7c-.6 3-2.3 5.5-4.9 7.2l7.5 5.8c4.4-4 7.3-10 7.3-17z"
+              />
+              <path
+                fill="#FBBC05"
+                d="M10.1 28.8c-.4-1.2-.6-2.5-.6-3.8 0-1.7.3-3.3.7-4.8L2.8 13.5A24 24 0 0 0 0 24c0 3.8.9 7.5 2.8 10.5l7.3-5.7z"
+              />
+              <path
+                fill="#34A853"
+                d="M24 48c6 0 11-2 14.7-5.4l-7.5-5.8c-2 1.4-4.6 2.2-7.2 2.2-6.5 0-12-4.4-14-10.2l-7.3 5.7C6.6 42.5 14.6 48 24 48z"
+              />
             </svg>
             <span className="text-[16px] font-semibold text-[#1A1228] font-sans">{t(language, "auth.googleSoon")}</span>
           </button>
-          <button disabled className="w-full flex items-center justify-center gap-3 rounded-lg h-[52px] bg-[#1C1C2E] border-[1.5px] border-[#3A3A5C] opacity-60 cursor-not-allowed text-foreground">
+          <button
+            disabled
+            className="w-full flex items-center justify-center gap-3 rounded-lg h-[52px] bg-[#1C1C2E] border-[1.5px] border-[#3A3A5C] opacity-60 cursor-not-allowed text-foreground"
+          >
             <svg width="16" height="20" viewBox="0 0 16 20" fill="currentColor" className="shrink-0">
               <path d="M13.2 10.6c0-2.7 2.3-4.1 2.4-4.2-1.3-1.9-3.3-2.1-4-2.2-1.7-.2-3.4 1-4.2 1-.8 0-2.2-1-3.6-.9-1.8 0-3.5 1.1-4.4 2.7C-1.6 10.2-.2 15.2 1.6 18c.9 1.3 1.9 2.7 3.3 2.7s1.8-.8 3.4-.8c1.6 0 2 .8 3.5.8 1.4 0 2.3-1.3 3.2-2.6.6-.9 1.1-1.8 1.4-2.1-.1-.1-2.2-.9-2.2-3.4zM10.5 2.9c.7-.9 1.3-2.2 1.1-3.4-1.1.1-2.4.7-3.1 1.6-.7.8-1.3 2.1-1.1 3.3 1.2.1 2.4-.6 3.1-1.5z" />
             </svg>
@@ -104,9 +127,7 @@ export function LoginScreen({
         <div className="flex-1" />
 
         <p className="text-center text-[11px] text-muted-foreground font-sans leading-[16px]">
-          By continuing you agree to our{" "}
-          <span className="text-primary underline underline-offset-2">Terms</span>{" "}
-          &{" "}
+          By continuing you agree to our <span className="text-primary underline underline-offset-2">Terms</span> &{" "}
           <span className="text-primary underline underline-offset-2">Privacy Policy</span>
         </p>
       </div>
@@ -138,7 +159,11 @@ export function PhoneInputScreen({
     <div className="flex flex-col h-full justify-between bg-background slide-in-from-right">
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-5 shrink-0 h-[56px]">
-          <button onClick={onBack} className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all" aria-label="Back">
+          <button
+            onClick={onBack}
+            className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all"
+            aria-label="Back"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-foreground rtl:-scale-x-100">
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -179,14 +204,13 @@ export function PhoneInputScreen({
                 id="phone-number"
                 type="tel"
                 value={phone}
-                onChange={e => setPhone(e.target.value)}
+                onChange={(e) => setPhone(e.target.value)}
                 placeholder="50 123 4567"
                 className="flex-1 bg-transparent focus:outline-none text-[17px] font-semibold text-foreground font-sans"
                 autoComplete="tel"
                 inputMode="tel"
                 enterKeyHint="send"
                 dir="ltr"
-                autoFocus
               />
             </div>
           </div>
@@ -194,7 +218,12 @@ export function PhoneInputScreen({
           <div className="flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-muted-foreground">
               <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.4" />
-              <path d="M7 3.5C5.3 4.2 4.5 5.5 4.5 7s.8 2.8 2.5 3.5M7 3.5C8.7 4.2 9.5 5.5 9.5 7s-.8 2.8-2.5 3.5M3.5 7h7M7 3.5v7" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              <path
+                d="M7 3.5C5.3 4.2 4.5 5.5 4.5 7s.8 2.8 2.5 3.5M7 3.5C8.7 4.2 9.5 5.5 9.5 7s-.8 2.8-2.5 3.5M3.5 7h7M7 3.5v7"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+              />
             </svg>
             <p className="text-[12px] text-muted-foreground font-sans">{t(language, "auth.countriesSupported")}</p>
           </div>
@@ -254,7 +283,7 @@ export function OTPScreen({
   const [countdown, setCountdown] = useState(272);
 
   useEffect(() => {
-    const timer = setInterval(() => setCountdown(current => Math.max(0, current - 1)), 1000);
+    const timer = setInterval(() => setCountdown((current) => Math.max(0, current - 1)), 1000);
     return () => clearInterval(timer);
   }, []);
 
@@ -266,7 +295,11 @@ export function OTPScreen({
     <div className="flex flex-col h-full justify-between bg-background slide-in-from-right">
       <div className="flex flex-col">
         <div className="flex items-center justify-between px-5 shrink-0 h-[56px]">
-          <button onClick={onBack} className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all" aria-label="Back">
+          <button
+            onClick={onBack}
+            className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all"
+            aria-label="Back"
+          >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-foreground rtl:-scale-x-100">
               <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -278,7 +311,10 @@ export function OTPScreen({
         <div className="px-6 pt-4 flex flex-col gap-8">
           <div className="flex flex-col gap-2">
             <p className="text-[13px] text-muted-foreground font-sans leading-[20px]">
-              {t(language, "auth.codeSentTo")} <span className="text-foreground" dir="ltr">{maskedPhone}</span>
+              {t(language, "auth.codeSentTo")}{" "}
+              <span className="text-foreground" dir="ltr">
+                {maskedPhone}
+              </span>
             </p>
             <div className="flex items-center gap-1.5">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-primary">
@@ -295,7 +331,7 @@ export function OTPScreen({
             <InputOTP
               maxLength={6}
               value={token}
-              onChange={value => setToken(value.replace(/\D/g, "").slice(0, 6))}
+              onChange={(value) => setToken(value.replace(/\D/g, "").slice(0, 6))}
               containerClassName="justify-center"
               className="w-full"
               inputMode="numeric"

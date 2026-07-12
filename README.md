@@ -2,6 +2,12 @@
 
 Vite + React prototype for the Azkar app UI, now cleaned up for local persistence and Supabase integration.
 
+## Quality commands
+
+- `pnpm check` runs formatting, linting, strict type checking, unit tests, production build, and bundle budgets.
+- `pnpm test:e2e` runs WCAG A/AA and keyboard smoke tests in desktop and mobile Chromium.
+- Pull requests and pushes to `main` run both suites in GitHub Actions.
+
 ## Run locally
 
 1. Install dependencies with `pnpm install`
@@ -31,7 +37,20 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 - Signed-in users sync profile, settings, progress, and session history to Supabase
 - The app builds successfully with `vite build`
 
-## Remaining follow-up
+## Architecture
 
-- Replace placeholder social auth and sharing actions with real implementations
-- Consider splitting the large single-file prototype UI into smaller components and routes
+- `src/app/screens`: screen-level presentation and interaction
+- `src/app/components`: reusable app components; `components/ui` contains vendored primitives
+- `src/app/content`: static azkar and category data
+- `src/app/i18n`: translations
+- `src/app/state.ts`: validated local state persistence and merging
+- `src/lib`: external service boundaries such as Supabase authentication
+- `src/styles`: design tokens, global behavior, fonts, and Tailwind integration
+- `e2e` and colocated `*.test.ts(x)`: browser and unit tests
+
+UI code must not access Supabase directly. Shared formatting, persistence, data access, and validation belong outside screen JSX. See [docs/QUALITY_CHECKLIST.md](docs/QUALITY_CHECKLIST.md) for the review standard and manual release gates.
+
+## Known product follow-up
+
+- Replace placeholder social auth and sharing actions with real implementations.
+- Continue extracting orchestration from `App.tsx` and focused subcomponents from `ReaderScreen.tsx` as those flows change.

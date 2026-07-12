@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function SettingsRootPanel({
   onNav,
@@ -143,13 +140,21 @@ export function SettingsRootPanel({
           icon={
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="7" stroke="currentColor" className="text-foreground" strokeWidth="1.5" />
-              <path d="M10 3v14M3 10h14" stroke="currentColor" className="text-foreground" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M10 3v14M3 10h14"
+                stroke="currentColor"
+                className="text-foreground"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           }
           label={t(language, "settings.displayTheme")}
           right={
             <div className="flex items-center gap-2">
-              <p className="font-sans text-[14px] text-foreground/90">{darkMode ? t(language, "common.dark") : t(language, "common.light")}</p>
+              <p className="font-sans text-[14px] text-foreground/90">
+                {darkMode ? t(language, "common.dark") : t(language, "common.light")}
+              </p>
               <RowToggle checked={darkMode} onChange={onToggleDark} label={t(language, "settings.displayTheme")} />
             </div>
           }
@@ -159,7 +164,13 @@ export function SettingsRootPanel({
           iconBg="var(--muted)"
           icon={
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path d="M10 4v12M7 7h6M7 13h4" stroke="currentColor" className="text-foreground" strokeWidth="1.5" strokeLinecap="round" />
+              <path
+                d="M10 4v12M7 7h6M7 13h4"
+                stroke="currentColor"
+                className="text-foreground"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+              />
             </svg>
           }
           label={t(language, "settings.textSize")}
@@ -252,7 +263,12 @@ export function SettingsRootPanel({
               iconBg="var(--muted)"
               icon={<Wifi size={18} className="text-foreground" />}
               label={t(language, "settings.accountSync")}
-              right={<RowValue value={isSyncing ? t(language, "common.syncing") : t(language, "common.connected")} withChevron={false} />}
+              right={
+                <RowValue
+                  value={isSyncing ? t(language, "common.syncing") : t(language, "common.connected")}
+                  withChevron={false}
+                />
+              }
             />
             <SettingsRowItem
               iconBg="color-mix(in srgb, var(--destructive) 20%, transparent)"
@@ -268,4 +284,3 @@ export function SettingsRootPanel({
     </motion.div>
   );
 }
-

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { ChevronLeft, Search, X } from "lucide-react";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
 import type { CategoryId } from "../types";
@@ -28,21 +28,23 @@ export function SearchScreen({
 }) {
   const [q, setQ] = useState("");
   const [recents, setRecents] = useState(RECENT_SEARCHES);
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const results = q.trim().length < 2
-    ? []
-    : ALL_AZKAR.filter(z => {
-        const lq = q.toLowerCase();
-        return z.arabicText.includes(q)
-          || z.translation.toLowerCase().includes(lq)
-          || z.transliteration.toLowerCase().includes(lq)
-          || (ZIKR_LABELS[z.id] ?? "").toLowerCase().includes(lq);
-      });
+  const results =
+    q.trim().length < 2
+      ? []
+      : ALL_AZKAR.filter((z) => {
+          const lq = q.toLowerCase();
+          return (
+            z.arabicText.includes(q) ||
+            z.translation.toLowerCase().includes(lq) ||
+            z.transliteration.toLowerCase().includes(lq) ||
+            (ZIKR_LABELS[z.id] ?? "").toLowerCase().includes(lq)
+          );
+        });
 
   const handleSubmit = (term: string) => {
     if (!recents.includes(term)) {
-      setRecents(current => [term, ...current].slice(0, 5));
+      setRecents((current) => [term, ...current].slice(0, 5));
     }
     setQ(term);
   };
@@ -50,26 +52,32 @@ export function SearchScreen({
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right">
       <div className="flex items-center gap-3 px-5 py-3 shrink-0">
-        <button onClick={onBack} className="flex items-center justify-center w-11 h-11 shrink-0 active:scale-95 transition-all" aria-label="Back">
+        <button
+          onClick={onBack}
+          className="flex items-center justify-center w-11 h-11 shrink-0 active:scale-95 transition-all"
+          aria-label="Back"
+        >
           <ChevronLeft size={24} className="text-foreground rtl:-scale-x-100" />
         </button>
 
         <div className="flex items-center gap-3 flex-1 rounded-full px-4 h-12 bg-card border border-border">
           <Search size={18} className="text-primary shrink-0" />
           <input
-            ref={inputRef}
-            autoFocus
             type="text"
             placeholder="Search adhkar or du'as"
             aria-label="Search adhkar and du'as"
             value={q}
-            onChange={e => setQ(e.target.value)}
-            onKeyDown={e => e.key === "Enter" && q.trim() && handleSubmit(q.trim())}
+            onChange={(e) => setQ(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && q.trim() && handleSubmit(q.trim())}
             className="flex-1 bg-transparent focus:outline-none text-[14px] text-foreground font-sans leading-[22px]"
           />
           {!q && <div className="shrink-0 rounded-sm w-[2px] h-[18px] bg-primary animate-pulse" />}
           {q && (
-            <button onClick={() => setQ("")} className="flex items-center justify-center shrink-0 w-11 h-11 -mr-3 text-muted-foreground" aria-label="Clear search">
+            <button
+              onClick={() => setQ("")}
+              className="flex items-center justify-center shrink-0 w-11 h-11 -mr-3 text-muted-foreground"
+              aria-label="Clear search"
+            >
               <X size={16} />
             </button>
           )}
@@ -79,9 +87,11 @@ export function SearchScreen({
       <div className="flex-1 overflow-y-auto px-5">
         {!q && recents.length > 0 && (
           <div className="mb-6">
-            <p className="mb-3 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">Recent searches</p>
+            <p className="mb-3 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">
+              Recent searches
+            </p>
             <div className="flex flex-wrap gap-2">
-              {recents.map(term => (
+              {recents.map((term) => (
                 <div key={term} className="flex items-center rounded-full bg-secondary text-secondary-foreground">
                   <button
                     onClick={() => setQ(term)}
@@ -91,7 +101,7 @@ export function SearchScreen({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setRecents(current => current.filter(saved => saved !== term))}
+                    onClick={() => setRecents((current) => current.filter((saved) => saved !== term))}
                     className="flex items-center justify-center w-11 h-11 text-secondary-foreground/70 hover:text-secondary-foreground"
                     aria-label={`Remove ${term} from recent searches`}
                   >
@@ -116,8 +126,8 @@ export function SearchScreen({
                 <p className="text-[14px] text-muted-foreground font-sans">No results for &quot;{q}&quot;</p>
               </div>
             ) : (
-              results.map(z => {
-                const zIdx = getAzkarByCategory(z.category).findIndex(a => a.id === z.id);
+              results.map((z) => {
+                const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);
                 const label = ZIKR_LABELS[z.id] ?? z.transliteration.slice(0, 24);
                 const subtitle = z.translation.slice(0, 40);
                 return (

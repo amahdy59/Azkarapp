@@ -37,7 +37,13 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   const pct = total > 0 ? count / total : 0;
 
   return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ transform: "rotate(-90deg)" }} aria-hidden="true">
+    <svg
+      width={size}
+      height={size}
+      viewBox={`0 0 ${size} ${size}`}
+      style={{ transform: "rotate(-90deg)" }}
+      aria-hidden="true"
+    >
       <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--muted)" strokeWidth="10" fill="none" />
       <circle
         cx={size / 2}

@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function AboutPanel({ onBack }: { onBack: () => void }) {
   return (
@@ -111,7 +108,13 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
               icon={
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
                   <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-background">
-                    <path d="M10 2l2.4 5 5.6.8-4 4.1.9 5.6-5-2.6-5 2.6.9-5.6-4-4.1 5.6-.8L10 2z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path
+                      d="M10 2l2.4 5 5.6.8-4 4.1.9 5.6-5-2.6-5 2.6.9-5.6-4-4.1 5.6-.8L10 2z"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
                   </svg>
                 </div>
               }
@@ -128,24 +131,46 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
             <SupportRow
               icon={
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-background">
-                  <path d="M15 12a3 3 0 0 1-3 3H5l-3 3V4a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M15 12a3 3 0 0 1-3 3H5l-3 3V4a3 3 0 0 1 3-3h7a3 3 0 0 1 3 3v8z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
               label="Send Feedback"
               onPress={() => openMailto("support@azkarapp.dev", "Azkar feedback")}
             />
-            <SupportRow icon={<HelpCircle size={18} className="text-background" />} label="Frequently Asked Questions" onPress={() => openExternal(REPO_URL)} />
+            <SupportRow
+              icon={<HelpCircle size={18} className="text-background" />}
+              label="Frequently Asked Questions"
+              onPress={() => openExternal(REPO_URL)}
+            />
             <SupportRow
               icon={
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-background">
                   <circle cx="9" cy="9" r="8" stroke="currentColor" strokeWidth="1.5" />
-                  <path d="M2 9h14M9 1c2.5 0 4 3.5 4 8s-1.5 8-4 8-4-3.5-4-8 1.5-8 4-8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M2 9h14M9 1c2.5 0 4 3.5 4 8s-1.5 8-4 8-4-3.5-4-8 1.5-8 4-8z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
               label="Visit Website"
               right={
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="text-muted-foreground">
-                  <path d="M14 8v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5M9 2h5v5M14 2L7 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M14 8v5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h5M9 2h5v5M14 2L7 9"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
               hasDivider={false}
@@ -160,7 +185,13 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
             <SupportRow
               icon={
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-background">
-                  <path d="M9 16a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM9 5v4M9 12h.01" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M9 16a7 7 0 1 0 0-14 7 7 0 0 0 0 14zM9 5v4M9 12h.01"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
               label="Privacy Policy"
@@ -169,7 +200,13 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
             <SupportRow
               icon={
                 <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-background">
-                  <path d="M4 4h10M4 9h10M4 14h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                  <path
+                    d="M4 4h10M4 9h10M4 14h10"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
                 </svg>
               }
               label="Terms of Service"
@@ -212,13 +249,15 @@ function AboutRow({
   return (
     <div className="relative">
       {onPress ? (
-        <button type="button" onClick={onPress} className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70">
+        <button
+          type="button"
+          onClick={onPress}
+          className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70"
+        >
           {content}
         </button>
       ) : (
-        <div className="flex h-[72px] w-full items-center gap-4 bg-card px-4">
-          {content}
-        </div>
+        <div className="flex h-[72px] w-full items-center gap-4 bg-card px-4">{content}</div>
       )}
       {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 64 }} />}
     </div>
@@ -240,7 +279,11 @@ function SupportRow({
 }) {
   return (
     <div className="relative">
-      <button type="button" onClick={onPress} className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70">
+      <button
+        type="button"
+        onClick={onPress}
+        className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70"
+      >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
         <p className="flex-1 font-sans text-[15px] font-medium text-foreground">{label}</p>
         {right}
@@ -249,4 +292,3 @@ function SupportRow({
     </div>
   );
 }
-

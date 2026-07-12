@@ -54,7 +54,9 @@ function dedupeAndSort(values: unknown): number[] {
     return [];
   }
 
-  return [...new Set(values.filter((value): value is number => Number.isInteger(value) && value >= 0))].sort((a, b) => a - b);
+  return [...new Set(values.filter((value): value is number => Number.isInteger(value) && value >= 0))].sort(
+    (a, b) => a - b,
+  );
 }
 
 export function loadAppState(): AppStateSnapshot {
@@ -72,8 +74,14 @@ export function loadAppState(): AppStateSnapshot {
 
     return {
       settings: {
-        language: parsed.settings?.language && isLanguage(parsed.settings.language) ? parsed.settings.language : DEFAULT_APP_STATE.settings.language,
-        darkMode: typeof parsed.settings?.darkMode === "boolean" ? parsed.settings.darkMode : DEFAULT_APP_STATE.settings.darkMode,
+        language:
+          parsed.settings?.language && isLanguage(parsed.settings.language)
+            ? parsed.settings.language
+            : DEFAULT_APP_STATE.settings.language,
+        darkMode:
+          typeof parsed.settings?.darkMode === "boolean"
+            ? parsed.settings.darkMode
+            : DEFAULT_APP_STATE.settings.darkMode,
         showTransliteration:
           typeof parsed.settings?.showTransliteration === "boolean"
             ? parsed.settings.showTransliteration
@@ -122,7 +130,8 @@ export function loadAppState(): AppStateSnapshot {
       profile: {
         displayName: parsed.profile?.displayName?.trim() || DEFAULT_APP_STATE.profile.displayName,
         lastPhoneNumber: parsed.profile?.lastPhoneNumber || DEFAULT_APP_STATE.profile.lastPhoneNumber,
-        isGuest: typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
+        isGuest:
+          typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
       },
       completed: {
         morning: dedupeAndSort(parsed.completed?.morning),
@@ -209,7 +218,9 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       isGuest: incoming.profile?.isGuest ?? base.profile.isGuest,
     },
     completed,
-    sessions: [...sessions.values()].sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime()),
+    sessions: [...sessions.values()].sort(
+      (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
+    ),
   };
 }
 
@@ -218,11 +229,13 @@ function startOfDay(date: Date) {
 }
 
 export function getStreakSummary(sessions: StoredSession[]) {
-  const completedDays = [...new Set(
-    sessions
-      .filter((session) => session.isComplete)
-      .map((session) => startOfDay(new Date(session.completedAt)).toISOString()),
-  )]
+  const completedDays = [
+    ...new Set(
+      sessions
+        .filter((session) => session.isComplete)
+        .map((session) => startOfDay(new Date(session.completedAt)).toISOString()),
+    ),
+  ]
     .map((value) => new Date(value))
     .sort((a, b) => b.getTime() - a.getTime());
 
@@ -231,16 +244,26 @@ export function getStreakSummary(sessions: StoredSession[]) {
   let runLength = 0;
 
   for (let index = 0; index < completedDays.length; index += 1) {
+    const completedDay = completedDays[index];
+    if (!completedDay) {
+      continue;
+    }
+
     if (index === 0) {
       runLength = 1;
       const today = startOfDay(new Date());
-      const diffDays = Math.round((today.getTime() - completedDays[index].getTime()) / 86400000);
+      const diffDays = Math.round((today.getTime() - completedDay.getTime()) / 86400000);
       currentStreak = diffDays <= 1 ? 1 : 0;
       longestStreak = 1;
       continue;
     }
 
-    const diffDays = Math.round((completedDays[index - 1].getTime() - completedDays[index].getTime()) / 86400000);
+    const previousCompletedDay = completedDays[index - 1];
+    if (!previousCompletedDay) {
+      continue;
+    }
+
+    const diffDays = Math.round((previousCompletedDay.getTime() - completedDay.getTime()) / 86400000);
     runLength = diffDays === 1 ? runLength + 1 : 1;
     longestStreak = Math.max(longestStreak, runLength);
 

@@ -3,12 +3,22 @@ import { ChevronLeft, Home, BookOpen, Settings } from "lucide-react";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
-export function Header({ title, subtitle, onBack, right }:
-  { title: string; subtitle?: string; onBack?: () => void; right?: React.ReactNode }) {
+export function Header({
+  title,
+  subtitle,
+  onBack,
+  right,
+}: {
+  title: string;
+  subtitle?: string;
+  onBack?: () => void;
+  right?: React.ReactNode;
+}) {
   return (
     <div className="flex items-center gap-2 px-4 shrink-0 border-b border-border h-14">
       {onBack && (
-        <button onClick={onBack}
+        <button
+          onClick={onBack}
           aria-label="Go back"
           className="flex items-center justify-center rounded-full transition-colors w-11 h-11 min-w-[44px] hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
@@ -24,7 +34,11 @@ export function Header({ title, subtitle, onBack, right }:
   );
 }
 
-export function BottomNav({ active, onChange, isArabic = false }: {
+export function BottomNav({
+  active,
+  onChange,
+  isArabic = false,
+}: {
   active: "home" | "azkar" | "settings";
   onChange: (t: "home" | "azkar" | "settings") => void;
   isArabic?: boolean;
@@ -40,12 +54,17 @@ export function BottomNav({ active, onChange, isArabic = false }: {
       {tabs.map(({ id, label, Icon }) => {
         const on = active === id;
         return (
-          <button key={id} onClick={() => onChange(id)}
+          <button
+            key={id}
+            onClick={() => onChange(id)}
             aria-label={label}
             aria-current={on ? "page" : undefined}
-            className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg">
+            className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
+          >
             <Icon size={22} className={on ? "text-primary" : "text-muted-foreground"} />
-            <span className={`text-[12px] font-medium font-sans leading-[16px] ${on ? "text-primary" : "text-muted-foreground"}`}>
+            <span
+              className={`text-[12px] font-medium font-sans leading-[16px] ${on ? "text-primary" : "text-muted-foreground"}`}
+            >
               {label}
             </span>
             {on && <div className="rounded-full w-1 h-1 bg-primary -mt-[2px]" />}

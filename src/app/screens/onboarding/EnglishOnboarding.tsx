@@ -50,7 +50,10 @@ export function OnboardCTA({
       >
         {primary}
       </button>
-      <button onClick={onSecondary} className="min-h-11 px-4 text-[15px] text-muted-foreground font-sans leading-[22px]">
+      <button
+        onClick={onSecondary}
+        className="min-h-11 px-4 text-[15px] text-muted-foreground font-sans leading-[22px]"
+      >
         {secondary}
       </button>
     </div>
@@ -64,7 +67,11 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
         <svg width="280" height="280" viewBox="0 0 280 280" fill="none" className="absolute">
           <circle cx="140" cy="140" r="140" fill="currentColor" className="text-primary" fillOpacity="0.12" />
         </svg>
-        {[[-60, -30], [40, -50], [-20, 40]].map(([dx, dy], i) => (
+        {[
+          [-60, -30],
+          [40, -50],
+          [-20, 40],
+        ].map(([dx, dy], i) => (
           <svg
             key={i}
             width="6"
@@ -86,7 +93,11 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
           </div>
         </div>
         <div className="absolute flex flex-col items-center gap-1.5 whitespace-nowrap top-[calc(50%+70px)] left-1/2 -translate-x-1/2">
-          <p className="text-[44px] font-extrabold text-foreground leading-[48px]" style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }} dir="auto">
+          <p
+            className="text-[44px] font-extrabold text-foreground leading-[48px]"
+            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            dir="auto"
+          >
             {"\u0623\u0630\u0643\u0627\u0631"}
           </p>
           <p className="text-[13px] font-bold text-primary font-sans tracking-[1.04px]">AZKAR</p>
@@ -144,13 +155,36 @@ export function EnglishOnboarding2Screen({ onNext, onBack }: { onNext: () => voi
 
         <div className="relative flex items-center justify-center w-[220px] h-[220px]">
           {[220, 180, 140].map((d, i) => (
-            <svg key={i} width={d} height={d} viewBox={`0 0 ${d} ${d}`} fill="none" className="absolute text-primary" style={{ opacity: [0.08, 0.14, 0.2][i] }}>
+            <svg
+              key={i}
+              width={d}
+              height={d}
+              viewBox={`0 0 ${d} ${d}`}
+              fill="none"
+              className="absolute text-primary"
+              style={{ opacity: [0.08, 0.14, 0.2][i] }}
+            >
               <circle cx={d / 2} cy={d / 2} r={d / 2 - 0.5} stroke="currentColor" />
             </svg>
           ))}
 
-          <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} fill="none" className="absolute -rotate-90" aria-label={`${demoCount} of ${demoTotal}`}>
-            <circle cx={size / 2} cy={size / 2} r={r} stroke="currentColor" className="text-card-foreground/30" strokeWidth="10" fill="none" />
+          <svg
+            width={size}
+            height={size}
+            viewBox={`0 0 ${size} ${size}`}
+            fill="none"
+            className="absolute -rotate-90"
+            aria-label={`${demoCount} of ${demoTotal}`}
+          >
+            <circle
+              cx={size / 2}
+              cy={size / 2}
+              r={r}
+              stroke="currentColor"
+              className="text-card-foreground/30"
+              strokeWidth="10"
+              fill="none"
+            />
             <circle
               cx={size / 2}
               cy={size / 2}
@@ -166,7 +200,9 @@ export function EnglishOnboarding2Screen({ onNext, onBack }: { onNext: () => voi
           </svg>
 
           <div className="absolute flex flex-col items-center top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <p className="text-[28px] font-extrabold text-foreground font-sans leading-[36px] tracking-[-0.28px]">{demoCount}</p>
+            <p className="text-[28px] font-extrabold text-foreground font-sans leading-[36px] tracking-[-0.28px]">
+              {demoCount}
+            </p>
             <p className="text-[14px] text-primary font-sans leading-[22px]">of {demoTotal}</p>
           </div>
 
@@ -231,19 +267,33 @@ export function EnglishOnboarding3Screen({ onNext, onBack }: { onNext: () => voi
 
         <div className="relative flex items-center justify-center w-[232px] h-[168px]">
           <div className="absolute flex items-center justify-center rounded-xl w-[110px] h-[168px] bg-card border border-primary -rotate-3 left-1">
-            <p className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]" dir="rtl" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>
-              {"\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"}
+            <p
+              className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]"
+              dir="rtl"
+              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            >
+              {
+                "\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"
+              }
             </p>
           </div>
           <div className="absolute flex items-center justify-center rounded-xl w-[110px] h-[168px] bg-card border border-primary rotate-3 right-1">
-            <p className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]" dir="rtl" style={{ fontFamily: "'Noto Naskh Arabic', serif" }}>
-              {"\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"}
+            <p
+              className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]"
+              dir="rtl"
+              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            >
+              {
+                "\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"
+              }
             </p>
           </div>
         </div>
 
         <div className="absolute flex items-center justify-center rounded-full px-3 py-2 bg-secondary text-secondary-foreground bottom-[46px]">
-          <p className="text-[10px] font-bold font-sans tracking-[0.3px] whitespace-nowrap">Hisn al-Muslim · Authenticated</p>
+          <p className="text-[10px] font-bold font-sans tracking-[0.3px] whitespace-nowrap">
+            Hisn al-Muslim · Authenticated
+          </p>
         </div>
       </div>
 

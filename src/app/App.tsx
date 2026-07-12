@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useCallback } from "react";
 import {
   fromCompletedSets,
   getStreakSummary,
@@ -27,48 +27,113 @@ import { isSupabaseConfigured } from "../lib/supabase";
 // ─── Design tokens (match Azkar/Colors Figma vars) ────────────────────────────
 // ─── Types ────────────────────────────────────────────────────────────────────
 type View =
-  | "home" | "category" | "reader" | "completion"
+  | "home"
+  | "category"
+  | "reader"
+  | "completion"
   // Phase 2 — English onboarding
-  | "splash" | "onboard1" | "onboard2" | "onboard3" | "language" | "login" | "phone" | "otp"
+  | "splash"
+  | "onboard1"
+  | "onboard2"
+  | "onboard3"
+  | "language"
+  | "login"
+  | "phone"
+  | "otp"
   // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
-  | "ar_onboard1" | "ar_onboard2" | "ar_onboard3"
+  | "ar_onboard1"
+  | "ar_onboard2"
+  | "ar_onboard3"
   // Phase 3
   | "settings"
   // Phase 4
   | "search";
 
-
-
 import { BottomNav } from "./components/LayoutShells";
-import { HomeScreen } from "./screens/HomeScreen";
-import { CategoryScreen } from "./screens/CategoryScreen";
-import { ReaderScreen } from "./screens/ReaderScreen";
-import { CompletionScreen } from "./screens/CompletionScreen";
-import { SettingsScreen } from "./screens/settings/SettingsScreen";
-import { SearchScreen } from "./screens/SearchScreen";
-import { SplashScreen } from "./screens/onboarding/SplashScreen";
-import { 
-  EnglishOnboarding1Screen, 
-  EnglishOnboarding2Screen, 
-  EnglishOnboarding3Screen 
-} from "./screens/onboarding/EnglishOnboarding";
-import { 
-  ArOnboarding1Screen, 
-  ArOnboarding2Screen, 
-  ArOnboarding3Screen 
-} from "./screens/onboarding/ArabicOnboarding";
-import { LanguageScreen, LANGUAGE_LABELS } from "./screens/onboarding/LanguageScreen";
-import { LoginScreen, PhoneInputScreen, OTPScreen } from "./screens/auth/AuthScreens";
+import { NetworkStatus } from "./components/NetworkStatus";
+import { LANGUAGE_LABELS } from "./languageOptions";
+
+const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
+const CategoryScreen = lazy(() =>
+  import("./screens/CategoryScreen").then((module) => ({ default: module.CategoryScreen })),
+);
+const ReaderScreen = lazy(() => import("./screens/ReaderScreen").then((module) => ({ default: module.ReaderScreen })));
+const CompletionScreen = lazy(() =>
+  import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
+);
+const SettingsScreen = lazy(() =>
+  import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
+);
+const SearchScreen = lazy(() => import("./screens/SearchScreen").then((module) => ({ default: module.SearchScreen })));
+const SplashScreen = lazy(() =>
+  import("./screens/onboarding/SplashScreen").then((module) => ({ default: module.SplashScreen })),
+);
+const EnglishOnboarding1Screen = lazy(() =>
+  import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding1Screen })),
+);
+const EnglishOnboarding2Screen = lazy(() =>
+  import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding2Screen })),
+);
+const EnglishOnboarding3Screen = lazy(() =>
+  import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding3Screen })),
+);
+const ArOnboarding1Screen = lazy(() =>
+  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding1Screen })),
+);
+const ArOnboarding2Screen = lazy(() =>
+  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding2Screen })),
+);
+const ArOnboarding3Screen = lazy(() =>
+  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding3Screen })),
+);
+const LanguageScreen = lazy(() =>
+  import("./screens/onboarding/LanguageScreen").then((module) => ({ default: module.LanguageScreen })),
+);
+const LoginScreen = lazy(() =>
+  import("./screens/auth/AuthScreens").then((module) => ({ default: module.LoginScreen })),
+);
+const PhoneInputScreen = lazy(() =>
+  import("./screens/auth/AuthScreens").then((module) => ({ default: module.PhoneInputScreen })),
+);
+const OTPScreen = lazy(() => import("./screens/auth/AuthScreens").then((module) => ({ default: module.OTPScreen })));
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
+function maskPhoneNumber(phone: string) {
+  const normalizedPhone = normalizePhoneNumber(phone);
+  if (!normalizedPhone) {
+    return "";
+  }
+
+  const visiblePrefixLength = normalizedPhone.startsWith("+") ? Math.min(4, normalizedPhone.length) : 0;
+  const visibleSuffixLength = Math.min(4, Math.max(0, normalizedPhone.length - visiblePrefixLength));
+  const prefix = normalizedPhone.slice(0, visiblePrefixLength);
+  const suffix = normalizedPhone.slice(normalizedPhone.length - visibleSuffixLength);
+  const hiddenLength = normalizedPhone.length - prefix.length - suffix.length;
+
+  return [prefix, "*".repeat(Math.max(0, hiddenLength)), suffix].filter(Boolean).join(" ");
+}
+
+function ScreenFallback() {
+  return (
+    <div
+      className="flex h-full items-center justify-center bg-background"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading"
+    >
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+    </div>
+  );
+}
+
 export default function App() {
   const initialState = useRef(loadAppState()).current;
-  const [view, setView]             = useState<View>("splash");
-  const [history, setHistory]       = useState<View[]>([]);
-  const [activeTab, setActiveTab]   = useState<"home" | "azkar" | "settings">("home");
-  const [activeCat, setActiveCat]   = useState<CategoryId>("morning");
-  const [activeIdx, setActiveIdx]   = useState(0);
-  const [darkMode, setDarkMode]     = useState(initialState.settings.darkMode);
+  const [view, setView] = useState<View>("splash");
+  const [history, setHistory] = useState<View[]>([]);
+  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "settings">("home");
+  const [activeCat, setActiveCat] = useState<CategoryId>("morning");
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [darkMode, setDarkMode] = useState(initialState.settings.darkMode);
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
@@ -81,7 +146,9 @@ export default function App() {
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
   const [voiceOver, setVoiceOver] = useState(initialState.settings.voiceOver);
   const [audioQuality, setAudioQuality] = useState<AudioQuality>(initialState.settings.audioQuality);
-  const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(initialState.settings.colorBlindSupport);
+  const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(
+    initialState.settings.colorBlindSupport,
+  );
   const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -93,11 +160,16 @@ export default function App() {
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [authError, setAuthError] = useState("");
   const [isSyncingRemote, setIsSyncingRemote] = useState(false);
+  const latestLastPhoneNumber = useRef(lastPhoneNumber);
 
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
   const useRtlLayout = isArabic || forceRtl;
+
+  useEffect(() => {
+    latestLastPhoneNumber.current = lastPhoneNumber;
+  }, [lastPhoneNumber]);
 
   // Apply theme class to root
   useEffect(() => {
@@ -119,7 +191,17 @@ export default function App() {
     document.documentElement.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
     document.documentElement.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
     document.documentElement.dataset.colorBlindSupport = colorBlindSupport;
-  }, [boldText, colorBlindSupport, darkMode, highContrast, reduceMotion, selectedLang, textSize, useRtlLayout, voiceOver]);
+  }, [
+    boldText,
+    colorBlindSupport,
+    darkMode,
+    highContrast,
+    reduceMotion,
+    selectedLang,
+    textSize,
+    useRtlLayout,
+    voiceOver,
+  ]);
 
   useEffect(() => {
     saveAppState({
@@ -146,7 +228,26 @@ export default function App() {
       completed: fromCompletedSets(completed),
       sessions,
     });
-  }, [audioQuality, boldText, colorBlindSupport, completed, darkMode, displayName, forceRtl, hapticFeedback, highContrast, isGuest, lastPhoneNumber, reduceMotion, selectedLang, sessions, showTranslation, showTransliteration, textSize, voiceOver]);
+  }, [
+    audioQuality,
+    boldText,
+    colorBlindSupport,
+    completed,
+    darkMode,
+    displayName,
+    forceRtl,
+    hapticFeedback,
+    highContrast,
+    isGuest,
+    lastPhoneNumber,
+    reduceMotion,
+    selectedLang,
+    sessions,
+    showTranslation,
+    showTransliteration,
+    textSize,
+    voiceOver,
+  ]);
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -164,30 +265,7 @@ export default function App() {
         }
 
         if (session) {
-          const mergedState = await loadRemoteState(session, {
-            settings: {
-              language: selectedLang,
-              darkMode,
-              showTransliteration,
-              showTranslation,
-              textSize,
-              highContrast,
-              boldText,
-              reduceMotion,
-              hapticFeedback,
-              forceRtl,
-              voiceOver,
-              audioQuality,
-              colorBlindSupport,
-            },
-            profile: {
-              displayName,
-              lastPhoneNumber,
-              isGuest,
-            },
-            completed: fromCompletedSets(completed),
-            sessions,
-          });
+          const mergedState = await loadRemoteState(session, initialState);
 
           setSelectedLang(mergedState.settings.language);
           setDarkMode(mergedState.settings.darkMode);
@@ -226,7 +304,7 @@ export default function App() {
         return;
       }
 
-      const profile = profileFromSession(session, lastPhoneNumber);
+      const profile = profileFromSession(session, latestLastPhoneNumber.current);
       setDisplayName(profile.displayName);
       setLastPhoneNumber(profile.lastPhoneNumber);
       setIsGuest(profile.isGuest);
@@ -239,8 +317,7 @@ export default function App() {
       active = false;
       unsubscribe();
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initialState]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !authSessionLoaded || isGuest) {
@@ -301,15 +378,43 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, [audioQuality, authSessionLoaded, boldText, colorBlindSupport, completed, currentStreak, darkMode, displayName, forceRtl, hapticFeedback, highContrast, isGuest, lastPhoneNumber, longestStreak, reduceMotion, selectedLang, sessions, showTranslation, showTransliteration, textSize, voiceOver]);
+  }, [
+    audioQuality,
+    authSessionLoaded,
+    boldText,
+    colorBlindSupport,
+    completed,
+    currentStreak,
+    darkMode,
+    displayName,
+    forceRtl,
+    hapticFeedback,
+    highContrast,
+    isGuest,
+    lastPhoneNumber,
+    longestStreak,
+    reduceMotion,
+    selectedLang,
+    sessions,
+    showTranslation,
+    showTransliteration,
+    textSize,
+    voiceOver,
+  ]);
 
-  const push = useCallback((to: View) => {
-    setHistory(h => [...h, view]);
-    setView(to);
-  }, [view]);
+  const push = useCallback(
+    (to: View) => {
+      setHistory((h) => [...h, view]);
+      setView(to);
+    },
+    [view],
+  );
 
   const handleResetCategory = (catId: CategoryId) => {
-    setCompleted(prev => {
+    if (!window.confirm("Reset all progress for this category? This cannot be undone.")) {
+      return;
+    }
+    setCompleted((prev) => {
       const next = { ...prev };
       next[catId] = new Set();
       return next;
@@ -317,7 +422,7 @@ export default function App() {
   };
 
   const pop = useCallback(() => {
-    setHistory(h => {
+    setHistory((h) => {
       const prev = h[h.length - 1] ?? "home";
       setView(prev);
       return h.slice(0, -1);
@@ -339,7 +444,7 @@ export default function App() {
   };
 
   const markComplete = (idx: number) => {
-    setCompleted(prev => {
+    setCompleted((prev) => {
       const updated = new Set(prev[activeCat]);
       updated.add(idx);
       return { ...prev, [activeCat]: updated };
@@ -351,7 +456,7 @@ export default function App() {
     if (idx + 1 < azkar.length) {
       setActiveIdx(idx + 1);
     } else {
-      setSessions(prev => [
+      setSessions((prev) => [
         {
           id: `${activeCat}-${Date.now()}`,
           category: activeCat,
@@ -368,7 +473,11 @@ export default function App() {
     }
   };
 
-  const goHome = () => { setView("home"); setActiveTab("home"); setHistory([]); };
+  const goHome = () => {
+    setView("home");
+    setActiveTab("home");
+    setHistory([]);
+  };
 
   const handleOpenAccountAuth = () => {
     setAuthError("");
@@ -396,6 +505,10 @@ export default function App() {
       setAuthError("");
       setIsVerifyingOtp(true);
       const session = await verifyPhoneOtp(lastPhoneNumber, token);
+      if (!session) {
+        throw new Error("Could not verify the code.");
+      }
+
       const mergedState = await loadRemoteState(session, {
         settings: {
           language: selectedLang,
@@ -462,6 +575,9 @@ export default function App() {
   };
 
   const handleSignOut = async () => {
+    if (!window.confirm("Sign out of your account on this device?")) {
+      return;
+    }
     try {
       setAuthError("");
       if (isSupabaseConfigured) {
@@ -480,194 +596,240 @@ export default function App() {
   const handleNavTab = (tab: "home" | "azkar" | "settings") => {
     setActiveTab(tab);
     setHistory([]);
-    if (tab === "home")     { setView("home"); }
-    else if (tab === "azkar")   { setView("category"); }
-    else if (tab === "settings") { setView("settings"); }
+    if (tab === "home") {
+      setView("home");
+    } else if (tab === "azkar") {
+      setView("category");
+    } else if (tab === "settings") {
+      setView("settings");
+    }
   };
 
   const showBottomNav = ["home", "category", "settings"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: "#060A15" }}>
+    <div className="app-viewport min-h-screen flex items-center justify-center">
       {/* Phone frame */}
-      <div className="relative flex flex-col overflow-hidden shadow-2xl"
-        style={{ width: 390, height: 844, borderRadius: 44, background: T.bg }}>
+      <div className="app-shell relative flex flex-col overflow-hidden shadow-2xl" style={{ background: T.bg }}>
+        <NetworkStatus />
 
         {/* iOS status bar — hidden on splash/onboarding (they manage their own) */}
         {/* Screen */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-          {/* Phase 2 — onboarding flow */}
-          {view === "splash" && (
-            <SplashScreen onDone={() => {
-              setView(isArabic ? "ar_onboard1" : "onboard1");
-            }} />
-          )}
-          {view === "onboard1" && (
-            <EnglishOnboarding1Screen
-              onNext={() => setView("onboard2")}
-              onSkip={() => { setView("home"); setActiveTab("home"); }}
-            />
-          )}
-          {view === "onboard2" && (
-            <EnglishOnboarding2Screen
-              onNext={() => setView("onboard3")}
-              onBack={() => setView("onboard1")}
-            />
-          )}
-          {view === "onboard3" && (
-            <EnglishOnboarding3Screen
-              onNext={() => { setView("language"); setActiveTab("home"); }}
-              onBack={() => setView("onboard2")}
-            />
-          )}
+        <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
+          <Suspense fallback={<ScreenFallback />}>
+            {/* Phase 2 — onboarding flow */}
+            {view === "splash" && (
+              <SplashScreen
+                onDone={() => {
+                  setView(isArabic ? "ar_onboard1" : "onboard1");
+                }}
+              />
+            )}
+            {view === "onboard1" && (
+              <EnglishOnboarding1Screen
+                onNext={() => setView("onboard2")}
+                onSkip={() => {
+                  setView("home");
+                  setActiveTab("home");
+                }}
+              />
+            )}
+            {view === "onboard2" && (
+              <EnglishOnboarding2Screen onNext={() => setView("onboard3")} onBack={() => setView("onboard1")} />
+            )}
+            {view === "onboard3" && (
+              <EnglishOnboarding3Screen
+                onNext={() => {
+                  setView("language");
+                  setActiveTab("home");
+                }}
+                onBack={() => setView("onboard2")}
+              />
+            )}
 
-          {/* Arabic onboarding — shown for Arabic-locale devices */}
-          {view === "ar_onboard1" && (
-            <ArOnboarding1Screen
-              onNext={() => setView("ar_onboard2")}
-              onSkip={() => { setView("language"); }}
-            />
-          )}
-          {view === "ar_onboard2" && (
-            <ArOnboarding2Screen
-              onNext={() => setView("ar_onboard3")}
-              onBack={() => setView("ar_onboard1")}
-            />
-          )}
-          {view === "ar_onboard3" && (
-            <ArOnboarding3Screen
-              onNext={() => setView("language")}
-              onBack={() => setView("ar_onboard2")}
-            />
-          )}
+            {/* Arabic onboarding — shown for Arabic-locale devices */}
+            {view === "ar_onboard1" && (
+              <ArOnboarding1Screen
+                onNext={() => setView("ar_onboard2")}
+                onSkip={() => {
+                  setView("language");
+                }}
+              />
+            )}
+            {view === "ar_onboard2" && (
+              <ArOnboarding2Screen onNext={() => setView("ar_onboard3")} onBack={() => setView("ar_onboard1")} />
+            )}
+            {view === "ar_onboard3" && (
+              <ArOnboarding3Screen onNext={() => setView("language")} onBack={() => setView("ar_onboard2")} />
+            )}
 
-          {view === "language" && (
-            <LanguageScreen
-              initialLanguage={selectedLang}
-              onContinue={(lang) => { setSelectedLang(lang); setView("login"); }}
-            />
-          )}
-          {view === "login" && (
-            <LoginScreen
-              language={selectedLang}
-              phoneAuthEnabled={isSupabaseConfigured}
-              onPhone={() => { setAuthError(""); setView("phone"); }}
-              onGuest={() => {
-                setDisplayName("Guest");
-                setIsGuest(true);
-                setView("home");
-                setActiveTab("home");
-                setHistory([]);
-              }}
-            />
-          )}
-          {view === "phone" && (
-            <PhoneInputScreen
-              language={selectedLang}
-              initialPhone={lastPhoneNumber}
-              errorMessage={authError}
-              isSending={isSendingOtp}
-              onSend={handleSendOtp}
-              onBack={() => { setAuthError(""); setView("login"); }}
-              onSkip={() => { setView("home"); setActiveTab("home"); setHistory([]); }}
-            />
-          )}
-          {view === "otp" && (
-            <OTPScreen
-              language={selectedLang}
-              maskedPhone={maskPhoneNumber(lastPhoneNumber)}
-              errorMessage={authError}
-              isVerifying={isVerifyingOtp}
-              isResending={isResendingOtp}
-              onVerify={handleVerifyOtp}
-              onResend={handleResendOtp}
-              onBack={() => { setAuthError(""); setView("phone"); }}
-              onDifferent={() => { setAuthError(""); setView("phone"); }}
-            />
-          )}
+            {view === "language" && (
+              <LanguageScreen
+                initialLanguage={selectedLang}
+                onContinue={(lang) => {
+                  setSelectedLang(lang);
+                  setView("login");
+                }}
+              />
+            )}
+            {view === "login" && (
+              <LoginScreen
+                language={selectedLang}
+                phoneAuthEnabled={isSupabaseConfigured}
+                onPhone={() => {
+                  setAuthError("");
+                  setView("phone");
+                }}
+                onGuest={() => {
+                  setDisplayName("Guest");
+                  setIsGuest(true);
+                  setView("home");
+                  setActiveTab("home");
+                  setHistory([]);
+                }}
+              />
+            )}
+            {view === "phone" && (
+              <PhoneInputScreen
+                language={selectedLang}
+                initialPhone={lastPhoneNumber}
+                errorMessage={authError}
+                isSending={isSendingOtp}
+                onSend={handleSendOtp}
+                onBack={() => {
+                  setAuthError("");
+                  setView("login");
+                }}
+                onSkip={() => {
+                  setView("home");
+                  setActiveTab("home");
+                  setHistory([]);
+                }}
+              />
+            )}
+            {view === "otp" && (
+              <OTPScreen
+                language={selectedLang}
+                maskedPhone={maskPhoneNumber(lastPhoneNumber)}
+                errorMessage={authError}
+                isVerifying={isVerifyingOtp}
+                isResending={isResendingOtp}
+                onVerify={handleVerifyOtp}
+                onResend={handleResendOtp}
+                onBack={() => {
+                  setAuthError("");
+                  setView("phone");
+                }}
+                onDifferent={() => {
+                  setAuthError("");
+                  setView("phone");
+                }}
+              />
+            )}
 
-          {/* Phase 1 — core app */}
-          {view === "home" && (
-            <HomeScreen
-              completed={completed}
-              displayName={displayName}
-              currentStreak={currentStreak}
-              longestStreak={longestStreak}
-              onCategory={openCategory}
-              onFeaturedZikr={(catId, i) => openReader(catId, i)}
-              onSearch={() => push("search")}
-              language={selectedLang}
-            />
-          )}
-          {view === "category" && (
-            <CategoryScreen 
-              catId={activeCat} 
-              completed={completed[activeCat] ?? new Set()} 
-              isArabic={isArabic}
-              onZikr={i => openReader(activeCat, i)} 
-              onReset={() => handleResetCategory(activeCat)}
-              onBack={pop} 
-            />
-          )}
-          {view === "reader" && (
-            <ReaderScreen catId={activeCat} idx={activeIdx} isArabic={isArabic}
-              isDone={completed[activeCat]?.has(activeIdx) ?? false}
-              completedCount={completed[activeCat]?.size ?? 0}
-              currentStreak={currentStreak}
-              showTransliteration={showTransliteration}
-              showTranslation={showTranslation}
-              onBack={pop}
-              onComplete={markComplete}
-              onAdvance={advanceAfterCompletion}
-              onToggleTransliteration={() => setShowTransliteration(value => !value)}
-              onToggleTranslation={() => setShowTranslation(value => !value)}
-              onNext={() => { if (activeIdx < azkar.length - 1) setActiveIdx(i => i + 1); }}
-              onPrev={() => { if (activeIdx > 0) setActiveIdx(i => i - 1); }}
-            />
-          )}
-          {view === "completion" && (
-            <CompletionScreen catId={activeCat} sessionStart={sessionStart}
-              currentStreak={currentStreak}
-              onHome={goHome} onRepeat={() => { setView("category"); setHistory([]); }} language={selectedLang} />
-          )}
-          {view === "settings" && (
-            <SettingsScreen
-              darkMode={darkMode}
-              languageLabel={languageLabel}
-              language={selectedLang}
-              phoneAuthEnabled={isSupabaseConfigured}
-              isGuest={isGuest}
-              isSyncing={isSyncingRemote}
-              textSize={textSize}
-              highContrast={highContrast}
-              boldText={boldText}
-              reduceMotion={reduceMotion}
-              hapticFeedback={hapticFeedback}
-              forceRtl={forceRtl}
-              voiceOver={voiceOver}
-              audioQuality={audioQuality}
-              colorBlindSupport={colorBlindSupport}
-              onLanguageChange={setSelectedLang}
-              onToggleDark={() => setDarkMode(d => !d)}
-              onTextSizeChange={setTextSize}
-              onHighContrastChange={setHighContrast}
-              onBoldTextChange={setBoldText}
-              onReduceMotionChange={setReduceMotion}
-              onHapticFeedbackChange={setHapticFeedback}
-              onForceRtlChange={setForceRtl}
-              onVoiceOverChange={setVoiceOver}
-              onAudioQualityChange={setAudioQuality}
-              onColorBlindSupportChange={setColorBlindSupport}
-              onActivateAccount={handleOpenAccountAuth}
-              onSignOut={handleSignOut}
-              onBack={pop}
-            />
-          )}
-          {view === "search" && (
-            <SearchScreen onBack={pop} onZikr={(catId, i) => { openReader(catId, i); }} />
-          )}
-        </div>
+            {/* Phase 1 — core app */}
+            {view === "home" && (
+              <HomeScreen
+                completed={completed}
+                displayName={displayName}
+                currentStreak={currentStreak}
+                longestStreak={longestStreak}
+                onCategory={openCategory}
+                onFeaturedZikr={(catId, i) => openReader(catId, i)}
+                onSearch={() => push("search")}
+                language={selectedLang}
+              />
+            )}
+            {view === "category" && (
+              <CategoryScreen
+                catId={activeCat}
+                completed={completed[activeCat] ?? new Set()}
+                isArabic={isArabic}
+                onZikr={(i) => openReader(activeCat, i)}
+                onReset={() => handleResetCategory(activeCat)}
+                onBack={pop}
+              />
+            )}
+            {view === "reader" && (
+              <ReaderScreen
+                catId={activeCat}
+                idx={activeIdx}
+                isArabic={isArabic}
+                isDone={completed[activeCat]?.has(activeIdx) ?? false}
+                completedCount={completed[activeCat]?.size ?? 0}
+                currentStreak={currentStreak}
+                showTransliteration={showTransliteration}
+                showTranslation={showTranslation}
+                onBack={pop}
+                onComplete={markComplete}
+                onAdvance={advanceAfterCompletion}
+                onToggleTransliteration={() => setShowTransliteration((value) => !value)}
+                onToggleTranslation={() => setShowTranslation((value) => !value)}
+                onNext={() => {
+                  if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
+                }}
+                onPrev={() => {
+                  if (activeIdx > 0) setActiveIdx((i) => i - 1);
+                }}
+              />
+            )}
+            {view === "completion" && (
+              <CompletionScreen
+                catId={activeCat}
+                sessionStart={sessionStart}
+                currentStreak={currentStreak}
+                onHome={goHome}
+                onRepeat={() => {
+                  setView("category");
+                  setHistory([]);
+                }}
+                language={selectedLang}
+              />
+            )}
+            {view === "settings" && (
+              <SettingsScreen
+                darkMode={darkMode}
+                languageLabel={languageLabel}
+                language={selectedLang}
+                phoneAuthEnabled={isSupabaseConfigured}
+                isGuest={isGuest}
+                isSyncing={isSyncingRemote}
+                textSize={textSize}
+                highContrast={highContrast}
+                boldText={boldText}
+                reduceMotion={reduceMotion}
+                hapticFeedback={hapticFeedback}
+                forceRtl={forceRtl}
+                voiceOver={voiceOver}
+                audioQuality={audioQuality}
+                colorBlindSupport={colorBlindSupport}
+                onLanguageChange={setSelectedLang}
+                onToggleDark={() => setDarkMode((d) => !d)}
+                onTextSizeChange={setTextSize}
+                onHighContrastChange={setHighContrast}
+                onBoldTextChange={setBoldText}
+                onReduceMotionChange={setReduceMotion}
+                onHapticFeedbackChange={setHapticFeedback}
+                onForceRtlChange={setForceRtl}
+                onVoiceOverChange={setVoiceOver}
+                onAudioQualityChange={setAudioQuality}
+                onColorBlindSupportChange={setColorBlindSupport}
+                onActivateAccount={handleOpenAccountAuth}
+                onSignOut={handleSignOut}
+                onBack={pop}
+              />
+            )}
+            {view === "search" && (
+              <SearchScreen
+                onBack={pop}
+                onZikr={(catId, i) => {
+                  openReader(catId, i);
+                }}
+              />
+            )}
+          </Suspense>
+        </main>
 
         {/* Bottom nav */}
         {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
@@ -675,4 +837,3 @@ export default function App() {
     </div>
   );
 }
-

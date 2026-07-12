@@ -1,8 +1,21 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Bell, BookOpen, Download, Flame, HelpCircle, Info, Pause, Play, Settings, Volume2, Wifi, X } from "lucide-react";
+import {
+  Bell,
+  BookOpen,
+  Download,
+  Flame,
+  HelpCircle,
+  Info,
+  Pause,
+  Play,
+  Settings,
+  Volume2,
+  Wifi,
+  X,
+} from "lucide-react";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../onboarding/LanguageScreen";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
@@ -16,14 +29,7 @@ const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 type DownloadState = "idle" | "downloading" | "paused" | "done";
 
 export type SettingsSubScreen =
-  | "root"
-  | "language"
-  | "audio"
-  | "accessibility"
-  | "downloads"
-  | "notifications"
-  | "progress"
-  | "about";
+  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -38,7 +44,7 @@ function openMailto(email: string, subject: string) {
 }
 
 function formatTextSize(value: TextSizeOption) {
-  return value[0].toUpperCase() + value.slice(1);
+  return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
 function formatAudioQuality(value: AudioQuality) {
@@ -58,15 +64,7 @@ function formatColorBlindSupport(value: ColorBlindSupport) {
   }
 }
 
-function PanelOptionButton({
-  active,
-  label,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  onClick: () => void;
-}) {
+function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -79,7 +77,6 @@ function PanelOptionButton({
     </button>
   );
 }
-
 
 export function DownloadsPanel({ onBack }: { onBack: () => void }) {
   const catMeta = useMemo(
@@ -184,7 +181,11 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
     });
   };
 
-  const usedStorage = Object.values(progress).reduce((sum, value, index) => sum + (value / 100) * [8.2, 7.8, 5.1][index], 0);
+  const storageSizes = [8.2, 7.8, 5.1];
+  const usedStorage = Object.values(progress).reduce(
+    (sum, value, index) => sum + (value / 100) * (storageSizes[index] ?? 0),
+    0,
+  );
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
@@ -192,10 +193,18 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
       <div className="flex-1 overflow-y-auto pb-8">
         <div className="mx-4 mt-2 flex items-center gap-3 rounded-xl bg-[#1A4F44] px-4 py-3">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0 text-white">
-            <path d="M12 16L7 11M12 16L17 11M12 16V4M5 20h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+            <path
+              d="M12 16L7 11M12 16L17 11M12 16V4M5 20h14"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
             <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.5" />
           </svg>
-          <p className="flex-1 font-sans text-[14px] leading-[22px] text-white">Download azkar for offline use and keep the reader available without internet.</p>
+          <p className="flex-1 font-sans text-[14px] leading-[22px] text-white">
+            Download azkar for offline use and keep the reader available without internet.
+          </p>
         </div>
 
         <div className="px-4 pb-2 pt-4">
@@ -214,7 +223,13 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
             const state = downloads[id];
             const amount = progress[id];
             const actionLabel =
-              state === "downloading" ? "Pause" : state === "paused" ? "Resume" : state === "done" ? "Remove" : "Download";
+              state === "downloading"
+                ? "Pause"
+                : state === "paused"
+                  ? "Resume"
+                  : state === "done"
+                    ? "Remove"
+                    : "Download";
             const action = () => {
               if (state === "downloading") {
                 pauseDownload(id);
@@ -228,7 +243,10 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
             };
 
             return (
-              <div key={id} className={`overflow-hidden rounded-xl border bg-card ${state === "downloading" ? "border-primary" : "border-border"}`}>
+              <div
+                key={id}
+                className={`overflow-hidden rounded-xl border bg-card ${state === "downloading" ? "border-primary" : "border-border"}`}
+              >
                 <div className="flex items-center gap-3 px-4 py-4">
                   <CatIcon type={icon} size={24} />
                   <div className="min-w-0 flex-1">
@@ -252,7 +270,11 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
                       state === "done" ? "bg-muted text-foreground" : "bg-[#1A4F44] text-white"
                     }`}
                   >
-                    {state === "downloading" ? <Pause size={14} className="mr-1" /> : state === "paused" ? <Play size={14} className="mr-1" /> : null}
+                    {state === "downloading" ? (
+                      <Pause size={14} className="mr-1" />
+                    ) : state === "paused" ? (
+                      <Play size={14} className="mr-1" />
+                    ) : null}
                     {actionLabel}
                   </button>
                 </div>
@@ -264,10 +286,14 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
         <SectionLabel label="Storage" />
         <div className="mx-4 mb-6 flex flex-col gap-3">
           <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-            <div className="h-full rounded-full bg-[#14B8A6]" style={{ width: `${Math.min(100, (usedStorage / 21.1) * 100)}%` }} />
+            <div
+              className="h-full rounded-full bg-[#14B8A6]"
+              style={{ width: `${Math.min(100, (usedStorage / 21.1) * 100)}%` }}
+            />
           </div>
           <p className="font-sans text-[13px] text-muted-foreground">
-            {usedStorage.toFixed(1)} MB used · <span className="text-foreground">{(96 - usedStorage).toFixed(1)} MB free</span>
+            {usedStorage.toFixed(1)} MB used ·{" "}
+            <span className="text-foreground">{(96 - usedStorage).toFixed(1)} MB free</span>
           </p>
         </div>
 
@@ -284,4 +310,3 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
     </div>
   );
 }
-

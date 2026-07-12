@@ -102,7 +102,9 @@ export function CategoryScreen({
               key={z.id}
               onClick={() => onZikr(index)}
               className="flex w-full items-center gap-3 rounded-xl bg-card p-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{ border: `1px solid ${isDone ? "color-mix(in srgb, var(--primary) 30%, transparent)" : "var(--border)"}` }}
+              style={{
+                border: `1px solid ${isDone ? "color-mix(in srgb, var(--primary) 30%, transparent)" : "var(--border)"}`,
+              }}
             >
               <div
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"

@@ -35,6 +35,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Verify quality gates
+        run: pnpm check
+
       - name: Build app for GitHub Pages
         run: pnpm build:pages
         env:

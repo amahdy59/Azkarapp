@@ -61,14 +61,15 @@ function TogglePill({
   );
 }
 
-
 function ModePill({
   active,
   label,
+  icon: Icon,
   onClick,
 }: {
   active: boolean;
   label: string;
+  icon?: React.ElementType;
   onClick: () => void;
 }) {
   return (
@@ -88,7 +89,6 @@ function ModePill({
     </button>
   );
 }
-
 
 function loadSavedZikrIds() {
   if (typeof window === "undefined") {
@@ -178,12 +178,11 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
     if (playing && !muted) {
       interval = setInterval(() => {
-        setAudioProgress(p => {
+        setAudioProgress((p) => {
           if (p >= 100) {
             setPlaying(false);
             if (autoPlayNext) {
@@ -192,7 +191,7 @@ export function ReaderScreen({
             return 0;
           }
           // Assuming each zikr audio takes approx 4 seconds on 1x speed
-          return p + (speed * 1.25);
+          return p + speed * 1.25;
         });
       }, 50);
     }
@@ -207,7 +206,7 @@ export function ReaderScreen({
     } else {
       setPlaying(false);
     }
-  }, [idx, listenMode]);
+  }, [autoPlayNext, idx, listenMode]);
 
   useEffect(() => {
     const initialCount = isDone && z ? z.repetitionCount : 0;
@@ -216,7 +215,7 @@ export function ReaderScreen({
     setBenefitOpen(false);
     setListenMode(false);
     setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
-  }, [idx, isDone, z?.id, z?.repetitionCount]);
+  }, [idx, isDone, z]);
 
   useEffect(() => {
     return () => {
@@ -242,7 +241,7 @@ export function ReaderScreen({
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
-  const completedIncludingActive = completedCount + (false ? 1 : 0);
+  const completedIncludingActive = completedCount + (!isDone && complete ? 1 : 0);
   const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
   const nextExcerpt = nextZikr?.arabicText.slice(0, 42).trim();
   const prevDisabled = idx === 0;
@@ -293,7 +292,7 @@ export function ReaderScreen({
     );
   };
 
-  const handleSurfaceTap = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleSurfaceTap = (event: React.MouseEvent<HTMLElement>) => {
     if (suppressTap.current || shouldIgnoreCountTap(event.target)) {
       return;
     }
@@ -315,10 +314,9 @@ export function ReaderScreen({
     const speeds: Array<0.75 | 1 | 1.25> = [0.75, 1, 1.25];
     const currentIndex = speeds.indexOf(speed);
     const nextIndex = (currentIndex + 1) % speeds.length;
-    setSpeed(speeds[nextIndex]);
+    setSpeed(speeds[nextIndex] ?? 1);
   };
 
-  
   const handleToggleSaved = () => {
     const savedIds = loadSavedZikrIds();
     if (savedIds.has(z.id)) {
@@ -386,14 +384,18 @@ export function ReaderScreen({
 
       {z.preferredTiming && (
         <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.timing")}</p>
+          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
+            {t(language, "reader.timing")}
+          </p>
           <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{z.preferredTiming}</p>
         </section>
       )}
 
       {authenticityNote && (
         <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.authenticity")}</p>
+          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
+            {t(language, "reader.authenticity")}
+          </p>
           <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{authenticityNote}</p>
         </section>
       )}
@@ -407,7 +409,9 @@ export function ReaderScreen({
 
       {z.hadithText && (
         <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.evidence")}</p>
+          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
+            {t(language, "reader.evidence")}
+          </p>
           <p
             className="mt-2 rounded-[18px] border border-border bg-background/65 px-4 py-4 text-[16px] leading-[30px] text-foreground"
             dir="auto"
@@ -433,9 +437,7 @@ export function ReaderScreen({
     </div>
   );
 
-  
-
-    const renderCounterActions = () => (
+  const renderCounterActions = () => (
     <div className="flex items-center justify-between gap-4 px-2">
       <button
         type="button"
@@ -461,7 +463,7 @@ export function ReaderScreen({
     </div>
   );
 
-    const renderReadingContent = () => (
+  const renderReadingContent = () => (
     <div className="px-5 pb-8 pt-4 space-y-6">
       <div className="mb-2 flex items-center justify-between gap-3">
         <span className="text-[12px] font-semibold text-muted-foreground">
@@ -517,8 +519,8 @@ export function ReaderScreen({
         <button
           type="button"
           onClick={(e) => {
-             e.stopPropagation();
-             setBenefitOpen((open) => !open);
+            e.stopPropagation();
+            setBenefitOpen((open) => !open);
           }}
           aria-expanded={benefitOpen}
           aria-controls="inline-reference-content"
@@ -540,16 +542,14 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => (
-    <div
-      className="border-t border-border/70 px-3 pb-3 pt-2.5"
-
-    >
+    <div className="border-t border-border/70 px-3 pb-3 pt-2.5">
       <div className="flex h-full flex-col">
         <div
           role="button"
           tabIndex={0}
           aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}`}
           className="flex flex-1 flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
+          onClick={handleSurfaceTap}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
               event.preventDefault();
@@ -564,14 +564,20 @@ export function ReaderScreen({
               <p
                 className="text-[42px] font-extrabold leading-[42px] text-primary"
                 dir="ltr"
-                style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                style={{
+                  fontFamily: counterNumeralFontFamily(language),
+                  fontVariantNumeric: "tabular-nums lining-nums",
+                }}
               >
                 {localizedCount}
               </p>
               <p
                 className="mt-1.5 text-[15px] font-semibold text-card-foreground"
                 dir="ltr"
-                style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                style={{
+                  fontFamily: counterNumeralFontFamily(language),
+                  fontVariantNumeric: "tabular-nums lining-nums",
+                }}
               >
                 {localizedRatio}
               </p>
@@ -603,21 +609,18 @@ export function ReaderScreen({
     </div>
   );
 
-    const renderListeningPanel = () => (
-    <div
-      className="border-t border-border/70 px-4 pb-4 pt-3"
-
-    >
+  const renderListeningPanel = () => (
+    <div className="border-t border-border/70 px-4 pb-4 pt-3">
       <div className="flex h-full flex-col justify-between rounded-[24px] border border-secondary/20 bg-secondary/5 px-4 py-3">
         <div className="flex items-center justify-between mt-1 px-2">
           <p className="text-[15px] font-bold text-secondary">{t(language, "reader.listenMode")}</p>
           <label className="flex items-center gap-2 cursor-pointer">
             <span className="text-[12px] font-semibold text-secondary">Auto-Play</span>
-            <input 
-               type="checkbox" 
-               checked={autoPlayNext} 
-               onChange={(e) => setAutoPlayNext(e.target.checked)}
-               className="h-4 w-4 rounded-sm border-secondary text-secondary focus:ring-secondary/50" 
+            <input
+              type="checkbox"
+              checked={autoPlayNext}
+              onChange={(e) => setAutoPlayNext(e.target.checked)}
+              className="h-4 w-4 rounded-sm border-secondary text-secondary focus:ring-secondary/50"
             />
           </label>
         </div>
@@ -668,105 +671,113 @@ export function ReaderScreen({
   );
 
   return (
-      <div
-        className="relative flex h-full flex-col bg-background"
-        onTouchStart={(event) => {
-          touchStartX.current = event.touches[0].clientX;
-        }}
-        onTouchEnd={(event) => {
-          if (touchStartX.current === null) {
-            return;
-          }
+    <div
+      className="relative flex h-full flex-col bg-background"
+      onTouchStart={(event) => {
+        const touch = event.touches[0];
+        if (touch) {
+          touchStartX.current = touch.clientX;
+        }
+      }}
+      onTouchEnd={(event) => {
+        if (touchStartX.current === null) {
+          return;
+        }
 
-          const deltaX = event.changedTouches[0].clientX - touchStartX.current;
-          if (Math.abs(deltaX) > 14) {
-            suppressTap.current = true;
-            if (tapSuppressTimer.current) {
-              clearTimeout(tapSuppressTimer.current);
-            }
-            tapSuppressTimer.current = setTimeout(() => {
-              suppressTap.current = false;
-            }, 220);
-          }
-
-          handleSwipe(deltaX);
+        const touch = event.changedTouches[0];
+        if (!touch) {
           touchStartX.current = null;
-        }}
-      >
-        <div className="sr-only" aria-live="polite">
-          {shareMessage}
-        </div>
+          return;
+        }
 
-        <div className="shrink-0 border-b border-border/70 px-4 py-3">
-          <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3">
+        const deltaX = touch.clientX - touchStartX.current;
+        if (Math.abs(deltaX) > 14) {
+          suppressTap.current = true;
+          if (tapSuppressTimer.current) {
+            clearTimeout(tapSuppressTimer.current);
+          }
+          tapSuppressTimer.current = setTimeout(() => {
+            suppressTap.current = false;
+          }, 220);
+        }
+
+        handleSwipe(deltaX);
+        touchStartX.current = null;
+      }}
+    >
+      <div className="sr-only" aria-live="polite">
+        {shareMessage}
+      </div>
+
+      <div className="shrink-0 border-b border-border/70 px-4 py-3">
+        <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3">
+          <button
+            onClick={onBack}
+            aria-label="Go back"
+            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronLeft size={22} className="rtl:-scale-x-100" />
+          </button>
+
+          <p className="truncate text-center text-[18px] font-bold text-foreground">
+            {isArabic ? category.nameArabic : category.name}
+          </p>
+
+          <div className="flex items-center gap-1">
             <button
-              onClick={onBack}
-              aria-label="Go back"
-              className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              type="button"
+              onClick={onPrev}
+              disabled={prevDisabled}
+              aria-label={t(language, "reader.prev")}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <ChevronLeft size={22} className="rtl:-scale-x-100" />
+              <ChevronLeft size={20} className="rtl:-scale-x-100" />
             </button>
-
-            <p className="truncate text-center text-[18px] font-bold text-foreground">
-              {isArabic ? category.nameArabic : category.name}
-            </p>
-
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={onPrev}
-                disabled={prevDisabled}
-                aria-label={t(language, "reader.prev")}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <ChevronLeft size={20} className="rtl:-scale-x-100" />
-              </button>
-              <button
-                type="button"
-                onClick={onNext}
-                disabled={nextDisabled}
-                aria-label={t(language, "reader.next")}
-                className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <ChevronRight size={20} className="rtl:-scale-x-100" />
-              </button>
-            </div>
-          </div>
-        </div>
-
-                <div className="shrink-0 border-b border-border/70 px-4 py-3">
-          <div className="flex items-center justify-between gap-3">
-            <p className="text-[13px] font-medium text-muted-foreground">
-              {t(language, "reader.progressSummary", {
-                done: formatNumerals(readingProgressValue, language),
-                total: formatNumerals(azkar.length, language),
-              })}
-            </p>
-          </div>
-          <div className="mt-2.5">
-            <ProgressBar
-              value={readingProgressValue}
-              max={azkar.length}
-              height={3}
-              trackColor="color-mix(in srgb, var(--muted) 78%, var(--card))"
-              fillColor="var(--primary)"
-              aria-label={t(language, "reader.groupProgress")}
-            />
-          </div>
-        </div>
-
-        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                      <div
-              className="grid min-h-0 flex-1"
-              onClick={handleSurfaceTap}
-              style={{
-                gridTemplateRows: "minmax(0, 1fr) 35vh",
-              }}
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={nextDisabled}
+              aria-label={t(language, "reader.next")}
+              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
-              {listenMode ? renderListeningPanel() : renderCounterPanel()}
-            </div>
+              <ChevronRight size={20} className="rtl:-scale-x-100" />
+            </button>
+          </div>
         </div>
       </div>
+
+      <div className="shrink-0 border-b border-border/70 px-4 py-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[13px] font-medium text-muted-foreground">
+            {t(language, "reader.progressSummary", {
+              done: formatNumerals(readingProgressValue, language),
+              total: formatNumerals(azkar.length, language),
+            })}
+          </p>
+        </div>
+        <div className="mt-2.5">
+          <ProgressBar
+            value={readingProgressValue}
+            max={azkar.length}
+            height={3}
+            trackColor="color-mix(in srgb, var(--muted) 78%, var(--card))"
+            fillColor="var(--primary)"
+            aria-label={t(language, "reader.groupProgress")}
+          />
+        </div>
+      </div>
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div
+          className="grid min-h-0 flex-1"
+          style={{
+            gridTemplateRows: "minmax(0, 1fr) 35vh",
+          }}
+        >
+          <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
+          {listenMode ? renderListeningPanel() : renderCounterPanel()}
+        </div>
+      </div>
+    </div>
   );
 }
