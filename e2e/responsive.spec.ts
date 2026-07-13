@@ -55,3 +55,73 @@ test("the typography contract assigns each content type to its approved family",
   expect(families.mixedEnglish).toContain("Inter");
   expect(families.zikr).toContain("IBM Plex Sans Arabic");
 });
+
+test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: {
+          language: "ar",
+          themeMode: "midnight",
+          showTransliteration: false,
+          showTranslation: false,
+          textSize: "medium",
+          highContrast: false,
+          boldText: false,
+          reduceMotion: true,
+          hapticFeedback: false,
+          forceRtl: false,
+          voiceOver: false,
+          audioQuality: "high",
+          colorBlindSupport: "none",
+        },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: { morning: [0, 1, 2, 3, 4, 5, 6, 7], evening: [], before_sleep: [] },
+        sessions: [],
+      }),
+    );
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await page.getByRole("button", { name: "🇸🇦 العربية ar", exact: true }).click();
+  await page.getByRole("button", { name: "Continue", exact: true }).click();
+  await page.getByRole("button", { name: "المتابعة كزائر ⚠ لن تتم مزامنة تقدمك بين الأجهزة", exact: true }).click();
+  await page.getByRole("button", { name: "تخطي", exact: true }).click();
+
+  const card = page.getByTestId("category-card-morning");
+  await expect(card).toBeVisible();
+  await expect(card).toHaveAttribute("dir", "ltr");
+
+  const arrowBox = await card.locator('[data-slot="category-chevron"]').boundingBox();
+  const iconBox = await card.locator('[data-slot="category-icon"]').boundingBox();
+  const copyBox = await card.locator('[data-slot="category-copy"]').boundingBox();
+  expect(arrowBox).not.toBeNull();
+  expect(iconBox).not.toBeNull();
+  expect(copyBox).not.toBeNull();
+  if (!arrowBox || !iconBox || !copyBox) return;
+
+  expect(arrowBox.x).toBeLessThan(iconBox.x);
+  expect(iconBox.x).toBeLessThan(copyBox.x);
+
+  const trackBox = await card.locator('[data-slot="progress-track"]').boundingBox();
+  const fillBox = await card.locator('[data-slot="progress-fill"]').boundingBox();
+  expect(trackBox).not.toBeNull();
+  expect(fillBox).not.toBeNull();
+  if (!trackBox || !fillBox) return;
+  expect(fillBox.x + fillBox.width).toBeCloseTo(trackBox.x + trackBox.width, 0);
+
+  const scene = page.locator(".featured-scene");
+  await expect(scene).toBeVisible();
+  const sceneState = await scene.evaluate((element) => {
+    const image = element as HTMLImageElement;
+    return {
+      naturalWidth: image.naturalWidth,
+      opacity: Number.parseFloat(getComputedStyle(image).opacity),
+    };
+  });
+  expect(sceneState.naturalWidth).toBeGreaterThan(0);
+  expect(sceneState.opacity).toBeGreaterThanOrEqual(0.3);
+  expect(sceneState.opacity).toBeLessThan(0.6);
+});

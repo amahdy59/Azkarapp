@@ -43,6 +43,14 @@ Rules:
 - Share, references, and save remain separate 48 px actions below the counter.
 - The reader has one contained vertical scroll region. Short screens must preserve access to the zikr, counter, and actions without document-level horizontal overflow.
 
+## Home and azkar-group contract
+
+- Arabic group cards use an explicit physical LTR grid so visual placement is deterministic: Arabic text occupies the right column with its own `dir="rtl"`, the category icon sits to its left, and the back/entry chevron is the far-left element. English mirrors that physical grid.
+- Group progress fills from the reading start edge: right-to-left for Arabic and left-to-right for English. DOM and tab order remain stable in both languages.
+- The featured “start your zikr” card is time-aware: Morning from 05:00–14:59, Evening from 15:00–20:59, and Before Sleep from 21:00–04:59 local device time. It always opens the first zikr in the selected group.
+- Each featured state uses its approved scene asset from `src/assets/home`: `morning-scene.png` for Morning, `evening-scene.png` for Evening, and `before-sleep-scene.png` for Before Sleep. Artwork is decorative, sits behind all copy, fills the card, and uses the theme-owned `--featured-scene-opacity` token plus a semantic card/background overlay for legibility in Light, Midnight, and Dark/OLED modes.
+- Featured-card Arabic copy is right aligned and uses RTL semantics. Zikr excerpts retain the `zikr-text` typography contract; decorative artwork has empty alternative text.
+
 ## Reference sheet contract
 
 - Width is fluid up to the 390 px app canvas.
