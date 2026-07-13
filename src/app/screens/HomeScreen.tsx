@@ -46,7 +46,7 @@ export function HomeScreen({
         >
           <Search size={19} />
         </button>
-        <div className="flex items-center justify-center gap-7">
+        <div className="flex items-center justify-center gap-7" dir="ltr">
           <span className="flex items-center gap-1 text-[13px] font-bold text-secondary">
             <Leaf size={18} />
             {formatNumerals(currentStreak, language)}
@@ -73,7 +73,7 @@ export function HomeScreen({
           <p className="text-[16px] font-bold text-foreground">
             {isArabic ? "حان وقت أذكارك" : "It’s time for your azkar"}
           </p>
-          <p className="mt-1 line-clamp-1 text-[12px] text-muted-foreground">
+          <p className={`mt-1 line-clamp-1 text-[12px] text-muted-foreground ${isArabic ? "zikr-text" : ""}`}>
             {isArabic ? featured.arabicText : featured.translation}
           </p>
           <p className="mt-3 text-[14px] font-bold text-primary">{isArabic ? "ابدأ الآن" : "Begin now"} ←</p>
@@ -89,7 +89,7 @@ export function HomeScreen({
               key={category.id}
               type="button"
               onClick={() => onCategory(category.id)}
-              className="flex min-h-[94px] w-full items-center gap-2 rounded-xl border border-border bg-card px-4 text-start"
+              className="flex min-h-[104px] w-full items-center gap-2 rounded-2xl border border-border bg-card p-4 text-start"
               aria-label={`${isArabic ? category.nameArabic : category.name}, ${done} of ${category.totalCount} complete`}
             >
               <ChevronLeft size={22} className="shrink-0 text-card-foreground rtl:-scale-x-100" />

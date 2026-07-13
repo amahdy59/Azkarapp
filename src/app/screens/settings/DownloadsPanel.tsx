@@ -213,7 +213,9 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
             onClick={handleDownloadAll}
             className="h-[52px] w-full rounded-xl border-[1.5px] border-primary bg-transparent transition-all active:scale-95"
           >
-            <p className="font-sans text-[16px] font-semibold text-primary">Download All Categories</p>
+            <p className="latin-ui text-[16px] font-semibold text-primary" lang="en" dir="ltr">
+              Download All Categories
+            </p>
           </button>
         </div>
 

@@ -26,7 +26,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           <div className="flex flex-col items-center gap-2">
             <p
               className="text-[40px] font-extrabold text-primary leading-[44px]"
-              style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
               dir="auto"
             >
               أذكار
@@ -38,14 +38,18 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           </div>
         </div>
 
-        <p className="mt-10 text-[15px] text-muted-foreground font-sans">Daily remembrance</p>
+        <p className="latin-ui mt-10 text-[15px] text-muted-foreground" lang="en" dir="ltr">
+          Daily remembrance
+        </p>
       </motion.div>
 
       <div className="flex flex-col items-center gap-3 pb-12">
         <div className="rounded-full overflow-hidden w-[160px] h-1 bg-card-foreground/25" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: 96 }} />
         </div>
-        <p className="text-[11px] font-medium text-muted-foreground font-sans">Version 2.0.1</p>
+        <p className="latin-ui text-[11px] font-medium text-muted-foreground" lang="en" dir="ltr">
+          Version 2.0.1
+        </p>
       </div>
     </div>
   );

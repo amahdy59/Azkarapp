@@ -87,8 +87,12 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
           <CrescentMark size={36} />
           <div className="flex flex-col items-center gap-1.5">
             <p className="font-sans text-[24px] font-bold text-foreground">Azkar</p>
-            <p className="font-sans text-[14px] text-muted-foreground">Daily Islamic Remembrance</p>
-            <p className="font-sans text-[12px] text-muted-foreground opacity-60">Version 2.0.1</p>
+            <p className="latin-ui text-[14px] text-muted-foreground" lang="en" dir="ltr">
+              Daily Islamic Remembrance
+            </p>
+            <p className="latin-ui text-[12px] text-muted-foreground opacity-60" lang="en" dir="ltr">
+              Version 2.0.1
+            </p>
           </div>
         </div>
 

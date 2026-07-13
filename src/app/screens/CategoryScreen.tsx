@@ -133,11 +133,10 @@ export function CategoryScreen({
                     </span>
                   )}
                   <p
-                    className="min-w-0 truncate text-[16px] leading-[26px]"
+                    className="zikr-text min-w-0 truncate text-[16px] leading-[26px]"
                     dir="rtl"
                     style={{
                       color: isDone ? "var(--muted-foreground)" : "var(--foreground)",
-                      fontFamily: "'Noto Naskh Arabic', serif",
                     }}
                   >
                     {z.arabicText.split("\n")[0]}

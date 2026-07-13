@@ -103,7 +103,9 @@ export function AudioPanel({
           <PanelOptionButton active={audioQuality === "high"} label="High" onClick={() => onChange("high")} />
         </div>
         <div className="mt-4 rounded-xl border border-border bg-card p-4">
-          <p className="font-sans text-[15px] font-semibold text-foreground">Current quality</p>
+          <p className="latin-ui text-[15px] font-semibold text-foreground" lang="en" dir="ltr">
+            Current quality
+          </p>
           <p className="mt-2 font-sans text-[14px] leading-[22px] text-muted-foreground">
             {audioQuality === "high"
               ? "Higher fidelity recitation audio with a larger download size."

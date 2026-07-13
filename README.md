@@ -48,7 +48,7 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 - `src/styles`: design tokens, global behavior, fonts, and Tailwind integration
 - `e2e` and colocated `*.test.ts(x)`: browser and unit tests
 
-UI code must not access Supabase directly. Shared formatting, persistence, data access, and validation belong outside screen JSX. See [docs/QUALITY_CHECKLIST.md](docs/QUALITY_CHECKLIST.md) for the review standard and manual release gates.
+UI code must not access Supabase directly. Shared formatting, persistence, data access, and validation belong outside screen JSX. See [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) for the authoritative typography, RTL, reader, modal, and responsive contracts, and [docs/QUALITY_CHECKLIST.md](docs/QUALITY_CHECKLIST.md) for review and release gates.
 
 ## Known product follow-up
 

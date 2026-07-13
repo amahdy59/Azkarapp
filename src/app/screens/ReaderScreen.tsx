@@ -1,95 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
-import {
-  Check,
-  BookOpen,
-  ChevronDown,
-  ChevronLeft,
-  ChevronRight,
-  ChevronUp,
-  ExternalLink,
-  Globe,
-  Heart,
-  Pause,
-  Play,
-  RotateCcw,
-  Share2,
-  Languages,
-  Type,
-  Volume2,
-  VolumeX,
-  X,
-} from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { BookOpen, ChevronUp, ExternalLink, Heart, RotateCcw, Share2, Menu, X } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import type { AppLanguage, CategoryId } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterRing, PulseRings, WaveformBars } from "../components/ZikrComponents";
+import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
-
-function TogglePill({
-  active,
-  label,
-  icon: Icon,
-  onClick,
-  ariaLabel,
-}: {
-  active: boolean;
-  label: string;
-  icon?: React.ElementType;
-  onClick: () => void;
-  ariaLabel: string;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      aria-label={ariaLabel}
-      onClick={onClick}
-      className="inline-flex min-w-[58px] items-center justify-center rounded-full border px-4 py-2 text-[11px] font-bold uppercase tracking-[0.08em] transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      style={{
-        background: active ? "color-mix(in srgb, var(--primary) 14%, var(--card))" : "var(--card)",
-        borderColor: active ? "color-mix(in srgb, var(--primary) 42%, transparent)" : "var(--border)",
-        color: active ? "var(--primary)" : "var(--muted-foreground)",
-      }}
-    >
-      {Icon && <Icon size={14} className="me-1.5" />}
-      {label}
-    </button>
-  );
-}
-
-function ModePill({
-  active,
-  label,
-  icon: Icon,
-  onClick,
-}: {
-  active: boolean;
-  label: string;
-  icon?: React.ElementType;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className="inline-flex h-8 items-center rounded-full border px-3 text-[12px] font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      style={{
-        background: active ? "color-mix(in srgb, var(--secondary) 22%, var(--card))" : "transparent",
-        borderColor: active ? "color-mix(in srgb, var(--secondary) 40%, transparent)" : "var(--border)",
-        color: active ? "var(--secondary)" : "var(--muted-foreground)",
-      }}
-    >
-      {Icon && <Icon size={14} className="me-1.5" />}
-      {label}
-    </button>
-  );
-}
 
 function loadSavedZikrIds() {
   if (typeof window === "undefined") {
@@ -126,15 +46,9 @@ export function ReaderScreen({
   idx,
   isArabic,
   isDone,
-  completedCount,
-  currentStreak,
-  showTransliteration,
-  showTranslation,
   onBack,
   onComplete,
   onAdvance,
-  onToggleTransliteration,
-  onToggleTranslation,
   onNext,
   onPrev,
 }: {
@@ -142,36 +56,24 @@ export function ReaderScreen({
   idx: number;
   isArabic: boolean;
   isDone: boolean;
-  completedCount: number;
-  currentStreak: number;
-  showTransliteration: boolean;
-  showTranslation: boolean;
   onBack: () => void;
   onComplete: (idx: number) => void;
   onAdvance: (idx: number) => void;
-  onToggleTransliteration: () => void;
-  onToggleTranslation: () => void;
   onNext: () => void;
   onPrev: () => void;
 }) {
   const azkar = getAzkarByCategory(catId);
   const z = azkar[idx];
-  const nextZikr = idx < azkar.length - 1 ? azkar[idx + 1] : null;
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
 
   const [benefitOpen, setBenefitOpen] = useState(false);
-  const [listenMode, setListenMode] = useState(false);
-  const [playing, setPlaying] = useState(false);
-  const [autoPlayNext, setAutoPlayNext] = useState(true);
-  const [audioProgress, setAudioProgress] = useState(0);
-  const [muted, setMuted] = useState(false);
-  const [speed, setSpeed] = useState<0.75 | 1 | 1.25>(1);
   const [count, setCount] = useState(0);
   const [pulse, setPulse] = useState(0);
   const [complete, setComplete] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
+  const [readerMenuOpen, setReaderMenuOpen] = useState(false);
 
   const touchStartX = useRef<number | null>(null);
   const suppressTap = useRef(false);
@@ -180,41 +82,10 @@ export function ReaderScreen({
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
-    if (playing && !muted) {
-      interval = setInterval(() => {
-        setAudioProgress((p) => {
-          if (p >= 100) {
-            setPlaying(false);
-            if (autoPlayNext) {
-              onAdvance(idx);
-            }
-            return 0;
-          }
-          // Assuming each zikr audio takes approx 4 seconds on 1x speed
-          return p + speed * 1.25;
-        });
-      }, 50);
-    }
-    return () => clearInterval(interval);
-  }, [playing, muted, speed, autoPlayNext, idx, onAdvance]);
-
-  // Reset progress when zikr changes
-  useEffect(() => {
-    setAudioProgress(0);
-    if (listenMode && autoPlayNext) {
-      setPlaying(true);
-    } else {
-      setPlaying(false);
-    }
-  }, [autoPlayNext, idx, listenMode]);
-
-  useEffect(() => {
     const initialCount = isDone && z ? z.repetitionCount : 0;
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
     setBenefitOpen(false);
-    setListenMode(false);
     setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
   }, [idx, isDone, z]);
 
@@ -242,9 +113,6 @@ export function ReaderScreen({
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
-  const completedIncludingActive = completedCount + (!isDone && complete ? 1 : 0);
-  const progressPercent = azkar.length > 0 ? Math.round((completedIncludingActive / azkar.length) * 100) : 0;
-  const nextExcerpt = nextZikr?.arabicText.slice(0, 42).trim();
   const prevDisabled = idx === 0;
   const nextDisabled = idx === azkar.length - 1;
 
@@ -266,7 +134,7 @@ export function ReaderScreen({
   };
 
   const handleTap = () => {
-    if (listenMode || complete) {
+    if (complete) {
       return;
     }
 
@@ -305,17 +173,6 @@ export function ReaderScreen({
     setCount(0);
     setComplete(false);
     setPulse((value) => value + 1);
-  };
-
-  const handleContinue = () => {
-    onAdvance(idx);
-  };
-
-  const cycleSpeed = () => {
-    const speeds: Array<0.75 | 1 | 1.25> = [0.75, 1, 1.25];
-    const currentIndex = speeds.indexOf(speed);
-    const nextIndex = (currentIndex + 1) % speeds.length;
-    setSpeed(speeds[nextIndex] ?? 1);
   };
 
   const handleToggleSaved = () => {
@@ -359,7 +216,9 @@ export function ReaderScreen({
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <span
-          className="inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold text-card-foreground"
+          className="latin-ui inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold text-card-foreground"
+          lang="en"
+          dir="ltr"
           style={{
             background: "color-mix(in srgb, var(--secondary) 12%, transparent)",
             borderColor: "color-mix(in srgb, var(--secondary) 34%, transparent)",
@@ -380,7 +239,9 @@ export function ReaderScreen({
 
       <section className="rounded-[22px] border border-border bg-card/55 p-4">
         <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.benefit")}</p>
-        <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{z.benefit}</p>
+        <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
+          {z.benefit}
+        </p>
       </section>
 
       {z.preferredTiming && (
@@ -388,7 +249,9 @@ export function ReaderScreen({
           <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
             {t(language, "reader.timing")}
           </p>
-          <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{z.preferredTiming}</p>
+          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
+            {z.preferredTiming}
+          </p>
         </section>
       )}
 
@@ -397,14 +260,18 @@ export function ReaderScreen({
           <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
             {t(language, "reader.authenticity")}
           </p>
-          <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{authenticityNote}</p>
+          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
+            {authenticityNote}
+          </p>
         </section>
       )}
 
       {extraNotes && (
         <section className="rounded-[22px] border border-border bg-card/55 p-4">
           <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.notes")}</p>
-          <p className="mt-2 text-[15px] leading-[24px] text-card-foreground">{extraNotes}</p>
+          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
+            {extraNotes}
+          </p>
         </section>
       )}
 
@@ -414,10 +281,9 @@ export function ReaderScreen({
             {t(language, "reader.evidence")}
           </p>
           <p
-            className="mt-2 rounded-[18px] border border-border bg-background/65 px-4 py-4 text-[16px] leading-[30px] text-foreground"
+            className="zikr-text mt-2 rounded-[18px] border border-border bg-background/65 px-4 py-4 text-[16px] leading-[30px] text-foreground"
             dir="auto"
             lang="ar"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
           >
             {z.hadithText}
           </p>
@@ -446,7 +312,7 @@ export function ReaderScreen({
           void handleShare();
         }}
         aria-label={t(language, "reader.share")}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card/50 text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/50 text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <Share2 size={18} />
       </button>
@@ -458,7 +324,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="flex h-12 min-w-[154px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[14px] font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-12 min-w-[166px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[14px] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <BookOpen size={17} />
         {t(language, "reader.referencesButton")}
@@ -470,7 +336,7 @@ export function ReaderScreen({
         onClick={handleToggleSaved}
         aria-label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         aria-pressed={isSaved}
-        className="flex h-10 w-10 items-center justify-center rounded-full border border-border bg-card/50 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/50 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ color: isSaved ? "var(--primary)" : "var(--card-foreground)" }}
       >
         <Heart size={18} className={isSaved ? "fill-current" : ""} />
@@ -479,67 +345,22 @@ export function ReaderScreen({
   );
 
   const renderReadingContent = () => (
-    <div className="px-5 pb-8 pt-4 space-y-6">
-      <div className="mb-2 flex items-center justify-between gap-3">
-        <span className="text-[12px] font-semibold text-muted-foreground">
-          {t(language, "reader.count")}: {localizedDisplayCount}
-        </span>
-        <span className="text-[12px] font-semibold text-primary">
-          {formatNumerals(readingProgressValue, language)} / {formatNumerals(azkar.length, language)}
-        </span>
-      </div>
-
-      <p
-        className="text-center text-[24px] font-bold leading-[42px] text-foreground"
-        dir="rtl"
-        lang="ar"
-        style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-      >
+    <div className="px-6 pb-3 pt-3">
+      <p className="zikr-text text-center text-[24px] font-medium leading-[36px] text-foreground" dir="rtl" lang="ar">
         {z.arabicText}
       </p>
-
-      <div className="flex justify-center gap-3 pt-2">
-        <TogglePill
-          active={showTranslation}
-          label="EN"
-          icon={Languages}
-          onClick={onToggleTranslation}
-          ariaLabel={t(language, "reader.toggleTranslation")}
-        />
-        <TogglePill
-          active={showTransliteration}
-          label="TR"
-          icon={Type}
-          onClick={onToggleTransliteration}
-          ariaLabel={t(language, "reader.toggleTransliteration")}
-        />
-        <TogglePill
-          active={listenMode}
-          label="Listen"
-          icon={Volume2}
-          onClick={() => setListenMode((value) => !value)}
-          ariaLabel={t(language, "reader.listenModeToggle")}
-        />
-      </div>
-
-      {showTranslation && (
-        <p className="text-center text-[16px] leading-[28px] text-card-foreground">{z.translation}</p>
-      )}
-
-      {showTransliteration && (
-        <p className="text-center text-[15px] italic leading-[26px] text-card-foreground">{z.transliteration}</p>
-      )}
     </div>
   );
 
   const renderCounterPanel = () => (
-    <div className="border-t border-border/70 px-3 pb-3 pt-2.5">
-      <div className="flex h-full flex-col">
+    <div className="flex min-h-[470px] flex-1 flex-col px-5 pb-5" data-testid="counter-panel">
+      <div className="flex min-h-0 flex-1 flex-col">
         <div
           role="button"
+          data-testid="counter-surface"
           tabIndex={0}
           aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className="flex flex-1 flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
+          className="flex min-h-[280px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
           onClick={handleSurfaceTap}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
@@ -548,12 +369,12 @@ export function ReaderScreen({
             }
           }}
         >
-          <div className="pointer-events-none relative flex h-[138px] w-[138px] items-center justify-center">
-            <PulseRings trigger={pulse} size={138} />
-            <CounterRing count={count} total={z.repetitionCount} size={138} />
+          <div className="pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center">
+            <PulseRings trigger={pulse} size={184} />
+            <CounterRing count={count} total={z.repetitionCount} size={184} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <p
-                className="text-[42px] font-extrabold leading-[42px] text-primary"
+                className="text-[28px] font-extrabold leading-9 text-foreground"
                 dir="ltr"
                 style={{
                   fontFamily: counterNumeralFontFamily(language),
@@ -563,7 +384,7 @@ export function ReaderScreen({
                 {localizedCount}
               </p>
               <p
-                className="mt-1.5 text-[15px] font-semibold text-card-foreground"
+                className="text-[14px] text-foreground"
                 dir="ltr"
                 style={{
                   fontFamily: counterNumeralFontFamily(language),
@@ -575,9 +396,9 @@ export function ReaderScreen({
             </div>
           </div>
 
-          <p className="mt-2 text-[15px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+          <p className="mt-5 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           {remaining > 0 ? (
-            <p className="mt-1 text-[13px] font-semibold text-primary">
+            <p className="mt-2 text-[14px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
             </p>
           ) : (
@@ -585,78 +406,7 @@ export function ReaderScreen({
           )}
         </div>
 
-        <div className="mt-2.5">{renderCounterActions()}</div>
-
-        <button
-          type="button"
-          onClick={handleReset}
-          aria-label={t(language, "reader.resetCounter")}
-          className="mx-auto mt-2 inline-flex items-center gap-2 rounded-full border border-border bg-card px-3.5 py-1.5 text-[12px] font-semibold text-card-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <RotateCcw size={14} />
-          <span>{t(language, "reader.resetCounter")}</span>
-        </button>
-      </div>
-    </div>
-  );
-
-  const renderListeningPanel = () => (
-    <div className="border-t border-border/70 px-4 pb-4 pt-3">
-      <div className="flex h-full flex-col justify-between rounded-[24px] border border-secondary/20 bg-secondary/5 px-4 py-3">
-        <div className="flex items-center justify-between mt-1 px-2">
-          <p className="text-[15px] font-bold text-secondary">{t(language, "reader.listenMode")}</p>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <span className="text-[12px] font-semibold text-secondary">Auto-Play</span>
-            <input
-              type="checkbox"
-              checked={autoPlayNext}
-              onChange={(e) => setAutoPlayNext(e.target.checked)}
-              className="h-4 w-4 rounded-sm border-secondary text-secondary focus:ring-secondary/50"
-            />
-          </label>
-        </div>
-
-        <div className="flex flex-1 flex-col items-center justify-center">
-          <button
-            type="button"
-            onClick={() => setPlaying((value) => !value)}
-            aria-label={playing ? "Pause" : "Play"}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-secondary/15 text-secondary shadow-[0_0_24px_rgba(45,212,191,0.15)] transition-transform hover:scale-105 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            {playing ? <Pause size={28} /> : <Play size={28} className="ms-1.5" />}
-          </button>
-
-          <div className="mt-6 flex w-full max-w-[280px] items-center gap-4">
-            <WaveformBars active={playing && !muted} />
-            <div className="h-[4px] flex-1 rounded-full bg-secondary/20 overflow-hidden" aria-hidden="true">
-              <div
-                className="h-full rounded-full bg-secondary"
-                style={{ width: `${audioProgress}%`, transition: "width 50ms linear" }}
-              />
-            </div>
-          </div>
-
-          <div className="mt-5 flex items-center justify-center gap-4">
-            <button
-              type="button"
-              onClick={cycleSpeed}
-              aria-label={t(language, "reader.audioSpeed")}
-              className="min-w-[48px] rounded-full border border-border bg-background/50 px-3 py-1.5 text-[13px] font-semibold text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {speed}x
-            </button>
-            <button
-              type="button"
-              onClick={() => setMuted((value) => !value)}
-              aria-label={muted ? "Unmute audio" : "Mute audio"}
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-background/50 border border-border text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {muted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-            </button>
-          </div>
-        </div>
-
-        <div className="mt-2">{renderCounterActions()}</div>
+        <div className="mt-5">{renderCounterActions()}</div>
       </div>
     </div>
   );
@@ -664,6 +414,7 @@ export function ReaderScreen({
   return (
     <div
       className="relative flex h-full flex-col bg-background"
+      dir={isArabic ? "rtl" : "ltr"}
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) {
@@ -700,75 +451,89 @@ export function ReaderScreen({
         {shareMessage}
       </div>
 
-      <div className="shrink-0 border-b border-border/70 px-4 py-3">
-        <div className="grid grid-cols-[44px_1fr_auto] items-center gap-3">
+      <div className="relative shrink-0 px-5 py-3">
+        <div className="grid grid-cols-[68px_1fr_68px] items-center gap-2" dir="ltr">
           <button
             onClick={onBack}
             aria-label="Go back"
-            className="flex h-11 w-11 items-center justify-center rounded-full text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronLeft size={22} className="rtl:-scale-x-100" />
+            <RotateCcw size={18} />
           </button>
 
-          <p className="truncate text-center text-[18px] font-bold text-foreground">
-            {isArabic ? category.nameArabic : category.name}
+          <p className="truncate text-center text-[20px] font-bold text-foreground" dir="auto">
+            {category.nameArabic}
           </p>
 
-          <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => setReaderMenuOpen((value) => !value)}
+            aria-label="Reader menu"
+            aria-expanded={readerMenuOpen}
+            className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Menu size={18} />
+          </button>
+        </div>
+
+        {readerMenuOpen && (
+          <div
+            className="absolute right-5 top-[62px] z-20 grid min-w-[170px] gap-1 rounded-2xl border border-border bg-card p-2 shadow-xl"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
             <button
               type="button"
-              onClick={onPrev}
+              onClick={() => {
+                onPrev();
+                setReaderMenuOpen(false);
+              }}
               disabled={prevDisabled}
-              aria-label={t(language, "reader.prev")}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted disabled:opacity-40"
             >
-              <ChevronLeft size={20} className="rtl:-scale-x-100" />
+              {t(language, "reader.prev")}
             </button>
             <button
               type="button"
-              onClick={onNext}
+              onClick={() => {
+                onNext();
+                setReaderMenuOpen(false);
+              }}
               disabled={nextDisabled}
-              aria-label={t(language, "reader.next")}
-              className="flex h-11 w-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted active:bg-muted disabled:opacity-35 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted disabled:opacity-40"
             >
-              <ChevronRight size={20} className="rtl:-scale-x-100" />
+              {t(language, "reader.next")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                handleReset();
+                setReaderMenuOpen(false);
+              }}
+              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted"
+            >
+              {t(language, "reader.resetCounter")}
             </button>
           </div>
-        </div>
+        )}
       </div>
 
-      <div className="shrink-0 border-b border-border/70 px-4 py-3">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-[13px] font-medium text-muted-foreground">
-            {t(language, "reader.progressSummary", {
-              done: formatNumerals(readingProgressValue, language),
-              total: formatNumerals(azkar.length, language),
-            })}
-          </p>
-        </div>
-        <div className="mt-2.5">
-          <ProgressBar
-            value={readingProgressValue}
-            max={azkar.length}
-            height={3}
-            trackColor="color-mix(in srgb, var(--muted) 78%, var(--card))"
-            fillColor="var(--primary)"
-            aria-label={t(language, "reader.groupProgress")}
-          />
-        </div>
+      <div className="shrink-0 px-5 pb-3 pt-2">
+        <ProgressBar
+          value={readingProgressValue}
+          max={azkar.length}
+          height={4}
+          trackColor="var(--card)"
+          fillColor="var(--primary)"
+          aria-label={t(language, "reader.groupProgress")}
+        />
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div
-          className="grid min-h-0 flex-1"
-          style={{
-            gridTemplateRows: "minmax(0, 1fr) 35vh",
-          }}
-        >
-          <ScrollArea className="zikr-scroll min-h-0">{renderReadingContent()}</ScrollArea>
-          {listenMode ? renderListeningPanel() : renderCounterPanel()}
+      <ScrollArea className="zikr-scroll min-h-0 flex-1">
+        <div className="flex min-h-full flex-col">
+          {renderReadingContent()}
+          {renderCounterPanel()}
         </div>
-      </div>
+      </ScrollArea>
 
       {benefitOpen && (
         <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
@@ -780,29 +545,31 @@ export function ReaderScreen({
           />
           <section
             role="dialog"
+            data-testid="reference-sheet"
             aria-modal="true"
             aria-label={t(language, "reader.referencesButton")}
-            className="fade-in relative max-h-[82dvh] w-full max-w-[390px] overflow-y-auto rounded-t-[20px] bg-background px-6 pb-6 pt-3 shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
+            className="reference-sheet fade-in relative w-full max-w-[390px] overflow-y-auto overscroll-contain rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
+            dir={isArabic ? "rtl" : "ltr"}
           >
-            <div className="relative flex min-h-11 items-center justify-center">
+            <div className="sticky top-0 z-10 flex h-16 items-end justify-center bg-background px-6 pb-3">
               <span className="h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
               <button
                 type="button"
                 onClick={() => setBenefitOpen(false)}
                 aria-label="Close reference"
-                className="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground"
+                className="absolute end-3 top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground"
               >
                 <X size={18} />
               </button>
             </div>
             <p
-              className="mt-2 rounded-xl bg-muted px-3 py-4 text-center text-[18px] leading-7 text-muted-foreground"
+              className="zikr-text mx-[clamp(1rem,6vw,1.5rem)] rounded-xl bg-muted px-3 py-4 text-center text-[18px] leading-7 text-muted-foreground"
               dir="rtl"
               lang="ar"
             >
               {z.arabicText}
             </p>
-            <div className="mt-4">{renderReferenceContent()}</div>
+            <div className="mx-[clamp(1rem,6vw,1.5rem)] mt-4">{renderReferenceContent()}</div>
           </section>
         </div>
       )}

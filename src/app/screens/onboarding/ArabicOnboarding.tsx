@@ -60,7 +60,7 @@ export function ArFeatureRow({ text, colorClass }: { text: string; colorClass: s
     <div className="flex items-center gap-3 w-full justify-end" dir="rtl">
       <p
         className="text-[14px] text-foreground leading-[22px] whitespace-nowrap"
-        style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+        style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
         dir="auto"
       >
         {text}
@@ -133,7 +133,7 @@ export function ArOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; on
         <div className="absolute flex flex-col items-center gap-1 whitespace-nowrap bottom-[24px] left-1/2 -translate-x-1/2">
           <p
             className="text-[44px] font-extrabold text-foreground leading-normal tracking-[-0.88px]"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
             dir="auto"
           >
             أذكار
@@ -151,7 +151,7 @@ export function ArOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; on
           <div className="flex flex-col gap-3 items-center text-center" dir="rtl">
             <p
               className="text-[28px] font-bold text-foreground whitespace-nowrap leading-[40px]"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               ذكرك الإسلامي اليومي
@@ -159,7 +159,7 @@ export function ArOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; on
             <div
               dir="auto"
               className="text-[14px] text-muted-foreground leading-[22px] text-center"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
             >
               <p>أذكار الصباح · المساء · قبل النوم</p>
               <p>أذكار موثقة من حصن المسلم</p>
@@ -177,7 +177,7 @@ export function ArOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; on
           <button
             onClick={onNext}
             className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95 h-[52px] bg-primary text-[17px] font-semibold text-primary-foreground"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
             dir="auto"
           >
             ابدأ الآن
@@ -185,7 +185,7 @@ export function ArOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; on
           <button onClick={onSkip}>
             <p
               className="text-[14px] font-semibold text-muted-foreground text-center w-full leading-[22px]"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               تخطي
@@ -256,20 +256,20 @@ export function ArOnboarding2Screen({ onNext, onBack }: { onNext: () => void; on
         <div className="absolute flex flex-col items-center gap-0.5 whitespace-nowrap left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
           <p
             className="text-[9px] font-bold text-primary opacity-80 leading-[13px] tracking-[0.72px]"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
             dir="auto"
           >
             انقر للعد
           </p>
           <p
             className="text-[56px] font-extrabold text-foreground leading-normal"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
           >
             ٧
           </p>
           <p
             className="text-[14px] font-semibold text-primary leading-[22px]"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
             dir="auto"
           >
             من ٣٣
@@ -278,7 +278,7 @@ export function ArOnboarding2Screen({ onNext, onBack }: { onNext: () => void; on
 
         <p
           className="absolute right-[48px] top-1/2 text-[20px] font-bold text-[#24A08A] leading-normal"
-          style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+          style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
           dir="auto"
         >
           +١
@@ -292,14 +292,14 @@ export function ArOnboarding2Screen({ onNext, onBack }: { onNext: () => void; on
           <div className="flex flex-col gap-3 items-center text-center">
             <p
               className="text-[28px] font-bold text-foreground leading-[40px] whitespace-nowrap"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               عدّ كل ذكر
             </p>
             <p
               className="text-[14px] text-muted-foreground leading-[22px] text-center"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               انقر في أي مكان على الشاشة — كامل الشاشة هو عدادك. اهتزاز خفيف مع كل نقرة.
@@ -317,7 +317,7 @@ export function ArOnboarding2Screen({ onNext, onBack }: { onNext: () => void; on
           <button
             onClick={onNext}
             className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95 h-[52px] bg-primary text-[17px] font-semibold text-primary-foreground"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
             dir="auto"
           >
             التالي
@@ -325,7 +325,7 @@ export function ArOnboarding2Screen({ onNext, onBack }: { onNext: () => void; on
           <button onClick={onBack}>
             <p
               className="text-[14px] font-semibold text-muted-foreground leading-[22px] text-center w-full"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               رجوع
@@ -394,9 +394,8 @@ export function ArOnboarding3Screen({ onNext, onBack }: { onNext: () => void; on
           <div className="flex items-center justify-center rounded-sm shrink-0 w-[80px] h-[110px] bg-card border border-border origin-bottom -rotate-5" />
           <div className="flex items-center justify-center rounded-sm px-2 shrink-0 w-[80px] h-[110px] bg-card border border-border origin-bottom rotate-5">
             <p
-              className="text-center text-[14px] font-bold text-foreground leading-[22px] w-[60px]"
-              dir="auto"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              className="zikr-text w-[60px] text-center text-[14px] font-bold leading-[22px] text-foreground"
+              dir="rtl"
             >
               اللَّهُمَّ إِنِّي أَسْأَلُكَ
             </p>
@@ -406,7 +405,7 @@ export function ArOnboarding3Screen({ onNext, onBack }: { onNext: () => void; on
         <div className="absolute flex items-center px-3 py-1 rounded-full left-[20px] top-[258px] bg-[#24A08A] bg-opacity-20 border border-[#24A08A]">
           <p
             className="text-[10px] font-medium text-[#24A08A] leading-[14px] whitespace-nowrap"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
             dir="auto"
           >
             حصن المسلم · موثق
@@ -421,14 +420,14 @@ export function ArOnboarding3Screen({ onNext, onBack }: { onNext: () => void; on
           <div className="flex flex-col gap-3 items-center text-center">
             <p
               className="text-[28px] font-bold text-foreground leading-[40px] whitespace-nowrap"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               اعرف فضل كل ذكر
             </p>
             <p
               className="text-[14px] text-muted-foreground leading-[22px] text-center"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+              style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
               dir="auto"
             >
               فضل كل ذكر مذكور من الحديث النبوي الشريف. افهم لماذا تقرأ هذا الذكر.
@@ -446,14 +445,14 @@ export function ArOnboarding3Screen({ onNext, onBack }: { onNext: () => void; on
           <button
             onClick={onNext}
             className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95 h-[52px] bg-primary text-[17px] font-semibold text-primary-foreground"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
             dir="auto"
           >
             ابدأ رحلتك
           </button>
           <p
             className="text-[14px] text-muted-foreground leading-[22px] text-center"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', sans-serif" }}
             dir="auto"
           >
             لديك حساب بالفعل؟ <span className="text-primary font-semibold">تسجيل الدخول</span>

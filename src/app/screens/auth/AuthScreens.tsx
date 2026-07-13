@@ -126,7 +126,7 @@ export function LoginScreen({
 
         <div className="flex-1" />
 
-        <p className="text-center text-[11px] text-muted-foreground font-sans leading-[16px]">
+        <p className="latin-ui text-center text-[11px] leading-[16px] text-muted-foreground" lang="en" dir="ltr">
           By continuing you agree to our <span className="text-primary underline underline-offset-2">Terms</span> &{" "}
           <span className="text-primary underline underline-offset-2">Privacy Policy</span>
         </p>
@@ -244,7 +244,7 @@ export function PhoneInputScreen({
         >
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
-        <p className="text-center text-[10px] text-muted-foreground font-sans leading-[14px]">
+        <p className="latin-ui text-center text-[10px] leading-[14px] text-muted-foreground" lang="en" dir="ltr">
           By continuing you agree to our{" "}
           <span className="text-primary underline underline-offset-2">Terms of Service</span>
           {" and "}

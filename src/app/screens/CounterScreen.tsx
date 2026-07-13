@@ -163,10 +163,7 @@ export function CounterScreen({
 
       <div className="shrink-0 px-6 pb-4">
         <div className="rounded-2xl border border-border bg-card px-4 py-4">
-          <p
-            className="text-center text-[18px] leading-[32px] text-foreground"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif", direction: "rtl" }}
-          >
+          <p className="zikr-text text-center text-[18px] leading-[32px] text-foreground" style={{ direction: "rtl" }}>
             {z.arabicText}
           </p>
           {showTransliteration && (

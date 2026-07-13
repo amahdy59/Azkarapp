@@ -95,7 +95,7 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
         <div className="absolute flex flex-col items-center gap-1.5 whitespace-nowrap top-[calc(50%+70px)] left-1/2 -translate-x-1/2">
           <p
             className="text-[44px] font-extrabold text-foreground leading-[48px]"
-            style={{ fontFamily: "'Noto Naskh Arabic', 'Inter', sans-serif" }}
+            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
             dir="auto"
           >
             {"\u0623\u0630\u0643\u0627\u0631"}
@@ -267,22 +267,14 @@ export function EnglishOnboarding3Screen({ onNext, onBack }: { onNext: () => voi
 
         <div className="relative flex items-center justify-center w-[232px] h-[168px]">
           <div className="absolute flex items-center justify-center rounded-xl w-[110px] h-[168px] bg-card border border-primary -rotate-3 left-1">
-            <p
-              className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]"
-              dir="rtl"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-            >
+            <p className="zikr-text px-4 text-center text-[15px] font-bold leading-[28px] text-foreground" dir="rtl">
               {
                 "\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"
               }
             </p>
           </div>
           <div className="absolute flex items-center justify-center rounded-xl w-[110px] h-[168px] bg-card border border-primary rotate-3 right-1">
-            <p
-              className="text-center px-4 text-[15px] font-bold text-foreground leading-[28px]"
-              dir="rtl"
-              style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-            >
+            <p className="zikr-text px-4 text-center text-[15px] font-bold leading-[28px] text-foreground" dir="rtl">
               {
                 "\u0627\u0644\u0644\u064e\u0651\u0647\u064f\u0645\u064e\u0651 \u0625\u0650\u0646\u0650\u0651\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e"
               }

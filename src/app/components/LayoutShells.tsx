@@ -1,5 +1,5 @@
 import React from "react";
-import { BookOpen, ChevronLeft, Home, Settings } from "lucide-react";
+import { BatteryFull, BookOpen, ChevronLeft, Home, Settings, Signal, Wifi } from "lucide-react";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -34,6 +34,19 @@ export function Header({
   );
 }
 
+export function StatusBar() {
+  return (
+    <div className="flex h-11 shrink-0 items-center justify-between px-6 text-foreground" dir="ltr" aria-hidden="true">
+      <span className="font-sans text-[14px] font-semibold leading-5">9:41</span>
+      <div className="flex items-center gap-2">
+        <Signal size={17} strokeWidth={2.5} />
+        <Wifi size={17} strokeWidth={2.5} />
+        <BatteryFull size={22} strokeWidth={2} />
+      </div>
+    </div>
+  );
+}
+
 export function BottomNav({
   active,
   onChange,
@@ -52,28 +65,34 @@ export function BottomNav({
   return (
     <nav
       aria-label="Bottom Navigation"
-      className="flex shrink-0 border-t border-border bg-background h-[83px] pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+      className="flex h-[83px] shrink-0 flex-col border-t border-border bg-card"
+      dir="ltr"
     >
-      {tabs.map(({ id, label, Icon }) => {
-        const on = active === id;
-        return (
-          <button
-            key={id}
-            onClick={() => onChange(id)}
-            aria-label={label}
-            aria-current={on ? "page" : undefined}
-            className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
-          >
-            <Icon size={22} style={{ color: on ? "var(--nav-active)" : "var(--nav-inactive)" }} />
-            <span
-              className={`text-[12px] font-medium font-sans leading-[16px] ${on ? "text-primary" : "text-muted-foreground"}`}
+      <div className="flex min-h-0 flex-1 items-start justify-between px-8 pt-3">
+        {tabs.map(({ id, label, Icon }) => {
+          const on = active === id;
+          return (
+            <button
+              key={id}
+              onClick={() => onChange(id)}
+              aria-label={label}
+              aria-current={on ? "page" : undefined}
+              className="flex min-w-12 flex-col items-center justify-center gap-1 rounded-lg transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              {label}
-            </span>
-            {on && <div className="rounded-full w-1 h-1 bg-primary -mt-[2px]" />}
-          </button>
-        );
-      })}
+              <Icon size={24} style={{ color: on ? "var(--nav-active)" : "var(--nav-inactive)" }} />
+              <span
+                className={`font-sans text-[11px] font-semibold leading-[14px] ${on ? "text-primary" : "text-muted-foreground"}`}
+                dir="auto"
+              >
+                {label}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <div className="flex h-7 shrink-0 items-start justify-center pt-2">
+        <span className="h-[5px] w-[134px] rounded-full bg-foreground" aria-hidden="true" />
+      </div>
     </nav>
   );
 }

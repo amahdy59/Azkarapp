@@ -48,7 +48,7 @@ type View =
   // Phase 4
   | "search";
 
-import { BottomNav } from "./components/LayoutShells";
+import { BottomNav, StatusBar } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { LANGUAGE_LABELS } from "./languageOptions";
 
@@ -613,6 +613,7 @@ export default function App() {
   };
 
   const showBottomNav = ["home", "category", "settings"].includes(view);
+  const showStatusBar = ["home", "category", "reader", "completion", "settings", "search"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
@@ -621,7 +622,7 @@ export default function App() {
       <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
         <NetworkStatus />
 
-        {/* iOS status bar — hidden on splash/onboarding (they manage their own) */}
+        {showStatusBar && <StatusBar />}
         {/* Screen */}
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
           <Suspense fallback={<ScreenFallback />}>
@@ -764,15 +765,9 @@ export default function App() {
                 idx={activeIdx}
                 isArabic={isArabic}
                 isDone={completed[activeCat]?.has(activeIdx) ?? false}
-                completedCount={completed[activeCat]?.size ?? 0}
-                currentStreak={currentStreak}
-                showTransliteration={showTransliteration}
-                showTranslation={showTranslation}
                 onBack={pop}
                 onComplete={markComplete}
                 onAdvance={advanceAfterCompletion}
-                onToggleTransliteration={() => setShowTransliteration((value) => !value)}
-                onToggleTranslation={() => setShowTranslation((value) => !value)}
                 onNext={() => {
                   if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
                 }}

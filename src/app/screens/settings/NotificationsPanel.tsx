@@ -159,7 +159,9 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
               strokeLinejoin="round"
             />
           </svg>
-          <p className="font-sans text-[14px] text-white">Notification preferences are saved for your reminder flow.</p>
+          <p className="latin-ui text-[14px] text-white" lang="en" dir="ltr">
+            Notification preferences are saved for your reminder flow.
+          </p>
         </div>
 
         <SectionLabel label="Azkar Reminders" />
