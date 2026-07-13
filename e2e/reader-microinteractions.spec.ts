@@ -40,3 +40,42 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   expect(Date.now() - startedAt).toBeGreaterThanOrEqual(450);
   await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
 });
+
+test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 560 });
+  await openFirstMorningZikr(page);
+
+  const trigger = page.getByRole("button", { name: "References", exact: true });
+  await trigger.click();
+
+  const sheet = page.getByTestId("reference-sheet");
+  const close = sheet.getByRole("button", { name: "Close references", exact: true });
+  await expect(sheet).toBeVisible();
+  await expect(close).toBeFocused();
+  await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
+  await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toBeVisible();
+  await expect(sheet.getByRole("button", { name: "Copy translation", exact: true })).toBeVisible();
+  await expect(sheet.getByText("Recommended timing", { exact: true })).toHaveCount(0);
+  await expect(sheet.getByText("Authenticity", { exact: true })).toHaveCount(0);
+  await expect
+    .poll(() => sheet.evaluate((element) => Math.abs(window.innerHeight - element.getBoundingClientRect().bottom)))
+    .toBeLessThan(0.5);
+
+  const dimensions = await sheet.evaluate((element) => {
+    const bounds = element.getBoundingClientRect();
+    const viewport = element.querySelector<HTMLElement>('[data-slot="scroll-area-viewport"]');
+    return {
+      height: bounds.height,
+      bottom: bounds.bottom,
+      scrollHeight: viewport?.scrollHeight ?? 0,
+      clientHeight: viewport?.clientHeight ?? 0,
+    };
+  });
+  expect(dimensions.height).toBeLessThanOrEqual(548.5);
+  expect(dimensions.bottom).toBeLessThanOrEqual(560.5);
+  expect(dimensions.scrollHeight).toBeGreaterThan(dimensions.clientHeight);
+
+  await page.keyboard.press("Escape");
+  await expect(sheet).toBeHidden();
+  await expect(trigger).toBeFocused();
+});

@@ -781,24 +781,66 @@ body {
   pointer-events: none;
 }
 
-.zikr-scroll [data-slot="scroll-area-scrollbar"] {
-  width: 10px;
-  padding: 2px;
+.app-shell,
+.app-shell * {
+  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 58%, transparent) transparent;
+  scrollbar-width: thin;
 }
 
-.zikr-scroll [data-slot="scroll-area-thumb"] {
-  background: color-mix(in srgb, var(--primary) 82%, var(--card));
+.app-shell *::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.app-shell *::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.app-shell *::-webkit-scrollbar-thumb {
+  border: 1px solid transparent;
+  background: color-mix(in srgb, var(--muted-foreground) 58%, transparent);
+  background-clip: padding-box;
   border-radius: 9999px;
 }
 
+.app-shell *::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--primary) 76%, var(--muted-foreground));
+  background-clip: padding-box;
+}
+
+[data-slot="scroll-area-scrollbar"] {
+  padding: 2px;
+  opacity: 0.72;
+}
+
+[data-slot="scroll-area-thumb"] {
+  background: color-mix(in srgb, var(--muted-foreground) 58%, transparent);
+  border-radius: 9999px;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+
+[data-slot="scroll-area-scrollbar"]:hover [data-slot="scroll-area-thumb"] {
+  background: color-mix(in srgb, var(--primary) 76%, var(--muted-foreground));
+}
+
 .reference-sheet {
-  max-height: min(82dvh, 720px);
+  height: min(82dvh, 720px);
+  max-height: calc(100dvh - 12px);
+}
+
+.reference-sheet-content {
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+}
+
+.reference-scroll [data-slot="scroll-area-viewport"] {
+  overscroll-behavior: contain;
 }
 
 @media (max-height: 560px) {
   .reference-sheet {
-    max-height: calc(100dvh - 12px);
+    height: calc(100dvh - 12px);
   }
 }
 

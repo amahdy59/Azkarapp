@@ -67,11 +67,19 @@ Rules:
 ## Reference sheet contract
 
 - Width is fluid up to the 390 px app canvas.
-- Normal maximum height is the smaller of 82 dynamic-viewport-height units and 720 px.
-- At heights of 560 px or less, maximum height becomes `100dvh - 12px`.
-- Content scrolls inside the sheet with overscroll containment. The 64 px handle/close header is sticky so dismissal remains reachable.
-- Horizontal content margins use `clamp(16px, 6vw, 24px)`. Bottom padding includes the device safe-area inset.
-- The close action uses the logical `end` edge and a 44×44 px target, so it follows RTL correctly.
+- Normal height is the smaller of 82 dynamic-viewport-height units and 720 px, capped at `100dvh - 12px`.
+- At heights of 560 px or less, height becomes `100dvh - 12px`.
+- Content scrolls inside the sheet with overscroll containment. The 64 px handle/close header remains outside the scroll viewport so dismissal is always reachable.
+- The Figma hierarchy is fixed: muted Arabic zikr card, translation, divider, transliteration, optional hadith, then source badge. Do not reintroduce metadata cards, timing notes, authenticity cards, or duplicate count information here.
+- Sheet content uses 24 px horizontal padding and 16 px vertical section gaps. Bottom padding includes the device safe-area inset.
+- The close control stays at the physical top-right to match the approved component in every locale and has a 44×44 px target.
+- Copy actions use Untitled UI `Copy04`, expose localized accessible labels, and replace the icon briefly with a check after a successful copy.
+
+## Scrollbar contract
+
+- Every native app scroll region and every Radix scroll area uses the same thin, rounded, theme-aware scrollbar treatment.
+- Tracks are transparent. Thumbs use the semantic muted-foreground color at restrained opacity and shift toward the primary color on pointer hover.
+- Scrollbars must not introduce horizontal overflow or steal content width; touch scrolling remains the primary mobile interaction.
 
 ## Motion and microinteraction contract
 

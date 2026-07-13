@@ -34,6 +34,7 @@ export {
   Circle as CircleIcon,
   CloudOff,
   Contrast01 as Contrast,
+  Copy04 as Copy,
   DotsGrid as GripVerticalIcon,
   DotsHorizontal as MoreHorizontal,
   DotsHorizontal as MoreHorizontalIcon,

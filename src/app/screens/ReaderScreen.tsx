@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { ArrowPrevious, BookOpen, Check, ChevronUp, ExternalLink, Heart, Share2, Menu, X } from "../components/icons";
+import { ArrowPrevious, BookOpen, Check, ChevronUp, Copy, Heart, Share2, Menu, X } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -11,6 +11,7 @@ import { ScrollArea } from "../components/ui/scroll-area";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 export const COUNTER_ADVANCE_DELAY_MS = 500;
+type ReferenceCopyKey = "translation" | "transliteration" | "hadith";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -83,6 +84,7 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
   const [readerMenuOpen, setReaderMenuOpen] = useState(false);
+  const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
 
   const touchStartX = useRef<number | null>(null);
   const suppressTap = useRef(false);
@@ -90,6 +92,10 @@ export function ReaderScreen({
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const referenceSheetRef = useRef<HTMLElement>(null);
+  const referenceCloseButtonRef = useRef<HTMLButtonElement>(null);
+  const referenceTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!z || activeZikrId.current === z.id) {
@@ -123,19 +129,59 @@ export function ReaderScreen({
       if (tapSuppressTimer.current) {
         clearTimeout(tapSuppressTimer.current);
       }
+      if (copyFeedbackTimer.current) {
+        clearTimeout(copyFeedbackTimer.current);
+      }
     };
   }, []);
+
+  useEffect(() => {
+    if (!benefitOpen) {
+      return;
+    }
+
+    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const frame = requestAnimationFrame(() => referenceCloseButtonRef.current?.focus());
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setBenefitOpen(false);
+        return;
+      }
+
+      if (event.key === "Tab") {
+        const focusableElements = referenceSheetRef.current?.querySelectorAll<HTMLElement>(
+          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusableElements?.length) {
+          return;
+        }
+
+        const first = focusableElements.item(0);
+        const last = focusableElements.item(focusableElements.length - 1);
+        if (event.shiftKey && document.activeElement === first) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && document.activeElement === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("keydown", handleKeyDown);
+      previouslyFocused?.focus();
+    };
+  }, [benefitOpen]);
 
   if (!z || !category) {
     return null;
   }
 
-  const displayCount = z.countLabel ?? String(z.repetitionCount);
-  const extraNotes = z.notes && z.notes !== z.benefit ? z.notes : "";
-  const authenticityNote = z.authenticityNote && z.authenticityNote !== z.benefit ? z.authenticityNote : "";
   const remaining = Math.max(0, z.repetitionCount - count);
   const localizedCount = formatNumerals(count, language);
-  const localizedDisplayCount = formatNumerals(displayCount, language);
   const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
@@ -253,95 +299,95 @@ export function ReaderScreen({
     }
   };
 
+  const handleCopyReference = async (key: ReferenceCopyKey, value: string) => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopiedReference(key);
+      setShareMessage(t(language, "reader.referenceCopied"));
+      if (copyFeedbackTimer.current) {
+        clearTimeout(copyFeedbackTimer.current);
+      }
+      copyFeedbackTimer.current = setTimeout(() => {
+        setCopiedReference(null);
+        setShareMessage("");
+      }, 1600);
+    } catch {
+      setCopiedReference(null);
+    }
+  };
+
+  const renderCopyAction = (key: ReferenceCopyKey, value: string, label: string) => (
+    <div className="relative h-8 w-full" dir="ltr">
+      <button
+        type="button"
+        onClick={() => {
+          void handleCopyReference(key, value);
+        }}
+        aria-label={label}
+        className="absolute -top-1.5 -left-1.5 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
+          {copiedReference === key ? <Check size={16} /> : <Copy size={16} />}
+        </span>
+      </button>
+    </div>
+  );
+
   const renderReferenceContent = () => (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="reference-sheet-content flex flex-col gap-4 px-6" dir="ltr">
+      <div className="rounded-xl bg-muted px-2 py-4">
+        <p className="zikr-text text-center text-[18px] leading-7 text-muted-foreground" dir="rtl" lang="ar">
+          {z.arabicText}
+        </p>
+      </div>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
+          {t(language, "reader.translationLabel")}
+        </h2>
+        <p className="latin-ui text-left text-[18px] leading-[1.5] text-foreground" lang="en" dir="ltr">
+          {z.translation}
+        </p>
+        {renderCopyAction("translation", z.translation, t(language, "reader.copyTranslation"))}
+      </section>
+
+      <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
+          {t(language, "reader.transliterationLabel")}
+        </h2>
+        <p className="latin-ui text-left text-[18px] leading-[1.5] text-muted-foreground" lang="en" dir="ltr">
+          {z.transliteration}
+        </p>
+        {renderCopyAction("transliteration", z.transliteration, t(language, "reader.copyTransliteration"))}
+      </section>
+
+      {z.hadithText && (
+        <>
+          <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+          <section className="flex flex-col gap-3">
+            <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
+              {t(language, "reader.hadithLabel")}
+            </h2>
+            <p className="zikr-text text-right text-[18px] leading-[1.6] text-muted-foreground" lang="ar" dir="rtl">
+              {z.hadithText}
+            </p>
+            {renderCopyAction("hadith", z.hadithText, t(language, "reader.copyHadith"))}
+          </section>
+        </>
+      )}
+
+      <div className="flex justify-end">
         <span
-          className="latin-ui inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold text-card-foreground"
+          className="latin-ui max-w-full rounded-full bg-muted px-2.5 py-1.5 text-right text-[11px] font-semibold leading-4 text-muted-foreground"
           lang="en"
           dir="ltr"
-          style={{
-            background: "color-mix(in srgb, var(--secondary) 12%, transparent)",
-            borderColor: "color-mix(in srgb, var(--secondary) 34%, transparent)",
-          }}
+          title={z.sourceReference}
         >
           {z.sourceReference}
         </span>
-        <span
-          className="inline-flex rounded-full border px-3 py-1 text-[12px] font-semibold text-card-foreground"
-          style={{
-            background: "color-mix(in srgb, var(--primary) 10%, transparent)",
-            borderColor: "color-mix(in srgb, var(--primary) 28%, transparent)",
-          }}
-        >
-          {t(language, "reader.count")}: {localizedDisplayCount}
-        </span>
       </div>
-
-      <section className="rounded-[22px] border border-border bg-card/55 p-4">
-        <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.benefit")}</p>
-        <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
-          {z.benefit}
-        </p>
-      </section>
-
-      {z.preferredTiming && (
-        <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
-            {t(language, "reader.timing")}
-          </p>
-          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
-            {z.preferredTiming}
-          </p>
-        </section>
-      )}
-
-      {authenticityNote && (
-        <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
-            {t(language, "reader.authenticity")}
-          </p>
-          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
-            {authenticityNote}
-          </p>
-        </section>
-      )}
-
-      {extraNotes && (
-        <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">{t(language, "reader.notes")}</p>
-          <p className="latin-ui mt-2 text-start text-[15px] leading-[24px] text-card-foreground" lang="en" dir="ltr">
-            {extraNotes}
-          </p>
-        </section>
-      )}
-
-      {z.hadithText && (
-        <section className="rounded-[22px] border border-border bg-card/55 p-4">
-          <p className="text-[12px] font-bold tracking-[0.08em] text-muted-foreground">
-            {t(language, "reader.evidence")}
-          </p>
-          <p
-            className="zikr-text mt-2 rounded-[18px] border border-border bg-background/65 px-4 py-4 text-[16px] leading-[30px] text-foreground"
-            dir="auto"
-            lang="ar"
-          >
-            {z.hadithText}
-          </p>
-        </section>
-      )}
-
-      {z.sourceUrl && (
-        <a
-          href={z.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="inline-flex h-11 items-center gap-2 rounded-full border border-border px-4 text-[14px] font-semibold text-primary transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ExternalLink size={16} />
-          <span>{t(language, "reader.openSource")}</span>
-        </a>
-      )}
     </div>
   );
 
@@ -359,6 +405,7 @@ export function ReaderScreen({
       </button>
 
       <button
+        ref={referenceTriggerRef}
         type="button"
         onClick={(event) => {
           event.stopPropagation();
@@ -607,35 +654,32 @@ export function ReaderScreen({
             type="button"
             className="absolute inset-0 cursor-default"
             onClick={() => setBenefitOpen(false)}
-            aria-label="Close reference"
+            aria-label={t(language, "reader.closeReference")}
           />
           <section
+            ref={referenceSheetRef}
             role="dialog"
             data-testid="reference-sheet"
             aria-modal="true"
             aria-label={t(language, "reader.referencesButton")}
-            className="reference-sheet sheet-enter relative w-full max-w-[390px] overflow-y-auto overscroll-contain rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
-            dir={isArabic ? "rtl" : "ltr"}
+            className="reference-sheet sheet-enter relative flex w-full max-w-[390px] flex-col overflow-hidden rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
+            dir="ltr"
           >
-            <div className="sticky top-0 z-10 flex h-16 items-end justify-center bg-background px-6 pb-3">
+            <div className="relative z-10 flex h-16 shrink-0 items-end justify-center bg-background px-6 pb-3">
               <span className="h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
               <button
+                ref={referenceCloseButtonRef}
                 type="button"
                 onClick={() => setBenefitOpen(false)}
-                aria-label="Close reference"
-                className="absolute end-3 top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground"
+                aria-label={t(language, "reader.closeReference")}
+                className="absolute right-3 top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <X size={18} />
               </button>
             </div>
-            <p
-              className="zikr-text mx-[clamp(1rem,6vw,1.5rem)] rounded-xl bg-muted px-3 py-4 text-center text-[18px] leading-7 text-muted-foreground"
-              dir="rtl"
-              lang="ar"
-            >
-              {z.arabicText}
-            </p>
-            <div className="mx-[clamp(1rem,6vw,1.5rem)] mt-4">{renderReferenceContent()}</div>
+            <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain">
+              {renderReferenceContent()}
+            </ScrollArea>
           </section>
         </div>
       )}
