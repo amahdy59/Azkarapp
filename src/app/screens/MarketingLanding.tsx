@@ -1,4 +1,6 @@
-import { ArrowRight, BarChart3, Check, Headphones, MoonStar, Smartphone } from "lucide-react";
+import { BarChart3, Check, Headphones, MoonStar, Smartphone } from "../components/icons";
+
+import { ArrowNext } from "../components/icons";
 
 export default function MarketingLanding() {
   return (
@@ -29,7 +31,7 @@ export default function MarketingLanding() {
                 href="./"
                 className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-6 py-3 font-semibold text-primary-foreground"
               >
-                Start remembering <ArrowRight size={18} />
+                Start remembering <ArrowNext size={18} />
               </a>
               <a
                 href="#features"

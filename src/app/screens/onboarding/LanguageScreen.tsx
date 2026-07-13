@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Check } from "../../components/icons";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage } from "../../types";
 
@@ -52,17 +53,7 @@ export function LanguageScreen({
                 {lang.native}
               </p>
               <p className="text-[11px] text-muted-foreground font-sans uppercase">{lang.code}</p>
-              {active && (
-                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 text-primary">
-                  <path
-                    d="M4 10L8.5 14.5L16 7"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              )}
+              {active && <Check size={20} className="shrink-0 text-primary" />}
             </button>
           );
         })}

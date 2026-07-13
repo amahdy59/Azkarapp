@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ChevronRight, RotateCcw } from "lucide-react";
+import { Check, ChevronNext, RotateCcw } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -66,7 +66,7 @@ export function CategoryScreen({
               {done === 0
                 ? t(language, "category.startSession")
                 : t(language, "category.resumeZikr", { index: formatNumerals(resumeIdx + 1, language) })}
-              <ChevronRight size={18} className="rtl:-scale-x-100" />
+              <ChevronNext size={18} />
             </button>
           ) : (
             <div

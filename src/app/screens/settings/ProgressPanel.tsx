@@ -1,5 +1,6 @@
-import { CheckCircle2, ChevronLeft, ChevronRight, Flame } from "lucide-react";
+import { CheckCircle2, Flame } from "../../components/icons";
 import { useMemo, useState } from "react";
+import { ChevronNext, ChevronPrevious } from "../../components/icons";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import type { AppLanguage, CategoryId, StoredSession } from "../../types";
@@ -84,13 +85,13 @@ export function ProgressPanel({
             ))}
           </div>
           <div className="mt-4 flex items-center justify-between text-muted-foreground">
-            <ChevronLeft size={20} />
+            <ChevronPrevious size={20} />
             <span className="text-[13px] font-semibold">
               {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { month: "long", year: "numeric" }).format(
                 new Date(),
               )}
             </span>
-            <ChevronRight size={20} />
+            <ChevronNext size={20} />
           </div>
           <div
             className={`mt-4 grid gap-1.5 ${period === "week" ? "grid-cols-7" : "grid-cols-7"}`}

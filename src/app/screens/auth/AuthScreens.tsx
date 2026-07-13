@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { ArrowPrevious, ChevronDown, ChevronNext, Clock, Globe, Phone } from "../../components/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
@@ -89,15 +90,7 @@ export function LoginScreen({
           className={`w-full flex items-center gap-3 rounded-lg transition-all px-4 h-[56px] bg-card border border-border ${phoneAuthEnabled ? "opacity-100 cursor-pointer active:scale-95" : "opacity-50 cursor-not-allowed"}`}
         >
           <div className="flex items-center justify-center rounded-[18px] shrink-0 w-[36px] h-[36px] bg-secondary text-secondary-foreground">
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M14.6 11.3c0 .3-.1.5-.2.8-.1.3-.3.5-.5.8-.3.4-.6.8-1 1-.4.2-.8.4-1.2.4-1.1 0-2.4-.3-3.7-.9C6.8 12.8 5.8 12 4.8 11 3.9 10 3.1 9 2.5 7.8 1.9 6.7 1.6 5.6 1.6 4.5c0-.4.1-.9.3-1.3.2-.4.6-.7 1.1-1C3.5 1.6 4.1 1.4 4.7 1.4c.2 0 .4 0 .7.1.2.1.5.2.7.4l2.2 3.2c.2.3.3.5.4.7.1.2.1.4.1.5 0 .2-.1.5-.2.7-.1.2-.3.4-.5.6l-.5.6c-.1.1-.1.2-.1.3s0 .2.1.3c.2.3.5.7.8 1 .4.4.7.8 1.1 1.1.1.1.2.1.3.1.1 0 .2-.1.3-.1l.5-.5c.2-.2.4-.4.6-.5.2-.1.4-.1.6-.1.2 0 .4 0 .5.1.2.1.4.2.7.4l3.2 2.3c.3.2.4.4.4.6z"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                fill="none"
-                strokeLinecap="round"
-              />
-            </svg>
+            <Phone size={16} />
           </div>
           <div className="flex flex-col items-start flex-1 min-w-0">
             <p className="text-[15px] font-semibold text-foreground font-sans leading-[20px]">
@@ -107,9 +100,7 @@ export function LoginScreen({
               {t(language, "auth.otpSubtitle")}
             </p>
           </div>
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 text-primary">
-            <path d="M7.5 15L12.5 10L7.5 5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-          </svg>
+          <ChevronNext size={20} className="shrink-0 text-primary" />
         </button>
 
         <button
@@ -164,9 +155,7 @@ export function PhoneInputScreen({
             className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all"
             aria-label="Back"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-foreground rtl:-scale-x-100">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <ArrowPrevious size={24} className="text-foreground" />
           </button>
           <p className="text-[17px] font-semibold text-foreground font-sans">{t(language, "auth.signIn")}</p>
           <button onClick={onSkip} className="min-w-11 min-h-11 px-3 active:scale-95 transition-all">
@@ -196,9 +185,7 @@ export function PhoneInputScreen({
                 aria-haspopup="listbox"
               >
                 <span className="text-[14px] font-sans">🇸🇦 +966</span>
-                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-foreground">
-                  <path d="M3 4.5L6 7.5L9 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                </svg>
+                <ChevronDown size={12} className="text-foreground" />
               </button>
               <input
                 id="phone-number"
@@ -216,15 +203,7 @@ export function PhoneInputScreen({
           </div>
 
           <div className="flex items-center gap-2">
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-muted-foreground">
-              <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.4" />
-              <path
-                d="M7 3.5C5.3 4.2 4.5 5.5 4.5 7s.8 2.8 2.5 3.5M7 3.5C8.7 4.2 9.5 5.5 9.5 7s-.8 2.8-2.5 3.5M3.5 7h7M7 3.5v7"
-                stroke="currentColor"
-                strokeWidth="1.4"
-                strokeLinecap="round"
-              />
-            </svg>
+            <Globe size={14} className="text-muted-foreground" />
             <p className="text-[12px] text-muted-foreground font-sans">{t(language, "auth.countriesSupported")}</p>
           </div>
 
@@ -300,9 +279,7 @@ export function OTPScreen({
             className="flex items-center justify-center w-[44px] h-[44px] active:scale-95 transition-all"
             aria-label="Back"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="text-foreground rtl:-scale-x-100">
-              <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-            </svg>
+            <ArrowPrevious size={24} className="text-foreground" />
           </button>
           <p className="text-[17px] font-semibold text-foreground font-sans">{t(language, "auth.verifyNumber")}</p>
           <div className="w-[44px]" />
@@ -317,10 +294,7 @@ export function OTPScreen({
               </span>
             </p>
             <div className="flex items-center gap-1.5">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-primary">
-                <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.4" />
-                <path d="M7 4V7.5L9 9.5" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
+              <Clock size={14} className="text-primary" />
               <p className="text-[13px] text-primary font-sans leading-[20px]">
                 {t(language, "auth.codeExpiresIn")} {mins}:{secs}
               </p>

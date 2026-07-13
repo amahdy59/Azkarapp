@@ -4,15 +4,17 @@ import {
   BookOpen,
   Download,
   Flame,
+  Globe,
   HelpCircle,
   Info,
   Pause,
   Play,
   Settings,
+  TypeIcon,
   Volume2,
   Wifi,
   X,
-} from "lucide-react";
+} from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
@@ -142,35 +144,14 @@ export function SettingsRootPanel({
         </div>
         <SettingsRowItem
           iconBg="var(--muted)"
-          icon={
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="8" stroke="currentColor" className="text-foreground" strokeWidth="1.5" />
-              <path
-                d="M10 2C10 2 7 6 7 10s3 8 3 8M10 2c0 0 3 4 3 8s-3 8-3 8M2 10h16"
-                stroke="currentColor"
-                className="text-foreground"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          }
+          icon={<Globe size={20} className="text-foreground" />}
           label={t(language, "settings.language")}
           right={<RowValue value={languageLabel} />}
           onPress={() => onNav("language")}
         />
         <SettingsRowItem
           iconBg="var(--muted)"
-          icon={
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <path
-                d="M10 4v12M7 7h6M7 13h4"
-                stroke="currentColor"
-                className="text-foreground"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          }
+          icon={<TypeIcon size={20} className="text-foreground" />}
           label={t(language, "settings.textSize")}
           right={<RowValue value={formatTextSize(textSize)} />}
           onPress={() => onNav("accessibility")}

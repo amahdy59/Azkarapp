@@ -12,7 +12,7 @@ import {
   Volume2,
   Wifi,
   X,
-} from "lucide-react";
+} from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
@@ -192,16 +192,7 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
       <SubHeader title="Offline Downloads" onBack={onBack} />
       <div className="flex-1 overflow-y-auto pb-8">
         <div className="mx-4 mt-2 flex items-center gap-3 rounded-xl bg-[#1A4F44] px-4 py-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0 text-white">
-            <path
-              d="M12 16L7 11M12 16L17 11M12 16V4M5 20h14"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-            <circle cx="12" cy="12" r="11" stroke="currentColor" strokeWidth="1.5" />
-          </svg>
+          <Download size={24} className="shrink-0 text-white" />
           <p className="flex-1 font-sans text-[14px] leading-[22px] text-white">
             Download azkar for offline use and keep the reader available without internet.
           </p>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ChevronLeft, Search, X } from "lucide-react";
+import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
 import type { CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
@@ -58,7 +58,7 @@ export function SearchScreen({
           className="flex items-center justify-center w-11 h-11 shrink-0 active:scale-95 transition-all"
           aria-label="Back"
         >
-          <ChevronLeft size={24} className="text-foreground rtl:-scale-x-100" />
+          <ArrowPrevious size={24} className="text-foreground" />
         </button>
 
         <div className="flex items-center gap-3 flex-1 rounded-full px-4 h-12 bg-card border border-border">

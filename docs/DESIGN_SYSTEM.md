@@ -14,6 +14,7 @@ This is the implementation source of truth for visual and interaction decisions.
 | Font loading                | `src/styles/fonts.css`                                                      |
 | Shared shell/navigation     | `src/app/components/LayoutShells.tsx`                                       |
 | Reader implementation       | `src/app/screens/ReaderScreen.tsx`                                          |
+| Product icon library        | Untitled UI Icons via `src/app/components/icons.ts`                         |
 
 ## Typography contract
 
@@ -32,6 +33,16 @@ Rules:
 - English interface copy uses Inter. Arabic interface copy uses Noto Sans Arabic. The document `lang` and `dir` are set by `App.tsx` and screens may repeat `dir` at layout boundaries to make behavior explicit.
 - Mixed-direction controls must use logical CSS properties (`start`, `end`, `ms`, `me`) or a deliberately isolated `dir="ltr"` physical layout. Arabic text inside that layout gets its own `dir="rtl"` or `dir="auto"`.
 - Do not encode direction by reversing arrays. Keep semantic DOM/tab order stable and mirror only directional icons.
+
+## Iconography contract
+
+- Every product interface icon comes from the official `@untitledui/icons` package and is imported through `src/app/components/icons.ts`. Do not import another icon library directly or add a hand-drawn SVG for an interface action.
+- Use the Untitled line style at its native two-pixel stroke. Standard sizes are 16 px for compact metadata, 18-20 px for row actions, and 20-24 px for primary navigation. The containing interactive target remains at least 44 x 44 px.
+- Back navigation uses `ArrowPrevious`; forward navigation uses `ArrowNext`. Nested-row disclosure uses `ChevronNext`, while calendar/carousel previous and next actions use `ChevronPrevious` and `ChevronNext`.
+- Directional Previous/Next components carry Untitled's `data-rtl-flip` attribute and mirror through the global RTL rule. Do not add local `rtl:-scale-x-100` transforms to them.
+- `RotateCcw` is reserved for an actual reset or restart action. It must never represent returning to prior content.
+- Icons inside labeled buttons are decorative and remain hidden from assistive technology; the control supplies the accessible name. Icon-only controls require a localized `aria-label`.
+- Custom SVG is limited to non-icon artwork: the Azkar brand mark, third-party provider logos, decorative illustrations, device/status mockups, and data visualizations such as progress rings. These exceptions must never be substituted for an interactive Untitled icon.
 
 ## Reader contract
 

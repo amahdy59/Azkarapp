@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Check, ChevronUp, ExternalLink, Heart, RotateCcw, Share2, Menu, X } from "lucide-react";
+import { ArrowPrevious, BookOpen, Check, ChevronUp, ExternalLink, Heart, Share2, Menu, X } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -524,7 +524,7 @@ export function ReaderScreen({
             aria-label="Go back"
             className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <RotateCcw size={18} />
+            <ArrowPrevious size={20} />
           </button>
 
           <p className="truncate text-center text-[20px] font-bold text-foreground" dir="auto">

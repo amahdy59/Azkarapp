@@ -1,4 +1,4 @@
-import { AlertTriangle, CloudOff, Download, Search, VolumeX } from "lucide-react";
+import { AlertTriangle, CloudOff, Download, Search, VolumeX } from "./icons";
 
 export type AppStateKind =
   "empty-search" | "network-error" | "offline" | "audio-error" | "download-error" | "interrupted";

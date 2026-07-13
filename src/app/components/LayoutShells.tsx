@@ -1,5 +1,5 @@
 import React from "react";
-import { BatteryFull, BookOpen, ChevronLeft, Home, Settings, Signal, Wifi } from "lucide-react";
+import { ArrowPrevious, BatteryFull, BookOpen, Home, Settings, Signal, Wifi } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -22,7 +22,7 @@ export function Header({
           aria-label="Go back"
           className="flex items-center justify-center rounded-full transition-colors w-11 h-11 min-w-[44px] hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <ChevronLeft size={22} className="text-foreground rtl:-scale-x-100" />
+          <ArrowPrevious size={22} className="text-foreground" />
         </button>
       )}
       <div className="flex-1 min-w-0">

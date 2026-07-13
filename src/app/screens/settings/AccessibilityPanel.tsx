@@ -1,18 +1,22 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
+  AlignRight,
   Bell,
   BookOpen,
+  Contrast,
   Download,
   Flame,
   HelpCircle,
   Info,
+  Smartphone,
+  TypeIcon,
   Pause,
   Play,
   Settings,
   Volume2,
   Wifi,
   X,
-} from "lucide-react";
+} from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
@@ -138,12 +142,7 @@ export function AccessibilityPanel({
         <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="var(--primary)" strokeWidth="1.5" />
-                <path d="M9 2A7 7 0 0 1 9 16V2Z" fill="var(--primary)" />
-              </svg>
-            }
+            icon={<Contrast size={18} className="text-primary" />}
             label="High Contrast Mode"
             right={
               <RowToggle
@@ -156,17 +155,7 @@ export function AccessibilityPanel({
           />
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path
-                  d="M5 4H9C11 4 11 7 9 7H5V4ZM5 7H10C12 7 12 11 10 11H5V7Z"
-                  stroke="var(--primary)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
+            icon={<TypeIcon size={18} className="text-primary" />}
             label="Bold Text"
             right={<RowToggle checked={boldText} onChange={() => onBoldTextChange(!boldText)} label="Bold Text" />}
             onPress={() => onBoldTextChange(!boldText)}
@@ -190,17 +179,7 @@ export function AccessibilityPanel({
         <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path
-                  d="M6 14V4M6 4L3 7M6 4L9 7M12 14V4M12 4L9 7M12 4L15 7"
-                  stroke="var(--primary)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
+            icon={<Pause size={18} className="text-primary" />}
             label="Reduce Motion"
             right={
               <RowToggle
@@ -213,12 +192,7 @@ export function AccessibilityPanel({
           />
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <rect x="6" y="2" width="6" height="14" rx="1" stroke="var(--primary)" strokeWidth="1.5" />
-                <path d="M3 6V12M15 6V12" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            }
+            icon={<Smartphone size={18} className="text-primary" />}
             label="Haptic Feedback"
             right={
               <RowToggle
@@ -236,16 +210,7 @@ export function AccessibilityPanel({
         <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <path
-                  d="M15 5H6M15 9H9M15 13H6M3 5H3.01M3 9H3.01M3 13H3.01"
-                  stroke="var(--primary)"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-              </svg>
-            }
+            icon={<AlignRight size={18} className="text-primary" />}
             label="Right-to-Left Layout"
             right={
               <RowToggle checked={forceRtl} onChange={() => onForceRtlChange(!forceRtl)} label="Right-to-Left Layout" />
@@ -254,12 +219,7 @@ export function AccessibilityPanel({
           />
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                <circle cx="9" cy="9" r="7" stroke="var(--primary)" strokeWidth="1.5" />
-                <path d="M9 13V8M9 5H9.01" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round" />
-              </svg>
-            }
+            icon={<Info size={18} className="text-primary" />}
             label="Screen Reader Hints"
             right={
               <RowToggle

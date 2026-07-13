@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   BookOpen,
+  CheckCircle2,
   Download,
   Flame,
   HelpCircle,
@@ -9,10 +10,12 @@ import {
   Pause,
   Play,
   Settings,
+  Sparkles,
+  Sprout,
   Volume2,
   Wifi,
   X,
-} from "lucide-react";
+} from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
@@ -149,16 +152,7 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
       <SubHeader title="Notifications" onBack={onBack} />
       <div className="flex-1 overflow-y-auto pb-8">
         <div className="mx-4 mt-2 flex items-center gap-3 rounded-xl bg-[#1A4F44] px-4 py-3">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="shrink-0 text-white">
-            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.5" />
-            <path
-              d="M8 12.5L11 15.5L16 9.5"
-              stroke="currentColor"
-              strokeWidth="1.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <CheckCircle2 size={24} className="shrink-0 text-white" />
           <p className="latin-ui text-[14px] text-white" lang="en" dir="ltr">
             Notification preferences are saved for your reminder flow.
           </p>
@@ -191,17 +185,7 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
         <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary">
-                <path
-                  d="M9 1l2 5 5 .5-3.5 3.5 1 5L9 13l-4.5 2 1-5L2 6.5 7 6z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
+            icon={<Sparkles size={18} className="text-primary" />}
             label="Completion Celebration"
             right={
               <RowToggle
@@ -214,17 +198,7 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
           />
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary">
-                <path
-                  d="M3 14h12M4 10l3-3 3 3 4-4"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
+            icon={<Sprout size={18} className="text-primary" />}
             label="Daily Streak Reminder"
             right={
               <RowToggle checked={streak} onChange={() => setStreak((value) => !value)} label="Daily Streak Reminder" />
@@ -233,17 +207,7 @@ export function NotificationsPanel({ onBack }: { onBack: () => void }) {
           />
           <SettingsRowItem
             iconBg="var(--muted)"
-            icon={
-              <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary">
-                <path
-                  d="M4 9h2v4H4V9zm4-4h2v8H8V5zm4 2h2v6h-2V7z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            }
+            icon={<Volume2 size={18} className="text-primary" />}
             label="Notification Sound"
             right={<RowValue value={soundOptions[notificationSoundIndex] ?? "Gentle Chime"} withChevron={false} />}
             onPress={() => setNotificationSoundIndex((index) => (index + 1) % soundOptions.length)}

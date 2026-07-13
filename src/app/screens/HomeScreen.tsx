@@ -1,5 +1,6 @@
-import { ArrowLeft, ArrowRight, ChevronLeft, Leaf, Menu, Search, Sprout } from "lucide-react";
+import { ChevronLeft, Leaf, Menu, Search, Sprout } from "../components/icons";
 import beforeSleepScene from "../../assets/home/before-sleep-scene.png";
+import { ArrowNext } from "../components/icons";
 import eveningScene from "../../assets/home/evening-scene.png";
 import morningScene from "../../assets/home/morning-scene.png";
 import { CatIcon } from "../components/CatIcon";
@@ -109,7 +110,7 @@ export function HomeScreen({
             </p>
             <span className="mt-3 inline-flex items-center gap-1.5 text-[14px] font-bold text-primary">
               {isArabic ? "ابدأ الآن" : "Begin now"}
-              {isArabic ? <ArrowLeft size={17} aria-hidden="true" /> : <ArrowRight size={17} aria-hidden="true" />}
+              <ArrowNext size={17} aria-hidden="true" />
             </span>
           </div>
         </button>

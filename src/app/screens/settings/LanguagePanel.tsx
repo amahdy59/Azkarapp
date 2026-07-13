@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   Bell,
   BookOpen,
+  Check,
   Download,
   Flame,
   HelpCircle,
@@ -12,7 +13,7 @@ import {
   Volume2,
   Wifi,
   X,
-} from "lucide-react";
+} from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
@@ -116,17 +117,7 @@ export function LanguagePanel({
                     {LANGUAGE_LABELS[item.code as AppLanguage]}
                   </p>
                 </div>
-                {active && (
-                  <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="shrink-0 text-primary">
-                    <path
-                      d="M4 10L8.5 14.5L16 7"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                )}
+                {active && <Check size={20} className="shrink-0 text-primary" />}
               </button>
             );
           })}

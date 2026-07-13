@@ -321,6 +321,11 @@ body {
   --font-weight-normal: 500;
 }
 
+/* Untitled UI directional icons mirror from the nearest language direction. */
+[data-rtl-flip]:dir(rtl) {
+  transform: scaleX(-1);
+}
+
 .reduce-motion *,
 .reduce-motion *::before,
 .reduce-motion *::after {

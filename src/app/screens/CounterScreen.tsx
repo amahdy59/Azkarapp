@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ChevronLeft, RotateCcw, Check, SkipBack, SkipForward } from "lucide-react";
+import { ArrowPrevious, RotateCcw, Check, SkipBack, SkipForward } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -133,7 +133,7 @@ export function CounterScreen({
             aria-label="Go back"
             className="flex h-11 w-11 items-center justify-center rounded-full bg-card hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <ChevronLeft size={20} className="text-foreground rtl:-scale-x-100" />
+            <ArrowPrevious size={20} className="text-foreground" />
           </button>
 
           <div className="text-center">

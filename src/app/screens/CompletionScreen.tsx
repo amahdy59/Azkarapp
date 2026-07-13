@@ -1,4 +1,4 @@
-import { Check, Home, Share2, Sparkles } from "lucide-react";
+import { Check, Home, Share2, Sparkles } from "../components/icons";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
