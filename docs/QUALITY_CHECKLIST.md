@@ -16,7 +16,7 @@ Every pull request must pass `pnpm check` and `pnpm test:e2e`.
 | Secrets             | Runtime environment variables; `.env*` excluded except `.env.example`             |
 | Deployment          | The Pages workflow runs all non-browser quality gates before building             |
 
-Current per-file production budgets are 550 KiB JavaScript, 128 KiB CSS, and 1 MiB for another asset. The CSS ceiling increased from 120 KiB to 128 KiB in July 2026 after the required Midnight/Light/OLED semantic theme contract produced a measured 125.4 KB stylesheet; this leaves less than 6 KiB headroom. Reducing a budget is encouraged; any further increase requires measured justification in the pull request.
+Current per-file production budgets are 550 KiB JavaScript, 128 KiB CSS, and 1 MiB for another asset. The CSS ceiling increased from 120 KiB to 128 KiB in July 2026 after the required Midnight/Light/OLED semantic theme contract. The documented accessible motion system now produces a measured 128.5 KB stylesheet while keeping the existing ceiling unchanged; approximately 2.5 KB of headroom remains. Reducing a budget is encouraged; any further increase requires measured justification in the pull request.
 
 ## Architecture rules
 

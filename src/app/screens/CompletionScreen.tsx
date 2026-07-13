@@ -37,7 +37,7 @@ export function CompletionScreen({
 
   return (
     <div
-      className="flex h-full flex-col overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
+      className="completion-screen-enter flex h-full flex-col overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
       dir={isArabic ? "rtl" : "ltr"}
     >
       <p className="text-[13px] text-muted-foreground">
@@ -45,7 +45,7 @@ export function CompletionScreen({
       </p>
 
       <div
-        className="relative mx-auto mt-7 flex h-28 w-28 items-center justify-center rounded-full bg-primary"
+        className="celebration-glow celebration-pop relative mx-auto mt-7 flex h-28 w-28 items-center justify-center rounded-full bg-primary"
         aria-hidden="true"
       >
         <Check size={48} className="text-primary-foreground" strokeWidth={2} />
@@ -64,10 +64,11 @@ export function CompletionScreen({
       </p>
 
       <section className="mt-8 grid grid-cols-2 gap-3" aria-label="Session summary">
-        {stats.map(({ value, suffix, label }) => (
+        {stats.map(({ value, suffix, label }, index) => (
           <article
             key={label}
-            className="flex min-h-[94px] flex-col items-center justify-center rounded-2xl bg-card p-4"
+            className="summary-item-enter flex min-h-[94px] flex-col items-center justify-center rounded-2xl bg-card p-4"
+            style={{ animationDelay: `${180 + index * 55}ms` }}
           >
             <p className="text-[25px] font-extrabold text-primary" style={{ fontFamily: numeralFontFamily(language) }}>
               {formatNumerals(value, language)}
@@ -85,14 +86,14 @@ export function CompletionScreen({
         <button
           type="button"
           onClick={() => void share()}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground transition-transform duration-150 active:scale-[0.98]"
         >
           <Share2 size={18} /> {isArabic ? "مشاركة التقدم" : "Share progress"}
         </button>
         <button
           type="button"
           onClick={onHome}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground transition-transform duration-150 active:scale-[0.98]"
         >
           <Home size={18} /> {isArabic ? "العودة للرئيسية" : "Return home"}
         </button>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, ChevronUp, ExternalLink, Heart, RotateCcw, Share2, Menu, X } from "lucide-react";
+import { BookOpen, Check, ChevronUp, ExternalLink, Heart, RotateCcw, Share2, Menu, X } from "lucide-react";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -10,6 +10,13 @@ import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../format
 import { ScrollArea } from "../components/ui/scroll-area";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
+export const COUNTER_ADVANCE_DELAY_MS = 500;
+
+function vibrate(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate(pattern);
+  }
+}
 
 function loadSavedZikrIds() {
   if (typeof window === "undefined") {
@@ -71,28 +78,47 @@ export function ReaderScreen({
   const [count, setCount] = useState(0);
   const [pulse, setPulse] = useState(0);
   const [complete, setComplete] = useState(false);
+  const [justCompleted, setJustCompleted] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
+  const [readerAnnouncement, setReaderAnnouncement] = useState("");
   const [readerMenuOpen, setReaderMenuOpen] = useState(false);
 
   const touchStartX = useRef<number | null>(null);
   const suppressTap = useRef(false);
+  const activeZikrId = useRef<string | null>(null);
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    if (!z || activeZikrId.current === z.id) {
+      return;
+    }
+
+    activeZikrId.current = z.id;
+    if (advanceTimer.current) {
+      clearTimeout(advanceTimer.current);
+      advanceTimer.current = null;
+    }
     const initialCount = isDone && z ? z.repetitionCount : 0;
     setCount(initialCount);
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
+    setJustCompleted(false);
     setBenefitOpen(false);
+    setReaderAnnouncement(
+      initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.counterReady"),
+    );
     setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
-  }, [idx, isDone, z]);
+  }, [idx, isDone, language, z]);
 
   useEffect(() => {
     return () => {
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
+      }
+      if (advanceTimer.current) {
+        clearTimeout(advanceTimer.current);
       }
       if (tapSuppressTimer.current) {
         clearTimeout(tapSuppressTimer.current);
@@ -141,11 +167,24 @@ export function ReaderScreen({
     const next = count + 1;
     setCount(next);
     setPulse((value) => value + 1);
+    vibrate(8);
 
     if (next >= z.repetitionCount) {
       setComplete(true);
+      setJustCompleted(true);
+      setReaderAnnouncement(
+        t(language, "reader.completionAnnouncement", {
+          index: formatNumerals(idx + 1, language),
+          total: formatNumerals(azkar.length, language),
+          percent: formatNumerals(Math.round(((idx + 1) / azkar.length) * 100), language),
+        }),
+      );
+      vibrate([18, 40, 32]);
       onComplete(idx);
-      onAdvance(idx);
+      advanceTimer.current = setTimeout(() => {
+        setJustCompleted(false);
+        onAdvance(idx);
+      }, COUNTER_ADVANCE_DELAY_MS);
     }
   };
 
@@ -172,6 +211,8 @@ export function ReaderScreen({
   const handleReset = () => {
     setCount(0);
     setComplete(false);
+    setJustCompleted(false);
+    setReaderAnnouncement(t(language, "reader.counterReady"));
     setPulse((value) => value + 1);
   };
 
@@ -339,14 +380,19 @@ export function ReaderScreen({
         className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/50 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         style={{ color: isSaved ? "var(--primary)" : "var(--card-foreground)" }}
       >
-        <Heart size={18} className={isSaved ? "fill-current" : ""} />
+        <Heart key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
       </button>
     </div>
   );
 
   const renderReadingContent = () => (
     <div className="px-6 pb-3 pt-3">
-      <p className="zikr-text text-center text-[24px] font-medium leading-[36px] text-foreground" dir="rtl" lang="ar">
+      <p
+        className="zikr-text text-center text-[24px] font-medium leading-[36px] text-foreground"
+        data-testid="zikr-text"
+        dir="rtl"
+        lang="ar"
+      >
         {z.arabicText}
       </p>
     </div>
@@ -359,8 +405,9 @@ export function ReaderScreen({
           role="button"
           data-testid="counter-surface"
           tabIndex={0}
-          aria-label={`${t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className="flex min-h-[280px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring"
+          aria-disabled={complete}
+          aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
+          className={`flex min-h-[280px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
           onClick={handleSurfaceTap}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
@@ -369,41 +416,66 @@ export function ReaderScreen({
             }
           }}
         >
-          <div className="pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center">
+          <div
+            className={`counter-ring-stage pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+          >
             <PulseRings trigger={pulse} size={184} />
             <CounterRing count={count} total={z.repetitionCount} size={184} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-              <p
-                className="text-[28px] font-extrabold leading-9 text-foreground"
-                dir="ltr"
-                style={{
-                  fontFamily: counterNumeralFontFamily(language),
-                  fontVariantNumeric: "tabular-nums lining-nums",
-                }}
-              >
-                {localizedCount}
-              </p>
-              <p
-                className="text-[14px] text-foreground"
-                dir="ltr"
-                style={{
-                  fontFamily: counterNumeralFontFamily(language),
-                  fontVariantNumeric: "tabular-nums lining-nums",
-                }}
-              >
-                {localizedRatio}
-              </p>
+              {complete ? (
+                <div
+                  className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+                  data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+                >
+                  <span className="counter-check-mark">
+                    <Check size={42} strokeWidth={2.5} />
+                  </span>
+                  <span className="mt-2 text-[14px] font-bold text-primary">{t(language, "reader.complete")}</span>
+                </div>
+              ) : (
+                <>
+                  <p
+                    className="counter-number text-[28px] font-extrabold leading-9 text-foreground"
+                    key={count}
+                    dir="ltr"
+                    style={{
+                      fontFamily: counterNumeralFontFamily(language),
+                      fontVariantNumeric: "tabular-nums lining-nums",
+                    }}
+                  >
+                    {localizedCount}
+                  </p>
+                  <p
+                    className="text-[14px] text-foreground"
+                    dir="ltr"
+                    style={{
+                      fontFamily: counterNumeralFontFamily(language),
+                      fontVariantNumeric: "tabular-nums lining-nums",
+                    }}
+                  >
+                    {localizedRatio}
+                  </p>
+                </>
+              )}
             </div>
           </div>
 
-          <p className="mt-5 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
-          {remaining > 0 ? (
+          <p className={`mt-5 text-[18px] font-bold ${complete ? "text-primary" : "text-foreground"}`}>
+            {complete
+              ? t(language, "reader.completionContext", { count: localizedDisplayCount })
+              : count === 0
+                ? t(language, "reader.counterReady")
+                : t(language, "reader.tapAnywhere")}
+          </p>
+          {!complete && count === 0 ? (
+            <p className="counter-ready-prompt mt-2 text-[14px] text-muted-foreground">
+              {t(language, "reader.counterReadyPrompt")}
+            </p>
+          ) : remaining > 0 ? (
             <p className="mt-2 text-[14px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
             </p>
-          ) : (
-            <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "reader.completed")}</p>
-          )}
+          ) : null}
         </div>
 
         <div className="mt-5">{renderCounterActions()}</div>
@@ -450,6 +522,9 @@ export function ReaderScreen({
       <div className="sr-only" aria-live="polite">
         {shareMessage}
       </div>
+      <div className="sr-only" aria-live="assertive" aria-atomic="true">
+        {readerAnnouncement}
+      </div>
 
       <div className="relative shrink-0 px-5 py-3">
         <div className="grid grid-cols-[68px_1fr_68px] items-center gap-2" dir="ltr">
@@ -478,7 +553,7 @@ export function ReaderScreen({
 
         {readerMenuOpen && (
           <div
-            className="absolute right-5 top-[62px] z-20 grid min-w-[170px] gap-1 rounded-2xl border border-border bg-card p-2 shadow-xl"
+            className="menu-pop absolute right-5 top-[62px] z-20 grid min-w-[170px] gap-1 rounded-2xl border border-border bg-card p-2 shadow-xl"
             dir={isArabic ? "rtl" : "ltr"}
           >
             <button
@@ -529,14 +604,14 @@ export function ReaderScreen({
       </div>
 
       <ScrollArea className="zikr-scroll min-h-0 flex-1">
-        <div className="flex min-h-full flex-col">
+        <div className="zikr-step-enter flex min-h-full flex-col" key={z.id}>
           {renderReadingContent()}
           {renderCounterPanel()}
         </div>
       </ScrollArea>
 
       {benefitOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
+        <div className="scrim-in fixed inset-0 z-50 flex items-end justify-center bg-black/45">
           <button
             type="button"
             className="absolute inset-0 cursor-default"
@@ -548,7 +623,7 @@ export function ReaderScreen({
             data-testid="reference-sheet"
             aria-modal="true"
             aria-label={t(language, "reader.referencesButton")}
-            className="reference-sheet fade-in relative w-full max-w-[390px] overflow-y-auto overscroll-contain rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
+            className="reference-sheet sheet-enter relative w-full max-w-[390px] overflow-y-auto overscroll-contain rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
             dir={isArabic ? "rtl" : "ltr"}
           >
             <div className="sticky top-0 z-10 flex h-16 items-end justify-center bg-background px-6 pb-3">

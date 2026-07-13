@@ -52,6 +52,43 @@ Rules:
 - Horizontal content margins use `clamp(16px, 6vw, 24px)`. Bottom padding includes the device safe-area inset.
 - The close action uses the logical `end` edge and a 44×44 px target, so it follows RTL correctly.
 
+## Motion and microinteraction contract
+
+Motion supports comprehension and calm focus; it must never turn worship into a game. Prefer one clear response to an action, short durations, restrained scale, and no endless decorative motion.
+
+### Timing and easing
+
+| Role                    |       Duration | Use                                               |
+| ----------------------- | -------------: | ------------------------------------------------- |
+| Press feedback          |     120–150 ms | Buttons, cards, navigation                        |
+| Small state change      |     160–220 ms | Count change, menu, favorite, active tab          |
+| Screen/content entrance |     240–300 ms | New zikr, sheets, completion content              |
+| Emphasis                |     440–600 ms | Counter readiness and completion check            |
+| Auto-advance pause      | Exactly 500 ms | Preserve the completed check before the next zikr |
+
+Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease-out for opacity. Motion must use opacity/transform whenever possible. The existing `.reduce-motion` class and `prefers-reduced-motion` query collapse animations and transitions to 0.01 ms, but the semantic 500 ms completion pause remains.
+
+### Screen audit
+
+| Surface                    | Required microinteraction                                                                                                                                                                    |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Splash/onboarding/auth     | One directional screen entrance; buttons compress slightly on press; progress dots resize smoothly. No looping decoration.                                                                   |
+| Home/category/search       | Cards compress to 98% on press; progress changes animate; completed state remains visible without replaying celebration whenever the list opens.                                             |
+| Bottom navigation          | Active icon performs one 220 ms lift/pop; press feedback remains subtle and does not reorder tabs.                                                                                           |
+| Reader — new zikr          | Content settles upward over 260 ms. The empty ring performs one 600 ms “calm breath” and halo, with “Take a calm breath, then tap to begin.” It never blocks the first tap.                  |
+| Reader — each count        | Number performs a 160 ms restrained pop, ring progress animates, a short 8 ms supported-device vibration confirms the physical tap, and the existing pulse ring responds once.               |
+| Reader — completion        | Lock duplicate taps, fill the ring, animate a drawn check, announce completion, use a short completion vibration pattern where supported, retain the state for exactly 500 ms, then advance. |
+| Reader menu/save/reference | Menu opens in 160 ms, save heart pops once, scrim fades in, and sheet rises in 260 ms with the close control immediately available.                                                          |
+| Settings                   | Toggle thumb and color change together in 200–300 ms; rows use opacity/press feedback; destructive actions do not celebrate.                                                                 |
+| Session completion         | Main check uses the celebration pop/glow once; summary cards enter with a short stagger; primary actions compress on press.                                                                  |
+
+### Accessibility and feedback
+
+- Completion uses a visible check, text, progress state, an assertive live-region announcement, and optional vibration; it never relies on color or vibration alone.
+- Ready-state copy is announced when a new zikr starts. Counter activation supports pointer, Enter, and Space.
+- Never delay navigation for decorative motion except the documented 500 ms completion acknowledgement.
+- Do not add autoplaying, looping, flashing, parallax, or large lateral movement. Haptics must be short, optional, and ignored gracefully when unsupported.
+
 ## Responsive shell
 
 - At viewport widths up to 430 px, the app is full-bleed and uses `100vw × 100dvh`.
@@ -60,4 +97,4 @@ Rules:
 
 ## Change control
 
-Any typography, direction, reader-control, counter-size, modal-height, or shell-width change must update this document and its automated regression coverage in the same change. Visual approval alone does not replace formatting, lint, strict types, unit/build, accessibility, and responsive browser gates.
+Any typography, direction, reader-control, counter-size, motion timing, modal-height, or shell-width change must update this document and its automated regression coverage in the same change. Visual approval alone does not replace formatting, lint, strict types, unit/build, accessibility, and responsive browser gates.

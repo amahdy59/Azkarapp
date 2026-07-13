@@ -73,6 +73,7 @@ const en = {
     unsave: "Remove saved zikr",
     openCounter: "Open the full counter",
     counterReady: "Ready to count",
+    counterReadyPrompt: "Take a calm breath, then tap to begin",
     counterReadyComplete: "Already completed",
     tapAnywhere: "Tap anywhere to count",
     autoAdvance: "Completes this zikr and moves to the next one automatically.",

@@ -25,7 +25,7 @@ export function ProgressBar({
       aria-label={ariaLabel || "Progress bar"}
     >
       <div
-        className="h-full rounded-full transition-all duration-500"
+        className="h-full rounded-full transition-all duration-300"
         style={{ width: `${pct}%`, background: fillColor }}
       />
     </div>
