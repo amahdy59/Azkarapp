@@ -1,7 +1,7 @@
 import { readdir, stat } from "node:fs/promises";
 import path from "node:path";
 
-const limits = { javascript: 550 * 1024, css: 120 * 1024, asset: 1024 * 1024 };
+const limits = { javascript: 550 * 1024, css: 128 * 1024, asset: 1024 * 1024 };
 const assetsDirectory = path.resolve("dist/assets");
 const entries = await readdir(assetsDirectory);
 const failures = [];

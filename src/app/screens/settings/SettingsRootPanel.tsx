@@ -16,7 +16,7 @@ import {
 import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
+import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "../../types";
 import { CATEGORIES } from "../../content/categories";
 import { CatIcon } from "../../components/CatIcon";
 import { CrescentMark } from "../../components/CrescentMark";
@@ -81,27 +81,27 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
 export function SettingsRootPanel({
   onNav,
   language,
-  darkMode,
+  themeMode,
   languageLabel,
   phoneAuthEnabled,
   audioQuality,
   textSize,
   isGuest,
   isSyncing,
-  onToggleDark,
+  onThemeModeChange,
   onActivateAccount,
   onSignOut,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
-  darkMode: boolean;
+  themeMode: ThemeMode;
   languageLabel: string;
   phoneAuthEnabled: boolean;
   audioQuality: AudioQuality;
   textSize: TextSizeOption;
   isGuest: boolean;
   isSyncing: boolean;
-  onToggleDark: () => void;
+  onThemeModeChange: (value: ThemeMode) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
 }) {
@@ -117,6 +117,29 @@ export function SettingsRootPanel({
     >
       <SectionLabel label={t(language, "settings.preferences")} />
       <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="border-b border-border px-4 py-4">
+          <p className="mb-3 font-sans text-[14px] font-semibold text-foreground">
+            {t(language, "settings.displayTheme")}
+          </p>
+          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t(language, "settings.displayTheme")}>
+            {(["midnight", "light", "dark"] as ThemeMode[]).map((mode) => (
+              <button
+                key={mode}
+                type="button"
+                role="radio"
+                aria-checked={themeMode === mode}
+                onClick={() => onThemeModeChange(mode)}
+                className={`min-h-11 rounded-lg border px-2 text-[12px] font-semibold capitalize ${
+                  themeMode === mode
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-background text-foreground"
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+        </div>
         <SettingsRowItem
           iconBg="var(--muted)"
           icon={
@@ -134,31 +157,6 @@ export function SettingsRootPanel({
           label={t(language, "settings.language")}
           right={<RowValue value={languageLabel} />}
           onPress={() => onNav("language")}
-        />
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={
-            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              <circle cx="10" cy="10" r="7" stroke="currentColor" className="text-foreground" strokeWidth="1.5" />
-              <path
-                d="M10 3v14M3 10h14"
-                stroke="currentColor"
-                className="text-foreground"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </svg>
-          }
-          label={t(language, "settings.displayTheme")}
-          right={
-            <div className="flex items-center gap-2">
-              <p className="font-sans text-[14px] text-foreground/90">
-                {darkMode ? t(language, "common.dark") : t(language, "common.light")}
-              </p>
-              <RowToggle checked={darkMode} onChange={onToggleDark} label={t(language, "settings.displayTheme")} />
-            </div>
-          }
-          onPress={onToggleDark}
         />
         <SettingsRowItem
           iconBg="var(--muted)"

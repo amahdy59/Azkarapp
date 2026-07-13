@@ -1,193 +1,145 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Bell,
-  BookOpen,
-  Download,
-  Flame,
-  HelpCircle,
-  Info,
-  Pause,
-  Play,
-  Settings,
-  Volume2,
-  Wifi,
-  X,
-} from "lucide-react";
-import { motion } from "motion/react";
-import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
+import { CheckCircle2, ChevronLeft, ChevronRight, Flame } from "lucide-react";
+import { useMemo, useState } from "react";
 import { CATEGORIES } from "../../content/categories";
-import { CatIcon } from "../../components/CatIcon";
-import { CrescentMark } from "../../components/CrescentMark";
-import { RowChevron, RowToggle, RowValue, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
+import { formatNumerals } from "../../formatting";
+import type { AppLanguage, CategoryId, StoredSession } from "../../types";
+import { SubHeader } from "./SettingsPrimitives";
 
-const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
-const REPO_URL = "https://github.com/amahdy59/Azkarapp";
-const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
+type Period = "week" | "month" | "year";
 
-type DownloadState = "idle" | "downloading" | "paused" | "done";
+const dayKey = (value: Date) => `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
 
-export type SettingsSubScreen =
-  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
-
-function openExternal(url: string) {
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
-function openMailto(email: string, subject: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
-  }
-}
-
-function formatTextSize(value: TextSizeOption) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function formatAudioQuality(value: AudioQuality) {
-  return value === "high" ? "High" : "Standard";
-}
-
-function formatColorBlindSupport(value: ColorBlindSupport) {
-  switch (value) {
-    case "deuteranopia":
-      return "Deuteranopia";
-    case "protanopia":
-      return "Protanopia";
-    case "tritanopia":
-      return "Tritanopia";
-    default:
-      return "None";
-  }
-}
-
-function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
-export function ProgressPanel({ onBack }: { onBack: () => void }) {
-  const barHeights = [15, 25, 10, 45, 20, 30, 50];
-  const days = ["M", "T", "W", "T", "F", "S", "S"];
-  const sessions = [
-    { date: "Thursday, Jan 29", count: 15, mins: 8 },
-    { date: "Wednesday, Jan 28", count: 12, mins: 6 },
-    { date: "Tuesday, Jan 27", count: 18, mins: 10 },
-  ];
+export function ProgressPanel({
+  onBack,
+  language,
+  sessions,
+  currentStreak,
+  longestStreak,
+}: {
+  onBack: () => void;
+  language: AppLanguage;
+  sessions: StoredSession[];
+  currentStreak: number;
+  longestStreak: number;
+}) {
+  const [period, setPeriod] = useState<Period>("week");
+  const [category, setCategory] = useState<CategoryId>("morning");
+  const isArabic = language === "ar";
+  const filtered = sessions.filter((session) => session.category === category && session.isComplete);
+  const totalCompleted = sessions.reduce((sum, session) => sum + session.completedCount, 0);
+  const activity = useMemo(() => {
+    const byDay = new Map<string, number>();
+    filtered.forEach((session) => byDay.set(dayKey(new Date(session.completedAt)), session.completedCount));
+    return byDay;
+  }, [filtered]);
+  const days = Array.from({ length: period === "week" ? 7 : period === "month" ? 35 : 84 }, (_, index) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() - index);
+    return { date, count: activity.get(dayKey(date)) ?? 0 };
+  }).reverse();
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
-      <SubHeader title="My Progress" onBack={onBack} />
-      <motion.div
-        className="flex-1 overflow-y-auto pb-8"
-        initial={{ opacity: 0, scaleX: 0.85, scaleY: 0.85, y: 10 }}
-        animate={{ opacity: [0, 1, 1], scaleX: [0.85, 1, 1], scaleY: [0.85, 1, 1], y: [10, 0, 0] }}
-        transition={{
-          opacity: { duration: 0.63, times: [0, 0.7143, 1], ease: "easeOut" },
-          scaleX: { duration: 0.63, times: [0, 0.7143, 1], ease: [[0.34, 1.56, 0.64, 1], "linear"] },
-          scaleY: { duration: 0.63, times: [0, 0.7143, 1], ease: [[0.34, 1.56, 0.64, 1], "linear"] },
-          y: { duration: 0.63, times: [0, 0.7143, 1], ease: "easeOut" },
-        }}
-      >
-        <div className="px-4 pt-4">
-          <div className="flex items-stretch overflow-hidden rounded-2xl border border-border bg-card">
-            <div className="w-[4px] shrink-0 bg-primary" />
-            <div className="flex flex-1 items-start justify-between p-5">
-              <div className="flex flex-col gap-1">
-                <p className="font-sans text-[14px] leading-[22px] text-muted-foreground">Total Azkar Completed</p>
-                <p className="font-sans text-[28px] font-bold leading-[36px] text-primary">1,247</p>
-                <p className="mt-1 font-sans text-[12px] text-muted-foreground">Since July 2026</p>
-              </div>
-              <svg width="48" height="48" viewBox="0 0 48 48" fill="none" className="text-muted-foreground opacity-60">
-                <rect x="36" y="22" width="10" height="14" rx="2" stroke="currentColor" strokeWidth="2" />
-                <rect x="24" y="12" width="10" height="24" rx="2" stroke="currentColor" strokeWidth="2" />
-              </svg>
-            </div>
-          </div>
-        </div>
+    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
+      <SubHeader title={isArabic ? "تقدّمي" : "My Progress"} onBack={onBack} />
+      <div className="flex-1 space-y-4 overflow-y-auto p-5">
+        <section className="rounded-2xl border border-border bg-card px-6 py-4 text-end">
+          <p className="text-[12px] text-muted-foreground">{isArabic ? "منذ بداية الاستخدام" : "Since you started"}</p>
+          <p className="mt-2 text-[14px] font-bold text-foreground">
+            {isArabic ? "إجمالي الأذكار المكتملة" : "Total azkar completed"}
+          </p>
+          <p className="mt-1 text-[36px] font-extrabold text-foreground">{formatNumerals(totalCompleted, language)}</p>
+        </section>
 
-        <div className="px-4 pt-4">
-          <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-5">
-            <div className="flex items-center gap-2">
-              <Flame size={20} className="text-muted-foreground" />
-              <p className="font-sans text-[14px] text-muted-foreground">Current Streak</p>
-            </div>
-            <div>
-              <p className="font-sans text-[28px] font-bold text-primary">7 days</p>
-              <p className="mt-1 font-sans text-[12px] text-muted-foreground">Best: 21 days</p>
-            </div>
-            <div className="mt-2 flex h-[60px] items-end gap-1.5">
-              {barHeights.map((height, index) => (
-                <div
-                  key={index}
-                  className={`flex-1 ${index === 6 ? "bg-primary" : "bg-foreground"}`}
-                  style={{ height }}
-                />
-              ))}
-            </div>
-            <div className="mt-1 flex justify-between">
-              {days.map((day, index) => (
-                <p
-                  key={index}
-                  className={`flex-1 text-center font-sans text-[11px] font-medium ${index === 6 ? "text-primary" : "text-muted-foreground"}`}
-                >
-                  {day}
-                </p>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <SectionLabel label="Category Breakdown" />
-        <div className="flex gap-3 px-4">
-          {[
-            { label: "Morning", count: 487, pct: "100%" },
-            { label: "Evening", count: 430, pct: "88%" },
-            { label: "Sleep", count: 330, pct: "67%" },
-          ].map(({ label, count, pct }) => (
-            <div key={label} className="flex-1 rounded-xl border border-border bg-card p-4">
-              <p className="font-sans text-[12px] text-primary">{label}</p>
-              <p className="mt-2 font-sans text-[22px] font-bold text-foreground">{count}</p>
-              <p className="mt-1 font-sans text-[12px] text-muted-foreground">{pct}</p>
-            </div>
+        <div className="flex justify-center gap-2" aria-label="Category filter">
+          {CATEGORIES.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              aria-pressed={category === item.id}
+              onClick={() => setCategory(item.id)}
+              className={`min-h-9 rounded-full border px-4 text-[13px] font-semibold ${category === item.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"}`}
+            >
+              {isArabic ? item.nameArabic.replace("أذكار ", "") : item.name.replace(" Azkar", "")}
+            </button>
           ))}
         </div>
 
-        <SectionLabel label="Recent Sessions" />
-        <div className="flex flex-col gap-3 px-4">
-          {sessions.map(({ date, count, mins }) => (
-            <div key={date} className="flex h-[72px] items-center gap-3 rounded-xl border border-border bg-card px-5">
-              <div className="flex flex-1 flex-col gap-1">
-                <p className="font-sans text-[15px] font-medium leading-[22px] text-foreground">{date}</p>
-                <p className="font-sans text-[14px] text-muted-foreground">
-                  {count} azkar · {mins} min
-                </p>
-              </div>
-              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" className="text-primary rtl:-scale-x-100">
-                <path
-                  d="M10 2l2.4 5 5.6.8-4 4.1.9 5.6-5-2.6-5 2.6.9-5.6-4-4.1 5.6-.8L10 2z"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
-            </div>
-          ))}
-        </div>
-      </motion.div>
+        <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="activity-title">
+          <p id="activity-title" className="text-center text-[12px] text-muted-foreground">
+            <Flame className="inline text-primary" size={14} /> {formatNumerals(currentStreak, language)}{" "}
+            {isArabic ? "أيام · أفضل:" : "day streak · Best:"} {formatNumerals(longestStreak, language)}
+          </p>
+          <div className="mt-4 grid grid-cols-3 gap-1 rounded-xl border border-border p-1">
+            {(["week", "month", "year"] as Period[]).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setPeriod(value)}
+                aria-pressed={period === value}
+                className={`min-h-8 rounded-lg text-[12px] font-bold ${period === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+              >
+                {isArabic ? { week: "أسبوع", month: "شهر", year: "سنة" }[value] : value}
+              </button>
+            ))}
+          </div>
+          <div className="mt-4 flex items-center justify-between text-muted-foreground">
+            <ChevronLeft size={20} />
+            <span className="text-[13px] font-semibold">
+              {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { month: "long", year: "numeric" }).format(
+                new Date(),
+              )}
+            </span>
+            <ChevronRight size={20} />
+          </div>
+          <div
+            className={`mt-4 grid gap-1.5 ${period === "week" ? "grid-cols-7" : "grid-cols-7"}`}
+            role="img"
+            aria-label={`${filtered.length} completed sessions`}
+          >
+            {days.map(({ date, count }) => (
+              <span
+                key={date.toISOString()}
+                title={`${date.toLocaleDateString()}: ${count}`}
+                className={`aspect-square rounded-md border ${count > 0 ? "border-primary bg-primary" : "border-border bg-muted"}`}
+              />
+            ))}
+          </div>
+        </section>
+
+        <section>
+          <h2 className="mb-3 text-[15px] font-bold text-foreground">
+            {isArabic ? "الجلسات الأخيرة" : "Recent sessions"}
+          </h2>
+          <div className="space-y-2">
+            {filtered.slice(0, 3).map((session) => (
+              <article
+                key={session.id}
+                className="flex min-h-[66px] items-center gap-3 rounded-xl border border-border bg-card px-4"
+              >
+                <div className="min-w-0 flex-1">
+                  <p className="text-[14px] font-semibold text-foreground">
+                    {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { dateStyle: "medium" }).format(
+                      new Date(session.completedAt),
+                    )}
+                  </p>
+                  <p className="mt-1 text-[12px] text-muted-foreground">
+                    {formatNumerals(session.completedCount, language)} {isArabic ? "ذكر" : "azkar"} ·{" "}
+                    {formatNumerals(Math.max(1, Math.round(session.durationSeconds / 60)), language)}{" "}
+                    {isArabic ? "دقائق" : "min"}
+                  </p>
+                </div>
+                <CheckCircle2 size={20} className="text-primary" />
+              </article>
+            ))}
+            {filtered.length === 0 && (
+              <p className="rounded-xl border border-dashed border-border p-6 text-center text-[13px] text-muted-foreground">
+                {isArabic ? "ستظهر جلساتك المكتملة هنا" : "Completed sessions will appear here."}
+              </p>
+            )}
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

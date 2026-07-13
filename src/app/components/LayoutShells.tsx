@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronLeft, Home, BookOpen, Settings } from "lucide-react";
+import { BookOpen, ChevronLeft, Home, Settings } from "lucide-react";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -50,7 +50,10 @@ export function BottomNav({
     { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
   ];
   return (
-    <nav aria-label="Bottom Navigation" className="flex shrink-0 border-t border-border bg-background h-[83px] pb-5">
+    <nav
+      aria-label="Bottom Navigation"
+      className="flex shrink-0 border-t border-border bg-background h-[83px] pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+    >
       {tabs.map(({ id, label, Icon }) => {
         const on = active === id;
         return (
@@ -61,7 +64,7 @@ export function BottomNav({
             aria-current={on ? "page" : undefined}
             className="flex-1 flex flex-col items-center justify-center gap-1 transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded-lg"
           >
-            <Icon size={22} className={on ? "text-primary" : "text-muted-foreground"} />
+            <Icon size={22} style={{ color: on ? "var(--nav-active)" : "var(--nav-inactive)" }} />
             <span
               className={`text-[12px] font-medium font-sans leading-[16px] ${on ? "text-primary" : "text-muted-foreground"}`}
             >

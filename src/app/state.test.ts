@@ -18,6 +18,14 @@ describe("app state persistence", () => {
     window.localStorage.setItem("azkarapp.state.v1", "not-json");
     expect(loadAppState()).toEqual(DEFAULT_APP_STATE);
   });
+
+  it("migrates the legacy light-mode flag to the new theme model", () => {
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({ settings: { ...DEFAULT_APP_STATE.settings, themeMode: undefined, darkMode: false } }),
+    );
+    expect(loadAppState().settings.themeMode).toBe("light");
+  });
 });
 
 describe("state merging", () => {

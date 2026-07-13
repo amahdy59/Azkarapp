@@ -1,19 +1,14 @@
-import React from "react";
-import { Search, Check, ChevronRight, Flame, BookOpen } from "lucide-react";
-import { t } from "../i18n";
-import { CATEGORIES } from "../content/categories";
-import { ALL_AZKAR } from "../content/azkar";
-import type { AppLanguage, CategoryId } from "../types";
-import { MaleAvatar } from "../components/Avatars";
+import { ChevronLeft, Leaf, Menu, Search, Sprout } from "lucide-react";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
-import { formatNumerals, numeralFontFamily } from "../formatting";
+import { ALL_AZKAR } from "../content/azkar";
+import { CATEGORIES } from "../content/categories";
+import { formatNumerals } from "../formatting";
+import type { AppLanguage, CategoryId } from "../types";
 
 export function HomeScreen({
   completed,
-  displayName,
   currentStreak,
-  longestStreak,
   onCategory,
   onFeaturedZikr,
   onSearch,
@@ -23,173 +18,102 @@ export function HomeScreen({
   displayName: string;
   currentStreak: number;
   longestStreak: number;
-  onCategory: (c: CategoryId) => void;
-  onFeaturedZikr: (catId: CategoryId, index: number) => void;
+  onCategory: (category: CategoryId) => void;
+  onFeaturedZikr: (category: CategoryId, index: number) => void;
   onSearch: () => void;
   language: AppLanguage;
 }) {
-  const h = new Date().getHours();
-  const timeLabel =
-    h < 12
-      ? t(language, "home.goodMorning")
-      : h < 17
-        ? t(language, "home.goodAfternoon")
-        : t(language, "home.goodEvening");
-  const totalDone = Object.values(completed).reduce((s, set) => s + set.size, 0);
-  const totalAll = CATEGORIES.reduce((s, c) => s + c.totalCount, 0);
-  const localizedTotalDone = formatNumerals(totalDone, language);
-  const localizedTotalAll = formatNumerals(totalAll, language);
-  const startOfYear = new Date(new Date().getFullYear(), 0, 0);
-  const today = new Date();
-  const dayOfYear = Math.floor((today.getTime() - startOfYear.getTime()) / 86_400_000);
-  const featuredZikr = ALL_AZKAR[dayOfYear % ALL_AZKAR.length] ?? ALL_AZKAR[0];
-  if (!featuredZikr) {
-    throw new Error("Azkar content is empty.");
-  }
-
-  const featuredCategory = CATEGORIES.find((item) => item.id === featuredZikr.category) ?? CATEGORIES[0];
-  const featuredText = featuredZikr.hadithText || featuredZikr.arabicText;
-  const featuredExcerpt = featuredText.length > 140 ? `${featuredText.slice(0, 140).trim()}...` : featuredText;
-  const featuredIndex = ALL_AZKAR.filter((item) => item.category === featuredZikr.category).findIndex(
-    (item) => item.id === featuredZikr.id,
-  );
+  const isArabic = language === "ar";
+  const day = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86_400_000);
+  const featured = ALL_AZKAR[day % ALL_AZKAR.length] ?? ALL_AZKAR[0];
+  const featuredIndex = featured
+    ? ALL_AZKAR.filter((item) => item.category === featured.category).findIndex((item) => item.id === featured.id)
+    : 0;
+  const hijriDate = new Intl.DateTimeFormat(isArabic ? "ar-SA-u-ca-islamic" : "en-US-u-ca-islamic", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
 
   return (
-    <div className="flex h-full flex-col bg-background">
-      <div className="shrink-0 px-5 pb-4 pt-5">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <MaleAvatar size={44} />
-            <div>
-              <p className="text-[12px] font-bold uppercase tracking-[0.08em] text-muted-foreground">{timeLabel}</p>
-              <p className="text-[20px] font-extrabold leading-[26px] text-foreground">{displayName}</p>
-            </div>
-          </div>
-          <button
-            onClick={onSearch}
-            aria-label="Search"
-            className="flex h-11 w-11 items-center justify-center rounded-full bg-card transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Search size={18} className="text-foreground" />
-          </button>
+    <div className="flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
+      <header className="grid h-14 shrink-0 grid-cols-[44px_1fr_44px] items-center px-5">
+        <button
+          type="button"
+          onClick={onSearch}
+          aria-label="Search"
+          className="flex h-11 w-11 items-center justify-center rounded-full"
+        >
+          <Search size={19} />
+        </button>
+        <div className="flex items-center justify-center gap-7">
+          <span className="flex items-center gap-1 text-[13px] font-bold text-secondary">
+            <Leaf size={18} />
+            {formatNumerals(currentStreak, language)}
+          </span>
+          <h1 className="text-[17px] font-bold text-foreground">{isArabic ? "الأذكار" : "Azkar"}</h1>
+          <span className="flex items-center gap-1 text-[13px] font-bold text-secondary">
+            <Sprout size={18} />
+            {formatNumerals(3, language)}
+          </span>
         </div>
-      </div>
+        <button type="button" aria-label="Menu" className="flex h-11 w-11 items-center justify-center rounded-full">
+          <Menu size={19} />
+        </button>
+      </header>
 
-      {totalDone > 0 && (
-        <div className="mb-4 px-5">
-          <div className="rounded-2xl border border-border bg-card px-5 py-4">
-            <div>
-              <div className="mb-1.5 flex justify-between">
-                <span className="text-[11px] text-muted-foreground">{t(language, "home.todaysProgress")}</span>
-                <span
-                  className="text-[12px] font-bold text-primary"
-                  dir="ltr"
-                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-                >
-                  {localizedTotalDone}/{localizedTotalAll}
-                </span>
-              </div>
-              <ProgressBar value={totalDone} max={totalAll} height={6} />
-            </div>
-          </div>
-        </div>
+      <p className="shrink-0 px-9 pb-2 text-end text-[13px] font-semibold text-card-foreground">{hijriDate}</p>
+
+      {featured && (
+        <button
+          type="button"
+          onClick={() => onFeaturedZikr(featured.category, featuredIndex)}
+          className="relative min-h-[111px] shrink-0 overflow-hidden bg-[linear-gradient(110deg,var(--card),color-mix(in_srgb,var(--primary)_12%,var(--background)))] px-7 py-4 text-end"
+        >
+          <p className="text-[16px] font-bold text-foreground">
+            {isArabic ? "حان وقت أذكارك" : "It’s time for your azkar"}
+          </p>
+          <p className="mt-1 line-clamp-1 text-[12px] text-muted-foreground">
+            {isArabic ? featured.arabicText : featured.translation}
+          </p>
+          <p className="mt-3 text-[14px] font-bold text-primary">{isArabic ? "ابدأ الآن" : "Begin now"} ←</p>
+        </button>
       )}
 
-      {totalDone === 0 && (
-        <div className="mb-4 px-5">
-          <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card px-5 py-6 text-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-              <BookOpen size={24} className="text-primary" />
-            </div>
-            <p className="text-[16px] font-bold text-foreground">{t(language, "home.startJourney")}</p>
-            <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "home.startJourneyDesc")}</p>
-          </div>
-        </div>
-      )}
-      <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-5 pb-4">
-        {CATEGORIES.map((cat) => {
-          const done = completed[cat.id]?.size ?? 0;
-          const complete = done === cat.totalCount;
+      <div className="flex-1 space-y-3 overflow-y-auto px-5 py-5">
+        {CATEGORIES.map((category) => {
+          const done = completed[category.id]?.size ?? 0;
+          const percent = category.totalCount ? Math.round((done / category.totalCount) * 100) : 0;
           return (
             <button
-              key={cat.id}
-              onClick={() => onCategory(cat.id)}
-              aria-label={`${cat.name}, ${done} of ${cat.totalCount} completed`}
-              className="w-full rounded-2xl bg-card p-4 text-start transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              style={{
-                border: `1px solid ${complete ? "color-mix(in srgb, var(--primary) 50%, transparent)" : "var(--border)"}`,
-              }}
+              key={category.id}
+              type="button"
+              onClick={() => onCategory(category.id)}
+              className="flex min-h-[94px] w-full items-center gap-2 rounded-xl border border-border bg-card px-4 text-start"
+              aria-label={`${isArabic ? category.nameArabic : category.name}, ${done} of ${category.totalCount} complete`}
             >
-              <div className="flex items-center gap-4">
-                <div
-                  className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl"
-                  style={{
-                    background: complete ? "color-mix(in srgb, var(--primary) 20%, transparent)" : "var(--muted)",
-                  }}
-                >
-                  <CatIcon type={cat.icon} size={26} color="var(--primary)" />
-                </div>
-
-                <div className="min-w-0 flex-1">
-                  <div className="mb-0.5 flex items-center justify-between">
-                    <p className="text-[16px] font-bold text-foreground">{cat.name}</p>
-                    {complete ? (
-                      <span
-                        className="flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold text-primary"
-                        style={{ background: "color-mix(in srgb, var(--primary) 20%, transparent)" }}
-                      >
-                        <Check size={10} /> Done
-                      </span>
-                    ) : (
-                      <span className="text-[12px] text-muted-foreground">
-                        {formatNumerals(done, language)}/{formatNumerals(cat.totalCount, language)}
-                      </span>
-                    )}
-                  </div>
-                  <p
-                    className="mb-2 text-[14px] text-muted-foreground"
-                    style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-                  >
-                    {cat.nameArabic}
+              <ChevronLeft size={22} className="shrink-0 text-card-foreground rtl:-scale-x-100" />
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-3">
+                  <CatIcon type={category.icon} size={24} color="var(--primary)" />
+                  <p className="flex-1 text-end text-[16px] font-bold text-foreground">
+                    {isArabic ? category.nameArabic : category.name}
                   </p>
-                  <ProgressBar value={done} max={cat.totalCount} height={7} />
                 </div>
-
-                <ChevronRight size={16} className="shrink-0 text-muted-foreground rtl:-scale-x-100" />
+                <div className="mt-2 flex items-center justify-between text-[12px] text-muted-foreground">
+                  <span>{formatNumerals(percent, language)}%</span>
+                  <span>
+                    {formatNumerals(done, language)} {isArabic ? "من" : "of"}{" "}
+                    {formatNumerals(category.totalCount, language)} {isArabic ? "مكتملة" : "complete"}
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <ProgressBar value={done} max={category.totalCount} height={4} />
+                </div>
               </div>
             </button>
           );
         })}
-
-        <div className="flex items-center gap-4 rounded-2xl border border-border bg-card p-4">
-          <div
-            className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl"
-            style={{ background: "color-mix(in srgb, var(--primary) 15%, transparent)" }}
-          >
-            <Flame size={24} className="text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-[13px] text-muted-foreground">{t(language, "home.currentStreak")}</p>
-            <p
-              className="text-[20px] font-extrabold text-primary"
-              dir="ltr"
-              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-            >
-              {formatNumerals(currentStreak, language)}{" "}
-              {t(language, currentStreak === 1 ? "home.daySuffix" : "home.daysSuffix")}
-            </p>
-          </div>
-          <div className="text-end">
-            <p className="text-[12px] text-muted-foreground">{t(language, "home.best")}</p>
-            <p
-              className="text-[16px] font-bold text-card-foreground"
-              dir="ltr"
-              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-            >
-              {formatNumerals(longestStreak, language)}
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

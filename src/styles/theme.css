@@ -117,6 +117,115 @@
   --sidebar-ring: #a87614;
 }
 
+/* Product theme modes. These semantic tokens are the only theme contract app components consume. */
+.theme-midnight {
+  --background: #0a1228;
+  --foreground: #f5f0e8;
+  --card: #111b35;
+  --card-foreground: #d4d0e0;
+  --popover: #111b35;
+  --popover-foreground: #f5f0e8;
+  --primary: #d4a020;
+  --primary-foreground: #0a1228;
+  --secondary: #1a7060;
+  --secondary-foreground: #f5f0e8;
+  --muted: #182540;
+  --muted-foreground: #b0aed0;
+  --accent: #e8b420;
+  --accent-foreground: #0a1228;
+  --destructive: #f09890;
+  --destructive-foreground: #0a1228;
+  --border: #2e4570;
+  --input: #2e4570;
+  --input-background: #182540;
+  --switch-background: #1e3050;
+  --ring: #e8b420;
+  --nav-active: #d4a020;
+  --nav-inactive: #b0aed0;
+  --counter-zone: #111b35;
+}
+
+.theme-light {
+  --background: #f8f5f0;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #4a4570;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #a07010;
+  --primary-foreground: #1a1228;
+  --secondary: #1a7060;
+  --secondary-foreground: #ffffff;
+  --muted: #f2eee9;
+  --muted-foreground: #4a4570;
+  --accent: #d4a020;
+  --accent-foreground: #1a1228;
+  --destructive: #8b2015;
+  --destructive-foreground: #ffffff;
+  --border: #c4bcb0;
+  --input: #c4bcb0;
+  --input-background: #f2eee9;
+  --switch-background: #e5e0d8;
+  --ring: #a07010;
+  --nav-active: #a07010;
+  --nav-inactive: #8e8aaa;
+  --counter-zone: #f2eee9;
+}
+
+.theme-dark {
+  --background: #0d0d0d;
+  --foreground: #f5f0e8;
+  --card: #171717;
+  --card-foreground: #d4d0e0;
+  --popover: #171717;
+  --popover-foreground: #f5f0e8;
+  --primary: #d4a020;
+  --primary-foreground: #0d0d0d;
+  --secondary: #1a7060;
+  --secondary-foreground: #f5f0e8;
+  --muted: #222222;
+  --muted-foreground: #b0aed0;
+  --accent: #e8b420;
+  --accent-foreground: #0d0d0d;
+  --destructive: #f09890;
+  --destructive-foreground: #0d0d0d;
+  --border: #555555;
+  --input: #555555;
+  --input-background: #222222;
+  --switch-background: #2d2d2d;
+  --ring: #e8b420;
+  --nav-active: #d4a020;
+  --nav-inactive: #b0aed0;
+  --counter-zone: #171717;
+}
+
+:root {
+  --success: #5ec88a;
+  --warning: #b87b10;
+  --sleep: #9f7aea;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-base: 1rem;
+  --space-lg: 1.25rem;
+  --space-xl: 1.5rem;
+  --space-2xl: 2rem;
+  --space-3xl: 3rem;
+  --space-4xl: 4rem;
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+[lang="ar"] body,
+[lang="ar"] .arabic-text {
+  font-family: "Amiri", "Noto Naskh Arabic", serif;
+}
+
 :root[data-color-blind-support="deuteranopia"] {
   --primary: #f4b400;
   --primary-foreground: #10131d;
@@ -427,6 +536,19 @@
   width: min(100vw, 390px);
   height: min(100dvh, 844px);
   border-radius: 44px;
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    width: min(100vw, 1024px);
+    height: min(100dvh, 1366px);
+    border-radius: 24px;
+  }
+
+  .app-shell main > * {
+    margin-inline: auto;
+    width: min(100%, 900px);
+  }
 }
 
 .skip-link {

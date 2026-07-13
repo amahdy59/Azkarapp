@@ -176,6 +176,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
     settings: {
       language: profile?.preferred_language ?? localState.settings.language,
       darkMode: settings?.dark_mode ?? localState.settings.darkMode,
+      themeMode: settings?.settings_json?.themeMode ?? localState.settings.themeMode,
       showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
       showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
       textSize: settings?.settings_json?.textSize ?? localState.settings.textSize,
@@ -230,6 +231,7 @@ export async function syncRemoteState(
     dark_mode: state.settings.darkMode,
     settings_json: {
       language: state.settings.language,
+      themeMode: state.settings.themeMode,
       showTransliteration: state.settings.showTransliteration,
       showTranslation: state.settings.showTranslation,
       textSize: state.settings.textSize,

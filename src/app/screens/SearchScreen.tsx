@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { ChevronLeft, Search, X } from "lucide-react";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
 import type { CategoryId } from "../types";
+import { StatePanel } from "../components/StatePanel";
 
 const RECENT_SEARCHES = ["Istighfar", "Morning Dua", "Ayat al-Kursi"];
 
@@ -121,10 +122,7 @@ export function SearchScreen({
               </p>
             )}
             {results.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-16 gap-3">
-                <Search size={36} className="text-muted" />
-                <p className="text-[14px] text-muted-foreground font-sans">No results for &quot;{q}&quot;</p>
-              </div>
+              <StatePanel kind="empty-search" actionLabel="Clear search" onAction={() => setQ("")} />
             ) : (
               results.map((z) => {
                 const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);

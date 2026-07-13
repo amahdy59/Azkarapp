@@ -3,6 +3,7 @@ export type CategoryId = "morning" | "evening" | "before_sleep";
 export type TextSizeOption = "small" | "medium" | "large";
 export type AudioQuality = "standard" | "high";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
+export type ThemeMode = "midnight" | "light" | "dark";
 
 export interface Zikr {
   id: string;
@@ -35,6 +36,7 @@ export interface StoredSession {
 export interface UserSettingsState {
   language: AppLanguage;
   darkMode: boolean;
+  themeMode: ThemeMode;
   showTransliteration: boolean;
   showTranslation: boolean;
   textSize: TextSizeOption;

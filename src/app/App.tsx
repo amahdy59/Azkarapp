@@ -8,8 +8,7 @@ import {
   type StoredSession,
 } from "./state";
 import { getAzkarByCategory } from "./content/azkar";
-import { T } from "./theme";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "./types";
+import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
 import {
   getCurrentSession,
   loadRemoteState,
@@ -133,7 +132,8 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
-  const [darkMode, setDarkMode] = useState(initialState.settings.darkMode);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
+  const darkMode = themeMode !== "light";
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
@@ -179,8 +179,10 @@ export default function App() {
       large: "18px",
     };
 
-    document.documentElement.classList.toggle("dark", darkMode);
-    document.documentElement.classList.toggle("light-mode", !darkMode);
+    document.documentElement.classList.toggle("dark", themeMode !== "light");
+    document.documentElement.classList.toggle("theme-midnight", themeMode === "midnight");
+    document.documentElement.classList.toggle("theme-light", themeMode === "light");
+    document.documentElement.classList.toggle("theme-dark", themeMode === "dark");
     document.documentElement.classList.toggle("high-contrast", highContrast);
     document.documentElement.classList.toggle("bold-text", boldText);
     document.documentElement.classList.toggle("reduce-motion", reduceMotion);
@@ -194,7 +196,7 @@ export default function App() {
   }, [
     boldText,
     colorBlindSupport,
-    darkMode,
+    themeMode,
     highContrast,
     reduceMotion,
     selectedLang,
@@ -208,6 +210,7 @@ export default function App() {
       settings: {
         language: selectedLang,
         darkMode,
+        themeMode,
         showTransliteration,
         showTranslation,
         textSize,
@@ -234,6 +237,7 @@ export default function App() {
     colorBlindSupport,
     completed,
     darkMode,
+    themeMode,
     displayName,
     forceRtl,
     hapticFeedback,
@@ -268,7 +272,7 @@ export default function App() {
           const mergedState = await loadRemoteState(session, initialState);
 
           setSelectedLang(mergedState.settings.language);
-          setDarkMode(mergedState.settings.darkMode);
+          setThemeMode(mergedState.settings.themeMode);
           setShowTransliteration(mergedState.settings.showTransliteration);
           setShowTranslation(mergedState.settings.showTranslation);
           setTextSize(mergedState.settings.textSize);
@@ -340,6 +344,7 @@ export default function App() {
             settings: {
               language: selectedLang,
               darkMode,
+              themeMode,
               showTransliteration,
               showTranslation,
               textSize,
@@ -386,6 +391,7 @@ export default function App() {
     completed,
     currentStreak,
     darkMode,
+    themeMode,
     displayName,
     forceRtl,
     hapticFeedback,
@@ -513,6 +519,7 @@ export default function App() {
         settings: {
           language: selectedLang,
           darkMode,
+          themeMode,
           showTransliteration,
           showTranslation,
           textSize,
@@ -535,7 +542,7 @@ export default function App() {
       });
 
       setSelectedLang(mergedState.settings.language);
-      setDarkMode(mergedState.settings.darkMode);
+      setThemeMode(mergedState.settings.themeMode);
       setShowTransliteration(mergedState.settings.showTransliteration);
       setShowTranslation(mergedState.settings.showTranslation);
       setTextSize(mergedState.settings.textSize);
@@ -552,7 +559,7 @@ export default function App() {
       setCompleted(toCompletedSets(mergedState.completed));
       setSessions(mergedState.sessions);
       setIsGuest(false);
-      setView("home");
+      setView(mergedState.settings.language === "ar" ? "ar_onboard1" : "onboard1");
       setActiveTab("home");
       setHistory([]);
     } catch (error) {
@@ -611,7 +618,7 @@ export default function App() {
   return (
     <div className="app-viewport min-h-screen flex items-center justify-center">
       {/* Phone frame */}
-      <div className="app-shell relative flex flex-col overflow-hidden shadow-2xl" style={{ background: T.bg }}>
+      <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
         <NetworkStatus />
 
         {/* iOS status bar — hidden on splash/onboarding (they manage their own) */}
@@ -622,7 +629,7 @@ export default function App() {
             {view === "splash" && (
               <SplashScreen
                 onDone={() => {
-                  setView(isArabic ? "ar_onboard1" : "onboard1");
+                  setView("language");
                 }}
               />
             )}
@@ -641,7 +648,7 @@ export default function App() {
             {view === "onboard3" && (
               <EnglishOnboarding3Screen
                 onNext={() => {
-                  setView("language");
+                  setView("home");
                   setActiveTab("home");
                 }}
                 onBack={() => setView("onboard2")}
@@ -653,7 +660,7 @@ export default function App() {
               <ArOnboarding1Screen
                 onNext={() => setView("ar_onboard2")}
                 onSkip={() => {
-                  setView("language");
+                  setView("home");
                 }}
               />
             )}
@@ -661,7 +668,7 @@ export default function App() {
               <ArOnboarding2Screen onNext={() => setView("ar_onboard3")} onBack={() => setView("ar_onboard1")} />
             )}
             {view === "ar_onboard3" && (
-              <ArOnboarding3Screen onNext={() => setView("language")} onBack={() => setView("ar_onboard2")} />
+              <ArOnboarding3Screen onNext={() => setView("home")} onBack={() => setView("ar_onboard2")} />
             )}
 
             {view === "language" && (
@@ -684,7 +691,7 @@ export default function App() {
                 onGuest={() => {
                   setDisplayName("Guest");
                   setIsGuest(true);
-                  setView("home");
+                  setView(isArabic ? "ar_onboard1" : "onboard1");
                   setActiveTab("home");
                   setHistory([]);
                 }}
@@ -702,7 +709,7 @@ export default function App() {
                   setView("login");
                 }}
                 onSkip={() => {
-                  setView("home");
+                  setView(isArabic ? "ar_onboard1" : "onboard1");
                   setActiveTab("home");
                   setHistory([]);
                 }}
@@ -789,12 +796,15 @@ export default function App() {
             )}
             {view === "settings" && (
               <SettingsScreen
-                darkMode={darkMode}
+                themeMode={themeMode}
                 languageLabel={languageLabel}
                 language={selectedLang}
                 phoneAuthEnabled={isSupabaseConfigured}
                 isGuest={isGuest}
                 isSyncing={isSyncingRemote}
+                sessions={sessions}
+                currentStreak={currentStreak}
+                longestStreak={longestStreak}
                 textSize={textSize}
                 highContrast={highContrast}
                 boldText={boldText}
@@ -805,7 +815,7 @@ export default function App() {
                 audioQuality={audioQuality}
                 colorBlindSupport={colorBlindSupport}
                 onLanguageChange={setSelectedLang}
-                onToggleDark={() => setDarkMode((d) => !d)}
+                onThemeModeChange={setThemeMode}
                 onTextSizeChange={setTextSize}
                 onHighContrastChange={setHighContrast}
                 onBoldTextChange={setBoldText}

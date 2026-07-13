@@ -17,8 +17,8 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     >
       <motion.div
         className="flex flex-col items-center w-full flex-1 pt-20"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
+        initial={{ y: 16 }}
+        animate={{ y: 0 }}
         transition={{ duration: 1.2, ease: [0.5, 0, 0.5, 1] }}
       >
         <div className="flex flex-col items-center gap-5">
@@ -41,17 +41,12 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <p className="mt-10 text-[15px] text-muted-foreground font-sans">Daily remembrance</p>
       </motion.div>
 
-      <motion.div
-        className="flex flex-col items-center gap-3 pb-12"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.5, ease: [0, 0, 0.58, 1] }}
-      >
+      <div className="flex flex-col items-center gap-3 pb-12">
         <div className="rounded-full overflow-hidden w-[160px] h-1 bg-card-foreground/25" aria-hidden="true">
           <div className="h-full rounded-full bg-primary" style={{ width: 96 }} />
         </div>
         <p className="text-[11px] font-medium text-muted-foreground font-sans">Version 2.0.1</p>
-      </motion.div>
+      </div>
     </div>
   );
 }

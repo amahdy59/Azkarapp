@@ -1,4 +1,4 @@
-import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, StoredSession } from "./types";
+import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, StoredSession, ThemeMode } from "./types";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
@@ -8,6 +8,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
     language: "en",
     darkMode: true,
+    themeMode: "midnight",
     showTransliteration: false,
     showTranslation: false,
     textSize: "medium",
@@ -49,6 +50,10 @@ function isColorBlindSupport(value: string): value is ColorBlindSupport {
   return ["none", "deuteranopia", "protanopia", "tritanopia"].includes(value);
 }
 
+function isThemeMode(value: string): value is ThemeMode {
+  return ["midnight", "light", "dark"].includes(value);
+}
+
 function dedupeAndSort(values: unknown): number[] {
   if (!Array.isArray(values)) {
     return [];
@@ -82,6 +87,12 @@ export function loadAppState(): AppStateSnapshot {
           typeof parsed.settings?.darkMode === "boolean"
             ? parsed.settings.darkMode
             : DEFAULT_APP_STATE.settings.darkMode,
+        themeMode:
+          parsed.settings?.themeMode && isThemeMode(parsed.settings.themeMode)
+            ? parsed.settings.themeMode
+            : parsed.settings?.darkMode === false
+              ? "light"
+              : DEFAULT_APP_STATE.settings.themeMode,
         showTransliteration:
           typeof parsed.settings?.showTransliteration === "boolean"
             ? parsed.settings.showTransliteration
@@ -200,6 +211,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     settings: {
       language: incoming.settings?.language ?? base.settings.language,
       darkMode: incoming.settings?.darkMode ?? base.settings.darkMode,
+      themeMode: incoming.settings?.themeMode ?? base.settings.themeMode,
       showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
       showTranslation: incoming.settings?.showTranslation ?? base.settings.showTranslation,
       textSize: incoming.settings?.textSize ?? base.settings.textSize,

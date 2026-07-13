@@ -1,5 +1,4 @@
-import React from "react";
-import { Check, Flame, Share2 } from "lucide-react";
+import { Check, Home, Share2, Sparkles } from "lucide-react";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
@@ -10,7 +9,6 @@ export function CompletionScreen({
   sessionStart,
   currentStreak,
   onHome,
-  onRepeat,
   language,
 }: {
   catId: CategoryId;
@@ -20,101 +18,83 @@ export function CompletionScreen({
   onRepeat: () => void;
   language: AppLanguage;
 }) {
-  const cat = CATEGORIES.find((c) => c.id === catId)!;
-  const azkar = getAzkarByCategory(catId);
-  const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60000));
-  const totalReps = azkar.reduce((s, z) => s + z.repetitionCount, 0);
+  const cat = CATEGORIES.find((item) => item.id === catId)!;
+  const azkarCount = getAzkarByCategory(catId).length;
+  const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
+  const isArabic = language === "ar";
+  const stats = [
+    { value: elapsedMin, suffix: isArabic ? " دقائق" : " min", label: isArabic ? "المدة" : "Duration" },
+    { value: azkarCount, suffix: "", label: isArabic ? "الأذكار" : "Azkar" },
+    { value: 100, suffix: "%", label: isArabic ? "المعدل" : "Completion" },
+    { value: currentStreak, suffix: isArabic ? " أيام" : " days", label: isArabic ? "السلسلة" : "Streak" },
+  ];
+
+  const share = async () => {
+    const text = isArabic ? `أتممت ${cat.nameArabic} — ما شاء الله!` : `I completed ${cat.name} — Masha’Allah!`;
+    if (navigator.share) await navigator.share({ title: "Azkar", text });
+    else await navigator.clipboard.writeText(text);
+  };
 
   return (
-    <div className="flex flex-col h-full items-center justify-between px-6 py-8 slide-up bg-background">
-      <div />
+    <div
+      className="flex h-full flex-col overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
+      <p className="text-[13px] text-muted-foreground">
+        {isArabic ? `جلسة ${cat.nameArabic} مكتملة` : `${cat.name} session complete`}
+      </p>
 
-      <div className="flex flex-col items-center gap-6 w-full">
-        {/* Gold checkmark circle */}
-        <div className="relative flex items-center justify-center w-[120px] h-[120px]" aria-hidden="true">
-          <svg className="absolute inset-0" viewBox="0 0 120 120">
-            <circle cx="60" cy="60" r="56" stroke="var(--primary)" strokeWidth="2" fill="none" opacity=".15" />
-            <circle
-              cx="60"
-              cy="60"
-              r="56"
-              stroke="var(--primary)"
-              strokeWidth="2.5"
-              fill="none"
-              strokeDasharray="352"
-              strokeDashoffset="0"
-            />
-          </svg>
-          <div className="flex items-center justify-center rounded-full w-[80px] h-[80px] bg-primary">
-            <Check size={36} className="text-background" style={{ strokeWidth: 3 }} />
-          </div>
-        </div>
-
-        {/* Arabic celebration */}
-        <div className="text-center">
-          <h1
-            className="text-[34px] text-primary font-bold leading-[48px]"
-            style={{ fontFamily: "'Noto Naskh Arabic', serif" }}
-          >
-            مَاشَاءَ اللَّه
-          </h1>
-          <p className="text-[22px] text-foreground font-sans font-extrabold mt-1">Masha&apos;Allah!</p>
-          <p className="text-[14px] text-muted-foreground font-sans mt-1.5">You completed {cat.name}</p>
-        </div>
-
-        {/* Stats grid */}
-        <div className="w-full grid grid-cols-3 gap-3">
-          {[
-            { value: azkar.length, label: "azkar" },
-            { value: totalReps, label: "repetitions" },
-            { value: elapsedMin, label: "minutes" },
-          ].map(({ value, label }) => (
-            <div key={label} className="rounded-xl p-4 text-center bg-card border border-border">
-              <p
-                className="text-[26px] font-extrabold text-primary leading-[32px]"
-                dir="ltr"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-              >
-                {formatNumerals(value, language)}
-              </p>
-              <p className="mt-1 text-[12px] text-muted-foreground font-sans">{label}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Streak callout */}
-        <div
-          className="w-full rounded-xl px-4 py-3 flex items-center gap-3 border"
-          style={{
-            background: "color-mix(in srgb, var(--primary) 10%, transparent)",
-            borderColor: "color-mix(in srgb, var(--primary) 30%, transparent)",
-          }}
-        >
-          <Flame size={20} className="text-primary" />
-          <div>
-            <p className="text-[13px] font-bold text-primary font-sans">
-              {formatNumerals(currentStreak, language)}-day streak maintained!
-            </p>
-            <p className="text-[12px] text-muted-foreground font-sans">Consistency is a form of worship.</p>
-          </div>
-        </div>
+      <div
+        className="relative mx-auto mt-7 flex h-28 w-28 items-center justify-center rounded-full bg-primary"
+        aria-hidden="true"
+      >
+        <Check size={48} className="text-primary-foreground" strokeWidth={2} />
+        <Sparkles size={18} className="absolute -left-3 bottom-4 text-secondary" />
+        <Sparkles size={16} className="absolute -right-3 top-3 text-primary" />
       </div>
 
-      {/* Actions */}
-      <div className="w-full flex flex-col gap-3">
+      <h1 className="mt-8 text-[28px] font-extrabold leading-9 text-primary">
+        {isArabic ? "ما شاء الله!" : "Masha’Allah!"}
+      </h1>
+      <p className="mt-2 text-[17px] font-semibold text-card-foreground">
+        {isArabic ? `لقد أتممت ${cat.nameArabic}` : `You completed ${cat.name}`}
+      </p>
+      <p className="mt-2 text-[13px] text-muted-foreground">
+        {isArabic ? "كل ذكر نور في قلبك" : "Every remembrance is a light in your heart"}
+      </p>
+
+      <section className="mt-8 grid grid-cols-2 gap-3" aria-label="Session summary">
+        {stats.map(({ value, suffix, label }) => (
+          <article
+            key={label}
+            className="flex min-h-[94px] flex-col items-center justify-center rounded-2xl bg-card p-4"
+          >
+            <p className="text-[25px] font-extrabold text-primary" style={{ fontFamily: numeralFontFamily(language) }}>
+              {formatNumerals(value, language)}
+              {suffix}
+            </p>
+            <p className="mt-1 text-[12px] text-muted-foreground">{label}</p>
+          </article>
+        ))}
+      </section>
+
+      <p className="mt-auto pt-7 text-[11px] text-muted-foreground">
+        {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en-US", { dateStyle: "long" }).format(new Date())}
+      </p>
+      <div className="mt-3 grid gap-3">
         <button
-          disabled
-          aria-label="Share Progress Soon"
-          className="w-full rounded-xl flex items-center justify-center gap-2 h-12 bg-card border border-border text-[15px] font-sans font-semibold opacity-50 cursor-not-allowed"
+          type="button"
+          onClick={() => void share()}
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground"
         >
-          <Share2 size={16} className="text-card-foreground" />{" "}
-          <span className="text-card-foreground">Share Progress Soon</span>
+          <Share2 size={18} /> {isArabic ? "مشاركة التقدم" : "Share progress"}
         </button>
         <button
+          type="button"
           onClick={onHome}
-          className="w-full rounded-xl font-bold transition-all active:scale-95 h-[52px] bg-primary text-background text-[16px] font-sans focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground"
         >
-          Return Home
+          <Home size={18} /> {isArabic ? "العودة للرئيسية" : "Return home"}
         </button>
       </div>
     </div>

@@ -1,7 +1,14 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
-import type { AppLanguage, AudioQuality, ColorBlindSupport, TextSizeOption } from "../../types";
+import type {
+  AppLanguage,
+  AudioQuality,
+  ColorBlindSupport,
+  StoredSession,
+  TextSizeOption,
+  ThemeMode,
+} from "../../types";
 import { t } from "../../i18n";
 import {
   AboutPanel,
@@ -16,12 +23,15 @@ import {
 } from "./SettingsPanels";
 
 export function SettingsScreen({
-  darkMode,
+  themeMode,
   languageLabel,
   language,
   phoneAuthEnabled,
   isGuest,
   isSyncing,
+  sessions,
+  currentStreak,
+  longestStreak,
   textSize,
   highContrast,
   boldText,
@@ -32,7 +42,7 @@ export function SettingsScreen({
   audioQuality,
   colorBlindSupport,
   onLanguageChange,
-  onToggleDark,
+  onThemeModeChange,
   onTextSizeChange,
   onHighContrastChange,
   onBoldTextChange,
@@ -46,12 +56,15 @@ export function SettingsScreen({
   onSignOut,
   onBack,
 }: {
-  darkMode: boolean;
+  themeMode: ThemeMode;
   languageLabel: string;
   language: AppLanguage;
   phoneAuthEnabled: boolean;
   isGuest: boolean;
   isSyncing: boolean;
+  sessions: StoredSession[];
+  currentStreak: number;
+  longestStreak: number;
   textSize: TextSizeOption;
   highContrast: boolean;
   boldText: boolean;
@@ -62,7 +75,7 @@ export function SettingsScreen({
   audioQuality: AudioQuality;
   colorBlindSupport: ColorBlindSupport;
   onLanguageChange: (value: AppLanguage) => void;
-  onToggleDark: () => void;
+  onThemeModeChange: (value: ThemeMode) => void;
   onTextSizeChange: (value: TextSizeOption) => void;
   onHighContrastChange: (value: boolean) => void;
   onBoldTextChange: (value: boolean) => void;
@@ -91,14 +104,14 @@ export function SettingsScreen({
           <SettingsRootPanel
             onNav={setSub}
             language={language}
-            darkMode={darkMode}
+            themeMode={themeMode}
             languageLabel={languageLabel}
             phoneAuthEnabled={phoneAuthEnabled}
             audioQuality={audioQuality}
             textSize={textSize}
             isGuest={isGuest}
             isSyncing={isSyncing}
-            onToggleDark={onToggleDark}
+            onThemeModeChange={onThemeModeChange}
             onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
           />
@@ -134,7 +147,15 @@ export function SettingsScreen({
       )}
       {sub === "downloads" && <DownloadsPanel onBack={goBack} />}
       {sub === "notifications" && <NotificationsPanel onBack={goBack} />}
-      {sub === "progress" && <ProgressPanel onBack={goBack} />}
+      {sub === "progress" && (
+        <ProgressPanel
+          onBack={goBack}
+          language={language}
+          sessions={sessions}
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+        />
+      )}
       {sub === "about" && <AboutPanel onBack={goBack} />}
     </div>
   );

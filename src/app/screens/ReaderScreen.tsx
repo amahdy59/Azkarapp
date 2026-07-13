@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   Check,
+  BookOpen,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
@@ -452,6 +453,20 @@ export function ReaderScreen({
 
       <button
         type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          setBenefitOpen(true);
+        }}
+        aria-haspopup="dialog"
+        className="flex h-12 min-w-[154px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[14px] font-semibold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <BookOpen size={17} />
+        {t(language, "reader.referencesButton")}
+        <ChevronUp size={17} />
+      </button>
+
+      <button
+        type="button"
         onClick={handleToggleSaved}
         aria-label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         aria-pressed={isSaved}
@@ -514,30 +529,6 @@ export function ReaderScreen({
       {showTransliteration && (
         <p className="text-center text-[15px] italic leading-[26px] text-card-foreground">{z.transliteration}</p>
       )}
-
-      <div className="rounded-[22px] border border-border bg-card/40 overflow-hidden">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            setBenefitOpen((open) => !open);
-          }}
-          aria-expanded={benefitOpen}
-          aria-controls="inline-reference-content"
-          className="flex w-full items-center gap-3 px-4 py-4 text-start transition-colors hover:bg-card/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <div className="text-muted-foreground">
-            {benefitOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-          </div>
-          <p className="flex-1 text-[16px] font-semibold text-foreground">{t(language, "reader.referencesButton")}</p>
-        </button>
-
-        {benefitOpen && (
-          <div id="inline-reference-content" className="fade-in border-t border-border px-4 pb-4 pt-3">
-            {renderReferenceContent()}
-          </div>
-        )}
-      </div>
     </div>
   );
 
@@ -778,6 +769,43 @@ export function ReaderScreen({
           {listenMode ? renderListeningPanel() : renderCounterPanel()}
         </div>
       </div>
+
+      {benefitOpen && (
+        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/45">
+          <button
+            type="button"
+            className="absolute inset-0 cursor-default"
+            onClick={() => setBenefitOpen(false)}
+            aria-label="Close reference"
+          />
+          <section
+            role="dialog"
+            aria-modal="true"
+            aria-label={t(language, "reader.referencesButton")}
+            className="fade-in relative max-h-[82dvh] w-full max-w-[390px] overflow-y-auto rounded-t-[20px] bg-background px-6 pb-6 pt-3 shadow-[0_-12px_32px_rgba(0,0,0,0.18)]"
+          >
+            <div className="relative flex min-h-11 items-center justify-center">
+              <span className="h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
+              <button
+                type="button"
+                onClick={() => setBenefitOpen(false)}
+                aria-label="Close reference"
+                className="absolute right-0 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <p
+              className="mt-2 rounded-xl bg-muted px-3 py-4 text-center text-[18px] leading-7 text-muted-foreground"
+              dir="rtl"
+              lang="ar"
+            >
+              {z.arabicText}
+            </p>
+            <div className="mt-4">{renderReferenceContent()}</div>
+          </section>
+        </div>
+      )}
     </div>
   );
 }
