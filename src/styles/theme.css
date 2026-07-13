@@ -686,10 +686,6 @@ body {
   animation: counter-ready-glow 720ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
 }
 
-.counter-ready-prompt {
-  animation: fade-in 360ms ease-out 180ms both;
-}
-
 .counter-number {
   animation: counter-number-pop 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }

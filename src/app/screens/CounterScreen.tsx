@@ -200,12 +200,9 @@ export function CounterScreen({
           <CounterRing count={count} total={z.repetitionCount} size={200} />
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             {complete ? (
-              <>
-                <div className="mb-2 flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary">
-                  <Check size={26} className="text-primary-foreground" />
-                </div>
-                <p className="font-sans text-[14px] font-bold text-primary">{t(language, "reader.complete")}</p>
-              </>
+              <div className="flex h-[52px] w-[52px] items-center justify-center rounded-full bg-primary">
+                <Check size={26} className="text-primary-foreground" />
+              </div>
             ) : (
               <>
                 <p

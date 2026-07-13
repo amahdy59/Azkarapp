@@ -14,24 +14,29 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
-test("counter acknowledges completion for 500 ms and gives the next zikr a calm ready cue", async ({ page }) => {
+test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 
   const zikr = page.getByTestId("zikr-text");
+  const counterSurface = page.getByTestId("counter-surface");
   const firstZikr = await zikr.textContent();
   expect(firstZikr).toBeTruthy();
-  await expect(page.getByText("Take a calm breath, then tap to begin", { exact: true })).toBeVisible();
+  await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
+  await expect(page.getByText("Take a calm breath, then tap to begin", { exact: true })).toHaveCount(0);
 
   const startedAt = Date.now();
-  await page.getByTestId("counter-surface").click();
+  await counterSurface.click();
 
-  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
-  await expect(page.getByText("Complete!", { exact: true })).toBeVisible();
+  const completionCue = page.getByTestId("counter-completion-cue");
+  await expect(completionCue).toBeVisible();
+  await expect(completionCue.locator("svg")).toBeVisible();
+  await expect(counterSurface).toHaveText("");
+  await expect(page.getByText("Complete!", { exact: true })).toHaveCount(0);
 
   await page.waitForTimeout(350);
   await expect(zikr).toHaveText(firstZikr!);
 
   await expect(zikr).not.toHaveText(firstZikr!, { timeout: 1000 });
   expect(Date.now() - startedAt).toBeGreaterThanOrEqual(450);
-  await expect(page.getByText("Take a calm breath, then tap to begin", { exact: true })).toBeVisible();
+  await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
 });

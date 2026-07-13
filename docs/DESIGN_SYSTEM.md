@@ -40,6 +40,8 @@ Rules:
 - Reader content shows the zikr only. EN, TR, and Listen controls are intentionally hidden until a future approved feature revision.
 - There is no separator between zikr content and the counter.
 - The counter ring is 184 CSS px. The entire counter surface is the 44 px-plus accessible tap target, not only the ring. It uses `touch-action: manipulation`, supports Enter/Space, and sits in the upper-middle/lower-thumb transition zone so one-handed use remains comfortable.
+- Before counting, the only visible instruction is “Tap anywhere to count” (localized). Do not add breathing, readiness, motivational, or other generic helper copy.
+- Per-zikr completion is visually checkmark-only: no text appears inside the ring or around it during the 500 ms acknowledgement. Completion details remain available through the nonvisual live-region announcement.
 - Share, references, and save remain separate 48 px actions below the counter.
 - The reader has one contained vertical scroll region. Short screens must preserve access to the zikr, counter, and actions without document-level horizontal overflow.
 
@@ -78,21 +80,21 @@ Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease
 
 ### Screen audit
 
-| Surface                    | Required microinteraction                                                                                                                                                                    |
-| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Splash/onboarding/auth     | One directional screen entrance; buttons compress slightly on press; progress dots resize smoothly. No looping decoration.                                                                   |
-| Home/category/search       | Cards compress to 98% on press; progress changes animate; completed state remains visible without replaying celebration whenever the list opens.                                             |
-| Bottom navigation          | Active icon performs one 220 ms lift/pop; press feedback remains subtle and does not reorder tabs.                                                                                           |
-| Reader — new zikr          | Content settles upward over 260 ms. The empty ring performs one 600 ms “calm breath” and halo, with “Take a calm breath, then tap to begin.” It never blocks the first tap.                  |
-| Reader — each count        | Number performs a 160 ms restrained pop, ring progress animates, a short 8 ms supported-device vibration confirms the physical tap, and the existing pulse ring responds once.               |
-| Reader — completion        | Lock duplicate taps, fill the ring, animate a drawn check, announce completion, use a short completion vibration pattern where supported, retain the state for exactly 500 ms, then advance. |
-| Reader menu/save/reference | Menu opens in 160 ms, save heart pops once, scrim fades in, and sheet rises in 260 ms with the close control immediately available.                                                          |
-| Settings                   | Toggle thumb and color change together in 200–300 ms; rows use opacity/press feedback; destructive actions do not celebrate.                                                                 |
-| Session completion         | Main check uses the celebration pop/glow once; summary cards enter with a short stagger; primary actions compress on press.                                                                  |
+| Surface                    | Required microinteraction                                                                                                                                                                          |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Splash/onboarding/auth     | One directional screen entrance; buttons compress slightly on press; progress dots resize smoothly. No looping decoration.                                                                         |
+| Home/category/search       | Cards compress to 98% on press; progress changes animate; completed state remains visible without replaying celebration whenever the list opens.                                                   |
+| Bottom navigation          | Active icon performs one 220 ms lift/pop; press feedback remains subtle and does not reorder tabs.                                                                                                 |
+| Reader — new zikr          | Content settles upward over 260 ms. The empty ring performs one restrained 600 ms readiness pulse and halo; the only visible instruction is “Tap anywhere to count.”                               |
+| Reader — each count        | Number performs a 160 ms restrained pop, ring progress animates, a short 8 ms supported-device vibration confirms the physical tap, and the existing pulse ring responds once.                     |
+| Reader — completion        | Lock duplicate taps, fill the ring, animate a check with no visible text, announce completion nonvisually, use a short vibration pattern where supported, retain for exactly 500 ms, then advance. |
+| Reader menu/save/reference | Menu opens in 160 ms, save heart pops once, scrim fades in, and sheet rises in 260 ms with the close control immediately available.                                                                |
+| Settings                   | Toggle thumb and color change together in 200–300 ms; rows use opacity/press feedback; destructive actions do not celebrate.                                                                       |
+| Session completion         | Main check uses the celebration pop/glow once; summary cards enter with a short stagger; primary actions compress on press.                                                                        |
 
 ### Accessibility and feedback
 
-- Completion uses a visible check, text, progress state, an assertive live-region announcement, and optional vibration; it never relies on color or vibration alone.
+- Completion uses a visible check, progress state, an assertive live-region announcement, and optional vibration; it never relies on color or vibration alone.
 - Ready-state copy is announced when a new zikr starts. Counter activation supports pointer, Enter, and Space.
 - Never delay navigation for decorative motion except the documented 500 ms completion acknowledgement.
 - Do not add autoplaying, looping, flashing, parallax, or large lateral movement. Haptics must be short, optional, and ignored gracefully when unsupported.

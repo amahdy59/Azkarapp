@@ -107,7 +107,7 @@ export function ReaderScreen({
     setJustCompleted(false);
     setBenefitOpen(false);
     setReaderAnnouncement(
-      initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.counterReady"),
+      initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.tapAnywhere"),
     );
     setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
   }, [idx, isDone, language, z]);
@@ -212,7 +212,7 @@ export function ReaderScreen({
     setCount(0);
     setComplete(false);
     setJustCompleted(false);
-    setReaderAnnouncement(t(language, "reader.counterReady"));
+    setReaderAnnouncement(t(language, "reader.tapAnywhere"));
     setPulse((value) => value + 1);
   };
 
@@ -430,7 +430,6 @@ export function ReaderScreen({
                   <span className="counter-check-mark">
                     <Check size={42} strokeWidth={2.5} />
                   </span>
-                  <span className="mt-2 text-[14px] font-bold text-primary">{t(language, "reader.complete")}</span>
                 </div>
               ) : (
                 <>
@@ -460,18 +459,10 @@ export function ReaderScreen({
             </div>
           </div>
 
-          <p className={`mt-5 text-[18px] font-bold ${complete ? "text-primary" : "text-foreground"}`}>
-            {complete
-              ? t(language, "reader.completionContext", { count: localizedDisplayCount })
-              : count === 0
-                ? t(language, "reader.counterReady")
-                : t(language, "reader.tapAnywhere")}
-          </p>
-          {!complete && count === 0 ? (
-            <p className="counter-ready-prompt mt-2 text-[14px] text-muted-foreground">
-              {t(language, "reader.counterReadyPrompt")}
-            </p>
-          ) : remaining > 0 ? (
+          {!complete && (
+            <p className="mt-5 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+          )}
+          {!complete && count > 0 && remaining > 0 ? (
             <p className="mt-2 text-[14px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
             </p>
