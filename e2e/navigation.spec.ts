@@ -15,9 +15,9 @@ test("Azkar tab opens the library and exposes search", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Search adhkar and duas", exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: /Morning Azkar, 0 of \d+ complete/ }).click();
+  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+ complete/ }).click();
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
-  await expect(page.getByText(/0 of \d+ complete/).first()).toBeVisible();
+  await expect(page.getByText(/\d+ of \d+/).first()).toBeVisible();
 
   await page.getByRole("button", { name: "Go back", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();

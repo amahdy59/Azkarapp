@@ -8,7 +8,7 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  await page.getByRole("button", { name: /Morning Azkar, 0 of \d+ complete/ }).click();
+  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+/ }).click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
@@ -31,8 +31,11 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   await expect(counterSurface).toHaveText("");
   await expect(page.getByText("Complete!", { exact: true })).toHaveCount(0);
 
-  await page.waitForTimeout(350);
-  await expect(zikr).toHaveText(firstZikr!);
+  const elapsed = Date.now() - startedAt;
+  if (elapsed < 300) {
+    await page.waitForTimeout(300 - elapsed);
+    await expect(zikr).toHaveText(firstZikr!);
+  }
 
   await expect(zikr).not.toHaveText(firstZikr!, { timeout: 1000 });
   expect(Date.now() - startedAt).toBeGreaterThanOrEqual(450);

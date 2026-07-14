@@ -4,7 +4,8 @@ import { expect, test } from "@playwright/test";
 test("initial flow has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
-  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  // Wait for the splash screen to finish by looking for the Language screen content
+  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible({ timeout: 5000 });
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
 });

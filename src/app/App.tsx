@@ -163,7 +163,7 @@ export default function App() {
 
   // Apply theme class to root
   useEffect(() => {
-    const fontSizeMap: Record<TextSizeOption, string> = {
+    const fontSizeMap = {
       small: "14px",
       medium: "16px",
       large: "18px",
