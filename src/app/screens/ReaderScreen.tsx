@@ -444,9 +444,21 @@ export function ReaderScreen({
   );
 
   const renderReadingContent = () => (
-    <div className="px-6 pb-3 pt-3">
+    <div
+      className="px-6 pb-3 pt-3 cursor-pointer touch-manipulation rounded-2xl transition-colors hover:bg-white/5 active:bg-white/10 mx-4 mt-2"
+      onClick={handleSurfaceTap}
+      role="button"
+      tabIndex={0}
+      aria-label={t(language, "reader.tapAnywhere")}
+      onKeyDown={(event) => {
+        if (event.key === " " || event.key === "Enter") {
+          event.preventDefault();
+          handleTap();
+        }
+      }}
+    >
       <p
-        className="zikr-text text-center text-[24px] font-medium leading-[1.5] text-foreground"
+        className="zikr-text text-center text-[24px] font-medium leading-[1.5] text-foreground pointer-events-none"
         data-testid="zikr-text"
         dir="rtl"
         lang="ar"
