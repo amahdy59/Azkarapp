@@ -11,12 +11,13 @@ export function LanguageScreen({
   onContinue: (lang: AppLanguage) => void;
 }) {
   const [selected, setSelected] = useState<AppLanguage>(initialLanguage);
+  // Keep the overall page direction based on the current selection
   const isArabic = selected === "ar";
 
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
       <div className="flex flex-col items-center gap-2 px-6 pt-5 pb-4 shrink-0">
-        <div className="relative w-[32px] h-[32px]">
+        <div className="relative w-[32px] h-[32px]" aria-hidden="true">
           <div className="absolute" style={{ inset: "-18.75% 0 0 -18.75%" }}>
             <svg width="38" height="38" viewBox="0 0 38 38" fill="none">
               <circle cx="22" cy="22" r="16" fill="currentColor" className="text-primary" />
@@ -25,36 +26,48 @@ export function LanguageScreen({
           </div>
         </div>
         <p className="text-[15px] font-semibold text-foreground font-sans">Azkar</p>
-        <p className="text-[18px] font-semibold text-foreground font-sans leading-[24px] text-center">
+        <h1 className="text-[18px] font-semibold text-foreground font-sans leading-[24px] text-center">
           {isArabic ? "اختر لغتك" : "Choose Your Language"}
-        </p>
+        </h1>
         <p className="text-[12px] text-muted-foreground font-sans leading-[16px]">
           {isArabic ? "يمكنك تغييرها لاحقًا من الإعدادات" : "You can change this later in Settings"}
         </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 flex flex-col gap-2 pb-4">
+      <div 
+        className="flex-1 overflow-y-auto px-6 flex flex-col gap-3 pb-4"
+        role="radiogroup"
+        aria-label={isArabic ? "اللغات المتاحة" : "Available Languages"}
+      >
         {LANGUAGES_LIST.map((lang) => {
           const active = selected === lang.code;
           return (
             <button
               key={lang.code}
+              role="radio"
+              aria-checked={active}
               data-testid={`language-option-${lang.code}`}
               onClick={() => setSelected(lang.code)}
-              className="flex items-center gap-3 rounded-xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border"
-              style={{
-                borderInlineStart: active ? `4px solid var(--primary)` : `4px solid transparent`,
-                borderColor: active ? `color-mix(in srgb, var(--primary) 40%, transparent)` : `var(--border)`,
-              }}
+              className={`relative flex items-center justify-center gap-3 rounded-2xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                active ? "border-primary shadow-sm" : "border-border"
+              }`}
+              dir={lang.code === "ar" ? "rtl" : "ltr"}
+              lang={lang.code}
             >
-              <p
-                className="flex-1 text-start text-[17px] font-semibold text-foreground font-sans leading-[24px]"
-                dir="auto"
-              >
-                {lang.native}
-              </p>
-              <p className="text-[11px] text-muted-foreground font-sans uppercase">{lang.code}</p>
-              {active && <Check size={20} className="shrink-0 text-primary" />}
+              <div className="flex items-center justify-center gap-3 w-full">
+                {active && (
+                  <div className="absolute left-4">
+                    <Check size={20} className="text-primary" aria-hidden="true" />
+                  </div>
+                )}
+                
+                <span className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider" aria-hidden="true">
+                  {lang.code}
+                </span>
+                <span className="text-[17px] font-semibold text-foreground">
+                  {lang.native}
+                </span>
+              </div>
             </button>
           );
         })}
@@ -64,7 +77,7 @@ export function LanguageScreen({
         <button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
-          className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95 h-[52px] bg-primary text-[17px] font-semibold text-primary-foreground font-sans"
+          className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[17px] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isArabic ? "متابعة" : "Continue"}
         </button>
