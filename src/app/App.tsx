@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef, useCallback } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useCallback, type CSSProperties } from "react";
 import {
   fromCompletedSets,
   getStreakSummary,
@@ -33,16 +33,12 @@ type View =
   // Phase 2 — English onboarding
   | "splash"
   | "onboard1"
-  | "onboard2"
-  | "onboard3"
   | "language"
   | "login"
   | "phone"
   | "otp"
   // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
   | "ar_onboard1"
-  | "ar_onboard2"
-  | "ar_onboard3"
   // Phase 3
   | "settings"
   // Phase 4
@@ -70,31 +66,19 @@ const SplashScreen = lazy(() =>
 const EnglishOnboarding1Screen = lazy(() =>
   import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding1Screen })),
 );
-const EnglishOnboarding2Screen = lazy(() =>
-  import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding2Screen })),
-);
-const EnglishOnboarding3Screen = lazy(() =>
-  import("./screens/onboarding/EnglishOnboarding").then((module) => ({ default: module.EnglishOnboarding3Screen })),
-);
 const ArOnboarding1Screen = lazy(() =>
-  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding1Screen })),
-);
-const ArOnboarding2Screen = lazy(() =>
-  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding2Screen })),
-);
-const ArOnboarding3Screen = lazy(() =>
-  import("./screens/onboarding/ArabicOnboarding").then((module) => ({ default: module.ArOnboarding3Screen })),
+  import("./screens/onboarding/ArabicWelcomeScreen").then((module) => ({ default: module.ArabicWelcomeScreen })),
 );
 const LanguageScreen = lazy(() =>
   import("./screens/onboarding/LanguageScreen").then((module) => ({ default: module.LanguageScreen })),
 );
 const LoginScreen = lazy(() =>
-  import("./screens/auth/AuthScreens").then((module) => ({ default: module.LoginScreen })),
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.LoginScreen })),
 );
 const PhoneInputScreen = lazy(() =>
-  import("./screens/auth/AuthScreens").then((module) => ({ default: module.PhoneInputScreen })),
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.PhoneInputScreen })),
 );
-const OTPScreen = lazy(() => import("./screens/auth/AuthScreens").then((module) => ({ default: module.OTPScreen })));
+const OTPScreen = lazy(() => import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.OTPScreen })));
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function maskPhoneNumber(phone: string) {
@@ -559,7 +543,7 @@ export default function App() {
       setCompleted(toCompletedSets(mergedState.completed));
       setSessions(mergedState.sessions);
       setIsGuest(false);
-      setView(mergedState.settings.language === "ar" ? "ar_onboard1" : "onboard1");
+      setView("home");
       setActiveTab("home");
       setHistory([]);
     } catch (error) {
@@ -614,12 +598,28 @@ export default function App() {
 
   const showBottomNav = ["home", "category", "settings"].includes(view);
   const showStatusBar = ["home", "category", "reader", "completion", "settings", "search"].includes(view);
+  const usesReferenceDarkTheme = ["home", "category", "reader"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
     <div className="app-viewport min-h-screen flex items-center justify-center">
       {/* Phone frame */}
-      <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
+      <div
+        className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl"
+        style={
+          usesReferenceDarkTheme
+            ? ({
+                "--background": "#0d0d0d",
+                "--foreground": "#f5f0e8",
+                "--card": "#171717",
+                "--card-foreground": "#b0aed0",
+                "--muted": "#555555",
+                "--muted-foreground": "#b0aed0",
+                "--border": "#555555",
+              } as CSSProperties)
+            : undefined
+        }
+      >
         <NetworkStatus />
 
         {showStatusBar && <StatusBar />}
@@ -629,6 +629,7 @@ export default function App() {
             {/* Phase 2 — onboarding flow */}
             {view === "splash" && (
               <SplashScreen
+                language={selectedLang}
                 onDone={() => {
                   setView("language");
                 }}
@@ -636,48 +637,28 @@ export default function App() {
             )}
             {view === "onboard1" && (
               <EnglishOnboarding1Screen
-                onNext={() => setView("onboard2")}
+                onNext={() => setView("login")}
                 onSkip={() => {
                   setView("home");
                   setActiveTab("home");
                 }}
               />
             )}
-            {view === "onboard2" && (
-              <EnglishOnboarding2Screen onNext={() => setView("onboard3")} onBack={() => setView("onboard1")} />
-            )}
-            {view === "onboard3" && (
-              <EnglishOnboarding3Screen
-                onNext={() => {
-                  setView("home");
-                  setActiveTab("home");
-                }}
-                onBack={() => setView("onboard2")}
-              />
-            )}
-
             {/* Arabic onboarding — shown for Arabic-locale devices */}
             {view === "ar_onboard1" && (
               <ArOnboarding1Screen
-                onNext={() => setView("ar_onboard2")}
+                onNext={() => setView("login")}
                 onSkip={() => {
                   setView("home");
                 }}
               />
             )}
-            {view === "ar_onboard2" && (
-              <ArOnboarding2Screen onNext={() => setView("ar_onboard3")} onBack={() => setView("ar_onboard1")} />
-            )}
-            {view === "ar_onboard3" && (
-              <ArOnboarding3Screen onNext={() => setView("home")} onBack={() => setView("ar_onboard2")} />
-            )}
-
             {view === "language" && (
               <LanguageScreen
                 initialLanguage={selectedLang}
                 onContinue={(lang) => {
                   setSelectedLang(lang);
-                  setView("login");
+                  setView(lang === "ar" ? "ar_onboard1" : "onboard1");
                 }}
               />
             )}
@@ -692,7 +673,7 @@ export default function App() {
                 onGuest={() => {
                   setDisplayName("Guest");
                   setIsGuest(true);
-                  setView(isArabic ? "ar_onboard1" : "onboard1");
+                  setView("home");
                   setActiveTab("home");
                   setHistory([]);
                 }}
@@ -710,7 +691,7 @@ export default function App() {
                   setView("login");
                 }}
                 onSkip={() => {
-                  setView(isArabic ? "ar_onboard1" : "onboard1");
+                  setView("home");
                   setActiveTab("home");
                   setHistory([]);
                 }}

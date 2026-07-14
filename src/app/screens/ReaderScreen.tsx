@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowPrevious, BookOpen, Check, ChevronUp, Copy, Heart, Share2, Menu, X } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
@@ -392,7 +392,7 @@ export function ReaderScreen({
   );
 
   const renderCounterActions = () => (
-    <div className="flex items-center justify-between gap-4 px-2">
+    <div className="flex items-center justify-between gap-4 px-2" dir="ltr">
       <button
         type="button"
         onClick={() => {
@@ -415,7 +415,7 @@ export function ReaderScreen({
         className="flex h-12 min-w-[166px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[14px] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <BookOpen size={17} />
-        {t(language, "reader.referencesButton")}
+        <span dir="auto">{t(language, "reader.referencesButton")}</span>
         <ChevronUp size={17} />
       </button>
 
@@ -435,7 +435,7 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <div className="px-6 pb-3 pt-3">
       <p
-        className="zikr-text text-center text-[24px] font-medium leading-[36px] text-foreground"
+        className="zikr-text text-center text-[24px] font-medium leading-[1.5] text-foreground"
         data-testid="zikr-text"
         dir="rtl"
         lang="ar"
@@ -446,7 +446,7 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => (
-    <div className="flex min-h-[470px] flex-1 flex-col px-5 pb-5" data-testid="counter-panel">
+    <div className="flex min-h-[360px] flex-1 flex-col px-5 pb-3" data-testid="counter-panel">
       <div className="flex min-h-0 flex-1 flex-col">
         <div
           role="button"
@@ -454,7 +454,7 @@ export function ReaderScreen({
           tabIndex={0}
           aria-disabled={complete}
           aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className={`flex min-h-[280px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
+          className={`flex min-h-[300px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
           onClick={handleSurfaceTap}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
@@ -464,10 +464,10 @@ export function ReaderScreen({
           }}
         >
           <div
-            className={`counter-ring-stage pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+            className={`counter-ring-stage pointer-events-none relative flex h-[160px] w-[160px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
           >
-            <PulseRings trigger={pulse} size={184} />
-            <CounterRing count={count} total={z.repetitionCount} size={184} />
+            <PulseRings trigger={pulse} size={160} />
+            <CounterRing count={count} total={z.repetitionCount} size={160} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {complete ? (
                 <div
@@ -506,9 +506,7 @@ export function ReaderScreen({
             </div>
           </div>
 
-          {!complete && (
-            <p className="mt-5 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
-          )}
+          {!complete && <p className="mt-6 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>}
           {!complete && count > 0 && remaining > 0 ? (
             <p className="mt-2 text-[14px] font-semibold text-primary">
               {t(language, "reader.remaining", { count: localizedRemaining })}
@@ -516,7 +514,6 @@ export function ReaderScreen({
           ) : null}
         </div>
 
-        <div className="mt-5">{renderCounterActions()}</div>
       </div>
     </div>
   );
@@ -525,6 +522,17 @@ export function ReaderScreen({
     <div
       className="relative flex h-full flex-col bg-background"
       dir={isArabic ? "rtl" : "ltr"}
+      style={
+        {
+          "--background": "#0d0d0d",
+          "--foreground": "#f5f0e8",
+          "--card": "#171717",
+          "--card-foreground": "#b0aed0",
+          "--muted": "#555555",
+          "--muted-foreground": "#b0aed0",
+          "--border": "#555555",
+        } as CSSProperties
+      }
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) {
@@ -575,7 +583,7 @@ export function ReaderScreen({
           </button>
 
           <p className="truncate text-center text-[20px] font-bold text-foreground" dir="auto">
-            {category.nameArabic}
+            {isArabic ? category.nameArabic : category.name}
           </p>
 
           <button
@@ -631,6 +639,11 @@ export function ReaderScreen({
       </div>
 
       <div className="shrink-0 px-5 pb-3 pt-2">
+        <p className="mb-3 text-end text-[14px] font-semibold text-foreground">
+          {isArabic
+            ? `ذكر ${formatNumerals(idx + 1, language)} من ${formatNumerals(azkar.length, language)}`
+            : `Zikr ${formatNumerals(idx + 1, language)} of ${formatNumerals(azkar.length, language)}`}
+        </p>
         <ProgressBar
           value={readingProgressValue}
           max={azkar.length}
@@ -647,6 +660,8 @@ export function ReaderScreen({
           {renderCounterPanel()}
         </div>
       </ScrollArea>
+
+      <footer className="shrink-0 px-6 pb-4 pt-3">{renderCounterActions()}</footer>
 
       {benefitOpen && (
         <div className="scrim-in fixed inset-0 z-50 flex items-end justify-center bg-black/45">

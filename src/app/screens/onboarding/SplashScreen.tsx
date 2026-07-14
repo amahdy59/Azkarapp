@@ -1,55 +1,40 @@
 import React, { useEffect } from "react";
 import { motion } from "motion/react";
-import { CrescentMark } from "../../components/CrescentMark";
+import type { AppLanguage } from "../../types";
+import { BrandLockup } from "./OnboardingBrand";
 
-export function SplashScreen({ onDone }: { onDone: () => void }) {
+export function SplashScreen({ onDone, language }: { onDone: () => void; language: AppLanguage }) {
   useEffect(() => {
-    const t = setTimeout(onDone, 2500);
-    return () => clearTimeout(t);
+    const timer = window.setTimeout(onDone, 2500);
+    return () => window.clearTimeout(timer);
   }, [onDone]);
 
-  return (
-    <div
-      className="flex flex-col items-center justify-between h-full bg-background"
-      role="status"
-      aria-live="polite"
-      aria-label="Loading Azkar"
-    >
-      <motion.div
-        className="flex flex-col items-center w-full flex-1 pt-20"
-        initial={{ y: 16 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 1.2, ease: [0.5, 0, 0.5, 1] }}
-      >
-        <div className="flex flex-col items-center gap-5">
-          <CrescentMark size={80} />
-          <div className="flex flex-col items-center gap-2">
-            <p
-              className="text-[40px] font-extrabold text-primary leading-[44px]"
-              style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
-              dir="auto"
-            >
-              أذكار
-            </p>
-            <p className="text-[18px] font-bold text-foreground font-sans tracking-[1.44px]">Azkar</p>
-            <svg width="60" height="1" viewBox="0 0 60 1" fill="none">
-              <line x1="0" y1="0.5" x2="60" y2="0.5" stroke="var(--primary)" />
-            </svg>
-          </div>
-        </div>
+  const arabic = language === "ar";
 
-        <p className="latin-ui mt-10 text-[15px] text-muted-foreground" lang="en" dir="ltr">
-          Daily remembrance
+  return (
+    <div className="flex h-full flex-col items-center justify-between bg-background" role="status" aria-live="polite" aria-label="Loading Azkar">
+      <motion.div
+        className="flex flex-1 flex-col items-center justify-center pb-16"
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <BrandLockup />
+        <div className="my-7 h-px w-20 bg-primary" />
+        <p
+          className="text-[14px] font-medium uppercase tracking-[0.56px] text-muted-foreground"
+          style={arabic ? { fontFamily: "'IBM Plex Sans Arabic', sans-serif" } : undefined}
+          dir={arabic ? "rtl" : "ltr"}
+        >
+          {arabic ? "الذكر اليومي للمسلم" : "Daily Remembrance"}
         </p>
       </motion.div>
 
-      <div className="flex flex-col items-center gap-3 pb-12">
-        <div className="rounded-full overflow-hidden w-[160px] h-1 bg-card-foreground/25" aria-hidden="true">
-          <div className="h-full rounded-full bg-primary" style={{ width: 96 }} />
+      <div className="flex flex-col items-center gap-3 pb-14">
+        <div className="h-1 w-40 overflow-hidden rounded-full bg-card" aria-hidden="true">
+          <motion.div className="h-full rounded-full bg-primary" initial={{ width: 0 }} animate={{ width: 100 }} transition={{ duration: 2.3, ease: "easeInOut" }} />
         </div>
-        <p className="latin-ui text-[11px] font-medium text-muted-foreground" lang="en" dir="ltr">
-          Version 2.0.1
-        </p>
+        <p className="text-[10px] font-medium text-muted-foreground/50">v2.0</p>
       </div>
     </div>
   );

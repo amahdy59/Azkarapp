@@ -80,7 +80,7 @@ export function BottomNav({
               className="flex min-w-12 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
-                <Icon size={24} style={{ color: on ? "var(--nav-active)" : "var(--nav-inactive)" }} />
+                <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
                 className={`font-sans text-[11px] font-semibold leading-[14px] ${on ? "text-primary" : "text-muted-foreground"}`}

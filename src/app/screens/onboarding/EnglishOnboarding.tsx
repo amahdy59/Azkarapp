@@ -1,4 +1,5 @@
 import React from "react";
+import { FeatureCheck, WelcomeArtwork } from "./OnboardingBrand";
 
 export function StepDots({ active, total = 3 }: { active: number; total?: number }) {
   return (
@@ -62,69 +63,26 @@ export function OnboardCTA({
 
 export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right">
-      <div className="relative shrink-0 flex items-center justify-center overflow-hidden h-[360px] bg-background">
-        <svg width="280" height="280" viewBox="0 0 280 280" fill="none" className="absolute">
-          <circle cx="140" cy="140" r="140" fill="currentColor" className="text-primary" fillOpacity="0.12" />
-        </svg>
-        {[
-          [-60, -30],
-          [40, -50],
-          [-20, 40],
-        ].map(([dx, dy], i) => (
-          <svg
-            key={i}
-            width="6"
-            height="6"
-            viewBox="0 0 6 6"
-            fill="none"
-            className="absolute text-primary"
-            style={{ left: `calc(50% + ${dx}px)`, top: `calc(50% + ${dy}px)`, transform: "translate(-50%,-50%)" }}
-          >
-            <circle cx="3" cy="3" r="3" fill="currentColor" />
-          </svg>
-        ))}
-        <div className="absolute w-[140px] h-[140px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="absolute inset-y-0 right-0 left-[-50%]">
-            <svg width="210" height="140" viewBox="0 0 210 140" fill="none">
-              <circle cx="70" cy="70" r="70" fill="currentColor" className="text-primary" />
-              <circle cx="140" cy="70" r="70" fill="currentColor" className="text-background" />
-            </svg>
-          </div>
-        </div>
-        <div className="absolute flex flex-col items-center gap-1.5 whitespace-nowrap top-[calc(50%+70px)] left-1/2 -translate-x-1/2">
-          <p
-            className="text-[44px] font-extrabold text-foreground leading-[48px]"
-            style={{ fontFamily: "'Noto Sans Arabic', 'Inter', sans-serif" }}
-            dir="auto"
-          >
-            {"\u0623\u0630\u0643\u0627\u0631"}
-          </p>
-          <p className="text-[13px] font-bold text-primary font-sans tracking-[1.04px]">AZKAR</p>
-        </div>
+    <div className="flex h-full flex-col bg-background slide-in-from-right">
+      <div className="h-[360px] shrink-0">
+        <WelcomeArtwork />
       </div>
-
-      <div className="flex flex-col items-center gap-4 flex-1 px-7 pt-2 pb-7 relative">
-        <StepDots active={0} />
-        <div className="text-center">
-          <p className="text-[28px] font-extrabold text-foreground font-sans leading-[36px] tracking-[-0.28px]">
-            Your daily Islamic
-            <br />
-            remembrance
-          </p>
-        </div>
-        <p className="text-center text-[14px] text-muted-foreground font-sans leading-[22px]">
-          Authentic du&apos;as from Hisn al-Muslim
+      <div className="flex flex-1 flex-col items-center gap-7 px-7 pb-7 pt-5">
+        <h1 className="text-center text-[28px] font-extrabold leading-9 tracking-[-0.28px] text-foreground">
+          Your Daily
           <br />
-          Morning, evening, and sleep adhkar
-        </p>
-        <div className="flex flex-col gap-3 w-full">
-          <FeatureItem text="Authentic du'as from Hisn al-Muslim" colorClass="bg-secondary" />
-          <FeatureItem text="15 morning, 15 evening, 10 sleep adhkar" colorClass="bg-primary" />
-          <FeatureItem text="Works offline - no internet needed" colorClass="bg-secondary" />
+          Companion for Dhikr
+        </h1>
+        <div className="flex w-full flex-col gap-4">
+          <FeatureCheck>Morning, evening &amp; sleep sessions</FeatureCheck>
+          <FeatureCheck>Tap-to-count with haptic feedback</FeatureCheck>
+          <FeatureCheck>Works fully offline</FeatureCheck>
         </div>
         <div className="flex-1" />
-        <OnboardCTA primary="Get started" secondary="Skip" onPrimary={onNext} onSecondary={onSkip} />
+        <button onClick={onNext} className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[17px] font-bold text-primary-foreground shadow-[inset_0_-2px_0_rgba(10,13,18,0.12)] transition-transform active:scale-[0.98]">
+          Get Started
+        </button>
+        <button onClick={onSkip} className="sr-only">Skip onboarding</button>
       </div>
     </div>
   );
