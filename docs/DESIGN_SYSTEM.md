@@ -58,6 +58,9 @@ Rules:
 
 ## Home and azkar-group contract
 
+- Home is the time-aware daily dashboard. The Azkar tab always opens the library index; it must never reopen an implicit previously selected category.
+- The library owns global search and the complete set of released collections. Unreleased collections stay hidden until reviewed content and navigation exist.
+- Category totals are derived from the content collection at runtime. Do not maintain duplicate display totals in category metadata.
 - Arabic group cards use an explicit physical LTR grid so visual placement is deterministic: Arabic text occupies the right column with its own `dir="rtl"`, the category icon sits to its left, and the back/entry chevron is the far-left element. English mirrors that physical grid.
 - Group progress fills from the reading start edge: right-to-left for Arabic and left-to-right for English. DOM and tab order remain stable in both languages.
 - The featured “start your zikr” card is time-aware: Morning from 05:00–14:59, Evening from 15:00–20:59, and Before Sleep from 21:00–04:59 local device time. It always opens the first zikr in the selected group.

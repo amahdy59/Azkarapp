@@ -1,11 +1,11 @@
 import type { CSSProperties } from "react";
-import { ArrowNext, BookOpen, ChevronLeft, MoonStar, Sun } from "../components/icons";
+import { ArrowNext, ChevronLeft, Leaf, Sprout, Search } from "../components/icons";
 import beforeSleepScene from "../../assets/home/before-sleep-scene.png";
 import eveningScene from "../../assets/home/evening-scene.png";
 import morningScene from "../../assets/home/morning-scene.png";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
-import { ALL_AZKAR } from "../content/azkar";
+import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage, CategoryId } from "../types";
@@ -21,41 +21,34 @@ const FEATURED_COPY: Record<
   { ar: { title: string; description: string; cta: string }; en: { title: string; description: string; cta: string } }
 > = {
   morning: {
-    ar: { title: "حان وقت أذكار الصباح", description: "أذكار الصباح تُقرأ بعد صلاة الفجر حتى الشروق", cta: "ابدأ أذكار الصباح" },
-    en: { title: "It’s time for Morning Azkar", description: "Read after Fajr until sunrise", cta: "Begin Morning Azkar" },
+    ar: {
+      title: "حان وقت أذكار الصباح",
+      description: "أذكار الصباح تُقرأ بعد صلاة الفجر حتى الشروق",
+      cta: "ابدأ أذكار الصباح",
+    },
+    en: {
+      title: "It’s time for Morning Azkar",
+      description: "Read after Fajr until sunrise",
+      cta: "Begin Morning Azkar",
+    },
   },
   evening: {
-    ar: { title: "حان وقت أذكار المساء", description: "أذكار المساء تُقرأ بعد صلاة العصر حتى المغرب", cta: "ابدأ أذكار المساء" },
-    en: { title: "It’s time for Evening Azkar", description: "Read after Asr until Maghrib", cta: "Begin Evening Azkar" },
+    ar: {
+      title: "حان وقت أذكار المساء",
+      description: "أذكار المساء تُقرأ بعد صلاة العصر حتى المغرب",
+      cta: "ابدأ أذكار المساء",
+    },
+    en: {
+      title: "It’s time for Evening Azkar",
+      description: "Read after Asr until Maghrib",
+      cta: "Begin Evening Azkar",
+    },
   },
   before_sleep: {
     ar: { title: "حان وقت أذكار النوم", description: "أذكار النوم تُقرأ عند الاستعداد للنوم", cta: "ابدأ أذكار النوم" },
     en: { title: "It’s time for Sleep Azkar", description: "Read as you prepare for sleep", cta: "Begin Sleep Azkar" },
   },
 };
-
-const SECONDARY_CATEGORIES = [
-  { ar: "أذكار بعد الصلاة", en: "After Prayer Azkar", Icon: MoonStar },
-  { ar: "أذكار الاستيقاظ", en: "Waking Up Azkar", Icon: Sun },
-  { ar: "أدعية نبوية", en: "Prophetic Duas", Icon: BookOpen },
-];
-
-function LeafBadgeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M16.8 3.2C10.2 3.5 5.5 6.2 4.4 10.5c-.8 3.1 1.1 5.5 4.2 5.1 4.7-.6 7.2-5.6 8.2-12.4Z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-      <path d="M3.2 16.8c2.3-3.5 5.2-6.2 9.1-8.2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PalmBadgeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-      <path d="M10 7.5c-.1 3.6-.3 6.6-1.3 9.3M10 7.5c2.4-3.1 5.1-3.4 7.1-1.8-2.4.2-4.2 1-5.4 2.4M10 7.5C7.6 4.4 4.9 4.1 2.9 5.7c2.4.2 4.2 1 5.4 2.4M10 7.5c-.3-3.2 1.1-5.1 3.4-5.5.1 2.2-.6 3.9-2.2 5.4M10 7.5C10.3 4.3 8.9 2.4 6.6 2c-.1 2.2.6 3.9 2.2 5.4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
 
 export function getScheduledCategory(date: Date): CategoryId {
   const hour = date.getHours();
@@ -69,6 +62,7 @@ export function HomeScreen({
   currentStreak,
   onCategory,
   onFeaturedZikr,
+  onSearch,
   language,
 }: {
   completed: Record<CategoryId, Set<number>>;
@@ -76,7 +70,7 @@ export function HomeScreen({
   currentStreak: number;
   longestStreak: number;
   onCategory: (category: CategoryId) => void;
-  onFeaturedZikr: (category: CategoryId, index: number) => void;
+  onFeaturedZikr: (category: CategoryId, itemIndex: number) => void;
   onSearch: () => void;
   language: AppLanguage;
 }) {
@@ -109,16 +103,23 @@ export function HomeScreen({
         <span aria-hidden="true" />
         <div className="flex items-center justify-between" dir="ltr">
           <span className="flex items-center gap-1 text-[15px] font-bold text-[#5ec88a]">
-            <LeafBadgeIcon />
+            <Leaf size={20} aria-hidden="true" />
             {formatNumerals(currentStreak, language)}
           </span>
           <h1 className="text-[18px] font-bold text-foreground">{isArabic ? "الأذكار" : "Azkar"}</h1>
           <span className="flex items-center gap-1 text-[15px] font-bold text-[#5ec88a]">
-            <PalmBadgeIcon />
+            <Sprout size={20} aria-hidden="true" />
             {formatNumerals(3, language)}
           </span>
         </div>
-        <span aria-hidden="true" />
+        <button
+          type="button"
+          onClick={onSearch}
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-card text-muted-foreground transition-transform active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={isArabic ? "البحث" : "Search"}
+        >
+          <Search size={20} aria-hidden="true" />
+        </button>
       </header>
 
       <p className="shrink-0 px-9 pb-2 text-start text-[14px] font-bold text-card-foreground">{hijriDate}</p>
@@ -151,7 +152,8 @@ export function HomeScreen({
         <div className="space-y-3">
           {CATEGORIES.map((category) => {
             const done = completed[category.id]?.size ?? 0;
-            const percent = category.totalCount ? Math.round((done / category.totalCount) * 100) : 0;
+            const totalCount = getCategoryTotal(category.id);
+            const percent = totalCount ? Math.round((done / totalCount) * 100) : 0;
             return (
               <button
                 key={category.id}
@@ -160,40 +162,50 @@ export function HomeScreen({
                 dir="ltr"
                 data-testid={`category-card-${category.id}`}
                 className={`grid min-h-[104px] w-full grid-rows-[auto_auto_auto] items-center gap-x-3 rounded-2xl border border-border bg-card p-4 text-start ${isArabic ? "grid-cols-[20px_36px_minmax(0,1fr)]" : "grid-cols-[minmax(0,1fr)_36px_20px]"}`}
-                aria-label={isArabic ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(category.totalCount, language)} مكتملة` : `${category.name}, ${done} of ${category.totalCount} complete`}
+                aria-label={
+                  isArabic
+                    ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة`
+                    : `${category.name}, ${done} of ${totalCount} complete`
+                }
               >
-                <ChevronLeft size={22} aria-hidden="true" data-slot="category-chevron" className={`row-span-3 self-center text-card-foreground ${isArabic ? "col-start-1" : "col-start-3 -scale-x-100"}`} />
-                <div data-slot="category-icon" className="col-start-2 row-span-2 flex flex-col items-center justify-center gap-2 self-center">
+                <ChevronLeft
+                  size={22}
+                  aria-hidden="true"
+                  data-slot="category-chevron"
+                  className={`row-span-3 self-center text-card-foreground ${isArabic ? "col-start-1" : "col-start-3 -scale-x-100"}`}
+                />
+                <div
+                  data-slot="category-icon"
+                  className="col-start-2 row-span-2 flex flex-col items-center justify-center gap-2 self-center"
+                >
                   <CatIcon type={category.icon} size={24} color="var(--primary)" />
                   <span className="text-[12px] text-muted-foreground">{formatNumerals(percent, language)}%</span>
                 </div>
-                <div dir={isArabic ? "rtl" : "ltr"} data-slot="category-copy" className={`min-w-0 self-center ${isArabic ? "col-start-3 text-right" : "col-start-1 text-left"}`}>
-                  <p className="text-[16px] font-bold text-foreground">{isArabic ? category.nameArabic : category.name}</p>
+                <div
+                  dir={isArabic ? "rtl" : "ltr"}
+                  data-slot="category-copy"
+                  className={`min-w-0 self-center ${isArabic ? "col-start-3 text-right" : "col-start-1 text-left"}`}
+                >
+                  <p className="text-[16px] font-bold text-foreground">
+                    {isArabic ? category.nameArabic : category.name}
+                  </p>
                   <p className="mt-1 text-[13px] text-muted-foreground">
-                    {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(category.totalCount, language)} {isArabic ? "مكتملة" : "complete"}
+                    {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(totalCount, language)}{" "}
+                    {isArabic ? "مكتملة" : "complete"}
                   </p>
                 </div>
                 <div className={`mt-2 ${isArabic ? "col-start-2 col-end-4" : "col-start-1 col-end-3"}`}>
-                  <ProgressBar value={done} max={category.totalCount} height={4} direction={isArabic ? "rtl" : "ltr"} aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`} />
+                  <ProgressBar
+                    value={done}
+                    max={totalCount}
+                    height={4}
+                    direction={isArabic ? "rtl" : "ltr"}
+                    aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`}
+                  />
                 </div>
               </button>
             );
           })}
-        </div>
-
-        <div className="mx-12 my-3 h-px bg-card-foreground" />
-
-        <div className="space-y-3">
-          {SECONDARY_CATEGORIES.map(({ ar, en, Icon }) => (
-            <div
-              key={en}
-              className={`grid min-h-[66px] grid-cols-[20px_36px_minmax(0,1fr)] items-center gap-x-3 rounded-2xl border border-border bg-card p-4 ${isArabic ? "" : "[direction:rtl]"}`}
-            >
-              <ChevronLeft size={22} className="text-card-foreground" aria-hidden="true" />
-              <Icon size={24} className="text-primary" aria-hidden="true" />
-              <p className={`text-[16px] font-bold text-foreground ${isArabic ? "text-right" : "text-left [direction:ltr]"}`}>{isArabic ? ar : en}</p>
-            </div>
-          ))}
         </div>
       </div>
     </div>

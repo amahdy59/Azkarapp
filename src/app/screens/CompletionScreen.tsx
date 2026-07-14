@@ -85,17 +85,17 @@ export function CompletionScreen({
       <div className="mt-3 grid gap-3">
         <button
           type="button"
-          onClick={() => void share()}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground transition-transform duration-150 active:scale-[0.98]"
-        >
-          <Share2 size={18} /> {isArabic ? "مشاركة التقدم" : "Share progress"}
-        </button>
-        <button
-          type="button"
           onClick={onHome}
           className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground transition-transform duration-150 active:scale-[0.98]"
         >
           <Home size={18} /> {isArabic ? "العودة للرئيسية" : "Return home"}
+        </button>
+        <button
+          type="button"
+          onClick={() => void share()}
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-border bg-card font-bold text-foreground transition-transform duration-150 active:scale-[0.98]"
+        >
+          <Share2 size={18} /> {isArabic ? "مشاركة التقدم" : "Share progress"}
         </button>
       </div>
     </div>

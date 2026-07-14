@@ -1,23 +1,30 @@
 import React, { useEffect } from "react";
-import { motion } from "motion/react";
+import { motion, useReducedMotion } from "motion/react";
 import type { AppLanguage } from "../../types";
 import { BrandLockup } from "./OnboardingBrand";
 
 export function SplashScreen({ onDone, language }: { onDone: () => void; language: AppLanguage }) {
+  const reduceMotion = useReducedMotion();
+
   useEffect(() => {
-    const timer = window.setTimeout(onDone, 2500);
+    const timer = window.setTimeout(onDone, 1200);
     return () => window.clearTimeout(timer);
   }, [onDone]);
 
   const arabic = language === "ar";
 
   return (
-    <div className="flex h-full flex-col items-center justify-between bg-background" role="status" aria-live="polite" aria-label="Loading Azkar">
+    <div
+      className="flex h-full flex-col items-center justify-between bg-background"
+      role="status"
+      aria-live="polite"
+      aria-label="Loading Azkar"
+    >
       <motion.div
         className="flex flex-1 flex-col items-center justify-center pb-16"
-        initial={{ opacity: 0, y: 14 }}
+        initial={reduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+        transition={{ duration: reduceMotion ? 0 : 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
         <BrandLockup />
         <div className="my-7 h-px w-20 bg-primary" />
@@ -32,9 +39,14 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
 
       <div className="flex flex-col items-center gap-3 pb-14">
         <div className="h-1 w-40 overflow-hidden rounded-full bg-card" aria-hidden="true">
-          <motion.div className="h-full rounded-full bg-primary" initial={{ width: 0 }} animate={{ width: 100 }} transition={{ duration: 2.3, ease: "easeInOut" }} />
+          <motion.div
+            className="h-full rounded-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: 100 }}
+            transition={{ duration: reduceMotion ? 0 : 1.1, ease: "easeInOut" }}
+          />
         </div>
-        <p className="text-[10px] font-medium text-muted-foreground/50">v2.0</p>
+        <p className="text-[10px] font-medium text-muted-foreground">v2.0</p>
       </div>
     </div>
   );

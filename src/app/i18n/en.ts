@@ -98,10 +98,11 @@ const en = {
     resetCounter: "Reset counter",
     prev: "Prev",
     next: "Next",
+    undo: "Undo",
   },
   auth: {
     welcome: "Welcome to Azkar",
-    syncSubtitle: "Sign in to sync your progress across all your devices",
+    syncSubtitle: "Sign in to securely sync your progress, favorites, and preferences across devices.",
     phoneDisabled: "Add Supabase env vars to enable phone sign-in.",
     googleSoon: "Google Coming Soon",
     appleSoon: "Apple Coming Soon",

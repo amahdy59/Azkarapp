@@ -17,7 +17,7 @@ import { motion } from "motion/react";
 import { t } from "../../i18n";
 import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
-import { CATEGORIES } from "../../content/categories";
+import { getCategoryTotal } from "../../content/azkar";
 import { CatIcon } from "../../components/CatIcon";
 import { CrescentMark } from "../../components/CrescentMark";
 import { RowChevron, RowToggle, RowValue, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
@@ -245,7 +245,7 @@ export function DownloadsPanel({ onBack }: { onBack: () => void }) {
                   <div className="min-w-0 flex-1">
                     <p className="font-sans text-[17px] font-semibold leading-[24px] text-foreground">{label}</p>
                     <p className="font-sans text-[13px] leading-[20px] text-muted-foreground">
-                      {CATEGORIES.find((category) => category.id === id)?.totalCount} azkar · {size}
+                      {getCategoryTotal(id)} azkar · {size}
                     </p>
                     {(state === "downloading" || state === "paused") && (
                       <div className="mt-3">

@@ -79,10 +79,16 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
           <FeatureCheck>Works fully offline</FeatureCheck>
         </div>
         <div className="flex-1" />
-        <button onClick={onNext} className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[17px] font-bold text-primary-foreground shadow-[inset_0_-2px_0_rgba(10,13,18,0.12)] transition-transform active:scale-[0.98]">
+        <button
+          data-testid="onboarding-get-started"
+          onClick={onNext}
+          className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[17px] font-bold text-primary-foreground shadow-[inset_0_-2px_0_rgba(10,13,18,0.12)] transition-transform active:scale-[0.98]"
+        >
           Get Started
         </button>
-        <button onClick={onSkip} className="sr-only">Skip onboarding</button>
+        <button onClick={onSkip} className="sr-only">
+          Skip onboarding
+        </button>
       </div>
     </div>
   );

@@ -4,13 +4,11 @@ async function openFirstMorningZikr(page: Page) {
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
 
-  await page.getByRole("button", { name: "🇬🇧 English en", exact: true }).click();
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page
-    .getByRole("button", { name: "Continue as Guest Your progress won't sync across devices", exact: true })
-    .click();
-  await page.getByRole("button", { name: "Skip", exact: true }).click();
-  await page.getByRole("button", { name: "Morning Azkar, 0 of 15 complete", exact: true }).click();
+  await page.getByTestId("language-option-en").click();
+  await page.getByTestId("confirm-language").click();
+  await page.getByTestId("onboarding-get-started").click();
+  await page.getByTestId("continue-as-guest").click();
+  await page.getByRole("button", { name: /Morning Azkar, 0 of \d+ complete/ }).click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 

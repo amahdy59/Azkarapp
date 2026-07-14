@@ -21,7 +21,13 @@ export function BrandLockup({ compact = false }: { compact?: boolean }) {
       >
         أذكار
       </p>
-      <p className={compact ? "text-[9px] font-bold tracking-[0.72px] text-foreground" : "text-[17px] font-bold tracking-[1.4px] text-foreground"}>
+      <p
+        className={
+          compact
+            ? "text-[9px] font-bold tracking-[0.72px] text-foreground"
+            : "text-[17px] font-bold tracking-[1.4px] text-foreground"
+        }
+      >
         {compact ? "AZKAR" : "Azkar"}
       </p>
     </div>
@@ -43,7 +49,11 @@ export function WelcomeArtwork({ arabic = false }: { arabic?: boolean }) {
         <BrandCrescent size={arabic ? 124 : 140} />
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-primary">
-        <p className="text-[38px] font-bold leading-[44px]" style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }} lang="ar">
+        <p
+          className="text-[38px] font-bold leading-[44px]"
+          style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}
+          lang="ar"
+        >
           أذكار
         </p>
         <p className="text-[11px] font-bold tracking-[1.2px]">AZKAR</p>

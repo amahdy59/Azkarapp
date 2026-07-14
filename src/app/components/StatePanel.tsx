@@ -28,10 +28,14 @@ export function StatePanel({
   kind,
   actionLabel,
   onAction,
+  title,
+  description,
 }: {
   kind: AppStateKind;
   actionLabel?: string;
   onAction?: () => void;
+  title?: string;
+  description?: string;
 }) {
   const copy = COPY[kind];
   const Icon = ICONS[kind];
@@ -41,8 +45,10 @@ export function StatePanel({
       role="status"
     >
       <Icon size={32} className="text-primary" aria-hidden="true" />
-      <h2 className="mt-3 text-[17px] font-semibold text-foreground">{copy.title}</h2>
-      <p className="mt-1 max-w-sm text-[14px] leading-[22px] text-muted-foreground">{copy.description}</p>
+      <h2 className="mt-3 text-[17px] font-semibold text-foreground">{title ?? copy.title}</h2>
+      <p className="mt-1 max-w-sm text-[14px] leading-[22px] text-muted-foreground">
+        {description ?? copy.description}
+      </p>
       {actionLabel && onAction && (
         <button
           type="button"

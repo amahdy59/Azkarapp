@@ -1,5 +1,16 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import { ArrowPrevious, BookOpen, Check, ChevronUp, Copy, Heart, Share2, Menu, X } from "../components/icons";
+import {
+  ArrowPrevious,
+  BookOpen,
+  Check,
+  ChevronUp,
+  Copy,
+  Heart,
+  Share2,
+  Menu,
+  X,
+  RotateCcw,
+} from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -464,10 +475,10 @@ export function ReaderScreen({
           }}
         >
           <div
-            className={`counter-ring-stage pointer-events-none relative flex h-[160px] w-[160px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+            className={`counter-ring-stage pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
           >
-            <PulseRings trigger={pulse} size={160} />
-            <CounterRing count={count} total={z.repetitionCount} size={160} />
+            <PulseRings trigger={pulse} size={184} />
+            <CounterRing count={count} total={z.repetitionCount} size={184} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {complete ? (
                 <div
@@ -506,14 +517,29 @@ export function ReaderScreen({
             </div>
           </div>
 
-          {!complete && <p className="mt-6 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>}
+          {!complete && (
+            <p className="mt-6 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+          )}
           {!complete && count > 0 && remaining > 0 ? (
-            <p className="mt-2 text-[14px] font-semibold text-primary">
-              {t(language, "reader.remaining", { count: localizedRemaining })}
-            </p>
+            <div className="mt-2 flex items-center justify-center gap-2">
+              <p className="text-[14px] font-semibold text-primary">
+                {t(language, "reader.remaining", { count: localizedRemaining })}
+              </p>
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCount((c) => Math.max(0, c - 1));
+                  setPulse((value) => value + 1);
+                }}
+                className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors hover:bg-primary/20 active:bg-primary/30"
+                aria-label={t(language, "reader.undo")}
+              >
+                <RotateCcw size={14} />
+              </button>
+            </div>
           ) : null}
         </div>
-
       </div>
     </div>
   );
@@ -639,11 +665,6 @@ export function ReaderScreen({
       </div>
 
       <div className="shrink-0 px-5 pb-3 pt-2">
-        <p className="mb-3 text-end text-[14px] font-semibold text-foreground">
-          {isArabic
-            ? `ذكر ${formatNumerals(idx + 1, language)} من ${formatNumerals(azkar.length, language)}`
-            : `Zikr ${formatNumerals(idx + 1, language)} of ${formatNumerals(azkar.length, language)}`}
-        </p>
         <ProgressBar
           value={readingProgressValue}
           max={azkar.length}

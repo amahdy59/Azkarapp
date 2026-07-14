@@ -26,7 +26,7 @@ export function Header({
         </button>
       )}
       <div className="flex-1 min-w-0">
-        <p className="font-semibold truncate text-[17px] leading-6 text-foreground font-sans">{title}</p>
+        <h1 className="font-semibold truncate text-[17px] leading-6 text-foreground font-sans">{title}</h1>
         {subtitle && <p className="text-[12px] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}

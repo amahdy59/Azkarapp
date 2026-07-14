@@ -27,6 +27,7 @@ import { isSupabaseConfigured } from "../lib/supabase";
 // ─── Types ────────────────────────────────────────────────────────────────────
 type View =
   | "home"
+  | "library"
   | "category"
   | "reader"
   | "completion"
@@ -49,6 +50,9 @@ import { NetworkStatus } from "./components/NetworkStatus";
 import { LANGUAGE_LABELS } from "./languageOptions";
 
 const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
+const AzkarLibraryScreen = lazy(() =>
+  import("./screens/AzkarLibraryScreen").then((module) => ({ default: module.AzkarLibraryScreen })),
+);
 const CategoryScreen = lazy(() =>
   import("./screens/CategoryScreen").then((module) => ({ default: module.CategoryScreen })),
 );
@@ -78,7 +82,9 @@ const LoginScreen = lazy(() =>
 const PhoneInputScreen = lazy(() =>
   import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.PhoneInputScreen })),
 );
-const OTPScreen = lazy(() => import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.OTPScreen })));
+const OTPScreen = lazy(() =>
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.OTPScreen })),
+);
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function maskPhoneNumber(phone: string) {
@@ -415,6 +421,7 @@ export default function App() {
     setHistory((h) => {
       const prev = h[h.length - 1] ?? "home";
       setView(prev);
+      setActiveTab(prev === "settings" ? "settings" : prev === "library" || prev === "category" ? "azkar" : "home");
       return h.slice(0, -1);
     });
   }, []);
@@ -422,7 +429,7 @@ export default function App() {
   const openCategory = (catId: CategoryId) => {
     setActiveCat(catId);
     setActiveTab("azkar");
-    setHistory([]);
+    setHistory([view]);
     setView("category");
   };
 
@@ -590,15 +597,15 @@ export default function App() {
     if (tab === "home") {
       setView("home");
     } else if (tab === "azkar") {
-      setView("category");
+      setView("library");
     } else if (tab === "settings") {
       setView("settings");
     }
   };
 
-  const showBottomNav = ["home", "category", "settings"].includes(view);
-  const showStatusBar = ["home", "category", "reader", "completion", "settings", "search"].includes(view);
-  const usesReferenceDarkTheme = ["home", "category", "reader"].includes(view);
+  const showBottomNav = ["home", "library", "category", "settings"].includes(view);
+  const showStatusBar = ["home", "library", "category", "reader", "completion", "settings", "search"].includes(view);
+  const usesReferenceDarkTheme = ["home", "library", "category", "reader", "search"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
@@ -730,6 +737,14 @@ export default function App() {
                 language={selectedLang}
               />
             )}
+            {view === "library" && (
+              <AzkarLibraryScreen
+                completed={completed}
+                language={selectedLang}
+                onCategory={openCategory}
+                onSearch={() => push("search")}
+              />
+            )}
             {view === "category" && (
               <CategoryScreen
                 catId={activeCat}
@@ -808,6 +823,7 @@ export default function App() {
             )}
             {view === "search" && (
               <SearchScreen
+                language={selectedLang}
                 onBack={pop}
                 onZikr={(catId, i) => {
                   openReader(catId, i);

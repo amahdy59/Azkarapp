@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
-import type { CategoryId } from "../types";
+import type { AppLanguage, CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
 
 const RECENT_SEARCHES = ["Istighfar", "Morning Dua", "Ayat al-Kursi"];
 
-export function CategoryBadge({ catId }: { catId: CategoryId }) {
+export function CategoryBadge({ catId, language = "en" }: { catId: CategoryId; language?: AppLanguage }) {
+  const isArabic = language === "ar";
   const cfg = {
-    morning: { label: "Morning", className: "bg-primary text-primary-foreground" },
-    evening: { label: "Evening", className: "bg-secondary text-secondary-foreground" },
-    before_sleep: { label: "Sleep", className: "bg-[#4A3D6B] text-foreground" },
+    morning: { label: isArabic ? "الصباح" : "Morning", className: "bg-primary text-primary-foreground" },
+    evening: { label: isArabic ? "المساء" : "Evening", className: "bg-secondary text-secondary-foreground" },
+    before_sleep: { label: isArabic ? "النوم" : "Sleep", className: "bg-[#4A3D6B] text-foreground" },
   }[catId];
 
   return (
@@ -23,12 +24,15 @@ export function CategoryBadge({ catId }: { catId: CategoryId }) {
 export function SearchScreen({
   onBack,
   onZikr,
+  language,
 }: {
   onBack: () => void;
   onZikr: (catId: CategoryId, i: number) => void;
+  language: AppLanguage;
 }) {
+  const isArabic = language === "ar";
   const [q, setQ] = useState("");
-  const [recents, setRecents] = useState(RECENT_SEARCHES);
+  const [recents, setRecents] = useState(() => (isArabic ? [] : RECENT_SEARCHES));
 
   const results =
     q.trim().length < 2
@@ -51,12 +55,12 @@ export function SearchScreen({
   };
 
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right">
+    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
       <div className="flex items-center gap-3 px-5 py-3 shrink-0">
         <button
           onClick={onBack}
           className="flex items-center justify-center w-11 h-11 shrink-0 active:scale-95 transition-all"
-          aria-label="Back"
+          aria-label={isArabic ? "رجوع" : "Back"}
         >
           <ArrowPrevious size={24} className="text-foreground" />
         </button>
@@ -65,8 +69,8 @@ export function SearchScreen({
           <Search size={18} className="text-primary shrink-0" />
           <input
             type="text"
-            placeholder="Search adhkar or du'as"
-            aria-label="Search adhkar and du'as"
+            placeholder={isArabic ? "ابحث في الأذكار والأدعية" : "Search adhkar or duas"}
+            aria-label={isArabic ? "البحث في الأذكار والأدعية" : "Search adhkar and duas"}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && q.trim() && handleSubmit(q.trim())}
@@ -77,7 +81,7 @@ export function SearchScreen({
             <button
               onClick={() => setQ("")}
               className="flex items-center justify-center shrink-0 w-11 h-11 -mr-3 text-muted-foreground"
-              aria-label="Clear search"
+              aria-label={isArabic ? "مسح البحث" : "Clear search"}
             >
               <X size={16} />
             </button>
@@ -89,7 +93,7 @@ export function SearchScreen({
         {!q && recents.length > 0 && (
           <div className="mb-6">
             <p className="mb-3 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">
-              Recent searches
+              {isArabic ? "عمليات البحث الأخيرة" : "Recent searches"}
             </p>
             <div className="flex flex-wrap gap-2">
               {recents.map((term) => (
@@ -104,7 +108,9 @@ export function SearchScreen({
                     type="button"
                     onClick={() => setRecents((current) => current.filter((saved) => saved !== term))}
                     className="flex items-center justify-center w-11 h-11 text-secondary-foreground/70 hover:text-secondary-foreground"
-                    aria-label={`Remove ${term} from recent searches`}
+                    aria-label={
+                      isArabic ? `إزالة ${term} من عمليات البحث الأخيرة` : `Remove ${term} from recent searches`
+                    }
                   >
                     <X size={12} />
                   </button>
@@ -118,16 +124,26 @@ export function SearchScreen({
           <div className="flex flex-col gap-2" aria-live="polite">
             {results.length > 0 && (
               <p className="mb-1 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">
-                {results.length} result{results.length === 1 ? "" : "s"} for &quot;{q}&quot;
+                {isArabic
+                  ? `${results.length} نتيجة للبحث عن «${q}»`
+                  : `${results.length} result${results.length === 1 ? "" : "s"} for “${q}”`}
               </p>
             )}
             {results.length === 0 ? (
-              <StatePanel kind="empty-search" actionLabel="Clear search" onAction={() => setQ("")} />
+              <StatePanel
+                kind="empty-search"
+                title={isArabic ? "لم يتم العثور على أذكار" : undefined}
+                description={isArabic ? "جرّب كلمة أخرى بالعربية أو الإنجليزية أو بالتهجئة اللاتينية." : undefined}
+                actionLabel={isArabic ? "مسح البحث" : "Clear search"}
+                onAction={() => setQ("")}
+              />
             ) : (
               results.map((z) => {
                 const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);
-                const label = ZIKR_LABELS[z.id] ?? z.transliteration.slice(0, 24);
-                const subtitle = z.translation.slice(0, 40);
+                const label = isArabic
+                  ? z.arabicText.split("\n")[0]
+                  : (ZIKR_LABELS[z.id] ?? z.transliteration.slice(0, 24));
+                const subtitle = isArabic ? z.translation.slice(0, 40) : z.translation.slice(0, 40);
                 return (
                   <button
                     key={z.id}
@@ -143,7 +159,7 @@ export function SearchScreen({
                       </p>
                     </div>
                     <div className="rtl:mr-2 ltr:ml-2">
-                      <CategoryBadge catId={z.category} />
+                      <CategoryBadge catId={z.category} language={language} />
                     </div>
                   </button>
                 );
@@ -156,7 +172,9 @@ export function SearchScreen({
           <div className="py-6 flex flex-col items-center gap-3">
             <div className="w-full h-px opacity-15 bg-muted-foreground" />
             <p className="text-[12px] text-muted-foreground font-sans leading-[18px] text-center">
-              Try Arabic, English, or transliteration
+              {isArabic
+                ? "ابحث بالعربية أو الإنجليزية أو بالتهجئة اللاتينية"
+                : "Try Arabic, English, or transliteration"}
             </p>
           </div>
         )}

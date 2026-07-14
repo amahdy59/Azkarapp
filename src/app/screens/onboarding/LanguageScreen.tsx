@@ -11,9 +11,10 @@ export function LanguageScreen({
   onContinue: (lang: AppLanguage) => void;
 }) {
   const [selected, setSelected] = useState<AppLanguage>(initialLanguage);
+  const isArabic = selected === "ar";
 
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right">
+    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
       <div className="flex flex-col items-center gap-2 px-6 pt-5 pb-4 shrink-0">
         <div className="relative w-[32px] h-[32px]">
           <div className="absolute" style={{ inset: "-18.75% 0 0 -18.75%" }}>
@@ -25,10 +26,10 @@ export function LanguageScreen({
         </div>
         <p className="text-[15px] font-semibold text-foreground font-sans">Azkar</p>
         <p className="text-[18px] font-semibold text-foreground font-sans leading-[24px] text-center">
-          Choose Your Language
+          {isArabic ? "اختر لغتك" : "Choose Your Language"}
         </p>
         <p className="text-[12px] text-muted-foreground font-sans leading-[16px]">
-          You can change this later in Settings
+          {isArabic ? "يمكنك تغييرها لاحقًا من الإعدادات" : "You can change this later in Settings"}
         </p>
       </div>
 
@@ -38,6 +39,7 @@ export function LanguageScreen({
           return (
             <button
               key={lang.code}
+              data-testid={`language-option-${lang.code}`}
               onClick={() => setSelected(lang.code)}
               className="flex items-center gap-3 rounded-xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border"
               style={{
@@ -45,7 +47,6 @@ export function LanguageScreen({
                 borderColor: active ? `color-mix(in srgb, var(--primary) 40%, transparent)` : `var(--border)`,
               }}
             >
-              <span className="text-[26px] leading-none shrink-0">{lang.flag}</span>
               <p
                 className="flex-1 text-start text-[17px] font-semibold text-foreground font-sans leading-[24px]"
                 dir="auto"
@@ -61,10 +62,11 @@ export function LanguageScreen({
 
       <div className="px-6 pb-8 shrink-0">
         <button
+          data-testid="confirm-language"
           onClick={() => onContinue(selected)}
           className="w-full flex items-center justify-center rounded-xl transition-all active:scale-95 h-[52px] bg-primary text-[17px] font-semibold text-primary-foreground font-sans"
         >
-          Continue
+          {isArabic ? "متابعة" : "Continue"}
         </button>
       </div>
     </div>
