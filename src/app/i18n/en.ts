@@ -33,9 +33,14 @@ const en = {
   },
   category: {
     completeSubtitle: "{done} of {total} complete",
+    remainingSubtitle: "{remaining} of {total} remaining",
     startSession: "Start Session",
-    resumeZikr: "Resume - Zikr {index}",
+    resumeZikr: "Resume • Zikr {index}",
     sessionComplete: "Session Complete",
+    dailyProgress: "Daily Progress",
+    remaining: "Remaining",
+    nextAndRemaining: "Next and Remaining Zikr",
+    completed: "Completed",
   },
   reader: {
     title: "Zikr {index} of {total}",

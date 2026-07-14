@@ -32,9 +32,14 @@ const ar = {
   },
   category: {
     completeSubtitle: "{done} / {total}",
-    startSession: "\u0627\u0628\u062f\u0623 \u0627\u0644\u062c\u0644\u0633\u0629",
-    resumeZikr: "\u0645\u062a\u0627\u0628\u0639\u0629 \u00b7 \u0630\u0643\u0631 {index}",
-    sessionComplete: "\u0627\u0643\u062a\u0645\u0644\u062a \u0627\u0644\u062c\u0644\u0633\u0629",
+    remainingSubtitle: "{remaining} / {total} • ذكر المتبقي",
+    startSession: "ابدأ الجلسة",
+    resumeZikr: "متابعة • ذكر {index}",
+    sessionComplete: "اكتملت الجلسة",
+    dailyProgress: "التقدم اليومي",
+    remaining: "متبقي",
+    nextAndRemaining: "الذكر التالي والمتبقي",
+    completed: "مكتمل",
   },
   reader: {
     title: "\u0630\u0643\u0631 {index} \u0645\u0646 {total}",
