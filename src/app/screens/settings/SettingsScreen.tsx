@@ -10,10 +10,7 @@ import type {
   ThemeMode,
 } from "../../types";
 import { t } from "../../i18n";
-  LanguagePanel,
-  SettingsRootPanel,
-  type SettingsSubScreen,
-} from "./SettingsPanels";
+import { LanguagePanel, SettingsRootPanel, type SettingsSubScreen } from "./SettingsPanels";
 
 export function SettingsScreen({
   themeMode,

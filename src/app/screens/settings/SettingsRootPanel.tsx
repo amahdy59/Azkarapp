@@ -126,11 +126,18 @@ export function SettingsRootPanel({
           <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t(language, "settings.displayTheme")}>
             {(["midnight", "light", "dark"] as ThemeMode[]).map((mode) => {
               // Properly translate the theme modes
-              const modeLabel = mode === "dark" 
-                ? (language === "ar" ? "داكن" : "Dark")
-                : mode === "light"
-                  ? (language === "ar" ? "فاتح" : "Light")
-                  : (language === "ar" ? "ليل" : "Midnight");
+              const modeLabel =
+                mode === "dark"
+                  ? language === "ar"
+                    ? "داكن"
+                    : "Dark"
+                  : mode === "light"
+                    ? language === "ar"
+                      ? "فاتح"
+                      : "Light"
+                    : language === "ar"
+                      ? "ليل"
+                      : "Midnight";
 
               return (
                 <button

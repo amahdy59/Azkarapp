@@ -93,7 +93,7 @@ export function LanguagePanel({
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "settings.language")} onBack={onBack} />
-      <div 
+      <div
         className="flex-1 overflow-y-auto px-4 pb-8 pt-3"
         role="radiogroup"
         aria-label={t(language, "settings.language")}
@@ -121,12 +121,13 @@ export function LanguagePanel({
                     </div>
                   )}
 
-                  <span className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground" aria-hidden="true">
+                  <span
+                    className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground"
+                    aria-hidden="true"
+                  >
                     {item.code}
                   </span>
-                  <span className="font-sans text-[17px] font-semibold text-foreground">
-                    {item.native}
-                  </span>
+                  <span className="font-sans text-[17px] font-semibold text-foreground">{item.native}</span>
                 </div>
               </button>
             );

@@ -34,7 +34,7 @@ export function LanguageScreen({
         </p>
       </div>
 
-      <div 
+      <div
         className="flex-1 overflow-y-auto px-6 flex flex-col gap-3 pb-4"
         role="radiogroup"
         aria-label={isArabic ? "اللغات المتاحة" : "Available Languages"}
@@ -60,13 +60,14 @@ export function LanguageScreen({
                     <Check size={20} className="text-primary" aria-hidden="true" />
                   </div>
                 )}
-                
-                <span className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider" aria-hidden="true">
+
+                <span
+                  className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider"
+                  aria-hidden="true"
+                >
                   {lang.code}
                 </span>
-                <span className="text-[17px] font-semibold text-foreground">
-                  {lang.native}
-                </span>
+                <span className="text-[17px] font-semibold text-foreground">{lang.native}</span>
               </div>
             </button>
           );
