@@ -108,7 +108,7 @@ export function LanguagePanel({
                   borderColor: active ? "color-mix(in srgb, var(--primary) 40%, transparent)" : "var(--border)",
                 }}
               >
-                <span className="text-[26px] leading-none">{item.flag}</span>
+
                 <div className="min-w-0 flex-1">
                   <p className="font-sans text-[16px] font-semibold text-foreground" dir="auto">
                     {item.native}
