@@ -1,4 +1,4 @@
-export type AppLanguage = "en" | "ar" | "fr" | "ur" | "tr" | "id" | "ml" | "ha";
+export type AppLanguage = "en" | "ar";
 export type CategoryId = "morning" | "evening" | "before_sleep";
 export type TextSizeOption = "small" | "medium" | "large";
 export type AudioQuality = "standard" | "high";

@@ -85,10 +85,10 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
 
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: "🇸🇦 العربية ar", exact: true }).click();
-  await page.getByRole("button", { name: "Continue", exact: true }).click();
-  await page.getByRole("button", { name: "المتابعة كزائر ⚠ لن تتم مزامنة تقدمك بين الأجهزة", exact: true }).click();
-  await page.getByRole("button", { name: "تخطي", exact: true }).click();
+  await page.getByTestId("language-option-ar").click();
+  await page.getByTestId("confirm-language").click();
+  await page.getByTestId("onboarding-get-started").click();
+  await page.getByTestId("continue-as-guest").click();
 
   const card = page.getByTestId("category-card-morning");
   await expect(card).toBeVisible();

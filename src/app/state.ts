@@ -35,7 +35,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
 };
 
 function isLanguage(value: string): value is AppLanguage {
-  return ["en", "ar", "fr", "ur", "tr", "id", "ml", "ha"].includes(value);
+  return ["en", "ar"].includes(value);
 }
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
@@ -64,6 +64,13 @@ function dedupeAndSort(values: unknown): number[] {
   );
 }
 
+/**
+ * Loads the application state from local storage.
+ * If no state is found or an error occurs during parsing, the default application state is returned.
+ * It also performs validation and fallback for every configuration property.
+ *
+ * @returns {AppStateSnapshot} The merged application state.
+ */
 export function loadAppState(): AppStateSnapshot {
   if (typeof window === "undefined") {
     return DEFAULT_APP_STATE;
@@ -168,6 +175,11 @@ export function loadAppState(): AppStateSnapshot {
   }
 }
 
+/**
+ * Persists the application state to local storage.
+ *
+ * @param {AppStateSnapshot} state - The application state to be saved.
+ */
 export function saveAppState(state: AppStateSnapshot) {
   if (typeof window === "undefined") {
     return;
@@ -176,6 +188,12 @@ export function saveAppState(state: AppStateSnapshot) {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
+/**
+ * Converts arrays of completed Azkar indices into sets for optimized lookup.
+ *
+ * @param {AppStateSnapshot["completed"]} completed - The plain object containing arrays of completed indices.
+ * @returns {Record<CategoryId, Set<number>>} A dictionary mapping category IDs to sets of completed indices.
+ */
 export function toCompletedSets(completed: AppStateSnapshot["completed"]): Record<CategoryId, Set<number>> {
   return {
     morning: new Set(completed.morning),
@@ -184,6 +202,12 @@ export function toCompletedSets(completed: AppStateSnapshot["completed"]): Recor
   };
 }
 
+/**
+ * Converts sets of completed Azkar indices back into sorted arrays for persistence.
+ *
+ * @param {Record<CategoryId, Set<number>>} completed - The dictionary mapping category IDs to sets of completed indices.
+ * @returns {AppStateSnapshot["completed"]} A plain object containing sorted arrays of completed indices.
+ */
 export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): AppStateSnapshot["completed"] {
   return {
     morning: [...completed.morning].sort((a, b) => a - b),
@@ -192,6 +216,14 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
   };
 }
 
+/**
+ * Merges an incoming partial state update into a base application state.
+ * Deduplicates and sorts arrays (e.g., completed indices) and merges session history.
+ *
+ * @param {AppStateSnapshot} base - The existing application state.
+ * @param {Partial<AppStateSnapshot>} incoming - The new state changes to merge.
+ * @returns {AppStateSnapshot} A new, immutably updated application state object.
+ */
 export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStateSnapshot>): AppStateSnapshot {
   const completed = {
     morning: dedupeAndSort([...(base.completed.morning ?? []), ...(incoming.completed?.morning ?? [])]),
@@ -209,7 +241,12 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
 
   return {
     settings: {
-      language: incoming.settings?.language ?? base.settings.language,
+      language:
+        incoming.settings?.language && isLanguage(incoming.settings.language)
+          ? incoming.settings.language
+          : isLanguage(base.settings.language)
+            ? base.settings.language
+            : DEFAULT_APP_STATE.settings.language,
       darkMode: incoming.settings?.darkMode ?? base.settings.darkMode,
       themeMode: incoming.settings?.themeMode ?? base.settings.themeMode,
       showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
@@ -240,6 +277,13 @@ function startOfDay(date: Date) {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+/**
+ * Calculates current and longest session streaks based on user activity history.
+ * A streak increments for consecutive days with at least one completed session.
+ *
+ * @param {StoredSession[]} sessions - The array of historical sessions.
+ * @returns {{ currentStreak: number, longestStreak: number }} The streak summary statistics.
+ */
 export function getStreakSummary(sessions: StoredSession[]) {
   const completedDays = [
     ...new Set(

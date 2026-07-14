@@ -1359,8 +1359,10 @@ const ALL_AZKAR = [...MORNING_AZKAR, ...EVENING_AZKAR, ...SLEEP_AZKAR];
 const getAzkarByCategory = (cat: CategoryId) =>
   ALL_AZKAR.filter((z) => z.category === cat).sort((a, b) => a.orderIndex - b.orderIndex);
 
+const getCategoryTotal = (cat: CategoryId) => getAzkarByCategory(cat).length;
+
 const ZIKR_LABELS: Record<string, string> = Object.fromEntries(
   ALL_AZKAR.map((z) => [z.id, z.translation.split(".")[0] ?? z.transliteration]),
 );
 
-export { ALL_AZKAR, EVENING_AZKAR, MORNING_AZKAR, SLEEP_AZKAR, ZIKR_LABELS, getAzkarByCategory };
+export { ALL_AZKAR, EVENING_AZKAR, MORNING_AZKAR, SLEEP_AZKAR, ZIKR_LABELS, getAzkarByCategory, getCategoryTotal };

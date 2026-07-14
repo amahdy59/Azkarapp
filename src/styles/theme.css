@@ -129,16 +129,16 @@
   --primary-foreground: #0a1228;
   --secondary: #1a7060;
   --secondary-foreground: #f5f0e8;
-  --muted: #182540;
-  --muted-foreground: #b0aed0;
+  --muted: #1d2c4b;
+  --muted-foreground: #cbd5e1;
   --accent: #e8b420;
   --accent-foreground: #0a1228;
   --destructive: #f09890;
   --destructive-foreground: #0a1228;
-  --border: #2e4570;
-  --input: #2e4570;
+  --border: #334a75;
+  --input: #334a75;
   --input-background: #182540;
-  --switch-background: #1e3050;
+  --switch-background: #2a3f66;
   --ring: #e8b420;
   --nav-active: #d4a020;
   --nav-inactive: #b0aed0;
@@ -637,6 +637,17 @@ body {
   }
   100% {
     background-position: 200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
