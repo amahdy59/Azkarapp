@@ -183,6 +183,18 @@ export default function App() {
     document.documentElement.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
     document.documentElement.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
     document.documentElement.dataset.colorBlindSupport = colorBlindSupport;
+
+    // Update theme-color meta tag for mobile status bar
+    setTimeout(() => {
+      const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--background").trim();
+      let metaThemeColor = document.querySelector('meta[name="theme-color"]');
+      if (!metaThemeColor) {
+        metaThemeColor = document.createElement("meta");
+        metaThemeColor.setAttribute("name", "theme-color");
+        document.head.appendChild(metaThemeColor);
+      }
+      metaThemeColor.setAttribute("content", bgColor);
+    }, 0);
   }, [
     boldText,
     colorBlindSupport,
