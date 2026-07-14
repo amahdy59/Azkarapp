@@ -118,28 +118,37 @@ export function SettingsRootPanel({
       }}
     >
       <SectionLabel label={t(language, "settings.preferences")} />
-      <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <div className="border-b border-border px-4 py-4">
           <p className="mb-3 font-sans text-[14px] font-semibold text-foreground">
             {t(language, "settings.displayTheme")}
           </p>
           <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t(language, "settings.displayTheme")}>
-            {(["midnight", "light", "dark"] as ThemeMode[]).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                role="radio"
-                aria-checked={themeMode === mode}
-                onClick={() => onThemeModeChange(mode)}
-                className={`min-h-11 rounded-lg border px-2 text-[12px] font-semibold capitalize ${
-                  themeMode === mode
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border bg-background text-foreground"
-                }`}
-              >
-                {mode}
-              </button>
-            ))}
+            {(["midnight", "light", "dark"] as ThemeMode[]).map((mode) => {
+              // Properly translate the theme modes
+              const modeLabel = mode === "dark" 
+                ? (language === "ar" ? "داكن" : "Dark")
+                : mode === "light"
+                  ? (language === "ar" ? "فاتح" : "Light")
+                  : (language === "ar" ? "ليل" : "Midnight");
+
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  role="radio"
+                  aria-checked={themeMode === mode}
+                  onClick={() => onThemeModeChange(mode)}
+                  className={`flex h-11 items-center justify-center rounded-xl border text-[13px] font-semibold capitalize transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    themeMode === mode
+                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                      : "border-border bg-background text-foreground"
+                  }`}
+                >
+                  {modeLabel}
+                </button>
+              );
+            })}
           </div>
         </div>
         <SettingsRowItem
@@ -159,75 +168,19 @@ export function SettingsRootPanel({
         />
       </div>
 
-      <SectionLabel label={t(language, "settings.content")} />
-      <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Volume2 size={18} className="text-foreground" />}
-          label={t(language, "settings.audioQuality")}
-          right={<RowValue value={formatAudioQuality(audioQuality)} />}
-          onPress={() => onNav("audio")}
-        />
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Download size={18} className="text-foreground" />}
-          label={t(language, "settings.offlineDownloads")}
-          right={<RowChevron />}
-          onPress={() => onNav("downloads")}
-          hasDivider={false}
-        />
-      </div>
-
-      <SectionLabel label={t(language, "settings.accessibility")} />
-      <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Settings size={18} className="text-foreground" />}
-          label={t(language, "settings.accessibility")}
-          right={<RowChevron />}
-          onPress={() => onNav("accessibility")}
-          hasDivider={false}
-        />
-      </div>
-
-      <SectionLabel label={t(language, "settings.account")} />
-      <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Bell size={18} className="text-foreground" />}
-          label={t(language, "settings.notifications")}
-          right={<RowChevron />}
-          onPress={() => onNav("notifications")}
-        />
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Flame size={18} className="text-foreground" />}
-          label={t(language, "settings.myProgress")}
-          right={<RowChevron />}
-          onPress={() => onNav("progress")}
-        />
-        <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Info size={18} className="text-foreground" />}
-          label={t(language, "settings.aboutHelp")}
-          right={<RowChevron />}
-          onPress={() => onNav("about")}
-          hasDivider={false}
-        />
-      </div>
-
       {isGuest ? (
         <>
           <SectionLabel label={t(language, "settings.sync")} />
-          <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+          <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
             <SettingsRowItem
               iconBg="color-mix(in srgb, var(--primary) 18%, transparent)"
               icon={<Wifi size={18} className="text-primary" />}
               label={t(language, "settings.activateAccount")}
               right={<RowChevron />}
               onPress={onActivateAccount}
+              hasDivider={false}
             />
-            <div className="px-4 pb-4 pt-3">
+            <div className="px-4 pb-4 pt-1">
               <p className="font-sans text-[13px] leading-[20px] text-muted-foreground">
                 {phoneAuthEnabled ? t(language, "settings.syncHint") : t(language, "auth.phoneDisabled")}
               </p>
@@ -237,7 +190,7 @@ export function SettingsRootPanel({
       ) : (
         <>
           <SectionLabel label={t(language, "settings.sync")} />
-          <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+          <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
             <SettingsRowItem
               iconBg="var(--muted)"
               icon={<Wifi size={18} className="text-foreground" />}

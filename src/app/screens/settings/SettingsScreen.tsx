@@ -10,14 +10,7 @@ import type {
   ThemeMode,
 } from "../../types";
 import { t } from "../../i18n";
-import {
-  AboutPanel,
-  AccessibilityPanel,
-  AudioPanel,
-  DownloadsPanel,
   LanguagePanel,
-  NotificationsPanel,
-  ProgressPanel,
   SettingsRootPanel,
   type SettingsSubScreen,
 } from "./SettingsPanels";
@@ -120,43 +113,6 @@ export function SettingsScreen({
       {sub === "language" && (
         <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
       )}
-      {sub === "audio" && (
-        <AudioPanel language={language} audioQuality={audioQuality} onChange={onAudioQualityChange} onBack={goBack} />
-      )}
-      {sub === "accessibility" && (
-        <AccessibilityPanel
-          language={language}
-          textSize={textSize}
-          highContrast={highContrast}
-          boldText={boldText}
-          reduceMotion={reduceMotion}
-          hapticFeedback={hapticFeedback}
-          forceRtl={forceRtl}
-          voiceOver={voiceOver}
-          colorBlindSupport={colorBlindSupport}
-          onTextSizeChange={onTextSizeChange}
-          onHighContrastChange={onHighContrastChange}
-          onBoldTextChange={onBoldTextChange}
-          onReduceMotionChange={onReduceMotionChange}
-          onHapticFeedbackChange={onHapticFeedbackChange}
-          onForceRtlChange={onForceRtlChange}
-          onVoiceOverChange={onVoiceOverChange}
-          onColorBlindSupportChange={onColorBlindSupportChange}
-          onBack={goBack}
-        />
-      )}
-      {sub === "downloads" && <DownloadsPanel onBack={goBack} />}
-      {sub === "notifications" && <NotificationsPanel onBack={goBack} />}
-      {sub === "progress" && (
-        <ProgressPanel
-          onBack={goBack}
-          language={language}
-          sessions={sessions}
-          currentStreak={currentStreak}
-          longestStreak={longestStreak}
-        />
-      )}
-      {sub === "about" && <AboutPanel onBack={goBack} />}
     </div>
   );
 }
