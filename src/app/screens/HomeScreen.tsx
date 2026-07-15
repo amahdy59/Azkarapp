@@ -38,7 +38,7 @@ export function HomeScreen({
           className="absolute left-5 flex h-10 w-10 items-center justify-center text-muted-foreground"
           aria-hidden="true"
         >
-          <ChevronLeft size={24} className={isArabic ? "" : "-scale-x-100"} />
+          <ChevronLeft size={24} />
         </button>
         <h1 className="text-[18px] font-bold text-foreground">{isArabic ? "الأذكار" : "Azkar"}</h1>
       </header>

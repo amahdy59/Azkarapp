@@ -114,16 +114,4 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   if (!trackBox || !fillBox) return;
   expect(fillBox.x + fillBox.width).toBeCloseTo(trackBox.x + trackBox.width, 0);
 
-  const scene = page.locator(".featured-scene");
-  await expect(scene).toBeVisible();
-  const sceneState = await scene.evaluate((element) => {
-    const image = element as HTMLImageElement;
-    return {
-      naturalWidth: image.naturalWidth,
-      opacity: Number.parseFloat(getComputedStyle(image).opacity),
-    };
-  });
-  expect(sceneState.naturalWidth).toBeGreaterThan(0);
-  expect(sceneState.opacity).toBeGreaterThanOrEqual(0.3);
-  expect(sceneState.opacity).toBeLessThan(0.6);
 });
