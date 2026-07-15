@@ -10,6 +10,9 @@ import {
   Menu,
   X,
   RotateCcw,
+  Type,
+  List,
+  Bookmark,
 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
@@ -19,6 +22,12 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 export const COUNTER_ADVANCE_DELAY_MS = 500;
@@ -94,7 +103,6 @@ export function ReaderScreen({
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
-  const [readerMenuOpen, setReaderMenuOpen] = useState(false);
   const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
 
   const touchStartX = useRef<number | null>(null);
@@ -605,56 +613,57 @@ export function ReaderScreen({
             {isArabic ? category.nameArabic : category.name}
           </p>
 
-          <button
-            type="button"
-            onClick={() => setReaderMenuOpen((value) => !value)}
-            aria-label="Reader menu"
-            aria-expanded={readerMenuOpen}
-            className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <Menu size={18} />
-          </button>
+          <DropdownMenu dir={isArabic ? "rtl" : "ltr"}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                aria-label="Reader menu"
+                className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Menu size={18} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="min-w-[200px] rounded-2xl p-2" sideOffset={8}>
+              <DropdownMenuItem
+                onClick={handleReset}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+              >
+                <RotateCcw size={18} />
+                {t(language, "reader.resetCounter")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={onBack}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+              >
+                <List size={18} />
+                {t(language, "reader.viewAllAzkar")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => void handleShare()}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+              >
+                <Share2 size={18} />
+                {t(language, "reader.share")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  // For now, let's keep it empty, until font sizing is implemented
+                }}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+              >
+                <Type size={18} />
+                {t(language, "reader.fontSize")}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={handleToggleSaved}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+              >
+                <Bookmark size={18} className={isSaved ? "fill-current" : ""} />
+                {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-
-        {readerMenuOpen && (
-          <div
-            className="menu-pop absolute right-5 top-[62px] z-20 grid min-w-[170px] gap-1 rounded-2xl border border-border bg-card p-2 shadow-xl"
-            dir={isArabic ? "rtl" : "ltr"}
-          >
-            <button
-              type="button"
-              onClick={() => {
-                onPrev();
-                setReaderMenuOpen(false);
-              }}
-              disabled={prevDisabled}
-              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted disabled:opacity-40"
-            >
-              {t(language, "reader.prev")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                onNext();
-                setReaderMenuOpen(false);
-              }}
-              disabled={nextDisabled}
-              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted disabled:opacity-40"
-            >
-              {t(language, "reader.next")}
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                handleReset();
-                setReaderMenuOpen(false);
-              }}
-              className="rounded-xl px-3 py-2 text-start text-[14px] font-semibold hover:bg-muted"
-            >
-              {t(language, "reader.resetCounter")}
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="shrink-0 px-5 pb-3 pt-2">

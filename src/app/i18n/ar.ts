@@ -118,7 +118,11 @@ const ar = {
     remaining: "\u0645\u062a\u0628\u0642\u064a {count}",
     holdToReset:
       "\u0627\u0636\u063a\u0637 \u0645\u0637\u0648\u0644\u0627\u064b \u0644\u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0636\u0628\u0637",
-    resetCounter: "\u0625\u0639\u0627\u062f\u0629 \u0636\u0628\u0637 \u0627\u0644\u0639\u062f\u0627\u062f",
+    resetCounter: "إعادة تعيين العداد",
+    viewAllAzkar: "عرض جميع الأذكار",
+    fontSize: "حجم الخط",
+    addToFavorites: "إضافة للمفضلة",
+    removeFromFavorites: "إزالة من المفضلة",
     prev: "\u0627\u0644\u0633\u0627\u0628\u0642",
     next: "\u0627\u0644\u062a\u0627\u0644\u064a",
     undo: "\u062a\u0631\u0627\u062c\u0639",

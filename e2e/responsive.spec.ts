@@ -113,5 +113,4 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   expect(fillBox).not.toBeNull();
   if (!trackBox || !fillBox) return;
   expect(fillBox.x + fillBox.width).toBeCloseTo(trackBox.x + trackBox.width, 0);
-
 });
