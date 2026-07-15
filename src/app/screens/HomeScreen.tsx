@@ -153,52 +153,41 @@ export function HomeScreen({
           {CATEGORIES.map((category) => {
             const done = completed[category.id]?.size ?? 0;
             const totalCount = getCategoryTotal(category.id);
-            const percent = totalCount ? Math.round((done / totalCount) * 100) : 0;
+
             return (
               <button
                 key={category.id}
                 type="button"
                 onClick={() => onCategory(category.id)}
-                dir="ltr"
+                dir={isArabic ? "rtl" : "ltr"}
                 data-testid={`category-card-${category.id}`}
-                className={`grid min-h-[104px] w-full grid-rows-[auto_auto_auto] items-center gap-x-3 rounded-2xl border border-border bg-card p-4 text-start ${isArabic ? "grid-cols-[20px_36px_minmax(0,1fr)]" : "grid-cols-[minmax(0,1fr)_36px_20px]"}`}
+                className="flex min-h-[96px] w-full items-center gap-5 rounded-[20px] border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label={
                   isArabic
                     ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة`
                     : `${category.name}, ${done} of ${totalCount} complete`
                 }
               >
-                <ChevronLeft
-                  size={22}
-                  aria-hidden="true"
-                  data-slot="category-chevron"
-                  className={`row-span-3 self-center text-card-foreground ${isArabic ? "col-start-1" : "col-start-3 -scale-x-100"}`}
-                />
-                <div
-                  data-slot="category-icon"
-                  className="col-start-2 row-span-2 flex flex-col items-center justify-center gap-2 self-center"
-                >
-                  <CatIcon type={category.icon} size={24} color="var(--primary)" />
-                  <span className="text-[12px] text-muted-foreground">{formatNumerals(percent, language)}%</span>
+                <div className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full bg-primary/10">
+                  <CatIcon type={category.icon} size={30} color="var(--primary)" />
                 </div>
-                <div
-                  dir={isArabic ? "rtl" : "ltr"}
-                  data-slot="category-copy"
-                  className={`min-w-0 self-center ${isArabic ? "col-start-3 text-right" : "col-start-1 text-left"}`}
-                >
-                  <p className="text-[16px] font-bold text-foreground">
-                    {isArabic ? category.nameArabic : category.name}
-                  </p>
-                  <p className="mt-1 text-[13px] text-muted-foreground">
-                    {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(totalCount, language)}{" "}
-                    {isArabic ? "مكتملة" : "complete"}
-                  </p>
-                </div>
-                <div className={`mt-2 ${isArabic ? "col-start-2 col-end-4" : "col-start-1 col-end-3"}`}>
+
+                <div className="flex min-w-0 flex-1 flex-col justify-center gap-3.5">
+                  <div className="flex items-center justify-between">
+                    <p className="text-[20px] font-bold text-foreground">
+                      {isArabic ? category.nameArabic : category.name}
+                    </p>
+                    <ChevronLeft
+                      size={24}
+                      aria-hidden="true"
+                      className={`shrink-0 text-[#6B6888] ${isArabic ? "" : "-scale-x-100"}`}
+                    />
+                  </div>
                   <ProgressBar
                     value={done}
                     max={totalCount}
-                    height={4}
+                    height={6}
+                    trackColor="color-mix(in srgb, var(--primary) 15%, transparent)"
                     direction={isArabic ? "rtl" : "ltr"}
                     aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`}
                   />
