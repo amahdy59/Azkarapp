@@ -458,7 +458,7 @@ export function ReaderScreen({
       }}
     >
       <p
-        className="zikr-text text-center text-[16px] font-medium leading-[1.5] text-foreground pointer-events-none"
+        className="zikr-text text-center text-[24px] font-medium leading-[1.5] text-foreground pointer-events-none"
         data-testid="zikr-text"
         dir="rtl"
         lang="ar"
