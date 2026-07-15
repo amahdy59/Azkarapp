@@ -1,19 +1,16 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Bell,
-  BookOpen,
+  BarChart3,
+  Database,
   Download,
-  Flame,
   Globe,
-  HelpCircle,
-  Info,
-  Pause,
-  Play,
-  Settings,
-  TypeIcon,
-  Volume2,
+  Headphones,
+  LogOut,
+  Menu,
+  Moon,
+  User,
   Wifi,
-  X,
 } from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
@@ -117,109 +114,106 @@ export function SettingsRootPanel({
         y: { duration: 0.61, times: [0, 0.7377, 1], ease: "easeOut" },
       }}
     >
-      <SectionLabel label={t(language, "settings.preferences")} />
+      <SectionLabel label={t(language, "settings.preferences") || "Preferences"} />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="border-b border-border px-4 py-4">
-          <p className="mb-3 font-sans text-[14px] font-semibold text-foreground">
-            {t(language, "settings.displayTheme")}
-          </p>
-          <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={t(language, "settings.displayTheme")}>
-            {(["midnight", "light", "dark"] as ThemeMode[]).map((mode) => {
-              // Properly translate the theme modes
-              const modeLabel =
-                mode === "dark"
-                  ? language === "ar"
-                    ? "داكن"
-                    : "Dark"
-                  : mode === "light"
-                    ? language === "ar"
-                      ? "فاتح"
-                      : "Light"
-                    : language === "ar"
-                      ? "ليل"
-                      : "Midnight";
-
-              return (
-                <button
-                  key={mode}
-                  type="button"
-                  role="radio"
-                  aria-checked={themeMode === mode}
-                  onClick={() => onThemeModeChange(mode)}
-                  className={`flex h-11 items-center justify-center rounded-xl border text-[13px] font-semibold capitalize transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                    themeMode === mode
-                      ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                      : "border-border bg-background text-foreground"
-                  }`}
-                >
-                  {modeLabel}
-                </button>
-              );
-            })}
-          </div>
-        </div>
         <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<Globe size={20} className="text-foreground" />}
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Globe size={20} className="text-primary" />}
           label={t(language, "settings.language")}
           right={<RowValue value={languageLabel} />}
           onPress={() => onNav("language")}
         />
         <SettingsRowItem
-          iconBg="var(--muted)"
-          icon={<TypeIcon size={20} className="text-foreground" />}
-          label={t(language, "settings.textSize")}
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Moon size={20} className="text-primary" />}
+          label={t(language, "settings.displayTheme")}
+          right={
+            <RowValue value={themeMode === "dark" ? "Dark Mode" : themeMode === "light" ? "Light Mode" : "Midnight"} />
+          }
+          onPress={() => onThemeModeChange(themeMode === "dark" ? "light" : "dark")} // Or open a subscreen if implemented
+        />
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Menu size={20} className="text-primary" />}
+          label={t(language, "settings.textSize") || "Text Size"}
           right={<RowValue value={formatTextSize(textSize)} />}
+          onPress={() => onNav("accessibility")}
+        />
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Bell size={20} className="text-primary" />}
+          label="Notifications"
+          right={<RowToggle checked={true} onChange={() => {}} />}
+          hasDivider={false}
+        />
+      </div>
+
+      <SectionLabel label="Content" />
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Headphones size={20} className="text-primary" />}
+          label="Audio Quality"
+          right={<RowValue value={formatAudioQuality(audioQuality)} />}
+          onPress={() => onNav("audio")}
+        />
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Download size={20} className="text-primary" />}
+          label="Offline Downloads"
+          right={<RowValue value="3 categories" />}
+          onPress={() => onNav("downloads")}
+        />
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Database size={20} className="text-primary" />}
+          label="Storage Used"
+          right={<RowValue value="24.3 MB" />}
+          hasDivider={false}
+        />
+      </div>
+
+      <SectionLabel label="Accessibility" />
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<User size={20} className="text-primary" />}
+          label="Accessibility"
+          right={<RowChevron />}
           onPress={() => onNav("accessibility")}
           hasDivider={false}
         />
       </div>
 
-      {isGuest ? (
-        <>
-          <SectionLabel label={t(language, "settings.sync")} />
-          <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-            <SettingsRowItem
-              iconBg="color-mix(in srgb, var(--primary) 18%, transparent)"
-              icon={<Wifi size={18} className="text-primary" />}
-              label={t(language, "settings.activateAccount")}
-              right={<RowChevron />}
-              onPress={onActivateAccount}
-              hasDivider={false}
-            />
-            <div className="px-4 pb-4 pt-1">
-              <p className="font-sans text-[13px] leading-[20px] text-muted-foreground">
-                {phoneAuthEnabled ? t(language, "settings.syncHint") : t(language, "auth.phoneDisabled")}
-              </p>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <SectionLabel label={t(language, "settings.sync")} />
-          <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-            <SettingsRowItem
-              iconBg="var(--muted)"
-              icon={<Wifi size={18} className="text-foreground" />}
-              label={t(language, "settings.accountSync")}
-              right={
-                <RowValue
-                  value={isSyncing ? t(language, "common.syncing") : t(language, "common.connected")}
-                  withChevron={false}
-                />
-              }
-            />
-            <SettingsRowItem
-              iconBg="color-mix(in srgb, var(--destructive) 20%, transparent)"
-              icon={<X size={18} className="text-destructive" />}
-              label={t(language, "common.signOut")}
-              right={<RowChevron />}
-              onPress={onSignOut}
-              hasDivider={false}
-            />
-          </div>
-        </>
-      )}
+      <SectionLabel label="Account" />
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        {isGuest ? (
+          <SettingsRowItem
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Wifi size={20} className="text-primary" />}
+            label={t(language, "settings.activateAccount")}
+            right={<RowChevron />}
+            onPress={onActivateAccount}
+          />
+        ) : (
+          <SettingsRowItem
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<BarChart3 size={20} className="text-primary" />}
+            label="My Progress"
+            right={<RowChevron />}
+            onPress={() => onNav("progress")}
+          />
+        )}
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--destructive) 15%, transparent)"
+          icon={<LogOut size={20} className="text-destructive" />}
+          label={t(language, "common.signOut") || "Sign Out"}
+          labelColor="text-destructive"
+          right={!isGuest ? <RowChevron /> : undefined}
+          onPress={onSignOut}
+          hasDivider={false}
+        />
+      </div>
     </motion.div>
   );
 }

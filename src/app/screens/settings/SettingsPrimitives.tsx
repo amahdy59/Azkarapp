@@ -32,6 +32,7 @@ export interface SettingsRowProps {
   icon: React.ReactNode;
   iconBg?: string;
   label: string;
+  labelColor?: string;
   right?: React.ReactNode;
   onPress?: () => void;
   hasDivider?: boolean;
@@ -41,6 +42,7 @@ export function SettingsRowItem({
   icon,
   iconBg = "var(--muted)",
   label,
+  labelColor = "text-foreground",
   right,
   onPress,
   hasDivider = true,
@@ -53,7 +55,7 @@ export function SettingsRowItem({
       >
         {icon}
       </div>
-      <p className="flex-1 text-start text-[16px] font-semibold text-foreground font-sans">{label}</p>
+      <p className={`flex-1 text-start text-[16px] font-semibold ${labelColor} font-sans`}>{label}</p>
       {right}
     </>
   );

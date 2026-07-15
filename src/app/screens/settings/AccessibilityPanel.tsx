@@ -128,21 +128,53 @@ export function AccessibilityPanel({
       <SubHeader title="Accessibility" onBack={onBack} />
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label="Visual" />
-        <div className="mx-4 mb-4 flex gap-3">
-          {(["small", "medium", "large"] as TextSizeOption[]).map((size) => (
-            <PanelOptionButton
-              key={size}
-              active={textSize === size}
-              label={formatTextSize(size)}
-              onClick={() => onTextSizeChange(size)}
-            />
-          ))}
+
+        {/* Text Size Slider */}
+        <div className="mx-4 mb-6 mt-2 flex flex-col items-center">
+          <div className="relative flex w-[75%] items-center justify-between">
+            <span className="absolute -left-8 font-semibold text-foreground">A</span>
+            <span className="absolute -right-8 text-xl font-bold text-foreground">A</span>
+
+            <div className="relative flex h-1.5 w-full items-center rounded-full bg-border">
+              {/* Thumbs */}
+              <button
+                type="button"
+                onClick={() => onTextSizeChange("small")}
+                className={`absolute left-0 -ml-2.5 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                  textSize === "small" ? "border-foreground bg-background" : ""
+                }`}
+                aria-label="Small text size"
+              />
+              <button
+                type="button"
+                onClick={() => onTextSizeChange("medium")}
+                className={`absolute left-1/2 -ml-3 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                  textSize === "medium" ? "border-foreground bg-background" : ""
+                }`}
+                aria-label="Medium text size"
+              />
+              <button
+                type="button"
+                onClick={() => onTextSizeChange("large")}
+                className={`absolute right-0 -mr-2.5 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                  textSize === "large" ? "border-foreground bg-background" : ""
+                }`}
+                aria-label="Large text size"
+              />
+            </div>
+          </div>
+
+          <div className="mt-4 flex w-[85%] justify-between text-[13px] font-semibold">
+            <span className={textSize === "small" ? "text-primary" : "text-muted-foreground"}>Small</span>
+            <span className={textSize === "medium" ? "text-primary" : "text-muted-foreground"}>Medium</span>
+            <span className={textSize === "large" ? "text-primary" : "text-muted-foreground"}>Large</span>
+          </div>
         </div>
 
-        <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Contrast size={18} className="text-primary" />}
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Contrast size={20} className="text-primary" />}
             label="High Contrast Mode"
             right={
               <RowToggle
@@ -154,32 +186,27 @@ export function AccessibilityPanel({
             onPress={() => onHighContrastChange(!highContrast)}
           />
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<TypeIcon size={18} className="text-primary" />}
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<TypeIcon size={20} className="text-primary" />}
             label="Bold Text"
             right={<RowToggle checked={boldText} onChange={() => onBoldTextChange(!boldText)} label="Bold Text" />}
             onPress={() => onBoldTextChange(!boldText)}
+          />
+          <SettingsRowItem
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Flame size={20} className="text-primary" />} // Replaced with a generic placeholder since Palette isn't available
+            label="Color Blind Support"
+            right={<RowValue value={formatColorBlindSupport(colorBlindSupport)} />}
+            onPress={() => {}}
             hasDivider={false}
           />
         </div>
 
-        <SectionLabel label="Color Support" />
-        <div className="mx-4 grid grid-cols-2 gap-3">
-          {colorBlindOptions.map((option) => (
-            <PanelOptionButton
-              key={option}
-              active={colorBlindSupport === option}
-              label={formatColorBlindSupport(option)}
-              onClick={() => onColorBlindSupportChange(option)}
-            />
-          ))}
-        </div>
-
         <SectionLabel label="Motion" />
-        <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Pause size={18} className="text-primary" />}
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Pause size={20} className="text-primary" />}
             label="Reduce Motion"
             right={
               <RowToggle
@@ -191,8 +218,8 @@ export function AccessibilityPanel({
             onPress={() => onReduceMotionChange(!reduceMotion)}
           />
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Smartphone size={18} className="text-primary" />}
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Smartphone size={20} className="text-primary" />}
             label="Haptic Feedback"
             right={
               <RowToggle
@@ -207,10 +234,10 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label="Reading" />
-        <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<AlignRight size={18} className="text-primary" />}
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<AlignRight size={20} className="text-primary" />}
             label="Right-to-Left Layout"
             right={
               <RowToggle checked={forceRtl} onChange={() => onForceRtlChange(!forceRtl)} label="Right-to-Left Layout" />
@@ -218,14 +245,14 @@ export function AccessibilityPanel({
             onPress={() => onForceRtlChange(!forceRtl)}
           />
           <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Info size={18} className="text-primary" />}
-            label="Screen Reader Hints"
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Info size={20} className="text-primary" />}
+            label="VoiceOver Compatible"
             right={
               <RowToggle
                 checked={voiceOver}
                 onChange={() => onVoiceOverChange(!voiceOver)}
-                label="Screen Reader Hints"
+                label="VoiceOver Compatible"
               />
             }
             onPress={() => onVoiceOverChange(!voiceOver)}
@@ -233,11 +260,22 @@ export function AccessibilityPanel({
           />
         </div>
 
-        <div className="mx-4 mt-4 rounded-xl border border-border bg-card p-4">
-          <p className="font-sans text-[15px] font-semibold text-foreground">{t(language, "settings.accessibility")}</p>
-          <p className="mt-2 font-sans text-[14px] leading-[22px] text-muted-foreground">
-            Text size, contrast, and motion settings apply across the app immediately and are saved to your profile.
-          </p>
+        <SectionLabel label="Audio" />
+        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card p-1">
+          <div className="flex h-[44px] items-center rounded-xl bg-background p-1">
+            {["0.75x", "1x", "1.25x", "1.5x"].map((speed, i) => (
+              <button
+                key={speed}
+                type="button"
+                className={`flex-1 rounded-lg text-[13px] font-semibold transition-colors ${
+                  i === 1 ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
+                style={{ height: 36 }}
+              >
+                {speed}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
     </div>
