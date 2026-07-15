@@ -20,7 +20,7 @@ export function ProgressBar({
     <div
       className="flex w-full overflow-hidden rounded-full"
       data-slot="progress-track"
-      style={{ height, background: trackColor, justifyContent: direction === "rtl" ? "flex-end" : "flex-start" }}
+      style={{ height, background: trackColor }}
       role="progressbar"
       aria-valuenow={value}
       aria-valuemin={0}

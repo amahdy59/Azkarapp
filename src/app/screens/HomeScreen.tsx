@@ -168,18 +168,22 @@ export function HomeScreen({
                     : `${category.name}, ${done} of ${totalCount} complete`
                 }
               >
-                <div className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <div
+                  data-slot="category-icon"
+                  className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-full bg-primary/10"
+                >
                   <CatIcon type={category.icon} size={30} color="var(--primary)" />
                 </div>
 
                 <div className="flex min-w-0 flex-1 flex-col justify-center gap-3.5">
                   <div className="flex items-center justify-between">
-                    <p className="text-[20px] font-bold text-foreground">
+                    <p data-slot="category-copy" className="text-[20px] font-bold text-foreground">
                       {isArabic ? category.nameArabic : category.name}
                     </p>
                     <ChevronLeft
                       size={24}
                       aria-hidden="true"
+                      data-slot="category-chevron"
                       className={`shrink-0 text-[#6B6888] ${isArabic ? "" : "-scale-x-100"}`}
                     />
                   </div>
