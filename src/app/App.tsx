@@ -737,18 +737,7 @@ export default function App() {
             )}
 
             {/* Phase 1 — core app */}
-            {view === "home" && (
-              <HomeScreen
-                completed={completed}
-                displayName={displayName}
-                currentStreak={currentStreak}
-                longestStreak={longestStreak}
-                onCategory={openCategory}
-                onFeaturedZikr={(catId, i) => openReader(catId, i)}
-                onSearch={() => push("search")}
-                language={selectedLang}
-              />
-            )}
+            {view === "home" && <HomeScreen completed={completed} onCategory={openCategory} language={selectedLang} />}
             {view === "library" && (
               <AzkarLibraryScreen
                 completed={completed}
