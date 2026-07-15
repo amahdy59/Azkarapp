@@ -532,7 +532,6 @@ export function ReaderScreen({
           {!complete && (
             <p className="mt-6 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           )}
-
         </div>
       </div>
     </div>
