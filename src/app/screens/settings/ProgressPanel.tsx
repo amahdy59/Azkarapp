@@ -3,12 +3,28 @@ import { useMemo, useState } from "react";
 import { ChevronNext, ChevronPrevious } from "../../components/icons";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
+import { t } from "../../i18n";
 import type { AppLanguage, CategoryId, StoredSession } from "../../types";
+import { ProgressBar } from "../../components/ProgressBar";
 import { SubHeader } from "./SettingsPrimitives";
 
 type Period = "week" | "month" | "year";
 
 const dayKey = (value: Date) => `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
+
+export function getWeeklyCompletedDays(sessions: StoredSession[], category: CategoryId, now = new Date()) {
+  const weekStart = new Date(now);
+  weekStart.setHours(0, 0, 0, 0);
+  weekStart.setDate(weekStart.getDate() - ((weekStart.getDay() + 6) % 7));
+
+  return new Set(
+    sessions
+      .filter(
+        (session) => session.isComplete && session.category === category && new Date(session.completedAt) >= weekStart,
+      )
+      .map((session) => dayKey(new Date(session.completedAt))),
+  ).size;
+}
 
 export function ProgressPanel({
   onBack,
@@ -16,18 +32,23 @@ export function ProgressPanel({
   sessions,
   currentStreak,
   longestStreak,
+  weeklyGoalDays,
+  onWeeklyGoalDaysChange,
 }: {
   onBack: () => void;
   language: AppLanguage;
   sessions: StoredSession[];
   currentStreak: number;
   longestStreak: number;
+  weeklyGoalDays: number;
+  onWeeklyGoalDaysChange: (value: number) => void;
 }) {
   const [period, setPeriod] = useState<Period>("week");
   const [category, setCategory] = useState<CategoryId>("morning");
   const isArabic = language === "ar";
   const filtered = sessions.filter((session) => session.category === category && session.isComplete);
   const totalCompleted = sessions.reduce((sum, session) => sum + session.completedCount, 0);
+  const completedGoalDays = getWeeklyCompletedDays(sessions, category);
   const activity = useMemo(() => {
     const byDay = new Map<string, number>();
     filtered.forEach((session) => byDay.set(dayKey(new Date(session.completedAt)), session.completedCount));
@@ -42,7 +63,7 @@ export function ProgressPanel({
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
-      <SubHeader title={isArabic ? "تقدّمي" : "My Progress"} onBack={onBack} />
+      <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         <section className="rounded-2xl border border-border bg-card px-6 py-4 text-end">
           <p className="text-[12px] text-muted-foreground">{isArabic ? "منذ بداية الاستخدام" : "Since you started"}</p>
@@ -50,6 +71,51 @@ export function ProgressPanel({
             {isArabic ? "إجمالي الأذكار المكتملة" : "Total azkar completed"}
           </p>
           <p className="mt-1 text-[36px] font-extrabold text-foreground">{formatNumerals(totalCompleted, language)}</p>
+        </section>
+
+        <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="weekly-goal-title">
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 id="weekly-goal-title" className="text-[15px] font-bold text-foreground">
+              {t(language, "progressPanel.weeklyGoal")}
+            </h2>
+            <p className="text-[13px] font-semibold text-muted-foreground">
+              {t(language, "progressPanel.goalProgress", {
+                done: formatNumerals(Math.min(completedGoalDays, weeklyGoalDays), language),
+                goal: formatNumerals(weeklyGoalDays, language),
+              })}
+            </p>
+          </div>
+          <ProgressBar
+            value={Math.min(completedGoalDays, weeklyGoalDays)}
+            max={weeklyGoalDays}
+            height={7}
+            trackColor="var(--muted)"
+            direction={isArabic ? "rtl" : "ltr"}
+            aria-label={t(language, "progressPanel.goalProgress", { done: completedGoalDays, goal: weeklyGoalDays })}
+          />
+          <div className="mt-4" role="radiogroup" aria-label={t(language, "progressPanel.chooseGoal")}>
+            <p className="mb-2 text-[12px] font-semibold text-muted-foreground">
+              {t(language, "progressPanel.chooseGoal")}
+            </p>
+            <div className="grid grid-cols-4 gap-2">
+              {[3, 4, 5, 7].map((goal) => (
+                <button
+                  key={goal}
+                  type="button"
+                  role="radio"
+                  aria-checked={weeklyGoalDays === goal}
+                  onClick={() => onWeeklyGoalDaysChange(goal)}
+                  className={`min-h-11 rounded-xl border px-2 text-[13px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    weeklyGoalDays === goal
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border text-foreground"
+                  }`}
+                >
+                  {formatNumerals(goal, language)}
+                </button>
+              ))}
+            </div>
+          </div>
         </section>
 
         <div className="flex justify-center gap-2" aria-label="Category filter">

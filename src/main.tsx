@@ -8,4 +8,12 @@ import { registerSW } from "virtual:pwa-register";
 const Root = window.location.pathname.replace(/\/$/, "").endsWith("/landing") ? MarketingLanding : App;
 createRoot(document.getElementById("root")!).render(<Root />);
 
-registerSW({ immediate: true });
+const updateServiceWorker = registerSW({
+  onNeedRefresh() {
+    window.dispatchEvent(new Event("azkar-update-available"));
+  },
+});
+
+window.addEventListener("azkar-apply-update", () => {
+  void updateServiceWorker(true);
+});

@@ -18,9 +18,10 @@ function figmaAssetResolver() {
 
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
+  const appBase = isGithubPages ? "/Azkarapp/" : "/";
 
   return {
-    base: isGithubPages ? "/Azkarapp/" : "/",
+    base: appBase,
     plugins: [
       figmaAssetResolver(),
       // The React and Tailwind plugins are both required for Make, even if
@@ -28,7 +29,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: "autoUpdate",
+        registerType: "prompt",
         includeAssets: ["**/*.svg"],
         manifest: {
           name: "Azkar",
@@ -38,6 +39,26 @@ export default defineConfig(({ mode }) => {
           theme_color: "#0a1228",
           background_color: "#0a1228",
           display: "standalone",
+          shortcuts: [
+            {
+              name: "Morning Azkar",
+              short_name: "Morning",
+              description: "Open the morning remembrance collection.",
+              url: `${appBase}?category=morning`,
+            },
+            {
+              name: "Evening Azkar",
+              short_name: "Evening",
+              description: "Open the evening remembrance collection.",
+              url: `${appBase}?category=evening`,
+            },
+            {
+              name: "Before Sleep Azkar",
+              short_name: "Sleep",
+              description: "Open the before-sleep remembrance collection.",
+              url: `${appBase}?category=before_sleep`,
+            },
+          ],
           icons: [
             {
               src: "192.png",

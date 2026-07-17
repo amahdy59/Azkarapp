@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
-import type { AppLanguage, ColorBlindSupport, StoredSession, TextSizeOption, ThemeMode } from "../../types";
+import type {
+  AppLanguage,
+  ArabicFontOption,
+  ColorBlindSupport,
+  ReminderSettings,
+  StoredSession,
+  TextSizeOption,
+  ThemeMode,
+} from "../../types";
 import { t } from "../../i18n";
 import {
   AboutPanel,
@@ -25,21 +33,31 @@ export function SettingsScreen({
   currentStreak,
   longestStreak,
   textSize,
+  arabicFont,
+  showTranslation,
+  showTransliteration,
   highContrast,
   boldText,
   reduceMotion,
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
+  reminders,
+  weeklyGoalDays,
   onLanguageChange,
   onThemeModeChange,
   onTextSizeChange,
+  onArabicFontChange,
+  onShowTranslationChange,
+  onShowTransliterationChange,
   onHighContrastChange,
   onBoldTextChange,
   onReduceMotionChange,
   onHapticFeedbackChange,
   onForceRtlChange,
   onColorBlindSupportChange,
+  onRemindersChange,
+  onWeeklyGoalDaysChange,
   onActivateAccount,
   onSignOut,
   onBack,
@@ -54,21 +72,31 @@ export function SettingsScreen({
   currentStreak: number;
   longestStreak: number;
   textSize: TextSizeOption;
+  arabicFont: ArabicFontOption;
+  showTranslation: boolean;
+  showTransliteration: boolean;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
+  reminders: ReminderSettings;
+  weeklyGoalDays: number;
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onTextSizeChange: (value: TextSizeOption) => void;
+  onArabicFontChange: (value: ArabicFontOption) => void;
+  onShowTranslationChange: (value: boolean) => void;
+  onShowTransliterationChange: (value: boolean) => void;
   onHighContrastChange: (value: boolean) => void;
   onBoldTextChange: (value: boolean) => void;
   onReduceMotionChange: (value: boolean) => void;
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
+  onRemindersChange: (value: ReminderSettings) => void;
+  onWeeklyGoalDaysChange: (value: number) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
   onBack: () => void;
@@ -79,11 +107,7 @@ export function SettingsScreen({
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background">
       {sub === "root" && (
-        <motion.div
-          className="absolute inset-0 flex h-full w-full flex-col"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
+        <motion.div className="absolute inset-0 flex h-full w-full flex-col">
           <Header title={t(language, "common.settings")} onBack={onBack} />
           <SettingsRootPanel
             onNav={setSub}
@@ -105,7 +129,11 @@ export function SettingsScreen({
       )}
       {sub === "accessibility" && (
         <AccessibilityPanel
+          language={language}
           textSize={textSize}
+          arabicFont={arabicFont}
+          showTranslation={showTranslation}
+          showTransliteration={showTransliteration}
           highContrast={highContrast}
           boldText={boldText}
           reduceMotion={reduceMotion}
@@ -113,6 +141,9 @@ export function SettingsScreen({
           forceRtl={forceRtl}
           colorBlindSupport={colorBlindSupport}
           onTextSizeChange={onTextSizeChange}
+          onArabicFontChange={onArabicFontChange}
+          onShowTranslationChange={onShowTranslationChange}
+          onShowTransliterationChange={onShowTransliterationChange}
           onHighContrastChange={onHighContrastChange}
           onBoldTextChange={onBoldTextChange}
           onReduceMotionChange={onReduceMotionChange}
@@ -122,18 +153,27 @@ export function SettingsScreen({
           onBack={goBack}
         />
       )}
-      {sub === "downloads" && <DownloadsPanel onBack={goBack} />}
-      {sub === "notifications" && <NotificationsPanel onBack={goBack} />}
+      {sub === "downloads" && <DownloadsPanel language={language} onBack={goBack} />}
+      {sub === "notifications" && (
+        <NotificationsPanel
+          language={language}
+          reminders={reminders}
+          onRemindersChange={onRemindersChange}
+          onBack={goBack}
+        />
+      )}
       {sub === "progress" && (
         <ProgressPanel
           language={language}
           sessions={sessions}
           currentStreak={currentStreak}
           longestStreak={longestStreak}
+          weeklyGoalDays={weeklyGoalDays}
+          onWeeklyGoalDaysChange={onWeeklyGoalDaysChange}
           onBack={goBack}
         />
       )}
-      {sub === "about" && <AboutPanel onBack={goBack} />}
+      {sub === "about" && <AboutPanel language={language} onBack={goBack} />}
     </div>
   );
 }

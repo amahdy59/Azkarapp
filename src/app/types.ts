@@ -1,8 +1,20 @@
 export type AppLanguage = "en" | "ar";
 export type CategoryId = "morning" | "evening" | "before_sleep";
 export type TextSizeOption = "small" | "medium" | "large";
+export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
+
+export interface ReminderSchedule {
+  enabled: boolean;
+  time: string;
+}
+
+export interface ReminderSettings {
+  morning: ReminderSchedule;
+  evening: ReminderSchedule;
+  onlyWhenIncomplete: boolean;
+}
 
 export interface Zikr {
   id: string;
@@ -39,12 +51,15 @@ export interface UserSettingsState {
   showTransliteration: boolean;
   showTranslation: boolean;
   textSize: TextSizeOption;
+  arabicFont: ArabicFontOption;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
+  reminders: ReminderSettings;
+  weeklyGoalDays: number;
 }
 
 export interface UserProfileState {
@@ -58,4 +73,6 @@ export interface AppStateSnapshot {
   profile: UserProfileState;
   completed: Record<CategoryId, number[]>;
   sessions: StoredSession[];
+  /** Stable content IDs saved by the user for quick return and account sync. */
+  savedZikrIds: string[];
 }

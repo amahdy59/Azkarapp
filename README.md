@@ -32,11 +32,13 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 
 ## Current state
 
-- User language, theme, guest/auth hints, progress, and sessions persist locally
+- User language, reading preferences, gentle-reminder schedule, guest/auth hints, progress, saved zikr, and sessions persist locally
 - Supabase client scaffolding is available in [src/lib/supabase.ts](/C:/Users/AhmedMahdy/OneDrive%20-%20Advansys%20IS/Documents/Antigravity/Azkarapp/src/lib/supabase.ts)
 - Phone OTP auth is wired for Supabase using `signInWithOtp`, `verifyOtp`, and `resend`
-- Signed-in users sync profile, settings, progress, and session history to Supabase
-- Installable PWA metadata and platform icons are included in production builds
+- Signed-in users sync profile, settings, saved zikr, progress, and session history to Supabase
+- Reader translation, pronunciation, Arabic font, and text preferences are available from Accessibility settings
+- Reminder controls request browser permission only after the user opts in; dependable reminders while the app is closed still require a backend push service
+- Installable PWA metadata, update prompts, and Morning/Evening/Before Sleep quick actions are included in production builds
 - The app builds successfully with `vite build`
 
 ## Architecture
@@ -54,5 +56,5 @@ UI code must not access Supabase directly. Shared formatting, persistence, data 
 
 ## Known product follow-up
 
-- Add backend push scheduling before exposing recurring reminder controls.
+- Add backend push scheduling for reliable reminders while the app is closed.
 - Continue extracting focused orchestration and presentation modules as those flows change.

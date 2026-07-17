@@ -26,6 +26,12 @@ describe("app state persistence", () => {
     );
     expect(loadAppState().settings.themeMode).toBe("light");
   });
+
+  it("migrates Reader-only saved zikr into app state", () => {
+    window.localStorage.setItem("azkarapp.saved-zikr.v1", JSON.stringify(["m-hm-75", "m-hm-75", 3]));
+
+    expect(loadAppState().savedZikrIds).toEqual(["m-hm-75"]);
+  });
 });
 
 describe("state merging", () => {
@@ -39,5 +45,12 @@ describe("state merging", () => {
     expect(
       fromCompletedSets({ morning: new Set([2, 1]), evening: new Set(), before_sleep: new Set() }).morning,
     ).toEqual([1, 2]);
+  });
+
+  it("merges saved zikr without duplicates", () => {
+    const base = { ...DEFAULT_APP_STATE, savedZikrIds: ["m-hm-75"] };
+    const merged = mergeAppStates(base, { savedZikrIds: ["m-hm-75", "e-hm-79"] });
+
+    expect(merged.savedZikrIds).toEqual(["e-hm-79", "m-hm-75"]);
   });
 });

@@ -1,6 +1,8 @@
 import React from "react";
 import { BookOpen, ExternalLink, FileText, Globe, HelpCircle, Info, MessageChat, Star } from "../../components/icons";
 import { CrescentMark } from "../../components/CrescentMark";
+import { t } from "../../i18n";
+import type { AppLanguage } from "../../types";
 import { RowChevron, SectionLabel, SubHeader } from "./SettingsPrimitives";
 
 const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
@@ -19,17 +21,17 @@ function openMailto(email: string, subject: string) {
   }
 }
 
-export function AboutPanel({ onBack }: { onBack: () => void }) {
+export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
-      <SubHeader title="About Azkar" onBack={onBack} />
+    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+      <SubHeader title={t(language, "about.title")} onBack={onBack} />
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8">
           <CrescentMark size={36} />
           <div className="flex flex-col items-center gap-1.5">
             <p className="font-sans text-[24px] font-bold text-foreground">Azkar</p>
             <p className="latin-ui text-[14px] text-muted-foreground" lang="en" dir="ltr">
-              Daily Islamic Remembrance
+              {t(language, "about.subtitle")}
             </p>
             <p className="latin-ui text-[12px] text-muted-foreground opacity-60" lang="en" dir="ltr">
               Version 2.0.1
@@ -38,7 +40,7 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
         </div>
 
         <div>
-          <SectionLabel label="Content Source" />
+          <SectionLabel label={t(language, "about.contentSource")} />
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <AboutRow
               icon={
@@ -47,7 +49,7 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
                 </div>
               }
               label="Hisnul Muslim"
-              sub="All azkar verified from authentic sources"
+              sub={t(language, "about.sourceDescription")}
             />
             <AboutRow
               icon={
@@ -55,29 +57,29 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
                   <Star size={20} className="text-background" />
                 </div>
               }
-              label="Hadith References"
-              sub="Bukhari, Muslim, Tirmidhi & more"
+              label={t(language, "about.references")}
+              sub={t(language, "about.referencesDescription")}
               hasDivider={false}
             />
           </div>
         </div>
 
         <div>
-          <SectionLabel label="Support" />
+          <SectionLabel label={t(language, "about.support")} />
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <SupportRow
               icon={<MessageChat size={18} className="text-background" />}
-              label="Send Feedback"
+              label={t(language, "about.sendFeedback")}
               onPress={() => openMailto("support@azkarapp.dev", "Azkar feedback")}
             />
             <SupportRow
               icon={<HelpCircle size={18} className="text-background" />}
-              label="Frequently Asked Questions"
+              label={t(language, "about.faq")}
               onPress={() => openExternal(REPO_URL)}
             />
             <SupportRow
               icon={<Globe size={18} className="text-background" />}
-              label="Visit Website"
+              label={t(language, "about.website")}
               right={<ExternalLink size={16} className="text-muted-foreground" />}
               hasDivider={false}
               onPress={() => openExternal(SITE_URL)}
@@ -86,16 +88,16 @@ export function AboutPanel({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="pb-8">
-          <SectionLabel label="Legal" />
+          <SectionLabel label={t(language, "about.legal")} />
           <div className="overflow-hidden rounded-xl border border-border bg-card">
             <SupportRow
               icon={<Info size={18} className="text-background" />}
-              label="Privacy Policy"
+              label={t(language, "about.privacy")}
               onPress={() => openExternal(REPO_URL)}
             />
             <SupportRow
               icon={<FileText size={18} className="text-background" />}
-              label="Terms of Service"
+              label={t(language, "about.terms")}
               hasDivider={false}
               onPress={() => openExternal(FEEDBACK_URL)}
             />

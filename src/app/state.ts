@@ -1,8 +1,18 @@
-import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, StoredSession, ThemeMode } from "./types";
+import type {
+  AppLanguage,
+  AppStateSnapshot,
+  ArabicFontOption,
+  CategoryId,
+  ColorBlindSupport,
+  ReminderSettings,
+  StoredSession,
+  ThemeMode,
+} from "./types";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
 const STORAGE_KEY = "azkarapp.state.v1";
+const LEGACY_SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 
 export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
@@ -12,12 +22,19 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     showTransliteration: false,
     showTranslation: false,
     textSize: "medium",
+    arabicFont: "ibm_plex",
     highContrast: false,
     boldText: false,
     reduceMotion: false,
     hapticFeedback: true,
     forceRtl: false,
     colorBlindSupport: "none",
+    reminders: {
+      morning: { enabled: false, time: "07:30" },
+      evening: { enabled: false, time: "18:30" },
+      onlyWhenIncomplete: true,
+    },
+    weeklyGoalDays: 4,
   },
   profile: {
     displayName: "Guest",
@@ -30,6 +47,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     before_sleep: [],
   },
   sessions: [],
+  savedZikrIds: [],
 };
 
 function isLanguage(value: string): value is AppLanguage {
@@ -40,12 +58,48 @@ function isTextSize(value: string): value is AppStateSnapshot["settings"]["textS
   return ["small", "medium", "large"].includes(value);
 }
 
+function isArabicFont(value: string): value is ArabicFontOption {
+  return ["ibm_plex", "noto_sans"].includes(value);
+}
+
+function isWeeklyGoalDays(value: unknown): value is number {
+  return typeof value === "number" && [3, 4, 5, 7].includes(value);
+}
+
 function isColorBlindSupport(value: string): value is ColorBlindSupport {
   return ["none", "deuteranopia", "protanopia", "tritanopia"].includes(value);
 }
 
 function isThemeMode(value: string): value is ThemeMode {
   return ["midnight", "light", "dark"].includes(value);
+}
+
+function isTime(value: unknown): value is string {
+  if (typeof value !== "string" || !/^[0-9]{2}:[0-9]{2}$/.test(value)) {
+    return false;
+  }
+
+  const [hour = -1, minute = -1] = value.split(":").map(Number);
+  return Number.isInteger(hour) && Number.isInteger(minute) && hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59;
+}
+
+function normalizeReminders(
+  value: unknown,
+  fallback: ReminderSettings = DEFAULT_APP_STATE.settings.reminders,
+): ReminderSettings {
+  const candidate = value as Partial<ReminderSettings> | undefined;
+  return {
+    morning: {
+      enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : fallback.morning.enabled,
+      time: isTime(candidate?.morning?.time) ? candidate.morning.time : fallback.morning.time,
+    },
+    evening: {
+      enabled: typeof candidate?.evening?.enabled === "boolean" ? candidate.evening.enabled : fallback.evening.enabled,
+      time: isTime(candidate?.evening?.time) ? candidate.evening.time : fallback.evening.time,
+    },
+    onlyWhenIncomplete:
+      typeof candidate?.onlyWhenIncomplete === "boolean" ? candidate.onlyWhenIncomplete : fallback.onlyWhenIncomplete,
+  };
 }
 
 function dedupeAndSort(values: unknown): number[] {
@@ -56,6 +110,22 @@ function dedupeAndSort(values: unknown): number[] {
   return [...new Set(values.filter((value): value is number => Number.isInteger(value) && value >= 0))].sort(
     (a, b) => a - b,
   );
+}
+
+function dedupeSavedZikrIds(values: unknown): string[] {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return [...new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0))].sort();
+}
+
+function loadLegacySavedZikrIds() {
+  try {
+    return dedupeSavedZikrIds(JSON.parse(window.localStorage.getItem(LEGACY_SAVED_ZIKR_STORAGE_KEY) ?? "[]"));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -73,7 +143,10 @@ export function loadAppState(): AppStateSnapshot {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) {
-      return DEFAULT_APP_STATE;
+      return {
+        ...DEFAULT_APP_STATE,
+        savedZikrIds: loadLegacySavedZikrIds(),
+      };
     }
 
     const parsed = JSON.parse(raw) as Partial<AppStateSnapshot>;
@@ -106,6 +179,10 @@ export function loadAppState(): AppStateSnapshot {
           parsed.settings?.textSize && isTextSize(parsed.settings.textSize)
             ? parsed.settings.textSize
             : DEFAULT_APP_STATE.settings.textSize,
+        arabicFont:
+          parsed.settings?.arabicFont && isArabicFont(parsed.settings.arabicFont)
+            ? parsed.settings.arabicFont
+            : DEFAULT_APP_STATE.settings.arabicFont,
         highContrast:
           typeof parsed.settings?.highContrast === "boolean"
             ? parsed.settings.highContrast
@@ -130,6 +207,10 @@ export function loadAppState(): AppStateSnapshot {
           parsed.settings?.colorBlindSupport && isColorBlindSupport(parsed.settings.colorBlindSupport)
             ? parsed.settings.colorBlindSupport
             : DEFAULT_APP_STATE.settings.colorBlindSupport,
+        reminders: normalizeReminders(parsed.settings?.reminders),
+        weeklyGoalDays: isWeeklyGoalDays(parsed.settings?.weeklyGoalDays)
+          ? parsed.settings.weeklyGoalDays
+          : DEFAULT_APP_STATE.settings.weeklyGoalDays,
       },
       profile: {
         displayName: parsed.profile?.displayName?.trim() || DEFAULT_APP_STATE.profile.displayName,
@@ -155,6 +236,11 @@ export function loadAppState(): AppStateSnapshot {
               typeof session.isComplete === "boolean",
           )
         : [],
+      // Reader-only saved items pre-date app-state persistence. Retain them the
+      // first time a user upgrades so favorites become visible and syncable.
+      savedZikrIds: Array.isArray(parsed.savedZikrIds)
+        ? dedupeSavedZikrIds(parsed.savedZikrIds)
+        : loadLegacySavedZikrIds(),
     };
   } catch {
     return DEFAULT_APP_STATE;
@@ -238,12 +324,17 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
       showTranslation: incoming.settings?.showTranslation ?? base.settings.showTranslation,
       textSize: incoming.settings?.textSize ?? base.settings.textSize,
+      arabicFont: incoming.settings?.arabicFont ?? base.settings.arabicFont,
       highContrast: incoming.settings?.highContrast ?? base.settings.highContrast,
       boldText: incoming.settings?.boldText ?? base.settings.boldText,
       reduceMotion: incoming.settings?.reduceMotion ?? base.settings.reduceMotion,
       hapticFeedback: incoming.settings?.hapticFeedback ?? base.settings.hapticFeedback,
       forceRtl: incoming.settings?.forceRtl ?? base.settings.forceRtl,
       colorBlindSupport: incoming.settings?.colorBlindSupport ?? base.settings.colorBlindSupport,
+      reminders: normalizeReminders(incoming.settings?.reminders, base.settings.reminders),
+      weeklyGoalDays: isWeeklyGoalDays(incoming.settings?.weeklyGoalDays)
+        ? incoming.settings.weeklyGoalDays
+        : base.settings.weeklyGoalDays,
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || base.profile.displayName,
@@ -254,6 +345,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     sessions: [...sessions.values()].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     ),
+    savedZikrIds: dedupeSavedZikrIds([...(base.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
   };
 }
 

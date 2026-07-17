@@ -8,7 +8,16 @@ import {
   type StoredSession,
 } from "./state";
 import { getAzkarByCategory } from "./content/azkar";
-import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
+import type {
+  AppLanguage,
+  AppStateSnapshot,
+  ArabicFontOption,
+  CategoryId,
+  ColorBlindSupport,
+  ReminderSettings,
+  TextSizeOption,
+  ThemeMode,
+} from "./types";
 import {
   loadRemoteState,
   normalizePhoneNumber,
@@ -41,11 +50,22 @@ type View =
   // Phase 4
   | "search";
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+};
+
+function categoryFromShortcutUrl(): CategoryId | null {
+  const category = new URLSearchParams(window.location.search).get("category");
+  return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
+}
+
 import { BottomNav, StatusBar } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { LANGUAGE_LABELS } from "./languageOptions";
+import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
+import { useForegroundReminders } from "./hooks/useForegroundReminders";
 
 const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
 const AzkarLibraryScreen = lazy(() =>
@@ -113,6 +133,45 @@ function ScreenFallback() {
   );
 }
 
+function PwaNotice({
+  title,
+  body,
+  actionLabel,
+  dismissLabel,
+  onAction,
+  onDismiss,
+}: {
+  title: string;
+  body: string;
+  actionLabel: string;
+  dismissLabel: string;
+  onAction: () => void;
+  onDismiss: () => void;
+}) {
+  return (
+    <aside className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg" role="status" aria-live="polite">
+      <p className="text-[15px] font-bold text-foreground">{title}</p>
+      <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{body}</p>
+      <div className="mt-3 flex justify-end gap-2">
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="min-h-11 rounded-xl px-3 text-[13px] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {dismissLabel}
+        </button>
+        <button
+          type="button"
+          onClick={onAction}
+          className="min-h-11 rounded-xl bg-primary px-4 text-[13px] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {actionLabel}
+        </button>
+      </div>
+    </aside>
+  );
+}
+
 export default function App() {
   const initialState = useRef(loadAppState()).current;
   const [view, setView] = useState<View>("splash");
@@ -127,6 +186,7 @@ export default function App() {
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
+  const [arabicFont, setArabicFont] = useState<ArabicFontOption>(initialState.settings.arabicFont);
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
@@ -135,8 +195,11 @@ export default function App() {
   const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(
     initialState.settings.colorBlindSupport,
   );
+  const [reminders, setReminders] = useState<ReminderSettings>(initialState.settings.reminders);
+  const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
+  const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
   const [lastPhoneNumber, setLastPhoneNumber] = useState(initialState.profile.lastPhoneNumber);
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
@@ -144,6 +207,11 @@ export default function App() {
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [authError, setAuthError] = useState("");
+  const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [installDismissed, setInstallDismissed] = useState(
+    () => window.localStorage.getItem("azkarapp.install-dismissed") === "true",
+  );
 
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
@@ -159,19 +227,24 @@ export default function App() {
         showTransliteration,
         showTranslation,
         textSize,
+        arabicFont,
         highContrast,
         boldText,
         reduceMotion,
         hapticFeedback,
         forceRtl,
         colorBlindSupport,
+        reminders,
+        weeklyGoalDays,
       },
       profile: { displayName, lastPhoneNumber, isGuest },
       completed: fromCompletedSets(completed),
       sessions,
+      savedZikrIds: [...savedZikrIds].sort(),
     }),
     [
       boldText,
+      arabicFont,
       colorBlindSupport,
       completed,
       darkMode,
@@ -182,8 +255,11 @@ export default function App() {
       isGuest,
       lastPhoneNumber,
       reduceMotion,
+      reminders,
+      weeklyGoalDays,
       selectedLang,
       sessions,
+      savedZikrIds,
       showTranslation,
       showTransliteration,
       textSize,
@@ -197,17 +273,21 @@ export default function App() {
     setShowTransliteration(state.settings.showTransliteration);
     setShowTranslation(state.settings.showTranslation);
     setTextSize(state.settings.textSize);
+    setArabicFont(state.settings.arabicFont);
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
+    setReminders(state.settings.reminders);
+    setWeeklyGoalDays(state.settings.weeklyGoalDays);
     setDisplayName(state.profile.displayName);
     setLastPhoneNumber(state.profile.lastPhoneNumber);
     setIsGuest(state.profile.isGuest);
     setCompleted(toCompletedSets(state.completed));
     setSessions(state.sessions);
+    setSavedZikrIds(new Set(state.savedZikrIds));
   }, []);
 
   const applyAuthProfile = useCallback((profile: AppStateSnapshot["profile"]) => {
@@ -229,6 +309,23 @@ export default function App() {
     onRemoteState: applyStateSnapshot,
     onAuthProfile: applyAuthProfile,
   });
+
+  useForegroundReminders({ reminders, sessions, language: selectedLang });
+
+  useEffect(() => {
+    const handleUpdate = () => setUpdateAvailable(true);
+    const handleInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as BeforeInstallPromptEvent);
+    };
+
+    window.addEventListener("azkar-update-available", handleUpdate);
+    window.addEventListener("beforeinstallprompt", handleInstallPrompt);
+    return () => {
+      window.removeEventListener("azkar-update-available", handleUpdate);
+      window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
+    };
+  }, []);
 
   // Apply theme class to root
   useEffect(() => {
@@ -308,6 +405,35 @@ export default function App() {
     setSessionStart(Date.now());
     push("reader");
   };
+
+  useEffect(() => {
+    if (view !== "home") {
+      return;
+    }
+
+    const category = categoryFromShortcutUrl();
+    if (!category) {
+      return;
+    }
+
+    setActiveCat(category);
+    setActiveTab("azkar");
+    setHistory(["home"]);
+    setView("category");
+    window.history.replaceState(null, "", window.location.pathname);
+  }, [view]);
+
+  const toggleSavedZikr = useCallback((zikrId: string) => {
+    setSavedZikrIds((previous) => {
+      const next = new Set(previous);
+      if (next.has(zikrId)) {
+        next.delete(zikrId);
+      } else {
+        next.add(zikrId);
+      }
+      return next;
+    });
+  }, []);
 
   const markComplete = (idx: number) => {
     setCompleted((prev) => {
@@ -539,13 +665,22 @@ export default function App() {
             )}
 
             {/* Phase 1 — core app */}
-            {view === "home" && <HomeScreen completed={completed} onCategory={openCategory} language={selectedLang} />}
+            {view === "home" && (
+              <HomeScreen
+                completed={completed}
+                onCategory={openCategory}
+                onResume={openReader}
+                language={selectedLang}
+              />
+            )}
             {view === "library" && (
               <AzkarLibraryScreen
                 completed={completed}
                 language={selectedLang}
                 onCategory={openCategory}
+                onZikr={openReader}
                 onSearch={() => push("search")}
+                savedZikrIds={savedZikrIds}
               />
             )}
             {view === "category" && (
@@ -565,6 +700,11 @@ export default function App() {
                 isArabic={isArabic}
                 isDone={completed[activeCat]?.has(activeIdx) ?? false}
                 hapticFeedback={hapticFeedback}
+                arabicFont={arabicFont}
+                showTranslation={showTranslation}
+                showTransliteration={showTransliteration}
+                textSize={textSize}
+                savedZikrIds={savedZikrIds}
                 onBack={pop}
                 onComplete={markComplete}
                 onAdvance={advanceAfterCompletion}
@@ -574,6 +714,7 @@ export default function App() {
                 onPrev={() => {
                   if (activeIdx > 0) setActiveIdx((i) => i - 1);
                 }}
+                onToggleSaved={toggleSavedZikr}
               />
             )}
             {view === "completion" && (
@@ -601,21 +742,31 @@ export default function App() {
                 currentStreak={currentStreak}
                 longestStreak={longestStreak}
                 textSize={textSize}
+                arabicFont={arabicFont}
+                showTranslation={showTranslation}
+                showTransliteration={showTransliteration}
                 highContrast={highContrast}
                 boldText={boldText}
                 reduceMotion={reduceMotion}
                 hapticFeedback={hapticFeedback}
                 forceRtl={forceRtl}
                 colorBlindSupport={colorBlindSupport}
+                reminders={reminders}
+                weeklyGoalDays={weeklyGoalDays}
                 onLanguageChange={setSelectedLang}
                 onThemeModeChange={setThemeMode}
                 onTextSizeChange={setTextSize}
+                onArabicFontChange={setArabicFont}
+                onShowTranslationChange={setShowTranslation}
+                onShowTransliterationChange={setShowTransliteration}
                 onHighContrastChange={setHighContrast}
                 onBoldTextChange={setBoldText}
                 onReduceMotionChange={setReduceMotion}
                 onHapticFeedbackChange={setHapticFeedback}
                 onForceRtlChange={setForceRtl}
                 onColorBlindSupportChange={setColorBlindSupport}
+                onRemindersChange={setReminders}
+                onWeeklyGoalDaysChange={setWeeklyGoalDays}
                 onActivateAccount={handleOpenAccountAuth}
                 onSignOut={handleSignOut}
                 onBack={pop}
@@ -632,6 +783,36 @@ export default function App() {
             )}
           </Suspense>
         </main>
+
+        {(updateAvailable || (installPrompt && sessions.length > 0 && !installDismissed)) && (
+          <div className={`absolute inset-x-0 z-40 ${showBottomNav ? "bottom-20" : "bottom-3"}`}>
+            {updateAvailable ? (
+              <PwaNotice
+                title={t(selectedLang, "pwa.updateTitle")}
+                body={t(selectedLang, "pwa.updateBody")}
+                actionLabel={t(selectedLang, "pwa.refresh")}
+                dismissLabel={t(selectedLang, "pwa.later")}
+                onAction={() => window.dispatchEvent(new Event("azkar-apply-update"))}
+                onDismiss={() => setUpdateAvailable(false)}
+              />
+            ) : (
+              <PwaNotice
+                title={t(selectedLang, "pwa.installTitle")}
+                body={t(selectedLang, "pwa.installBody")}
+                actionLabel={t(selectedLang, "pwa.install")}
+                dismissLabel={t(selectedLang, "pwa.later")}
+                onAction={() => {
+                  void installPrompt?.prompt();
+                  setInstallPrompt(null);
+                }}
+                onDismiss={() => {
+                  window.localStorage.setItem("azkarapp.install-dismissed", "true");
+                  setInstallDismissed(true);
+                }}
+              />
+            )}
+          </div>
+        )}
 
         {/* Bottom nav */}
         {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}

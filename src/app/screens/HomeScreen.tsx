@@ -5,77 +5,175 @@ import { ProgressBar } from "../components/ProgressBar";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
+import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
+
+type HomeActionKind = "resume" | "start" | "again";
+
+export type HomeAction = {
+  categoryId: CategoryId;
+  index: number;
+  completedCount: number;
+  totalCount: number;
+  kind: HomeActionKind;
+};
+
+function suggestedCategoryId(date: Date): CategoryId {
+  const hour = date.getHours();
+  if (hour >= 20 || hour < 4) {
+    return "before_sleep";
+  }
+  return hour >= 12 ? "evening" : "morning";
+}
+
+function getNextIndex(completed: Set<number>, totalCount: number) {
+  return Array.from({ length: totalCount }, (_, index) => index).find((index) => !completed.has(index)) ?? 0;
+}
+
+/** Chooses one calm, useful next action without blocking access to any collection. */
+export function getHomeAction(completed: Record<CategoryId, Set<number>>, now: Date = new Date()): HomeAction {
+  const suggestedId = suggestedCategoryId(now);
+  const categoryIds = [suggestedId, ...CATEGORIES.map((category) => category.id)].filter(
+    (id, index, values) => values.indexOf(id) === index,
+  ) as CategoryId[];
+
+  for (const categoryId of categoryIds) {
+    const done = completed[categoryId]?.size ?? 0;
+    const totalCount = getCategoryTotal(categoryId);
+    if (done > 0 && done < totalCount) {
+      return {
+        categoryId,
+        index: getNextIndex(completed[categoryId], totalCount),
+        completedCount: done,
+        totalCount,
+        kind: "resume",
+      };
+    }
+  }
+
+  for (const categoryId of categoryIds) {
+    const done = completed[categoryId]?.size ?? 0;
+    const totalCount = getCategoryTotal(categoryId);
+    if (done === 0) {
+      return { categoryId, index: 0, completedCount: done, totalCount, kind: "start" };
+    }
+  }
+
+  const totalCount = getCategoryTotal(suggestedId);
+  return { categoryId: suggestedId, index: 0, completedCount: totalCount, totalCount, kind: "again" };
+}
 
 export function HomeScreen({
   completed,
   onCategory,
+  onResume,
   language,
 }: {
   completed: Record<CategoryId, Set<number>>;
   onCategory: (category: CategoryId) => void;
+  onResume: (category: CategoryId, index: number) => void;
   language: AppLanguage;
 }) {
   const isArabic = language === "ar";
+  const action = getHomeAction(completed);
+  const actionCategory = CATEGORIES.find((category) => category.id === action.categoryId)!;
+  const actionName = isArabic ? actionCategory.nameArabic : actionCategory.name;
+  const actionLabel = t(language, `home.${action.kind}Action`, { category: actionName });
 
   return (
     <div className="flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
-      <header className="relative flex h-14 shrink-0 items-center justify-center px-5">
-        <span
-          className="absolute left-5 flex h-11 w-11 items-center justify-center text-muted-foreground"
-          aria-hidden="true"
-        >
-          <ChevronLeft size={24} />
-        </span>
-        <h1 className="text-[18px] font-bold text-foreground">{isArabic ? "الأذكار" : "Azkar"}</h1>
+      <header className="flex h-14 shrink-0 items-center px-5">
+        <h1 className="text-[18px] font-bold text-foreground">{t(language, "home.title")}</h1>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
-        <div className="space-y-3">
-          {CATEGORIES.map((category, index) => {
-            const done = completed[category.id]?.size ?? 0;
-            const totalCount = getCategoryTotal(category.id);
-            const isDaily = ["morning", "evening", "before_sleep"].includes(category.id);
+        <section aria-labelledby="next-azkar-heading" className="mb-6">
+          <p id="next-azkar-heading" className="mb-2 text-[13px] font-semibold text-muted-foreground">
+            {t(language, "home.nextUp")}
+          </p>
+          <button
+            type="button"
+            data-testid="home-primary-cta"
+            onClick={() => onResume(action.categoryId, action.index)}
+            className="flex min-h-[126px] w-full items-center gap-4 rounded-[22px] border border-primary/35 bg-primary/10 p-5 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`${actionLabel}. ${formatNumerals(action.completedCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(action.totalCount, language)} ${t(language, "home.complete")}`}
+          >
+            <span
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground"
+              aria-hidden="true"
+            >
+              <CatIcon type={actionCategory.icon} size={30} color="currentColor" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-[18px] font-extrabold text-foreground">{actionLabel}</span>
+              <span className="mt-1 block text-[14px] text-muted-foreground">{actionName}</span>
+              <span className="mt-3 block">
+                <ProgressBar
+                  value={action.completedCount}
+                  max={action.totalCount}
+                  height={6}
+                  trackColor="color-mix(in srgb, var(--primary) 22%, transparent)"
+                  direction={isArabic ? "rtl" : "ltr"}
+                  aria-label={isArabic ? `تقدم ${actionName}` : `${actionName} progress`}
+                />
+                <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
+                  {formatNumerals(action.completedCount, language)} {isArabic ? "من" : "of"}{" "}
+                  {formatNumerals(action.totalCount, language)} {t(language, "home.complete")}
+                </span>
+              </span>
+            </span>
+            <ChevronLeft
+              size={22}
+              aria-hidden="true"
+              className={`shrink-0 text-primary ${isArabic ? "" : "-scale-x-100"}`}
+            />
+          </button>
+        </section>
 
-            return (
-              <Fragment key={category.id}>
-                {index === 3 && <div className="mx-6 my-2 h-[1px] bg-border opacity-50" aria-hidden="true" />}
-                <button
-                  type="button"
-                  onClick={() => onCategory(category.id)}
-                  dir={isArabic ? "rtl" : "ltr"}
-                  data-testid={`category-card-${category.id}`}
-                  className={`flex w-full items-center gap-4 rounded-[20px] border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isDaily ? "min-h-[96px]" : "min-h-[76px]"}`}
-                  aria-label={
-                    isArabic
-                      ? `${category.nameArabic}${isDaily ? `، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة` : ""}`
-                      : `${category.name}${isDaily ? `, ${done} of ${totalCount} complete` : ""}`
-                  }
-                >
-                  <div
-                    data-slot="category-icon"
-                    className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full bg-white"
+        <section aria-labelledby="collections-heading">
+          <h2 id="collections-heading" className="mb-3 text-[15px] font-bold text-foreground">
+            {t(language, "home.collections")}
+          </h2>
+          <div className="space-y-3">
+            {CATEGORIES.map((category) => {
+              const done = completed[category.id]?.size ?? 0;
+              const totalCount = getCategoryTotal(category.id);
+
+              return (
+                <Fragment key={category.id}>
+                  <button
+                    type="button"
+                    onClick={() => onCategory(category.id)}
+                    dir={isArabic ? "rtl" : "ltr"}
+                    data-testid={`category-card-${category.id}`}
+                    className="flex min-h-[96px] w-full items-center gap-4 rounded-[20px] border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={
+                      isArabic
+                        ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة`
+                        : `${category.name}, ${done} of ${totalCount} complete`
+                    }
                   >
-                    <CatIcon type={category.icon} size={28} color="var(--primary)" />
-                  </div>
+                    <span
+                      data-slot="category-icon"
+                      className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full bg-white"
+                      aria-hidden="true"
+                    >
+                      <CatIcon type={category.icon} size={28} color="var(--primary)" />
+                    </span>
 
-                  <div className="flex min-w-0 flex-1 flex-col justify-center gap-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p data-slot="category-copy" className="text-[18px] font-bold text-foreground">
-                        {isArabic ? category.nameArabic : category.name}
-                      </p>
-                      {isDaily && (
+                    <span data-slot="category-copy" className="flex min-w-0 flex-1 flex-col justify-center gap-3">
+                      <span className="flex items-center justify-between gap-2">
+                        <span className="text-[18px] font-bold text-foreground">
+                          {isArabic ? category.nameArabic : category.name}
+                        </span>
                         <span
                           className="whitespace-nowrap text-[13px] font-medium text-muted-foreground"
                           dir={isArabic ? "rtl" : "ltr"}
                         >
-                          {isArabic
-                            ? `${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)}`
-                            : `${done} of ${totalCount}`}
+                          {formatNumerals(done, language)} {isArabic ? "من" : "of"}{" "}
+                          {formatNumerals(totalCount, language)}
                         </span>
-                      )}
-                    </div>
-                    {isDaily && (
+                      </span>
                       <ProgressBar
                         value={done}
                         max={totalCount}
@@ -84,20 +182,20 @@ export function HomeScreen({
                         direction={isArabic ? "rtl" : "ltr"}
                         aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`}
                       />
-                    )}
-                  </div>
+                    </span>
 
-                  <ChevronLeft
-                    size={20}
-                    aria-hidden="true"
-                    data-slot="category-chevron"
-                    className={`shrink-0 text-[#6B6888] ${isArabic ? "" : "-scale-x-100"}`}
-                  />
-                </button>
-              </Fragment>
-            );
-          })}
-        </div>
+                    <ChevronLeft
+                      size={20}
+                      aria-hidden="true"
+                      data-slot="category-chevron"
+                      className={`shrink-0 text-[#6B6888] ${isArabic ? "" : "-scale-x-100"}`}
+                    />
+                  </button>
+                </Fragment>
+              );
+            })}
+          </div>
+        </section>
       </div>
     </div>
   );

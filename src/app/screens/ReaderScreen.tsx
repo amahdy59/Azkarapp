@@ -14,7 +14,7 @@ import {
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import type { AppLanguage, CategoryId } from "../types";
+import type { AppLanguage, ArabicFontOption, CategoryId, TextSizeOption } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -27,7 +27,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 export const COUNTER_ADVANCE_DELAY_MS = 500;
 
 function vibrate(pattern: number | number[]) {
@@ -36,58 +35,40 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
-function loadSavedZikrIds() {
-  if (typeof window === "undefined") {
-    return new Set<string>();
-  }
-
-  try {
-    const raw = window.localStorage.getItem(SAVED_ZIKR_STORAGE_KEY);
-    if (!raw) {
-      return new Set<string>();
-    }
-
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) {
-      return new Set<string>();
-    }
-
-    return new Set(parsed.filter((value): value is string => typeof value === "string"));
-  } catch {
-    return new Set<string>();
-  }
-}
-
-function persistSavedZikrIds(ids: Set<string>) {
-  if (typeof window === "undefined") {
-    return;
-  }
-
-  window.localStorage.setItem(SAVED_ZIKR_STORAGE_KEY, JSON.stringify([...ids]));
-}
-
 export function ReaderScreen({
   catId,
   idx,
   isArabic,
   isDone,
   hapticFeedback,
+  arabicFont,
+  showTranslation,
+  showTransliteration,
+  textSize,
+  savedZikrIds,
   onBack,
   onComplete,
   onAdvance,
   onNext,
   onPrev,
+  onToggleSaved,
 }: {
   catId: CategoryId;
   idx: number;
   isArabic: boolean;
   isDone: boolean;
   hapticFeedback: boolean;
+  arabicFont: ArabicFontOption;
+  showTranslation: boolean;
+  showTransliteration: boolean;
+  textSize: TextSizeOption;
+  savedZikrIds: Set<string>;
   onBack: () => void;
   onComplete: (idx: number) => void;
   onAdvance: (idx: number) => void;
   onNext: () => void;
   onPrev: () => void;
+  onToggleSaved: (zikrId: string) => void;
 }) {
   const azkar = getAzkarByCategory(catId);
   const z = azkar[idx];
@@ -99,7 +80,6 @@ export function ReaderScreen({
   const [pulse, setPulse] = useState(0);
   const [complete, setComplete] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
   const closeReference = useCallback(() => setBenefitOpen(false), []);
@@ -129,7 +109,6 @@ export function ReaderScreen({
     setReaderAnnouncement(
       initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.tapAnywhere"),
     );
-    setIsSaved(loadSavedZikrIds().has(z?.id ?? ""));
   }, [idx, isDone, language, z]);
 
   useEffect(() => {
@@ -153,6 +132,12 @@ export function ReaderScreen({
   const localizedCount = formatNumerals(count, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
+  const isSaved = savedZikrIds.has(z.id);
+  const readingFontSize = { small: "18px", medium: "20px", large: "24px" }[textSize];
+  const readingFontFamily =
+    arabicFont === "noto_sans"
+      ? "'Noto Sans Arabic', sans-serif"
+      : "'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif";
 
   const handleSwipe = (dx: number) => {
     if (isArabic) {
@@ -233,15 +218,7 @@ export function ReaderScreen({
   };
 
   const handleToggleSaved = () => {
-    const savedIds = loadSavedZikrIds();
-    if (savedIds.has(z.id)) {
-      savedIds.delete(z.id);
-      setIsSaved(false);
-    } else {
-      savedIds.add(z.id);
-      setIsSaved(true);
-    }
-    persistSavedZikrIds(savedIds);
+    onToggleSaved(z.id);
   };
 
   const handleShare = async () => {
@@ -324,13 +301,38 @@ export function ReaderScreen({
       }}
     >
       <p
-        className="zikr-text text-center text-[20px] font-medium leading-[1.6] text-foreground pointer-events-none"
+        className="zikr-text text-center font-medium leading-[1.75] text-foreground pointer-events-none"
         data-testid="zikr-text"
         dir="rtl"
         lang="ar"
+        style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
       >
         {z.arabicText}
       </p>
+      {(showTranslation || showTransliteration) && (
+        <div className="mt-5 space-y-4 border-t border-border pt-4 text-start" data-prevent-count="true">
+          {showTranslation && (
+            <section aria-labelledby="reader-translation-title">
+              <h2 id="reader-translation-title" className="text-[13px] font-bold text-muted-foreground">
+                {t(language, "reader.translationLabel")}
+              </h2>
+              <p className="mt-1 text-[16px] leading-7 text-foreground" lang="en" dir="ltr">
+                {z.translation}
+              </p>
+            </section>
+          )}
+          {showTransliteration && (
+            <section aria-labelledby="reader-transliteration-title">
+              <h2 id="reader-transliteration-title" className="text-[13px] font-bold text-muted-foreground">
+                {t(language, "reader.transliterationLabel")}
+              </h2>
+              <p className="mt-1 text-[16px] leading-7 text-foreground" lang="en" dir="ltr">
+                {z.transliteration}
+              </p>
+            </section>
+          )}
+        </div>
+      )}
     </div>
   );
 

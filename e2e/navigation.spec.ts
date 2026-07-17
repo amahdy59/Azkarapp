@@ -22,3 +22,16 @@ test("Azkar tab opens the library and exposes search", async ({ page }) => {
   await page.getByRole("button", { name: "Go back", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
+
+test("saved zikr is visible from the first-class Saved library tab", async ({ page }) => {
+  await enterAsEnglishGuest(page);
+
+  await page.getByTestId("home-primary-cta").click();
+  await page.getByRole("button", { name: "Save zikr", exact: true }).click();
+  await page.getByRole("button", { name: "Go back", exact: true }).click();
+  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("tab", { name: /Saved/ }).click();
+
+  await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Azkar:/ }).first()).toBeVisible();
+});

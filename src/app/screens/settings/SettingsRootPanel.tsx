@@ -1,5 +1,4 @@
-import { Bell, BarChart3, Download, Globe, LogOut, Menu, Moon, User, Wifi } from "../../components/icons";
-import { motion } from "motion/react";
+import { Bell, BarChart3, Download, Globe, Info, LogOut, Menu, Moon, User, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage, TextSizeOption, ThemeMode } from "../../types";
 import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
@@ -7,8 +6,15 @@ import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsP
 export type SettingsSubScreen =
   "root" | "language" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
-function formatTextSize(value: TextSizeOption) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
+function formatTextSize(value: TextSizeOption, language: AppLanguage) {
+  return t(
+    language,
+    value === "small" ? "settings.textSmall" : value === "large" ? "settings.textLarge" : "settings.medium",
+  );
+}
+
+function formatThemeMode(value: ThemeMode, language: AppLanguage) {
+  return t(language, `settings.theme${value.charAt(0).toUpperCase()}${value.slice(1)}`);
 }
 
 export function getNextThemeMode(themeMode: ThemeMode): ThemeMode {
@@ -42,15 +48,7 @@ export function SettingsRootPanel({
   onSignOut: () => void;
 }) {
   return (
-    <motion.div
-      className="flex-1 overflow-y-auto pb-8"
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: [0, 1, 1], y: [8, 0, 0] }}
-      transition={{
-        opacity: { duration: 0.61, times: [0, 0.7377, 1], ease: "easeOut" },
-        y: { duration: 0.61, times: [0, 0.7377, 1], ease: "easeOut" },
-      }}
-    >
+    <div className="flex-1 overflow-y-auto pb-8">
       <SectionLabel label={t(language, "settings.preferences") || "Preferences"} />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
@@ -64,94 +62,117 @@ export function SettingsRootPanel({
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Moon size={20} className="text-primary" />}
           label={t(language, "settings.displayTheme")}
-          right={
-            <RowValue value={themeMode === "dark" ? "Dark Mode" : themeMode === "light" ? "Light Mode" : "Midnight"} />
-          }
+          right={<RowValue value={formatThemeMode(themeMode, language)} />}
           onPress={() => onThemeModeChange(getNextThemeMode(themeMode))}
         />
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Menu size={20} className="text-primary" />}
-          label={t(language, "settings.textSize") || "Text Size"}
-          right={<RowValue value={formatTextSize(textSize)} />}
+          label={t(language, "settings.textSize")}
+          right={<RowValue value={formatTextSize(textSize, language)} />}
           onPress={() => onNav("accessibility")}
         />
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Bell size={20} className="text-primary" />}
-          label="Notifications"
-          right={<RowValue value="Setup" />}
+          label={t(language, "settings.notifications")}
+          right={<RowValue value={t(language, "settings.notificationsSetup")} />}
           onPress={() => onNav("notifications")}
           hasDivider={false}
         />
       </div>
 
-      <SectionLabel label="Content" />
+      <SectionLabel label={t(language, "settings.contentSection")} />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Download size={20} className="text-primary" />}
-          label="Offline Access"
-          right={<RowValue value="Included" />}
+          label={t(language, "settings.offlineAccess")}
+          right={<RowValue value={t(language, "settings.included")} />}
           onPress={() => onNav("downloads")}
           hasDivider={false}
         />
       </div>
 
-      <SectionLabel label="Accessibility" />
+      <SectionLabel label={t(language, "settings.accessibilitySection")} />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<User size={20} className="text-primary" />}
-          label="Accessibility"
+          label={t(language, "settings.accessibility")}
           right={<RowChevron />}
           onPress={() => onNav("accessibility")}
           hasDivider={false}
         />
       </div>
 
-      <SectionLabel label="Account" />
+      <SectionLabel label={t(language, "settings.progressSection")} />
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <SettingsRowItem
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<BarChart3 size={20} className="text-primary" />}
+          label={t(language, "settings.myProgress")}
+          right={<RowChevron />}
+          onPress={() => onNav("progress")}
+          hasDivider={false}
+        />
+      </div>
+
+      <SectionLabel label={t(language, "settings.accountSection")} />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         {!isGuest && (
           <SettingsRowItem
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Wifi size={20} className="text-primary" />}
-            label="Account Sync"
+            label={t(language, "settings.accountSync")}
             right={
               <RowValue
-                value={syncError ? "Needs attention" : isSyncing ? "Syncing…" : "Up to date"}
+                value={
+                  syncError
+                    ? t(language, "settings.accountNeedsAttention")
+                    : isSyncing
+                      ? t(language, "common.syncing")
+                      : t(language, "settings.accountUpToDate")
+                }
                 withChevron={false}
               />
             }
           />
         )}
-        {isGuest ? (
+        {isGuest && (
           <SettingsRowItem
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Wifi size={20} className="text-primary" />}
             label={t(language, "settings.activateAccount")}
             right={<RowChevron />}
             onPress={onActivateAccount}
-          />
-        ) : (
-          <SettingsRowItem
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<BarChart3 size={20} className="text-primary" />}
-            label="My Progress"
-            right={<RowChevron />}
-            onPress={() => onNav("progress")}
+            hasDivider={false}
           />
         )}
+        {!isGuest && (
+          <SettingsRowItem
+            iconBg="color-mix(in srgb, var(--destructive) 15%, transparent)"
+            icon={<LogOut size={20} className="text-destructive" />}
+            label={t(language, "common.signOut")}
+            labelColor="text-destructive"
+            right={<RowChevron />}
+            onPress={onSignOut}
+            hasDivider={false}
+          />
+        )}
+      </div>
+
+      <SectionLabel label={t(language, "settings.supportSection")} />
+      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
-          iconBg="color-mix(in srgb, var(--destructive) 15%, transparent)"
-          icon={<LogOut size={20} className="text-destructive" />}
-          label={t(language, "common.signOut") || "Sign Out"}
-          labelColor="text-destructive"
-          right={!isGuest ? <RowChevron /> : undefined}
-          onPress={onSignOut}
+          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+          icon={<Info size={20} className="text-primary" />}
+          label={t(language, "settings.aboutHelp")}
+          right={<RowChevron />}
+          onPress={() => onNav("about")}
           hasDivider={false}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }

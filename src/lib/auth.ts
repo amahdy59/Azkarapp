@@ -131,9 +131,13 @@ type RemoteProfileRow = {
   preferred_language: AppLanguage | null;
 };
 
+type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
+  savedZikrIds?: AppStateSnapshot["savedZikrIds"];
+};
+
 type RemoteSettingsRow = {
   dark_mode: boolean;
-  settings_json?: Partial<AppStateSnapshot["settings"]> | null;
+  settings_json?: RemoteSettingsJson | null;
 };
 
 type RemoteProgressRow = {
@@ -183,12 +187,15 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
       showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
       textSize: settings?.settings_json?.textSize ?? localState.settings.textSize,
+      arabicFont: settings?.settings_json?.arabicFont ?? localState.settings.arabicFont,
       highContrast: settings?.settings_json?.highContrast ?? localState.settings.highContrast,
       boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
       reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
       hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
       forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
       colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
+      reminders: settings?.settings_json?.reminders ?? localState.settings.reminders,
+      weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
     },
     profile: {
       displayName:
@@ -206,6 +213,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       durationSeconds: item.duration_seconds,
       isComplete: item.is_complete,
     })),
+    savedZikrIds: settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds,
   };
 
   return mergeAppStates(localState, remoteState);
@@ -236,12 +244,16 @@ export async function syncRemoteState(
       showTransliteration: state.settings.showTransliteration,
       showTranslation: state.settings.showTranslation,
       textSize: state.settings.textSize,
+      arabicFont: state.settings.arabicFont,
       highContrast: state.settings.highContrast,
       boldText: state.settings.boldText,
       reduceMotion: state.settings.reduceMotion,
       hapticFeedback: state.settings.hapticFeedback,
       forceRtl: state.settings.forceRtl,
       colorBlindSupport: state.settings.colorBlindSupport,
+      reminders: state.settings.reminders,
+      weeklyGoalDays: state.settings.weeklyGoalDays,
+      savedZikrIds: state.savedZikrIds,
     },
     updated_at: new Date().toISOString(),
   };
