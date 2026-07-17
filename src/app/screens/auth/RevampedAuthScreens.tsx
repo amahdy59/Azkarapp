@@ -6,8 +6,8 @@ import type { AppLanguage } from "../../types";
 import { BrandLockup } from "../onboarding/OnboardingBrand";
 
 const rtlFont = { fontFamily: "'IBM Plex Sans Arabic', sans-serif" };
-const termsUrl = (import.meta.env.VITE_TERMS_URL as string | undefined) || "https://example.com/terms";
-const privacyUrl = (import.meta.env.VITE_PRIVACY_URL as string | undefined) || "https://example.com/privacy";
+const termsUrl = (import.meta.env.VITE_TERMS_URL as string | undefined)?.trim() || "";
+const privacyUrl = (import.meta.env.VITE_PRIVACY_URL as string | undefined)?.trim() || "";
 
 function LegalConsent({ language, compact = false }: { language: AppLanguage; compact?: boolean }) {
   const ar = language === "ar";

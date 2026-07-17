@@ -1,219 +1,116 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Bell,
-  BookOpen,
-  CheckCircle2,
-  Download,
-  Flame,
-  HelpCircle,
-  Info,
-  Pause,
-  Play,
-  Settings,
-  Sparkles,
-  Sprout,
-  Volume2,
-  Wifi,
-  X,
-} from "../../components/icons";
-import { motion } from "motion/react";
-import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
-import { CATEGORIES } from "../../content/categories";
-import { CatIcon } from "../../components/CatIcon";
-import { CrescentMark } from "../../components/CrescentMark";
-import { RowChevron, RowToggle, RowValue, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
+import { useState } from "react";
+import { Bell, CheckCircle2, Info } from "../../components/icons";
+import { SubHeader } from "./SettingsPrimitives";
 
-const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
-const REPO_URL = "https://github.com/amahdy59/Azkarapp";
-const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
+type BrowserNotificationPermission = NotificationPermission | "unsupported";
 
-type DownloadState = "idle" | "downloading" | "paused" | "done";
-
-export type SettingsSubScreen =
-  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
-
-function openExternal(url: string) {
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
+function readNotificationPermission(): BrowserNotificationPermission {
+  if (typeof window === "undefined" || !("Notification" in window)) {
+    return "unsupported";
   }
+
+  return Notification.permission;
 }
 
-function openMailto(email: string, subject: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
-  }
-}
-
-function formatTextSize(value: TextSizeOption) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function formatAudioQuality(value: AudioQuality) {
-  return value === "high" ? "High" : "Standard";
-}
-
-function formatColorBlindSupport(value: ColorBlindSupport) {
-  switch (value) {
-    case "deuteranopia":
-      return "Deuteranopia";
-    case "protanopia":
-      return "Protanopia";
-    case "tritanopia":
-      return "Tritanopia";
+function permissionCopy(permission: BrowserNotificationPermission) {
+  switch (permission) {
+    case "granted":
+      return "Browser permission is granted. Scheduled reminders are not configured in this build yet.";
+    case "denied":
+      return "Browser permission is blocked. You can change it from your browser or device settings.";
+    case "unsupported":
+      return "This browser does not support web notifications.";
     default:
-      return "None";
+      return "Permission has not been requested.";
   }
-}
-
-function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
 }
 
 export function NotificationsPanel({ onBack }: { onBack: () => void }) {
-  const [morningOn, setMorningOn] = useState(true);
-  const [eveningOn, setEveningOn] = useState(true);
-  const [sleepOn, setSleepOn] = useState(false);
-  const [celebration, setCelebration] = useState(true);
-  const [streak, setStreak] = useState(false);
-  const [notificationSoundIndex, setNotificationSoundIndex] = useState(0);
-  const [times, setTimes] = useState({
-    morning: "6:30 AM",
-    evening: "5:00 PM",
-    before_sleep: "9:30 PM",
-  });
+  const [permission, setPermission] = useState<BrowserNotificationPermission>(readNotificationPermission);
+  const [isRequesting, setIsRequesting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const soundOptions = ["Gentle Chime", "Soft Oud", "Calm Bell"];
-  const timeOptions: Record<CategoryId, string[]> = {
-    morning: ["5:45 AM", "6:30 AM", "7:15 AM"],
-    evening: ["4:30 PM", "5:00 PM", "6:15 PM"],
-    before_sleep: ["9:30 PM", "10:00 PM", "10:30 PM"],
+  const requestPermission = async () => {
+    if (!("Notification" in window)) {
+      setPermission("unsupported");
+      return;
+    }
+
+    try {
+      setErrorMessage("");
+      setIsRequesting(true);
+      setPermission(await Notification.requestPermission());
+    } catch (error) {
+      setErrorMessage(error instanceof Error ? error.message : "Could not request notification permission.");
+    } finally {
+      setIsRequesting(false);
+    }
   };
-
-  const cycleTime = (categoryId: CategoryId) => {
-    setTimes((current) => {
-      const options = timeOptions[categoryId];
-      const index = options.indexOf(current[categoryId]);
-      return {
-        ...current,
-        [categoryId]: options[(index + 1) % options.length],
-      };
-    });
-  };
-
-  const ReminderRow = ({
-    label,
-    categoryId,
-    enabled,
-    onToggle,
-    hasDivider = true,
-  }: {
-    label: string;
-    categoryId: CategoryId;
-    enabled: boolean;
-    onToggle: () => void;
-    hasDivider?: boolean;
-  }) => (
-    <div>
-      <div className="flex h-[56px] items-center gap-3 bg-card px-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-muted">
-          <Bell size={18} className="text-primary" />
-        </div>
-        <p className="flex-1 font-sans text-[17px] font-semibold text-foreground">{label}</p>
-        <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={() => enabled && cycleTime(categoryId)}
-            disabled={!enabled}
-            className="font-sans text-[14px] text-muted-foreground disabled:opacity-50"
-          >
-            {enabled ? times[categoryId] : "Not set"}
-          </button>
-          <RowToggle checked={enabled} onChange={onToggle} label={label} />
-        </div>
-      </div>
-      {hasDivider && <div className="mx-4 h-px bg-border" style={{ marginLeft: 56 }} />}
-    </div>
-  );
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title="Notifications" onBack={onBack} />
-      <div className="flex-1 overflow-y-auto pb-8">
-        <div className="mx-4 mt-2 flex items-center gap-3 rounded-xl bg-[#1A4F44] px-4 py-3">
-          <CheckCircle2 size={24} className="shrink-0 text-white" />
-          <p className="latin-ui text-[14px] text-white" lang="en" dir="ltr">
-            Notification preferences are saved for your reminder flow.
-          </p>
-        </div>
+      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-3">
+        <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="notification-availability">
+          <div className="flex items-start gap-3">
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
+              aria-hidden="true"
+            >
+              <Info size={22} className="text-primary" />
+            </span>
+            <div>
+              <h2 id="notification-availability" className="text-[17px] font-semibold text-foreground">
+                Reminder availability
+              </h2>
+              <p className="mt-1 text-[14px] leading-[22px] text-muted-foreground">
+                Scheduled reminders require a push service and are not active in this build. Your azkar and progress
+                continue to work offline.
+              </p>
+            </div>
+          </div>
+        </section>
 
-        <SectionLabel label="Azkar Reminders" />
-        <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
-          <ReminderRow
-            label="Morning Azkar"
-            categoryId="morning"
-            enabled={morningOn}
-            onToggle={() => setMorningOn((value) => !value)}
-          />
-          <ReminderRow
-            label="Evening Azkar"
-            categoryId="evening"
-            enabled={eveningOn}
-            onToggle={() => setEveningOn((value) => !value)}
-          />
-          <ReminderRow
-            label="Before Sleep"
-            categoryId="before_sleep"
-            enabled={sleepOn}
-            onToggle={() => setSleepOn((value) => !value)}
-            hasDivider={false}
-          />
-        </div>
+        <section
+          className="mt-4 rounded-2xl border border-border bg-card p-5"
+          aria-labelledby="notification-permission"
+        >
+          <div className="flex items-start gap-3">
+            <span
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
+              aria-hidden="true"
+            >
+              {permission === "granted" ? (
+                <CheckCircle2 size={22} className="text-primary" />
+              ) : (
+                <Bell size={22} className="text-primary" />
+              )}
+            </span>
+            <div className="min-w-0 flex-1">
+              <h2 id="notification-permission" className="text-[17px] font-semibold text-foreground">
+                Browser permission
+              </h2>
+              <p className="mt-1 text-[14px] leading-[22px] text-muted-foreground">{permissionCopy(permission)}</p>
+            </div>
+          </div>
 
-        <SectionLabel label="General" />
-        <div className="mx-4 overflow-hidden rounded-xl border border-border bg-card">
-          <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Sparkles size={18} className="text-primary" />}
-            label="Completion Celebration"
-            right={
-              <RowToggle
-                checked={celebration}
-                onChange={() => setCelebration((value) => !value)}
-                label="Completion Celebration"
-              />
-            }
-            onPress={() => setCelebration((value) => !value)}
-          />
-          <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Sprout size={18} className="text-primary" />}
-            label="Daily Streak Reminder"
-            right={
-              <RowToggle checked={streak} onChange={() => setStreak((value) => !value)} label="Daily Streak Reminder" />
-            }
-            onPress={() => setStreak((value) => !value)}
-          />
-          <SettingsRowItem
-            iconBg="var(--muted)"
-            icon={<Volume2 size={18} className="text-primary" />}
-            label="Notification Sound"
-            right={<RowValue value={soundOptions[notificationSoundIndex] ?? "Gentle Chime"} withChevron={false} />}
-            onPress={() => setNotificationSoundIndex((index) => (index + 1) % soundOptions.length)}
-            hasDivider={false}
-          />
-        </div>
+          {permission === "default" && (
+            <button
+              type="button"
+              onClick={requestPermission}
+              disabled={isRequesting}
+              className="mt-4 min-h-11 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60"
+            >
+              {isRequesting ? "Requesting permission…" : "Enable browser notifications"}
+            </button>
+          )}
+
+          {errorMessage && (
+            <p className="mt-3 text-[14px] text-destructive" role="alert">
+              {errorMessage} Check your browser settings and try again.
+            </p>
+          )}
+        </section>
       </div>
     </div>
   );

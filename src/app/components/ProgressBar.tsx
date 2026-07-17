@@ -26,6 +26,7 @@ export function ProgressBar({
       aria-valuemin={0}
       aria-valuemax={max}
       aria-label={ariaLabel || "Progress bar"}
+      dir={direction}
     >
       <div
         className="h-full rounded-full transition-all duration-300"

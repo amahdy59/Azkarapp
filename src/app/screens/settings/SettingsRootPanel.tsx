@@ -1,80 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  Bell,
-  BarChart3,
-  Database,
-  Download,
-  Globe,
-  Headphones,
-  LogOut,
-  Menu,
-  Moon,
-  User,
-  Wifi,
-} from "../../components/icons";
+import { Bell, BarChart3, Download, Globe, LogOut, Menu, Moon, User, Wifi } from "../../components/icons";
 import { motion } from "motion/react";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "../../types";
-import { CATEGORIES } from "../../content/categories";
-import { CatIcon } from "../../components/CatIcon";
-import { CrescentMark } from "../../components/CrescentMark";
-import { RowChevron, RowToggle, RowValue, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
-
-const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
-const REPO_URL = "https://github.com/amahdy59/Azkarapp";
-const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
-
-type DownloadState = "idle" | "downloading" | "paused" | "done";
+import type { AppLanguage, TextSizeOption, ThemeMode } from "../../types";
+import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
 
 export type SettingsSubScreen =
-  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
-
-function openExternal(url: string) {
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
-function openMailto(email: string, subject: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
-  }
-}
+  "root" | "language" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
 
 function formatTextSize(value: TextSizeOption) {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
-function formatAudioQuality(value: AudioQuality) {
-  return value === "high" ? "High" : "Standard";
-}
-
-function formatColorBlindSupport(value: ColorBlindSupport) {
-  switch (value) {
-    case "deuteranopia":
-      return "Deuteranopia";
-    case "protanopia":
-      return "Protanopia";
-    case "tritanopia":
-      return "Tritanopia";
-    default:
-      return "None";
-  }
-}
-
-function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
-      }`}
-    >
-      {label}
-    </button>
-  );
+export function getNextThemeMode(themeMode: ThemeMode): ThemeMode {
+  const modes: ThemeMode[] = ["midnight", "light", "dark"];
+  return modes[(modes.indexOf(themeMode) + 1) % modes.length] ?? "midnight";
 }
 
 export function SettingsRootPanel({
@@ -82,11 +21,10 @@ export function SettingsRootPanel({
   language,
   themeMode,
   languageLabel,
-  phoneAuthEnabled,
-  audioQuality,
   textSize,
   isGuest,
   isSyncing,
+  syncError,
   onThemeModeChange,
   onActivateAccount,
   onSignOut,
@@ -95,11 +33,10 @@ export function SettingsRootPanel({
   language: AppLanguage;
   themeMode: ThemeMode;
   languageLabel: string;
-  phoneAuthEnabled: boolean;
-  audioQuality: AudioQuality;
   textSize: TextSizeOption;
   isGuest: boolean;
   isSyncing: boolean;
+  syncError: string;
   onThemeModeChange: (value: ThemeMode) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
@@ -130,7 +67,7 @@ export function SettingsRootPanel({
           right={
             <RowValue value={themeMode === "dark" ? "Dark Mode" : themeMode === "light" ? "Light Mode" : "Midnight"} />
           }
-          onPress={() => onThemeModeChange(themeMode === "dark" ? "light" : "dark")} // Or open a subscreen if implemented
+          onPress={() => onThemeModeChange(getNextThemeMode(themeMode))}
         />
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
@@ -143,7 +80,8 @@ export function SettingsRootPanel({
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Bell size={20} className="text-primary" />}
           label="Notifications"
-          right={<RowToggle checked={true} onChange={() => {}} />}
+          right={<RowValue value="Setup" />}
+          onPress={() => onNav("notifications")}
           hasDivider={false}
         />
       </div>
@@ -152,23 +90,10 @@ export function SettingsRootPanel({
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
           iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-          icon={<Headphones size={20} className="text-primary" />}
-          label="Audio Quality"
-          right={<RowValue value={formatAudioQuality(audioQuality)} />}
-          onPress={() => onNav("audio")}
-        />
-        <SettingsRowItem
-          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
           icon={<Download size={20} className="text-primary" />}
-          label="Offline Downloads"
-          right={<RowValue value="3 categories" />}
+          label="Offline Access"
+          right={<RowValue value="Included" />}
           onPress={() => onNav("downloads")}
-        />
-        <SettingsRowItem
-          iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-          icon={<Database size={20} className="text-primary" />}
-          label="Storage Used"
-          right={<RowValue value="24.3 MB" />}
           hasDivider={false}
         />
       </div>
@@ -187,6 +112,19 @@ export function SettingsRootPanel({
 
       <SectionLabel label="Account" />
       <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        {!isGuest && (
+          <SettingsRowItem
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Wifi size={20} className="text-primary" />}
+            label="Account Sync"
+            right={
+              <RowValue
+                value={syncError ? "Needs attention" : isSyncing ? "Syncing…" : "Up to date"}
+                withChevron={false}
+              />
+            }
+          />
+        )}
         {isGuest ? (
           <SettingsRowItem
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"

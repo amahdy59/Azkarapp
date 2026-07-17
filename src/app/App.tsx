@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useRef, useCallback, type CSSProperties } from "react";
+import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   fromCompletedSets,
   getStreakSummary,
@@ -8,17 +8,13 @@ import {
   type StoredSession,
 } from "./state";
 import { getAzkarByCategory } from "./content/azkar";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
+import type { AppLanguage, AppStateSnapshot, CategoryId, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
 import {
-  getCurrentSession,
   loadRemoteState,
   normalizePhoneNumber,
-  profileFromSession,
   requestPhoneOtp,
   resendPhoneOtp,
   signOutSupabase,
-  subscribeToAuthChanges,
-  syncRemoteState,
   verifyPhoneOtp,
 } from "../lib/auth";
 import { isSupabaseConfigured } from "../lib/supabase";
@@ -47,7 +43,9 @@ type View =
 
 import { BottomNav, StatusBar } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
+import { SyncStatus } from "./components/SyncStatus";
 import { LANGUAGE_LABELS } from "./languageOptions";
+import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 
 const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
 const AzkarLibraryScreen = lazy(() =>
@@ -118,7 +116,7 @@ function ScreenFallback() {
 export default function App() {
   const initialState = useRef(loadAppState()).current;
   const [view, setView] = useState<View>("splash");
-  const [history, setHistory] = useState<View[]>([]);
+  const [, setHistory] = useState<View[]>([]);
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
@@ -134,8 +132,6 @@ export default function App() {
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
-  const [voiceOver, setVoiceOver] = useState(initialState.settings.voiceOver);
-  const [audioQuality, setAudioQuality] = useState<AudioQuality>(initialState.settings.audioQuality);
   const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(
     initialState.settings.colorBlindSupport,
   );
@@ -144,22 +140,95 @@ export default function App() {
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
   const [lastPhoneNumber, setLastPhoneNumber] = useState(initialState.profile.lastPhoneNumber);
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
-  const [authSessionLoaded, setAuthSessionLoaded] = useState(false);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [authError, setAuthError] = useState("");
-  const [isSyncingRemote, setIsSyncingRemote] = useState(false);
-  const latestLastPhoneNumber = useRef(lastPhoneNumber);
 
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
   const useRtlLayout = isArabic || forceRtl;
 
-  useEffect(() => {
-    latestLastPhoneNumber.current = lastPhoneNumber;
-  }, [lastPhoneNumber]);
+  const appStateSnapshot = useMemo<AppStateSnapshot>(
+    () => ({
+      settings: {
+        language: selectedLang,
+        darkMode,
+        themeMode,
+        showTransliteration,
+        showTranslation,
+        textSize,
+        highContrast,
+        boldText,
+        reduceMotion,
+        hapticFeedback,
+        forceRtl,
+        colorBlindSupport,
+      },
+      profile: { displayName, lastPhoneNumber, isGuest },
+      completed: fromCompletedSets(completed),
+      sessions,
+    }),
+    [
+      boldText,
+      colorBlindSupport,
+      completed,
+      darkMode,
+      displayName,
+      forceRtl,
+      hapticFeedback,
+      highContrast,
+      isGuest,
+      lastPhoneNumber,
+      reduceMotion,
+      selectedLang,
+      sessions,
+      showTranslation,
+      showTransliteration,
+      textSize,
+      themeMode,
+    ],
+  );
+
+  const applyStateSnapshot = useCallback((state: AppStateSnapshot) => {
+    setSelectedLang(state.settings.language);
+    setThemeMode(state.settings.themeMode);
+    setShowTransliteration(state.settings.showTransliteration);
+    setShowTranslation(state.settings.showTranslation);
+    setTextSize(state.settings.textSize);
+    setHighContrast(state.settings.highContrast);
+    setBoldText(state.settings.boldText);
+    setReduceMotion(state.settings.reduceMotion);
+    setHapticFeedback(state.settings.hapticFeedback);
+    setForceRtl(state.settings.forceRtl);
+    setColorBlindSupport(state.settings.colorBlindSupport);
+    setDisplayName(state.profile.displayName);
+    setLastPhoneNumber(state.profile.lastPhoneNumber);
+    setIsGuest(state.profile.isGuest);
+    setCompleted(toCompletedSets(state.completed));
+    setSessions(state.sessions);
+  }, []);
+
+  const applyAuthProfile = useCallback((profile: AppStateSnapshot["profile"]) => {
+    setDisplayName(profile.displayName);
+    setLastPhoneNumber(profile.lastPhoneNumber);
+    setIsGuest(profile.isGuest);
+  }, []);
+
+  const {
+    isSyncing: isSyncingRemote,
+    retry: retrySync,
+    syncError,
+  } = useRemoteAccountSync({
+    initialState,
+    state: appStateSnapshot,
+    isGuest,
+    currentStreak,
+    longestStreak,
+    onRemoteState: applyStateSnapshot,
+    onAuthProfile: applyAuthProfile,
+  });
 
   // Apply theme class to root
   useEffect(() => {
@@ -176,7 +245,6 @@ export default function App() {
     document.documentElement.classList.toggle("high-contrast", highContrast);
     document.documentElement.classList.toggle("bold-text", boldText);
     document.documentElement.classList.toggle("reduce-motion", reduceMotion);
-    document.documentElement.classList.toggle("screen-reader-mode", voiceOver);
     document.documentElement.lang = selectedLang;
     document.documentElement.dir = useRtlLayout ? "rtl" : "ltr";
     document.documentElement.style.setProperty("--font-size", fontSizeMap[textSize]);
@@ -195,220 +263,9 @@ export default function App() {
       }
       metaThemeColor.setAttribute("content", bgColor);
     }, 0);
-  }, [
-    boldText,
-    colorBlindSupport,
-    themeMode,
-    highContrast,
-    reduceMotion,
-    selectedLang,
-    textSize,
-    useRtlLayout,
-    voiceOver,
-  ]);
+  }, [boldText, colorBlindSupport, themeMode, highContrast, reduceMotion, selectedLang, textSize, useRtlLayout]);
 
-  useEffect(() => {
-    saveAppState({
-      settings: {
-        language: selectedLang,
-        darkMode,
-        themeMode,
-        showTransliteration,
-        showTranslation,
-        textSize,
-        highContrast,
-        boldText,
-        reduceMotion,
-        hapticFeedback,
-        forceRtl,
-        voiceOver,
-        audioQuality,
-        colorBlindSupport,
-      },
-      profile: {
-        displayName,
-        lastPhoneNumber,
-        isGuest,
-      },
-      completed: fromCompletedSets(completed),
-      sessions,
-    });
-  }, [
-    audioQuality,
-    boldText,
-    colorBlindSupport,
-    completed,
-    darkMode,
-    themeMode,
-    displayName,
-    forceRtl,
-    hapticFeedback,
-    highContrast,
-    isGuest,
-    lastPhoneNumber,
-    reduceMotion,
-    selectedLang,
-    sessions,
-    showTranslation,
-    showTransliteration,
-    textSize,
-    voiceOver,
-  ]);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setAuthSessionLoaded(true);
-      return;
-    }
-
-    let active = true;
-
-    const hydrateSession = async () => {
-      try {
-        const session = await getCurrentSession();
-        if (!active) {
-          return;
-        }
-
-        if (session) {
-          const mergedState = await loadRemoteState(session, initialState);
-
-          setSelectedLang(mergedState.settings.language);
-          setThemeMode(mergedState.settings.themeMode);
-          setShowTransliteration(mergedState.settings.showTransliteration);
-          setShowTranslation(mergedState.settings.showTranslation);
-          setTextSize(mergedState.settings.textSize);
-          setHighContrast(mergedState.settings.highContrast);
-          setBoldText(mergedState.settings.boldText);
-          setReduceMotion(mergedState.settings.reduceMotion);
-          setHapticFeedback(mergedState.settings.hapticFeedback);
-          setForceRtl(mergedState.settings.forceRtl);
-          setVoiceOver(mergedState.settings.voiceOver);
-          setAudioQuality(mergedState.settings.audioQuality);
-          setColorBlindSupport(mergedState.settings.colorBlindSupport);
-          setDisplayName(mergedState.profile.displayName);
-          setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
-          setIsGuest(false);
-          setCompleted(toCompletedSets(mergedState.completed));
-          setSessions(mergedState.sessions);
-        }
-      } catch (error) {
-        if (active) {
-          setAuthError(error instanceof Error ? error.message : "Could not restore your session.");
-        }
-      } finally {
-        if (active) {
-          setAuthSessionLoaded(true);
-        }
-      }
-    };
-
-    void hydrateSession();
-
-    const unsubscribe = subscribeToAuthChanges((session) => {
-      if (!active) {
-        return;
-      }
-
-      const profile = profileFromSession(session, latestLastPhoneNumber.current);
-      setDisplayName(profile.displayName);
-      setLastPhoneNumber(profile.lastPhoneNumber);
-      setIsGuest(profile.isGuest);
-      if (!session) {
-        setAuthSessionLoaded(true);
-      }
-    });
-
-    return () => {
-      active = false;
-      unsubscribe();
-    };
-  }, [initialState]);
-
-  useEffect(() => {
-    if (!isSupabaseConfigured || !authSessionLoaded || isGuest) {
-      return;
-    }
-
-    let cancelled = false;
-
-    const pushRemoteState = async () => {
-      try {
-        setIsSyncingRemote(true);
-        const session = await getCurrentSession();
-        if (!session || cancelled) {
-          return;
-        }
-
-        await syncRemoteState(
-          session,
-          {
-            settings: {
-              language: selectedLang,
-              darkMode,
-              themeMode,
-              showTransliteration,
-              showTranslation,
-              textSize,
-              highContrast,
-              boldText,
-              reduceMotion,
-              hapticFeedback,
-              forceRtl,
-              voiceOver,
-              audioQuality,
-              colorBlindSupport,
-            },
-            profile: {
-              displayName,
-              lastPhoneNumber,
-              isGuest,
-            },
-            completed: fromCompletedSets(completed),
-            sessions,
-          },
-          { currentStreak, longestStreak },
-        );
-      } catch (error) {
-        if (!cancelled) {
-          setAuthError(error instanceof Error ? error.message : "Could not sync your account.");
-        }
-      } finally {
-        if (!cancelled) {
-          setIsSyncingRemote(false);
-        }
-      }
-    };
-
-    void pushRemoteState();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [
-    audioQuality,
-    authSessionLoaded,
-    boldText,
-    colorBlindSupport,
-    completed,
-    currentStreak,
-    darkMode,
-    themeMode,
-    displayName,
-    forceRtl,
-    hapticFeedback,
-    highContrast,
-    isGuest,
-    lastPhoneNumber,
-    longestStreak,
-    reduceMotion,
-    selectedLang,
-    sessions,
-    showTranslation,
-    showTransliteration,
-    textSize,
-    voiceOver,
-  ]);
+  useEffect(() => saveAppState(appStateSnapshot), [appStateSnapshot]);
 
   const push = useCallback(
     (to: View) => {
@@ -518,50 +375,8 @@ export default function App() {
         throw new Error("Could not verify the code.");
       }
 
-      const mergedState = await loadRemoteState(session, {
-        settings: {
-          language: selectedLang,
-          darkMode,
-          themeMode,
-          showTransliteration,
-          showTranslation,
-          textSize,
-          highContrast,
-          boldText,
-          reduceMotion,
-          hapticFeedback,
-          forceRtl,
-          voiceOver,
-          audioQuality,
-          colorBlindSupport,
-        },
-        profile: {
-          displayName,
-          lastPhoneNumber,
-          isGuest,
-        },
-        completed: fromCompletedSets(completed),
-        sessions,
-      });
-
-      setSelectedLang(mergedState.settings.language);
-      setThemeMode(mergedState.settings.themeMode);
-      setShowTransliteration(mergedState.settings.showTransliteration);
-      setShowTranslation(mergedState.settings.showTranslation);
-      setTextSize(mergedState.settings.textSize);
-      setHighContrast(mergedState.settings.highContrast);
-      setBoldText(mergedState.settings.boldText);
-      setReduceMotion(mergedState.settings.reduceMotion);
-      setHapticFeedback(mergedState.settings.hapticFeedback);
-      setForceRtl(mergedState.settings.forceRtl);
-      setVoiceOver(mergedState.settings.voiceOver);
-      setAudioQuality(mergedState.settings.audioQuality);
-      setColorBlindSupport(mergedState.settings.colorBlindSupport);
-      setDisplayName(mergedState.profile.displayName);
-      setLastPhoneNumber(mergedState.profile.lastPhoneNumber);
-      setCompleted(toCompletedSets(mergedState.completed));
-      setSessions(mergedState.sessions);
-      setIsGuest(false);
+      const mergedState = await loadRemoteState(session, appStateSnapshot);
+      applyStateSnapshot(mergedState);
       setView("home");
       setActiveTab("home");
       setHistory([]);
@@ -617,29 +432,16 @@ export default function App() {
 
   const showBottomNav = ["home", "library", "category", "settings"].includes(view);
   const showStatusBar = ["home", "library", "category", "reader", "completion", "settings", "search"].includes(view);
-  const usesReferenceDarkTheme = ["home", "library", "category", "reader", "search"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
     <div className="app-viewport min-h-screen flex items-center justify-center">
       {/* Phone frame */}
-      <div
-        className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl"
-        style={
-          usesReferenceDarkTheme
-            ? ({
-                "--background": "#0d0d0d",
-                "--foreground": "#f5f0e8",
-                "--card": "#171717",
-                "--card-foreground": "#b0aed0",
-                "--muted": "#555555",
-                "--muted-foreground": "#b0aed0",
-                "--border": "#555555",
-              } as CSSProperties)
-            : undefined
-        }
-      >
+      <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
         <NetworkStatus />
+        {isSupabaseConfigured && !isGuest && (
+          <SyncStatus isSyncing={isSyncingRemote} errorMessage={syncError} onRetry={retrySync} />
+        )}
 
         {showStatusBar && <StatusBar />}
         {/* Screen */}
@@ -762,6 +564,7 @@ export default function App() {
                 idx={activeIdx}
                 isArabic={isArabic}
                 isDone={completed[activeCat]?.has(activeIdx) ?? false}
+                hapticFeedback={hapticFeedback}
                 onBack={pop}
                 onComplete={markComplete}
                 onAdvance={advanceAfterCompletion}
@@ -791,9 +594,9 @@ export default function App() {
                 themeMode={themeMode}
                 languageLabel={languageLabel}
                 language={selectedLang}
-                phoneAuthEnabled={isSupabaseConfigured}
                 isGuest={isGuest}
                 isSyncing={isSyncingRemote}
+                syncError={syncError}
                 sessions={sessions}
                 currentStreak={currentStreak}
                 longestStreak={longestStreak}
@@ -803,8 +606,6 @@ export default function App() {
                 reduceMotion={reduceMotion}
                 hapticFeedback={hapticFeedback}
                 forceRtl={forceRtl}
-                voiceOver={voiceOver}
-                audioQuality={audioQuality}
                 colorBlindSupport={colorBlindSupport}
                 onLanguageChange={setSelectedLang}
                 onThemeModeChange={setThemeMode}
@@ -814,8 +615,6 @@ export default function App() {
                 onReduceMotionChange={setReduceMotion}
                 onHapticFeedbackChange={setHapticFeedback}
                 onForceRtlChange={setForceRtl}
-                onVoiceOverChange={setVoiceOver}
-                onAudioQualityChange={setAudioQuality}
                 onColorBlindSupportChange={setColorBlindSupport}
                 onActivateAccount={handleOpenAccountAuth}
                 onSignOut={handleSignOut}

@@ -35,19 +35,21 @@ export default defineConfig(({ mode }) => {
           short_name: "Azkar",
           description:
             "A daily Islamic remembrance app for reading, counting, and tracking morning, evening, and before-sleep azkar.",
-          theme_color: "#0d0d0d",
-          background_color: "#0d0d0d",
+          theme_color: "#0a1228",
+          background_color: "#0a1228",
           display: "standalone",
           icons: [
             {
               src: "192.png",
               sizes: "192x192",
               type: "image/png",
+              purpose: "any",
             },
             {
               src: "512.png",
               sizes: "512x512",
               type: "image/png",
+              purpose: "any maskable",
             },
           ],
         },

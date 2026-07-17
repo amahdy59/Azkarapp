@@ -3,6 +3,8 @@ import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state"
 import { DEFAULT_APP_STATE, mergeAppStates } from "../app/state";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
+export const REMOTE_SESSION_PAGE_SIZE = 100;
+
 export function normalizePhoneNumber(input: string) {
   const trimmed = input.trim();
   if (!trimmed) {
@@ -169,6 +171,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       .select("id, category, completed_at, completed_count, total_count, duration_seconds, is_complete")
       .eq("user_id", userId)
       .order("completed_at", { ascending: false })
+      .limit(REMOTE_SESSION_PAGE_SIZE)
       .returns<RemoteSessionRow[]>(),
   ]);
 
@@ -185,8 +188,6 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
       hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
       forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
-      voiceOver: settings?.settings_json?.voiceOver ?? localState.settings.voiceOver,
-      audioQuality: settings?.settings_json?.audioQuality ?? localState.settings.audioQuality,
       colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
     },
     profile: {
@@ -240,8 +241,6 @@ export async function syncRemoteState(
       reduceMotion: state.settings.reduceMotion,
       hapticFeedback: state.settings.hapticFeedback,
       forceRtl: state.settings.forceRtl,
-      voiceOver: state.settings.voiceOver,
-      audioQuality: state.settings.audioQuality,
       colorBlindSupport: state.settings.colorBlindSupport,
     },
     updated_at: new Date().toISOString(),

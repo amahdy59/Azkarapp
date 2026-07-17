@@ -1,4 +1,4 @@
-import { type CSSProperties, Fragment } from "react";
+import { Fragment } from "react";
 import { ChevronLeft } from "../components/icons";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
@@ -19,27 +19,14 @@ export function HomeScreen({
   const isArabic = language === "ar";
 
   return (
-    <div
-      className="flex h-full flex-col bg-background"
-      dir={isArabic ? "rtl" : "ltr"}
-      style={
-        {
-          "--background": "#0d0d0d",
-          "--foreground": "#f5f0e8",
-          "--card": "#171717",
-          "--card-foreground": "#b0aed0",
-          "--muted-foreground": "#b0aed0",
-          "--border": "#2c2c2e",
-        } as CSSProperties
-      }
-    >
+    <div className="flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
       <header className="relative flex h-14 shrink-0 items-center justify-center px-5">
-        <button
-          className="absolute left-5 flex h-10 w-10 items-center justify-center text-muted-foreground"
+        <span
+          className="absolute left-5 flex h-11 w-11 items-center justify-center text-muted-foreground"
           aria-hidden="true"
         >
           <ChevronLeft size={24} />
-        </button>
+        </span>
         <h1 className="text-[18px] font-bold text-foreground">{isArabic ? "الأذكار" : "Azkar"}</h1>
       </header>
 

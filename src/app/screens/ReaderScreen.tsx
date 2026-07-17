@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ArrowPrevious,
   BookOpen,
   Check,
   ChevronUp,
-  Copy,
   Heart,
   Share2,
   Menu,
-  X,
   RotateCcw,
-  Type,
   List,
   Bookmark,
 } from "../components/icons";
@@ -20,6 +17,7 @@ import { getAzkarByCategory } from "../content/azkar";
 import type { AppLanguage, CategoryId } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
+import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
 import {
@@ -31,7 +29,6 @@ import {
 
 const SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 export const COUNTER_ADVANCE_DELAY_MS = 500;
-type ReferenceCopyKey = "translation" | "transliteration" | "hadith";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -74,6 +71,7 @@ export function ReaderScreen({
   idx,
   isArabic,
   isDone,
+  hapticFeedback,
   onBack,
   onComplete,
   onAdvance,
@@ -84,6 +82,7 @@ export function ReaderScreen({
   idx: number;
   isArabic: boolean;
   isDone: boolean;
+  hapticFeedback: boolean;
   onBack: () => void;
   onComplete: (idx: number) => void;
   onAdvance: (idx: number) => void;
@@ -103,7 +102,7 @@ export function ReaderScreen({
   const [isSaved, setIsSaved] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
-  const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
+  const closeReference = useCallback(() => setBenefitOpen(false), []);
 
   const touchStartX = useRef<number | null>(null);
   const suppressTap = useRef(false);
@@ -111,10 +110,6 @@ export function ReaderScreen({
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const referenceSheetRef = useRef<HTMLElement>(null);
-  const referenceCloseButtonRef = useRef<HTMLButtonElement>(null);
-  const referenceTriggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!z || activeZikrId.current === z.id) {
@@ -148,64 +143,16 @@ export function ReaderScreen({
       if (tapSuppressTimer.current) {
         clearTimeout(tapSuppressTimer.current);
       }
-      if (copyFeedbackTimer.current) {
-        clearTimeout(copyFeedbackTimer.current);
-      }
     };
   }, []);
-
-  useEffect(() => {
-    if (!benefitOpen) {
-      return;
-    }
-
-    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const frame = requestAnimationFrame(() => referenceCloseButtonRef.current?.focus());
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setBenefitOpen(false);
-        return;
-      }
-
-      if (event.key === "Tab") {
-        const focusableElements = referenceSheetRef.current?.querySelectorAll<HTMLElement>(
-          'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
-        );
-        if (!focusableElements?.length) {
-          return;
-        }
-
-        const first = focusableElements.item(0);
-        const last = focusableElements.item(focusableElements.length - 1);
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => {
-      cancelAnimationFrame(frame);
-      document.removeEventListener("keydown", handleKeyDown);
-      previouslyFocused?.focus();
-    };
-  }, [benefitOpen]);
 
   if (!z || !category) {
     return null;
   }
 
-  const remaining = Math.max(0, z.repetitionCount - count);
   const localizedCount = formatNumerals(count, language);
-  const localizedRemaining = formatNumerals(remaining, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = idx + 1;
-  const prevDisabled = idx === 0;
-  const nextDisabled = idx === azkar.length - 1;
 
   const handleSwipe = (dx: number) => {
     if (isArabic) {
@@ -232,7 +179,9 @@ export function ReaderScreen({
     const next = count + 1;
     setCount(next);
     setPulse((value) => value + 1);
-    vibrate(8);
+    if (hapticFeedback) {
+      vibrate(8);
+    }
 
     if (next >= z.repetitionCount) {
       setComplete(true);
@@ -244,7 +193,9 @@ export function ReaderScreen({
           percent: formatNumerals(Math.round(((idx + 1) / azkar.length) * 100), language),
         }),
       );
-      vibrate([18, 40, 32]);
+      if (hapticFeedback) {
+        vibrate([18, 40, 32]);
+      }
       onComplete(idx);
       advanceTimer.current = setTimeout(() => {
         setJustCompleted(false);
@@ -318,98 +269,6 @@ export function ReaderScreen({
     }
   };
 
-  const handleCopyReference = async (key: ReferenceCopyKey, value: string) => {
-    try {
-      await navigator.clipboard.writeText(value);
-      setCopiedReference(key);
-      setShareMessage(t(language, "reader.referenceCopied"));
-      if (copyFeedbackTimer.current) {
-        clearTimeout(copyFeedbackTimer.current);
-      }
-      copyFeedbackTimer.current = setTimeout(() => {
-        setCopiedReference(null);
-        setShareMessage("");
-      }, 1600);
-    } catch {
-      setCopiedReference(null);
-    }
-  };
-
-  const renderCopyAction = (key: ReferenceCopyKey, value: string, label: string) => (
-    <div className="relative h-8 w-full" dir="ltr">
-      <button
-        type="button"
-        onClick={() => {
-          void handleCopyReference(key, value);
-        }}
-        aria-label={label}
-        className="absolute -top-1.5 -left-1.5 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
-          {copiedReference === key ? <Check size={16} /> : <Copy size={16} />}
-        </span>
-      </button>
-    </div>
-  );
-
-  const renderReferenceContent = () => (
-    <div className="reference-sheet-content flex flex-col gap-4 px-6" dir="ltr">
-      <div className="rounded-xl bg-muted px-2 py-4">
-        <p className="zikr-text text-center text-[18px] leading-7 text-muted-foreground" dir="rtl" lang="ar">
-          {z.arabicText}
-        </p>
-      </div>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
-          {t(language, "reader.translationLabel")}
-        </h2>
-        <p className="latin-ui text-left text-[18px] leading-[1.5] text-foreground" lang="en" dir="ltr">
-          {z.translation}
-        </p>
-        {renderCopyAction("translation", z.translation, t(language, "reader.copyTranslation"))}
-      </section>
-
-      <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
-          {t(language, "reader.transliterationLabel")}
-        </h2>
-        <p className="latin-ui text-left text-[18px] leading-[1.5] text-muted-foreground" lang="en" dir="ltr">
-          {z.transliteration}
-        </p>
-        {renderCopyAction("transliteration", z.transliteration, t(language, "reader.copyTransliteration"))}
-      </section>
-
-      {z.hadithText && (
-        <>
-          <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
-          <section className="flex flex-col gap-3">
-            <h2 className="text-right text-[14px] font-semibold tracking-[0.02em] text-muted-foreground" dir="auto">
-              {t(language, "reader.hadithLabel")}
-            </h2>
-            <p className="zikr-text text-right text-[18px] leading-[1.6] text-muted-foreground" lang="ar" dir="rtl">
-              {z.hadithText}
-            </p>
-            {renderCopyAction("hadith", z.hadithText, t(language, "reader.copyHadith"))}
-          </section>
-        </>
-      )}
-
-      <div className="flex justify-end">
-        <span
-          className="latin-ui max-w-full rounded-full bg-muted px-2.5 py-1.5 text-right text-[11px] font-semibold leading-4 text-muted-foreground"
-          lang="en"
-          dir="ltr"
-          title={z.sourceReference}
-        >
-          {z.sourceReference}
-        </span>
-      </div>
-    </div>
-  );
-
   const renderCounterActions = () => (
     <div className="flex items-center justify-between gap-4 px-2" dir="ltr">
       <button
@@ -424,7 +283,6 @@ export function ReaderScreen({
       </button>
 
       <button
-        ref={referenceTriggerRef}
         type="button"
         onClick={(event) => {
           event.stopPropagation();
@@ -549,17 +407,6 @@ export function ReaderScreen({
     <div
       className="relative flex h-full flex-col bg-background"
       dir={isArabic ? "rtl" : "ltr"}
-      style={
-        {
-          "--background": "#0d0d0d",
-          "--foreground": "#f5f0e8",
-          "--card": "#171717",
-          "--card-foreground": "#b0aed0",
-          "--muted": "#555555",
-          "--muted-foreground": "#b0aed0",
-          "--border": "#555555",
-        } as CSSProperties
-      }
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) {
@@ -646,15 +493,6 @@ export function ReaderScreen({
                 {t(language, "reader.share")}
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  // For now, let's keep it empty, until font sizing is implemented
-                }}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
-              >
-                <Type size={18} />
-                {t(language, "reader.fontSize")}
-              </DropdownMenuItem>
-              <DropdownMenuItem
                 onClick={handleToggleSaved}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
               >
@@ -687,39 +525,7 @@ export function ReaderScreen({
       <footer className="shrink-0 px-6 pb-4 pt-3">{renderCounterActions()}</footer>
 
       {benefitOpen && (
-        <div className="scrim-in fixed inset-0 z-50 flex items-end justify-center bg-black/45">
-          <button
-            type="button"
-            className="absolute inset-0 cursor-default"
-            onClick={() => setBenefitOpen(false)}
-            aria-label={t(language, "reader.closeReference")}
-          />
-          <section
-            ref={referenceSheetRef}
-            role="dialog"
-            data-testid="reference-sheet"
-            aria-modal="true"
-            aria-label={t(language, "reader.referencesButton")}
-            className="reference-sheet sheet-enter relative flex w-full max-w-[390px] flex-col overflow-hidden rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
-            dir="ltr"
-          >
-            <div className="relative z-10 flex h-16 shrink-0 items-end justify-center bg-background px-6 pb-3">
-              <span className="h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
-              <button
-                ref={referenceCloseButtonRef}
-                type="button"
-                onClick={() => setBenefitOpen(false)}
-                aria-label={t(language, "reader.closeReference")}
-                className="absolute right-3 top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <X size={18} />
-              </button>
-            </div>
-            <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain">
-              {renderReferenceContent()}
-            </ScrollArea>
-          </section>
-        </div>
+        <ReaderReferenceSheet zikr={z} language={language} onClose={closeReference} onAnnouncement={setShareMessage} />
       )}
     </div>
   );

@@ -6,7 +6,6 @@ import { getAzkarByCategory } from "../content/azkar";
 import type { CategoryId } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
-import { RepBadge } from "../components/ZikrComponents";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 
 export function CategoryScreen({
@@ -28,7 +27,6 @@ export function CategoryScreen({
   const cat = CATEGORIES.find((c) => c.id === catId)!;
   const done = completed.size;
   const resumeIdx = azkar.findIndex((_, i) => !completed.has(i));
-  const pct = Math.round((done / azkar.length) * 100);
   const language = isArabic ? "ar" : "en";
   const doneLabel = formatNumerals(done, language);
   const totalLabel = formatNumerals(azkar.length, language);

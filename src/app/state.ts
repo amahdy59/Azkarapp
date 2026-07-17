@@ -17,8 +17,6 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     reduceMotion: false,
     hapticFeedback: true,
     forceRtl: false,
-    voiceOver: false,
-    audioQuality: "high",
     colorBlindSupport: "none",
   },
   profile: {
@@ -40,10 +38,6 @@ function isLanguage(value: string): value is AppLanguage {
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
   return ["small", "medium", "large"].includes(value);
-}
-
-function isAudioQuality(value: string): value is AppStateSnapshot["settings"]["audioQuality"] {
-  return ["standard", "high"].includes(value);
 }
 
 function isColorBlindSupport(value: string): value is ColorBlindSupport {
@@ -132,14 +126,6 @@ export function loadAppState(): AppStateSnapshot {
           typeof parsed.settings?.forceRtl === "boolean"
             ? parsed.settings.forceRtl
             : DEFAULT_APP_STATE.settings.forceRtl,
-        voiceOver:
-          typeof parsed.settings?.voiceOver === "boolean"
-            ? parsed.settings.voiceOver
-            : DEFAULT_APP_STATE.settings.voiceOver,
-        audioQuality:
-          parsed.settings?.audioQuality && isAudioQuality(parsed.settings.audioQuality)
-            ? parsed.settings.audioQuality
-            : DEFAULT_APP_STATE.settings.audioQuality,
         colorBlindSupport:
           parsed.settings?.colorBlindSupport && isColorBlindSupport(parsed.settings.colorBlindSupport)
             ? parsed.settings.colorBlindSupport
@@ -257,8 +243,6 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       reduceMotion: incoming.settings?.reduceMotion ?? base.settings.reduceMotion,
       hapticFeedback: incoming.settings?.hapticFeedback ?? base.settings.hapticFeedback,
       forceRtl: incoming.settings?.forceRtl ?? base.settings.forceRtl,
-      voiceOver: incoming.settings?.voiceOver ?? base.settings.voiceOver,
-      audioQuality: incoming.settings?.audioQuality ?? base.settings.audioQuality,
       colorBlindSupport: incoming.settings?.colorBlindSupport ?? base.settings.colorBlindSupport,
     },
     profile: {

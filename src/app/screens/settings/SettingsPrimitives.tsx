@@ -12,7 +12,7 @@ export function SubHeader({ title, onBack, right }: { title: string; onBack: () 
       >
         <ArrowPrevious size={24} className="text-foreground" />
       </button>
-      <p className="text-[18px] font-semibold text-foreground font-sans leading-[24px]">{title}</p>
+      <h1 className="text-[18px] font-semibold text-foreground font-sans leading-[24px]">{title}</h1>
       <div style={{ width: 44 }} className="flex justify-end items-center">
         {right}
       </div>
@@ -23,7 +23,7 @@ export function SubHeader({ title, onBack, right }: { title: string; onBack: () 
 export function SectionLabel({ label }: { label: string }) {
   return (
     <div className="px-4 pt-6 pb-2">
-      <p className="text-[13px] font-semibold text-muted-foreground font-sans leading-[18px]">{label}</p>
+      <h2 className="text-[13px] font-semibold text-muted-foreground font-sans leading-[18px]">{label}</h2>
     </div>
   );
 }
@@ -90,34 +90,62 @@ export function RowValue({ value, withChevron = true }: { value: string; withChe
   );
 }
 
-export function RowToggle({ checked, onChange, label }: { checked: boolean; onChange: () => void; label?: string }) {
+function ToggleTrack({ checked }: { checked: boolean }) {
   return (
-    <button
-      onClick={(e) => {
-        e.stopPropagation();
-        onChange();
-      }}
-      role="switch"
-      aria-checked={checked}
-      aria-label={label}
-      className="relative flex items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    <span
+      aria-hidden="true"
+      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors"
       style={{
-        width: 44,
-        height: 26,
         background: checked ? "var(--primary)" : "var(--card)",
-        border: checked ? "2px solid var(--primary)" : "2px solid var(--border)",
+        borderColor: checked ? "var(--primary)" : "var(--border)",
       }}
     >
       <span
-        className="absolute rounded-full shadow-md transition-all duration-200"
+        className="absolute top-0 h-[22px] w-[22px] rounded-full shadow-md transition-all duration-200"
         style={{
-          width: 22,
-          height: 22,
-          top: 0,
           insetInlineStart: checked ? 18 : 0,
           background: checked ? "var(--primary-foreground)" : "var(--foreground)",
         }}
       />
-    </button>
+    </span>
+  );
+}
+
+export function SettingsToggleRow({
+  icon,
+  iconBg = "var(--muted)",
+  label,
+  checked,
+  onChange,
+  hasDivider = true,
+}: {
+  icon: React.ReactNode;
+  iconBg?: string;
+  label: string;
+  checked: boolean;
+  onChange: () => void;
+  hasDivider?: boolean;
+}) {
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={onChange}
+        className="flex h-[60px] w-full items-center gap-4 bg-card px-4 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+      >
+        <span
+          aria-hidden="true"
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+          style={{ background: iconBg }}
+        >
+          {icon}
+        </span>
+        <span className="flex-1 font-sans text-[16px] font-semibold text-foreground">{label}</span>
+        <ToggleTrack checked={checked} />
+      </button>
+      {hasDivider && <div className="absolute bottom-0 right-0 h-px bg-border" style={{ insetInlineStart: 68 }} />}
+    </div>
   );
 }

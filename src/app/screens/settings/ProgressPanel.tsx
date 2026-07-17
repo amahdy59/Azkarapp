@@ -59,7 +59,7 @@ export function ProgressPanel({
               type="button"
               aria-pressed={category === item.id}
               onClick={() => setCategory(item.id)}
-              className={`min-h-9 rounded-full border px-4 text-[13px] font-semibold ${category === item.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"}`}
+              className={`min-h-11 rounded-full border px-4 text-[13px] font-semibold ${category === item.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-muted-foreground"}`}
             >
               {isArabic ? item.nameArabic.replace("أذكار ", "") : item.name.replace(" Azkar", "")}
             </button>
@@ -78,7 +78,7 @@ export function ProgressPanel({
                 type="button"
                 onClick={() => setPeriod(value)}
                 aria-pressed={period === value}
-                className={`min-h-8 rounded-lg text-[12px] font-bold ${period === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
+                className={`min-h-11 rounded-lg text-[12px] font-bold ${period === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"}`}
               >
                 {isArabic ? { week: "أسبوع", month: "شهر", year: "سنة" }[value] : value}
               </button>

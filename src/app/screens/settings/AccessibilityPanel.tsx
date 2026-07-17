@@ -1,59 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
-import {
-  AlignRight,
-  Bell,
-  BookOpen,
-  Contrast,
-  Download,
-  Flame,
-  HelpCircle,
-  Info,
-  Smartphone,
-  TypeIcon,
-  Pause,
-  Play,
-  Settings,
-  Volume2,
-  Wifi,
-  X,
-} from "../../components/icons";
-import { motion } from "motion/react";
-import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, AudioQuality, CategoryId, ColorBlindSupport, TextSizeOption } from "../../types";
-import { CATEGORIES } from "../../content/categories";
-import { CatIcon } from "../../components/CatIcon";
-import { CrescentMark } from "../../components/CrescentMark";
-import { RowChevron, RowToggle, RowValue, SectionLabel, SettingsRowItem, SubHeader } from "./SettingsPrimitives";
-
-const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
-const REPO_URL = "https://github.com/amahdy59/Azkarapp";
-const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
-
-type DownloadState = "idle" | "downloading" | "paused" | "done";
-
-export type SettingsSubScreen =
-  "root" | "language" | "audio" | "accessibility" | "downloads" | "notifications" | "progress" | "about";
-
-function openExternal(url: string) {
-  if (typeof window !== "undefined") {
-    window.open(url, "_blank", "noopener,noreferrer");
-  }
-}
-
-function openMailto(email: string, subject: string) {
-  if (typeof window !== "undefined") {
-    window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}`;
-  }
-}
-
-function formatTextSize(value: TextSizeOption) {
-  return value.charAt(0).toUpperCase() + value.slice(1);
-}
-
-function formatAudioQuality(value: AudioQuality) {
-  return value === "high" ? "High" : "Standard";
-}
+import { AlignRight, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
+import type { ColorBlindSupport, TextSizeOption } from "../../types";
+import { RowValue, SectionLabel, SettingsRowItem, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 
 function formatColorBlindSupport(value: ColorBlindSupport) {
   switch (value) {
@@ -73,7 +20,8 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
     <button
       type="button"
       onClick={onClick}
-      className={`flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
+      aria-pressed={active}
+      className={`min-h-11 flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
         active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
       }`}
     >
@@ -83,14 +31,12 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
 }
 
 export function AccessibilityPanel({
-  language,
   textSize,
   highContrast,
   boldText,
   reduceMotion,
   hapticFeedback,
   forceRtl,
-  voiceOver,
   colorBlindSupport,
   onTextSizeChange,
   onHighContrastChange,
@@ -98,18 +44,15 @@ export function AccessibilityPanel({
   onReduceMotionChange,
   onHapticFeedbackChange,
   onForceRtlChange,
-  onVoiceOverChange,
   onColorBlindSupportChange,
   onBack,
 }: {
-  language: AppLanguage;
   textSize: TextSizeOption;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
-  voiceOver: boolean;
   colorBlindSupport: ColorBlindSupport;
   onTextSizeChange: (value: TextSizeOption) => void;
   onHighContrastChange: (value: boolean) => void;
@@ -117,7 +60,6 @@ export function AccessibilityPanel({
   onReduceMotionChange: (value: boolean) => void;
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
-  onVoiceOverChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
   onBack: () => void;
 }) {
@@ -140,27 +82,45 @@ export function AccessibilityPanel({
               <button
                 type="button"
                 onClick={() => onTextSizeChange("small")}
-                className={`absolute left-0 -ml-2.5 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                  textSize === "small" ? "border-foreground bg-background" : ""
-                }`}
+                aria-pressed={textSize === "small"}
+                className="absolute left-0 -ml-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Small text size"
-              />
+              >
+                <span
+                  aria-hidden="true"
+                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                    textSize === "small" ? "border-foreground bg-background" : ""
+                  }`}
+                />
+              </button>
               <button
                 type="button"
                 onClick={() => onTextSizeChange("medium")}
-                className={`absolute left-1/2 -ml-3 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                  textSize === "medium" ? "border-foreground bg-background" : ""
-                }`}
+                aria-pressed={textSize === "medium"}
+                className="absolute left-1/2 -ml-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Medium text size"
-              />
+              >
+                <span
+                  aria-hidden="true"
+                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                    textSize === "medium" ? "border-foreground bg-background" : ""
+                  }`}
+                />
+              </button>
               <button
                 type="button"
                 onClick={() => onTextSizeChange("large")}
-                className={`absolute right-0 -mr-2.5 h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                  textSize === "large" ? "border-foreground bg-background" : ""
-                }`}
+                aria-pressed={textSize === "large"}
+                className="absolute right-0 -mr-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label="Large text size"
-              />
+              >
+                <span
+                  aria-hidden="true"
+                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
+                    textSize === "large" ? "border-foreground bg-background" : ""
+                  }`}
+                />
+              </button>
             </div>
           </div>
 
@@ -172,110 +132,74 @@ export function AccessibilityPanel({
         </div>
 
         <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-          <SettingsRowItem
+          <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Contrast size={20} className="text-primary" />}
             label="High Contrast Mode"
-            right={
-              <RowToggle
-                checked={highContrast}
-                onChange={() => onHighContrastChange(!highContrast)}
-                label="High Contrast Mode"
-              />
-            }
-            onPress={() => onHighContrastChange(!highContrast)}
+            checked={highContrast}
+            onChange={() => onHighContrastChange(!highContrast)}
           />
-          <SettingsRowItem
+          <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<TypeIcon size={20} className="text-primary" />}
             label="Bold Text"
-            right={<RowToggle checked={boldText} onChange={() => onBoldTextChange(!boldText)} label="Bold Text" />}
-            onPress={() => onBoldTextChange(!boldText)}
+            checked={boldText}
+            onChange={() => onBoldTextChange(!boldText)}
           />
           <SettingsRowItem
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<Flame size={20} className="text-primary" />} // Replaced with a generic placeholder since Palette isn't available
+            icon={<Eye size={20} className="text-primary" />}
             label="Color Blind Support"
-            right={<RowValue value={formatColorBlindSupport(colorBlindSupport)} />}
-            onPress={() => {}}
+            right={<RowValue value={formatColorBlindSupport(colorBlindSupport)} withChevron={false} />}
             hasDivider={false}
           />
+        </div>
+        <div className="mx-4 mt-3 grid grid-cols-2 gap-2" aria-label="Color blind support options">
+          {colorBlindOptions.map((option) => (
+            <PanelOptionButton
+              key={option}
+              active={colorBlindSupport === option}
+              label={formatColorBlindSupport(option)}
+              onClick={() => onColorBlindSupportChange(option)}
+            />
+          ))}
         </div>
 
         <SectionLabel label="Motion" />
         <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-          <SettingsRowItem
+          <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Pause size={20} className="text-primary" />}
             label="Reduce Motion"
-            right={
-              <RowToggle
-                checked={reduceMotion}
-                onChange={() => onReduceMotionChange(!reduceMotion)}
-                label="Reduce Motion"
-              />
-            }
-            onPress={() => onReduceMotionChange(!reduceMotion)}
+            checked={reduceMotion}
+            onChange={() => onReduceMotionChange(!reduceMotion)}
           />
-          <SettingsRowItem
+          <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Smartphone size={20} className="text-primary" />}
             label="Haptic Feedback"
-            right={
-              <RowToggle
-                checked={hapticFeedback}
-                onChange={() => onHapticFeedbackChange(!hapticFeedback)}
-                label="Haptic Feedback"
-              />
-            }
-            onPress={() => onHapticFeedbackChange(!hapticFeedback)}
+            checked={hapticFeedback}
+            onChange={() => onHapticFeedbackChange(!hapticFeedback)}
             hasDivider={false}
           />
         </div>
 
         <SectionLabel label="Reading" />
         <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-          <SettingsRowItem
+          <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<AlignRight size={20} className="text-primary" />}
             label="Right-to-Left Layout"
-            right={
-              <RowToggle checked={forceRtl} onChange={() => onForceRtlChange(!forceRtl)} label="Right-to-Left Layout" />
-            }
-            onPress={() => onForceRtlChange(!forceRtl)}
+            checked={forceRtl}
+            onChange={() => onForceRtlChange(!forceRtl)}
           />
           <SettingsRowItem
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Info size={20} className="text-primary" />}
-            label="VoiceOver Compatible"
-            right={
-              <RowToggle
-                checked={voiceOver}
-                onChange={() => onVoiceOverChange(!voiceOver)}
-                label="VoiceOver Compatible"
-              />
-            }
-            onPress={() => onVoiceOverChange(!voiceOver)}
+            label="Screen reader support"
+            right={<RowValue value="Always on" withChevron={false} />}
             hasDivider={false}
           />
-        </div>
-
-        <SectionLabel label="Audio" />
-        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card p-1">
-          <div className="flex h-[44px] items-center rounded-xl bg-background p-1">
-            {["0.75x", "1x", "1.25x", "1.5x"].map((speed, i) => (
-              <button
-                key={speed}
-                type="button"
-                className={`flex-1 rounded-lg text-[13px] font-semibold transition-colors ${
-                  i === 1 ? "bg-card text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
-                }`}
-                style={{ height: 36 }}
-              >
-                {speed}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
     </div>

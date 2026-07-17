@@ -36,46 +36,56 @@ create table if not exists public.session_history (
   completed_at timestamptz not null default now()
 );
 
+create index if not exists session_history_user_completed_idx
+on public.session_history (user_id, completed_at desc);
+
 alter table public.profiles enable row level security;
 alter table public.user_settings enable row level security;
 alter table public.user_progress enable row level security;
 alter table public.session_history enable row level security;
 
+drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
 on public.profiles
 for select
 to authenticated
-using (auth.uid() = id);
+using ((select auth.uid()) = id);
 
+drop policy if exists "profiles_insert_own" on public.profiles;
 create policy "profiles_insert_own"
 on public.profiles
 for insert
 to authenticated
-with check (auth.uid() = id);
+with check ((select auth.uid()) = id);
 
+drop policy if exists "profiles_update_own" on public.profiles;
 create policy "profiles_update_own"
 on public.profiles
 for update
 to authenticated
-using (auth.uid() = id);
+using ((select auth.uid()) = id)
+with check ((select auth.uid()) = id);
 
+drop policy if exists "user_settings_own_all" on public.user_settings;
 create policy "user_settings_own_all"
 on public.user_settings
 for all
 to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 
+drop policy if exists "user_progress_own_all" on public.user_progress;
 create policy "user_progress_own_all"
 on public.user_progress
 for all
 to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
 
+drop policy if exists "session_history_own_all" on public.session_history;
 create policy "session_history_own_all"
 on public.session_history
 for all
 to authenticated
-using (auth.uid() = user_id)
-with check (auth.uid() = user_id);
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);

@@ -1,24 +1,26 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
-import type {
-  AppLanguage,
-  AudioQuality,
-  ColorBlindSupport,
-  StoredSession,
-  TextSizeOption,
-  ThemeMode,
-} from "../../types";
+import type { AppLanguage, ColorBlindSupport, StoredSession, TextSizeOption, ThemeMode } from "../../types";
 import { t } from "../../i18n";
-import { LanguagePanel, SettingsRootPanel, type SettingsSubScreen } from "./SettingsPanels";
+import {
+  AboutPanel,
+  AccessibilityPanel,
+  DownloadsPanel,
+  LanguagePanel,
+  NotificationsPanel,
+  ProgressPanel,
+  SettingsRootPanel,
+  type SettingsSubScreen,
+} from "./SettingsPanels";
 
 export function SettingsScreen({
   themeMode,
   languageLabel,
   language,
-  phoneAuthEnabled,
   isGuest,
   isSyncing,
+  syncError,
   sessions,
   currentStreak,
   longestStreak,
@@ -28,8 +30,6 @@ export function SettingsScreen({
   reduceMotion,
   hapticFeedback,
   forceRtl,
-  voiceOver,
-  audioQuality,
   colorBlindSupport,
   onLanguageChange,
   onThemeModeChange,
@@ -39,8 +39,6 @@ export function SettingsScreen({
   onReduceMotionChange,
   onHapticFeedbackChange,
   onForceRtlChange,
-  onVoiceOverChange,
-  onAudioQualityChange,
   onColorBlindSupportChange,
   onActivateAccount,
   onSignOut,
@@ -49,9 +47,9 @@ export function SettingsScreen({
   themeMode: ThemeMode;
   languageLabel: string;
   language: AppLanguage;
-  phoneAuthEnabled: boolean;
   isGuest: boolean;
   isSyncing: boolean;
+  syncError: string;
   sessions: StoredSession[];
   currentStreak: number;
   longestStreak: number;
@@ -61,8 +59,6 @@ export function SettingsScreen({
   reduceMotion: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
-  voiceOver: boolean;
-  audioQuality: AudioQuality;
   colorBlindSupport: ColorBlindSupport;
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
@@ -72,8 +68,6 @@ export function SettingsScreen({
   onReduceMotionChange: (value: boolean) => void;
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
-  onVoiceOverChange: (value: boolean) => void;
-  onAudioQualityChange: (value: AudioQuality) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
@@ -96,11 +90,10 @@ export function SettingsScreen({
             language={language}
             themeMode={themeMode}
             languageLabel={languageLabel}
-            phoneAuthEnabled={phoneAuthEnabled}
-            audioQuality={audioQuality}
             textSize={textSize}
             isGuest={isGuest}
             isSyncing={isSyncing}
+            syncError={syncError}
             onThemeModeChange={onThemeModeChange}
             onActivateAccount={onActivateAccount}
             onSignOut={onSignOut}
@@ -110,6 +103,37 @@ export function SettingsScreen({
       {sub === "language" && (
         <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
       )}
+      {sub === "accessibility" && (
+        <AccessibilityPanel
+          textSize={textSize}
+          highContrast={highContrast}
+          boldText={boldText}
+          reduceMotion={reduceMotion}
+          hapticFeedback={hapticFeedback}
+          forceRtl={forceRtl}
+          colorBlindSupport={colorBlindSupport}
+          onTextSizeChange={onTextSizeChange}
+          onHighContrastChange={onHighContrastChange}
+          onBoldTextChange={onBoldTextChange}
+          onReduceMotionChange={onReduceMotionChange}
+          onHapticFeedbackChange={onHapticFeedbackChange}
+          onForceRtlChange={onForceRtlChange}
+          onColorBlindSupportChange={onColorBlindSupportChange}
+          onBack={goBack}
+        />
+      )}
+      {sub === "downloads" && <DownloadsPanel onBack={goBack} />}
+      {sub === "notifications" && <NotificationsPanel onBack={goBack} />}
+      {sub === "progress" && (
+        <ProgressPanel
+          language={language}
+          sessions={sessions}
+          currentStreak={currentStreak}
+          longestStreak={longestStreak}
+          onBack={goBack}
+        />
+      )}
+      {sub === "about" && <AboutPanel onBack={goBack} />}
     </div>
   );
 }

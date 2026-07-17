@@ -6,6 +6,7 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 
 - `pnpm check` runs formatting, linting, strict type checking, unit tests, production build, and bundle budgets.
 - `pnpm test:e2e` runs WCAG A/AA and keyboard smoke tests in desktop and mobile Chromium.
+- `pnpm audit:prod` checks production dependencies for known vulnerabilities.
 - Pull requests and pushes to `main` run both suites in GitHub Actions.
 
 ## Run locally
@@ -35,6 +36,7 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 - Supabase client scaffolding is available in [src/lib/supabase.ts](/C:/Users/AhmedMahdy/OneDrive%20-%20Advansys%20IS/Documents/Antigravity/Azkarapp/src/lib/supabase.ts)
 - Phone OTP auth is wired for Supabase using `signInWithOtp`, `verifyOtp`, and `resend`
 - Signed-in users sync profile, settings, progress, and session history to Supabase
+- Installable PWA metadata and platform icons are included in production builds
 - The app builds successfully with `vite build`
 
 ## Architecture
@@ -52,5 +54,5 @@ UI code must not access Supabase directly. Shared formatting, persistence, data 
 
 ## Known product follow-up
 
-- Replace placeholder social auth and sharing actions with real implementations.
-- Continue extracting orchestration from `App.tsx` and focused subcomponents from `ReaderScreen.tsx` as those flows change.
+- Add backend push scheduling before exposing recurring reminder controls.
+- Continue extracting focused orchestration and presentation modules as those flows change.

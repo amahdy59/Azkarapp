@@ -6,17 +6,18 @@ This document makes the project checklist auditable. A recommendation is **met**
 
 Every pull request must pass `pnpm check` and `pnpm test:e2e`.
 
-| Concern             | Evidence                                                                          |
-| ------------------- | --------------------------------------------------------------------------------- |
-| Type safety         | Strict TypeScript and `tsc --noEmit`                                              |
-| Code hygiene        | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                  |
-| Critical data logic | Unit tests for persistence, corruption recovery, merging, and localization        |
-| Accessibility       | Axe WCAG A/AA scan plus keyboard skip-link smoke test at mobile and desktop sizes |
-| Performance         | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets              |
-| Secrets             | Runtime environment variables; `.env*` excluded except `.env.example`             |
-| Deployment          | The Pages workflow runs all non-browser quality gates before building             |
+| Concern             | Evidence                                                                                    |
+| ------------------- | ------------------------------------------------------------------------------------------- |
+| Type safety         | Strict TypeScript and `tsc --noEmit`                                                        |
+| Code hygiene        | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                            |
+| Critical data logic | Unit tests for persistence, corruption recovery, merging, and localization                  |
+| Accessibility       | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks |
+| Performance         | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                        |
+| Supply chain        | Production dependency audit in the quality workflow                                         |
+| Secrets             | Runtime environment variables; `.env*` excluded except `.env.example`                       |
+| Deployment          | The Pages workflow runs all non-browser quality gates before building                       |
 
-Current per-file production budgets are 550 KiB JavaScript, 128 KiB CSS, and 1 MiB for another asset. The CSS ceiling increased from 120 KiB to 128 KiB in July 2026 after the required Midnight/Light/OLED semantic theme contract. The documented accessible motion system now produces a measured 128.5 KB stylesheet while keeping the existing ceiling unchanged; approximately 2.5 KB of headroom remains. Reducing a budget is encouraged; any further increase requires measured justification in the pull request.
+Current per-file production budgets are 550 KiB JavaScript, 140 KiB CSS, and 1 MiB for another asset. The CSS ceiling reflects the Midnight/Light/OLED semantic theme contract and accessible motion system. Reducing a budget is encouraged; any increase requires a fresh production measurement and justification in the pull request.
 
 ## Architecture rules
 
