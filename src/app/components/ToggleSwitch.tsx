@@ -9,6 +9,7 @@ export function Toggle({
 }) {
   return (
     <button
+      type="button"
       onClick={onChange}
       role="switch"
       aria-checked={checked}
@@ -17,7 +18,7 @@ export function Toggle({
       style={{ background: checked ? "var(--primary)" : "var(--muted)" }}
     >
       <span
-        className={`inline-block h-[27px] w-[27px] rounded-full bg-white shadow-md transition-transform duration-300 ${checked ? "translate-x-[22px] rtl:-translate-x-[22px]" : "translate-x-[2px] rtl:-translate-x-[2px]"}`}
+        className={`inline-block h-[27px] w-[27px] rounded-full bg-primary-foreground shadow-md transition-transform duration-300 ${checked ? "translate-x-[22px] rtl:-translate-x-[22px]" : "translate-x-[2px] rtl:-translate-x-[2px]"}`}
       />
     </button>
   );

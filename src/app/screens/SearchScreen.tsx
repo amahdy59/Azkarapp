@@ -11,7 +11,7 @@ export function CategoryBadge({ catId, language = "en" }: { catId: CategoryId; l
   const cfg = {
     morning: { label: isArabic ? "الصباح" : "Morning", className: "bg-primary text-primary-foreground" },
     evening: { label: isArabic ? "المساء" : "Evening", className: "bg-secondary text-secondary-foreground" },
-    before_sleep: { label: isArabic ? "النوم" : "Sleep", className: "bg-[#4A3D6B] text-foreground" },
+    before_sleep: { label: isArabic ? "النوم" : "Sleep", className: "bg-muted text-foreground" },
   }[catId];
 
   return (

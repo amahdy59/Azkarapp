@@ -43,7 +43,7 @@ export function CategoryScreen({
 
   return (
     <div className="flex h-full flex-col bg-background">
-      <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} />
+      <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={isArabic ? "ar" : "en"} />
 
       <div className="shrink-0 border-b border-border px-5 py-4">
         <div className="mb-2 flex items-center justify-between" dir={isArabic ? "rtl" : "ltr"}>
@@ -62,7 +62,7 @@ export function CategoryScreen({
           {done > 0 && (
             <button
               onClick={onReset}
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#F5EBE9] text-[#7C3636] transition-all hover:bg-[#ebd9d5] active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive dark:bg-red-950/30 dark:text-red-400 dark:hover:bg-red-950/50"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-destructive/40 bg-destructive/10 text-destructive transition-all hover:bg-destructive/15 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
               aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
             >
               <RotateCcw size={22} />

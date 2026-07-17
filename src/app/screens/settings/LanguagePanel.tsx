@@ -17,7 +17,7 @@ export function LanguagePanel({
 }) {
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
-      <SubHeader title={t(language, "settings.language")} onBack={onBack} />
+      <SubHeader title={t(language, "settings.language")} onBack={onBack} language={language} />
       <div
         className="flex-1 overflow-y-auto px-4 pb-8 pt-3"
         role="radiogroup"

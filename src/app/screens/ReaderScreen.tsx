@@ -288,7 +288,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <div
-      className="px-6 pb-3 pt-3 cursor-pointer touch-manipulation rounded-2xl transition-colors hover:bg-white/5 active:bg-white/10 mx-4 mt-2"
+      className="mx-4 mt-2 cursor-pointer touch-manipulation rounded-2xl px-6 pb-3 pt-3 transition-colors hover:bg-muted/50 active:bg-muted"
       onClick={handleSurfaceTap}
       role="button"
       tabIndex={0}

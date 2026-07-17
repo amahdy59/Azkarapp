@@ -6,8 +6,6 @@ import type { AppLanguage } from "../../types";
 import { RowChevron, SectionLabel, SubHeader } from "./SettingsPrimitives";
 
 const SITE_URL = "https://amahdy59.github.io/Azkarapp/";
-const REPO_URL = "https://github.com/amahdy59/Azkarapp";
-const FEEDBACK_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 
 function openExternal(url: string) {
   if (typeof window !== "undefined") {
@@ -21,10 +19,22 @@ function openMailto(email: string, subject: string) {
   }
 }
 
-export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
+export function AboutPanel({
+  language,
+  onHelp,
+  onLegal,
+  onSources,
+  onBack,
+}: {
+  language: AppLanguage;
+  onHelp: () => void;
+  onLegal: () => void;
+  onSources: () => void;
+  onBack: () => void;
+}) {
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
-      <SubHeader title={t(language, "about.title")} onBack={onBack} />
+      <SubHeader title={t(language, "about.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8">
           <CrescentMark size={36} />
@@ -50,6 +60,7 @@ export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack
               }
               label="Hisnul Muslim"
               sub={t(language, "about.sourceDescription")}
+              onPress={onSources}
             />
             <AboutRow
               icon={
@@ -60,6 +71,7 @@ export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack
               label={t(language, "about.references")}
               sub={t(language, "about.referencesDescription")}
               hasDivider={false}
+              onPress={onSources}
             />
           </div>
         </div>
@@ -75,7 +87,7 @@ export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack
             <SupportRow
               icon={<HelpCircle size={18} className="text-background" />}
               label={t(language, "about.faq")}
-              onPress={() => openExternal(REPO_URL)}
+              onPress={onHelp}
             />
             <SupportRow
               icon={<Globe size={18} className="text-background" />}
@@ -93,13 +105,13 @@ export function AboutPanel({ language, onBack }: { language: AppLanguage; onBack
             <SupportRow
               icon={<Info size={18} className="text-background" />}
               label={t(language, "about.privacy")}
-              onPress={() => openExternal(REPO_URL)}
+              onPress={onLegal}
             />
             <SupportRow
               icon={<FileText size={18} className="text-background" />}
               label={t(language, "about.terms")}
               hasDivider={false}
-              onPress={() => openExternal(FEEDBACK_URL)}
+              onPress={onLegal}
             />
           </div>
         </div>

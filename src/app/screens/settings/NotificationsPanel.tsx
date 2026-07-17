@@ -152,7 +152,7 @@ export function NotificationsPanel({
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
-      <SubHeader title={t(language, "notifications.title")} onBack={onBack} />
+      <SubHeader title={t(language, "notifications.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
         <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="notification-availability">
           <div className="flex items-start gap-3">

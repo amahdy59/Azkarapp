@@ -85,20 +85,35 @@ function isTime(value: unknown): value is string {
 
 function normalizeReminders(
   value: unknown,
-  fallback: ReminderSettings = DEFAULT_APP_STATE.settings.reminders,
+  fallback: Partial<ReminderSettings> = DEFAULT_APP_STATE.settings.reminders,
 ): ReminderSettings {
   const candidate = value as Partial<ReminderSettings> | undefined;
+  const defaultReminders = DEFAULT_APP_STATE.settings.reminders;
+  const morningFallback = {
+    enabled:
+      typeof fallback?.morning?.enabled === "boolean" ? fallback.morning.enabled : defaultReminders.morning.enabled,
+    time: isTime(fallback?.morning?.time) ? fallback.morning.time : defaultReminders.morning.time,
+  };
+  const eveningFallback = {
+    enabled:
+      typeof fallback?.evening?.enabled === "boolean" ? fallback.evening.enabled : defaultReminders.evening.enabled,
+    time: isTime(fallback?.evening?.time) ? fallback.evening.time : defaultReminders.evening.time,
+  };
   return {
     morning: {
-      enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : fallback.morning.enabled,
-      time: isTime(candidate?.morning?.time) ? candidate.morning.time : fallback.morning.time,
+      enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : morningFallback.enabled,
+      time: isTime(candidate?.morning?.time) ? candidate.morning.time : morningFallback.time,
     },
     evening: {
-      enabled: typeof candidate?.evening?.enabled === "boolean" ? candidate.evening.enabled : fallback.evening.enabled,
-      time: isTime(candidate?.evening?.time) ? candidate.evening.time : fallback.evening.time,
+      enabled: typeof candidate?.evening?.enabled === "boolean" ? candidate.evening.enabled : eveningFallback.enabled,
+      time: isTime(candidate?.evening?.time) ? candidate.evening.time : eveningFallback.time,
     },
     onlyWhenIncomplete:
-      typeof candidate?.onlyWhenIncomplete === "boolean" ? candidate.onlyWhenIncomplete : fallback.onlyWhenIncomplete,
+      typeof candidate?.onlyWhenIncomplete === "boolean"
+        ? candidate.onlyWhenIncomplete
+        : typeof fallback?.onlyWhenIncomplete === "boolean"
+          ? fallback.onlyWhenIncomplete
+          : defaultReminders.onlyWhenIncomplete,
   };
 }
 
@@ -128,6 +143,101 @@ function loadLegacySavedZikrIds() {
   }
 }
 
+function isStoredSession(value: unknown): value is StoredSession {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+
+  const session = value as Partial<StoredSession>;
+  return (
+    typeof session.id === "string" &&
+    typeof session.category === "string" &&
+    ["morning", "evening", "before_sleep"].includes(session.category) &&
+    typeof session.completedAt === "string" &&
+    !Number.isNaN(Date.parse(session.completedAt)) &&
+    typeof session.completedCount === "number" &&
+    Number.isFinite(session.completedCount) &&
+    typeof session.totalCount === "number" &&
+    Number.isFinite(session.totalCount) &&
+    typeof session.durationSeconds === "number" &&
+    Number.isFinite(session.durationSeconds) &&
+    typeof session.isComplete === "boolean"
+  );
+}
+
+/** Converts untrusted persisted or remote data into a complete, render-safe snapshot. */
+export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[] = []): AppStateSnapshot {
+  const parsed = value && typeof value === "object" ? (value as Partial<AppStateSnapshot>) : {};
+  const settings = parsed.settings as Partial<AppStateSnapshot["settings"]> | undefined;
+
+  return {
+    settings: {
+      language:
+        settings?.language && isLanguage(settings.language) ? settings.language : DEFAULT_APP_STATE.settings.language,
+      darkMode: typeof settings?.darkMode === "boolean" ? settings.darkMode : DEFAULT_APP_STATE.settings.darkMode,
+      themeMode:
+        settings?.themeMode && isThemeMode(settings.themeMode)
+          ? settings.themeMode
+          : settings?.darkMode === false
+            ? "light"
+            : DEFAULT_APP_STATE.settings.themeMode,
+      showTransliteration:
+        typeof settings?.showTransliteration === "boolean"
+          ? settings.showTransliteration
+          : DEFAULT_APP_STATE.settings.showTransliteration,
+      showTranslation:
+        typeof settings?.showTranslation === "boolean"
+          ? settings.showTranslation
+          : DEFAULT_APP_STATE.settings.showTranslation,
+      textSize:
+        settings?.textSize && isTextSize(settings.textSize) ? settings.textSize : DEFAULT_APP_STATE.settings.textSize,
+      arabicFont:
+        settings?.arabicFont && isArabicFont(settings.arabicFont)
+          ? settings.arabicFont
+          : DEFAULT_APP_STATE.settings.arabicFont,
+      highContrast:
+        typeof settings?.highContrast === "boolean" ? settings.highContrast : DEFAULT_APP_STATE.settings.highContrast,
+      boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
+      reduceMotion:
+        typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
+      hapticFeedback:
+        typeof settings?.hapticFeedback === "boolean"
+          ? settings.hapticFeedback
+          : DEFAULT_APP_STATE.settings.hapticFeedback,
+      forceRtl: typeof settings?.forceRtl === "boolean" ? settings.forceRtl : DEFAULT_APP_STATE.settings.forceRtl,
+      colorBlindSupport:
+        settings?.colorBlindSupport && isColorBlindSupport(settings.colorBlindSupport)
+          ? settings.colorBlindSupport
+          : DEFAULT_APP_STATE.settings.colorBlindSupport,
+      reminders: normalizeReminders(settings?.reminders),
+      weeklyGoalDays: isWeeklyGoalDays(settings?.weeklyGoalDays)
+        ? settings.weeklyGoalDays
+        : DEFAULT_APP_STATE.settings.weeklyGoalDays,
+    },
+    profile: {
+      displayName:
+        typeof parsed.profile?.displayName === "string" && parsed.profile.displayName.trim()
+          ? parsed.profile.displayName.trim()
+          : DEFAULT_APP_STATE.profile.displayName,
+      lastPhoneNumber:
+        typeof parsed.profile?.lastPhoneNumber === "string"
+          ? parsed.profile.lastPhoneNumber
+          : DEFAULT_APP_STATE.profile.lastPhoneNumber,
+      isGuest:
+        typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
+    },
+    completed: {
+      morning: dedupeAndSort(parsed.completed?.morning),
+      evening: dedupeAndSort(parsed.completed?.evening),
+      before_sleep: dedupeAndSort(parsed.completed?.before_sleep),
+    },
+    sessions: Array.isArray(parsed.sessions) ? parsed.sessions.filter(isStoredSession) : [],
+    savedZikrIds: Array.isArray(parsed.savedZikrIds)
+      ? dedupeSavedZikrIds(parsed.savedZikrIds)
+      : dedupeSavedZikrIds(fallbackSavedZikrIds),
+  };
+}
+
 /**
  * Loads the application state from local storage.
  * If no state is found or an error occurs during parsing, the default application state is returned.
@@ -149,99 +259,7 @@ export function loadAppState(): AppStateSnapshot {
       };
     }
 
-    const parsed = JSON.parse(raw) as Partial<AppStateSnapshot>;
-
-    return {
-      settings: {
-        language:
-          parsed.settings?.language && isLanguage(parsed.settings.language)
-            ? parsed.settings.language
-            : DEFAULT_APP_STATE.settings.language,
-        darkMode:
-          typeof parsed.settings?.darkMode === "boolean"
-            ? parsed.settings.darkMode
-            : DEFAULT_APP_STATE.settings.darkMode,
-        themeMode:
-          parsed.settings?.themeMode && isThemeMode(parsed.settings.themeMode)
-            ? parsed.settings.themeMode
-            : parsed.settings?.darkMode === false
-              ? "light"
-              : DEFAULT_APP_STATE.settings.themeMode,
-        showTransliteration:
-          typeof parsed.settings?.showTransliteration === "boolean"
-            ? parsed.settings.showTransliteration
-            : DEFAULT_APP_STATE.settings.showTransliteration,
-        showTranslation:
-          typeof parsed.settings?.showTranslation === "boolean"
-            ? parsed.settings.showTranslation
-            : DEFAULT_APP_STATE.settings.showTranslation,
-        textSize:
-          parsed.settings?.textSize && isTextSize(parsed.settings.textSize)
-            ? parsed.settings.textSize
-            : DEFAULT_APP_STATE.settings.textSize,
-        arabicFont:
-          parsed.settings?.arabicFont && isArabicFont(parsed.settings.arabicFont)
-            ? parsed.settings.arabicFont
-            : DEFAULT_APP_STATE.settings.arabicFont,
-        highContrast:
-          typeof parsed.settings?.highContrast === "boolean"
-            ? parsed.settings.highContrast
-            : DEFAULT_APP_STATE.settings.highContrast,
-        boldText:
-          typeof parsed.settings?.boldText === "boolean"
-            ? parsed.settings.boldText
-            : DEFAULT_APP_STATE.settings.boldText,
-        reduceMotion:
-          typeof parsed.settings?.reduceMotion === "boolean"
-            ? parsed.settings.reduceMotion
-            : DEFAULT_APP_STATE.settings.reduceMotion,
-        hapticFeedback:
-          typeof parsed.settings?.hapticFeedback === "boolean"
-            ? parsed.settings.hapticFeedback
-            : DEFAULT_APP_STATE.settings.hapticFeedback,
-        forceRtl:
-          typeof parsed.settings?.forceRtl === "boolean"
-            ? parsed.settings.forceRtl
-            : DEFAULT_APP_STATE.settings.forceRtl,
-        colorBlindSupport:
-          parsed.settings?.colorBlindSupport && isColorBlindSupport(parsed.settings.colorBlindSupport)
-            ? parsed.settings.colorBlindSupport
-            : DEFAULT_APP_STATE.settings.colorBlindSupport,
-        reminders: normalizeReminders(parsed.settings?.reminders),
-        weeklyGoalDays: isWeeklyGoalDays(parsed.settings?.weeklyGoalDays)
-          ? parsed.settings.weeklyGoalDays
-          : DEFAULT_APP_STATE.settings.weeklyGoalDays,
-      },
-      profile: {
-        displayName: parsed.profile?.displayName?.trim() || DEFAULT_APP_STATE.profile.displayName,
-        lastPhoneNumber: parsed.profile?.lastPhoneNumber || DEFAULT_APP_STATE.profile.lastPhoneNumber,
-        isGuest:
-          typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
-      },
-      completed: {
-        morning: dedupeAndSort(parsed.completed?.morning),
-        evening: dedupeAndSort(parsed.completed?.evening),
-        before_sleep: dedupeAndSort(parsed.completed?.before_sleep),
-      },
-      sessions: Array.isArray(parsed.sessions)
-        ? parsed.sessions.filter(
-            (session): session is StoredSession =>
-              !!session &&
-              typeof session.id === "string" &&
-              typeof session.category === "string" &&
-              typeof session.completedAt === "string" &&
-              typeof session.completedCount === "number" &&
-              typeof session.totalCount === "number" &&
-              typeof session.durationSeconds === "number" &&
-              typeof session.isComplete === "boolean",
-          )
-        : [],
-      // Reader-only saved items pre-date app-state persistence. Retain them the
-      // first time a user upgrades so favorites become visible and syncable.
-      savedZikrIds: Array.isArray(parsed.savedZikrIds)
-        ? dedupeSavedZikrIds(parsed.savedZikrIds)
-        : loadLegacySavedZikrIds(),
-    };
+    return normalizeAppState(JSON.parse(raw), loadLegacySavedZikrIds());
   } catch {
     return DEFAULT_APP_STATE;
   }
@@ -257,7 +275,56 @@ export function saveAppState(state: AppStateSnapshot) {
     return;
   }
 
-  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeAppState(state)));
+  } catch {
+    // Storage can be denied or full. Persistence failure must never blank the app.
+  }
+}
+
+/** Resets preferences while preserving progress, sessions, saved items, and account metadata. */
+export function resetStoredSettings() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  try {
+    const existing = normalizeAppState(JSON.parse(window.localStorage.getItem(STORAGE_KEY) ?? "{}"));
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        ...existing,
+        settings: DEFAULT_APP_STATE.settings,
+      }),
+    );
+  } catch {
+    try {
+      window.localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // The recovery screen can still reload with in-memory defaults.
+    }
+  }
+}
+
+/** Removes only Azkar-owned local data, leaving unrelated origin storage untouched. */
+export function clearStoredAppData() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  for (const key of [
+    STORAGE_KEY,
+    LEGACY_SAVED_ZIKR_STORAGE_KEY,
+    "azkarapp.foreground-reminders.v1",
+    "azkarapp.install-dismissed",
+    "azkarapp.onboarding-complete.v1",
+  ]) {
+    try {
+      window.localStorage.removeItem(key);
+    } catch {
+      // Continue clearing any remaining app-owned keys when storage is partially unavailable.
+    }
+  }
 }
 
 /**
@@ -297,18 +364,24 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
  * @returns {AppStateSnapshot} A new, immutably updated application state object.
  */
 export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStateSnapshot>): AppStateSnapshot {
+  const safeBase = normalizeAppState(base);
   const completed = {
-    morning: dedupeAndSort([...(base.completed.morning ?? []), ...(incoming.completed?.morning ?? [])]),
-    evening: dedupeAndSort([...(base.completed.evening ?? []), ...(incoming.completed?.evening ?? [])]),
-    before_sleep: dedupeAndSort([...(base.completed.before_sleep ?? []), ...(incoming.completed?.before_sleep ?? [])]),
+    morning: dedupeAndSort([...(safeBase.completed.morning ?? []), ...(incoming.completed?.morning ?? [])]),
+    evening: dedupeAndSort([...(safeBase.completed.evening ?? []), ...(incoming.completed?.evening ?? [])]),
+    before_sleep: dedupeAndSort([
+      ...(safeBase.completed.before_sleep ?? []),
+      ...(incoming.completed?.before_sleep ?? []),
+    ]),
   };
 
   const sessions = new Map<string, StoredSession>();
-  for (const session of base.sessions) {
+  for (const session of safeBase.sessions) {
     sessions.set(session.id, session);
   }
   for (const session of incoming.sessions ?? []) {
-    sessions.set(session.id, session);
+    if (isStoredSession(session)) {
+      sessions.set(session.id, session);
+    }
   }
 
   return {
@@ -316,36 +389,66 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       language:
         incoming.settings?.language && isLanguage(incoming.settings.language)
           ? incoming.settings.language
-          : isLanguage(base.settings.language)
-            ? base.settings.language
+          : isLanguage(safeBase.settings.language)
+            ? safeBase.settings.language
             : DEFAULT_APP_STATE.settings.language,
-      darkMode: incoming.settings?.darkMode ?? base.settings.darkMode,
-      themeMode: incoming.settings?.themeMode ?? base.settings.themeMode,
-      showTransliteration: incoming.settings?.showTransliteration ?? base.settings.showTransliteration,
-      showTranslation: incoming.settings?.showTranslation ?? base.settings.showTranslation,
-      textSize: incoming.settings?.textSize ?? base.settings.textSize,
-      arabicFont: incoming.settings?.arabicFont ?? base.settings.arabicFont,
-      highContrast: incoming.settings?.highContrast ?? base.settings.highContrast,
-      boldText: incoming.settings?.boldText ?? base.settings.boldText,
-      reduceMotion: incoming.settings?.reduceMotion ?? base.settings.reduceMotion,
-      hapticFeedback: incoming.settings?.hapticFeedback ?? base.settings.hapticFeedback,
-      forceRtl: incoming.settings?.forceRtl ?? base.settings.forceRtl,
-      colorBlindSupport: incoming.settings?.colorBlindSupport ?? base.settings.colorBlindSupport,
-      reminders: normalizeReminders(incoming.settings?.reminders, base.settings.reminders),
+      darkMode:
+        typeof incoming.settings?.darkMode === "boolean" ? incoming.settings.darkMode : safeBase.settings.darkMode,
+      themeMode:
+        incoming.settings?.themeMode && isThemeMode(incoming.settings.themeMode)
+          ? incoming.settings.themeMode
+          : safeBase.settings.themeMode,
+      showTransliteration:
+        typeof incoming.settings?.showTransliteration === "boolean"
+          ? incoming.settings.showTransliteration
+          : safeBase.settings.showTransliteration,
+      showTranslation:
+        typeof incoming.settings?.showTranslation === "boolean"
+          ? incoming.settings.showTranslation
+          : safeBase.settings.showTranslation,
+      textSize:
+        incoming.settings?.textSize && isTextSize(incoming.settings.textSize)
+          ? incoming.settings.textSize
+          : safeBase.settings.textSize,
+      arabicFont:
+        incoming.settings?.arabicFont && isArabicFont(incoming.settings.arabicFont)
+          ? incoming.settings.arabicFont
+          : safeBase.settings.arabicFont,
+      highContrast:
+        typeof incoming.settings?.highContrast === "boolean"
+          ? incoming.settings.highContrast
+          : safeBase.settings.highContrast,
+      boldText:
+        typeof incoming.settings?.boldText === "boolean" ? incoming.settings.boldText : safeBase.settings.boldText,
+      reduceMotion:
+        typeof incoming.settings?.reduceMotion === "boolean"
+          ? incoming.settings.reduceMotion
+          : safeBase.settings.reduceMotion,
+      hapticFeedback:
+        typeof incoming.settings?.hapticFeedback === "boolean"
+          ? incoming.settings.hapticFeedback
+          : safeBase.settings.hapticFeedback,
+      forceRtl:
+        typeof incoming.settings?.forceRtl === "boolean" ? incoming.settings.forceRtl : safeBase.settings.forceRtl,
+      colorBlindSupport:
+        incoming.settings?.colorBlindSupport && isColorBlindSupport(incoming.settings.colorBlindSupport)
+          ? incoming.settings.colorBlindSupport
+          : safeBase.settings.colorBlindSupport,
+      reminders: normalizeReminders(incoming.settings?.reminders, safeBase.settings.reminders),
       weeklyGoalDays: isWeeklyGoalDays(incoming.settings?.weeklyGoalDays)
         ? incoming.settings.weeklyGoalDays
-        : base.settings.weeklyGoalDays,
+        : safeBase.settings.weeklyGoalDays,
     },
     profile: {
-      displayName: incoming.profile?.displayName?.trim() || base.profile.displayName,
-      lastPhoneNumber: incoming.profile?.lastPhoneNumber ?? base.profile.lastPhoneNumber,
-      isGuest: incoming.profile?.isGuest ?? base.profile.isGuest,
+      displayName: incoming.profile?.displayName?.trim() || safeBase.profile.displayName,
+      lastPhoneNumber: incoming.profile?.lastPhoneNumber ?? safeBase.profile.lastPhoneNumber,
+      isGuest: incoming.profile?.isGuest ?? safeBase.profile.isGuest,
     },
     completed,
     sessions: [...sessions.values()].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     ),
-    savedZikrIds: dedupeSavedZikrIds([...(base.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
+    savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
   };
 }
 

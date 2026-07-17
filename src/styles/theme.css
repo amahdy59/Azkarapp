@@ -157,8 +157,8 @@
   --card-foreground: #4a4570;
   --popover: #ffffff;
   --popover-foreground: #171717;
-  --primary: #a07010;
-  --primary-foreground: #1a1228;
+  --primary: #835806;
+  --primary-foreground: #ffffff;
   --secondary: #1a7060;
   --secondary-foreground: #ffffff;
   --muted: #f2eee9;
@@ -171,8 +171,8 @@
   --input: #c4bcb0;
   --input-background: #f2eee9;
   --switch-background: #e5e0d8;
-  --ring: #a07010;
-  --nav-active: #a07010;
+  --ring: #835806;
+  --nav-active: #835806;
   --nav-inactive: #8e8aaa;
   --counter-zone: #f2eee9;
   --featured-scene-opacity: 0.34;

@@ -155,7 +155,7 @@ export function HomeScreen({
                   >
                     <span
                       data-slot="category-icon"
-                      className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full bg-white"
+                      className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full border border-border bg-background"
                       aria-hidden="true"
                     >
                       <CatIcon type={category.icon} size={28} color="var(--primary)" />
@@ -188,7 +188,7 @@ export function HomeScreen({
                       size={20}
                       aria-hidden="true"
                       data-slot="category-chevron"
-                      className={`shrink-0 text-[#6B6888] ${isArabic ? "" : "-scale-x-100"}`}
+                      className={`shrink-0 text-muted-foreground ${isArabic ? "" : "-scale-x-100"}`}
                     />
                   </button>
                 </Fragment>

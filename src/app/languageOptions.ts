@@ -11,5 +11,5 @@ export const LANGUAGES_LIST: Array<{
 
 export const LANGUAGE_LABELS: Record<AppLanguage, string> = {
   en: "English",
-  ar: "Arabic",
+  ar: "العربية",
 };

@@ -1,5 +1,12 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { DEFAULT_APP_STATE, fromCompletedSets, loadAppState, mergeAppStates, saveAppState } from "./state";
+import {
+  DEFAULT_APP_STATE,
+  fromCompletedSets,
+  loadAppState,
+  mergeAppStates,
+  normalizeAppState,
+  saveAppState,
+} from "./state";
 
 describe("app state persistence", () => {
   beforeEach(() => window.localStorage.clear());
@@ -32,6 +39,29 @@ describe("app state persistence", () => {
 
     expect(loadAppState().savedZikrIds).toEqual(["m-hm-75"]);
   });
+
+  it("repairs malformed nested settings instead of exposing them to the renderer", () => {
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: {
+          themeMode: "sepia",
+          textSize: "giant",
+          reminders: { morning: null, evening: { enabled: true, time: "99:72" } },
+        },
+        sessions: [null, { id: "broken" }],
+      }),
+    );
+
+    const state = loadAppState();
+    expect(state.settings.themeMode).toBe("midnight");
+    expect(state.settings.textSize).toBe("medium");
+    expect(state.settings.reminders).toEqual({
+      ...DEFAULT_APP_STATE.settings.reminders,
+      evening: { enabled: true, time: DEFAULT_APP_STATE.settings.reminders.evening.time },
+    });
+    expect(state.sessions).toEqual([]);
+  });
 });
 
 describe("state merging", () => {
@@ -52,5 +82,17 @@ describe("state merging", () => {
     const merged = mergeAppStates(base, { savedZikrIds: ["m-hm-75", "e-hm-79"] });
 
     expect(merged.savedZikrIds).toEqual(["e-hm-79", "m-hm-75"]);
+  });
+
+  it("normalizes invalid remote preferences during merge", () => {
+    const incoming = {
+      settings: { ...DEFAULT_APP_STATE.settings, themeMode: "sepia", reminders: undefined },
+    } as unknown as Parameters<typeof mergeAppStates>[1];
+
+    expect(mergeAppStates(DEFAULT_APP_STATE, incoming).settings).toEqual(DEFAULT_APP_STATE.settings);
+  });
+
+  it("normalizes completely untrusted snapshots", () => {
+    expect(normalizeAppState(null)).toEqual(DEFAULT_APP_STATE);
   });
 });

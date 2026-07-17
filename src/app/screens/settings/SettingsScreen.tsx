@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
+import { t } from "../../i18n";
 import type {
   AppLanguage,
   ArabicFontOption,
@@ -10,58 +11,23 @@ import type {
   TextSizeOption,
   ThemeMode,
 } from "../../types";
-import { t } from "../../i18n";
 import {
   AboutPanel,
   AccessibilityPanel,
+  AccountDataPanel,
+  AppearancePanel,
   DownloadsPanel,
+  HelpPanel,
   LanguagePanel,
+  LegalPanel,
   NotificationsPanel,
   ProgressPanel,
   SettingsRootPanel,
+  SourcesPanel,
   type SettingsSubScreen,
 } from "./SettingsPanels";
 
-export function SettingsScreen({
-  themeMode,
-  languageLabel,
-  language,
-  isGuest,
-  isSyncing,
-  syncError,
-  sessions,
-  currentStreak,
-  longestStreak,
-  textSize,
-  arabicFont,
-  showTranslation,
-  showTransliteration,
-  highContrast,
-  boldText,
-  reduceMotion,
-  hapticFeedback,
-  forceRtl,
-  colorBlindSupport,
-  reminders,
-  weeklyGoalDays,
-  onLanguageChange,
-  onThemeModeChange,
-  onTextSizeChange,
-  onArabicFontChange,
-  onShowTranslationChange,
-  onShowTransliterationChange,
-  onHighContrastChange,
-  onBoldTextChange,
-  onReduceMotionChange,
-  onHapticFeedbackChange,
-  onForceRtlChange,
-  onColorBlindSupportChange,
-  onRemindersChange,
-  onWeeklyGoalDaysChange,
-  onActivateAccount,
-  onSignOut,
-  onBack,
-}: {
+interface SettingsScreenProps {
   themeMode: ThemeMode;
   languageLabel: string;
   language: AppLanguage;
@@ -69,6 +35,7 @@ export function SettingsScreen({
   isSyncing: boolean;
   syncError: string;
   sessions: StoredSession[];
+  savedCount: number;
   currentStreak: number;
   longestStreak: number;
   textSize: TextSizeOption;
@@ -99,8 +66,56 @@ export function SettingsScreen({
   onWeeklyGoalDaysChange: (value: number) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
+  onExportData: () => void;
+  onResetPreferences: () => void;
+  onClearLocalData: () => void;
   onBack: () => void;
-}) {
+}
+
+export function SettingsScreen({
+  themeMode,
+  languageLabel,
+  language,
+  isGuest,
+  isSyncing,
+  syncError,
+  sessions,
+  savedCount,
+  currentStreak,
+  longestStreak,
+  textSize,
+  arabicFont,
+  showTranslation,
+  showTransliteration,
+  highContrast,
+  boldText,
+  reduceMotion,
+  hapticFeedback,
+  forceRtl,
+  colorBlindSupport,
+  reminders,
+  weeklyGoalDays,
+  onLanguageChange,
+  onThemeModeChange,
+  onTextSizeChange,
+  onArabicFontChange,
+  onShowTranslationChange,
+  onShowTransliterationChange,
+  onHighContrastChange,
+  onBoldTextChange,
+  onReduceMotionChange,
+  onHapticFeedbackChange,
+  onForceRtlChange,
+  onColorBlindSupportChange,
+  onRemindersChange,
+  onWeeklyGoalDaysChange,
+  onActivateAccount,
+  onSignOut,
+  onExportData,
+  onResetPreferences,
+  onClearLocalData,
+  onBack,
+}: SettingsScreenProps) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
   const goBack = () => setSub("root");
 
@@ -108,7 +123,7 @@ export function SettingsScreen({
     <div className="relative flex h-full flex-col overflow-hidden bg-background">
       {sub === "root" && (
         <motion.div className="absolute inset-0 flex h-full w-full flex-col">
-          <Header title={t(language, "common.settings")} onBack={onBack} />
+          <Header title={t(language, "common.settings")} onBack={onBack} language={language} />
           <SettingsRootPanel
             onNav={setSub}
             language={language}
@@ -118,11 +133,18 @@ export function SettingsScreen({
             isGuest={isGuest}
             isSyncing={isSyncing}
             syncError={syncError}
-            onThemeModeChange={onThemeModeChange}
-            onActivateAccount={onActivateAccount}
-            onSignOut={onSignOut}
           />
         </motion.div>
+      )}
+      {sub === "appearance" && (
+        <AppearancePanel
+          language={language}
+          themeMode={themeMode}
+          highContrast={highContrast}
+          onThemeModeChange={onThemeModeChange}
+          onDisableHighContrast={() => onHighContrastChange(false)}
+          onBack={goBack}
+        />
       )}
       {sub === "language" && (
         <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
@@ -173,7 +195,34 @@ export function SettingsScreen({
           onBack={goBack}
         />
       )}
-      {sub === "about" && <AboutPanel language={language} onBack={goBack} />}
+      {sub === "account-data" && (
+        <AccountDataPanel
+          language={language}
+          isGuest={isGuest}
+          isSyncing={isSyncing}
+          syncError={syncError}
+          sessionCount={sessions.length}
+          savedCount={savedCount}
+          onActivateAccount={onActivateAccount}
+          onSignOut={onSignOut}
+          onExportData={onExportData}
+          onResetPreferences={onResetPreferences}
+          onClearLocalData={onClearLocalData}
+          onBack={goBack}
+        />
+      )}
+      {sub === "help" && <HelpPanel language={language} onBack={goBack} />}
+      {sub === "legal" && <LegalPanel language={language} onBack={goBack} />}
+      {sub === "sources" && <SourcesPanel language={language} onBack={goBack} />}
+      {sub === "about" && (
+        <AboutPanel
+          language={language}
+          onHelp={() => setSub("help")}
+          onLegal={() => setSub("legal")}
+          onSources={() => setSub("sources")}
+          onBack={goBack}
+        />
+      )}
     </div>
   );
 }

@@ -63,7 +63,7 @@ export function ProgressPanel({
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
-      <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} />
+      <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         <section className="rounded-2xl border border-border bg-card px-6 py-4 text-end">
           <p className="text-[12px] text-muted-foreground">{isArabic ? "منذ بداية الاستخدام" : "Since you started"}</p>

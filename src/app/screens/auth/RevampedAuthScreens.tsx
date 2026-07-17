@@ -195,7 +195,7 @@ export function PhoneInputScreen({
         <button
           onClick={canSend && !isSending ? () => onSend(phone.trim()) : undefined}
           disabled={!canSend || isSending}
-          className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[16px] font-bold text-primary-foreground disabled:opacity-45"
+          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[16px] font-bold text-primary-foreground disabled:opacity-45"
         >
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
@@ -316,7 +316,7 @@ export function OTPScreen({
         <button
           onClick={complete && !isVerifying ? () => onVerify(token) : undefined}
           disabled={!complete || isVerifying}
-          className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[16px] font-bold text-primary-foreground disabled:border-border disabled:bg-[#f5f5f5] disabled:text-[#a4a7ae]"
+          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[16px] font-bold text-primary-foreground disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
         >
           {isVerifying ? t(language, "common.verifying") : t(language, "common.verify")}
         </button>

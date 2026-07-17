@@ -82,7 +82,7 @@ export function AccessibilityPanel({
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
-      <SubHeader title={t(language, "settings.accessibility")} onBack={onBack} />
+      <SubHeader title={t(language, "settings.accessibility")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.visual")} />
 

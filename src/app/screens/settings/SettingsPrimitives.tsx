@@ -1,14 +1,26 @@
 import React from "react";
 import { ArrowPrevious, ChevronNext } from "../../components/icons";
+import type { AppLanguage } from "../../types";
 
-export function SubHeader({ title, onBack, right }: { title: string; onBack: () => void; right?: React.ReactNode }) {
+export function SubHeader({
+  title,
+  onBack,
+  right,
+  language = "en",
+}: {
+  title: string;
+  onBack: () => void;
+  right?: React.ReactNode;
+  language?: AppLanguage;
+}) {
   return (
     <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 56 }}>
       <button
+        type="button"
         onClick={onBack}
         className="flex items-center justify-center rounded-full active:scale-95 transition-all"
         style={{ width: 44, height: 44 }}
-        aria-label="Back"
+        aria-label={language === "ar" ? "رجوع" : "Back"}
       >
         <ArrowPrevious size={24} className="text-foreground" />
       </button>
@@ -64,6 +76,7 @@ export function SettingsRowItem({
     <div className="relative">
       {onPress ? (
         <button
+          type="button"
           onClick={onPress}
           className="w-full flex items-center gap-4 px-4 transition-all active:opacity-70 bg-card h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
         >

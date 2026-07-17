@@ -72,7 +72,11 @@ function hasAlreadyNotified(kind: ReminderKind, now: Date) {
 function recordNotification(kind: ReminderKind, now: Date) {
   const history = readReminderHistory();
   history[kind] = localDayKey(now);
-  window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
+  try {
+    window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
+  } catch {
+    // Notification delivery should not fail when history storage is unavailable.
+  }
 }
 
 /**

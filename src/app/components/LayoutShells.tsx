@@ -8,18 +8,21 @@ export function Header({
   subtitle,
   onBack,
   right,
+  language = "en",
 }: {
   title: string;
   subtitle?: string;
   onBack?: () => void;
   right?: React.ReactNode;
+  language?: AppLanguage;
 }) {
   return (
     <div className="flex items-center gap-2 px-4 shrink-0 border-b border-border h-14">
       {onBack && (
         <button
+          type="button"
           onClick={onBack}
-          aria-label="Go back"
+          aria-label={language === "ar" ? "رجوع" : "Go back"}
           className="flex items-center justify-center rounded-full transition-colors w-11 h-11 min-w-[44px] hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowPrevious size={22} className="text-foreground" />

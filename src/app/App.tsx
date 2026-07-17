@@ -1,12 +1,15 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
+  clearStoredAppData,
   fromCompletedSets,
   getStreakSummary,
   loadAppState,
+  resetStoredSettings,
   saveAppState,
   toCompletedSets,
   type StoredSession,
 } from "./state";
+import { applyAppAppearance } from "./theme";
 import { getAzkarByCategory } from "./content/azkar";
 import type {
   AppLanguage,
@@ -53,6 +56,8 @@ type View =
 type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;
 };
+
+const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
@@ -175,6 +180,13 @@ function PwaNotice({
 export default function App() {
   const initialState = useRef(loadAppState()).current;
   const [view, setView] = useState<View>("splash");
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
+    try {
+      return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
+    } catch {
+      return false;
+    }
+  });
   const [, setHistory] = useState<View[]>([]);
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
@@ -209,14 +221,17 @@ export default function App() {
   const [authError, setAuthError] = useState("");
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installDismissed, setInstallDismissed] = useState(
-    () => window.localStorage.getItem("azkarapp.install-dismissed") === "true",
-  );
+  const [installDismissed, setInstallDismissed] = useState(() => {
+    try {
+      return window.localStorage.getItem("azkarapp.install-dismissed") === "true";
+    } catch {
+      return false;
+    }
+  });
 
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
-  const useRtlLayout = isArabic || forceRtl;
 
   const appStateSnapshot = useMemo<AppStateSnapshot>(
     () => ({
@@ -266,6 +281,19 @@ export default function App() {
       themeMode,
     ],
   );
+
+  const markOnboardingComplete = useCallback(() => {
+    setHasCompletedOnboarding(true);
+    try {
+      window.localStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
+    } catch {
+      // The current session can still continue when persistent storage is unavailable.
+    }
+  }, []);
+
+  const handleSplashDone = useCallback(() => {
+    setView(hasCompletedOnboarding ? "home" : "language");
+  }, [hasCompletedOnboarding]);
 
   const applyStateSnapshot = useCallback((state: AppStateSnapshot) => {
     setSelectedLang(state.settings.language);
@@ -327,40 +355,18 @@ export default function App() {
     };
   }, []);
 
-  // Apply theme class to root
   useEffect(() => {
-    const fontSizeMap = {
-      small: "14px",
-      medium: "16px",
-      large: "18px",
-    };
-
-    document.documentElement.classList.toggle("dark", themeMode !== "light");
-    document.documentElement.classList.toggle("theme-midnight", themeMode === "midnight");
-    document.documentElement.classList.toggle("theme-light", themeMode === "light");
-    document.documentElement.classList.toggle("theme-dark", themeMode === "dark");
-    document.documentElement.classList.toggle("high-contrast", highContrast);
-    document.documentElement.classList.toggle("bold-text", boldText);
-    document.documentElement.classList.toggle("reduce-motion", reduceMotion);
-    document.documentElement.lang = selectedLang;
-    document.documentElement.dir = useRtlLayout ? "rtl" : "ltr";
-    document.documentElement.style.setProperty("--font-size", fontSizeMap[textSize]);
-    document.documentElement.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
-    document.documentElement.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
-    document.documentElement.dataset.colorBlindSupport = colorBlindSupport;
-
-    // Update theme-color meta tag for mobile status bar
-    setTimeout(() => {
-      const bgColor = getComputedStyle(document.documentElement).getPropertyValue("--background").trim();
-      let metaThemeColor = document.querySelector('meta[name="theme-color"]');
-      if (!metaThemeColor) {
-        metaThemeColor = document.createElement("meta");
-        metaThemeColor.setAttribute("name", "theme-color");
-        document.head.appendChild(metaThemeColor);
-      }
-      metaThemeColor.setAttribute("content", bgColor);
-    }, 0);
-  }, [boldText, colorBlindSupport, themeMode, highContrast, reduceMotion, selectedLang, textSize, useRtlLayout]);
+    applyAppAppearance({
+      themeMode,
+      language: selectedLang,
+      textSize,
+      highContrast,
+      boldText,
+      reduceMotion,
+      forceRtl,
+      colorBlindSupport,
+    });
+  }, [boldText, colorBlindSupport, forceRtl, themeMode, highContrast, reduceMotion, selectedLang, textSize]);
 
   useEffect(() => saveAppState(appStateSnapshot), [appStateSnapshot]);
 
@@ -503,6 +509,7 @@ export default function App() {
 
       const mergedState = await loadRemoteState(session, appStateSnapshot);
       applyStateSnapshot(mergedState);
+      markOnboardingComplete();
       setView("home");
       setActiveTab("home");
       setHistory([]);
@@ -544,6 +551,40 @@ export default function App() {
     }
   };
 
+  const handleExportData = () => {
+    const blob = new Blob([JSON.stringify(appStateSnapshot, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `azkar-data-${new Date().toISOString().slice(0, 10)}.json`;
+    link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
+  };
+
+  const handleResetPreferences = () => {
+    const message =
+      selectedLang === "ar"
+        ? "هل تريد استعادة التفضيلات الافتراضية؟ سيبقى تقدمك وجلساتك والأذكار المحفوظة."
+        : "Restore default preferences? Your progress, sessions, and saved azkar will be kept.";
+    if (!window.confirm(message)) {
+      return;
+    }
+    resetStoredSettings();
+    window.location.reload();
+  };
+
+  const handleClearLocalData = () => {
+    const message =
+      selectedLang === "ar"
+        ? "هل تريد مسح كل بيانات أذكار المحلية على هذا الجهاز؟ لا يمكن التراجع عن ذلك."
+        : "Erase all local Azkar data on this device? This cannot be undone.";
+    if (!window.confirm(message)) {
+      return;
+    }
+    clearStoredAppData();
+    window.location.reload();
+  };
+
   const handleNavTab = (tab: "home" | "azkar" | "settings") => {
     setActiveTab(tab);
     setHistory([]);
@@ -574,18 +615,12 @@ export default function App() {
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
           <Suspense fallback={<ScreenFallback />}>
             {/* Phase 2 — onboarding flow */}
-            {view === "splash" && (
-              <SplashScreen
-                language={selectedLang}
-                onDone={() => {
-                  setView("language");
-                }}
-              />
-            )}
+            {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
             {view === "onboard1" && (
               <EnglishOnboarding1Screen
                 onNext={() => setView("login")}
                 onSkip={() => {
+                  markOnboardingComplete();
                   setView("home");
                   setActiveTab("home");
                 }}
@@ -596,7 +631,9 @@ export default function App() {
               <ArOnboarding1Screen
                 onNext={() => setView("login")}
                 onSkip={() => {
+                  markOnboardingComplete();
                   setView("home");
+                  setActiveTab("home");
                 }}
               />
             )}
@@ -618,6 +655,7 @@ export default function App() {
                   setView("phone");
                 }}
                 onGuest={() => {
+                  markOnboardingComplete();
                   setDisplayName("Guest");
                   setIsGuest(true);
                   setView("home");
@@ -638,6 +676,7 @@ export default function App() {
                   setView("login");
                 }}
                 onSkip={() => {
+                  markOnboardingComplete();
                   setView("home");
                   setActiveTab("home");
                   setHistory([]);
@@ -739,6 +778,7 @@ export default function App() {
                 isSyncing={isSyncingRemote}
                 syncError={syncError}
                 sessions={sessions}
+                savedCount={savedZikrIds.size}
                 currentStreak={currentStreak}
                 longestStreak={longestStreak}
                 textSize={textSize}
@@ -769,6 +809,9 @@ export default function App() {
                 onWeeklyGoalDaysChange={setWeeklyGoalDays}
                 onActivateAccount={handleOpenAccountAuth}
                 onSignOut={handleSignOut}
+                onExportData={handleExportData}
+                onResetPreferences={handleResetPreferences}
+                onClearLocalData={handleClearLocalData}
                 onBack={pop}
               />
             )}
@@ -806,7 +849,11 @@ export default function App() {
                   setInstallPrompt(null);
                 }}
                 onDismiss={() => {
-                  window.localStorage.setItem("azkarapp.install-dismissed", "true");
+                  try {
+                    window.localStorage.setItem("azkarapp.install-dismissed", "true");
+                  } catch {
+                    // Dismissing the prompt should still work when storage is unavailable.
+                  }
                   setInstallDismissed(true);
                 }}
               />
