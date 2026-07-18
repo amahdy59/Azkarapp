@@ -15,6 +15,8 @@ const en = {
     sending: "Sending...",
     verifying: "Verifying...",
     resending: "Resending...",
+    back: "Back",
+    bottomNavigation: "Bottom Navigation",
   },
   home: {
     title: "Azkar",
@@ -253,6 +255,7 @@ const en = {
   reader: {
     title: "Zikr {index} of {total}",
     groupProgress: "Group progress",
+    menu: "Reader options",
     progressSummary: "{done} of {total} zikr",
     viewAll: "View all",
     listenModeToggle: "Listen",

@@ -10,6 +10,7 @@ export function CompletionScreen({
   currentStreak,
   onHome,
   language,
+  direction,
 }: {
   catId: CategoryId;
   sessionStart: number;
@@ -17,6 +18,7 @@ export function CompletionScreen({
   onHome: () => void;
   onRepeat: () => void;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
 }) {
   const cat = CATEGORIES.find((item) => item.id === catId)!;
   const azkarCount = getAzkarByCategory(catId).length;
@@ -38,7 +40,7 @@ export function CompletionScreen({
   return (
     <div
       className="completion-screen-enter flex h-full flex-col overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
-      dir={isArabic ? "rtl" : "ltr"}
+      dir={direction}
     >
       <p className="text-[13px] text-muted-foreground">
         {isArabic ? `جلسة ${cat.nameArabic} مكتملة` : `${cat.name} session complete`}

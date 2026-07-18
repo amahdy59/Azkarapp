@@ -53,7 +53,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   }, [refreshStatus]);
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto px-4 pb-8 pt-3">
         <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="offline-content-title">

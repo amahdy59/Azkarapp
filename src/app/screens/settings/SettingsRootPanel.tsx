@@ -8,17 +8,16 @@ import {
   Globe,
   HelpCircle,
   Info,
-  Menu,
   Moon,
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
-import type { AppLanguage, TextSizeOption, ThemeMode } from "../../types";
+import type { AppLanguage, ThemeMode } from "../../types";
 import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
+import { ThemeModeSelector } from "./ThemeModeSelector";
 
 export type SettingsSubScreen =
   | "root"
-  | "appearance"
   | "language"
   | "accessibility"
   | "downloads"
@@ -30,34 +29,29 @@ export type SettingsSubScreen =
   | "sources"
   | "about";
 
-function formatTextSize(value: TextSizeOption, language: AppLanguage) {
-  return t(
-    language,
-    value === "small" ? "settings.textSmall" : value === "large" ? "settings.textLarge" : "settings.medium",
-  );
-}
-
-function formatThemeMode(value: ThemeMode, language: AppLanguage) {
-  return t(language, `settings.theme${value.charAt(0).toUpperCase()}${value.slice(1)}`);
-}
-
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 
 export function SettingsRootPanel({
   onNav,
   language,
+  direction,
   themeMode,
+  highContrast,
+  onThemeModeChange,
+  onDisableHighContrast,
   languageLabel,
-  textSize,
   isGuest,
   isSyncing,
   syncError,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
   themeMode: ThemeMode;
+  highContrast: boolean;
+  onThemeModeChange: (value: ThemeMode) => void;
+  onDisableHighContrast: () => void;
   languageLabel: string;
-  textSize: TextSizeOption;
   isGuest: boolean;
   isSyncing: boolean;
   syncError: string;
@@ -65,27 +59,42 @@ export function SettingsRootPanel({
   return (
     <div className="flex-1 overflow-y-auto pb-8">
       <SectionLabel label={t(language, "settings.preferences")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<Moon size={20} className="text-primary" />}
-          label={t(language, "settings.displayTheme")}
-          right={<RowValue value={formatThemeMode(themeMode, language)} />}
-          onPress={() => onNav("appearance")}
-        />
+      <div className="mx-4 rounded-2xl border border-border bg-card p-4">
+        <div className="mb-3 flex items-center gap-3">
+          <span
+            className="flex size-9 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: iconBackground }}
+            aria-hidden="true"
+          >
+            <Moon size={20} className="text-primary" />
+          </span>
+          <h3 className="text-[16px] font-semibold text-foreground">{t(language, "settings.displayTheme")}</h3>
+        </div>
+        <ThemeModeSelector language={language} direction={direction} value={themeMode} onChange={onThemeModeChange} />
+        {highContrast && (
+          <aside className="mt-3 rounded-xl border border-primary/40 bg-primary/10 p-3" aria-live="polite">
+            <h4 className="text-[14px] font-semibold text-foreground">{t(language, "appearance.highContrastTitle")}</h4>
+            <p className="mt-1 text-[12px] leading-5 text-muted-foreground">
+              {t(language, "appearance.highContrastBody")}
+            </p>
+            <button
+              type="button"
+              onClick={onDisableHighContrast}
+              className="mt-2 min-h-11 rounded-xl bg-primary px-3 text-[12px] font-semibold text-primary-foreground"
+            >
+              {t(language, "appearance.disableHighContrast")}
+            </button>
+          </aside>
+        )}
+      </div>
+
+      <div className="mx-4 mt-3 overflow-hidden rounded-2xl border border-border bg-card">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Globe size={20} className="text-primary" />}
           label={t(language, "settings.language")}
           right={<RowValue value={languageLabel} />}
           onPress={() => onNav("language")}
-        />
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<Menu size={20} className="text-primary" />}
-          label={t(language, "settings.textSize")}
-          right={<RowValue value={formatTextSize(textSize, language)} />}
-          onPress={() => onNav("accessibility")}
         />
         <SettingsRowItem
           iconBg={iconBackground}

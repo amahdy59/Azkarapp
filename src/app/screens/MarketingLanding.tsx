@@ -4,7 +4,7 @@ import { ArrowNext } from "../components/icons";
 
 export default function MarketingLanding() {
   return (
-    <div className="theme-midnight min-h-screen bg-background text-foreground">
+    <div className="marketing-landing theme-midnight h-dvh overflow-y-auto bg-background text-foreground">
       <header className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-6">
         <a href="./" className="flex items-center gap-2 text-[20px] font-extrabold">
           <MoonStar className="text-primary" /> Azkar

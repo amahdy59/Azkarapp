@@ -4,7 +4,7 @@ export function ProgressBar({
   height = 8,
   trackColor = "var(--muted)",
   fillColor = "var(--primary)",
-  direction = "ltr",
+  direction,
   "aria-label": ariaLabel,
 }: {
   value: number;

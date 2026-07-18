@@ -33,7 +33,7 @@ export function AboutPanel({
   onBack: () => void;
 }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "about.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8">
@@ -159,7 +159,9 @@ function AboutRow({
       ) : (
         <div className="flex h-[72px] w-full items-center gap-4 bg-card px-4">{content}</div>
       )}
-      {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 64 }} />}
+      {hasDivider && (
+        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 64, insetInlineEnd: 0 }} />
+      )}
     </div>
   );
 }
@@ -188,7 +190,9 @@ function SupportRow({
         <p className="flex-1 font-sans text-[15px] font-medium text-foreground">{label}</p>
         {right}
       </button>
-      {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 64 }} />}
+      {hasDivider && (
+        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 64, insetInlineEnd: 0 }} />
+      )}
     </div>
   );
 }

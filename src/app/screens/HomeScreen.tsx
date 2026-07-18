@@ -1,5 +1,5 @@
 import { Fragment } from "react";
-import { ChevronLeft } from "../components/icons";
+import { ChevronNext } from "../components/icons";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
 import { getCategoryTotal } from "../content/azkar";
@@ -68,11 +68,13 @@ export function HomeScreen({
   onCategory,
   onResume,
   language,
+  direction,
 }: {
   completed: Record<CategoryId, Set<number>>;
   onCategory: (category: CategoryId) => void;
   onResume: (category: CategoryId, index: number) => void;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
 }) {
   const isArabic = language === "ar";
   const action = getHomeAction(completed);
@@ -81,7 +83,7 @@ export function HomeScreen({
   const actionLabel = t(language, `home.${action.kind}Action`, { category: actionName });
 
   return (
-    <div className="flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
+    <div className="flex h-full flex-col bg-background" dir={direction}>
       <header className="flex h-14 shrink-0 items-center px-5">
         <h1 className="text-[18px] font-bold text-foreground">{t(language, "home.title")}</h1>
       </header>
@@ -113,7 +115,7 @@ export function HomeScreen({
                   max={action.totalCount}
                   height={6}
                   trackColor="color-mix(in srgb, var(--primary) 22%, transparent)"
-                  direction={isArabic ? "rtl" : "ltr"}
+                  direction={direction}
                   aria-label={isArabic ? `تقدم ${actionName}` : `${actionName} progress`}
                 />
                 <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
@@ -122,11 +124,7 @@ export function HomeScreen({
                 </span>
               </span>
             </span>
-            <ChevronLeft
-              size={22}
-              aria-hidden="true"
-              className={`shrink-0 text-primary ${isArabic ? "" : "-scale-x-100"}`}
-            />
+            <ChevronNext size={22} aria-hidden="true" className="shrink-0 text-primary" />
           </button>
         </section>
 
@@ -144,7 +142,7 @@ export function HomeScreen({
                   <button
                     type="button"
                     onClick={() => onCategory(category.id)}
-                    dir={isArabic ? "rtl" : "ltr"}
+                    dir={direction}
                     data-testid={`category-card-${category.id}`}
                     className="flex min-h-[96px] w-full items-center gap-4 rounded-[20px] border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     aria-label={
@@ -179,16 +177,16 @@ export function HomeScreen({
                         max={totalCount}
                         height={6}
                         trackColor="color-mix(in srgb, var(--primary) 15%, transparent)"
-                        direction={isArabic ? "rtl" : "ltr"}
+                        direction={direction}
                         aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`}
                       />
                     </span>
 
-                    <ChevronLeft
+                    <ChevronNext
                       size={20}
                       aria-hidden="true"
                       data-slot="category-chevron"
-                      className={`shrink-0 text-muted-foreground ${isArabic ? "" : "-scale-x-100"}`}
+                      className="shrink-0 text-muted-foreground"
                     />
                   </button>
                 </Fragment>

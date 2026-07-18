@@ -1,4 +1,5 @@
-import { AlignRight, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
+import { AlignRight, Check, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage, ArabicFontOption, ColorBlindSupport, TextSizeOption } from "../../types";
 import { RowValue, SectionLabel, SettingsRowItem, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -33,6 +34,7 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
 
 export function AccessibilityPanel({
   language,
+  direction,
   textSize,
   arabicFont,
   showTranslation,
@@ -56,6 +58,7 @@ export function AccessibilityPanel({
   onBack,
 }: {
   language: AppLanguage;
+  direction: "ltr" | "rtl";
   textSize: TextSizeOption;
   arabicFont: ArabicFontOption;
   showTranslation: boolean;
@@ -81,76 +84,55 @@ export function AccessibilityPanel({
   const colorBlindOptions: ColorBlindSupport[] = ["none", "deuteranopia", "protanopia", "tritanopia"];
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "settings.accessibility")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.visual")} />
 
-        {/* Text Size Slider */}
-        <div className="mx-4 mb-6 mt-2 flex flex-col items-center">
-          <div className="relative flex w-[75%] items-center justify-between">
-            <span className="absolute -left-8 font-semibold text-foreground">A</span>
-            <span className="absolute -right-8 text-xl font-bold text-foreground">A</span>
-
-            <div className="relative flex h-1.5 w-full items-center rounded-full bg-border">
-              {/* Thumbs */}
-              <button
-                type="button"
-                onClick={() => onTextSizeChange("small")}
-                aria-pressed={textSize === "small"}
-                className="absolute left-0 -ml-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`${t(language, "settings.textSmall")} ${t(language, "settings.textSize")}`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                    textSize === "small" ? "border-foreground bg-background" : ""
+        <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
+          <h3 id="text-size-title" className="mb-3 text-[14px] font-semibold text-foreground">
+            {t(language, "settings.textSize")}
+          </h3>
+          <RadioGroupPrimitive.Root
+            dir={direction}
+            value={textSize}
+            onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}
+            className="grid grid-cols-3 gap-2"
+            aria-labelledby="text-size-title"
+          >
+            {(
+              [
+                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-[15px]" },
+                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-[18px]" },
+                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-[22px]" },
+              ] as const
+            ).map((option) => {
+              const selected = textSize === option.value;
+              return (
+                <RadioGroupPrimitive.Item
+                  key={option.value}
+                  value={option.value}
+                  data-testid={`text-size-option-${option.value}`}
+                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    selected
+                      ? "border-primary bg-primary/10 text-foreground"
+                      : "border-border bg-card text-muted-foreground"
                   }`}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={() => onTextSizeChange("medium")}
-                aria-pressed={textSize === "medium"}
-                className="absolute left-1/2 -ml-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`${t(language, "settings.medium")} ${t(language, "settings.textSize")}`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                    textSize === "medium" ? "border-foreground bg-background" : ""
-                  }`}
-                />
-              </button>
-              <button
-                type="button"
-                onClick={() => onTextSizeChange("large")}
-                aria-pressed={textSize === "large"}
-                className="absolute right-0 -mr-[22px] flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`${t(language, "settings.textLarge")} ${t(language, "settings.textSize")}`}
-              >
-                <span
-                  aria-hidden="true"
-                  className={`h-6 w-6 rounded-full border-[4px] border-background bg-muted shadow-md transition-all ${
-                    textSize === "large" ? "border-foreground bg-background" : ""
-                  }`}
-                />
-              </button>
-            </div>
-          </div>
-
-          <div className="mt-4 flex w-[85%] justify-between text-[13px] font-semibold">
-            <span className={textSize === "small" ? "text-primary" : "text-muted-foreground"}>
-              {t(language, "settings.textSmall")}
-            </span>
-            <span className={textSize === "medium" ? "text-primary" : "text-muted-foreground"}>
-              {t(language, "settings.medium")}
-            </span>
-            <span className={textSize === "large" ? "text-primary" : "text-muted-foreground"}>
-              {t(language, "settings.textLarge")}
-            </span>
-          </div>
-        </div>
+                >
+                  <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
+                    Aa
+                  </span>
+                  <span className="text-[12px] font-semibold leading-4">{option.label}</span>
+                  {selected && (
+                    <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
+                      <Check size={14} strokeWidth={2.5} />
+                    </span>
+                  )}
+                </RadioGroupPrimitive.Item>
+              );
+            })}
+          </RadioGroupPrimitive.Root>
+        </section>
 
         <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
           <SettingsToggleRow

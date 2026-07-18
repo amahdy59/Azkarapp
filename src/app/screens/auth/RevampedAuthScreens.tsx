@@ -61,7 +61,6 @@ export function LoginScreen({
   return (
     <div
       className="flex h-full flex-col bg-background px-6 pb-7 pt-8 slide-in-from-right"
-      dir={ar ? "rtl" : "ltr"}
       style={ar ? rtlFont : undefined}
     >
       <div className="flex flex-col items-center gap-7">
@@ -134,18 +133,14 @@ export function PhoneInputScreen({
   const canSend = phone.replace(/\s/g, "").length >= 7;
   const ar = language === "ar";
   return (
-    <div
-      className="flex h-full flex-col bg-background slide-in-from-right"
-      dir={ar ? "rtl" : "ltr"}
-      style={ar ? rtlFont : undefined}
-    >
+    <div className="flex h-full flex-col bg-background slide-in-from-right" style={ar ? rtlFont : undefined}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
         <button
           onClick={onBack}
           className="flex size-11 items-center justify-center justify-self-start"
-          aria-label="Back"
+          aria-label={t(language, "common.back")}
         >
-          <ArrowPrevious size={24} className={ar ? "rotate-180 text-foreground" : "text-foreground"} />
+          <ArrowPrevious size={24} className="text-foreground" />
         </button>
         <p className="text-[17px] font-semibold text-foreground">{t(language, "auth.signIn")}</p>
         <button
@@ -200,7 +195,6 @@ export function PhoneInputScreen({
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
         <LegalConsent language={language} compact />
-        <span className="h-[5px] w-[134px] rounded-full bg-foreground" />
       </div>
     </div>
   );
@@ -238,18 +232,14 @@ export function OTPScreen({
   const seconds = String(countdown % 60).padStart(2, "0");
   const complete = token.length === 6;
   return (
-    <div
-      className="flex h-full flex-col bg-background slide-in-from-right"
-      dir={ar ? "rtl" : "ltr"}
-      style={ar ? rtlFont : undefined}
-    >
+    <div className="flex h-full flex-col bg-background slide-in-from-right" style={ar ? rtlFont : undefined}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
         <button
           onClick={onBack}
           className="flex size-11 items-center justify-center justify-self-start"
-          aria-label="Back"
+          aria-label={t(language, "common.back")}
         >
-          <ArrowPrevious size={24} className={ar ? "rotate-180 text-foreground" : "text-foreground"} />
+          <ArrowPrevious size={24} className="text-foreground" />
         </button>
         <p className="text-[17px] font-semibold text-foreground">{t(language, "auth.verifyNumber")}</p>
         <span />
@@ -323,7 +313,6 @@ export function OTPScreen({
         <button onClick={onDifferent} className="min-h-11 px-3 text-[15px] font-semibold text-primary">
           {t(language, "auth.tryDifferentNumber")}
         </button>
-        <span className="h-[5px] w-[134px] rounded-full bg-foreground" />
       </div>
     </div>
   );

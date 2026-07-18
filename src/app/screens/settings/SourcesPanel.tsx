@@ -8,7 +8,7 @@ const CORRECTION_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 
 export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "sources.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-8 pt-4">
         <InformationCard

@@ -19,7 +19,7 @@ test("Azkar tab opens the library and exposes search", async ({ page }) => {
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expect(page.getByText(/\d+ of \d+/).first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Go back", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
@@ -28,7 +28,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
 
   await page.getByTestId("home-primary-cta").click();
   await page.getByRole("button", { name: "Save zikr", exact: true }).click();
-  await page.getByRole("button", { name: "Go back", exact: true }).click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
   await page.getByRole("tab", { name: /Saved/ }).click();
 

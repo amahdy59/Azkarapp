@@ -40,10 +40,10 @@ describe("icon design-system contract", () => {
 
   it("uses previous navigation rather than reset in the reader header", () => {
     const reader = readFileSync(join(appRoot, "screens", "ReaderScreen.tsx"), "utf8");
-    const header = reader.slice(
-      reader.indexOf('aria-label="Go back"'),
-      reader.indexOf("<p", reader.indexOf('aria-label="Go back"')),
-    );
+    const backLabel = 'aria-label={t(language, "common.back")}';
+    const backButtonStart = reader.indexOf(backLabel);
+    expect(backButtonStart).toBeGreaterThanOrEqual(0);
+    const header = reader.slice(backButtonStart, reader.indexOf("<p", backButtonStart));
 
     expect(header).toContain("<ArrowPrevious");
     expect(header).not.toContain("RotateCcw");

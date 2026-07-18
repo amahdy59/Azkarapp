@@ -15,7 +15,6 @@ import {
   AboutPanel,
   AccessibilityPanel,
   AccountDataPanel,
-  AppearancePanel,
   DownloadsPanel,
   HelpPanel,
   LanguagePanel,
@@ -50,6 +49,7 @@ interface SettingsScreenProps {
   colorBlindSupport: ColorBlindSupport;
   reminders: ReminderSettings;
   weeklyGoalDays: number;
+  direction: "ltr" | "rtl";
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onTextSizeChange: (value: TextSizeOption) => void;
@@ -95,6 +95,7 @@ export function SettingsScreen({
   colorBlindSupport,
   reminders,
   weeklyGoalDays,
+  direction,
   onLanguageChange,
   onThemeModeChange,
   onTextSizeChange,
@@ -120,31 +121,24 @@ export function SettingsScreen({
   const goBack = () => setSub("root");
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-background">
+    <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
       {sub === "root" && (
         <motion.div className="absolute inset-0 flex h-full w-full flex-col">
           <Header title={t(language, "common.settings")} onBack={onBack} language={language} />
           <SettingsRootPanel
             onNav={setSub}
             language={language}
+            direction={direction}
             themeMode={themeMode}
+            highContrast={highContrast}
+            onThemeModeChange={onThemeModeChange}
+            onDisableHighContrast={() => onHighContrastChange(false)}
             languageLabel={languageLabel}
-            textSize={textSize}
             isGuest={isGuest}
             isSyncing={isSyncing}
             syncError={syncError}
           />
         </motion.div>
-      )}
-      {sub === "appearance" && (
-        <AppearancePanel
-          language={language}
-          themeMode={themeMode}
-          highContrast={highContrast}
-          onThemeModeChange={onThemeModeChange}
-          onDisableHighContrast={() => onHighContrastChange(false)}
-          onBack={goBack}
-        />
       )}
       {sub === "language" && (
         <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
@@ -152,6 +146,7 @@ export function SettingsScreen({
       {sub === "accessibility" && (
         <AccessibilityPanel
           language={language}
+          direction={direction}
           textSize={textSize}
           arabicFont={arabicFont}
           showTranslation={showTranslation}
@@ -187,6 +182,7 @@ export function SettingsScreen({
       {sub === "progress" && (
         <ProgressPanel
           language={language}
+          direction={direction}
           sessions={sessions}
           currentStreak={currentStreak}
           longestStreak={longestStreak}

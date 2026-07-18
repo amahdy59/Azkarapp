@@ -25,10 +25,12 @@ export function SearchScreen({
   onBack,
   onZikr,
   language,
+  direction,
 }: {
   onBack: () => void;
   onZikr: (catId: CategoryId, i: number) => void;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
 }) {
   const isArabic = language === "ar";
   const [q, setQ] = useState("");
@@ -55,7 +57,7 @@ export function SearchScreen({
   };
 
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
+    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
       <div className="flex items-center gap-3 px-5 py-3 shrink-0">
         <button
           onClick={onBack}
@@ -72,6 +74,7 @@ export function SearchScreen({
             placeholder={isArabic ? "ابحث في الأذكار والأدعية" : "Search adhkar or duas"}
             aria-label={isArabic ? "البحث في الأذكار والأدعية" : "Search adhkar and duas"}
             value={q}
+            dir="auto"
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && q.trim() && handleSubmit(q.trim())}
             className="flex-1 bg-transparent focus:outline-none text-[14px] text-foreground font-sans leading-[22px]"
@@ -80,7 +83,7 @@ export function SearchScreen({
           {q && (
             <button
               onClick={() => setQ("")}
-              className="flex items-center justify-center shrink-0 w-11 h-11 -mr-3 text-muted-foreground"
+              className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground"
               aria-label={isArabic ? "مسح البحث" : "Clear search"}
             >
               <X size={16} />
@@ -150,15 +153,22 @@ export function SearchScreen({
                     onClick={() => onZikr(z.category, zIdx)}
                     className="w-full flex items-center justify-between px-4 rounded-xl transition-all active:scale-[0.98] h-[72px] bg-card border border-border"
                   >
-                    <div className="flex flex-col items-start gap-1 min-w-0 flex-1">
-                      <p className="truncate w-full text-[17px] font-semibold text-foreground font-sans leading-[24px] text-start">
+                    <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
+                      <p
+                        className="w-full truncate text-start font-sans text-[17px] font-semibold leading-[24px] text-foreground"
+                        dir="auto"
+                      >
                         {label}
                       </p>
-                      <p className="truncate w-full text-[14px] text-muted-foreground font-sans leading-[22px] text-start">
+                      <p
+                        className="w-full truncate text-left font-sans text-[14px] leading-[22px] text-muted-foreground"
+                        dir="ltr"
+                        lang="en"
+                      >
                         {subtitle}
                       </p>
                     </div>
-                    <div className="rtl:mr-2 ltr:ml-2">
+                    <div className="ms-2">
                       <CategoryBadge catId={z.category} language={language} />
                     </div>
                   </button>

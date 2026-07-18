@@ -23,7 +23,11 @@ async function expectNoWcagViolations(page: Page) {
 test("all product themes apply atomically and remain accessible", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await openSettings(page);
-  await page.getByRole("button", { name: "Appearance Midnight" }).click();
+
+  const themePicker = page.getByRole("radiogroup", { name: "Choose a color theme" });
+  await expect(themePicker).toBeVisible();
+  await expect(themePicker.getByRole("radio")).toHaveCount(3);
+  await expect(page.getByRole("button", { name: /Appearance (Midnight|Light mode|Dark mode)/ })).toHaveCount(0);
 
   const expectations = [
     { mode: "midnight", background: "#0a1228", scheme: "dark" },
@@ -50,11 +54,49 @@ test("high contrast explains why a selected theme is visually overridden", async
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
   await page.getByRole("switch", { name: "High contrast mode" }).click();
   await page.getByRole("button", { name: "Back" }).click();
-  await page.getByRole("button", { name: "Appearance Midnight" }).click();
 
   await expect(page.getByRole("heading", { name: "High contrast is overriding theme colors" })).toBeVisible();
   await page.getByRole("button", { name: "Turn off high contrast" }).click();
   await expect(page.getByRole("heading", { name: "High contrast is overriding theme colors" })).toHaveCount(0);
+});
+
+test("text size is exposed only inside Accessibility", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await openSettings(page);
+
+  await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
+  await expect(page.getByTestId("text-size-option-medium")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "Accessibility", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Accessibility", exact: true })).toBeVisible();
+  const textSizePicker = page.getByRole("radiogroup", { name: "Text size" });
+  await expect(textSizePicker).toBeVisible();
+  await expect(textSizePicker.getByRole("radio")).toHaveCount(3);
+  await page.getByTestId("text-size-option-large").click();
+  await expect(page.getByTestId("text-size-option-large")).toBeChecked();
+
+  await page.getByRole("button", { name: "Back" }).click();
+  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+  await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
+  await expect(page.getByTestId("text-size-option-large")).toHaveCount(0);
+});
+
+test("forced RTL updates settings controls and their keyboard direction", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await openSettings(page);
+
+  const themePicker = page.getByRole("radiogroup", { name: "Choose a color theme" });
+  await expect(themePicker).toHaveAttribute("dir", "ltr");
+
+  await page.getByRole("button", { name: "Accessibility", exact: true }).click();
+  const textSizePicker = page.getByRole("radiogroup", { name: "Text size" });
+  await expect(textSizePicker).toHaveAttribute("dir", "ltr");
+
+  await page.getByRole("switch", { name: "Right-to-left layout" }).click();
+  await expect(textSizePicker).toHaveAttribute("dir", "rtl");
+
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await expect(themePicker).toHaveAttribute("dir", "rtl");
 });
 
 test("launch-critical settings screens are discoverable and accessible", async ({ page }) => {

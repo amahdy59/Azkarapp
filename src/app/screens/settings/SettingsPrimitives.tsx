@@ -1,5 +1,6 @@
 import React from "react";
 import { ArrowPrevious, ChevronNext } from "../../components/icons";
+import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 
 export function SubHeader({
@@ -20,7 +21,7 @@ export function SubHeader({
         onClick={onBack}
         className="flex items-center justify-center rounded-full active:scale-95 transition-all"
         style={{ width: 44, height: 44 }}
-        aria-label={language === "ar" ? "رجوع" : "Back"}
+        aria-label={t(language, "common.back")}
       >
         <ArrowPrevious size={24} className="text-foreground" />
       </button>
@@ -85,7 +86,9 @@ export function SettingsRowItem({
       ) : (
         <div className="w-full flex items-center gap-4 px-4 bg-card h-[60px]">{content}</div>
       )}
-      {hasDivider && <div className="absolute bottom-0 h-px bg-border right-0" style={{ insetInlineStart: 68 }} />}
+      {hasDivider && (
+        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
+      )}
     </div>
   );
 }
@@ -158,7 +161,9 @@ export function SettingsToggleRow({
         <span className="flex-1 font-sans text-[16px] font-semibold text-foreground">{label}</span>
         <ToggleTrack checked={checked} />
       </button>
-      {hasDivider && <div className="absolute bottom-0 right-0 h-px bg-border" style={{ insetInlineStart: 68 }} />}
+      {hasDivider && (
+        <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
+      )}
     </div>
   );
 }

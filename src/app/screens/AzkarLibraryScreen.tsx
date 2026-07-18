@@ -12,6 +12,7 @@ type LibrarySection = "collections" | "saved";
 export function AzkarLibraryScreen({
   completed,
   language,
+  direction,
   onCategory,
   onZikr,
   onSearch,
@@ -19,6 +20,7 @@ export function AzkarLibraryScreen({
 }: {
   completed: Record<CategoryId, Set<number>>;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
   onCategory: (category: CategoryId) => void;
   onZikr: (category: CategoryId, index: number) => void;
   onSearch: () => void;
@@ -29,7 +31,7 @@ export function AzkarLibraryScreen({
   const savedAzkar = useMemo(() => ALL_AZKAR.filter((zikr) => savedZikrIds.has(zikr.id)), [savedZikrIds]);
 
   return (
-    <div className="flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
+    <div className="flex h-full flex-col bg-background" dir={direction}>
       <header className="shrink-0 px-5 pb-4 pt-3">
         <h1 className="text-[24px] font-extrabold text-foreground">{t(language, "library.title")}</h1>
         <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "library.subtitle")}</p>
@@ -99,11 +101,7 @@ export function AzkarLibraryScreen({
                         {t(language, "library.complete")}
                       </span>
                     </span>
-                    <ChevronNext
-                      size={22}
-                      className={isArabic ? "rotate-180 text-muted-foreground" : "text-muted-foreground"}
-                      aria-hidden="true"
-                    />
+                    <ChevronNext size={22} className="text-muted-foreground" aria-hidden="true" />
                   </button>
                 );
               })}
@@ -145,7 +143,11 @@ export function AzkarLibraryScreen({
                       >
                         {zikr.arabicText}
                       </span>
-                      <span className="mt-1 line-clamp-2 block text-[13px] leading-5 text-muted-foreground">
+                      <span
+                        className="mt-1 line-clamp-2 block text-left text-[13px] leading-5 text-muted-foreground"
+                        dir="ltr"
+                        lang="en"
+                      >
                         {zikr.translation}
                       </span>
                     </span>

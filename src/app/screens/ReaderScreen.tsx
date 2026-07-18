@@ -39,6 +39,7 @@ export function ReaderScreen({
   catId,
   idx,
   isArabic,
+  direction,
   isDone,
   hapticFeedback,
   arabicFont,
@@ -56,6 +57,7 @@ export function ReaderScreen({
   catId: CategoryId;
   idx: number;
   isArabic: boolean;
+  direction: "ltr" | "rtl";
   isDone: boolean;
   hapticFeedback: boolean;
   arabicFont: ArabicFontOption;
@@ -140,7 +142,7 @@ export function ReaderScreen({
       : "'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif";
 
   const handleSwipe = (dx: number) => {
-    if (isArabic) {
+    if (direction === "rtl") {
       if (dx > 60) {
         onNext();
       } else if (dx < -60) {
@@ -247,7 +249,7 @@ export function ReaderScreen({
   };
 
   const renderCounterActions = () => (
-    <div className="flex items-center justify-between gap-4 px-2" dir="ltr">
+    <div className="flex items-center justify-between gap-4 px-2">
       <button
         type="button"
         onClick={() => {
@@ -408,7 +410,7 @@ export function ReaderScreen({
   return (
     <div
       className="relative flex h-full flex-col bg-background"
-      dir={isArabic ? "rtl" : "ltr"}
+      dir={direction}
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) {
@@ -449,10 +451,10 @@ export function ReaderScreen({
       </div>
 
       <div className="relative shrink-0 px-5 py-3">
-        <div className="grid grid-cols-[68px_1fr_68px] items-center gap-2" dir="ltr">
+        <div className="grid grid-cols-[68px_1fr_68px] items-center gap-2">
           <button
             onClick={onBack}
-            aria-label="Go back"
+            aria-label={t(language, "common.back")}
             className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ArrowPrevious size={20} />
@@ -462,11 +464,11 @@ export function ReaderScreen({
             {isArabic ? category.nameArabic : category.name}
           </p>
 
-          <DropdownMenu dir={isArabic ? "rtl" : "ltr"}>
+          <DropdownMenu dir={direction}>
             <DropdownMenuTrigger asChild>
               <button
                 type="button"
-                aria-label="Reader menu"
+                aria-label={t(language, "reader.menu")}
                 className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 <Menu size={18} />
@@ -513,11 +515,12 @@ export function ReaderScreen({
           height={4}
           trackColor="var(--card)"
           fillColor="var(--primary)"
+          direction={direction}
           aria-label={t(language, "reader.groupProgress")}
         />
       </div>
 
-      <ScrollArea className="zikr-scroll min-h-0 flex-1">
+      <ScrollArea className="zikr-scroll min-h-0 flex-1" dir={direction}>
         <div className="zikr-step-enter flex min-h-full flex-col" key={z.id}>
           {renderReadingContent()}
           {renderCounterPanel()}
@@ -527,7 +530,13 @@ export function ReaderScreen({
       <footer className="shrink-0 px-6 pb-4 pt-3">{renderCounterActions()}</footer>
 
       {benefitOpen && (
-        <ReaderReferenceSheet zikr={z} language={language} onClose={closeReference} onAnnouncement={setShareMessage} />
+        <ReaderReferenceSheet
+          zikr={z}
+          language={language}
+          direction={direction}
+          onClose={closeReference}
+          onAnnouncement={setShareMessage}
+        />
       )}
     </div>
   );

@@ -64,7 +64,7 @@ function categoryFromShortcutUrl(): CategoryId | null {
   return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
 }
 
-import { BottomNav, StatusBar } from "./components/LayoutShells";
+import { BottomNav } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { LANGUAGE_LABELS } from "./languageOptions";
@@ -232,6 +232,7 @@ export default function App() {
   const { currentStreak, longestStreak } = getStreakSummary(sessions);
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
+  const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
 
   const appStateSnapshot = useMemo<AppStateSnapshot>(
     () => ({
@@ -598,20 +599,16 @@ export default function App() {
   };
 
   const showBottomNav = ["home", "library", "category", "settings"].includes(view);
-  const showStatusBar = ["home", "library", "category", "reader", "completion", "settings", "search"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
-    <div className="app-viewport min-h-screen flex items-center justify-center">
-      {/* Phone frame */}
+    <div className="app-viewport flex items-center justify-center">
       <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
         <NetworkStatus />
         {isSupabaseConfigured && !isGuest && (
           <SyncStatus isSyncing={isSyncingRemote} errorMessage={syncError} onRetry={retrySync} />
         )}
 
-        {showStatusBar && <StatusBar />}
-        {/* Screen */}
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
           <Suspense fallback={<ScreenFallback />}>
             {/* Phase 2 — onboarding flow */}
@@ -710,12 +707,14 @@ export default function App() {
                 onCategory={openCategory}
                 onResume={openReader}
                 language={selectedLang}
+                direction={layoutDirection}
               />
             )}
             {view === "library" && (
               <AzkarLibraryScreen
                 completed={completed}
                 language={selectedLang}
+                direction={layoutDirection}
                 onCategory={openCategory}
                 onZikr={openReader}
                 onSearch={() => push("search")}
@@ -727,6 +726,7 @@ export default function App() {
                 catId={activeCat}
                 completed={completed[activeCat] ?? new Set()}
                 isArabic={isArabic}
+                direction={layoutDirection}
                 onZikr={(i) => openReader(activeCat, i)}
                 onReset={() => handleResetCategory(activeCat)}
                 onBack={pop}
@@ -737,6 +737,7 @@ export default function App() {
                 catId={activeCat}
                 idx={activeIdx}
                 isArabic={isArabic}
+                direction={layoutDirection}
                 isDone={completed[activeCat]?.has(activeIdx) ?? false}
                 hapticFeedback={hapticFeedback}
                 arabicFont={arabicFont}
@@ -767,6 +768,7 @@ export default function App() {
                   setHistory([]);
                 }}
                 language={selectedLang}
+                direction={layoutDirection}
               />
             )}
             {view === "settings" && (
@@ -793,6 +795,7 @@ export default function App() {
                 colorBlindSupport={colorBlindSupport}
                 reminders={reminders}
                 weeklyGoalDays={weeklyGoalDays}
+                direction={layoutDirection}
                 onLanguageChange={setSelectedLang}
                 onThemeModeChange={setThemeMode}
                 onTextSizeChange={setTextSize}
@@ -818,6 +821,7 @@ export default function App() {
             {view === "search" && (
               <SearchScreen
                 language={selectedLang}
+                direction={layoutDirection}
                 onBack={pop}
                 onZikr={(catId, i) => {
                   openReader(catId, i);
@@ -828,7 +832,14 @@ export default function App() {
         </main>
 
         {(updateAvailable || (installPrompt && sessions.length > 0 && !installDismissed)) && (
-          <div className={`absolute inset-x-0 z-40 ${showBottomNav ? "bottom-20" : "bottom-3"}`}>
+          <div
+            className="absolute inset-x-0 z-40"
+            style={{
+              bottom: showBottomNav
+                ? "calc(4rem + env(safe-area-inset-bottom))"
+                : "max(0.75rem, env(safe-area-inset-bottom))",
+            }}
+          >
             {updateAvailable ? (
               <PwaNotice
                 title={t(selectedLang, "pwa.updateTitle")}

@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowPrevious, BatteryFull, BookOpen, Home, Settings, Signal, Wifi } from "./icons";
+import { ArrowPrevious, BookOpen, Home, Settings } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -22,7 +22,7 @@ export function Header({
         <button
           type="button"
           onClick={onBack}
-          aria-label={language === "ar" ? "رجوع" : "Go back"}
+          aria-label={t(language, "common.back")}
           className="flex items-center justify-center rounded-full transition-colors w-11 h-11 min-w-[44px] hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <ArrowPrevious size={22} className="text-foreground" />
@@ -33,19 +33,6 @@ export function Header({
         {subtitle && <p className="text-[12px] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}
-    </div>
-  );
-}
-
-export function StatusBar() {
-  return (
-    <div className="flex h-11 shrink-0 items-center justify-between px-6 text-foreground" dir="ltr" aria-hidden="true">
-      <span className="font-sans text-[14px] font-semibold leading-5">9:41</span>
-      <div className="flex items-center gap-2">
-        <Signal size={17} strokeWidth={2.5} />
-        <Wifi size={17} strokeWidth={2.5} />
-        <BatteryFull size={22} strokeWidth={2} />
-      </div>
     </div>
   );
 }
@@ -67,11 +54,10 @@ export function BottomNav({
   ];
   return (
     <nav
-      aria-label="Bottom Navigation"
-      className="flex h-[83px] shrink-0 flex-col border-t border-border bg-card"
-      dir="ltr"
+      aria-label={t(language, "common.bottomNavigation")}
+      className="flex h-16 shrink-0 border-t border-border bg-card"
     >
-      <div className="flex min-h-0 flex-1 items-start justify-between px-8 pt-3">
+      <div className="flex min-h-0 flex-1 items-center justify-between px-8">
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;
           return (
@@ -94,9 +80,6 @@ export function BottomNav({
             </button>
           );
         })}
-      </div>
-      <div className="flex h-7 shrink-0 items-start justify-center pt-2">
-        <span className="h-[5px] w-[134px] rounded-full bg-foreground" aria-hidden="true" />
       </div>
     </nav>
   );

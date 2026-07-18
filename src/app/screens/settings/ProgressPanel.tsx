@@ -1,6 +1,6 @@
 import { CheckCircle2, Flame } from "../../components/icons";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { useMemo, useState } from "react";
-import { ChevronNext, ChevronPrevious } from "../../components/icons";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
@@ -29,6 +29,7 @@ export function getWeeklyCompletedDays(sessions: StoredSession[], category: Cate
 export function ProgressPanel({
   onBack,
   language,
+  direction,
   sessions,
   currentStreak,
   longestStreak,
@@ -37,6 +38,7 @@ export function ProgressPanel({
 }: {
   onBack: () => void;
   language: AppLanguage;
+  direction: "ltr" | "rtl";
   sessions: StoredSession[];
   currentStreak: number;
   longestStreak: number;
@@ -62,7 +64,7 @@ export function ProgressPanel({
   }).reverse();
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={isArabic ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         <section className="rounded-2xl border border-border bg-card px-6 py-4 text-end">
@@ -90,21 +92,23 @@ export function ProgressPanel({
             max={weeklyGoalDays}
             height={7}
             trackColor="var(--muted)"
-            direction={isArabic ? "rtl" : "ltr"}
             aria-label={t(language, "progressPanel.goalProgress", { done: completedGoalDays, goal: weeklyGoalDays })}
           />
-          <div className="mt-4" role="radiogroup" aria-label={t(language, "progressPanel.chooseGoal")}>
+          <RadioGroupPrimitive.Root
+            className="mt-4"
+            dir={direction}
+            value={String(weeklyGoalDays)}
+            onValueChange={(value) => onWeeklyGoalDaysChange(Number(value))}
+            aria-label={t(language, "progressPanel.chooseGoal")}
+          >
             <p className="mb-2 text-[12px] font-semibold text-muted-foreground">
               {t(language, "progressPanel.chooseGoal")}
             </p>
             <div className="grid grid-cols-4 gap-2">
               {[3, 4, 5, 7].map((goal) => (
-                <button
+                <RadioGroupPrimitive.Item
                   key={goal}
-                  type="button"
-                  role="radio"
-                  aria-checked={weeklyGoalDays === goal}
-                  onClick={() => onWeeklyGoalDaysChange(goal)}
+                  value={String(goal)}
                   className={`min-h-11 rounded-xl border px-2 text-[13px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     weeklyGoalDays === goal
                       ? "border-primary bg-primary text-primary-foreground"
@@ -112,10 +116,10 @@ export function ProgressPanel({
                   }`}
                 >
                   {formatNumerals(goal, language)}
-                </button>
+                </RadioGroupPrimitive.Item>
               ))}
             </div>
-          </div>
+          </RadioGroupPrimitive.Root>
         </section>
 
         <div className="flex justify-center gap-2" aria-label="Category filter">
@@ -150,14 +154,12 @@ export function ProgressPanel({
               </button>
             ))}
           </div>
-          <div className="mt-4 flex items-center justify-between text-muted-foreground">
-            <ChevronPrevious size={20} />
+          <div className="mt-4 flex items-center justify-center text-muted-foreground">
             <span className="text-[13px] font-semibold">
               {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { month: "long", year: "numeric" }).format(
                 new Date(),
               )}
             </span>
-            <ChevronNext size={20} />
           </div>
           <div
             className={`mt-4 grid gap-1.5 ${period === "week" ? "grid-cols-7" : "grid-cols-7"}`}

@@ -16,13 +16,48 @@ test("the app canvas stays phone-sized on large viewports and fills phone viewpo
   if (viewport.width <= 430) {
     expect(box.width).toBeCloseTo(viewport.width, 0);
     expect(box.height).toBeCloseTo(viewport.height, 0);
+    expect(box.x).toBeCloseTo(0, 0);
+    expect(box.y).toBeCloseTo(0, 0);
     await expect(shell).toHaveCSS("border-radius", "0px");
+
+    const resizedHeight = Math.max(520, viewport.height - 120);
+    await page.setViewportSize({ width: viewport.width, height: resizedHeight });
+    await expect
+      .poll(async () => {
+        const resizedBox = await shell.boundingBox();
+        return resizedBox ? { top: resizedBox.y, bottom: resizedBox.y + resizedBox.height } : null;
+      })
+      .toEqual({ top: 0, bottom: resizedHeight });
   } else {
     expect(box.width).toBeCloseTo(390, 0);
     expect(box.height).toBeLessThanOrEqual(882);
     expect(box.x).toBeCloseTo((viewport.width - box.width) / 2, 0);
     await expect(shell).toHaveCSS("border-radius", "40px");
   }
+});
+
+test("the production shell does not render simulated device chrome", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await page.getByTestId("language-option-en").click();
+  await page.getByTestId("confirm-language").click();
+  await page.getByTestId("onboarding-get-started").click();
+  await page.getByTestId("continue-as-guest").click();
+
+  const shell = page.locator(".app-shell");
+  const navigation = page.getByRole("navigation", { name: "Bottom Navigation" });
+  await expect(navigation).toBeVisible();
+  await expect(shell.getByText("9:41", { exact: true })).toHaveCount(0);
+  await expect(navigation).toHaveCSS("height", "64px");
+
+  const simulatedHomeIndicators = await navigation.locator("span").evaluateAll(
+    (spans) =>
+      spans.filter((span) => {
+        const bounds = span.getBoundingClientRect();
+        return bounds.width >= 120 && bounds.width <= 150 && bounds.height > 0 && bounds.height <= 6;
+      }).length,
+  );
+  expect(simulatedHomeIndicators).toBe(0);
 });
 
 test("the typography contract assigns each content type to its approved family", async ({ page }) => {

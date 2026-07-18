@@ -38,7 +38,7 @@ export function AccountDataPanel({
       : t(language, "accountData.upToDate");
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "accountData.title")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto px-4 pb-8">
         <section className="mt-4 rounded-2xl border border-border bg-card p-4">

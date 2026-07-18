@@ -8,7 +8,7 @@ import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 
 export function LegalPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={language === "ar" ? "rtl" : "ltr"}>
+    <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "legal.title")} onBack={onBack} language={language} />
       <div
         className="flex-1 overflow-y-auto px-4 pb-8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
