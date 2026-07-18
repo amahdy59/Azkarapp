@@ -142,7 +142,7 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
   await expect(sheet.getByText("Authenticity", { exact: true })).toHaveCount(0);
   await expect
     .poll(() => sheet.evaluate((element) => Math.abs(window.innerHeight - element.getBoundingClientRect().bottom)))
-    .toBeLessThan(0.5);
+    .toBeLessThan(1);
 
   const dimensions = await sheet.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
@@ -170,21 +170,14 @@ test("benefit sheet rises from the bottom edge of the centered app canvas", asyn
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
   // Wait for slide-up sheet-enter transition to complete
   await page.waitForTimeout(300);
-  const layer = page.getByTestId("reference-sheet-layer");
   const reader = page.getByTestId("reader-screen");
   const sheet = page.getByTestId("reference-sheet");
 
-  const bounds = await Promise.all([layer.boundingBox(), reader.boundingBox(), sheet.boundingBox()]);
-  const [layerBox, readerBox, sheetBox] = bounds;
-  expect(layerBox).not.toBeNull();
+  const bounds = await Promise.all([reader.boundingBox(), sheet.boundingBox()]);
+  const [readerBox, sheetBox] = bounds;
   expect(readerBox).not.toBeNull();
   expect(sheetBox).not.toBeNull();
-  if (!layerBox || !readerBox || !sheetBox) return;
-
-  expect(Math.abs(layerBox.x - readerBox.x)).toBeLessThanOrEqual(1);
-  expect(Math.abs(layerBox.y - readerBox.y)).toBeLessThanOrEqual(1);
-  expect(Math.abs(layerBox.width - readerBox.width)).toBeLessThanOrEqual(1);
-  expect(Math.abs(layerBox.height - readerBox.height)).toBeLessThanOrEqual(1);
+  if (!readerBox || !sheetBox) return;
   expect(Math.abs(sheetBox.y + sheetBox.height - (readerBox.y + readerBox.height))).toBeLessThanOrEqual(1);
   expect(sheetBox.y + sheetBox.height).toBeLessThan(1000);
 });

@@ -8,6 +8,8 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 
+import { ScreenContainer } from "../components/ScreenContainer";
+
 export function CategoryScreen({
   catId,
   completed,
@@ -46,7 +48,7 @@ export function CategoryScreen({
     .sort((a, b) => a.z.orderIndex - b.z.orderIndex);
 
   return (
-    <div className="flex h-full flex-col bg-background" dir={direction}>
+    <ScreenContainer dir={direction}>
       <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={isArabic ? "ar" : "en"} />
 
       <div className="shrink-0 border-b border-border px-5 py-4">
@@ -74,7 +76,7 @@ export function CategoryScreen({
           {done > 0 && done < azkar.length && (
             <button
               onClick={onReset}
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-destructive/40 bg-destructive/10 text-destructive transition-all hover:bg-destructive/15 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+              className="interactive-elem flex h-14 w-14 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
               aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
             >
               <RotateCcw size={22} />
@@ -83,7 +85,7 @@ export function CategoryScreen({
           {done < azkar.length ? (
             <button
               onClick={() => onZikr(Math.max(0, resumeIdx))}
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary text-[1rem] font-bold text-primary-foreground shadow-sm transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="interactive-elem flex h-14 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[1rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <ChevronNext size={20} />
               {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
@@ -92,7 +94,7 @@ export function CategoryScreen({
             <button
               type="button"
               onClick={onRepeat}
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 text-primary transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="interactive-elem flex h-14 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <RotateCcw size={20} />
               <span className="text-[1rem] font-bold">{t(language, "category.readAgain")}</span>
@@ -114,7 +116,7 @@ export function CategoryScreen({
                   <button
                     key={z.id}
                     onClick={() => onZikr(index)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="interactive-elem flex w-full items-center gap-3 rounded-card border border-border bg-card p-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
                       <Check size={16} />
@@ -162,7 +164,7 @@ export function CategoryScreen({
                   <button
                     key={z.id}
                     onClick={() => onZikr(index)}
-                    className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="interactive-elem flex w-full items-center gap-3 rounded-card border border-border bg-card p-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-[1.5px] border-muted-foreground/40">
                       {/* Empty circle */}
@@ -197,6 +199,6 @@ export function CategoryScreen({
           </div>
         )}
       </div>
-    </div>
+    </ScreenContainer>
   );
 }

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
+import confetti from "canvas-confetti";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
@@ -7,6 +8,12 @@ import { formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
+
+function vibrate(pattern: number | number[]) {
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    navigator.vibrate(pattern);
+  }
+}
 
 export function CompletionScreen({
   catId,
@@ -34,6 +41,43 @@ export function CompletionScreen({
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
   const isArabic = language === "ar";
   const [shareStatus, setShareStatus] = useState("");
+
+  const encouragement = useMemo(() => {
+    const messages = t(language, "completion.encouragements") as unknown as string[];
+    return messages[Math.floor(Math.random() * messages.length)];
+  }, [language]);
+
+  useEffect(() => {
+    // Haptic feedback
+    vibrate([30, 50, 30, 50, 50]);
+
+    // Confetti animation
+    const duration = 2500;
+    const end = Date.now() + duration;
+
+    const frame = () => {
+      confetti({
+        particleCount: 5,
+        angle: 60,
+        spread: 55,
+        origin: { x: 0 },
+        colors: ["#16a34a", "#22c55e", "#4ade80"],
+      });
+      confetti({
+        particleCount: 5,
+        angle: 120,
+        spread: 55,
+        origin: { x: 1 },
+        colors: ["#16a34a", "#22c55e", "#4ade80"],
+      });
+
+      if (Date.now() < end) {
+        requestAnimationFrame(frame);
+      }
+    };
+    frame();
+  }, []);
+
   const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
   const stats = [
     { value: elapsedMin, suffix: t(language, "completion.minutes"), label: t(language, "completion.duration") },
@@ -90,7 +134,7 @@ export function CompletionScreen({
       <p className="mt-2 text-[1.0625rem] font-semibold text-card-foreground">
         {t(language, "completion.completed", { category: isArabic ? cat.nameArabic : cat.name })}
       </p>
-      <p className="mt-2 text-[0.8125rem] text-muted-foreground">{t(language, "completion.reflection")}</p>
+      <p className="mt-2 text-[0.8125rem] text-muted-foreground">{encouragement}</p>
 
       {quietProgressEnabled && growthEvent && <GrowthEventStatus event={growthEvent} language={language} />}
 

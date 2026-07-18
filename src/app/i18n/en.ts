@@ -325,6 +325,14 @@ const en = {
     shareSuccess: "Shared.",
     copySuccess: "Copied to clipboard.",
     shareError: "Could not share this completion.",
+    encouragements: [
+      "May Allah accept your remembrance.",
+      "A heart at peace through His remembrance.",
+      "Every word of Zikr is a light for your soul.",
+      "Consistency is more beloved to Allah than amount.",
+      "The best of deeds are those that are consistent.",
+      "May this bring barakah to your day.",
+    ],
   },
   category: {
     completeSubtitle: "{done} of {total} complete",

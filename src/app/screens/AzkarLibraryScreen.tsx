@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { CatIcon } from "../components/CatIcon";
-import { Bookmark, ChevronNext, Search } from "../components/icons";
+import { Search, Bookmark, ChevronNext } from "../components/icons";
+import { BottomNav, IconButton } from "../components/LayoutShells";
+import { ScreenContainer } from "../components/ScreenContainer";
 import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
@@ -31,21 +33,21 @@ export function AzkarLibraryScreen({
   const savedAzkar = useMemo(() => ALL_AZKAR.filter((zikr) => savedZikrIds.has(zikr.id)), [savedZikrIds]);
 
   return (
-    <div className="flex h-full flex-col bg-background" dir={direction}>
+    <ScreenContainer dir={direction}>
       <header className="shrink-0 px-5 pb-4 pt-3">
         <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>
         <p className="mt-1 text-[0.8125rem] text-muted-foreground">{t(language, "library.subtitle")}</p>
         <button
           type="button"
           onClick={onSearch}
-          className="mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-start text-[0.875rem] text-muted-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="interactive-elem mt-4 flex h-12 w-full items-center gap-3 rounded-card border border-border bg-card px-4 text-start text-[0.875rem] text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           aria-label={t(language, "library.search")}
         >
           <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
           <span>{t(language, "library.search")}</span>
         </button>
         <div
-          className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border bg-card p-1"
+          className="mt-4 grid grid-cols-2 gap-2 rounded-xl border border-border bg-card p-1"
           role="tablist"
           aria-label={t(language, "library.title")}
         >
@@ -197,6 +199,6 @@ export function AzkarLibraryScreen({
           </section>
         )}
       </div>
-    </div>
+    </ScreenContainer>
   );
 }

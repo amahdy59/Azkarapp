@@ -409,6 +409,12 @@ body {
   --color-sidebar-ring: var(--sidebar-ring);
 }
 
+@layer utilities {
+  .interactive-elem {
+    @apply transition-transform active:scale-[0.98] cursor-pointer;
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

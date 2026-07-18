@@ -7,6 +7,7 @@ import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
@@ -94,12 +95,12 @@ export function HomeScreen({
   const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
 
   return (
-    <div className="flex h-full flex-col bg-background" dir={direction}>
-      <header className="flex h-14 shrink-0 items-center px-5">
+    <ScreenContainer dir={direction}>
+      <header className="flex h-14 shrink-0 items-center">
         <h1 className="text-[1.125rem] font-bold text-foreground">{t(language, "home.title")}</h1>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
+      <div className="min-h-0 flex-1 overflow-y-auto pt-2">
         <section aria-labelledby="next-azkar-heading" className="mb-6">
           <p id="next-azkar-heading" className="mb-2 text-[0.8125rem] font-semibold text-muted-foreground">
             {t(language, "home.nextUp")}
@@ -110,11 +111,11 @@ export function HomeScreen({
             onClick={() =>
               action.kind === "again" ? onRepeat(action.categoryId) : onResume(action.categoryId, action.index)
             }
-            className="flex min-h-[126px] w-full items-center gap-4 rounded-2xl border border-primary/35 bg-primary/10 p-5 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="interactive-elem flex min-h-[126px] w-full items-center gap-4 rounded-card border border-primary/35 bg-primary/10 p-5 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={`${actionLabel}. ${formatNumerals(action.completedCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(action.totalCount, language)} ${t(language, "home.complete")}`}
           >
             <span
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground"
+              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-btn bg-primary text-primary-foreground"
               aria-hidden="true"
             >
               <CatIcon type={actionCategory.icon} size={30} color="currentColor" />
@@ -210,6 +211,6 @@ export function HomeScreen({
           </div>
         </section>
       </div>
-    </div>
+    </ScreenContainer>
   );
 }

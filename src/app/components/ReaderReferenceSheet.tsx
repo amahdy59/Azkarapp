@@ -4,6 +4,7 @@ import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { Drawer, DrawerContent, DrawerOverlay, DrawerPortal, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
 
@@ -21,7 +22,7 @@ export function ReaderReferenceSheet({
   onAnnouncement: (message: string) => void;
 }) {
   const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
-  const sheetRef = useRef<HTMLElement>(null);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
@@ -29,46 +30,12 @@ export function ReaderReferenceSheet({
   const sourceReference = getLocalizedSourceReference(zikr, language);
 
   useEffect(() => {
-    const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
-    const frame = requestAnimationFrame(() => closeButtonRef.current?.focus());
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-
-      if (event.key !== "Tab") {
-        return;
-      }
-
-      const focusableElements = sheetRef.current?.querySelectorAll<HTMLElement>(
-        'button:not([disabled]), [href], [tabindex]:not([tabindex="-1"])',
-      );
-      if (!focusableElements?.length) {
-        return;
-      }
-
-      const first = focusableElements.item(0);
-      const last = focusableElements.item(focusableElements.length - 1);
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
     return () => {
-      cancelAnimationFrame(frame);
-      document.removeEventListener("keydown", handleKeyDown);
       if (copyFeedbackTimer.current) {
         clearTimeout(copyFeedbackTimer.current);
       }
-      previouslyFocused?.focus();
     };
-  }, [onClose]);
+  }, []);
 
   const copyReference = async (key: ReferenceCopyKey, value: string) => {
     try {
@@ -104,44 +71,37 @@ export function ReaderReferenceSheet({
   );
 
   return (
-    <div
-      className="scrim-in absolute inset-0 z-50 flex items-end justify-center overflow-hidden bg-black/45"
-      data-testid="reference-sheet-layer"
-    >
-      <button
-        type="button"
-        className="absolute inset-0 cursor-default"
-        onClick={onClose}
-        aria-hidden="true"
-        tabIndex={-1}
-      />
-      <section
-        ref={sheetRef}
-        role="dialog"
-        data-testid="reference-sheet"
-        aria-modal="true"
-        aria-labelledby="reader-benefit-sheet-title"
-        className="reference-sheet sheet-enter relative flex w-full max-w-[390px] flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
-        dir={direction}
-      >
-        <div className="relative z-10 flex min-h-16 shrink-0 items-center justify-center bg-background px-16 pb-2 pt-5">
-          <span className="absolute top-2.5 h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
-          <h2 id="reader-benefit-sheet-title" className="text-center text-[1.0625rem] font-bold text-foreground">
+    <Drawer open={true} onOpenChange={(open) => { if (!open) onClose(); }}>
+      <DrawerPortal>
+        <DrawerOverlay className="bg-black/45 z-50" />
+        <DrawerContent
+          data-testid="reference-sheet"
+          ref={sheetRef}
+          aria-describedby={undefined}
+          className="reference-sheet fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-[390px] flex-col rounded-t-3xl bg-background outline-none focus-visible:outline-none max-h-[85vh] shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
+          dir={direction}
+        >
+          <DrawerTitle className="sr-only" id="reader-benefit-sheet-title">
             {t(language, "reader.referencesButton")}
-          </h2>
-          <button
-            ref={closeButtonRef}
-            type="button"
-            onClick={onClose}
-            aria-label={t(language, "reader.closeReference")}
-            className="absolute top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            style={{ insetInlineEnd: 12 }}
-          >
-            <X size={18} />
-          </button>
-        </div>
-        <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain" dir={direction}>
-          <div className="reference-sheet-content flex flex-col gap-4 px-6">
+          </DrawerTitle>
+          <div className="relative z-10 flex min-h-12 shrink-0 items-center justify-center bg-background px-16 pb-2 pt-2">
+            <h2 className="text-center text-[1.0625rem] font-bold text-foreground">
+              {t(language, "reader.referencesButton")}
+            </h2>
+            <button
+              ref={closeButtonRef}
+              autoFocus
+              type="button"
+              onClick={onClose}
+              aria-label={t(language, "reader.closeReference")}
+              className="absolute top-1 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              style={{ insetInlineEnd: 12 }}
+            >
+              <X size={18} />
+            </button>
+          </div>
+          <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain" dir={direction}>
+            <div className="reference-sheet-content flex flex-col gap-4 px-6 pb-6 pt-2">
             {isArabic ? (
               <div className="rounded-xl bg-muted px-4 py-4">
                 <p className="zikr-text text-center text-[1.125rem] leading-8 text-foreground" dir="rtl" lang="ar">
@@ -229,9 +189,10 @@ export function ReaderReferenceSheet({
               </p>
               {copyAction("source", sourceReference, t(language, "reader.copySource"), direction)}
             </section>
-          </div>
-        </ScrollArea>
-      </section>
-    </div>
+            </div>
+          </ScrollArea>
+        </DrawerContent>
+      </DrawerPortal>
+    </Drawer>
   );
 }

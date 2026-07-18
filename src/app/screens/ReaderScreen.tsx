@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useZikrCounter } from "../hooks/useZikrCounter";
+import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import {
   ArrowPrevious,
   BookOpen,
@@ -23,6 +25,7 @@ import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
+import { ScreenContainer } from "../components/ScreenContainer";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -97,52 +100,46 @@ export function ReaderScreen({
   const language: AppLanguage = isArabic ? "ar" : "en";
 
   const [benefitOpen, setBenefitOpen] = useState(false);
-  const [count, setCount] = useState(0);
-  const [pulse, setPulse] = useState(0);
-  const [complete, setComplete] = useState(false);
-  const [justCompleted, setJustCompleted] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
-  const [readerAnnouncement, setReaderAnnouncement] = useState("");
   const closeReference = useCallback(() => setBenefitOpen(false), []);
 
-  const touchStartX = useRef<number | null>(null);
-  const suppressTap = useRef(false);
-  const activeZikrId = useRef<string | null>(null);
-  const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  useEffect(() => {
-    if (!z || activeZikrId.current === z.id) {
-      return;
-    }
+  const {
+    count,
+    pulse,
+    complete,
+    justCompleted,
+    readerAnnouncement,
+    suppressTap,
+    handleTap,
+    handleSurfaceTap,
+    handleReset,
+  } = useZikrCounter({
+    z,
+    idx,
+    isDone,
+    language,
+    azkarLength: azkar.length,
+    collectionCompletedCount,
+    hapticFeedback,
+    vibrate,
+    onComplete,
+    onAdvance,
+  });
 
-    activeZikrId.current = z.id;
-    if (advanceTimer.current) {
-      clearTimeout(advanceTimer.current);
-      advanceTimer.current = null;
-    }
-    const initialCount = isDone && z ? z.repetitionCount : 0;
-    setCount(initialCount);
-    setComplete(initialCount >= (z?.repetitionCount ?? 1));
-    setJustCompleted(false);
-    setBenefitOpen(false);
-    setReaderAnnouncement(
-      initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.tapAnywhere"),
-    );
-  }, [idx, isDone, language, z]);
+  const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGestures({
+    direction,
+    onNext,
+    onPrev,
+    suppressTap,
+  });
 
   useEffect(() => {
     return () => {
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
-      }
-      if (advanceTimer.current) {
-        clearTimeout(advanceTimer.current);
-      }
-      if (tapSuppressTimer.current) {
-        clearTimeout(tapSuppressTimer.current);
       }
     };
   }, []);
@@ -160,85 +157,6 @@ export function ReaderScreen({
     arabicFont === "noto_sans"
       ? "'Noto Sans Arabic', sans-serif"
       : "'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif";
-
-  const handleSwipe = (dx: number) => {
-    if (direction === "rtl") {
-      if (dx > 60) {
-        onNext();
-      } else if (dx < -60) {
-        onPrev();
-      }
-      return;
-    }
-
-    if (dx > 60) {
-      onPrev();
-    } else if (dx < -60) {
-      onNext();
-    }
-  };
-
-  const handleTap = () => {
-    if (complete) {
-      return;
-    }
-
-    const next = count + 1;
-    setCount(next);
-    setPulse((value) => value + 1);
-    if (hapticFeedback) {
-      vibrate(8);
-    }
-
-    if (next >= z.repetitionCount) {
-      setComplete(true);
-      setJustCompleted(true);
-      const announcedCompletedCount = Math.min(collectionCompletedCount + (isDone ? 0 : 1), azkar.length);
-      setReaderAnnouncement(
-        t(language, "reader.completionAnnouncement", {
-          index: formatNumerals(announcedCompletedCount, language),
-          total: formatNumerals(azkar.length, language),
-          percent: formatNumerals(Math.round((announcedCompletedCount / azkar.length) * 100), language),
-        }),
-      );
-      if (hapticFeedback) {
-        vibrate([18, 40, 32]);
-      }
-      onComplete(idx);
-      advanceTimer.current = setTimeout(() => {
-        setJustCompleted(false);
-        onAdvance(idx);
-      }, COUNTER_ADVANCE_DELAY_MS);
-    }
-  };
-
-  const shouldIgnoreCountTap = (target: EventTarget | null) => {
-    if (!(target instanceof Element)) {
-      return false;
-    }
-
-    return Boolean(
-      target.closest(
-        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-radix-scroll-area-thumb], [data-radix-scroll-area-scrollbar], [data-prevent-count='true']",
-      ),
-    );
-  };
-
-  const handleSurfaceTap = (event: React.MouseEvent<HTMLElement>) => {
-    if (suppressTap.current || shouldIgnoreCountTap(event.target)) {
-      return;
-    }
-
-    handleTap();
-  };
-
-  const handleReset = () => {
-    setCount(0);
-    setComplete(false);
-    setJustCompleted(false);
-    setReaderAnnouncement(t(language, "reader.tapAnywhere"));
-    setPulse((value) => value + 1);
-  };
 
   const handleToggleSaved = () => {
     onToggleSaved(z.id);
@@ -303,7 +221,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="interactive-elem ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-btn border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <BookOpen className="shrink-0" size={17} />
         <span className="truncate" dir="auto">
@@ -393,7 +311,7 @@ export function ReaderScreen({
           <div
             className={`counter-ring-stage pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
           >
-            <PulseRings trigger={pulse} size={184} />
+            <PulseRings trigger={pulse} size={184} count={count} total={z.repetitionCount} />
             <CounterRing count={count} total={z.repetitionCount} size={184} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {complete ? (
@@ -444,42 +362,14 @@ export function ReaderScreen({
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-    <div
-      className="relative flex h-full flex-col bg-background"
+    <ScreenContainer
+      className="relative"
       data-testid="reader-screen"
       dir={direction}
       onClick={handleSurfaceTap}
-      onTouchStart={(event) => {
-        const touch = event.touches[0];
-        if (touch) {
-          touchStartX.current = touch.clientX;
-        }
-      }}
-      onTouchEnd={(event) => {
-        if (touchStartX.current === null) {
-          return;
-        }
-
-        const touch = event.changedTouches[0];
-        if (!touch) {
-          touchStartX.current = null;
-          return;
-        }
-
-        const deltaX = touch.clientX - touchStartX.current;
-        if (Math.abs(deltaX) > 14) {
-          suppressTap.current = true;
-          if (tapSuppressTimer.current) {
-            clearTimeout(tapSuppressTimer.current);
-          }
-          tapSuppressTimer.current = setTimeout(() => {
-            suppressTap.current = false;
-          }, 220);
-        }
-
-        handleSwipe(deltaX);
-        touchStartX.current = null;
-      }}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       <div className="sr-only" aria-live="polite">
         {shareMessage}
@@ -573,6 +463,6 @@ export function ReaderScreen({
           onAnnouncement={setShareMessage}
         />
       )}
-    </div>
+    </ScreenContainer>
   );
 }

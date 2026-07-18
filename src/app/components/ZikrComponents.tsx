@@ -13,11 +13,15 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
   );
 }
 
-export function PulseRings({ trigger, size = 200 }: { trigger: number; size?: number }) {
+export function PulseRings({ trigger, size = 200, count = 0, total = 1 }: { trigger: number; size?: number, count?: number, total?: number }) {
+  const isComplete = total > 0 && count >= total;
+  const isHighProgress = total > 0 && (count / total) >= 0.8;
+  const ringColor = isComplete ? "border-green-500" : isHighProgress ? "border-yellow-500" : "border-primary/60";
+
   return (
     <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div
-        className="absolute rounded-full border border-primary/60 pulse-ring"
+        className={`absolute rounded-full border ${ringColor} pulse-ring`}
         style={{
           width: `${size - 8}px`,
           height: `${size - 8}px`,
