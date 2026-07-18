@@ -488,7 +488,7 @@ export function ReaderScreen({
         {readerAnnouncement}
       </div>
 
-      <div className="relative shrink-0 px-4 py-3" data-prevent-count="true">
+      <div className="relative shrink-0 px-4 py-3">
         <div className="flex items-center gap-2">
           <IconButton
             onClick={onBack}
@@ -562,9 +562,7 @@ export function ReaderScreen({
         </div>
       </ScrollArea>
 
-      <footer className="shrink-0 px-4 pb-4 pt-3" data-prevent-count="true">
-        {renderCounterActions()}
-      </footer>
+      <footer className="shrink-0 px-4 pb-4 pt-3">{renderCounterActions()}</footer>
 
       {benefitOpen && (
         <ReaderReferenceSheet

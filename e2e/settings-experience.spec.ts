@@ -16,6 +16,7 @@ async function openSettings(page: Page) {
 }
 
 async function expectNoWcagViolations(page: Page) {
+  await page.waitForTimeout(200);
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
   expect(results.violations).toEqual([]);
 }
@@ -81,14 +82,18 @@ test("text size is exposed only inside Accessibility", async ({ page }) => {
   await expect(page.getByTestId("text-size-option-large")).toHaveCount(0);
 });
 
-test("language changes in place from the Settings selector", async ({ page }) => {
+test("language changes from the dedicated Settings Language panel", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
   const settingsUrl = page.url();
   const historyLength = await page.evaluate(() => window.history.length);
-  const languageSelector = page.getByTestId("settings-language-select");
 
+  // Click the Language settings row to open the panel
+  await page.getByRole("button", { name: /Language/i }).click();
+  await expect(page.getByRole("heading", { name: "Language", exact: true, level: 1 })).toBeVisible();
+
+  const languageSelector = page.getByTestId("settings-language-dropdown");
   await expect(languageSelector).toBeVisible();
   await expect(languageSelector).toHaveValue("en");
   await languageSelector.selectOption("ar");
@@ -97,9 +102,13 @@ test("language changes in place from the Settings selector", async ({ page }) =>
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(languageSelector).toBeVisible();
   await expect(languageSelector).toHaveValue("ar");
+
+  // Navigate back to Settings main screen
+  await page.getByRole("button", { name: "رجوع", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a", exact: true }),
   ).toBeVisible();
+
   expect(page.url()).toBe(settingsUrl);
   expect(await page.evaluate(() => window.history.length)).toBe(historyLength);
 });

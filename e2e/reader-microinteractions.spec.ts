@@ -168,6 +168,8 @@ test("benefit sheet rises from the bottom edge of the centered app canvas", asyn
   await openFirstMorningZikr(page);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  // Wait for slide-up sheet-enter transition to complete
+  await page.waitForTimeout(300);
   const layer = page.getByTestId("reference-sheet-layer");
   const reader = page.getByTestId("reader-screen");
   const sheet = page.getByTestId("reference-sheet");
