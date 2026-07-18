@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
 import { CatIcon } from "../components/CatIcon";
 import { Search, Bookmark, ChevronNext } from "../components/icons";
-import { BottomNav, IconButton } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";

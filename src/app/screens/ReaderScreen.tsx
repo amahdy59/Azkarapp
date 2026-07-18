@@ -361,7 +361,6 @@ export function ReaderScreen({
 
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <ScreenContainer
       className="relative"
       data-testid="reader-screen"

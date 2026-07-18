@@ -90,7 +90,6 @@ export function ReaderReferenceSheet({
             </h2>
             <button
               ref={closeButtonRef}
-              autoFocus
               type="button"
               onClick={onClose}
               aria-label={t(language, "reader.closeReference")}

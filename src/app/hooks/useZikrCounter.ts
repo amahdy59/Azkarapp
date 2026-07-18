@@ -59,12 +59,9 @@ export function useZikrCounter({
 
   useEffect(() => {
     return () => {
-      if (advanceTimer.current) {
-        clearTimeout(advanceTimer.current);
-      }
-      if (tapSuppressTimer.current) {
-        clearTimeout(tapSuppressTimer.current);
-      }
+      if (advanceTimer.current) clearTimeout(advanceTimer.current);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      if (tapSuppressTimer.current) clearTimeout(tapSuppressTimer.current);
     };
   }, []);
 
