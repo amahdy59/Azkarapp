@@ -38,12 +38,12 @@ describe("icon design-system contract", () => {
     expect(violations).toEqual([]);
   });
 
-  it("uses previous navigation rather than reset in the reader header", () => {
-    const reader = readFileSync(join(appRoot, "screens", "ReaderScreen.tsx"), "utf8");
+  it("uses previous navigation rather than reset in the header", () => {
+    const layout = readFileSync(join(appRoot, "components", "LayoutShells.tsx"), "utf8");
     const backLabel = 'label={t(language, "common.back")}';
-    const backButtonStart = reader.indexOf(backLabel);
+    const backButtonStart = layout.indexOf(backLabel);
     expect(backButtonStart).toBeGreaterThanOrEqual(0);
-    const header = reader.slice(backButtonStart, reader.indexOf("<p", backButtonStart));
+    const header = layout.slice(backButtonStart, layout.indexOf("</IconButton>", backButtonStart));
 
     expect(header).toContain("<ArrowPrevious");
     expect(header).not.toContain("RotateCcw");

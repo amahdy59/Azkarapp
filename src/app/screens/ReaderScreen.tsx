@@ -1,17 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import {
-  BookOpen,
-  Check,
-  ChevronUp,
-  Heart,
-  Share2,
-  Menu,
-  RotateCcw,
-  List,
-  Bookmark,
-} from "../components/icons";
+import { BookOpen, Check, ChevronUp, Heart, Share2, Menu, RotateCcw, List, Bookmark } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
