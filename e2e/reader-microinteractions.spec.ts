@@ -132,7 +132,7 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
-  const close = sheet.getByRole("button", { name: "Close benefit", exact: true });
+
   await expect(sheet).toBeVisible();
   await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
   await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toBeVisible();
