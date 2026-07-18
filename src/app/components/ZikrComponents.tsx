@@ -13,9 +13,19 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
   );
 }
 
-export function PulseRings({ trigger, size = 200, count = 0, total = 1 }: { trigger: number; size?: number, count?: number, total?: number }) {
+export function PulseRings({
+  trigger,
+  size = 200,
+  count = 0,
+  total = 1,
+}: {
+  trigger: number;
+  size?: number;
+  count?: number;
+  total?: number;
+}) {
   const isComplete = total > 0 && count >= total;
-  const isHighProgress = total > 0 && (count / total) >= 0.8;
+  const isHighProgress = total > 0 && count / total >= 0.8;
   const ringColor = isComplete ? "border-green-500" : isHighProgress ? "border-yellow-500" : "border-primary/60";
 
   return (

@@ -6,12 +6,7 @@ interface ScreenContainerProps extends HTMLAttributes<HTMLDivElement> {
   dir?: "ltr" | "rtl";
 }
 
-export function ScreenContainer({
-  children,
-  className = "",
-  dir,
-  ...props
-}: ScreenContainerProps) {
+export function ScreenContainer({ children, className = "", dir, ...props }: ScreenContainerProps) {
   return (
     <div
       className={`flex h-full flex-col bg-background px-page pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 ${className}`}

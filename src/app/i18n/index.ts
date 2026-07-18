@@ -31,7 +31,11 @@ export type TranslationKey = {
     : K & string;
 }[keyof TranslationSchema];
 
-export function t(language: AppLanguage, key: TranslationKey | (string & {}), replacements?: Record<string, string | number>) {
+export function t(
+  language: AppLanguage,
+  key: TranslationKey | (string & {}),
+  replacements?: Record<string, string | number>,
+) {
   const dictionary = getDictionary(language) as unknown as Record<string, unknown>;
   let template = resolveKey(dictionary, key);
 
