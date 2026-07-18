@@ -1,27 +1,26 @@
 import { useEffect } from "react";
 import { t } from "../i18n";
-import type { AppLanguage, CategoryId, ReminderSettings, StoredSession } from "../types";
+import { getProgressDayKey } from "../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, ReminderSettings } from "../types";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 90_000;
 
-type ReminderKind = "morning" | "evening";
+type ReminderKind = CategoryId;
 
 type DueReminder = {
   kind: ReminderKind;
   category: CategoryId;
 };
 
-function localDayKey(value: Date) {
-  return `${value.getFullYear()}-${value.getMonth()}-${value.getDate()}`;
-}
-
-function didCompleteCategoryToday(sessions: StoredSession[], category: CategoryId, now: Date) {
-  const today = localDayKey(now);
-  return sessions.some(
-    (session) =>
-      session.isComplete && session.category === category && localDayKey(new Date(session.completedAt)) === today,
-  );
+function didCompleteCategoryToday(
+  dailyCompletions: DailyCollectionCompletion[],
+  category: CategoryId,
+  now: Date,
+  progressDayStartHour: number,
+) {
+  const today = getProgressDayKey(now, progressDayStartHour);
+  return dailyCompletions.some((completion) => completion.category === category && completion.dayKey === today);
 }
 
 function hasReachedReminderTime(now: Date, time: string) {
@@ -34,20 +33,26 @@ function hasReachedReminderTime(now: Date, time: string) {
 
 export function getDueReminder(
   reminders: ReminderSettings,
-  sessions: StoredSession[],
+  dailyCompletions: DailyCollectionCompletion[],
   now = new Date(),
+  progressDayStartHour = 4,
+  wasAlreadyNotified: (kind: ReminderKind) => boolean = () => false,
 ): DueReminder | null {
   const candidates: Array<{ kind: ReminderKind; category: CategoryId }> = [
     { kind: "morning", category: "morning" },
     { kind: "evening", category: "evening" },
+    { kind: "before_sleep", category: "before_sleep" },
   ];
 
   for (const candidate of candidates) {
     const schedule = reminders[candidate.kind];
-    if (!schedule.enabled || !hasReachedReminderTime(now, schedule.time)) {
+    if (!schedule.enabled || !hasReachedReminderTime(now, schedule.time) || wasAlreadyNotified(candidate.kind)) {
       continue;
     }
-    if (reminders.onlyWhenIncomplete && didCompleteCategoryToday(sessions, candidate.category, now)) {
+    if (
+      reminders.onlyWhenIncomplete &&
+      didCompleteCategoryToday(dailyCompletions, candidate.category, now, progressDayStartHour)
+    ) {
       continue;
     }
     return candidate;
@@ -65,17 +70,40 @@ function readReminderHistory() {
   }
 }
 
-function hasAlreadyNotified(kind: ReminderKind, now: Date) {
-  return readReminderHistory()[kind] === localDayKey(now);
+function hasAlreadyNotified(kind: ReminderKind, now: Date, progressDayStartHour: number) {
+  return readReminderHistory()[kind] === getProgressDayKey(now, progressDayStartHour);
 }
 
-function recordNotification(kind: ReminderKind, now: Date) {
+function recordNotification(kind: ReminderKind, now: Date, progressDayStartHour: number) {
   const history = readReminderHistory();
-  history[kind] = localDayKey(now);
+  history[kind] = getProgressDayKey(now, progressDayStartHour);
   try {
     window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
   } catch {
     // Notification delivery should not fail when history storage is unavailable.
+  }
+}
+
+async function deliverNotification(kind: ReminderKind, language: AppLanguage, dayKey: string) {
+  const options: NotificationOptions = {
+    body: t(language, `notifications.${kind}`),
+    tag: `azkar-${kind}-${dayKey}`,
+  };
+
+  try {
+    if ("serviceWorker" in navigator) {
+      const registration = await navigator.serviceWorker.getRegistration();
+      if (registration) {
+        await registration.showNotification("Azkar", options);
+        return true;
+      }
+    }
+
+    new Notification("Azkar", options);
+    return true;
+  } catch {
+    // Some mobile browsers expose Notification but only permit service-worker delivery.
+    return false;
   }
 }
 
@@ -86,11 +114,13 @@ function recordNotification(kind: ReminderKind, now: Date) {
  */
 export function useForegroundReminders({
   reminders,
-  sessions,
+  dailyCompletions,
+  progressDayStartHour,
   language,
 }: {
   reminders: ReminderSettings;
-  sessions: StoredSession[];
+  dailyCompletions: DailyCollectionCompletion[];
+  progressDayStartHour: number;
   language: AppLanguage;
 }) {
   useEffect(() => {
@@ -98,22 +128,29 @@ export function useForegroundReminders({
       return;
     }
 
-    const notifyIfDue = () => {
+    let isDelivering = false;
+    const notifyIfDue = async () => {
+      if (isDelivering) {
+        return;
+      }
       const now = new Date();
-      const due = getDueReminder(reminders, sessions, now);
-      if (!due || hasAlreadyNotified(due.kind, now)) {
+      const due = getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, (kind) =>
+        hasAlreadyNotified(kind, now, progressDayStartHour),
+      );
+      if (!due) {
         return;
       }
 
-      new Notification("Azkar", {
-        body: t(language, `notifications.${due.kind}`),
-        tag: `azkar-${due.kind}-${localDayKey(now)}`,
-      });
-      recordNotification(due.kind, now);
+      isDelivering = true;
+      const delivered = await deliverNotification(due.kind, language, getProgressDayKey(now, progressDayStartHour));
+      isDelivering = false;
+      if (delivered) {
+        recordNotification(due.kind, now, progressDayStartHour);
+      }
     };
 
-    notifyIfDue();
-    const interval = window.setInterval(notifyIfDue, 30_000);
+    void notifyIfDue();
+    const interval = window.setInterval(() => void notifyIfDue(), 30_000);
     return () => window.clearInterval(interval);
-  }, [language, reminders, sessions]);
+  }, [dailyCompletions, language, progressDayStartHour, reminders]);
 }

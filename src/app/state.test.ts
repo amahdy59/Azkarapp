@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   DEFAULT_APP_STATE,
+  clearPrivateAppData,
   fromCompletedSets,
   loadAppState,
   mergeAppStates,
@@ -62,6 +63,83 @@ describe("app state persistence", () => {
     });
     expect(state.sessions).toEqual([]);
   });
+
+  it("migrates legacy complete sessions once and keeps their progress-day keys stable", () => {
+    const completedAt = new Date(2026, 6, 18, 2, 30).toISOString();
+    const migrated = normalizeAppState({
+      settings: { ...DEFAULT_APP_STATE.settings, progressDayStartHour: 4 },
+      sessions: [
+        {
+          id: "legacy-morning",
+          category: "morning",
+          completedAt,
+          completedCount: 5,
+          totalCount: 5,
+          durationSeconds: 60,
+          isComplete: true,
+        },
+      ],
+    });
+
+    expect(migrated.dailyCompletions).toEqual([
+      { dayKey: "2026-07-17", category: "morning", timeZone: expect.any(String) },
+    ]);
+
+    const afterBoundaryChange = normalizeAppState({
+      ...migrated,
+      settings: { ...migrated.settings, progressDayStartHour: 0 },
+    });
+    expect(afterBoundaryChange.dailyCompletions).toEqual(migrated.dailyCompletions);
+  });
+
+  it("repairs invalid quiet-progress preferences", () => {
+    const state = normalizeAppState({
+      settings: { quietProgressEnabled: "yes", progressDayStartHour: 12 },
+    });
+
+    expect(state.settings.quietProgressEnabled).toBe(true);
+    expect(state.settings.progressDayStartHour).toBe(4);
+  });
+
+  it("drops out-of-range completion indexes from untrusted storage", () => {
+    const state = normalizeAppState({ completed: { morning: [0, 999], evening: [], before_sleep: [] } });
+
+    expect(state.completed.morning).toEqual([0]);
+  });
+
+  it("clears account-owned private data while preserving device preferences", () => {
+    const cleared = clearPrivateAppData({
+      ...DEFAULT_APP_STATE,
+      settings: { ...DEFAULT_APP_STATE.settings, themeMode: "light" },
+      profile: {
+        displayName: "Ahmed",
+        lastPhoneNumber: "+201000000000",
+        isGuest: false,
+        accountUserId: "account-a",
+      },
+      completed: { morning: [0], evening: [], before_sleep: [] },
+      sessions: [
+        {
+          id: "private-session",
+          category: "morning",
+          completedAt: new Date(2026, 6, 18, 9).toISOString(),
+          completedCount: 1,
+          totalCount: 1,
+          durationSeconds: 10,
+          isComplete: true,
+        },
+      ],
+      dailyCompletions: [{ dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" }],
+      savedZikrIds: ["m-hm-75"],
+    });
+
+    expect(cleared.settings.themeMode).toBe("light");
+    expect(cleared.profile).toEqual(DEFAULT_APP_STATE.profile);
+    expect(cleared.completed.morning).toEqual([]);
+    expect(cleared.sessions).toEqual([]);
+    expect(cleared.dailyCompletions).toEqual([]);
+    expect(cleared.savedZikrIds).toEqual([]);
+  });
 });
 
 describe("state merging", () => {
@@ -94,5 +172,23 @@ describe("state merging", () => {
 
   it("normalizes completely untrusted snapshots", () => {
     expect(normalizeAppState(null)).toEqual(DEFAULT_APP_STATE);
+  });
+
+  it("unions explicit completion ledgers without duplicate leaves", () => {
+    const base = {
+      ...DEFAULT_APP_STATE,
+      dailyCompletions: [{ dayKey: "2026-07-18", category: "morning" as const, timeZone: "Africa/Cairo" }],
+    };
+    const merged = mergeAppStates(base, {
+      dailyCompletions: [
+        { dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" },
+        { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
+      ],
+    });
+
+    expect(merged.dailyCompletions).toEqual([
+      { dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
+    ]);
   });
 });

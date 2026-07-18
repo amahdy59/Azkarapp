@@ -1,48 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { getWeeklyCompletedDays } from "./ProgressPanel";
+import { getGardenSummary } from "../../progress";
+import type { DailyCollectionCompletion } from "../../types";
 
-describe("getWeeklyCompletedDays", () => {
-  it("counts distinct completed days in the current week for one collection", () => {
-    const now = new Date(2026, 6, 17, 12);
-    const sessions = [
-      {
-        id: "a",
-        category: "morning" as const,
-        completedAt: new Date(2026, 6, 13, 8).toISOString(),
-        completedCount: 20,
-        totalCount: 20,
-        durationSeconds: 60,
-        isComplete: true,
-      },
-      {
-        id: "b",
-        category: "morning" as const,
-        completedAt: new Date(2026, 6, 13, 18).toISOString(),
-        completedCount: 20,
-        totalCount: 20,
-        durationSeconds: 60,
-        isComplete: true,
-      },
-      {
-        id: "c",
-        category: "morning" as const,
-        completedAt: new Date(2026, 6, 15, 8).toISOString(),
-        completedCount: 20,
-        totalCount: 20,
-        durationSeconds: 60,
-        isComplete: true,
-      },
-      {
-        id: "d",
-        category: "evening" as const,
-        completedAt: new Date(2026, 6, 15, 18).toISOString(),
-        completedCount: 20,
-        totalCount: 20,
-        durationSeconds: 60,
-        isComplete: true,
-      },
+describe("ProgressPanel rolling intention", () => {
+  it("counts distinct active days rather than duplicate collection sessions", () => {
+    const records: DailyCollectionCompletion[] = [
+      { dayKey: "2026-07-13", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-13", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-15", category: "morning", timeZone: "Africa/Cairo" },
     ];
 
-    expect(getWeeklyCompletedDays(sessions, "morning", now)).toBe(2);
+    const summary = getGardenSummary(records, new Date(2026, 6, 17, 12), 4);
+    expect(summary.activeDaysLast7).toBe(2);
+    expect(summary.palmDaysLast7).toBe(0);
   });
 });

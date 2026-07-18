@@ -1,4 +1,4 @@
-import { BookOpen, Bookmark, Bell, Database, ExternalLink, HelpCircle, Wifi } from "../../components/icons";
+import { BarChart3, BookOpen, Bookmark, Bell, Database, ExternalLink, HelpCircle, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
@@ -11,6 +11,7 @@ const FAQ_ITEMS = [
   { question: "help.remindersQ", answer: "help.remindersA", icon: Bell },
   { question: "help.offlineQ", answer: "help.offlineA", icon: Wifi },
   { question: "help.syncQ", answer: "help.syncA", icon: Database },
+  { question: "help.gardenQ", answer: "help.gardenA", icon: BarChart3 },
   { question: "help.accessibilityQ", answer: "help.accessibilityA", icon: HelpCircle },
 ];
 
@@ -21,8 +22,8 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
       <div className="flex-1 overflow-y-auto px-4 pb-8">
         <section className="mt-4 rounded-2xl border border-border bg-card p-5">
           <HelpCircle size={24} className="text-primary" aria-hidden="true" />
-          <h2 className="mt-3 text-[18px] font-semibold text-foreground">{t(language, "help.introTitle")}</h2>
-          <p className="mt-1 text-[14px] leading-6 text-muted-foreground">{t(language, "help.introBody")}</p>
+          <h2 className="mt-3 text-[1.125rem] font-semibold text-foreground">{t(language, "help.introTitle")}</h2>
+          <p className="mt-1 text-[0.875rem] leading-6 text-muted-foreground">{t(language, "help.introBody")}</p>
         </section>
 
         <SectionLabel label={t(language, "help.faq")} />
@@ -31,7 +32,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
             <details className="group border-b border-border last:border-b-0" key={question}>
               <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
                 <Icon size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                <span className="flex-1 text-start text-[14px] font-semibold leading-5 text-foreground">
+                <span className="flex-1 text-start text-[0.875rem] font-semibold leading-5 text-foreground">
                   {t(language, question)}
                 </span>
                 <span
@@ -41,7 +42,10 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
                   +
                 </span>
               </summary>
-              <p className="px-4 pb-4 text-[13px] leading-6 text-muted-foreground" style={{ paddingInlineStart: 50 }}>
+              <p
+                className="px-4 pb-4 text-[0.8125rem] leading-6 text-muted-foreground"
+                style={{ paddingInlineStart: 50 }}
+              >
                 {t(language, answer)}
               </p>
             </details>
@@ -49,12 +53,12 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
         </div>
 
         <section className="mt-4 rounded-2xl border border-border bg-card p-4">
-          <h2 className="text-[15px] font-semibold text-foreground">{t(language, "help.stillNeedHelp")}</h2>
-          <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{t(language, "help.reportHint")}</p>
+          <h2 className="text-[0.9375rem] font-semibold text-foreground">{t(language, "help.stillNeedHelp")}</h2>
+          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "help.reportHint")}</p>
           <button
             type="button"
             onClick={() => window.open(ISSUE_URL, "_blank", "noopener,noreferrer")}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[13px] font-semibold text-primary-foreground"
+            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[0.8125rem] font-semibold text-primary-foreground"
           >
             {t(language, "help.reportIssue")}
             <ExternalLink size={16} aria-hidden="true" />

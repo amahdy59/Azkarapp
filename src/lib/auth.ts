@@ -1,9 +1,13 @@
 import type { Session } from "@supabase/supabase-js";
 import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state";
 import { DEFAULT_APP_STATE, mergeAppStates } from "../app/state";
+import { mergeDailyCompletions, normalizeDailyCompletions } from "../app/progress";
 import { isSupabaseConfigured, supabase } from "./supabase";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
+const REMOTE_DAILY_COMPLETION_PAGE_SIZE = 500;
+const syncedDailyCompletionKeysByUser = new Map<string, Set<string>>();
+const dailyCompletionTableAvailability = new Map<string, boolean>();
 
 export function normalizePhoneNumber(input: string) {
   const trimmed = input.trim();
@@ -122,6 +126,7 @@ export function profileFromSession(session: Session | null, fallbackPhone: strin
     displayName,
     lastPhoneNumber: user?.phone ?? fallbackPhone,
     isGuest: !user,
+    accountUserId: user?.id ?? "",
   };
 }
 
@@ -133,6 +138,7 @@ type RemoteProfileRow = {
 
 type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
   savedZikrIds?: AppStateSnapshot["savedZikrIds"];
+  dailyCompletions?: AppStateSnapshot["dailyCompletions"];
 };
 
 type RemoteSettingsRow = {
@@ -154,11 +160,60 @@ type RemoteSessionRow = {
   is_complete: boolean;
 };
 
+type RemoteDailyCompletionRow = {
+  day_key: string;
+  category: StoredSession["category"];
+  time_zone: string;
+};
+
+function isMissingDailyCompletionTable(error: unknown) {
+  const candidate = error as { code?: string; message?: string } | null;
+  return (
+    candidate?.code === "42P01" ||
+    candidate?.code === "PGRST205" ||
+    candidate?.message?.includes("daily_collection_completions") === true
+  );
+}
+
+function dailyCompletionKey(record: { dayKey: string; category: StoredSession["category"] }) {
+  return `${record.dayKey}:${record.category}`;
+}
+
+async function loadAllRemoteDailyCompletions(client: ReturnType<typeof assertSupabase>, userId: string) {
+  const rows: RemoteDailyCompletionRow[] = [];
+  let start = 0;
+
+  while (true) {
+    const { data, error } = await client
+      .from("daily_collection_completions")
+      .select("day_key, category, time_zone")
+      .eq("user_id", userId)
+      .order("day_key", { ascending: true })
+      .order("category", { ascending: true })
+      .range(start, start + REMOTE_DAILY_COMPLETION_PAGE_SIZE - 1)
+      .returns<RemoteDailyCompletionRow[]>();
+
+    if (error) {
+      if (isMissingDailyCompletionTable(error)) {
+        return { rows: [], tableAvailable: false };
+      }
+      throw error;
+    }
+
+    const page = data ?? [];
+    rows.push(...page);
+    if (page.length < REMOTE_DAILY_COMPLETION_PAGE_SIZE) {
+      return { rows, tableAvailable: true };
+    }
+    start += REMOTE_DAILY_COMPLETION_PAGE_SIZE;
+  }
+}
+
 export async function loadRemoteState(session: Session, localState: AppStateSnapshot) {
   const client = assertSupabase();
   const userId = session.user.id;
 
-  const [{ data: profile }, { data: settings }, { data: progress }, { data: sessions }] = await Promise.all([
+  const [profileResult, settingsResult, progressResult, sessionsResult, dailyCompletionResult] = await Promise.all([
     client
       .from("profiles")
       .select("display_name, phone, preferred_language")
@@ -177,7 +232,42 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       .order("completed_at", { ascending: false })
       .limit(REMOTE_SESSION_PAGE_SIZE)
       .returns<RemoteSessionRow[]>(),
+    loadAllRemoteDailyCompletions(client, userId),
   ]);
+
+  for (const result of [profileResult, settingsResult, progressResult, sessionsResult]) {
+    if (result.error) {
+      throw result.error;
+    }
+  }
+
+  const profile = profileResult.data;
+  const settings = settingsResult.data;
+  const progress = progressResult.data;
+  const sessions = sessionsResult.data;
+
+  dailyCompletionTableAvailability.set(userId, dailyCompletionResult.tableAvailable);
+  if (dailyCompletionResult.tableAvailable) {
+    syncedDailyCompletionKeysByUser.set(
+      userId,
+      new Set(
+        dailyCompletionResult.rows.map((record) =>
+          dailyCompletionKey({ dayKey: record.day_key, category: record.category }),
+        ),
+      ),
+    );
+  }
+
+  const remoteDailyCompletions = mergeDailyCompletions(
+    normalizeDailyCompletions(settings?.settings_json?.dailyCompletions),
+    normalizeDailyCompletions(
+      dailyCompletionResult.rows.map((record) => ({
+        dayKey: record.day_key,
+        category: record.category,
+        timeZone: record.time_zone,
+      })),
+    ),
+  );
 
   const remoteState: Partial<AppStateSnapshot> = {
     settings: {
@@ -196,12 +286,15 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
       reminders: settings?.settings_json?.reminders ?? localState.settings.reminders,
       weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
+      quietProgressEnabled: settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
+      progressDayStartHour: settings?.settings_json?.progressDayStartHour ?? localState.settings.progressDayStartHour,
     },
     profile: {
       displayName:
         profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
       lastPhoneNumber: profile?.phone ?? session.user.phone ?? localState.profile.lastPhoneNumber,
       isGuest: false,
+      accountUserId: userId,
     },
     completed: progress?.completed ?? localState.completed,
     sessions: (sessions ?? []).map((item) => ({
@@ -213,6 +306,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       durationSeconds: item.duration_seconds,
       isComplete: item.is_complete,
     })),
+    ...(remoteDailyCompletions.length > 0 ? { dailyCompletions: remoteDailyCompletions } : {}),
     savedZikrIds: settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds,
   };
 
@@ -235,29 +329,6 @@ export async function syncRemoteState(
     updated_at: new Date().toISOString(),
   };
 
-  const settingsPayload = {
-    user_id: userId,
-    dark_mode: state.settings.darkMode,
-    settings_json: {
-      language: state.settings.language,
-      themeMode: state.settings.themeMode,
-      showTransliteration: state.settings.showTransliteration,
-      showTranslation: state.settings.showTranslation,
-      textSize: state.settings.textSize,
-      arabicFont: state.settings.arabicFont,
-      highContrast: state.settings.highContrast,
-      boldText: state.settings.boldText,
-      reduceMotion: state.settings.reduceMotion,
-      hapticFeedback: state.settings.hapticFeedback,
-      forceRtl: state.settings.forceRtl,
-      colorBlindSupport: state.settings.colorBlindSupport,
-      reminders: state.settings.reminders,
-      weeklyGoalDays: state.settings.weeklyGoalDays,
-      savedZikrIds: state.savedZikrIds,
-    },
-    updated_at: new Date().toISOString(),
-  };
-
   const progressPayload = {
     user_id: userId,
     completed: state.completed,
@@ -271,6 +342,77 @@ export async function syncRemoteState(
   if (profileError) {
     throw profileError;
   }
+
+  let tableAvailable = dailyCompletionTableAvailability.get(userId) !== false;
+  const knownDailyCompletionKeys = syncedDailyCompletionKeysByUser.get(userId) ?? new Set<string>();
+  const pendingDailyCompletions = normalizeDailyCompletions(state.dailyCompletions).filter(
+    (record) => !knownDailyCompletionKeys.has(dailyCompletionKey(record)),
+  );
+  if (tableAvailable && pendingDailyCompletions.length > 0) {
+    const { error: dailyCompletionError } = await client.from("daily_collection_completions").upsert(
+      pendingDailyCompletions.map((record) => ({
+        user_id: userId,
+        day_key: record.dayKey,
+        category: record.category,
+        time_zone: record.timeZone,
+      })),
+      { onConflict: "user_id,day_key,category" },
+    );
+    if (dailyCompletionError) {
+      if (!isMissingDailyCompletionTable(dailyCompletionError)) {
+        throw dailyCompletionError;
+      }
+      tableAvailable = false;
+      dailyCompletionTableAvailability.set(userId, false);
+    } else {
+      for (const record of pendingDailyCompletions) {
+        knownDailyCompletionKeys.add(dailyCompletionKey(record));
+      }
+      syncedDailyCompletionKeysByUser.set(userId, knownDailyCompletionKeys);
+      dailyCompletionTableAvailability.set(userId, true);
+    }
+  }
+
+  const settingsJson: RemoteSettingsJson = {
+    language: state.settings.language,
+    themeMode: state.settings.themeMode,
+    showTransliteration: state.settings.showTransliteration,
+    showTranslation: state.settings.showTranslation,
+    textSize: state.settings.textSize,
+    arabicFont: state.settings.arabicFont,
+    highContrast: state.settings.highContrast,
+    boldText: state.settings.boldText,
+    reduceMotion: state.settings.reduceMotion,
+    hapticFeedback: state.settings.hapticFeedback,
+    forceRtl: state.settings.forceRtl,
+    colorBlindSupport: state.settings.colorBlindSupport,
+    reminders: state.settings.reminders,
+    weeklyGoalDays: state.settings.weeklyGoalDays,
+    quietProgressEnabled: state.settings.quietProgressEnabled,
+    progressDayStartHour: state.settings.progressDayStartHour,
+    savedZikrIds: state.savedZikrIds,
+  };
+  if (!tableAvailable) {
+    const { data: currentSettings, error: currentSettingsError } = await client
+      .from("user_settings")
+      .select("settings_json")
+      .eq("user_id", userId)
+      .maybeSingle<{ settings_json?: RemoteSettingsJson | null }>();
+    if (currentSettingsError) {
+      throw currentSettingsError;
+    }
+    settingsJson.dailyCompletions = mergeDailyCompletions(
+      normalizeDailyCompletions(currentSettings?.settings_json?.dailyCompletions),
+      state.dailyCompletions,
+    );
+  }
+
+  const settingsPayload = {
+    user_id: userId,
+    dark_mode: state.settings.darkMode,
+    settings_json: settingsJson,
+    updated_at: new Date().toISOString(),
+  };
 
   const { error: settingsError } = await client.from("user_settings").upsert(settingsPayload);
   if (settingsError) {

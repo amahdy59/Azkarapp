@@ -19,8 +19,8 @@ export function InformationCard({
           {icon}
         </span>
         <div className="min-w-0 flex-1">
-          <Heading className="text-[15px] font-semibold text-foreground">{title}</Heading>
-          <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{body}</p>
+          <Heading className="text-[0.9375rem] font-semibold text-foreground">{title}</Heading>
+          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
         </div>
       </div>
     </section>

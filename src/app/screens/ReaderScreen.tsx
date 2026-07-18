@@ -41,6 +41,7 @@ export function ReaderScreen({
   isArabic,
   direction,
   isDone,
+  collectionCompletedCount,
   hapticFeedback,
   arabicFont,
   showTranslation,
@@ -59,6 +60,7 @@ export function ReaderScreen({
   isArabic: boolean;
   direction: "ltr" | "rtl";
   isDone: boolean;
+  collectionCompletedCount: number;
   hapticFeedback: boolean;
   arabicFont: ArabicFontOption;
   showTranslation: boolean;
@@ -133,7 +135,7 @@ export function ReaderScreen({
 
   const localizedCount = formatNumerals(count, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
-  const readingProgressValue = idx + 1;
+  const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "18px", medium: "20px", large: "24px" }[textSize];
   const readingFontFamily =
@@ -173,11 +175,12 @@ export function ReaderScreen({
     if (next >= z.repetitionCount) {
       setComplete(true);
       setJustCompleted(true);
+      const announcedCompletedCount = Math.min(collectionCompletedCount + (isDone ? 0 : 1), azkar.length);
       setReaderAnnouncement(
         t(language, "reader.completionAnnouncement", {
-          index: formatNumerals(idx + 1, language),
+          index: formatNumerals(announcedCompletedCount, language),
           total: formatNumerals(azkar.length, language),
-          percent: formatNumerals(Math.round(((idx + 1) / azkar.length) * 100), language),
+          percent: formatNumerals(Math.round((announcedCompletedCount / azkar.length) * 100), language),
         }),
       );
       if (hapticFeedback) {
@@ -268,7 +271,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="flex h-12 min-w-[166px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[14px] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="flex h-12 min-w-[166px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <BookOpen size={17} />
         <span dir="auto">{t(language, "reader.referencesButton")}</span>
@@ -315,20 +318,20 @@ export function ReaderScreen({
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-start" data-prevent-count="true">
           {showTranslation && (
             <section aria-labelledby="reader-translation-title">
-              <h2 id="reader-translation-title" className="text-[13px] font-bold text-muted-foreground">
+              <h2 id="reader-translation-title" className="text-[0.8125rem] font-bold text-muted-foreground">
                 {t(language, "reader.translationLabel")}
               </h2>
-              <p className="mt-1 text-[16px] leading-7 text-foreground" lang="en" dir="ltr">
+              <p className="mt-1 text-[1rem] leading-7 text-foreground" lang="en" dir="ltr">
                 {z.translation}
               </p>
             </section>
           )}
           {showTransliteration && (
             <section aria-labelledby="reader-transliteration-title">
-              <h2 id="reader-transliteration-title" className="text-[13px] font-bold text-muted-foreground">
+              <h2 id="reader-transliteration-title" className="text-[0.8125rem] font-bold text-muted-foreground">
                 {t(language, "reader.transliterationLabel")}
               </h2>
-              <p className="mt-1 text-[16px] leading-7 text-foreground" lang="en" dir="ltr">
+              <p className="mt-1 text-[1rem] leading-7 text-foreground" lang="en" dir="ltr">
                 {z.transliteration}
               </p>
             </section>
@@ -374,7 +377,7 @@ export function ReaderScreen({
               ) : (
                 <>
                   <p
-                    className="counter-number text-[28px] font-extrabold leading-9 text-foreground"
+                    className="counter-number text-[1.75rem] font-extrabold leading-9 text-foreground"
                     key={count}
                     dir="ltr"
                     style={{
@@ -385,7 +388,7 @@ export function ReaderScreen({
                     {localizedCount}
                   </p>
                   <p
-                    className="text-[14px] text-foreground"
+                    className="text-[0.875rem] text-foreground"
                     dir="ltr"
                     style={{
                       fontFamily: counterNumeralFontFamily(language),
@@ -400,7 +403,7 @@ export function ReaderScreen({
           </div>
 
           {!complete && (
-            <p className="mt-6 text-[18px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+            <p className="mt-6 text-[1.125rem] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           )}
         </div>
       </div>
@@ -460,7 +463,7 @@ export function ReaderScreen({
             <ArrowPrevious size={20} />
           </button>
 
-          <p className="truncate text-center text-[20px] font-bold text-foreground" dir="auto">
+          <p className="truncate text-center text-[1.25rem] font-bold text-foreground" dir="auto">
             {isArabic ? category.nameArabic : category.name}
           </p>
 
@@ -477,28 +480,28 @@ export function ReaderScreen({
             <DropdownMenuContent align="end" className="min-w-[200px] rounded-2xl p-2" sideOffset={8}>
               <DropdownMenuItem
                 onClick={handleReset}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
                 <RotateCcw size={18} />
                 {t(language, "reader.resetCounter")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={onBack}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
                 <List size={18} />
                 {t(language, "reader.viewAllAzkar")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => void handleShare()}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
                 <Share2 size={18} />
                 {t(language, "reader.share")}
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleToggleSaved}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[15px] font-medium transition-colors hover:bg-muted"
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
                 <Bookmark size={18} className={isSaved ? "fill-current" : ""} />
                 {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}

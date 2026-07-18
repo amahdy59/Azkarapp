@@ -25,7 +25,7 @@ export function SubHeader({
       >
         <ArrowPrevious size={24} className="text-foreground" />
       </button>
-      <h1 className="text-[18px] font-semibold text-foreground font-sans leading-[24px]">{title}</h1>
+      <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px]">{title}</h1>
       <div style={{ width: 44 }} className="flex justify-end items-center">
         {right}
       </div>
@@ -36,7 +36,7 @@ export function SubHeader({
 export function SectionLabel({ label }: { label: string }) {
   return (
     <div className="px-4 pt-6 pb-2">
-      <h2 className="text-[13px] font-semibold text-muted-foreground font-sans leading-[18px]">{label}</h2>
+      <h2 className="text-[0.8125rem] font-semibold text-muted-foreground font-sans leading-[18px]">{label}</h2>
     </div>
   );
 }
@@ -68,7 +68,7 @@ export function SettingsRowItem({
       >
         {icon}
       </div>
-      <p className={`flex-1 text-start text-[16px] font-semibold ${labelColor} font-sans`}>{label}</p>
+      <p className={`flex-1 text-start text-[1rem] font-semibold ${labelColor} font-sans`}>{label}</p>
       {right}
     </>
   );
@@ -100,7 +100,7 @@ export function RowChevron() {
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
   return (
     <div className="flex items-center gap-1.5">
-      <p className="text-[15px] text-foreground/90 font-sans">{value}</p>
+      <p className="text-[0.9375rem] text-foreground/90 font-sans">{value}</p>
       {withChevron && <RowChevron />}
     </div>
   );
@@ -131,6 +131,7 @@ export function SettingsToggleRow({
   icon,
   iconBg = "var(--muted)",
   label,
+  description,
   checked,
   onChange,
   hasDivider = true,
@@ -138,6 +139,7 @@ export function SettingsToggleRow({
   icon: React.ReactNode;
   iconBg?: string;
   label: string;
+  description?: string;
   checked: boolean;
   onChange: () => void;
   hasDivider?: boolean;
@@ -149,7 +151,7 @@ export function SettingsToggleRow({
         role="switch"
         aria-checked={checked}
         onClick={onChange}
-        className="flex h-[60px] w-full items-center gap-4 bg-card px-4 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="flex min-h-[60px] w-full items-center gap-4 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span
           aria-hidden="true"
@@ -158,7 +160,12 @@ export function SettingsToggleRow({
         >
           {icon}
         </span>
-        <span className="flex-1 font-sans text-[16px] font-semibold text-foreground">{label}</span>
+        <span className="min-w-0 flex-1">
+          <span className="block font-sans text-[1rem] font-semibold text-foreground">{label}</span>
+          {description && (
+            <span className="mt-1 block text-[0.75rem] leading-5 text-muted-foreground">{description}</span>
+          )}
+        </span>
         <ToggleTrack checked={checked} />
       </button>
       {hasDivider && (

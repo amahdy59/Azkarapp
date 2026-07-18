@@ -1,22 +1,31 @@
-import { Check, Home, Share2, Sparkles } from "../components/icons";
+import { useState } from "react";
+import { Check, Home, Share2 } from "../components/icons";
+import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
-import type { AppLanguage, CategoryId } from "../types";
+import { t } from "../i18n";
+import { getGardenSummary, type GrowthEvent } from "../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 export function CompletionScreen({
   catId,
   sessionStart,
-  currentStreak,
+  dailyCompletions,
+  growthEvent,
+  quietProgressEnabled,
+  progressDayStartHour,
   onHome,
   language,
   direction,
 }: {
   catId: CategoryId;
   sessionStart: number;
-  currentStreak: number;
+  dailyCompletions: DailyCollectionCompletion[];
+  growthEvent: GrowthEvent | null;
+  quietProgressEnabled: boolean;
+  progressDayStartHour: number;
   onHome: () => void;
-  onRepeat: () => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
 }) {
@@ -24,17 +33,39 @@ export function CompletionScreen({
   const azkarCount = getAzkarByCategory(catId).length;
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
   const isArabic = language === "ar";
+  const [shareStatus, setShareStatus] = useState("");
+  const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
   const stats = [
-    { value: elapsedMin, suffix: isArabic ? " دقائق" : " min", label: isArabic ? "المدة" : "Duration" },
-    { value: azkarCount, suffix: "", label: isArabic ? "الأذكار" : "Azkar" },
-    { value: 100, suffix: "%", label: isArabic ? "المعدل" : "Completion" },
-    { value: currentStreak, suffix: isArabic ? " أيام" : " days", label: isArabic ? "السلسلة" : "Streak" },
+    { value: elapsedMin, suffix: t(language, "completion.minutes"), label: t(language, "completion.duration") },
+    { value: azkarCount, suffix: "", label: t(language, "completion.azkar") },
+    { value: 100, suffix: "%", label: t(language, "completion.completion") },
+    ...(quietProgressEnabled
+      ? [
+          {
+            value: gardenSummary.activeDaysLast7,
+            suffix: t(language, "completion.daysOfSeven"),
+            label: t(language, "completion.activeDays"),
+          },
+        ]
+      : []),
   ];
 
   const share = async () => {
-    const text = isArabic ? `أتممت ${cat.nameArabic} — ما شاء الله!` : `I completed ${cat.name} — Masha’Allah!`;
-    if (navigator.share) await navigator.share({ title: "Azkar", text });
-    else await navigator.clipboard.writeText(text);
+    const text = t(language, "completion.shareText", { category: isArabic ? cat.nameArabic : cat.name });
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Azkar", text });
+        setShareStatus(t(language, "completion.shareSuccess"));
+      } else {
+        await navigator.clipboard.writeText(text);
+        setShareStatus(t(language, "completion.copySuccess"));
+      }
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        return;
+      }
+      setShareStatus(t(language, "completion.shareError"));
+    }
   };
 
   return (
@@ -42,8 +73,8 @@ export function CompletionScreen({
       className="completion-screen-enter flex h-full flex-col overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
       dir={direction}
     >
-      <p className="text-[13px] text-muted-foreground">
-        {isArabic ? `جلسة ${cat.nameArabic} مكتملة` : `${cat.name} session complete`}
+      <p className="text-[0.8125rem] text-muted-foreground">
+        {t(language, "completion.sessionComplete", { category: isArabic ? cat.nameArabic : cat.name })}
       </p>
 
       <div
@@ -51,37 +82,38 @@ export function CompletionScreen({
         aria-hidden="true"
       >
         <Check size={48} className="text-primary-foreground" strokeWidth={2} />
-        <Sparkles size={18} className="absolute -left-3 bottom-4 text-secondary" />
-        <Sparkles size={16} className="absolute -right-3 top-3 text-primary" />
       </div>
 
-      <h1 className="mt-8 text-[28px] font-extrabold leading-9 text-primary">
-        {isArabic ? "ما شاء الله!" : "Masha’Allah!"}
+      <h1 className="mt-8 text-[1.75rem] font-extrabold leading-9 text-primary">
+        {t(language, "completion.mashaAllah")}
       </h1>
-      <p className="mt-2 text-[17px] font-semibold text-card-foreground">
-        {isArabic ? `لقد أتممت ${cat.nameArabic}` : `You completed ${cat.name}`}
+      <p className="mt-2 text-[1.0625rem] font-semibold text-card-foreground">
+        {t(language, "completion.completed", { category: isArabic ? cat.nameArabic : cat.name })}
       </p>
-      <p className="mt-2 text-[13px] text-muted-foreground">
-        {isArabic ? "كل ذكر نور في قلبك" : "Every remembrance is a light in your heart"}
-      </p>
+      <p className="mt-2 text-[0.8125rem] text-muted-foreground">{t(language, "completion.reflection")}</p>
 
-      <section className="mt-8 grid grid-cols-2 gap-3" aria-label="Session summary">
+      {quietProgressEnabled && growthEvent && <GrowthEventStatus event={growthEvent} language={language} />}
+
+      <section className="mt-8 grid grid-cols-2 gap-3" aria-label={t(language, "completion.sessionSummary")}>
         {stats.map(({ value, suffix, label }, index) => (
           <article
             key={label}
-            className="summary-item-enter flex min-h-[94px] flex-col items-center justify-center rounded-2xl bg-card p-4"
+            className={`summary-item-enter flex min-h-[94px] flex-col items-center justify-center rounded-2xl bg-card p-4 ${!quietProgressEnabled && index === stats.length - 1 ? "col-span-2" : ""}`}
             style={{ animationDelay: `${180 + index * 55}ms` }}
           >
-            <p className="text-[25px] font-extrabold text-primary" style={{ fontFamily: numeralFontFamily(language) }}>
+            <p
+              className="text-[1.5625rem] font-extrabold text-primary"
+              style={{ fontFamily: numeralFontFamily(language) }}
+            >
               {formatNumerals(value, language)}
               {suffix}
             </p>
-            <p className="mt-1 text-[12px] text-muted-foreground">{label}</p>
+            <p className="mt-1 text-[0.75rem] text-muted-foreground">{label}</p>
           </article>
         ))}
       </section>
 
-      <p className="mt-auto pt-7 text-[11px] text-muted-foreground">
+      <p className="mt-auto pt-7 text-[0.6875rem] text-muted-foreground">
         {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en-US", { dateStyle: "long" }).format(new Date())}
       </p>
       <div className="mt-3 grid gap-3">
@@ -90,15 +122,20 @@ export function CompletionScreen({
           onClick={onHome}
           className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg bg-primary font-bold text-primary-foreground transition-transform duration-150 active:scale-[0.98]"
         >
-          <Home size={18} /> {isArabic ? "العودة للرئيسية" : "Return home"}
+          <Home size={18} /> {t(language, "completion.returnHome")}
         </button>
         <button
           type="button"
           onClick={() => void share()}
           className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-border bg-card font-bold text-foreground transition-transform duration-150 active:scale-[0.98]"
         >
-          <Share2 size={18} /> {isArabic ? "مشاركة التقدم" : "Share progress"}
+          <Share2 size={18} /> {t(language, "completion.share")}
         </button>
+        {shareStatus && (
+          <p className="text-[0.75rem] font-semibold text-muted-foreground" role="status" aria-live="polite">
+            {shareStatus}
+          </p>
+        )}
       </div>
     </div>
   );

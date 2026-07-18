@@ -20,6 +20,7 @@ describe("profileFromSession", () => {
   it("prefers a trimmed display name and the authenticated phone number", () => {
     const session = {
       user: {
+        id: "user-123",
         phone: "+966501234567",
         user_metadata: { display_name: "  Ahmed  " },
       },
@@ -29,6 +30,7 @@ describe("profileFromSession", () => {
       displayName: "Ahmed",
       lastPhoneNumber: "+966501234567",
       isGuest: false,
+      accountUserId: "user-123",
     });
   });
 

@@ -16,7 +16,7 @@ export function CategoryBadge({ catId, language = "en" }: { catId: CategoryId; l
 
   return (
     <div className={`flex items-center justify-center rounded-full px-2 py-1 shrink-0 ${cfg.className}`}>
-      <p className="text-[10px] font-medium font-sans leading-[14px] whitespace-nowrap">{cfg.label}</p>
+      <p className="text-[0.625rem] font-medium font-sans leading-[14px] whitespace-nowrap">{cfg.label}</p>
     </div>
   );
 }
@@ -77,7 +77,7 @@ export function SearchScreen({
             dir="auto"
             onChange={(e) => setQ(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && q.trim() && handleSubmit(q.trim())}
-            className="flex-1 bg-transparent focus:outline-none text-[14px] text-foreground font-sans leading-[22px]"
+            className="flex-1 bg-transparent focus:outline-none text-[0.875rem] text-foreground font-sans leading-[22px]"
           />
           {!q && <div className="shrink-0 rounded-sm w-[2px] h-[18px] bg-primary animate-pulse" />}
           {q && (
@@ -95,7 +95,7 @@ export function SearchScreen({
       <div className="flex-1 overflow-y-auto px-5">
         {!q && recents.length > 0 && (
           <div className="mb-6">
-            <p className="mb-3 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">
+            <p className="mb-3 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]">
               {isArabic ? "عمليات البحث الأخيرة" : "Recent searches"}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -103,7 +103,7 @@ export function SearchScreen({
                 <div key={term} className="flex items-center rounded-full bg-secondary text-secondary-foreground">
                   <button
                     onClick={() => setQ(term)}
-                    className="min-h-11 px-4 text-[13px] font-medium font-sans leading-[20px] text-start transition-all active:scale-95"
+                    className="min-h-11 px-4 text-[0.8125rem] font-medium font-sans leading-[20px] text-start transition-all active:scale-95"
                   >
                     {term}
                   </button>
@@ -126,7 +126,7 @@ export function SearchScreen({
         {q.trim().length >= 2 && (
           <div className="flex flex-col gap-2" aria-live="polite">
             {results.length > 0 && (
-              <p className="mb-1 text-[13px] text-muted-foreground font-semibold font-sans leading-[18px]">
+              <p className="mb-1 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]">
                 {isArabic
                   ? `${results.length} نتيجة للبحث عن «${q}»`
                   : `${results.length} result${results.length === 1 ? "" : "s"} for “${q}”`}
@@ -155,13 +155,13 @@ export function SearchScreen({
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
-                        className="w-full truncate text-start font-sans text-[17px] font-semibold leading-[24px] text-foreground"
+                        className="w-full truncate text-start font-sans text-[1.0625rem] font-semibold leading-[24px] text-foreground"
                         dir="auto"
                       >
                         {label}
                       </p>
                       <p
-                        className="w-full truncate text-left font-sans text-[14px] leading-[22px] text-muted-foreground"
+                        className="w-full truncate text-left font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
                         dir="ltr"
                         lang="en"
                       >
@@ -181,7 +181,7 @@ export function SearchScreen({
         {!q && (
           <div className="py-6 flex flex-col items-center gap-3">
             <div className="w-full h-px opacity-15 bg-muted-foreground" />
-            <p className="text-[12px] text-muted-foreground font-sans leading-[18px] text-center">
+            <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px] text-center">
               {isArabic
                 ? "ابحث بالعربية أو الإنجليزية أو بالتهجئة اللاتينية"
                 : "Try Arabic, English, or transliteration"}

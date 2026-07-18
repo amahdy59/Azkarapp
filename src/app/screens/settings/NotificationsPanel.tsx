@@ -5,7 +5,7 @@ import type { AppLanguage, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
 type BrowserNotificationPermission = NotificationPermission | "unsupported";
-type ReminderKind = "morning" | "evening";
+type ReminderKind = "morning" | "evening" | "before_sleep";
 
 function readNotificationPermission(): BrowserNotificationPermission {
   if (typeof window === "undefined" || !("Notification" in window)) {
@@ -52,8 +52,8 @@ function ReminderScheduleRow({
           <Bell size={19} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[15px] font-bold text-foreground">{label}</span>
-          <span className="mt-0.5 block text-[13px] text-muted-foreground">
+          <span className="block text-[0.9375rem] font-bold text-foreground">{label}</span>
+          <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
             {schedule.enabled ? t(language, "notifications.enabled") : t(language, "notifications.disabled")}
           </span>
         </span>
@@ -74,7 +74,7 @@ function ReminderScheduleRow({
         </button>
       </div>
       <label
-        className="mt-4 flex items-center justify-between gap-3 text-[14px] font-semibold text-foreground"
+        className="mt-4 flex items-center justify-between gap-3 text-[0.875rem] font-semibold text-foreground"
         htmlFor={`${kind}-reminder-time`}
       >
         <span>{label}</span>
@@ -84,7 +84,7 @@ function ReminderScheduleRow({
           value={schedule.time}
           disabled={!schedule.enabled}
           onChange={(event) => onTimeChange(event.target.value)}
-          className="h-11 rounded-xl border border-border bg-background px-3 text-[14px] font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-11 rounded-xl border border-border bg-background px-3 text-[0.875rem] font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           dir="ltr"
         />
       </label>
@@ -148,7 +148,7 @@ export function NotificationsPanel({
     updateSchedule(kind, { enabled: enabling });
   };
 
-  const anyReminderEnabled = reminders.morning.enabled || reminders.evening.enabled;
+  const anyReminderEnabled = reminders.morning.enabled || reminders.evening.enabled || reminders.before_sleep.enabled;
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
@@ -163,10 +163,10 @@ export function NotificationsPanel({
               <Info size={22} className="text-primary" />
             </span>
             <div>
-              <h2 id="notification-availability" className="text-[17px] font-semibold text-foreground">
+              <h2 id="notification-availability" className="text-[1.0625rem] font-semibold text-foreground">
                 {t(language, "notifications.availability")}
               </h2>
-              <p className="mt-1 text-[14px] leading-[22px] text-muted-foreground">
+              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
                 {t(language, "notifications.availabilityBody")}
               </p>
             </div>
@@ -186,10 +186,10 @@ export function NotificationsPanel({
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="notification-permission" className="text-[17px] font-semibold text-foreground">
+              <h2 id="notification-permission" className="text-[1.0625rem] font-semibold text-foreground">
                 {t(language, "notifications.permission")}
               </h2>
-              <p className="mt-1 text-[14px] leading-[22px] text-muted-foreground">
+              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
                 {permissionCopy(permission, language)}
               </p>
             </div>
@@ -209,7 +209,7 @@ export function NotificationsPanel({
           )}
 
           {hasRequestError && (
-            <p className="mt-3 text-[14px] text-destructive" role="alert">
+            <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
               {t(language, "notifications.permissionError")}
             </p>
           )}
@@ -217,15 +217,15 @@ export function NotificationsPanel({
 
         <section aria-labelledby="gentle-reminders-title">
           <div className="mb-3 px-1">
-            <h2 id="gentle-reminders-title" className="text-[17px] font-bold text-foreground">
+            <h2 id="gentle-reminders-title" className="text-[1.0625rem] font-bold text-foreground">
               {t(language, "notifications.scheduleTitle")}
             </h2>
-            <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+            <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
               {t(language, "notifications.scheduleHint")}
             </p>
           </div>
           <div className="space-y-3">
-            {(["morning", "evening"] as const).map((kind) => (
+            {(["morning", "evening", "before_sleep"] as const).map((kind) => (
               <ReminderScheduleRow
                 key={kind}
                 kind={kind}
@@ -236,7 +236,10 @@ export function NotificationsPanel({
               />
             ))}
           </div>
-          <div className="mt-3 flex min-h-11 items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start">
+          <label
+            htmlFor="only-when-incomplete"
+            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-within:ring-2 focus-within:ring-ring"
+          >
             <input
               id="only-when-incomplete"
               type="checkbox"
@@ -246,16 +249,19 @@ export function NotificationsPanel({
               className="mt-0.5 size-5 accent-primary"
             />
             <span>
-              <span className="block text-[14px] font-bold text-foreground">
+              <span className="block text-[0.875rem] font-bold text-foreground">
                 {t(language, "notifications.onlyIfIncomplete")}
               </span>
-              <span className="mt-1 block text-[13px] leading-5 text-muted-foreground">
+              <span className="mt-1 block text-[0.8125rem] leading-5 text-muted-foreground">
                 {t(language, "notifications.onlyIfIncompleteHint")}
               </span>
             </span>
-          </div>
+          </label>
           {anyReminderEnabled && permission === "granted" && (
-            <p className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-[13px] leading-5 text-foreground" role="status">
+            <p
+              className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-[0.8125rem] leading-5 text-foreground"
+              role="status"
+            >
               {t(language, "notifications.activeNotice")}
             </p>
           )}

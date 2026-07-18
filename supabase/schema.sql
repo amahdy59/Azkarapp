@@ -39,10 +39,22 @@ create table if not exists public.session_history (
 create index if not exists session_history_user_completed_idx
 on public.session_history (user_id, completed_at desc);
 
+-- Append-only, conflict-safe completion ledger used by the private routine garden.
+-- A row is a completed collection, not a spiritual score or rank.
+create table if not exists public.daily_collection_completions (
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  day_key date not null,
+  category text not null check (category in ('morning', 'evening', 'before_sleep')),
+  time_zone text not null default 'local',
+  created_at timestamptz not null default now(),
+  primary key (user_id, day_key, category)
+);
+
 alter table public.profiles enable row level security;
 alter table public.user_settings enable row level security;
 alter table public.user_progress enable row level security;
 alter table public.session_history enable row level security;
+alter table public.daily_collection_completions enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
@@ -85,6 +97,14 @@ with check ((select auth.uid()) = user_id);
 drop policy if exists "session_history_own_all" on public.session_history;
 create policy "session_history_own_all"
 on public.session_history
+for all
+to authenticated
+using ((select auth.uid()) = user_id)
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "daily_collection_completions_own_all" on public.daily_collection_completions;
+create policy "daily_collection_completions_own_all"
+on public.daily_collection_completions
 for all
 to authenticated
 using ((select auth.uid()) = user_id)

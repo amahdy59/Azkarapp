@@ -8,6 +8,13 @@ import type {
   StoredSession,
   ThemeMode,
 } from "./types";
+import {
+  DEFAULT_PROGRESS_DAY_START_HOUR,
+  deriveDailyCompletionsFromLegacySessions,
+  mergeDailyCompletions,
+  normalizeDailyCompletions,
+} from "./progress";
+import { getCategoryTotal } from "./content/azkar";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
@@ -32,14 +39,18 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     reminders: {
       morning: { enabled: false, time: "07:30" },
       evening: { enabled: false, time: "18:30" },
+      before_sleep: { enabled: false, time: "22:00" },
       onlyWhenIncomplete: true,
     },
     weeklyGoalDays: 4,
+    quietProgressEnabled: true,
+    progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
   },
   profile: {
     displayName: "Guest",
     lastPhoneNumber: "",
     isGuest: true,
+    accountUserId: "",
   },
   completed: {
     morning: [],
@@ -47,6 +58,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     before_sleep: [],
   },
   sessions: [],
+  dailyCompletions: [],
   savedZikrIds: [],
 };
 
@@ -64,6 +76,10 @@ function isArabicFont(value: string): value is ArabicFontOption {
 
 function isWeeklyGoalDays(value: unknown): value is number {
   return typeof value === "number" && [3, 4, 5, 7].includes(value);
+}
+
+function isProgressDayStartHour(value: unknown): value is number {
+  return typeof value === "number" && [0, 2, 4, 6].includes(value);
 }
 
 function isColorBlindSupport(value: string): value is ColorBlindSupport {
@@ -99,6 +115,13 @@ function normalizeReminders(
       typeof fallback?.evening?.enabled === "boolean" ? fallback.evening.enabled : defaultReminders.evening.enabled,
     time: isTime(fallback?.evening?.time) ? fallback.evening.time : defaultReminders.evening.time,
   };
+  const beforeSleepFallback = {
+    enabled:
+      typeof fallback?.before_sleep?.enabled === "boolean"
+        ? fallback.before_sleep.enabled
+        : defaultReminders.before_sleep.enabled,
+    time: isTime(fallback?.before_sleep?.time) ? fallback.before_sleep.time : defaultReminders.before_sleep.time,
+  };
   return {
     morning: {
       enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : morningFallback.enabled,
@@ -107,6 +130,13 @@ function normalizeReminders(
     evening: {
       enabled: typeof candidate?.evening?.enabled === "boolean" ? candidate.evening.enabled : eveningFallback.enabled,
       time: isTime(candidate?.evening?.time) ? candidate.evening.time : eveningFallback.time,
+    },
+    before_sleep: {
+      enabled:
+        typeof candidate?.before_sleep?.enabled === "boolean"
+          ? candidate.before_sleep.enabled
+          : beforeSleepFallback.enabled,
+      time: isTime(candidate?.before_sleep?.time) ? candidate.before_sleep.time : beforeSleepFallback.time,
     },
     onlyWhenIncomplete:
       typeof candidate?.onlyWhenIncomplete === "boolean"
@@ -125,6 +155,11 @@ function dedupeAndSort(values: unknown): number[] {
   return [...new Set(values.filter((value): value is number => Number.isInteger(value) && value >= 0))].sort(
     (a, b) => a - b,
   );
+}
+
+function normalizeCompletedIndexes(values: unknown, category: CategoryId) {
+  const total = getCategoryTotal(category);
+  return dedupeAndSort(values).filter((value) => value < total);
 }
 
 function dedupeSavedZikrIds(values: unknown): string[] {
@@ -169,6 +204,13 @@ function isStoredSession(value: unknown): value is StoredSession {
 export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[] = []): AppStateSnapshot {
   const parsed = value && typeof value === "object" ? (value as Partial<AppStateSnapshot>) : {};
   const settings = parsed.settings as Partial<AppStateSnapshot["settings"]> | undefined;
+  const progressDayStartHour = isProgressDayStartHour(settings?.progressDayStartHour)
+    ? settings.progressDayStartHour
+    : DEFAULT_APP_STATE.settings.progressDayStartHour;
+  const sessions = Array.isArray(parsed.sessions) ? parsed.sessions.filter(isStoredSession) : [];
+  const dailyCompletions = Array.isArray(parsed.dailyCompletions)
+    ? normalizeDailyCompletions(parsed.dailyCompletions)
+    : deriveDailyCompletionsFromLegacySessions(sessions, progressDayStartHour);
 
   return {
     settings: {
@@ -213,6 +255,11 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       weeklyGoalDays: isWeeklyGoalDays(settings?.weeklyGoalDays)
         ? settings.weeklyGoalDays
         : DEFAULT_APP_STATE.settings.weeklyGoalDays,
+      quietProgressEnabled:
+        typeof settings?.quietProgressEnabled === "boolean"
+          ? settings.quietProgressEnabled
+          : DEFAULT_APP_STATE.settings.quietProgressEnabled,
+      progressDayStartHour,
     },
     profile: {
       displayName:
@@ -225,13 +272,18 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           : DEFAULT_APP_STATE.profile.lastPhoneNumber,
       isGuest:
         typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
+      accountUserId:
+        typeof parsed.profile?.accountUserId === "string"
+          ? parsed.profile.accountUserId
+          : DEFAULT_APP_STATE.profile.accountUserId,
     },
     completed: {
-      morning: dedupeAndSort(parsed.completed?.morning),
-      evening: dedupeAndSort(parsed.completed?.evening),
-      before_sleep: dedupeAndSort(parsed.completed?.before_sleep),
+      morning: normalizeCompletedIndexes(parsed.completed?.morning, "morning"),
+      evening: normalizeCompletedIndexes(parsed.completed?.evening, "evening"),
+      before_sleep: normalizeCompletedIndexes(parsed.completed?.before_sleep, "before_sleep"),
     },
-    sessions: Array.isArray(parsed.sessions) ? parsed.sessions.filter(isStoredSession) : [],
+    sessions,
+    dailyCompletions,
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
@@ -366,12 +418,18 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
 export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStateSnapshot>): AppStateSnapshot {
   const safeBase = normalizeAppState(base);
   const completed = {
-    morning: dedupeAndSort([...(safeBase.completed.morning ?? []), ...(incoming.completed?.morning ?? [])]),
-    evening: dedupeAndSort([...(safeBase.completed.evening ?? []), ...(incoming.completed?.evening ?? [])]),
-    before_sleep: dedupeAndSort([
-      ...(safeBase.completed.before_sleep ?? []),
-      ...(incoming.completed?.before_sleep ?? []),
-    ]),
+    morning: normalizeCompletedIndexes(
+      [...(safeBase.completed.morning ?? []), ...(incoming.completed?.morning ?? [])],
+      "morning",
+    ),
+    evening: normalizeCompletedIndexes(
+      [...(safeBase.completed.evening ?? []), ...(incoming.completed?.evening ?? [])],
+      "evening",
+    ),
+    before_sleep: normalizeCompletedIndexes(
+      [...(safeBase.completed.before_sleep ?? []), ...(incoming.completed?.before_sleep ?? [])],
+      "before_sleep",
+    ),
   };
 
   const sessions = new Map<string, StoredSession>();
@@ -438,77 +496,48 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       weeklyGoalDays: isWeeklyGoalDays(incoming.settings?.weeklyGoalDays)
         ? incoming.settings.weeklyGoalDays
         : safeBase.settings.weeklyGoalDays,
+      quietProgressEnabled:
+        typeof incoming.settings?.quietProgressEnabled === "boolean"
+          ? incoming.settings.quietProgressEnabled
+          : safeBase.settings.quietProgressEnabled,
+      progressDayStartHour: isProgressDayStartHour(incoming.settings?.progressDayStartHour)
+        ? incoming.settings.progressDayStartHour
+        : safeBase.settings.progressDayStartHour,
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || safeBase.profile.displayName,
       lastPhoneNumber: incoming.profile?.lastPhoneNumber ?? safeBase.profile.lastPhoneNumber,
       isGuest: incoming.profile?.isGuest ?? safeBase.profile.isGuest,
+      accountUserId: incoming.profile?.accountUserId ?? safeBase.profile.accountUserId,
     },
     completed,
     sessions: [...sessions.values()].sort(
       (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
     ),
+    dailyCompletions: mergeDailyCompletions(
+      safeBase.dailyCompletions,
+      Array.isArray(incoming.dailyCompletions)
+        ? normalizeDailyCompletions(incoming.dailyCompletions)
+        : deriveDailyCompletionsFromLegacySessions(
+            incoming.sessions ?? [],
+            isProgressDayStartHour(incoming.settings?.progressDayStartHour)
+              ? incoming.settings.progressDayStartHour
+              : safeBase.settings.progressDayStartHour,
+          ),
+    ),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
   };
 }
 
-function startOfDay(date: Date) {
-  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
-}
-
-/**
- * Calculates current and longest session streaks based on user activity history.
- * A streak increments for consecutive days with at least one completed session.
- *
- * @param {StoredSession[]} sessions - The array of historical sessions.
- * @returns {{ currentStreak: number, longestStreak: number }} The streak summary statistics.
- */
-export function getStreakSummary(sessions: StoredSession[]) {
-  const completedDays = [
-    ...new Set(
-      sessions
-        .filter((session) => session.isComplete)
-        .map((session) => startOfDay(new Date(session.completedAt)).toISOString()),
-    ),
-  ]
-    .map((value) => new Date(value))
-    .sort((a, b) => b.getTime() - a.getTime());
-
-  let currentStreak = 0;
-  let longestStreak = 0;
-  let runLength = 0;
-
-  for (let index = 0; index < completedDays.length; index += 1) {
-    const completedDay = completedDays[index];
-    if (!completedDay) {
-      continue;
-    }
-
-    if (index === 0) {
-      runLength = 1;
-      const today = startOfDay(new Date());
-      const diffDays = Math.round((today.getTime() - completedDay.getTime()) / 86400000);
-      currentStreak = diffDays <= 1 ? 1 : 0;
-      longestStreak = 1;
-      continue;
-    }
-
-    const previousCompletedDay = completedDays[index - 1];
-    if (!previousCompletedDay) {
-      continue;
-    }
-
-    const diffDays = Math.round((previousCompletedDay.getTime() - completedDay.getTime()) / 86400000);
-    runLength = diffDays === 1 ? runLength + 1 : 1;
-    longestStreak = Math.max(longestStreak, runLength);
-
-    if (currentStreak === index && diffDays === 1) {
-      currentStreak += 1;
-    }
-  }
-
+/** Preserves device preferences while removing all private data owned by a guest or signed-in account. */
+export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
+  const safeState = normalizeAppState(state);
   return {
-    currentStreak,
-    longestStreak,
+    ...safeState,
+    profile: { ...DEFAULT_APP_STATE.profile },
+    completed: { morning: [], evening: [], before_sleep: [] },
+    sessions: [],
+    dailyCompletions: [],
+    savedZikrIds: [],
   };
 }

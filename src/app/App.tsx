@@ -1,8 +1,8 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   clearStoredAppData,
+  clearPrivateAppData,
   fromCompletedSets,
-  getStreakSummary,
   loadAppState,
   resetStoredSettings,
   saveAppState,
@@ -24,6 +24,7 @@ import type {
 import {
   loadRemoteState,
   normalizePhoneNumber,
+  profileFromSession,
   requestPhoneOtp,
   resendPhoneOtp,
   signOutSupabase,
@@ -71,6 +72,14 @@ import { LANGUAGE_LABELS } from "./languageOptions";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useForegroundReminders } from "./hooks/useForegroundReminders";
+import {
+  getNextIncompleteIndex,
+  getPalmStreakSummary,
+  millisecondsUntilNextProgressDay,
+  recordDailyCollectionCompletion,
+  resetStaleCompletedCollections,
+  type GrowthEvent,
+} from "./progress";
 
 const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
 const AzkarLibraryScreen = lazy(() =>
@@ -155,20 +164,20 @@ function PwaNotice({
 }) {
   return (
     <aside className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg" role="status" aria-live="polite">
-      <p className="text-[15px] font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-[13px] leading-5 text-muted-foreground">{body}</p>
+      <p className="text-[0.9375rem] font-bold text-foreground">{title}</p>
+      <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
       <div className="mt-3 flex justify-end gap-2">
         <button
           type="button"
           onClick={onDismiss}
-          className="min-h-11 rounded-xl px-3 text-[13px] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {dismissLabel}
         </button>
         <button
           type="button"
           onClick={onAction}
-          className="min-h-11 rounded-xl bg-primary px-4 text-[13px] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {actionLabel}
         </button>
@@ -209,12 +218,27 @@ export default function App() {
   );
   const [reminders, setReminders] = useState<ReminderSettings>(initialState.settings.reminders);
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
-  const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(toCompletedSets(initialState.completed));
+  const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
+  const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
+  const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
+  const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
+  const [isRepeatSession, setIsRepeatSession] = useState(false);
+  const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
+  const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(() =>
+    resetStaleCompletedCollections(
+      toCompletedSets(initialState.completed),
+      initialState.dailyCompletions,
+      new Date(),
+      initialState.settings.progressDayStartHour,
+    ),
+  );
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
   const [lastPhoneNumber, setLastPhoneNumber] = useState(initialState.profile.lastPhoneNumber);
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
+  const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
+  const [remoteSyncReady, setRemoteSyncReady] = useState(false);
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
@@ -229,7 +253,11 @@ export default function App() {
     }
   });
 
-  const { currentStreak, longestStreak } = getStreakSummary(sessions);
+  const { currentPalmRhythm: currentStreak, longestPalmRhythm: longestStreak } = getPalmStreakSummary(
+    dailyCompletions,
+    new Date(),
+    progressDayStartHour,
+  );
   const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
   const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
@@ -252,14 +280,18 @@ export default function App() {
         colorBlindSupport,
         reminders,
         weeklyGoalDays,
+        quietProgressEnabled,
+        progressDayStartHour,
       },
-      profile: { displayName, lastPhoneNumber, isGuest },
+      profile: { displayName, lastPhoneNumber, isGuest, accountUserId },
       completed: fromCompletedSets(completed),
       sessions,
+      dailyCompletions,
       savedZikrIds: [...savedZikrIds].sort(),
     }),
     [
       boldText,
+      accountUserId,
       arabicFont,
       colorBlindSupport,
       completed,
@@ -273,8 +305,11 @@ export default function App() {
       reduceMotion,
       reminders,
       weeklyGoalDays,
+      quietProgressEnabled,
+      progressDayStartHour,
       selectedLang,
       sessions,
+      dailyCompletions,
       savedZikrIds,
       showTranslation,
       showTransliteration,
@@ -311,18 +346,23 @@ export default function App() {
     setColorBlindSupport(state.settings.colorBlindSupport);
     setReminders(state.settings.reminders);
     setWeeklyGoalDays(state.settings.weeklyGoalDays);
+    setQuietProgressEnabled(state.settings.quietProgressEnabled);
+    setProgressDayStartHour(state.settings.progressDayStartHour);
     setDisplayName(state.profile.displayName);
     setLastPhoneNumber(state.profile.lastPhoneNumber);
     setIsGuest(state.profile.isGuest);
-    setCompleted(toCompletedSets(state.completed));
+    setAccountUserId(state.profile.accountUserId);
+    setDailyCompletions(state.dailyCompletions);
+    setCompleted(
+      resetStaleCompletedCollections(
+        toCompletedSets(state.completed),
+        state.dailyCompletions,
+        new Date(),
+        state.settings.progressDayStartHour,
+      ),
+    );
     setSessions(state.sessions);
     setSavedZikrIds(new Set(state.savedZikrIds));
-  }, []);
-
-  const applyAuthProfile = useCallback((profile: AppStateSnapshot["profile"]) => {
-    setDisplayName(profile.displayName);
-    setLastPhoneNumber(profile.lastPhoneNumber);
-    setIsGuest(profile.isGuest);
   }, []);
 
   const {
@@ -335,11 +375,47 @@ export default function App() {
     isGuest,
     currentStreak,
     longestStreak,
+    remoteSyncReady,
     onRemoteState: applyStateSnapshot,
-    onAuthProfile: applyAuthProfile,
+    onRemoteHydrationChange: setRemoteSyncReady,
   });
 
-  useForegroundReminders({ reminders, sessions, language: selectedLang });
+  useForegroundReminders({ reminders, dailyCompletions, progressDayStartHour, language: selectedLang });
+
+  const reconcileDailyProgress = useCallback(() => {
+    setCompleted((previous) =>
+      resetStaleCompletedCollections(previous, dailyCompletions, new Date(), progressDayStartHour),
+    );
+  }, [dailyCompletions, progressDayStartHour]);
+
+  useEffect(() => {
+    let timerId: number | undefined;
+
+    const scheduleNextBoundary = () => {
+      timerId = window.setTimeout(
+        () => {
+          reconcileDailyProgress();
+          scheduleNextBoundary();
+        },
+        millisecondsUntilNextProgressDay(new Date(), progressDayStartHour),
+      );
+    };
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        reconcileDailyProgress();
+      }
+    };
+
+    reconcileDailyProgress();
+    scheduleNextBoundary();
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      if (timerId !== undefined) {
+        window.clearTimeout(timerId);
+      }
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [progressDayStartHour, reconcileDailyProgress]);
 
   useEffect(() => {
     const handleUpdate = () => setUpdateAvailable(true);
@@ -380,7 +456,7 @@ export default function App() {
   );
 
   const handleResetCategory = (catId: CategoryId) => {
-    if (!window.confirm("Reset all progress for this category? This cannot be undone.")) {
+    if (!window.confirm(t(selectedLang, "category.resetConfirm"))) {
       return;
     }
     setCompleted((prev) => {
@@ -400,6 +476,8 @@ export default function App() {
   }, []);
 
   const openCategory = (catId: CategoryId) => {
+    setIsRepeatSession(false);
+    setRepeatCompleted(new Set());
     setActiveCat(catId);
     setActiveTab("azkar");
     setHistory([view]);
@@ -411,6 +489,18 @@ export default function App() {
     setActiveIdx(i);
     setSessionStart(Date.now());
     push("reader");
+  };
+
+  const repeatCategory = (catId: CategoryId) => {
+    setIsRepeatSession(true);
+    setRepeatCompleted(new Set());
+    openReader(catId, 0);
+  };
+
+  const leaveReader = () => {
+    setIsRepeatSession(false);
+    setRepeatCompleted(new Set());
+    pop();
   };
 
   useEffect(() => {
@@ -443,30 +533,64 @@ export default function App() {
   }, []);
 
   const markComplete = (idx: number) => {
-    setCompleted((prev) => {
-      const updated = new Set(prev[activeCat]);
-      updated.add(idx);
-      return { ...prev, [activeCat]: updated };
-    });
+    const azkar = getAzkarByCategory(activeCat);
+    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
+    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
+    effectiveProgress.add(idx);
+
+    if (isRepeatSession) {
+      setRepeatCompleted((previous) => new Set(previous).add(idx));
+    } else {
+      setCompleted((prev) => {
+        const updated = new Set(prev[activeCat]);
+        updated.add(idx);
+        return { ...prev, [activeCat]: updated };
+      });
+    }
+
+    if (
+      (!isRepeatSession && canonicalCollectionWasAlreadyComplete) ||
+      getNextIncompleteIndex(azkar.length, effectiveProgress, idx) !== null
+    ) {
+      return;
+    }
+
+    // Persist the completed collection before the cancellable auto-navigation delay.
+    const completedAt = new Date();
+    const growth = recordDailyCollectionCompletion(dailyCompletions, activeCat, completedAt, progressDayStartHour);
+    setDailyCompletions(growth.records);
+    setLastGrowthEvent(growth.event);
+    setSessions((prev) => [
+      {
+        id: `${activeCat}-${completedAt.getTime()}`,
+        category: activeCat,
+        completedAt: completedAt.toISOString(),
+        completedCount: azkar.length,
+        totalCount: azkar.length,
+        durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
+        isComplete: true,
+      },
+      ...prev,
+    ]);
   };
 
   const advanceAfterCompletion = (idx: number) => {
     const azkar = getAzkarByCategory(activeCat);
-    if (idx + 1 < azkar.length) {
-      setActiveIdx(idx + 1);
+    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
+    if (!isRepeatSession && canonicalCollectionWasAlreadyComplete) {
+      pop();
+      return;
+    }
+
+    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
+    effectiveProgress.add(idx);
+    const nextIncomplete = getNextIncompleteIndex(azkar.length, effectiveProgress, idx);
+
+    if (nextIncomplete !== null) {
+      setActiveIdx(nextIncomplete);
     } else {
-      setSessions((prev) => [
-        {
-          id: `${activeCat}-${Date.now()}`,
-          category: activeCat,
-          completedAt: new Date().toISOString(),
-          completedCount: azkar.length,
-          totalCount: azkar.length,
-          durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
-          isComplete: true,
-        },
-        ...prev,
-      ]);
+      setIsRepeatSession(false);
+      setRepeatCompleted(new Set());
       setView("completion");
       setHistory([]);
     }
@@ -493,7 +617,7 @@ export default function App() {
       setLastPhoneNumber(normalizedPhone);
       setView("otp");
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not send the verification code.");
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.sendCodeError"));
     } finally {
       setIsSendingOtp(false);
     }
@@ -503,19 +627,60 @@ export default function App() {
     try {
       setAuthError("");
       setIsVerifyingOtp(true);
+      setRemoteSyncReady(false);
       const session = await verifyPhoneOtp(lastPhoneNumber, token);
       if (!session) {
-        throw new Error("Could not verify the code.");
+        throw new Error(t(selectedLang, "auth.verifyCodeError"));
       }
 
-      const mergedState = await loadRemoteState(session, appStateSnapshot);
+      const privateGuestDataExists =
+        appStateSnapshot.sessions.length > 0 ||
+        appStateSnapshot.dailyCompletions.length > 0 ||
+        appStateSnapshot.savedZikrIds.length > 0 ||
+        Object.values(appStateSnapshot.completed).some((items) => items.length > 0);
+      const legacyIdentityMatches =
+        !appStateSnapshot.profile.accountUserId &&
+        !appStateSnapshot.profile.isGuest &&
+        Boolean(session.user.phone) &&
+        normalizePhoneNumber(appStateSnapshot.profile.lastPhoneNumber) ===
+          normalizePhoneNumber(session.user.phone ?? "");
+      let hydrationBase = appStateSnapshot;
+      if (appStateSnapshot.profile.accountUserId && appStateSnapshot.profile.accountUserId !== session.user.id) {
+        hydrationBase = clearPrivateAppData(appStateSnapshot);
+      } else if (
+        !appStateSnapshot.profile.accountUserId &&
+        !appStateSnapshot.profile.isGuest &&
+        !legacyIdentityMatches
+      ) {
+        hydrationBase = clearPrivateAppData(appStateSnapshot);
+      } else if (
+        !appStateSnapshot.profile.accountUserId &&
+        appStateSnapshot.profile.isGuest &&
+        privateGuestDataExists
+      ) {
+        const shouldMergeGuestProgress = window.confirm(t(selectedLang, "auth.mergeGuestProgress"));
+        if (!shouldMergeGuestProgress) {
+          hydrationBase = clearPrivateAppData(appStateSnapshot);
+        }
+      }
+
+      if (hydrationBase !== appStateSnapshot) {
+        hydrationBase = {
+          ...hydrationBase,
+          profile: profileFromSession(session, hydrationBase.profile.lastPhoneNumber),
+        };
+        applyStateSnapshot(hydrationBase);
+      }
+
+      const mergedState = await loadRemoteState(session, hydrationBase);
       applyStateSnapshot(mergedState);
+      setRemoteSyncReady(true);
       markOnboardingComplete();
       setView("home");
       setActiveTab("home");
       setHistory([]);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not verify the code.");
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -527,28 +692,28 @@ export default function App() {
       setIsResendingOtp(true);
       await resendPhoneOtp(lastPhoneNumber);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not resend the verification code.");
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.resendCodeError"));
     } finally {
       setIsResendingOtp(false);
     }
   };
 
   const handleSignOut = async () => {
-    if (!window.confirm("Sign out of your account on this device?")) {
+    if (!window.confirm(t(selectedLang, "auth.signOutConfirm"))) {
       return;
     }
     try {
       setAuthError("");
+      setRemoteSyncReady(false);
       if (isSupabaseConfigured) {
         await signOutSupabase();
       }
-      setDisplayName("Guest");
-      setIsGuest(true);
+      applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
       setView("login");
       setActiveTab("home");
       setHistory([]);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not sign out.");
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
     }
   };
 
@@ -606,7 +771,12 @@ export default function App() {
       <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
         <NetworkStatus />
         {isSupabaseConfigured && !isGuest && (
-          <SyncStatus isSyncing={isSyncingRemote} errorMessage={syncError} onRetry={retrySync} />
+          <SyncStatus
+            isSyncing={isSyncingRemote}
+            errorMessage={syncError}
+            onRetry={retrySync}
+            language={selectedLang}
+          />
         )}
 
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
@@ -704,8 +874,12 @@ export default function App() {
             {view === "home" && (
               <HomeScreen
                 completed={completed}
+                dailyCompletions={dailyCompletions}
+                quietProgressEnabled={quietProgressEnabled}
+                progressDayStartHour={progressDayStartHour}
                 onCategory={openCategory}
                 onResume={openReader}
+                onRepeat={repeatCategory}
                 language={selectedLang}
                 direction={layoutDirection}
               />
@@ -729,6 +903,7 @@ export default function App() {
                 direction={layoutDirection}
                 onZikr={(i) => openReader(activeCat, i)}
                 onReset={() => handleResetCategory(activeCat)}
+                onRepeat={() => repeatCategory(activeCat)}
                 onBack={pop}
               />
             )}
@@ -738,14 +913,17 @@ export default function App() {
                 idx={activeIdx}
                 isArabic={isArabic}
                 direction={layoutDirection}
-                isDone={completed[activeCat]?.has(activeIdx) ?? false}
+                isDone={
+                  isRepeatSession ? repeatCompleted.has(activeIdx) : (completed[activeCat]?.has(activeIdx) ?? false)
+                }
+                collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
                 hapticFeedback={hapticFeedback}
                 arabicFont={arabicFont}
                 showTranslation={showTranslation}
                 showTransliteration={showTransliteration}
                 textSize={textSize}
                 savedZikrIds={savedZikrIds}
-                onBack={pop}
+                onBack={leaveReader}
                 onComplete={markComplete}
                 onAdvance={advanceAfterCompletion}
                 onNext={() => {
@@ -761,12 +939,11 @@ export default function App() {
               <CompletionScreen
                 catId={activeCat}
                 sessionStart={sessionStart}
-                currentStreak={currentStreak}
+                dailyCompletions={dailyCompletions}
+                growthEvent={lastGrowthEvent}
+                quietProgressEnabled={quietProgressEnabled}
+                progressDayStartHour={progressDayStartHour}
                 onHome={goHome}
-                onRepeat={() => {
-                  setView("category");
-                  setHistory([]);
-                }}
                 language={selectedLang}
                 direction={layoutDirection}
               />
@@ -780,9 +957,8 @@ export default function App() {
                 isSyncing={isSyncingRemote}
                 syncError={syncError}
                 sessions={sessions}
+                dailyCompletions={dailyCompletions}
                 savedCount={savedZikrIds.size}
-                currentStreak={currentStreak}
-                longestStreak={longestStreak}
                 textSize={textSize}
                 arabicFont={arabicFont}
                 showTranslation={showTranslation}
@@ -795,6 +971,8 @@ export default function App() {
                 colorBlindSupport={colorBlindSupport}
                 reminders={reminders}
                 weeklyGoalDays={weeklyGoalDays}
+                quietProgressEnabled={quietProgressEnabled}
+                progressDayStartHour={progressDayStartHour}
                 direction={layoutDirection}
                 onLanguageChange={setSelectedLang}
                 onThemeModeChange={setThemeMode}
@@ -810,6 +988,8 @@ export default function App() {
                 onColorBlindSupportChange={setColorBlindSupport}
                 onRemindersChange={setReminders}
                 onWeeklyGoalDaysChange={setWeeklyGoalDays}
+                onQuietProgressEnabledChange={setQuietProgressEnabled}
+                onProgressDayStartHourChange={setProgressDayStartHour}
                 onActivateAccount={handleOpenAccountAuth}
                 onSignOut={handleSignOut}
                 onExportData={handleExportData}

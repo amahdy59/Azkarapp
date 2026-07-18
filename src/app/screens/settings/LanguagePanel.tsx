@@ -47,12 +47,12 @@ export function LanguagePanel({
                   )}
 
                   <span
-                    className="text-[12px] font-bold uppercase tracking-wider text-muted-foreground"
+                    className="text-[0.75rem] font-bold uppercase tracking-wider text-muted-foreground"
                     aria-hidden="true"
                   >
                     {item.code}
                   </span>
-                  <span className="font-sans text-[17px] font-semibold text-foreground">{item.native}</span>
+                  <span className="font-sans text-[1.0625rem] font-semibold text-foreground">{item.native}</span>
                 </div>
               </button>
             );

@@ -46,7 +46,7 @@ export function ThemeModeSelector({
             }`}
           >
             <Icon size={20} className={selected ? "text-primary" : "text-muted-foreground"} aria-hidden="true" />
-            <span className="text-[12px] font-semibold leading-4">{t(language, labelKey)}</span>
+            <span className="text-[0.75rem] font-semibold leading-4">{t(language, labelKey)}</span>
             {selected && (
               <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                 <Check size={14} strokeWidth={2.5} />

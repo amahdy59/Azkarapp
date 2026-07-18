@@ -15,6 +15,7 @@ export function CategoryScreen({
   direction,
   onZikr,
   onReset,
+  onRepeat,
   onBack,
 }: {
   catId: CategoryId;
@@ -23,6 +24,7 @@ export function CategoryScreen({
   direction: "ltr" | "rtl";
   onZikr: (i: number) => void;
   onReset: () => void;
+  onRepeat: () => void;
   onBack: () => void;
 }) {
   const azkar = getAzkarByCategory(catId);
@@ -49,9 +51,9 @@ export function CategoryScreen({
 
       <div className="shrink-0 border-b border-border px-5 py-4">
         <div className="mb-2 flex items-center justify-between">
-          <p className="text-[13px] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+          <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
           <p
-            className="text-[13px] font-bold text-muted-foreground"
+            className="text-[0.8125rem] font-bold text-muted-foreground"
             dir="auto"
             style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
           >
@@ -69,7 +71,7 @@ export function CategoryScreen({
         />
 
         <div className="mt-4 flex w-full gap-3">
-          {done > 0 && (
+          {done > 0 && done < azkar.length && (
             <button
               onClick={onReset}
               className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-destructive/40 bg-destructive/10 text-destructive transition-all hover:bg-destructive/15 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
@@ -81,22 +83,20 @@ export function CategoryScreen({
           {done < azkar.length ? (
             <button
               onClick={() => onZikr(Math.max(0, resumeIdx))}
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary text-[16px] font-bold text-primary-foreground shadow-sm transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary text-[1rem] font-bold text-primary-foreground shadow-sm transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ChevronNext size={20} />
               {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
             </button>
           ) : (
-            <div
-              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl"
-              style={{
-                background: "color-mix(in srgb, var(--primary) 15%, transparent)",
-                border: "1px solid color-mix(in srgb, var(--primary) 40%, transparent)",
-              }}
+            <button
+              type="button"
+              onClick={onRepeat}
+              className="flex h-14 flex-1 items-center justify-center gap-2 rounded-2xl border border-primary/40 bg-primary/10 text-primary transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
-              <Check size={20} className="text-primary" />
-              <span className="text-[16px] font-bold text-primary">{t(language, "category.sessionComplete")}</span>
-            </div>
+              <RotateCcw size={20} />
+              <span className="text-[1rem] font-bold">{t(language, "category.readAgain")}</span>
+            </button>
           )}
         </div>
       </div>
@@ -105,7 +105,7 @@ export function CategoryScreen({
         {completedAzkar.length > 0 && (
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[13px] font-bold text-muted-foreground">{t(language, "category.completed")}</h3>
+              <h3 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h3>
             </div>
             <div className="flex flex-col gap-3">
               {completedAzkar.map(({ z, index }) => {
@@ -122,7 +122,7 @@ export function CategoryScreen({
 
                     <div className="min-w-0 flex-1 opacity-70">
                       <p
-                        className="zikr-text truncate text-right text-[16px] font-medium leading-[26px] text-foreground"
+                        className="zikr-text truncate text-right text-[1rem] font-medium leading-[26px] text-foreground"
                         dir="rtl"
                       >
                         {z.arabicText.split("\n")[0]}
@@ -130,7 +130,7 @@ export function CategoryScreen({
                     </div>
 
                     <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/60 px-3 py-1.5 opacity-70">
-                      <span className="text-[13px] font-bold text-muted-foreground">x{countLabel}</span>
+                      <span className="text-[0.8125rem] font-bold text-muted-foreground">x{countLabel}</span>
                     </div>
                   </button>
                 );
@@ -142,7 +142,7 @@ export function CategoryScreen({
         {remainingAzkar.length > 0 && (
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[13px] font-bold text-muted-foreground">{t(language, "category.remaining")}</h3>
+              <h3 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h3>
             </div>
             <div className="flex flex-col gap-3">
               {remainingAzkar.map(({ z, index }) => {
@@ -160,7 +160,7 @@ export function CategoryScreen({
 
                     <div className="min-w-0 flex-1">
                       <p
-                        className="zikr-text truncate text-right text-[16px] font-medium leading-[26px] text-foreground"
+                        className="zikr-text truncate text-right text-[1rem] font-medium leading-[26px] text-foreground"
                         dir="rtl"
                       >
                         {z.arabicText.split("\n")[0]}
@@ -168,7 +168,7 @@ export function CategoryScreen({
                     </div>
 
                     <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/60 px-3 py-1.5">
-                      <span className="text-[13px] font-bold text-muted-foreground">x{countLabel}</span>
+                      <span className="text-[0.8125rem] font-bold text-muted-foreground">x{countLabel}</span>
                     </div>
                   </button>
                 );

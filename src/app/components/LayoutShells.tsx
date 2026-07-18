@@ -29,8 +29,8 @@ export function Header({
         </button>
       )}
       <div className="flex-1 min-w-0">
-        <h1 className="font-semibold truncate text-[17px] leading-6 text-foreground font-sans">{title}</h1>
-        {subtitle && <p className="text-[12px] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
+        <h1 className="font-semibold truncate text-[1.0625rem] leading-6 text-foreground font-sans">{title}</h1>
+        {subtitle && <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}
     </div>
@@ -72,7 +72,7 @@ export function BottomNav({
                 <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`font-sans text-[11px] font-semibold leading-[14px] ${on ? "text-primary" : "text-muted-foreground"}`}
+                className={`font-sans text-[0.6875rem] font-semibold leading-[14px] ${on ? "text-primary" : "text-muted-foreground"}`}
                 dir="auto"
               >
                 {label}

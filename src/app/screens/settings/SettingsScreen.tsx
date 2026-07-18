@@ -6,6 +6,7 @@ import type {
   AppLanguage,
   ArabicFontOption,
   ColorBlindSupport,
+  DailyCollectionCompletion,
   ReminderSettings,
   StoredSession,
   TextSizeOption,
@@ -34,9 +35,8 @@ interface SettingsScreenProps {
   isSyncing: boolean;
   syncError: string;
   sessions: StoredSession[];
+  dailyCompletions: DailyCollectionCompletion[];
   savedCount: number;
-  currentStreak: number;
-  longestStreak: number;
   textSize: TextSizeOption;
   arabicFont: ArabicFontOption;
   showTranslation: boolean;
@@ -49,6 +49,8 @@ interface SettingsScreenProps {
   colorBlindSupport: ColorBlindSupport;
   reminders: ReminderSettings;
   weeklyGoalDays: number;
+  quietProgressEnabled: boolean;
+  progressDayStartHour: number;
   direction: "ltr" | "rtl";
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
@@ -64,6 +66,8 @@ interface SettingsScreenProps {
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
   onRemindersChange: (value: ReminderSettings) => void;
   onWeeklyGoalDaysChange: (value: number) => void;
+  onQuietProgressEnabledChange: (value: boolean) => void;
+  onProgressDayStartHourChange: (value: number) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
@@ -80,9 +84,8 @@ export function SettingsScreen({
   isSyncing,
   syncError,
   sessions,
+  dailyCompletions,
   savedCount,
-  currentStreak,
-  longestStreak,
   textSize,
   arabicFont,
   showTranslation,
@@ -95,6 +98,8 @@ export function SettingsScreen({
   colorBlindSupport,
   reminders,
   weeklyGoalDays,
+  quietProgressEnabled,
+  progressDayStartHour,
   direction,
   onLanguageChange,
   onThemeModeChange,
@@ -110,6 +115,8 @@ export function SettingsScreen({
   onColorBlindSupportChange,
   onRemindersChange,
   onWeeklyGoalDaysChange,
+  onQuietProgressEnabledChange,
+  onProgressDayStartHourChange,
   onActivateAccount,
   onSignOut,
   onExportData,
@@ -137,6 +144,7 @@ export function SettingsScreen({
             isGuest={isGuest}
             isSyncing={isSyncing}
             syncError={syncError}
+            quietProgressEnabled={quietProgressEnabled}
           />
         </motion.div>
       )}
@@ -184,9 +192,12 @@ export function SettingsScreen({
           language={language}
           direction={direction}
           sessions={sessions}
-          currentStreak={currentStreak}
-          longestStreak={longestStreak}
+          dailyCompletions={dailyCompletions}
+          quietProgressEnabled={quietProgressEnabled}
+          progressDayStartHour={progressDayStartHour}
           weeklyGoalDays={weeklyGoalDays}
+          onQuietProgressEnabledChange={onQuietProgressEnabledChange}
+          onProgressDayStartHourChange={onProgressDayStartHourChange}
           onWeeklyGoalDaysChange={onWeeklyGoalDaysChange}
           onBack={goBack}
         />

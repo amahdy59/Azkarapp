@@ -137,10 +137,10 @@ export function CounterScreen({
           </button>
 
           <div className="text-center">
-            <p className="font-sans text-[13px] font-bold uppercase tracking-[0.08em] text-muted-foreground">
+            <p className="font-sans text-[0.8125rem] font-bold uppercase tracking-[0.08em] text-muted-foreground">
               {isArabic ? category?.nameArabic : category?.name}
             </p>
-            <p className="font-sans text-[15px] font-semibold text-card-foreground">
+            <p className="font-sans text-[0.9375rem] font-semibold text-card-foreground">
               {t(language, "reader.title", {
                 index: formatNumerals(idx + 1, language),
                 total: formatNumerals(azkar.length, language),
@@ -163,16 +163,19 @@ export function CounterScreen({
 
       <div className="shrink-0 px-6 pb-4">
         <div className="rounded-2xl border border-border bg-card px-4 py-4">
-          <p className="zikr-text text-center text-[18px] leading-[32px] text-foreground" style={{ direction: "rtl" }}>
+          <p
+            className="zikr-text text-center text-[1.125rem] leading-[32px] text-foreground"
+            style={{ direction: "rtl" }}
+          >
             {z.arabicText}
           </p>
           {showTransliteration && (
-            <p className="mt-3 text-center font-sans text-[13px] italic leading-[20px] text-muted-foreground">
+            <p className="mt-3 text-center font-sans text-[0.8125rem] italic leading-[20px] text-muted-foreground">
               {z.transliteration}
             </p>
           )}
           {showTranslation && (
-            <p className="mt-3 text-center font-sans text-[14px] leading-[22px] text-card-foreground">
+            <p className="mt-3 text-center font-sans text-[0.875rem] leading-[22px] text-card-foreground">
               {z.translation}
             </p>
           )}
@@ -206,14 +209,14 @@ export function CounterScreen({
             ) : (
               <>
                 <p
-                  className="text-[64px] font-extrabold leading-[64px] text-primary"
+                  className="text-[4rem] font-extrabold leading-[64px] text-primary"
                   dir="ltr"
                   style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
                 >
                   {localizedCount}
                 </p>
                 <p
-                  className="max-w-[220px] text-center text-[18px] font-semibold text-card-foreground"
+                  className="max-w-[220px] text-center text-[1.125rem] font-semibold text-card-foreground"
                   dir="ltr"
                   style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
                 >
@@ -225,17 +228,17 @@ export function CounterScreen({
         </div>
 
         {!complete && (
-          <p className="pointer-events-none z-10 mt-8 font-sans text-[12px] font-bold uppercase tracking-[0.12em] text-card-foreground">
+          <p className="pointer-events-none z-10 mt-8 font-sans text-[0.75rem] font-bold uppercase tracking-[0.12em] text-card-foreground">
             {t(language, "reader.tapAnywhere")}
           </p>
         )}
         {!complete && remaining <= 5 && remaining > 0 && (
-          <p className="pointer-events-none z-10 mt-2 font-sans text-[14px] font-semibold text-primary">
+          <p className="pointer-events-none z-10 mt-2 font-sans text-[0.875rem] font-semibold text-primary">
             {t(language, "reader.remaining", { count: localizedRemaining })}
           </p>
         )}
         {!complete && (
-          <p className="pointer-events-none absolute bottom-4 z-10 font-sans text-[12px] leading-[18px] text-muted-foreground">
+          <p className="pointer-events-none absolute bottom-4 z-10 font-sans text-[0.75rem] leading-[18px] text-muted-foreground">
             {t(language, "reader.holdToReset")}
           </p>
         )}
@@ -249,7 +252,9 @@ export function CounterScreen({
           className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <SkipBack size={16} className="text-card-foreground rtl:-scale-x-100" />
-          <span className="font-sans text-[14px] font-semibold text-card-foreground">{t(language, "reader.prev")}</span>
+          <span className="font-sans text-[0.875rem] font-semibold text-card-foreground">
+            {t(language, "reader.prev")}
+          </span>
         </button>
 
         <div className="flex gap-1.5" aria-hidden="true">
@@ -274,7 +279,9 @@ export function CounterScreen({
           aria-label="Next Zikr"
           className="flex items-center gap-2 rounded-xl border border-border bg-card px-4 py-3 transition-all active:scale-95 disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
-          <span className="font-sans text-[14px] font-semibold text-card-foreground">{t(language, "reader.next")}</span>
+          <span className="font-sans text-[0.875rem] font-semibold text-card-foreground">
+            {t(language, "reader.next")}
+          </span>
           <SkipForward size={16} className="text-card-foreground rtl:-scale-x-100" />
         </button>
       </div>

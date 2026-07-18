@@ -29,7 +29,7 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
         <BrandLockup />
         <div className="my-7 h-px w-20 bg-primary" />
         <p
-          className="text-[14px] font-medium uppercase tracking-[0.56px] text-muted-foreground"
+          className="text-[0.875rem] font-medium uppercase tracking-[0.56px] text-muted-foreground"
           style={arabic ? { fontFamily: "'IBM Plex Sans Arabic', sans-serif" } : undefined}
           dir={arabic ? "rtl" : "ltr"}
         >
@@ -46,7 +46,7 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
             transition={{ duration: reduceMotion ? 0 : 1.1, ease: "easeInOut" }}
           />
         </div>
-        <p className="text-[10px] font-medium text-muted-foreground">v2.0</p>
+        <p className="text-[0.625rem] font-medium text-muted-foreground">v2.0</p>
       </div>
     </div>
   );

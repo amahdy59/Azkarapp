@@ -39,11 +39,11 @@ export function AboutPanel({
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8">
           <CrescentMark size={36} />
           <div className="flex flex-col items-center gap-1.5">
-            <p className="font-sans text-[24px] font-bold text-foreground">Azkar</p>
-            <p className="latin-ui text-[14px] text-muted-foreground" lang="en" dir="ltr">
+            <p className="font-sans text-[1.5rem] font-bold text-foreground">Azkar</p>
+            <p className="latin-ui text-[0.875rem] text-muted-foreground" lang="en" dir="ltr">
               {t(language, "about.subtitle")}
             </p>
-            <p className="latin-ui text-[12px] text-muted-foreground opacity-60" lang="en" dir="ltr">
+            <p className="latin-ui text-[0.75rem] text-muted-foreground opacity-60" lang="en" dir="ltr">
               Version 2.0.1
             </p>
           </div>
@@ -139,8 +139,8 @@ function AboutRow({
     <>
       {icon}
       <div className="flex flex-1 flex-col items-start gap-0.5">
-        <p className="font-sans text-[15px] font-medium leading-[22px] text-foreground">{label}</p>
-        {sub && <p className="font-sans text-[14px] text-muted-foreground">{sub}</p>}
+        <p className="font-sans text-[0.9375rem] font-medium leading-[22px] text-foreground">{label}</p>
+        {sub && <p className="font-sans text-[0.875rem] text-muted-foreground">{sub}</p>}
       </div>
       {right}
     </>
@@ -187,7 +187,7 @@ function SupportRow({
         className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70"
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
-        <p className="flex-1 font-sans text-[15px] font-medium text-foreground">{label}</p>
+        <p className="flex-1 font-sans text-[0.9375rem] font-medium text-foreground">{label}</p>
         {right}
       </button>
       {hasDivider && (

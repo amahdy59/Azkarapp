@@ -22,6 +22,8 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`
 3. Apply [supabase/schema.sql](/C:/Users/AhmedMahdy/OneDrive%20-%20Advansys%20IS/Documents/Antigravity/Azkarapp/supabase/schema.sql) in your Supabase project
 
+Existing projects should also apply new files in `supabase/migrations/` in filename order. The routine-garden migration adds a conflict-safe, private completion ledger for cross-device sync.
+
 ## GitHub Pages
 
 1. Push the repo to `main`
@@ -32,10 +34,10 @@ Vite + React prototype for the Azkar app UI, now cleaned up for local persistenc
 
 ## Current state
 
-- User language, reading preferences, gentle-reminder schedule, guest/auth hints, progress, saved zikr, and sessions persist locally
+- User language, reading preferences, three routine reminders, quiet garden progress, saved zikr, and sessions persist locally
 - Supabase client scaffolding is available in [src/lib/supabase.ts](/C:/Users/AhmedMahdy/OneDrive%20-%20Advansys%20IS/Documents/Antigravity/Azkarapp/src/lib/supabase.ts)
 - Phone OTP auth is wired for Supabase using `signInWithOtp`, `verifyOtp`, and `resend`
-- Signed-in users sync profile, settings, saved zikr, progress, and session history to Supabase
+- Signed-in users sync profile, settings, saved zikr, session history, and idempotent collection completions to Supabase
 - Reader translation, pronunciation, Arabic font, and text preferences are available from Accessibility settings
 - Reminder controls request browser permission only after the user opts in; dependable reminders while the app is closed still require a backend push service
 - Installable PWA metadata, update prompts, and Morning/Evening/Before Sleep quick actions are included in production builds

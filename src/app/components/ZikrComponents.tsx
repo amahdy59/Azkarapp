@@ -5,7 +5,7 @@ import type { AppLanguage } from "../types";
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
     <span
-      className={`shrink-0 rounded-full border px-2.5 py-1 text-center text-[12px] font-bold leading-[14px] ${done ? "border-primary/40 bg-primary/20 text-primary" : "border-secondary/50 bg-secondary/25 text-secondary-foreground"}`}
+      className={`shrink-0 rounded-full border px-2.5 py-1 text-center text-[0.75rem] font-bold leading-[14px] ${done ? "border-primary/40 bg-primary/20 text-primary" : "border-secondary/50 bg-secondary/25 text-secondary-foreground"}`}
       style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
     >
       x{label}

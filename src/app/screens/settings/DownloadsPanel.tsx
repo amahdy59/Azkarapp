@@ -65,10 +65,10 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               <CloudOff size={22} className="text-primary" />
             </span>
             <div>
-              <h2 id="offline-content-title" className="text-[17px] font-semibold text-foreground">
+              <h2 id="offline-content-title" className="text-[1.0625rem] font-semibold text-foreground">
                 {t(language, "downloads.bundledTitle")}
               </h2>
-              <p className="mt-1 text-[14px] leading-[22px] text-muted-foreground">
+              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
                 {t(language, "downloads.bundledBody")}
               </p>
             </div>
@@ -88,15 +88,15 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="offline-status-title" className="text-[17px] font-semibold text-foreground">
+              <h2 id="offline-status-title" className="text-[1.0625rem] font-semibold text-foreground">
                 {t(language, "downloads.statusTitle")}
               </h2>
               {isLoading ? (
-                <p className="mt-1 text-[14px] text-muted-foreground" role="status">
+                <p className="mt-1 text-[0.875rem] text-muted-foreground" role="status">
                   {t(language, "downloads.checking")}
                 </p>
               ) : status ? (
-                <dl className="mt-2 space-y-2 text-[14px]">
+                <dl className="mt-2 space-y-2 text-[0.875rem]">
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted-foreground">{t(language, "downloads.serviceWorker")}</dt>
                     <dd className="font-medium text-foreground">
@@ -131,7 +131,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           </button>
 
           {errorMessage && (
-            <p className="mt-3 text-[14px] text-destructive" role="alert">
+            <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
               {errorMessage || t(language, "downloads.statusError")}
             </p>
           )}

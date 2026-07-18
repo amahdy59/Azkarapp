@@ -2,11 +2,13 @@ import { Fragment } from "react";
 import { ChevronNext } from "../components/icons";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
+import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import type { AppLanguage, CategoryId } from "../types";
+import { getGardenSummary } from "../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
 
@@ -65,14 +67,22 @@ export function getHomeAction(completed: Record<CategoryId, Set<number>>, now: D
 
 export function HomeScreen({
   completed,
+  dailyCompletions,
+  quietProgressEnabled,
+  progressDayStartHour,
   onCategory,
   onResume,
+  onRepeat,
   language,
   direction,
 }: {
   completed: Record<CategoryId, Set<number>>;
+  dailyCompletions: DailyCollectionCompletion[];
+  quietProgressEnabled: boolean;
+  progressDayStartHour: number;
   onCategory: (category: CategoryId) => void;
   onResume: (category: CategoryId, index: number) => void;
+  onRepeat: (category: CategoryId) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
 }) {
@@ -81,22 +91,25 @@ export function HomeScreen({
   const actionCategory = CATEGORIES.find((category) => category.id === action.categoryId)!;
   const actionName = isArabic ? actionCategory.nameArabic : actionCategory.name;
   const actionLabel = t(language, `home.${action.kind}Action`, { category: actionName });
+  const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
 
   return (
     <div className="flex h-full flex-col bg-background" dir={direction}>
       <header className="flex h-14 shrink-0 items-center px-5">
-        <h1 className="text-[18px] font-bold text-foreground">{t(language, "home.title")}</h1>
+        <h1 className="text-[1.125rem] font-bold text-foreground">{t(language, "home.title")}</h1>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5">
         <section aria-labelledby="next-azkar-heading" className="mb-6">
-          <p id="next-azkar-heading" className="mb-2 text-[13px] font-semibold text-muted-foreground">
+          <p id="next-azkar-heading" className="mb-2 text-[0.8125rem] font-semibold text-muted-foreground">
             {t(language, "home.nextUp")}
           </p>
           <button
             type="button"
             data-testid="home-primary-cta"
-            onClick={() => onResume(action.categoryId, action.index)}
+            onClick={() =>
+              action.kind === "again" ? onRepeat(action.categoryId) : onResume(action.categoryId, action.index)
+            }
             className="flex min-h-[126px] w-full items-center gap-4 rounded-[22px] border border-primary/35 bg-primary/10 p-5 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             aria-label={`${actionLabel}. ${formatNumerals(action.completedCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(action.totalCount, language)} ${t(language, "home.complete")}`}
           >
@@ -107,8 +120,8 @@ export function HomeScreen({
               <CatIcon type={actionCategory.icon} size={30} color="currentColor" />
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block text-[18px] font-extrabold text-foreground">{actionLabel}</span>
-              <span className="mt-1 block text-[14px] text-muted-foreground">{actionName}</span>
+              <span className="block text-[1.125rem] font-extrabold text-foreground">{actionLabel}</span>
+              <span className="mt-1 block text-[0.875rem] text-muted-foreground">{actionName}</span>
               <span className="mt-3 block">
                 <ProgressBar
                   value={action.completedCount}
@@ -118,7 +131,7 @@ export function HomeScreen({
                   direction={direction}
                   aria-label={isArabic ? `تقدم ${actionName}` : `${actionName} progress`}
                 />
-                <span className="mt-2 block text-[12px] font-semibold text-muted-foreground">
+                <span className="mt-2 block text-[0.75rem] font-semibold text-muted-foreground">
                   {formatNumerals(action.completedCount, language)} {isArabic ? "من" : "of"}{" "}
                   {formatNumerals(action.totalCount, language)} {t(language, "home.complete")}
                 </span>
@@ -128,8 +141,10 @@ export function HomeScreen({
           </button>
         </section>
 
+        {quietProgressEnabled && <TodayRoutineGarden summary={gardenSummary} language={language} />}
+
         <section aria-labelledby="collections-heading">
-          <h2 id="collections-heading" className="mb-3 text-[15px] font-bold text-foreground">
+          <h2 id="collections-heading" className="mb-3 text-[0.9375rem] font-bold text-foreground">
             {t(language, "home.collections")}
           </h2>
           <div className="space-y-3">
@@ -161,11 +176,11 @@ export function HomeScreen({
 
                     <span data-slot="category-copy" className="flex min-w-0 flex-1 flex-col justify-center gap-3">
                       <span className="flex items-center justify-between gap-2">
-                        <span className="text-[18px] font-bold text-foreground">
+                        <span className="text-[1.125rem] font-bold text-foreground">
                           {isArabic ? category.nameArabic : category.name}
                         </span>
                         <span
-                          className="whitespace-nowrap text-[13px] font-medium text-muted-foreground"
+                          className="whitespace-nowrap text-[0.8125rem] font-medium text-muted-foreground"
                           dir={isArabic ? "rtl" : "ltr"}
                         >
                           {formatNumerals(done, language)} {isArabic ? "من" : "of"}{" "}

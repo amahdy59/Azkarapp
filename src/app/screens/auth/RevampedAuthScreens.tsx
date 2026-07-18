@@ -13,7 +13,7 @@ function LegalConsent({ language, compact = false }: { language: AppLanguage; co
   const ar = language === "ar";
   if (!termsUrl || !privacyUrl) {
     return (
-      <p className={`text-center text-muted-foreground ${compact ? "text-[10px]" : "text-[11px] leading-4"}`}>
+      <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
         {ar
           ? "سيُتاح تسجيل الدخول بعد نشر شروط الخدمة وسياسة الخصوصية."
           : "Account sign-in will open after the Terms and Privacy Policy are published."}
@@ -22,7 +22,7 @@ function LegalConsent({ language, compact = false }: { language: AppLanguage; co
   }
 
   return (
-    <p className={`text-center text-muted-foreground ${compact ? "text-[10px]" : "text-[11px] leading-4"}`}>
+    <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
       {ar ? "بالمتابعة، أنت توافق على " : "By continuing you agree to our "}
       <a
         className="font-semibold text-primary underline underline-offset-2"
@@ -66,15 +66,17 @@ export function LoginScreen({
       <div className="flex flex-col items-center gap-7">
         <BrandLockup compact />
         <div className="text-center">
-          <h1 className="text-[28px] font-extrabold leading-9 tracking-[-0.28px] text-foreground">
+          <h1 className="text-[1.75rem] font-extrabold leading-9 tracking-[-0.28px] text-foreground">
             {t(language, "auth.welcome")}
           </h1>
-          <p className="mt-2 text-[14px] leading-[22px] text-muted-foreground">{t(language, "auth.syncSubtitle")}</p>
+          <p className="mt-2 text-[0.875rem] leading-[22px] text-muted-foreground">
+            {t(language, "auth.syncSubtitle")}
+          </p>
         </div>
         <div className="flex w-full flex-col gap-3">
           <div className="flex w-full items-center gap-4">
             <span className="h-px flex-1 bg-card" />
-            <span className="text-[12px] font-semibold uppercase text-muted-foreground/60">
+            <span className="text-[0.75rem] font-semibold uppercase text-muted-foreground/60">
               {t(language, "auth.or")}
             </span>
             <span className="h-px flex-1 bg-card" />
@@ -83,12 +85,12 @@ export function LoginScreen({
             <button
               onClick={accountAuthEnabled ? onPhone : undefined}
               disabled={!accountAuthEnabled}
-              className="min-h-11 text-[15px] font-semibold text-primary disabled:cursor-not-allowed disabled:text-muted-foreground"
+              className="min-h-11 text-[0.9375rem] font-semibold text-primary disabled:cursor-not-allowed disabled:text-muted-foreground"
             >
               {ar ? "المتابعة باستخدام رقم الهاتف" : "Continue with Phone Number"}
             </button>
             {!accountAuthEnabled && (
-              <p className="text-center text-[11px] leading-4 text-muted-foreground">
+              <p className="text-center text-[0.6875rem] leading-4 text-muted-foreground">
                 {ar
                   ? "تسجيل الدخول غير متاح حاليًا؛ يمكنك المتابعة كزائر."
                   : "Sign-in is not available yet. You can continue as a guest."}
@@ -102,7 +104,7 @@ export function LoginScreen({
         <button
           data-testid="continue-as-guest"
           onClick={onGuest}
-          className="h-12 w-full rounded-xl bg-secondary text-[15px] font-semibold text-secondary-foreground transition-transform active:scale-[0.98]"
+          className="h-12 w-full rounded-xl bg-secondary text-[0.9375rem] font-semibold text-secondary-foreground transition-transform active:scale-[0.98]"
         >
           {t(language, "auth.continueAsGuest")}
         </button>
@@ -142,23 +144,23 @@ export function PhoneInputScreen({
         >
           <ArrowPrevious size={24} className="text-foreground" />
         </button>
-        <p className="text-[17px] font-semibold text-foreground">{t(language, "auth.signIn")}</p>
+        <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.signIn")}</p>
         <button
           onClick={onSkip}
-          className="min-h-11 justify-self-end px-2 text-[15px] font-medium text-muted-foreground"
+          className="min-h-11 justify-self-end px-2 text-[0.9375rem] font-medium text-muted-foreground"
         >
           {t(language, "auth.skip")}
         </button>
       </header>
       <div className="flex flex-col gap-8 px-6 pt-6">
         <div>
-          <h1 className="text-[24px] font-extrabold leading-8 text-foreground">{t(language, "auth.enterNumber")}</h1>
-          <p className="mt-2 text-[14px] leading-5 text-muted-foreground">{t(language, "auth.phoneHelp")}</p>
+          <h1 className="text-[1.5rem] font-extrabold leading-8 text-foreground">{t(language, "auth.enterNumber")}</h1>
+          <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">{t(language, "auth.phoneHelp")}</p>
         </div>
         <div className="flex h-[60px] items-center gap-3 rounded-2xl border-[1.5px] border-primary bg-card px-3 focus-within:ring-2 focus-within:ring-ring">
           <button
             type="button"
-            className="flex items-center gap-1 rounded-lg border border-secondary px-2 py-1.5 text-[15px] text-foreground"
+            className="flex items-center gap-1 rounded-lg border border-secondary px-2 py-1.5 text-[0.9375rem] text-foreground"
             aria-label="Country code Saudi Arabia plus 966"
           >
             <span>🇸🇦 +966</span>
@@ -169,7 +171,7 @@ export function PhoneInputScreen({
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
             placeholder="50 123 4567"
-            className="min-w-0 flex-1 bg-transparent text-[18px] font-semibold text-foreground outline-none"
+            className="min-w-0 flex-1 bg-transparent text-[1.125rem] font-semibold text-foreground outline-none"
             inputMode="tel"
             autoComplete="tel"
             dir="ltr"
@@ -177,10 +179,10 @@ export function PhoneInputScreen({
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
           <Globe size={15} />
-          <p className="text-[12px]">{t(language, "auth.countriesSupported")}</p>
+          <p className="text-[0.75rem]">{t(language, "auth.countriesSupported")}</p>
         </div>
         {errorMessage && (
-          <p className="text-[12px] text-destructive" role="alert">
+          <p className="text-[0.75rem] text-destructive" role="alert">
             {errorMessage}
           </p>
         )}
@@ -190,7 +192,7 @@ export function PhoneInputScreen({
         <button
           onClick={canSend && !isSending ? () => onSend(phone.trim()) : undefined}
           disabled={!canSend || isSending}
-          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[16px] font-bold text-primary-foreground disabled:opacity-45"
+          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[1rem] font-bold text-primary-foreground disabled:opacity-45"
         >
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
@@ -241,12 +243,12 @@ export function OTPScreen({
         >
           <ArrowPrevious size={24} className="text-foreground" />
         </button>
-        <p className="text-[17px] font-semibold text-foreground">{t(language, "auth.verifyNumber")}</p>
+        <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.verifyNumber")}</p>
         <span />
       </header>
       <div className="flex flex-col gap-8 px-6 pt-5">
         <div className="flex flex-col gap-3">
-          <p className="text-[14px] leading-[22px] text-muted-foreground">
+          <p className="text-[0.875rem] leading-[22px] text-muted-foreground">
             {t(language, "auth.codeSentTo")}{" "}
             <strong className="text-foreground" dir="ltr">
               {maskedPhone || "+966 ••• ••• 789"}
@@ -254,7 +256,7 @@ export function OTPScreen({
           </p>
           <div className="flex items-center gap-1.5 text-primary">
             <Clock size={15} />
-            <p className="text-[14px] font-semibold">
+            <p className="text-[0.875rem] font-semibold">
               {t(language, "auth.codeExpiresIn")} {minutes}:{seconds}
             </p>
           </div>
@@ -273,17 +275,17 @@ export function OTPScreen({
               <InputOTPSlot
                 key={index}
                 index={index}
-                className="h-[60px] w-[50px] rounded-xl border border-card bg-card text-[22px] font-semibold text-foreground first:rounded-xl first:border-l last:rounded-xl data-[active=true]:border-2 data-[active=true]:border-primary data-[active=true]:ring-0"
+                className="h-[60px] w-[50px] rounded-xl border border-card bg-card text-[1.375rem] font-semibold text-foreground first:rounded-xl first:border-l last:rounded-xl data-[active=true]:border-2 data-[active=true]:border-primary data-[active=true]:ring-0"
               />
             ))}
           </InputOTPGroup>
         </InputOTP>
         {errorMessage && (
-          <p className="text-center text-[12px] text-destructive" role="alert">
+          <p className="text-center text-[0.75rem] text-destructive" role="alert">
             {errorMessage}
           </p>
         )}
-        <p className="text-center text-[14px] text-muted-foreground">
+        <p className="text-center text-[0.875rem] text-muted-foreground">
           {t(language, "auth.didntReceive")}{" "}
           {countdown === 0 ? (
             <button
@@ -306,11 +308,11 @@ export function OTPScreen({
         <button
           onClick={complete && !isVerifying ? () => onVerify(token) : undefined}
           disabled={!complete || isVerifying}
-          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[16px] font-bold text-primary-foreground disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
+          className="h-[52px] w-full rounded-2xl border-2 border-primary/20 bg-primary text-[1rem] font-bold text-primary-foreground disabled:border-border disabled:bg-muted disabled:text-muted-foreground"
         >
           {isVerifying ? t(language, "common.verifying") : t(language, "common.verify")}
         </button>
-        <button onClick={onDifferent} className="min-h-11 px-3 text-[15px] font-semibold text-primary">
+        <button onClick={onDifferent} className="min-h-11 px-3 text-[0.9375rem] font-semibold text-primary">
           {t(language, "auth.tryDifferentNumber")}
         </button>
       </div>

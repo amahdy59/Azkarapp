@@ -33,12 +33,12 @@ export function AzkarLibraryScreen({
   return (
     <div className="flex h-full flex-col bg-background" dir={direction}>
       <header className="shrink-0 px-5 pb-4 pt-3">
-        <h1 className="text-[24px] font-extrabold text-foreground">{t(language, "library.title")}</h1>
-        <p className="mt-1 text-[13px] text-muted-foreground">{t(language, "library.subtitle")}</p>
+        <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>
+        <p className="mt-1 text-[0.8125rem] text-muted-foreground">{t(language, "library.subtitle")}</p>
         <button
           type="button"
           onClick={onSearch}
-          className="mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-start text-[14px] text-muted-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-start text-[0.875rem] text-muted-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={t(language, "library.search")}
         >
           <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
@@ -56,7 +56,7 @@ export function AzkarLibraryScreen({
               role="tab"
               aria-selected={section === value}
               onClick={() => setSection(value)}
-              className={`min-h-11 rounded-xl px-3 text-[13px] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 section === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               }`}
             >
@@ -93,10 +93,10 @@ export function AzkarLibraryScreen({
                       <CatIcon type={category.icon} size={24} color="var(--primary)" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[16px] font-bold text-foreground">
+                      <span className="block text-[1rem] font-bold text-foreground">
                         {isArabic ? category.nameArabic : category.name}
                       </span>
-                      <span className="mt-1 block text-[13px] text-muted-foreground">
+                      <span className="mt-1 block text-[0.8125rem] text-muted-foreground">
                         {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(total, language)}{" "}
                         {t(language, "library.complete")}
                       </span>
@@ -106,13 +106,13 @@ export function AzkarLibraryScreen({
                 );
               })}
             </div>
-            <p className="px-4 pt-5 text-center text-[12px] leading-5 text-muted-foreground">
+            <p className="px-4 pt-5 text-center text-[0.75rem] leading-5 text-muted-foreground">
               {t(language, "library.reviewNotice")}
             </p>
           </>
         ) : savedAzkar.length > 0 ? (
           <section aria-labelledby="saved-zikr-heading">
-            <h2 id="saved-zikr-heading" className="mb-3 text-[15px] font-bold text-foreground">
+            <h2 id="saved-zikr-heading" className="mb-3 text-[0.9375rem] font-bold text-foreground">
               {t(language, "library.savedTitle")}
             </h2>
             <div className="space-y-3">
@@ -133,18 +133,18 @@ export function AzkarLibraryScreen({
                       <Bookmark size={19} className="fill-current" />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[12px] font-semibold text-primary">
+                      <span className="block text-[0.75rem] font-semibold text-primary">
                         {isArabic ? category.nameArabic : category.name}
                       </span>
                       <span
-                        className="mt-1 line-clamp-2 block text-[15px] font-semibold leading-6 text-foreground"
+                        className="mt-1 line-clamp-2 block text-[0.9375rem] font-semibold leading-6 text-foreground"
                         dir="rtl"
                         lang="ar"
                       >
                         {zikr.arabicText}
                       </span>
                       <span
-                        className="mt-1 line-clamp-2 block text-left text-[13px] leading-5 text-muted-foreground"
+                        className="mt-1 line-clamp-2 block text-left text-[0.8125rem] leading-5 text-muted-foreground"
                         dir="ltr"
                         lang="en"
                       >
@@ -167,14 +167,16 @@ export function AzkarLibraryScreen({
             >
               <Bookmark size={22} />
             </span>
-            <h2 id="saved-empty-heading" className="mt-4 text-[17px] font-bold text-foreground">
+            <h2 id="saved-empty-heading" className="mt-4 text-[1.0625rem] font-bold text-foreground">
               {t(language, "library.savedEmptyTitle")}
             </h2>
-            <p className="mt-2 text-[14px] leading-6 text-muted-foreground">{t(language, "library.savedEmptyBody")}</p>
+            <p className="mt-2 text-[0.875rem] leading-6 text-muted-foreground">
+              {t(language, "library.savedEmptyBody")}
+            </p>
             <button
               type="button"
               onClick={() => setSection("collections")}
-              className="mt-5 min-h-11 rounded-xl bg-primary px-4 text-[14px] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="mt-5 min-h-11 rounded-xl bg-primary px-4 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               {t(language, "library.browseCollections")}
             </button>

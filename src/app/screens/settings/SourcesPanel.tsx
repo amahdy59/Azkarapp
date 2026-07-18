@@ -38,8 +38,10 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
               <MessageChat size={20} aria-hidden="true" />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-[15px] font-semibold text-foreground">{t(language, "sources.correctionTitle")}</h2>
-              <p className="mt-1 text-[13px] leading-5 text-muted-foreground">
+              <h2 className="text-[0.9375rem] font-semibold text-foreground">
+                {t(language, "sources.correctionTitle")}
+              </h2>
+              <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
                 {t(language, "sources.correctionBody")}
               </p>
             </div>
@@ -47,7 +49,7 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           <button
             type="button"
             onClick={() => window.open(CORRECTION_URL, "_blank", "noopener,noreferrer")}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[13px] font-semibold text-primary-foreground"
+            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[0.8125rem] font-semibold text-primary-foreground"
           >
             {t(language, "sources.reportCorrection")}
             <ExternalLink size={16} aria-hidden="true" />

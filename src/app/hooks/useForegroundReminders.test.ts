@@ -20,18 +20,39 @@ describe("getDueReminder", () => {
       morning: { enabled: true, time: "07:30" },
       onlyWhenIncomplete: true,
     };
-    const sessions = [
+    const dailyCompletions = [
       {
-        id: "morning-1",
         category: "morning" as const,
-        completedAt: new Date(2026, 6, 17, 6, 45).toISOString(),
-        completedCount: 26,
-        totalCount: 26,
-        durationSeconds: 120,
-        isComplete: true,
+        dayKey: "2026-07-17",
+        timeZone: "Africa/Cairo",
       },
     ];
 
-    expect(getDueReminder(reminders, sessions, morningTime)).toBeNull();
+    expect(getDueReminder(reminders, dailyCompletions, morningTime, 4)).toBeNull();
+  });
+
+  it("supports a user-chosen before-sleep routine anchor", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      before_sleep: { enabled: true, time: "22:00" },
+    };
+
+    expect(getDueReminder(reminders, [], new Date(2026, 6, 17, 22, 0, 30), 4)).toEqual({
+      kind: "before_sleep",
+      category: "before_sleep",
+    });
+  });
+
+  it("moves to another due reminder when the first one was already delivered", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+      evening: { enabled: true, time: "07:30" },
+    };
+
+    expect(getDueReminder(reminders, [], morningTime, 4, (kind) => kind === "morning")).toEqual({
+      kind: "evening",
+      category: "evening",
+    });
   });
 });

@@ -13,7 +13,15 @@ export interface ReminderSchedule {
 export interface ReminderSettings {
   morning: ReminderSchedule;
   evening: ReminderSchedule;
+  before_sleep: ReminderSchedule;
   onlyWhenIncomplete: boolean;
+}
+
+/** One idempotent collection completion in the user's resolved progress day. */
+export interface DailyCollectionCompletion {
+  dayKey: string;
+  category: CategoryId;
+  timeZone: string;
 }
 
 export interface Zikr {
@@ -60,12 +68,16 @@ export interface UserSettingsState {
   colorBlindSupport: ColorBlindSupport;
   reminders: ReminderSettings;
   weeklyGoalDays: number;
+  quietProgressEnabled: boolean;
+  progressDayStartHour: number;
 }
 
 export interface UserProfileState {
   displayName: string;
   lastPhoneNumber: string;
   isGuest: boolean;
+  /** Supabase user ID that owns the locally cached private progress. Empty for guest data. */
+  accountUserId: string;
 }
 
 export interface AppStateSnapshot {
@@ -73,6 +85,7 @@ export interface AppStateSnapshot {
   profile: UserProfileState;
   completed: Record<CategoryId, number[]>;
   sessions: StoredSession[];
+  dailyCompletions: DailyCollectionCompletion[];
   /** Stable content IDs saved by the user for quick return and account sync. */
   savedZikrIds: string[];
 }

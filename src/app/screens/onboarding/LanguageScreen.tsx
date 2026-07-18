@@ -25,11 +25,11 @@ export function LanguageScreen({
             </svg>
           </div>
         </div>
-        <p className="text-[15px] font-semibold text-foreground font-sans">Azkar</p>
-        <h1 className="text-[18px] font-semibold text-foreground font-sans leading-[24px] text-center">
+        <p className="text-[0.9375rem] font-semibold text-foreground font-sans">Azkar</p>
+        <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px] text-center">
           {isArabic ? "اختر لغتك" : "Choose Your Language"}
         </h1>
-        <p className="text-[12px] text-muted-foreground font-sans leading-[16px]">
+        <p className="text-[0.75rem] text-muted-foreground font-sans leading-[16px]">
           {isArabic ? "يمكنك تغييرها لاحقًا من الإعدادات" : "You can change this later in Settings"}
         </p>
       </div>
@@ -62,12 +62,12 @@ export function LanguageScreen({
                 )}
 
                 <span
-                  className="text-[12px] font-bold text-muted-foreground uppercase tracking-wider"
+                  className="text-[0.75rem] font-bold text-muted-foreground uppercase tracking-wider"
                   aria-hidden="true"
                 >
                   {lang.code}
                 </span>
-                <span className="text-[17px] font-semibold text-foreground">{lang.native}</span>
+                <span className="text-[1.0625rem] font-semibold text-foreground">{lang.native}</span>
               </div>
             </button>
           );
@@ -78,7 +78,7 @@ export function LanguageScreen({
         <button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
-          className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[17px] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[1.0625rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           {isArabic ? "متابعة" : "Continue"}
         </button>

@@ -23,7 +23,7 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-11 flex-1 rounded-xl border px-3 py-3 text-[13px] font-semibold transition-all active:scale-[0.98] ${
+      className={`min-h-11 flex-1 rounded-xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
         active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
       }`}
     >
@@ -90,7 +90,7 @@ export function AccessibilityPanel({
         <SectionLabel label={t(language, "settings.visual")} />
 
         <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
-          <h3 id="text-size-title" className="mb-3 text-[14px] font-semibold text-foreground">
+          <h3 id="text-size-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
             {t(language, "settings.textSize")}
           </h3>
           <RadioGroupPrimitive.Root
@@ -102,9 +102,9 @@ export function AccessibilityPanel({
           >
             {(
               [
-                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-[15px]" },
-                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-[18px]" },
-                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-[22px]" },
+                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-[0.9375rem]" },
+                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-[1.125rem]" },
+                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-[1.375rem]" },
               ] as const
             ).map((option) => {
               const selected = textSize === option.value;
@@ -122,7 +122,7 @@ export function AccessibilityPanel({
                   <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
                     Aa
                   </span>
-                  <span className="text-[12px] font-semibold leading-4">{option.label}</span>
+                  <span className="text-[0.75rem] font-semibold leading-4">{option.label}</span>
                   {selected && (
                     <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                       <Check size={14} strokeWidth={2.5} />
@@ -219,7 +219,9 @@ export function AccessibilityPanel({
           />
         </div>
         <div className="mx-4 mt-3">
-          <p className="mb-2 text-[13px] font-semibold text-muted-foreground">{t(language, "settings.arabicFont")}</p>
+          <p className="mb-2 text-[0.8125rem] font-semibold text-muted-foreground">
+            {t(language, "settings.arabicFont")}
+          </p>
           <div className="grid grid-cols-2 gap-2">
             <PanelOptionButton
               active={arabicFont === "ibm_plex"}

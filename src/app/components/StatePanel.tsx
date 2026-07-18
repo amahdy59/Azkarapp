@@ -45,8 +45,8 @@ export function StatePanel({
       role="status"
     >
       <Icon size={32} className="text-primary" aria-hidden="true" />
-      <h2 className="mt-3 text-[17px] font-semibold text-foreground">{title ?? copy.title}</h2>
-      <p className="mt-1 max-w-sm text-[14px] leading-[22px] text-muted-foreground">
+      <h2 className="mt-3 text-[1.0625rem] font-semibold text-foreground">{title ?? copy.title}</h2>
+      <p className="mt-1 max-w-sm text-[0.875rem] leading-[22px] text-muted-foreground">
         {description ?? copy.description}
       </p>
       {actionLabel && onAction && (

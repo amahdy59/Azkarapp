@@ -269,11 +269,11 @@ body {
 
 :root[data-color-blind-support="protanopia"] {
   --primary: #2b7fff;
-  --primary-foreground: #f8fbff;
+  --primary-foreground: #10131d;
   --secondary: #ffd166;
   --secondary-foreground: #182030;
   --accent: #2b7fff;
-  --accent-foreground: #f8fbff;
+  --accent-foreground: #10131d;
   --ring: #ffd166;
   --chart-1: #2b7fff;
   --chart-2: #ffd166;
