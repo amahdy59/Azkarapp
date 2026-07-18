@@ -91,13 +91,14 @@ test("language changes in place from the Settings selector", async ({ page }) =>
   const languageSelector = page.getByTestId("settings-language-select");
 
   await expect(languageSelector).toBeVisible();
-  await expect(languageSelector).toHaveValue("en");
-  await languageSelector.selectOption("ar");
+  await expect(languageSelector).toHaveText("English");
+  await languageSelector.click();
+  await page.getByRole("option", { name: "العربية" }).click();
 
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
   await expect(languageSelector).toBeVisible();
-  await expect(languageSelector).toHaveValue("ar");
+  await expect(languageSelector).toHaveText("العربية");
   await expect(
     page.getByRole("heading", { name: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a", exact: true }),
   ).toBeVisible();

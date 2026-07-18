@@ -3,6 +3,7 @@ import { IconButton } from "../../components/LayoutShells";
 import { ArrowPrevious, ChevronDown, ChevronNext } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 
 export function SubHeader({
   title,
@@ -112,7 +113,7 @@ export function SettingsSelectRow({
 
   return (
     <div className="relative">
-      <label className="group relative flex min-h-16 w-full cursor-pointer items-center gap-3 bg-card px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring">
+      <div className="group relative flex min-h-16 w-full items-center gap-3 bg-card px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring">
         <span
           aria-hidden="true"
           className="flex size-10 shrink-0 items-center justify-center rounded-[var(--ds-radius-control)]"
@@ -129,21 +130,29 @@ export function SettingsSelectRow({
           </p>
           <ChevronDown aria-hidden="true" size={18} className="shrink-0 text-foreground/70" />
         </div>
-        <select
-          data-testid={testId}
-          aria-labelledby={labelId}
-          value={selectedValue}
-          onChange={(event) => onChange(event.target.value)}
-          className="absolute inset-0 size-full cursor-pointer appearance-none opacity-0"
-          dir={direction}
-        >
-          {options.map((option) => (
-            <option key={option.value} value={option.value} lang={option.language} dir={option.direction}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </label>
+        <Select value={selectedValue} onValueChange={onChange} dir={direction}>
+          <SelectTrigger
+            data-testid={testId}
+            aria-labelledby={labelId}
+            className="absolute inset-0 size-full cursor-pointer opacity-0"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                lang={option.language}
+                dir={option.direction}
+                className={option.direction === "rtl" ? "text-right" : "text-left"}
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
       {hasDivider && (
         <div
           aria-hidden="true"
