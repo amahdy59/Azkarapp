@@ -95,7 +95,7 @@ export function HomeScreen({
   const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
 
   return (
-    <ScreenContainer dir={direction}>
+    <ScreenContainer dir={direction} className="px-page">
       <header className="flex h-14 shrink-0 items-center">
         <h1 className="text-[1.125rem] font-bold text-foreground">{t(language, "home.title")}</h1>
       </header>
