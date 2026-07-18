@@ -12,9 +12,9 @@ import {
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS } from "../../languageOptions";
+import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, ThemeMode } from "../../types";
-import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
+import { RowChevron, RowValue, SectionLabel, SettingsRowItem, SettingsSelectRow } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
 
@@ -28,8 +28,7 @@ export type SettingsSubScreen =
   | "help"
   | "legal"
   | "sources"
-  | "about"
-  | "language";
+  | "about";
 
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 
@@ -41,6 +40,7 @@ export function SettingsRootPanel({
   highContrast,
   onThemeModeChange,
   onDisableHighContrast,
+  onLanguageChange,
   isGuest,
   isSyncing,
   syncError,
@@ -53,6 +53,7 @@ export function SettingsRootPanel({
   highContrast: boolean;
   onThemeModeChange: (value: ThemeMode) => void;
   onDisableHighContrast: () => void;
+  onLanguageChange: (value: AppLanguage) => void;
   isGuest: boolean;
   isSyncing: boolean;
   syncError: string;
@@ -93,12 +94,21 @@ export function SettingsRootPanel({
       </div>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-2xl border border-border bg-card">
-        <SettingsRowItem
+        <SettingsSelectRow
           iconBg={iconBackground}
           icon={<Globe size={20} className="text-primary" />}
           label={t(language, "settings.language")}
-          right={<RowValue value={LANGUAGE_LABELS[language]} />}
-          onPress={() => onNav("language")}
+          selectedValue={language}
+          value={LANGUAGE_LABELS[language]}
+          options={LANGUAGES_LIST.map((opt) => ({
+            value: opt.code,
+            label: opt.native,
+            language: opt.code,
+            direction: opt.code === "ar" ? "rtl" : "ltr",
+          }))}
+          onChange={(val) => onLanguageChange(val as AppLanguage)}
+          direction={direction}
+          testId="settings-language-select"
         />
 
         <SettingsRowItem

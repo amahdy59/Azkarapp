@@ -23,7 +23,6 @@ import {
   ProgressPanel,
   SettingsRootPanel,
   SourcesPanel,
-  LanguagePanel,
   type SettingsSubScreen,
 } from "./SettingsPanels";
 
@@ -138,6 +137,7 @@ export function SettingsScreen({
             highContrast={highContrast}
             onThemeModeChange={onThemeModeChange}
             onDisableHighContrast={() => onHighContrastChange(false)}
+            onLanguageChange={onLanguageChange}
             isGuest={isGuest}
             isSyncing={isSyncing}
             syncError={syncError}
@@ -223,9 +223,6 @@ export function SettingsScreen({
           onSources={() => setSub("sources")}
           onBack={goBack}
         />
-      )}
-      {sub === "language" && (
-        <LanguagePanel language={language} direction={direction} onLanguageChange={onLanguageChange} onBack={goBack} />
       )}
     </div>
   );
