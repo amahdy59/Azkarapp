@@ -26,6 +26,7 @@ import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } fr
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { Header } from "../components/LayoutShells";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -201,7 +202,8 @@ export function ReaderScreen({
   const renderCounterActions = () => (
     <div className="flex min-w-0 items-center gap-2">
       <IconButton
-        onClick={() => {
+        onClick={(event) => {
+          event.stopPropagation();
           void handleShare();
         }}
         label={t(language, "reader.share")}
@@ -231,7 +233,10 @@ export function ReaderScreen({
       </button>
 
       <IconButton
-        onClick={handleToggleSaved}
+        onClick={(event) => {
+          event.stopPropagation();
+          handleToggleSaved();
+        }}
         label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         aria-pressed={isSaved}
         className="shrink-0 border border-border-control bg-card"
@@ -244,7 +249,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <div
-      className="mx-4 mt-2 cursor-pointer touch-manipulation rounded-2xl px-6 pb-3 pt-3 transition-colors hover:bg-muted/50 active:bg-muted"
+      className="mx-4 mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
       role="button"
       tabIndex={0}
       aria-label={t(language, "reader.tapAnywhere")}
@@ -377,20 +382,11 @@ export function ReaderScreen({
         {readerAnnouncement}
       </div>
 
-      <div className="relative shrink-0 px-4 py-3">
-        <div className="flex items-center gap-2">
-          <IconButton
-            onClick={onBack}
-            label={t(language, "common.back")}
-            className="shrink-0 border border-border-control bg-background"
-          >
-            <ArrowPrevious size={20} className="text-foreground" />
-          </IconButton>
-
-          <p className="min-w-0 flex-1 truncate text-center text-[1.25rem] font-bold text-foreground" dir="auto">
-            {isArabic ? category.nameArabic : category.name}
-          </p>
-
+      <Header
+        title={isArabic ? category.nameArabic : category.name}
+        onBack={onBack}
+        language={language}
+        right={
           <DropdownMenu dir={direction}>
             <DropdownMenuTrigger
               aria-label={t(language, "reader.menu")}
@@ -429,8 +425,8 @@ export function ReaderScreen({
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
-      </div>
+        }
+      />
 
       <div className="shrink-0 px-5 pb-3 pt-2">
         <ProgressBar

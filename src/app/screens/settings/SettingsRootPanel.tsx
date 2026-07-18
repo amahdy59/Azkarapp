@@ -94,22 +94,37 @@ export function SettingsRootPanel({
       </div>
 
       <div className="mx-4 mt-3 overflow-hidden rounded-2xl border border-border bg-card">
-        <SettingsSelectRow
-          iconBg={iconBackground}
-          icon={<Globe size={20} className="text-primary" />}
-          label={t(language, "settings.language")}
-          selectedValue={language}
-          value={LANGUAGE_LABELS[language]}
-          options={LANGUAGES_LIST.map((opt) => ({
-            value: opt.code,
-            label: opt.native,
-            language: opt.code,
-            direction: opt.code === "ar" ? "rtl" : "ltr",
-          }))}
-          onChange={(val) => onLanguageChange(val as AppLanguage)}
-          direction={direction}
-          testId="settings-language-select"
-        />
+        <div className="p-4 border-b border-border">
+          <div className="mb-3 flex items-center gap-3">
+            <span
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+              style={{ backgroundColor: iconBackground }}
+              aria-hidden="true"
+            >
+              <Globe size={20} className="text-primary" />
+            </span>
+            <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.language")}</h3>
+          </div>
+          <div className="flex bg-muted p-1 rounded-xl" role="radiogroup" aria-label={t(language, "settings.language")}>
+            {LANGUAGES_LIST.map((opt) => {
+              const selected = language === opt.code;
+              return (
+                <button
+                  key={opt.code}
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => onLanguageChange(opt.code as AppLanguage)}
+                  className={`flex-1 rounded-lg py-2 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    selected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  }`}
+                  data-testid={`settings-language-${opt.code}`}
+                >
+                  {opt.native}
+                </button>
+              );
+            })}
+          </div>
+        </div>
 
         <SettingsRowItem
           iconBg={iconBackground}

@@ -982,8 +982,8 @@ const EVENING_AZKAR: Zikr[] = [
     translation:
       "None is worthy of worship but Allah alone, without partner. His is the dominion and praise, and He is able to do all things.",
     benefit: "Same wording as HM-93 but different count and virtue.",
-    repetitionCount: 10,
-    countLabel: "10; or 1 when unable",
+    repetitionCount: 100,
+    countLabel: "100",
     sourceReference: "An-Nasa\u2019i Amal al-Yawm wa al-Laylah no. 24; Ahmad; Abu Dawud; Ibn Majah; Hisn al-Muslim 92.",
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:

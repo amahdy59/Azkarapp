@@ -445,13 +445,29 @@ export default function App() {
 
   useEffect(() => saveAppState(appStateSnapshot), [appStateSnapshot]);
 
-  const push = useCallback(
-    (to: View) => {
-      setHistory((h) => [...h, view]);
-      setView(to);
-    },
-    [view],
-  );
+  useEffect(() => {
+    const handlePopState = (e: PopStateEvent) => {
+      if (e.state && e.state.view) {
+        setView(e.state.view);
+        if (e.state.view === "settings") {
+          setActiveTab("settings");
+        } else if (e.state.view === "library" || e.state.view === "category") {
+          setActiveTab("azkar");
+        } else if (e.state.view === "home") {
+          setActiveTab("home");
+        }
+      } else {
+        setView(hasCompletedOnboarding ? "home" : "language");
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [hasCompletedOnboarding]);
+
+  const push = useCallback((to: View) => {
+    window.history.pushState({ view: to }, "", `?view=${to}`);
+    setView(to);
+  }, []);
 
   const handleResetCategory = (catId: CategoryId) => {
     if (!window.confirm(t(selectedLang, "category.resetConfirm"))) {
@@ -465,21 +481,19 @@ export default function App() {
   };
 
   const pop = useCallback(() => {
-    setHistory((h) => {
-      const prev = h[h.length - 1] ?? "home";
-      setView(prev);
-      setActiveTab(prev === "settings" ? "settings" : prev === "library" || prev === "category" ? "azkar" : "home");
-      return h.slice(0, -1);
-    });
-  }, []);
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      push("home");
+    }
+  }, [push]);
 
   const openCategory = (catId: CategoryId) => {
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
     setActiveCat(catId);
     setActiveTab("azkar");
-    setHistory([view]);
-    setView("category");
+    push("category");
   };
 
   const openReader = (catId: CategoryId, i: number) => {
@@ -751,17 +765,16 @@ export default function App() {
 
   const handleNavTab = (tab: "home" | "azkar" | "settings") => {
     setActiveTab(tab);
-    setHistory([]);
     if (tab === "home") {
-      setView("home");
+      push("home");
     } else if (tab === "azkar") {
-      setView("library");
+      push("library");
     } else if (tab === "settings") {
-      setView("settings");
+      push("settings");
     }
   };
 
-  const showBottomNav = ["home", "library", "category", "settings"].includes(view);
+  const showBottomNav = ["home", "library", "category", "reader", "settings", "search"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (

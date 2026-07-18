@@ -58,6 +58,7 @@ async function openFirstMorningZikr(page: Page) {
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 
+  await page.screenshot({ path: "screenshot.png", fullPage: true });
   const zikr = page.getByTestId("zikr-text");
   const counterSurface = page.getByTestId("counter-surface");
   const firstZikr = await zikr.textContent();

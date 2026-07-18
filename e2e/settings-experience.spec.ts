@@ -88,17 +88,19 @@ test("language changes in place from the Settings selector", async ({ page }) =>
 
   const settingsUrl = page.url();
   const historyLength = await page.evaluate(() => window.history.length);
-  const languageSelector = page.getByTestId("settings-language-select");
 
-  await expect(languageSelector).toBeVisible();
-  await expect(languageSelector).toHaveText("English");
-  await languageSelector.click();
-  await page.getByRole("option", { name: "العربية" }).click();
+  const englishButton = page.getByTestId("settings-language-en");
+  const arabicButton = page.getByTestId("settings-language-ar");
+
+  await expect(englishButton).toBeVisible();
+  await expect(englishButton).toHaveAttribute("aria-checked", "true");
+  await expect(arabicButton).toBeVisible();
+  await arabicButton.click();
 
   await expect(page.locator("html")).toHaveAttribute("lang", "ar");
   await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
-  await expect(languageSelector).toBeVisible();
-  await expect(languageSelector).toHaveText("العربية");
+  await expect(arabicButton).toBeVisible();
+  await expect(arabicButton).toHaveAttribute("aria-checked", "true");
   await expect(
     page.getByRole("heading", { name: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a", exact: true }),
   ).toBeVisible();

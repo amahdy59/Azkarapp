@@ -149,23 +149,28 @@ export function AccessibilityPanel({
             checked={boldText}
             onChange={() => onBoldTextChange(!boldText)}
           />
-          <SettingsRowItem
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<Eye size={20} className="text-primary" />}
-            label={t(language, "settings.colorBlindSupport")}
-            right={<RowValue value={formatColorBlindSupport(colorBlindSupport, language)} withChevron={false} />}
-            hasDivider={false}
-          />
-        </div>
-        <div className="mx-4 mt-3 grid grid-cols-2 gap-2" aria-label={t(language, "settings.colorBlindSupport")}>
-          {colorBlindOptions.map((option) => (
-            <PanelOptionButton
-              key={option}
-              active={colorBlindSupport === option}
-              label={formatColorBlindSupport(option, language)}
-              onClick={() => onColorBlindSupportChange(option)}
-            />
-          ))}
+          <div className="p-4">
+            <div className="mb-3 flex items-center gap-3">
+              <span
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                style={{ backgroundColor: "color-mix(in srgb, var(--primary) 12%, transparent)" }}
+                aria-hidden="true"
+              >
+                <Eye size={20} className="text-primary" />
+              </span>
+              <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.colorBlindSupport")}</h3>
+            </div>
+            <div className="grid grid-cols-2 gap-2" aria-label={t(language, "settings.colorBlindSupport")}>
+              {colorBlindOptions.map((option) => (
+                <PanelOptionButton
+                  key={option}
+                  active={colorBlindSupport === option}
+                  label={formatColorBlindSupport(option, language)}
+                  onClick={() => onColorBlindSupportChange(option)}
+                />
+              ))}
+            </div>
+          </div>
         </div>
 
         <SectionLabel label={t(language, "settings.motion")} />
