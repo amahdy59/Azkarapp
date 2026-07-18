@@ -38,7 +38,7 @@ export function AzkarLibraryScreen({
         <button
           type="button"
           onClick={onSearch}
-          className="mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-start text-[0.875rem] text-muted-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border bg-card px-4 text-start text-[0.875rem] text-muted-foreground transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           aria-label={t(language, "library.search")}
         >
           <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
@@ -56,7 +56,7 @@ export function AzkarLibraryScreen({
               role="tab"
               aria-selected={section === value}
               onClick={() => setSection(value)}
-              className={`min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 section === value ? "bg-primary text-primary-foreground" : "text-muted-foreground"
               }`}
             >
@@ -79,7 +79,7 @@ export function AzkarLibraryScreen({
                     key={category.id}
                     type="button"
                     onClick={() => onCategory(category.id)}
-                    className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={
                       isArabic
                         ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(total, language)} مكتملة`
@@ -123,8 +123,10 @@ export function AzkarLibraryScreen({
                     key={zikr.id}
                     type="button"
                     onClick={() => onZikr(zikr.category, zikr.orderIndex)}
-                    className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    aria-label={`${isArabic ? category.nameArabic : category.name}: ${zikr.translation}`}
+                    className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    aria-label={`${isArabic ? category.nameArabic : category.name}: ${
+                      isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
+                    }`}
                   >
                     <span
                       className="mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
@@ -136,20 +138,32 @@ export function AzkarLibraryScreen({
                       <span className="block text-[0.75rem] font-semibold text-primary">
                         {isArabic ? category.nameArabic : category.name}
                       </span>
-                      <span
-                        className="mt-1 line-clamp-2 block text-[0.9375rem] font-semibold leading-6 text-foreground"
-                        dir="rtl"
-                        lang="ar"
-                      >
-                        {zikr.arabicText}
-                      </span>
-                      <span
-                        className="mt-1 line-clamp-2 block text-left text-[0.8125rem] leading-5 text-muted-foreground"
-                        dir="ltr"
-                        lang="en"
-                      >
-                        {zikr.translation}
-                      </span>
+                      {isArabic ? (
+                        <span
+                          className="zikr-text mt-1 line-clamp-3 block text-start text-[0.9375rem] font-semibold leading-7 text-foreground"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {zikr.arabicText}
+                        </span>
+                      ) : (
+                        <>
+                          <span
+                            className="mt-1 line-clamp-2 block text-start text-[0.9375rem] font-semibold leading-6 text-foreground"
+                            dir="ltr"
+                            lang="en"
+                          >
+                            {zikr.translation}
+                          </span>
+                          <span
+                            className="mt-1 line-clamp-2 block text-start text-[0.8125rem] leading-5 text-muted-foreground"
+                            dir="ltr"
+                            lang="en"
+                          >
+                            {zikr.transliteration}
+                          </span>
+                        </>
+                      )}
                     </span>
                   </button>
                 );
@@ -176,7 +190,7 @@ export function AzkarLibraryScreen({
             <button
               type="button"
               onClick={() => setSection("collections")}
-              className="mt-5 min-h-11 rounded-xl bg-primary px-4 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="mt-5 min-h-11 rounded-xl bg-primary px-4 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {t(language, "library.browseCollections")}
             </button>

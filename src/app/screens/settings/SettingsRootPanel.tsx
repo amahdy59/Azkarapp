@@ -12,13 +12,14 @@ import {
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
+import { LANGUAGE_LABELS } from "../../languageOptions";
 import type { AppLanguage, ThemeMode } from "../../types";
 import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
+
 import { ThemeModeSelector } from "./ThemeModeSelector";
 
 export type SettingsSubScreen =
   | "root"
-  | "language"
   | "accessibility"
   | "downloads"
   | "notifications"
@@ -27,7 +28,8 @@ export type SettingsSubScreen =
   | "help"
   | "legal"
   | "sources"
-  | "about";
+  | "about"
+  | "language";
 
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";
 
@@ -39,7 +41,6 @@ export function SettingsRootPanel({
   highContrast,
   onThemeModeChange,
   onDisableHighContrast,
-  languageLabel,
   isGuest,
   isSyncing,
   syncError,
@@ -52,7 +53,6 @@ export function SettingsRootPanel({
   highContrast: boolean;
   onThemeModeChange: (value: ThemeMode) => void;
   onDisableHighContrast: () => void;
-  languageLabel: string;
   isGuest: boolean;
   isSyncing: boolean;
   syncError: string;
@@ -97,9 +97,10 @@ export function SettingsRootPanel({
           iconBg={iconBackground}
           icon={<Globe size={20} className="text-primary" />}
           label={t(language, "settings.language")}
-          right={<RowValue value={languageLabel} />}
+          right={<RowValue value={LANGUAGE_LABELS[language]} />}
           onPress={() => onNav("language")}
         />
+
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Bell size={20} className="text-primary" />}

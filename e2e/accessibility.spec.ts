@@ -15,6 +15,44 @@ async function expectNoWcagViolations(page: import("@playwright/test").Page) {
   expect(results.violations).toEqual([]);
 }
 
+async function expectVisibleInteractiveTargetsAtLeast44px(page: import("@playwright/test").Page, screenName: string) {
+  const undersized = await page
+    .locator(
+      'button:visible, a[href]:visible, input:visible, select:visible, [role="button"]:visible, [role="tab"]:visible, [role="radio"]:visible, [role="switch"]:visible',
+    )
+    .evaluateAll((nodes) => {
+      const uniqueNodes = [...new Set(nodes)] as HTMLElement[];
+      return uniqueNodes.flatMap((node) => {
+        const ownBounds = node.getBoundingClientRect();
+        const associatedLabel =
+          node instanceof HTMLInputElement || node instanceof HTMLSelectElement
+            ? node.labels?.item(0)?.getBoundingClientRect()
+            : null;
+        const targetBounds =
+          associatedLabel && associatedLabel.width >= ownBounds.width && associatedLabel.height >= ownBounds.height
+            ? associatedLabel
+            : ownBounds;
+
+        if (targetBounds.width >= 44 && targetBounds.height >= 44) return [];
+
+        return [
+          {
+            label:
+              node.getAttribute("aria-label") ||
+              node.getAttribute("title") ||
+              node.textContent?.replace(/\s+/g, " ").trim() ||
+              node.tagName,
+            tag: node.tagName,
+            width: Math.round(targetBounds.width),
+            height: Math.round(targetBounds.height),
+          },
+        ];
+      });
+    });
+
+  expect(undersized, `${screenName} has interactive targets below the 44px product standard`).toEqual([]);
+}
+
 test("initial flow has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
@@ -74,4 +112,24 @@ test("visible settings controls meet the 44px minimum touch target", async ({ pa
     );
 
   expect(undersized).toEqual([]);
+});
+
+test("visible core-flow controls meet the 44px product touch-target standard", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Home");
+
+  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Azkar Library");
+
+  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+ complete/ }).click();
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Category");
+
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Reader");
+
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  await expect(page.getByTestId("reference-sheet")).toBeVisible();
+  await expectVisibleInteractiveTargetsAtLeast44px(page, "Benefit sheet");
 });

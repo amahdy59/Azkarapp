@@ -127,10 +127,10 @@ export function ProgressPanel({
                     <RadioGroupPrimitive.Item
                       key={goal}
                       value={String(goal)}
-                      className={`min-h-11 rounded-xl border px-2 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      className={`min-h-11 rounded-xl border px-2 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                         weeklyGoalDays === goal
                           ? "border-primary bg-primary text-primary-foreground"
-                          : "border-border text-foreground"
+                          : "border-border-control text-foreground"
                       }`}
                     >
                       {formatNumerals(goal, language)}
@@ -169,7 +169,7 @@ export function ProgressPanel({
               id="progress-day-start-hour"
               value={progressDayStartHour}
               onChange={(event) => onProgressDayStartHourChange(Number(event.target.value))}
-              className="h-11 rounded-xl border border-border bg-background px-3 text-[0.8125rem] font-bold text-foreground"
+              className="h-11 rounded-xl border border-border-control bg-background px-3 text-[0.8125rem] font-bold text-foreground"
               dir={direction}
             >
               {[0, 2, 4, 6].map((hour) => (

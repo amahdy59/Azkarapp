@@ -124,7 +124,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             type="button"
             onClick={() => void refreshStatus()}
             disabled={isLoading}
-            className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background px-4 font-semibold text-foreground disabled:opacity-60"
+            className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-background px-4 font-semibold text-foreground disabled:opacity-60"
           >
             <RotateCcw size={18} aria-hidden="true" />
             {t(language, "downloads.refresh")}

@@ -40,7 +40,7 @@ describe("icon design-system contract", () => {
 
   it("uses previous navigation rather than reset in the reader header", () => {
     const reader = readFileSync(join(appRoot, "screens", "ReaderScreen.tsx"), "utf8");
-    const backLabel = 'aria-label={t(language, "common.back")}';
+    const backLabel = 'label={t(language, "common.back")}';
     const backButtonStart = reader.indexOf(backLabel);
     expect(backButtonStart).toBeGreaterThanOrEqual(0);
     const header = reader.slice(backButtonStart, reader.indexOf("<p", backButtonStart));

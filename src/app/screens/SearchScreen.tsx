@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
+import { CATEGORIES } from "../content/categories";
 import type { AppLanguage, CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
+import { IconButton } from "../components/LayoutShells";
+import { t } from "../i18n";
 
 const RECENT_SEARCHES = ["Istighfar", "Morning Dua", "Ayat al-Kursi"];
 
@@ -59,15 +62,11 @@ export function SearchScreen({
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
       <div className="flex items-center gap-3 px-5 py-3 shrink-0">
-        <button
-          onClick={onBack}
-          className="flex items-center justify-center w-11 h-11 shrink-0 active:scale-95 transition-all"
-          aria-label={isArabic ? "رجوع" : "Back"}
-        >
-          <ArrowPrevious size={24} className="text-foreground" />
-        </button>
+        <IconButton onClick={onBack} label={t(language, "common.back")} className="shrink-0">
+          <ArrowPrevious size={20} className="text-foreground" />
+        </IconButton>
 
-        <div className="flex items-center gap-3 flex-1 rounded-full px-4 h-12 bg-card border border-border">
+        <div className="flex h-12 flex-1 items-center gap-3 rounded-full border border-border-control bg-card px-4">
           <Search size={18} className="text-primary shrink-0" />
           <input
             type="text"
@@ -143,27 +142,27 @@ export function SearchScreen({
             ) : (
               results.map((z) => {
                 const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);
-                const label = isArabic
-                  ? z.arabicText.split("\n")[0]
-                  : (ZIKR_LABELS[z.id] ?? z.transliteration.slice(0, 24));
-                const subtitle = isArabic ? z.translation.slice(0, 40) : z.translation.slice(0, 40);
+                const category = CATEGORIES.find((item) => item.id === z.category)!;
+                const label = isArabic ? z.arabicText.split("\n")[0] : z.translation;
+                const subtitle = isArabic ? category.nameArabic : z.transliteration;
                 return (
                   <button
                     key={z.id}
                     onClick={() => onZikr(z.category, zIdx)}
-                    className="w-full flex items-center justify-between px-4 rounded-xl transition-all active:scale-[0.98] h-[72px] bg-card border border-border"
+                    className="flex h-[72px] w-full items-center justify-between rounded-2xl border border-border bg-card px-4 transition-all active:scale-[0.98]"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
                         className="w-full truncate text-start font-sans text-[1.0625rem] font-semibold leading-[24px] text-foreground"
-                        dir="auto"
+                        dir={isArabic ? "rtl" : "ltr"}
+                        lang={isArabic ? "ar" : "en"}
                       >
                         {label}
                       </p>
                       <p
-                        className="w-full truncate text-left font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
-                        dir="ltr"
-                        lang="en"
+                        className="w-full truncate text-start font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
+                        dir={isArabic ? "rtl" : "ltr"}
+                        lang={isArabic ? "ar" : "en"}
                       >
                         {subtitle}
                       </p>

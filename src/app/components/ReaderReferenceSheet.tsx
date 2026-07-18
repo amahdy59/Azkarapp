@@ -3,8 +3,9 @@ import { Check, Copy, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 
-type ReferenceCopyKey = "translation" | "transliteration" | "hadith";
+type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
 
 export function ReaderReferenceSheet({
   zikr,
@@ -23,6 +24,9 @@ export function ReaderReferenceSheet({
   const sheetRef = useRef<HTMLElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isArabic = language === "ar";
+  const benefit = getLocalizedZikrBenefit(zikr, language);
+  const sourceReference = getLocalizedSourceReference(zikr, language);
 
   useEffect(() => {
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -89,7 +93,7 @@ export function ReaderReferenceSheet({
         type="button"
         onClick={() => void copyReference(key, value)}
         aria-label={label}
-        className="absolute -top-1.5 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="absolute -top-1.5 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         style={{ insetInlineStart: -6 }}
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
@@ -100,30 +104,37 @@ export function ReaderReferenceSheet({
   );
 
   return (
-    <div className="scrim-in fixed inset-0 z-50 flex items-end justify-center bg-black/45">
+    <div
+      className="scrim-in absolute inset-0 z-50 flex items-end justify-center overflow-hidden bg-black/45"
+      data-testid="reference-sheet-layer"
+    >
       <button
         type="button"
         className="absolute inset-0 cursor-default"
         onClick={onClose}
-        aria-label={t(language, "reader.closeReference")}
+        aria-hidden="true"
+        tabIndex={-1}
       />
       <section
         ref={sheetRef}
         role="dialog"
         data-testid="reference-sheet"
         aria-modal="true"
-        aria-label={t(language, "reader.referencesButton")}
-        className="reference-sheet sheet-enter relative flex w-full max-w-[390px] flex-col overflow-hidden rounded-t-[20px] bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
+        aria-labelledby="reader-benefit-sheet-title"
+        className="reference-sheet sheet-enter relative flex w-full max-w-[390px] flex-col overflow-hidden rounded-t-3xl bg-background shadow-[0_-12px_32px_rgba(0,0,0,0.4)]"
         dir={direction}
       >
-        <div className="relative z-10 flex h-16 shrink-0 items-end justify-center bg-background px-6 pb-3">
-          <span className="h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
+        <div className="relative z-10 flex min-h-16 shrink-0 items-center justify-center bg-background px-16 pb-2 pt-5">
+          <span className="absolute top-2.5 h-1 w-8 rounded-full bg-muted-foreground" aria-hidden="true" />
+          <h2 id="reader-benefit-sheet-title" className="text-center text-[1.0625rem] font-bold text-foreground">
+            {t(language, "reader.referencesButton")}
+          </h2>
           <button
             ref={closeButtonRef}
             type="button"
             onClick={onClose}
             aria-label={t(language, "reader.closeReference")}
-            className="absolute top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="absolute top-2.5 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             style={{ insetInlineEnd: 12 }}
           >
             <X size={18} />
@@ -131,46 +142,71 @@ export function ReaderReferenceSheet({
         </div>
         <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain" dir={direction}>
           <div className="reference-sheet-content flex flex-col gap-4 px-6">
-            <div className="rounded-xl bg-muted px-2 py-4">
-              <p className="zikr-text text-center text-[1.125rem] leading-7 text-muted-foreground" dir="rtl" lang="ar">
-                {zikr.arabicText}
-              </p>
-            </div>
+            {isArabic ? (
+              <div className="rounded-xl bg-muted px-4 py-4">
+                <p className="zikr-text text-center text-[1.125rem] leading-8 text-foreground" dir="rtl" lang="ar">
+                  {zikr.arabicText}
+                </p>
+              </div>
+            ) : (
+              <>
+                <section className="flex flex-col gap-4">
+                  <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                    {t(language, "reader.translationLabel")}
+                  </h3>
+                  <p className="latin-ui text-left text-[1.125rem] leading-[1.5] text-foreground" lang="en" dir="ltr">
+                    {zikr.translation}
+                  </p>
+                  {copyAction("translation", zikr.translation, t(language, "reader.copyTranslation"), "ltr")}
+                </section>
 
-            <section className="flex flex-col gap-4">
-              <h2 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
-                {t(language, "reader.translationLabel")}
-              </h2>
-              <p className="latin-ui text-left text-[1.125rem] leading-[1.5] text-foreground" lang="en" dir="ltr">
-                {zikr.translation}
-              </p>
-              {copyAction("translation", zikr.translation, t(language, "reader.copyTranslation"), "ltr")}
-            </section>
+                <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+
+                <section className="flex flex-col gap-4">
+                  <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                    {t(language, "reader.transliterationLabel")}
+                  </h3>
+                  <p
+                    className="latin-ui text-left text-[1.125rem] leading-[1.5] text-muted-foreground"
+                    lang="en"
+                    dir="ltr"
+                  >
+                    {zikr.transliteration}
+                  </p>
+                  {copyAction(
+                    "transliteration",
+                    zikr.transliteration,
+                    t(language, "reader.copyTransliteration"),
+                    "ltr",
+                  )}
+                </section>
+              </>
+            )}
 
             <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
 
-            <section className="flex flex-col gap-4">
-              <h2 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
-                {t(language, "reader.transliterationLabel")}
-              </h2>
-              <p className="latin-ui text-left text-[1.125rem] leading-[1.5] text-muted-foreground" lang="en" dir="ltr">
-                {zikr.transliteration}
+            <section className="flex flex-col gap-3">
+              <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                {t(language, "reader.benefitLabel")}
+              </h3>
+              <p
+                className="text-start text-[1.0625rem] leading-7 text-foreground"
+                lang={isArabic ? "ar" : "en"}
+                dir={direction}
+              >
+                {benefit}
               </p>
-              {copyAction("transliteration", zikr.transliteration, t(language, "reader.copyTransliteration"), "ltr")}
+              {copyAction("benefit", benefit, t(language, "reader.copyBenefit"), direction)}
             </section>
 
-            {zikr.hadithText && (
+            {isArabic && zikr.hadithText && (
               <>
                 <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
                 <section className="flex flex-col gap-3">
-                  <h2 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
-                    {t(language, "reader.hadithLabel")}
-                  </h2>
-                  <p
-                    className="zikr-text text-right text-[1.125rem] leading-[1.6] text-muted-foreground"
-                    lang="ar"
-                    dir="rtl"
-                  >
+                  <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                    {t(language, "reader.evidence")}
+                  </h3>
+                  <p className="zikr-text text-right text-[1.125rem] leading-[1.8] text-foreground" lang="ar" dir="rtl">
                     {zikr.hadithText}
                   </p>
                   {copyAction("hadith", zikr.hadithText, t(language, "reader.copyHadith"), "rtl")}
@@ -178,16 +214,21 @@ export function ReaderReferenceSheet({
               </>
             )}
 
-            <div className="flex justify-end">
-              <span
-                className="latin-ui max-w-full rounded-full bg-muted px-2.5 py-1.5 text-right text-[0.6875rem] font-semibold leading-4 text-muted-foreground"
-                lang="en"
-                dir="ltr"
-                title={zikr.sourceReference}
+            <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+
+            <section className="flex flex-col gap-3">
+              <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                {t(language, "reader.sourceLabel")}
+              </h3>
+              <p
+                className="max-w-full rounded-xl bg-muted px-3 py-2.5 text-start text-[0.8125rem] font-semibold leading-5 text-muted-foreground"
+                lang={isArabic ? "ar" : "en"}
+                dir={direction}
               >
-                {zikr.sourceReference}
-              </span>
-            </div>
+                {sourceReference}
+              </p>
+              {copyAction("source", sourceReference, t(language, "reader.copySource"), direction)}
+            </section>
           </div>
         </ScrollArea>
       </section>

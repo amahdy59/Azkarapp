@@ -24,7 +24,7 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
       onClick={onClick}
       aria-pressed={active}
       className={`min-h-11 flex-1 rounded-xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card text-foreground"
+        active ? "border-primary bg-primary text-primary-foreground" : "border-border-control bg-card text-foreground"
       }`}
     >
       {label}
@@ -113,10 +113,10 @@ export function AccessibilityPanel({
                   key={option.value}
                   value={option.value}
                   data-testid={`text-size-option-${option.value}`}
-                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border bg-card text-muted-foreground"
+                      : "border-border-control bg-card text-muted-foreground"
                   }`}
                 >
                   <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">

@@ -118,7 +118,7 @@ function gardenMessage(summary: GardenSummary, language: AppLanguage) {
 export function TodayRoutineGarden({ summary, language }: { summary: GardenSummary; language: AppLanguage }) {
   return (
     <section
-      className="mb-6 rounded-[22px] border border-border bg-card p-4"
+      className="mb-6 rounded-2xl border border-border bg-card p-4"
       aria-labelledby="today-garden-title"
       data-testid="today-garden-card"
     >

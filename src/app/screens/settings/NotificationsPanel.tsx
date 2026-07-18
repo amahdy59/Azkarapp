@@ -63,14 +63,17 @@ function ReminderScheduleRow({
           aria-label={label}
           aria-checked={schedule.enabled}
           onClick={onToggle}
-          className={`relative h-7 w-12 shrink-0 rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-            schedule.enabled ? "bg-primary" : "bg-muted"
-          }`}
+          className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <span
-            className="absolute top-1 size-5 rounded-full bg-primary-foreground shadow-sm transition-[inset]"
-            style={{ insetInlineStart: schedule.enabled ? "1.5rem" : "0.25rem" }}
-          />
+            aria-hidden="true"
+            className={`relative h-7 w-12 rounded-full border transition-colors ${schedule.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
+          >
+            <span
+              className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${schedule.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
+              style={{ insetInlineStart: schedule.enabled ? "1.5rem" : "0.25rem" }}
+            />
+          </span>
         </button>
       </div>
       <label
@@ -84,7 +87,7 @@ function ReminderScheduleRow({
           value={schedule.time}
           disabled={!schedule.enabled}
           onChange={(event) => onTimeChange(event.target.value)}
-          className="h-11 rounded-xl border border-border bg-background px-3 text-[0.875rem] font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className="h-11 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
           dir="ltr"
         />
       </label>
@@ -238,7 +241,7 @@ export function NotificationsPanel({
           </div>
           <label
             htmlFor="only-when-incomplete"
-            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-within:ring-2 focus-within:ring-ring"
+            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-within:ring-[3px] focus-within:ring-ring"
           >
             <input
               id="only-when-incomplete"

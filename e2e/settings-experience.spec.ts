@@ -81,6 +81,29 @@ test("text size is exposed only inside Accessibility", async ({ page }) => {
   await expect(page.getByTestId("text-size-option-large")).toHaveCount(0);
 });
 
+test("language changes in place from the Settings selector", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await openSettings(page);
+
+  const settingsUrl = page.url();
+  const historyLength = await page.evaluate(() => window.history.length);
+  const languageSelector = page.getByTestId("settings-language-select");
+
+  await expect(languageSelector).toBeVisible();
+  await expect(languageSelector).toHaveValue("en");
+  await languageSelector.selectOption("ar");
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expect(languageSelector).toBeVisible();
+  await expect(languageSelector).toHaveValue("ar");
+  await expect(
+    page.getByRole("heading", { name: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a", exact: true }),
+  ).toBeVisible();
+  expect(page.url()).toBe(settingsUrl);
+  expect(await page.evaluate(() => window.history.length)).toBe(historyLength);
+});
+
 test("forced RTL updates settings controls and their keyboard direction", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await openSettings(page);

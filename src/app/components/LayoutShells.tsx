@@ -3,6 +3,26 @@ import { ArrowPrevious, BookOpen, Home, Settings } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
+export function IconButton({
+  label,
+  className = "",
+  children,
+  ...props
+}: Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "aria-label"> & {
+  label: string;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      className={`ui-icon-button focus-visible:outline-none ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
+  );
+}
+
 export function Header({
   title,
   subtitle,
@@ -19,14 +39,9 @@ export function Header({
   return (
     <div className="flex items-center gap-2 px-4 shrink-0 border-b border-border h-14">
       {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          aria-label={t(language, "common.back")}
-          className="flex items-center justify-center rounded-full transition-colors w-11 h-11 min-w-[44px] hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <ArrowPrevious size={22} className="text-foreground" />
-        </button>
+        <IconButton onClick={onBack} label={t(language, "common.back")}>
+          <ArrowPrevious size={20} className="text-foreground" />
+        </IconButton>
       )}
       <div className="flex-1 min-w-0">
         <h1 className="font-semibold truncate text-[1.0625rem] leading-6 text-foreground font-sans">{title}</h1>
@@ -66,7 +81,7 @@ export function BottomNav({
               onClick={() => onChange(id)}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="flex min-h-11 min-w-12 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex min-h-11 min-w-12 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
                 <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />

@@ -1,5 +1,6 @@
-import React from "react";
-import { ArrowPrevious, ChevronNext } from "../../components/icons";
+import React, { useId } from "react";
+import { IconButton } from "../../components/LayoutShells";
+import { ArrowPrevious, ChevronDown, ChevronNext } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 
@@ -16,15 +17,9 @@ export function SubHeader({
 }) {
   return (
     <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 56 }}>
-      <button
-        type="button"
-        onClick={onBack}
-        className="flex items-center justify-center rounded-full active:scale-95 transition-all"
-        style={{ width: 44, height: 44 }}
-        aria-label={t(language, "common.back")}
-      >
-        <ArrowPrevious size={24} className="text-foreground" />
-      </button>
+      <IconButton onClick={onBack} label={t(language, "common.back")}>
+        <ArrowPrevious size={20} className="text-foreground" />
+      </IconButton>
       <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px]">{title}</h1>
       <div style={{ width: 44 }} className="flex justify-end items-center">
         {right}
@@ -62,13 +57,10 @@ export function SettingsRowItem({
 }: SettingsRowProps) {
   const content = (
     <>
-      <div
-        className="flex items-center justify-center rounded-xl shrink-0"
-        style={{ width: 36, height: 36, background: iconBg }}
-      >
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: iconBg }}>
         {icon}
       </div>
-      <p className={`flex-1 text-start text-[1rem] font-semibold ${labelColor} font-sans`}>{label}</p>
+      <p className={`min-w-0 flex-1 text-start text-[1rem] font-semibold ${labelColor} font-sans`}>{label}</p>
       {right}
     </>
   );
@@ -79,15 +71,85 @@ export function SettingsRowItem({
         <button
           type="button"
           onClick={onPress}
-          className="w-full flex items-center gap-4 px-4 transition-all active:opacity-70 bg-card h-[60px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+          className="flex min-h-16 w-full items-center gap-3 bg-card px-4 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
           {content}
         </button>
       ) : (
-        <div className="w-full flex items-center gap-4 px-4 bg-card h-[60px]">{content}</div>
+        <div className="flex min-h-16 w-full items-center gap-3 bg-card px-4">{content}</div>
       )}
       {hasDivider && (
         <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
+      )}
+    </div>
+  );
+}
+
+export function SettingsSelectRow({
+  icon,
+  iconBg = "var(--muted)",
+  label,
+  selectedValue,
+  value,
+  options,
+  onChange,
+  direction,
+  testId,
+  hasDivider = true,
+}: {
+  icon: React.ReactNode;
+  iconBg?: string;
+  label: string;
+  selectedValue: string;
+  value: string;
+  options: Array<{ value: string; label: string; language?: string; direction?: "ltr" | "rtl" }>;
+  onChange: (value: string) => void;
+  direction: "ltr" | "rtl";
+  testId?: string;
+  hasDivider?: boolean;
+}) {
+  const labelId = useId();
+
+  return (
+    <div className="relative">
+      <label className="group relative flex min-h-16 w-full cursor-pointer items-center gap-3 bg-card px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring">
+        <span
+          aria-hidden="true"
+          className="flex size-10 shrink-0 items-center justify-center rounded-[var(--ds-radius-control)]"
+          style={{ background: iconBg }}
+        >
+          {icon}
+        </span>
+        <span id={labelId} className="min-w-0 flex-1 text-start font-sans text-[1rem] font-semibold text-foreground">
+          {label}
+        </span>
+        <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
+          <p className="truncate font-sans text-[0.9375rem] text-foreground/90" title={value}>
+            {value}
+          </p>
+          <ChevronDown aria-hidden="true" size={18} className="shrink-0 text-foreground/70" />
+        </div>
+        <select
+          data-testid={testId}
+          aria-labelledby={labelId}
+          value={selectedValue}
+          onChange={(event) => onChange(event.target.value)}
+          className="absolute inset-0 size-full cursor-pointer appearance-none opacity-0"
+          dir={direction}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value} lang={option.language} dir={option.direction}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {hasDivider && (
+        <div
+          aria-hidden="true"
+          className="absolute bottom-0 h-px bg-border"
+          style={{ insetInlineStart: 68, insetInlineEnd: 0 }}
+        />
       )}
     </div>
   );
@@ -99,8 +161,10 @@ export function RowChevron() {
 
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
   return (
-    <div className="flex items-center gap-1.5">
-      <p className="text-[0.9375rem] text-foreground/90 font-sans">{value}</p>
+    <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
+      <p className="truncate text-[0.9375rem] text-foreground/90 font-sans" title={value}>
+        {value}
+      </p>
       {withChevron && <RowChevron />}
     </div>
   );
@@ -113,7 +177,7 @@ function ToggleTrack({ checked }: { checked: boolean }) {
       className="relative block h-[26px] w-11 rounded-full border-2 transition-colors"
       style={{
         background: checked ? "var(--primary)" : "var(--card)",
-        borderColor: checked ? "var(--primary)" : "var(--border)",
+        borderColor: checked ? "var(--primary)" : "var(--border-control)",
       }}
     >
       <span
@@ -151,11 +215,11 @@ export function SettingsToggleRow({
         role="switch"
         aria-checked={checked}
         onClick={onChange}
-        className="flex min-h-[60px] w-full items-center gap-4 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring"
+        className="flex min-h-16 w-full items-center gap-3 bg-card px-4 py-3 text-start transition-opacity active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
       >
         <span
           aria-hidden="true"
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl"
+          className="flex size-10 shrink-0 items-center justify-center rounded-xl"
           style={{ background: iconBg }}
         >
           {icon}

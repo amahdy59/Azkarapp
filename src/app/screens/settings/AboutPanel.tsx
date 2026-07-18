@@ -51,7 +51,7 @@ export function AboutPanel({
 
         <div>
           <SectionLabel label={t(language, "about.contentSource")} />
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <AboutRow
               icon={
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
@@ -78,7 +78,7 @@ export function AboutPanel({
 
         <div>
           <SectionLabel label={t(language, "about.support")} />
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <SupportRow
               icon={<MessageChat size={18} className="text-background" />}
               label={t(language, "about.sendFeedback")}
@@ -101,7 +101,7 @@ export function AboutPanel({
 
         <div className="pb-8">
           <SectionLabel label={t(language, "about.legal")} />
-          <div className="overflow-hidden rounded-xl border border-border bg-card">
+          <div className="overflow-hidden rounded-2xl border border-border bg-card">
             <SupportRow
               icon={<Info size={18} className="text-background" />}
               label={t(language, "about.privacy")}

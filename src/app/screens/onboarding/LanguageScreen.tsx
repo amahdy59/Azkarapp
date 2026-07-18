@@ -48,15 +48,15 @@ export function LanguageScreen({
               aria-checked={active}
               data-testid={`language-option-${lang.code}`}
               onClick={() => setSelected(lang.code)}
-              className={`relative flex items-center justify-center gap-3 rounded-2xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                active ? "border-primary shadow-sm" : "border-border"
+              className={`relative flex items-center justify-center gap-3 rounded-2xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                active ? "border-primary shadow-sm" : "border-border-control"
               }`}
               dir={lang.code === "ar" ? "rtl" : "ltr"}
               lang={lang.code}
             >
               <div className="flex items-center justify-center gap-3 w-full">
                 {active && (
-                  <div className="absolute left-4">
+                  <div className="absolute start-4">
                     <Check size={20} className="text-primary" aria-hidden="true" />
                   </div>
                 )}
@@ -78,7 +78,7 @@ export function LanguageScreen({
         <button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
-          className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[1.0625rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[1.0625rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {isArabic ? "متابعة" : "Continue"}
         </button>

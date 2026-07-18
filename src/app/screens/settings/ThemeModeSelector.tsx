@@ -39,10 +39,10 @@ export function ThemeModeSelector({
             key={mode}
             value={mode}
             data-testid={`theme-option-${mode}`}
-            className={`relative flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            className={`relative flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               selected
                 ? "border-primary bg-primary/10 text-foreground"
-                : "border-border bg-background text-muted-foreground hover:border-primary/60"
+                : "border-border-control bg-background text-muted-foreground hover:border-primary"
             }`}
           >
             <Icon size={20} className={selected ? "text-primary" : "text-muted-foreground"} aria-hidden="true" />

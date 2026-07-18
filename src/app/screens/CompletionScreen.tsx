@@ -127,7 +127,7 @@ export function CompletionScreen({
         <button
           type="button"
           onClick={() => void share()}
-          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-border bg-card font-bold text-foreground transition-transform duration-150 active:scale-[0.98]"
+          className="flex min-h-[48px] items-center justify-center gap-2 rounded-lg border border-border-control bg-card font-bold text-foreground transition-transform duration-150 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <Share2 size={18} /> {t(language, "completion.share")}
         </button>

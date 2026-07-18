@@ -35,7 +35,7 @@ export default function MarketingLanding() {
               </a>
               <a
                 href="#features"
-                className="inline-flex min-h-11 items-center rounded-xl border border-border px-6 py-3 font-semibold"
+                className="inline-flex min-h-11 items-center rounded-xl border border-border-control px-6 py-3 font-semibold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 Explore features
               </a>

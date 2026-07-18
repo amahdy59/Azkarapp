@@ -44,16 +44,26 @@ Rules:
 - Icons inside labeled buttons are decorative and remain hidden from assistive technology; the control supplies the accessible name. Icon-only controls require a localized `aria-label`.
 - Custom SVG is limited to non-icon artwork: the Azkar brand mark, third-party provider logos, decorative illustrations, device/status mockups, and data visualizations such as progress rings. These exceptions must never be substituted for an interactive Untitled icon.
 
+## Geometry and control contract
+
+- Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets.
+- Radius roles are 8 px for small elements, 14 px for controls, 20 px for cards, and 24 px for overlays. Pills and circles use the full-radius token.
+- Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px; controls with room should use the regular role.
+- Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs, toggles, outlined buttons, and other boundaries needed to identify an interactive control. Meaningful control boundaries must reach 3:1 non-text contrast against their adjacent surface.
+- All focusable controls use the semantic ring color and a 3 px visible focus indicator. Do not remove focus indication or stack competing ring and outline treatments.
+- Shared `IconButton`, UI `Button`, settings rows, and sheet primitives own these roles. Product screens must not reintroduce one-off sizes, strokes, or radii without documenting an exception here.
+
 ## Reader contract
 
-- The header uses fixed physical placement: back on the left, screen title centered, menu on the right. Its internal grid is LTR; Arabic title and menu content retain RTL semantics.
+- The header follows reading direction: back is at logical start, the screen title stays centered, and the menu is at logical end. DOM and tab order remain stable.
 - The single top progress track is the only session-position indicator. Do not add a second “1 of 26” text row above the zikr.
-- Reader content shows the zikr only. EN, TR, and Listen controls are intentionally hidden until a future approved feature revision.
+- The Arabic source text remains visible in the Reader because it is the zikr itself. English mode may additionally show the reviewed translation and transliteration when those reading preferences are enabled; Arabic mode must not leak English supporting copy.
 - There is no separator between zikr content and the counter.
-- The counter ring is 184 CSS px. The entire counter surface is the 44 px-plus accessible tap target, not only the ring. It uses `touch-action: manipulation`, supports Enter/Space, and sits in the upper-middle/lower-thumb transition zone so one-handed use remains comfortable.
+- The counter ring is 184 CSS px. A pointer activation anywhere on the Reader canvas counts, except interactive controls, menus, dialogs, editable fields, and scrollbars. The explicit reading and counter surfaces also support Enter/Space and use `touch-action: manipulation`.
 - Before counting, the only visible instruction is “Tap anywhere to count” (localized). Do not add breathing, readiness, motivational, or other generic helper copy.
 - Per-zikr completion is visually checkmark-only: no text appears inside the ring or around it during the 500 ms acknowledgement. Completion details remain available through the nonvisual live-region announcement.
-- Share, references, and save remain separate 48 px actions below the counter.
+- Share, Benefit, and save remain separate actions below the counter with targets of at least 44×44 CSS px. Their flexible toolbar must stay inside a 320 px app canvas.
+- Share generates a theme-aware 1080×2920 PNG locally. Mobile uses Web Share with an image file; unsupported browsers copy the PNG or download it. Arabic cards exclude English supporting content, while English cards include the Arabic zikr with meaning, pronunciation, benefit, and source.
 - The reader has one contained vertical scroll region. Short screens must preserve access to the zikr, counter, and actions without document-level horizontal overflow.
 
 ## Home and azkar-group contract
@@ -67,15 +77,16 @@ Rules:
 - Each featured state uses its approved scene asset from `src/assets/home`: `morning-scene.png` for Morning, `evening-scene.png` for Evening, and `before-sleep-scene.png` for Before Sleep. Artwork is decorative, sits behind all copy, fills the card, and uses the theme-owned `--featured-scene-opacity` token plus a semantic card/background overlay for legibility in Light, Midnight, and Dark/OLED modes.
 - Featured-card Arabic copy is right aligned and uses RTL semantics. Zikr excerpts retain the `zikr-text` typography contract; decorative artwork has empty alternative text.
 
-## Reference sheet contract
+## Benefit sheet contract
 
+- The modal layer is positioned inside the app canvas rather than the browser viewport. Its sheet rises from and remains attached to the app canvas bottom edge on phone, tablet, and desktop.
 - Width is fluid up to the 390 px app canvas.
 - Normal height is the smaller of 82 dynamic-viewport-height units and 720 px, capped at `100dvh - 12px`.
 - At heights of 560 px or less, height becomes `100dvh - 12px`.
 - Content scrolls inside the sheet with overscroll containment. The 64 px handle/close header remains outside the scroll viewport so dismissal is always reachable.
-- The Figma hierarchy is fixed: muted Arabic zikr card, translation, divider, transliteration, optional hadith, then source badge. Do not reintroduce metadata cards, timing notes, authenticity cards, or duplicate count information here.
+- English hierarchy is translation, pronunciation, reviewed benefit, and English source. Arabic hierarchy is Arabic zikr, Arabic benefit, optional Arabic evidence, and Arabic source. Content from the other UI language must not appear.
 - Sheet content uses 24 px horizontal padding and 16 px vertical section gaps. Bottom padding includes the device safe-area inset.
-- The close control stays at the physical top-right to match the approved component in every locale and has a 44×44 px target.
+- The close control stays at logical end and has a 44×44 px target.
 - Copy actions use Untitled UI `Copy04`, expose localized accessible labels, and replace the icon briefly with a check after a successful copy.
 
 ## Scrollbar contract
@@ -125,7 +136,7 @@ Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease
 
 - At viewport widths up to 430 px, the app is full-bleed and uses `100vw × 100dvh`.
 - Above 430 px, preserve the centered 390 px mobile design canvas; do not stretch cards or reader content across tablet/desktop widths.
-- The reference layouts are verified at 390×844, 643×275, and 1110×835. Playwright protects phone, tablet, and desktop shell geometry.
+- The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 
 ## Change control
 

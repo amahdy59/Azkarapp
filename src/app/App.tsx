@@ -68,7 +68,6 @@ function categoryFromShortcutUrl(): CategoryId | null {
 import { BottomNav } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
-import { LANGUAGE_LABELS } from "./languageOptions";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useForegroundReminders } from "./hooks/useForegroundReminders";
@@ -170,14 +169,14 @@ function PwaNotice({
         <button
           type="button"
           onClick={onDismiss}
-          className="min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {dismissLabel}
         </button>
         <button
           type="button"
           onClick={onAction}
-          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {actionLabel}
         </button>
@@ -258,7 +257,6 @@ export default function App() {
     new Date(),
     progressDayStartHour,
   );
-  const languageLabel = LANGUAGE_LABELS[selectedLang];
   const isArabic = selectedLang === "ar";
   const layoutDirection = isArabic || forceRtl ? "rtl" : "ltr";
 
@@ -913,6 +911,7 @@ export default function App() {
                 idx={activeIdx}
                 isArabic={isArabic}
                 direction={layoutDirection}
+                themeMode={themeMode}
                 isDone={
                   isRepeatSession ? repeatCompleted.has(activeIdx) : (completed[activeCat]?.has(activeIdx) ?? false)
                 }
@@ -951,7 +950,6 @@ export default function App() {
             {view === "settings" && (
               <SettingsScreen
                 themeMode={themeMode}
-                languageLabel={languageLabel}
                 language={selectedLang}
                 isGuest={isGuest}
                 isSyncing={isSyncingRemote}

@@ -30,7 +30,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
         <div className="overflow-hidden rounded-2xl border border-border bg-card">
           {FAQ_ITEMS.map(({ question, answer, icon: Icon }) => (
             <details className="group border-b border-border last:border-b-0" key={question}>
-              <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring">
+              <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">
                 <Icon size={19} className="shrink-0 text-primary" aria-hidden="true" />
                 <span className="flex-1 text-start text-[0.875rem] font-semibold leading-5 text-foreground">
                   {t(language, question)}

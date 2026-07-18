@@ -6,7 +6,7 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
       <div className="h-[360px] shrink-0">
         <WelcomeArtwork />
       </div>
-      <div className="flex flex-1 flex-col items-center gap-7 px-7 pb-7 pt-5">
+      <div className="flex flex-1 flex-col items-center gap-7 px-6 pb-7 pt-5">
         <h1 className="text-center text-[1.75rem] font-extrabold leading-9 tracking-[-0.28px] text-foreground">
           Your Daily
           <br />

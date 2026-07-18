@@ -1,7 +1,6 @@
 export type { SettingsSubScreen } from "./SettingsRootPanel";
 export { SettingsRootPanel } from "./SettingsRootPanel";
 export { AccountDataPanel } from "./AccountDataPanel";
-export { LanguagePanel } from "./LanguagePanel";
 export { AccessibilityPanel } from "./AccessibilityPanel";
 export { DownloadsPanel } from "./DownloadsPanel";
 export { NotificationsPanel } from "./NotificationsPanel";
@@ -10,3 +9,4 @@ export { AboutPanel } from "./AboutPanel";
 export { HelpPanel } from "./HelpPanel";
 export { LegalPanel } from "./LegalPanel";
 export { SourcesPanel } from "./SourcesPanel";
+export { LanguagePanel } from "./LanguagePanel";

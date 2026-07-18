@@ -85,15 +85,54 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
 });
 
+test("the full reader canvas counts taps while controls and the benefit sheet never do", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  const counterSurface = page.getByTestId("counter-surface");
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  await page.getByRole("button", { name: "Save zikr", exact: true }).click();
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  const sheet = page.getByTestId("reference-sheet");
+  await sheet.getByText("Included as the opening item of the morning/evening chapter.", { exact: true }).click();
+  await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  await page.locator("footer").click({ position: { x: 2, y: 2 } });
+  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+});
+
+test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await openFirstMorningZikr(page);
+
+  const readerBox = await page.getByTestId("reader-screen").boundingBox();
+  const actionBoxes = await Promise.all(
+    ["Share zikr", "Benefit", "Save zikr"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
+  );
+  expect(readerBox).not.toBeNull();
+  if (!readerBox) return;
+
+  for (const actionBox of actionBoxes) {
+    expect(actionBox).not.toBeNull();
+    if (!actionBox) continue;
+    expect(actionBox.x).toBeGreaterThanOrEqual(readerBox.x);
+    expect(actionBox.x + actionBox.width).toBeLessThanOrEqual(readerBox.x + readerBox.width);
+    expect(actionBox.height).toBeGreaterThanOrEqual(44);
+  }
+});
+
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 560 });
   await openFirstMorningZikr(page);
 
-  const trigger = page.getByRole("button", { name: "References", exact: true });
+  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
   await trigger.click();
 
   const sheet = page.getByTestId("reference-sheet");
-  const close = sheet.getByRole("button", { name: "Close references", exact: true });
+  const close = sheet.getByRole("button", { name: "Close benefit", exact: true });
   await expect(sheet).toBeVisible();
   await expect(close).toBeFocused();
   await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
@@ -124,6 +163,59 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
   await expect(trigger).toBeFocused();
 });
 
+test("benefit sheet rises from the bottom edge of the centered app canvas", async ({ page }) => {
+  await page.setViewportSize({ width: 1000, height: 1000 });
+  await openFirstMorningZikr(page);
+
+  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  const layer = page.getByTestId("reference-sheet-layer");
+  const reader = page.getByTestId("reader-screen");
+  const sheet = page.getByTestId("reference-sheet");
+
+  const bounds = await Promise.all([layer.boundingBox(), reader.boundingBox(), sheet.boundingBox()]);
+  const [layerBox, readerBox, sheetBox] = bounds;
+  expect(layerBox).not.toBeNull();
+  expect(readerBox).not.toBeNull();
+  expect(sheetBox).not.toBeNull();
+  if (!layerBox || !readerBox || !sheetBox) return;
+
+  expect(Math.abs(layerBox.x - readerBox.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layerBox.y - readerBox.y)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layerBox.width - readerBox.width)).toBeLessThanOrEqual(1);
+  expect(Math.abs(layerBox.height - readerBox.height)).toBeLessThanOrEqual(1);
+  expect(Math.abs(sheetBox.y + sheetBox.height - (readerBox.y + readerBox.height))).toBeLessThanOrEqual(1);
+  expect(sheetBox.y + sheetBox.height).toBeLessThan(1000);
+});
+
+for (const locale of [
+  { language: "en", benefit: "Benefit", source: "Source" },
+  { language: "ar", benefit: "\u0641\u0627\u0626\u062f\u0629", source: "\u0627\u0644\u0645\u0635\u062f\u0631" },
+] as const) {
+  test(`${locale.language.toUpperCase()} benefit sheet only shows content for its selected language`, async ({
+    page,
+  }) => {
+    await openReturningGuestHome(page, locale.language);
+    await page.getByTestId("category-card-morning").click();
+    await page.locator(`button:has([lang='${locale.language}'])`).first().click();
+    await page.getByRole("button", { name: locale.benefit, exact: true }).click();
+
+    const sheet = page.getByTestId("reference-sheet");
+    await expect(sheet.getByRole("heading", { name: locale.source, exact: true })).toBeVisible();
+
+    if (locale.language === "ar") {
+      await expect(sheet.locator("[lang='en']")).toHaveCount(0);
+      await expect(sheet.locator("[lang='ar']").first()).toBeVisible();
+      for (const text of await sheet.locator("[lang='ar']").allTextContents()) {
+        expect(text).not.toMatch(/[A-Za-z]/);
+      }
+    } else {
+      await expect(sheet.locator("[lang='ar']")).toHaveCount(0);
+      await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
+      await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toBeVisible();
+    }
+  });
+}
+
 for (const locale of [
   {
     language: "en",
@@ -147,7 +239,7 @@ for (const locale of [
     const categoryProgress = page.getByRole("progressbar");
     await expectFillToStartAt(categoryProgress, locale.direction);
 
-    await page.locator("button:has(.zikr-text)").first().click();
+    await page.locator(`button:has([lang='${locale.language}'])`).first().click();
     await expect(page.getByTestId("zikr-text")).toBeVisible();
 
     const readerProgress = page.getByRole("progressbar");

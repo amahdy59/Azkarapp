@@ -18,18 +18,17 @@ import {
   AccountDataPanel,
   DownloadsPanel,
   HelpPanel,
-  LanguagePanel,
   LegalPanel,
   NotificationsPanel,
   ProgressPanel,
   SettingsRootPanel,
   SourcesPanel,
+  LanguagePanel,
   type SettingsSubScreen,
 } from "./SettingsPanels";
 
 interface SettingsScreenProps {
   themeMode: ThemeMode;
-  languageLabel: string;
   language: AppLanguage;
   isGuest: boolean;
   isSyncing: boolean;
@@ -78,7 +77,6 @@ interface SettingsScreenProps {
 
 export function SettingsScreen({
   themeMode,
-  languageLabel,
   language,
   isGuest,
   isSyncing,
@@ -140,16 +138,12 @@ export function SettingsScreen({
             highContrast={highContrast}
             onThemeModeChange={onThemeModeChange}
             onDisableHighContrast={() => onHighContrastChange(false)}
-            languageLabel={languageLabel}
             isGuest={isGuest}
             isSyncing={isSyncing}
             syncError={syncError}
             quietProgressEnabled={quietProgressEnabled}
           />
         </motion.div>
-      )}
-      {sub === "language" && (
-        <LanguagePanel language={language} selectedLanguage={language} onChange={onLanguageChange} onBack={goBack} />
       )}
       {sub === "accessibility" && (
         <AccessibilityPanel
@@ -229,6 +223,9 @@ export function SettingsScreen({
           onSources={() => setSub("sources")}
           onBack={goBack}
         />
+      )}
+      {sub === "language" && (
+        <LanguagePanel language={language} direction={direction} onLanguageChange={onLanguageChange} onBack={goBack} />
       )}
     </div>
   );

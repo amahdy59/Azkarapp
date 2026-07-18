@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ArrowPrevious, ChevronDown, Clock, Globe } from "../../components/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
 import { t } from "../../i18n";
+import { IconButton } from "../../components/LayoutShells";
 import type { AppLanguage } from "../../types";
 import { BrandLockup } from "../onboarding/OnboardingBrand";
 
@@ -137,13 +138,9 @@ export function PhoneInputScreen({
   return (
     <div className="flex h-full flex-col bg-background slide-in-from-right" style={ar ? rtlFont : undefined}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
-        <button
-          onClick={onBack}
-          className="flex size-11 items-center justify-center justify-self-start"
-          aria-label={t(language, "common.back")}
-        >
+        <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
-        </button>
+        </IconButton>
         <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.signIn")}</p>
         <button
           onClick={onSkip}
@@ -157,10 +154,10 @@ export function PhoneInputScreen({
           <h1 className="text-[1.5rem] font-extrabold leading-8 text-foreground">{t(language, "auth.enterNumber")}</h1>
           <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">{t(language, "auth.phoneHelp")}</p>
         </div>
-        <div className="flex h-[60px] items-center gap-3 rounded-2xl border-[1.5px] border-primary bg-card px-3 focus-within:ring-2 focus-within:ring-ring">
+        <div className="flex h-[60px] items-center gap-3 rounded-2xl border-[1.5px] border-primary bg-card px-3 focus-within:ring-[3px] focus-within:ring-ring">
           <button
             type="button"
-            className="flex items-center gap-1 rounded-lg border border-secondary px-2 py-1.5 text-[0.9375rem] text-foreground"
+            className="flex min-h-11 items-center gap-1 rounded-xl border border-border-control px-2 text-[0.9375rem] text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label="Country code Saudi Arabia plus 966"
           >
             <span>🇸🇦 +966</span>
@@ -236,13 +233,9 @@ export function OTPScreen({
   return (
     <div className="flex h-full flex-col bg-background slide-in-from-right" style={ar ? rtlFont : undefined}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
-        <button
-          onClick={onBack}
-          className="flex size-11 items-center justify-center justify-self-start"
-          aria-label={t(language, "common.back")}
-        >
+        <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
-        </button>
+        </IconButton>
         <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.verifyNumber")}</p>
         <span />
       </header>
@@ -265,7 +258,7 @@ export function OTPScreen({
           maxLength={6}
           value={token}
           onChange={(value) => setToken(value.replace(/\D/g, "").slice(0, 6))}
-          containerClassName="justify-center"
+          containerClassName="w-full justify-center"
           inputMode="numeric"
           autoComplete="one-time-code"
           aria-label="Verification code"
@@ -275,7 +268,7 @@ export function OTPScreen({
               <InputOTPSlot
                 key={index}
                 index={index}
-                className="h-[60px] w-[50px] rounded-xl border border-card bg-card text-[1.375rem] font-semibold text-foreground first:rounded-xl first:border-l last:rounded-xl data-[active=true]:border-2 data-[active=true]:border-primary data-[active=true]:ring-0"
+                className="h-[60px] min-w-10 max-w-[50px] flex-1 rounded-xl border border-border-control bg-card text-[1.375rem] font-semibold text-foreground first:rounded-xl first:border-l last:rounded-xl data-[active=true]:border-2 data-[active=true]:border-primary data-[active=true]:ring-0"
               />
             ))}
           </InputOTPGroup>

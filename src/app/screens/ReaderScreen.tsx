@@ -14,10 +14,13 @@ import {
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import type { AppLanguage, ArabicFontOption, CategoryId, TextSizeOption } from "../types";
+import type { AppLanguage, ArabicFontOption, CategoryId, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
+import { IconButton } from "../components/LayoutShells";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScrollArea } from "../components/ui/scroll-area";
 import {
@@ -28,6 +31,18 @@ import {
 } from "../components/ui/dropdown-menu";
 
 export const COUNTER_ADVANCE_DELAY_MS = 500;
+
+const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
+  generating: "reader.shareCardGenerating",
+  openingShareSheet: "reader.shareCardOpening",
+  shared: "reader.shareCardShared",
+  copying: "reader.shareCardCopying",
+  copied: "reader.shareCardCopied",
+  downloading: "reader.shareCardDownloading",
+  downloaded: "reader.shareCardDownloaded",
+  cancelled: "reader.shareCardCancelled",
+  error: "reader.shareCardError",
+};
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -40,6 +55,7 @@ export function ReaderScreen({
   idx,
   isArabic,
   direction,
+  themeMode,
   isDone,
   collectionCompletedCount,
   hapticFeedback,
@@ -59,6 +75,7 @@ export function ReaderScreen({
   idx: number;
   isArabic: boolean;
   direction: "ltr" | "rtl";
+  themeMode: ThemeMode;
   isDone: boolean;
   collectionCompletedCount: number;
   hapticFeedback: boolean;
@@ -85,6 +102,7 @@ export function ReaderScreen({
   const [complete, setComplete] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
+  const [isSharing, setIsSharing] = useState(false);
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
   const closeReference = useCallback(() => setBenefitOpen(false), []);
 
@@ -201,7 +219,7 @@ export function ReaderScreen({
 
     return Boolean(
       target.closest(
-        "button, a, input, textarea, select, summary, [role='dialog'], [data-radix-scroll-area-thumb], [data-radix-scroll-area-scrollbar], [data-prevent-count='true']",
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-radix-scroll-area-thumb], [data-radix-scroll-area-scrollbar], [data-prevent-count='true']",
       ),
     );
   };
@@ -227,42 +245,56 @@ export function ReaderScreen({
   };
 
   const handleShare = async () => {
-    const shareText = `${z.arabicText}\n\n${z.translation}\n\n${z.sourceReference}`;
-
+    setIsSharing(true);
     try {
-      if (navigator.share) {
-        await navigator.share({
-          title: isArabic ? category.nameArabic : category.name,
-          text: shareText,
-        });
-        return;
-      }
-
-      await navigator.clipboard.writeText(shareText);
-      setShareMessage(t(language, "reader.shareSuccess"));
+      await shareZikrCard(
+        {
+          id: z.id,
+          language,
+          themeMode,
+          arabicText: z.arabicText,
+          translation: language === "en" ? z.translation : undefined,
+          transliteration: language === "en" ? z.transliteration : undefined,
+          benefit: getLocalizedZikrBenefit(z, language),
+          sourceReference: getLocalizedSourceReference(z, language),
+          categoryLabel: isArabic ? category.nameArabic : category.name,
+          repetitionCount: z.repetitionCount,
+          appUrl:
+            typeof window === "undefined"
+              ? undefined
+              : new URL(import.meta.env.BASE_URL, window.location.origin).toString(),
+          labels: { brandName: t(language, "common.azkar") },
+        },
+        {
+          onStatus: (status) => setShareMessage(t(language, SHARE_STATUS_KEYS[status])),
+        },
+      );
+    } catch {
+      // The share helper has already announced a localized error state.
+    } finally {
+      setIsSharing(false);
       if (shareTimer.current) {
         clearTimeout(shareTimer.current);
       }
-      shareTimer.current = setTimeout(() => setShareMessage(""), 1800);
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") {
-        return;
-      }
+      shareTimer.current = setTimeout(() => setShareMessage(""), 2600);
     }
   };
 
   const renderCounterActions = () => (
-    <div className="flex items-center justify-between gap-4 px-2">
-      <button
-        type="button"
+    <div className="flex min-w-0 items-center gap-2">
+      <IconButton
         onClick={() => {
           void handleShare();
         }}
-        aria-label={t(language, "reader.share")}
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/50 text-card-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        label={t(language, "reader.share")}
+        disabled={isSharing}
+        aria-busy={isSharing || undefined}
+        onPointerEnter={() => void prepareZikrShareCardFonts()}
+        onFocus={() => void prepareZikrShareCardFonts()}
+        className="shrink-0 border border-border-control bg-card text-card-foreground"
       >
         <Share2 size={18} />
-      </button>
+      </IconButton>
 
       <button
         type="button"
@@ -271,30 +303,30 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="flex h-12 min-w-[166px] items-center justify-center gap-2 rounded-full border border-border bg-card px-5 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
-        <BookOpen size={17} />
-        <span dir="auto">{t(language, "reader.referencesButton")}</span>
-        <ChevronUp size={17} />
+        <BookOpen className="shrink-0" size={17} />
+        <span className="truncate" dir="auto">
+          {t(language, "reader.referencesButton")}
+        </span>
+        <ChevronUp className="shrink-0" size={17} />
       </button>
 
-      <button
-        type="button"
+      <IconButton
         onClick={handleToggleSaved}
-        aria-label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
+        label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
         aria-pressed={isSaved}
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-border bg-card/50 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="shrink-0 border border-border-control bg-card"
         style={{ color: isSaved ? "var(--primary)" : "var(--card-foreground)" }}
       >
         <Heart key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
-      </button>
+      </IconButton>
     </div>
   );
 
   const renderReadingContent = () => (
     <div
       className="mx-4 mt-2 cursor-pointer touch-manipulation rounded-2xl px-6 pb-3 pt-3 transition-colors hover:bg-muted/50 active:bg-muted"
-      onClick={handleSurfaceTap}
       role="button"
       tabIndex={0}
       aria-label={t(language, "reader.tapAnywhere")}
@@ -314,8 +346,8 @@ export function ReaderScreen({
       >
         {z.arabicText}
       </p>
-      {(showTranslation || showTransliteration) && (
-        <div className="mt-5 space-y-4 border-t border-border pt-4 text-start" data-prevent-count="true">
+      {!isArabic && (showTranslation || showTransliteration) && (
+        <div className="mt-5 space-y-4 border-t border-border pt-4 text-start">
           {showTranslation && (
             <section aria-labelledby="reader-translation-title">
               <h2 id="reader-translation-title" className="text-[0.8125rem] font-bold text-muted-foreground">
@@ -350,8 +382,7 @@ export function ReaderScreen({
           tabIndex={0}
           aria-disabled={complete}
           aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className={`flex min-h-[300px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-[28px] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
-          onClick={handleSurfaceTap}
+          className={`flex min-h-[300px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
               event.preventDefault();
@@ -411,9 +442,13 @@ export function ReaderScreen({
   );
 
   return (
+    // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
+    // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
     <div
       className="relative flex h-full flex-col bg-background"
+      data-testid="reader-screen"
       dir={direction}
+      onClick={handleSurfaceTap}
       onTouchStart={(event) => {
         const touch = event.touches[0];
         if (touch) {
@@ -453,29 +488,26 @@ export function ReaderScreen({
         {readerAnnouncement}
       </div>
 
-      <div className="relative shrink-0 px-5 py-3">
-        <div className="grid grid-cols-[68px_1fr_68px] items-center gap-2">
-          <button
+      <div className="relative shrink-0 px-4 py-3" data-prevent-count="true">
+        <div className="flex items-center gap-2">
+          <IconButton
             onClick={onBack}
-            aria-label={t(language, "common.back")}
-            className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            label={t(language, "common.back")}
+            className="shrink-0 border border-border-control bg-background"
           >
-            <ArrowPrevious size={20} />
-          </button>
+            <ArrowPrevious size={20} className="text-foreground" />
+          </IconButton>
 
-          <p className="truncate text-center text-[1.25rem] font-bold text-foreground" dir="auto">
+          <p className="min-w-0 flex-1 truncate text-center text-[1.25rem] font-bold text-foreground" dir="auto">
             {isArabic ? category.nameArabic : category.name}
           </p>
 
           <DropdownMenu dir={direction}>
-            <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                aria-label={t(language, "reader.menu")}
-                className="flex h-11 w-[68px] items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted active:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Menu size={18} />
-              </button>
+            <DropdownMenuTrigger
+              aria-label={t(language, "reader.menu")}
+              className="ui-icon-button shrink-0 border border-border-control bg-background focus-visible:outline-none"
+            >
+              <Menu size={18} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="min-w-[200px] rounded-2xl p-2" sideOffset={8}>
               <DropdownMenuItem
@@ -530,7 +562,9 @@ export function ReaderScreen({
         </div>
       </ScrollArea>
 
-      <footer className="shrink-0 px-6 pb-4 pt-3">{renderCounterActions()}</footer>
+      <footer className="shrink-0 px-4 pb-4 pt-3" data-prevent-count="true">
+        {renderCounterActions()}
+      </footer>
 
       {benefitOpen && (
         <ReaderReferenceSheet

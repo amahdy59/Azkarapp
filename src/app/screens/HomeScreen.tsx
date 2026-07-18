@@ -110,7 +110,7 @@ export function HomeScreen({
             onClick={() =>
               action.kind === "again" ? onRepeat(action.categoryId) : onResume(action.categoryId, action.index)
             }
-            className="flex min-h-[126px] w-full items-center gap-4 rounded-[22px] border border-primary/35 bg-primary/10 p-5 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex min-h-[126px] w-full items-center gap-4 rounded-2xl border border-primary/35 bg-primary/10 p-5 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={`${actionLabel}. ${formatNumerals(action.completedCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(action.totalCount, language)} ${t(language, "home.complete")}`}
           >
             <span
@@ -159,7 +159,7 @@ export function HomeScreen({
                     onClick={() => onCategory(category.id)}
                     dir={direction}
                     data-testid={`category-card-${category.id}`}
-                    className="flex min-h-[96px] w-full items-center gap-4 rounded-[20px] border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="flex min-h-[96px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={
                       isArabic
                         ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة`
