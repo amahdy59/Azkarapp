@@ -12,9 +12,9 @@ import {
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
-import { LANGUAGE_LABELS, LANGUAGES_LIST } from "../../languageOptions";
+import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, ThemeMode } from "../../types";
-import { RowChevron, RowValue, SectionLabel, SettingsRowItem, SettingsSelectRow } from "./SettingsPrimitives";
+import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
 
