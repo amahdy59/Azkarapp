@@ -37,7 +37,7 @@ export function Header({
   language?: AppLanguage;
 }) {
   return (
-    <div className="flex items-center gap-2 px-4 shrink-0 border-b border-border h-14">
+    <div className="flex items-center gap-2 px-4 shrink-0 h-14">
       {onBack && (
         <IconButton onClick={onBack} label={t(language, "common.back")}>
           <ArrowPrevious size={20} className="text-foreground" />
@@ -70,7 +70,7 @@ export function BottomNav({
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
-      className="flex h-16 shrink-0 border-t border-border bg-card"
+      className="flex h-16 shrink-0 bg-card"
     >
       <div className="flex min-h-0 flex-1 items-center justify-between px-8">
         {tabs.map(({ id, label, Icon }) => {

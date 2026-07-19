@@ -436,7 +436,7 @@ export function ReaderScreen({
         </div>
       </ScrollArea>
 
-      <footer className="shrink-0 px-4 pb-4 pt-3">{renderCounterActions()}</footer>
+      <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
 
       {benefitOpen && (
         <ReaderReferenceSheet
