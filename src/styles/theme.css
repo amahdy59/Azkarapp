@@ -595,12 +595,37 @@ body {
 
 @keyframes zikr-step-enter {
   0% {
-    opacity: 0.35;
-    transform: translateY(6px) scale(0.995);
+    opacity: 0;
+    transform: translateY(10px) scale(0.993);
+  }
+  60% {
+    opacity: 1;
   }
   100% {
     opacity: 1;
     transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes zikr-step-exit {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.994);
+  }
+}
+
+@keyframes hint-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
   }
 }
 
@@ -769,7 +794,26 @@ body {
 }
 
 .zikr-step-enter {
-  animation: zikr-step-enter 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: zikr-step-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.zikr-step-exit {
+  animation: zikr-step-exit 220ms cubic-bezier(0.4, 0, 1, 1) both;
+  pointer-events: none;
+}
+
+.tap-anywhere-hint {
+  /* Reserve height so layout never reflows when hint disappears */
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 200ms ease, transform 200ms ease;
+}
+
+.tap-anywhere-hint.hint-hidden {
+  animation: hint-fade-out 180ms cubic-bezier(0.4, 0, 0.6, 1) both;
+  pointer-events: none;
 }
 
 .counter-ring-stage {

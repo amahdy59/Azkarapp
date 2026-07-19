@@ -377,9 +377,15 @@ export function ReaderScreen({
             </div>
           </div>
 
-          {!complete && (
-            <p className="mt-4 text-[10px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
-          )}
+          {/* Reserved-height hint: always rendered to prevent layout reflow, animated out on complete */}
+          <p
+            className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${
+              complete ? " hint-hidden" : ""
+            }`}
+            aria-hidden={complete}
+          >
+            {complete ? "" : t(language, "reader.tapAnywhere")}
+          </p>
         </div>
       </div>
     </div>
@@ -467,7 +473,11 @@ export function ReaderScreen({
       {/* Main Layout Area */}
       <div className="flex-1 flex flex-col min-h-0 justify-between select-none" key={z.id}>
         {/* Upper section: Zikr content, middle and center aligned */}
-        <div className="flex-1 flex items-center justify-center min-h-0 w-full py-4 zikr-step-enter">
+        <div
+          className={`flex-1 flex items-center justify-center min-h-0 w-full py-4 ${
+            justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+          }`}
+        >
           {renderReadingContent()}
         </div>
 
@@ -475,7 +485,7 @@ export function ReaderScreen({
         <div className="shrink-0 pb-4">{renderCounterPanel()}</div>
       </div>
 
-      <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
+      <footer className="shrink-0 px-4 pb-4 pt-4">{renderCounterActions()}</footer>
 
       {benefitOpen && (
         <ReaderReferenceSheet
