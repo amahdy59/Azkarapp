@@ -13,7 +13,6 @@ import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
-import { ScrollArea } from "../components/ui/scroll-area";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import {
