@@ -808,7 +808,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 200ms ease, transform 200ms ease;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
 }
 
 .tap-anywhere-hint.hint-hidden {

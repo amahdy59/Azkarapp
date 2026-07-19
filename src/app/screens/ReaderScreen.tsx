@@ -379,9 +379,7 @@ export function ReaderScreen({
 
           {/* Reserved-height hint: always rendered to prevent layout reflow, animated out on complete */}
           <p
-            className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${
-              complete ? " hint-hidden" : ""
-            }`}
+            className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${complete ? " hint-hidden" : ""}`}
             aria-hidden={complete}
           >
             {complete ? "" : t(language, "reader.tapAnywhere")}
