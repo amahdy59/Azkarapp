@@ -879,48 +879,35 @@ body {
   pointer-events: none;
 }
 
+/* Hide native scrollbar inside the app shell — Radix ScrollArea provides its own overlay thumb */
 .app-shell,
 .app-shell * {
-  scrollbar-color: color-mix(in srgb, var(--muted-foreground) 58%, transparent) transparent;
-  scrollbar-width: thin;
+  scrollbar-width: none;
 }
 
 .app-shell *::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  display: none;
 }
 
-.app-shell *::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.app-shell *::-webkit-scrollbar-thumb {
-  border: 1px solid transparent;
-  background: color-mix(in srgb, var(--muted-foreground) 58%, transparent);
-  background-clip: padding-box;
-  border-radius: 9999px;
-}
-
-.app-shell *::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--primary) 76%, var(--muted-foreground));
-  background-clip: padding-box;
-}
-
+/* Radix ScrollArea auto-hide overlay scrollbar (type="hover") */
 [data-slot="scroll-area-scrollbar"] {
   padding: 2px;
-  opacity: 0.72;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+[data-slot="scroll-area-scrollbar"][data-state="visible"] {
+  opacity: 0.64;
 }
 
 [data-slot="scroll-area-thumb"] {
-  background: color-mix(in srgb, var(--muted-foreground) 58%, transparent);
+  background: color-mix(in srgb, var(--muted-foreground) 48%, transparent);
   border-radius: 9999px;
-  transition:
-    background-color 160ms ease,
-    opacity 160ms ease;
+  transition: background-color 160ms ease;
 }
 
 [data-slot="scroll-area-scrollbar"]:hover [data-slot="scroll-area-thumb"] {
-  background: color-mix(in srgb, var(--primary) 76%, var(--muted-foreground));
+  background: color-mix(in srgb, var(--muted-foreground) 72%, transparent);
 }
 
 .reference-sheet {

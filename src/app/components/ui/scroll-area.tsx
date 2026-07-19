@@ -13,7 +13,7 @@ function ScrollArea({
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      type="scroll"
+      type="hover"
       className={cn("relative", className)}
       {...props}
     >
