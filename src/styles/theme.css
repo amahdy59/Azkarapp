@@ -731,6 +731,15 @@ body {
   }
 }
 
+@keyframes sheet-exit {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
 @keyframes favorite-pop {
   0% {
     transform: scale(0.72);
@@ -971,6 +980,14 @@ body {
 .reference-sheet {
   height: min(82dvh, 720px);
   max-height: calc(100dvh - 12px);
+}
+
+.reference-sheet[data-state="open"] {
+  animation: sheet-enter 360ms cubic-bezier(0.32, 0.94, 0.6, 1) both;
+}
+
+.reference-sheet[data-state="closed"] {
+  animation: sheet-exit 300ms cubic-bezier(0.32, 0.94, 0.6, 1) both;
 }
 
 .reference-sheet-content {
