@@ -43,6 +43,33 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
+const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
+  const isLight = themeMode === "light";
+  if (isLight) {
+    switch (catId) {
+      case "morning":
+        return { "--primary": "#b45309", "--ring": "#b45309" } as React.CSSProperties; // Amber 700
+      case "evening":
+        return { "--primary": "#0f766e", "--ring": "#0f766e" } as React.CSSProperties; // Teal 700
+      case "before_sleep":
+        return { "--primary": "#6d28d9", "--ring": "#6d28d9" } as React.CSSProperties; // Violet 700
+      default:
+        return {};
+    }
+  } else {
+    switch (catId) {
+      case "morning":
+        return { "--primary": "#fbbf24", "--ring": "#fbbf24" } as React.CSSProperties; // Amber 400
+      case "evening":
+        return { "--primary": "#2dd4bf", "--ring": "#2dd4bf" } as React.CSSProperties; // Teal 400
+      case "before_sleep":
+        return { "--primary": "#a78bfa", "--ring": "#a78bfa" } as React.CSSProperties; // Violet 400
+      default:
+        return {};
+    }
+  }
+};
+
 export function ReaderScreen({
   catId,
   idx,
@@ -238,7 +265,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <div
-      className="mx-4 mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
+      className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-2 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
       role="button"
       tabIndex={0}
       aria-label={t(language, "reader.tapAnywhere")}
@@ -259,23 +286,29 @@ export function ReaderScreen({
         {z.arabicText}
       </p>
       {!isArabic && (showTranslation || showTransliteration) && (
-        <div className="mt-5 space-y-4 border-t border-border pt-4 text-start">
+        <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
           {showTranslation && (
             <section aria-labelledby="reader-translation-title">
-              <h2 id="reader-translation-title" className="text-[0.8125rem] font-bold text-muted-foreground">
+              <h2
+                id="reader-translation-title"
+                className="text-[0.8125rem] font-bold text-muted-foreground text-center"
+              >
                 {t(language, "reader.translationLabel")}
               </h2>
-              <p className="mt-1 text-[1rem] leading-7 text-foreground" lang="en" dir="ltr">
+              <p className="mt-1 text-[1rem] leading-7 text-foreground text-center" lang="en" dir="ltr">
                 {z.translation}
               </p>
             </section>
           )}
           {showTransliteration && (
             <section aria-labelledby="reader-transliteration-title">
-              <h2 id="reader-transliteration-title" className="text-[0.8125rem] font-bold text-muted-foreground">
+              <h2
+                id="reader-transliteration-title"
+                className="text-[0.8125rem] font-bold text-muted-foreground text-center"
+              >
                 {t(language, "reader.transliterationLabel")}
               </h2>
-              <p className="mt-1 text-[1rem] leading-7 text-foreground" lang="en" dir="ltr">
+              <p className="mt-1 text-[1rem] leading-7 text-foreground text-center" lang="en" dir="ltr">
                 {z.transliteration}
               </p>
             </section>
@@ -286,15 +319,15 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => (
-    <div className="flex min-h-[360px] flex-1 flex-col px-5 pb-3" data-testid="counter-panel">
-      <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex flex-col px-5 pb-3" data-testid="counter-panel">
+      <div className="flex flex-col">
         <div
           role="button"
           data-testid="counter-surface"
           tabIndex={0}
           aria-disabled={complete}
           aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className={`flex min-h-[300px] flex-1 touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
+          className={`flex touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
           onKeyDown={(event) => {
             if (event.key === " " || event.key === "Enter") {
               event.preventDefault();
@@ -303,10 +336,10 @@ export function ReaderScreen({
           }}
         >
           <div
-            className={`counter-ring-stage pointer-events-none relative flex h-[184px] w-[184px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+            className={`counter-ring-stage pointer-events-none relative flex h-[150px] w-[150px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
           >
-            <PulseRings trigger={pulse} size={184} count={count} total={z.repetitionCount} />
-            <CounterRing count={count} total={z.repetitionCount} size={184} />
+            <PulseRings trigger={pulse} size={150} count={count} total={z.repetitionCount} />
+            <CounterRing count={count} total={z.repetitionCount} size={150} />
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               {complete ? (
                 <div
@@ -314,13 +347,13 @@ export function ReaderScreen({
                   data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
                 >
                   <span className="counter-check-mark">
-                    <Check size={42} strokeWidth={2.5} />
+                    <Check size={36} strokeWidth={2.5} />
                   </span>
                 </div>
               ) : (
                 <>
                   <p
-                    className="counter-number text-[1.75rem] font-extrabold leading-9 text-foreground"
+                    className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
                     key={count}
                     dir="ltr"
                     style={{
@@ -331,7 +364,7 @@ export function ReaderScreen({
                     {localizedCount}
                   </p>
                   <p
-                    className="text-[0.875rem] text-foreground"
+                    className="text-[0.75rem] text-foreground"
                     dir="ltr"
                     style={{
                       fontFamily: counterNumeralFontFamily(language),
@@ -346,12 +379,14 @@ export function ReaderScreen({
           </div>
 
           {!complete && (
-            <p className="mt-6 text-[1.125rem] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+            <p className="mt-4 text-[10px] font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
           )}
         </div>
       </div>
     </div>
   );
+
+  const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
 
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
@@ -359,6 +394,7 @@ export function ReaderScreen({
       className="relative"
       data-testid="reader-screen"
       dir={direction}
+      style={categoryThemeStyles}
       onClick={handleSurfaceTap}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
@@ -421,7 +457,7 @@ export function ReaderScreen({
         <ProgressBar
           value={readingProgressValue}
           max={azkar.length}
-          height={4}
+          height={6}
           trackColor="var(--card)"
           fillColor="var(--primary)"
           direction={direction}
@@ -429,12 +465,16 @@ export function ReaderScreen({
         />
       </div>
 
-      <ScrollArea className="zikr-scroll min-h-0 flex-1" dir={direction}>
-        <div className="zikr-step-enter flex min-h-full flex-col" key={z.id}>
+      {/* Main Layout Area */}
+      <div className="flex-1 flex flex-col min-h-0 justify-between select-none" key={z.id}>
+        {/* Upper section: Zikr content, middle and center aligned */}
+        <div className="flex-1 flex items-center justify-center min-h-0 w-full py-4 zikr-step-enter">
           {renderReadingContent()}
-          {renderCounterPanel()}
         </div>
-      </ScrollArea>
+
+        {/* Lower section: Counter panel */}
+        <div className="shrink-0 pb-4">{renderCounterPanel()}</div>
+      </div>
 
       <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
 
