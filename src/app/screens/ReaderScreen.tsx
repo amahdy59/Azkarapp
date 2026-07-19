@@ -116,6 +116,7 @@ export function ReaderScreen({
   const language: AppLanguage = isArabic ? "ar" : "en";
 
   const [benefitOpen, setBenefitOpen] = useState(false);
+  const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
@@ -235,6 +236,7 @@ export function ReaderScreen({
         type="button"
         onClick={(event) => {
           event.stopPropagation();
+          setHasOpenedBenefit(true);
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
@@ -485,8 +487,9 @@ export function ReaderScreen({
 
       <footer className="shrink-0 px-4 pb-4 pt-4">{renderCounterActions()}</footer>
 
-      {benefitOpen && (
+      {hasOpenedBenefit && (
         <ReaderReferenceSheet
+          open={benefitOpen}
           zikr={z}
           language={language}
           direction={direction}

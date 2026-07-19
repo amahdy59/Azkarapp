@@ -73,32 +73,65 @@ export function CategoryScreen({
         />
 
         <div className="mt-4 flex w-full gap-3">
-          {done > 0 && done < azkar.length && (
-            <button
-              onClick={onReset}
-              className="interactive-elem flex h-14 w-14 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
-              aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
-            >
-              <RotateCcw size={22} />
-            </button>
-          )}
           {done < azkar.length ? (
-            <button
-              onClick={() => onZikr(Math.max(0, resumeIdx))}
-              className="interactive-elem flex h-14 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[1rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <ChevronNext size={20} />
-              {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
-            </button>
+            <>
+              <button
+                onClick={() => onZikr(Math.max(0, resumeIdx))}
+                className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {isArabic ? (
+                  <>
+                    <span className="leading-none">
+                      {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                    </span>
+                    <ChevronNext size={18} className="shrink-0 rtl:rotate-180" />
+                  </>
+                ) : (
+                  <>
+                    <ChevronNext size={18} className="shrink-0" />
+                    <span className="leading-none">
+                      {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                    </span>
+                  </>
+                )}
+              </button>
+              {done > 0 && (
+                <button
+                  onClick={onReset}
+                  className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                  aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
+                >
+                  <RotateCcw size={18} />
+                </button>
+              )}
+            </>
           ) : (
-            <button
-              type="button"
-              onClick={onRepeat}
-              className="interactive-elem flex h-14 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <RotateCcw size={20} />
-              <span className="text-[1rem] font-bold">{t(language, "category.readAgain")}</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={onRepeat}
+                className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {isArabic ? (
+                  <>
+                    <span className="text-[0.9375rem] font-bold leading-none">{t(language, "category.readAgain")}</span>
+                    <RotateCcw size={18} className="shrink-0" />
+                  </>
+                ) : (
+                  <>
+                    <RotateCcw size={18} className="shrink-0" />
+                    <span className="text-[0.9375rem] font-bold leading-none">{t(language, "category.readAgain")}</span>
+                  </>
+                )}
+              </button>
+              <button
+                onClick={onReset}
+                className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
+              >
+                <RotateCcw size={18} />
+              </button>
+            </>
           )}
         </div>
       </div>

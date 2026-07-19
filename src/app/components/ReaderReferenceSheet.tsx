@@ -4,17 +4,19 @@ import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
-import { Drawer, DrawerContent, DrawerOverlay, DrawerPortal, DrawerTitle } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerPortal, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
 
 export function ReaderReferenceSheet({
+  open,
   zikr,
   language,
   direction,
   onClose,
   onAnnouncement,
 }: {
+  open: boolean;
   zikr: Zikr;
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -64,7 +66,7 @@ export function ReaderReferenceSheet({
         style={{ insetInlineStart: -6 }}
       >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
-          {copiedReference === key ? <Check size={16} /> : <Copy size={16} />}
+          {copiedReference === key ? <Check size={16} className="favorite-pop text-primary" /> : <Copy size={16} />}
         </span>
       </button>
     </div>
@@ -72,13 +74,12 @@ export function ReaderReferenceSheet({
 
   return (
     <Drawer
-      open={true}
-      onOpenChange={(open) => {
-        if (!open) onClose();
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
       }}
     >
       <DrawerPortal>
-        <DrawerOverlay className="bg-black/45 z-50" />
         <DrawerContent
           data-testid="reference-sheet"
           ref={sheetRef}

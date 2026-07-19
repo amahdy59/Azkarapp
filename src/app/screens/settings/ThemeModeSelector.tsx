@@ -39,7 +39,7 @@ export function ThemeModeSelector({
             key={mode}
             value={mode}
             data-testid={`theme-option-${mode}`}
-            className={`relative flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`interactive-elem relative flex min-h-[84px] flex-col items-center justify-center gap-2 rounded-xl border px-2 py-3 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               selected
                 ? "border-primary bg-primary/10 text-foreground"
                 : "border-border-control bg-background text-muted-foreground hover:border-primary"
@@ -48,7 +48,7 @@ export function ThemeModeSelector({
             <Icon size={20} className={selected ? "text-primary" : "text-muted-foreground"} aria-hidden="true" />
             <span className="text-[0.75rem] font-semibold leading-4">{t(language, labelKey)}</span>
             {selected && (
-              <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
+              <span className="absolute end-1.5 top-1.5 text-primary element-pop" aria-hidden="true">
                 <Check size={14} strokeWidth={2.5} />
               </span>
             )}

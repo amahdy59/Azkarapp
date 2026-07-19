@@ -183,17 +183,19 @@ function ToggleTrack({ checked }: { checked: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors"
+      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors duration-200"
       style={{
         background: checked ? "var(--primary)" : "var(--card)",
         borderColor: checked ? "var(--primary)" : "var(--border-control)",
       }}
     >
       <span
-        className="absolute top-0 h-[22px] w-[22px] rounded-full shadow-md transition-all duration-200"
+        className="absolute top-0 h-[22px] w-[22px] rounded-full shadow-md"
         style={{
           insetInlineStart: checked ? 18 : 0,
           background: checked ? "var(--primary-foreground)" : "var(--foreground)",
+          transition:
+            "inset-inline-start 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.2s ease, transform 0.15s ease",
         }}
       />
     </span>
