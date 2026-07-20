@@ -160,6 +160,7 @@ function PwaNotice({
   dismissLabel: string;
   onAction: () => void;
   onDismiss: () => void;
+  isActionLoading?: boolean;
 }) {
   return (
     <aside className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg" role="status" aria-live="polite">
@@ -176,8 +177,12 @@ function PwaNotice({
         <button
           type="button"
           onClick={onAction}
-          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          disabled={isActionLoading}
+          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
+          {isActionLoading && (
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
+          )}
           {actionLabel}
         </button>
       </div>
@@ -243,6 +248,7 @@ export default function App() {
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [authError, setAuthError] = useState("");
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installDismissed, setInstallDismissed] = useState(() => {
     try {
@@ -1037,7 +1043,16 @@ export default function App() {
                 body={t(selectedLang, "pwa.updateBody")}
                 actionLabel={t(selectedLang, "pwa.refresh")}
                 dismissLabel={t(selectedLang, "pwa.later")}
-                onAction={() => window.dispatchEvent(new Event("azkar-apply-update"))}
+                isActionLoading={isUpdating}
+                onAction={() => {
+                  setIsUpdating(true);
+                  window.dispatchEvent(new Event("azkar-apply-update"));
+                  // Fallback: If service worker controllerchange doesn't fire to reload the page automatically,
+                  // force a reload after a short delay to ensure the new version is loaded.
+                  setTimeout(() => {
+                    window.location.reload();
+                  }, 1500);
+                }}
                 onDismiss={() => setUpdateAvailable(false)}
               />
             ) : (
