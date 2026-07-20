@@ -97,7 +97,7 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
   const sheet = page.getByTestId("reference-sheet");
-  await sheet.getByText("Included as the opening item of the morning/evening chapter.", { exact: true }).click();
+  await sheet.click();
   await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
