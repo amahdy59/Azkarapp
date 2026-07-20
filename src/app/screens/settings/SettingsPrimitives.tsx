@@ -32,7 +32,12 @@ export function SubHeader({
 export function SectionLabel({ label }: { label: string }) {
   return (
     <div className="px-4 pt-6 pb-2">
-      <h2 className="text-[0.8125rem] font-semibold text-muted-foreground font-sans leading-[18px]">{label}</h2>
+      <h2
+        className="text-[0.8125rem] font-semibold font-sans leading-[18px]"
+        style={{ color: "var(--muted-foreground)" }}
+      >
+        {label}
+      </h2>
     </div>
   );
 }
@@ -61,7 +66,12 @@ export function SettingsRowItem({
       <div className="flex size-10 shrink-0 items-center justify-center rounded-xl" style={{ background: iconBg }}>
         {icon}
       </div>
-      <p className={`min-w-0 flex-1 text-start text-[1rem] font-semibold ${labelColor} font-sans`}>{label}</p>
+      <p
+        className={`min-w-0 flex-1 text-start text-[1rem] font-semibold font-sans`}
+        style={{ color: labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
+      >
+        {label}
+      </p>
       {right}
     </>
   );
@@ -72,12 +82,15 @@ export function SettingsRowItem({
         <button
           type="button"
           onClick={onPress}
-          className="flex min-h-16 w-full items-center gap-3 bg-card px-4 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="flex min-h-16 w-full items-center gap-3 px-4 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          style={{ background: "var(--card)" }}
         >
           {content}
         </button>
       ) : (
-        <div className="flex min-h-16 w-full items-center gap-3 bg-card px-4">{content}</div>
+        <div className="flex min-h-16 w-full items-center gap-3 px-4" style={{ background: "var(--card)" }}>
+          {content}
+        </div>
       )}
       {hasDivider && (
         <div className="absolute bottom-0 h-px bg-border" style={{ insetInlineStart: 68, insetInlineEnd: 0 }} />
@@ -113,7 +126,10 @@ export function SettingsSelectRow({
 
   return (
     <div className="relative">
-      <div className="group relative flex min-h-16 w-full items-center gap-3 bg-card px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring">
+      <div
+        className="group relative flex min-h-16 w-full items-center gap-3 px-4 focus-within:z-10 focus-within:outline-none focus-within:ring-[3px] focus-within:ring-inset focus-within:ring-ring"
+        style={{ background: "var(--card)" }}
+      >
         <span
           aria-hidden="true"
           className="flex size-10 shrink-0 items-center justify-center rounded-[var(--ds-radius-control)]"
@@ -121,14 +137,27 @@ export function SettingsSelectRow({
         >
           {icon}
         </span>
-        <span id={labelId} className="min-w-0 flex-1 text-start font-sans text-[1rem] font-semibold text-foreground">
+        <span
+          id={labelId}
+          className="min-w-0 flex-1 text-start font-sans text-[1rem] font-semibold"
+          style={{ color: "var(--foreground)" }}
+        >
           {label}
         </span>
         <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
-          <p className="truncate font-sans text-[0.9375rem] text-foreground/90" title={value}>
+          <p
+            className="truncate font-sans text-[0.9375rem]"
+            style={{ color: "var(--foreground)", opacity: 0.9 }}
+            title={value}
+          >
             {value}
           </p>
-          <ChevronDown aria-hidden="true" size={18} className="shrink-0 text-foreground/70" />
+          <ChevronDown
+            aria-hidden="true"
+            size={18}
+            className="shrink-0"
+            style={{ color: "var(--foreground)", opacity: 0.7 }}
+          />
         </div>
         <Select value={selectedValue} onValueChange={onChange} dir={direction}>
           <SelectTrigger
@@ -171,7 +200,11 @@ export function RowChevron() {
 export function RowValue({ value, withChevron = true }: { value: string; withChevron?: boolean }) {
   return (
     <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
-      <p className="truncate text-[0.9375rem] text-foreground/90 font-sans" title={value}>
+      <p
+        className="truncate text-[0.9375rem] font-sans"
+        style={{ color: "var(--foreground)", opacity: 0.9 }}
+        title={value}
+      >
         {value}
       </p>
       {withChevron && <RowChevron />}
