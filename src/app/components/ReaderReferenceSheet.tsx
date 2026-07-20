@@ -146,7 +146,6 @@ export function ReaderReferenceSheet({
               </>
             )}
 
-
             {isArabic && zikr.hadithText && (
               <>
                 <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
