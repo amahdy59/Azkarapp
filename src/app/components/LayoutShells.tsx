@@ -68,7 +68,10 @@ export function BottomNav({
     { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
   ];
   return (
-    <nav aria-label={t(language, "common.bottomNavigation")} className="flex h-16 shrink-0 bg-card">
+    <nav
+      aria-label={t(language, "common.bottomNavigation")}
+      className="flex h-[calc(4rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+    >
       <div className="flex min-h-0 flex-1 items-center justify-between px-8">
         {tabs.map(({ id, label, Icon }) => {
           const on = active === id;

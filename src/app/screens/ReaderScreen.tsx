@@ -396,7 +396,7 @@ export function ReaderScreen({
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
-      className="relative"
+      className="relative !pb-2"
       data-testid="reader-screen"
       dir={direction}
       style={categoryThemeStyles}
