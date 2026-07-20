@@ -266,7 +266,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <div
-      className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-3 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
+      className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
       role="button"
       tabIndex={0}
       aria-label={t(language, "reader.tapAnywhere")}
