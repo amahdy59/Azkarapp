@@ -154,7 +154,7 @@ export function SettingsScreen({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
-      <AnimatePresence mode="popLayout" initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         {sub === "root" && (
           <motion.div
             key="root"

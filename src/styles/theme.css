@@ -1103,23 +1103,15 @@ body {
   }
 }
 
-/* Smooth Theme transition across variables */
+/* Smooth Theme transition across main app shell */
 :root {
   --theme-transition:
-    background-color 320ms cubic-bezier(0.4, 0, 0.2, 1), border-color 320ms cubic-bezier(0.4, 0, 0.2, 1),
-    color 320ms cubic-bezier(0.4, 0, 0.2, 1), fill 320ms cubic-bezier(0.4, 0, 0.2, 1),
-    stroke 320ms cubic-bezier(0.4, 0, 0.2, 1);
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-body,
 .app-viewport,
-.app-shell,
-.bg-card,
-.bg-background,
-.text-foreground,
-.text-muted-foreground,
-.border-border,
-.border-border-control {
+.app-shell {
   transition: var(--theme-transition);
 }
 
