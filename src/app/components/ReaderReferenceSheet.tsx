@@ -4,7 +4,7 @@ import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
-import { Drawer, DrawerContent, DrawerPortal, DrawerTitle } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
 
