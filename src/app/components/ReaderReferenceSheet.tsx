@@ -3,7 +3,7 @@ import { Check, Copy, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
-import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { getLocalizedSourceReference } from "../content/localizedZikr";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
@@ -28,7 +28,6 @@ export function ReaderReferenceSheet({
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
-  const benefit = getLocalizedZikrBenefit(zikr, language);
   const sourceReference = getLocalizedSourceReference(zikr, language);
 
   useEffect(() => {
@@ -147,21 +146,6 @@ export function ReaderReferenceSheet({
               </>
             )}
 
-            <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
-
-            <section className="flex flex-col gap-3">
-              <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
-                {t(language, "reader.benefitLabel")}
-              </h3>
-              <p
-                className="text-start text-[1.0625rem] leading-7 text-foreground"
-                lang={isArabic ? "ar" : "en"}
-                dir={direction}
-              >
-                {benefit}
-              </p>
-              {copyAction("benefit", benefit, t(language, "reader.copyBenefit"), direction)}
-            </section>
 
             {isArabic && zikr.hadithText && (
               <>
