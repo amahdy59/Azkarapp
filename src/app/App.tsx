@@ -153,6 +153,7 @@ function PwaNotice({
   dismissLabel,
   onAction,
   onDismiss,
+  isActionLoading,
 }: {
   title: string;
   body: string;
