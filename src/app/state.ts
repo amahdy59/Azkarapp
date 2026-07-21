@@ -194,7 +194,18 @@ function isStoredSession(value: unknown): value is StoredSession {
   return (
     typeof session.id === "string" &&
     typeof session.category === "string" &&
-    ["morning", "evening", "before_sleep"].includes(session.category) &&
+    [
+      "morning",
+      "evening",
+      "before_sleep",
+      "waking_up",
+      "home",
+      "mosque",
+      "after_prayer",
+      "restroom",
+      "food_drink",
+      "travel",
+    ].includes(session.category) &&
     typeof session.completedAt === "string" &&
     !Number.isNaN(Date.parse(session.completedAt)) &&
     typeof session.completedCount === "number" &&
