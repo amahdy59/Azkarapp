@@ -1354,7 +1354,255 @@ const SLEEP_AZKAR: Zikr[] = [
   },
 ];
 
-const ALL_AZKAR = [...MORNING_AZKAR, ...EVENING_AZKAR, ...SLEEP_AZKAR];
+const WAKING_UP_AZKAR: Zikr[] = [
+  {
+    id: "wu-hm-1",
+    category: "waking_up",
+    orderIndex: 0,
+    arabicText: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ.",
+    transliteration: "Alḥamdu lillāhil-ladhī aḥyānā baʿda mā amātanā wa ilayhin-nushūr.",
+    translation:
+      "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
+    benefit: "Sahih al-Bukhari.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Al-Bukhari 11/113; Muslim 4/2083; Hisn al-Muslim 1.",
+    hadithText:
+      "عَنْ حُذَيْفَةَ، وَأَبِي ذَرٍّ، رضى الله عنهما قَالاَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَوَى إِلَى فِرَاشِهِ قَالَ: «بِاسْمِكَ اللَّهُمَّ أَحْيَا وَأَمُوتُ» وَإِذَا اسْتَيْقَظَ قَالَ: «الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ».",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "wu-hm-2",
+    category: "waking_up",
+    orderIndex: 1,
+    arabicText:
+      "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، سُبْحَانَ اللَّهِ، وَالْحَمْدُ لِلَّهِ، وَلاَ إِلَهَ إِلاَّ اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ الْعَلِيِّ الْعَظِيمِ، رَبِّ اغْفِرْ لِي.",
+    transliteration:
+      "Lā ilāha illallāhu waḥdahu lā sharīka lah, lahul-mulku wa lahul-ḥamd, wa huwa ʿalā kulli shay’in qadīr. Subḥānallāhi, walḥamdu lillāhi, wa lā ilāha illallāhu, wallāhu akbar, wa lā ḥawla wa lā quwwata illā billāhil-ʿAliyyil-ʿAẓīm. Rabbighfir lī.",
+    translation:
+      "None has the right to be worshipped but Allah alone, Who has no partner. His is the dominion and His is the praise, and He is Able to do all things. Glory is to Allah. All praise is to Allah. None has the right to be worshipped but Allah. Allah is the Greatest. There is no power and no might except by Allah. My Lord, forgive me.",
+    benefit:
+      "Whoever says this will be forgiven, and if he supplicates Allah, his prayer will be answered; if he performs ablution and prays, his prayer will be accepted.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Al-Bukhari 3/39; Hisn al-Muslim 2.",
+    hadithText:
+      "مَنْ تَعَارَّ مِنَ اللَّيْلِ فَقَالَ... ثُمَّ قَالَ: اللَّهُمَّ اغْفِرْ لِي. أَوْ دَعَا اسْتُجِيبَ لَهُ، فَإِنْ تَوَضَّأَ وَصَلَّى قُبِلَتْ صَلاَتُهُ.",
+    authenticityNote: "Sahih al-Bukhari.",
+  },
+];
+
+const HOME_AZKAR: Zikr[] = [
+  {
+    id: "home-hm-15",
+    category: "home",
+    orderIndex: 0,
+    arabicText: "بِسْمِ اللَّهِ، تَوَكَّلْتُ عَلَى اللَّهِ، وَلاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ.",
+    transliteration: "Bismillāh, tawakkaltu ʿalallāh, wa lā ḥawla wa lā quwwata illā billāh.",
+    translation:
+      "In the Name of Allah, I have placed my trust in Allah, there is no might and no power except by Allah.",
+    benefit:
+      "When you say this, it will be said to you: 'You are guided, defended and protected.' The devil will go far away from you.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud 4/325; At-Tirmidhi 5/490; Hisn al-Muslim 15.",
+    hadithText:
+      "مَنْ قَالَ يَعْنِي إِذَا خَرَجَ مِنْ بَيْتِهِ: بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ، يُقَالُ لَهُ كُفِيتَ وَوُقِيتَ وَتَنَحَّى عَنْهُ الشَّيْطَانُ.",
+    authenticityNote: "Sahih according to Al-Albani.",
+  },
+  {
+    id: "home-hm-16",
+    category: "home",
+    orderIndex: 1,
+    arabicText: "بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا.",
+    transliteration: "Bismillāhi walajnā, wa bismillāhi kharajnā, wa ʿalā Rabbīnā tawakkalnā.",
+    translation: "In the Name of Allah we enter, in the Name of Allah we leave, and upon our Lord we depend.",
+    benefit: "To be said upon entering the home. The person should then greet his family.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud 4/325; Hisn al-Muslim 16.",
+    hadithText:
+      "إِذَا وَلَجَ الرَّجُلُ بَيْتَهُ فَلْيَقُلْ: بِسْمِ اللَّهِ وَلَجْنَا وَبِسْمِ اللَّهِ خَرَجْنَا وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا ثُمَّ لِيُسَلِّمْ عَلَى أَهْلِهِ.",
+    authenticityNote: "Hasan according to Al-Albani.",
+  },
+];
+
+const MOSQUE_AZKAR: Zikr[] = [
+  {
+    id: "msq-hm-20",
+    category: "mosque",
+    orderIndex: 0,
+    arabicText:
+      "أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ... بِسْمِ اللَّهِ، وَالصَّلاَةُ وَالسَّلاَمُ عَلَى رَسُولِ اللَّهِ... اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.",
+    transliteration:
+      "Aʿūdhu billāhil-ʿAẓīm, wa bi-wajhihil-karīm, wa sulṭānihil-qadīm, minash-shayṭānir-rajīm... Bismillāhi, waṣ-ṣalātu was-salāmu ʿalā rasūlillāh... Allāhummaf-taḥ lī abwāba raḥmatik.",
+    translation:
+      "I seek refuge in Almighty Allah, by His Noble Face, by His primordial power, from Satan the outcast. In the Name of Allah, and blessings and peace be upon the Messenger of Allah. O Allah, open before me the doors of Your mercy.",
+    benefit: "Upon entering the mosque. He will be protected from Satan for the rest of the day.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud; Muslim 1/494; Hisn al-Muslim 20.",
+    hadithText: "إِذَا دَخَلَ أَحَدُكُمُ الْمَسْجِدَ فَلْيَقُلِ اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ.",
+    authenticityNote: "Sahih Muslim and Abu Dawud (Sahih Al-Albani).",
+  },
+  {
+    id: "msq-hm-21",
+    category: "mosque",
+    orderIndex: 1,
+    arabicText:
+      "بِسْمِ اللَّهِ وَالصَّلاَةُ وَالسَّلاَمُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ، اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ.",
+    transliteration:
+      "Bismillāhi waṣ-ṣalātu was-salāmu ʿalā rasūlillāh, Allāhumma innī as’aluka min faḍlik, Allāhummaʿṣimnī minash-shayṭānir-rajīm.",
+    translation:
+      "In the Name of Allah, and peace and blessings be upon the Messenger of Allah. O Allah, I ask for Your favor, O Allah, protect me from Satan the outcast.",
+    benefit: "To be said upon leaving the mosque.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
+    hadithText: "وَإِذَا خَرَجَ فَلْيَقُلِ اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ.",
+    authenticityNote: "Sahih Muslim.",
+  },
+];
+
+const AFTER_PRAYER_AZKAR: Zikr[] = [
+  {
+    id: "ap-hm-66",
+    category: "after_prayer",
+    orderIndex: 0,
+    arabicText:
+      "أَسْتَغْفِرُ اللَّهَ (ثَلاَثاً)... اللَّهُمَّ أَنْتَ السَّلاَمُ، وَمِنْكَ السَّلاَمُ، تَبَارَكْتَ يَا ذَا الْجَلاَلِ وَالإِكْرَامِ.",
+    transliteration:
+      "Astaghfirullāh (three times)... Allāhumma antas-salām, wa minkas-salām, tabārakta yā dhal-jalāli wal-ikrām.",
+    translation:
+      "I ask Allah for forgiveness (three times). O Allah, You are Peace and from You comes peace. Blessed are You, O Owner of majesty and honor.",
+    benefit: "To be said immediately after concluding the prayer.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Muslim 1/414; Hisn al-Muslim 66.",
+    hadithText:
+      "كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا انْصَرَفَ مِنْ صَلاَتِهِ اسْتَغْفَرَ ثَلاَثًا وَقَالَ: «اللَّهُمَّ أَنْتَ السَّلاَمُ وَمِنْكَ السَّلاَمُ تَبَارَكْتَ ذَا الْجَلاَلِ وَالإِكْرَامِ».",
+    authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ap-hm-67",
+    category: "after_prayer",
+    orderIndex: 1,
+    arabicText:
+      "لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، اللَّهُمَّ لاَ مَانِعَ لِمَا أَعْطَيْتَ، وَلاَ مُعْطِيَ لِمَا مَنَعْتَ، وَلاَ يَنْفَعُ ذَا الْجَدِّ مِنْكَ الْجَدُّ.",
+    transliteration:
+      "Lā ilāha illallāhu waḥdahu lā sharīka lah, lahul-mulku wa lahul-ḥamd, wa huwa ʿalā kulli shay’in qadīr, Allāhumma lā māniʿa limā aʿṭayt, wa lā muʿṭiya limā manaʿt, wa lā yanfaʿu dhal-jaddi minkal-jadd.",
+    translation:
+      "None has the right to be worshipped but Allah alone, He has no partner, His is the dominion and His is the praise, and He is Able to do all things. O Allah, there is none who can withhold what You give, and none may give what You have withheld; and the might of a mighty person cannot benefit him against You.",
+    benefit: "Reported by Al-Bukhari to be said after every obligatory prayer.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Al-Bukhari 1/255; Muslim 1/414; Hisn al-Muslim 67.",
+    hadithText:
+      "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ يَقُولُ فِي دُبُرِ كُلِّ صَلاَةٍ مَكْتُوبَةٍ... (الحديث)",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+];
+
+const RESTROOM_AZKAR: Zikr[] = [
+  {
+    id: "rst-hm-10",
+    category: "restroom",
+    orderIndex: 0,
+    arabicText: "(بِسْمِ اللَّهِ)، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبْثِ وَالْخَبَائِثِ.",
+    transliteration: "(Bismillāh), Allāhumma innī aʿūdhu bika minal-khubthi wal-khabā’ith.",
+    translation: "(In the Name of Allah). O Allah, I seek refuge in You from the male and female evil devils.",
+    benefit: "Said before entering the restroom.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Al-Bukhari 1/45; Muslim 1/283; Hisn al-Muslim 10.",
+    hadithText:
+      "كَانَ النَّبِيُّ صلى الله عليه وسلم إِذَا دَخَلَ الْخَلاَءَ قَالَ: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْخُبُثِ وَالْخَبَائِثِ».",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "rst-hm-11",
+    category: "restroom",
+    orderIndex: 1,
+    arabicText: "غُفْرَانَكَ.",
+    transliteration: "Ghufrānak.",
+    translation: "I ask You (Allah) for forgiveness.",
+    benefit: "Said upon exiting the restroom.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud; At-Tirmidhi; Hisn al-Muslim 11.",
+    hadithText: "كَانَ النَّبِيُّ صلى الله عليه وسلم إِذَا خَرَجَ مِنَ الْخَلاَءِ قَالَ: «غُفْرَانَكَ».",
+    authenticityNote: "Sahih according to Al-Albani.",
+  },
+];
+
+const FOOD_DRINK_AZKAR: Zikr[] = [
+  {
+    id: "fd-hm-178",
+    category: "food_drink",
+    orderIndex: 0,
+    arabicText: "بِسْمِ اللَّهِ. (فَإِنْ نَسِيَ فِي أَوَّلِهِ فَلْيَقُلْ): بِسْمِ اللَّهِ فِي أَوَّلِهِ وَآخِرِهِ.",
+    transliteration:
+      "Bismillāh. (If you forget to say it at the beginning, then say): Bismillāhi fī awwalihi wa ākhirih.",
+    translation: "In the Name of Allah. (If forgotten, say): In the Name of Allah, in its beginning and its end.",
+    benefit: "To be said before eating.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud 3/347; At-Tirmidhi 4/288; Hisn al-Muslim 178.",
+    hadithText:
+      "إِذَا أَكَلَ أَحَدُكُمْ فَلْيَذْكُرِ اسْمَ اللَّهِ تَعَالَى فَإِنْ نَسِيَ أَنْ يَذْكُرَ اسْمَ اللَّهِ تَعَالَى فِي أَوَّلِهِ فَلْيَقُلْ بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ.",
+    authenticityNote: "Sahih according to Al-Albani.",
+  },
+  {
+    id: "fd-hm-179",
+    category: "food_drink",
+    orderIndex: 1,
+    arabicText: "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا، وَرَزَقَنِيهِ، مِنْ غَيْرِ حَوْلٍ مِنِّي وَلاَ قُوَّةٍ.",
+    transliteration: "Alḥamdu lillāhil-ladhī aṭʿamanī hādhā, wa razaqanīhi, min ghayri ḥawlin minnī wa lā quwwah.",
+    translation:
+      "All praise is to Allah Who has fed me this and provided it for me without any might or power on my part.",
+    benefit: "Whoever says this after eating, his previous sins will be forgiven.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Abu Dawud, Ibn Majah, At-Tirmidhi; Hisn al-Muslim 179.",
+    hadithText:
+      "مَنْ أَكَلَ طَعَامًا ثُمَّ قَالَ: الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنِي هَذَا الطَّعَامَ وَرَزَقَنِيهِ مِنْ غَيْرِ حَوْلٍ مِنِّي وَلاَ قُوَّةٍ غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ.",
+    authenticityNote: "Hasan according to Al-Albani.",
+  },
+];
+
+const TRAVEL_AZKAR: Zikr[] = [
+  {
+    id: "trv-hm-205",
+    category: "travel",
+    orderIndex: 0,
+    arabicText:
+      "اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، ﴿سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ * وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ﴾ اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا، وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالأَهْلِ.",
+    transliteration:
+      "Allāhu akbar, Allāhu akbar, Allāhu akbar, Subḥānal-ladhī sakhkhara lanā hādhā wa mā kunnā lahu muqrinīn. Wa innā ilā Rabbinā lamunqalibūn. Allāhumma innā nas’aluka fī safarinā hādhal-birra wat-taqwā, wa minal-ʿamali mā tarḍā, Allāhumma hawwin ʿalaynā safaranā hādhā, waṭwi ʿannā buʿdah, Allāhumma antas-ṣāḥibu fis-safar, wal-khalīfatu fil-ahl, Allāhumma innī aʿūdhu bika min waʿthā’is-safar, wa ka’ābatil-manẓar, wa sū’il-munqalabi fil-māli wal-ahl.",
+    translation:
+      "Allah is the Most Great. Allah is the Most Great. Allah is the Most Great. Glory is to Him Who has provided this for us though we could never have had it by our efforts. Surely, unto our Lord we are returning. O Allah, we ask You on this our journey for goodness and piety, and for works that are pleasing to You. O Allah, lighten this journey for us and make its distance easy for us. O Allah, You are our Companion on the road and the One in Whose care we leave our family. O Allah, I seek refuge in You from this journey's hardships, and from the wicked sights in store and from finding our family and property in misfortune upon returning.",
+    benefit: "To be said when setting out on a journey.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Muslim 2/978; Hisn al-Muslim 205.",
+    hadithText:
+      "أَنَّ رَسُولَ اللَّهِ صلى الله عليه وسلم كَانَ إِذَا اسْتَوَى عَلَى بَعِيرِهِ خَارِجًا إِلَى سَفَرٍ كَبَّرَ ثَلاَثًا ثُمَّ قَالَ: سُبْحَانَ الَّذِي سَخَّرَ لَنَا... (الحديث)",
+    authenticityNote: "Sahih Muslim.",
+  },
+];
+
+const ALL_AZKAR = [
+  ...MORNING_AZKAR,
+  ...EVENING_AZKAR,
+  ...SLEEP_AZKAR,
+  ...WAKING_UP_AZKAR,
+  ...HOME_AZKAR,
+  ...MOSQUE_AZKAR,
+  ...AFTER_PRAYER_AZKAR,
+  ...RESTROOM_AZKAR,
+  ...FOOD_DRINK_AZKAR,
+  ...TRAVEL_AZKAR,
+];
 
 const getAzkarByCategory = (cat: CategoryId) =>
   ALL_AZKAR.filter((z) => z.category === cat).sort((a, b) => a.orderIndex - b.orderIndex);
@@ -1365,4 +1613,19 @@ const ZIKR_LABELS: Record<string, string> = Object.fromEntries(
   ALL_AZKAR.map((z) => [z.id, z.translation.split(".")[0] ?? z.transliteration]),
 );
 
-export { ALL_AZKAR, EVENING_AZKAR, MORNING_AZKAR, SLEEP_AZKAR, ZIKR_LABELS, getAzkarByCategory, getCategoryTotal };
+export {
+  ALL_AZKAR,
+  EVENING_AZKAR,
+  MORNING_AZKAR,
+  SLEEP_AZKAR,
+  WAKING_UP_AZKAR,
+  HOME_AZKAR,
+  MOSQUE_AZKAR,
+  AFTER_PRAYER_AZKAR,
+  RESTROOM_AZKAR,
+  FOOD_DRINK_AZKAR,
+  TRAVEL_AZKAR,
+  ZIKR_LABELS,
+  getAzkarByCategory,
+  getCategoryTotal,
+};

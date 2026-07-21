@@ -108,6 +108,13 @@ describe("quiet garden progress", () => {
       morning: fullProgress("morning"),
       evening: new Set([0, 1]),
       before_sleep: new Set<number>(),
+      waking_up: new Set<number>(),
+      home: new Set<number>(),
+      mosque: new Set<number>(),
+      after_prayer: new Set<number>(),
+      restroom: new Set<number>(),
+      food_drink: new Set<number>(),
+      travel: new Set<number>(),
     };
     const reset = resetStaleCompletedCollections(completed, [], new Date(2026, 6, 18, 12), 4);
 

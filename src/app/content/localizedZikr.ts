@@ -48,6 +48,22 @@ const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
   "Same wording as HM-93 but different count and virtue.": "نصه مماثل للذكر رقم ٩٣، مع اختلاف العدد والفضل الوارد.",
   "Use evening wording in the evening row.": "تُستخدم صيغة المساء عند قراءته في المساء.",
   "Use the evening wording in the evening row.": "تُستخدم صيغة المساء عند قراءته في المساء.",
+  "Whoever says this will be forgiven, and if he supplicates Allah, his prayer will be answered; if he performs ablution and prays, his prayer will be accepted.":
+    "من قاله غُفر له، وإن دعا استُجيب له، وإن توضأ وصلى قُبلت صلاته.",
+  "When you say this, it will be said to you: 'You are guided, defended and protected.' The devil will go far away from you.":
+    "من قاله يقال له: هديت وكفيت ووقيت، ويتنحى عنه الشيطان.",
+  "To be said upon entering the home. The person should then greet his family.":
+    "يُقال عند الدخول إلى المنزل، ثم يُسلّم على أهله.",
+  "Upon entering the mosque. He will be protected from Satan for the rest of the day.":
+    "يُقال عند دخول المسجد. ويُعصم من الشيطان سائر اليوم.",
+  "To be said upon leaving the mosque.": "يُقال عند الخروج من المسجد.",
+  "To be said immediately after concluding the prayer.": "يُقال فور الانتهاء من الصلاة المكتوبة.",
+  "Reported by Al-Bukhari to be said after every obligatory prayer.": "رواه البخاري، ويُقال دبر كل صلاة مكتوبة.",
+  "Said before entering the restroom.": "يُقال قبل دخول الخلاء.",
+  "Said upon exiting the restroom.": "يُقال عند الخروج من الخلاء.",
+  "To be said before eating.": "يُقال قبل الطعام.",
+  "Whoever says this after eating, his previous sins will be forgiven.": "من قاله بعد طعامه غُفر له ما تقدم من ذنبه.",
+  "To be said when setting out on a journey.": "يُقال عند الشروع في السفر.",
 };
 
 const ARABIC_CITATION_NAMES: ReadonlyArray<readonly [string, string]> = [

@@ -56,6 +56,13 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     morning: [],
     evening: [],
     before_sleep: [],
+    waking_up: [],
+    home: [],
+    mosque: [],
+    after_prayer: [],
+    restroom: [],
+    food_drink: [],
+    travel: [],
   },
   sessions: [],
   dailyCompletions: [],
@@ -281,6 +288,13 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       morning: normalizeCompletedIndexes(parsed.completed?.morning, "morning"),
       evening: normalizeCompletedIndexes(parsed.completed?.evening, "evening"),
       before_sleep: normalizeCompletedIndexes(parsed.completed?.before_sleep, "before_sleep"),
+      waking_up: normalizeCompletedIndexes(parsed.completed?.waking_up, "waking_up"),
+      home: normalizeCompletedIndexes(parsed.completed?.home, "home"),
+      mosque: normalizeCompletedIndexes(parsed.completed?.mosque, "mosque"),
+      after_prayer: normalizeCompletedIndexes(parsed.completed?.after_prayer, "after_prayer"),
+      restroom: normalizeCompletedIndexes(parsed.completed?.restroom, "restroom"),
+      food_drink: normalizeCompletedIndexes(parsed.completed?.food_drink, "food_drink"),
+      travel: normalizeCompletedIndexes(parsed.completed?.travel, "travel"),
     },
     sessions,
     dailyCompletions,
@@ -390,6 +404,13 @@ export function toCompletedSets(completed: AppStateSnapshot["completed"]): Recor
     morning: new Set(completed.morning),
     evening: new Set(completed.evening),
     before_sleep: new Set(completed.before_sleep),
+    waking_up: new Set(completed.waking_up),
+    home: new Set(completed.home),
+    mosque: new Set(completed.mosque),
+    after_prayer: new Set(completed.after_prayer),
+    restroom: new Set(completed.restroom),
+    food_drink: new Set(completed.food_drink),
+    travel: new Set(completed.travel),
   };
 }
 
@@ -404,6 +425,13 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
     morning: [...completed.morning].sort((a, b) => a - b),
     evening: [...completed.evening].sort((a, b) => a - b),
     before_sleep: [...completed.before_sleep].sort((a, b) => a - b),
+    waking_up: [...completed.waking_up].sort((a, b) => a - b),
+    home: [...completed.home].sort((a, b) => a - b),
+    mosque: [...completed.mosque].sort((a, b) => a - b),
+    after_prayer: [...completed.after_prayer].sort((a, b) => a - b),
+    restroom: [...completed.restroom].sort((a, b) => a - b),
+    food_drink: [...completed.food_drink].sort((a, b) => a - b),
+    travel: [...completed.travel].sort((a, b) => a - b),
   };
 }
 
@@ -429,6 +457,31 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     before_sleep: normalizeCompletedIndexes(
       [...(safeBase.completed.before_sleep ?? []), ...(incoming.completed?.before_sleep ?? [])],
       "before_sleep",
+    ),
+    waking_up: normalizeCompletedIndexes(
+      [...(safeBase.completed.waking_up ?? []), ...(incoming.completed?.waking_up ?? [])],
+      "waking_up",
+    ),
+    home: normalizeCompletedIndexes([...(safeBase.completed.home ?? []), ...(incoming.completed?.home ?? [])], "home"),
+    mosque: normalizeCompletedIndexes(
+      [...(safeBase.completed.mosque ?? []), ...(incoming.completed?.mosque ?? [])],
+      "mosque",
+    ),
+    after_prayer: normalizeCompletedIndexes(
+      [...(safeBase.completed.after_prayer ?? []), ...(incoming.completed?.after_prayer ?? [])],
+      "after_prayer",
+    ),
+    restroom: normalizeCompletedIndexes(
+      [...(safeBase.completed.restroom ?? []), ...(incoming.completed?.restroom ?? [])],
+      "restroom",
+    ),
+    food_drink: normalizeCompletedIndexes(
+      [...(safeBase.completed.food_drink ?? []), ...(incoming.completed?.food_drink ?? [])],
+      "food_drink",
+    ),
+    travel: normalizeCompletedIndexes(
+      [...(safeBase.completed.travel ?? []), ...(incoming.completed?.travel ?? [])],
+      "travel",
     ),
   };
 
@@ -535,7 +588,18 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
   return {
     ...safeState,
     profile: { ...DEFAULT_APP_STATE.profile },
-    completed: { morning: [], evening: [], before_sleep: [] },
+    completed: {
+      morning: [],
+      evening: [],
+      before_sleep: [],
+      waking_up: [],
+      home: [],
+      mosque: [],
+      after_prayer: [],
+      restroom: [],
+      food_drink: [],
+      travel: [],
+    },
     sessions: [],
     dailyCompletions: [],
     savedZikrIds: [],

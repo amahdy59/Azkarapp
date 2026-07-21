@@ -6,7 +6,7 @@ import type { AppLanguage, CategoryId, DailyCollectionCompletion, ReminderSettin
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 90_000;
 
-type ReminderKind = CategoryId;
+type ReminderKind = "morning" | "evening" | "before_sleep";
 
 type DueReminder = {
   kind: ReminderKind;

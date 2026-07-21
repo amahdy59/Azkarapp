@@ -102,7 +102,20 @@ describe("app state persistence", () => {
   });
 
   it("drops out-of-range completion indexes from untrusted storage", () => {
-    const state = normalizeAppState({ completed: { morning: [0, 999], evening: [], before_sleep: [] } });
+    const state = normalizeAppState({
+      completed: {
+        morning: [0, 999],
+        evening: [],
+        before_sleep: [],
+        waking_up: [],
+        home: [],
+        mosque: [],
+        after_prayer: [],
+        restroom: [],
+        food_drink: [],
+        travel: [],
+      },
+    });
 
     expect(state.completed.morning).toEqual([0]);
   });
@@ -117,7 +130,18 @@ describe("app state persistence", () => {
         isGuest: false,
         accountUserId: "account-a",
       },
-      completed: { morning: [0], evening: [], before_sleep: [] },
+      completed: {
+        morning: [0],
+        evening: [],
+        before_sleep: [],
+        waking_up: [],
+        home: [],
+        mosque: [],
+        after_prayer: [],
+        restroom: [],
+        food_drink: [],
+        travel: [],
+      },
       sessions: [
         {
           id: "private-session",
@@ -144,14 +168,38 @@ describe("app state persistence", () => {
 
 describe("state merging", () => {
   it("deduplicates completed items", () => {
-    const incoming = { completed: { morning: [2, 2, 1], evening: [], before_sleep: [] } };
+    const incoming = {
+      completed: {
+        morning: [2, 2, 1],
+        evening: [],
+        before_sleep: [],
+        waking_up: [],
+        home: [],
+        mosque: [],
+        after_prayer: [],
+        restroom: [],
+        food_drink: [],
+        travel: [],
+      },
+    };
     const merged = mergeAppStates(DEFAULT_APP_STATE, incoming);
     expect(merged.completed.morning).toEqual([1, 2]);
   });
 
   it("serializes completion sets in stable order", () => {
     expect(
-      fromCompletedSets({ morning: new Set([2, 1]), evening: new Set(), before_sleep: new Set() }).morning,
+      fromCompletedSets({
+        morning: new Set([2, 1]),
+        evening: new Set(),
+        before_sleep: new Set(),
+        waking_up: new Set(),
+        home: new Set(),
+        mosque: new Set(),
+        after_prayer: new Set(),
+        restroom: new Set(),
+        food_drink: new Set(),
+        travel: new Set(),
+      }).morning,
     ).toEqual([1, 2]);
   });
 

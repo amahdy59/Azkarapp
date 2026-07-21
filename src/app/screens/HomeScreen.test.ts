@@ -7,6 +7,13 @@ function progress(values: Partial<Record<CategoryId, number[]>> = {}) {
     morning: new Set(values.morning ?? []),
     evening: new Set(values.evening ?? []),
     before_sleep: new Set(values.before_sleep ?? []),
+    waking_up: new Set(values.waking_up ?? []),
+    home: new Set(values.home ?? []),
+    mosque: new Set(values.mosque ?? []),
+    after_prayer: new Set(values.after_prayer ?? []),
+    restroom: new Set(values.restroom ?? []),
+    food_drink: new Set(values.food_drink ?? []),
+    travel: new Set(values.travel ?? []),
   };
 }
 

@@ -396,7 +396,7 @@ export function ReaderScreen({
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
-      className="relative !pb-2"
+      className="relative !pb-0"
       data-testid="reader-screen"
       dir={direction}
       style={categoryThemeStyles}
@@ -485,7 +485,7 @@ export function ReaderScreen({
         <div className="shrink-0 pb-4">{renderCounterPanel()}</div>
       </div>
 
-      <footer className="shrink-0 px-4 pb-4 pt-4">{renderCounterActions()}</footer>
+      <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
 
       {hasOpenedBenefit && (
         <ReaderReferenceSheet

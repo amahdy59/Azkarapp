@@ -15,6 +15,13 @@ export function CategoryBadge({ catId, language = "en" }: { catId: CategoryId; l
     morning: { label: isArabic ? "الصباح" : "Morning", className: "bg-primary text-primary-foreground" },
     evening: { label: isArabic ? "المساء" : "Evening", className: "bg-secondary text-secondary-foreground" },
     before_sleep: { label: isArabic ? "النوم" : "Sleep", className: "bg-muted text-foreground" },
+    waking_up: { label: isArabic ? "الاستيقاظ" : "Waking Up", className: "bg-muted text-foreground" },
+    home: { label: isArabic ? "المنزل" : "Home", className: "bg-muted text-foreground" },
+    mosque: { label: isArabic ? "المسجد" : "Mosque", className: "bg-muted text-foreground" },
+    after_prayer: { label: isArabic ? "بعد الصلاة" : "Prayer", className: "bg-muted text-foreground" },
+    restroom: { label: isArabic ? "الخلاء" : "Restroom", className: "bg-muted text-foreground" },
+    food_drink: { label: isArabic ? "الطعام" : "Food", className: "bg-muted text-foreground" },
+    travel: { label: isArabic ? "السفر" : "Travel", className: "bg-muted text-foreground" },
   }[catId];
 
   return (
