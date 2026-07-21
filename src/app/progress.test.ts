@@ -33,18 +33,26 @@ describe("quiet garden progress", () => {
     expect(getProgressDayKey(new Date(2026, 6, 18, 4, 0), 4)).toBe("2026-07-18");
   });
 
-  it("records one leaf per category and creates a palm only for three distinct categories", () => {
+  it("records one leaf per category and creates a palm only for ten distinct categories", () => {
     const now = new Date(2026, 6, 18, 10);
     const first = recordDailyCollectionCompletion([], "morning", now, 4);
     const duplicate = recordDailyCollectionCompletion(first.records, "morning", now, 4);
-    const second = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
-    const third = recordDailyCollectionCompletion(second.records, "before_sleep", now, 4);
+
+    let state = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "before_sleep", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "waking_up", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "home", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "mosque", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "after_prayer", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "restroom", now, 4);
+    state = recordDailyCollectionCompletion(state.records, "food_drink", now, 4);
+    const tenth = recordDailyCollectionCompletion(state.records, "travel", now, 4);
 
     expect(first.event.kind).toBe("leaf");
     expect(duplicate.event.kind).toBe("repeat");
     expect(duplicate.records).toHaveLength(1);
-    expect(third.event).toMatchObject({ kind: "palm", leafCount: 3 });
-    expect(third.records).toHaveLength(3);
+    expect(tenth.event).toMatchObject({ kind: "palm", leafCount: 10 });
+    expect(tenth.records).toHaveLength(10);
   });
 
   it("migrates only complete legacy sessions and deduplicates category/day records", () => {
@@ -75,7 +83,18 @@ describe("quiet garden progress", () => {
     const records: DailyCollectionCompletion[] = [];
     for (let offset = 0; offset < 8; offset += 1) {
       const day = new Date(2026, 6, 18 - offset, 10);
-      for (const category of ["morning", "evening", "before_sleep"] as const) {
+      for (const category of [
+        "morning",
+        "evening",
+        "before_sleep",
+        "waking_up",
+        "home",
+        "mosque",
+        "after_prayer",
+        "restroom",
+        "food_drink",
+        "travel",
+      ] as const) {
         records.push({ dayKey: getProgressDayKey(day, 4), category, timeZone: "Africa/Cairo" });
       }
     }
@@ -89,14 +108,22 @@ describe("quiet garden progress", () => {
   });
 
   it("keeps yesterday's palm rhythm active while today is still in progress", () => {
-    const records: DailyCollectionCompletion[] = [
-      { dayKey: "2026-07-16", category: "morning", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-16", category: "evening", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-16", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-17", category: "evening", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-17", category: "before_sleep", timeZone: "Africa/Cairo" },
-    ];
+    const records: DailyCollectionCompletion[] = [];
+    for (const category of [
+      "morning",
+      "evening",
+      "before_sleep",
+      "waking_up",
+      "home",
+      "mosque",
+      "after_prayer",
+      "restroom",
+      "food_drink",
+      "travel",
+    ] as const) {
+      records.push({ dayKey: "2026-07-16", category, timeZone: "Africa/Cairo" });
+      records.push({ dayKey: "2026-07-17", category, timeZone: "Africa/Cairo" });
+    }
 
     const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
     expect(summary.currentPalmRhythm).toBe(2);
