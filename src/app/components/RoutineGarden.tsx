@@ -99,14 +99,14 @@ function gardenMessage(summary: GardenSummary, language: AppLanguage) {
     case "partial":
       return t(language, "garden.messagePartial", {
         count: formatNumerals(summary.today.leafCount, language),
-        total: formatNumerals(3, language),
+        total: formatNumerals(CATEGORIES.length, language),
       });
     case "welcome_back":
       return t(language, "garden.messageWelcomeBack");
     case "yesterday_partial":
       return t(language, "garden.messageYesterdayPartial", {
         count: formatNumerals(summary.yesterdayLeafCount, language),
-        total: formatNumerals(3, language),
+        total: formatNumerals(CATEGORIES.length, language),
       });
     case "continue":
       return t(language, "garden.messageContinue");
@@ -137,7 +137,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
             <span className="text-[0.75rem] font-bold text-primary" data-testid="today-leaf-count">
               {t(language, "garden.leafProgress", {
                 count: formatNumerals(summary.today.leafCount, language),
-                total: formatNumerals(3, language),
+                total: formatNumerals(CATEGORIES.length, language),
               })}
             </span>
           </span>
@@ -251,7 +251,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               {day.isPalm ? <PalmMark size={27} /> : <LeafMark size={21} filled={day.leafCount > 0} />}
             </span>
             <span className="mt-1 text-[0.625rem] font-bold text-foreground" aria-hidden="true">
-              {formatNumerals(day.leafCount, language)}/{formatNumerals(3, language)}
+              {formatNumerals(day.leafCount, language)}/{formatNumerals(CATEGORIES.length, language)}
             </span>
           </li>
         ))}
@@ -340,7 +340,7 @@ export function GrowthEventStatus({ event, language }: { event: GrowthEvent; lan
         <span className="mt-1 block text-[0.75rem] leading-5 text-muted-foreground">
           {t(language, "garden.eventHint", {
             count: formatNumerals(event.leafCount, language),
-            total: formatNumerals(3, language),
+            total: formatNumerals(CATEGORIES.length, language),
           })}
         </span>
       </span>
