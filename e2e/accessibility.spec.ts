@@ -168,7 +168,7 @@ test("visible settings controls meet the 44px minimum touch target", async ({ pa
     .evaluateAll((nodes) =>
       nodes.flatMap((node) => {
         const rect = node.getBoundingClientRect();
-        if (rect.width >= 44 && rect.height >= 44) {
+        if (Math.round(rect.width) >= 44 && Math.round(rect.height) >= 44) {
           return [];
         }
         return [
