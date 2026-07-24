@@ -219,10 +219,17 @@ export function HomeScreen({
             {/* Card Content */}
             <div className="relative z-10 flex min-h-[170px] flex-col justify-between p-5 text-start">
               <div>
-                <h2 id="current-zikr-heading" className="text-[1.25rem] font-extrabold text-white tracking-wide">
+                <h2
+                  id="current-zikr-heading"
+                  className="text-[1.25rem] font-extrabold text-white tracking-wide"
+                  style={{ color: "#FFFFFF" }}
+                >
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p className="mt-1 text-[0.875rem] font-medium text-amber-100 leading-relaxed">
+                <p
+                  className="mt-1 text-[0.875rem] font-medium text-amber-100 leading-relaxed"
+                  style={{ color: "#FEF3C7" }}
+                >
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
               </div>
