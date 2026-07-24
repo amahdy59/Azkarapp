@@ -199,12 +199,7 @@ export function HomeScreen({
       <div className="min-h-0 flex-1 overflow-y-auto pt-1">
         {/* Current Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-6">
-          <div
-            onClick={() =>
-              actionKind === "again" ? onRepeat(reminderInfo.categoryId) : onResume(reminderInfo.categoryId, nextIdx)
-            }
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#18181B] shadow-xl transition-all cursor-pointer"
-          >
+          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#18181B] shadow-xl transition-all">
             {/* Background Scene Image */}
             <img
               src={reminderInfo.bgImage}
@@ -257,11 +252,12 @@ export function HomeScreen({
                 <button
                   type="button"
                   data-testid="home-primary-cta"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    actionKind === "again"
-                      ? onRepeat(reminderInfo.categoryId)
-                      : onResume(reminderInfo.categoryId, nextIdx);
+                  onClick={() => {
+                    if (actionKind === "again") {
+                      onRepeat(reminderInfo.categoryId);
+                    } else {
+                      onResume(reminderInfo.categoryId, nextIdx);
+                    }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
                   className="interactive-elem group inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 self-start rounded-lg px-3 py-2 text-[0.9375rem] font-extrabold text-[#FACC15] hover:text-amber-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
