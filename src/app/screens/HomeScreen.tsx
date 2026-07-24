@@ -200,8 +200,10 @@ export function HomeScreen({
         {/* Current Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-6">
           <div
-            data-testid="home-primary-cta"
-            className="relative overflow-hidden rounded-2xl border border-white/10 bg-zinc-900 shadow-xl transition-all"
+            onClick={() =>
+              actionKind === "again" ? onRepeat(reminderInfo.categoryId) : onResume(reminderInfo.categoryId, nextIdx)
+            }
+            className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#18181B] shadow-xl transition-all cursor-pointer"
           >
             {/* Background Scene Image */}
             <img
@@ -220,7 +222,7 @@ export function HomeScreen({
                 <h2 id="current-zikr-heading" className="text-[1.25rem] font-extrabold text-white tracking-wide">
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p className="mt-1 text-[0.875rem] font-medium text-amber-100/90 leading-relaxed">
+                <p className="mt-1 text-[0.875rem] font-medium text-amber-100 leading-relaxed">
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
               </div>
@@ -238,7 +240,7 @@ export function HomeScreen({
                         isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
                       }
                     />
-                    <span className="mt-1.5 block text-[0.75rem] font-semibold text-white/80">
+                    <span className="mt-1.5 block text-[0.75rem] font-semibold text-white">
                       {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                       {formatNumerals(totalCount, language)} {t(language, "home.complete")}
                     </span>
@@ -247,13 +249,15 @@ export function HomeScreen({
 
                 <button
                   type="button"
-                  onClick={() =>
+                  data-testid="home-primary-cta"
+                  onClick={(e) => {
+                    e.stopPropagation();
                     actionKind === "again"
                       ? onRepeat(reminderInfo.categoryId)
-                      : onResume(reminderInfo.categoryId, nextIdx)
-                  }
+                      : onResume(reminderInfo.categoryId, nextIdx);
+                  }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex items-center gap-1.5 self-start rounded-lg text-[0.9375rem] font-extrabold text-[#FACC15] hover:text-amber-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
+                  className="interactive-elem group inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 self-start rounded-lg px-3 py-2 text-[0.9375rem] font-extrabold text-[#FACC15] hover:text-amber-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
                 >
                   <span>{ctaLabel}</span>
                   <span

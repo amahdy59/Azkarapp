@@ -113,10 +113,10 @@ test("populated Home exposes leaf progress through text, state, and accessible n
   const garden = page.getByTestId("today-garden-card");
   await expect(garden).toBeVisible();
   await expect(garden.getByRole("heading", { name: "Today's practice" })).toBeVisible();
-  await expect(page.getByTestId("today-leaf-count")).toHaveText("2 of 10 leaves");
+  await expect(page.getByTestId("today-leaf-count")).toHaveText("2 of 3 leaves");
 
   const collections = garden.getByRole("list", { name: "Today's collection progress" });
-  await expect(collections.getByRole("listitem")).toHaveCount(10);
+  await expect(collections.getByRole("listitem")).toHaveCount(3);
   await expect(page.getByTestId("garden-category-morning")).toHaveAttribute("data-state", "complete");
   await expect(page.getByTestId("garden-category-evening")).toHaveAttribute("data-state", "complete");
   await expect(page.getByTestId("garden-category-before_sleep")).toHaveAttribute("data-state", "pending");
@@ -126,27 +126,16 @@ test("populated Home exposes leaf progress through text, state, and accessible n
   await expectNoWcagViolations(page);
 });
 
-test("ten completed collections are announced as a palm without points or rank", async ({ page }) => {
+test("three completed main collections are announced as a palm without points or rank", async ({ page }) => {
   await seedReturningGardenUser(page, {
-    completedToday: [
-      "morning",
-      "evening",
-      "before_sleep",
-      "waking_up",
-      "home",
-      "mosque",
-      "after_prayer",
-      "restroom",
-      "food_drink",
-      "travel",
-    ],
+    completedToday: ["morning", "evening", "before_sleep"],
   });
   await openReturningHome(page);
 
   const garden = page.getByTestId("today-garden-card");
-  await expect(page.getByTestId("today-leaf-count")).toHaveText("10 of 10 leaves");
+  await expect(page.getByTestId("today-leaf-count")).toHaveText("3 of 3 leaves");
   await expect(garden).toContainText(/palm has grown/i);
-  await expect(garden.locator('[data-state="complete"]')).toHaveCount(10);
+  await expect(garden.locator('[data-state="complete"]')).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
 
