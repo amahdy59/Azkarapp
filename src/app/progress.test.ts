@@ -33,26 +33,19 @@ describe("quiet garden progress", () => {
     expect(getProgressDayKey(new Date(2026, 6, 18, 4, 0), 4)).toBe("2026-07-18");
   });
 
-  it("records one leaf per category and creates a palm only for ten distinct categories", () => {
+  it("records one leaf per main category and creates a palm for the three main categories", () => {
     const now = new Date(2026, 6, 18, 10);
     const first = recordDailyCollectionCompletion([], "morning", now, 4);
     const duplicate = recordDailyCollectionCompletion(first.records, "morning", now, 4);
 
     let state = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "before_sleep", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "waking_up", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "home", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "mosque", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "after_prayer", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "restroom", now, 4);
-    state = recordDailyCollectionCompletion(state.records, "food_drink", now, 4);
-    const tenth = recordDailyCollectionCompletion(state.records, "travel", now, 4);
+    const third = recordDailyCollectionCompletion(state.records, "before_sleep", now, 4);
 
     expect(first.event.kind).toBe("leaf");
     expect(duplicate.event.kind).toBe("repeat");
     expect(duplicate.records).toHaveLength(1);
-    expect(tenth.event).toMatchObject({ kind: "palm", leafCount: 10 });
-    expect(tenth.records).toHaveLength(10);
+    expect(third.event).toMatchObject({ kind: "palm", leafCount: 3 });
+    expect(third.records).toHaveLength(3);
   });
 
   it("migrates only complete legacy sessions and deduplicates category/day records", () => {

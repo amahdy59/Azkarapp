@@ -2,8 +2,10 @@ import { Check } from "./icons";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import type { GardenMilestoneId, GardenSummary, GrowthEvent } from "../progress";
+import { MAIN_CATEGORY_IDS, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId } from "../types";
+
+const MAIN_CATEGORIES = CATEGORIES.filter((category) => MAIN_CATEGORY_IDS.includes(category.id));
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -99,14 +101,14 @@ function gardenMessage(summary: GardenSummary, language: AppLanguage) {
     case "partial":
       return t(language, "garden.messagePartial", {
         count: formatNumerals(summary.today.leafCount, language),
-        total: formatNumerals(CATEGORIES.length, language),
+        total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
       });
     case "welcome_back":
       return t(language, "garden.messageWelcomeBack");
     case "yesterday_partial":
       return t(language, "garden.messageYesterdayPartial", {
         count: formatNumerals(summary.yesterdayLeafCount, language),
-        total: formatNumerals(CATEGORIES.length, language),
+        total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
       });
     case "continue":
       return t(language, "garden.messageContinue");
@@ -137,7 +139,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
             <span className="text-[0.75rem] font-bold text-primary" data-testid="today-leaf-count">
               {t(language, "garden.leafProgress", {
                 count: formatNumerals(summary.today.leafCount, language),
-                total: formatNumerals(CATEGORIES.length, language),
+                total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
               })}
             </span>
           </span>
@@ -148,7 +150,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
       </div>
 
       <ul className="mt-4 grid grid-cols-3 gap-2" aria-label={t(language, "garden.todayCollections")}>
-        {CATEGORIES.map((category) => {
+        {MAIN_CATEGORIES.map((category) => {
           const complete = summary.today.completedCategories.includes(category.id);
           const name = language === "ar" ? category.nameArabic : category.name;
           return (
@@ -251,7 +253,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               {day.isPalm ? <PalmMark size={27} /> : <LeafMark size={21} filled={day.leafCount > 0} />}
             </span>
             <span className="mt-1 text-[0.625rem] font-bold text-foreground" aria-hidden="true">
-              {formatNumerals(day.leafCount, language)}/{formatNumerals(CATEGORIES.length, language)}
+              {formatNumerals(day.leafCount, language)}/{formatNumerals(MAIN_CATEGORY_IDS.length, language)}
             </span>
           </li>
         ))}

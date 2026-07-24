@@ -13,6 +13,7 @@ export const CATEGORY_IDS: CategoryId[] = [
   "food_drink",
   "travel",
 ];
+export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
 
 export type GrowthEventKind = "leaf" | "palm" | "repeat";
@@ -176,20 +177,32 @@ export function recordDailyCollectionCompletion(
   const normalized = normalizeDailyCompletions(records);
   const dayRecords = normalized.filter((record) => record.dayKey === dayKey);
   const existing = dayRecords.some((record) => record.category === category);
+  const isMainCategory = MAIN_CATEGORY_IDS.includes(category);
 
   if (existing) {
+    const leafCount = dayRecords.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
     return {
       records: normalized,
-      event: { kind: "repeat", category, dayKey, leafCount: dayRecords.length } satisfies GrowthEvent,
+      event: { kind: "repeat", category, dayKey, leafCount } satisfies GrowthEvent,
     };
   }
 
   const next = mergeDailyCompletions(normalized, [{ dayKey, category, timeZone: currentTimeZone() }]);
-  const leafCount = next.filter((record) => record.dayKey === dayKey).length;
+  const leafCount = next
+    .filter((record) => record.dayKey === dayKey)
+    .filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+
+  if (!isMainCategory) {
+    return {
+      records: next,
+      event: { kind: "repeat", category, dayKey, leafCount } satisfies GrowthEvent,
+    };
+  }
+
   return {
     records: next,
     event: {
-      kind: leafCount === CATEGORY_IDS.length ? "palm" : "leaf",
+      kind: leafCount === MAIN_CATEGORY_IDS.length ? "palm" : "leaf",
       category,
       dayKey,
       leafCount,
@@ -209,13 +222,13 @@ function categoryMap(records: DailyCollectionCompletion[]) {
 
 function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<CategoryId>>): GardenDay {
   const categories = byDay.get(dayKey) ?? new Set<CategoryId>();
-  const completedCategories = CATEGORY_IDS.filter((category) => categories.has(category));
+  const completedCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
   return {
     dayKey,
     date: dateFromProgressDayKey(dayKey),
     completedCategories,
     leafCount: completedCategories.length,
-    isPalm: completedCategories.length === CATEGORY_IDS.length,
+    isPalm: completedCategories.length === MAIN_CATEGORY_IDS.length,
     isToday: dayKey === todayKey,
   };
 }
@@ -227,7 +240,10 @@ export function getPalmStreakSummary(
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const palmKeys = [...categoryMap(records).entries()]
-    .filter(([dayKey, categories]) => dayKey <= todayKey && categories.size === CATEGORY_IDS.length)
+    .filter(
+      ([dayKey, categories]) =>
+        dayKey <= todayKey && MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
+    )
     .map(([dayKey]) => dayKey)
     .sort();
 
@@ -271,13 +287,16 @@ export function getGardenSummary(
   const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay);
   const yesterday = days.at(-2);
   const activeKeys = [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort();
-  const lifetimeLeaves = normalized.length;
-  const lifetimePalms = [...byDay.values()].filter((categories) => categories.size === CATEGORY_IDS.length).length;
+  const lifetimeLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+  const lifetimePalms = [...byDay.values()].filter((categories) =>
+    MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
+  ).length;
   const { currentPalmRhythm, longestPalmRhythm } = getPalmStreakSummary(normalized, now, boundaryHour);
 
   let messageKind: GardenMessageKind;
   if (today.isPalm) {
     messageKind = "complete";
+
   } else if (today.leafCount > 0) {
     messageKind = "partial";
   } else if (activeKeys.length === 0) {
