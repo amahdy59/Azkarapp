@@ -38,7 +38,7 @@ describe("quiet garden progress", () => {
     const first = recordDailyCollectionCompletion([], "morning", now, 4);
     const duplicate = recordDailyCollectionCompletion(first.records, "morning", now, 4);
 
-    let state = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
+    const state = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
     const third = recordDailyCollectionCompletion(state.records, "before_sleep", now, 4);
 
     expect(first.event.kind).toBe("leaf");

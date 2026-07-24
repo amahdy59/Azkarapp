@@ -141,24 +141,17 @@ export function HomeScreen({
     actionKind = "resume";
   }
 
-  let ctaLabel = "";
-  if (isArabic) {
-    if (actionKind === "again") {
-      ctaLabel = `اقرأ أذكار ${reminderCategory.nameArabic.replace("أذكار ", "")} مرة أخرى`;
-    } else if (actionKind === "resume") {
-      ctaLabel = `تابع ${reminderCategory.nameArabic}`;
-    } else {
-      ctaLabel = `ابدأ ${reminderCategory.nameArabic}`;
-    }
-  } else {
-    if (actionKind === "again") {
-      ctaLabel = `Read ${reminderCategory.name} Again`;
-    } else if (actionKind === "resume") {
-      ctaLabel = `Resume ${reminderCategory.name}`;
-    } else {
-      ctaLabel = `Start ${reminderCategory.name}`;
-    }
-  }
+  const ctaLabel = isArabic
+    ? actionKind === "again"
+      ? `اقرأ أذكار ${reminderCategory.nameArabic.replace("أذكار ", "")} مرة أخرى`
+      : actionKind === "resume"
+        ? `تابع ${reminderCategory.nameArabic}`
+        : `ابدأ ${reminderCategory.nameArabic}`
+    : actionKind === "again"
+      ? `Read ${reminderCategory.name} Again`
+      : actionKind === "resume"
+        ? `Resume ${reminderCategory.name}`
+        : `Start ${reminderCategory.name}`;
 
   return (
     <ScreenContainer dir={direction} className="px-page">
@@ -168,7 +161,11 @@ export function HomeScreen({
         <div
           className="flex items-center gap-1.5 font-extrabold text-emerald-500"
           title={isArabic ? "أوراق اليوم" : "Today's Leaves"}
-          aria-label={isArabic ? `أوراق اليوم: ${gardenSummary.today.leafCount}` : `Today's leaves: ${gardenSummary.today.leafCount}`}
+          aria-label={
+            isArabic
+              ? `أوراق اليوم: ${gardenSummary.today.leafCount}`
+              : `Today's leaves: ${gardenSummary.today.leafCount}`
+          }
         >
           <span className="text-[1.125rem]">{formatNumerals(gardenSummary.today.leafCount, language)}</span>
           <LeafMark size={22} filled={gardenSummary.today.leafCount > 0} className="text-emerald-500" />
@@ -181,7 +178,11 @@ export function HomeScreen({
         <div
           className="flex items-center gap-1.5 font-extrabold text-emerald-500"
           title={isArabic ? "النخيل المكتسبة" : "Palms Earned"}
-          aria-label={isArabic ? `النخيل المكتسبة: ${gardenSummary.lifetimePalms}` : `Palms earned: ${gardenSummary.lifetimePalms}`}
+          aria-label={
+            isArabic
+              ? `النخيل المكتسبة: ${gardenSummary.lifetimePalms}`
+              : `Palms earned: ${gardenSummary.lifetimePalms}`
+          }
         >
           <span className="text-[1.125rem]">{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
           <PalmMark size={24} className="text-emerald-500" />
@@ -233,7 +234,9 @@ export function HomeScreen({
                       height={5}
                       trackColor="rgba(255, 255, 255, 0.25)"
                       direction={direction}
-                      aria-label={isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`}
+                      aria-label={
+                        isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
+                      }
                     />
                     <span className="mt-1.5 block text-[0.75rem] font-semibold text-white/80">
                       {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
@@ -253,7 +256,10 @@ export function HomeScreen({
                   className="interactive-elem group inline-flex items-center gap-1.5 self-start rounded-lg text-[0.9375rem] font-extrabold text-[#FACC15] hover:text-amber-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
                 >
                   <span>{ctaLabel}</span>
-                  <span className="text-[1.125rem] leading-none transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5" aria-hidden="true">
+                  <span
+                    className="text-[1.125rem] leading-none transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                    aria-hidden="true"
+                  >
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
@@ -336,4 +342,3 @@ export function HomeScreen({
     </ScreenContainer>
   );
 }
-

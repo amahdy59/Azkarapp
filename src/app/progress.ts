@@ -240,10 +240,7 @@ export function getPalmStreakSummary(
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const palmKeys = [...categoryMap(records).entries()]
-    .filter(
-      ([dayKey, categories]) =>
-        dayKey <= todayKey && MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
-    )
+    .filter(([dayKey, categories]) => dayKey <= todayKey && MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)))
     .map(([dayKey]) => dayKey)
     .sort();
 
@@ -296,7 +293,6 @@ export function getGardenSummary(
   let messageKind: GardenMessageKind;
   if (today.isPalm) {
     messageKind = "complete";
-
   } else if (today.leafCount > 0) {
     messageKind = "partial";
   } else if (activeKeys.length === 0) {

@@ -42,4 +42,3 @@ export function formatHijriDate(date: Date = new Date(), language: AppLanguage =
     return "";
   }
 }
-
