@@ -2,36 +2,68 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import type { Zikr } from "../types";
 
 // Audio CDN URL resolver for Quranic & Prophetic Azkar
-export function getZikrAudioUrl(zikr: Zikr): string | null {
-  if (!zikr) return null;
-  const id = zikr.id;
+export function getZikrAudioUrl(
+  zikr: Zikr | null,
+  reciter: "alafasy" | "ghamdi" | "abdulbasit" = "alafasy",
+): string | null {
+  if (!zikr || !zikr.id) return null;
+  const id = zikr.id.toLowerCase();
+  const ref = (zikr.sourceReference ?? "").toLowerCase();
 
-  // Quranic Verses mapped to EveryAyah Alafasy 128kbps CDN
-  if (id.includes("75") || zikr.sourceReference?.includes("2:255")) {
-    // Ayat Al-Kursi (2:255)
-    return "https://everyayah.com/data/Alafasy_128kbps/002255.mp3";
+  const reciterPath =
+    reciter === "ghamdi"
+      ? "Ghamadi_40kbps"
+      : reciter === "abdulbasit"
+        ? "Abdul_Basit_Murattal_192kbps"
+        : "Alafasy_128kbps";
+
+  // 1. Ayat Al-Kursi (Qur'an 2:255)
+  if (id.includes("75") || ref.includes("2:255") || ref.includes("البقرة: 255")) {
+    return `https://everyayah.com/data/${reciterPath}/002255.mp3`;
   }
-  if (id.includes("76") || zikr.sourceReference?.includes("112")) {
-    // Surah Al-Ikhlas (112)
-    return "https://everyayah.com/data/Alafasy_128kbps/112001.mp3";
+  // 2. Surah Al-Ikhlas (Qur'an 112)
+  if (id.includes("76a") || ref.includes("112") || ref.includes("الإخلاص")) {
+    return `https://everyayah.com/data/${reciterPath}/112001.mp3`;
   }
-  if (id.includes("77") || zikr.sourceReference?.includes("113")) {
-    // Surah Al-Falaq (113)
-    return "https://everyayah.com/data/Alafasy_128kbps/113001.mp3";
+  // 3. Surah Al-Falaq (Qur'an 113)
+  if (id.includes("76b") || ref.includes("113") || ref.includes("الفلق")) {
+    return `https://everyayah.com/data/${reciterPath}/113001.mp3`;
   }
-  if (id.includes("78") || zikr.sourceReference?.includes("114")) {
-    // Surah An-Nas (114)
-    return "https://everyayah.com/data/Alafasy_128kbps/114001.mp3";
+  // 4. Surah An-Nas (Qur'an 114)
+  if (id.includes("76c") || ref.includes("114") || ref.includes("الناس")) {
+    return `https://everyayah.com/data/${reciterPath}/114001.mp3`;
+  }
+  // 5. Amanar-Rasul (Qur'an 2:285-286)
+  if (id.includes("285") || ref.includes("2:285") || ref.includes("البقرة: 285")) {
+    return `https://everyayah.com/data/${reciterPath}/002285.mp3`;
+  }
+  // 6. Surah Al-Kahf (Qur'an 18)
+  if (id.includes("kahf") || ref.includes("18:") || ref.includes("الكهف")) {
+    return `https://everyayah.com/data/${reciterPath}/018001.mp3`;
+  }
+  // 7. Surah Al-Mulk (Qur'an 67)
+  if (id.includes("mulk") || ref.includes("67:") || ref.includes("الملك")) {
+    return `https://everyayah.com/data/${reciterPath}/067001.mp3`;
+  }
+  // 8. Surah Al-Sajdah (Qur'an 32)
+  if (id.includes("sajdah") || ref.includes("32:") || ref.includes("السجدة")) {
+    return `https://everyayah.com/data/${reciterPath}/032001.mp3`;
+  }
+  // 9. Surah Yasin (Qur'an 36)
+  if (id.includes("yasin") || ref.includes("36:") || ref.includes("يس")) {
+    return `https://everyayah.com/data/${reciterPath}/036001.mp3`;
+  }
+  // 10. Surah Ar-Rahman (Qur'an 55)
+  if (id.includes("rahman") || ref.includes("55:") || ref.includes("الرحمن")) {
+    return `https://everyayah.com/data/${reciterPath}/055001.mp3`;
   }
 
-  // Fallback to EveryAyah / Public Islamic Audio CDN based on hash for authentic demo playback
-  const charSum = id.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const quranVerses = ["001001", "002255", "036001", "055001", "067001", "112001", "113001", "114001"];
-  const verseCode = quranVerses[charSum % quranVerses.length];
-  return `https://everyayah.com/data/Alafasy_128kbps/${verseCode}.mp3`;
+  // Strictly return null for items without authentic recitation audio to prevent misconfiguration
+  return null;
 }
 
 export type PlaybackRate = 0.8 | 1.0 | 1.25;
+export type ReciterOption = "alafasy" | "ghamdi" | "abdulbasit";
 
 export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: (index: number) => void) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
@@ -41,6 +73,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: 
   const [duration, setDuration] = useState(0);
   const [playbackRate, setPlaybackRateState] = useState<PlaybackRate>(1.0);
   const [autoPlayAll, setAutoPlayAll] = useState(false);
+  const [reciter, setReciter] = useState<ReciterOption>("alafasy");
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
@@ -60,7 +93,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: 
   }, []);
 
   const currentZikr = zikrs[currentIndex] ?? null;
-  const audioUrl = currentZikr ? getZikrAudioUrl(currentZikr) : null;
+  const audioUrl = currentZikr ? getZikrAudioUrl(currentZikr, reciter) : null;
 
   // Play audio for specific index
   const playTrackAtIndex = useCallback(
@@ -69,7 +102,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: 
       const zikr = zikrs[index];
       if (!zikr) return;
 
-      const url = getZikrAudioUrl(zikr);
+      const url = getZikrAudioUrl(zikr, reciter);
       if (!url) return;
 
       if (!audioRef.current) {
@@ -97,7 +130,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: 
           setIsBuffering(false);
         });
     },
-    [zikrs, playbackRate, onIndexChange],
+    [zikrs, playbackRate, reciter, onIndexChange],
   );
 
   // Auto advance event handlers
@@ -204,6 +237,8 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: 
     duration,
     playbackRate,
     autoPlayAll,
+    reciter,
+    setReciter,
     togglePlayPause,
     playTrackAtIndex,
     playNext,

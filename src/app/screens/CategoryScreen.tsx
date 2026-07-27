@@ -191,7 +191,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     key={z.id}
-                    className="interactive-elem flex w-full items-start gap-3 rounded-card border border-border bg-card p-3 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                    className="interactive-elem flex w-full items-start gap-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer hover:bg-emerald-500/10 transition-all dark:bg-emerald-950/20"
                     onClick={() => onZikr(index)}
                   >
                     <span
@@ -209,37 +209,28 @@ export function CategoryScreen({
                       }}
                       aria-label={
                         isArabic
-                          ? `${z.arabicText.slice(0, 20)}. مكتمل، انقر للنعطيل`
-                          : `${z.translation.slice(0, 20)}. Completed, click to uncheck`
+                          ? `${z.arabicText.slice(0, 30)}. مكتمل، انقر للتعطيل`
+                          : `${z.translation.slice(0, 30)}. Completed, click to uncheck`
                       }
                       className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shadow-sm">
-                        <Check size={16} />
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shadow-sm">
+                        <Check size={18} strokeWidth={3} />
                       </span>
                     </span>
 
-                    <div className="min-w-0 flex-1 opacity-80 pt-1">
+                    <div className="min-w-0 flex-1 pt-0.5 opacity-90">
                       <p
-                        className={`${isArabic ? "zikr-text" : "font-sans"} line-clamp-3 text-start text-[1rem] font-medium leading-[26px] text-foreground`}
+                        className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.8] text-foreground whitespace-pre-line`}
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
-                        {isArabic ? z.arabicText.split("\n")[0] : z.translation}
+                        {isArabic ? z.arabicText : z.translation}
                       </p>
-                      {!isArabic && (
-                        <p
-                          className="mt-1 line-clamp-1 text-start text-[0.75rem] text-muted-foreground"
-                          dir="ltr"
-                          lang="en"
-                        >
-                          {z.transliteration}
-                        </p>
-                      )}
 
                       {timingTip && (
                         <div
-                          className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1 text-[0.75rem] font-bold text-amber-700 dark:text-amber-300"
+                          className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-amber-500/15 px-3 py-1 text-[0.75rem] font-extrabold text-amber-800 dark:text-amber-300"
                           dir="auto"
                         >
                           <span>💡</span>
@@ -248,8 +239,8 @@ export function CategoryScreen({
                       )}
                     </div>
 
-                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/60 px-3 py-1.5 opacity-70">
-                      <span className="text-[0.8125rem] font-bold text-muted-foreground">x{countLabel}</span>
+                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/80 px-3 py-1.5 shadow-xs">
+                      <span className="text-[0.875rem] font-extrabold text-muted-foreground">x{countLabel}</span>
                     </div>
                   </button>
                 );
@@ -263,7 +254,7 @@ export function CategoryScreen({
             <div className="mb-3 flex items-center justify-between">
               <h3 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h3>
             </div>
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3.5">
               {remainingAzkar.map(({ z, index }) => {
                 const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
                 const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
@@ -272,7 +263,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     key={z.id}
-                    className="interactive-elem flex w-full items-start gap-3 rounded-card border border-border bg-card p-3 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer hover:border-border/80 transition-colors"
+                    className="interactive-elem flex w-full items-start gap-3.5 rounded-2xl border border-border/80 bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
                     onClick={() => onZikr(index)}
                   >
                     <span
@@ -290,35 +281,26 @@ export function CategoryScreen({
                       }}
                       aria-label={
                         isArabic
-                          ? `${z.arabicText.slice(0, 20)}. غير مكتمل، انقر للتحديد`
-                          : `${z.translation.slice(0, 20)}. Not completed, click to check`
+                          ? `${z.arabicText.slice(0, 30)}. غير مكتمل، انقر للتحديد`
+                          : `${z.translation.slice(0, 30)}. Not completed, click to check`
                       }
                       className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full border-2 border-muted-foreground/40 hover:border-emerald-500 transition-colors" />
+                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-muted-foreground/40 hover:border-emerald-500 hover:bg-emerald-500/10 transition-colors" />
                     </span>
 
-                    <div className="min-w-0 flex-1 pt-1">
+                    <div className="min-w-0 flex-1 pt-0.5">
                       <p
-                        className={`${isArabic ? "zikr-text" : "font-sans"} line-clamp-3 text-start text-[1rem] font-medium leading-[26px] text-foreground`}
+                        className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
-                        {isArabic ? z.arabicText.split("\n")[0] : z.translation}
+                        {isArabic ? z.arabicText : z.translation}
                       </p>
-                      {!isArabic && (
-                        <p
-                          className="mt-1 line-clamp-1 text-start text-[0.75rem] text-muted-foreground"
-                          dir="ltr"
-                          lang="en"
-                        >
-                          {z.transliteration}
-                        </p>
-                      )}
 
                       {timingTip && (
                         <div
-                          className="mt-1.5 inline-flex items-center gap-1.5 rounded-lg bg-amber-500/10 px-2.5 py-1 text-[0.75rem] font-bold text-amber-700 dark:text-amber-300"
+                          className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-amber-500/15 px-3 py-1 text-[0.75rem] font-extrabold text-amber-800 dark:text-amber-300"
                           dir="auto"
                         >
                           <span>💡</span>
@@ -327,8 +309,10 @@ export function CategoryScreen({
                       )}
                     </div>
 
-                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/60 px-3 py-1.5">
-                      <span className="text-[0.8125rem] font-bold text-muted-foreground">x{countLabel}</span>
+                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-amber-500/15 px-3 py-1.5 shadow-xs">
+                      <span className="text-[0.875rem] font-extrabold text-amber-700 dark:text-amber-300">
+                        x{countLabel}
+                      </span>
                     </div>
                   </button>
                 );

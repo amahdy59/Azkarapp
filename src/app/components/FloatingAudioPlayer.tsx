@@ -1,6 +1,6 @@
 import { Play, Pause, SkipForward, SkipBack, X } from "../components/icons";
 import type { AppLanguage } from "../types";
-import type { PlaybackRate } from "../hooks/useAudioPlayer";
+import type { PlaybackRate, ReciterOption } from "../hooks/useAudioPlayer";
 
 interface FloatingAudioPlayerProps {
   title: string;
@@ -10,11 +10,13 @@ interface FloatingAudioPlayerProps {
   duration: number;
   playbackRate: PlaybackRate;
   autoPlayAll: boolean;
+  reciter?: ReciterOption;
   language: AppLanguage;
   onTogglePlayPause: () => void;
   onNext: () => void;
   onPrev: () => void;
   onSetSpeed: (rate: PlaybackRate) => void;
+  onSetReciter?: (reciter: ReciterOption) => void;
   onToggleAutoPlayAll: () => void;
   onClose: () => void;
 }
@@ -34,11 +36,13 @@ export function FloatingAudioPlayer({
   duration,
   playbackRate,
   autoPlayAll,
+  reciter = "alafasy",
   language,
   onTogglePlayPause,
   onNext,
   onPrev,
   onSetSpeed,
+  onSetReciter,
   onToggleAutoPlayAll,
   onClose,
 }: FloatingAudioPlayerProps) {
@@ -157,6 +161,31 @@ export function FloatingAudioPlayer({
             </svg>
             <span>{autoPlayAll ? (isArabic ? "الكل" : "All") : isArabic ? "مفرد" : "Single"}</span>
           </button>
+
+          {/* Reciter Selector */}
+          {onSetReciter && (
+            <button
+              type="button"
+              onClick={() => {
+                const options: ReciterOption[] = ["alafasy", "ghamdi", "abdulbasit"];
+                const nextIdx = (options.indexOf(reciter) + 1) % options.length;
+                onSetReciter(options[nextIdx]!);
+              }}
+              aria-label={
+                isArabic
+                  ? `القارئ الحالي: ${reciter === "alafasy" ? "العفاسي" : reciter === "ghamdi" ? "الغامدي" : "عبد الباسط"}`
+                  : `Current reciter: ${reciter}`
+              }
+              title={
+                isArabic
+                  ? `القارئ: ${reciter === "alafasy" ? "مشاري العفاسي" : reciter === "ghamdi" ? "سعد الغامدي" : "عبد الباسط"}`
+                  : `Reciter: ${reciter}`
+              }
+              className="flex h-8 px-2 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 text-[0.6875rem] font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all"
+            >
+              🎙️ {reciter === "alafasy" ? "العفاسي" : reciter === "ghamdi" ? "الغامدي" : "عبدالباسط"}
+            </button>
+          )}
 
           {/* Speed Selector */}
           <button

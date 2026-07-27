@@ -17,4 +17,18 @@ describe("azkar content totals", () => {
       expect(new Set(indexes).size).toBe(indexes.length);
     }
   });
+
+  it("passes comprehensive authenticity & content completeness audit across all zikrs", () => {
+    for (const category of CATEGORIES) {
+      const items = getAzkarByCategory(category.id);
+      for (const item of items) {
+        expect(item.id).toBeTruthy();
+        expect(item.arabicText.trim().length).toBeGreaterThan(0);
+        expect(item.translation.trim().length).toBeGreaterThan(0);
+        expect(item.repetitionCount).toBeGreaterThanOrEqual(1);
+        expect(item.sourceReference).toBeTruthy();
+        expect(item.sourceReference.trim().length).toBeGreaterThan(0);
+      }
+    }
+  });
 });

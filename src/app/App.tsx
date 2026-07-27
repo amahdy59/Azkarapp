@@ -1118,11 +1118,13 @@ export default function App() {
             duration={audioPlayer.duration}
             playbackRate={audioPlayer.playbackRate}
             autoPlayAll={audioPlayer.autoPlayAll}
+            reciter={audioPlayer.reciter}
             language={selectedLang}
             onTogglePlayPause={audioPlayer.togglePlayPause}
             onNext={audioPlayer.playNext}
             onPrev={audioPlayer.playPrev}
             onSetSpeed={audioPlayer.setPlaybackRate}
+            onSetReciter={audioPlayer.setReciter}
             onToggleAutoPlayAll={audioPlayer.toggleAutoPlayAll}
             onClose={audioPlayer.stop}
           />
