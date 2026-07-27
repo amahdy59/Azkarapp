@@ -225,9 +225,7 @@ function categoryMap(records: DailyCollectionCompletion[]) {
 function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<CategoryId>>): GardenDay {
   const categories = byDay.get(dayKey) ?? new Set<CategoryId>();
   const completedCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
-  const extraLeafCount = CATEGORY_IDS.filter(
-    (id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id),
-  ).length;
+  const extraLeafCount = CATEGORY_IDS.filter((id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id)).length;
   return {
     dayKey,
     date: dateFromProgressDayKey(dayKey),

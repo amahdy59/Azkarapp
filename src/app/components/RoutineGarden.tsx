@@ -48,13 +48,7 @@ export function LeafMark({
 }
 
 /** Pale leaf mark — used for extra (non-core) group completions. Softer, smaller visual weight. */
-export function PaleLeafMark({
-  className = "",
-  size = 20,
-}: {
-  className?: string;
-  size?: number;
-}) {
+export function PaleLeafMark({ className = "", size = 20 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -80,13 +74,7 @@ export function PaleLeafMark({
 }
 
 /** Bud mark — used for pending core group slots, communicating "not yet completed". */
-export function BudMark({
-  className = "",
-  size = 14,
-}: {
-  className?: string;
-  size?: number;
-}) {
+export function BudMark({ className = "", size = 14 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 14 14"
@@ -115,13 +103,7 @@ export function BudMark({
  * Features: curved trunk with bark texture, 7 arching fronds, date clusters at crown,
  * and a subtle ground shadow. Uses currentColor for full theme compatibility.
  */
-export function PalmTreeMark({
-  className = "",
-  size = 32,
-}: {
-  className?: string;
-  size?: number;
-}) {
+export function PalmTreeMark({ className = "", size = 32 }: { className?: string; size?: number }) {
   return (
     <svg
       viewBox="0 0 64 64"
@@ -191,20 +173,13 @@ export function PalmMark({ className = "", size = 32 }: { className?: string; si
  * - A pale-leaf + count for extra groups when any are completed
  * - A golden ambient glow when all 3 core groups are done (palm day)
  */
-export function PalmTreeReward({
-  summary,
-  language,
-}: {
-  summary: GardenSummary;
-  language: AppLanguage;
-}) {
+export function PalmTreeReward({ summary, language }: { summary: GardenSummary; language: AppLanguage }) {
   const { today } = summary;
   const isPalm = today.isPalm;
   const coreLeafCount = today.leafCount;
   const extraLeafCount = today.extraLeafCount;
 
-  const treeColor =
-    isPalm ? "text-emerald-500" : coreLeafCount > 0 ? "text-primary" : "text-muted-foreground";
+  const treeColor = isPalm ? "text-emerald-500" : coreLeafCount > 0 ? "text-primary" : "text-muted-foreground";
   const treeOpacity = coreLeafCount === 0 ? "opacity-40" : "opacity-100";
 
   const ariaLabel =
@@ -223,22 +198,14 @@ export function PalmTreeReward({
       )}
 
       {/* The palm tree */}
-      <PalmTreeMark
-        size={28}
-        className={`${treeColor} ${treeOpacity} transition-[color,opacity] duration-500`}
-      />
+      <PalmTreeMark size={28} className={`${treeColor} ${treeOpacity} transition-[color,opacity] duration-500`} />
 
       {/* Leaf cluster row — core slots + optional extra count */}
       <div className="flex items-center gap-0.5" aria-hidden="true">
         {MAIN_CATEGORY_IDS.map((catId) => {
           const complete = today.completedCategories.includes(catId as CategoryId);
           return complete ? (
-            <LeafMark
-              key={catId}
-              size={10}
-              filled
-              className="text-emerald-500 animate-leaf-appear"
-            />
+            <LeafMark key={catId} size={10} filled className="text-emerald-500 animate-leaf-appear" />
           ) : (
             <BudMark key={catId} size={9} className="text-muted-foreground/35" />
           );
@@ -536,12 +503,7 @@ export function GrowthEventStatus({ event, language }: { event: GrowthEvent; lan
     : "flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground";
 
   return (
-    <div
-      className={containerClass}
-      role="status"
-      aria-live="polite"
-      data-testid="garden-growth-event"
-    >
+    <div className={containerClass} role="status" aria-live="polite" data-testid="garden-growth-event">
       <span className={iconClass} aria-hidden="true">
         {event.kind === "palm" ? (
           <PalmTreeMark size={isCore ? 28 : 22} />

@@ -172,17 +172,11 @@ export function HomeScreen({
           <span className="text-[0.9375rem] font-extrabold text-foreground">
             {formatNumerals(gardenSummary.today.leafCount, language)}
           </span>
-          <span className="text-[0.75rem] font-medium text-muted-foreground">
-            {isArabic ? "/" : "/"}
-          </span>
+          <span className="text-[0.75rem] font-medium text-muted-foreground">{isArabic ? "/" : "/"}</span>
           <span className="text-[0.9375rem] font-extrabold text-foreground">
             {formatNumerals(MAIN_CATEGORY_IDS.length, language)}
           </span>
-          <LeafMark
-            size={16}
-            filled={gardenSummary.today.leafCount > 0}
-            className="text-emerald-500"
-          />
+          <LeafMark size={16} filled={gardenSummary.today.leafCount > 0} className="text-emerald-500" />
         </div>
 
         {/* Center: Palm Tree Reward — visual gamification hub */}

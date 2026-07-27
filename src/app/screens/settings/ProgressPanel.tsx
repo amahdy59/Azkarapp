@@ -115,11 +115,16 @@ export function ProgressPanel({
               </div>
 
               {/* Three core stat pills */}
-              <div className="mt-4 grid grid-cols-3 gap-3 text-center" aria-label={isArabic ? "إحصائيات اليوم" : "Today's stats"}>
+              <div
+                className="mt-4 grid grid-cols-3 gap-3 text-center"
+                aria-label={isArabic ? "إحصائيات اليوم" : "Today's stats"}
+              >
                 <div className="rounded-xl border border-border bg-background px-2 py-3">
                   <span
                     className="block text-[1.375rem] font-extrabold text-emerald-500"
-                    aria-label={isArabic ? `${summary.today.leafCount} مجموعات أساسية` : `${summary.today.leafCount} core groups`}
+                    aria-label={
+                      isArabic ? `${summary.today.leafCount} مجموعات أساسية` : `${summary.today.leafCount} core groups`
+                    }
                   >
                     {formatNumerals(summary.today.leafCount, language)}
                   </span>
@@ -130,7 +135,11 @@ export function ProgressPanel({
                 <div className="rounded-xl border border-border bg-background px-2 py-3">
                   <span
                     className="block text-[1.375rem] font-extrabold text-primary"
-                    aria-label={isArabic ? `${summary.today.extraLeafCount} مجموعات إضافية` : `${summary.today.extraLeafCount} extra groups`}
+                    aria-label={
+                      isArabic
+                        ? `${summary.today.extraLeafCount} مجموعات إضافية`
+                        : `${summary.today.extraLeafCount} extra groups`
+                    }
                   >
                     {formatNumerals(summary.today.extraLeafCount, language)}
                   </span>
@@ -141,7 +150,9 @@ export function ProgressPanel({
                 <div className="rounded-xl border border-border bg-background px-2 py-3">
                   <span
                     className="block text-[1.375rem] font-extrabold text-primary"
-                    aria-label={isArabic ? `سلسلة ${summary.currentPalmRhythm} أيام` : `${summary.currentPalmRhythm} day streak`}
+                    aria-label={
+                      isArabic ? `سلسلة ${summary.currentPalmRhythm} أيام` : `${summary.currentPalmRhythm} day streak`
+                    }
                   >
                     {formatNumerals(summary.currentPalmRhythm, language)}
                   </span>
@@ -207,9 +218,7 @@ export function ProgressPanel({
                     <article
                       key={cat.id}
                       className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-colors ${
-                        isCompleted
-                          ? "border-primary/35 bg-primary/8"
-                          : "border-border bg-card"
+                        isCompleted ? "border-primary/35 bg-primary/8" : "border-border bg-card"
                       }`}
                       aria-label={`${name}. ${isCompleted ? t(language, "garden.complete") : t(language, "garden.pending")}`}
                     >
