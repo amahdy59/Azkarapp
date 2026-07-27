@@ -188,11 +188,11 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await enterEnglishGuestMode(page);
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Home");
 
-  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByTestId("nav-azkar").click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Azkar Library");
 
-  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+ complete/ }).click();
+  await page.getByTestId("category-card-morning").click();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Category");
 
   await page.getByRole("button", { name: "Start Session", exact: true }).click();

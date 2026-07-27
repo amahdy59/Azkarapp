@@ -23,6 +23,7 @@ async function openReturningGuestHome(page: Page, language: "en" | "ar") {
 
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await page.getByTestId("nav-azkar").click();
   await expect(page.getByTestId("category-card-morning")).toBeVisible();
 }
 
@@ -51,7 +52,8 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+/ }).click();
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("category-card-morning").click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 

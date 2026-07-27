@@ -98,7 +98,7 @@ async function seedReturningGardenUser(
 async function openReturningHome(page: Page) {
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await expect(page.getByRole("navigation")).toBeVisible();
+  await expect(page.getByRole("navigation").first()).toBeVisible();
 }
 
 async function expectNoWcagViolations(page: Page) {

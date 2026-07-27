@@ -173,7 +173,7 @@ export function HomeScreen({
                 >
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p className="mt-1.5 text-[0.875rem] font-medium leading-relaxed text-muted-foreground dark:text-amber-100/90">
+                <p className="mt-1.5 text-[0.875rem] font-semibold leading-relaxed text-muted-foreground">
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
               </div>
@@ -209,11 +209,13 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 py-3 text-[0.9375rem] font-extrabold text-amber-950 bg-amber-400 hover:bg-amber-300 dark:bg-amber-500 dark:text-amber-950 dark:hover:bg-amber-400 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
+                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-6 py-3 text-[0.9375rem] font-black active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
+                  style={{ color: "#020617", backgroundColor: "#F59E0B" }}
                 >
-                  <span>{ctaLabel}</span>
+                  <span style={{ color: "#020617" }}>{ctaLabel}</span>
                   <span
                     className="text-[1.125rem] leading-none transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                    style={{ color: "#020617" }}
                     aria-hidden="true"
                   >
                     {direction === "rtl" ? "←" : "→"}

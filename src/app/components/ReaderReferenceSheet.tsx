@@ -56,15 +56,15 @@ export function ReaderReferenceSheet({
   };
 
   const copyAction = (key: ReferenceCopyKey, value: string, label: string, contentDirection: "ltr" | "rtl") => (
-    <div className="relative h-8 w-full" dir={contentDirection}>
+    <div className="relative h-10 w-full" dir={contentDirection}>
       <button
         type="button"
         onClick={() => void copyReference(key, value)}
         aria-label={label}
-        className="absolute -top-1.5 flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="absolute -top-1 flex min-h-[48px] min-w-[48px] items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         style={{ insetInlineStart: -6 }}
       >
-        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
+        <span className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors">
           {copiedReference === key ? <Check size={16} className="favorite-pop text-primary" /> : <Copy size={16} />}
         </span>
       </button>

@@ -78,6 +78,7 @@ export function BottomNav({
           return (
             <button
               key={id}
+              data-testid={`nav-${id}`}
               onClick={() => onChange(id)}
               aria-label={label}
               aria-current={on ? "page" : undefined}

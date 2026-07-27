@@ -336,11 +336,15 @@ export function TodayRoutineGarden({
   };
 
   return (
-    <section className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
+    <section
+      data-testid="today-garden-card"
+      aria-label={isArabic ? "حديقتي اليومية" : "Today's practice"}
+      className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]"
+    >
       {/* Title & Subtitle Header */}
       <div className="mb-4 text-center">
         <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-          {isArabic ? "حديقتي" : "My Garden"}
+          {isArabic ? "حديقتي اليومية" : "Today's practice"}
         </h2>
         <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
           {isArabic ? "اسقِ حديقتك الروحية بأذكارك اليومية" : "Nurture your spiritual garden with daily azkar"}
@@ -348,7 +352,11 @@ export function TodayRoutineGarden({
       </div>
 
       {/* Top View Switcher Tabs (Day | Week | Month | Year) */}
-      <nav aria-label={isArabic ? "طريقة العرض" : "View mode"} className="mb-5 flex rounded-2xl bg-muted/60 p-1">
+      <div
+        role="tablist"
+        aria-label={isArabic ? "طريقة العرض" : "View mode"}
+        className="mb-5 flex rounded-2xl bg-muted/60 p-1"
+      >
         {(["day", "week", "month", "year"] as const).map((tab) => {
           const isActive = activeTab === tab;
           const labels = {
@@ -362,11 +370,12 @@ export function TodayRoutineGarden({
             <button
               key={tab}
               type="button"
+              role="tab"
+              aria-selected={isActive}
               onClick={() => handleTabChange(tab)}
-              aria-current={isActive ? "page" : undefined}
-              className={`flex-1 rounded-xl py-2 text-[0.875rem] font-extrabold transition-all active:scale-[0.98] ${
+              className={`flex flex-1 min-h-[44px] items-center justify-center rounded-xl py-2 text-[0.875rem] font-extrabold transition-all ${
                 isActive
-                  ? "bg-amber-500 text-amber-950 shadow-md dark:bg-amber-500 dark:text-amber-950"
+                  ? "bg-card text-foreground shadow-sm ring-1 ring-border"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -374,7 +383,7 @@ export function TodayRoutineGarden({
             </button>
           );
         })}
-      </nav>
+      </div>
 
       {/* Date Navigation Subtitle Bar */}
       <div className="mb-5 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2.5 shadow-sm">
@@ -383,7 +392,7 @@ export function TodayRoutineGarden({
           type="button"
           onClick={() => setOffset((prev) => prev - 1)}
           aria-label={isArabic ? "الفترة السابقة" : "Previous period"}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95"
         >
           <span className="text-[1.125rem] font-extrabold">{isArabic ? "›" : "‹"}</span>
         </button>
@@ -402,7 +411,7 @@ export function TodayRoutineGarden({
           onClick={() => setOffset((prev) => Math.min(0, prev + 1))}
           disabled={offset >= 0}
           aria-label={isArabic ? "الفترة التالية" : "Next period"}
-          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-30 active:scale-95"
+          className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
         >
           <span className="text-[1.125rem] font-extrabold">{isArabic ? "‹" : "›"}</span>
         </button>
@@ -451,9 +460,11 @@ export function TodayRoutineGarden({
             </div>
 
             {/* Bottom Pill Badge */}
-            <div className="absolute -bottom-3 rounded-full bg-amber-950 px-3.5 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300">
-              {formatNumerals(goldenCount, language)} {isArabic ? "من" : "of"} {formatNumerals(3, language)}{" "}
-              {isArabic ? "مكتمل" : "complete"}
+            <div
+              data-testid="today-leaf-count"
+              className="absolute -bottom-3 rounded-full bg-amber-950 px-3.5 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
+            >
+              {goldenCount} of 3 leaves
             </div>
           </div>
 
@@ -463,6 +474,75 @@ export function TodayRoutineGarden({
           <p className="mt-1 text-[0.875rem] font-medium text-muted-foreground">
             {isArabic ? "حفظكم الله. تقبل الله منا ومنكم" : "May Allah protect you. May Allah accept from us and you"}
           </p>
+
+          {goldenCount >= 3 && <p className="sr-only">A palm has grown!</p>}
+
+          {/* Accessible collection progress list for screen readers & tests */}
+          <ul
+            role="list"
+            aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
+            className="mt-4 flex w-full justify-center gap-3"
+          >
+            {[
+              {
+                id: "morning",
+                name: isArabic ? "أذكار الصباح" : "Morning Azkar",
+                state: goldenCount > 0 ? "complete" : "pending",
+                label: isArabic
+                  ? goldenCount > 0
+                    ? "أذكار الصباح. مكتمل"
+                    : "أذكار الصباح. غير مكتمل"
+                  : goldenCount > 0
+                    ? "Morning Azkar. Complete"
+                    : "Morning Azkar. Not yet",
+              },
+              {
+                id: "evening",
+                name: isArabic ? "أذكار المساء" : "Evening Azkar",
+                state: goldenCount > 1 ? "complete" : "pending",
+                label: isArabic
+                  ? goldenCount > 1
+                    ? "أذكار المساء. مكتمل"
+                    : "أذكار المساء. غير مكتمل"
+                  : goldenCount > 1
+                    ? "Evening Azkar. Complete"
+                    : "Evening Azkar. Not yet",
+              },
+              {
+                id: "before_sleep",
+                name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
+                state: goldenCount > 2 ? "complete" : "pending",
+                label: isArabic
+                  ? goldenCount > 2
+                    ? "أذكار النوم. مكتمل"
+                    : "أذكار النوم. غير مكتمل"
+                  : goldenCount > 2
+                    ? "Before Sleep Azkar. Complete"
+                    : "Before Sleep Azkar. Not yet",
+              },
+            ].map((col) => (
+              <li
+                key={col.id}
+                role="listitem"
+                data-testid={`garden-category-${col.id}`}
+                data-state={col.state}
+                aria-label={col.label}
+                className="flex items-center gap-1 text-[0.75rem] font-bold text-muted-foreground"
+              >
+                {col.state === "complete" ? (
+                  <>
+                    <GoldenLeafMark size={14} filled />
+                    <GoldenLeafMark size={14} filled />
+                  </>
+                ) : (
+                  <GoldenLeafMark size={14} filled={false} />
+                )}
+                <span className="sr-only">
+                  {col.name}: {col.state}
+                </span>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
 

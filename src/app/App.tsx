@@ -593,6 +593,30 @@ export default function App() {
     ]);
   };
 
+  const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
+    const azkar = getAzkarByCategory(catId);
+    const setForCat = new Set(completed[catId] ?? new Set());
+    const wasCompleted = setForCat.has(idx);
+
+    if (wasCompleted) {
+      setForCat.delete(idx);
+    } else {
+      setForCat.add(idx);
+    }
+
+    setCompleted((prev) => ({
+      ...prev,
+      [catId]: setForCat,
+    }));
+
+    if (!wasCompleted && setForCat.size === azkar.length) {
+      const completedAt = new Date();
+      const growth = recordDailyCollectionCompletion(dailyCompletions, catId, completedAt, progressDayStartHour);
+      setDailyCompletions(growth.records);
+      setLastGrowthEvent(growth.event);
+    }
+  };
+
   const advanceAfterCompletion = (idx: number) => {
     const azkar = getAzkarByCategory(activeCat);
     const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
@@ -920,6 +944,7 @@ export default function App() {
                 isArabic={isArabic}
                 direction={layoutDirection}
                 onZikr={(i) => openReader(activeCat, i)}
+                onToggleZikr={(i) => toggleZikrCompletion(activeCat, i)}
                 onReset={() => handleResetCategory(activeCat)}
                 onRepeat={() => repeatCategory(activeCat)}
                 onBack={pop}

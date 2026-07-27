@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { CatIcon } from "../components/CatIcon";
 import { Search, Bookmark, ChevronNext } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { ProgressBar } from "../components/ProgressBar";
 import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
@@ -79,6 +80,8 @@ export function AzkarLibraryScreen({
                   <button
                     key={category.id}
                     type="button"
+                    data-testid={`category-card-${category.id}`}
+                    dir={direction}
                     onClick={() => onCategory(category.id)}
                     className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={
@@ -88,21 +91,33 @@ export function AzkarLibraryScreen({
                     }
                   >
                     <span
+                      data-slot="category-icon"
                       className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10"
                       aria-hidden="true"
                     >
                       <CatIcon type={category.icon} size={24} color="var(--primary)" />
                     </span>
-                    <span className="min-w-0 flex-1">
+                    <span data-slot="category-copy" className="min-w-0 flex-1">
                       <span className="block text-[1rem] font-bold text-foreground">
                         {isArabic ? category.nameArabic : category.name}
                       </span>
-                      <span className="mt-1 block text-[0.8125rem] text-muted-foreground">
-                        {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(total, language)}{" "}
-                        {t(language, "library.complete")}
-                      </span>
+                      <div className="mt-2 flex flex-col gap-1">
+                        <ProgressBar
+                          value={done}
+                          max={total}
+                          height={5}
+                          trackColor="var(--muted)"
+                          fillColor="var(--primary)"
+                          direction={direction}
+                          aria-label={t(language, "library.complete")}
+                        />
+                        <span className="block text-[0.8125rem] text-muted-foreground">
+                          {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(total, language)}{" "}
+                          {t(language, "library.complete")}
+                        </span>
+                      </div>
                     </span>
-                    <ChevronNext size={22} className="text-muted-foreground" aria-hidden="true" />
+                    <ChevronNext data-slot="category-chevron" size={22} className="text-muted-foreground" aria-hidden="true" />
                   </button>
                 );
               })}

@@ -114,8 +114,8 @@ export function SettingsRootPanel({
                   role="radio"
                   aria-checked={selected}
                   onClick={() => onLanguageChange(opt.code as AppLanguage)}
-                  className={`min-h-11 flex-1 rounded-lg py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                  className={`min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
                   }`}
                   data-testid={`settings-language-${opt.code}`}
                 >

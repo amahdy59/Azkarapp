@@ -23,3 +23,15 @@ export const CATEGORIES: Array<{
   { id: "natural_events", name: "Natural Events", nameArabic: "أذكار الظواهر الطبيعية", icon: "globe" },
   { id: "miscellaneous", name: "Miscellaneous", nameArabic: "أذكار متنوعة", icon: "sparkles" },
 ];
+
+export const ROUTINE_CATEGORY_IDS: ReadonlySet<CategoryId> = new Set([
+  "morning",
+  "evening",
+  "before_sleep",
+  "waking_up",
+  "after_prayer",
+]);
+
+export function isOccasionalCategory(catId: CategoryId): boolean {
+  return !ROUTINE_CATEGORY_IDS.has(catId);
+}
