@@ -247,3 +247,46 @@ export function getLocalizedSourceReference(zikr: Zikr, language: AppLanguage) {
 
   return formatArabicCitationNumerals(localized);
 }
+
+const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
+  "Morning: after Fajr until sunrise. Evening: after ‘Asr until sunset as a strong recommended dhikr sitting.":
+    "تُقال في الصباح عقب صلاة الفجر حتى طلوع الشمس، وفي المساء عقب صلاة العصر حتى غروب الشمس.",
+  "Morning after Fajr; evening after ‘Asr/sunset window.":
+    "تُقال في الصباح بعد الفجر، وفي المساء بعد العصر وقبل الغروب.",
+  "Recited 10 times after Fajr and Maghrib prayers; once after Dhuhr, 'Asr, and 'Isha.":
+    "تُقال ١٠ مرات عقب صلاتي الفجر والمغرب، ومرة واحدة عقب الظهر والعصر والعشاء.",
+  "Recited 3 times each after Fajr and Maghrib; once after Dhuhr, 'Asr, and 'Isha.":
+    "تُقرأ ٣ مرات لكل سورة عقب صلاتي الفجر والمغرب، ومرة واحدة عقب الظهر والعصر والعشاء.",
+  "Recited immediately after concluding any obligatory prayer.": "تُقال فور الانتهاء من الصلاة المكتوبة.",
+  "Recited immediately after the 3 Istighfars following obligatory prayer.":
+    "تُقال عقب الاستغفار الثلاثي دبر الصلاة المكتوبة.",
+  "Advised by the Prophet ﷺ to recite after every obligatory prayer.": "وصية نبوية مباركة بالقراءة عقب كل صلاة مكتوبة.",
+  "Recited 33 times each, followed by Tawhid, after every obligatory prayer.":
+    "تُسبح وتُحمد وتُكبر ٣٣ مرة لكل منها، وتُختم بالتوهيد عقب كل صلاة مكتوبة.",
+  "Recited after every obligatory prayer. Guaranteed entry to Paradise.":
+    "تُقرأ عقب كل صلاة مكتوبة؛ حرز وأمان وموجبة للجنة.",
+  "Recited before sleeping.": "تُقال عند الاضطجاع وقبل النوم.",
+  "Recited upon waking up.": "تُقال فور الاستيقاظ من النوم.",
+  "Recited when leaving the home.": "تُقال عند الخروج من المنزل.",
+  "Recited when entering the home.": "تُقال عند دخول المنزل.",
+  "Recited when walking to or entering the mosque.": "تُقال عند المشي إلى المسجد أو دخوله.",
+  "Recited when exiting the mosque.": "تُقال عند الخروج من المسجد.",
+  "Recited after completing wudu.": "تُقال عقب الفراغ من الوضوء.",
+  "Recited before eating.": "تُقال قبل البدء في تناول الطعام.",
+  "Recited after eating.": "تُقال عقب الانتهاء من الطعام.",
+  "Recited when putting on clothes.": "تُقال عند لبس الثوب.",
+  "Recited when setting out on a journey.": "تُقال عند الشروع في السفر.",
+  "Recited in times of distress or anxiety.": "تُقال عند الكرب والهم والشدة.",
+  "Recited when visiting a sick person.": "تُقال عند عيادة المريض.",
+  "Recited upon seeing rain or hearing thunder.": "تُقال عند نزول المطر أو سماع الرعد.",
+};
+
+export function getLocalizedPreferredTiming(zikr: Zikr, language: AppLanguage): string {
+  if (!zikr.preferredTiming) {
+    return "";
+  }
+  if (language === "en") {
+    return zikr.preferredTiming;
+  }
+  return ARABIC_PREFERRED_TIMING[zikr.preferredTiming] ?? zikr.preferredTiming;
+}

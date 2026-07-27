@@ -3,7 +3,7 @@ import { Check, Copy, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
-import { getLocalizedSourceReference } from "../content/localizedZikr";
+import { getLocalizedPreferredTiming, getLocalizedSourceReference } from "../content/localizedZikr";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
@@ -157,6 +157,25 @@ export function ReaderReferenceSheet({
                     {zikr.hadithText}
                   </p>
                   {copyAction("hadith", zikr.hadithText, t(language, "reader.copyHadith"), "rtl")}
+                </section>
+              </>
+            )}
+
+            {getLocalizedPreferredTiming(zikr, language) && (
+              <>
+                <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+                <section className="flex flex-col gap-2">
+                  <h3 className="text-start text-[0.875rem] font-bold tracking-[0.02em] text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                    <span>💡</span>
+                    <span>{isArabic ? "وقت الاستحباب والهدى النبوي" : "Recommended Timing & Guidance"}</span>
+                  </h3>
+                  <p
+                    className="max-w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-start text-[0.875rem] font-extrabold leading-6 text-amber-950 dark:text-amber-200"
+                    lang={isArabic ? "ar" : "en"}
+                    dir={direction}
+                  >
+                    {getLocalizedPreferredTiming(zikr, language)}
+                  </p>
                 </section>
               </>
             )}

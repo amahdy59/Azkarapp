@@ -10,7 +10,11 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedSourceReference,
+  getLocalizedZikrBenefit,
+} from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -286,6 +290,16 @@ export function ReaderScreen({
       >
         {z.arabicText}
       </p>
+
+      {getLocalizedPreferredTiming(z, language) && (
+        <div
+          className="mt-4 flex items-center justify-center gap-1.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-center text-[0.8125rem] font-bold text-amber-900 dark:text-amber-200"
+          role="note"
+        >
+          <span aria-hidden="true">💡</span>
+          <span dir="auto">{getLocalizedPreferredTiming(z, language)}</span>
+        </div>
+      )}
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
           {showTranslation && (
