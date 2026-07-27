@@ -147,39 +147,38 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Header Bar — clean edge-to-edge Elevate style header */}
-      <header className="flex h-12 w-full shrink-0 items-center justify-between px-0 pt-0 pb-1">
-        {/* Date, Weekday & Live Time */}
-        <div className="min-w-0 flex-1 text-start">
-          <p className="text-[0.875rem] font-bold text-muted-foreground" data-testid="hijri-date">
+      {/* Top Header Bar — Enlarged Full-Width Streaks Bar */}
+      <header className="flex w-full shrink-0 flex-col gap-2 px-0 pt-0 pb-2">
+        {/* Full-width Palm Tree & Leaves Reward Widget */}
+        <PalmTreeReward summary={gardenSummary} language={language} />
+
+        {/* Date, Weekday & Live Time on its OWN SEPARATE LINE */}
+        <div className="w-full text-center">
+          <p className="text-[0.875rem] font-bold text-muted-foreground" data-testid="hijri-date" dir="auto">
             {formatHijriDateWithTime(now, language)}
           </p>
         </div>
-        {/* Palm Tree Reward Widget */}
-        <PalmTreeReward summary={gardenSummary} language={language} />
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1">
         {/* Clean Hero Zikr Reminder Card */}
-        <section aria-labelledby="current-zikr-heading" className="mb-6">
-          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-6 text-card-foreground shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
+        <section aria-labelledby="current-zikr-heading" className="mb-5">
+          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-4 text-card-foreground shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]">
             {/* Card Content */}
             <div className="flex flex-col justify-between text-start">
               <div>
                 <h2
                   id="current-zikr-heading"
-                  className="text-[1.375rem] font-black tracking-wide text-foreground dark:text-white"
+                  className="text-[1.25rem] font-black tracking-wide text-foreground dark:text-white"
                 >
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p className="mt-1.5 text-[0.875rem] font-semibold leading-relaxed text-muted-foreground">
+                <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
-              </div>
 
-              <div className="mt-5 flex flex-col gap-3">
                 {doneCount > 0 && (
-                  <div>
+                  <div className="mt-3">
                     <ProgressBar
                       value={doneCount}
                       max={totalCount}
@@ -190,13 +189,15 @@ export function HomeScreen({
                         isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
                       }
                     />
-                    <span className="mt-2 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
+                    <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
                       {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                       {formatNumerals(totalCount, language)} {t(language, "home.complete")}
                     </span>
                   </div>
                 )}
+              </div>
 
+              <div className="mt-4 flex flex-col gap-3">
                 <button
                   type="button"
                   data-testid="home-primary-cta"
@@ -208,7 +209,7 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-6 py-3 text-[0.9375rem] font-black active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
+                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-[0.9375rem] font-black active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
                   style={{ color: "#020617", backgroundColor: "#F59E0B" }}
                 >
                   <span style={{ color: "#020617" }}>{ctaLabel}</span>

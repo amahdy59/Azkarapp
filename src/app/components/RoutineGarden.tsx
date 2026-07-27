@@ -190,7 +190,7 @@ export function PalmTreeReward({ summary, language }: { summary: GardenSummary; 
 
   return (
     <div
-      className="flex items-center gap-3 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 shadow-sm dark:bg-amber-500/15"
+      className="flex w-full items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15"
       role="img"
       aria-label={
         language === "ar"
@@ -198,24 +198,24 @@ export function PalmTreeReward({ summary, language }: { summary: GardenSummary; 
           : `Palms: ${summary.lifetimePalms}, Golden: ${goldenCount}, Green: ${greenCount}`
       }
     >
-      <div className="flex items-center gap-1">
-        <PalmTreeMark size={22} />
-        <span className="text-[0.9375rem] font-extrabold text-amber-500">
-          {formatNumerals(summary.lifetimePalms, language)}
+      <div className="flex items-center gap-1.5">
+        <GreenLeafMark size={22} filled />
+        <span className="text-[1rem] font-black text-emerald-600 dark:text-emerald-400">
+          {formatNumerals(greenCount, language)}
         </span>
       </div>
-      <span className="h-3.5 w-px bg-amber-500/30" />
-      <div className="flex items-center gap-1">
-        <GoldenLeafMark size={18} filled />
-        <span className="text-[0.9375rem] font-bold text-amber-600 dark:text-amber-400">
+      <span className="h-4 w-px bg-amber-500/30" />
+      <div className="flex items-center gap-1.5">
+        <GoldenLeafMark size={22} filled />
+        <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
           {formatNumerals(goldenCount, language)}
         </span>
       </div>
-      <span className="h-3.5 w-px bg-amber-500/30" />
-      <div className="flex items-center gap-1">
-        <GreenLeafMark size={18} filled />
-        <span className="text-[0.9375rem] font-bold text-emerald-600 dark:text-emerald-400">
-          {formatNumerals(greenCount, language)}
+      <span className="h-4 w-px bg-amber-500/30" />
+      <div className="flex items-center gap-1.5">
+        <PalmTreeMark size={26} />
+        <span className="text-[1.0625rem] font-black text-amber-500">
+          {formatNumerals(summary.lifetimePalms, language)}
         </span>
       </div>
     </div>
@@ -424,26 +424,28 @@ export function TodayRoutineGarden({
       )}
 
       {/* Summary Badge Row */}
-      <div className="mb-6 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-3 px-4 dark:bg-amber-500/10">
-        <div className="flex items-center gap-2">
-          <PalmTreeMark size={26} />
-          <span className="text-[1.125rem] font-black text-amber-500">{formatNumerals(totalPalms, language)}</span>
+      {!hideTabs && (
+        <div className="mb-6 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-3 px-4 dark:bg-amber-500/10">
+          <div className="flex items-center gap-2">
+            <PalmTreeMark size={26} />
+            <span className="text-[1.125rem] font-black text-amber-500">{formatNumerals(totalPalms, language)}</span>
+          </div>
+          <span className="h-6 w-px bg-amber-500/30" />
+          <div className="flex items-center gap-2">
+            <GoldenLeafMark size={22} filled />
+            <span className="text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
+              {formatNumerals(goldenCount, language)}
+            </span>
+          </div>
+          <span className="h-6 w-px bg-amber-500/30" />
+          <div className="flex items-center gap-2">
+            <GreenLeafMark size={22} filled />
+            <span className="text-[1.125rem] font-black text-emerald-600 dark:text-emerald-400">
+              {formatNumerals(greenCount, language)}
+            </span>
+          </div>
         </div>
-        <span className="h-6 w-px bg-amber-500/30" />
-        <div className="flex items-center gap-2">
-          <GoldenLeafMark size={22} filled />
-          <span className="text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
-            {formatNumerals(goldenCount, language)}
-          </span>
-        </div>
-        <span className="h-6 w-px bg-amber-500/30" />
-        <div className="flex items-center gap-2">
-          <GreenLeafMark size={22} filled />
-          <span className="text-[1.125rem] font-black text-emerald-600 dark:text-emerald-400">
-            {formatNumerals(greenCount, language)}
-          </span>
-        </div>
-      </div>
+      )}
 
       {/* View Content Rendering */}
       {activeTab === "day" && (
