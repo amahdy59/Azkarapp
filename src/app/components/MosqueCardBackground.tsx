@@ -1,12 +1,6 @@
 import type { CategoryId } from "../types";
 
-export function MosqueCardBackground({
-  category,
-  className = "",
-}: {
-  category: CategoryId;
-  className?: string;
-}) {
+export function MosqueCardBackground({ category, className = "" }: { category: CategoryId; className?: string }) {
   return (
     <div className={`pointer-events-none absolute inset-0 overflow-hidden ${className}`}>
       {/* Dynamic Sky Gradient according to category and theme mode */}
