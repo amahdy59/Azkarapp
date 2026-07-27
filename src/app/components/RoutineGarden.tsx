@@ -198,16 +198,15 @@ export function PalmTreeReward({
   const isArabic = language === "ar";
 
   return (
-    <div
-      className="flex w-full items-center justify-between gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15"
-      role="img"
-      aria-label={
-        isArabic
-          ? `النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق ذهبية: ${formatNumerals(goldenCount, language)}، أوراق خضراء: ${formatNumerals(greenCount, language)}`
-          : `Palms: ${summary.lifetimePalms}, Golden: ${goldenCount}, Green: ${greenCount}`
-      }
-    >
-      <div className="flex flex-1 items-center justify-around">
+    <div className="flex w-full items-center justify-between gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 shadow-sm dark:bg-amber-500/15">
+      <div
+        className="flex flex-1 items-center justify-around"
+        aria-label={
+          isArabic
+            ? `النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق ذهبية: ${formatNumerals(goldenCount, language)}، أوراق خضراء: ${formatNumerals(greenCount, language)}`
+            : `Palms: ${summary.lifetimePalms}, Golden: ${goldenCount}, Green: ${greenCount}`
+        }
+      >
         <div className="flex items-center gap-1.5">
           <GreenLeafMark size={22} filled />
           <span className="text-[1rem] font-black text-emerald-600 dark:text-emerald-400">
@@ -234,7 +233,7 @@ export function PalmTreeReward({
         <button
           type="button"
           onClick={onOpenShareModal}
-          className="flex min-h-[36px] items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/20 px-3 text-[0.8125rem] font-black text-amber-700 dark:text-amber-300 hover:bg-amber-500/30 active:scale-95 transition-all shrink-0"
+          className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
           aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
         >
           <span>🌴</span>
@@ -354,12 +353,14 @@ export function TodayRoutineGarden({
   hideTabs = false,
   onOpenShareModal,
   calendarType = "hijri",
+  dailyCompletions = [],
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   hideTabs?: boolean;
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
+  dailyCompletions?: DailyCollectionCompletion[];
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -380,15 +381,9 @@ export function TodayRoutineGarden({
     }
   }
 
-  // Calculate garden summary for display date
-  const summary = getGardenSummary(
-    initialSummary.today.completedCategories.map((c) => ({
-      dayKey: initialSummary.today.dayKey,
-      category: c,
-      completedAt: new Date().toISOString(),
-    })),
-    displayDate,
-  );
+  // Calculate garden summary for display date (use initialSummary when offset === 0 to preserve full history)
+  const summary =
+    offset === 0 && activeTab === "day" ? initialSummary : getGardenSummary(dailyCompletions, displayDate);
 
   const { today } = summary;
   const goldenCount = today.goldenLeafCount ?? today.leafCount;
@@ -463,7 +458,7 @@ export function TodayRoutineGarden({
       <div className="mb-4 flex items-center justify-between gap-3 text-start">
         <div>
           <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-            {isArabic ? "حديقتي" : "My Garden"}
+            {isArabic ? "حديقتي اليومية" : "Today's practice"}
           </h2>
           <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
             {activeTab === "month"
@@ -484,7 +479,7 @@ export function TodayRoutineGarden({
           <button
             type="button"
             onClick={onOpenShareModal}
-            className="flex min-h-[38px] items-center gap-1.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-3.5 text-[0.8125rem] font-black text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all shrink-0"
+            className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
             aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
           >
             <span>🌴</span>

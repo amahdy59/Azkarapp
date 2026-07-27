@@ -961,6 +961,7 @@ export default function App() {
                   language={selectedLang}
                   hideTabs={false}
                   calendarType={calendarType}
+                  dailyCompletions={dailyCompletions}
                   onOpenShareModal={() => setShowShareModal(true)}
                 />
               </ScreenContainer>

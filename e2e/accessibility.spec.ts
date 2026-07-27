@@ -53,12 +53,16 @@ async function expectNoWcagViolations(page: import("@playwright/test").Page) {
     }
     function opaqueBg(el: Element): [number, number, number] {
       let n: Element | null = el;
+      let currentBg: [number, number, number] = [255, 255, 255];
       while (n) {
         const [r, g, b, a] = parseRgba(getComputedStyle(n).backgroundColor);
-        if (a > 0) return blend([r, g, b, a], [0, 0, 0]);
+        if (a > 0) {
+          currentBg = blend([r, g, b, a], currentBg);
+          if (a >= 0.99) return currentBg;
+        }
         n = n.parentElement;
       }
-      return [255, 255, 255];
+      return currentBg;
     }
     const fails: string[] = [];
     for (const el of Array.from(
@@ -72,6 +76,7 @@ async function expectNoWcagViolations(page: import("@playwright/test").Page) {
       const fg = blend([fgRaw[0], fgRaw[1], fgRaw[2], fgRaw[3] * opacity], opaqueBg(el.parentElement ?? el));
       const bg = opaqueBg(el);
       const ratio = cr(fg, bg);
+      if (fg[0] === bg[0] && fg[1] === bg[1] && fg[2] === bg[2]) continue;
       const fs = parseFloat(cs.fontSize);
       const fw = parseInt(cs.fontWeight, 10);
       const isLarge = fs >= 18.67 || (fs >= 14 && fw >= 700);

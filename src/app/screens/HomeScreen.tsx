@@ -270,6 +270,7 @@ export function HomeScreen({
             language={language}
             hideTabs={true}
             calendarType={calendarType}
+            dailyCompletions={dailyCompletions}
             onOpenShareModal={onOpenShareModal}
           />
         )}
