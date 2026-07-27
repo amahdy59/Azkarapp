@@ -240,7 +240,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="interactive-elem ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-btn border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="interactive-elem ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <BookOpen className="shrink-0" size={17} />
         <span className="truncate" dir="auto">

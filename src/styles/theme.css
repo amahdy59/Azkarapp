@@ -125,11 +125,17 @@
   --success: #5ec88a;
   --warning: #b87b10;
   --sleep: #9f7aea;
+  --ds-control-height-compact: 2.75rem;
+  --ds-control-height: 3rem;
+  --ds-control-height-prominent: 3.25rem;
+  --ds-icon-size: 2.75rem;
+  --ds-stroke: 1px;
   --ds-radius-small: 0.5rem;
   --ds-radius-control: 0.875rem;
   --ds-radius-card: 1.25rem;
   --ds-radius-overlay: 1.5rem;
   --ds-focus-width: 3px;
+  --radius-full: 9999px;
 }
 
 body {
