@@ -33,11 +33,7 @@ export function getZikrAudioUrl(zikr: Zikr): string | null {
 
 export type PlaybackRate = 0.8 | 1.0 | 1.25;
 
-export function useAudioPlayer(
-  zikrs: Zikr[],
-  initialIndex = 0,
-  onIndexChange?: (index: number) => void,
-) {
+export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0, onIndexChange?: (index: number) => void) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);

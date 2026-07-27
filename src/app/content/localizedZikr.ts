@@ -283,8 +283,7 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
     "تُقال عند الاستيقاظ في الصباح، ويمكن قراءتها في أي وقت خلال اليوم.",
   "Upon rising in the morning.": "تُقال عند الاستيقاظ في الصباح.",
   "After Fajr / upon rising in the morning.": "تُقال بعد صلاة الفجر أو عند الاستيقاظ صباحاً.",
-  "During the day; suitable to include in morning/evening routine.":
-    "تُقال خلال اليوم؛ وتناسب أذكار الصباح والمساء.",
+  "During the day; suitable to include in morning/evening routine.": "تُقال خلال اليوم؛ وتناسب أذكار الصباح والمساء.",
   "Morning and evening.": "تُقال في الصباح والمساء.",
   "Morning after Fajr.": "تُقال في الصباح بعد صلاة الفجر.",
   "After ‘Asr/sunset window.": "تُقال في المساء بعد صلاة العصر وقبل الغروب.",

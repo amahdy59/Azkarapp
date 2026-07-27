@@ -155,7 +155,7 @@ export function FloatingAudioPlayer({
               <polyline points="7 23 3 19 7 15" />
               <path d="M21 13v2a4 4 0 0 1-4 4H3" />
             </svg>
-            <span>{autoPlayAll ? (isArabic ? "الكل" : "All") : (isArabic ? "مفرد" : "Single")}</span>
+            <span>{autoPlayAll ? (isArabic ? "الكل" : "All") : isArabic ? "مفرد" : "Single"}</span>
           </button>
 
           {/* Speed Selector */}
