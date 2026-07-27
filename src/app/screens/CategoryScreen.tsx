@@ -119,13 +119,17 @@ export function CategoryScreen({
                 >
                   {isArabic ? (
                     <>
-                      <span className="text-[0.9375rem] font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-[0.9375rem] font-bold leading-none">
+                        {t(language, "category.readAgain")}
+                      </span>
                       <RotateCcw size={18} className="shrink-0" />
                     </>
                   ) : (
                     <>
                       <RotateCcw size={18} className="shrink-0" />
-                      <span className="text-[0.9375rem] font-bold leading-none">{t(language, "category.readAgain")}</span>
+                      <span className="text-[0.9375rem] font-bold leading-none">
+                        {t(language, "category.readAgain")}
+                      </span>
                     </>
                   )}
                 </button>
@@ -166,7 +170,7 @@ export function CategoryScreen({
             <div className="flex flex-col gap-3">
               {completedAzkar.map(({ z, index }) => {
                 const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
-                const timingTip = getLocalizedPreferredTiming(z, language) || z.context;
+                const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
 
                 return (
                   <button
@@ -247,7 +251,7 @@ export function CategoryScreen({
             <div className="flex flex-col gap-3">
               {remainingAzkar.map(({ z, index }) => {
                 const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
-                const timingTip = getLocalizedPreferredTiming(z, language) || z.context;
+                const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
 
                 return (
                   <button

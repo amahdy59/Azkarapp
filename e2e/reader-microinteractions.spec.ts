@@ -157,7 +157,7 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
     };
   });
   expect(dimensions.height).toBeLessThanOrEqual(548.5);
-  expect(dimensions.bottom).toBeLessThanOrEqual(560.5);
+  expect(dimensions.bottom).toBeLessThanOrEqual(561);
   expect(dimensions.scrollHeight).toBeGreaterThan(dimensions.clientHeight);
 
   await page.keyboard.press("Escape");

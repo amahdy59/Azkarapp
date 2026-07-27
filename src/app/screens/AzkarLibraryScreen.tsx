@@ -117,7 +117,12 @@ export function AzkarLibraryScreen({
                         </span>
                       </div>
                     </span>
-                    <ChevronNext data-slot="category-chevron" size={22} className="text-muted-foreground" aria-hidden="true" />
+                    <ChevronNext
+                      data-slot="category-chevron"
+                      size={22}
+                      className="text-muted-foreground"
+                      aria-hidden="true"
+                    />
                   </button>
                 );
               })}

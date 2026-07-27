@@ -32,6 +32,7 @@ export function formatHijriDate(date: Date = new Date(), language: AppLanguage =
   try {
     const locale = language === "ar" ? "ar-SA-u-ca-islamic-umalqura" : "en-US-u-ca-islamic-umalqura";
     const formatter = new Intl.DateTimeFormat(locale, {
+      weekday: "long",
       day: "numeric",
       month: "long",
       year: "numeric",
@@ -42,5 +43,19 @@ export function formatHijriDate(date: Date = new Date(), language: AppLanguage =
     return language === "ar" ? `${cleaned} هـ` : `${cleaned} AH`;
   } catch {
     return "";
+  }
+}
+
+export function formatHijriDateWithTime(date: Date = new Date(), language: AppLanguage = "ar"): string {
+  try {
+    const dateStr = formatHijriDate(date, language);
+    const timeFormatter = new Intl.DateTimeFormat(language === "ar" ? "ar-SA" : "en-US", {
+      hour: "numeric",
+      minute: "numeric",
+    });
+    const timeStr = timeFormatter.format(date);
+    return `${dateStr} • ${timeStr}`;
+  } catch {
+    return formatHijriDate(date, language);
   }
 }

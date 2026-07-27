@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowPrevious, BookOpen, Home, Settings } from "./icons";
+import { ArrowPrevious, BarChart3, BookOpen, Home, Settings } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -37,7 +37,7 @@ export function Header({
   language?: AppLanguage;
 }) {
   return (
-    <div className="flex items-center gap-2 px-4 shrink-0 h-14">
+    <div className="flex w-full shrink-0 h-12 items-center gap-2 px-1 pt-0 pb-1">
       {onBack && (
         <IconButton onClick={onBack} label={t(language, "common.back")}>
           <ArrowPrevious size={20} className="text-foreground" />
@@ -57,14 +57,15 @@ export function BottomNav({
   onChange,
   isArabic = false,
 }: {
-  active: "home" | "azkar" | "settings";
-  onChange: (t: "home" | "azkar" | "settings") => void;
+  active: "home" | "azkar" | "progress" | "settings";
+  onChange: (t: "home" | "azkar" | "progress" | "settings") => void;
   isArabic?: boolean;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const tabs = [
     { id: "home" as const, label: t(language, "common.home"), Icon: Home },
     { id: "azkar" as const, label: t(language, "common.azkar"), Icon: BookOpen },
+    { id: "progress" as const, label: t(language, "common.progress"), Icon: BarChart3 },
     { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
   ];
   return (

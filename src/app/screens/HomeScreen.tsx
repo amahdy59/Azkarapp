@@ -2,7 +2,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { formatHijriDate, formatNumerals } from "../formatting";
+import { formatHijriDateWithTime, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
@@ -147,18 +147,17 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Header Bar — clean centered single reward pill */}
-      <header className="flex h-14 shrink-0 items-center justify-center px-2">
-        {/* Center: Palm Tree Reward Widget */}
+      {/* Top Header Bar — clean edge-to-edge Elevate style header */}
+      <header className="flex h-12 w-full shrink-0 items-center justify-between px-0 pt-0 pb-1">
+        {/* Date, Weekday & Live Time */}
+        <div className="min-w-0 flex-1 text-start">
+          <p className="text-[0.875rem] font-bold text-muted-foreground" data-testid="hijri-date">
+            {formatHijriDateWithTime(now, language)}
+          </p>
+        </div>
+        {/* Palm Tree Reward Widget */}
         <PalmTreeReward summary={gardenSummary} language={language} />
       </header>
-
-      {/* Hijri Date Subtitle */}
-      <div className="pb-3 text-center">
-        <p className="text-[0.875rem] font-semibold text-muted-foreground" data-testid="hijri-date">
-          {formatHijriDate(now, language)}
-        </p>
-      </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1">
         {/* Clean Hero Zikr Reminder Card */}
@@ -226,8 +225,8 @@ export function HomeScreen({
           </div>
         </section>
 
-        {/* Leaves & Progress Garden (Day, Week, Month, Year tabs) */}
-        {quietProgressEnabled && <TodayRoutineGarden summary={gardenSummary} language={language} />}
+        {/* Leaves & Progress Garden (Daily Progress) */}
+        {quietProgressEnabled && <TodayRoutineGarden summary={gardenSummary} language={language} hideTabs={true} />}
       </div>
     </ScreenContainer>
   );

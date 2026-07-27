@@ -37,6 +37,7 @@ import { isSupabaseConfigured } from "../lib/supabase";
 type View =
   | "home"
   | "library"
+  | "progress"
   | "category"
   | "reader"
   | "completion"
@@ -65,7 +66,10 @@ function categoryFromShortcutUrl(): CategoryId | null {
   return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
 }
 
-import { BottomNav } from "./components/LayoutShells";
+import { BottomNav, Header } from "./components/LayoutShells";
+import { ScreenContainer } from "./components/ScreenContainer";
+import { TodayRoutineGarden } from "./components/RoutineGarden";
+import { getGardenSummary } from "./progress";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { t } from "./i18n";
@@ -202,7 +206,7 @@ export default function App() {
     }
   });
   const [, setHistory] = useState<View[]>([]);
-  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "settings">("home");
+  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
@@ -458,6 +462,8 @@ export default function App() {
         setView(e.state.view);
         if (e.state.view === "settings") {
           setActiveTab("settings");
+        } else if (e.state.view === "progress") {
+          setActiveTab("progress");
         } else if (e.state.view === "library" || e.state.view === "category") {
           setActiveTab("azkar");
         } else if (e.state.view === "home") {
@@ -794,18 +800,20 @@ export default function App() {
     window.location.reload();
   };
 
-  const handleNavTab = (tab: "home" | "azkar" | "settings") => {
+  const handleNavTab = (tab: "home" | "azkar" | "progress" | "settings") => {
     setActiveTab(tab);
     if (tab === "home") {
       push("home");
     } else if (tab === "azkar") {
       push("library");
+    } else if (tab === "progress") {
+      push("progress");
     } else if (tab === "settings") {
       push("settings");
     }
   };
 
-  const showBottomNav = ["home", "library", "category", "reader", "settings", "search"].includes(view);
+  const showBottomNav = ["home", "library", "category", "reader", "settings", "search", "progress"].includes(view);
   const azkar = getAzkarByCategory(activeCat);
 
   return (
@@ -936,6 +944,16 @@ export default function App() {
                 onSearch={() => push("search")}
                 savedZikrIds={savedZikrIds}
               />
+            )}
+            {view === "progress" && (
+              <ScreenContainer dir={layoutDirection} className="px-page py-4 overflow-y-auto">
+                <Header title={t(selectedLang, "common.progress")} language={selectedLang} />
+                <TodayRoutineGarden
+                  summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}
+                  language={selectedLang}
+                  hideTabs={false}
+                />
+              </ScreenContainer>
             )}
             {view === "category" && (
               <CategoryScreen
