@@ -45,6 +45,8 @@ export function AccessibilityPanel({
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
+  calendarType = "hijri",
+  onCalendarTypeChange,
   onTextSizeChange,
   onArabicFontChange,
   onShowTranslationChange,
@@ -59,6 +61,7 @@ export function AccessibilityPanel({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  calendarType?: "hijri" | "gregorian";
   textSize: TextSizeOption;
   arabicFont: ArabicFontOption;
   showTranslation: boolean;
@@ -69,6 +72,7 @@ export function AccessibilityPanel({
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
+  onCalendarTypeChange?: (val: "hijri" | "gregorian") => void;
   onTextSizeChange: (value: TextSizeOption) => void;
   onArabicFontChange: (value: ArabicFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
@@ -89,7 +93,41 @@ export function AccessibilityPanel({
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.visual")} />
 
-        <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
+        {/* Calendar System Preference */}
+        <section className="mx-4 mb-6 mt-2" aria-labelledby="calendar-type-title">
+          <h3 id="calendar-type-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
+            {language === "ar" ? "نظام التقويم" : "Calendar System"}
+          </h3>
+          <RadioGroupPrimitive.Root
+            dir={direction}
+            value={calendarType}
+            onValueChange={(val) => onCalendarTypeChange?.(val as "hijri" | "gregorian")}
+            className="grid grid-cols-2 gap-2"
+          >
+            <RadioGroupPrimitive.Item
+              value="hijri"
+              className={`min-h-11 rounded-xl border px-3 text-[0.8125rem] font-bold ${
+                calendarType === "hijri"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border-control bg-card text-foreground"
+              }`}
+            >
+              {language === "ar" ? "التقويم الهجري (الافتراضي)" : "Hijri (Default)"}
+            </RadioGroupPrimitive.Item>
+            <RadioGroupPrimitive.Item
+              value="gregorian"
+              className={`min-h-11 rounded-xl border px-3 text-[0.8125rem] font-bold ${
+                calendarType === "gregorian"
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border-control bg-card text-foreground"
+              }`}
+            >
+              {language === "ar" ? "التقويم الميلادي" : "Gregorian"}
+            </RadioGroupPrimitive.Item>
+          </RadioGroupPrimitive.Root>
+        </section>
+
+        <section className="mx-4 mb-6" aria-labelledby="text-size-title">
           <h3 id="text-size-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
             {t(language, "settings.textSize")}
           </h3>

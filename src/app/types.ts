@@ -86,6 +86,7 @@ export interface UserSettingsState {
   weeklyGoalDays: number;
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
+  calendarType?: "hijri" | "gregorian";
 }
 
 export interface UserProfileState {

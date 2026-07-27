@@ -238,6 +238,9 @@ export default function App() {
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
+  const [calendarType, setCalendarType] = useState<"hijri" | "gregorian">(
+    initialState.settings.calendarType ?? "hijri",
+  );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [isRepeatSession, setIsRepeatSession] = useState(false);
@@ -300,6 +303,7 @@ export default function App() {
         weeklyGoalDays,
         quietProgressEnabled,
         progressDayStartHour,
+        calendarType,
       },
       profile: { displayName, lastPhoneNumber, isGuest, accountUserId },
       completed: fromCompletedSets(completed),
@@ -311,6 +315,7 @@ export default function App() {
       boldText,
       accountUserId,
       arabicFont,
+      calendarType,
       colorBlindSupport,
       completed,
       darkMode,
@@ -933,6 +938,7 @@ export default function App() {
                 onOpenFridayMode={() => push("friday")}
                 onOpenShareModal={() => setShowShareModal(true)}
                 language={selectedLang}
+                calendarType={calendarType}
                 direction={layoutDirection}
               />
             )}
@@ -954,6 +960,8 @@ export default function App() {
                   summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}
                   language={selectedLang}
                   hideTabs={false}
+                  calendarType={calendarType}
+                  onOpenShareModal={() => setShowShareModal(true)}
                 />
               </ScreenContainer>
             )}
@@ -1042,9 +1050,11 @@ export default function App() {
                 weeklyGoalDays={weeklyGoalDays}
                 quietProgressEnabled={quietProgressEnabled}
                 progressDayStartHour={progressDayStartHour}
+                calendarType={calendarType}
                 direction={layoutDirection}
                 onLanguageChange={setSelectedLang}
                 onThemeModeChange={setThemeMode}
+                onCalendarTypeChange={setCalendarType}
                 onTextSizeChange={setTextSize}
                 onArabicFontChange={setArabicFont}
                 onShowTranslationChange={setShowTranslation}

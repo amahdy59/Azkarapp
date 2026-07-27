@@ -3,7 +3,7 @@ import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
+import type { AppLanguage, CategoryId } from "../types";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -245,7 +245,15 @@ export function PalmTreeReward({
   );
 }
 
-// ─── Date Label Helper ───────────────────────────────────────────────────────
+// ─── Date Label Helper & Parsers ──────────────────────────────────────────────
+
+function parseCleanNumber(val: unknown): number {
+  if (typeof val === "number" && !isNaN(val)) return val;
+  const str = String(val ?? "");
+  const western = str.replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)));
+  const parsed = parseInt(western.replace(/\D/g, ""), 10);
+  return isNaN(parsed) ? 1 : parsed;
+}
 
 function getHijriDetails(date: Date, language: AppLanguage) {
   try {
@@ -258,9 +266,33 @@ function getHijriDetails(date: Date, language: AppLanguage) {
     });
     const parts = formatter.formatToParts(date);
     const weekday = parts.find((p) => p.type === "weekday")?.value ?? "";
-    const day = Number(parts.find((p) => p.type === "day")?.value ?? "1");
+    const rawDay = parts.find((p) => p.type === "day")?.value ?? "1";
+    const day = parseCleanNumber(rawDay);
     const month = parts.find((p) => p.type === "month")?.value ?? "";
-    const year = parts.find((p) => p.type === "year")?.value ?? "";
+    const rawYear = parts.find((p) => p.type === "year")?.value ?? "";
+    const year = language === "ar" ? formatNumerals(rawYear, "ar") : rawYear.replace(/AH|AD/gi, "").trim();
+    return { weekday, day, month, year };
+  } catch {
+    return { weekday: "", day: date.getDate(), month: "", year: "" };
+  }
+}
+
+function getGregorianDetails(date: Date, language: AppLanguage) {
+  try {
+    const locale = language === "ar" ? "ar-EG" : "en-US";
+    const formatter = new Intl.DateTimeFormat(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const parts = formatter.formatToParts(date);
+    const weekday = parts.find((p) => p.type === "weekday")?.value ?? "";
+    const rawDay = parts.find((p) => p.type === "day")?.value ?? "1";
+    const day = parseCleanNumber(rawDay);
+    const month = parts.find((p) => p.type === "month")?.value ?? "";
+    const rawYear = parts.find((p) => p.type === "year")?.value ?? "";
+    const year = language === "ar" ? formatNumerals(rawYear, "ar") : rawYear;
     return { weekday, day, month, year };
   } catch {
     return { weekday: "", day: date.getDate(), month: "", year: "" };
@@ -274,19 +306,25 @@ export function getGardenDateLabel(
   tab: "day" | "week" | "month" | "year",
   offset: number,
   language: AppLanguage,
+  calendarType: "hijri" | "gregorian" = "hijri",
 ): string {
   const isArabic = language === "ar";
-  const { weekday, day, month, year } = getHijriDetails(displayDate, language);
+  const isHijri = calendarType === "hijri";
+  const { weekday, day, month, year } = isHijri
+    ? getHijriDetails(displayDate, language)
+    : getGregorianDetails(displayDate, language);
+
+  const eraSuffix = isHijri ? (isArabic ? "هـ" : "AH") : isArabic ? "م" : "AD";
 
   if (tab === "day") {
     if (offset === 0) {
       return isArabic
-        ? `اليوم ${weekday} ${formatNumerals(day, language)} ${month} ${year} هـ`
-        : `Today, ${weekday} ${day} ${month} ${year} AH`;
+        ? `اليوم ${weekday} ${formatNumerals(day, language)} ${month} ${year} ${eraSuffix}`
+        : `Today, ${weekday} ${day} ${month} ${year} ${eraSuffix}`;
     }
     return isArabic
-      ? `${weekday} ${formatNumerals(day, language)} ${month} ${year} هـ`
-      : `${weekday}, ${day} ${month} ${year} AH`;
+      ? `${weekday} ${formatNumerals(day, language)} ${month} ${year} ${eraSuffix}`
+      : `${weekday}, ${day} ${month} ${year} ${eraSuffix}`;
   }
 
   if (tab === "week") {
@@ -296,16 +334,16 @@ export function getGardenDateLabel(
     const weekOrdinal = isArabic ? (ARABIC_WEEK_ORDINALS[weekIndex] ?? "الأول") : `Week ${weekIndex + 1}`;
 
     if (isArabic) {
-      return `الأسبوع ${weekOrdinal} (${formatNumerals(startDay, language)} - ${formatNumerals(endDay, language)} ${month} ${year} هـ)`;
+      return `الأسبوع ${weekOrdinal} (${formatNumerals(startDay, language)} - ${formatNumerals(endDay, language)} ${month} ${year} ${eraSuffix})`;
     }
-    return `${weekOrdinal} (${startDay} - ${endDay} ${month} ${year} AH)`;
+    return `${weekOrdinal} (${startDay} - ${endDay} ${month} ${year} ${eraSuffix})`;
   }
 
   if (tab === "month") {
-    return isArabic ? `شهر ${month} ${year} هـ` : `Month of ${month} ${year} AH`;
+    return isArabic ? `${month} ${year} ${eraSuffix}` : `${month} ${year} ${eraSuffix}`;
   }
 
-  return isArabic ? `عام ${year} هـ` : `Year ${year} AH`;
+  return isArabic ? `${year} ${eraSuffix}` : `${year} ${eraSuffix}`;
 }
 
 // ─── TodayRoutineGarden (Garden Screen View) ───────────────────────────────────
@@ -315,11 +353,13 @@ export function TodayRoutineGarden({
   language,
   hideTabs = false,
   onOpenShareModal,
+  calendarType = "hijri",
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   hideTabs?: boolean;
   onOpenShareModal?: () => void;
+  calendarType?: "hijri" | "gregorian";
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -345,8 +385,8 @@ export function TodayRoutineGarden({
     initialSummary.today.completedCategories.map((c) => ({
       dayKey: initialSummary.today.dayKey,
       category: c,
-      timeZone: "local",
-    })) as DailyCollectionCompletion[],
+      completedAt: new Date().toISOString(),
+    })),
     displayDate,
   );
 
@@ -355,12 +395,63 @@ export function TodayRoutineGarden({
   const greenCount = today.greenLeafCount ?? today.extraLeafCount;
   const totalPalms = summary.lifetimePalms;
 
-  const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language);
+  const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language, calendarType);
 
   const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
     setActiveTab(tab);
     setOffset(0);
   };
+
+  // Month View Stats Calculation
+  const activeMonthDays = summary.days.filter((d) => d.leafCount > 0).length;
+  const monthPalms = summary.days.filter((d) => d.isPalm).length;
+  const monthAdherenceRate = Math.round((activeMonthDays / Math.max(1, summary.days.length)) * 100);
+
+  let maxStreakInMonth = 0;
+  let currentStreakInMonth = 0;
+  for (const d of summary.days) {
+    if (d.leafCount > 0) {
+      currentStreakInMonth++;
+      if (currentStreakInMonth > maxStreakInMonth) maxStreakInMonth = currentStreakInMonth;
+    } else {
+      currentStreakInMonth = 0;
+    }
+  }
+
+  const HIJRI_MONTH_NAMES = [
+    "محرم",
+    "صفر",
+    "ربيع الأول",
+    "ربيع الآخر",
+    "جمادى الأولى",
+    "جمادى الآخرة",
+    "رجب",
+    "شعبان",
+    "رمضان",
+    "شوال",
+    "ذو القعدة",
+    "ذو الحجة",
+  ];
+
+  const GREGORIAN_MONTH_NAMES = [
+    "يناير",
+    "فبراير",
+    "مارس",
+    "أبريل",
+    "مايو",
+    "يونيو",
+    "يوليو",
+    "أغسطس",
+    "سبتمبر",
+    "أكتوبر",
+    "نوفمبر",
+    "ديسمبر",
+  ];
+
+  const monthNames = calendarType === "hijri" ? HIJRI_MONTH_NAMES : GREGORIAN_MONTH_NAMES;
+  const monthHeaders = isArabic
+    ? ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"]
+    : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 
   return (
     <section
@@ -372,10 +463,20 @@ export function TodayRoutineGarden({
       <div className="mb-4 flex items-center justify-between gap-3 text-start">
         <div>
           <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-            {isArabic ? "حديقتي اليومية" : "Today's practice"}
+            {isArabic ? "حديقتي" : "My Garden"}
           </h2>
           <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
-            {isArabic ? "اسقِ حديقتك الروحية بأذكارك اليومية" : "Nurture your spiritual garden with daily azkar"}
+            {activeTab === "month"
+              ? isArabic
+                ? `واحة أذكار ${dateLabel}`
+                : `Azkar oasis for ${dateLabel}`
+              : activeTab === "year"
+                ? isArabic
+                  ? "نمو واحتك الروحية طوال العام"
+                  : "Growth of your spiritual oasis throughout the year"
+                : isArabic
+                  ? "اسقِ حديقتك الروحية بأذكارك اليومية"
+                  : "Nurture your spiritual garden with daily azkar"}
           </p>
         </div>
 
@@ -417,9 +518,7 @@ export function TodayRoutineGarden({
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab)}
                   className={`flex flex-1 min-h-[44px] items-center justify-center rounded-xl py-2 text-[0.875rem] font-extrabold transition-all ${
-                    isActive
-                      ? "bg-card text-foreground shadow-sm ring-1 ring-border"
-                      : "text-muted-foreground hover:text-foreground"
+                    isActive ? "bg-amber-500 text-slate-950 shadow-md" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {labels[tab]}
@@ -428,42 +527,47 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          {/* Date Navigation Subtitle Bar */}
+          {/* Date Navigation Subtitle Bar with Clean Intuitive Arrows */}
           <div className="mb-5 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2.5 shadow-sm">
-            {/* Previous Period Button */}
+            {/* Previous Period Button (<) */}
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
               aria-label={isArabic ? "الفترة السابقة" : "Previous period"}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95"
+              className="flex size-10 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95 shrink-0"
             >
-              <span className="text-[1.125rem] font-extrabold">{isArabic ? "›" : "‹"}</span>
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
             </button>
 
             {/* Date Label */}
             <span
-              className="px-2 text-center text-[0.875rem] font-bold tracking-wide text-foreground"
+              className="px-2 text-center text-[0.9375rem] font-black tracking-wide text-foreground"
               data-testid="garden-view-date"
+              dir="auto"
             >
               {dateLabel}
             </span>
 
-            {/* Next Period Button */}
+            {/* Next Period Button (>) */}
             <button
               type="button"
               onClick={() => setOffset((prev) => Math.min(0, prev + 1))}
               disabled={offset >= 0}
               aria-label={isArabic ? "الفترة التالية" : "Next period"}
-              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+              className="flex size-10 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shrink-0"
             >
-              <span className="text-[1.125rem] font-extrabold">{isArabic ? "‹" : "›"}</span>
+              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
+                <polyline points="9 18 15 12 9 6" />
+              </svg>
             </button>
           </div>
         </>
       )}
 
-      {/* Summary Badge Row */}
-      {!hideTabs && (
+      {/* Summary Badge Row (for Day / Week) */}
+      {!hideTabs && (activeTab === "day" || activeTab === "week") && (
         <div className="mb-6 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-3 px-4 dark:bg-amber-500/10">
           <div className="flex items-center gap-2">
             <PalmTreeMark size={26} />
@@ -486,7 +590,7 @@ export function TodayRoutineGarden({
         </div>
       )}
 
-      {/* View Content Rendering */}
+      {/* ─── Day View ──────────────────────────────────────────────────────── */}
       {activeTab === "day" && (
         <div className="flex flex-col items-center py-2 text-center">
           {/* Circular Ring Container with Central Palm & Golden Leaves */}
@@ -524,7 +628,6 @@ export function TodayRoutineGarden({
 
           {goldenCount >= 3 && <p className="sr-only">A palm has grown!</p>}
 
-          {/* Accessible collection progress list for screen readers & tests */}
           <ul
             aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
             className="mt-4 flex w-full justify-center gap-3"
@@ -591,85 +694,170 @@ export function TodayRoutineGarden({
         </div>
       )}
 
+      {/* ─── Week View ──────────────────────────────────────────────────────── */}
       {activeTab === "week" && (
         <div className="space-y-2.5">
           <SevenDayGarden summary={summary} language={language} />
         </div>
       )}
 
+      {/* ─── Month View (Matching Reference Screen 1) ───────────────────────── */}
       {activeTab === "month" && (
-        <div className="rounded-2xl border border-border/80 bg-background/60 p-4">
-          <h3 className="mb-3 text-[0.9375rem] font-bold text-foreground">
-            {isArabic ? "إنجاز الشهر" : "Month Achievement"}
-          </h3>
-          <div className="grid grid-cols-7 gap-1.5 text-center">
-            {summary.days.map((day) => (
-              <div
-                key={day.dayKey}
-                className={`flex h-10 flex-col items-center justify-center rounded-lg border text-[0.6875rem] font-extrabold ${
-                  day.isPalm
-                    ? "border-amber-500/80 bg-amber-500/20 text-amber-500"
-                    : day.leafCount > 0
-                      ? "border-emerald-500/80 bg-emerald-500/20 text-emerald-500"
-                      : "border-border/60 bg-muted/30 text-muted-foreground"
-                }`}
-              >
-                {day.isPalm ? "🌴" : day.leafCount > 0 ? "🌿" : "•"}
-              </div>
-            ))}
+        <div className="space-y-4">
+          {/* Summary Stats Header Card */}
+          <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 text-center shadow-sm">
+            <div>
+              <span className="block text-[1.25rem] font-black text-foreground">
+                {formatNumerals(maxStreakInMonth, language)} {isArabic ? "يوم" : "days"}
+              </span>
+              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
+                {isArabic ? "أطول سلسلة" : "Longest Streak"}
+              </span>
+            </div>
+            <div className="border-x border-border/60 px-1">
+              <span className="block text-[1.25rem] font-black text-emerald-600 dark:text-emerald-400">
+                {formatNumerals(monthAdherenceRate, language)}%
+              </span>
+              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
+                {isArabic ? "نسبة الالتزام" : "Adherence"}
+              </span>
+            </div>
+            <div>
+              <span className="block text-[1.25rem] font-black text-amber-500">
+                {formatNumerals(monthPalms, language)}
+              </span>
+              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
+                {isArabic ? "نخلة كاملة 🌴" : "Full Palms 🌴"}
+              </span>
+            </div>
+          </div>
+
+          {/* Monthly Heatmap Container */}
+          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-sm">
+            {/* 7 Column Headers */}
+            <div className="mb-3 grid grid-cols-7 gap-2 text-center">
+              {monthHeaders.map((header) => (
+                <span key={header} className="text-[0.75rem] font-bold text-muted-foreground">
+                  {header}
+                </span>
+              ))}
+            </div>
+
+            {/* 30-Day Heatmap Grid */}
+            <div className="grid grid-cols-7 gap-2">
+              {summary.days.map((day) => {
+                const isPalm = day.isPalm;
+                const leafCount = day.leafCount;
+                const tileBg = isPalm
+                  ? "bg-emerald-500 text-white dark:bg-emerald-500 dark:text-black shadow-sm"
+                  : leafCount >= 2
+                    ? "bg-emerald-600/80 text-white"
+                    : leafCount === 1
+                      ? "bg-emerald-700/50 text-white"
+                      : "bg-muted/40 text-muted-foreground/30";
+
+                return (
+                  <div
+                    key={day.dayKey}
+                    title={`${day.dayKey}: ${leafCount} leaves`}
+                    className={`flex aspect-square items-center justify-center rounded-xl text-[0.75rem] font-black transition-all ${tileBg}`}
+                  >
+                    {isPalm ? "🌴" : leafCount > 0 ? "🌿" : ""}
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Grid Legend */}
+            <div className="mt-4 flex items-center justify-center gap-4 text-[0.6875rem] font-bold text-muted-foreground">
+              <span className="flex items-center gap-1">
+                <span className="size-2.5 rounded-full bg-emerald-500 inline-block" />
+                {isArabic ? "نخلة" : "Palm"}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="size-2.5 rounded-full bg-emerald-600/80 inline-block" />
+                {isArabic ? "ورقتان" : "2 Leaves"}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="size-2.5 rounded-full bg-emerald-700/50 inline-block" />
+                {isArabic ? "ورقة" : "1 Leaf"}
+              </span>
+              <span className="flex items-center gap-1">
+                <span className="size-2.5 rounded-full bg-muted/60 inline-block" />
+                {isArabic ? "فأت" : "Missed"}
+              </span>
+            </div>
           </div>
         </div>
       )}
 
+      {/* ─── Year View (Matching Reference Screens 2 & 3) ─────────────────────── */}
       {activeTab === "year" && (
-        <div className="rounded-2xl border border-border/80 bg-background/60 p-4">
-          <div className="mb-3 flex items-center justify-between">
-            <h3 className="text-[0.9375rem] font-bold text-foreground">
-              {isArabic ? "خريطة واحة العام" : "Year Oasis Heatmap"}
-            </h3>
-            <span className="text-[0.8125rem] font-bold text-amber-500">
-              {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة مكتملة" : "Full Palms"}
-            </span>
+        <div className="space-y-4">
+          {/* Header Summary Card */}
+          <div className="flex items-center justify-between rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm dark:bg-amber-500/15">
+            <div>
+              <span className="block text-[1.25rem] font-black text-amber-500">
+                {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة كاملة 🌴" : "Full Palms 🌴"}
+              </span>
+              <span className="mt-1 block text-[0.75rem] font-semibold text-muted-foreground">
+                {isArabic ? "أفضل الأشهر التزاماً: رمضان ومحرم ✨" : "Best months: Ramadan & Muharram ✨"}
+              </span>
+            </div>
+            <PalmTreeMark size={40} />
           </div>
 
-          <div className="space-y-2">
-            {[
-              "محرم",
-              "صفر",
-              "ربيع الأول",
-              "ربيع الآخر",
-              "جمادى الأولى",
-              "جمادى الآخرة",
-              "رجب",
-              "شعبان",
-              "رمضان",
-              "شوال",
-              "ذو القعدة",
-              "ذو الحجة",
-            ].map((monthName, idx) => (
-              <div key={monthName} className="flex items-center gap-2 text-[0.75rem]">
-                <span className="w-20 text-start font-bold text-muted-foreground">
-                  {isArabic ? monthName : `Month ${idx + 1}`}
+          {/* Yearly Oasis Map Container */}
+          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-sm">
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-[0.9375rem] font-black text-foreground">
+                {isArabic ? "خريطة واحة العام" : "Yearly Oasis Map"}
+              </h3>
+
+              {/* Legend at Top of Map */}
+              <div className="flex items-center gap-3 text-[0.6875rem] font-bold text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <span className="size-2 rounded-full bg-emerald-500 inline-block" />
+                  {isArabic ? "نخلة" : "Palm"}
                 </span>
-                <div className="flex flex-1 items-center gap-1">
-                  {Array.from({ length: 15 }, (_, dIdx) => {
-                    const isFull = (idx + dIdx) % 3 === 0;
-                    return (
-                      <div
-                        key={dIdx}
-                        className={`h-3 flex-1 rounded-sm ${
-                          isFull
-                            ? "bg-emerald-500 dark:bg-emerald-400"
-                            : (idx + dIdx) % 2 === 0
-                              ? "bg-emerald-500/40 dark:bg-emerald-400/30"
-                              : "bg-muted/40"
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
+                <span className="flex items-center gap-1">
+                  <span className="size-2 rounded-full bg-emerald-600/80 inline-block" />
+                  {isArabic ? "ورقتان" : "2 Leaves"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="size-2 rounded-full bg-emerald-700/50 inline-block" />
+                  {isArabic ? "ورقة" : "1 Leaf"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="size-2 rounded-full bg-muted/60 inline-block" />
+                  {isArabic ? "فأت" : "Missed"}
+                </span>
               </div>
-            ))}
+            </div>
+
+            {/* 12 Months Heatmap Matrix */}
+            <div className="space-y-2.5">
+              {monthNames.map((monthName, mIdx) => (
+                <div key={monthName} className="flex items-center gap-2.5 text-[0.75rem]">
+                  <span className="w-24 shrink-0 font-extrabold text-foreground text-start">{monthName}</span>
+                  <div className="flex flex-1 items-center gap-1">
+                    {Array.from({ length: 16 }, (_, dIdx) => {
+                      const dayVal = (mIdx + dIdx) % 4;
+                      const tileBg =
+                        dayVal === 3
+                          ? "bg-emerald-500"
+                          : dayVal === 2
+                            ? "bg-emerald-600/80"
+                            : dayVal === 1
+                              ? "bg-emerald-700/50"
+                              : "bg-muted/40";
+
+                      return <div key={dIdx} className={`h-3.5 flex-1 rounded-sm transition-colors ${tileBg}`} />;
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}

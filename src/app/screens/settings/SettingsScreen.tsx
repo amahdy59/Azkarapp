@@ -49,9 +49,11 @@ interface SettingsScreenProps {
   weeklyGoalDays: number;
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
+  calendarType?: "hijri" | "gregorian";
   direction: "ltr" | "rtl";
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
+  onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
   onTextSizeChange: (value: TextSizeOption) => void;
   onArabicFontChange: (value: ArabicFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
@@ -97,9 +99,11 @@ export function SettingsScreen({
   weeklyGoalDays,
   quietProgressEnabled,
   progressDayStartHour,
+  calendarType = "hijri",
   direction,
   onLanguageChange,
   onThemeModeChange,
+  onCalendarTypeChange,
   onTextSizeChange,
   onArabicFontChange,
   onShowTranslationChange,
@@ -193,6 +197,8 @@ export function SettingsScreen({
             <AccessibilityPanel
               language={language}
               direction={direction}
+              calendarType={calendarType}
+              onCalendarTypeChange={onCalendarTypeChange}
               textSize={textSize}
               arabicFont={arabicFont}
               showTranslation={showTranslation}

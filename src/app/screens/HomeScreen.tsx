@@ -100,6 +100,7 @@ export function HomeScreen({
   progressDayStartHour,
   language,
   direction,
+  calendarType = "hijri",
   onResume,
   onRepeat,
   onOpenFridayMode,
@@ -111,6 +112,7 @@ export function HomeScreen({
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
+  calendarType?: "hijri" | "gregorian";
   onResume: (category: CategoryId, index: number) => void;
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
@@ -267,6 +269,7 @@ export function HomeScreen({
             summary={gardenSummary}
             language={language}
             hideTabs={true}
+            calendarType={calendarType}
             onOpenShareModal={onOpenShareModal}
           />
         )}

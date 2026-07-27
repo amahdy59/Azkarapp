@@ -46,6 +46,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     weeklyGoalDays: 4,
     quietProgressEnabled: true,
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
+    calendarType: "hijri",
   },
   profile: {
     displayName: "Guest",
@@ -257,6 +258,10 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ? settings.quietProgressEnabled
           : DEFAULT_APP_STATE.settings.quietProgressEnabled,
       progressDayStartHour,
+      calendarType:
+        settings?.calendarType === "hijri" || settings?.calendarType === "gregorian"
+          ? settings.calendarType
+          : (DEFAULT_APP_STATE.settings.calendarType ?? "hijri"),
     },
     profile: {
       displayName:
@@ -491,6 +496,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       progressDayStartHour: isProgressDayStartHour(incoming.settings?.progressDayStartHour)
         ? incoming.settings.progressDayStartHour
         : safeBase.settings.progressDayStartHour,
+      calendarType:
+        incoming.settings?.calendarType === "hijri" || incoming.settings?.calendarType === "gregorian"
+          ? incoming.settings.calendarType
+          : (safeBase.settings.calendarType ?? "hijri"),
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || safeBase.profile.displayName,
