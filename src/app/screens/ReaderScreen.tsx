@@ -434,7 +434,7 @@ export function ReaderScreen({
           <DropdownMenu dir={direction}>
             <DropdownMenuTrigger
               aria-label={t(language, "reader.menu")}
-              className="ui-icon-button shrink-0 border border-border-control bg-background focus-visible:outline-none"
+              className="ui-icon-button shrink-0 border border-border-control bg-background focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <Menu size={18} />
             </DropdownMenuTrigger>

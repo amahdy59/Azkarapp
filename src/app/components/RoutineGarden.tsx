@@ -1,8 +1,14 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
+import {
+  getGardenSummary,
+  MAIN_CATEGORY_IDS,
+  type GardenMilestoneId,
+  type GardenSummary,
+  type GrowthEvent,
+} from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
@@ -796,7 +802,7 @@ export function TodayRoutineGarden({
                 {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة كاملة 🌴" : "Full Palms 🌴"}
               </span>
               <span className="mt-1 block text-[0.75rem] font-semibold text-muted-foreground">
-                {isArabic ? "أفضل الأشهر التزاماً: رمضان ومحرم ✨" : "Best months: Ramadan & Muharram ✨"}
+                {isArabic ? `المجموع: ${formatNumerals(summary.lifetimeLeaves, language)} ورقة` : `Total: ${summary.lifetimeLeaves} leaves earned`}
               </span>
             </div>
             <PalmTreeMark size={40} />
@@ -830,28 +836,66 @@ export function TodayRoutineGarden({
               </div>
             </div>
 
-            {/* 12 Months Heatmap Matrix */}
+            {/* 12 Months Heatmap Matrix — real data computed from dailyCompletions */}
             <div className="space-y-2.5">
-              {monthNames.map((monthName, mIdx) => (
-                <div key={monthName} className="flex items-center gap-2.5 text-[0.75rem]">
-                  <span className="w-24 shrink-0 font-extrabold text-foreground text-start">{monthName}</span>
-                  <div className="flex flex-1 items-center gap-1">
-                    {Array.from({ length: 16 }, (_, dIdx) => {
-                      const dayVal = (mIdx + dIdx) % 4;
-                      const tileBg =
-                        dayVal === 3
-                          ? "bg-emerald-500"
-                          : dayVal === 2
-                            ? "bg-emerald-600/80"
-                            : dayVal === 1
-                              ? "bg-emerald-700/50"
-                              : "bg-muted/40";
+              {monthNames.map((monthName, mIdx) => {
+                // Build a set of leaf counts per day for this month, using Gregorian calendar
+                // Each tile represents ~2 calendar days. 16 tiles × ~2 days ≈ 30 days/month.
+                const TILES_PER_MONTH = 16;
+                const DAYS_PER_TILE = 2;
 
-                      return <div key={dIdx} className={`h-3.5 flex-1 rounded-sm transition-colors ${tileBg}`} />;
-                    })}
+                // Filter completions that fall in this calendar month
+                // For hijri, we map months approximately (hijri month ≈ gregorian - 1 for offset)
+                // We use the Gregorian year/month from the displayDate year for indexing
+                const targetYear = displayDate.getFullYear();
+                // For Gregorian: monthIdx maps directly. For Hijri: approximate mapping
+                // We use Gregorian months to bucket data (most accessible approach without full Hijri lib)
+                const targetMonthGregorian = calendarType === "hijri"
+                  ? (mIdx + 2) % 12  // rough Hijri→Gregorian offset
+                  : mIdx;
+
+                // Build a map of day-of-month → leaf count for this target month/year
+                const dayLeafMap = new Map<number, number>();
+                for (const record of dailyCompletions) {
+                  const d = new Date(record.dayKey);
+                  if (d.getFullYear() === targetYear && d.getMonth() === targetMonthGregorian) {
+                    const dom = d.getDate();
+                    // Count golden leaves (main categories)
+                    const isGolden = MAIN_CATEGORY_IDS.includes(record.category);
+                    dayLeafMap.set(dom, (dayLeafMap.get(dom) ?? 0) + (isGolden ? 1 : 0));
+                  }
+                }
+
+                return (
+                  <div key={monthName} className="flex items-center gap-2.5 text-[0.75rem]">
+                    <span className="w-24 shrink-0 font-extrabold text-foreground text-start">{monthName}</span>
+                    <div className="flex flex-1 items-center gap-1">
+                      {Array.from({ length: TILES_PER_MONTH }, (_, tIdx) => {
+                        // Each tile covers ~2 days
+                        const startDay = tIdx * DAYS_PER_TILE + 1;
+                        const endDay = startDay + DAYS_PER_TILE - 1;
+                        // Sum leaves across those 2 days
+                        let tileLeaves = 0;
+                        for (let day = startDay; day <= endDay; day++) {
+                          tileLeaves += dayLeafMap.get(day) ?? 0;
+                        }
+                        // Determine if any day in this tile was a palm (all 3 main cats done)
+                        // Cap at meaningful levels: 0=missed, 1=partial, 2=good, 3=palm
+                        const level = tileLeaves === 0 ? 0 : tileLeaves === 1 ? 1 : tileLeaves === 2 ? 2 : 3;
+                        const tileBg =
+                          level === 3
+                            ? "bg-emerald-500"
+                            : level === 2
+                              ? "bg-emerald-600/80"
+                              : level === 1
+                                ? "bg-emerald-700/50"
+                                : "bg-muted/40";
+                        return <div key={tIdx} className={`h-3.5 flex-1 rounded-sm transition-colors ${tileBg}`} />;
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>

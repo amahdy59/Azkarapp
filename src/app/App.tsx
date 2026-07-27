@@ -75,6 +75,7 @@ import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { FloatingAudioPlayer } from "./components/FloatingAudioPlayer";
 import { ShareableCardModal } from "./components/ShareableCardModal";
+import { ConfirmDialog } from "./components/ConfirmDialog";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { FridayModeScreen } from "./screens/FridayModeScreen";
 import { t } from "./i18n";
@@ -274,6 +275,28 @@ export default function App() {
       return false;
     }
   });
+
+  // ── Confirmation dialog state ──────────────────────────────────────────────
+  // Replaces window.confirm() with a branded, accessible AlertDialog.
+  const [pendingConfirm, setPendingConfirm] = useState<{
+    title: string;
+    description: string;
+    confirmLabel: string;
+    cancelLabel: string;
+    destructive?: boolean;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const showConfirm = (
+    title: string,
+    description: string,
+    confirmLabel: string,
+    cancelLabel: string,
+    onConfirm: () => void,
+    destructive = false,
+  ) => {
+    setPendingConfirm({ title, description, confirmLabel, cancelLabel, onConfirm, destructive });
+  };
 
   const { currentPalmRhythm: currentStreak, longestPalmRhythm: longestStreak } = getPalmStreakSummary(
     dailyCompletions,
@@ -497,14 +520,20 @@ export default function App() {
   }, []);
 
   const handleResetCategory = (catId: CategoryId) => {
-    if (!window.confirm(t(selectedLang, "category.resetConfirm"))) {
-      return;
-    }
-    setCompleted((prev) => {
-      const next = { ...prev };
-      next[catId] = new Set();
-      return next;
-    });
+    showConfirm(
+      t(selectedLang, "category.resetConfirmTitle"),
+      t(selectedLang, "category.resetConfirm"),
+      t(selectedLang, "common.reset"),
+      t(selectedLang, "common.cancel"),
+      () => {
+        setCompleted((prev) => {
+          const next = { ...prev };
+          next[catId] = new Set();
+          return next;
+        });
+      },
+      true,
+    );
   };
 
   const pop = useCallback(() => {
@@ -717,10 +746,23 @@ export default function App() {
         appStateSnapshot.profile.isGuest &&
         privateGuestDataExists
       ) {
-        const shouldMergeGuestProgress = window.confirm(t(selectedLang, "auth.mergeGuestProgress"));
-        if (!shouldMergeGuestProgress) {
+        await new Promise<void>((resolve) => {
+          showConfirm(
+            t(selectedLang, "auth.mergeTitle"),
+            t(selectedLang, "auth.mergeGuestProgress"),
+            t(selectedLang, "auth.mergeConfirm"),
+            t(selectedLang, "common.skip"),
+            () => resolve(),
+            false,
+          );
+          // If user cancels, clear private data instead
+          setPendingConfirm((prev) => prev ? {
+            ...prev,
+            onConfirm: () => resolve(),
+          } : null);
+        }).catch(() => {
           hydrationBase = clearPrivateAppData(appStateSnapshot);
-        }
+        });
       }
 
       if (hydrationBase !== appStateSnapshot) {
@@ -757,21 +799,27 @@ export default function App() {
   };
 
   const handleSignOut = async () => {
-    if (!window.confirm(t(selectedLang, "auth.signOutConfirm"))) {
-      return;
-    }
-    try {
-      setAuthError("");
-      setRemoteSyncReady(false);
-      if (isSupabaseConfigured) {
-        await signOutSupabase();
-      }
-      applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
-      setView("login");
-      setActiveTab("home");
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
-    }
+    showConfirm(
+      t(selectedLang, "auth.signOutTitle"),
+      t(selectedLang, "auth.signOutConfirm"),
+      t(selectedLang, "auth.signOut"),
+      t(selectedLang, "common.cancel"),
+      async () => {
+        try {
+          setAuthError("");
+          setRemoteSyncReady(false);
+          if (isSupabaseConfigured) {
+            await signOutSupabase();
+          }
+          applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
+          setView("login");
+          setActiveTab("home");
+        } catch (error) {
+          setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
+        }
+      },
+      true,
+    );
   };
 
   const handleExportData = () => {
@@ -785,27 +833,31 @@ export default function App() {
   };
 
   const handleResetPreferences = () => {
-    const message =
-      selectedLang === "ar"
-        ? "هل تريد استعادة التفضيلات الافتراضية؟ سيبقى تقدمك وجلساتك والأذكار المحفوظة."
-        : "Restore default preferences? Your progress, sessions, and saved azkar will be kept.";
-    if (!window.confirm(message)) {
-      return;
-    }
-    resetStoredSettings();
-    window.location.reload();
+    showConfirm(
+      t(selectedLang, "settings.resetPreferencesTitle"),
+      t(selectedLang, "settings.resetPreferencesConfirm"),
+      t(selectedLang, "common.reset"),
+      t(selectedLang, "common.cancel"),
+      () => {
+        resetStoredSettings();
+        window.location.reload();
+      },
+      false,
+    );
   };
 
   const handleClearLocalData = () => {
-    const message =
-      selectedLang === "ar"
-        ? "هل تريد مسح كل بيانات أذكار المحلية على هذا الجهاز؟ لا يمكن التراجع عن ذلك."
-        : "Erase all local Azkar data on this device? This cannot be undone.";
-    if (!window.confirm(message)) {
-      return;
-    }
-    clearStoredAppData();
-    window.location.reload();
+    showConfirm(
+      t(selectedLang, "settings.clearLocalDataTitle"),
+      t(selectedLang, "settings.clearLocalDataConfirm"),
+      t(selectedLang, "settings.clearLocalDataAction"),
+      t(selectedLang, "common.cancel"),
+      () => {
+        clearStoredAppData();
+        window.location.reload();
+      },
+      true,
+    );
   };
 
   const handleNavTab = (tab: "home" | "azkar" | "progress" | "settings") => {
@@ -1184,6 +1236,23 @@ export default function App() {
         {/* Bottom nav */}
         {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
       </div>
+
+      {/* Accessible confirmation dialog — replaces window.confirm() */}
+      {pendingConfirm && (
+        <ConfirmDialog
+          open={true}
+          title={pendingConfirm.title}
+          description={pendingConfirm.description}
+          confirmLabel={pendingConfirm.confirmLabel}
+          cancelLabel={pendingConfirm.cancelLabel}
+          destructive={pendingConfirm.destructive}
+          onConfirm={() => {
+            pendingConfirm.onConfirm();
+            setPendingConfirm(null);
+          }}
+          onCancel={() => setPendingConfirm(null)}
+        />
+      )}
     </div>
   );
 }

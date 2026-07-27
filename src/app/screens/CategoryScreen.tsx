@@ -107,11 +107,11 @@ export function CategoryScreen({
                     type="button"
                     onClick={onPlayAllAudio}
                     className="interactive-elem flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/40 bg-amber-500/10 px-3.5 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500"
-                    aria-label={isArabic ? "تشغيل الصوتي للكل" : "Play All Audio"}
-                    title={isArabic ? "تشغيل الصوتي للكل" : "Play All Audio"}
+                    aria-label={t(language, "category.playAllAudio")}
+                    title={t(language, "category.playAllAudio")}
                   >
                     <Volume2 size={18} />
-                    <span className="text-[0.875rem] font-bold">{isArabic ? "تشغيل الكل" : "Play All"}</span>
+                    <span className="text-[0.875rem] font-bold">{t(language, "category.playAll")}</span>
                   </button>
                 )}
                 {done > 0 && (
@@ -119,7 +119,7 @@ export function CategoryScreen({
                     type="button"
                     onClick={onReset}
                     className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
-                    aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
+                    aria-label={t(language, "category.resetProgress")}
                   >
                     <RotateCcw size={18} />
                   </button>
@@ -152,7 +152,7 @@ export function CategoryScreen({
                   type="button"
                   onClick={onReset}
                   className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
-                  aria-label={isArabic ? "إعادة تعيين" : "Reset Progress"}
+                  aria-label={t(language, "category.resetProgress")}
                 >
                   <RotateCcw size={18} />
                 </button>
@@ -166,10 +166,10 @@ export function CategoryScreen({
                 type="button"
                 onClick={onReset}
                 className="interactive-elem flex h-9 items-center gap-1.5 rounded-lg px-3 text-[0.75rem] font-bold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
-                aria-label={isArabic ? "إعادة تعيين التقدم" : "Reset Progress"}
+                aria-label={t(language, "category.resetProgress")}
               >
                 <RotateCcw size={14} />
-                <span>{isArabic ? "إعادة تعيين التقدم" : "Reset Progress"}</span>
+                <span>{t(language, "category.resetProgress")}</span>
               </button>
             </div>
           )
@@ -180,7 +180,7 @@ export function CategoryScreen({
         {completedAzkar.length > 0 && (
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h3>
+              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h2>
             </div>
             <div className="flex flex-col gap-3">
               {completedAzkar.map(({ z, index }) => {
@@ -188,38 +188,32 @@ export function CategoryScreen({
                 const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
 
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={z.id}
-                    className="interactive-elem flex w-full items-start gap-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer hover:bg-emerald-500/10 transition-all dark:bg-emerald-950/20"
-                    onClick={() => onZikr(index)}
+                    className="flex w-full items-start gap-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 transition-all dark:bg-emerald-950/20"
                   >
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggle(index);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.stopPropagation();
-                          handleToggle(index);
-                        }
-                      }}
+                    {/* Toggle button — standalone interactive control */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggle(index)}
                       aria-label={
                         isArabic
-                          ? `${z.arabicText.slice(0, 30)}. مكتمل، انقر للتعطيل`
-                          : `${z.translation.slice(0, 30)}. Completed, click to uncheck`
+                          ? `${z.arabicText.slice(0, 30)}. ${t(language, "category.completedToggle")}`
+                          : `${z.translation.slice(0, 30)}. ${t(language, "category.completedToggle")}`
                       }
                       className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shadow-sm">
                         <Check size={18} strokeWidth={3} />
                       </span>
-                    </span>
+                    </button>
 
-                    <div className="min-w-0 flex-1 pt-0.5 opacity-90">
+                    {/* Card text — navigates to reader */}
+                    <button
+                      type="button"
+                      onClick={() => onZikr(index)}
+                      className="interactive-elem min-w-0 flex-1 pt-0.5 text-start opacity-90 focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+                    >
                       <p
                         className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.8] text-foreground whitespace-pre-line`}
                         dir={isArabic ? "rtl" : "ltr"}
@@ -237,12 +231,12 @@ export function CategoryScreen({
                           <span>{timingTip}</span>
                         </div>
                       )}
-                    </div>
+                    </button>
 
                     <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/80 px-3 py-1.5 shadow-xs">
                       <span className="text-[0.875rem] font-extrabold text-muted-foreground">x{countLabel}</span>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>
@@ -252,7 +246,7 @@ export function CategoryScreen({
         {remainingAzkar.length > 0 && (
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h3>
+              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h2>
             </div>
             <div className="flex flex-col gap-3.5">
               {remainingAzkar.map(({ z, index }) => {
@@ -260,36 +254,30 @@ export function CategoryScreen({
                 const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
 
                 return (
-                  <button
-                    type="button"
+                  <div
                     key={z.id}
-                    className="interactive-elem flex w-full items-start gap-3.5 rounded-2xl border border-border/80 bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer hover:border-primary/50 hover:shadow-md transition-all"
-                    onClick={() => onZikr(index)}
+                    className="flex w-full items-start gap-3.5 rounded-2xl border border-border/80 bg-card p-4 hover:border-primary/50 hover:shadow-md transition-all"
                   >
-                    <span
-                      role="button"
-                      tabIndex={0}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggle(index);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.stopPropagation();
-                          handleToggle(index);
-                        }
-                      }}
+                    {/* Toggle button — standalone interactive control */}
+                    <button
+                      type="button"
+                      onClick={() => handleToggle(index)}
                       aria-label={
                         isArabic
-                          ? `${z.arabicText.slice(0, 30)}. غير مكتمل، انقر للتحديد`
-                          : `${z.translation.slice(0, 30)}. Not completed, click to check`
+                          ? `${z.arabicText.slice(0, 30)}. ${t(language, "category.remainingToggle")}`
+                          : `${z.translation.slice(0, 30)}. ${t(language, "category.remainingToggle")}`
                       }
                       className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
                       <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-muted-foreground/40 hover:border-emerald-500 hover:bg-emerald-500/10 transition-colors" />
-                    </span>
+                    </button>
 
-                    <div className="min-w-0 flex-1 pt-0.5">
+                    {/* Card text — navigates to reader */}
+                    <button
+                      type="button"
+                      onClick={() => onZikr(index)}
+                      className="interactive-elem min-w-0 flex-1 pt-0.5 text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+                    >
                       <p
                         className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
                         dir={isArabic ? "rtl" : "ltr"}
@@ -307,14 +295,14 @@ export function CategoryScreen({
                           <span>{timingTip}</span>
                         </div>
                       )}
-                    </div>
+                    </button>
 
                     <div className="flex shrink-0 items-center justify-center rounded-xl bg-amber-500/15 px-3 py-1.5 shadow-xs">
                       <span className="text-[0.875rem] font-extrabold text-amber-700 dark:text-amber-300">
                         x{countLabel}
                       </span>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

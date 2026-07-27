@@ -163,7 +163,11 @@ export function PhoneInputScreen({
             <span>🇸🇦 +966</span>
             <ChevronDown size={11} />
           </button>
+          <label htmlFor="phone-input" className="sr-only">
+            {t(language, "auth.enterNumber")}
+          </label>
           <input
+            id="phone-input"
             type="tel"
             value={phone}
             onChange={(event) => setPhone(event.target.value)}
@@ -172,6 +176,9 @@ export function PhoneInputScreen({
             inputMode="tel"
             autoComplete="tel"
             dir="ltr"
+            aria-label={t(language, "auth.phoneInputLabel")}
+            aria-describedby={errorMessage ? "phone-error" : undefined}
+            aria-invalid={errorMessage ? "true" : undefined}
           />
         </div>
         <div className="flex items-center gap-2 text-muted-foreground">
@@ -179,7 +186,7 @@ export function PhoneInputScreen({
           <p className="text-[0.75rem]">{t(language, "auth.countriesSupported")}</p>
         </div>
         {errorMessage && (
-          <p className="text-[0.75rem] text-destructive" role="alert">
+          <p id="phone-error" className="text-[0.75rem] text-destructive" role="alert" aria-live="assertive">
             {errorMessage}
           </p>
         )}
