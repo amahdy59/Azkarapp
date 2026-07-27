@@ -3,6 +3,7 @@ import { ChevronNext } from "../components/icons";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, LeafMark, PalmTreeMark, PalmTreeReward } from "../components/RoutineGarden";
+import { MosqueCardBackground } from "../components/MosqueCardBackground";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatHijriDate, formatNumerals } from "../formatting";
@@ -10,10 +11,6 @@ import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-
-import morningScene from "../../assets/home/morning-scene.png";
-import eveningScene from "../../assets/home/evening-scene.png";
-import beforeSleepScene from "../../assets/home/before-sleep-scene.png";
 
 type HomeActionKind = "resume" | "start" | "again";
 
@@ -46,7 +43,6 @@ export function getTimeOfDayZikr(now: Date = new Date()) {
       titleEnglish: "Time for Morning Azkar",
       descArabic: "أذكار الصباح تُقرأ بعد صلاة الفجر حتى طلوع الشمس",
       descEnglish: "Morning Azkar are read after Fajr prayer until sunrise",
-      bgImage: morningScene,
     };
   }
   if (hour >= 15.5 && hour < 20) {
@@ -56,7 +52,6 @@ export function getTimeOfDayZikr(now: Date = new Date()) {
       titleEnglish: "Time for Evening Azkar",
       descArabic: "أذكار المساء تُقرأ بعد صلاة العصر حتى المغرب",
       descEnglish: "Evening Azkar are read after Asr prayer until Maghrib",
-      bgImage: eveningScene,
     };
   }
   return {
@@ -65,7 +60,6 @@ export function getTimeOfDayZikr(now: Date = new Date()) {
     titleEnglish: "Time for Before Sleep Azkar",
     descArabic: "أذكار النوم تُقرأ بعد صلاة العشاء وقبل النوم",
     descEnglish: "Before Sleep Azkar are read after Isha prayer and before sleep",
-    bgImage: beforeSleepScene,
   };
 }
 
@@ -208,32 +202,23 @@ export function HomeScreen({
       <div className="min-h-0 flex-1 overflow-y-auto pt-1">
         {/* Current Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-6">
-          <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-[#18181B] shadow-xl transition-all">
-            {/* Background Scene Image */}
-            <img
-              src={reminderInfo.bgImage}
-              alt=""
-              aria-hidden="true"
-              className="absolute inset-0 h-full w-full object-cover object-bottom opacity-75 pointer-events-none"
-            />
+          <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card text-card-foreground shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
+            {/* Mosque SVG Vector Background */}
+            <MosqueCardBackground category={reminderInfo.categoryId} />
 
-            {/* Gradient Overlay for AAA Text Legibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/35 pointer-events-none" />
+            {/* Subtle Gradient Overlay for AAA Text Legibility */}
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-amber-500/5 via-transparent to-transparent dark:from-black/90 dark:via-black/50 dark:to-black/30" />
 
             {/* Card Content */}
             <div className="relative z-10 flex min-h-[170px] flex-col justify-between p-5 text-start">
               <div>
                 <h2
                   id="current-zikr-heading"
-                  className="text-[1.25rem] font-extrabold text-white tracking-wide"
-                  style={{ color: "#FFFFFF" }}
+                  className="text-[1.25rem] font-extrabold tracking-wide text-foreground dark:text-white"
                 >
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p
-                  className="mt-1 text-[0.875rem] font-medium text-amber-100 leading-relaxed"
-                  style={{ color: "#FEF3C7" }}
-                >
+                <p className="mt-1 text-[0.875rem] font-medium leading-relaxed text-muted-foreground dark:text-amber-100/90">
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
               </div>
@@ -245,13 +230,13 @@ export function HomeScreen({
                       value={doneCount}
                       max={totalCount}
                       height={5}
-                      trackColor="rgba(255, 255, 255, 0.25)"
+                      trackColor="var(--muted)"
                       direction={direction}
                       aria-label={
                         isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
                       }
                     />
-                    <span className="mt-1.5 block text-[0.75rem] font-semibold text-white">
+                    <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
                       {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                       {formatNumerals(totalCount, language)} {t(language, "home.complete")}
                     </span>
@@ -269,7 +254,7 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 self-start rounded-lg px-3 py-2 text-[0.9375rem] font-extrabold text-[#FACC15] hover:text-amber-300 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 transition-colors"
+                  className="interactive-elem group inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 self-start rounded-xl px-4 py-2.5 text-[0.9375rem] font-extrabold text-amber-950 bg-amber-200/90 border border-amber-400 hover:bg-amber-300 dark:bg-amber-500/20 dark:text-[#FACC15] dark:border-amber-500/30 dark:hover:bg-amber-500/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-sm"
                 >
                   <span>{ctaLabel}</span>
                   <span
