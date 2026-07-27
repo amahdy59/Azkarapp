@@ -34,15 +34,17 @@ export function GoldenLeafMark({
     >
       <path
         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-        fill={filled ? "#F59E0B" : "none"}
-        fillOpacity={filled ? 0.95 : 0}
-        stroke={filled ? "#D97706" : "currentColor"}
+        fill="#F59E0B"
+        fillOpacity={filled ? 0.95 : 0.22}
+        stroke="#D97706"
+        strokeOpacity={filled ? 1 : 0.45}
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
       <path
         d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-        stroke={filled ? "#92400E" : "currentColor"}
+        stroke="#92400E"
+        strokeOpacity={filled ? 1 : 0.35}
         strokeWidth="1.8"
         strokeLinecap="round"
       />
@@ -72,15 +74,17 @@ export function GreenLeafMark({
     >
       <path
         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-        fill={filled ? "#10B981" : "none"}
-        fillOpacity={filled ? 0.95 : 0}
-        stroke={filled ? "#059669" : "currentColor"}
+        fill="#10B981"
+        fillOpacity={filled ? 0.95 : 0.22}
+        stroke="#059669"
+        strokeOpacity={filled ? 1 : 0.45}
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
       <path
         d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-        stroke={filled ? "#064E3B" : "currentColor"}
+        stroke="#064E3B"
+        strokeOpacity={filled ? 1 : 0.35}
         strokeWidth="1.8"
         strokeLinecap="round"
       />
@@ -128,14 +132,22 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
 }
 
 /** PalmTreeMark — detailed date palm tree SVG. */
-export function PalmTreeMark({ className = "", size = 32 }: { className?: string; size?: number }) {
+export function PalmTreeMark({
+  filled = true,
+  className = "",
+  size = 32,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+}) {
   return (
     <svg
       viewBox="0 0 64 64"
       width={size}
       height={size}
       fill="none"
-      className={className}
+      className={`${className} ${filled ? "opacity-100" : "opacity-45"}`}
       aria-hidden="true"
       focusable="false"
     >

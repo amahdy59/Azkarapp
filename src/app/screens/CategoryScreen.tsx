@@ -1,5 +1,5 @@
 import React from "react";
-import { Check, ChevronNext, RotateCcw } from "../components/icons";
+import { Check, RotateCcw } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -79,21 +79,12 @@ export function CategoryScreen({
                 onClick={() => onZikr(Math.max(0, resumeIdx))}
                 className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
-                {isArabic ? (
-                  <>
-                    <span className="leading-none">
-                      {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
-                    </span>
-                    <ChevronNext size={18} className="shrink-0 rtl:rotate-180" />
-                  </>
-                ) : (
-                  <>
-                    <ChevronNext size={18} className="shrink-0" />
-                    <span className="leading-none">
-                      {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
-                    </span>
-                  </>
-                )}
+                <span className="leading-none">
+                  {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                </span>
+                <span className="text-[1.125rem] leading-none" aria-hidden="true">
+                  {direction === "rtl" ? "←" : "→"}
+                </span>
               </button>
               {done > 0 && (
                 <button
