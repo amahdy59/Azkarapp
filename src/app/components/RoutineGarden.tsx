@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { CATEGORIES } from "../content/categories";
-import { formatHijriDate, formatNumerals } from "../formatting";
+import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
-import type { AppLanguage, CategoryId } from "../types";
+import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -88,7 +88,6 @@ export function GreenLeafMark({
   );
 }
 
-/** Standard Leaf Mark — aliases to Golden/Green depending on core status. */
 export function LeafMark({
   filled = true,
   className = "",
@@ -101,12 +100,10 @@ export function LeafMark({
   return <GoldenLeafMark filled={filled} className={className} size={size} />;
 }
 
-/** Pale Leaf Mark — kept for subtle secondary indicators. */
 export function PaleLeafMark({ className = "", size = 20 }: { className?: string; size?: number }) {
   return <GreenLeafMark filled className={className} size={size} />;
 }
 
-/** Bud mark — used for pending core group slots. */
 export function BudMark({ className = "", size = 14 }: { className?: string; size?: number }) {
   return (
     <svg
@@ -130,7 +127,7 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
   );
 }
 
-/** PalmTreeMark — refined date palm tree SVG. */
+/** PalmTreeMark — detailed date palm tree SVG. */
 export function PalmTreeMark({ className = "", size = 32 }: { className?: string; size?: number }) {
   return (
     <svg
@@ -154,7 +151,7 @@ export function PalmTreeMark({ className = "", size = 32 }: { className?: string
       <circle cx="36" cy="29" r="2.2" fill="#F59E0B" />
       <circle cx="37.5" cy="31.2" r="1.8" fill="#D97706" />
 
-      {/* Frond canopy */}
+      {/* Canopy */}
       <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" fill="#10B981" />
       <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" fill="#059669" />
       <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" fill="#10B981" />
@@ -181,7 +178,7 @@ export function PalmTreeReward({ summary, language }: { summary: GardenSummary; 
 
   return (
     <div
-      className="flex items-center gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-3 py-1.5 dark:bg-amber-500/10"
+      className="flex items-center gap-3 rounded-full border border-amber-500/30 bg-amber-500/10 px-4 py-1.5 shadow-sm dark:bg-amber-500/15"
       role="img"
       aria-label={
         language === "ar"
@@ -191,21 +188,21 @@ export function PalmTreeReward({ summary, language }: { summary: GardenSummary; 
     >
       <div className="flex items-center gap-1">
         <PalmTreeMark size={22} />
-        <span className="text-[0.875rem] font-extrabold text-amber-500">
+        <span className="text-[0.9375rem] font-extrabold text-amber-500">
           {formatNumerals(summary.lifetimePalms, language)}
         </span>
       </div>
-      <span className="h-3 w-px bg-amber-500/30" />
+      <span className="h-3.5 w-px bg-amber-500/30" />
       <div className="flex items-center gap-1">
-        <GoldenLeafMark size={16} filled />
-        <span className="text-[0.875rem] font-bold text-amber-600 dark:text-amber-400">
+        <GoldenLeafMark size={18} filled />
+        <span className="text-[0.9375rem] font-bold text-amber-600 dark:text-amber-400">
           {formatNumerals(goldenCount, language)}
         </span>
       </div>
-      <span className="h-3 w-px bg-amber-500/30" />
+      <span className="h-3.5 w-px bg-amber-500/30" />
       <div className="flex items-center gap-1">
-        <GreenLeafMark size={16} filled />
-        <span className="text-[0.875rem] font-bold text-emerald-600 dark:text-emerald-400">
+        <GreenLeafMark size={18} filled />
+        <span className="text-[0.9375rem] font-bold text-emerald-600 dark:text-emerald-400">
           {formatNumerals(greenCount, language)}
         </span>
       </div>
@@ -213,20 +210,118 @@ export function PalmTreeReward({ summary, language }: { summary: GardenSummary; 
   );
 }
 
+// ─── Date Label Helper ───────────────────────────────────────────────────────
+
+function getHijriDetails(date: Date, language: AppLanguage) {
+  try {
+    const locale = language === "ar" ? "ar-SA-u-ca-islamic-umalqura" : "en-US-u-ca-islamic-umalqura";
+    const formatter = new Intl.DateTimeFormat(locale, {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    });
+    const parts = formatter.formatToParts(date);
+    const weekday = parts.find((p) => p.type === "weekday")?.value ?? "";
+    const day = Number(parts.find((p) => p.type === "day")?.value ?? "1");
+    const month = parts.find((p) => p.type === "month")?.value ?? "";
+    const year = parts.find((p) => p.type === "year")?.value ?? "";
+    return { weekday, day, month, year };
+  } catch {
+    return { weekday: "", day: date.getDate(), month: "", year: "" };
+  }
+}
+
+const ARABIC_WEEK_ORDINALS = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس"];
+
+export function getGardenDateLabel(
+  displayDate: Date,
+  tab: "day" | "week" | "month" | "year",
+  offset: number,
+  language: AppLanguage,
+): string {
+  const isArabic = language === "ar";
+  const { weekday, day, month, year } = getHijriDetails(displayDate, language);
+
+  if (tab === "day") {
+    if (offset === 0) {
+      return isArabic
+        ? `اليوم ${weekday} ${formatNumerals(day, language)} ${month} ${year} هـ`
+        : `Today, ${weekday} ${day} ${month} ${year} AH`;
+    }
+    return isArabic
+      ? `${weekday} ${formatNumerals(day, language)} ${month} ${year} هـ`
+      : `${weekday}, ${day} ${month} ${year} AH`;
+  }
+
+  if (tab === "week") {
+    const weekIndex = Math.min(4, Math.max(0, Math.floor((day - 1) / 7)));
+    const startDay = weekIndex * 7 + 1;
+    const endDay = Math.min((weekIndex + 1) * 7, 30);
+    const weekOrdinal = isArabic ? (ARABIC_WEEK_ORDINALS[weekIndex] ?? "الأول") : `Week ${weekIndex + 1}`;
+
+    if (isArabic) {
+      return `الأسبوع ${weekOrdinal} (${formatNumerals(startDay, language)} - ${formatNumerals(endDay, language)} ${month} ${year} هـ)`;
+    }
+    return `${weekOrdinal} (${startDay} - ${endDay} ${month} ${year} AH)`;
+  }
+
+  if (tab === "month") {
+    return isArabic ? `شهر ${month} ${year} هـ` : `Month of ${month} ${year} AH`;
+  }
+
+  return isArabic ? `عام ${year} هـ` : `Year ${year} AH`;
+}
+
 // ─── TodayRoutineGarden (Garden Screen View) ───────────────────────────────────
 
-export function TodayRoutineGarden({ summary, language }: { summary: GardenSummary; language: AppLanguage }) {
+export function TodayRoutineGarden({
+  summary: initialSummary,
+  language,
+}: {
+  summary: GardenSummary;
+  language: AppLanguage;
+}) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
-  const [dayOffset, setDayOffset] = useState(0);
+  const [offset, setOffset] = useState(0);
 
   const isArabic = language === "ar";
+
+  // Calculate target date based on offset and tab
+  const displayDate = new Date();
+  if (offset !== 0) {
+    if (activeTab === "day") {
+      displayDate.setDate(displayDate.getDate() + offset);
+    } else if (activeTab === "week") {
+      displayDate.setDate(displayDate.getDate() + offset * 7);
+    } else if (activeTab === "month") {
+      displayDate.setMonth(displayDate.getMonth() + offset);
+    } else if (activeTab === "year") {
+      displayDate.setFullYear(displayDate.getFullYear() + offset);
+    }
+  }
+
+  // Calculate garden summary for display date
+  const summary = getGardenSummary(
+    initialSummary.today.completedCategories.map((c) => ({
+      dayKey: initialSummary.today.dayKey,
+      category: c,
+      timeZone: "local",
+    })) as DailyCollectionCompletion[],
+    displayDate,
+  );
+
   const { today } = summary;
   const goldenCount = today.goldenLeafCount ?? today.leafCount;
   const greenCount = today.greenLeafCount ?? today.extraLeafCount;
   const totalPalms = summary.lifetimePalms;
 
-  const displayDate = new Date();
-  displayDate.setDate(displayDate.getDate() + dayOffset);
+  const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language);
+
+  const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
+    setActiveTab(tab);
+    setOffset(0);
+  };
 
   return (
     <section className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
@@ -255,7 +350,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
             <button
               key={tab}
               type="button"
-              onClick={() => setActiveTab(tab)}
+              onClick={() => handleTabChange(tab)}
               aria-current={isActive ? "page" : undefined}
               className={`flex-1 rounded-xl py-2 text-[0.875rem] font-extrabold transition-all active:scale-[0.98] ${
                 isActive
@@ -270,47 +365,34 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
       </nav>
 
       {/* Date Navigation Subtitle Bar */}
-      <div className="mb-5 flex items-center justify-between rounded-xl bg-background/80 px-3 py-2 border border-border/60">
+      <div className="mb-5 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2.5 shadow-sm">
+        {/* Previous Period Button */}
         <button
           type="button"
-          onClick={() =>
-            setDayOffset(
-              (prev) => prev - (activeTab === "week" ? 7 : activeTab === "month" ? 30 : activeTab === "year" ? 365 : 1),
-            )
-          }
-          aria-label={isArabic ? "السابق" : "Previous"}
-          className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted text-foreground transition-colors"
+          onClick={() => setOffset((prev) => prev - 1)}
+          aria-label={isArabic ? "الفترة السابقة" : "Previous period"}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95"
         >
-          {isArabic ? "›" : "‹"}
+          <span className="text-[1.125rem] font-extrabold">{isArabic ? "›" : "‹"}</span>
         </button>
-        <span className="text-[0.875rem] font-bold text-foreground" data-testid="garden-view-date">
-          {activeTab === "day"
-            ? `${isArabic ? "اليوم" : "Today"} ${formatHijriDate(displayDate, language)}`
-            : activeTab === "week"
-              ? isArabic
-                ? "الأسبوع الحالي"
-                : "Current Week"
-              : activeTab === "month"
-                ? isArabic
-                  ? "الشهر الحالي"
-                  : "Current Month"
-                : `${formatNumerals(1447, language)} ${isArabic ? "هـ" : "AH"}`}
+
+        {/* Date Label */}
+        <span
+          className="px-2 text-center text-[0.875rem] font-bold tracking-wide text-foreground"
+          data-testid="garden-view-date"
+        >
+          {dateLabel}
         </span>
+
+        {/* Next Period Button */}
         <button
           type="button"
-          onClick={() =>
-            setDayOffset((prev) =>
-              Math.min(
-                0,
-                prev + (activeTab === "week" ? 7 : activeTab === "month" ? 30 : activeTab === "year" ? 365 : 1),
-              ),
-            )
-          }
-          disabled={dayOffset >= 0}
-          aria-label={isArabic ? "التالي" : "Next"}
-          className="flex h-9 w-9 items-center justify-center rounded-lg hover:bg-muted text-foreground transition-colors disabled:opacity-30"
+          onClick={() => setOffset((prev) => Math.min(0, prev + 1))}
+          disabled={offset >= 0}
+          aria-label={isArabic ? "الفترة التالية" : "Next period"}
+          className="flex h-9 w-9 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-30 active:scale-95"
         >
-          {isArabic ? "‹" : "›"}
+          <span className="text-[1.125rem] font-extrabold">{isArabic ? "‹" : "›"}</span>
         </button>
       </div>
 
@@ -381,7 +463,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
       {activeTab === "month" && (
         <div className="rounded-2xl border border-border/80 bg-background/60 p-4">
           <h3 className="mb-3 text-[0.9375rem] font-bold text-foreground">
-            {isArabic ? "إنجاز الشهر الحالي" : "Current Month Achievement"}
+            {isArabic ? "إنجاز الشهر" : "Month Achievement"}
           </h3>
           <div className="grid grid-cols-7 gap-1.5 text-center">
             {summary.days.map((day) => (
@@ -409,7 +491,7 @@ export function TodayRoutineGarden({ summary, language }: { summary: GardenSumma
               {isArabic ? "خريطة واحة العام" : "Year Oasis Heatmap"}
             </h3>
             <span className="text-[0.8125rem] font-bold text-amber-500">
-              {formatNumerals(247, language)} {isArabic ? "نخلة كاملة" : "Full Palms"}
+              {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة مكتملة" : "Full Palms"}
             </span>
           </div>
 

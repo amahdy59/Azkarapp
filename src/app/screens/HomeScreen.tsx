@@ -1,11 +1,11 @@
 import { ProgressBar } from "../components/ProgressBar";
-import { TodayRoutineGarden, GoldenLeafMark, PalmTreeMark, PalmTreeReward } from "../components/RoutineGarden";
+import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
+import { getGardenSummary } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
@@ -147,44 +147,10 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Header Bar — unified palm-tree reward ecosystem */}
-      <header className="flex h-14 shrink-0 items-center justify-between px-2">
-        {/* Left: Core leaf progress label */}
-        <div
-          className="flex items-center gap-1.5"
-          aria-label={
-            isArabic
-              ? `${gardenSummary.today.goldenLeafCount} من ${MAIN_CATEGORY_IDS.length} أوراق ذهبية`
-              : `${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length} golden leaves`
-          }
-        >
-          <span className="text-[0.9375rem] font-extrabold text-foreground">
-            {formatNumerals(gardenSummary.today.goldenLeafCount, language)}
-          </span>
-          <span className="text-[0.75rem] font-medium text-muted-foreground">/</span>
-          <span className="text-[0.9375rem] font-extrabold text-foreground">
-            {formatNumerals(MAIN_CATEGORY_IDS.length, language)}
-          </span>
-          <GoldenLeafMark size={18} filled={gardenSummary.today.goldenLeafCount > 0} />
-        </div>
-
+      {/* Top Header Bar — clean centered single reward pill */}
+      <header className="flex h-14 shrink-0 items-center justify-center px-2">
         {/* Center: Palm Tree Reward Widget */}
         <PalmTreeReward summary={gardenSummary} language={language} />
-
-        {/* Right: Lifetime palms earned */}
-        <div
-          className="flex items-center gap-1.5"
-          aria-label={
-            isArabic
-              ? `النخيل المكتسبة: ${gardenSummary.lifetimePalms}`
-              : `Palms earned: ${gardenSummary.lifetimePalms}`
-          }
-        >
-          <PalmTreeMark size={22} />
-          <span className="text-[0.9375rem] font-extrabold text-amber-500">
-            {formatNumerals(gardenSummary.lifetimePalms, language)}
-          </span>
-        </div>
       </header>
 
       {/* Hijri Date Subtitle */}
