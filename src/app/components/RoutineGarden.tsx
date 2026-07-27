@@ -115,43 +115,43 @@ export function PalmTreeMark({ className = "", size = 32 }: { className?: string
       focusable="false"
     >
       {/* Ground shadow — subtle ellipse anchoring the tree */}
-      <ellipse cx="29" cy="62" rx="11" ry="2.5" fill="currentColor" fillOpacity="0.1" />
+      <ellipse cx="32" cy="62" rx="10" ry="2.2" fill="currentColor" fillOpacity="0.12" />
 
-      {/* Trunk — organic gentle curve with slight rightward lean, tapers toward crown */}
+      {/* Trunk — structured notched palm bark nodes */}
+      <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" fill="currentColor" fillOpacity="0.85" />
+      <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" fill="currentColor" fillOpacity="0.9" />
       <path
-        d="M27 62 C26 54 27 44 28 34 C29 26 30 22 32 16"
-        stroke="currentColor"
-        strokeWidth="5"
-        strokeLinecap="round"
-        fill="none"
+        d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z"
+        fill="currentColor"
+        fillOpacity="0.95"
       />
+      <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" fill="currentColor" />
 
-      {/* Bark ring marks — subtle horizontal tick marks suggesting palm bark texture */}
-      <path d="M27 52 Q28 51 29 52" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.28" />
-      <path d="M27 42 Q28 41 30 42" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.28" />
-      <path d="M28 32 Q29 31 31 32" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.28" />
-      <path d="M29 24 Q30 23 32 24" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.28" />
+      {/* Date clusters — natural date bunches hanging under the crown */}
+      <circle cx="28" cy="29" r="2.2" fill="currentColor" fillOpacity="0.5" />
+      <circle cx="26.5" cy="31.2" r="1.8" fill="currentColor" fillOpacity="0.4" />
+      <circle cx="36" cy="29" r="2.2" fill="currentColor" fillOpacity="0.5" />
+      <circle cx="37.5" cy="31.2" r="1.8" fill="currentColor" fillOpacity="0.4" />
 
-      {/* Date clusters — three grouped circles at the crown base, referencing the Islamic date palm */}
-      <circle cx="29" cy="19" r="3" fill="currentColor" fillOpacity="0.45" />
-      <circle cx="33" cy="20" r="2.5" fill="currentColor" fillOpacity="0.38" />
-      <circle cx="31" cy="22" r="2.2" fill="currentColor" fillOpacity="0.32" />
+      {/* Crown canopy — 9 majestic radiating frond blades */}
+      {/* 1. Top vertical spear frond */}
+      <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" fill="currentColor" />
 
-      {/* Crown fronds — 7 arching paths radiating from the crown point */}
-      {/* Frond 1: Top center, slight rightward lean */}
-      <path d="M32 16 C33 10 34 6 36 2" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-      {/* Frond 2: Upper-left */}
-      <path d="M31 15 C24 9 16 7 8 8" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-      {/* Frond 3: Upper-right */}
-      <path d="M33 15 C40 9 48 7 56 8" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" />
-      {/* Frond 4: Left drooping — arches outward and curves down */}
-      <path d="M30 18 C22 17 14 19 6 25" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      {/* Frond 5: Right drooping */}
-      <path d="M34 18 C42 17 50 19 58 25" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
-      {/* Frond 6: Lower-left — hanging frond */}
-      <path d="M29 21 C21 22 13 27 7 35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-      {/* Frond 7: Lower-right */}
-      <path d="M35 21 C43 22 51 27 57 35" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      {/* 2 & 3. Upper fronds (left & right) */}
+      <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" fill="currentColor" />
+      <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" fill="currentColor" />
+
+      {/* 4 & 5. Mid-upper fronds (left & right) */}
+      <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" fill="currentColor" />
+      <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" fill="currentColor" />
+
+      {/* 6 & 7. Lower-mid fronds (left & right) */}
+      <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" fill="currentColor" />
+      <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" fill="currentColor" />
+
+      {/* 8 & 9. Drooping fronds (hanging downward left & right) */}
+      <path d="M32 26 C22 24.5 13.5 30 6.5 40 C14 36.5 23 31.5 32 26 Z" fill="currentColor" />
+      <path d="M32 26 C42 24.5 50.5 30 57.5 40 C50 36.5 41 31.5 32 26 Z" fill="currentColor" />
     </svg>
   );
 }

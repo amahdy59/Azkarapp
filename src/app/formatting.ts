@@ -37,7 +37,9 @@ export function formatHijriDate(date: Date = new Date(), language: AppLanguage =
       year: "numeric",
     });
     const formatted = formatter.format(date);
-    return language === "ar" ? `${formatted} هـ` : `${formatted} AH`;
+    // Strip any existing era indicators to prevent duplicate suffixes ("AH AH" / "هـ هـ")
+    const cleaned = formatted.replace(/\s*(AH|هـ)+/gi, "").trim();
+    return language === "ar" ? `${cleaned} هـ` : `${cleaned} AH`;
   } catch {
     return "";
   }
