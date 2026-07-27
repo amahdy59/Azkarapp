@@ -1,6 +1,7 @@
+import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
-import { getCategoryTotal } from "../content/azkar";
+import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatHijriDateWithTime, formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -97,50 +98,58 @@ export function HomeScreen({
   dailyCompletions,
   quietProgressEnabled,
   progressDayStartHour,
-  onResume,
-  onRepeat,
   language,
   direction,
+  onResume,
+  onRepeat,
+  onOpenFridayMode,
+  onOpenShareModal,
 }: {
   completed: Record<CategoryId, Set<number>>;
   dailyCompletions: DailyCollectionCompletion[];
-  quietProgressEnabled: boolean;
-  progressDayStartHour: number;
-  onCategory: (category: CategoryId) => void;
-  onResume: (category: CategoryId, index: number) => void;
-  onRepeat: (category: CategoryId) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  quietProgressEnabled: boolean;
+  progressDayStartHour: number;
+  onResume: (category: CategoryId, index: number) => void;
+  onRepeat: (category: CategoryId) => void;
+  onOpenFridayMode?: () => void;
+  onOpenShareModal?: () => void;
 }) {
   const isArabic = language === "ar";
-  const now = new Date();
-  const gardenSummary = getGardenSummary(dailyCompletions, now, progressDayStartHour);
+  const [now, setNow] = useState(() => new Date());
 
-  // Time-of-day Zikr Reminder
-  const reminderInfo = getTimeOfDayZikr(now);
-  const reminderCategory = CATEGORIES.find((category) => category.id === reminderInfo.categoryId)!;
-  const doneCount = completed[reminderInfo.categoryId]?.size ?? 0;
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const gardenSummary = useMemo(
+    () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
+    [dailyCompletions, now, progressDayStartHour],
+  );
+
+  // Determine which category to feature based on time of day
+  const reminderInfo = useMemo(() => getTimeOfDayZikr(now), [now]);
+  const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
+  const categoryAzkar = getAzkarByCategory(reminderInfo.categoryId);
+  const doneSet = completed[reminderInfo.categoryId] ?? new Set<number>();
+
   const totalCount = getCategoryTotal(reminderInfo.categoryId);
-  const nextIdx = getNextIndex(completed[reminderInfo.categoryId] ?? new Set(), totalCount);
+  const doneCount = doneSet.size;
+  const nextIdx = Array.from({ length: categoryAzkar.length }, (_, i) => i).find((i) => !doneSet.has(i)) ?? 0;
+  const isComplete = doneCount >= totalCount && totalCount > 0;
 
-  let actionKind: HomeActionKind = "start";
-  if (doneCount === totalCount) {
-    actionKind = "again";
-  } else if (doneCount > 0) {
-    actionKind = "resume";
-  }
+  const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
-  const ctaLabel = isArabic
-    ? actionKind === "again"
-      ? `اقرأ أذكار ${reminderCategory.nameArabic.replace("أذكار ", "")} مرة أخرى`
-      : actionKind === "resume"
-        ? `تابع ${reminderCategory.nameArabic}`
-        : `ابدأ ${reminderCategory.nameArabic}`
-    : actionKind === "again"
-      ? `Read ${reminderCategory.name} Again`
-      : actionKind === "resume"
-        ? `Resume ${reminderCategory.name}`
-        : `Start ${reminderCategory.name}`;
+  const ctaLabel =
+    actionKind === "start"
+      ? t(language, "home.startGroup", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
+      : actionKind === "again"
+        ? t(language, "home.readGroupAgain", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
+        : t(language, "home.continueGroup", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name });
+
+  const isFriday = now.getDay() === 5;
 
   return (
     <ScreenContainer dir={direction} className="px-page">
@@ -160,7 +169,35 @@ export function HomeScreen({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pt-1">
+      <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
+        {/* Friday Special Routine Banner */}
+        {(isFriday || onOpenFridayMode) && (
+          <section className="mb-4">
+            <button
+              type="button"
+              onClick={onOpenFridayMode}
+              className="group flex w-full items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-start shadow-md hover:bg-amber-500/15 active:scale-[0.98] transition-all dark:bg-amber-500/15"
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-black text-[1.125rem] shadow-sm">
+                  ✨
+                </span>
+                <div>
+                  <h3 className="text-[0.9375rem] font-black text-foreground">
+                    {isArabic ? "فضائل يوم الجمعة" : "Friday Special Virtues"}
+                  </h3>
+                  <p className="text-[0.75rem] font-semibold text-muted-foreground">
+                    {isArabic ? "الصلاة على النبي ﷺ • سورة الكهف" : "Salawat counter & Surah Al-Kahf"}
+                  </p>
+                </div>
+              </div>
+              <span className="text-[1.125rem] font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+                {direction === "rtl" ? "←" : "→"}
+              </span>
+            </button>
+          </section>
+        )}
+
         {/* Clean Hero Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-5">
           <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-4 text-card-foreground shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]">
@@ -197,7 +234,7 @@ export function HomeScreen({
                 )}
               </div>
 
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-4 flex items-center justify-between gap-3">
                 <button
                   type="button"
                   data-testid="home-primary-cta"
@@ -221,6 +258,18 @@ export function HomeScreen({
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
+
+                {onOpenShareModal && (
+                  <button
+                    type="button"
+                    onClick={onOpenShareModal}
+                    className="flex min-h-[48px] items-center gap-1.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-3.5 text-[0.8125rem] font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all"
+                    aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
+                  >
+                    <span>🌴</span>
+                    <span>{isArabic ? "مشاركة" : "Share"}</span>
+                  </button>
+                )}
               </div>
             </div>
           </div>

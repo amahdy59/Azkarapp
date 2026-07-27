@@ -38,6 +38,7 @@ type View =
   | "home"
   | "library"
   | "progress"
+  | "friday"
   | "category"
   | "reader"
   | "completion"
@@ -72,7 +73,12 @@ import { TodayRoutineGarden } from "./components/RoutineGarden";
 import { getGardenSummary } from "./progress";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
+import { FloatingAudioPlayer } from "./components/FloatingAudioPlayer";
+import { ShareableCardModal } from "./components/ShareableCardModal";
+import { useAudioPlayer } from "./hooks/useAudioPlayer";
+import { FridayModeScreen } from "./screens/FridayModeScreen";
 import { t } from "./i18n";
+import { formatHijriDateWithTime } from "./formatting";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useForegroundReminders } from "./hooks/useForegroundReminders";
 import {
@@ -205,10 +211,13 @@ export default function App() {
       return false;
     }
   });
-  const [, setHistory] = useState<View[]>([]);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
+
+  const activeAzkarList = useMemo(() => getAzkarByCategory(activeCat), [activeCat]);
+  const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
   const [sessionStart, setSessionStart] = useState(Date.now());
@@ -540,7 +549,6 @@ export default function App() {
 
     setActiveCat(category);
     setActiveTab("azkar");
-    setHistory(["home"]);
     setView("category");
     window.history.replaceState(null, "", window.location.pathname);
   }, [view]);
@@ -641,21 +649,18 @@ export default function App() {
       setIsRepeatSession(false);
       setRepeatCompleted(new Set());
       setView("completion");
-      setHistory([]);
     }
   };
 
   const goHome = () => {
     setView("home");
     setActiveTab("home");
-    setHistory([]);
   };
 
   const handleOpenAccountAuth = () => {
     setAuthError("");
     setView("login");
     setActiveTab("settings");
-    setHistory([]);
   };
 
   const handleSendOtp = async (phone: string) => {
@@ -727,7 +732,6 @@ export default function App() {
       markOnboardingComplete();
       setView("home");
       setActiveTab("home");
-      setHistory([]);
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
     } finally {
@@ -760,7 +764,6 @@ export default function App() {
       applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
       setView("login");
       setActiveTab("home");
-      setHistory([]);
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
     }
@@ -877,7 +880,6 @@ export default function App() {
                   setIsGuest(true);
                   setView("home");
                   setActiveTab("home");
-                  setHistory([]);
                 }}
               />
             )}
@@ -896,7 +898,6 @@ export default function App() {
                   markOnboardingComplete();
                   setView("home");
                   setActiveTab("home");
-                  setHistory([]);
                 }}
               />
             )}
@@ -927,9 +928,10 @@ export default function App() {
                 dailyCompletions={dailyCompletions}
                 quietProgressEnabled={quietProgressEnabled}
                 progressDayStartHour={progressDayStartHour}
-                onCategory={openCategory}
-                onResume={openReader}
+                onResume={(catId, i) => openReader(catId, i)}
                 onRepeat={repeatCategory}
+                onOpenFridayMode={() => push("friday")}
+                onOpenShareModal={() => setShowShareModal(true)}
                 language={selectedLang}
                 direction={layoutDirection}
               />
@@ -955,6 +957,7 @@ export default function App() {
                 />
               </ScreenContainer>
             )}
+            {view === "friday" && <FridayModeScreen isArabic={isArabic} direction={layoutDirection} onBack={pop} />}
             {view === "category" && (
               <CategoryScreen
                 catId={activeCat}
@@ -966,6 +969,11 @@ export default function App() {
                 onReset={() => handleResetCategory(activeCat)}
                 onRepeat={() => repeatCategory(activeCat)}
                 onBack={pop}
+                onPlayAllAudio={() => {
+                  openReader(activeCat, 0);
+                  audioPlayer.toggleAutoPlayAll();
+                  audioPlayer.playTrackAtIndex(0);
+                }}
               />
             )}
             {view === "reader" && (
@@ -1071,6 +1079,44 @@ export default function App() {
             )}
           </Suspense>
         </main>
+
+        {/* Share Achievement Modal */}
+        {showShareModal && (
+          <ShareableCardModal
+            palms={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).lifetimePalms}
+            golden={
+              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.goldenLeafCount ??
+              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.leafCount
+            }
+            green={
+              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.greenLeafCount ??
+              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.extraLeafCount
+            }
+            dateStr={formatHijriDateWithTime(new Date(), selectedLang)}
+            language={selectedLang}
+            onClose={() => setShowShareModal(false)}
+          />
+        )}
+
+        {/* Floating Audio Player */}
+        {(audioPlayer.isPlaying || audioPlayer.isBuffering) && (
+          <FloatingAudioPlayer
+            title={audioPlayer.currentZikr?.arabicText ?? ""}
+            isPlaying={audioPlayer.isPlaying}
+            isBuffering={audioPlayer.isBuffering}
+            currentTime={audioPlayer.currentTime}
+            duration={audioPlayer.duration}
+            playbackRate={audioPlayer.playbackRate}
+            autoPlayAll={audioPlayer.autoPlayAll}
+            language={selectedLang}
+            onTogglePlayPause={audioPlayer.togglePlayPause}
+            onNext={audioPlayer.playNext}
+            onPrev={audioPlayer.playPrev}
+            onSetSpeed={audioPlayer.setPlaybackRate}
+            onToggleAutoPlayAll={audioPlayer.toggleAutoPlayAll}
+            onClose={audioPlayer.stop}
+          />
+        )}
 
         {(updateAvailable || (installPrompt && sessions.length > 0 && !installDismissed)) && (
           <div

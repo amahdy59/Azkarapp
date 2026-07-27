@@ -1,5 +1,6 @@
 import React from "react";
 import { Check, RotateCcw } from "../components/icons";
+import { Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -20,6 +21,7 @@ export function CategoryScreen({
   onReset,
   onRepeat,
   onBack,
+  onPlayAllAudio,
 }: {
   catId: CategoryId;
   completed: Set<number>;
@@ -30,6 +32,7 @@ export function CategoryScreen({
   onReset: () => void;
   onRepeat: () => void;
   onBack: () => void;
+  onPlayAllAudio?: () => void;
 }) {
   const azkar = getAzkarByCategory(catId);
   const cat = CATEGORIES.find((c) => c.id === catId)!;
@@ -99,6 +102,18 @@ export function CategoryScreen({
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
+                {onPlayAllAudio && (
+                  <button
+                    type="button"
+                    onClick={onPlayAllAudio}
+                    className="interactive-elem flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/40 bg-amber-500/10 px-3.5 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500"
+                    aria-label={isArabic ? "تشغيل الصوتي للكل" : "Play All Audio"}
+                    title={isArabic ? "تشغيل الصوتي للكل" : "Play All Audio"}
+                  >
+                    <Volume2 size={18} />
+                    <span className="text-[0.875rem] font-bold">{isArabic ? "تشغيل الكل" : "Play All"}</span>
+                  </button>
+                )}
                 {done > 0 && (
                   <button
                     type="button"
