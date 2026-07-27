@@ -37,6 +37,8 @@ export interface GardenDay {
   dayKey: string;
   date: Date;
   completedCategories: CategoryId[];
+  goldenLeafCount: number;
+  greenLeafCount: number;
   leafCount: number;
   /** Number of extra (non-core) categories completed this day. */
   extraLeafCount: number;
@@ -56,6 +58,8 @@ export interface GardenSummary {
   days: GardenDay[];
   activeDaysLast7: number;
   palmDaysLast7: number;
+  lifetimeGoldenLeaves: number;
+  lifetimeGreenLeaves: number;
   lifetimeLeaves: number;
   lifetimePalms: number;
   currentPalmRhythm: number;
@@ -230,15 +234,22 @@ function categoryMap(records: DailyCollectionCompletion[]) {
 
 function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<CategoryId>>): GardenDay {
   const categories = byDay.get(dayKey) ?? new Set<CategoryId>();
-  const completedCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
-  const extraLeafCount = CATEGORY_IDS.filter((id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id)).length;
+  const completedCategories = CATEGORY_IDS.filter((category) => categories.has(category));
+  const goldenCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
+  const greenCategories = CATEGORY_IDS.filter((id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id));
+
+  const goldenLeafCount = goldenCategories.length;
+  const greenLeafCount = greenCategories.length;
+
   return {
     dayKey,
     date: dateFromProgressDayKey(dayKey),
     completedCategories,
-    leafCount: completedCategories.length,
-    extraLeafCount,
-    isPalm: completedCategories.length === MAIN_CATEGORY_IDS.length,
+    goldenLeafCount,
+    greenLeafCount,
+    leafCount: goldenLeafCount,
+    extraLeafCount: greenLeafCount,
+    isPalm: goldenLeafCount === MAIN_CATEGORY_IDS.length,
     isToday: dayKey === todayKey,
   };
 }
@@ -294,7 +305,10 @@ export function getGardenSummary(
   const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay);
   const yesterday = days.at(-2);
   const activeKeys = [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort();
-  const lifetimeLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+
+  const lifetimeGoldenLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+  const lifetimeGreenLeaves = normalized.filter((record) => !MAIN_CATEGORY_IDS.includes(record.category)).length;
+  const lifetimeLeaves = normalized.length;
   const lifetimePalms = [...byDay.values()].filter((categories) =>
     MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
   ).length;
@@ -315,7 +329,7 @@ export function getGardenSummary(
   }
 
   const milestones: GardenMilestone[] = [
-    { id: "first_leaf", current: lifetimeLeaves, target: 1, complete: lifetimeLeaves >= 1 },
+    { id: "first_leaf", current: lifetimeGoldenLeaves, target: 1, complete: lifetimeGoldenLeaves >= 1 },
     { id: "first_palm", current: lifetimePalms, target: 1, complete: lifetimePalms >= 1 },
     { id: "seven_palms", current: lifetimePalms, target: 7, complete: lifetimePalms >= 7 },
     { id: "thirty_palms", current: lifetimePalms, target: 30, complete: lifetimePalms >= 30 },
@@ -326,6 +340,8 @@ export function getGardenSummary(
     days,
     activeDaysLast7: days.filter((day) => day.leafCount > 0).length,
     palmDaysLast7: days.filter((day) => day.isPalm).length,
+    lifetimeGoldenLeaves,
+    lifetimeGreenLeaves,
     lifetimeLeaves,
     lifetimePalms,
     currentPalmRhythm,

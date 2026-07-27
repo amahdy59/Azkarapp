@@ -1,9 +1,5 @@
-import { Fragment } from "react";
-import { ChevronNext } from "../components/icons";
-import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
-import { TodayRoutineGarden, LeafMark, PalmTreeMark, PalmTreeReward } from "../components/RoutineGarden";
-import { MosqueCardBackground } from "../components/MosqueCardBackground";
+import { TodayRoutineGarden, GoldenLeafMark, PalmTreeMark, PalmTreeReward } from "../components/RoutineGarden";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatHijriDate, formatNumerals } from "../formatting";
@@ -101,7 +97,6 @@ export function HomeScreen({
   dailyCompletions,
   quietProgressEnabled,
   progressDayStartHour,
-  onCategory,
   onResume,
   onRepeat,
   language,
@@ -156,37 +151,37 @@ export function HomeScreen({
       <header className="flex h-14 shrink-0 items-center justify-between px-2">
         {/* Left: Core leaf progress label */}
         <div
-          className="flex items-center gap-1"
+          className="flex items-center gap-1.5"
           aria-label={
             isArabic
-              ? `${gardenSummary.today.leafCount} من ${MAIN_CATEGORY_IDS.length} مجموعات أساسية`
-              : `${gardenSummary.today.leafCount} of ${MAIN_CATEGORY_IDS.length} core groups`
+              ? `${gardenSummary.today.goldenLeafCount} من ${MAIN_CATEGORY_IDS.length} أوراق ذهبية`
+              : `${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length} golden leaves`
           }
         >
           <span className="text-[0.9375rem] font-extrabold text-foreground">
-            {formatNumerals(gardenSummary.today.leafCount, language)}
+            {formatNumerals(gardenSummary.today.goldenLeafCount, language)}
           </span>
-          <span className="text-[0.75rem] font-medium text-muted-foreground">{isArabic ? "/" : "/"}</span>
+          <span className="text-[0.75rem] font-medium text-muted-foreground">/</span>
           <span className="text-[0.9375rem] font-extrabold text-foreground">
             {formatNumerals(MAIN_CATEGORY_IDS.length, language)}
           </span>
-          <LeafMark size={16} filled={gardenSummary.today.leafCount > 0} className="text-emerald-500" />
+          <GoldenLeafMark size={18} filled={gardenSummary.today.goldenLeafCount > 0} />
         </div>
 
-        {/* Center: Palm Tree Reward — visual gamification hub */}
+        {/* Center: Palm Tree Reward Widget */}
         <PalmTreeReward summary={gardenSummary} language={language} />
 
         {/* Right: Lifetime palms earned */}
         <div
-          className="flex items-center gap-1"
+          className="flex items-center gap-1.5"
           aria-label={
             isArabic
               ? `النخيل المكتسبة: ${gardenSummary.lifetimePalms}`
               : `Palms earned: ${gardenSummary.lifetimePalms}`
           }
         >
-          <PalmTreeMark size={22} className="text-emerald-500" />
-          <span className="text-[0.9375rem] font-extrabold text-foreground">
+          <PalmTreeMark size={22} />
+          <span className="text-[0.9375rem] font-extrabold text-amber-500">
             {formatNumerals(gardenSummary.lifetimePalms, language)}
           </span>
         </div>
@@ -200,43 +195,37 @@ export function HomeScreen({
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1">
-        {/* Current Zikr Reminder Card */}
+        {/* Clean Hero Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-6">
-          <div className="relative overflow-hidden rounded-2xl border border-border/80 bg-card text-card-foreground shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
-            {/* Mosque SVG Vector Background */}
-            <MosqueCardBackground category={reminderInfo.categoryId} />
-
-            {/* Subtle Gradient Overlay for AAA Text Legibility */}
-            <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-amber-500/5 via-transparent to-transparent dark:from-black/90 dark:via-black/50 dark:to-black/30" />
-
+          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-6 text-card-foreground shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]">
             {/* Card Content */}
-            <div className="relative z-10 flex min-h-[170px] flex-col justify-between p-5 text-start">
+            <div className="flex flex-col justify-between text-start">
               <div>
                 <h2
                   id="current-zikr-heading"
-                  className="text-[1.25rem] font-extrabold tracking-wide text-foreground dark:text-white"
+                  className="text-[1.375rem] font-black tracking-wide text-foreground dark:text-white"
                 >
                   {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
                 </h2>
-                <p className="mt-1 text-[0.875rem] font-medium leading-relaxed text-muted-foreground dark:text-amber-100/90">
+                <p className="mt-1.5 text-[0.875rem] font-medium leading-relaxed text-muted-foreground dark:text-amber-100/90">
                   {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
                 </p>
               </div>
 
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-5 flex flex-col gap-3">
                 {doneCount > 0 && (
                   <div>
                     <ProgressBar
                       value={doneCount}
                       max={totalCount}
-                      height={5}
+                      height={6}
                       trackColor="var(--muted)"
                       direction={direction}
                       aria-label={
                         isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
                       }
                     />
-                    <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
+                    <span className="mt-2 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
                       {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                       {formatNumerals(totalCount, language)} {t(language, "home.complete")}
                     </span>
@@ -254,7 +243,7 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 self-start rounded-xl px-4 py-2.5 text-[0.9375rem] font-extrabold text-amber-950 bg-amber-200/90 border border-amber-400 hover:bg-amber-300 dark:bg-amber-500/20 dark:text-[#FACC15] dark:border-amber-500/30 dark:hover:bg-amber-500/30 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-sm"
+                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 py-3 text-[0.9375rem] font-extrabold text-amber-950 bg-amber-400 hover:bg-amber-300 dark:bg-amber-500 dark:text-amber-950 dark:hover:bg-amber-400 active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
                 >
                   <span>{ctaLabel}</span>
                   <span
@@ -269,76 +258,8 @@ export function HomeScreen({
           </div>
         </section>
 
-        {/* Leaves & Progress Garden (tracked for 3 main azkar groups) */}
+        {/* Leaves & Progress Garden (Day, Week, Month, Year tabs) */}
         {quietProgressEnabled && <TodayRoutineGarden summary={gardenSummary} language={language} />}
-
-        {/* Collections List */}
-        <section aria-labelledby="collections-heading" className="mb-6">
-          <h2 id="collections-heading" className="mb-3 text-[0.9375rem] font-bold text-foreground">
-            {t(language, "home.collections")}
-          </h2>
-          <div className="space-y-3">
-            {CATEGORIES.map((category) => {
-              const done = completed[category.id]?.size ?? 0;
-              const totalCount = getCategoryTotal(category.id);
-
-              return (
-                <Fragment key={category.id}>
-                  <button
-                    type="button"
-                    onClick={() => onCategory(category.id)}
-                    dir={direction}
-                    data-testid={`category-card-${category.id}`}
-                    className="flex min-h-[96px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    aria-label={
-                      isArabic
-                        ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(totalCount, language)} مكتملة`
-                        : `${category.name}, ${done} of ${totalCount} complete`
-                    }
-                  >
-                    <span
-                      data-slot="category-icon"
-                      className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-full border border-border bg-background"
-                      aria-hidden="true"
-                    >
-                      <CatIcon type={category.icon} size={28} color="var(--primary)" />
-                    </span>
-
-                    <span data-slot="category-copy" className="flex min-w-0 flex-1 flex-col justify-center gap-3">
-                      <span className="flex items-center justify-between gap-2">
-                        <span className="text-[1.125rem] font-bold text-foreground">
-                          {isArabic ? category.nameArabic : category.name}
-                        </span>
-                        <span
-                          className="whitespace-nowrap text-[0.8125rem] font-medium text-muted-foreground"
-                          dir={isArabic ? "rtl" : "ltr"}
-                        >
-                          {formatNumerals(done, language)} {isArabic ? "من" : "of"}{" "}
-                          {formatNumerals(totalCount, language)}
-                        </span>
-                      </span>
-                      <ProgressBar
-                        value={done}
-                        max={totalCount}
-                        height={6}
-                        trackColor="color-mix(in srgb, var(--primary) 15%, transparent)"
-                        direction={direction}
-                        aria-label={isArabic ? `تقدم ${category.nameArabic}` : `${category.name} progress`}
-                      />
-                    </span>
-
-                    <ChevronNext
-                      size={20}
-                      aria-hidden="true"
-                      data-slot="category-chevron"
-                      className="shrink-0 text-muted-foreground"
-                    />
-                  </button>
-                </Fragment>
-              );
-            })}
-          </div>
-        </section>
       </div>
     </ScreenContainer>
   );
