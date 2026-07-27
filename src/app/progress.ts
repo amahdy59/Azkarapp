@@ -16,7 +16,7 @@ export const CATEGORY_IDS: CategoryId[] = [
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
 
-export type GrowthEventKind = "leaf" | "palm" | "repeat";
+export type GrowthEventKind = "leaf" | "palm" | "repeat" | "extra_leaf";
 export type GardenMessageKind = "first" | "partial" | "complete" | "continue" | "welcome_back" | "yesterday_partial";
 export type GardenMilestoneId = "first_leaf" | "first_palm" | "seven_palms" | "thirty_palms";
 
@@ -32,6 +32,8 @@ export interface GardenDay {
   date: Date;
   completedCategories: CategoryId[];
   leafCount: number;
+  /** Number of extra (non-core) categories completed this day. */
+  extraLeafCount: number;
   isPalm: boolean;
   isToday: boolean;
 }
@@ -195,7 +197,7 @@ export function recordDailyCollectionCompletion(
   if (!isMainCategory) {
     return {
       records: next,
-      event: { kind: "repeat", category, dayKey, leafCount } satisfies GrowthEvent,
+      event: { kind: "extra_leaf", category, dayKey, leafCount } satisfies GrowthEvent,
     };
   }
 
@@ -223,11 +225,15 @@ function categoryMap(records: DailyCollectionCompletion[]) {
 function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<CategoryId>>): GardenDay {
   const categories = byDay.get(dayKey) ?? new Set<CategoryId>();
   const completedCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
+  const extraLeafCount = CATEGORY_IDS.filter(
+    (id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id),
+  ).length;
   return {
     dayKey,
     date: dateFromProgressDayKey(dayKey),
     completedCategories,
     leafCount: completedCategories.length,
+    extraLeafCount,
     isPalm: completedCategories.length === MAIN_CATEGORY_IDS.length,
     isToday: dayKey === todayKey,
   };

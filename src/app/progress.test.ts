@@ -48,6 +48,29 @@ describe("quiet garden progress", () => {
     expect(third.records).toHaveLength(3);
   });
 
+  it("emits extra_leaf for the first completion of a non-core category and repeat on subsequent completions", () => {
+    const now = new Date(2026, 6, 18, 10);
+    const first = recordDailyCollectionCompletion([], "travel", now, 4);
+    const duplicate = recordDailyCollectionCompletion(first.records, "travel", now, 4);
+
+    expect(first.event.kind).toBe("extra_leaf");
+    expect(duplicate.event.kind).toBe("repeat");
+    expect(first.records).toHaveLength(1);
+    expect(duplicate.records).toHaveLength(1);
+  });
+
+  it("computes extraLeafCount on GardenDay for non-core categories", () => {
+    const now = new Date(2026, 6, 18, 10);
+    const records = [
+      { dayKey: "2026-07-18", category: "morning" as const, timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "travel" as const, timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "home" as const, timeZone: "Africa/Cairo" },
+    ];
+    const summary = getGardenSummary(records, now, 4);
+    expect(summary.today.leafCount).toBe(1);
+    expect(summary.today.extraLeafCount).toBe(2);
+  });
+
   it("migrates only complete legacy sessions and deduplicates category/day records", () => {
     const date = new Date(2026, 6, 18, 9);
     const migrated = deriveDailyCompletionsFromLegacySessions(

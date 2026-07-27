@@ -266,6 +266,7 @@ const en = {
     dayStartsAt: "A new practice day begins at",
     midnight: "Midnight",
     hourAm: "{hour}:00 AM",
+    todayBreakdown: "Today's collections",
   },
   garden: {
     todayTitle: "Today's practice",
@@ -300,7 +301,12 @@ const en = {
     eventLeaf: "A leaf was recorded for {category}.",
     eventPalm: "All three collections are complete today. Your palm was recorded.",
     eventRepeat: "{category} was already recorded for this progress day.",
+    eventExtraLeaf: "A step was recorded for {category}.",
     eventHint: "Today's garden: {count} of {total} collections.",
+    coreLeafLabel: "Core",
+    extraLeafLabel: "Extra",
+    extraProgress: "+{count} extra",
+    nextMilestoneHint: "Next: {current} of {target}",
     explanation:
       "Each completed collection adds one leaf. Complete Morning, Evening, and Before Sleep Azkar in one progress day to add a palm. This reflects progress in the app; it does not measure spiritual reward or rank.",
     private: "Private by default and never shared as a ranking.",

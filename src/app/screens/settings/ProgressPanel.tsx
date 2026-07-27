@@ -1,15 +1,22 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { CheckCircle2, Info } from "../../components/icons";
-import { GardenMilestones, LeafMark, SevenDayGarden } from "../../components/RoutineGarden";
+import {
+  BudMark,
+  GardenMilestones,
+  LeafMark,
+  PaleLeafMark,
+  PalmTreeMark,
+  SevenDayGarden,
+} from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
-import { getGardenSummary } from "../../progress";
-import type { AppLanguage, DailyCollectionCompletion, StoredSession } from "../../types";
+import { getGardenSummary, getProgressDayKey, MAIN_CATEGORY_IDS } from "../../progress";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, StoredSession } from "../../types";
 import { ProgressBar } from "../../components/ProgressBar";
 import { SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 
-function categoryName(category: StoredSession["category"], language: AppLanguage) {
+function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
   return language === "ar" ? (item?.nameArabic ?? category) : (item?.name ?? category);
 }
@@ -39,14 +46,26 @@ export function ProgressPanel({
   onProgressDayStartHourChange: (value: number) => void;
   onWeeklyGoalDaysChange: (value: number) => void;
 }) {
-  const summary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
+  const now = new Date();
+  const summary = getGardenSummary(dailyCompletions, now, progressDayStartHour);
   const completedSessions = sessions.filter((session) => session.isComplete);
   const completedGoalDays = Math.min(summary.activeDaysLast7, weeklyGoalDays);
+  const isArabic = language === "ar";
+
+  // Build set of categories completed today
+  const todayKey = getProgressDayKey(now, progressDayStartHour);
+  const completedTodayIds = new Set(
+    dailyCompletions.filter((record) => record.dayKey === todayKey).map((record) => record.category),
+  );
+
+  // Next incomplete milestone
+  const nextMilestone = summary.milestones.find((m) => !m.complete);
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
+        {/* Garden toggle */}
         <section
           className="overflow-hidden rounded-2xl border border-border bg-card"
           aria-label={t(language, "progressPanel.gardenToggle")}
@@ -64,6 +83,89 @@ export function ProgressPanel({
 
         {quietProgressEnabled ? (
           <>
+            {/* ── Large tree illustration with today's state ────────────────── */}
+            <section
+              className="relative overflow-hidden rounded-2xl border border-border bg-card px-4 pb-5 pt-6"
+              aria-label={isArabic ? "حالة حديقتك اليوم" : "Today's garden state"}
+            >
+              {/* Palm day ambient glow */}
+              {summary.today.isPalm && (
+                <div
+                  className="pointer-events-none absolute inset-0 rounded-2xl"
+                  style={{
+                    background:
+                      "radial-gradient(ellipse 70% 50% at 50% 30%, color-mix(in srgb, var(--primary) 18%, transparent), transparent)",
+                  }}
+                  aria-hidden="true"
+                />
+              )}
+
+              {/* Tree centred */}
+              <div className="relative flex justify-center">
+                <PalmTreeMark
+                  size={72}
+                  className={
+                    summary.today.isPalm
+                      ? "text-emerald-500"
+                      : summary.today.leafCount > 0
+                        ? "text-primary"
+                        : "text-muted-foreground opacity-35"
+                  }
+                />
+              </div>
+
+              {/* Three core stat pills */}
+              <div className="mt-4 grid grid-cols-3 gap-3 text-center" aria-label={isArabic ? "إحصائيات اليوم" : "Today's stats"}>
+                <div className="rounded-xl border border-border bg-background px-2 py-3">
+                  <span
+                    className="block text-[1.375rem] font-extrabold text-emerald-500"
+                    aria-label={isArabic ? `${summary.today.leafCount} مجموعات أساسية` : `${summary.today.leafCount} core groups`}
+                  >
+                    {formatNumerals(summary.today.leafCount, language)}
+                  </span>
+                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
+                    {t(language, "garden.coreLeafLabel")}
+                  </span>
+                </div>
+                <div className="rounded-xl border border-border bg-background px-2 py-3">
+                  <span
+                    className="block text-[1.375rem] font-extrabold text-primary"
+                    aria-label={isArabic ? `${summary.today.extraLeafCount} مجموعات إضافية` : `${summary.today.extraLeafCount} extra groups`}
+                  >
+                    {formatNumerals(summary.today.extraLeafCount, language)}
+                  </span>
+                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
+                    {t(language, "garden.extraLeafLabel")}
+                  </span>
+                </div>
+                <div className="rounded-xl border border-border bg-background px-2 py-3">
+                  <span
+                    className="block text-[1.375rem] font-extrabold text-primary"
+                    aria-label={isArabic ? `سلسلة ${summary.currentPalmRhythm} أيام` : `${summary.currentPalmRhythm} day streak`}
+                  >
+                    {formatNumerals(summary.currentPalmRhythm, language)}
+                  </span>
+                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
+                    {t(language, "home.currentStreak")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Next milestone preview */}
+              {nextMilestone && (
+                <div className="mt-3 flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/6 px-3 py-2">
+                  <LeafMark size={14} filled className="shrink-0 text-primary" />
+                  <span className="text-[0.6875rem] font-semibold text-muted-foreground">
+                    {t(language, "garden.nextMilestoneHint", {
+                      current: formatNumerals(Math.min(nextMilestone.current, nextMilestone.target), language),
+                      target: formatNumerals(nextMilestone.target, language),
+                    })}
+                  </span>
+                </div>
+              )}
+            </section>
+
+            {/* Garden explanation */}
             <aside
               className="rounded-2xl border border-primary/35 bg-primary/10 p-4"
               aria-labelledby="garden-explanation-title"
@@ -87,8 +189,72 @@ export function ProgressPanel({
               </div>
             </aside>
 
+            {/* Seven-day garden */}
             <SevenDayGarden summary={summary} language={language} />
 
+            {/* ── Today's group breakdown (Screen 3) ──────────────────────────── */}
+            <section aria-labelledby="today-breakdown-title">
+              <h2 id="today-breakdown-title" className="mb-3 text-[0.9375rem] font-bold text-foreground">
+                {t(language, "progressPanel.todayBreakdown")}
+              </h2>
+              <div className="space-y-1.5">
+                {CATEGORIES.map((cat) => {
+                  const isCore = MAIN_CATEGORY_IDS.includes(cat.id);
+                  const isCompleted = completedTodayIds.has(cat.id);
+                  const name = isArabic ? cat.nameArabic : cat.name;
+
+                  return (
+                    <article
+                      key={cat.id}
+                      className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-colors ${
+                        isCompleted
+                          ? "border-primary/35 bg-primary/8"
+                          : "border-border bg-card"
+                      }`}
+                      aria-label={`${name}. ${isCompleted ? t(language, "garden.complete") : t(language, "garden.pending")}`}
+                    >
+                      {/* Leaf state icon */}
+                      <span
+                        className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
+                          isCompleted
+                            ? isCore
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted text-muted-foreground"
+                            : "bg-muted text-muted-foreground/50"
+                        }`}
+                        aria-hidden="true"
+                      >
+                        {isCompleted ? (
+                          isCore ? (
+                            <LeafMark size={17} filled />
+                          ) : (
+                            <PaleLeafMark size={15} />
+                          )
+                        ) : (
+                          <BudMark size={13} />
+                        )}
+                      </span>
+
+                      {/* Category name */}
+                      <span className="min-w-0 flex-1 text-[0.8125rem] font-semibold text-foreground">{name}</span>
+
+                      {/* Core / Extra chip */}
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[0.5625rem] font-bold tracking-wide ${
+                          isCore
+                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
+                            : "bg-primary/15 text-primary/80"
+                        }`}
+                      >
+                        {isCore ? t(language, "garden.coreLeafLabel") : t(language, "garden.extraLeafLabel")}
+                      </span>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Weekly goal */}
             <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="weekly-goal-title">
               <div className="flex items-baseline justify-between gap-3">
                 <h2 id="weekly-goal-title" className="text-[0.9375rem] font-bold text-foreground">
@@ -198,7 +364,7 @@ export function ProgressPanel({
                     {categoryName(session.category, language)}
                   </p>
                   <p className="mt-1 text-[0.75rem] text-muted-foreground">
-                    {new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-US", { dateStyle: "medium" }).format(
+                    {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en-US", { dateStyle: "medium" }).format(
                       new Date(session.completedAt),
                     )}
                   </p>

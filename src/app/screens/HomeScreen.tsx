@@ -2,13 +2,13 @@ import { Fragment } from "react";
 import { ChevronNext } from "../components/icons";
 import { CatIcon } from "../components/CatIcon";
 import { ProgressBar } from "../components/ProgressBar";
-import { TodayRoutineGarden, LeafMark, PalmMark } from "../components/RoutineGarden";
+import { TodayRoutineGarden, LeafMark, PalmTreeMark, PalmTreeReward } from "../components/RoutineGarden";
 import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getGardenSummary } from "../progress";
+import { getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 import morningScene from "../../assets/home/morning-scene.png";
@@ -155,37 +155,52 @@ export function HomeScreen({
 
   return (
     <ScreenContainer dir={direction} className="px-page">
-      {/* Top Header Bar matching Screenshot 1 */}
-      <header className="flex h-14 shrink-0 items-center justify-between px-1">
-        {/* Left: Today's Leaves Count */}
+      {/* Accessibility: visually-hidden page title for screen readers */}
+      <h1 className="sr-only">{t(language, "home.title")}</h1>
+
+      {/* Top Header Bar — unified palm-tree reward ecosystem */}
+      <header className="flex h-14 shrink-0 items-center justify-between px-2">
+        {/* Left: Core leaf progress label */}
         <div
-          className="flex items-center gap-1.5 font-extrabold text-emerald-500"
-          title={isArabic ? "أوراق اليوم" : "Today's Leaves"}
+          className="flex items-center gap-1"
           aria-label={
             isArabic
-              ? `أوراق اليوم: ${gardenSummary.today.leafCount}`
-              : `Today's leaves: ${gardenSummary.today.leafCount}`
+              ? `${gardenSummary.today.leafCount} من ${MAIN_CATEGORY_IDS.length} مجموعات أساسية`
+              : `${gardenSummary.today.leafCount} of ${MAIN_CATEGORY_IDS.length} core groups`
           }
         >
-          <span className="text-[1.125rem]">{formatNumerals(gardenSummary.today.leafCount, language)}</span>
-          <LeafMark size={22} filled={gardenSummary.today.leafCount > 0} className="text-emerald-500" />
+          <span className="text-[0.9375rem] font-extrabold text-foreground">
+            {formatNumerals(gardenSummary.today.leafCount, language)}
+          </span>
+          <span className="text-[0.75rem] font-medium text-muted-foreground">
+            {isArabic ? "/" : "/"}
+          </span>
+          <span className="text-[0.9375rem] font-extrabold text-foreground">
+            {formatNumerals(MAIN_CATEGORY_IDS.length, language)}
+          </span>
+          <LeafMark
+            size={16}
+            filled={gardenSummary.today.leafCount > 0}
+            className="text-emerald-500"
+          />
         </div>
 
-        {/* Center: Title */}
-        <h1 className="text-[1.25rem] font-extrabold text-foreground tracking-wide">{t(language, "home.title")}</h1>
+        {/* Center: Palm Tree Reward — visual gamification hub */}
+        <PalmTreeReward summary={gardenSummary} language={language} />
 
-        {/* Right: Palms Earned Count */}
+        {/* Right: Lifetime palms earned */}
         <div
-          className="flex items-center gap-1.5 font-extrabold text-emerald-500"
-          title={isArabic ? "النخيل المكتسبة" : "Palms Earned"}
+          className="flex items-center gap-1"
           aria-label={
             isArabic
               ? `النخيل المكتسبة: ${gardenSummary.lifetimePalms}`
               : `Palms earned: ${gardenSummary.lifetimePalms}`
           }
         >
-          <span className="text-[1.125rem]">{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-          <PalmMark size={24} className="text-emerald-500" />
+          <PalmTreeMark size={22} className="text-emerald-500" />
+          <span className="text-[0.9375rem] font-extrabold text-foreground">
+            {formatNumerals(gardenSummary.lifetimePalms, language)}
+          </span>
         </div>
       </header>
 

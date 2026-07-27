@@ -6,7 +6,7 @@ import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
-import { getGardenSummary, type GrowthEvent } from "../progress";
+import { getGardenSummary, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 function vibrate(pattern: number | number[]) {
@@ -51,32 +51,45 @@ export function CompletionScreen({
     // Haptic feedback
     vibrate([30, 50, 30, 50, 50]);
 
-    // Confetti animation
-    const duration = 2500;
-    const end = Date.now() + duration;
+    const isCore = MAIN_CATEGORY_IDS.includes(catId);
 
-    const frame = () => {
+    if (isCore) {
+      // Stronger confetti burst for core groups (morning / evening / before_sleep)
+      const duration = 2500;
+      const end = Date.now() + duration;
+      const frame = () => {
+        confetti({
+          particleCount: 5,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0 },
+          colors: ["#16a34a", "#22c55e", "#4ade80"],
+        });
+        confetti({
+          particleCount: 5,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1 },
+          colors: ["#16a34a", "#22c55e", "#4ade80"],
+        });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      };
+      frame();
+    } else {
+      // Quieter single burst for extra groups — softer colours, smaller scale
       confetti({
-        particleCount: 5,
-        angle: 60,
-        spread: 55,
-        origin: { x: 0 },
-        colors: ["#16a34a", "#22c55e", "#4ade80"],
+        particleCount: 28,
+        angle: 90,
+        spread: 45,
+        origin: { x: 0.5, y: 0.35 },
+        colors: ["#d7a528", "#fbbf24", "#fde68a", "#a3e635"],
+        scalar: 0.7,
+        gravity: 0.9,
       });
-      confetti({
-        particleCount: 5,
-        angle: 120,
-        spread: 55,
-        origin: { x: 1 },
-        colors: ["#16a34a", "#22c55e", "#4ade80"],
-      });
-
-      if (Date.now() < end) {
-        requestAnimationFrame(frame);
-      }
-    };
-    frame();
-  }, []);
+    }
+  }, [catId]);
 
   const gardenSummary = getGardenSummary(dailyCompletions, new Date(), progressDayStartHour);
   const stats = [

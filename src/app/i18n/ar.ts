@@ -253,6 +253,7 @@ const ar = {
     dayStartsAt: "يبدأ يوم ممارسة جديد عند",
     midnight: "منتصف الليل",
     hourAm: "{hour}:00 ص",
+    todayBreakdown: "مجموعات اليوم",
   },
   garden: {
     todayTitle: "ممارستك اليوم",
@@ -286,7 +287,12 @@ const ar = {
     eventLeaf: "سُجلت ورقة لـ {category}.",
     eventPalm: "اكتملت المجموعات الثلاث اليوم. سُجلت نخلتك.",
     eventRepeat: "سُجلت {category} بالفعل ليوم التقدم هذا.",
+    eventExtraLeaf: "سُجلت خطوة لـ {category}.",
     eventHint: "حديقة اليوم: {count} من {total} مجموعات.",
+    coreLeafLabel: "أساسي",
+    extraLeafLabel: "إضافي",
+    extraProgress: "+{count} إضافية",
+    nextMilestoneHint: "التالي: {current} من {target}",
     explanation:
       "تضيف كل مجموعة مكتملة ورقة. وعند إكمال أذكار الصباح والمساء والنوم في يوم تقدم واحد، تُضاف نخلة. هذا يعكس التقدم داخل التطبيق، ولا يقيس الأجر أو المنزلة.",
     private: "خاص بك افتراضياً ولا يُشارك في أي ترتيب.",
