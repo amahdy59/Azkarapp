@@ -3,7 +3,7 @@ import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
-import type { AppLanguage, CategoryId } from "../types";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
