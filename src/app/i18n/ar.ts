@@ -487,8 +487,7 @@ const ar = {
     verifyCodeError: "تعذر التحقق من الرمز.",
     resendCodeError: "تعذر إعادة إرسال رمز التحقق.",
     enterNumber: "\u0623\u062f\u062e\u0644 \u0631\u0642\u0645 \u0647\u0627\u062a\u0641\u0643",
-    phoneHelp:
-      "سنرسل رمزاً مكوناً من 6 أرقام للتحقق من حسابك.",
+    phoneHelp: "سنرسل رمزاً مكوناً من 6 أرقام للتحقق من حسابك.",
     phoneInputLabel: "رقم الهاتف",
     sendVerificationCode: "أرسل الرمز",
     verifyNumber: "\u062a\u062d\u0642\u0642 \u0645\u0646 \u0631\u0642\u0645\u0643",

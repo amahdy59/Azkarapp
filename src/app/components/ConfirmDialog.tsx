@@ -45,12 +45,15 @@ export function ConfirmDialog({
   children,
 }: ConfirmDialogProps) {
   return (
-    <AlertDialog open={open} onOpenChange={(isOpen) => { if (!isOpen) onCancel(); }}>
+    <AlertDialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onCancel();
+      }}
+    >
       <AlertDialogContent className="rounded-2xl border border-border bg-background p-6 shadow-xl">
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[1.0625rem] font-bold text-foreground">
-            {title}
-          </AlertDialogTitle>
+          <AlertDialogTitle className="text-[1.0625rem] font-bold text-foreground">{title}</AlertDialogTitle>
           <AlertDialogDescription className="mt-2 text-[0.875rem] leading-relaxed text-muted-foreground">
             {description}
           </AlertDialogDescription>

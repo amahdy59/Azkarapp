@@ -756,10 +756,14 @@ export default function App() {
             false,
           );
           // If user cancels, clear private data instead
-          setPendingConfirm((prev) => prev ? {
-            ...prev,
-            onConfirm: () => resolve(),
-          } : null);
+          setPendingConfirm((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  onConfirm: () => resolve(),
+                }
+              : null,
+          );
         }).catch(() => {
           hydrationBase = clearPrivateAppData(appStateSnapshot);
         });

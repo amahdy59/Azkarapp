@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -802,7 +802,9 @@ export function TodayRoutineGarden({
                 {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة كاملة 🌴" : "Full Palms 🌴"}
               </span>
               <span className="mt-1 block text-[0.75rem] font-semibold text-muted-foreground">
-                {isArabic ? `المجموع: ${formatNumerals(summary.lifetimeLeaves, language)} ورقة` : `Total: ${summary.lifetimeLeaves} leaves earned`}
+                {isArabic
+                  ? `المجموع: ${formatNumerals(summary.lifetimeLeaves, language)} ورقة`
+                  : `Total: ${summary.lifetimeLeaves} leaves earned`}
               </span>
             </div>
             <PalmTreeMark size={40} />
@@ -850,9 +852,10 @@ export function TodayRoutineGarden({
                 const targetYear = displayDate.getFullYear();
                 // For Gregorian: monthIdx maps directly. For Hijri: approximate mapping
                 // We use Gregorian months to bucket data (most accessible approach without full Hijri lib)
-                const targetMonthGregorian = calendarType === "hijri"
-                  ? (mIdx + 2) % 12  // rough Hijri→Gregorian offset
-                  : mIdx;
+                const targetMonthGregorian =
+                  calendarType === "hijri"
+                    ? (mIdx + 2) % 12 // rough Hijri→Gregorian offset
+                    : mIdx;
 
                 // Build a map of day-of-month → leaf count for this target month/year
                 const dayLeafMap = new Map<number, number>();
