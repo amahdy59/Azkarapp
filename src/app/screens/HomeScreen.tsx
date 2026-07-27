@@ -159,7 +159,7 @@ export function HomeScreen({
       {/* Top Header Bar — Enlarged Full-Width Streaks Bar */}
       <header className="flex w-full shrink-0 flex-col gap-2 px-0 pt-0 pb-2">
         {/* Full-width Palm Tree & Leaves Reward Widget */}
-        <PalmTreeReward summary={gardenSummary} language={language} />
+        <PalmTreeReward summary={gardenSummary} language={language} onOpenShareModal={onOpenShareModal} />
 
         {/* Date, Weekday & Live Time on its OWN SEPARATE LINE */}
         <div className="w-full text-center">
@@ -170,8 +170,8 @@ export function HomeScreen({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
-        {/* Friday Special Routine Banner */}
-        {(isFriday || onOpenFridayMode) && (
+        {/* Friday Special Routine Banner — ONLY ON FRIDAYS */}
+        {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button
               type="button"
@@ -200,7 +200,7 @@ export function HomeScreen({
 
         {/* Clean Hero Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-5">
-          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-4 text-card-foreground shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]">
+          <div className="relative overflow-hidden rounded-3xl border border-border/80 bg-card p-5 text-card-foreground shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]">
             {/* Card Content */}
             <div className="flex flex-col justify-between text-start">
               <div>
@@ -234,7 +234,7 @@ export function HomeScreen({
                 )}
               </div>
 
-              <div className="mt-4 flex items-center justify-between gap-3">
+              <div className="mt-5 flex items-center justify-start">
                 <button
                   type="button"
                   data-testid="home-primary-cta"
@@ -246,37 +246,30 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex min-h-[48px] items-center justify-center gap-2 rounded-2xl px-5 py-2.5 text-[0.9375rem] font-black active:scale-[0.97] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md self-start"
-                  style={{ color: "#020617", backgroundColor: "#F59E0B" }}
+                  className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 transition-all shadow-md"
                 >
-                  <span style={{ color: "#020617" }}>{ctaLabel}</span>
+                  <span>{ctaLabel}</span>
                   <span
                     className="text-[1.125rem] leading-none transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
-                    style={{ color: "#020617" }}
                     aria-hidden="true"
                   >
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
-
-                {onOpenShareModal && (
-                  <button
-                    type="button"
-                    onClick={onOpenShareModal}
-                    className="flex min-h-[48px] items-center gap-1.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-3.5 text-[0.8125rem] font-black text-amber-600 dark:text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all"
-                    aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
-                  >
-                    <span>🌴</span>
-                    <span>{isArabic ? "مشاركة" : "Share"}</span>
-                  </button>
-                )}
               </div>
             </div>
           </div>
         </section>
 
         {/* Leaves & Progress Garden (Daily Progress) */}
-        {quietProgressEnabled && <TodayRoutineGarden summary={gardenSummary} language={language} hideTabs={true} />}
+        {quietProgressEnabled && (
+          <TodayRoutineGarden
+            summary={gardenSummary}
+            language={language}
+            hideTabs={true}
+            onOpenShareModal={onOpenShareModal}
+          />
+        )}
       </div>
     </ScreenContainer>
   );

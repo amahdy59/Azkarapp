@@ -111,21 +111,37 @@ export function FloatingAudioPlayer({
             <SkipForward size={16} className="rtl:rotate-180" />
           </button>
 
-          {/* Auto-Play All Toggle */}
+          {/* Auto-Play All / Single Item Toggle */}
           <button
             type="button"
             onClick={onToggleAutoPlayAll}
-            aria-label={isArabic ? "التشغيل المتتابع للكل" : "Auto-Play All"}
-            title={isArabic ? "التشغيل المتتابع للكل" : "Auto-Play All"}
-            className={`flex size-8 items-center justify-center rounded-lg text-[0.75rem] font-bold transition-all ${
+            aria-label={
               autoPlayAll
-                ? "bg-amber-500/20 text-amber-600 dark:text-amber-400 ring-1 ring-amber-500/50"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                ? isArabic
+                  ? "الوضع الحالي: تشغيل الكل متتابعاً. اضغط للتبديل للذكر الحالي فقط"
+                  : "Current mode: Play All. Click for single item only"
+                : isArabic
+                  ? "الوضع الحالي: الذكر الحالي فقط. اضغط للتبديل لتشغيل الكل"
+                  : "Current mode: Single Item. Click for Play All"
+            }
+            title={
+              autoPlayAll
+                ? isArabic
+                  ? "تشغيل الكل متتابعاً"
+                  : "Play All"
+                : isArabic
+                  ? "الذكر الحالي فقط"
+                  : "Play Current Only"
+            }
+            className={`flex h-8 px-2 items-center gap-1 rounded-lg text-[0.75rem] font-bold transition-all ${
+              autoPlayAll
+                ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/50"
+                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             <svg
-              width={15}
-              height={15}
+              width={14}
+              height={14}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -139,6 +155,7 @@ export function FloatingAudioPlayer({
               <polyline points="7 23 3 19 7 15" />
               <path d="M21 13v2a4 4 0 0 1-4 4H3" />
             </svg>
+            <span>{autoPlayAll ? (isArabic ? "الكل" : "All") : (isArabic ? "مفرد" : "Single")}</span>
           </button>
 
           {/* Speed Selector */}

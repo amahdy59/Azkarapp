@@ -217,7 +217,7 @@ export default function App() {
   const [activeIdx, setActiveIdx] = useState(0);
 
   const activeAzkarList = useMemo(() => getAzkarByCategory(activeCat), [activeCat]);
-  const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx);
+  const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx, setActiveIdx);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
   const [sessionStart, setSessionStart] = useState(Date.now());

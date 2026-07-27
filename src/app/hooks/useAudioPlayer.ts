@@ -33,7 +33,11 @@ export function getZikrAudioUrl(zikr: Zikr): string | null {
 
 export type PlaybackRate = 0.8 | 1.0 | 1.25;
 
-export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
+export function useAudioPlayer(
+  zikrs: Zikr[],
+  initialIndex = 0,
+  onIndexChange?: (index: number) => void,
+) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isBuffering, setIsBuffering] = useState(false);
@@ -82,6 +86,9 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
 
       setIsBuffering(true);
       setCurrentIndex(index);
+      if (onIndexChange) {
+        onIndexChange(index);
+      }
 
       audio
         .play()
@@ -94,7 +101,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
           setIsBuffering(false);
         });
     },
-    [zikrs, playbackRate],
+    [zikrs, playbackRate, onIndexChange],
   );
 
   // Auto advance event handlers
@@ -108,9 +115,13 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
       setIsPlaying(false);
       setCurrentTime(0);
 
-      // Auto-advance to next Zikr if autoPlayAll is enabled
+      // Auto-advance to next Zikr and move screen if autoPlayAll is enabled
       if (autoPlayAll && currentIndex + 1 < zikrs.length) {
-        playTrackAtIndex(currentIndex + 1);
+        const nextIdx = currentIndex + 1;
+        if (onIndexChange) {
+          onIndexChange(nextIdx);
+        }
+        playTrackAtIndex(nextIdx);
       }
     };
 
@@ -123,7 +134,7 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
       audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
       audio.removeEventListener("ended", handleEnded);
     };
-  }, [currentIndex, zikrs.length, autoPlayAll, playTrackAtIndex]);
+  }, [currentIndex, zikrs.length, autoPlayAll, playTrackAtIndex, onIndexChange]);
 
   const togglePlayPause = useCallback(
     (targetIndex?: number) => {
@@ -173,15 +184,19 @@ export function useAudioPlayer(zikrs: Zikr[], initialIndex = 0) {
 
   const playNext = useCallback(() => {
     if (currentIndex + 1 < zikrs.length) {
-      playTrackAtIndex(currentIndex + 1);
+      const nextIdx = currentIndex + 1;
+      if (onIndexChange) onIndexChange(nextIdx);
+      playTrackAtIndex(nextIdx);
     }
-  }, [currentIndex, zikrs.length, playTrackAtIndex]);
+  }, [currentIndex, zikrs.length, playTrackAtIndex, onIndexChange]);
 
   const playPrev = useCallback(() => {
     if (currentIndex > 0) {
-      playTrackAtIndex(currentIndex - 1);
+      const prevIdx = currentIndex - 1;
+      if (onIndexChange) onIndexChange(prevIdx);
+      playTrackAtIndex(prevIdx);
     }
-  }, [currentIndex, playTrackAtIndex]);
+  }, [currentIndex, playTrackAtIndex, onIndexChange]);
 
   return {
     currentIndex,

@@ -279,6 +279,16 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "Recited in times of distress or anxiety.": "تُقال عند الكرب والهم والشدة.",
   "Recited when visiting a sick person.": "تُقال عند عيادة المريض.",
   "Recited upon seeing rain or hearing thunder.": "تُقال عند نزول المطر أو سماع الرعد.",
+  "Upon rising in the morning; can be recited any time during the day.":
+    "تُقال عند الاستيقاظ في الصباح، ويمكن قراءتها في أي وقت خلال اليوم.",
+  "Upon rising in the morning.": "تُقال عند الاستيقاظ في الصباح.",
+  "After Fajr / upon rising in the morning.": "تُقال بعد صلاة الفجر أو عند الاستيقاظ صباحاً.",
+  "During the day; suitable to include in morning/evening routine.":
+    "تُقال خلال اليوم؛ وتناسب أذكار الصباح والمساء.",
+  "Morning and evening.": "تُقال في الصباح والمساء.",
+  "Morning after Fajr.": "تُقال في الصباح بعد صلاة الفجر.",
+  "After ‘Asr/sunset window.": "تُقال في المساء بعد صلاة العصر وقبل الغروب.",
+  "In the evening.": "تُقال في المساء.",
 };
 
 export function getLocalizedPreferredTiming(zikr: Zikr, language: AppLanguage): string {

@@ -183,41 +183,64 @@ export function PalmMark({ className = "", size = 32 }: { className?: string; si
 
 // ─── PalmTreeReward Header Widget ───────────────────────────────────────────
 
-export function PalmTreeReward({ summary, language }: { summary: GardenSummary; language: AppLanguage }) {
+export function PalmTreeReward({
+  summary,
+  language,
+  onOpenShareModal,
+}: {
+  summary: GardenSummary;
+  language: AppLanguage;
+  onOpenShareModal?: () => void;
+}) {
   const { today } = summary;
   const goldenCount = today.goldenLeafCount ?? today.leafCount;
   const greenCount = today.greenLeafCount ?? today.extraLeafCount;
+  const isArabic = language === "ar";
 
   return (
     <div
-      className="flex w-full items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15"
+      className="flex w-full items-center justify-between gap-2 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15"
       role="img"
       aria-label={
-        language === "ar"
+        isArabic
           ? `النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق ذهبية: ${formatNumerals(goldenCount, language)}، أوراق خضراء: ${formatNumerals(greenCount, language)}`
           : `Palms: ${summary.lifetimePalms}, Golden: ${goldenCount}, Green: ${greenCount}`
       }
     >
-      <div className="flex items-center gap-1.5">
-        <GreenLeafMark size={22} filled />
-        <span className="text-[1rem] font-black text-emerald-600 dark:text-emerald-400">
-          {formatNumerals(greenCount, language)}
-        </span>
+      <div className="flex flex-1 items-center justify-around">
+        <div className="flex items-center gap-1.5">
+          <GreenLeafMark size={22} filled />
+          <span className="text-[1rem] font-black text-emerald-600 dark:text-emerald-400">
+            {formatNumerals(greenCount, language)}
+          </span>
+        </div>
+        <span className="h-4 w-px bg-amber-500/30" />
+        <div className="flex items-center gap-1.5">
+          <GoldenLeafMark size={22} filled />
+          <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+            {formatNumerals(goldenCount, language)}
+          </span>
+        </div>
+        <span className="h-4 w-px bg-amber-500/30" />
+        <div className="flex items-center gap-1.5">
+          <PalmTreeMark size={26} />
+          <span className="text-[1.0625rem] font-black text-amber-500">
+            {formatNumerals(summary.lifetimePalms, language)}
+          </span>
+        </div>
       </div>
-      <span className="h-4 w-px bg-amber-500/30" />
-      <div className="flex items-center gap-1.5">
-        <GoldenLeafMark size={22} filled />
-        <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
-          {formatNumerals(goldenCount, language)}
-        </span>
-      </div>
-      <span className="h-4 w-px bg-amber-500/30" />
-      <div className="flex items-center gap-1.5">
-        <PalmTreeMark size={26} />
-        <span className="text-[1.0625rem] font-black text-amber-500">
-          {formatNumerals(summary.lifetimePalms, language)}
-        </span>
-      </div>
+
+      {onOpenShareModal && (
+        <button
+          type="button"
+          onClick={onOpenShareModal}
+          className="flex min-h-[36px] items-center gap-1.5 rounded-xl border border-amber-500/40 bg-amber-500/20 px-3 text-[0.8125rem] font-black text-amber-700 dark:text-amber-300 hover:bg-amber-500/30 active:scale-95 transition-all shrink-0"
+          aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
+        >
+          <span>🌴</span>
+          <span>{isArabic ? "مشاركة" : "Share"}</span>
+        </button>
+      )}
     </div>
   );
 }
@@ -291,10 +314,12 @@ export function TodayRoutineGarden({
   summary: initialSummary,
   language,
   hideTabs = false,
+  onOpenShareModal,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   hideTabs?: boolean;
+  onOpenShareModal?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -344,13 +369,27 @@ export function TodayRoutineGarden({
       className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]"
     >
       {/* Title & Subtitle Header */}
-      <div className="mb-4 text-center">
-        <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-          {isArabic ? "حديقتي اليومية" : "Today's practice"}
-        </h2>
-        <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
-          {isArabic ? "اسقِ حديقتك الروحية بأذكارك اليومية" : "Nurture your spiritual garden with daily azkar"}
-        </p>
+      <div className="mb-4 flex items-center justify-between gap-3 text-start">
+        <div>
+          <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
+            {isArabic ? "حديقتي اليومية" : "Today's practice"}
+          </h2>
+          <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
+            {isArabic ? "اسقِ حديقتك الروحية بأذكارك اليومية" : "Nurture your spiritual garden with daily azkar"}
+          </p>
+        </div>
+
+        {onOpenShareModal && (
+          <button
+            type="button"
+            onClick={onOpenShareModal}
+            className="flex min-h-[38px] items-center gap-1.5 rounded-2xl border border-amber-500/40 bg-amber-500/10 px-3.5 text-[0.8125rem] font-black text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all shrink-0"
+            aria-label={isArabic ? "مشاركة الإنجاز اليومي" : "Share Daily Achievement"}
+          >
+            <span>🌴</span>
+            <span>{isArabic ? "مشاركة" : "Share"}</span>
+          </button>
+        )}
       </div>
 
       {!hideTabs && (
@@ -472,7 +511,7 @@ export function TodayRoutineGarden({
               data-testid="today-leaf-count"
               className="absolute -bottom-3 rounded-full bg-amber-950 px-3.5 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
-              {goldenCount} of 3 leaves
+              {isArabic ? `${formatNumerals(goldenCount, language)} من ٣ أوراق` : `${goldenCount} of 3 leaves`}
             </div>
           </div>
 
