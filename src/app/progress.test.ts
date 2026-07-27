@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getCategoryTotal } from "./content/azkar";
 import {
+  CATEGORY_IDS,
   deriveDailyCompletionsFromLegacySessions,
   getGardenSummary,
   getNextIncompleteIndex,
@@ -147,17 +148,15 @@ describe("quiet garden progress", () => {
   });
 
   it("clears stale full collections while preserving partial progress", () => {
+    const emptyCompletedSets = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<number>()])) as Record<
+      CategoryId,
+      Set<number>
+    >;
+
     const completed = {
+      ...emptyCompletedSets,
       morning: fullProgress("morning"),
       evening: new Set([0, 1]),
-      before_sleep: new Set<number>(),
-      waking_up: new Set<number>(),
-      home: new Set<number>(),
-      mosque: new Set<number>(),
-      after_prayer: new Set<number>(),
-      restroom: new Set<number>(),
-      food_drink: new Set<number>(),
-      travel: new Set<number>(),
     };
     const reset = resetStaleCompletedCollections(completed, [], new Date(2026, 6, 18, 12), 4);
 

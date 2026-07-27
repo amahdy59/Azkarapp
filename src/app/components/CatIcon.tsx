@@ -1,4 +1,19 @@
-import { Moon, Stars, Sun, Home, Building, BookOpen, Droplets, Coffee, Plane, Globe } from "./icons";
+import {
+  Moon,
+  Stars,
+  Sun,
+  Home,
+  Building,
+  BookOpen,
+  Droplets,
+  Coffee,
+  Plane,
+  Globe,
+  User,
+  Heart,
+  Sparkles,
+  AlertTriangle,
+} from "./icons";
 
 export function CatIcon({
   type,
@@ -20,5 +35,9 @@ export function CatIcon({
   if (type === "coffee") return <Coffee {...sharedProps} />;
   if (type === "plane") return <Plane {...sharedProps} />;
   if (type === "globe") return <Globe {...sharedProps} />;
+  if (type === "user") return <User {...sharedProps} />;
+  if (type === "heart") return <Heart {...sharedProps} />;
+  if (type === "sparkles") return <Sparkles {...sharedProps} />;
+  if (type === "alert") return <AlertTriangle {...sharedProps} />;
   return <Stars {...sharedProps} />;
 }

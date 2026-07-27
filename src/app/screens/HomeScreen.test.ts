@@ -1,20 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { getHomeAction } from "./HomeScreen";
+import { CATEGORY_IDS } from "../progress";
 import type { CategoryId } from "../types";
 
 function progress(values: Partial<Record<CategoryId, number[]>> = {}) {
-  return {
-    morning: new Set(values.morning ?? []),
-    evening: new Set(values.evening ?? []),
-    before_sleep: new Set(values.before_sleep ?? []),
-    waking_up: new Set(values.waking_up ?? []),
-    home: new Set(values.home ?? []),
-    mosque: new Set(values.mosque ?? []),
-    after_prayer: new Set(values.after_prayer ?? []),
-    restroom: new Set(values.restroom ?? []),
-    food_drink: new Set(values.food_drink ?? []),
-    travel: new Set(values.travel ?? []),
-  };
+  const result = {} as Record<CategoryId, Set<number>>;
+  for (const id of CATEGORY_IDS) {
+    result[id] = new Set(values[id] ?? []);
+  }
+  return result;
 }
 
 describe("getHomeAction", () => {

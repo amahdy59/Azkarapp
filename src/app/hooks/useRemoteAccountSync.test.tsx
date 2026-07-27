@@ -43,16 +43,8 @@ function privateState(profile: AppStateSnapshot["profile"]): AppStateSnapshot {
     settings: { ...DEFAULT_APP_STATE.settings, themeMode: "light" },
     profile,
     completed: {
+      ...DEFAULT_APP_STATE.completed,
       morning: [0, 1],
-      evening: [],
-      before_sleep: [],
-      waking_up: [],
-      home: [],
-      mosque: [],
-      after_prayer: [],
-      restroom: [],
-      food_drink: [],
-      travel: [],
     },
     sessions: [
       {
@@ -115,18 +107,7 @@ function expectSanitizedBoundaryState(state: AppStateSnapshot, expectedAccountId
     isGuest: false,
     accountUserId: expectedAccountId,
   });
-  expect(state.completed).toEqual({
-    morning: [],
-    evening: [],
-    before_sleep: [],
-    waking_up: [],
-    home: [],
-    mosque: [],
-    after_prayer: [],
-    restroom: [],
-    food_drink: [],
-    travel: [],
-  });
+  expect(state.completed).toEqual(DEFAULT_APP_STATE.completed);
   expect(state.sessions).toEqual([]);
   expect(state.dailyCompletions).toEqual([]);
   expect(state.savedZikrIds).toEqual([]);
@@ -166,16 +147,8 @@ describe("useRemoteAccountSync account boundaries", () => {
     const restoredState = {
       ...sanitizedState,
       completed: {
-        morning: [],
+        ...DEFAULT_APP_STATE.completed,
         evening: [0],
-        before_sleep: [],
-        waking_up: [],
-        home: [],
-        mosque: [],
-        after_prayer: [],
-        restroom: [],
-        food_drink: [],
-        travel: [],
       },
     };
     await act(async () => {

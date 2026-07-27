@@ -9,7 +9,13 @@ export type CategoryId =
   | "after_prayer"
   | "restroom"
   | "food_drink"
-  | "travel";
+  | "clothing"
+  | "travel"
+  | "distress_anxiety"
+  | "illness_ruqyah"
+  | "social_community"
+  | "natural_events"
+  | "miscellaneous";
 export type TextSizeOption = "small" | "medium" | "large";
 export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";

@@ -9,6 +9,7 @@ import type {
   ThemeMode,
 } from "./types";
 import {
+  CATEGORY_IDS,
   DEFAULT_PROGRESS_DAY_START_HOUR,
   deriveDailyCompletionsFromLegacySessions,
   mergeDailyCompletions,
@@ -52,18 +53,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     isGuest: true,
     accountUserId: "",
   },
-  completed: {
-    morning: [],
-    evening: [],
-    before_sleep: [],
-    waking_up: [],
-    home: [],
-    mosque: [],
-    after_prayer: [],
-    restroom: [],
-    food_drink: [],
-    travel: [],
-  },
+  completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, number[]>,
   sessions: [],
   dailyCompletions: [],
   savedZikrIds: [],
@@ -194,18 +184,7 @@ function isStoredSession(value: unknown): value is StoredSession {
   return (
     typeof session.id === "string" &&
     typeof session.category === "string" &&
-    [
-      "morning",
-      "evening",
-      "before_sleep",
-      "waking_up",
-      "home",
-      "mosque",
-      "after_prayer",
-      "restroom",
-      "food_drink",
-      "travel",
-    ].includes(session.category) &&
+    (CATEGORY_IDS as string[]).includes(session.category) &&
     typeof session.completedAt === "string" &&
     !Number.isNaN(Date.parse(session.completedAt)) &&
     typeof session.completedCount === "number" &&
@@ -295,18 +274,9 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ? parsed.profile.accountUserId
           : DEFAULT_APP_STATE.profile.accountUserId,
     },
-    completed: {
-      morning: normalizeCompletedIndexes(parsed.completed?.morning, "morning"),
-      evening: normalizeCompletedIndexes(parsed.completed?.evening, "evening"),
-      before_sleep: normalizeCompletedIndexes(parsed.completed?.before_sleep, "before_sleep"),
-      waking_up: normalizeCompletedIndexes(parsed.completed?.waking_up, "waking_up"),
-      home: normalizeCompletedIndexes(parsed.completed?.home, "home"),
-      mosque: normalizeCompletedIndexes(parsed.completed?.mosque, "mosque"),
-      after_prayer: normalizeCompletedIndexes(parsed.completed?.after_prayer, "after_prayer"),
-      restroom: normalizeCompletedIndexes(parsed.completed?.restroom, "restroom"),
-      food_drink: normalizeCompletedIndexes(parsed.completed?.food_drink, "food_drink"),
-      travel: normalizeCompletedIndexes(parsed.completed?.travel, "travel"),
-    },
+    completed: Object.fromEntries(
+      CATEGORY_IDS.map((id) => [id, normalizeCompletedIndexes(parsed.completed?.[id], id)]),
+    ) as Record<CategoryId, number[]>,
     sessions,
     dailyCompletions,
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
@@ -411,18 +381,11 @@ export function clearStoredAppData() {
  * @returns {Record<CategoryId, Set<number>>} A dictionary mapping category IDs to sets of completed indices.
  */
 export function toCompletedSets(completed: AppStateSnapshot["completed"]): Record<CategoryId, Set<number>> {
-  return {
-    morning: new Set(completed.morning),
-    evening: new Set(completed.evening),
-    before_sleep: new Set(completed.before_sleep),
-    waking_up: new Set(completed.waking_up),
-    home: new Set(completed.home),
-    mosque: new Set(completed.mosque),
-    after_prayer: new Set(completed.after_prayer),
-    restroom: new Set(completed.restroom),
-    food_drink: new Set(completed.food_drink),
-    travel: new Set(completed.travel),
-  };
+  const result = {} as Record<CategoryId, Set<number>>;
+  for (const id of CATEGORY_IDS) {
+    result[id] = new Set(completed[id] ?? []);
+  }
+  return result;
 }
 
 /**
@@ -432,18 +395,11 @@ export function toCompletedSets(completed: AppStateSnapshot["completed"]): Recor
  * @returns {AppStateSnapshot["completed"]} A plain object containing sorted arrays of completed indices.
  */
 export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): AppStateSnapshot["completed"] {
-  return {
-    morning: [...completed.morning].sort((a, b) => a - b),
-    evening: [...completed.evening].sort((a, b) => a - b),
-    before_sleep: [...completed.before_sleep].sort((a, b) => a - b),
-    waking_up: [...completed.waking_up].sort((a, b) => a - b),
-    home: [...completed.home].sort((a, b) => a - b),
-    mosque: [...completed.mosque].sort((a, b) => a - b),
-    after_prayer: [...completed.after_prayer].sort((a, b) => a - b),
-    restroom: [...completed.restroom].sort((a, b) => a - b),
-    food_drink: [...completed.food_drink].sort((a, b) => a - b),
-    travel: [...completed.travel].sort((a, b) => a - b),
-  };
+  const result = {} as AppStateSnapshot["completed"];
+  for (const id of CATEGORY_IDS) {
+    result[id] = [...(completed[id] ?? [])].sort((a, b) => a - b);
+  }
+  return result;
 }
 
 /**
@@ -456,45 +412,13 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
  */
 export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStateSnapshot>): AppStateSnapshot {
   const safeBase = normalizeAppState(base);
-  const completed = {
-    morning: normalizeCompletedIndexes(
-      [...(safeBase.completed.morning ?? []), ...(incoming.completed?.morning ?? [])],
-      "morning",
-    ),
-    evening: normalizeCompletedIndexes(
-      [...(safeBase.completed.evening ?? []), ...(incoming.completed?.evening ?? [])],
-      "evening",
-    ),
-    before_sleep: normalizeCompletedIndexes(
-      [...(safeBase.completed.before_sleep ?? []), ...(incoming.completed?.before_sleep ?? [])],
-      "before_sleep",
-    ),
-    waking_up: normalizeCompletedIndexes(
-      [...(safeBase.completed.waking_up ?? []), ...(incoming.completed?.waking_up ?? [])],
-      "waking_up",
-    ),
-    home: normalizeCompletedIndexes([...(safeBase.completed.home ?? []), ...(incoming.completed?.home ?? [])], "home"),
-    mosque: normalizeCompletedIndexes(
-      [...(safeBase.completed.mosque ?? []), ...(incoming.completed?.mosque ?? [])],
-      "mosque",
-    ),
-    after_prayer: normalizeCompletedIndexes(
-      [...(safeBase.completed.after_prayer ?? []), ...(incoming.completed?.after_prayer ?? [])],
-      "after_prayer",
-    ),
-    restroom: normalizeCompletedIndexes(
-      [...(safeBase.completed.restroom ?? []), ...(incoming.completed?.restroom ?? [])],
-      "restroom",
-    ),
-    food_drink: normalizeCompletedIndexes(
-      [...(safeBase.completed.food_drink ?? []), ...(incoming.completed?.food_drink ?? [])],
-      "food_drink",
-    ),
-    travel: normalizeCompletedIndexes(
-      [...(safeBase.completed.travel ?? []), ...(incoming.completed?.travel ?? [])],
-      "travel",
-    ),
-  };
+  const completed = {} as Record<CategoryId, number[]>;
+  for (const id of CATEGORY_IDS) {
+    completed[id] = normalizeCompletedIndexes(
+      [...(safeBase.completed[id] ?? []), ...(incoming.completed?.[id] ?? [])],
+      id,
+    );
+  }
 
   const sessions = new Map<string, StoredSession>();
   for (const session of safeBase.sessions) {
@@ -599,18 +523,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
   return {
     ...safeState,
     profile: { ...DEFAULT_APP_STATE.profile },
-    completed: {
-      morning: [],
-      evening: [],
-      before_sleep: [],
-      waking_up: [],
-      home: [],
-      mosque: [],
-      after_prayer: [],
-      restroom: [],
-      food_drink: [],
-      travel: [],
-    },
+    completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, number[]>,
     sessions: [],
     dailyCompletions: [],
     savedZikrIds: [],

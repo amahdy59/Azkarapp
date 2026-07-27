@@ -7,6 +7,7 @@ import {
   mergeAppStates,
   normalizeAppState,
   saveAppState,
+  toCompletedSets,
 } from "./state";
 
 describe("app state persistence", () => {
@@ -131,16 +132,8 @@ describe("app state persistence", () => {
         accountUserId: "account-a",
       },
       completed: {
+        ...DEFAULT_APP_STATE.completed,
         morning: [0],
-        evening: [],
-        before_sleep: [],
-        waking_up: [],
-        home: [],
-        mosque: [],
-        after_prayer: [],
-        restroom: [],
-        food_drink: [],
-        travel: [],
       },
       sessions: [
         {
@@ -170,16 +163,8 @@ describe("state merging", () => {
   it("deduplicates completed items", () => {
     const incoming = {
       completed: {
+        ...DEFAULT_APP_STATE.completed,
         morning: [2, 2, 1],
-        evening: [],
-        before_sleep: [],
-        waking_up: [],
-        home: [],
-        mosque: [],
-        after_prayer: [],
-        restroom: [],
-        food_drink: [],
-        travel: [],
       },
     };
     const merged = mergeAppStates(DEFAULT_APP_STATE, incoming);
@@ -189,16 +174,8 @@ describe("state merging", () => {
   it("serializes completion sets in stable order", () => {
     expect(
       fromCompletedSets({
+        ...toCompletedSets(DEFAULT_APP_STATE.completed),
         morning: new Set([2, 1]),
-        evening: new Set(),
-        before_sleep: new Set(),
-        waking_up: new Set(),
-        home: new Set(),
-        mosque: new Set(),
-        after_prayer: new Set(),
-        restroom: new Set(),
-        food_drink: new Set(),
-        travel: new Set(),
       }).morning,
     ).toEqual([1, 2]);
   });

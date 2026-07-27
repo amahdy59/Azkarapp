@@ -9,24 +9,21 @@ import { t } from "../i18n";
 
 const RECENT_SEARCHES = ["Istighfar", "Morning Dua", "Ayat al-Kursi"];
 
-export function CategoryBadge({ catId, language = "en" }: { catId: CategoryId; language?: AppLanguage }) {
+export function CategoryBadge({ catId, language }: { catId: CategoryId; language: AppLanguage }) {
   const isArabic = language === "ar";
-  const cfg = {
-    morning: { label: isArabic ? "الصباح" : "Morning", className: "bg-primary text-primary-foreground" },
-    evening: { label: isArabic ? "المساء" : "Evening", className: "bg-secondary text-secondary-foreground" },
-    before_sleep: { label: isArabic ? "النوم" : "Sleep", className: "bg-muted text-foreground" },
-    waking_up: { label: isArabic ? "الاستيقاظ" : "Waking Up", className: "bg-muted text-foreground" },
-    home: { label: isArabic ? "المنزل" : "Home", className: "bg-muted text-foreground" },
-    mosque: { label: isArabic ? "المسجد" : "Mosque", className: "bg-muted text-foreground" },
-    after_prayer: { label: isArabic ? "بعد الصلاة" : "Prayer", className: "bg-muted text-foreground" },
-    restroom: { label: isArabic ? "الخلاء" : "Restroom", className: "bg-muted text-foreground" },
-    food_drink: { label: isArabic ? "الطعام" : "Food", className: "bg-muted text-foreground" },
-    travel: { label: isArabic ? "السفر" : "Travel", className: "bg-muted text-foreground" },
-  }[catId];
+  const cat = CATEGORIES.find((c) => c.id === catId);
+  const label = isArabic ? (cat?.nameArabic ?? catId) : (cat?.name ?? catId);
+  const isPrimary = catId === "morning";
+  const isSecondary = catId === "evening";
+  const className = isPrimary
+    ? "bg-primary text-primary-foreground"
+    : isSecondary
+      ? "bg-secondary text-secondary-foreground"
+      : "bg-muted text-foreground";
 
   return (
-    <div className={`flex items-center justify-center rounded-full px-2 py-1 shrink-0 ${cfg.className}`}>
-      <p className="text-[0.625rem] font-medium font-sans leading-[14px] whitespace-nowrap">{cfg.label}</p>
+    <div className={`flex items-center justify-center rounded-full px-2 py-1 shrink-0 ${className}`}>
+      <p className="text-[0.625rem] font-medium font-sans leading-[14px] whitespace-nowrap">{label}</p>
     </div>
   );
 }

@@ -6,12 +6,18 @@ export const CATEGORY_IDS: CategoryId[] = [
   "evening",
   "before_sleep",
   "waking_up",
+  "after_prayer",
   "home",
   "mosque",
-  "after_prayer",
-  "restroom",
   "food_drink",
+  "restroom",
+  "clothing",
   "travel",
+  "distress_anxiety",
+  "illness_ruqyah",
+  "social_community",
+  "natural_events",
+  "miscellaneous",
 ];
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
