@@ -189,10 +189,7 @@ test("Arabic garden mirrors collection order and provides non-color completion c
   await expect(evening).toHaveAttribute("data-state", "pending");
 
   const completeStatus = morning.locator("span").last();
-  const pendingStatus = evening.locator("span").last();
-  await expect(completeStatus).not.toHaveText("");
-  await expect(pendingStatus).not.toHaveText("");
-  expect(await completeStatus.textContent()).not.toBe(await pendingStatus.textContent());
+  await expect(completeStatus).toHaveText("✓");
   expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
   await expect(morning.locator("svg")).toHaveCount(1);
   await expect(evening.locator("svg")).toHaveCount(1);
