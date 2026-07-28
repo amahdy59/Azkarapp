@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
-import { MosqueCardBackground } from "../components/MosqueCardBackground";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
@@ -225,83 +224,21 @@ export function HomeScreen({
 
         {/* Clean Hero Zikr Reminder Card */}
         <section aria-labelledby="current-zikr-heading" className="mb-5">
-          <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-card text-card-foreground shadow-lg transition-all dark:border-amber-500/20">
-            {/* Mosque & Dunes Background Vector Illustration */}
-            <MosqueCardBackground category={reminderInfo.categoryId} />
-
-            {/* Ambient Watermark Icon Overlay */}
-            <div
-              className="pointer-events-none absolute -end-2 -bottom-2 z-0 opacity-15 dark:opacity-20 transition-opacity"
-              aria-hidden="true"
-            >
-              {reminderInfo.categoryId === "morning" && (
-                <svg
-                  width="110"
-                  height="110"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="text-amber-600 dark:text-amber-400"
-                >
-                  <circle cx="12" cy="12" r="4" />
-                  <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" />
-                </svg>
-              )}
-              {reminderInfo.categoryId === "evening" && (
-                <svg
-                  width="110"
-                  height="110"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="text-orange-600 dark:text-orange-400"
-                >
-                  <path d="M12 9a4 4 0 0 0-4 4M3 17h18M2 20h20M12 3v4M4.93 6.93l2.83 2.83M19.07 6.93l-2.83 2.83" />
-                </svg>
-              )}
-              {reminderInfo.categoryId === "before_sleep" && (
-                <svg
-                  width="110"
-                  height="110"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.5"
-                  className="text-amber-400 dark:text-amber-300"
-                >
-                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
-                </svg>
-              )}
-            </div>
-
+          <div
+            className={`relative overflow-hidden rounded-3xl border p-5 transition-all shadow-md ${
+              reminderInfo.categoryId === "morning"
+                ? "border-amber-300/80 bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 dark:border-amber-500/30 dark:from-[#2c1c0a] dark:via-[#1e1408] dark:to-[#140e05]"
+                : reminderInfo.categoryId === "evening"
+                  ? "border-orange-300/80 bg-gradient-to-br from-orange-100/90 via-amber-50 to-rose-100/80 dark:border-orange-500/30 dark:from-[#2e160a] dark:via-[#1f1008] dark:to-[#140a05]"
+                  : "border-sky-300/80 bg-gradient-to-br from-sky-100/90 via-indigo-50 to-blue-100/80 dark:border-sky-500/30 dark:from-[#0c1c38] dark:via-[#081226] dark:to-[#050c19]"
+            }`}
+          >
             {/* Card Content Overlay */}
-            <div className="relative z-10 flex flex-col justify-between p-4.5 text-start sm:p-5">
+            <div className="flex flex-col justify-between text-start">
               <div>
-                {/* Time Session Context Pill Chip */}
-                <div className="mb-2.5 inline-flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/15 px-3 py-0.5 text-[0.75rem] font-extrabold text-amber-950 dark:bg-amber-950/60 dark:text-amber-200 shadow-xs">
-                  <span aria-hidden="true" className="text-[0.875rem]">
-                    {reminderInfo.categoryId === "morning" ? "☀️" : reminderInfo.categoryId === "evening" ? "🌇" : "🌙"}
-                  </span>
-                  <span>
-                    {isArabic
-                      ? reminderInfo.categoryId === "morning"
-                        ? "أذكار الصباح"
-                        : reminderInfo.categoryId === "evening"
-                          ? "أذكار المساء"
-                          : "أذكار النوم"
-                      : reminderInfo.categoryId === "morning"
-                        ? "Morning Azkar"
-                        : reminderInfo.categoryId === "evening"
-                          ? "Evening Azkar"
-                          : "Before Sleep Azkar"}
-                  </span>
-                </div>
-
                 <h2
                   id="current-zikr-heading"
-                  className="text-[1.25rem] font-black tracking-wide text-foreground dark:text-white"
+                  className="text-[1.25rem] font-black tracking-wide text-foreground"
                 >
                   {reminderInfo.title}
                 </h2>
@@ -310,7 +247,7 @@ export function HomeScreen({
                 </p>
 
                 {doneCount > 0 && (
-                  <div className="mt-3">
+                  <div className="mt-3.5">
                     <ProgressBar
                       value={doneCount}
                       max={totalCount}
