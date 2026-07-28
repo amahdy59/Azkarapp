@@ -673,8 +673,19 @@ export function TodayRoutineGarden({
             {t(language, "garden.dailyProtection")}
           </h3>
 
-          <div className="relative mb-4 flex h-28 w-28 flex-col items-center justify-center rounded-full border-3 border-amber-500/80 bg-amber-500/5 p-1.5 shadow-inner dark:bg-amber-500/10">
-            <PalmTreeMark size={58} className="transition-transform duration-500 hover:scale-105" />
+          <div
+            className={`relative mb-4 flex h-28 w-28 flex-col items-center justify-center rounded-full transition-all duration-700 ${
+              goldenCount >= 3
+                ? "border-3 border-amber-500 bg-amber-500/10 shadow-md shadow-amber-500/20 dark:bg-amber-500/15"
+                : "border-2 border-amber-500/30 bg-amber-500/5 shadow-inner dark:bg-amber-500/5"
+            } p-1.5`}
+          >
+            <PalmTreeMark
+              size={58}
+              className={`transition-all duration-700 ${
+                goldenCount >= 3 ? "opacity-100 filter-none" : "grayscale opacity-30 contrast-75 blur-[0.2px]"
+              }`}
+            />
 
             <div className="-mt-1 flex items-center justify-center gap-1">
               {[0, 1, 2].map((idx) => (
