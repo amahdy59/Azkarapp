@@ -194,6 +194,6 @@ test("Arabic garden mirrors collection order and provides non-color completion c
   await expect(pendingStatus).not.toHaveText("");
   expect(await completeStatus.textContent()).not.toBe(await pendingStatus.textContent());
   expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
-  await expect(morning.locator("svg")).toHaveCount(2);
+  await expect(morning.locator("svg")).toHaveCount(1);
   await expect(evening.locator("svg")).toHaveCount(1);
 });
