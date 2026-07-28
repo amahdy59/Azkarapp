@@ -114,9 +114,11 @@ export function CategoryScreen({
         key={z.id}
         id={`zikr-card-${index}`}
         className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-xs ${
-          isCardCompleted
-            ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20"
-            : "border-border/80 bg-card hover:border-primary/40 hover:shadow-md"
+          isOccasional
+            ? "border-border/80 bg-card hover:border-amber-500/40 hover:shadow-md"
+            : isCardCompleted
+              ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20"
+              : "border-border/80 bg-card hover:border-primary/40 hover:shadow-md"
         }`}
       >
         {/* Card Header & Text — Clicking text opens full Reader */}
@@ -134,6 +136,23 @@ export function CategoryScreen({
           </p>
         </button>
 
+        {/* Repetition Badge for Occasional Cards (if count > 1) */}
+        {isOccasional && targetCount > 1 && (
+          <div
+            className="flex items-center gap-1.5 rounded-xl border border-primary/20 bg-primary/5 px-3 py-1.5 text-[0.8125rem] font-extrabold text-primary"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            <span aria-hidden="true" className="shrink-0">
+              🔁
+            </span>
+            <span>
+              {isArabic
+                ? `تُقال ${formatNumerals(targetCount, language)} مرات`
+                : `Recite ${formatNumerals(targetCount, language)} times`}
+            </span>
+          </div>
+        )}
+
         {/* Specific Recommended Timing Pill — shown ONLY for specific zikrs */}
         {showTiming && timingText && (
           <div
@@ -147,76 +166,89 @@ export function CategoryScreen({
           </div>
         )}
 
-        {/* Bottom Action Footer: Interactive Counter Button */}
-        <button
-          type="button"
-          onClick={() => handleCardTap(index, targetCount)}
-          aria-label={
-            isCardCompleted
-              ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
-              : t(language, "category.remainingToggle")
-          }
-          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
-            isCardCompleted
-              ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
-              : currentCount > 0
-                ? "border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 shadow-xs"
-                : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs"
-          }`}
-        >
-          {isCardCompleted ? (
-            <>
-              <Check size={18} strokeWidth={3} className="shrink-0" />
-              <span>{t(language, "category.completedButton")}</span>
-            </>
-          ) : (
-            <>
-              <span
-                className="text-[1.0625rem] font-extrabold"
-                dir="auto"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-              >
-                {counterLabelText}
+        {/* Bottom Action Footer for Routine Cards vs Occasional Cards */}
+        {!isOccasional ? (
+          <button
+            type="button"
+            onClick={() => handleCardTap(index, targetCount)}
+            aria-label={
+              isCardCompleted
+                ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
+                : t(language, "category.remainingToggle")
+            }
+            className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+              isCardCompleted
+                ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
+                : currentCount > 0
+                  ? "border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 shadow-xs"
+                  : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs"
+            }`}
+          >
+            {isCardCompleted ? (
+              <>
+                <Check size={18} strokeWidth={3} className="shrink-0" />
+                <span>{t(language, "category.completedButton")}</span>
+              </>
+            ) : (
+              <>
+                <span
+                  className="text-[1.0625rem] font-extrabold"
+                  dir="auto"
+                  style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+                >
+                  {counterLabelText}
+                </span>
+                <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
+              </>
+            )}
+          </button>
+        ) : (
+          <div className="flex items-center justify-between pt-1">
+            <button
+              type="button"
+              onClick={() => onZikr(index)}
+              className="interactive-elem flex h-9 items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/5 px-3 text-[0.8125rem] font-bold text-primary hover:bg-primary/15 transition-all"
+            >
+              <span>{isArabic ? "اقرأ الذكر كاملاً" : "Read Full Dua"}</span>
+              <span className="text-[1.125rem] leading-none" aria-hidden="true">
+                {direction === "rtl" ? "←" : "→"}
               </span>
-              <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
-            </>
-          )}
-        </button>
+            </button>
+          </div>
+        )}
       </div>
     );
   };
-
-  const progressCountText = t(language, "category.counterProgress", {
-    current: formatNumerals(done, language),
-    total: formatNumerals(azkar.length, language),
-  });
 
   return (
     <ScreenContainer dir={direction}>
       <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 
-      <div className="shrink-0 border-b border-border px-5 py-4">
-        <div className="mb-2 flex items-center justify-between">
-          <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
-          <p
-            className="text-[0.8125rem] font-bold text-muted-foreground"
-            dir="auto"
-            style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-          >
-            {progressCountText}
-          </p>
-        </div>
-        <ProgressBar
-          value={done}
-          max={azkar.length}
-          height={8}
-          trackColor="var(--card)"
-          fillColor="var(--primary)"
-          direction={direction}
-          aria-label={t(language, "category.dailyProgress")}
-        />
+      {!isOccasional && (
+        <div className="shrink-0 border-b border-border px-5 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+            <p
+              className="text-[0.8125rem] font-bold text-muted-foreground"
+              dir="auto"
+              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+            >
+              {t(language, "category.counterProgress", {
+                current: formatNumerals(done, language),
+                total: formatNumerals(azkar.length, language),
+              })}
+            </p>
+          </div>
+          <ProgressBar
+            value={done}
+            max={azkar.length}
+            height={8}
+            trackColor="var(--card)"
+            fillColor="var(--primary)"
+            direction={direction}
+            aria-label={t(language, "category.dailyProgress")}
+          />
 
-        {!isOccasional ? (
           <div className="mt-4 flex w-full gap-3">
             {done < azkar.length ? (
               <>
@@ -293,50 +325,46 @@ export function CategoryScreen({
               </>
             )}
           </div>
-        ) : (
-          done > 0 && (
-            <div className="mt-3 flex justify-end">
-              <button
-                type="button"
-                onClick={onReset}
-                className="interactive-elem flex h-9 items-center gap-1.5 rounded-lg px-3 text-[0.75rem] font-bold text-destructive hover:bg-destructive/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-destructive"
-                aria-label={t(language, "category.resetProgress")}
-              >
-                <RotateCcw size={14} />
-                <span>{t(language, "category.resetProgress")}</span>
-              </button>
-            </div>
-          )
-        )}
-      </div>
+        </div>
+      )}
 
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
-        {remainingAzkar.length > 0 && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h2>
-              <span className="text-[0.75rem] font-semibold text-muted-foreground">
-                {t(language, "category.remainingCount", { count: formatNumerals(remainingAzkar.length, language) })}
-              </span>
-            </div>
-            <div className="flex flex-col gap-3.5">
-              {remainingAzkar.map(({ z, index }) => renderZikrCard({ z, index }, false))}
-            </div>
-          </div>
-        )}
+        {isOccasional ? (
+          <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
+        ) : (
+          <>
+            {remainingAzkar.length > 0 && (
+              <div className="mb-6">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-[0.8125rem] font-bold text-muted-foreground">
+                    {t(language, "category.remaining")}
+                  </h2>
+                  <span className="text-[0.75rem] font-semibold text-muted-foreground">
+                    {t(language, "category.remainingCount", { count: formatNumerals(remainingAzkar.length, language) })}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3.5">
+                  {remainingAzkar.map(({ z, index }) => renderZikrCard({ z, index }, false))}
+                </div>
+              </div>
+            )}
 
-        {completedAzkar.length > 0 && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h2>
-              <span className="text-[0.75rem] font-semibold text-muted-foreground">
-                {t(language, "category.completedCount", { count: formatNumerals(completedAzkar.length, language) })}
-              </span>
-            </div>
-            <div className="flex flex-col gap-3.5">
-              {completedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, true))}
-            </div>
-          </div>
+            {completedAzkar.length > 0 && (
+              <div className="mb-6">
+                <div className="mb-3 flex items-center justify-between">
+                  <h2 className="text-[0.8125rem] font-bold text-muted-foreground">
+                    {t(language, "category.completed")}
+                  </h2>
+                  <span className="text-[0.75rem] font-semibold text-muted-foreground">
+                    {t(language, "category.completedCount", { count: formatNumerals(completedAzkar.length, language) })}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-3.5">
+                  {completedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, true))}
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </ScreenContainer>

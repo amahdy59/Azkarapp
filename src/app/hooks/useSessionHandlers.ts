@@ -153,6 +153,10 @@ export function useSessionHandlers({
       },
       ...prev,
     ]);
+
+    if (activeCat === "after_prayer") {
+      setCompleted((prev) => ({ ...prev, after_prayer: new Set() }));
+    }
   };
 
   const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
