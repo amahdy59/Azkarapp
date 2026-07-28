@@ -52,6 +52,16 @@ const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
         return { "--primary": "#0f766e", "--ring": "#0f766e" } as React.CSSProperties; // Teal 700
       case "before_sleep":
         return { "--primary": "#6d28d9", "--ring": "#6d28d9" } as React.CSSProperties; // Violet 700
+      case "after_prayer":
+        return { "--primary": "#047857", "--ring": "#047857" } as React.CSSProperties; // Emerald 700
+      case "waking_up":
+        return { "--primary": "#0369a1", "--ring": "#0369a1" } as React.CSSProperties; // Sky 700
+      case "illness_ruqyah":
+        return { "--primary": "#be123c", "--ring": "#be123c" } as React.CSSProperties; // Rose 700
+      case "distress_anxiety":
+        return { "--primary": "#4338ca", "--ring": "#4338ca" } as React.CSSProperties; // Indigo 700
+      case "travel":
+        return { "--primary": "#d97706", "--ring": "#d97706" } as React.CSSProperties; // Amber 600
       default:
         return {};
     }
@@ -63,6 +73,16 @@ const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
         return { "--primary": "#2dd4bf", "--ring": "#2dd4bf" } as React.CSSProperties; // Teal 400
       case "before_sleep":
         return { "--primary": "#a78bfa", "--ring": "#a78bfa" } as React.CSSProperties; // Violet 400
+      case "after_prayer":
+        return { "--primary": "#34d399", "--ring": "#34d399" } as React.CSSProperties; // Emerald 400
+      case "waking_up":
+        return { "--primary": "#38bdf8", "--ring": "#38bdf8" } as React.CSSProperties; // Sky 400
+      case "illness_ruqyah":
+        return { "--primary": "#fb7185", "--ring": "#fb7185" } as React.CSSProperties; // Rose 400
+      case "distress_anxiety":
+        return { "--primary": "#818cf8", "--ring": "#818cf8" } as React.CSSProperties; // Indigo 400
+      case "travel":
+        return { "--primary": "#fbbf24", "--ring": "#fbbf24" } as React.CSSProperties; // Amber 400
       default:
         return {};
     }

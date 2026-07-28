@@ -20,7 +20,7 @@ export function CategoryScreen({
   onReset,
   onRepeat,
   onBack,
-  onPlayAllAudio: _onPlayAllAudio,
+  onPlayAllAudio,
 }: {
   catId: CategoryId;
   completed: Set<number>;
@@ -234,17 +234,19 @@ export function CategoryScreen({
                 </button>
                 <button
                   type="button"
-                  disabled
-                  aria-disabled="true"
-                  className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3 text-amber-700/80 dark:text-amber-300/80 opacity-75 cursor-not-allowed focus-visible:outline-none"
-                  aria-label={t(language, "category.audioComingSoon")}
-                  title={t(language, "category.audioComingSoon")}
+                  onClick={onPlayAllAudio}
+                  disabled={!onPlayAllAudio}
+                  aria-disabled={!onPlayAllAudio}
+                  className={`flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 dark:text-amber-300 transition-all ${
+                    onPlayAllAudio
+                      ? "hover:bg-amber-500/20 active:scale-95 cursor-pointer shadow-xs"
+                      : "opacity-75 cursor-not-allowed"
+                  }`}
+                  aria-label={t(language, "category.playAllAudio")}
+                  title={t(language, "category.playAllAudio")}
                 >
-                  <Volume2 size={18} className="shrink-0 opacity-70" />
-                  <span className="text-[0.875rem] font-bold">{t(language, "category.playAll")}</span>
-                  <span className="rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[0.6875rem] font-semibold text-amber-800 dark:text-amber-200 leading-none">
-                    {t(language, "common.comingSoon")}
-                  </span>
+                  <Volume2 size={16} />
+                  <span>{t(language, "category.playAll")}</span>
                 </button>
                 {done > 0 && (
                   <button
