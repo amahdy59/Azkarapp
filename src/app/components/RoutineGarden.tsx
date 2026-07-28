@@ -795,7 +795,7 @@ export function TodayRoutineGarden({
 
       {activeTab === "month" && (
         <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 text-center shadow-sm">
+          <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 text-center shadow-xs">
             <div>
               <span className="block text-[1.25rem] font-black text-foreground">
                 {formatNumerals(maxStreakInMonth, language)} {isArabic ? "يوم" : "days"}
@@ -822,9 +822,12 @@ export function TodayRoutineGarden({
             </div>
           </div>
 
-          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-sm">
+          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-xs">
             <div className="mb-3 grid grid-cols-7 gap-2 text-center">
-              {monthHeaders.map((header) => (
+              {(isArabic
+                ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
+                : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
+              ).map((header) => (
                 <span key={header} className="text-[0.75rem] font-bold text-muted-foreground">
                   {header}
                 </span>
@@ -832,16 +835,21 @@ export function TodayRoutineGarden({
             </div>
 
             <div className="grid grid-cols-7 gap-2">
+              {/* Empty leading offset tiles for Month View */}
+              {Array.from({ length: (new Date(targetYear, targetMonth, 1).getDay() + 1) % 7 }).map((_, oIdx) => (
+                <div key={`month-offset-${oIdx}`} className="aspect-square w-full bg-transparent" />
+              ))}
+
               {monthDayRecords.map((day) => {
                 const isPalm = day.isPalm;
-                const leafCount = day.leafCount;
+                const leafCount = day.goldenCount;
                 const tileBg = isPalm
-                  ? "bg-emerald-500 text-white dark:bg-emerald-500 dark:text-black shadow-sm"
+                  ? "bg-emerald-600 border border-amber-400/80 text-amber-300 font-black shadow-xs"
                   : leafCount >= 2
-                    ? "bg-emerald-600/80 text-white"
+                    ? "bg-emerald-500/75 text-white font-bold"
                     : leafCount === 1
-                      ? "bg-emerald-700/50 text-white"
-                      : "bg-muted/40 text-muted-foreground/30";
+                      ? "bg-emerald-500/35 text-emerald-900 dark:text-emerald-300 font-semibold"
+                      : "bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/30";
 
                 const tileTitle = isArabic
                   ? `${day.dayKey}: ${formatNumerals(leafCount, language)} أوراق`
@@ -854,7 +862,7 @@ export function TodayRoutineGarden({
                     aria-label={tileTitle}
                     className={`flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all ${tileBg}`}
                   >
-                    <span>{isPalm ? "🌴" : leafCount > 0 ? "🌿" : ""}</span>
+                    <span>{isPalm ? "🌴" : leafCount > 0 ? "🍃" : ""}</span>
                     <span className="text-[0.625rem] opacity-75">{formatNumerals(day.dayNum, language)}</span>
                   </div>
                 );
@@ -866,63 +874,119 @@ export function TodayRoutineGarden({
 
       {activeTab === "year" && (
         <div className="space-y-4">
-          <div className="flex items-center justify-between rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm dark:bg-amber-500/15">
-            <div>
-              <span className="block text-[1.25rem] font-black text-amber-500">
-                {formatNumerals(yearTotalPalms, language)} {t(language, "garden.fullPalms")}
-              </span>
-              <span className="mt-1 block text-[0.75rem] font-semibold text-muted-foreground">
-                {t(language, "garden.totalLeavesEarned", { count: formatNumerals(yearTotalLeaves, language) })}
-              </span>
+          <div className="rounded-2xl border border-border/80 bg-background/80 p-4 shadow-xs">
+            {/* Year Map Header & Legend */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
+              <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "garden.yearMapTitle")}</h3>
+              <div className="flex items-center gap-1.5 text-[0.6875rem] font-bold text-muted-foreground">
+                <span>{t(language, "garden.legendLess")}</span>
+                <span className="h-3.5 w-3.5 rounded-[3px] bg-muted/40 dark:bg-zinc-800/60" title="0" />
+                <span className="h-3.5 w-3.5 rounded-[3px] bg-emerald-500/35" title="1 leaf" />
+                <span className="h-3.5 w-3.5 rounded-[3px] bg-emerald-500/75" title="2 leaves" />
+                <span
+                  className="flex h-3.5 w-3.5 items-center justify-center rounded-[3px] border border-amber-400 bg-emerald-600 text-[0.5rem]"
+                  title="3 leaves (Palm)"
+                >
+                  🌴
+                </span>
+                <span>{t(language, "garden.legendMore")}</span>
+              </div>
             </div>
-            <PalmTreeMark size={40} />
-          </div>
 
-          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-sm">
-            <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "garden.yearlyOasisMap")}</h3>
+            {/* Weekday Column Headers */}
+            <div className="mt-3 flex items-center gap-2">
+              <span className="w-20 shrink-0 text-[0.6875rem] font-bold text-transparent select-none">Month</span>
+              <div className="grid flex-1 grid-cols-7 gap-1 text-center text-[0.625rem] font-extrabold text-muted-foreground">
+                {(isArabic
+                  ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
+                  : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
+                ).map((wd) => (
+                  <span key={wd} className="truncate">
+                    {wd}
+                  </span>
+                ))}
+              </div>
             </div>
 
-            <div className="space-y-2.5">
+            {/* 12 Months Blocks grouped into 4 Quarters */}
+            <div className="mt-3 space-y-3">
               {monthNames.map((monthName, mIdx) => {
-                const TILES_PER_MONTH = 15;
+                const quarterIndex = Math.floor(mIdx / 3);
+                const isQuarterStart = mIdx % 3 === 0;
+                const quarterKey = `garden.quarter${quarterIndex + 1}` as const;
+
+                const daysInM = new Date(targetYear, mIdx + 1, 0).getDate();
+                const firstDayDate = new Date(targetYear, mIdx, 1);
+                const startOffset = (firstDayDate.getDay() + 1) % 7;
 
                 const monthStr = padZero(mIdx + 1);
-                const prefix = `${targetYear}-${monthStr}-`;
-
-                const monthCompletions = dailyCompletions.filter((r) => r.dayKey.startsWith(prefix));
-                const dayLeavesMap = new Map<number, number>();
-                for (const rec of monthCompletions) {
-                  const dayNum = parseInt(rec.dayKey.slice(8), 10);
-                  if (!isNaN(dayNum)) {
-                    dayLeavesMap.set(dayNum, (dayLeavesMap.get(dayNum) ?? 0) + 1);
-                  }
-                }
 
                 return (
-                  <div key={monthName} className="flex items-center gap-2.5 text-[0.75rem]">
-                    <span className="w-24 shrink-0 font-extrabold text-foreground text-start">{monthName}</span>
-                    <div className="flex flex-1 items-center gap-1">
-                      {Array.from({ length: TILES_PER_MONTH }, (_, tIdx) => {
-                        const day1 = tIdx * 2 + 1;
-                        const day2 = tIdx * 2 + 2;
-                        const tileLeaves = (dayLeavesMap.get(day1) ?? 0) + (dayLeavesMap.get(day2) ?? 0);
-                        // Determine if any day in this tile was a palm (all 3 main cats done)
-                        // Cap at meaningful levels: 0=missed, 1=partial, 2=good, 3=palm
-                        const level = tileLeaves === 0 ? 0 : tileLeaves === 1 ? 1 : tileLeaves === 2 ? 2 : 3;
-                        const tileBg =
-                          level === 3
-                            ? "bg-emerald-500"
-                            : level === 2
-                              ? "bg-emerald-600/80"
-                              : level === 1
-                                ? "bg-emerald-700/50"
-                                : "bg-muted/40";
-                        return <div key={tIdx} className={`h-3.5 flex-1 rounded-sm transition-colors ${tileBg}`} />;
-                      })}
+                  <div key={monthName} className="space-y-1">
+                    {isQuarterStart && (
+                      <div className="my-2.5 flex items-center gap-2">
+                        <span className="h-px flex-1 bg-border/60" />
+                        <span className="text-[0.6875rem] font-extrabold text-muted-foreground/80">
+                          {t(language, quarterKey)}
+                        </span>
+                        <span className="h-px flex-1 bg-border/60" />
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2">
+                      <span className="w-20 shrink-0 truncate text-start text-[0.75rem] font-extrabold text-foreground">
+                        {monthName}
+                      </span>
+                      <div className="grid flex-1 grid-cols-7 gap-1">
+                        {/* Empty leading offset tiles */}
+                        {Array.from({ length: startOffset }).map((_, oIdx) => (
+                          <div key={`offset-${oIdx}`} className="h-3.5 w-full bg-transparent" />
+                        ))}
+
+                        {/* Actual days of month */}
+                        {Array.from({ length: daysInM }, (_, dIdx) => {
+                          const dNum = dIdx + 1;
+                          const dayKey = `${targetYear}-${monthStr}-${padZero(dNum)}`;
+                          const cats = completionsByDayKey.get(dayKey) ?? new Set<CategoryId>();
+                          const goldenCount = MAIN_CATEGORY_IDS.filter((c) => cats.has(c)).length;
+                          const isPalm = goldenCount === 3;
+
+                          const tileBg = isPalm
+                            ? "bg-emerald-600 border border-amber-400/80 text-amber-300 font-black shadow-2xs"
+                            : goldenCount === 2
+                              ? "bg-emerald-500/75 text-white font-bold"
+                              : goldenCount === 1
+                                ? "bg-emerald-500/35 text-emerald-900 dark:text-emerald-300"
+                                : "bg-muted/30 dark:bg-zinc-800/40";
+
+                          const tileTitle = isArabic
+                            ? `${monthName} ${formatNumerals(dNum, language)}: ${formatNumerals(goldenCount, language)} أوراق`
+                            : `${monthName} ${dNum}: ${goldenCount} leaves`;
+
+                          return (
+                            <div
+                              key={dayKey}
+                              title={tileTitle}
+                              aria-label={tileTitle}
+                              className={`flex h-3.5 w-full items-center justify-center rounded-[3px] text-[0.5rem] transition-colors ${tileBg}`}
+                            >
+                              {isPalm ? "🌴" : ""}
+                            </div>
+                          );
+                        })}
+                      </div>
                     </div>
                   </div>
                 );
+              })}
+            </div>
+
+            {/* Bottom Summary Footer */}
+            <div className="mt-4 border-t border-border/60 pt-3 text-center text-[0.75rem] font-extrabold text-muted-foreground">
+              {t(language, "garden.yearSummaryFooter", {
+                azkar: formatNumerals(yearTotalLeaves, language),
+                days: formatNumerals(yearCompletionsByDay.size, language),
+                palms: formatNumerals(yearTotalPalms, language),
               })}
             </div>
           </div>

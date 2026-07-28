@@ -3,6 +3,7 @@ import { CheckCircle2, Info } from "../../components/icons";
 import {
   BudMark,
   GardenMilestones,
+  GoldenLeafMark,
   LeafMark,
   PaleLeafMark,
   PalmTreeMark,
@@ -114,50 +115,47 @@ export function ProgressPanel({
                 />
               </div>
 
-              {/* Three core stat pills */}
+              {/* Three core stat pills (Flame streak, Golden leaves, Lifetime palms) */}
               <div
                 className="mt-4 grid grid-cols-3 gap-3 text-center"
                 aria-label={t(language, "progressPanel.todayStats")}
               >
-                <div className="rounded-xl border border-border bg-background px-2 py-3">
-                  <span
-                    className="block text-[1.375rem] font-extrabold text-emerald-500"
-                    aria-label={
-                      isArabic ? `${summary.today.leafCount} مجموعات أساسية` : `${summary.today.leafCount} core groups`
-                    }
-                  >
-                    {formatNumerals(summary.today.leafCount, language)}
-                  </span>
-                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
-                    {t(language, "garden.coreLeafLabel")}
-                  </span>
-                </div>
-                <div className="rounded-xl border border-border bg-background px-2 py-3">
-                  <span
-                    className="block text-[1.375rem] font-extrabold text-primary"
-                    aria-label={
-                      isArabic
-                        ? `${summary.today.extraLeafCount} مجموعات إضافية`
-                        : `${summary.today.extraLeafCount} extra groups`
-                    }
-                  >
-                    {formatNumerals(summary.today.extraLeafCount, language)}
-                  </span>
-                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
-                    {t(language, "garden.extraLeafLabel")}
-                  </span>
-                </div>
-                <div className="rounded-xl border border-border bg-background px-2 py-3">
-                  <span
-                    className="block text-[1.375rem] font-extrabold text-primary"
-                    aria-label={
-                      isArabic ? `سلسلة ${summary.currentPalmRhythm} أيام` : `${summary.currentPalmRhythm} day streak`
-                    }
-                  >
-                    {formatNumerals(summary.currentPalmRhythm, language)}
-                  </span>
-                  <span className="mt-0.5 block text-[0.625rem] font-semibold text-muted-foreground">
+                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
+                  <div className="flex items-center gap-1">
+                    <span role="img" aria-label="Flame streak">
+                      🔥
+                    </span>
+                    <span className="text-[1.25rem] font-black text-amber-600 dark:text-amber-400">
+                      {formatNumerals(summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0, language)}
+                    </span>
+                  </div>
+                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
                     {t(language, "home.currentStreak")}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
+                  <div className="flex items-center gap-1">
+                    <GoldenLeafMark size={18} filled />
+                    <span className="text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
+                      {formatNumerals(summary.today.goldenLeafCount ?? summary.today.leafCount, language)} /{" "}
+                      {formatNumerals(3, language)}
+                    </span>
+                  </div>
+                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
+                    {t(language, "garden.todayTitle")}
+                  </span>
+                </div>
+
+                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
+                  <div className="flex items-center gap-1">
+                    <PalmTreeMark size={20} filled={summary.lifetimePalms > 0} />
+                    <span className="text-[1.25rem] font-black text-amber-500">
+                      {formatNumerals(summary.lifetimePalms, language)}
+                    </span>
+                  </div>
+                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
+                    {t(language, "garden.fullPalms")}
                   </span>
                 </div>
               </div>
