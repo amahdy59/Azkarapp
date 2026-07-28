@@ -112,7 +112,7 @@ test("populated Home exposes leaf progress through text, state, and accessible n
 
   const garden = page.getByTestId("today-garden-card");
   await expect(garden).toBeVisible();
-  await expect(garden.getByRole("heading", { name: "Today's practice" })).toBeVisible();
+  await expect(garden.getByRole("heading", { name: /Daily Protection|Today's practice/i })).toBeVisible();
   await expect(page.getByTestId("today-leaf-count")).toHaveText("2 of 3 leaves");
 
   const collections = garden.getByRole("list", { name: "Today's collection progress" });

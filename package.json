@@ -12,7 +12,7 @@
     "audit:prod": "pnpm audit --prod",
     "build:pages": "vite build --mode github-pages",
     "build": "vite build",
-    "check": "prettier --check . && eslint . --max-warnings 0 && tsc --noEmit && vitest run && vite build && node scripts/check-bundle-budget.mjs",
+    "check": "prettier --check . && eslint . --max-warnings 0 && tsc --noEmit && vitest run && playwright test && vite build && node scripts/check-bundle-budget.mjs",
     "dev": "vite",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
