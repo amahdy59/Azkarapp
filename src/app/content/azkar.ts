@@ -1679,6 +1679,7 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     translation:
       "None has the right to be worshipped except Allah alone, with no partner. His is the kingdom and praise; He gives life and causes death, and He has power over all things.",
     benefit: "Recited 10 times after Fajr and Maghrib prayers.",
+    preferredTiming: "Recited 10 times after Fajr and 10 times after Maghrib.",
     repetitionCount: 10,
     countLabel: "10",
     sourceReference: "Jami' at-Tirmidhi 3474; Hisn al-Muslim 29.",
@@ -1710,6 +1711,7 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     transliteration: "Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbala",
     translation: "O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.",
     benefit: "Recited after Fajr prayer.",
+    preferredTiming: "Recited after Fajr prayer.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Ibn Majah 925; Hisn al-Muslim 32.",

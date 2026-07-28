@@ -326,6 +326,7 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "When lying down, placing the right hand under the cheek.": "تُقال عند الاضطجاع مع وضع اليد اليمنى تحت الخد.",
   "Before sleeping; perform wudu, lie on the right side, and make this the final words.":
     "تُقال قبل النوم؛ بعد الوضوء والاضطجاع على الشق الأيمن، وتُجعل آخر ما يُقال.",
+  "Recited after Fajr prayer.": "تُقال عقب صلاة الفجر.",
 };
 
 const GENERIC_PREFERRED_TIMINGS = new Set<string>([
