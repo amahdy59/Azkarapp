@@ -236,10 +236,7 @@ export function HomeScreen({
             {/* Card Content Overlay */}
             <div className="flex flex-col justify-between text-start">
               <div>
-                <h2
-                  id="current-zikr-heading"
-                  className="text-[1.25rem] font-black tracking-wide text-foreground"
-                >
+                <h2 id="current-zikr-heading" className="text-[1.25rem] font-black tracking-wide text-foreground">
                   {reminderInfo.title}
                 </h2>
                 <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
