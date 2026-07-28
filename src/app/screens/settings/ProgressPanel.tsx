@@ -1,9 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { CheckCircle2 } from "../../components/icons";
-import {
-  LeafMark,
-  TodayRoutineGarden,
-} from "../../components/RoutineGarden";
+import { LeafMark, TodayRoutineGarden } from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";

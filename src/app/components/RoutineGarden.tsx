@@ -650,7 +650,10 @@ export function TodayRoutineGarden({
             </span>
           </div>
           <span className="h-4 w-px bg-amber-500/30" />
-          <div className="flex items-center gap-1.5" title={isArabic ? "الأوراق الذهبية اليومية" : "Daily Golden Leaves"}>
+          <div
+            className="flex items-center gap-1.5"
+            title={isArabic ? "الأوراق الذهبية اليومية" : "Daily Golden Leaves"}
+          >
             <GoldenLeafMark size={20} filled />
             <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
               {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
@@ -659,9 +662,7 @@ export function TodayRoutineGarden({
           <span className="h-4 w-px bg-amber-500/30" />
           <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
             <PalmTreeMark size={24} filled={totalPalms > 0} />
-            <span className="text-[1rem] font-black text-amber-500">
-              {formatNumerals(totalPalms, language)}
-            </span>
+            <span className="text-[1rem] font-black text-amber-500">{formatNumerals(totalPalms, language)}</span>
           </div>
         </div>
       )}
