@@ -534,10 +534,6 @@ export function TodayRoutineGarden({
       ? HIJRI_MONTH_NAMES_EN
       : GREGORIAN_MONTH_NAMES_EN;
 
-  const monthHeaders = isArabic
-    ? ["سبت", "أحد", "إثنين", "ثلاثاء", "أربعاء", "خميس", "جمعة"]
-    : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
-
   return (
     <section
       data-testid="today-garden-card"
