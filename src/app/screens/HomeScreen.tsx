@@ -281,10 +281,7 @@ export function HomeScreen({
                   className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
                 >
                   <span>{ctaLabel}</span>
-                  <span
-                    className="text-[1.125rem] leading-none transition-transform"
-                    aria-hidden="true"
-                  >
+                  <span className="text-[1.125rem] leading-none transition-transform" aria-hidden="true">
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
