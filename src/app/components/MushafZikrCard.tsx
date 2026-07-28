@@ -109,8 +109,9 @@ export function MushafZikrCard({
       </div>
 
       {/* Main Mushaf Content Body */}
-      <div
-        className="p-5 sm:p-6 cursor-pointer hover:bg-amber-500/5 transition-colors"
+      <button
+        type="button"
+        className="w-full text-start p-5 sm:p-6 cursor-pointer hover:bg-amber-500/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onSelect && onSelect(index)}
       >
         {/* Basmalah Header if applicable */}
@@ -132,25 +133,26 @@ export function MushafZikrCard({
             const isAyahMarker = /^﴿[0-9٠-٩]+﴾$/.test(segment.trim());
 
             if (isAyahMarker) {
-              const ayahNum = parseInt(segment.replace(/[^0-9]/g, "")) || segIdx;
+              const ayahNum = parseInt(segment.replace(/[^0-9]/g, ""), 10) || segIdx;
               const isSelected = highlightedAyah === ayahNum;
 
               return (
-                <span
+                <button
+                  type="button"
                   key={segIdx}
                   onClick={(e) => {
                     e.stopPropagation();
                     setHighlightedAyah(isSelected ? null : ayahNum);
                   }}
                   title={`آية ${formatNumerals(ayahNum, language)}`}
-                  className={`inline-flex items-center justify-center px-1.5 py-0.5 mx-1 rounded-md text-[0.95rem] font-semibold transition-all cursor-pointer ${
+                  className={`inline-flex items-center justify-center px-1.5 py-0.5 mx-1 rounded-md text-[0.95rem] font-semibold transition-all cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                     isSelected
                       ? "bg-amber-500 text-amber-950 font-black scale-110 shadow-sm"
                       : "text-amber-800 dark:text-amber-300 hover:bg-amber-500/20"
                   }`}
                 >
                   {segment}
-                </span>
+                </button>
               );
             }
 
@@ -167,7 +169,7 @@ export function MushafZikrCard({
             )}
           </div>
         )}
-      </div>
+      </button>
     </div>
   );
 }

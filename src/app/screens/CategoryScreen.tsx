@@ -9,7 +9,6 @@ import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
-import { MushafZikrCard } from "../components/MushafZikrCard";
 
 export function CategoryScreen({
   catId,
