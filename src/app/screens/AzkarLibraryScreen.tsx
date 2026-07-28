@@ -84,10 +84,14 @@ export function AzkarLibraryScreen({
                     dir={direction}
                     onClick={() => onCategory(category.id)}
                     className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    aria-label={t(language, "library.progressOfTotal", {
-                      done: formatNumerals(done, language),
-                      total: formatNumerals(total, language),
-                    })}
+                    aria-label={`${isArabic ? category.nameArabic : category.name}, ${t(
+                      language,
+                      "library.progressOfTotal",
+                      {
+                        done: formatNumerals(done, language),
+                        total: formatNumerals(total, language),
+                      },
+                    )}`}
                   >
                     <span
                       data-slot="category-icon"
