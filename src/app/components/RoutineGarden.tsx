@@ -668,19 +668,19 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="flex flex-col items-center py-2 text-center">
-          <h3 className="mb-5 text-[1.25rem] font-black text-foreground dark:text-white">
+        <div className="flex flex-col items-center py-1 text-center">
+          <h3 className="mb-3 text-[1.125rem] font-black text-foreground dark:text-white">
             {t(language, "garden.dailyProtection")}
           </h3>
 
-          <div className="relative mb-5 flex h-48 w-48 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/5 shadow-inner dark:bg-amber-500/10">
-            <PalmTreeMark size={60} className="transition-transform duration-500 hover:scale-105" />
+          <div className="relative mb-4 flex h-36 w-36 flex-col items-center justify-center rounded-full border-3 border-amber-500/80 bg-amber-500/5 p-2 shadow-inner dark:bg-amber-500/10">
+            <PalmTreeMark size={44} className="transition-transform duration-500 hover:scale-105" />
 
-            <div className="mt-1 flex items-center justify-center gap-2">
+            <div className="mt-0.5 flex items-center justify-center gap-1.5">
               {[0, 1, 2].map((idx) => (
                 <GoldenLeafMark
                   key={idx}
-                  size={24}
+                  size={18}
                   filled={goldenCount > idx}
                   className="transition-all duration-300"
                 />
@@ -689,13 +689,17 @@ export function TodayRoutineGarden({
 
             <div
               data-testid="today-leaf-count"
-              className="absolute -bottom-3.5 rounded-full bg-amber-950 px-4 py-1 text-[0.8125rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
+              aria-label={t(language, "garden.goldenLeavesCount", { count: formatNumerals(goldenCount, language) })}
+              className="absolute -bottom-3 flex items-center gap-1 rounded-full bg-amber-950 px-3 py-0.5 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
-              {t(language, "garden.goldenLeavesCount", { count: formatNumerals(goldenCount, language) })}
+              <span>
+                {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
+              </span>
+              <GoldenLeafMark size={14} filled={goldenCount > 0} />
             </div>
           </div>
 
-          <p className="mt-2 text-[0.875rem] font-medium text-muted-foreground">
+          <p className="mt-1 text-[0.8125rem] font-medium text-muted-foreground">
             {t(language, "garden.leavesMeaning")}
           </p>
 
@@ -703,7 +707,7 @@ export function TodayRoutineGarden({
 
           <ul
             aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-            className="mt-4 flex w-full justify-center gap-3"
+            className="mt-3 flex w-full justify-center gap-2"
           >
             {[
               {
@@ -749,19 +753,25 @@ export function TodayRoutineGarden({
                 data-state={col.state}
                 aria-label={col.label}
                 title={col.label}
-                className="flex items-center gap-1 text-[0.75rem] font-bold text-muted-foreground"
+                className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[0.75rem] font-extrabold transition-all ${
+                  col.state === "complete"
+                    ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
+                    : "border-border/50 bg-muted/20 text-muted-foreground/60"
+                }`}
               >
+                <span className="truncate">{col.name}</span>
                 {col.state === "complete" ? (
-                  <>
+                  <span className="flex shrink-0 items-center gap-0.5 text-amber-500">
                     <GoldenLeafMark size={14} filled />
                     <GoldenLeafMark size={14} filled />
-                  </>
+                    <span className="text-[0.7rem]">✓</span>
+                  </span>
                 ) : (
-                  <GoldenLeafMark size={14} filled={false} />
+                  <span className="flex shrink-0 items-center gap-0.5 text-muted-foreground/40">
+                    <GoldenLeafMark size={14} filled={false} />
+                    <span className="text-[0.7rem]">•</span>
+                  </span>
                 )}
-                <span className="sr-only">
-                  {col.name}: {col.state}
-                </span>
               </li>
             ))}
           </ul>
