@@ -939,7 +939,9 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               </div>
               <div className="flex items-center gap-1 rounded-lg bg-amber-500/10 px-2 py-1 text-[0.75rem] font-extrabold text-amber-600 dark:text-amber-400">
                 <GoldenLeafMark size={14} filled={golden > 0} />
-                <span>{formatNumerals(golden, language)} / {formatNumerals(3, language)}</span>
+                <span>
+                  {formatNumerals(golden, language)} / {formatNumerals(3, language)}
+                </span>
               </div>
             </div>
           </div>
