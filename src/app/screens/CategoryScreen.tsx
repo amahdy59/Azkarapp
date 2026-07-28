@@ -158,6 +158,82 @@ export function CategoryScreen({
         </button>
       );
     }
+
+    return (
+      <div
+        key={z.id}
+        id={`zikr-card-${index}`}
+        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-xs ${
+          isCardCompleted
+            ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20"
+            : "border-border/80 bg-card hover:border-primary/40 hover:shadow-md"
+        }`}
+      >
+        {/* Card Header & Text — Clicking text opens full Reader */}
+        <button
+          type="button"
+          onClick={() => onZikr(index)}
+          className="interactive-elem min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+        >
+          <p
+            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+            dir={isArabic ? "rtl" : "ltr"}
+            lang={isArabic ? "ar" : "en"}
+          >
+            {isArabic ? z.arabicText : z.translation}
+          </p>
+        </button>
+
+        {/* Specific Recommended Timing Pill — shown ONLY for specific zikrs */}
+        {showTiming && timingText && (
+          <div
+            className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            <span aria-hidden="true" className="shrink-0">
+              💡
+            </span>
+            <span className="leading-snug">{timingText}</span>
+          </div>
+        )}
+
+        {/* Bottom Action Footer for Routine Cards */}
+        <button
+          type="button"
+          onClick={() => handleCardTap(index, targetCount)}
+          aria-label={
+            isCardCompleted
+              ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
+              : t(language, "category.remainingToggle")
+          }
+          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+            isCardCompleted
+              ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
+              : currentCount > 0
+                ? "border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 shadow-xs"
+                : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs"
+          }`}
+        >
+          {isCardCompleted ? (
+            <>
+              <Check size={18} strokeWidth={3} className="shrink-0" />
+              <span>{t(language, "category.completedButton")}</span>
+            </>
+          ) : (
+            <>
+              <span
+                className="text-[1.0625rem] font-extrabold"
+                dir="auto"
+                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              >
+                {counterLabelText}
+              </span>
+              <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
+            </>
+          )}
+        </button>
+      </div>
+    );
   };
 
   return (
