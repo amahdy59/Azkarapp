@@ -1,0 +1,8 @@
+#!/bin/sh
+echo "Running pre-push quality checks (prettier, eslint, tsc, vitest, build, budget)..."
+npm run check
+if [ $? -ne 0 ]; then
+  echo "❌ Pre-push check failed! Please fix the errors above before pushing."
+  exit 1
+fi
+echo "✅ All quality checks passed!"
