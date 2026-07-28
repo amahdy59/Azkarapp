@@ -21,6 +21,19 @@ describe("localized zikr supporting content", () => {
     }
   });
 
+  it("provides Arabic translation for every zikr preferred timing without English fallbacks", () => {
+    const unmapped = new Set<string>();
+    for (const zikr of ALL_AZKAR) {
+      if (zikr.preferredTiming) {
+        const timing = getLocalizedPreferredTiming(zikr, "ar");
+        if (/[A-Za-z]/.test(timing)) {
+          unmapped.add(zikr.preferredTiming);
+        }
+      }
+    }
+    expect(Array.from(unmapped), `Unmapped timings: ${JSON.stringify(Array.from(unmapped))}`).toEqual([]);
+  });
+
   it("keeps the reviewed English content unchanged", () => {
     for (const zikr of ALL_AZKAR) {
       expect(getLocalizedZikrBenefit(zikr, "en")).toBe(zikr.benefit);

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Check } from "./icons";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import type { AppLanguage, Zikr } from "../types";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 
 export interface MushafZikrCardProps {
   zikr: Zikr;
@@ -163,9 +164,11 @@ export function MushafZikrCard({
         {/* Hadith / Source Reference Footer */}
         {zikr.sourceReference && (
           <div className="mt-4 pt-3 border-t border-amber-700/15 dark:border-amber-600/15 flex items-center justify-between text-[0.75rem] font-medium text-muted-foreground">
-            <span className="truncate">{zikr.sourceReference}</span>
+            <span className="truncate">{getLocalizedSourceReference(zikr, language)}</span>
             {zikr.benefit && (
-              <span className="italic text-amber-800 dark:text-amber-300 truncate max-w-[60%]">{zikr.benefit}</span>
+              <span className="italic text-amber-800 dark:text-amber-300 truncate max-w-[60%]">
+                {getLocalizedZikrBenefit(zikr, language)}
+              </span>
             )}
           </div>
         )}

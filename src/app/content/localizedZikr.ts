@@ -317,6 +317,15 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "Morning after Fajr.": "تُقال في الصباح بعد صلاة الفجر.",
   "After ‘Asr/sunset window.": "تُقال في المساء بعد صلاة العصر وقبل الغروب.",
   "In the evening.": "تُقال في المساء.",
+  "Before sleeping, after lying down.": "تُقال عند الاضطجاع وقبل النوم.",
+  "When lying down to sleep.": "تُقال عند المأوى إلى الفراش والنوم.",
+  "At night before sleeping.": "تُقال ليلاً قبل النوم.",
+  "Before sleeping.": "تُقال قبل النوم.",
+  "Before sleeping every night.": "تُقال كل ليلة قبل النوم.",
+  "When lying down after dusting off the bed.": "تُقال عند الاضطجاع بعد نفض الفراش.",
+  "When lying down, placing the right hand under the cheek.": "تُقال عند الاضطجاع مع وضع اليد اليمنى تحت الخد.",
+  "Before sleeping; perform wudu, lie on the right side, and make this the final words.":
+    "تُقال قبل النوم؛ بعد الوضوء والاضطجاع على الشق الأيمن، وتُجعل آخر ما يُقال.",
 };
 
 const GENERIC_PREFERRED_TIMINGS = new Set<string>([
