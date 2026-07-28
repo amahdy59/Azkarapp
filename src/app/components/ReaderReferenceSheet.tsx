@@ -153,7 +153,11 @@ export function ReaderReferenceSheet({
                   <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
                     {t(language, "reader.evidence")}
                   </h3>
-                  <p className="zikr-text text-right text-[1.125rem] leading-[1.8] text-foreground" lang="ar" dir="rtl">
+                  <p
+                    className="zikr-text text-right text-[1.125rem] leading-[1.8] text-foreground"
+                    lang={isArabic ? "ar" : undefined}
+                    dir={isArabic ? "rtl" : undefined}
+                  >
                     {zikr.hadithText}
                   </p>
                   {copyAction("hadith", zikr.hadithText, t(language, "reader.copyHadith"), "rtl")}
