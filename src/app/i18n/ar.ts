@@ -20,6 +20,7 @@ const ar = {
     cancel: "إلغاء",
     reset: "إعادة تعيين",
     skip: "تخطي",
+    comingSoon: "قريباً",
   },
   syncStatus: {
     paused: "توقفت مزامنة الحساب مؤقتاً: {error}",
@@ -347,6 +348,7 @@ const ar = {
     completed: "مكتمل",
     playAllAudio: "تشغيل الصوتي للكل",
     playAll: "تشغيل الكل",
+    audioComingSoon: "الصوت (قريباً)",
     resetProgress: "إعادة تعيين التقدم",
     completedToggle: "مكتمل — انقر للإلغاء",
     remainingToggle: "غير مكتمل — انقر للتحديد",

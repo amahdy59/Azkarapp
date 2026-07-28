@@ -161,7 +161,7 @@ export function HomeScreen({
       {/* Top Header Bar — Enlarged Full-Width Streaks Bar */}
       <header className="flex w-full shrink-0 flex-col gap-2 px-0 pt-0 pb-2">
         {/* Full-width Palm Tree & Leaves Reward Widget */}
-        <PalmTreeReward summary={gardenSummary} language={language} onOpenShareModal={onOpenShareModal} />
+        <PalmTreeReward summary={gardenSummary} language={language} />
 
         {/* Date, Weekday & Live Time on its OWN SEPARATE LINE */}
         <div className="w-full text-center">
@@ -271,7 +271,6 @@ export function HomeScreen({
             hideTabs={true}
             calendarType={calendarType}
             dailyCompletions={dailyCompletions}
-            onOpenShareModal={onOpenShareModal}
           />
         )}
       </div>

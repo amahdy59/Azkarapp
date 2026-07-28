@@ -226,18 +226,20 @@ export function CategoryScreen({
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
-                {onPlayAllAudio && (
-                  <button
-                    type="button"
-                    onClick={onPlayAllAudio}
-                    className="interactive-elem flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/40 bg-amber-500/10 px-3.5 text-amber-600 dark:text-amber-400 hover:bg-amber-500/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-amber-500"
-                    aria-label={t(language, "category.playAllAudio")}
-                    title={t(language, "category.playAllAudio")}
-                  >
-                    <Volume2 size={18} />
-                    <span className="text-[0.875rem] font-bold">{t(language, "category.playAll")}</span>
-                  </button>
-                )}
+                <button
+                  type="button"
+                  disabled
+                  aria-disabled="true"
+                  className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3 text-amber-700/80 dark:text-amber-300/80 opacity-75 cursor-not-allowed focus-visible:outline-none"
+                  aria-label={t(language, "category.audioComingSoon")}
+                  title={t(language, "category.audioComingSoon")}
+                >
+                  <Volume2 size={18} className="shrink-0 opacity-70" />
+                  <span className="text-[0.875rem] font-bold">{t(language, "category.playAll")}</span>
+                  <span className="rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[0.6875rem] font-semibold text-amber-800 dark:text-amber-200 leading-none">
+                    {t(language, "common.comingSoon")}
+                  </span>
+                </button>
                 {done > 0 && (
                   <button
                     type="button"

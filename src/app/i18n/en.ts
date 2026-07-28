@@ -20,6 +20,7 @@ const en = {
     cancel: "Cancel",
     reset: "Reset",
     skip: "Skip",
+    comingSoon: "Coming Soon",
   },
   syncStatus: {
     paused: "Account sync paused: {error}",
@@ -361,6 +362,7 @@ const en = {
     completed: "Completed",
     playAllAudio: "Play All Audio",
     playAll: "Play All",
+    audioComingSoon: "Audio (Coming Soon)",
     resetProgress: "Reset Progress",
     completedToggle: "Completed — tap to uncheck",
     remainingToggle: "Not completed — tap to check",

@@ -168,4 +168,14 @@ describe("quiet garden progress", () => {
     expect(getNextIncompleteIndex(4, new Set([2, 3]), 3)).toBe(0);
     expect(getNextIncompleteIndex(4, new Set([0, 1, 2, 3]), 3)).toBeNull();
   });
+
+  it("calculates daily usage streak for consecutive active days", () => {
+    const records: DailyCollectionCompletion[] = [
+      { dayKey: "2026-07-16", category: "travel", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
+    ];
+    const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
+    expect(summary.currentUsageStreak).toBe(3);
+  });
 });
