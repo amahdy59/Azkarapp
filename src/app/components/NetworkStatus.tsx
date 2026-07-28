@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
+import { t } from "../i18n";
+import type { AppLanguage } from "../types";
 
 /** Announces connectivity changes while allowing locally stored reading and counting to continue. */
-export function NetworkStatus() {
-  const [isOnline, setIsOnline] = useState(() => navigator.onLine);
+export function NetworkStatus({ language = "en" }: { language?: AppLanguage }) {
+  const [isOnline, setIsOnline] = useState(() => (typeof navigator !== "undefined" ? navigator.onLine : true));
 
   useEffect(() => {
     const updateStatus = () => setIsOnline(navigator.onLine);
@@ -18,7 +20,7 @@ export function NetworkStatus() {
 
   return (
     <div className="network-status" role="status" aria-live="polite">
-      You’re offline. Reading and progress continue locally; account sync will resume when connected.
+      {t(language, "syncStatus.offlineNotice")}
     </div>
   );
 }

@@ -31,32 +31,26 @@ function getNextIndex(completed: Set<number>, totalCount: number) {
   return Array.from({ length: totalCount }, (_, index) => index).find((index) => !completed.has(index)) ?? 0;
 }
 
-export function getTimeOfDayZikr(now: Date = new Date()) {
+export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar") {
   const hour = now.getHours() + now.getMinutes() / 60;
   if (hour >= 4 && hour < 15.5) {
     return {
       categoryId: "morning" as CategoryId,
-      titleArabic: "حان وقت أذكار الصباح",
-      titleEnglish: "Time for Morning Azkar",
-      descArabic: "أذكار الصباح تُقرأ بعد صلاة الفجر حتى طلوع الشمس",
-      descEnglish: "Morning Azkar are read after Fajr prayer until sunrise",
+      title: t(language, "home.morningTitle"),
+      desc: t(language, "home.morningDesc"),
     };
   }
   if (hour >= 15.5 && hour < 20) {
     return {
       categoryId: "evening" as CategoryId,
-      titleArabic: "حان وقت أذكار المساء",
-      titleEnglish: "Time for Evening Azkar",
-      descArabic: "أذكار المساء تُقرأ بعد صلاة العصر حتى المغرب",
-      descEnglish: "Evening Azkar are read after Asr prayer until Maghrib",
+      title: t(language, "home.eveningTitle"),
+      desc: t(language, "home.eveningDesc"),
     };
   }
   return {
     categoryId: "before_sleep" as CategoryId,
-    titleArabic: "حان وقت أذكار النوم",
-    titleEnglish: "Time for Before Sleep Azkar",
-    descArabic: "أذكار النوم تُقرأ بعد صلاة العشاء وقبل النوم",
-    descEnglish: "Before Sleep Azkar are read after Isha prayer and before sleep",
+    title: t(language, "home.beforeSleepTitle"),
+    desc: t(language, "home.beforeSleepDesc"),
   };
 }
 
@@ -132,7 +126,7 @@ export function HomeScreen({
   );
 
   // Determine which category to feature based on time of day
-  const reminderInfo = useMemo(() => getTimeOfDayZikr(now), [now]);
+  const reminderInfo = useMemo(() => getTimeOfDayZikr(now, language), [now, language]);
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
   const categoryAzkar = getAzkarByCategory(reminderInfo.categoryId);
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<number>();
@@ -185,11 +179,9 @@ export function HomeScreen({
                   ✨
                 </span>
                 <div>
-                  <h3 className="text-[0.9375rem] font-black text-foreground">
-                    {isArabic ? "فضائل يوم الجمعة" : "Friday Special Virtues"}
-                  </h3>
+                  <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "friday.title")}</h3>
                   <p className="text-[0.75rem] font-semibold text-muted-foreground">
-                    {isArabic ? "الصلاة على النبي ﷺ • سورة الكهف" : "Salawat counter & Surah Al-Kahf"}
+                    {t(language, "friday.homeSubtitle")}
                   </p>
                 </div>
               </div>
@@ -210,10 +202,10 @@ export function HomeScreen({
                   id="current-zikr-heading"
                   className="text-[1.25rem] font-black tracking-wide text-foreground dark:text-white"
                 >
-                  {isArabic ? reminderInfo.titleArabic : reminderInfo.titleEnglish}
+                  {reminderInfo.title}
                 </h2>
                 <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
-                  {isArabic ? reminderInfo.descArabic : reminderInfo.descEnglish}
+                  {reminderInfo.desc}
                 </p>
 
                 {doneCount > 0 && (
@@ -224,13 +216,16 @@ export function HomeScreen({
                       height={6}
                       trackColor="var(--muted)"
                       direction={direction}
-                      aria-label={
-                        isArabic ? `تقدم ${reminderCategory.nameArabic}` : `${reminderCategory.name} progress`
-                      }
+                      aria-label={t(language, "home.progressOf", {
+                        done: formatNumerals(doneCount, language),
+                        total: formatNumerals(totalCount, language),
+                      })}
                     />
                     <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
-                      {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
-                      {formatNumerals(totalCount, language)} {t(language, "home.complete")}
+                      {t(language, "home.progressOf", {
+                        done: formatNumerals(doneCount, language),
+                        total: formatNumerals(totalCount, language),
+                      })}
                     </span>
                   </div>
                 )}

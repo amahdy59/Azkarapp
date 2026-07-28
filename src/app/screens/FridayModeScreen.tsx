@@ -4,6 +4,23 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import { Sparkles, BookOpen, Heart, CheckCircle2, RotateCcw } from "../components/icons";
+import { t } from "../i18n";
+
+// ─── Weekly-reset key ─────────────────────────────────────────────────────────
+// Returns an ISO-week string like "2025-W03" so the Surah Al-Kahf checkbox
+// automatically un-ticks on the first use of a new Friday week.
+function getIsoWeekKey(): string {
+  const now = new Date();
+  const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+  const day = d.getUTCDay() || 7; // Sunday → 7
+  d.setUTCDate(d.getUTCDate() + 4 - day); // Nearest Thursday
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  const weekNo = Math.ceil(((d.getTime() - yearStart.getTime()) / 86_400_000 + 1) / 7);
+  return `${d.getUTCFullYear()}-W${String(weekNo).padStart(2, "0")}`;
+}
+
+const SALAWAT_KEY = "azkarapp_salawat_friday_count";
+const KAHF_KEY_PREFIX = "azkarapp_surah_kahf_complete_";
 
 export function FridayModeScreen({
   isArabic,
@@ -15,18 +32,21 @@ export function FridayModeScreen({
   onBack: () => void;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+
+  // Salawat counter — lifetime running total, intentionally never auto-resets
   const [salawatCount, setSalawatCount] = useState<number>(() => {
     try {
-      const stored = localStorage.getItem("azkarapp_salawat_friday_count");
+      const stored = localStorage.getItem(SALAWAT_KEY);
       return stored ? parseInt(stored, 10) : 0;
     } catch {
       return 0;
     }
   });
 
+  // Surah Al-Kahf — keyed by ISO week so it resets automatically each Friday week
   const [surahKahfRead, setSurahKahfRead] = useState<boolean>(() => {
     try {
-      return localStorage.getItem("azkarapp_surah_kahf_complete") === "true";
+      return localStorage.getItem(`${KAHF_KEY_PREFIX}${getIsoWeekKey()}`) === "true";
     } catch {
       return false;
     }
@@ -36,7 +56,7 @@ export function FridayModeScreen({
     const next = salawatCount + 1;
     setSalawatCount(next);
     try {
-      localStorage.setItem("azkarapp_salawat_friday_count", next.toString());
+      localStorage.setItem(SALAWAT_KEY, next.toString());
     } catch {
       // ignore storage errors
     }
@@ -45,7 +65,7 @@ export function FridayModeScreen({
   const handleResetSalawat = () => {
     setSalawatCount(0);
     try {
-      localStorage.setItem("azkarapp_salawat_friday_count", "0");
+      localStorage.setItem(SALAWAT_KEY, "0");
     } catch {
       // ignore
     }
@@ -55,7 +75,7 @@ export function FridayModeScreen({
     const next = !surahKahfRead;
     setSurahKahfRead(next);
     try {
-      localStorage.setItem("azkarapp_surah_kahf_complete", next ? "true" : "false");
+      localStorage.setItem(`${KAHF_KEY_PREFIX}${getIsoWeekKey()}`, next ? "true" : "false");
     } catch {
       // ignore
     }
@@ -65,11 +85,7 @@ export function FridayModeScreen({
 
   return (
     <ScreenContainer dir={direction} className="px-0">
-      <Header
-        onBack={onBack}
-        title={isArabic ? "فضائل يوم الجمعة" : "Friday Special Virtues"}
-        subtitle={isArabic ? "الصلاة على النبي وسورة الكهف" : "Salawat & Surah Al-Kahf"}
-      />
+      <Header onBack={onBack} title={t(language, "friday.title")} subtitle={t(language, "friday.subtitle")} />
 
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4 space-y-6">
         {/* Banner Card */}
@@ -79,13 +95,9 @@ export function FridayModeScreen({
               <Sparkles size={24} />
             </div>
             <div>
-              <h2 className="text-[1.125rem] font-black text-foreground">
-                {isArabic ? "يوم الجمعة عيد الأسبوع" : "Blessed Friday Routine"}
-              </h2>
+              <h2 className="text-[1.125rem] font-black text-foreground">{t(language, "friday.bannerHeading")}</h2>
               <p className="mt-0.5 text-[0.8125rem] font-semibold text-muted-foreground">
-                {isArabic
-                  ? "«إِنَّ مِنْ أَفْضَلِ أَيَّامِكُمْ يَوْمَ الْجُمُعَةِ، فَأَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ»"
-                  : "Multiply prayers upon Prophet Muhammad ﷺ on Friday"}
+                {t(language, "friday.bannerHadith")}
               </p>
             </div>
           </div>
@@ -97,7 +109,7 @@ export function FridayModeScreen({
             <div className="flex items-center gap-2">
               <Heart size={20} className="text-rose-500 fill-rose-500/20" />
               <h3 id="salawat-heading" className="text-[1rem] font-black text-foreground">
-                {isArabic ? "عداد الصلاة على النبي ﷺ" : "Salawat Counter ﷺ"}
+                {t(language, "friday.salawatHeading")}
               </h3>
             </div>
             {salawatCount > 0 && (
@@ -105,18 +117,16 @@ export function FridayModeScreen({
                 type="button"
                 onClick={handleResetSalawat}
                 className="flex items-center gap-1 text-[0.75rem] font-extrabold text-muted-foreground hover:text-destructive transition-colors"
-                aria-label={isArabic ? "إعادة تعيين العداد" : "Reset Counter"}
+                aria-label={t(language, "friday.salawatResetAriaLabel")}
               >
                 <RotateCcw size={14} />
-                <span>{isArabic ? "تصفير" : "Reset"}</span>
+                <span>{t(language, "friday.salawatResetLabel")}</span>
               </button>
             )}
           </div>
 
           <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
-            {isArabic
-              ? "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ"
-              : "Allahumma salli wa sallim 'ala Nabiyyina Muhammad"}
+            {t(language, "friday.salawatText")}
           </p>
 
           {/* Interactive Counter Circle Button */}
@@ -124,18 +134,16 @@ export function FridayModeScreen({
             <button
               type="button"
               onClick={handleIncrementSalawat}
-              aria-label={
-                isArabic
-                  ? `الصلاة على النبي. العداد الحالي: ${formatNumerals(salawatCount, language)}`
-                  : `Salawat. Current count: ${salawatCount}`
-              }
+              aria-label={t(language, "friday.salawatCounterAriaLabel", {
+                count: formatNumerals(salawatCount, language),
+              })}
               className="group relative flex size-36 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/10 shadow-xl active:scale-95 transition-all hover:bg-amber-500/20 dark:bg-amber-500/15"
             >
               <span className="text-[2.25rem] font-black text-amber-600 dark:text-amber-400">
                 {formatNumerals(salawatCount, language)}
               </span>
               <span className="text-[0.75rem] font-black text-muted-foreground group-hover:text-foreground">
-                {isArabic ? "اضغط للزيادة" : "Tap to Count"}
+                {t(language, "friday.salawatTapHint")}
               </span>
             </button>
           </div>
@@ -155,7 +163,7 @@ export function FridayModeScreen({
                 >
                   <span className="block text-[0.875rem] font-black">{formatNumerals(target, language)}</span>
                   <span className="block text-[0.6875rem] font-bold">
-                    {reached ? (isArabic ? "مكتمل ✓" : "Done ✓") : isArabic ? "هدف" : "Target"}
+                    {reached ? t(language, "friday.milestoneDone") : t(language, "friday.milestoneTarget")}
                   </span>
                 </div>
               );
@@ -169,7 +177,7 @@ export function FridayModeScreen({
             <div className="flex items-center gap-2">
               <BookOpen size={20} className="text-amber-500" />
               <h3 id="kahf-heading" className="text-[1rem] font-black text-foreground">
-                {isArabic ? "قراءة سورة الكهف" : "Surah Al-Kahf"}
+                {t(language, "friday.kahfHeading")}
               </h3>
             </div>
 
@@ -183,16 +191,12 @@ export function FridayModeScreen({
               }`}
             >
               <CheckCircle2 size={15} />
-              <span>
-                {surahKahfRead ? (isArabic ? "تمت القراءة" : "Completed") : isArabic ? "تحديد كمكتمل" : "Mark Done"}
-              </span>
+              <span>{surahKahfRead ? t(language, "friday.kahfCompleted") : t(language, "friday.kahfMarkDone")}</span>
             </button>
           </div>
 
           <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
-            {isArabic
-              ? "«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»"
-              : "Whoever reads Surah Al-Kahf on Friday, a light will shine for him between the two Fridays."}
+            {t(language, "friday.kahfHadith")}
           </p>
         </section>
       </div>

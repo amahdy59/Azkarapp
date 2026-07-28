@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Check, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
@@ -38,8 +38,6 @@ export function CategoryScreen({
   const done = completed.size;
   const resumeIdx = azkar.findIndex((_, i) => !completed.has(i));
   const language = isArabic ? "ar" : "en";
-  const doneLabel = formatNumerals(done, language);
-  const totalLabel = formatNumerals(azkar.length, language);
   const isOccasional = isOccasionalCategory(catId);
 
   const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
@@ -106,6 +104,11 @@ export function CategoryScreen({
     const showTiming = hasSpecificRecommendedTiming(z);
     const timingText = getLocalizedPreferredTiming(z, language);
 
+    const counterLabelText = t(language, "category.counterProgress", {
+      current: localizedCurrent,
+      total: localizedTarget,
+    });
+
     return (
       <div
         key={z.id}
@@ -150,10 +153,8 @@ export function CategoryScreen({
           onClick={() => handleCardTap(index, targetCount)}
           aria-label={
             isCardCompleted
-              ? `${isArabic ? "مكتمل" : "Completed"}. ${t(language, "category.completedToggle")}`
-              : isArabic
-                ? `تكرار الذكر: ${localizedCurrent} من ${localizedTarget}`
-                : `Repeat zikr: ${localizedCurrent} of ${localizedTarget}`
+              ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
+              : t(language, "category.remainingToggle")
           }
           className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
             isCardCompleted
@@ -175,7 +176,7 @@ export function CategoryScreen({
                 dir="auto"
                 style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
               >
-                {isArabic ? `${localizedCurrent} من ${localizedTarget}` : `${localizedCurrent} of ${localizedTarget}`}
+                {counterLabelText}
               </span>
               <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
             </>
@@ -185,9 +186,14 @@ export function CategoryScreen({
     );
   };
 
+  const progressCountText = t(language, "category.counterProgress", {
+    current: formatNumerals(done, language),
+    total: formatNumerals(azkar.length, language),
+  });
+
   return (
     <ScreenContainer dir={direction}>
-      <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={isArabic ? "ar" : "en"} />
+      <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 
       <div className="shrink-0 border-b border-border px-5 py-4">
         <div className="mb-2 flex items-center justify-between">
@@ -197,7 +203,7 @@ export function CategoryScreen({
             dir="auto"
             style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
           >
-            {isArabic ? `${formatNumerals(done, language)} من ${totalLabel}` : `${doneLabel} of ${totalLabel}`}
+            {progressCountText}
           </p>
         </div>
         <ProgressBar
@@ -307,6 +313,9 @@ export function CategoryScreen({
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h2>
+              <span className="text-[0.75rem] font-semibold text-muted-foreground">
+                {t(language, "category.remainingCount", { count: formatNumerals(remainingAzkar.length, language) })}
+              </span>
             </div>
             <div className="flex flex-col gap-3.5">
               {remainingAzkar.map(({ z, index }) => renderZikrCard({ z, index }, false))}
@@ -318,6 +327,9 @@ export function CategoryScreen({
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h2>
+              <span className="text-[0.75rem] font-semibold text-muted-foreground">
+                {t(language, "category.completedCount", { count: formatNumerals(completedAzkar.length, language) })}
+              </span>
             </div>
             <div className="flex flex-col gap-3.5">
               {completedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, true))}

@@ -1,6 +1,8 @@
 import { Play, Pause, SkipForward, SkipBack, X } from "../components/icons";
 import type { AppLanguage } from "../types";
 import type { PlaybackRate, ReciterOption } from "../hooks/useAudioPlayer";
+import { formatNumerals } from "../formatting";
+import { t } from "../i18n";
 
 interface FloatingAudioPlayerProps {
   title: string;
@@ -21,11 +23,12 @@ interface FloatingAudioPlayerProps {
   onClose: () => void;
 }
 
-function formatTime(seconds: number): string {
-  if (isNaN(seconds) || seconds <= 0) return "0:00";
+function formatTime(seconds: number, language: AppLanguage): string {
+  if (isNaN(seconds) || seconds <= 0) return formatNumerals("0:00", language);
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  const timeStr = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
+  return formatNumerals(timeStr, language);
 }
 
 export function FloatingAudioPlayer({
@@ -47,12 +50,21 @@ export function FloatingAudioPlayer({
   onClose,
 }: FloatingAudioPlayerProps) {
   const isArabic = language === "ar";
+  const direction = isArabic ? "rtl" : "ltr";
   const speeds: PlaybackRate[] = [0.8, 1.0, 1.25];
+
+  const reciterNameKey =
+    reciter === "alafasy"
+      ? "audioPlayer.reciterAlafasy"
+      : reciter === "ghamdi"
+        ? "audioPlayer.reciterGhamdi"
+        : "audioPlayer.reciterAbdulbasit";
 
   return (
     <div
       role="region"
-      aria-label={isArabic ? "مشغل الصوت" : "Audio Player"}
+      aria-label={t(language, "audioPlayer.regionAria")}
+      dir={direction}
       className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-amber-500/30 bg-card/95 p-3 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-[#18181B]/95"
     >
       {/* Title & Controls Header */}
@@ -60,29 +72,29 @@ export function FloatingAudioPlayer({
         {/* Track Title */}
         <div className="min-w-0 flex-1 text-start">
           <p className="truncate text-[0.8125rem] font-black text-foreground">{title}</p>
-          <span className="text-[0.6875rem] font-semibold text-muted-foreground">
-            {formatTime(currentTime)} / {formatTime(duration)}
+          <span className="text-[0.6875rem] font-semibold text-muted-foreground" dir="ltr">
+            {formatTime(currentTime, language)} / {formatTime(duration, language)}
           </span>
         </div>
 
         {/* Action Controls */}
         <div className="flex items-center gap-1.5 shrink-0">
-          {/* Previous Track */}
+          {/* Previous Track — 44px touch target */}
           <button
             type="button"
             onClick={onPrev}
-            aria-label={isArabic ? "السابق" : "Previous"}
-            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
+            aria-label={t(language, "audioPlayer.previous")}
+            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
           >
-            <SkipBack size={16} className="rtl:rotate-180" />
+            <SkipBack size={18} className="rtl:rotate-180" />
           </button>
 
-          {/* Play / Pause Toggle */}
+          {/* Play / Pause Toggle — 44px touch target */}
           <button
             type="button"
             onClick={onTogglePlayPause}
-            aria-label={isPlaying ? (isArabic ? "إيقاف مؤقت" : "Pause") : isArabic ? "تشغيل الصوتي" : "Play Audio"}
-            className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all"
+            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
+            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all"
           >
             {isBuffering ? (
               <svg
@@ -105,39 +117,23 @@ export function FloatingAudioPlayer({
             )}
           </button>
 
-          {/* Next Track */}
+          {/* Next Track — 44px touch target */}
           <button
             type="button"
             onClick={onNext}
-            aria-label={isArabic ? "التالي" : "Next"}
-            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
+            aria-label={t(language, "audioPlayer.next")}
+            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
           >
-            <SkipForward size={16} className="rtl:rotate-180" />
+            <SkipForward size={18} className="rtl:rotate-180" />
           </button>
 
-          {/* Auto-Play All / Single Item Toggle */}
+          {/* Auto-Play All / Single Item Toggle — 44px touch target */}
           <button
             type="button"
             onClick={onToggleAutoPlayAll}
-            aria-label={
-              autoPlayAll
-                ? isArabic
-                  ? "الوضع الحالي: تشغيل الكل متتابعاً. اضغط للتبديل للذكر الحالي فقط"
-                  : "Current mode: Play All. Click for single item only"
-                : isArabic
-                  ? "الوضع الحالي: الذكر الحالي فقط. اضغط للتبديل لتشغيل الكل"
-                  : "Current mode: Single Item. Click for Play All"
-            }
-            title={
-              autoPlayAll
-                ? isArabic
-                  ? "تشغيل الكل متتابعاً"
-                  : "Play All"
-                : isArabic
-                  ? "الذكر الحالي فقط"
-                  : "Play Current Only"
-            }
-            className={`flex h-8 px-2 items-center gap-1 rounded-lg text-[0.75rem] font-bold transition-all ${
+            aria-label={autoPlayAll ? t(language, "audioPlayer.modePlayAll") : t(language, "audioPlayer.modeSingle")}
+            title={autoPlayAll ? t(language, "audioPlayer.playAll") : t(language, "audioPlayer.playSingle")}
+            className={`flex h-11 min-h-[44px] px-2.5 items-center gap-1 rounded-xl text-[0.75rem] font-bold transition-all ${
               autoPlayAll
                 ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/50"
                 : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -159,10 +155,10 @@ export function FloatingAudioPlayer({
               <polyline points="7 23 3 19 7 15" />
               <path d="M21 13v2a4 4 0 0 1-4 4H3" />
             </svg>
-            <span>{autoPlayAll ? (isArabic ? "الكل" : "All") : isArabic ? "مفرد" : "Single"}</span>
+            <span>{autoPlayAll ? t(language, "audioPlayer.all") : t(language, "audioPlayer.single")}</span>
           </button>
 
-          {/* Reciter Selector */}
+          {/* Reciter Selector — 44px touch target */}
           {onSetReciter && (
             <button
               type="button"
@@ -171,43 +167,35 @@ export function FloatingAudioPlayer({
                 const nextIdx = (options.indexOf(reciter) + 1) % options.length;
                 onSetReciter(options[nextIdx]!);
               }}
-              aria-label={
-                isArabic
-                  ? `القارئ الحالي: ${reciter === "alafasy" ? "العفاسي" : reciter === "ghamdi" ? "الغامدي" : "عبد الباسط"}`
-                  : `Current reciter: ${reciter}`
-              }
-              title={
-                isArabic
-                  ? `القارئ: ${reciter === "alafasy" ? "مشاري العفاسي" : reciter === "ghamdi" ? "سعد الغامدي" : "عبد الباسط"}`
-                  : `Reciter: ${reciter}`
-              }
-              className="flex h-8 px-2 items-center justify-center rounded-lg border border-amber-500/30 bg-amber-500/10 text-[0.6875rem] font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all"
+              aria-label={t(language, "audioPlayer.currentReciter", { name: t(language, reciterNameKey) })}
+              title={t(language, "audioPlayer.currentReciter", { name: t(language, reciterNameKey) })}
+              className="flex h-11 min-h-[44px] px-2.5 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-[0.6875rem] font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all"
             >
-              🎙️ {reciter === "alafasy" ? "العفاسي" : reciter === "ghamdi" ? "الغامدي" : "عبدالباسط"}
+              🎙️ {t(language, reciterNameKey)}
             </button>
           )}
 
-          {/* Speed Selector */}
+          {/* Speed Selector — 44px touch target */}
           <button
             type="button"
             onClick={() => {
               const nextIdx = (speeds.indexOf(playbackRate) + 1) % speeds.length;
               onSetSpeed(speeds[nextIdx]!);
             }}
-            aria-label={isArabic ? `السرعة: ${playbackRate}x` : `Speed: ${playbackRate}x`}
-            className="flex h-8 px-2 items-center justify-center rounded-lg border border-border text-[0.75rem] font-extrabold text-foreground hover:bg-muted active:scale-95 transition-all"
+            aria-label={t(language, "audioPlayer.speed", { rate: formatNumerals(playbackRate, language) })}
+            className="flex h-11 min-h-[44px] px-2.5 items-center justify-center rounded-xl border border-border text-[0.75rem] font-extrabold text-foreground hover:bg-muted active:scale-95 transition-all"
           >
-            {playbackRate}x
+            {formatNumerals(playbackRate, language)}x
           </button>
 
-          {/* Close Player */}
+          {/* Close Player — 44px touch target */}
           <button
             type="button"
             onClick={onClose}
-            aria-label={isArabic ? "إغلاق مشغل الصوت" : "Close Audio Player"}
-            className="flex size-8 items-center justify-center rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
+            aria-label={t(language, "audioPlayer.close")}
+            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
       </div>

@@ -4,7 +4,7 @@ import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import { formatNumerals, numeralFontFamily } from "../formatting";
+import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
@@ -170,8 +170,8 @@ export function CompletionScreen({
         ))}
       </section>
 
-      <p className="mt-auto pt-7 text-[0.6875rem] text-muted-foreground">
-        {new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en-US", { dateStyle: "long" }).format(new Date())}
+      <p className="mt-auto pt-7 text-[0.6875rem] text-muted-foreground" dir="auto">
+        {formatHijriDate(new Date(), language)}
       </p>
       <div className="mt-3 grid gap-3">
         <button

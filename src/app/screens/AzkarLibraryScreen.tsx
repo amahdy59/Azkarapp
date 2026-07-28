@@ -84,11 +84,10 @@ export function AzkarLibraryScreen({
                     dir={direction}
                     onClick={() => onCategory(category.id)}
                     className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    aria-label={
-                      isArabic
-                        ? `${category.nameArabic}، ${formatNumerals(done, language)} من ${formatNumerals(total, language)} مكتملة`
-                        : `${category.name}, ${done} of ${total} complete`
-                    }
+                    aria-label={t(language, "library.progressOfTotal", {
+                      done: formatNumerals(done, language),
+                      total: formatNumerals(total, language),
+                    })}
                   >
                     <span
                       data-slot="category-icon"
@@ -112,8 +111,10 @@ export function AzkarLibraryScreen({
                           aria-label={t(language, "library.complete")}
                         />
                         <span className="block text-[0.8125rem] text-muted-foreground">
-                          {formatNumerals(done, language)} {isArabic ? "من" : "of"} {formatNumerals(total, language)}{" "}
-                          {t(language, "library.complete")}
+                          {t(language, "library.progressOfTotal", {
+                            done: formatNumerals(done, language),
+                            total: formatNumerals(total, language),
+                          })}
                         </span>
                       </div>
                     </span>

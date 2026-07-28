@@ -1,64 +1,20 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
-import {
-  clearStoredAppData,
-  clearPrivateAppData,
-  fromCompletedSets,
-  loadAppState,
-  resetStoredSettings,
-  saveAppState,
-  toCompletedSets,
-  type StoredSession,
-} from "./state";
+import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
 import { getAzkarByCategory } from "./content/azkar";
 import type {
   AppLanguage,
   AppStateSnapshot,
   ArabicFontOption,
+  BeforeInstallPromptEvent,
   CategoryId,
   ColorBlindSupport,
   ReminderSettings,
   TextSizeOption,
   ThemeMode,
+  View,
 } from "./types";
-import {
-  loadRemoteState,
-  normalizePhoneNumber,
-  profileFromSession,
-  requestPhoneOtp,
-  resendPhoneOtp,
-  signOutSupabase,
-  verifyPhoneOtp,
-} from "../lib/auth";
 import { isSupabaseConfigured } from "../lib/supabase";
-
-// ─── Design tokens (match Azkar/Colors Figma vars) ────────────────────────────
-// ─── Types ────────────────────────────────────────────────────────────────────
-type View =
-  | "home"
-  | "library"
-  | "progress"
-  | "friday"
-  | "category"
-  | "reader"
-  | "completion"
-  // Phase 2 — English onboarding
-  | "splash"
-  | "onboard1"
-  | "language"
-  | "login"
-  | "phone"
-  | "otp"
-  // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
-  | "ar_onboard1"
-  // Phase 3
-  | "settings"
-  // Phase 4
-  | "search";
-
-type BeforeInstallPromptEvent = Event & {
-  prompt: () => Promise<void>;
-};
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
@@ -76,17 +32,20 @@ import { SyncStatus } from "./components/SyncStatus";
 import { FloatingAudioPlayer } from "./components/FloatingAudioPlayer";
 import { ShareableCardModal } from "./components/ShareableCardModal";
 import { ConfirmDialog } from "./components/ConfirmDialog";
+import { ScreenFallback } from "./components/ScreenFallback";
+import { PwaNotice } from "./components/PwaNotice";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { FridayModeScreen } from "./screens/FridayModeScreen";
 import { t } from "./i18n";
 import { formatHijriDateWithTime } from "./formatting";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useForegroundReminders } from "./hooks/useForegroundReminders";
+import { useAuthHandlers, type ConfirmDialogOptions } from "./hooks/useAuthHandlers";
+import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
+import { useSessionHandlers } from "./hooks/useSessionHandlers";
 import {
-  getNextIncompleteIndex,
   getPalmStreakSummary,
   millisecondsUntilNextProgressDay,
-  recordDailyCollectionCompletion,
   resetStaleCompletedCollections,
   type GrowthEvent,
 } from "./progress";
@@ -129,79 +88,6 @@ const OTPScreen = lazy(() =>
 );
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
-function maskPhoneNumber(phone: string) {
-  const normalizedPhone = normalizePhoneNumber(phone);
-  if (!normalizedPhone) {
-    return "";
-  }
-
-  const visiblePrefixLength = normalizedPhone.startsWith("+") ? Math.min(4, normalizedPhone.length) : 0;
-  const visibleSuffixLength = Math.min(4, Math.max(0, normalizedPhone.length - visiblePrefixLength));
-  const prefix = normalizedPhone.slice(0, visiblePrefixLength);
-  const suffix = normalizedPhone.slice(normalizedPhone.length - visibleSuffixLength);
-  const hiddenLength = normalizedPhone.length - prefix.length - suffix.length;
-
-  return [prefix, "*".repeat(Math.max(0, hiddenLength)), suffix].filter(Boolean).join(" ");
-}
-
-function ScreenFallback() {
-  return (
-    <div
-      className="flex h-full items-center justify-center bg-background"
-      role="status"
-      aria-live="polite"
-      aria-label="Loading"
-    >
-      <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-    </div>
-  );
-}
-
-function PwaNotice({
-  title,
-  body,
-  actionLabel,
-  dismissLabel,
-  onAction,
-  onDismiss,
-  isActionLoading,
-}: {
-  title: string;
-  body: string;
-  actionLabel: string;
-  dismissLabel: string;
-  onAction: () => void;
-  onDismiss: () => void;
-  isActionLoading?: boolean;
-}) {
-  return (
-    <aside className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg" role="status" aria-live="polite">
-      <p className="text-[0.9375rem] font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
-      <div className="mt-3 flex justify-end gap-2">
-        <button
-          type="button"
-          onClick={onDismiss}
-          className="min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          {dismissLabel}
-        </button>
-        <button
-          type="button"
-          onClick={onAction}
-          disabled={isActionLoading}
-          className="min-h-11 rounded-xl bg-primary px-4 text-[0.8125rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
-          {isActionLoading && (
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground" />
-          )}
-          {actionLabel}
-        </button>
-      </div>
-    </aside>
-  );
-}
-
 export default function App() {
   const initialState = useRef(loadAppState()).current;
   const [view, setView] = useState<View>("splash");
@@ -221,7 +107,6 @@ export default function App() {
   const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx, setActiveIdx);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
-  const [sessionStart, setSessionStart] = useState(Date.now());
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
@@ -244,8 +129,6 @@ export default function App() {
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
-  const [isRepeatSession, setIsRepeatSession] = useState(false);
-  const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
   const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(() =>
     resetStaleCompletedCollections(
       toCompletedSets(initialState.completed),
@@ -261,10 +144,6 @@ export default function App() {
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
-  const [isSendingOtp, setIsSendingOtp] = useState(false);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [isResendingOtp, setIsResendingOtp] = useState(false);
-  const [authError, setAuthError] = useState("");
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -277,26 +156,21 @@ export default function App() {
   });
 
   // ── Confirmation dialog state ──────────────────────────────────────────────
-  // Replaces window.confirm() with a branded, accessible AlertDialog.
-  const [pendingConfirm, setPendingConfirm] = useState<{
-    title: string;
-    description: string;
-    confirmLabel: string;
-    cancelLabel: string;
-    destructive?: boolean;
-    onConfirm: () => void;
-  } | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogOptions | null>(null);
 
-  const showConfirm = (
-    title: string,
-    description: string,
-    confirmLabel: string,
-    cancelLabel: string,
-    onConfirm: () => void,
-    destructive = false,
-  ) => {
-    setPendingConfirm({ title, description, confirmLabel, cancelLabel, onConfirm, destructive });
-  };
+  const showConfirm = useCallback(
+    (
+      title: string,
+      description: string,
+      confirmLabel: string,
+      cancelLabel: string,
+      onConfirm: () => void,
+      destructive = false,
+    ) => {
+      setPendingConfirm({ title, description, confirmLabel, cancelLabel, onConfirm, destructive });
+    },
+    [],
+  );
 
   const { currentPalmRhythm: currentStreak, longestPalmRhythm: longestStreak } = getPalmStreakSummary(
     dailyCompletions,
@@ -364,14 +238,128 @@ export default function App() {
     ],
   );
 
+  const push = useCallback((to: View) => {
+    window.history.pushState({ view: to }, "", `?view=${to}`);
+    setView(to);
+  }, []);
+
+  const pop = useCallback(() => {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      push("home");
+    }
+  }, [push]);
+
+  // Hook modules
+  const {
+    sessionStart,
+    isRepeatSession,
+    repeatCompleted,
+    handleResetCategory,
+    openCategory,
+    openReader,
+    repeatCategory,
+    leaveReader,
+    toggleSavedZikr,
+    markComplete,
+    toggleZikrCompletion,
+    advanceAfterCompletion,
+    goHome,
+  } = useSessionHandlers({
+    activeCat,
+    setActiveCat,
+    activeIdx,
+    setActiveIdx,
+    completed,
+    setCompleted,
+    dailyCompletions,
+    setDailyCompletions,
+    setLastGrowthEvent,
+    setSessions,
+    setSavedZikrIds,
+    progressDayStartHour,
+    selectedLang,
+    push,
+    pop,
+    setView,
+    setActiveTab,
+    showConfirm,
+  });
+
   const markOnboardingComplete = useCallback(() => {
     setHasCompletedOnboarding(true);
     try {
       window.localStorage.setItem(ONBOARDING_COMPLETE_KEY, "true");
     } catch {
-      // The current session can still continue when persistent storage is unavailable.
+      // Storage failure non-fatal
     }
   }, []);
+
+  const {
+    isSendingOtp,
+    isVerifyingOtp,
+    isResendingOtp,
+    authError,
+    setAuthError,
+    handleOpenAccountAuth,
+    handleSendOtp,
+    handleVerifyOtp,
+    handleResendOtp,
+    handleSignOut,
+  } = useAuthHandlers({
+    selectedLang,
+    lastPhoneNumber,
+    setLastPhoneNumber,
+    setDisplayName,
+    setIsGuest,
+    setRemoteSyncReady,
+    appStateSnapshot,
+    applyStateSnapshot: useCallback((state: AppStateSnapshot) => {
+      setSelectedLang(state.settings.language);
+      setThemeMode(state.settings.themeMode);
+      setShowTransliteration(state.settings.showTransliteration);
+      setShowTranslation(state.settings.showTranslation);
+      setTextSize(state.settings.textSize);
+      setArabicFont(state.settings.arabicFont);
+      setHighContrast(state.settings.highContrast);
+      setBoldText(state.settings.boldText);
+      setReduceMotion(state.settings.reduceMotion);
+      setHapticFeedback(state.settings.hapticFeedback);
+      setForceRtl(state.settings.forceRtl);
+      setColorBlindSupport(state.settings.colorBlindSupport);
+      setReminders(state.settings.reminders);
+      setWeeklyGoalDays(state.settings.weeklyGoalDays);
+      setQuietProgressEnabled(state.settings.quietProgressEnabled);
+      setProgressDayStartHour(state.settings.progressDayStartHour);
+      setDisplayName(state.profile.displayName);
+      setLastPhoneNumber(state.profile.lastPhoneNumber);
+      setIsGuest(state.profile.isGuest);
+      setAccountUserId(state.profile.accountUserId);
+      setDailyCompletions(state.dailyCompletions);
+      setCompleted(
+        resetStaleCompletedCollections(
+          toCompletedSets(state.completed),
+          state.dailyCompletions,
+          new Date(),
+          state.settings.progressDayStartHour,
+        ),
+      );
+      setSessions(state.sessions);
+      setSavedZikrIds(new Set(state.savedZikrIds));
+    }, []),
+    markOnboardingComplete,
+    showConfirm,
+    setPendingConfirm,
+    setView,
+    setActiveTab,
+  });
+
+  const { handleExportData, handleResetPreferences, handleClearLocalData } = useSettingsHandlers({
+    selectedLang,
+    appStateSnapshot,
+    showConfirm,
+  });
 
   const handleSplashDone = useCallback(() => {
     setView(hasCompletedOnboarding ? "home" : "language");
@@ -514,63 +502,6 @@ export default function App() {
     return () => window.removeEventListener("popstate", handlePopState);
   }, [hasCompletedOnboarding]);
 
-  const push = useCallback((to: View) => {
-    window.history.pushState({ view: to }, "", `?view=${to}`);
-    setView(to);
-  }, []);
-
-  const handleResetCategory = (catId: CategoryId) => {
-    showConfirm(
-      t(selectedLang, "category.resetConfirmTitle"),
-      t(selectedLang, "category.resetConfirm"),
-      t(selectedLang, "common.reset"),
-      t(selectedLang, "common.cancel"),
-      () => {
-        setCompleted((prev) => {
-          const next = { ...prev };
-          next[catId] = new Set();
-          return next;
-        });
-      },
-      true,
-    );
-  };
-
-  const pop = useCallback(() => {
-    if (window.history.length > 1) {
-      window.history.back();
-    } else {
-      push("home");
-    }
-  }, [push]);
-
-  const openCategory = (catId: CategoryId) => {
-    setIsRepeatSession(false);
-    setRepeatCompleted(new Set());
-    setActiveCat(catId);
-    setActiveTab("azkar");
-    push("category");
-  };
-
-  const openReader = (catId: CategoryId, i: number) => {
-    setActiveCat(catId);
-    setActiveIdx(i);
-    setSessionStart(Date.now());
-    push("reader");
-  };
-
-  const repeatCategory = (catId: CategoryId) => {
-    setIsRepeatSession(true);
-    setRepeatCompleted(new Set());
-    openReader(catId, 0);
-  };
-
-  const leaveReader = () => {
-    setIsRepeatSession(false);
-    setRepeatCompleted(new Set());
-    pop();
-  };
-
   useEffect(() => {
     if (view !== "home") {
       return;
@@ -586,283 +517,6 @@ export default function App() {
     setView("category");
     window.history.replaceState(null, "", window.location.pathname);
   }, [view]);
-
-  const toggleSavedZikr = useCallback((zikrId: string) => {
-    setSavedZikrIds((previous) => {
-      const next = new Set(previous);
-      if (next.has(zikrId)) {
-        next.delete(zikrId);
-      } else {
-        next.add(zikrId);
-      }
-      return next;
-    });
-  }, []);
-
-  const markComplete = (idx: number) => {
-    const azkar = getAzkarByCategory(activeCat);
-    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
-    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
-    effectiveProgress.add(idx);
-
-    if (isRepeatSession) {
-      setRepeatCompleted((previous) => new Set(previous).add(idx));
-    } else {
-      setCompleted((prev) => {
-        const updated = new Set(prev[activeCat]);
-        updated.add(idx);
-        return { ...prev, [activeCat]: updated };
-      });
-    }
-
-    if (
-      (!isRepeatSession && canonicalCollectionWasAlreadyComplete) ||
-      getNextIncompleteIndex(azkar.length, effectiveProgress, idx) !== null
-    ) {
-      return;
-    }
-
-    // Persist the completed collection before the cancellable auto-navigation delay.
-    const completedAt = new Date();
-    const growth = recordDailyCollectionCompletion(dailyCompletions, activeCat, completedAt, progressDayStartHour);
-    setDailyCompletions(growth.records);
-    setLastGrowthEvent(growth.event);
-    setSessions((prev) => [
-      {
-        id: `${activeCat}-${completedAt.getTime()}`,
-        category: activeCat,
-        completedAt: completedAt.toISOString(),
-        completedCount: azkar.length,
-        totalCount: azkar.length,
-        durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
-        isComplete: true,
-      },
-      ...prev,
-    ]);
-  };
-
-  const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
-    const azkar = getAzkarByCategory(catId);
-    const setForCat = new Set(completed[catId] ?? new Set());
-    const wasCompleted = setForCat.has(idx);
-
-    if (wasCompleted) {
-      setForCat.delete(idx);
-    } else {
-      setForCat.add(idx);
-    }
-
-    setCompleted((prev) => ({
-      ...prev,
-      [catId]: setForCat,
-    }));
-
-    if (!wasCompleted && setForCat.size === azkar.length) {
-      const completedAt = new Date();
-      const growth = recordDailyCollectionCompletion(dailyCompletions, catId, completedAt, progressDayStartHour);
-      setDailyCompletions(growth.records);
-      setLastGrowthEvent(growth.event);
-    }
-  };
-
-  const advanceAfterCompletion = (idx: number) => {
-    const azkar = getAzkarByCategory(activeCat);
-    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
-    if (!isRepeatSession && canonicalCollectionWasAlreadyComplete) {
-      pop();
-      return;
-    }
-
-    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
-    effectiveProgress.add(idx);
-    const nextIncomplete = getNextIncompleteIndex(azkar.length, effectiveProgress, idx);
-
-    if (nextIncomplete !== null) {
-      setActiveIdx(nextIncomplete);
-    } else {
-      setIsRepeatSession(false);
-      setRepeatCompleted(new Set());
-      setView("completion");
-    }
-  };
-
-  const goHome = () => {
-    setView("home");
-    setActiveTab("home");
-  };
-
-  const handleOpenAccountAuth = () => {
-    setAuthError("");
-    setView("login");
-    setActiveTab("settings");
-  };
-
-  const handleSendOtp = async (phone: string) => {
-    try {
-      setAuthError("");
-      setIsSendingOtp(true);
-      const normalizedPhone = isSupabaseConfigured ? await requestPhoneOtp(phone) : normalizePhoneNumber(phone);
-      setLastPhoneNumber(normalizedPhone);
-      setView("otp");
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.sendCodeError"));
-    } finally {
-      setIsSendingOtp(false);
-    }
-  };
-
-  const handleVerifyOtp = async (token: string) => {
-    try {
-      setAuthError("");
-      setIsVerifyingOtp(true);
-      setRemoteSyncReady(false);
-      const session = await verifyPhoneOtp(lastPhoneNumber, token);
-      if (!session) {
-        throw new Error(t(selectedLang, "auth.verifyCodeError"));
-      }
-
-      const privateGuestDataExists =
-        appStateSnapshot.sessions.length > 0 ||
-        appStateSnapshot.dailyCompletions.length > 0 ||
-        appStateSnapshot.savedZikrIds.length > 0 ||
-        Object.values(appStateSnapshot.completed).some((items) => items.length > 0);
-      const legacyIdentityMatches =
-        !appStateSnapshot.profile.accountUserId &&
-        !appStateSnapshot.profile.isGuest &&
-        Boolean(session.user.phone) &&
-        normalizePhoneNumber(appStateSnapshot.profile.lastPhoneNumber) ===
-          normalizePhoneNumber(session.user.phone ?? "");
-      let hydrationBase = appStateSnapshot;
-      if (appStateSnapshot.profile.accountUserId && appStateSnapshot.profile.accountUserId !== session.user.id) {
-        hydrationBase = clearPrivateAppData(appStateSnapshot);
-      } else if (
-        !appStateSnapshot.profile.accountUserId &&
-        !appStateSnapshot.profile.isGuest &&
-        !legacyIdentityMatches
-      ) {
-        hydrationBase = clearPrivateAppData(appStateSnapshot);
-      } else if (
-        !appStateSnapshot.profile.accountUserId &&
-        appStateSnapshot.profile.isGuest &&
-        privateGuestDataExists
-      ) {
-        await new Promise<void>((resolve) => {
-          showConfirm(
-            t(selectedLang, "auth.mergeTitle"),
-            t(selectedLang, "auth.mergeGuestProgress"),
-            t(selectedLang, "auth.mergeConfirm"),
-            t(selectedLang, "common.skip"),
-            () => resolve(),
-            false,
-          );
-          // If user cancels, clear private data instead
-          setPendingConfirm((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  onConfirm: () => resolve(),
-                }
-              : null,
-          );
-        }).catch(() => {
-          hydrationBase = clearPrivateAppData(appStateSnapshot);
-        });
-      }
-
-      if (hydrationBase !== appStateSnapshot) {
-        hydrationBase = {
-          ...hydrationBase,
-          profile: profileFromSession(session, hydrationBase.profile.lastPhoneNumber),
-        };
-        applyStateSnapshot(hydrationBase);
-      }
-
-      const mergedState = await loadRemoteState(session, hydrationBase);
-      applyStateSnapshot(mergedState);
-      setRemoteSyncReady(true);
-      markOnboardingComplete();
-      setView("home");
-      setActiveTab("home");
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
-    } finally {
-      setIsVerifyingOtp(false);
-    }
-  };
-
-  const handleResendOtp = async () => {
-    try {
-      setAuthError("");
-      setIsResendingOtp(true);
-      await resendPhoneOtp(lastPhoneNumber);
-    } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.resendCodeError"));
-    } finally {
-      setIsResendingOtp(false);
-    }
-  };
-
-  const handleSignOut = async () => {
-    showConfirm(
-      t(selectedLang, "auth.signOutTitle"),
-      t(selectedLang, "auth.signOutConfirm"),
-      t(selectedLang, "auth.signOut"),
-      t(selectedLang, "common.cancel"),
-      async () => {
-        try {
-          setAuthError("");
-          setRemoteSyncReady(false);
-          if (isSupabaseConfigured) {
-            await signOutSupabase();
-          }
-          applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
-          setView("login");
-          setActiveTab("home");
-        } catch (error) {
-          setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
-        }
-      },
-      true,
-    );
-  };
-
-  const handleExportData = () => {
-    const blob = new Blob([JSON.stringify(appStateSnapshot, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `azkar-data-${new Date().toISOString().slice(0, 10)}.json`;
-    link.click();
-    window.setTimeout(() => URL.revokeObjectURL(url), 0);
-  };
-
-  const handleResetPreferences = () => {
-    showConfirm(
-      t(selectedLang, "settings.resetPreferencesTitle"),
-      t(selectedLang, "settings.resetPreferencesConfirm"),
-      t(selectedLang, "common.reset"),
-      t(selectedLang, "common.cancel"),
-      () => {
-        resetStoredSettings();
-        window.location.reload();
-      },
-      false,
-    );
-  };
-
-  const handleClearLocalData = () => {
-    showConfirm(
-      t(selectedLang, "settings.clearLocalDataTitle"),
-      t(selectedLang, "settings.clearLocalDataConfirm"),
-      t(selectedLang, "settings.clearLocalDataAction"),
-      t(selectedLang, "common.cancel"),
-      () => {
-        clearStoredAppData();
-        window.location.reload();
-      },
-      true,
-    );
-  };
 
   const handleNavTab = (tab: "home" | "azkar" | "progress" | "settings") => {
     setActiveTab(tab);
@@ -883,7 +537,7 @@ export default function App() {
   return (
     <div className="app-viewport flex items-center justify-center">
       <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
-        <NetworkStatus />
+        <NetworkStatus language={selectedLang} />
         {isSupabaseConfigured && !isGuest && (
           <SyncStatus
             isSyncing={isSyncingRemote}
@@ -894,7 +548,7 @@ export default function App() {
         )}
 
         <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
-          <Suspense fallback={<ScreenFallback />}>
+          <Suspense fallback={<ScreenFallback language={selectedLang} />}>
             {/* Phase 2 — onboarding flow */}
             {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
             {view === "onboard1" && (
@@ -965,7 +619,7 @@ export default function App() {
             {view === "otp" && (
               <OTPScreen
                 language={selectedLang}
-                maskedPhone={maskPhoneNumber(lastPhoneNumber)}
+                maskedPhone={lastPhoneNumber}
                 errorMessage={authError}
                 isVerifying={isVerifyingOtp}
                 isResending={isResendingOtp}
@@ -1206,8 +860,6 @@ export default function App() {
                 onAction={() => {
                   setIsUpdating(true);
                   window.dispatchEvent(new Event("azkar-apply-update"));
-                  // Fallback: If service worker controllerchange doesn't fire to reload the page automatically,
-                  // force a reload after a short delay to ensure the new version is loaded.
                   setTimeout(() => {
                     window.location.reload();
                   }, 1500);
@@ -1228,7 +880,7 @@ export default function App() {
                   try {
                     window.localStorage.setItem("azkarapp.install-dismissed", "true");
                   } catch {
-                    // Dismissing the prompt should still work when storage is unavailable.
+                    // Non-fatal storage failure
                   }
                   setInstallDismissed(true);
                 }}
@@ -1241,7 +893,7 @@ export default function App() {
         {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
       </div>
 
-      {/* Accessible confirmation dialog — replaces window.confirm() */}
+      {/* Accessible confirmation dialog */}
       {pendingConfirm && (
         <ConfirmDialog
           open={true}

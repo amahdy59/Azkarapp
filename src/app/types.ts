@@ -21,6 +21,32 @@ export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
 
+export type View =
+  | "home"
+  | "library"
+  | "progress"
+  | "friday"
+  | "category"
+  | "reader"
+  | "completion"
+  // Phase 2 — English onboarding
+  | "splash"
+  | "onboard1"
+  | "language"
+  | "login"
+  | "phone"
+  | "otp"
+  // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
+  | "ar_onboard1"
+  // Phase 3
+  | "settings"
+  // Phase 4
+  | "search";
+
+export type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+};
+
 export interface ReminderSchedule {
   enabled: boolean;
   time: string;

@@ -240,7 +240,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="interactive-elem ui-control flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="interactive-elem ui-control flex min-h-[44px] min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <BookOpen className="shrink-0" size={17} />
         <span className="truncate" dir="auto">
@@ -494,16 +494,18 @@ export function ReaderScreen({
 
       {/* Main Layout Area */}
       <div className="flex-1 flex flex-col min-h-0 justify-between select-none" key={z.id}>
-        {/* Upper section: Zikr content, middle and center aligned */}
+        {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
+            within this region; the counter below is always visible and never covered. */}
         <div
-          className={`flex-1 flex items-center justify-center min-h-0 w-full py-4 ${
+          className={`flex-1 overflow-y-auto min-h-0 w-full py-4 ${
             justCompleted ? "zikr-step-exit" : "zikr-step-enter"
           }`}
         >
-          {renderReadingContent()}
+          {/* Inner wrapper keeps short azkar vertically centered; long content simply overflows into the scroll. */}
+          <div className="flex min-h-full items-center justify-center">{renderReadingContent()}</div>
         </div>
 
-        {/* Lower section: Counter panel */}
+        {/* Lower section: Counter panel — shrink-0 ensures it is always pinned and never covered */}
         <div className="shrink-0 pb-4">{renderCounterPanel()}</div>
       </div>
 

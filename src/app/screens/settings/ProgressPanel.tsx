@@ -86,7 +86,7 @@ export function ProgressPanel({
             {/* ── Large tree illustration with today's state ────────────────── */}
             <section
               className="relative overflow-hidden rounded-2xl border border-border bg-card px-4 pb-5 pt-6"
-              aria-label={isArabic ? "حالة حديقتك اليوم" : "Today's garden state"}
+              aria-label={t(language, "progressPanel.gardenState")}
             >
               {/* Palm day ambient glow */}
               {summary.today.isPalm && (
@@ -117,7 +117,7 @@ export function ProgressPanel({
               {/* Three core stat pills */}
               <div
                 className="mt-4 grid grid-cols-3 gap-3 text-center"
-                aria-label={isArabic ? "إحصائيات اليوم" : "Today's stats"}
+                aria-label={t(language, "progressPanel.todayStats")}
               >
                 <div className="rounded-xl border border-border bg-background px-2 py-3">
                   <span
