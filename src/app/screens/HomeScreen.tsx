@@ -104,7 +104,7 @@ export function HomeScreen({
   onResume,
   onRepeat,
   onOpenFridayMode,
-  onOpenShareModal,
+  onOpenShareModal: _onOpenShareModal,
 }: {
   completed: Record<CategoryId, Set<number>>;
   dailyCompletions: DailyCollectionCompletion[];

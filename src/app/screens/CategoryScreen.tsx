@@ -20,7 +20,7 @@ export function CategoryScreen({
   onReset,
   onRepeat,
   onBack,
-  onPlayAllAudio,
+  onPlayAllAudio: _onPlayAllAudio,
 }: {
   catId: CategoryId;
   completed: Set<number>;
