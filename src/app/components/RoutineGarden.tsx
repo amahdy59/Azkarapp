@@ -542,10 +542,10 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]"
+      className="mb-5 rounded-3xl border border-border/80 bg-card p-3.5 shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]"
     >
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-between gap-3 text-start">
+        <div className="mb-3 flex items-center justify-between gap-3 text-start">
           <div>
             <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
               {t(language, "garden.todayTitle")}
@@ -563,7 +563,7 @@ export function TodayRoutineGarden({
             <button
               type="button"
               onClick={onOpenShareModal}
-              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
+              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
               aria-label={t(language, "garden.shareAchievementAria")}
               title={t(language, "garden.shareAchievementAria")}
             >
@@ -579,7 +579,7 @@ export function TodayRoutineGarden({
           <div
             role="tablist"
             aria-label={t(language, "garden.viewMode")}
-            className="mb-5 flex rounded-2xl bg-muted/60 p-1"
+            className="mb-4 flex rounded-2xl bg-muted/60 p-1"
           >
             {(["day", "week", "month", "year"] as const).map((tab) => {
               const isActive = activeTab === tab;
@@ -607,7 +607,7 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          <div className="mb-5 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2.5 shadow-sm [direction:ltr]">
+          <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2 shadow-sm [direction:ltr]">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
@@ -645,7 +645,7 @@ export function TodayRoutineGarden({
       )}
 
       {!hideTabs && (activeTab === "day" || activeTab === "week") && (
-        <div className="mb-6 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-3 px-4 dark:bg-amber-500/10">
+        <div className="mb-5 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-2.5 px-3 dark:bg-amber-500/10">
           <div className="flex items-center gap-2" title={t(language, "garden.palmsCount", { count: "" }).trim()}>
             <PalmTreeMark size={26} />
             <span className="text-[1.125rem] font-black text-amber-500">{formatNumerals(totalPalms, language)}</span>
@@ -668,19 +668,19 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="flex flex-col items-center py-1 text-center">
-          <h3 className="mb-3 text-[1.125rem] font-black text-foreground dark:text-white">
+        <div className="flex flex-col items-center py-0.5 text-center">
+          <h3 className="mb-2 text-[1.0625rem] font-black text-foreground dark:text-white">
             {t(language, "garden.dailyProtection")}
           </h3>
 
-          <div className="relative mb-4 flex h-36 w-36 flex-col items-center justify-center rounded-full border-3 border-amber-500/80 bg-amber-500/5 p-2 shadow-inner dark:bg-amber-500/10">
-            <PalmTreeMark size={44} className="transition-transform duration-500 hover:scale-105" />
+          <div className="relative mb-4 flex h-28 w-28 flex-col items-center justify-center rounded-full border-3 border-amber-500/80 bg-amber-500/5 p-1.5 shadow-inner dark:bg-amber-500/10">
+            <PalmTreeMark size={58} className="transition-transform duration-500 hover:scale-105" />
 
-            <div className="mt-0.5 flex items-center justify-center gap-1.5">
+            <div className="-mt-1 flex items-center justify-center gap-1">
               {[0, 1, 2].map((idx) => (
                 <GoldenLeafMark
                   key={idx}
-                  size={18}
+                  size={16}
                   filled={goldenCount > idx}
                   className="transition-all duration-300"
                 />
@@ -690,12 +690,12 @@ export function TodayRoutineGarden({
             <div
               data-testid="today-leaf-count"
               aria-label={t(language, "garden.goldenLeavesCount", { count: formatNumerals(goldenCount, language) })}
-              className="absolute -bottom-3 flex items-center gap-1 rounded-full bg-amber-950 px-3 py-0.5 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
+              className="absolute -bottom-3 flex items-center gap-1 rounded-full bg-amber-950 px-2.5 py-0.5 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
               <span>
                 {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
               </span>
-              <GoldenLeafMark size={14} filled={goldenCount > 0} />
+              <GoldenLeafMark size={13} filled={goldenCount > 0} />
             </div>
           </div>
 
@@ -707,42 +707,42 @@ export function TodayRoutineGarden({
 
           <ul
             aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-            className="mt-3 flex w-full justify-center gap-2"
+            className="mt-2.5 flex w-full justify-center gap-1.5"
           >
             {[
               {
-                id: "morning",
+                id: "morning" as const,
                 name: isArabic ? "أذكار الصباح" : "Morning Azkar",
-                state: goldenCount > 0 ? "complete" : "pending",
+                state: summary.today.completedCategories.includes("morning") ? "complete" : "pending",
                 label: isArabic
-                  ? goldenCount > 0
+                  ? summary.today.completedCategories.includes("morning")
                     ? "أذكار الصباح. مكتمل"
                     : "أذكار الصباح. غير مكتمل"
-                  : goldenCount > 0
+                  : summary.today.completedCategories.includes("morning")
                     ? "Morning Azkar. Complete"
                     : "Morning Azkar. Not yet",
               },
               {
-                id: "evening",
+                id: "evening" as const,
                 name: isArabic ? "أذكار المساء" : "Evening Azkar",
-                state: goldenCount > 1 ? "complete" : "pending",
+                state: summary.today.completedCategories.includes("evening") ? "complete" : "pending",
                 label: isArabic
-                  ? goldenCount > 1
+                  ? summary.today.completedCategories.includes("evening")
                     ? "أذكار المساء. مكتمل"
                     : "أذكار المساء. غير مكتمل"
-                  : goldenCount > 1
+                  : summary.today.completedCategories.includes("evening")
                     ? "Evening Azkar. Complete"
                     : "Evening Azkar. Not yet",
               },
               {
-                id: "before_sleep",
+                id: "before_sleep" as const,
                 name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
-                state: goldenCount > 2 ? "complete" : "pending",
+                state: summary.today.completedCategories.includes("before_sleep") ? "complete" : "pending",
                 label: isArabic
-                  ? goldenCount > 2
+                  ? summary.today.completedCategories.includes("before_sleep")
                     ? "أذكار النوم. مكتمل"
                     : "أذكار النوم. غير مكتمل"
-                  : goldenCount > 2
+                  : summary.today.completedCategories.includes("before_sleep")
                     ? "Before Sleep Azkar. Complete"
                     : "Before Sleep Azkar. Not yet",
               },
@@ -753,7 +753,7 @@ export function TodayRoutineGarden({
                 data-state={col.state}
                 aria-label={col.label}
                 title={col.label}
-                className={`flex items-center gap-1 rounded-lg border px-2.5 py-1 text-[0.75rem] font-extrabold transition-all ${
+                className={`flex items-center gap-1 rounded-lg border px-2 py-1 text-[0.75rem] font-extrabold transition-all ${
                   col.state === "complete"
                     ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
                     : "border-border/50 bg-muted/20 text-muted-foreground/60"
@@ -763,13 +763,11 @@ export function TodayRoutineGarden({
                 {col.state === "complete" ? (
                   <span className="flex shrink-0 items-center gap-0.5 text-amber-500">
                     <GoldenLeafMark size={14} filled />
-                    <GoldenLeafMark size={14} filled />
-                    <span className="text-[0.7rem]">✓</span>
+                    <span className="text-[0.7rem] font-black text-amber-600 dark:text-amber-400">✓</span>
                   </span>
                 ) : (
-                  <span className="flex shrink-0 items-center gap-0.5 text-muted-foreground/40">
+                  <span className="flex shrink-0 items-center text-muted-foreground/40">
                     <GoldenLeafMark size={14} filled={false} />
-                    <span className="text-[0.7rem]">•</span>
                   </span>
                 )}
               </li>

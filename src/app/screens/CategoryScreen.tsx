@@ -116,7 +116,7 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/80 bg-card p-4.5 text-start transition-all shadow-xs hover:border-amber-500/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99]"
+          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/80 bg-card p-4.5 text-start transition-all shadow-xs hover:border-amber-500/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
@@ -206,7 +206,7 @@ export function CategoryScreen({
               ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
               : t(language, "category.remainingToggle")
           }
-          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             isCardCompleted
               ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
               : currentCount > 0

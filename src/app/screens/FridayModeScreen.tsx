@@ -137,7 +137,7 @@ export function FridayModeScreen({
               aria-label={t(language, "friday.salawatCounterAriaLabel", {
                 count: formatNumerals(salawatCount, language),
               })}
-              className="group relative flex size-36 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/10 shadow-xl active:scale-95 transition-all hover:bg-amber-500/20 dark:bg-amber-500/15"
+              className="group relative flex size-36 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/10 shadow-xl transition-all hover:bg-amber-500/20 dark:bg-amber-500/15"
             >
               <span className="text-[2.25rem] font-black text-amber-600 dark:text-amber-400">
                 {formatNumerals(salawatCount, language)}

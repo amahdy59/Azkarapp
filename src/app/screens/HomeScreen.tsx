@@ -202,7 +202,7 @@ export function HomeScreen({
             <button
               type="button"
               onClick={onOpenFridayMode}
-              className="group flex w-full items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-start shadow-md hover:bg-amber-500/15 active:scale-[0.98] transition-all dark:bg-amber-500/15"
+              className="group flex w-full items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-start shadow-md hover:bg-amber-500/15 transition-all dark:bg-amber-500/15"
             >
               <div className="flex items-center gap-3">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-black text-[1.125rem] shadow-sm">
@@ -215,7 +215,7 @@ export function HomeScreen({
                   </p>
                 </div>
               </div>
-              <span className="text-[1.125rem] font-bold text-amber-600 dark:text-amber-400 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform">
+              <span className="text-[1.125rem] font-bold text-amber-600 dark:text-amber-400 transition-transform">
                 {direction === "rtl" ? "←" : "→"}
               </span>
             </button>
@@ -223,9 +223,9 @@ export function HomeScreen({
         )}
 
         {/* Clean Hero Zikr Reminder Card */}
-        <section aria-labelledby="current-zikr-heading" className="mb-5">
+        <section aria-labelledby="current-zikr-heading" className="mb-4">
           <div
-            className={`relative overflow-hidden rounded-3xl border p-5 transition-all shadow-md ${
+            className={`relative overflow-hidden rounded-3xl border p-4 transition-all shadow-md ${
               reminderInfo.categoryId === "morning"
                 ? "border-amber-300/80 bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 dark:border-amber-500/30 dark:from-[#2c1c0a] dark:via-[#1e1408] dark:to-[#140e05]"
                 : reminderInfo.categoryId === "evening"
@@ -278,11 +278,11 @@ export function HomeScreen({
                     }
                   }}
                   aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
+                  className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
                 >
                   <span>{ctaLabel}</span>
                   <span
-                    className="text-[1.125rem] leading-none transition-transform group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5"
+                    className="text-[1.125rem] leading-none transition-transform"
                     aria-hidden="true"
                   >
                     {direction === "rtl" ? "←" : "→"}

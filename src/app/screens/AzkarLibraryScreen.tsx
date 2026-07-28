@@ -83,7 +83,7 @@ export function AzkarLibraryScreen({
                     data-testid={`category-card-${category.id}`}
                     dir={direction}
                     onClick={() => onCategory(category.id)}
-                    className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${isArabic ? category.nameArabic : category.name}, ${t(
                       language,
                       "library.progressOfTotal",
@@ -149,7 +149,7 @@ export function AzkarLibraryScreen({
                     key={zikr.id}
                     type="button"
                     onClick={() => onZikr(zikr.category, zikr.orderIndex)}
-                    className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                       isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                     }`}

@@ -205,7 +205,7 @@ export function SearchScreen({
                       handleSubmit(q);
                       onZikr(z.category, zIdx);
                     }}
-                    className="flex h-[72px] w-full items-center justify-between rounded-2xl border border-border bg-card px-4 transition-all active:scale-[0.98]"
+                    className="flex h-[72px] w-full items-center justify-between rounded-2xl border border-border bg-card px-4 transition-all"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
