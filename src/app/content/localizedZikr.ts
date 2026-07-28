@@ -34,6 +34,10 @@ const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
     "تُقال ٣٣ مرة قبل النوم (وصية النبي ﷺ لعلي وفاطمة رضي الله عنهما).",
   "Gathers palms, blows lightly into them, recites the 3 Surahs, then wipes over as much of the body as possible. Repeated 3 times.":
     "يجمع كفيه وينفث فيهما فيقرأ المعوذات الثلاث ثم يمسح بهما ما استطاع من جسده، يفعل ذلك ثلاث مرات.",
+  "Recited along with Al-Ikhlas and An-Nas before sleeping for complete protection. Repeated 3 times.":
+    "تُقرأ مع سورتي الإخلاص والناس قبل النوم للتحصين الشامل، تُكرر ثلاث مرات.",
+  "Recited along with Al-Ikhlas and Al-Falaq before sleeping for complete protection. Repeated 3 times.":
+    "تُقرأ مع سورتي الإخلاص والفلق قبل النوم للتحصين الشامل، تُكرر ثلاث مرات.",
   "Also appears in before-sleep adhkar.": "يرد هذا الذكر أيضًا ضمن أذكار ما قبل النوم.",
   "Authentic/Hasan as cited by Hisn al-Muslim/Sunnah.com.": "صححه أو حسنه أهل العلم كما هو موثق في حصن المسلم.",
   "Authenticated by al-Albani in Sahih al-Targhib wa al-Tarhib as cited in Hisn al-Muslim/Sunnah.com.":
@@ -203,6 +207,10 @@ const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
   "Supplication when entering a market.": "دعاء دخول السوق.",
   "Supplication before starting a gathering.": "دعاء البدء في المجلس.",
   "Kaffarat al-Majlis (expiation for a gathering).": "دعاء كفارة المجلس.",
+  "Recited 10 times after Fajr and Maghrib before speaking; grants 10 good deeds, erases 10 sins, raises 10 degrees, and protects from Satan and harm.":
+    "تُقال ١٠ مرات عقب صلاتي الفجر والمغرب قبل أن يتكلم؛ تُكتب له بها عشر حسنات، وتُمحى عنه عشر سيئات، وتُرفع له عشر درجات، وتكون له حرزاً من كل مكروه وحرساً من الشيطان.",
+  "Recited 7 times after Fajr and Maghrib before speaking; grants protection and immunity from the Hellfire.":
+    "تُقال ٧ مرات قبل أن يتكلم عقب صلاتي الفجر والمغرب؛ موجبة للحماية والجوار من النار.",
 };
 
 const ARABIC_CITATION_NAMES: ReadonlyArray<readonly [string, string]> = [
@@ -314,6 +322,7 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "During the day; suitable to include in morning/evening routine.": "تُقال خلال اليوم؛ وتناسب أذكار الصباح والمساء.",
   "Morning and evening.": "تُقال في الصباح والمساء.",
   "Recited 10 times after Fajr and 10 times after Maghrib.": "تُقال ١٠ مرات بعد صلاة الفجر و١٠ مرات بعد صلاة المغرب.",
+  "Recited 7 times after Fajr and 7 times after Maghrib.": "تُقال ٧ مرات بعد صلاة الفجر و٧ مرات بعد صلاة المغرب.",
   "Morning after Fajr.": "تُقال في الصباح بعد صلاة الفجر.",
   "After ‘Asr/sunset window.": "تُقال في المساء بعد صلاة العصر وقبل الغروب.",
   "In the evening.": "تُقال في المساء.",

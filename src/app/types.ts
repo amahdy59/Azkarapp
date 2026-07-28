@@ -88,6 +88,7 @@ export interface Zikr {
   surahType?: "Meccan" | "Medinan" | "مكية" | "مدنية";
   verseCount?: number;
   hasBasmalah?: boolean;
+  hasSeekRefuge?: boolean;
 }
 
 export interface StoredSession {

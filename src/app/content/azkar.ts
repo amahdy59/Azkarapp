@@ -1089,20 +1089,20 @@ const EVENING_AZKAR: Zikr[] = [
 
 const SLEEP_AZKAR: Zikr[] = [
   {
-    id: "s-hm-99",
+    id: "s-hm-99-ikhlas",
     category: "before_sleep",
     orderIndex: 0,
     isSurah: true,
-    surahNameArabic: "الإِخْلَاص وَالفَلَق وَالنَّاس",
-    surahNameEnglish: "Al-Ikhlas, Al-Falaq, An-Nas",
+    surahNameArabic: "الإِخْلَاص",
+    surahNameEnglish: "Al-Ikhlas",
     surahType: "مكية",
-    verseCount: 15,
+    verseCount: 4,
     hasBasmalah: true,
     arabicText:
-      "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾﴾\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾﴾\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾﴾",
-    transliteration: "Qul huwallahu ahad... Qul a'udhu birabbil-falaq... Qul a'udhu birabbin-nas...",
+      "﴿قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾﴾",
+    transliteration: "Qul huwallahu ahad. Allahus-samad. Lam yalid wa lam yulad. Wa lam yakul-lahu kufuwan ahad.",
     translation:
-      "Say: He is Allah, One... Say: I seek refuge in the Lord of daybreak... Say: I seek refuge in the Lord of mankind...",
+      "Say: He is Allah, [who is] One. Allah, the Eternal Refuge. He neither begets nor is born, nor is there to Him any equivalent.",
     benefit:
       "Gathers palms, blows lightly into them, recites the 3 Surahs, then wipes over as much of the body as possible. Repeated 3 times.",
     repetitionCount: 3,
@@ -1114,11 +1114,64 @@ const SLEEP_AZKAR: Zikr[] = [
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
-    id: "s-hm-100",
+    id: "s-hm-99-falaq",
     category: "before_sleep",
     orderIndex: 1,
+    isSurah: true,
+    surahNameArabic: "الفَلَق",
+    surahNameEnglish: "Al-Falaq",
+    surahType: "مكية",
+    verseCount: 5,
+    hasBasmalah: true,
     arabicText:
-      "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ. ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾",
+      "﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾﴾",
+    transliteration:
+      "Qul a'udhu birabbil-falaq. Min sharri ma khalaq. Wa min sharri ghasiqin idha waqab. Wa min sharrin-naffathati fil-'uqad. Wa min sharri hasidin idha hasad.",
+    translation:
+      "Say: I seek refuge in the Lord of daybreak from the evil of that which He created, and from the evil of darkness when it settles, and from the evil of the blowers in knots, and from the evil of an envier when he envies.",
+    benefit: "Recited along with Al-Ikhlas and An-Nas before sleeping for complete protection. Repeated 3 times.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+    preferredTiming: "Before sleeping, after lying down.",
+    hadithText:
+      "عَنْ عَائِشَةَ رَضِيَ اللَّهُ عَنْهَا أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ﴾ وَ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ﴾ وَ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ﴾، ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ، يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ، يَفْعَلُ ذَلِكَ ثَلَاثَ مَرَّاتٍ.",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "s-hm-99-nas",
+    category: "before_sleep",
+    orderIndex: 2,
+    isSurah: true,
+    surahNameArabic: "النَّاس",
+    surahNameEnglish: "An-Nas",
+    surahType: "مكية",
+    verseCount: 6,
+    hasBasmalah: true,
+    arabicText:
+      "﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾﴾",
+    transliteration:
+      "Qul a'udhu birabbin-nas. Malikin-nas. Ilahin-nas. Min sharril-waswasil-khannas. Alladhi yuwaswisu fi sudurin-nas. Minal-jinnati wan-nas.",
+    translation:
+      "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer who whispers into the breasts of mankind, from among the jinn and mankind.",
+    benefit: "Recited along with Al-Ikhlas and Al-Falaq before sleeping for complete protection. Repeated 3 times.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+    preferredTiming: "Before sleeping, after lying down.",
+    hadithText:
+      "عَنْ عَائِشَةَ رَضِيَ اللَّهُ عَنْهَا أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ﴾ وَ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ﴾ وَ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ﴾، ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ، يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ، يَفْعَلُ ذَلِكَ ثَلَاثَ مَرَّاتٍ.",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "s-hm-100",
+    category: "before_sleep",
+    orderIndex: 3,
+    hasSeekRefuge: true,
+    surahNameArabic: "البَقَرَة (آيَةُ الكُرْسِيِّ)",
+    surahNameEnglish: "Al-Baqarah (Ayah Al-Kursi)",
+    arabicText:
+      "﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾",
     transliteration:
       "Allahu la ilaha illa huwal-Hayyul-Qayyum, la ta'khudhuhu sinatun wa la nawm, lahu ma fis-samawati wa ma fil-ard, man dhal-ladhi yashfa'u 'indahu illa bi'idhnih, ya'lamu ma bayna aydihim wa ma khalfahum, wa la yuhituna bishay'im-min 'ilmihi illa bima sha', wasi'a kursiyyuhus-samawati wal-ard, wa la ya'uduhu hifzuhuma, wa huwal-'Aliyyul-'Azim.",
     translation:
@@ -1136,7 +1189,10 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-101",
     category: "before_sleep",
-    orderIndex: 2,
+    orderIndex: 4,
+    hasSeekRefuge: true,
+    surahNameArabic: "البَقَرَة (٢٨٥ - ٢٨٦)",
+    surahNameEnglish: "Al-Baqarah (285-286)",
     arabicText:
       "﴿آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِنْ رُسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ﴿٢٨٥﴾ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ ﴿٢٨٦﴾﴾",
     transliteration: "Amanar-Rasulu bima unzila ilayhi mir-Rabbihi wal-mu'minun... fan-surna 'alal-qawmil-kafirin.",
@@ -1154,7 +1210,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-109a",
     category: "before_sleep",
-    orderIndex: 3,
+    orderIndex: 5,
     isSurah: true,
     surahNameArabic: "الكَافِرُون",
     surahNameEnglish: "Al-Kafirun",
@@ -1179,7 +1235,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-110a",
     category: "before_sleep",
-    orderIndex: 4,
+    orderIndex: 6,
     isSurah: true,
     surahNameArabic: "السَّجْدَة",
     surahNameEnglish: "As-Sajdah",
@@ -1202,7 +1258,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-110b",
     category: "before_sleep",
-    orderIndex: 5,
+    orderIndex: 7,
     isSurah: true,
     surahNameArabic: "الْمُلْك",
     surahNameEnglish: "Al-Mulk (Tabarak)",
@@ -1226,7 +1282,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-106-subhanallah",
     category: "before_sleep",
-    orderIndex: 6,
+    orderIndex: 8,
     arabicText: "سُبْحَانَ اللَّهِ",
     transliteration: "Subhanallah",
     translation: "Glory be to Allah.",
@@ -1242,7 +1298,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-106-alhamdulillah",
     category: "before_sleep",
-    orderIndex: 7,
+    orderIndex: 9,
     arabicText: "الْحَمْدُ لِلَّهِ",
     transliteration: "Alhamdulillah",
     translation: "All praise is due to Allah.",
@@ -1258,7 +1314,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-106-allahu-akbar",
     category: "before_sleep",
-    orderIndex: 8,
+    orderIndex: 10,
     arabicText: "اللَّهُ أَكْبَرُ",
     transliteration: "Allahu Akbar",
     translation: "Allah is the Greatest.",
@@ -1274,7 +1330,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-102",
     category: "before_sleep",
-    orderIndex: 9,
+    orderIndex: 11,
     arabicText:
       "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.",
     transliteration:
@@ -1293,7 +1349,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-105",
     category: "before_sleep",
-    orderIndex: 10,
+    orderIndex: 12,
     arabicText: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.",
     transliteration: "Bismika Allahumma amutu wa ahya.",
     translation: "In Your Name, O Allah, I die and I live.",
@@ -1308,7 +1364,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-104",
     category: "before_sleep",
-    orderIndex: 11,
+    orderIndex: 13,
     arabicText: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.",
     transliteration: "Allahumma qini 'adhabaka yawma tab'athu 'ibadak.",
     translation: "O Allah, protect me from Your punishment on the Day You resurrect Your servants.",
@@ -1324,7 +1380,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-108",
     category: "before_sleep",
-    orderIndex: 12,
+    orderIndex: 14,
     arabicText:
       "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا، وَكَفَانَا، وَآوَانَا، فَكَمْ مِمَّنْ لَا كَافِيَ لَهُ وَلَا مُؤْوِيَ.",
     transliteration:
@@ -1343,7 +1399,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-107",
     category: "before_sleep",
-    orderIndex: 13,
+    orderIndex: 15,
     arabicText:
       "اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَرَبَّ الْعَرْشِ الْعَظِيمِ، رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ، فَالِقَ الْحَبِّ وَالنَّوَى، وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ. اللَّهُمَّ أَنْتَ الْأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الْآخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنَّا الدَّيْنَ، وَأَغْنِنَا مِنَ الْفَقْرِ.",
     transliteration:
@@ -1362,7 +1418,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-109",
     category: "before_sleep",
-    orderIndex: 14,
+    orderIndex: 16,
     arabicText:
       "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.",
     transliteration: "Allahumma 'Alimal-ghaybi wash-shahadah, Fatiras-samawati wal-ard...",
@@ -1379,7 +1435,7 @@ const SLEEP_AZKAR: Zikr[] = [
   {
     id: "s-hm-111",
     category: "before_sleep",
-    orderIndex: 15,
+    orderIndex: 17,
     arabicText:
       "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ.",
     transliteration:
@@ -1674,24 +1730,42 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     category: "after_prayer",
     orderIndex: 10,
     arabicText:
-      "لَا إِلَهَ إِلَّا اللَّهُ وَحدَهُ لَا شَرِيكَ لَهُ، لَهُ المُلكُ وَلَهُ الحَمدُ يُحيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيءٍ قَدِيرٌ",
+      "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
     transliteration:
       "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamdu yuhyi wa yumitu wa huwa 'ala kulli shay'in qadir",
     translation:
       "None has the right to be worshipped except Allah alone, with no partner. His is the kingdom and praise; He gives life and causes death, and He has power over all things.",
-    benefit: "Recited 10 times after Fajr and Maghrib prayers.",
+    benefit:
+      "Recited 10 times after Fajr and Maghrib before speaking; grants 10 good deeds, erases 10 sins, raises 10 degrees, and protects from Satan and harm.",
     preferredTiming: "Recited 10 times after Fajr and 10 times after Maghrib.",
     repetitionCount: 10,
     countLabel: "10",
-    sourceReference: "Jami' at-Tirmidhi 3474; Hisn al-Muslim 29.",
+    sourceReference: "Jami' at-Tirmidhi 3474; Sunan an-Nasa'i 10234; Hisn al-Muslim 29.",
     hadithText:
-      "عن أبي ذر رضي الله عنه أن رسول الله ﷺ قال: «من قال في دبر صلاة الفجر وهو ثاني رجليه قبل أن يتكلم: لا إله إلا الله وحده لا شريك له... عشر مرات كتب الله له عشر حسنات ومحا عنه عشر سيئات...».",
-    authenticityNote: "Graded Sahih by al-Albani.",
+      "عَنْ أَبِي ذَرٍّ رَضِيَ اللَّهُ عَنْهُ أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ فِي دُبُرِ صَلَاةِ الْفَجْرِ وَهُوَ ثَانِي رِجْلَيْهِ قَبْلَ أَنْ يَتَكَلَّمَ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ عَشْرَ مَرَّاتٍ، كُتِبَ لَهُ عَشْرُ حَسَنَاتٍ، وَمُحِيَ عَنْهُ عَشْرُ سَيِّئَاتٍ، وَرُفِعَ لَهُ عَشْرُ دَرَجَاتٍ، وَكَانَ يَوْمَهُ ذَلِكَ كُلَّهُ فِي حِرْزٍ مِنْ كُلِّ مَكْرُوهٍ، وَحُرِسَ مِنَ الشَّيْطَانِ، وَلَمْ يَنْبَغِ لِذَنْبٍ أَنْ يُدْرِكَهُ فِي ذَلِكَ الْيَوْمِ إِلَّا الشِّرْكُ بِاللَّهِ».",
+    authenticityNote: "Graded Sahih/Hasan by al-Albani.",
+  },
+  {
+    id: "ap-ref-11",
+    category: "after_prayer",
+    orderIndex: 11,
+    arabicText: "اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ",
+    transliteration: "Allahumma ajirni min an-nar",
+    translation: "O Allah, protect me from the Hellfire.",
+    benefit:
+      "Recited 7 times after Fajr and Maghrib before speaking; grants protection and immunity from the Hellfire.",
+    repetitionCount: 7,
+    countLabel: "7",
+    sourceReference: "Sunan Abu Dawud 5079; Musnad Ahmad 17990; Hisn al-Muslim.",
+    preferredTiming: "Recited 7 times after Fajr and 7 times after Maghrib.",
+    hadithText:
+      "عَنْ الْحَارِثِ بْنِ مُسْلِمٍ التَّمِيمِيِّ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ لِي رَسُولُ اللَّهِ ﷺ: «إِذَا صَلَّيْتَ الصُّبْحَ فَقُلْ قَبْلَ أَنْ تَتَكَلَّمَ: اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ سَبْعَ مَرَّاتٍ، فَإِنَّكَ إِنْ مُتَّ مِنْ يَوْمِكَ ذَلِكَ كَتَبَ اللَّهُ لَكَ جِوَارًا مِنْهَا، وَإِذَا صَلَّيْتَ الْمَغْرِبَ فَقُلْ قَبْلَ أَنْ تَتَكَلَّمَ: اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ سَبْعَ مَرَّاتٍ، فَإِنَّكَ إِنْ مُتَّ مِنْ لَيْلَتِكَ كَتَبَ اللَّهُ لَكَ جِوَارًا مِنْهَا».",
+    authenticityNote: "Reported by Abu Dawud and Ahmad.",
   },
   {
     id: "ap-ref-8",
     category: "after_prayer",
-    orderIndex: 11,
+    orderIndex: 12,
     arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ فِعلَ الخَيرَاتِ وَتَركَ المُنكَرَاتِ وَحُبَّ المَسَاكِينِ",
     transliteration: "Allahumma inni as'aluka fi'lal-khayrati wa tarkal-munkarati wa hubbal-masakin",
     translation:
@@ -1707,7 +1781,7 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
   {
     id: "ap-ref-10",
     category: "after_prayer",
-    orderIndex: 12,
+    orderIndex: 13,
     arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ عِلمًا نَافِعًا وَرِزقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا",
     transliteration: "Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbala",
     translation: "O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.",

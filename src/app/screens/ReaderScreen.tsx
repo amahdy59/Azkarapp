@@ -297,24 +297,51 @@ export function ReaderScreen({
         }
       }}
     >
-      {z.isSurah && (
-        <div className="mb-4 text-center">
-          <div className="inline-flex items-center gap-2 border border-amber-700/30 dark:border-amber-500/30 rounded-xl px-3.5 py-1.5 bg-amber-500/10 dark:bg-amber-950/40">
-            <span className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200">
-              {z.surahType ?? "سُورَة"}
-            </span>
-            <span className="text-[1.1rem] font-extrabold font-arabic text-amber-950 dark:text-amber-100">
-              {z.surahNameArabic ? `سُورَةُ ${z.surahNameArabic}` : "القرآن الكريم"}
+      {(z.isSurah || z.surahNameArabic) && (
+        <div className="mb-3 text-center">
+          <div className="inline-flex items-center gap-1.5 border border-amber-700/25 dark:border-amber-500/25 rounded-lg px-2.5 py-1 bg-amber-500/10 dark:bg-amber-950/30">
+            {z.surahType && (
+              <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">
+                {z.surahType}
+              </span>
+            )}
+            <span className="text-[0.875rem] font-bold font-arabic text-amber-950 dark:text-amber-100">
+              {z.isSurah && z.surahNameArabic ? `سُورَةُ ${z.surahNameArabic}` : (z.surahNameArabic ?? "القرآن الكريم")}
             </span>
             {z.verseCount && (
               <span
-                className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200"
+                className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80"
                 style={{ fontFamily: counterNumeralFontFamily(language) }}
               >
                 آيَاتُهَا {formatNumerals(z.verseCount, language)}
               </span>
             )}
           </div>
+        </div>
+      )}
+
+      {z.hasSeekRefuge && (
+        <div className="mb-3 text-center">
+          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+            أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+          </p>
+        </div>
+      )}
+
+      {(z.hasBasmalah || z.isSurah) && (
+        <div className="mb-3 text-center">
+          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+          </p>
+        </div>
+      )}
+
+      {z.preferredTiming && (
+        <div className="mb-3.5 text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-[0.75rem] font-bold text-emerald-900 dark:text-emerald-200">
+            <span aria-hidden="true">📜</span>
+            <span>{z.preferredTiming}</span>
+          </span>
         </div>
       )}
 

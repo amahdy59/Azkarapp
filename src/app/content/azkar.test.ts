@@ -40,18 +40,32 @@ describe("azkar content totals", () => {
   it("verifies no Quranic Zikrs are truncated and Surah metadata is valid", () => {
     const sleepAzkar = getAzkarByCategory("before_sleep");
     const surahItems = sleepAzkar.filter((z) => z.isSurah);
-    expect(surahItems.length).toBeGreaterThanOrEqual(4);
+    expect(surahItems.length).toBe(6); // Al-Ikhlas, Al-Falaq, An-Nas, Al-Kafirun, As-Sajdah, Al-Mulk
 
     for (const surah of surahItems) {
       expect(surah.surahNameArabic).toBeTruthy();
       expect(surah.arabicText).not.toContain("...");
+      expect(surah.hasBasmalah).toBe(true);
     }
+
+    const ikhlas = sleepAzkar.find((z) => z.id === "s-hm-99-ikhlas");
+    const falaq = sleepAzkar.find((z) => z.id === "s-hm-99-falaq");
+    const nas = sleepAzkar.find((z) => z.id === "s-hm-99-nas");
+    const ayatKursi = sleepAzkar.find((z) => z.id === "s-hm-100");
+    const amanarRasul = sleepAzkar.find((z) => z.id === "s-hm-101");
+
+    expect(ikhlas?.repetitionCount).toBe(3);
+    expect(falaq?.repetitionCount).toBe(3);
+    expect(nas?.repetitionCount).toBe(3);
+
+    expect(ayatKursi?.hasSeekRefuge).toBe(true);
+    expect(amanarRasul?.hasSeekRefuge).toBe(true);
 
     // Verify Ayat Al-Kursi in after_prayer is untruncated
     const afterPrayerAzkar = getAzkarByCategory("after_prayer");
-    const ayatKursi = afterPrayerAzkar.find((z) => z.id === "ap-ref-9");
-    expect(ayatKursi?.arabicText).not.toContain("...");
-    expect(ayatKursi?.arabicText).toContain("وَهُوَ الْعَلِيُّ الْعَظِيمُ");
+    const ayatKursiAfterPrayer = afterPrayerAzkar.find((z) => z.id === "ap-ref-9");
+    expect(ayatKursiAfterPrayer?.arabicText).not.toContain("...");
+    expect(ayatKursiAfterPrayer?.arabicText).toContain("وَهُوَ الْعَلِيُّ الْعَظِيمُ");
   });
 
   it("verifies Tasbeeh items after prayer are split into individual cards", () => {

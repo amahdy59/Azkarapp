@@ -1,3 +1,5 @@
+export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+
 export interface PrayerTimes {
   fajr: string; // e.g. "04:45"
   dhuhr: string; // e.g. "12:15"
@@ -30,6 +32,50 @@ export function getEstimatedPrayerTimes(date: Date = new Date()): PrayerTimes {
     asr: "15:30",
     maghrib: `${pad(mH)}:${pad(mM)}`,
     isha: "19:45",
+  };
+}
+
+/** Converts "HH:MM" time string to total minutes from midnight */
+export function timeToMinutes(timeStr: string): number {
+  const [h, m] = timeStr.split(":").map((v) => parseInt(v, 10));
+  return (h || 0) * 60 + (m || 0);
+}
+
+/** Determines which prayer period the current time falls into or follows */
+export function getCurrentPrayerPeriod(date: Date = new Date()): {
+  currentPrayer: PrayerName;
+  isFajrOrMaghrib: boolean;
+  prayerTimes: PrayerTimes;
+} {
+  const times = getEstimatedPrayerTimes(date);
+  const nowMins = date.getHours() * 60 + date.getMinutes();
+
+  const fajrM = timeToMinutes(times.fajr);
+  const dhuhrM = timeToMinutes(times.dhuhr);
+  const asrM = timeToMinutes(times.asr);
+  const maghribM = timeToMinutes(times.maghrib);
+  const ishaM = timeToMinutes(times.isha);
+
+  let currentPrayer: PrayerName;
+
+  if (nowMins >= fajrM && nowMins < dhuhrM) {
+    currentPrayer = "fajr";
+  } else if (nowMins >= dhuhrM && nowMins < asrM) {
+    currentPrayer = "dhuhr";
+  } else if (nowMins >= asrM && nowMins < maghribM) {
+    currentPrayer = "asr";
+  } else if (nowMins >= maghribM && nowMins < ishaM) {
+    currentPrayer = "maghrib";
+  } else {
+    currentPrayer = "isha";
+  }
+
+  const isFajrOrMaghrib = currentPrayer === "fajr" || currentPrayer === "maghrib";
+
+  return {
+    currentPrayer,
+    isFajrOrMaghrib,
+    prayerTimes: times,
   };
 }
 

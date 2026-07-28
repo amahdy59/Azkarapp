@@ -1,8 +1,10 @@
 import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
+import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
+import { getCurrentPrayerPeriod } from "../content/prayerTimes";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -125,6 +127,9 @@ export function HomeScreen({
     [dailyCompletions, now, progressDayStartHour],
   );
 
+  // Real-time prayer tracking
+  const _prayerInfo = useMemo(() => getCurrentPrayerPeriod(now), [now]);
+
   // Determine which category to feature based on time of day
   const reminderInfo = useMemo(() => getTimeOfDayZikr(now, language), [now, language]);
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
@@ -222,73 +227,82 @@ export function HomeScreen({
           </section>
         )}
 
-        {/* Clean Hero Zikr Reminder Card */}
-        <section aria-labelledby="current-zikr-heading" className="mb-4">
-          <div
-            className={`relative overflow-hidden rounded-3xl border p-4 transition-all shadow-md ${
-              reminderInfo.categoryId === "morning"
-                ? "border-amber-300/80 bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 dark:border-amber-500/30 dark:from-[#2c1c0a] dark:via-[#1e1408] dark:to-[#140e05]"
-                : reminderInfo.categoryId === "evening"
-                  ? "border-orange-300/80 bg-gradient-to-br from-orange-100/90 via-amber-50 to-rose-100/80 dark:border-orange-500/30 dark:from-[#2e160a] dark:via-[#1f1008] dark:to-[#140a05]"
-                  : "border-sky-300/80 bg-gradient-to-br from-sky-100/90 via-indigo-50 to-blue-100/80 dark:border-sky-500/30 dark:from-[#0c1c38] dark:via-[#081226] dark:to-[#050c19]"
-            }`}
-          >
-            {/* Card Content Overlay */}
-            <div className="flex flex-col justify-between text-start">
-              <div>
-                <h2 id="current-zikr-heading" className="text-[1.25rem] font-black tracking-wide text-foreground">
-                  {reminderInfo.title}
-                </h2>
-                <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
-                  {reminderInfo.desc}
-                </p>
+        {/* Hero Zikr Section: Tranquility Card if complete, active card if incomplete */}
+        {isComplete ? (
+          <TranquilityCompletionCard
+            categoryId={reminderInfo.categoryId}
+            language={language}
+            direction={direction}
+            onReview={onRepeat}
+          />
+        ) : (
+          <section aria-labelledby="current-zikr-heading" className="mb-4">
+            <div
+              className={`relative overflow-hidden rounded-3xl border p-4 transition-all shadow-md ${
+                reminderInfo.categoryId === "morning"
+                  ? "border-amber-300/80 bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 dark:border-amber-500/30 dark:from-[#2c1c0a] dark:via-[#1e1408] dark:to-[#140e05]"
+                  : reminderInfo.categoryId === "evening"
+                    ? "border-orange-300/80 bg-gradient-to-br from-orange-100/90 via-amber-50 to-rose-100/80 dark:border-orange-500/30 dark:from-[#2e160a] dark:via-[#1f1008] dark:to-[#140a05]"
+                    : "border-sky-300/80 bg-gradient-to-br from-sky-100/90 via-indigo-50 to-blue-100/80 dark:border-sky-500/30 dark:from-[#0c1c38] dark:via-[#081226] dark:to-[#050c19]"
+              }`}
+            >
+              {/* Card Content Overlay */}
+              <div className="flex flex-col justify-between text-start">
+                <div>
+                  <h2 id="current-zikr-heading" className="text-[1.25rem] font-black tracking-wide text-foreground">
+                    {reminderInfo.title}
+                  </h2>
+                  <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
+                    {reminderInfo.desc}
+                  </p>
 
-                {doneCount > 0 && (
-                  <div className="mt-3.5">
-                    <ProgressBar
-                      value={doneCount}
-                      max={totalCount}
-                      height={6}
-                      trackColor="var(--muted)"
-                      direction={direction}
-                      aria-label={t(language, "home.progressOf", {
-                        done: formatNumerals(doneCount, language),
-                        total: formatNumerals(totalCount, language),
-                      })}
-                    />
-                    <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
-                      {t(language, "home.progressOf", {
-                        done: formatNumerals(doneCount, language),
-                        total: formatNumerals(totalCount, language),
-                      })}
+                  {doneCount > 0 && (
+                    <div className="mt-3.5">
+                      <ProgressBar
+                        value={doneCount}
+                        max={totalCount}
+                        height={6}
+                        trackColor="var(--muted)"
+                        direction={direction}
+                        aria-label={t(language, "home.progressOf", {
+                          done: formatNumerals(doneCount, language),
+                          total: formatNumerals(totalCount, language),
+                        })}
+                      />
+                      <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
+                        {t(language, "home.progressOf", {
+                          done: formatNumerals(doneCount, language),
+                          total: formatNumerals(totalCount, language),
+                        })}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-4 flex items-center justify-start">
+                  <button
+                    type="button"
+                    data-testid="home-primary-cta"
+                    onClick={() => {
+                      if (actionKind === "again") {
+                        onRepeat(reminderInfo.categoryId);
+                      } else {
+                        onResume(reminderInfo.categoryId, nextIdx);
+                      }
+                    }}
+                    aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
+                    className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
+                  >
+                    <span>{ctaLabel}</span>
+                    <span className="text-[1.125rem] leading-none transition-transform" aria-hidden="true">
+                      {direction === "rtl" ? "←" : "→"}
                     </span>
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-4 flex items-center justify-start">
-                <button
-                  type="button"
-                  data-testid="home-primary-cta"
-                  onClick={() => {
-                    if (actionKind === "again") {
-                      onRepeat(reminderInfo.categoryId);
-                    } else {
-                      onResume(reminderInfo.categoryId, nextIdx);
-                    }
-                  }}
-                  aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                  className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
-                >
-                  <span>{ctaLabel}</span>
-                  <span className="text-[1.125rem] leading-none transition-transform" aria-hidden="true">
-                    {direction === "rtl" ? "←" : "→"}
-                  </span>
-                </button>
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* Leaves & Progress Garden (Daily Progress) */}
         {quietProgressEnabled && (

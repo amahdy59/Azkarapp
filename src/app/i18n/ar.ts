@@ -70,6 +70,12 @@ const ar = {
     eveningDesc: "أذكار المساء تُقرأ بعد صلاة العصر حتى المغرب",
     beforeSleepTitle: "حان وقت أذكار النوم",
     beforeSleepDesc: "أذكار النوم تُقرأ بعد صلاة العشاء وقبل النوم",
+    completedTitle: "أكملت {name} • تقبل الله طاعتك",
+    completedSubtitle: "كتب الله أجرك وثبت قلبك على ذكره وطاعته",
+    reviewAction: "إعادة قراءة {name}",
+    fajrMaghribSunnah: "سُنَّة مؤكدة بعد الفجر والمغرب",
+    fajrSunnah: "سُنَّة خاصة بعد صلاة الفجر",
+    afterPrayerTitle: "أذكار ما بعد الصلاة",
     progressOf: "{done} من {total} مكتملة",
   },
   friday: {

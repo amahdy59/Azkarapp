@@ -69,6 +69,12 @@ const en = {
     eveningDesc: "Evening Azkar are read after Asr prayer until Maghrib",
     beforeSleepTitle: "Time for Before Sleep Azkar",
     beforeSleepDesc: "Before Sleep Azkar are read after Isha prayer and before sleep",
+    completedTitle: "Completed {name} • May Allah accept",
+    completedSubtitle: "May Allah accept your worship and keep your heart steadfast in His remembrance",
+    reviewAction: "Read {name} again",
+    fajrMaghribSunnah: "Confirmed Sunnah after Fajr & Maghrib",
+    fajrSunnah: "Special Sunnah after Fajr prayer",
+    afterPrayerTitle: "Post-Prayer Azkar",
     progressOf: "{done} of {total} complete",
   },
   friday: {

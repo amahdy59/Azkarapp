@@ -78,24 +78,30 @@ export function MushafZikrCard({
           )}
         </button>
 
-        {/* Surah Title Banner */}
+        {/* Surah / Ayah Title Banner */}
         <div className="text-center flex-1 px-2">
-          <div className="inline-flex items-center gap-2 border border-amber-700/30 dark:border-amber-500/30 rounded-xl px-3 py-1 bg-amber-100/50 dark:bg-amber-900/30">
-            <span className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200">
-              {zikr.surahType ? `${zikr.surahType}` : "سُورَة"}
-            </span>
-            <span className="text-[1.05rem] font-extrabold font-arabic text-amber-950 dark:text-amber-100 leading-tight">
-              {zikr.surahNameArabic ? `سُورَةُ ${zikr.surahNameArabic}` : "القرآن الكريم"}
-            </span>
-            {zikr.verseCount && (
-              <span
-                className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200"
-                style={{ fontFamily: numeralFontFamily(language) }}
-              >
-                آيَاتُهَا {formatNumerals(zikr.verseCount, language)}
+          {(zikr.isSurah || zikr.surahNameArabic) && (
+            <div className="inline-flex items-center gap-1.5 border border-amber-700/25 dark:border-amber-500/25 rounded-lg px-2.5 py-1 bg-amber-100/50 dark:bg-amber-900/30">
+              {zikr.surahType && (
+                <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">
+                  {zikr.surahType}
+                </span>
+              )}
+              <span className="text-[0.875rem] font-bold font-arabic text-amber-950 dark:text-amber-100 leading-tight">
+                {zikr.isSurah && zikr.surahNameArabic
+                  ? `سُورَةُ ${zikr.surahNameArabic}`
+                  : (zikr.surahNameArabic ?? "القرآن الكريم")}
               </span>
-            )}
-          </div>
+              {zikr.verseCount && (
+                <span
+                  className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80"
+                  style={{ fontFamily: numeralFontFamily(language) }}
+                >
+                  آيَاتُهَا {formatNumerals(zikr.verseCount, language)}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Counter Badge */}
@@ -115,6 +121,15 @@ export function MushafZikrCard({
         className="w-full text-start p-5 sm:p-6 cursor-pointer hover:bg-amber-500/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onSelect && onSelect(index)}
       >
+        {/* Seek Refuge Header if applicable */}
+        {zikr.hasSeekRefuge && (
+          <div className="mb-3 text-center">
+            <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+            </p>
+          </div>
+        )}
+
         {/* Basmalah Header if applicable */}
         {(zikr.hasBasmalah || zikr.isSurah) && (
           <div className="mb-4 text-center">
