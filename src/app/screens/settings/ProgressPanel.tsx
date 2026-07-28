@@ -1,18 +1,13 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { CheckCircle2, Info } from "../../components/icons";
+import { CheckCircle2 } from "../../components/icons";
 import {
-  BudMark,
-  GardenMilestones,
-  GoldenLeafMark,
   LeafMark,
-  PaleLeafMark,
-  PalmTreeMark,
-  SevenDayGarden,
+  TodayRoutineGarden,
 } from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
-import { getGardenSummary, getProgressDayKey, MAIN_CATEGORY_IDS } from "../../progress";
+import { getGardenSummary } from "../../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, StoredSession } from "../../types";
 import { ProgressBar } from "../../components/ProgressBar";
 import { SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -53,15 +48,6 @@ export function ProgressPanel({
   const completedGoalDays = Math.min(summary.activeDaysLast7, weeklyGoalDays);
   const isArabic = language === "ar";
 
-  // Build set of categories completed today
-  const todayKey = getProgressDayKey(now, progressDayStartHour);
-  const completedTodayIds = new Set(
-    dailyCompletions.filter((record) => record.dayKey === todayKey).map((record) => record.category),
-  );
-
-  // Next incomplete milestone
-  const nextMilestone = summary.milestones.find((m) => !m.complete);
-
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
       <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
@@ -84,182 +70,13 @@ export function ProgressPanel({
 
         {quietProgressEnabled ? (
           <>
-            {/* ── Large tree illustration with today's state ────────────────── */}
-            <section
-              className="relative overflow-hidden rounded-2xl border border-border bg-card px-4 pb-5 pt-6"
-              aria-label={t(language, "progressPanel.gardenState")}
-            >
-              {/* Palm day ambient glow */}
-              {summary.today.isPalm && (
-                <div
-                  className="pointer-events-none absolute inset-0 rounded-2xl"
-                  style={{
-                    background:
-                      "radial-gradient(ellipse 70% 50% at 50% 30%, color-mix(in srgb, var(--primary) 18%, transparent), transparent)",
-                  }}
-                  aria-hidden="true"
-                />
-              )}
-
-              {/* Tree centred */}
-              <div className="relative flex justify-center">
-                <PalmTreeMark
-                  size={72}
-                  className={
-                    summary.today.isPalm
-                      ? "text-emerald-500"
-                      : summary.today.leafCount > 0
-                        ? "text-primary"
-                        : "text-muted-foreground opacity-35"
-                  }
-                />
-              </div>
-
-              {/* Three core stat pills (Flame streak, Golden leaves, Lifetime palms) */}
-              <div
-                className="mt-4 grid grid-cols-3 gap-3 text-center"
-                aria-label={t(language, "progressPanel.todayStats")}
-              >
-                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
-                  <div className="flex items-center gap-1">
-                    <span role="img" aria-label="Flame streak">
-                      🔥
-                    </span>
-                    <span className="text-[1.25rem] font-black text-amber-600 dark:text-amber-400">
-                      {formatNumerals(summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0, language)}
-                    </span>
-                  </div>
-                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
-                    {t(language, "home.currentStreak")}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
-                  <div className="flex items-center gap-1">
-                    <GoldenLeafMark size={18} filled />
-                    <span className="text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
-                      {formatNumerals(summary.today.goldenLeafCount ?? summary.today.leafCount, language)} /{" "}
-                      {formatNumerals(3, language)}
-                    </span>
-                  </div>
-                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
-                    {t(language, "garden.todayTitle")}
-                  </span>
-                </div>
-
-                <div className="flex flex-col items-center justify-center rounded-xl border border-border bg-background px-2 py-3">
-                  <div className="flex items-center gap-1">
-                    <PalmTreeMark size={20} filled={summary.lifetimePalms > 0} />
-                    <span className="text-[1.25rem] font-black text-amber-500">
-                      {formatNumerals(summary.lifetimePalms, language)}
-                    </span>
-                  </div>
-                  <span className="mt-1 block text-[0.625rem] font-extrabold text-muted-foreground">
-                    {t(language, "garden.fullPalms")}
-                  </span>
-                </div>
-              </div>
-
-              {/* Next milestone preview */}
-              {nextMilestone && (
-                <div className="mt-3 flex items-center gap-2 rounded-lg border border-primary/25 bg-primary/6 px-3 py-2">
-                  <LeafMark size={14} filled className="shrink-0 text-primary" />
-                  <span className="text-[0.6875rem] font-semibold text-muted-foreground">
-                    {t(language, "garden.nextMilestoneHint", {
-                      current: formatNumerals(Math.min(nextMilestone.current, nextMilestone.target), language),
-                      target: formatNumerals(nextMilestone.target, language),
-                    })}
-                  </span>
-                </div>
-              )}
-            </section>
-
-            {/* Garden explanation */}
-            <aside
-              className="rounded-2xl border border-primary/35 bg-primary/10 p-4"
-              aria-labelledby="garden-explanation-title"
-            >
-              <div className="flex items-start gap-3">
-                <span
-                  className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
-                  aria-hidden="true"
-                >
-                  <Info size={20} />
-                </span>
-                <div>
-                  <h2 id="garden-explanation-title" className="text-[0.875rem] font-bold text-foreground">
-                    {t(language, "garden.todayTitle")}
-                  </h2>
-                  <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
-                    {t(language, "garden.explanation")}
-                  </p>
-                  <p className="mt-2 text-[0.6875rem] font-semibold text-foreground">{t(language, "garden.private")}</p>
-                </div>
-              </div>
-            </aside>
-
-            {/* Seven-day garden */}
-            <SevenDayGarden summary={summary} language={language} />
-
-            {/* ── Today's group breakdown (Screen 3) ──────────────────────────── */}
-            <section aria-labelledby="today-breakdown-title">
-              <h2 id="today-breakdown-title" className="mb-3 text-[0.9375rem] font-bold text-foreground">
-                {t(language, "progressPanel.todayBreakdown")}
-              </h2>
-              <div className="space-y-1.5">
-                {CATEGORIES.map((cat) => {
-                  const isCore = MAIN_CATEGORY_IDS.includes(cat.id);
-                  const isCompleted = completedTodayIds.has(cat.id);
-                  const name = isArabic ? cat.nameArabic : cat.name;
-
-                  return (
-                    <article
-                      key={cat.id}
-                      className={`flex items-center gap-3 rounded-xl border px-4 py-2.5 transition-colors ${
-                        isCompleted ? "border-primary/35 bg-primary/8" : "border-border bg-card"
-                      }`}
-                      aria-label={`${name}. ${isCompleted ? t(language, "garden.complete") : t(language, "garden.pending")}`}
-                    >
-                      {/* Leaf state icon */}
-                      <span
-                        className={`flex size-8 shrink-0 items-center justify-center rounded-full ${
-                          isCompleted
-                            ? isCore
-                              ? "bg-primary text-primary-foreground"
-                              : "bg-muted text-muted-foreground"
-                            : "bg-muted text-muted-foreground/50"
-                        }`}
-                        aria-hidden="true"
-                      >
-                        {isCompleted ? (
-                          isCore ? (
-                            <LeafMark size={17} filled />
-                          ) : (
-                            <PaleLeafMark size={15} />
-                          )
-                        ) : (
-                          <BudMark size={13} />
-                        )}
-                      </span>
-
-                      {/* Category name */}
-                      <span className="min-w-0 flex-1 text-[0.8125rem] font-semibold text-foreground">{name}</span>
-
-                      {/* Core / Extra chip */}
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[0.5625rem] font-bold tracking-wide ${
-                          isCore
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                            : "bg-primary/15 text-primary/80"
-                        }`}
-                      >
-                        {isCore ? t(language, "garden.coreLeafLabel") : t(language, "garden.extraLeafLabel")}
-                      </span>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
+            {/* Embedded Routine Garden with Day, Week, Month, and 12-Month Year views */}
+            <TodayRoutineGarden
+              summary={summary}
+              language={language}
+              dailyCompletions={dailyCompletions}
+              calendarType="hijri"
+            />
 
             {/* Weekly goal */}
             <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="weekly-goal-title">
@@ -312,8 +129,6 @@ export function ProgressPanel({
                 </div>
               </RadioGroupPrimitive.Root>
             </section>
-
-            <GardenMilestones summary={summary} language={language} />
           </>
         ) : (
           <section className="rounded-2xl border border-border bg-card p-5" data-testid="garden-hidden-state">

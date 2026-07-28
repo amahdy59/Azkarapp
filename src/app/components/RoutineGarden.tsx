@@ -451,7 +451,6 @@ export function TodayRoutineGarden({
   const { today } = summary;
   const goldenCount = today.goldenLeafCount ?? today.leafCount;
   const totalPalms = summary.lifetimePalms;
-  const greenCount = today.greenLeafCount ?? today.extraLeafCount;
 
   const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language, calendarType);
 
@@ -640,24 +639,28 @@ export function TodayRoutineGarden({
         </>
       )}
 
-      {!hideTabs && (activeTab === "day" || activeTab === "week") && (
-        <div className="mb-5 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/5 py-2.5 px-3 dark:bg-amber-500/10">
-          <div className="flex items-center gap-2" title={t(language, "garden.palmsCount", { count: "" }).trim()}>
-            <PalmTreeMark size={26} />
-            <span className="text-[1.125rem] font-black text-amber-500">{formatNumerals(totalPalms, language)}</span>
-          </div>
-          <span className="h-6 w-px bg-amber-500/30" />
-          <div className="flex items-center gap-2" title={t(language, "garden.goldenLeaves")}>
-            <GoldenLeafMark size={22} filled />
-            <span className="text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
-              {formatNumerals(goldenCount, language)}
+      {!hideTabs && (
+        <div className="mb-4 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 py-2.5 px-3 shadow-xs dark:bg-amber-500/15">
+          <div className="flex items-center gap-1.5" title={isArabic ? "سلسلة الأيام" : "Daily Streak"}>
+            <span className="text-[1.25rem]" role="img" aria-label="Streak flame">
+              🔥
+            </span>
+            <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+              {formatNumerals(summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0, language)}
             </span>
           </div>
-          <span className="h-6 w-px bg-amber-500/30" />
-          <div className="flex items-center gap-2" title={t(language, "garden.greenLeaves")}>
-            <GreenLeafMark size={22} filled />
-            <span className="text-[1.125rem] font-black text-emerald-600 dark:text-emerald-400">
-              {formatNumerals(greenCount, language)}
+          <span className="h-4 w-px bg-amber-500/30" />
+          <div className="flex items-center gap-1.5" title={isArabic ? "الأوراق الذهبية اليومية" : "Daily Golden Leaves"}>
+            <GoldenLeafMark size={20} filled />
+            <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+              {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
+            </span>
+          </div>
+          <span className="h-4 w-px bg-amber-500/30" />
+          <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
+            <PalmTreeMark size={24} filled={totalPalms > 0} />
+            <span className="text-[1rem] font-black text-amber-500">
+              {formatNumerals(totalPalms, language)}
             </span>
           </div>
         </div>
