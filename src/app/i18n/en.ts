@@ -385,6 +385,7 @@ const en = {
     nurtureGarden: "Nurture your spiritual garden with daily azkar",
     goldenLeavesCount: "{count} of 3 leaves",
     dailyProtection: "Daily Protection",
+    leavesMeaning: "The leaves represent Morning, Evening, and Sleep Azkar",
     mayAllahProtect: "May Allah protect you. May Allah accept from us and you",
     palmsCount: "{count} Palms",
     goldenLeaves: "Golden Leaves",

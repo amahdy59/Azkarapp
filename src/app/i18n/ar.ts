@@ -374,6 +374,7 @@ const ar = {
     nurtureGarden: "اسقِ حديقتك الروحية بأذكارك اليومية",
     goldenLeavesCount: "{count} من ٣ أوراق",
     dailyProtection: "التحصين اليومي",
+    leavesMeaning: "الورقات تمثل أذكار الصباح والمساء والنوم",
     mayAllahProtect: "حفظكم الله. تقبل الله منا ومنكم",
     palmsCount: "{count} نخلة",
     goldenLeaves: "أوراق ذهبية",

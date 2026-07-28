@@ -192,49 +192,57 @@ export function PalmMark({ className = "", size = 32 }: { className?: string; si
 export function PalmTreeReward({
   summary,
   language,
+  bare = false,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   onOpenShareModal?: () => void;
+  bare?: boolean;
 }) {
   const { today } = summary;
   const goldenCount = today.goldenLeafCount ?? today.leafCount;
   const streak = summary.currentUsageStreak ?? summary.activeDaysLast7 ?? 0;
   const isArabic = language === "ar";
 
+  const content = (
+    <div
+      className="flex w-full items-center justify-around"
+      aria-label={
+        isArabic
+          ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أوراق ذهبية: ${formatNumerals(goldenCount, language)} من ٣، النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
+          : `Daily streak: ${streak} days, Golden leaves: ${goldenCount}/3, Palms: ${summary.lifetimePalms}`
+      }
+    >
+      <div className="flex items-center gap-1.5" title={isArabic ? "سلسلة الأيام" : "Daily Streak"}>
+        <span className="text-[1.25rem]" role="img" aria-label="Streak flame">
+          🔥
+        </span>
+        <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+          {formatNumerals(streak, language)}
+        </span>
+      </div>
+      <span className="h-4 w-px bg-amber-500/30" />
+      <div className="flex items-center gap-1.5" title={isArabic ? "الأوراق الذهبية اليومية" : "Daily Golden Leaves"}>
+        <GoldenLeafMark size={22} filled />
+        <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+          {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
+        </span>
+      </div>
+      <span className="h-4 w-px bg-amber-500/30" />
+      <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
+        <PalmTreeMark size={26} filled={summary.lifetimePalms > 0} />
+        <span className="text-[1.0625rem] font-black text-amber-500">
+          {formatNumerals(summary.lifetimePalms, language)}
+        </span>
+      </div>
+    </div>
+  );
+
+  if (bare) return content;
+
   return (
     <div className="flex w-full items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15">
-      <div
-        className="flex w-full items-center justify-around"
-        aria-label={
-          isArabic
-            ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أوراق ذهبية: ${formatNumerals(goldenCount, language)} من ٣، النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
-            : `Daily streak: ${streak} days, Golden leaves: ${goldenCount}/3, Palms: ${summary.lifetimePalms}`
-        }
-      >
-        <div className="flex items-center gap-1.5" title={isArabic ? "سلسلة الأيام" : "Daily Streak"}>
-          <span className="text-[1.25rem]" role="img" aria-label="Streak flame">
-            🔥
-          </span>
-          <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
-            {formatNumerals(streak, language)}
-          </span>
-        </div>
-        <span className="h-4 w-px bg-amber-500/30" />
-        <div className="flex items-center gap-1.5" title={isArabic ? "الأوراق الذهبية اليومية" : "Daily Golden Leaves"}>
-          <GoldenLeafMark size={22} filled />
-          <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
-            {formatNumerals(goldenCount, language)} / {formatNumerals(3, language)}
-          </span>
-        </div>
-        <span className="h-4 w-px bg-amber-500/30" />
-        <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
-          <PalmTreeMark size={26} filled={summary.lifetimePalms > 0} />
-          <span className="text-[1.0625rem] font-black text-amber-500">
-            {formatNumerals(summary.lifetimePalms, language)}
-          </span>
-        </div>
-      </div>
+      {content}
     </div>
   );
 }
@@ -536,33 +544,35 @@ export function TodayRoutineGarden({
       aria-label={t(language, "garden.todayTitle")}
       className="mb-6 rounded-3xl border border-border/80 bg-card p-5 shadow-xl transition-all dark:border-white/10 dark:bg-[#18181B]"
     >
-      <div className="mb-4 flex items-center justify-between gap-3 text-start">
-        <div>
-          <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-            {t(language, "garden.todayTitle")}
-          </h2>
-          <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
-            {activeTab === "month"
-              ? t(language, "garden.oasisFor", { date: dateLabel })
-              : activeTab === "year"
-                ? t(language, "garden.growthYear")
-                : t(language, "garden.nurtureGarden")}
-          </p>
-        </div>
+      {!hideTabs && (
+        <div className="mb-4 flex items-center justify-between gap-3 text-start">
+          <div>
+            <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
+              {t(language, "garden.todayTitle")}
+            </h2>
+            <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
+              {activeTab === "month"
+                ? t(language, "garden.oasisFor", { date: dateLabel })
+                : activeTab === "year"
+                  ? t(language, "garden.growthYear")
+                  : t(language, "garden.nurtureGarden")}
+            </p>
+          </div>
 
-        {onOpenShareModal && (
-          <button
-            type="button"
-            onClick={onOpenShareModal}
-            className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
-            aria-label={t(language, "garden.shareAchievementAria")}
-            title={t(language, "garden.shareAchievementAria")}
-          >
-            <span>🌴</span>
-            <span>{t(language, "garden.shareAchievement")}</span>
-          </button>
-        )}
-      </div>
+          {onOpenShareModal && (
+            <button
+              type="button"
+              onClick={onOpenShareModal}
+              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 active:scale-95 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
+              aria-label={t(language, "garden.shareAchievementAria")}
+              title={t(language, "garden.shareAchievementAria")}
+            >
+              <span>🌴</span>
+              <span>{t(language, "garden.shareAchievement")}</span>
+            </button>
+          )}
+        </div>
+      )}
 
       {!hideTabs && (
         <>
@@ -659,7 +669,11 @@ export function TodayRoutineGarden({
 
       {activeTab === "day" && (
         <div className="flex flex-col items-center py-2 text-center">
-          <div className="relative mb-6 flex h-48 w-48 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/5 shadow-inner dark:bg-amber-500/10">
+          <h3 className="mb-5 text-[1.25rem] font-black text-foreground dark:text-white">
+            {t(language, "garden.dailyProtection")}
+          </h3>
+
+          <div className="relative mb-5 flex h-48 w-48 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/5 shadow-inner dark:bg-amber-500/10">
             <PalmTreeMark size={60} className="transition-transform duration-500 hover:scale-105" />
 
             <div className="mt-1 flex items-center justify-center gap-2">
@@ -675,17 +689,14 @@ export function TodayRoutineGarden({
 
             <div
               data-testid="today-leaf-count"
-              className="absolute -bottom-3 rounded-full bg-amber-950 px-3.5 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
+              className="absolute -bottom-3.5 rounded-full bg-amber-950 px-4 py-1 text-[0.8125rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
               {t(language, "garden.goldenLeavesCount", { count: formatNumerals(goldenCount, language) })}
             </div>
           </div>
 
-          <h3 className="mt-2 text-[1.125rem] font-black text-foreground dark:text-white">
-            {t(language, "garden.dailyProtection")}
-          </h3>
-          <p className="mt-1 text-[0.875rem] font-medium text-muted-foreground">
-            {t(language, "garden.mayAllahProtect")}
+          <p className="mt-2 text-[0.875rem] font-medium text-muted-foreground">
+            {t(language, "garden.leavesMeaning")}
           </p>
 
           {goldenCount >= 3 && <p className="sr-only">A palm has grown!</p>}

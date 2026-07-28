@@ -152,40 +152,45 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Header Bar — Enlarged Full-Width Streaks Bar */}
-      <header className="flex w-full shrink-0 flex-col gap-2 px-0 pt-0 pb-2">
-        {/* Full-width Palm Tree & Leaves Reward Widget */}
-        <PalmTreeReward summary={gardenSummary} language={language} />
-
-        {/* Modern Islamic Date & Live Clock Header Bar */}
+      {/* Combined Header Card — Badges & Date/Clock */}
+      <header className="w-full shrink-0 px-0 pt-0 pb-2">
         <div
-          className="flex w-full items-center justify-between gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-xs dark:bg-amber-950/30 dark:border-amber-500/20"
+          className="flex w-full flex-col gap-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-xs dark:bg-amber-950/30 dark:border-amber-500/20"
           dir={direction}
         >
-          <div className="flex items-center gap-2 min-w-0">
-            <span aria-hidden="true" className="shrink-0 text-[1.05rem]">
-              🌙
-            </span>
-            <span
-              className="truncate text-[0.84375rem] font-black text-amber-950 dark:text-amber-100"
-              data-testid="hijri-date"
-              dir="auto"
-            >
-              {formatHijriDate(now, language)}
-            </span>
-          </div>
+          {/* Badges section */}
+          <PalmTreeReward summary={gardenSummary} language={language} bare />
 
-          <div className="flex shrink-0 items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/20 px-2.5 py-1 dark:bg-amber-900/40">
-            <span aria-hidden="true" className="text-[0.75rem]">
-              🕒
-            </span>
-            <span
-              className="text-[0.8125rem] font-black text-amber-950 dark:text-amber-100"
-              dir="auto"
-              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-            >
-              {now.toLocaleTimeString(isArabic ? "ar-SA" : "en-US", { hour: "numeric", minute: "numeric" })}
-            </span>
+          {/* Light line separator */}
+          <div className="h-px w-full bg-amber-500/20 dark:bg-amber-500/20" />
+
+          {/* Islamic Date & Live Clock section */}
+          <div className="flex w-full items-center justify-between gap-3">
+            <div className="flex items-center gap-2 min-w-0">
+              <span aria-hidden="true" className="shrink-0 text-[1.05rem]">
+                🌙
+              </span>
+              <span
+                className="truncate text-[0.84375rem] font-black text-amber-950 dark:text-amber-100"
+                data-testid="hijri-date"
+                dir="auto"
+              >
+                {formatHijriDate(now, language)}
+              </span>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/20 px-2.5 py-1 dark:bg-amber-900/40">
+              <span aria-hidden="true" className="text-[0.75rem]">
+                🕒
+              </span>
+              <span
+                className="text-[0.8125rem] font-black text-amber-950 dark:text-amber-100"
+                dir="auto"
+                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              >
+                {now.toLocaleTimeString(isArabic ? "ar-SA" : "en-US", { hour: "numeric", minute: "numeric" })}
+              </span>
+            </div>
           </div>
         </div>
       </header>
