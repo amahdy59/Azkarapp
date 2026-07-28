@@ -48,6 +48,12 @@ const MORNING_AZKAR: Zikr[] = [
   {
     id: "m-hm-76a",
     category: "morning",
+    isSurah: true,
+    surahNameArabic: "الإِخْلَاص",
+    surahNameEnglish: "Al-Ikhlas",
+    surahType: "مكية",
+    verseCount: 4,
+    hasBasmalah: true,
     orderIndex: 2,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c \u06dd \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0627\u0644\u0635\u0651\u064e\u0645\u064e\u062f\u064f \u06dd \u0644\u064e\u0645\u0652 \u064a\u064e\u0644\u0650\u062f\u0652 \u0648\u064e\u0644\u064e\u0645\u0652 \u064a\u064f\u0648\u0644\u064e\u062f\u0652 \u06dd \u0648\u064e\u0644\u064e\u0645\u0652 \u064a\u064e\u0643\u064f\u0646 \u0644\u0651\u064e\u0647\u064f \u0643\u064f\u0641\u064f\u0648\u0627\u064b \u0623\u064e\u062d\u064e\u062f\u064c\ufd3e",
@@ -69,6 +75,12 @@ const MORNING_AZKAR: Zikr[] = [
   {
     id: "m-hm-76b",
     category: "morning",
+    isSurah: true,
+    surahNameArabic: "الفَلَق",
+    surahNameEnglish: "Al-Falaq",
+    surahType: "مكية",
+    verseCount: 5,
+    hasBasmalah: true,
     orderIndex: 3,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0652\u0641\u064e\u0644\u064e\u0642\u0650 \u06dd \u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0645\u064e\u0627 \u062e\u064e\u0644\u064e\u0642\u064e \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u063a\u064e\u0627\u0633\u0650\u0642\u064d \u0625\u0650\u0630\u064e\u0627 \u0648\u064e\u0642\u064e\u0628\u064e \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0646\u0651\u064e\u0641\u0651\u064e\u0627\u062b\u064e\u0627\u062a\u0650 \u0641\u0650\u064a \u0627\u0644\u0652\u0639\u064f\u0642\u064e\u062f\u0650 \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u062d\u064e\u0627\u0633\u0650\u062f\u064d \u0625\u0650\u0630\u064e\u0627 \u062d\u064e\u0633\u064e\u062f\u064e\ufd3e",
@@ -90,6 +102,12 @@ const MORNING_AZKAR: Zikr[] = [
   {
     id: "m-hm-76c",
     category: "morning",
+    isSurah: true,
+    surahNameArabic: "النَّاس",
+    surahNameEnglish: "An-Nas",
+    surahType: "مكية",
+    verseCount: 6,
+    hasBasmalah: true,
     orderIndex: 4,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u064e\u0644\u0650\u0643\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0625\u0650\u0644\u064e\u0647\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0652\u0648\u064e\u0633\u0652\u0648\u064e\u0627\u0633\u0650 \u0627\u0644\u0652\u062e\u064e\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u064a\u064f\u0648\u064e\u0633\u0652\u0648\u0650\u0633\u064f \u0641\u0650\u064a \u0635\u064f\u062f\u064f\u0648\u0631\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u0650\u0646\u064e \u0627\u0644\u0652\u062c\u0650\u0646\u0651\u064e\u0629\u0650 \u0648\u064e\u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650\ufd3e",
@@ -438,7 +456,7 @@ const MORNING_AZKAR: Zikr[] = [
     repetitionCount: 10,
     countLabel: "10; or 1 when unable",
     sourceReference: "An-Nasa\u2019i Amal al-Yawm wa al-Laylah no. 24; Ahmad; Abu Dawud; Ibn Majah; Hisn al-Muslim 92.",
-    preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
+    preferredTiming: "Recited 10 times after Fajr and 10 times after Maghrib.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u0639\u0634\u0631 \u0645\u0631\u0627\u062a \u0635\u0628\u0627\u062d\u064b\u0627 \u0643\u064f\u062a\u0628 \u0644\u0647 \u0639\u0634\u0631 \u062d\u0633\u0646\u0627\u062a \u0648\u0645\u064f\u062d\u064a\u062a \u0639\u0646\u0647 \u0639\u0634\u0631 \u0633\u064a\u0626\u0627\u062a\u060c \u0648\u0643\u0627\u0646 \u0644\u0647 \u0639\u062f\u0644 \u0639\u0634\u0631 \u0631\u0642\u0627\u0628\u060c \u0648\u062d\u064f\u0641\u0638 \u0645\u0646 \u0627\u0644\u0634\u064a\u0637\u0627\u0646 \u062d\u062a\u0649 \u064a\u0645\u0633\u064a\u060c \u0648\u0644\u0647 \u0645\u062b\u0644 \u0630\u0644\u0643 \u0641\u064a \u0627\u0644\u0645\u0633\u0627\u0621.",
     authenticityNote: "Sahih/Hasan reports as cited in Hisn al-Muslim/Sunnah.com.",
@@ -595,6 +613,12 @@ const EVENING_AZKAR: Zikr[] = [
   {
     id: "e-hm-76a",
     category: "evening",
+    isSurah: true,
+    surahNameArabic: "الإِخْلَاص",
+    surahNameEnglish: "Al-Ikhlas",
+    surahType: "مكية",
+    verseCount: 4,
+    hasBasmalah: true,
     orderIndex: 2,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c \u06dd \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0627\u0644\u0635\u0651\u064e\u0645\u064e\u062f\u064f \u06dd \u0644\u064e\u0645\u0652 \u064a\u064e\u0644\u0650\u062f\u0652 \u0648\u064e\u0644\u064e\u0645\u0652 \u064a\u064f\u0648\u0644\u064e\u062f\u0652 \u06dd \u0648\u064e\u0644\u064e\u0645\u0652 \u064a\u064e\u0643\u064f\u0646 \u0644\u0651\u064e\u0647\u064f \u0643\u064f\u0641\u064f\u0648\u0627\u064b \u0623\u064e\u062d\u064e\u062f\u064c\ufd3e",
@@ -616,6 +640,12 @@ const EVENING_AZKAR: Zikr[] = [
   {
     id: "e-hm-76b",
     category: "evening",
+    isSurah: true,
+    surahNameArabic: "الفَلَق",
+    surahNameEnglish: "Al-Falaq",
+    surahType: "مكية",
+    verseCount: 5,
+    hasBasmalah: true,
     orderIndex: 3,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0652\u0641\u064e\u0644\u064e\u0642\u0650 \u06dd \u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0645\u064e\u0627 \u062e\u064e\u0644\u064e\u0642\u064e \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u063a\u064e\u0627\u0633\u0650\u0642\u064d \u0625\u0650\u0630\u064e\u0627 \u0648\u064e\u0642\u064e\u0628\u064e \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0646\u0651\u064e\u0641\u0651\u064e\u0627\u062b\u064e\u0627\u062a\u0650 \u0641\u0650\u064a \u0627\u0644\u0652\u0639\u064f\u0642\u064e\u062f\u0650 \u06dd \u0648\u064e\u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u062d\u064e\u0627\u0633\u0650\u062f\u064d \u0625\u0650\u0630\u064e\u0627 \u062d\u064e\u0633\u064e\u062f\u064e\ufd3e",
@@ -637,6 +667,12 @@ const EVENING_AZKAR: Zikr[] = [
   {
     id: "e-hm-76c",
     category: "evening",
+    isSurah: true,
+    surahNameArabic: "النَّاس",
+    surahNameEnglish: "An-Nas",
+    surahType: "مكية",
+    verseCount: 6,
+    hasBasmalah: true,
     orderIndex: 4,
     arabicText:
       "\u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650 \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650. \ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u064e\u0644\u0650\u0643\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0625\u0650\u0644\u064e\u0647\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u0650\u0646 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0652\u0648\u064e\u0633\u0652\u0648\u064e\u0627\u0633\u0650 \u0627\u0644\u0652\u062e\u064e\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u064a\u064f\u0648\u064e\u0633\u0652\u0648\u0650\u0633\u064f \u0641\u0650\u064a \u0635\u064f\u062f\u064f\u0648\u0631\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650 \u06dd \u0645\u0650\u0646\u064e \u0627\u0644\u0652\u062c\u0650\u0646\u0651\u064e\u0629\u0650 \u0648\u064e\u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650\ufd3e",
@@ -1056,301 +1092,308 @@ const SLEEP_AZKAR: Zikr[] = [
     id: "s-hm-99",
     category: "before_sleep",
     orderIndex: 0,
+    isSurah: true,
+    surahNameArabic: "الإِخْلَاص وَالفَلَق وَالنَّاس",
+    surahNameEnglish: "Al-Ikhlas, Al-Falaq, An-Nas",
+    surahType: "مكية",
+    verseCount: 15,
+    hasBasmalah: true,
     arabicText:
-      "\u064a\u064e\u062c\u0652\u0645\u064e\u0639\u064f \u0643\u064e\u0641\u0651\u064e\u064a\u0652\u0647\u0650 \u062b\u064f\u0645\u0651\u064e \u064a\u064e\u0646\u0652\u0641\u064f\u062b\u064f \u0641\u0650\u064a\u0647\u0650\u0645\u064e\u0627 \u0641\u064e\u064a\u064e\u0642\u0652\u0631\u064e\u0623\u064f \u0641\u0650\u064a\u0647\u0650\u0645\u064e\u0627: \ufd3f\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\ufd3e\u060c \u0648\ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0652\u0641\u064e\u0644\u064e\u0642\u0650\ufd3e\u060c \u0648\ufd3f\u0642\u064f\u0644\u0652 \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0631\u064e\u0628\u0651\u0650 \u0627\u0644\u0646\u0651\u064e\u0627\u0633\u0650\ufd3e\u060c \u062b\u064f\u0645\u0651\u064e \u064a\u064e\u0645\u0652\u0633\u064e\u062d\u064f \u0628\u0650\u0647\u0650\u0645\u064e\u0627 \u0645\u064e\u0627 \u0627\u0633\u0652\u062a\u064e\u0637\u064e\u0627\u0639\u064e \u0645\u0650\u0646\u0652 \u062c\u064e\u0633\u064e\u062f\u0650\u0647\u0650.",
-    transliteration:
-      "Yajma\u02bfu kaffayhi thumma yanfuthu f\u012bhim\u0101 fa yaqra\u2019u f\u012bhim\u0101: Qul huwall\u0101hu a\u1e25ad, Qul a\u02bf\u016bdhu birabbil-falaq, Qul a\u02bf\u016bdhu birabbin-n\u0101s; thumma yamsa\u1e25u bihim\u0101 m\u0101 ista\u1e6d\u0101\u02bfa min jasadih.",
+      "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ هُوَ اللَّهُ أَحَدٌ ﴿١﴾ اللَّهُ الصَّمَدُ ﴿٢﴾ لَمْ يَلِدْ وَلَمْ يُولَدْ ﴿٣﴾ وَلَمْ يَكُن لَّهُ كُفُوًا أَحَدٌ ﴿٤﴾﴾\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ ﴿١﴾ مِن شَرِّ مَا خَلَقَ ﴿٢﴾ وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ ﴿٣﴾ وَمِن شَرِّ النَّفَّاثَاتِ فِي الْعُقَدِ ﴿٤﴾ وَمِن شَرِّ حَاسِدٍ إِذَا حَسَدَ ﴿٥﴾﴾\n\nبِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\n﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ ﴿١﴾ مَلِكِ النَّاسِ ﴿٢﴾ إِلَٰهِ النَّاسِ ﴿٣﴾ مِن شَرِّ الْوَسْوَاسِ الْخَنَّاسِ ﴿٤﴾ الَّذِي يُوَسْوِسُ فِي صُدُورِ النَّاسِ ﴿٥﴾ مِنَ الْجِنَّةِ وَالنَّاسِ ﴿٦﴾﴾",
+    transliteration: "Qul huwallahu ahad... Qul a'udhu birabbil-falaq... Qul a'udhu birabbin-nas...",
     translation:
-      "He gathers his palms, blows lightly into them, recites al-Ikhlas, al-Falaq, and an-Nas, then wipes over as much of his body as he can.",
-    benefit: "Full surah texts are already listed in morning/evening rows HM-76a/b/c.",
+      "Say: He is Allah, One... Say: I seek refuge in the Lord of daybreak... Say: I seek refuge in the Lord of mankind...",
+    benefit:
+      "Gathers palms, blows lightly into them, recites the 3 Surahs, then wipes over as much of the body as possible. Repeated 3 times.",
     repetitionCount: 3,
     countLabel: "3",
-    sourceReference: "Al-Bukhari; Muslim 4/1723; Hisn al-Muslim 99.",
-    preferredTiming: "Before sleeping, after lying down; gather palms, blow lightly, recite, then wipe body.",
+    sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
+    preferredTiming: "Before sleeping, after lying down.",
     hadithText:
-      "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0625\u0630\u0627 \u0623\u0648\u0649 \u0625\u0644\u0649 \u0641\u0631\u0627\u0634\u0647 \u0643\u0644 \u0644\u064a\u0644\u0629 \u062c\u0645\u0639 \u0643\u0641\u064a\u0647 \u062b\u0645 \u0646\u0641\u062b \u0641\u064a\u0647\u0645\u0627 \u0641\u0642\u0631\u0623 \u0641\u064a\u0647\u0645\u0627 \u0627\u0644\u0633\u0648\u0631 \u0627\u0644\u062b\u0644\u0627\u062b\u060c \u062b\u0645 \u0645\u0633\u062d \u0628\u0647\u0645\u0627 \u0645\u0627 \u0627\u0633\u062a\u0637\u0627\u0639 \u0645\u0646 \u062c\u0633\u062f\u0647\u060c \u064a\u0641\u0639\u0644 \u0630\u0644\u0643 \u062b\u0644\u0627\u062b \u0645\u0631\u0627\u062a.",
+      "عَنْ عَائِشَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا: ﴿قُلْ هُوَ اللَّهُ أَحَدٌ﴾ وَ ﴿قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ﴾ وَ ﴿قُلْ أَعُوذُ بِرَبِّ النَّاسِ﴾ ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ... يَفْعَلُ ذَلِكَ ثَلَاثَ مَرَّاتٍ.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "Full surah texts are already listed in morning/evening rows HM-76a/b/c.",
-    sourceUrl: "https://sunnah.com/hisn%3A99",
   },
   {
     id: "s-hm-100",
     category: "before_sleep",
     orderIndex: 1,
     arabicText:
-      "\ufd3f\u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0644\u0627\u064e \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0627\u0651\u064e \u0647\u064f\u0648\u064e \u0627\u0644\u0652\u062d\u064e\u064a\u0651\u064f \u0627\u0644\u0652\u0642\u064e\u064a\u0651\u064f\u0648\u0645\u064f \u0644\u0627\u064e \u062a\u064e\u0623\u0652\u062e\u064f\u0630\u064f\u0647\u064f \u0633\u0650\u0646\u064e\u0629\u064c \u0648\u064e\u0644\u0627\u064e \u0646\u064e\u0648\u0652\u0645\u064c... \u0648\u064e\u0647\u064f\u0648\u064e \u0627\u0644\u0652\u0639\u064e\u0644\u0650\u064a\u0651\u064f \u0627\u0644\u0652\u0639\u064e\u0638\u0650\u064a\u0645\u064f\ufd3e",
+      "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ. ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾",
     transliteration:
-      "All\u0101hu l\u0101 il\u0101ha ill\u0101 huwa \u2019l-\u1e24ayyul-Qayy\u016bm, l\u0101 ta\u2019khudhuhu sinatun wa l\u0101 nawm... wa huwal-\u02bfAliyyul-\u02bfA\u1e93\u012bm.",
+      "Allahu la ilaha illa huwal-Hayyul-Qayyum, la ta'khudhuhu sinatun wa la nawm, lahu ma fis-samawati wa ma fil-ard, man dhal-ladhi yashfa'u 'indahu illa bi'idhnih, ya'lamu ma bayna aydihim wa ma khalfahum, wa la yuhituna bishay'im-min 'ilmihi illa bima sha', wasi'a kursiyyuhus-samawati wal-ard, wa la ya'uduhu hifzuhuma, wa huwal-'Aliyyul-'Azim.",
     translation:
-      "Allah\u2014there is none worthy of worship except Him, the Ever-Living, the Sustainer... and He is the Most High, the Magnificent.",
-    benefit: "Full Arabic text appears in HM-75.",
+      "Allah—there is none worthy of worship except Him, the Ever-Living, the Sustainer. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and earth. None can intercede except by His permission. He knows what is before and behind them; they encompass nothing of His knowledge except what He wills. His Kursi extends over the heavens and earth, and preserving them does not tire Him. He is the Most High, the Magnificent.",
+    benefit:
+      "Whoever recites it when lying down to sleep, a guardian from Allah will remain with him and no devil will approach him until morning.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari; Hisn al-Muslim 100.",
+    sourceReference: "Sahih al-Bukhari 2311; Hisn al-Muslim 100.",
     preferredTiming: "When lying down to sleep.",
     hadithText:
-      "\u0648\u0631\u062f \u0641\u064a \u062d\u062f\u064a\u062b \u0623\u0628\u064a \u0647\u0631\u064a\u0631\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u0645\u0646 \u0642\u0631\u0623 \u0622\u064a\u0629 \u0627\u0644\u0643\u0631\u0633\u064a \u0639\u0646\u062f \u0627\u0644\u0646\u0648\u0645 \u0644\u0627 \u064a\u0632\u0627\u0644 \u0639\u0644\u064a\u0647 \u0645\u0646 \u0627\u0644\u0644\u0647 \u062d\u0627\u0641\u0638\u060c \u0648\u0644\u0627 \u064a\u0642\u0631\u0628\u0647 \u0634\u064a\u0637\u0627\u0646 \u062d\u062a\u0649 \u064a\u0635\u0628\u062d.",
+      "عن أبي هريرة رضي الله عنه قال: قال رسول الله ﷺ: «إِذَا أَوَيْتَ إِلَى فِرَاشِكَ فَاقْرَأْ آيَةَ الْكُرْسِيِّ... لَنْ يَزَالَ عَلَيْكَ مِنَ اللَّهِ حَافِظٌ وَلَا يَقْرَبَكَ شَيْطَانٌ حَتَّى تُصْبِحَ».",
     authenticityNote: "Sahih al-Bukhari.",
-    notes: "Full Arabic text appears in HM-75.",
-    sourceUrl: "https://sunnah.com/hisn%3A100",
   },
   {
     id: "s-hm-101",
     category: "before_sleep",
     orderIndex: 2,
     arabicText:
-      "\ufd3f\u0622\u0645\u064e\u0646\u064e \u0627\u0644\u0631\u0651\u064e\u0633\u064f\u0648\u0644\u064f \u0628\u0650\u0645\u064e\u0627 \u0623\u064f\u0646\u0632\u0650\u0644\u064e \u0625\u0650\u0644\u064e\u064a\u0652\u0647\u0650 \u0645\u0650\u0646 \u0631\u0651\u064e\u0628\u0651\u0650\u0647\u0650 \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0624\u0652\u0645\u0650\u0646\u064f\u0648\u0646\u064e... \u0641\u064e\u0627\u0646\u0635\u064f\u0631\u0652\u0646\u064e\u0627 \u0639\u064e\u0644\u064e\u0649 \u0627\u0644\u0652\u0642\u064e\u0648\u0652\u0645\u0650 \u0627\u0644\u0652\u0643\u064e\u0627\u0641\u0650\u0631\u0650\u064a\u0646\u064e\ufd3e",
-    transliteration:
-      "\u0100manar-Ras\u016blu bim\u0101 unzila ilayhi mir-Rabbihi wal-mu\u2019min\u016bn... fan\u1e63urn\u0101 \u02bfalal-qawmil-k\u0101fir\u012bn.",
+      "﴿آمَنَ الرَّسُولُ بِمَا أُنْزِلَ إِلَيْهِ مِنْ رَبِّهِ وَالْمُؤْمِنُونَ ۚ كُلٌّ آمَنَ بِاللَّهِ وَمَلَائِكَتِهِ وَكُتُبِهِ وَرُسُلِهِ لَا نُفَرِّقُ بَيْنَ أَحَدٍ مِنْ رُسُلِهِ ۚ وَقَالُوا سَمِعْنَا وَأَطَعْنَا ۖ غُفْرَانَكَ رَبَّنَا وَإِلَيْكَ الْمَصِيرُ ﴿٢٨٥﴾ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا ۚ لَهَا مَا كَسَبَتْ وَعَلَيْهَا مَا اكْتَسَبَتْ ۗ رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا أَوْ أَخْطَأْنَا ۚ رَبَّنَا وَلَا تَحْمِلْ عَلَيْنَا إِصْرًا كَمَا حَمَلْتَهُ عَلَى الَّذِينَ مِنْ قَبْلِنَا ۚ رَبَّنَا وَلَا تُحَمِّلْنَا مَا لَا طَاقَةَ لَنَا بِهِ ۖ وَاعْفُ عَنَّا وَاغْفِرْ لَنَا وَارْحَمْنَا ۚ أَنْتَ مَوْلَانَا فَانْصُرْنَا عَلَى الْقَوْمِ الْكَافِرِينَ ﴿٢٨٦﴾﴾",
+    transliteration: "Amanar-Rasulu bima unzila ilayhi mir-Rabbihi wal-mu'minun... fan-surna 'alal-qawmil-kafirin.",
     translation:
       "The Messenger believes in what was sent down to him from his Lord, and so do the believers... so grant us victory over the disbelieving people.",
-    benefit: "Full verses are al-Baqarah 2:285-286.",
+    benefit: "Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari; Muslim 1/554; Hisn al-Muslim 101.",
+    sourceReference: "Sahih al-Bukhari 5009; Sahih Muslim 807; Hisn al-Muslim 101.",
     preferredTiming: "At night before sleeping.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa: \u00ab\u0627\u0644\u0622\u064a\u064e\u062a\u064e\u0627\u0646\u0650 \u0645\u0650\u0646\u0652 \u0622\u062e\u0650\u0631\u0650 \u0633\u064f\u0648\u0631\u064e\u0629\u0650 \u0627\u0644\u0652\u0628\u064e\u0642\u064e\u0631\u064e\u0629\u0650\u060c \u0645\u064e\u0646\u0652 \u0642\u064e\u0631\u064e\u0623\u064e\u0647\u064f\u0645\u064e\u0627 \u0641\u0650\u064a \u0644\u064e\u064a\u0652\u0644\u064e\u0629\u064d \u0643\u064e\u0641\u064e\u062a\u064e\u0627\u0647\u064f\u00bb.",
+      "عَنْ أَبِي مَسْعُودٍ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ النَّبِيُّ ﷺ: «الْآيَتَانِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ مَنْ قَرَأَهُمَا فِي لَيْلَةٍ كَفَتَاهُ».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "Full verses are al-Baqarah 2:285-286.",
-    sourceUrl: "https://sunnah.com/hisn%3A101",
   },
   {
-    id: "s-hm-102",
+    id: "s-hm-109a",
     category: "before_sleep",
     orderIndex: 3,
+    isSurah: true,
+    surahNameArabic: "الكَافِرُون",
+    surahNameEnglish: "Al-Kafirun",
+    surahType: "مكية",
+    verseCount: 6,
+    hasBasmalah: true,
     arabicText:
-      "\u0628\u0650\u0627\u0633\u0652\u0645\u0650\u0643\u064e \u0631\u064e\u0628\u0651\u0650\u064a \u0648\u064e\u0636\u064e\u0639\u0652\u062a\u064f \u062c\u064e\u0646\u0652\u0628\u0650\u064a\u060c \u0648\u064e\u0628\u0650\u0643\u064e \u0623\u064e\u0631\u0652\u0641\u064e\u0639\u064f\u0647\u064f\u060c \u0641\u064e\u0625\u0650\u0646\u0652 \u0623\u064e\u0645\u0652\u0633\u064e\u0643\u0652\u062a\u064e \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0641\u064e\u0627\u0631\u0652\u062d\u064e\u0645\u0652\u0647\u064e\u0627\u060c \u0648\u064e\u0625\u0650\u0646\u0652 \u0623\u064e\u0631\u0652\u0633\u064e\u0644\u0652\u062a\u064e\u0647\u064e\u0627 \u0641\u064e\u0627\u062d\u0652\u0641\u064e\u0638\u0652\u0647\u064e\u0627 \u0628\u0650\u0645\u064e\u0627 \u062a\u064e\u062d\u0652\u0641\u064e\u0638\u064f \u0628\u0650\u0647\u0650 \u0639\u0650\u0628\u064e\u0627\u062f\u064e\u0643\u064e \u0627\u0644\u0635\u0651\u064e\u0627\u0644\u0650\u062d\u0650\u064a\u0646\u064e.",
+      "﴿قُلْ يَا أَيُّهَا الْكَافِرُونَ ﴿١﴾ لَا أَعْبُدُ مَا تَعْبُدُونَ ﴿٢﴾ وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ ﴿٣﴾ وَلَا أَنَا عَابِدٌ مَا عَبَدْتُمْ ﴿٤﴾ وَلَا أَنْتُمْ عَابِدُونَ مَا أَعْبُدُ ﴿٥﴾ لَكُمْ دِينُكُمْ وَلِيَ دِينِ ﴿٦﴾﴾",
     transliteration:
-      "Bismika Rabb\u012b wa\u1e0da\u02bftu janb\u012b, wa bika arfa\u02bfuh, fa in amsakta nafs\u012b far\u1e25amh\u0101, wa in arsaltah\u0101 fa\u1e25fa\u1e93h\u0101 bim\u0101 ta\u1e25fa\u1e93u bihi \u02bfib\u0101daka\u1e63-\u1e63\u0101li\u1e25\u012bn.",
+      "Qul ya ayyuhal-kafirun. La a'budu ma ta'budun. Wa la antum 'abiduna ma a'bud. Wa la ana 'abidum-ma 'abadtum. Wa la antum 'abiduna ma a'bud. Lakum dinukum wa liya din.",
     translation:
-      "With Your Name, my Lord, I lay down my side, and by You I raise it. If You take my soul, have mercy on it; and if You release it, protect it as You protect Your righteous servants.",
-    benefit: "Sahih al-Bukhari and Sahih Muslim.",
+      "Say: O disbelievers! I do not worship what you worship, nor do you worship what I worship... To you be your religion, and to me my religion.",
+    benefit: "Reciting Surah Al-Kafirun before sleeping is a disavowal and immunity from shirk (polytheism).",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari 11/126; Muslim 4/2084; Hisn al-Muslim 102.",
-    preferredTiming: "When lying down after dusting off the bed.",
+    sourceReference: "Sunan Abu Dawud 5055; Jami' at-Tirmidhi 3403.",
+    preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa: \u00ab\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0648\u064e\u0649 \u0623\u064e\u062d\u064e\u062f\u064f\u0643\u064f\u0645\u0652 \u0625\u0650\u0644\u064e\u0649 \u0641\u0650\u0631\u064e\u0627\u0634\u0650\u0647\u0650 \u0641\u064e\u0644\u0652\u064a\u064e\u0646\u0652\u0641\u064f\u0636\u0652 \u0641\u0650\u0631\u064e\u0627\u0634\u064e\u0647\u064f \u0628\u0650\u062f\u064e\u0627\u062e\u0650\u0644\u064e\u0629\u0650 \u0625\u0650\u0632\u064e\u0627\u0631\u0650\u0647\u0650... \u062b\u064f\u0645\u0651\u064e \u0644\u0650\u064a\u064e\u0642\u064f\u0644\u0652: \u0628\u0650\u0627\u0633\u0652\u0645\u0650\u0643\u064e \u0631\u064e\u0628\u0651\u0650\u064a \u0648\u064e\u0636\u064e\u0639\u0652\u062a\u064f \u062c\u064e\u0646\u0652\u0628\u0650\u064a...\u00bb",
-    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A102",
+      "عن نَوْفَلٍ الأَشْجَعِيِّ رضي الله عنه أن النبي ﷺ قال له: «اقْرَأْ: ﴿قُلْ يَا أَيُّهَا الْكَافِرُونَ﴾ ثُمَّ نَمْ عَلَى خَاتِمَتِهَا، فَإِنَّهَا بَرَاءَةٌ مِنَ الشِّرْكِ».",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
-    id: "s-hm-103",
+    id: "s-hm-110a",
     category: "before_sleep",
     orderIndex: 4,
+    isSurah: true,
+    surahNameArabic: "السَّجْدَة",
+    surahNameEnglish: "As-Sajdah",
+    surahType: "مكية",
+    verseCount: 30,
+    hasBasmalah: true,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u062e\u064e\u0644\u064e\u0642\u0652\u062a\u064e \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0648\u064e\u0623\u064e\u0646\u0652\u062a\u064e \u062a\u064e\u0648\u064e\u0641\u0651\u064e\u0627\u0647\u064e\u0627\u060c \u0644\u064e\u0643\u064e \u0645\u064e\u0645\u064e\u0627\u062a\u064f\u0647\u064e\u0627 \u0648\u064e\u0645\u064e\u062d\u0652\u064a\u064e\u0627\u0647\u064e\u0627\u060c \u0625\u0650\u0646\u0652 \u0623\u064e\u062d\u0652\u064a\u064e\u064a\u0652\u062a\u064e\u0647\u064e\u0627 \u0641\u064e\u0627\u062d\u0652\u0641\u064e\u0638\u0652\u0647\u064e\u0627\u060c \u0648\u064e\u0625\u0650\u0646\u0652 \u0623\u064e\u0645\u064e\u062a\u0651\u064e\u0647\u064e\u0627 \u0641\u064e\u0627\u063a\u0652\u0641\u0650\u0631\u0652 \u0644\u064e\u0647\u064e\u0627. \u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0625\u0650\u0646\u0651\u0650\u064a \u0623\u064e\u0633\u0652\u0623\u064e\u0644\u064f\u0643\u064e \u0627\u0644\u0652\u0639\u064e\u0627\u0641\u0650\u064a\u064e\u0629\u064e.",
-    transliteration:
-      "All\u0101humma innaka khalaqta nafs\u012b wa anta tawaff\u0101h\u0101, laka mam\u0101tuh\u0101 wa ma\u1e25y\u0101h\u0101, in a\u1e25yaytah\u0101 fa\u1e25fa\u1e93h\u0101, wa in amattah\u0101 faghfir lah\u0101. All\u0101humma inn\u012b as\u2019alukal-\u02bf\u0101fiyah.",
-    translation:
-      "O Allah, You created my soul and You take it. To You belongs its death and life. If You keep it alive, protect it; and if You cause it to die, forgive it. O Allah, I ask You for wellbeing.",
-    benefit: "Sahih Muslim.",
+      "﴿الم ﴿١﴾ تَنْزِيلُ الْكِتَابِ لَا رَيْبَ فِيهِ مِنْ رَبِّ الْعَالَمِينَ ﴿٢﴾ أَمْ يَقُولُونَ افْتَرَاهُ ۚ بَلْ هُوَ الْحَقُّ مِنْ رَبِّكَ لِتُنْذِرَ قَوْمًا مَا أَتَاهُمْ مِنْ نَذِيرٍ مِنْ قَبْلِكَ لَعَلَّهُمْ يَهْتَدُونَ ﴿٣﴾ اللَّهُ الَّذِي خَلَقَ السَّمَاوَاتِ وَالْأَرْضَ وَمَا بَيْنَهُمَا فِي سِتَّةِ أَيَّامٍ ثُمَّ اسْتَوَىٰ عَلَى الْعَرْشِ ۖ مَا لَكُمْ مِنْ دُونِهِ مِنْ وَلِيٍّ وَلَا شَفِيعٍ ۚ أَفَلَا تَتَذَكَّرُونَ ﴿٤﴾ يُدَبِّرُ الْأَمْرَ مِنَ السَّمَاءِ إِلَى الْأَرْضِ ثُمَّ يَعْرُجُ إِلَيْهِ فِي يَوْمٍ كَانَ مِقْدَارُهُ أَلْفَ سَنَةٍ مِمَّا تَعُدُّونَ ﴿٥﴾ ذَٰلِكَ عَالِمُ الْغَيْبِ وَالشَّهَادَةِ الْعَزِيزُ الرَّحِيمُ ﴿٦﴾ الَّذِي أَحْسَنَ كُلَّ شَيْءٍ خَلَقَهُ ۖ وَبَدَأَ خَلْقَ الْإِنْسَانِ مِنْ طِينٍ ﴿٧﴾ ثُمَّ جَعَلَ نَسْلَهُ مِنْ سُلَالَةٍ مِنْ مَاءٍ مَهِينٍ ﴿٨﴾ ثُمَّ سَوَّاهُ وَنَفَخَ فِيهِ مِنْ رُوحِهِ ۖ وَجَعَلَ لَكُمُ السَّمْعَ وَالْأَفْئِدَةَ ۚ قَلِيلًا مَا تَشْكُرُونَ ﴿٩﴾ وَقَالُوا أَإِذَا ضَلَلْنَا فِي الْأَرْضِ أَإِنَّا لَفِي خَلْقٍ جَدِيدٍ ۚ بَلْ هُمْ بِلِقَاءِ رَبِّهِمْ كَافِرُونَ ﴿١٠﴾ قُلْ يَتَوَفَّاكُمْ مَلَكُ الْمَوْتِ الَّذِي وُكِّلَ بِكُمْ ثُمَّ إِلَىٰ رَبِّكُمْ تُرْجَعُونَ ﴿١١﴾ وَلَوْ تَرَىٰ إِذِ الْمُجْرِمُونَ نَاكِسُو رُؤُوسِهِمْ عِنْدَ رَبِّهِمْ رَبَّنَا أَبْصَرْنَا وَسَمِعْنَا فَارْجِعْنَا نَعْمَلْ صَالِحًا إِنَّا مُوقِنُونَ ﴿١٢﴾ وَلَوْ شِئْنَا لَآتَيْنَا كُلَّ نَفْسٍ هُدَاهَا وَلَٰكِنْ حَقَّ الْقَوْلُ مِنِّي لَأَمْلَأَنَّ جَهَنَّمَ مِنَ الْجِنَّةِ وَالنَّاسِ أَجْمَعِينَ ﴿١٣﴾ فَذُوقُوا بِمَا نَسِيتُمْ لِقَاءَ يَوْمِكُمْ هَٰذَا إِنَّا نَسِينَاكُمْ ۖ وَذُوقُوا عَذَابَ الْخُلْدِ بِمَا كُنْتُمْ تَعْمَلُونَ ﴿١٤﴾ إِنَّمَا يُؤْمِنُ بِآيَاتِنَا الَّذِينَ إِذَا ذُكِّرُوا بِهَا خَرُّوا سُجَّدًا وَسَبَّحُوا بِحَمْدِ رَبِّهِمْ وَهُمْ لَا يَسْتَكْبِرُونَ ۩ ﴿١٥﴾ تَتَجَافَىٰ جُنُوبُهُمْ عَنِ الْمَضَاجِعِ يَدْعُونَ رَبَّهُمْ خَوْفًا وَطَمَعًا وَمِمَّا رَزَقْنَاهُمْ يُنْفِقُونَ ﴿١٦﴾ فَلَا تَعْلَمُ نَفْسٌ مَا أُخْفِيَ لَهُمْ مِنْ قُرَّةِ أَعْيُنٍ جَزَاءً بِمَا كَانُوا يَعْمَلُونَ ﴿١٧﴾ أَفَمَنْ كَانَ مُؤْمِنًا كَمَنْ كَانَ فَاسِقًا ۚ لَا يَسْتَوُونَ ﴿١٨﴾ أَمَّا الَّذِينَ آمَنُوا وَعَمِلُوا الصَّالِحَاتِ فَلَهُمْ جَنَّاتُ الْمَأْوَىٰ نُزُلًا بِمَا كَانُوا يَعْمَلُونَ ﴿١٩﴾ وَأَمَّا الَّذِينَ فَسَقُوا فَمَأْوَاهُمُ النَّارُ ۖ كُلَّمَا أَرَادُوا أَنْ يَخْرُجُوا مِنْهَا أُعِيدُوا فِيهَا وَقِيلَ لَهُمْ ذُوقُوا عَذَابَ النَّارِ الَّذِي كُنْتُمْ بِهِ تُكَذِّبُونَ ﴿٢٠﴾ وَلَنُذِيقَنَّهُمْ مِنَ الْعَذَابِ الْأَدْنَىٰ دُونَ الْعَذَابِ الْأَكْبَرِ لَعَلَّهُمْ يَرْجِعُونَ ﴿٢١﴾ وَمَنْ أَظْلَمُ مِمَّنْ ذُكِّرَ بِآيَاتِ رَبِّهِ ثُمَّ أَعْرَضَ عَنْهَا ۚ إِنَّا مِنَ الْمُجْرِمِينَ مُنْتَقِمُونَ ﴿٢٢﴾ وَلَقَدْ آتَيْنَا مُوسَى الْكِتَابَ فَلَا تَكُنْ فِي مِرْيَةٍ مِنْ لِقَائِهِ ۖ وَجَعَلْنَاهُ هُدًى لِبَنِي إِسْرَائِيلَ ﴿٢٣﴾ وَجَعَلْنَا مِنْهُمْ أَئِمَّةً يَهْدُونَ بِأَمْرِنَا لَمَّا صَبَرُوا ۖ وَكَانُوا بِآيَاتِنَا يُوقِنُونَ ﴿٢٤﴾ إِنَّ رَبَّكَ هُوَ يَفْصِلُ بَيْنَهُمْ يَوْمَ الْقِيَامَةِ فِيمَا كَانُوا فِيهِ يَخْتَلِفُونَ ﴿٢٥﴾ أَوَلَمْ يَهْدِ لَهُمْ كَمْ أَهْلَكْنَا مِنْ قَبْلِهِمْ مِنَ الْقُرُونِ يَمْشُونَ فِي مَسَاكِنِهِمْ ۚ إِنَّ فِي ذَٰلِكَ لَآيَاتٍ ۖ أَفَلَا يَسْمَعُونَ ﴿٢٦﴾ أَوَلَمْ يَرَوْا أَنَّا نَسُوقُ الْمَاءَ إِلَى الْأَرْضِ الْجُرُزِ فَنُخْرِجُ بِهِ زَرْعًا تَأْكُلُ مِنْهُ أَنْعَامُهُمْ وَأَنْفُسُهُمْ ۖ أَفَلَا يُبْصِرُونَ ﴿٢٧﴾ وَيَقُولُونَ مَتَىٰ هَٰذَا الْفَتْحُ إِنْ كُنْتُمْ صَادِقِينَ ﴿٢٨﴾ قُلْ يَوْمَ الْفَتْحِ لَا يَنْفَعُ الَّذِينَ كَفَرُوا إِيمَانُهُمْ وَلَا هُمْ يُنْظَرُونَ ﴿٢٩﴾ فَأَعْرِضْ عَنْهُمْ وَانْتَظِرْ إِنَّهُمْ مُنْتَظِرُونَ ﴿٣٠﴾﴾",
+    transliteration: "Alif-Lam-Mim. Tanzilul-Kitabi la rayba fihi mir-Rabbil-'alamin...",
+    translation: "Alif-Lam-Mim. The revelation of the Book is without doubt from the Lord of the worlds...",
+    benefit: "The Prophet ﷺ would not sleep until he recited Surah As-Sajdah and Surah Al-Mulk.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Muslim 4/2083; Ahmad 2/79; Hisn al-Muslim 103.",
+    sourceReference: "Jami' at-Tirmidhi 2892; Sunan an-Nasa'i 10043.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0648\u0631\u062f \u0639\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0647\u0630\u0627 \u0627\u0644\u062f\u0639\u0627\u0621 \u0639\u0646\u062f \u0627\u0644\u0646\u0648\u0645 \u0641\u064a \u0635\u062d\u064a\u062d \u0645\u0633\u0644\u0645.",
-    authenticityNote: "Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A103",
+      "عن جابر رضي الله عنه أَنَّ النَّبِيَّ ﷺ كَانَ لَا يَنَامُ حَتَّى يَقْرَأَ ﴿الم * تَنْزِيلُ﴾ السَّجْدَةَ، وَ ﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ﴾.",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
-    id: "s-hm-104",
+    id: "s-hm-110b",
     category: "before_sleep",
     orderIndex: 5,
+    isSurah: true,
+    surahNameArabic: "الْمُلْك",
+    surahNameEnglish: "Al-Mulk (Tabarak)",
+    surahType: "مكية",
+    verseCount: 30,
+    hasBasmalah: true,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0642\u0650\u0646\u0650\u064a \u0639\u064e\u0630\u064e\u0627\u0628\u064e\u0643\u064e \u064a\u064e\u0648\u0652\u0645\u064e \u062a\u064e\u0628\u0652\u0639\u064e\u062b\u064f \u0639\u0650\u0628\u064e\u0627\u062f\u064e\u0643\u064e.",
-    transliteration: "All\u0101humma qin\u012b \u02bfadh\u0101baka yawma tab\u02bfathu \u02bfib\u0101dak.",
-    translation: "O Allah, protect me from Your punishment on the Day You resurrect Your servants.",
-    benefit: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
-    repetitionCount: 3,
-    countLabel: "3",
-    sourceReference: "Abu Dawud 4/311; At-Tirmidhi; Hisn al-Muslim 104.",
-    preferredTiming: "When lying down, placing the right hand under the cheek.",
-    hadithText:
-      "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0625\u0630\u0627 \u0623\u0631\u0627\u062f \u0623\u0646 \u064a\u0631\u0642\u062f \u0648\u0636\u0639 \u064a\u062f\u0647 \u0627\u0644\u064a\u0645\u0646\u0649 \u062a\u062d\u062a \u062e\u062f\u0647 \u062b\u0645 \u0642\u0627\u0644: \u00ab\u0627\u0644\u0644\u0647\u0645 \u0642\u0646\u064a \u0639\u0630\u0627\u0628\u0643 \u064a\u0648\u0645 \u062a\u0628\u0639\u062b \u0639\u0628\u0627\u062f\u0643\u00bb \u062b\u0644\u0627\u062b \u0645\u0631\u0627\u062a.",
-    authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A104",
-  },
-  {
-    id: "s-hm-105",
-    category: "before_sleep",
-    orderIndex: 6,
-    arabicText:
-      "\u0628\u0650\u0627\u0633\u0652\u0645\u0650\u0643\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0623\u064e\u0645\u064f\u0648\u062a\u064f \u0648\u064e\u0623\u064e\u062d\u0652\u064a\u064e\u0627.",
-    transliteration: "Bismika All\u0101humma am\u016btu wa a\u1e25y\u0101.",
-    translation: "In Your Name, O Allah, I die and I live.",
-    benefit: "Sahih al-Bukhari and Sahih Muslim.",
+      "﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ وَهُوَ عَلَىٰ كُلِّ شَيْءٍ قَدِيرٌ ﴿١﴾ الَّذِي خَلَقَ الْمَوْتَ وَالْحَيَاةَ لِيَبْلُوَكُمْ أَيُّكُمْ أَحْسَنُ عَمَلًا ۚ وَهُوَ الْعَزِيزُ الْغَفُورُ ﴿٢﴾ الَّذِي خَلَقَ سَبْعَ سَمَاوَاتٍ طِبَاقًا ۖ مَا تَرَىٰ فِي خَلْقِ الرَّحْمَٰنِ مِنْ تَفَاوُتٍ ۖ فَارْجِعِ الْبَصَرَ هَلْ تَرَىٰ مِنْ فُطُورٍ ﴿٣﴾ ثُمَّ ارْجِعِ الْبَصَرَ كَرَّتَيْنِ يَنْقَلِبْ إِلَيْكَ الْبَصَرُ خَاسِئًا وَهُوَ حَسِيرٌ ﴿٤﴾ وَلَقَدْ زَيَّنَّا السَّمَاءَ الدُّنْيَا بِمَصَابِيحَ وَجَعَلْنَاهَا رُجُومًا لِلشَّيَاطِينِ ۖ وَأَعْتَدْنَا لَهُمْ عَذَابَ السَّعِيرِ ﴿٥﴾ وَلِلَّذِينَ كَفَرُوا بِرَبِّهِمْ عَذَابُ جَهَنَّمَ ۖ وَبِئْسَ الْمَصِيرُ ﴿٦﴾ إِذَا أُلْقُوا فِيهَا سَمِعُوا لَهَا شَهِيقًا وَهِيَ تَفُورُ ﴿٧﴾ تَكَادُ تَمَيَّزُ مِنَ الْغَيْظِ ۖ كُلَّمَا أُلْقِيَ فِيهَا فَوْجٌ سَأَلَهُمْ خَزَنَتُهَا أَلَمْ يَأْتِكُمْ نَذِيرٌ ﴿٨﴾ قَالُوا بَلَىٰ قَدْ جَاءَنَا نَذِيرٌ فَكَذَّبْنَا وَقُلْنَا مَا نَزَّلَ اللَّهُ مِنْ شَيْءٍ إِنْ أَنْتُمْ إِلَّا فِي ضَلَالٍ كَبِيرٍ ﴿٩﴾ وَقَالُوا لَوْ كُنَّا نَسْمَعُ أَوْ نَعْقِلُ مَا كُنَّا فِي أَصْحَابِ السَّعِيرِ ﴿١٠﴾ فَاعْتَرَفُوا بِذَنْبِهِمْ فَسُحْقًا لِأَصْحَابِ السَّعِيرِ ﴿١١﴾ إِنَّ الَّذِينَ يَخْشَوْنَ رَبَّهُمْ بِالْغَيْبِ لَهُمْ مَغْفِرَةٌ وَأَجْرٌ كَبِيرٌ ﴿١٢﴾ وَأَسِرُّوا قَوْلَكُمْ أَوِ اجْهَرُوا بِهِ ۖ إِنَّهُ عَلِيمٌ بِذَاتِ الصُّدُورِ ﴿١٣﴾ أَلَا يَعْلَمُ مَنْ خَلَقَ وَهُوَ اللَّطِيفُ الْخَبِيرُ ﴿١٤﴾ هُوَ الَّذِي جَعَلَ لَكُمُ الْأَرْضَ ذَلُولًا فَامْشُوا فِي مَنَاكِبِهَا وَكُلُوا مِنْ رِزْقِهِ ۖ وَإِلَيْهِ النُّشُورُ ﴿١٥﴾ أَأَمِنْتُمْ مَنْ فِي السَّمَاءِ أَنْ يَخْسِفَ بِكُمُ الْأَرْضَ فَإِذَا هِيَ تَمُورُ ﴿١٦﴾ أَمْ أَمِنْتُمْ مَنْ فِي السَّمَاءِ أَنْ يُرْسِلَ عَلَيْكُمْ حَاصِبًا ۖ فَسَتَعْلَمُونَ كَيْفَ نَذِيرِ ﴿١٧﴾ وَلَقَدْ كَذَّبَ الَّذِينَ مِنْ قَبْلِهِمْ فَكَيْفَ كَانَ نَكِيرِ ﴿١٨﴾ أَوَلَمْ يَرَوْا إِلَى الطَّيْرِ فَوْقَهُمْ صَافَّاتٍ وَيَقْبِضْنَ ۚ مَا يُمْسِكُهُنَّ إِلَّا الرَّحْمَٰنُ ۚ إِنَّهُ بِكُلِّ شَيْءٍ بَصِيرٌ ﴿١٩﴾ أَمَّنْ هَٰذَا الَّذِي هُوَ جُنْدٌ لَكُمْ يَنْصُرُكُمْ مِنْ دُونِ الرَّحْمَٰنِ ۚ إِنِ الْكَافِرُونَ إِلَّا فِي غُرُورٍ ﴿٢٠﴾ أَمَّنْ هَٰذَا الَّذِي يَرْزُقُكُمْ إِنْ أَمْسَكَ رِزْقَهُ ۚ بَلْ لَجُّوا فِي عُتُوٍّ وَنُفُورٍ ﴿٢١﴾ أَفَمَنْ يَمْشِي مُكِبًّا عَلَىٰ وَجْهِهِ أَهْدَىٰ أَمَّنْ يَمْشِي سَوِيًّا عَلَىٰ صِرَاطٍ مُسْتَقِيمٍ ﴿٢٢﴾ قُلْ هُوَ الَّذِي أَنْشَأَكُمْ وَجَعَلَ لَكُمُ السَّمْعَ وَالْأَفْئِدَةَ ۖ قَلِيلًا مَا تَشْكُرُونَ ﴿٢٣﴾ قُلْ هُوَ الَّذِي ذَرَأَكُمْ فِي الْأَرْضِ وَإِلَيْهِ تُحْشَرُونَ ﴿٢٤﴾ وَيَقُولُونَ مَتَىٰ هَٰذَا الْوَعْدُ إِنْ كُنْتُمْ صَادِقِينَ ﴿٢٥﴾ قُلْ إِنَّمَا الْعِلْمُ عِنْدَ اللَّهِ وَإِنَّمَا أَنَا نَذِيرٌ مُبِينٌ ﴿٢٦﴾ فَلَمَّا رَأَوْهُ زُلْفَةً سِيئَتْ وُجُوهُ الَّذِينَ كَفَرُوا وَقِيلَ هَٰذَا الَّذِي كُنْتُمْ بِهِ تَدَّعُونَ ﴿٢٧﴾ قُلْ أَرَأَيْتُمْ إِنْ أَهْلَكَنِيَ اللَّهُ وَمَنْ مَعِيَ أَوْ رَحِمَنَا فَمَنْ يُجِيرُ الْكَافِرِينَ مِنْ عَذَابٍ أَلِيمٍ ﴿٢٨﴾ قُلْ هُوَ الرَّحْمَٰنُ آمَنَّا بِهِ وَعَلَيْهِ تَوَكَّلْنَا ۖ فَسَتَعْلَمُونَ مَنْ هُوَ فِي ضَلَالٍ مُبِينٍ ﴿٢٩﴾ قُلْ أَرَأَيْتُمْ إِنْ أَصْبَحَ مَاؤُكُمْ غَوْرًا فَمَنْ يَأْتِيكُمْ بِمَاءٍ مَعِينٍ ﴿٣٠﴾﴾",
+    transliteration: "Tabarakal-ladhi biyadihil-mulku wa huwa 'ala kulli shay'in qadir...",
+    translation: "Blessed is He in Whose Hand is dominion, and He is Able to do all things...",
+    benefit:
+      "Surah Al-Mulk intercedes for its reciter until he is forgiven and protects against the torment of the grave.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari; Muslim 4/2083; Hisn al-Muslim 105.",
-    preferredTiming: "Before sleeping.",
+    sourceReference: "Jami' at-Tirmidhi 2891; Sunan Abu Dawud 1400.",
+    preferredTiming: "Before sleeping every night.",
     hadithText:
-      "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0625\u0630\u0627 \u0623\u0648\u0649 \u0625\u0644\u0649 \u0641\u0631\u0627\u0634\u0647 \u0642\u0627\u0644: \u00ab\u0628\u0627\u0633\u0645\u0643 \u0627\u0644\u0644\u0647\u0645 \u0623\u0645\u0648\u062a \u0648\u0623\u062d\u064a\u0627\u00bb\u060c \u0648\u0625\u0630\u0627 \u0627\u0633\u062a\u064a\u0642\u0638 \u0642\u0627\u0644: \u00ab\u0627\u0644\u062d\u0645\u062f \u0644\u0644\u0647 \u0627\u0644\u0630\u064a \u0623\u062d\u064a\u0627\u0646\u0627 \u0628\u0639\u062f \u0645\u0627 \u0623\u0645\u0627\u062a\u0646\u0627 \u0648\u0625\u0644\u064a\u0647 \u0627\u0644\u0646\u0634\u0648\u0631\u00bb.",
-    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A105",
+      "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه عَنِ النَّبِيِّ ﷺ قَالَ: «إِنَّ سُورَةً مِنَ الْقُرْآنِ ثَلَاثُونَ آيَةً شَفَعَتْ لِرَجُلٍ حَتَّى غُفِرَ لَهُ، وَهِيَ سُورَةُ ﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ﴾».",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "s-hm-106-subhanallah",
     category: "before_sleep",
-    orderIndex: 7,
-    arabicText: "\u0633\u064f\u0628\u0652\u062d\u064e\u0627\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u0650",
-    transliteration: "Sub\u1e25\u0101nall\u0101h.",
+    orderIndex: 6,
+    arabicText: "سُبْحَانَ اللَّهِ",
+    transliteration: "Subhanallah",
     translation: "Glory be to Allah.",
-    benefit: "Sahih al-Bukhari and Sahih Muslim.",
+    benefit: "Recited 33 times before sleeping (Hadith of Ali & Fatima).",
     repetitionCount: 33,
-    countLabel: "33 + 33 + 34",
-    sourceReference: "Al-Bukhari; Muslim 4/2091; Hisn al-Muslim 106.",
+    countLabel: "33",
+    sourceReference: "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0639\u0644\u0651\u0645 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0639\u0644\u064a\u0651\u064b\u0627 \u0648\u0641\u0627\u0637\u0645\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647\u0645\u0627 \u0623\u0646 \u064a\u0633\u0628\u0651\u062d\u0627 \u0639\u0646\u062f \u0645\u0646\u0627\u0645\u0647\u0645\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u062d\u0645\u062f\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u0643\u0628\u0651\u0631\u0627 \u0623\u0631\u0628\u0639\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u0642\u0627\u0644: \u00ab\u0641\u064e\u0647\u064f\u0648\u064e \u062e\u064e\u064a\u0652\u0631\u064c \u0644\u064e\u0643\u064f\u0645\u064e\u0627 \u0645\u0650\u0646\u0652 \u062e\u064e\u0627\u062f\u0650\u0645\u064d\u00bb.",
+      "عَلَّمَ النَّبِيُّ ﷺ عَلِيًّا وَفَاطِمَةَ رَضِيَ اللَّهُ عَنْهُمَا أَنْ يُسَبِّحَا ثَلَاثًا وَثَلَاثِينَ، وَيَحْمَدَا ثَلَاثًا وَثَلَاثِينَ، وَيُكَبِّرَا أَرْبَعًا وَثَلَاثِينَ عِنْدَ الْمَنَامِ.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A106",
   },
   {
     id: "s-hm-106-alhamdulillah",
     category: "before_sleep",
-    orderIndex: 8,
-    arabicText: "\u0627\u0644\u0652\u062d\u064e\u0645\u0652\u062f\u064f \u0644\u0650\u0644\u0651\u064e\u0647\u0650",
-    transliteration: "Al\u1e25amdulill\u0101h.",
+    orderIndex: 7,
+    arabicText: "الْحَمْدُ لِلَّهِ",
+    transliteration: "Alhamdulillah",
     translation: "All praise is due to Allah.",
-    benefit: "Sahih al-Bukhari and Sahih Muslim.",
+    benefit: "Recited 33 times before sleeping.",
     repetitionCount: 33,
-    countLabel: "33 + 33 + 34",
-    sourceReference: "Al-Bukhari; Muslim 4/2091; Hisn al-Muslim 106.",
+    countLabel: "33",
+    sourceReference: "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0639\u0644\u0651\u0645 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0639\u0644\u064a\u0651\u064b\u0627 \u0648\u0641\u0627\u0637\u0645\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647\u0645\u0627 \u0623\u0646 \u064a\u0633\u0628\u0651\u062d\u0627 \u0639\u0646\u062f \u0645\u0646\u0627\u0645\u0647\u0645\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u062d\u0645\u062f\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u0643\u0628\u0651\u0631\u0627 \u0623\u0631\u0628\u0639\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u0642\u0627\u0644: \u00ab\u0641\u064e\u0647\u064f\u0648\u064e \u062e\u064e\u064a\u0652\u0631\u064c \u0644\u064e\u0643\u064f\u0645\u064e\u0627 \u0645\u0650\u0646\u0652 \u062e\u064e\u0627\u062f\u0650\u0645\u064d\u00bb.",
+      "عَلَّمَ النَّبِيُّ ﷺ عَلِيًّا وَفَاطِمَةَ رَضِيَ اللَّهُ عَنْهُمَا أَنْ يُسَبِّحَا ثَلَاثًا وَثَلَاثِينَ، وَيَحْمَدَا ثَلَاثًا وَثَلَاثِينَ...",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A106",
   },
   {
     id: "s-hm-106-allahu-akbar",
     category: "before_sleep",
-    orderIndex: 9,
-    arabicText: "\u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u0643\u0652\u0628\u064e\u0631\u064f",
-    transliteration: "All\u0101hu akbar.",
+    orderIndex: 8,
+    arabicText: "اللَّهُ أَكْبَرُ",
+    transliteration: "Allahu Akbar",
     translation: "Allah is the Greatest.",
-    benefit: "Sahih al-Bukhari and Sahih Muslim.",
+    benefit: "Recited 34 times before sleeping.",
     repetitionCount: 34,
-    countLabel: "33 + 33 + 34",
-    sourceReference: "Al-Bukhari; Muslim 4/2091; Hisn al-Muslim 106.",
+    countLabel: "34",
+    sourceReference: "Sahih al-Bukhari 3113; Sahih Muslim 2727; Hisn al-Muslim 106.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0639\u0644\u0651\u0645 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0639\u0644\u064a\u0651\u064b\u0627 \u0648\u0641\u0627\u0637\u0645\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647\u0645\u0627 \u0623\u0646 \u064a\u0633\u0628\u0651\u062d\u0627 \u0639\u0646\u062f \u0645\u0646\u0627\u0645\u0647\u0645\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u062d\u0645\u062f\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u064a\u0643\u0628\u0651\u0631\u0627 \u0623\u0631\u0628\u0639\u064b\u0627 \u0648\u062b\u0644\u0627\u062b\u064a\u0646\u060c \u0648\u0642\u0627\u0644: \u00ab\u0641\u064e\u0647\u064f\u0648\u064e \u062e\u064e\u064a\u0652\u0631\u064c \u0644\u064e\u0643\u064f\u0645\u064e\u0627 \u0645\u0650\u0646\u0652 \u062e\u064e\u0627\u062f\u0650\u0645\u064d\u00bb.",
+      "عَلَّمَ النَّبِيُّ ﷺ عَلِيًّا وَفَاطِمَةَ رَضِيَ اللَّهُ عَنْهُمَا:... وَيُكَبِّرَا أَرْبَعًا وَثَلَاثِينَ، وَقَالَ: «فَهُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A106",
   },
   {
-    id: "s-hm-107",
+    id: "s-hm-102",
     category: "before_sleep",
-    orderIndex: 10,
+    orderIndex: 9,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0631\u064e\u0628\u0651\u064e \u0627\u0644\u0633\u0651\u064e\u0645\u064e\u0627\u0648\u064e\u0627\u062a\u0650 \u0627\u0644\u0633\u0651\u064e\u0628\u0652\u0639\u0650 \u0648\u064e\u0631\u064e\u0628\u0651\u064e \u0627\u0644\u0652\u0639\u064e\u0631\u0652\u0634\u0650 \u0627\u0644\u0652\u0639\u064e\u0638\u0650\u064a\u0645\u0650\u060c \u0631\u064e\u0628\u0651\u064e\u0646\u064e\u0627 \u0648\u064e\u0631\u064e\u0628\u0651\u064e \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u060c \u0641\u064e\u0627\u0644\u0650\u0642\u064e \u0627\u0644\u0652\u062d\u064e\u0628\u0651\u0650 \u0648\u064e\u0627\u0644\u0646\u0651\u064e\u0648\u064e\u0649\u060c \u0648\u064e\u0645\u064f\u0646\u0652\u0632\u0650\u0644\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0652\u0631\u064e\u0627\u0629\u0650 \u0648\u064e\u0627\u0644\u0625\u0650\u0646\u0652\u062c\u0650\u064a\u0644\u0650 \u0648\u064e\u0627\u0644\u0652\u0641\u064f\u0631\u0652\u0642\u064e\u0627\u0646\u0650\u060c \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0643\u064e \u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d \u0623\u064e\u0646\u0652\u062a\u064e \u0622\u062e\u0650\u0630\u064c \u0628\u0650\u0646\u064e\u0627\u0635\u0650\u064a\u064e\u062a\u0650\u0647\u0650. \u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0623\u064e\u0648\u0651\u064e\u0644\u064f \u0641\u064e\u0644\u064e\u064a\u0652\u0633\u064e \u0642\u064e\u0628\u0652\u0644\u064e\u0643\u064e \u0634\u064e\u064a\u0652\u0621\u064c\u060c \u0648\u064e\u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0622\u062e\u0650\u0631\u064f \u0641\u064e\u0644\u064e\u064a\u0652\u0633\u064e \u0628\u064e\u0639\u0652\u062f\u064e\u0643\u064e \u0634\u064e\u064a\u0652\u0621\u064c\u060c \u0648\u064e\u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0638\u0651\u064e\u0627\u0647\u0650\u0631\u064f \u0641\u064e\u0644\u064e\u064a\u0652\u0633\u064e \u0641\u064e\u0648\u0652\u0642\u064e\u0643\u064e \u0634\u064e\u064a\u0652\u0621\u064c\u060c \u0648\u064e\u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u0652\u0628\u064e\u0627\u0637\u0650\u0646\u064f \u0641\u064e\u0644\u064e\u064a\u0652\u0633\u064e \u062f\u064f\u0648\u0646\u064e\u0643\u064e \u0634\u064e\u064a\u0652\u0621\u064c\u060c \u0627\u0642\u0652\u0636\u0650 \u0639\u064e\u0646\u0651\u064e\u0627 \u0627\u0644\u062f\u0651\u064e\u064a\u0652\u0646\u064e\u060c \u0648\u064e\u0623\u064e\u063a\u0652\u0646\u0650\u0646\u064e\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0652\u0641\u064e\u0642\u0652\u0631\u0650.",
+      "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي، وَبِكَ أَرْفَعُهُ، فَإِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ.",
     transliteration:
-      "All\u0101humma Rabbas-sam\u0101w\u0101tis-sab\u02bfi wa Rabbal-\u02bfArshil-\u02bfA\u1e93\u012bm, Rabban\u0101 wa Rabba kulli shay\u2019, f\u0101liqal-\u1e25abbi wan-naw\u0101, wa munzilat-Tawr\u0101ti wal-Inj\u012bli wal-Furq\u0101n, a\u02bf\u016bdhu bika min sharri kulli shay\u2019in anta \u0101khidhun bin\u0101\u1e63iyatih. All\u0101humma antal-Awwalu falaysa qablaka shay\u2019, wa antal-\u0100khiru falaysa ba\u02bfdaka shay\u2019, wa anta\u1e93-\u1e92\u0101hiru falaysa fawqaka shay\u2019, wa antal-B\u0101\u1e6dinu falaysa d\u016bnaka shay\u2019, iq\u1e0di \u02bfannad-dayn, wa aghnin\u0101 minal-faqr.",
+      "Bismika Rabbi wada'tu janbi, wa bika arfa'uh, fa in amsakta nafsi farhamha, wa in arsaltaha fahfazha bima tahfazu bihi 'ibadakas-salihin.",
     translation:
-      "O Allah, Lord of the seven heavens and Lord of the Magnificent Throne, our Lord and Lord of everything, Splitter of the seed and date-stone, Revealer of the Torah, Injil, and Qur\u2019an, I seek refuge in You from the evil of everything You hold by the forelock. O Allah, You are the First and nothing is before You; You are the Last and nothing is after You; You are the Manifest and nothing is above You; You are the Near/Hidden and nothing is beneath You. Settle our debts and enrich us from poverty.",
-    benefit: "Sahih Muslim.",
+      "With Your Name, my Lord, I lay down my side, and by You I raise it. If You take my soul, have mercy on it; and if You release it, protect it as You protect Your righteous servants.",
+    benefit: "Recited when lying down to sleep.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Muslim 4/2084; Hisn al-Muslim 107.",
-    preferredTiming: "Before sleeping.",
+    sourceReference: "Sahih al-Bukhari 6320; Sahih Muslim 2714; Hisn al-Muslim 102.",
+    preferredTiming: "When lying down after dusting off the bed.",
     hadithText:
-      "\u0648\u0631\u062f \u0647\u0630\u0627 \u0627\u0644\u062f\u0639\u0627\u0621 \u0641\u064a \u0635\u062d\u064a\u062d \u0645\u0633\u0644\u0645 \u0645\u0646 \u0623\u0630\u0643\u0627\u0631 \u0627\u0644\u0646\u0648\u0645.",
-    authenticityNote: "Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A107",
+      "قَالَ ﷺ: «إِذَا أَوَى أَحَدُكُمْ إِلَى فِرَاشِهِ فَلْيَنْفُضْ فِرَاشَهُ... ثُمَّ لِيَقُلْ: بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي...»",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "s-hm-105",
+    category: "before_sleep",
+    orderIndex: 10,
+    arabicText: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.",
+    transliteration: "Bismika Allahumma amutu wa ahya.",
+    translation: "In Your Name, O Allah, I die and I live.",
+    benefit: "Standard supplication when sleeping.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih al-Bukhari 6312; Sahih Muslim 2711; Hisn al-Muslim 105.",
+    preferredTiming: "Before sleeping.",
+    hadithText: "كَانَ النَّبِيُّ ﷺ إِذَا أَوَى إِلَى فِرَاشِهِ قَالَ: «بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا».",
+    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+  },
+  {
+    id: "s-hm-104",
+    category: "before_sleep",
+    orderIndex: 11,
+    arabicText: "اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ.",
+    transliteration: "Allahumma qini 'adhabaka yawma tab'athu 'ibadak.",
+    translation: "O Allah, protect me from Your punishment on the Day You resurrect Your servants.",
+    benefit: "Recited 3 times with right hand under cheek.",
+    repetitionCount: 3,
+    countLabel: "3",
+    sourceReference: "Sunan Abu Dawud 5045; Jami' at-Tirmidhi 3398; Hisn al-Muslim 104.",
+    preferredTiming: "When lying down, placing the right hand under the cheek.",
+    hadithText:
+      "كَانَ النَّبِيُّ ﷺ إِذَا أَرَادَ أَنْ يَرْقُدَ وَضَعَ يَدَهُ الْيُمْنَى تَحْتَ خَدِّهِ ثُمَّ قَالَ: «اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ» ثَلَاثَ مَرَّاتٍ.",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "s-hm-108",
     category: "before_sleep",
-    orderIndex: 11,
+    orderIndex: 12,
     arabicText:
-      "\u0627\u0644\u0652\u062d\u064e\u0645\u0652\u062f\u064f \u0644\u0650\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u0623\u064e\u0637\u0652\u0639\u064e\u0645\u064e\u0646\u064e\u0627 \u0648\u064e\u0633\u064e\u0642\u064e\u0627\u0646\u064e\u0627\u060c \u0648\u064e\u0643\u064e\u0641\u064e\u0627\u0646\u064e\u0627\u060c \u0648\u064e\u0622\u0648\u064e\u0627\u0646\u064e\u0627\u060c \u0641\u064e\u0643\u064e\u0645\u0652 \u0645\u0650\u0645\u0651\u064e\u0646\u0652 \u0644\u0627\u064e \u0643\u064e\u0627\u0641\u0650\u064a\u064e \u0644\u064e\u0647\u064f \u0648\u064e\u0644\u0627\u064e \u0645\u064f\u0624\u0652\u0648\u0650\u064a\u064e.",
+      "الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا، وَكَفَانَا، وَآوَانَا، فَكَمْ مِمَّنْ لَا كَافِيَ لَهُ وَلَا مُؤْوِيَ.",
     transliteration:
-      "Al\u1e25amdu lill\u0101hil-ladh\u012b a\u1e6d\u02bfaman\u0101 wa saq\u0101n\u0101, wa kaf\u0101n\u0101, wa \u0101w\u0101n\u0101, fakam mimman l\u0101 k\u0101fiya lahu wa l\u0101 mu\u2019w\u012b.",
+      "Alhamdu lillahil-ladhi at'amana wa saqana, wa kafana, wa awana, fakam mimman la kafiya lahu wa la mu'wi.",
     translation:
       "Praise be to Allah who fed us, gave us drink, sufficed us, and sheltered us; how many have no one to suffice or shelter them.",
-    benefit: "Sahih Muslim.",
+    benefit: "Expresses gratitude for life, food, and shelter before sleep.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Muslim 4/2085; Hisn al-Muslim 108.",
+    sourceReference: "Sahih Muslim 2715; Hisn al-Muslim 108.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0648\u0631\u062f \u0647\u0630\u0627 \u0627\u0644\u062d\u0645\u062f \u0639\u0646\u062f \u0627\u0644\u0646\u0648\u0645 \u0641\u064a \u0635\u062d\u064a\u062d \u0645\u0633\u0644\u0645.",
+      "عَنْ أَنَسٍ رَضِيَ اللَّهُ عَنْهُ أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ قَالَ: «الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا...».",
     authenticityNote: "Sahih Muslim.",
-    notes: "",
-    sourceUrl: "https://sunnah.com/hisn%3A108",
+  },
+  {
+    id: "s-hm-107",
+    category: "before_sleep",
+    orderIndex: 13,
+    arabicText:
+      "اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَرَبَّ الْعَرْشِ الْعَظِيمِ، رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ، فَالِقَ الْحَبِّ وَالنَّوَى، وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ. اللَّهُمَّ أَنْتَ الْأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الْآخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنَّا الدَّيْنَ، وَأَغْنِنَا مِنَ الْفَقْرِ.",
+    transliteration:
+      "Allahumma Rabbas-samawatis-sab'i wa Rabbal-'Arshil-'Azim, Rabbana wa Rabba kulli shay', faliqal-habbi wan-nawa, wa munzilat-Tawrati wal-Injili wal-Furqan...",
+    translation:
+      "O Allah, Lord of the seven heavens and Lord of the Magnificent Throne, our Lord and Lord of everything...",
+    benefit: "Deep supplication for debt clearance and spiritual protection.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 2713; Hisn al-Muslim 107.",
+    preferredTiming: "Before sleeping.",
+    hadithText: "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ يَدْعُو عِنْدَ النَّوْمِ...",
+    authenticityNote: "Sahih Muslim.",
   },
   {
     id: "s-hm-109",
     category: "before_sleep",
-    orderIndex: 12,
+    orderIndex: 14,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0639\u064e\u0627\u0644\u0650\u0645\u064e \u0627\u0644\u0652\u063a\u064e\u064a\u0652\u0628\u0650 \u0648\u064e\u0627\u0644\u0634\u0651\u064e\u0647\u064e\u0627\u062f\u064e\u0629\u0650\u060c \u0641\u064e\u0627\u0637\u0650\u0631\u064e \u0627\u0644\u0633\u0651\u064e\u0645\u064e\u0627\u0648\u064e\u0627\u062a\u0650 \u0648\u064e\u0627\u0644\u0623\u064e\u0631\u0652\u0636\u0650\u060c \u0631\u064e\u0628\u0651\u064e \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d \u0648\u064e\u0645\u064e\u0644\u0650\u064a\u0643\u064e\u0647\u064f\u060c \u0623\u064e\u0634\u0652\u0647\u064e\u062f\u064f \u0623\u064e\u0646\u0652 \u0644\u0627\u064e \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0627\u0651\u064e \u0623\u064e\u0646\u0652\u062a\u064e\u060c \u0623\u064e\u0639\u064f\u0648\u0630\u064f \u0628\u0650\u0643\u064e \u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0646\u064e\u0641\u0652\u0633\u0650\u064a\u060c \u0648\u064e\u0645\u0650\u0646\u0652 \u0634\u064e\u0631\u0651\u0650 \u0627\u0644\u0634\u0651\u064e\u064a\u0652\u0637\u064e\u0627\u0646\u0650 \u0648\u064e\u0634\u0650\u0631\u0652\u0643\u0650\u0647\u0650\u060c \u0648\u064e\u0623\u064e\u0646\u0652 \u0623\u064e\u0642\u0652\u062a\u064e\u0631\u0650\u0641\u064e \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0633\u064f\u0648\u0621\u064b\u0627\u060c \u0623\u064e\u0648\u0652 \u0623\u064e\u062c\u064f\u0631\u0651\u064e\u0647\u064f \u0625\u0650\u0644\u064e\u0649 \u0645\u064f\u0633\u0652\u0644\u0650\u0645\u064d.",
-    transliteration:
-      "All\u0101humma \u02bf\u0101limal-ghaybi wash-shah\u0101dah, f\u0101\u1e6diras-sam\u0101w\u0101ti wal-ar\u1e0d, Rabba kulli shay\u2019in wa mal\u012bkah, ash-hadu an l\u0101 il\u0101ha ill\u0101 ant, a\u02bf\u016bdhu bika min sharri nafs\u012b, wa min sharrish-shay\u1e6d\u0101ni wa shirkih, wa an aqtarifa \u02bfal\u0101 nafs\u012b s\u016b\u2019an, aw ajurrahu il\u0101 Muslim.",
-    translation:
-      "O Allah, Knower of the unseen and witnessed, Creator of the heavens and earth, Lord and Sovereign of everything. I bear witness that none is worthy of worship but You. I seek refuge in You from the evil of myself and from the evil of Satan and his shirk, and from committing evil against myself or bringing it upon a Muslim.",
-    benefit: "Duplicate wording with HM-85; retained here because Hisn lists it in before-sleep chapter too.",
+      "اللَّهُمَّ عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي، وَمِنْ شَرِّ الشَّيْطَانِ وَشِرْكِهِ، وَأَنْ أَقْتَرِفَ عَلَى نَفْسِي سُوءًا، أَوْ أَجُرَّهُ إِلَى مُسْلِمٍ.",
+    transliteration: "Allahumma 'Alimal-ghaybi wash-shahadah, Fatiras-samawati wal-ard...",
+    translation: "O Allah, Knower of the unseen and witnessed, Creator of the heavens and earth...",
+    benefit: "Protects against self-harm, Satan, and wronging others.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Abu Dawud 4/317; At-Tirmidhi; Hisn al-Muslim 109.",
-    preferredTiming: "Before sleeping; also said morning/evening.",
-    hadithText:
-      "\u0642\u0627\u0644 \ufdfa \u0644\u0623\u0628\u064a \u0628\u0643\u0631 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u00ab\u0642\u064f\u0644\u0652\u0647\u064f \u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062e\u064e\u0630\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e\u00bb.",
-    authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
-    notes: "Duplicate wording with HM-85; retained here because Hisn lists it in before-sleep chapter too.",
-    sourceUrl: "https://sunnah.com/hisn%3A109",
-  },
-  {
-    id: "s-hm-110",
-    category: "before_sleep",
-    orderIndex: 13,
-    arabicText:
-      "\u064a\u064e\u0642\u0652\u0631\u064e\u0623\u064f \u0633\u064f\u0648\u0631\u064e\u0629\u064e \u0627\u0644\u0633\u0651\u064e\u062c\u0652\u062f\u064e\u0629\u0650 \u0648\u064e\u0633\u064f\u0648\u0631\u064e\u0629\u064e \u0627\u0644\u0652\u0645\u064f\u0644\u0652\u0643\u0650.",
-    transliteration: "Yaqra\u2019u S\u016brat as-Sajdah wa S\u016brat al-Mulk.",
-    translation: "Recite Surah as-Sajdah and Surah al-Mulk.",
-    benefit: "Full surah text not expanded to keep the workbook usable; recite from Qur\u2019an.",
-    repetitionCount: 1,
-    countLabel: "1 each",
-    sourceReference: "At-Tirmidhi; An-Nasa\u2019i; Hisn al-Muslim 110.",
+    sourceReference: "Sunan Abu Dawud 5067; Jami' at-Tirmidhi 3392; Hisn al-Muslim 109.",
     preferredTiming: "Before sleeping.",
     hadithText:
-      "\u0648\u0631\u062f \u0623\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0643\u0627\u0646 \u0644\u0627 \u064a\u0646\u0627\u0645 \u062d\u062a\u0649 \u064a\u0642\u0631\u0623: \ufd3f\u0627\u0644\u0645 * \u062a\u0646\u0632\u064a\u0644\ufd3e \u0627\u0644\u0633\u062c\u062f\u0629\u060c \u0648\ufd3f\u062a\u0628\u0627\u0631\u0643 \u0627\u0644\u0630\u064a \u0628\u064a\u062f\u0647 \u0627\u0644\u0645\u0644\u0643\ufd3e.",
-    authenticityNote: "Authenticated by al-Albani in Sahih al-Jami\u02bf as cited in Hisn al-Muslim/Sunnah.com.",
-    notes: "Full surah text not expanded to keep the workbook usable; recite from Qur\u2019an.",
-    sourceUrl: "https://sunnah.com/hisn%3A110",
+      "قَالَ ﷺ لِأَبِي بَكْرٍ الصِّدِّيقِ رَضِيَ اللَّهُ عَنْهُ: «قُلْهَا إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "s-hm-111",
     category: "before_sleep",
-    orderIndex: 14,
+    orderIndex: 15,
     arabicText:
-      "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0623\u064e\u0633\u0652\u0644\u064e\u0645\u0652\u062a\u064f \u0646\u064e\u0641\u0652\u0633\u0650\u064a \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0648\u064e\u0641\u064e\u0648\u0651\u064e\u0636\u0652\u062a\u064f \u0623\u064e\u0645\u0652\u0631\u0650\u064a \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0648\u064e\u0648\u064e\u062c\u0651\u064e\u0647\u0652\u062a\u064f \u0648\u064e\u062c\u0652\u0647\u0650\u064a \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0648\u064e\u0623\u064e\u0644\u0652\u062c\u064e\u0623\u0652\u062a\u064f \u0638\u064e\u0647\u0652\u0631\u0650\u064a \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0631\u064e\u063a\u0652\u0628\u064e\u0629\u064b \u0648\u064e\u0631\u064e\u0647\u0652\u0628\u064e\u0629\u064b \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0644\u0627\u064e \u0645\u064e\u0644\u0652\u062c\u064e\u0623\u064e \u0648\u064e\u0644\u0627\u064e \u0645\u064e\u0646\u0652\u062c\u064e\u0627 \u0645\u0650\u0646\u0652\u0643\u064e \u0625\u0650\u0644\u0627\u0651\u064e \u0625\u0650\u0644\u064e\u064a\u0652\u0643\u064e\u060c \u0622\u0645\u064e\u0646\u0652\u062a\u064f \u0628\u0650\u0643\u0650\u062a\u064e\u0627\u0628\u0650\u0643\u064e \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u0623\u064e\u0646\u0652\u0632\u064e\u0644\u0652\u062a\u064e\u060c \u0648\u064e\u0628\u0650\u0646\u064e\u0628\u0650\u064a\u0651\u0650\u0643\u064e \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u0623\u064e\u0631\u0652\u0633\u064e\u0644\u0652\u062a\u064e.",
+      "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ.",
     transliteration:
-      "All\u0101humma aslamtu nafs\u012b ilayk, wa fawwa\u1e0dtu amr\u012b ilayk, wa wajjahtu wajh\u012b ilayk, wa alja\u2019tu \u1e93ahr\u012b ilayk, raghbatan wa rahbatan ilayk, l\u0101 malja\u2019a wa l\u0101 manj\u0101 minka ill\u0101 ilayk, \u0101mantu bikit\u0101bikal-ladh\u012b anzalt, wa binabiyyikal-ladh\u012b arsalt.",
+      "Allahumma aslamtu nafsi ilayk, wa fawwadtu amri ilayk, wa wajjahtu wajhi ilayk, wa alja'tu zahri ilayk, raghbatan wa rahbatan ilayk...",
     translation:
-      "O Allah, I submit myself to You, entrust my affair to You, turn my face to You, and lay my back relying upon You, hoping in You and fearing You. There is no refuge and no escape from You except to You. I believe in Your Book that You revealed and Your Prophet whom You sent.",
-    benefit: "Make it the last supplication before sleep when possible.",
+      "O Allah, I submit myself to You, entrust my affair to You, turn my face to You, and lay my back relying upon You... I believe in Your Book that You revealed and Your Prophet whom You sent.",
+    benefit:
+      "Make it the last supplication before sleep. If you die that night, you die upon natural faith (al-Fitrah).",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Al-Bukhari 11/113; Muslim 4/2081; Hisn al-Muslim 111.",
-    preferredTiming: "Before sleeping; perform wudu, lie on the right side, and make this the final words if possible.",
+    sourceReference: "Sahih al-Bukhari 247; Sahih Muslim 2710; Hisn al-Muslim 111.",
+    preferredTiming: "Before sleeping; perform wudu, lie on the right side, and make this the final words.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa: \u00ab\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062a\u064e\u064a\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e \u0641\u064e\u062a\u064e\u0648\u064e\u0636\u0651\u064e\u0623\u0652 \u0648\u064f\u0636\u064f\u0648\u0621\u064e\u0643\u064e \u0644\u0650\u0644\u0635\u0651\u064e\u0644\u0627\u064e\u0629\u0650\u060c \u062b\u064f\u0645\u0651\u064e \u0627\u0636\u0652\u0637\u064e\u062c\u0650\u0639\u0652 \u0639\u064e\u0644\u064e\u0649 \u0634\u0650\u0642\u0651\u0650\u0643\u064e \u0627\u0644\u0623\u064e\u064a\u0652\u0645\u064e\u0646\u0650\u060c \u062b\u064f\u0645\u0651\u064e \u0642\u064f\u0644\u0652...\u00bb \u062b\u0645 \u0642\u0627\u0644: \u00ab\u0641\u064e\u0625\u0650\u0646\u0652 \u0645\u064f\u062a\u0651\u064e \u0645\u0650\u0646\u0652 \u0644\u064e\u064a\u0652\u0644\u064e\u062a\u0650\u0643\u064e \u0641\u064e\u0623\u064e\u0646\u0652\u062a\u064e \u0639\u064e\u0644\u064e\u0649 \u0627\u0644\u0652\u0641\u0650\u0637\u0652\u0631\u064e\u0629\u0650\u060c \u0648\u064e\u0627\u062c\u0652\u0639\u064e\u0644\u0652\u0647\u064f\u0646\u0651\u064e \u0622\u062e\u0650\u0631\u064e \u0645\u064e\u0627 \u062a\u064e\u062a\u064e\u0643\u064e\u0644\u0651\u064e\u0645\u064f \u0628\u0650\u0647\u0650\u00bb.",
+      "قَالَ النَّبِيُّ ﷺ لِلْبَرَاءِ بْنِ عَازِبٍ رَضِيَ اللَّهُ عَنْهُ: «إِذَا أَتَيْتَ مَضْجَعَكَ فَتَوَضَّأْ وُضُوءَكَ لِلصَّلَاةِ... وَاجْعَلْهُنَّ آخِرَ مَا تَتَكَلَّمُ بِهِ...».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
-    notes: "Make it the last supplication before sleep when possible.",
-    sourceUrl: "https://sunnah.com/hisn%3A111",
   },
 ];
 
@@ -1450,7 +1493,7 @@ const MOSQUE_AZKAR: Zikr[] = [
     category: "mosque",
     orderIndex: 1,
     arabicText:
-      "بِسْمِ اللَّهِ وَالصَّلاَةُ وَالسَّلاَمُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ، اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ.",
+      "بِسْمِ اللَّهِ وَالصَّلاَةُ وَالسَّلاَمُ عَلَى رَسُولِ اللَّهِ، اللَّهُمَّ إِنِّي أَسأَلُكَ مِنْ فَضْلِكَ، اللَّهُمَّ اعْصِمْنِي مِنَ الشَّيْطَانِ الرَّجِيمِ.",
     transliteration:
       "Bismillāhi waṣ-ṣalātu was-salāmu ʿalā rasūlillāh, Allāhumma innī as’aluka min faḍlik, Allāhummaʿṣimnī minash-shayṭānir-rajīm.",
     translation:
@@ -1459,7 +1502,7 @@ const MOSQUE_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
-    hadithText: "وَإِذَا خَرَجَ فَلْيَقُلِ اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ.",
+    hadithText: "وَإِذَا خَرَجَ فَلْيَقُلِ اللَّهُمَّ إِنِّي أَسأَلُكَ مِنْ فَضْلِكَ.",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -1476,25 +1519,47 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih Muslim 591; Hisn al-Muslim 66.",
+    hadithText: "عن ثوبان رضي الله عنه قال: «كان رسول الله ﷺ إذا انصرف من صلاته استغفر ثلاثاً...»",
     authenticityNote: "Sahih Muslim.",
   },
   {
     id: "ap-ref-2",
     category: "after_prayer",
     orderIndex: 1,
-    arabicText: "اللَّهُمَّ أَنتَ السَّلَامُ وَمِنكَ السَّلَامُ تَبَارَكتَ ذَا الجَلَالِ وَالإِكرَامِ",
-    transliteration: "Allahumma antas-salamu wa minkas-salam, tabarakta dhal-jalali wal-ikram",
+    arabicText: "اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ",
+    transliteration: "Allahumma antas-salamu wa minkas-salam, tabarakta ya dhal-jalali wal-ikram",
     translation: "O Allah, You are Peace and from You comes peace. Blessed are You, O Possessor of Majesty and Honor.",
     benefit: "Recited immediately after prayer.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 592; Hisn al-Muslim 66.",
+    hadithText:
+      "عن ثوبان رضي الله عنه قال: كان رسول الله ﷺ إذا انصرف من صلاته استغفر ثلاثاً وقال: «اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ».",
     authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ap-ref-9",
+    category: "after_prayer",
+    orderIndex: 2,
+    arabicText:
+      "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ. ﴿اللَّهُ لَا إِلَٰهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ ۚ لَا تَأْخُذُهُ سِنَةٌ وَلَا نَوْمٌ ۚ لَهُ مَا فِي السَّمَاوَاتِ وَمَا فِي الْأَرْضِ ۗ مَنْ ذَا الَّذِي يَشْفَعُ عِنْدَهُ إِلَّا بِإِذْنِهِ ۚ يَعْلَمُ مَا بَيْنَ أَيْدِيهِمْ وَمَا خَلْفَهُمْ ۖ وَلَا يُحِيطُونَ بِشَيْءٍ مِنْ عِلْمِهِ إِلَّا بِمَا شَاءَ ۚ وَسِعَ كُرْسِيُّهُ السَّمَاوَاتِ وَالْأَرْضَ ۖ وَلَا يَئُودُهُ حِفْظُهُمَا ۚ وَهُوَ الْعَلِيُّ الْعَظِيمُ﴾",
+    transliteration:
+      "A'udhu billahi minash-shaytanir-rajim. Allahu la ilaha illa huwal-Hayyul-Qayyum, la ta'khudhuhu sinatun wa la nawm, lahu ma fis-samawati wa ma fil-ard, man dhal-ladhi yashfa'u 'indahu illa bi'idhnih, ya'lamu ma bayna aydihim wa ma khalfahum, wa la yuhituna bishay'im-min 'ilmihi illa bima sha', wasi'a kursiyyuhus-samawati wal-ard, wa la ya'uduhu hifzuhuma, wa huwal-'Aliyyul-'Azim.",
+    translation:
+      "Allah—there is none worthy of worship except Him, the Ever-Living, the Sustainer. Neither drowsiness nor sleep overtakes Him. To Him belongs whatever is in the heavens and earth. None can intercede except by His permission. He knows what is before and behind them; they encompass nothing of His knowledge except what He wills. His Kursi extends over the heavens and earth, and preserving them does not tire Him. He is the Most High, the Magnificent.",
+    benefit:
+      "Whoever recites Ayat Al-Kursi after each obligatory prayer, nothing prevents him from entering Paradise except death.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sunan an-Nasa'i 9928; Ibn Hibban 2004; Hisn al-Muslim 31.",
+    hadithText:
+      "عن أبي أمامة رضي الله عنه قال: قال رسول الله ﷺ: «من قرأ آية الكرسي دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا أن يموت».",
+    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "ap-ref-3",
     category: "after_prayer",
-    orderIndex: 2,
+    orderIndex: 3,
     arabicText:
       "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
     transliteration:
@@ -1505,12 +1570,14 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 6329; Sahih Muslim 595; Hisn al-Muslim 25.",
+    hadithText:
+      "عن المغيرة بن شعبة رضي الله عنه أن النبي ﷺ كان يقول في دبر كل صلاة مكتوبة: «لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
     id: "ap-ref-4",
     category: "after_prayer",
-    orderIndex: 3,
+    orderIndex: 4,
     arabicText:
       "اللَّهُمَّ لَا مَانِعَ لِمَا أَعطَيتَ وَلَا مُعطِيَ لِمَا مَنَعتَ وَلَا يَنفَعُ ذَا الجَدِّ مِنكَ الجَدُّ",
     transliteration: "Allahumma la mani'a lima a'tayta wa la mu'tiya lima mana'ta wa la yanfa'u dhal-jaddi minkal-jadd",
@@ -1520,28 +1587,76 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 844; Sahih Muslim 593; Hisn al-Muslim 26.",
+    hadithText:
+      "عن المغيرة بن شعبة رضي الله عنه قال: سمعت النبي ﷺ يقول حين يسلم: «اللَّهُمَّ لَا مَانِعَ لِمَا أَعطَيتَ وَلَا مُعطِيَ لِمَا مَنَعتَ وَلَا يَنفَعُ ذَا الجَدِّ مِنكَ الجَدُّ».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
-    id: "ap-ref-5",
+    id: "ap-tasbeeh-subhanallah",
     category: "after_prayer",
-    orderIndex: 4,
-    arabicText:
-      "سُبحَانَ اللَّهِ × ٣٣ / الحَمدُ لِلَّهِ × ٣٣ / اللَّهُ أَكبَرُ × ٣٣ ، ثُمَّ: لَا إِلَهَ إِلَّا اللَّهُ وَحدَهُ لَا شَرِيكَ لَهُ، لَهُ المُلكُ وَلَهُ الحَمدُ وَهُوَ عَلَى كُلِّ شَيءٍ قَدِيرٌ",
-    transliteration:
-      "SubhanAllah (33x), Alhamdulillah (33x), Allahu Akbar (33x), complete 100 with La ilaha illallah...",
-    translation:
-      "Glory be to Allah (33x), Praise be to Allah (33x), Allah is the Greatest (33x) — completed to 100 with Tawhid.",
-    benefit: "Whoever says this after every prayer, his sins will be forgiven even if abundant as sea foam.",
-    repetitionCount: 99,
-    countLabel: "99",
+    orderIndex: 5,
+    arabicText: "سُبْحَانَ اللَّهِ",
+    transliteration: "Subhanallah",
+    translation: "Glory be to Allah.",
+    benefit: "Recited 33 times after obligatory prayer.",
+    repetitionCount: 33,
+    countLabel: "33",
     sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «من سبح الله في دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين، وكبر الله ثلاثاً وثلاثين... غُفرت خطاياه وإن كانت مثل زبد البحر».",
+    authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ap-tasbeeh-alhamdulillah",
+    category: "after_prayer",
+    orderIndex: 6,
+    arabicText: "الْحَمْدُ لِلَّهِ",
+    transliteration: "Alhamdulillah",
+    translation: "Praise be to Allah.",
+    benefit: "Recited 33 times after obligatory prayer.",
+    repetitionCount: 33,
+    countLabel: "33",
+    sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «من سبح الله في دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين...».",
+    authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ap-tasbeeh-allahuakbar",
+    category: "after_prayer",
+    orderIndex: 7,
+    arabicText: "اللَّهُ أَكْبَرُ",
+    transliteration: "Allahu Akbar",
+    translation: "Allah is the Greatest.",
+    benefit: "Recited 33 times after obligatory prayer.",
+    repetitionCount: 33,
+    countLabel: "33",
+    sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
+    hadithText: "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «...وكبر الله ثلاثاً وثلاثين، فتلك تسعة وتسعون...».",
+    authenticityNote: "Sahih Muslim.",
+  },
+  {
+    id: "ap-tasbeeh-tawhid",
+    category: "after_prayer",
+    orderIndex: 8,
+    arabicText:
+      "لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ",
+    transliteration:
+      "La ilaha illallahu wahdahu la sharika lah, lahul-mulku wa lahul-hamdu wa huwa 'ala kulli shay'in qadir",
+    translation:
+      "None has the right to be worshipped except Allah alone, with no partner. His is the kingdom and praise, and He has power over all things.",
+    benefit: "Completed to 100 with Tawhid following the 99 Tasbeehs.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ: «...وقال تمام المائة: لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير غفرت خطاياه وإن كانت مثل زبد البحر».",
     authenticityNote: "Sahih Muslim.",
   },
   {
     id: "ap-ref-6",
     category: "after_prayer",
-    orderIndex: 5,
+    orderIndex: 9,
     arabicText: "رَبِّ أَعِنِّي عَلَى ذِكرِكَ وَشُكرِكَ وَحُسنِ عِبَادَتِكَ",
     transliteration: "Rabbi a'inni 'ala dhikrika wa shukrika wa husni 'ibadatik",
     translation: "My Lord, help me to remember You, be grateful to You, and worship You in an excellent manner.",
@@ -1549,12 +1664,14 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan an-Nasa'i al-Kubra 1226; Mustadrak al-Hakim 1/273; Hisn al-Muslim 28.",
+    hadithText:
+      "عن معاذ بن جبل رضي الله عنه أن رسول الله ﷺ أخذ بيده وقال: «يا معاذ، والله إني لأحبك، أوصيك يا معاذ لا تدعن في دبر كل صلاة تقول: اللَّهُمَّ أَعِنِّي عَلَى ذِكرِكَ وَشُكرِكَ وَحُسنِ عِبَادَتِكَ».",
     authenticityNote: "Sahih (Abu Dawud & An-Nasa'i).",
   },
   {
     id: "ap-ref-7",
     category: "after_prayer",
-    orderIndex: 6,
+    orderIndex: 10,
     arabicText:
       "لَا إِلَهَ إِلَّا اللَّهُ وَحدَهُ لَا شَرِيكَ لَهُ، لَهُ المُلكُ وَلَهُ الحَمدُ يُحيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيءٍ قَدِيرٌ",
     transliteration:
@@ -1565,12 +1682,14 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 10,
     countLabel: "10",
     sourceReference: "Jami' at-Tirmidhi 3474; Hisn al-Muslim 29.",
+    hadithText:
+      "عن أبي ذر رضي الله عنه أن رسول الله ﷺ قال: «من قال في دبر صلاة الفجر وهو ثاني رجليه قبل أن يتكلم: لا إله إلا الله وحده لا شريك له... عشر مرات كتب الله له عشر حسنات ومحا عنه عشر سيئات...».",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "ap-ref-8",
     category: "after_prayer",
-    orderIndex: 7,
+    orderIndex: 11,
     arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ فِعلَ الخَيرَاتِ وَتَركَ المُنكَرَاتِ وَحُبَّ المَسَاكِينِ",
     transliteration: "Allahumma inni as'aluka fi'lal-khayrati wa tarkal-munkarati wa hubbal-masakin",
     translation:
@@ -1579,26 +1698,14 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3233; Hisn al-Muslim 30.",
+    hadithText:
+      "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال الله تعالى: «يا محمد، إذا صليت فقل: اللهم إني أسألك فعل الخيرات وترك المنكرات وحب المساكين...».",
     authenticityNote: "Sahih at-Tirmidhi.",
-  },
-  {
-    id: "ap-ref-9",
-    category: "after_prayer",
-    orderIndex: 8,
-    arabicText: "آيَةُ الكُرسِيّ (اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ...)",
-    transliteration: "Ayat al-Kursi (Quran 2:255)",
-    translation: "Ayat al-Kursi (Quran 2:255) — recited once after each obligatory prayer.",
-    benefit:
-      "Whoever recites it after each obligatory prayer, nothing prevents him from entering Paradise except death.",
-    repetitionCount: 1,
-    countLabel: "1",
-    sourceReference: "Sunan an-Nasa'i 9928; Ibn Hibban 2004; Hisn al-Muslim 31.",
-    authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
     id: "ap-ref-10",
     category: "after_prayer",
-    orderIndex: 9,
+    orderIndex: 12,
     arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ عِلمًا نَافِعًا وَرِزقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا",
     transliteration: "Allahumma inni as'aluka 'ilman nafi'an wa rizqan tayyiban wa 'amalan mutaqabbala",
     translation: "O Allah, I ask You for beneficial knowledge, wholesome provision, and accepted deeds.",
@@ -1606,6 +1713,8 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Ibn Majah 925; Hisn al-Muslim 32.",
+    hadithText:
+      "عن أم سلمة رضي الله عنها أن النبي ﷺ كان يقول إذا صلى الصبح حين يسلم: «اللَّهُمَّ إِنِّي أَسأَلُكَ عِلمًا نَافِعًا وَرِزقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا».",
     authenticityNote: "Authenticated by al-Albani.",
   },
 ];
@@ -1622,6 +1731,8 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 101; Sunan Ibn Majah 399; Hisn al-Muslim 8.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «لا صلاة لمن لا وضوء له، ولا وضوء لمن لم يذكر اسم الله عليه».",
     authenticityNote: "Hasan (Abu Dawud & Ibn Majah).",
   },
   {
@@ -1635,6 +1746,8 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Ibn Majah 299.",
+    hadithText:
+      "عن أبي موسى الأشعري رضي الله عنه قال: أتيت النبي ﷺ بوضوء فتوضأ فسمعته يدعو يقول: «اللَّهُمَّ اغفِر لِي ذَنبِي وَوَسِّع لِي فِي دَارِي وَبَارِك لِي فِي رِزقِي».",
     authenticityNote: "Hasan by al-Albani.",
   },
   {
@@ -1648,6 +1761,8 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 142; Sahih Muslim 375; Hisn al-Muslim 6.",
+    hadithText:
+      "عن أنس بن مالك رضي الله عنه قال: كان النبي ﷺ إذا دخل الخلاء قال: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الخُبُثِ وَالخَبَائِثِ».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1661,6 +1776,7 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 30; Jami' at-Tirmidhi 7; Hisn al-Muslim 7.",
+    hadithText: "عن عائشة رضي الله عنها قَالَت: كَانَ النَّبِيُّ ﷺ إِذَا خَرَجَ مِنَ الخَلَاءِ قَالَ: «غُفرَانَكَ».",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1677,6 +1793,8 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 234; Hisn al-Muslim 9.",
+    hadithText:
+      "عن عمر بن الخطاب رضي الله عنه قال: قال رسول الله ﷺ: «ما منكم من أحد يتوضأ فيسبغ الوضوء ثم يقول: أشهد أن لا إله إلا الله وحده لا شريك له... إلا فتحت له أبواب الجنة الثمانية».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1691,6 +1809,8 @@ const RESTROOM_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3/153; Sunan an-Nasa'i; Hisn al-Muslim 10.",
+    hadithText:
+      "عن أبي سعيد الخدري رضي الله عنه عن النبي ﷺ قال: «من توضأ فقال: سبحانك اللهم وبحمدك... كُتب في رق ثم طُبع بطابع فلم يُكسر إلى يوم القيامة».",
     authenticityNote: "Authenticated by al-Albani.",
   },
 ];
@@ -1707,6 +1827,7 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 3/347; Jami' at-Tirmidhi 4/288; Hisn al-Muslim 178.",
+    hadithText: "عن عائشة رضي الله عنها أن رسول الله ﷺ قال: «إذا أكل أحدكم فليذكر اسم الله تعالى...».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1720,6 +1841,7 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 3767; Jami' at-Tirmidhi 1858; Hisn al-Muslim 178.",
+    hadithText: "عن عائشة رضي الله عنها أن رسول الله ﷺ قال: «فإن نسي في أوله فليقل: بسم الله في أوله وآخره».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1733,6 +1855,8 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 179.",
+    hadithText:
+      "عن أبي سعيد الخدري رضي الله عنه أن النبي ﷺ كان إذا فرغ من طعامه قال: «الحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1749,6 +1873,8 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/84; Hisn al-Muslim 180.",
+    hadithText:
+      "عن أبي أمامة رضي الله عنه أن النبي ﷺ كان إذا رفع مائدته قال: «الحَمدُ لِلَّهِ حَمدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ غَيرَ مَكفِيٍّ وَلَا مُوَدَّعٍ وَلَا مُستَغنًى عَنهُ رَبَّنَا».",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -1762,6 +1888,8 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 5/506; Hisn al-Muslim 181.",
+    hadithText:
+      "عن ابن عباس رضي الله عنهما قال: قال رسول الله ﷺ: «من أطعمه الله طعاماً فليقل: اللهم بارك لنا فيه وأطعمنا خيراً منه».",
     authenticityNote: "Sahih by al-Albani.",
   },
   {
@@ -1775,6 +1903,8 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 2055; Hisn al-Muslim 182.",
+    hadithText:
+      "عن المقداد رضي الله عنه في حديثه الطويل عن النبي ﷺ أنه دعا فقال: «اللَّهُمَّ أَطعِم مَن أَطعَمَنِي وَاسقِ مَن سَقَانِي».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1789,6 +1919,8 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 3854; Sunan Ibn Majah 1747; Hisn al-Muslim 183.",
+    hadithText:
+      "عن أنس بن مالك رضي الله عنه أن النبي ﷺ جاء إلى سعد بن عبادة فجاء بخبز وزيت فأكل، ثم قال النبي ﷺ: «أَفطَرَ عِندَكُمُ الصَّائِمُونَ وَأَكَلَ طَعَامَكُمُ الأَبرَارُ وَصَلَّت عَلَيكُمُ المَلَائِكَةُ».",
     authenticityNote: "Sahih (Abu Dawud).",
   },
 ];
@@ -1806,6 +1938,8 @@ const CLOTHING_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 2.",
+    hadithText:
+      "عن معاذ بن أنس رضي الله عنه أن رسول الله ﷺ قال: «من لبس ثوباً فقال: الحمد لله الذي كساني هذا ورزقنيه من غير حول مني ولا قوة غُفر له ما تقدم من ذنبه».",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1822,6 +1956,8 @@ const CLOTHING_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 4020; Jami' at-Tirmidhi 1767; Hisn al-Muslim 3.",
+    hadithText:
+      "عن أبي سعيد الخدري رضي الله عنه قال: كان رسول الله ﷺ إذا استجد ثوباً سماه باسمه ثم يقول: «اللَّهُمَّ لَكَ الحَمدُ أَنتَ كَسَوتَنِيهِ...».",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -1835,6 +1971,8 @@ const CLOTHING_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 4020; Hisn al-Muslim 4.",
+    hadithText:
+      "عن أم خالد بنت خالد بن سعيد رضي الله عنها قَالَت: أُتِيَ النَّبِيُّ ﷺ بِثِيَابٍ فِيهَا خَمِيصَةٌ سَوْدَاءُ صَغِيرَةٌ فَكَسَاهَا إِيَّاهَا وَقَالَ: «تُبْلِي وَيُخْلِفُ اللَّهُ تَعَالَى».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -1848,6 +1986,8 @@ const CLOTHING_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Ibn Majah 297; Jami' at-Tirmidhi; Hisn al-Muslim 5.",
+    hadithText:
+      "عن علي بن أبي طالب رضي الله عنه أن رسول الله ﷺ قال: «ستر ما بين أعين الجن وعورات بني آدم إذا وضع أحدهم ثوبه أن يقول: بسم الله».",
     authenticityNote: "Authenticated.",
   },
 ];
@@ -1867,6 +2007,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2602; Hisn al-Muslim 75.",
+    hadithText:
+      "عن ابن عمر رضي الله عنهما أن رسول الله ﷺ كان إذا استوى على بعيره خارجاً إلى سفر كبر ثلاثاً ثم قال: «سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ...».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1880,6 +2022,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 1342; Hisn al-Muslim 76.",
+    hadithText:
+      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان يقول في سفره: «اللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1893,6 +2037,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2600; Hisn al-Muslim 76.",
+    hadithText:
+      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان يقول: «اللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1909,6 +2055,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 1343; Hisn al-Muslim 77.",
+    hadithText:
+      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان إذا رجع كبر على كل شرف... وقال: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ...».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1922,6 +2070,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 3/418; Sahih Muslim 1345; Hisn al-Muslim 78.",
+    hadithText:
+      "عن أنس بن مالك رضي الله عنه قال: أقبلنا مع النبي ﷺ حتى إذا كنا بظهر المدينة قال: «آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ» فما زال يقولها حتى قدمنا المدينة.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1935,6 +2085,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Ibn al-Sunni; al-Hakim; Hisn al-Muslim 80.",
+    hadithText:
+      "عن صهيب رضي الله عنه أن النبي ﷺ لم ير قرية يريد دخولها إلا قال حين يراها: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ... اجعَل لَنَا فِيهَا قَرَارًا وَرِزقًا حَسَنًا».",
     authenticityNote: "Hasan.",
   },
   {
@@ -1949,6 +2101,8 @@ const TRAVEL_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Ibn al-Sunni; Hisn al-Muslim 80.",
+    hadithText:
+      "عن صهيب رضي الله عنه أن النبي ﷺ كان يقول إذا دخل قرية: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَ هَذِهِ القَريَةِ وَخَيرَ أَهلِهَا وَأَعُوذُ بِكَ مِن شَرِّهَا».",
     authenticityNote: "Hasan.",
   },
 ];
@@ -1968,6 +2122,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 6363; Sunan Abu Dawud 1555; Hisn al-Muslim 120.",
+    hadithText:
+      "عن أنس بن مالك رضي الله عنه قال: كنت أخدم رسول الله ﷺ فكنت أسمعه يكثر أن يقول: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الهَمِّ وَالحَزَنِ...».",
     authenticityNote: "Sahih al-Bukhari and Sunan Abu Dawud.",
   },
   {
@@ -1982,6 +2138,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3505; Quran 21:87; Hisn al-Muslim 121.",
+    hadithText:
+      "عن سعد بن أبي وقاص رضي الله عنه قال: قال رسول الله ﷺ: «دعوة ذي النون إذ دعا وهو في بطن الحوت: لا إله إلا أنت سبحانك إني كنت من الظالمين، فإنه لم يدع بها رجل مسلم في شيء قط إلا استجاب الله له».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -1995,6 +2153,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 1525; Hisn al-Muslim 122.",
+    hadithText:
+      "عن أسماء بنت عميس رضي الله عنها قالت: قال لي رسول الله ﷺ: «ألا أعلمك كلمات تقولينهن عند الكرب: الله الله ربي لا أشرك به شيئاً».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2011,6 +2171,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 5090; Hisn al-Muslim 123.",
+    hadithText:
+      "عن أبي بكرة رضي الله عنه أن رسول الله ﷺ قال: «دعوات المكروب: اللَّهُمَّ رَحمَتَكَ أَرجُو فَلَا تَكِلنِي إِلَى نَفسِي طَرفَةَ عَينٍ وَأَصلِح لِي شَأنِي كُلَّهُ لَا إِلَهَ إِلَّا أَنتَ».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2025,6 +2187,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 7,
     countLabel: "7",
     sourceReference: "Sunan Abu Dawud 5081; Ibn al-Sunni; Hisn al-Muslim 124.",
+    hadithText:
+      "عن أبي الدرداء رضي الله عنه قال: «من قال إذا أصبح وإذا أمسى: حسبي الله لا إله إلا هو عليه توكلت وهو رب العرش العظيم سبع مرات كفاه الله ما أهمه من أمر الدنيا والآخرة».",
     authenticityNote: "Hasan by al-Albani.",
   },
   {
@@ -2041,6 +2205,8 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Musnad Ahmad 1/391; Ibn Hibban; Hisn al-Muslim 125.",
+    hadithText:
+      "عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «ما أصاب أحداً قط هم ولا حزن فقال: اللهم إني عبدك وابن عبدك وابن أمتك... إلا أذهب الله همه وأبدله مكانه فرجاً».",
     authenticityNote: "Authenticated by Ibn Hibban and al-Albani.",
   },
 ];
@@ -2057,6 +2223,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 7,
     countLabel: "7",
     sourceReference: "Sahih Muslim 2202; Hisn al-Muslim 131.",
+    hadithText:
+      "عن عثمان بن أبي العاص رضي الله عنه أنه شكى إلى رسول الله ﷺ وجعاً، فقال له رسول الله ﷺ: «ضع يدك على الذي يلمس من جسدك وقل: باسم الله ثلاثاً، وقل سبع مرات: أَعُوذُ بِعِزَّةِ اللَّهِ وَقُدرَتِهِ مِن شَرِّ مَا أَجِدُ وَأُحَاذِرُ».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2073,6 +2241,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/131; Sahih Muslim 2191; Hisn al-Muslim 129.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان يعوذ بعض أهله يمسح بيمينه ويقول: «اللَّهُمَّ رَبَّ النَّاسِ أَذهِبِ البَأسَ اشفِهِ وَأَنتَ الشَّافِي...».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2089,6 +2259,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 130.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا اشتكى رقاه جبريل عليه السلام فقال: «بِاسمِ اللَّهِ يُبرِيكَ وَمِن كُلِّ دَاءٍ يَشفِيكَ...».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2102,6 +2274,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 7,
     countLabel: "7",
     sourceReference: "Sunan Abu Dawud 3106; Jami' at-Tirmidhi 2083; Hisn al-Muslim 128.",
+    hadithText:
+      "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال: «من عاد مريضاً لم يحضر أجله فقال عنده سبع مرار: أسأل الله العظيم رب العرش العظيم أن يشفيك إلا عافاه الله من ذلك المرض».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2115,6 +2289,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: قل هو الله أحد وقل أعوذ برب الفلق وقل أعوذ برب الناس...",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2131,6 +2307,8 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 133.",
+    hadithText:
+      "عن أبي سعيد الخدري رضي الله عنه أن جبريل أتى النبي ﷺ فقال: يا محمد اشتكيت؟ فقال: نعم، قال: «بِسمِ اللَّهِ أَرقِيكَ مِن كُلِّ شَيءٍ يُؤذِيكَ...».",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -2147,6 +2325,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+    hadithText:
+      "عن عمران بن حصين رضي الله عنهما قال: جاء رجل إلى النبي ﷺ فقال: السلام عليكم، فرد عليه وقال: «عشر»، ثم جاء آخر فقال: السلام عليكم ورحمة الله، فرد عليه وقال: «عشرون»، ثم جاء آخر فقال: السلام عليكم ورحمة الله وبركاته، فرد عليه وقال: «ثلاثون».",
     authenticityNote: "Sahih (Abu Dawud).",
   },
   {
@@ -2160,6 +2340,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
+    hadithText:
+      "عن عائشة رضي الله عنها قالت: قال لي رسول الله ﷺ: «هذا جبريل يقرأ عليك السلام»، فقلت: «وعليه السلام ورحمة الله وبركاته».",
     authenticityNote: "Sahih (Abu Dawud).",
   },
   {
@@ -2173,6 +2355,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «إذا عطس أحدكم فليقل: الحمد لله، وليقل له أخوه أو صاحبه: يرحمك الله...».",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2186,6 +2370,7 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
+    hadithText: "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «فإذا قال له يرحمك الله، فليقل: يهديكم الله ويصلح بالكم».",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2199,6 +2384,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 2035.",
+    hadithText:
+      "عن أسامة بن زيد رضي الله عنهما قال: قال رسول الله ﷺ: «من صُنع إليه معروف فقال لفاعله: جزاك الله خيراً فقد أبلغ في الثناء».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2212,6 +2399,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Various Sahih narrations.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أُهديت له شاة قال: «ما فعلوا؟» فتقول عائشة: يدعون لهم، فيقول النبي ﷺ: «وبارك الله فيهم، نرد عليهم مثل ما قالوا ويبقى لنا أجرنا».",
     authenticityNote: "Sahih.",
   },
   {
@@ -2225,6 +2414,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 2130; Jami' at-Tirmidhi 1091; Hisn al-Muslim 98.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه أن النبي ﷺ كان إذا رفأ الإنسان إذا تزوج قال: «بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيكَ وَجَمَعَ بَينَكُمَا فِي خَيرٍ».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2240,6 +2431,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 918; Hisn al-Muslim 134.",
+    hadithText:
+      "عن أم سلمة رضي الله عنها قالت: سمعت رسول الله ﷺ يقول: «ما من مسلم تصيبه مصيبة فيقول ما أمره الله: إنا لله وإنا إليه راجعون... إلا أخلف الله له خيراً منها».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2254,6 +2447,8 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 920; Hisn al-Muslim 135.",
+    hadithText:
+      "عن أم سلمة رضي الله عنها قالت: دخل رسول الله ﷺ على أبي سلمة وقد شق بصره فأغمضه ثم قال: «اللَّهُمَّ اغفِر لِأَبِي سَلَمَةَ وَارفَع دَرَجَتَهُ فِي المَهدِيِّينَ...».",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -2271,6 +2466,8 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 899; Hisn al-Muslim 170.",
+    hadithText:
+      "عن عائشة رضي الله عنها قالت: كان النبي ﷺ إذا عصفت الريح قال: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَخَيرَ مَا فِيهَا...».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2284,6 +2481,7 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 2/518; Hisn al-Muslim 171.",
+    hadithText: "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا رأى المطر قال: «اللَّهُمَّ صَيِّبًا نَافِعًا».",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2297,6 +2495,8 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 846; Sahih Muslim 71; Hisn al-Muslim 172.",
+    hadithText:
+      "عن زيد بن خالد الجهني رضي الله عنه قال: صلى لنا رسول الله ﷺ صلاة الصبح بالحديبية على إثر سماء كانت من الليلة... وقال: «أصبح من عبادي مؤمن بي وكافر... قال مطرنا بفضل الله ورحمته فذلك مؤمن بي وكافر بالكوكب».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2310,6 +2510,8 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Muwatta Imam Malik 2/992; Hisn al-Muslim 173.",
+    hadithText:
+      "عن عبد الله بن الزبير رضي الله عنهما أنه كان إذا سمع الرعد ترك الحديث وقال: «سُبحَانَ الَّذِي يُسَبِّحُ الرَّعدُ بِحَمدِهِ وَالمَلَائِكَةُ مِن خِيفَتِهِ» ثم يقول: إن هذا لوعيد شديد لأهل الأرض.",
     authenticityNote: "Authenticated by al-Albani.",
   },
   {
@@ -2325,6 +2527,8 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Jami' at-Tirmidhi 3451; Hisn al-Muslim 168.",
+    hadithText:
+      "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالأَمنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2339,6 +2543,8 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 1194; Sunan Ibn Majah 1264.",
+    hadithText:
+      "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا رأى تخيلا أو كسوفا تغير وجهه وقام فصلى وقال: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَأَعُوذُ بِكَ مِن شَرِّهَا».",
     authenticityNote: "Sahih.",
   },
 ];
@@ -2355,6 +2561,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 2725; Hisn al-Muslim 127.",
+    hadithText:
+      "عن علي بن أبي طالب رضي الله عنه قال: قال لي رسول الله ﷺ: «قل: اللهم اهدني وسددني، واذكر بالهدى هدايتك الطريق، وبالسداد سداد السهم».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2372,6 +2580,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 100,
     countLabel: "100",
     sourceReference: "Sahih al-Bukhari 3293; Sahih Muslim 2691; Hisn al-Muslim 152.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ قال: «من قال: لا إله إلا الله وحده لا شريك له له الملك وله الحمد وهو على كل شيء قدير في يوم مائة مرة كانت له عدل عشر رقاب وكتبت له مائة حسنة ومحيت عنه مائة سيئة...».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2385,6 +2595,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 100,
     countLabel: "100",
     sourceReference: "Sahih al-Bukhari 6042; Sahih Muslim 2691; Hisn al-Muslim 153.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ قال: «من قال سبحان الله وبحمده في يوم مائة مرة حُطت خطاياه وإن كانت مثل زبد البحر».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2398,6 +2610,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7563; Sahih Muslim 2694; Hisn al-Muslim 154.",
+    hadithText:
+      "عن أبي هريرة رضي الله عنه قال: قال رسول الله ﷺ: «كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن: سبحان الله وبحمده، سبحان الله العظيم».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2411,6 +2625,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sunan Ibn Majah 3871; Hisn al-Muslim 126.",
+    hadithText:
+      "عن ابن عمر رضي الله عنهما قال: لم يكن رسول الله ﷺ يدع هؤلاء الدعوات حين يمسي وحين يصبح: «اللَّهُمَّ إِنِّي أَسأَلُكَ العَفوَ وَالعَافِيَةَ فِي الدُّنيَا وَالآخِرَةِ...».",
     authenticityNote: "Sahih by al-Albani.",
   },
   {
@@ -2424,6 +2640,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 4409; Sahih Muslim 2704; Hisn al-Muslim 155.",
+    hadithText:
+      "عن أبا موسى الأشعري رضي الله عنه قال: قال لي رسول الله ﷺ: «ألا أدلك على كنز من كنوز الجنة؟ قلت: بلى يا رسول الله، قال: لا حول ولا قوة إلا بالله».",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2437,6 +2655,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih Muslim 2696; Hisn al-Muslim 156.",
+    hadithText:
+      "عن طارق بن أشيم رضي الله عنه قال: كان الرجل إذا أسلم علمه النبي ﷺ الصلاة ثم أمره أن يدعو بهؤلاء الكلمات: «اللَّهُمَّ اغفِر لِي وَارحَمنِي وَاهدِني وَارزُقنِي».",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2454,6 +2674,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 6306; Hisn al-Muslim 69.",
+    hadithText:
+      "عن شداد بن أوس رضي الله عنه عن النبي ﷺ قال: «سيد الاستغفار أن تقول: اللهم أنت ربي لا إله إلا أنت خلقتني وأنا عبدك... من قالها من النهار موقنا بها فمات من يومه قبل أن يمسي فهو من أهل الجنة...».",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2469,6 +2691,8 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sunan Abu Dawud 5088; Jami' at-Tirmidhi 3388; Hisn al-Muslim 70.",
+    hadithText:
+      "عن عثمان بن عفان رضي الله عنه قال: قال رسول الله ﷺ: «ما من عبد يقول في صباح كل يوم ومساء كل ليلة: بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم ثلاث مرات لم يضره شيء».",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
 ];

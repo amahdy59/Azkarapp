@@ -56,6 +56,12 @@ export interface Zikr {
   sourceUrl?: string;
   category: CategoryId;
   orderIndex: number;
+  isSurah?: boolean;
+  surahNameArabic?: string;
+  surahNameEnglish?: string;
+  surahType?: "Meccan" | "Medinan" | "مكية" | "مدنية";
+  verseCount?: number;
+  hasBasmalah?: boolean;
 }
 
 export interface StoredSession {

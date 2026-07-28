@@ -364,6 +364,9 @@ const en = {
     resetProgress: "Reset Progress",
     completedToggle: "Completed — tap to uncheck",
     remainingToggle: "Not completed — tap to check",
+    counterProgress: "{current} of {total}",
+    tapToCount: "Tap to count",
+    completedButton: "Completed",
   },
   reader: {
     title: "Zikr {index} of {total}",

@@ -1,15 +1,15 @@
-import React from "react";
-import { Check, RotateCcw } from "../components/icons";
-import { Volume2 } from "../components/icons";
+import React, { useState } from "react";
+import { Check, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
-import { getLocalizedPreferredTiming } from "../content/localizedZikr";
-import type { CategoryId } from "../types";
+import type { CategoryId, Zikr } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
+import { MushafZikrCard } from "../components/MushafZikrCard";
 
 export function CategoryScreen({
   catId,
@@ -43,6 +43,8 @@ export function CategoryScreen({
   const totalLabel = formatNumerals(azkar.length, language);
   const isOccasional = isOccasionalCategory(catId);
 
+  const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
+
   const remainingAzkar = azkar
     .map((z, i) => ({ z, index: i }))
     .filter((x) => !completed.has(x.index))
@@ -59,6 +61,129 @@ export function CategoryScreen({
     } else {
       onZikr(index);
     }
+  };
+
+  const handleCardTap = (index: number, repetitionCount: number) => {
+    const isAlreadyDone = completed.has(index);
+    if (isAlreadyDone) {
+      setCardCounts((prev) => ({ ...prev, [index]: 0 }));
+      handleToggle(index);
+      return;
+    }
+
+    const currentCount = cardCounts[index] ?? 0;
+    const nextCount = currentCount + 1;
+
+    if (nextCount >= repetitionCount) {
+      setCardCounts((prev) => ({ ...prev, [index]: repetitionCount }));
+      handleToggle(index);
+
+      // Smooth auto-scroll to next incomplete card
+      const nextIncomplete = azkar.findIndex((_, i) => i > index && !completed.has(i));
+      const targetIndex =
+        nextIncomplete !== -1 ? nextIncomplete : azkar.findIndex((_, i) => i !== index && !completed.has(i));
+
+      if (targetIndex !== -1) {
+        setTimeout(() => {
+          const el = document.getElementById(`zikr-card-${targetIndex}`);
+          if (el) {
+            el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }, 120);
+      }
+    } else {
+      setCardCounts((prev) => ({ ...prev, [index]: nextCount }));
+      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+        navigator.vibrate(15);
+      }
+    }
+  };
+
+  const renderZikrCard = ({ z, index }: { z: Zikr; index: number }, isCardCompleted: boolean) => {
+    const targetCount = z.repetitionCount;
+    const currentCount = isCardCompleted ? targetCount : (cardCounts[index] ?? 0);
+    const localizedCurrent = formatNumerals(currentCount, language);
+    const localizedTarget = formatNumerals(targetCount, language);
+    const showTiming = hasSpecificRecommendedTiming(z);
+    const timingText = getLocalizedPreferredTiming(z, language);
+
+    return (
+      <div
+        key={z.id}
+        id={`zikr-card-${index}`}
+        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-xs ${
+          isCardCompleted
+            ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20"
+            : "border-border/80 bg-card hover:border-primary/40 hover:shadow-md"
+        }`}
+      >
+        {/* Card Header & Text — Clicking text opens full Reader */}
+        <button
+          type="button"
+          onClick={() => onZikr(index)}
+          className="interactive-elem min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+        >
+          <p
+            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+            dir={isArabic ? "rtl" : "ltr"}
+            lang={isArabic ? "ar" : "en"}
+          >
+            {isArabic ? z.arabicText : z.translation}
+          </p>
+        </button>
+
+        {/* Specific Recommended Timing Pill — shown ONLY for specific zikrs */}
+        {showTiming && timingText && (
+          <div
+            className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            <span aria-hidden="true" className="shrink-0">
+              💡
+            </span>
+            <span className="leading-snug">{timingText}</span>
+          </div>
+        )}
+
+        {/* Bottom Action Footer: Interactive Counter Button */}
+        <button
+          type="button"
+          onClick={() => handleCardTap(index, targetCount)}
+          aria-label={
+            isCardCompleted
+              ? `${isArabic ? "مكتمل" : "Completed"}. ${t(language, "category.completedToggle")}`
+              : isArabic
+                ? `تكرار الذكر: ${localizedCurrent} من ${localizedTarget}`
+                : `Repeat zikr: ${localizedCurrent} of ${localizedTarget}`
+          }
+          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] ${
+            isCardCompleted
+              ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
+              : currentCount > 0
+                ? "border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 shadow-xs"
+                : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs"
+          }`}
+        >
+          {isCardCompleted ? (
+            <>
+              <Check size={18} strokeWidth={3} className="shrink-0" />
+              <span>{t(language, "category.completedButton")}</span>
+            </>
+          ) : (
+            <>
+              <span
+                className="text-[1.0625rem] font-extrabold"
+                dir="auto"
+                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              >
+                {isArabic ? `${localizedCurrent} من ${localizedTarget}` : `${localizedCurrent} of ${localizedTarget}`}
+              </span>
+              <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
+            </>
+          )}
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -177,134 +302,24 @@ export function CategoryScreen({
       </div>
 
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
-        {completedAzkar.length > 0 && (
-          <div className="mb-6">
-            <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h2>
-            </div>
-            <div className="flex flex-col gap-3">
-              {completedAzkar.map(({ z, index }) => {
-                const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
-                const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
-
-                return (
-                  <div
-                    key={z.id}
-                    className="flex w-full items-start gap-3.5 rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-4 transition-all dark:bg-emerald-950/20"
-                  >
-                    {/* Toggle button — standalone interactive control */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggle(index)}
-                      aria-label={
-                        isArabic
-                          ? `${z.arabicText.slice(0, 30)}. ${t(language, "category.completedToggle")}`
-                          : `${z.translation.slice(0, 30)}. ${t(language, "category.completedToggle")}`
-                      }
-                      className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-black shadow-sm">
-                        <Check size={18} strokeWidth={3} />
-                      </span>
-                    </button>
-
-                    {/* Card text — navigates to reader */}
-                    <button
-                      type="button"
-                      onClick={() => onZikr(index)}
-                      className="interactive-elem min-w-0 flex-1 pt-0.5 text-start opacity-90 focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
-                    >
-                      <p
-                        className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.8] text-foreground whitespace-pre-line`}
-                        dir={isArabic ? "rtl" : "ltr"}
-                        lang={isArabic ? "ar" : "en"}
-                      >
-                        {isArabic ? z.arabicText : z.translation}
-                      </p>
-
-                      {timingTip && (
-                        <div
-                          className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-amber-500/15 px-3 py-1 text-[0.75rem] font-extrabold text-amber-800 dark:text-amber-300"
-                          dir="auto"
-                        >
-                          <span>💡</span>
-                          <span>{timingTip}</span>
-                        </div>
-                      )}
-                    </button>
-
-                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-muted/80 px-3 py-1.5 shadow-xs">
-                      <span className="text-[0.875rem] font-extrabold text-muted-foreground">x{countLabel}</span>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-
         {remainingAzkar.length > 0 && (
           <div className="mb-6">
             <div className="mb-3 flex items-center justify-between">
               <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.remaining")}</h2>
             </div>
             <div className="flex flex-col gap-3.5">
-              {remainingAzkar.map(({ z, index }) => {
-                const countLabel = formatNumerals(z.countLabel ?? String(z.repetitionCount), language);
-                const timingTip = getLocalizedPreferredTiming(z, language) || z.preferredTiming;
+              {remainingAzkar.map(({ z, index }) => renderZikrCard({ z, index }, false))}
+            </div>
+          </div>
+        )}
 
-                return (
-                  <div
-                    key={z.id}
-                    className="flex w-full items-start gap-3.5 rounded-2xl border border-border/80 bg-card p-4 hover:border-primary/50 hover:shadow-md transition-all"
-                  >
-                    {/* Toggle button — standalone interactive control */}
-                    <button
-                      type="button"
-                      onClick={() => handleToggle(index)}
-                      aria-label={
-                        isArabic
-                          ? `${z.arabicText.slice(0, 30)}. ${t(language, "category.remainingToggle")}`
-                          : `${z.translation.slice(0, 30)}. ${t(language, "category.remainingToggle")}`
-                      }
-                      className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <span className="flex h-9 w-9 items-center justify-center rounded-full border-2 border-muted-foreground/40 hover:border-emerald-500 hover:bg-emerald-500/10 transition-colors" />
-                    </button>
-
-                    {/* Card text — navigates to reader */}
-                    <button
-                      type="button"
-                      onClick={() => onZikr(index)}
-                      className="interactive-elem min-w-0 flex-1 pt-0.5 text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
-                    >
-                      <p
-                        className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
-                        dir={isArabic ? "rtl" : "ltr"}
-                        lang={isArabic ? "ar" : "en"}
-                      >
-                        {isArabic ? z.arabicText : z.translation}
-                      </p>
-
-                      {timingTip && (
-                        <div
-                          className="mt-2.5 inline-flex items-center gap-1.5 rounded-xl bg-amber-500/15 px-3 py-1 text-[0.75rem] font-extrabold text-amber-800 dark:text-amber-300"
-                          dir="auto"
-                        >
-                          <span>💡</span>
-                          <span>{timingTip}</span>
-                        </div>
-                      )}
-                    </button>
-
-                    <div className="flex shrink-0 items-center justify-center rounded-xl bg-amber-500/15 px-3 py-1.5 shadow-xs">
-                      <span className="text-[0.875rem] font-extrabold text-amber-700 dark:text-amber-300">
-                        x{countLabel}
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+        {completedAzkar.length > 0 && (
+          <div className="mb-6">
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.completed")}</h2>
+            </div>
+            <div className="flex flex-col gap-3.5">
+              {completedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, true))}
             </div>
           </div>
         )}

@@ -10,11 +10,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import {
-  getLocalizedPreferredTiming,
-  getLocalizedSourceReference,
-  getLocalizedZikrBenefit,
-} from "../content/localizedZikr";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -281,8 +277,29 @@ export function ReaderScreen({
         }
       }}
     >
+      {z.isSurah && (
+        <div className="mb-4 text-center">
+          <div className="inline-flex items-center gap-2 border border-amber-700/30 dark:border-amber-500/30 rounded-xl px-3.5 py-1.5 bg-amber-500/10 dark:bg-amber-950/40">
+            <span className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200">
+              {z.surahType ?? "سُورَة"}
+            </span>
+            <span className="text-[1.1rem] font-extrabold font-arabic text-amber-950 dark:text-amber-100">
+              {z.surahNameArabic ? `سُورَةُ ${z.surahNameArabic}` : "القرآن الكريم"}
+            </span>
+            {z.verseCount && (
+              <span
+                className="text-[0.75rem] font-bold text-amber-900 dark:text-amber-200"
+                style={{ fontFamily: counterNumeralFontFamily(language) }}
+              >
+                آيَاتُهَا {formatNumerals(z.verseCount, language)}
+              </span>
+            )}
+          </div>
+        </div>
+      )}
+
       <p
-        className="zikr-text text-center font-medium leading-[1.75] text-foreground pointer-events-none"
+        className="zikr-text text-center font-medium leading-[2.1] text-foreground pointer-events-none"
         data-testid="zikr-text"
         dir="rtl"
         lang="ar"
@@ -291,15 +308,6 @@ export function ReaderScreen({
         {z.arabicText}
       </p>
 
-      {getLocalizedPreferredTiming(z, language) && (
-        <div
-          className="mt-4 flex items-center justify-center gap-1.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-center text-[0.8125rem] font-bold text-amber-900 dark:text-amber-200"
-          role="note"
-        >
-          <span aria-hidden="true">💡</span>
-          <span dir="auto">{getLocalizedPreferredTiming(z, language)}</span>
-        </div>
-      )}
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
           {showTranslation && (

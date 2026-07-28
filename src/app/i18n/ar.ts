@@ -350,6 +350,9 @@ const ar = {
     resetProgress: "إعادة تعيين التقدم",
     completedToggle: "مكتمل — انقر للإلغاء",
     remainingToggle: "غير مكتمل — انقر للتحديد",
+    counterProgress: "{current} من {total}",
+    tapToCount: "اضغط للتكرار",
+    completedButton: "مكتمل",
   },
   reader: {
     title: "\u0630\u0643\u0631 {index} \u0645\u0646 {total}",

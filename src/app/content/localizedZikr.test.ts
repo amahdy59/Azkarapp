@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { ALL_AZKAR } from "./azkar";
-import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "./localizedZikr";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedSourceReference,
+  getLocalizedZikrBenefit,
+  hasSpecificRecommendedTiming,
+} from "./localizedZikr";
 
 describe("localized zikr supporting content", () => {
   it("provides Arabic-only benefit and citation text for every zikr", () => {
@@ -21,5 +26,16 @@ describe("localized zikr supporting content", () => {
       expect(getLocalizedZikrBenefit(zikr, "en")).toBe(zikr.benefit);
       expect(getLocalizedSourceReference(zikr, "en")).toBe(zikr.sourceReference);
     }
+  });
+
+  it("identifies specific recommended timing versus generic category default timing", () => {
+    const genericZikr = ALL_AZKAR.find((z) => z.id === "m-hm-75a")!;
+    const specificZikr = ALL_AZKAR.find((z) => z.id === "m-hm-92")!;
+
+    expect(hasSpecificRecommendedTiming(genericZikr)).toBe(false);
+    expect(hasSpecificRecommendedTiming(specificZikr)).toBe(true);
+    expect(getLocalizedPreferredTiming(specificZikr, "ar")).toBe(
+      "تُقال ١٠ مرات بعد صلاة الفجر و١٠ مرات بعد صلاة المغرب.",
+    );
   });
 });

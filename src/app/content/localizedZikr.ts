@@ -6,6 +6,34 @@ import type { AppLanguage, Zikr } from "../types";
  * of the original zikr or hadith text.
  */
 const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
+  "Reciting Surah Al-Kafirun before sleeping is a disavowal and immunity from shirk (polytheism).":
+    "قراءة سورة الكافرون قبل النوم براءة من الشرك.",
+  "Make it the last supplication before sleep. If you die that night, you die upon natural faith (al-Fitrah).":
+    "اجعله آخر ما تقول قبل النوم؛ فإن متّ من ليلتك متّ على الفطرة.",
+  "Recited 34 times before sleeping.": "تُقال ٣٤ مرة قبل النوم.",
+  "Recited when lying down to sleep.": "تُقال عند الاضطجاع للنوم.",
+  "Completed to 100 with Tawhid following the 99 Tasbeehs.": "تمام المائة بالتوحيد عقب التسبيحات التسع والتسعين.",
+  "Protects against self-harm, Satan, and wronging others.": "حماية وتأمين من شر النفس والشيطان والظلم.",
+  "Expresses gratitude for life, food, and shelter before sleep.": "حمد وإقرار بنعم الحياة والطعام والإيواء قبل النوم.",
+  "Recited 3 times with right hand under cheek.": "تُقال ٣ مرات مع وضع اليد اليمنى تحت الخد.",
+  "Recited 33 times before sleeping.": "تُقال ٣٣ مرة قبل النوم.",
+  "Recited 33 times after obligatory prayer.": "تُقال ٣٣ مرة عقب كل صلاة مكتوبة.",
+  "Standard supplication when sleeping.": "دعاء نبوي عند النوم.",
+  "Whoever recites the last two verses of Surah Al-Baqarah at night, they will suffice him.":
+    "من قرأ الآيتين من آخر سورة البقرة في ليلة كفتاه.",
+  "Surah Al-Mulk intercedes for its reciter until he is forgiven and protects against the torment of the grave.":
+    "سورة الملك تشفع لصاحبها حتى يُغفر له، وتنجي من عذاب القبر.",
+  "The Prophet ﷺ would not sleep until he recited Surah As-Sajdah and Surah Al-Mulk.":
+    "كان النبي ﷺ لا ينام حتى يقرا سورتي السجدة والملك.",
+  "Deep supplication for debt clearance and spiritual protection.": "دعاء جامع لقضاء الدين وحفظ الروح والنفس.",
+  "Whoever recites Ayat Al-Kursi after each obligatory prayer, nothing prevents him from entering Paradise except death.":
+    "من قرأ آية الكرسي دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا أن يموت.",
+  "Whoever recites it when lying down to sleep, a guardian from Allah will remain with him and no devil will approach him until morning.":
+    "من قرأها إذا أوى إلى فراشه لم يزل عليه من الله حافظ ولا يقربه شيطان حتى يصبح.",
+  "Recited 33 times before sleeping (Hadith of Ali & Fatima).":
+    "تُقال ٣٣ مرة قبل النوم (وصية النبي ﷺ لعلي وفاطمة رضي الله عنهما).",
+  "Gathers palms, blows lightly into them, recites the 3 Surahs, then wipes over as much of the body as possible. Repeated 3 times.":
+    "يجمع كفيه وينفث فيهما فيقرأ المعوذات الثلاث ثم يمسح بهما ما استطاع من جسده، يفعل ذلك ثلاث مرات.",
   "Also appears in before-sleep adhkar.": "يرد هذا الذكر أيضًا ضمن أذكار ما قبل النوم.",
   "Authentic/Hasan as cited by Hisn al-Muslim/Sunnah.com.": "صححه أو حسنه أهل العلم كما هو موثق في حصن المسلم.",
   "Authenticated by al-Albani in Sahih al-Targhib wa al-Tarhib as cited in Hisn al-Muslim/Sunnah.com.":
@@ -285,10 +313,31 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "After Fajr / upon rising in the morning.": "تُقال بعد صلاة الفجر أو عند الاستيقاظ صباحاً.",
   "During the day; suitable to include in morning/evening routine.": "تُقال خلال اليوم؛ وتناسب أذكار الصباح والمساء.",
   "Morning and evening.": "تُقال في الصباح والمساء.",
+  "Recited 10 times after Fajr and 10 times after Maghrib.": "تُقال ١٠ مرات بعد صلاة الفجر و١٠ مرات بعد صلاة المغرب.",
   "Morning after Fajr.": "تُقال في الصباح بعد صلاة الفجر.",
   "After ‘Asr/sunset window.": "تُقال في المساء بعد صلاة العصر وقبل الغروب.",
   "In the evening.": "تُقال في المساء.",
 };
+
+const GENERIC_PREFERRED_TIMINGS = new Set<string>([
+  "Morning: after Fajr until sunrise. Evening: after ‘Asr until sunset as a strong recommended dhikr sitting.",
+  "Morning after Fajr; evening after ‘Asr/sunset window.",
+  "Morning after Fajr.",
+  "After ‘Asr/sunset window.",
+  "In the evening.",
+  "Morning and evening.",
+  "Upon rising in the morning; can be recited any time during the day.",
+  "Upon rising in the morning.",
+  "After Fajr / upon rising in the morning.",
+  "During the day; suitable to include in morning/evening routine.",
+]);
+
+export function hasSpecificRecommendedTiming(zikr: Zikr): boolean {
+  if (!zikr.preferredTiming) {
+    return false;
+  }
+  return !GENERIC_PREFERRED_TIMINGS.has(zikr.preferredTiming);
+}
 
 export function getLocalizedPreferredTiming(zikr: Zikr, language: AppLanguage): string {
   if (!zikr.preferredTiming) {
