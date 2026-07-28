@@ -64,6 +64,8 @@ export interface GardenSummary {
   lifetimePalms: number;
   currentPalmRhythm: number;
   longestPalmRhythm: number;
+  currentUsageStreak: number;
+  longestUsageStreak: number;
   messageKind: GardenMessageKind;
   yesterdayLeafCount: number;
   milestones: GardenMilestone[];
@@ -254,6 +256,43 @@ function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<Cate
   };
 }
 
+export function getUsageStreakSummary(
+  records: DailyCollectionCompletion[],
+  now = new Date(),
+  boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
+) {
+  const todayKey = getProgressDayKey(now, boundaryHour);
+  const activeKeys = [...categoryMap(records).entries()]
+    .filter(([dayKey, categories]) => dayKey <= todayKey && categories.size > 0)
+    .map(([dayKey]) => dayKey)
+    .sort();
+
+  let longestUsageStreak = 0;
+  let run = 0;
+  for (let index = 0; index < activeKeys.length; index += 1) {
+    const current = activeKeys[index];
+    const previous = activeKeys[index - 1];
+    run = previous && current && dayOrdinal(current) - dayOrdinal(previous) === 1 ? run + 1 : 1;
+    longestUsageStreak = Math.max(longestUsageStreak, run);
+  }
+
+  let currentUsageStreak = 0;
+  const latest = activeKeys.at(-1);
+  if (latest && dayOrdinal(todayKey) - dayOrdinal(latest) <= 1) {
+    currentUsageStreak = 1;
+    for (let index = activeKeys.length - 1; index > 0; index -= 1) {
+      const current = activeKeys[index];
+      const previous = activeKeys[index - 1];
+      if (!current || !previous || dayOrdinal(current) - dayOrdinal(previous) !== 1) {
+        break;
+      }
+      currentUsageStreak += 1;
+    }
+  }
+
+  return { currentUsageStreak, longestUsageStreak };
+}
+
 export function getPalmStreakSummary(
   records: DailyCollectionCompletion[],
   now = new Date(),
@@ -313,6 +352,7 @@ export function getGardenSummary(
     MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
   ).length;
   const { currentPalmRhythm, longestPalmRhythm } = getPalmStreakSummary(normalized, now, boundaryHour);
+  const { currentUsageStreak, longestUsageStreak } = getUsageStreakSummary(normalized, now, boundaryHour);
 
   let messageKind: GardenMessageKind;
   if (today.isPalm) {
@@ -346,6 +386,8 @@ export function getGardenSummary(
     lifetimePalms,
     currentPalmRhythm,
     longestPalmRhythm,
+    currentUsageStreak,
+    longestUsageStreak,
     messageKind,
     yesterdayLeafCount: yesterday?.leafCount ?? 0,
     milestones,
