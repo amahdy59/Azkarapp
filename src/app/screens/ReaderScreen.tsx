@@ -563,6 +563,7 @@ export function ReaderScreen({
               type="button"
               onClick={onPrev}
               disabled={idx === 0}
+              title={t(language, "reader.prev")}
               aria-label={t(language, "reader.prev")}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-foreground/45 transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-foreground/45 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
@@ -573,6 +574,7 @@ export function ReaderScreen({
               type="button"
               onClick={onNext}
               disabled={idx === azkar.length - 1}
+              title={t(language, "reader.next")}
               aria-label={t(language, "reader.next")}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-foreground/45 transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-foreground/45 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
