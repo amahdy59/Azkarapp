@@ -22,12 +22,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import {
-  getLocalizedPreferredTiming,
-  getLocalizedSourceReference,
-  getLocalizedZikrBenefit,
-  hasSpecificRecommendedTiming,
-} from "../content/localizedZikr";
+import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
