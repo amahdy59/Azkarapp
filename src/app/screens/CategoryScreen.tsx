@@ -8,7 +8,11 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedZikrBenefit,
+  hasSpecificRecommendedTiming,
+} from "../content/localizedZikr";
 
 export function CategoryScreen({
   catId,
@@ -103,6 +107,7 @@ export function CategoryScreen({
     const localizedTarget = formatNumerals(targetCount, language);
     const showTiming = hasSpecificRecommendedTiming(z);
     const timingText = getLocalizedPreferredTiming(z, language);
+    const contextTip = getLocalizedZikrBenefit(z, language) || timingText;
 
     const counterLabelText = t(language, "category.counterProgress", {
       current: localizedCurrent,
@@ -143,8 +148,8 @@ export function CategoryScreen({
             </div>
           )}
 
-          {/* Specific Recommended Timing Pill — shown ONLY for specific zikrs */}
-          {showTiming && timingText && (
+          {/* Suggested Timing / Context Tip Pill for Occasional Cards */}
+          {contextTip && (
             <div
               className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
               dir={isArabic ? "rtl" : "ltr"}
@@ -152,7 +157,7 @@ export function CategoryScreen({
               <span aria-hidden="true" className="shrink-0">
                 💡
               </span>
-              <span className="leading-snug">{timingText}</span>
+              <span className="leading-snug">{contextTip}</span>
             </div>
           )}
         </button>

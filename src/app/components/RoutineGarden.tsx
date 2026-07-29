@@ -227,9 +227,6 @@ export function PalmTreeReward({
         {Array.from({ length: maxLeaves }).map((_, i) => (
           <GoldenLeafMark key={i} size={18} filled={i < todayLeaves} />
         ))}
-        <span className="ms-0.5 text-[0.875rem] font-black text-amber-600 dark:text-amber-400">
-          {formatNumerals(todayLeaves, language)}/{formatNumerals(maxLeaves, language)}
-        </span>
       </div>
       <span className="h-4 w-px bg-amber-500/30" />
       <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
