@@ -173,7 +173,7 @@ export function CategoryScreen({
         <button
           type="button"
           onClick={() => onZikr(index)}
-          className="interactive-elem min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+          className="interactive-elem min-h-[44px] min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
         >
           {isArabic && z.hasSeekRefuge && (
             <div className="mb-2 text-center pointer-events-none">

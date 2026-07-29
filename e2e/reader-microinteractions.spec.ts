@@ -53,7 +53,7 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
   await page.getByTestId("nav-azkar").click();
-  await page.getByTestId("category-card-morning").click();
+  await page.getByTestId("category-card-waking_up").click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 

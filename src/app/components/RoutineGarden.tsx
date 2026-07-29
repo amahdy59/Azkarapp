@@ -663,7 +663,7 @@ export function TodayRoutineGarden({
       {activeTab === "day" && (
         <div className="flex flex-col items-center py-0.5 text-center">
           <h3 className="mb-2 text-[1.0625rem] font-black text-foreground dark:text-white">
-            {isArabic ? "نخلة اليوم" : "Today's Palm Tree"}
+            {isArabic ? "نخلة اليوم (أذكار الحماية)" : "Today's practice"}
           </h3>
 
           <div
@@ -685,29 +685,35 @@ export function TodayRoutineGarden({
               aria-label={
                 isTodayPalm
                   ? isArabic
-                    ? "اكتملت نخلة اليوم"
-                    : "Today's palm complete"
+                    ? "اكتملت نخلة اليوم (٣ / ٣)"
+                    : "Today's palm complete (3 of 3)"
                   : isArabic
-                    ? "نخلة اليوم قيد الإكمال"
-                    : "Today's palm in progress"
+                    ? `نخلة اليوم (${formatNumerals(summary.today.goldenLeafCount, language)} / ٣)`
+                    : `Today's palm in progress (${summary.today.goldenLeafCount} of 3)`
               }
               className="absolute -bottom-3 flex items-center gap-1.5 rounded-full bg-amber-950 px-3 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
               <span>
-                {isTodayPalm ? "🌴 " + (isArabic ? "مكتملة" : "Complete") : isArabic ? "قيد الإكمال" : "In Progress"}
+                {isTodayPalm
+                  ? "🌴 " + (isArabic ? "مكتملة (٣ / ٣)" : "Complete (3 / 3)")
+                  : `${formatNumerals(summary.today.goldenLeafCount, language)} / ${formatNumerals(3, language)}`}
               </span>
             </div>
           </div>
 
           <p className="mt-1 text-[0.8125rem] font-medium text-muted-foreground">
-            {isArabic
-              ? "أكمل أذكار الصباح والمساء والنوم لكسب نخلة اليوم"
-              : "Complete Morning, Evening, and Before Sleep Azkar to earn today's palm"}
+            {isTodayPalm
+              ? isArabic
+                ? "تهانينا! نمت نخلتك اليوم بتمام أذكار الحماية 🌴"
+                : "Congratulations! Your palm has grown today after completing all 3 protection azkar 🌴"
+              : isArabic
+                ? "أكمل أذكار الصباح والمساء والنوم لكسب نخلة اليوم"
+                : "Complete Morning, Evening, and Before Sleep Azkar to earn today's palm"}
           </p>
 
           <ul
             aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-            className="mt-3.5 flex w-full flex-wrap justify-center gap-2"
+            className="mt-3.5 grid w-full grid-cols-3 gap-1.5 sm:gap-2"
           >
             {[
               {
@@ -731,7 +737,7 @@ export function TodayRoutineGarden({
                 data-testid={`garden-category-${col.id}`}
                 data-state={col.state}
                 aria-label={`${col.name}: ${col.state === "complete" ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "غير مكتمل" : "Pending"}`}
-                className={`flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-[0.8125rem] font-extrabold transition-all ${
+                className={`flex items-center justify-center gap-1.5 rounded-xl border px-2 py-1.5 text-[0.75rem] sm:text-[0.8125rem] font-extrabold transition-all ${
                   col.state === "complete"
                     ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
                     : "border-border/50 bg-muted/20 text-muted-foreground/60"
@@ -740,10 +746,17 @@ export function TodayRoutineGarden({
                 <span className="truncate">{col.name}</span>
                 {col.state === "complete" ? (
                   <span className="flex shrink-0 items-center gap-0.5 text-amber-500">
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
+                      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
                     <span className="text-[0.75rem] font-black text-amber-600 dark:text-amber-400">✓</span>
                   </span>
                 ) : (
-                  <span className="flex shrink-0 items-center text-muted-foreground/40 font-normal">○</span>
+                  <span className="flex shrink-0 items-center text-muted-foreground/40 font-normal">
+                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                      <circle cx="12" cy="12" r="9" />
+                    </svg>
+                  </span>
                 )}
               </li>
             ))}
