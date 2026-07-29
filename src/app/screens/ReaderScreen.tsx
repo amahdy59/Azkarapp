@@ -202,7 +202,7 @@ export function ReaderScreen({
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
-  const readingFontSize = { small: "18px", medium: "20px", large: "24px" }[textSize];
+  const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
   const readingFontFamily =
     arabicFont === "noto_sans"
       ? "'Noto Sans Arabic', sans-serif"
@@ -648,9 +648,12 @@ export function ReaderScreen({
       </div>
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex flex-col min-h-0 justify-between select-none relative" key={z.id}>
-        {/* Top-positioned Navigation Arrows: Flanking the top of the Zikr card without overlapping or squishing text */}
-        <div className="absolute top-1 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
+      <div className="flex-1 flex flex-col min-h-0 justify-between select-none relative group" key={z.id}>
+        {/* Navigation Arrows positioned at vertical middle of screen canvas (top-[42%] -translate-y-1/2)
+            Default state when idle: near-invisible opacity-10 so reading is 100% peaceful.
+            On hover/touch/focus of screen or Zikr card: smoothly fades in (opacity-75).
+            On hover directly over arrow button: opacity-100 bg-muted/80 text-foreground. */}
+        <div className="absolute top-[42%] -translate-y-1/2 left-1.5 right-1.5 z-20 flex items-center justify-between pointer-events-none opacity-10 transition-opacity duration-300 group-hover:opacity-75 group-focus-within:opacity-75 group-active:opacity-75">
           <button
             type="button"
             onClick={(e) => {
@@ -660,9 +663,9 @@ export function ReaderScreen({
             disabled={idx === 0}
             title={t(language, "reader.prev")}
             aria-label={t(language, "reader.prev")}
-            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/40 transition-all hover:bg-muted/70 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/40"
+            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/80 transition-all hover:bg-muted/90 hover:text-foreground hover:scale-105 hover:opacity-100 active:scale-95 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:scale-100"
           >
-            {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+            {direction === "rtl" ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
           </button>
 
           <button
@@ -674,25 +677,25 @@ export function ReaderScreen({
             disabled={idx === azkar.length - 1}
             title={t(language, "reader.next")}
             aria-label={t(language, "reader.next")}
-            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/40 transition-all hover:bg-muted/70 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/40"
+            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/80 transition-all hover:bg-muted/90 hover:text-foreground hover:scale-105 hover:opacity-100 active:scale-95 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:scale-100"
           >
-            {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+            {direction === "rtl" ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
           </button>
         </div>
 
         {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
             within this region; the counter below is always visible and never covered. */}
         <div
-          className={`flex-1 overflow-y-auto min-h-0 w-full py-4 ${
+          className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 ${
             justCompleted ? "zikr-step-exit" : "zikr-step-enter"
           }`}
         >
-          {/* Inner wrapper keeps short azkar vertically centered; long content simply overflows into the scroll. */}
-          <div className="flex min-h-full items-center justify-center">{renderReadingContent()}</div>
+          {/* Inner wrapper starts from top (`justify-start pt-1`), expanding content naturally down to the counter */}
+          <div className="flex min-h-full flex-col justify-start pt-1 pb-2 items-center">{renderReadingContent()}</div>
         </div>
 
         {/* Lower section: Counter panel — shrink-0 ensures it is always pinned and never covered */}
-        <div className="shrink-0 pb-4">{renderCounterPanel()}</div>
+        <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>
       </div>
 
       <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
