@@ -173,19 +173,20 @@ export function HomeScreen({
       <header className="flex w-full shrink-0 flex-col gap-2.5 px-1 pt-1 pb-3" dir={direction}>
         <PalmTreeReward summary={gardenSummary} language={language} bare />
 
-        <div className="flex w-full flex-col items-center justify-between gap-2 px-0.5 pt-0.5 min-[390px]:flex-row">
-          <div
-            className="flex w-full items-center justify-center rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[390px]:min-w-0 min-[390px]:flex-1 dark:border-amber-500/30 dark:bg-amber-950/30"
-            data-testid="hijri-date"
-            dir="auto"
-          >
-            <span className="whitespace-nowrap font-sans text-[0.75rem] font-extrabold text-amber-950 min-[430px]:text-[0.8125rem] dark:text-amber-100">
+        <div
+          className="flex w-full items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30"
+          data-testid="prayer-header-card"
+        >
+          <div className="flex min-w-0 flex-1 items-center justify-center px-1.5" data-testid="hijri-date" dir="auto">
+            <span className="font-sans text-[0.6875rem] leading-4 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
               {formatHijriDate(now, language)}
             </span>
           </div>
 
+          <span className="my-0.5 w-px shrink-0 self-stretch bg-amber-700/25 dark:bg-amber-200/25" aria-hidden="true" />
+
           <div
-            className="flex w-full items-center justify-center rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[390px]:w-auto min-[390px]:shrink-0 dark:border-amber-500/30 dark:bg-amber-950/30"
+            className="flex shrink-0 items-center justify-center px-1.5"
             data-testid="next-prayer"
             dir="auto"
             title={
@@ -193,7 +194,7 @@ export function HomeScreen({
             }
           >
             <span
-              className="whitespace-nowrap font-sans text-[0.75rem] font-extrabold text-amber-950 min-[430px]:text-[0.8125rem] dark:text-amber-100"
+              className="whitespace-nowrap font-sans text-[0.6875rem] font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
               style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
             >
               {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
