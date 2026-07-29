@@ -521,7 +521,7 @@ export function ReaderScreen({
           <DropdownMenu dir={direction}>
             <DropdownMenuTrigger
               aria-label={t(language, "reader.menu")}
-              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
+              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
               <MoreVertical size={20} />
             </DropdownMenuTrigger>
