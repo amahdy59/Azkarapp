@@ -300,7 +300,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
-    lastActiveDayKey: currentDayKey,
+    ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
 
@@ -342,7 +342,8 @@ export function saveAppState(state: AppStateSnapshot) {
   }
 
   try {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeAppState(state)));
+    const dayKey = getProgressDayKey(new Date(), state.settings.progressDayStartHour);
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeAppState({ ...state, lastActiveDayKey: dayKey })));
   } catch {
     // Storage can be denied or full. Persistence failure must never blank the app.
   }
