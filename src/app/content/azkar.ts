@@ -2060,18 +2060,17 @@ const TRAVEL_AZKAR: Zikr[] = [
     category: "travel",
     orderIndex: 0,
     arabicText:
-      "اللَّهُ أَكبَرُ (٣×) سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ\n\nاللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى\n\nاللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ",
+      "اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ\n\n﴿سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ * وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ﴾\n\nاللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ",
     transliteration:
-      "Allahu Akbar (3x). Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun.\n\nAllahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa wa minal-'amali ma tarda.\n\nAllahumma antas-sahibu fis-safari wal-khalifatu fil-ahl.",
+      "Allahu Akbar, Allahu Akbar, Allahu Akbar. Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun. Allahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa, wa minal-'amali ma tarda, Allahumma hawwin 'alayna safarana hadha watwi 'anna bu'dah, Allahumma antas-Sahibu fis-safari, wal-khalifatu fil-ahl, Allahumma inni a'udhu bika min wa'tha'is-safari, wa ka'abatil-manzari, wa su'il-munqalabi fil-mali wal-ahl.",
     translation:
-      "Allah is the Greatest (3×). Glory be to Him Who has subjected this to us, and we could never have it (by our efforts). And verily, to our Lord we indeed are to return.\n\nO Allah, we ask You on this our journey for righteousness, piety, and deeds that please You.\n\nO Allah, You are the Companion during travel and the Guardian over the family.",
-    benefit:
-      "Recited when mounting a vehicle and setting out on a journey — all three phrases from the same narration of Ibn ʿUmar.",
+      "Allah is the Greatest (3×). Glory be to Him Who has subjected this to us, and we could never have it by our efforts, and surely to our Lord we will return. O Allah, we ask You on this journey of ours for righteousness, piety, and deeds that please You. O Allah, make this journey easy for us and shorten its distance. O Allah, You are the Companion on the journey and the Guardian over the family. O Allah, I seek refuge in You from the hardship of travel, a depressing sight, and an ill-fated return in wealth and family.",
+    benefit: "Recited when mounting a transport and setting out on travel — full supplication from Sahih Muslim.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2600, 2602; Hisn al-Muslim 75–76.",
+    sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2599; Hisn al-Muslim 75–76.",
     hadithText:
-      "عن ابن عمر رضي الله عنهما أن رسول الله ﷺ كان إذا استوى على بعيره خارجاً إلى سفر كبَّر ثلاثاً، ثم قال: «سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ، اللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى، اللَّهُمَّ هَوِّن عَلَينَا سَفَرَنَا هَذَا وَاطوِ عَنَّا بُعدَهُ، اللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ».",
+      "عَنِ ابْنِ عُمَرَ رَضِيَ اللَّهُ عَنْهُمَا أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا اسْتَوَى عَلَى بَعِيرِهِ خَارِجًا إِلَى سَفَرٍ كَبَّرَ ثَلَاثًا، ثُمَّ قَالَ: «سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ...»",
     authenticityNote: "Sahih Muslim.",
     notes: "sourceUrl: https://sunnah.com/muslim:1342a",
   },
@@ -2080,17 +2079,17 @@ const TRAVEL_AZKAR: Zikr[] = [
     category: "travel",
     orderIndex: 1,
     arabicText:
-      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ وَسُوءِ المَنظَرِ فِي المَالِ وَالأَهلِ\n\nآيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ",
+      "آيِبُونَ تائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ\n\nاللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْقَلَبِ، وَسُوءِ الْمَنْظَرِ فِي الْمَالِ وَالْأَهْلِ",
     transliteration:
-      "Allahumma inni a'udhu bika min wa'tha'is-safari wa ka'abatil-munqalabi wa su'il-manzari fil-mali wal-ahl.\n\nA'ibuna ta'ibuna 'abiduna li-Rabbina hamidun.",
+      "A'ibuna ta'ibuna 'abiduna li-Rabbina hamidun. Allahumma inni a'udhu bika min wa'tha'is-safari, wa ka'abatil-munqalabi, wa su'il-manzari fil-mali wal-ahl.",
     translation:
-      "O Allah, I seek refuge in You from the hardships of travel, from returning to a depressing sight, and from finding misfortune in wealth and family.\n\nWe return, repentant, worshipping and praising our Lord.",
-    benefit: "Recited when returning from travel — both phrases narrated from Ibn ʿUmar and Anas ibn Mālik.",
+      "We return, repentant, worshipping, and praising our Lord. O Allah, I seek refuge in You from the hardship of travel, a depressing sight, and an ill-fated return in wealth and family.",
+    benefit: "Recited when returning from travel to home or city.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 1343; Sahih al-Bukhari 3/418; Hisn al-Muslim 77–78.",
+    sourceReference: "Sahih Muslim 1343; Sahih al-Bukhari 3084; Hisn al-Muslim 77–78.",
     hadithText:
-      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان إذا قفل من الغزو أو الحج أو العمرة يكبر على كل شرف من الأرض ثلاث تكبيرات ثم يقول: «لا إله إلا الله وحده لا شريك له... آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ وَسُوءِ المَنظَرِ فِي المَالِ وَالأَهلِ». رواه مسلم.",
+      "عَنِ ابْنِ عُمَرَ رَضِيَ اللَّهُ عَنْهُمَا أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا قَفَلَ مِنَ الْغَزْوِ أَوِ الْحَجِّ أَوِ الْعُمْرَةِ... قَالَ: «آيِبُونَ تائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ».",
     authenticityNote: "Sahih Muslim and Sahih al-Bukhari.",
     notes: "sourceUrl: https://sunnah.com/muslim:1343b",
   },
@@ -2098,33 +2097,19 @@ const TRAVEL_AZKAR: Zikr[] = [
     id: "tr-ref-6",
     category: "travel",
     orderIndex: 2,
-    arabicText: "اللَّهُمَّ اجعَل لَنَا فِيهَا قَرَارًا وَرِزقًا حَسَنًا",
-    transliteration: "Allahummaj'al lana fiha qararan wa rizqan hasana",
-    translation: "O Allah, make for us a stable settlement and good provision in it.",
-    benefit: "Recited upon entering a town or city.",
-    repetitionCount: 1,
-    countLabel: "1",
-    sourceReference: "Ibn al-Sunni; al-Hakim; Hisn al-Muslim 80.",
-    hadithText:
-      "عن صهيب رضي الله عنه أن النبي ﷺ لم ير قرية يريد دخولها إلا قال حين يراها: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ... اجعَل لَنَا فِيهَا قَرَارًا وَرِزقًا حَسَنًا».",
-    authenticityNote: "Hasan.",
-    notes: "sourceUrl: https://sunnah.com/hisn%3A80",
-  },
-  {
-    id: "tr-ref-7",
-    category: "travel",
-    orderIndex: 3,
-    arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَ هَذِهِ القَريَةِ وَخَيرَ أَهلِهَا وَأَعُوذُ بِكَ مِن شَرِّهَا",
-    transliteration: "Allahumma inni as'aluka khayra hadhihil-qaryati wa khayra ahliha wa a'udhu bika min sharriha",
+    arabicText:
+      "اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ، وَرَبَّ الْأَرَضِينَ السَّبْعِ وَمَا أَقْلَلْنَ، وَرَبَّ الشَّيَاطِينِ وَمَا أَضْلَلْنَ، وَرَبَّ الرِّيَاحِ وَمَا ذَرَيْنَ، فَإِنَّا نَسْأَلُكَ خَيْرَ هَذِهِ الْقَرْيَةِ وَخَيْرَ أَهْلِهَا وَخَيْرَ مَا فِيهَا، وَنَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ أَهْلِهَا وَشَرِّ مَا فِيهَا",
+    transliteration:
+      "Allahumma Rabbas-samawatis-sab'i wa ma azlalna, wa Rabbal-aradina-sab'i wa ma aqlalna, wa Rabbash-shayatini wa ma adlalna, wa Rabbar-riyahi wa ma dharayna, fa inna nas'aluka khayra hadhihil-qaryati wa khayra ahliha wa khayra ma fiha, wa na'udhu bika min sharriha wa sharri ahliha wa sharri ma fiha.",
     translation:
-      "O Allah, I ask You for the good of this town and the good of its people, and I seek refuge in You from its evil.",
-    benefit: "Recited upon entering a village or town.",
+      "O Allah, Lord of the seven heavens and all they overshadow, Lord of the seven earths and all they carry, Lord of the devils and all they lead astray, Lord of the winds and all they scatter: We ask You for the good of this town, the good of its people, and the good within it; and we seek refuge in You from its evil, the evil of its people, and the evil within it.",
+    benefit: "Recited when entering a town, city, or new destination.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Ibn al-Sunni; Hisn al-Muslim 80.",
+    sourceReference: "Sahih Ibn Hibban 2697; Al-Hakim 1/442; Hisn al-Muslim 80.",
     hadithText:
-      "عن صهيب رضي الله عنه أن النبي ﷺ كان يقول إذا دخل قرية: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَ هَذِهِ القَريَةِ وَخَيرَ أَهلِهَا وَأَعُوذُ بِكَ مِن شَرِّهَا».",
-    authenticityNote: "Hasan.",
+      "عَنْ صُهَيْبٍ رَضِيَ اللَّهُ عَنْهُ أَنَّ النَّبِيَّ ﷺ لَمْ يَرَ قَرْيَةً يُرِيدُ دُخُولَهَا إِلَّا قَالَ حِينَ يَرَاهَا: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ، وَرَبَّ الْأَرَضِينَ السَّبْعِ وَمَا أَقْلَلْنَ، وَرَبَّ الشَّيَاطِينِ وَمَا أَضْلَلْنَ، وَرَبَّ الرِّيَاحِ وَمَا ذَرَيْنَ، فَإِنَّا نَسْأَلُكَ خَيْرَ هَذِهِ الْقَرْيَةِ وَخَيْرَ أَهْلِهَا وَخَيْرَ مَا فِيهَا، وَنَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ أَهْلِهَا وَشَرِّ مَا فِيهَا».",
+    authenticityNote: "Graded Hasan by Al-Albani; Sahih Ibn Hibban.",
     notes: "sourceUrl: https://sunnah.com/hisn%3A80",
   },
 ];

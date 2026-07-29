@@ -119,6 +119,10 @@ const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
   "Recited when returning from travel.": "يُقال عند الرجوع من السفر.",
   "Recited upon returning from travel.": "يُقال عند القفول والرجوع من السفر.",
   "Recited upon entering a town or city.": "يُقال عند دخول القرية أو البلدة.",
+  "Recited when entering a town, city, or new destination.": "يُقال عند دخول القرية أو المدينة أو البلدة.",
+  "Recited when mounting a transport and setting out on travel — full supplication from Sahih Muslim.":
+    "يُقال عند ركوب المركب والشروع في السفر — الذكر الكامل من صحيح مسلم.",
+  "Recited when returning from travel to home or city.": "يُقال عند القفول والرجوع من السفر إلى البلد أو المنزل.",
   "Recited upon entering a village or town.": "يُقال عند دخول القرية أو المدينة.",
   "Comprehensive refuge against grief, debt, and hardship.": "تعوذ جامع من الهم والحزن والدين والغلَبَة.",
   "No Muslim supplicates with this in any distress except that Allah relieves him.":
