@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
-import { CALCULATION_METHODS, DEFAULT_LOCATION, detectUserCoordinates } from "../../content/prayerCalculation";
+import {
+  CALCULATION_METHODS,
+  DEFAULT_LOCATION,
+  detectUserCoordinates,
+  fetchAladhanPrayerData,
+  formatUtcOffset,
+  getTimeZoneStatus,
+} from "../../content/prayerCalculation";
 import type { AppLanguage, LocationSettings, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
@@ -121,6 +128,7 @@ export function NotificationsPanel({
   const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
   const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
+  const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
 
   useEffect(() => {
     setLatitudeDraft(String(locationSettings?.latitude ?? ""));
@@ -133,18 +141,25 @@ export function NotificationsPanel({
     setIsDetectingLocation(true);
     setLocationStatus(null);
     const coords = await detectUserCoordinates();
-    setIsDetectingLocation(false);
 
     if (coords && onLocationChange) {
+      const prayerData = await fetchAladhanPrayerData(
+        new Date(),
+        coords.latitude,
+        coords.longitude,
+        locationSettings?.calculationMethod ?? DEFAULT_LOCATION.calculationMethod,
+      );
       onLocationChange({
         ...(locationSettings ?? { calculationMethod: 5, autoDetect: true }),
         latitude: coords.latitude,
         longitude: coords.longitude,
         cityName: `${coords.latitude.toFixed(2)}°, ${coords.longitude.toFixed(2)}°`,
         autoDetect: true,
-        timeZone: coords.timeZone,
+        timeZone: prayerData?.timeZone ?? coords.timeZone ?? DEFAULT_LOCATION.timeZone,
       });
-      setLocationStatus(isArabic ? "تم تحديث الموقع بنجاح!" : "Location updated successfully!");
+      setLocationStatus(
+        isArabic ? "تم تحديث الموقع والمنطقة الزمنية بنجاح." : "Location and time zone updated successfully.",
+      );
     } else {
       setLocationStatus(
         isArabic
@@ -152,6 +167,7 @@ export function NotificationsPanel({
           : "Could not detect location. Please check browser location permissions.",
       );
     }
+    setIsDetectingLocation(false);
   };
 
   const handleMethodChange = (methodId: number) => {
@@ -268,6 +284,43 @@ export function NotificationsPanel({
                   : "Prayer times are calculated accurately based on your location and local DST."}
               </p>
             </div>
+          </div>
+
+          <div
+            className="mt-4 rounded-xl border border-border bg-muted/50 p-3"
+            data-testid="daylight-saving-status"
+            aria-live="polite"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <strong className="text-[0.8125rem] text-foreground" dir="ltr">
+                {timeZoneStatus.timeZone}
+              </strong>
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-[0.75rem] font-bold text-primary" dir="ltr">
+                {formatUtcOffset(timeZoneStatus.currentOffsetHours)}
+              </span>
+            </div>
+            <p className="mt-2 text-[0.8125rem] font-semibold text-foreground">
+              {timeZoneStatus.daylightSavingActive
+                ? isArabic
+                  ? "التوقيت الصيفي مُفعّل تلقائيًا لهذا التاريخ."
+                  : "Daylight saving time is active automatically for this date."
+                : timeZoneStatus.observesDaylightSaving
+                  ? isArabic
+                    ? "التوقيت القياسي مُفعّل حاليًا، وسيُطبّق التوقيت الصيفي تلقائيًا عند بدايته."
+                    : "Standard time is active; daylight saving will apply automatically when it begins."
+                  : isArabic
+                    ? "هذه المنطقة الزمنية لا تستخدم تغييرًا موسميًا للتوقيت."
+                    : "This time zone does not use a seasonal daylight-saving change."}
+            </p>
+            <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
+              {locationSettings?.autoDetect
+                ? isArabic
+                  ? "يتم التحقق من المنطقة الزمنية من الإحداثيات عند الاتصال، مع الرجوع إلى إعداد الجهاز دون اتصال."
+                  : "The time zone is verified from coordinates online, with the device setting as the offline fallback."
+                : isArabic
+                  ? "تُستخدم هذه المنطقة الزمنية لحساب المواقيت دون اتصال."
+                  : "This time zone is used for offline prayer calculations."}
+            </p>
           </div>
 
           <div className="mt-4 space-y-3">

@@ -4,8 +4,11 @@ import {
   calculateOfflinePrayerTimes,
   CALCULATION_METHODS,
   DEFAULT_LOCATION,
+  formatUtcOffset,
   getPrayerTimes,
   getTimeZoneOffsetHours,
+  getTimeZoneStatus,
+  parseAladhanPrayerData,
   parseAladhanPrayerTimes,
 } from "./prayerCalculation";
 
@@ -24,6 +27,21 @@ describe("prayerCalculation", () => {
   it("uses Egypt's IANA timezone rules for standard time and DST", () => {
     expect(getTimeZoneOffsetHours(new Date(2026, 0, 15), "Africa/Cairo")).toBe(2);
     expect(getTimeZoneOffsetHours(new Date(2026, 6, 29), "Africa/Cairo")).toBe(3);
+
+    expect(getTimeZoneStatus(new Date(2026, 0, 15), "Africa/Cairo")).toMatchObject({
+      currentOffsetHours: 2,
+      standardOffsetHours: 2,
+      observesDaylightSaving: true,
+      daylightSavingActive: false,
+    });
+    expect(getTimeZoneStatus(new Date(2026, 6, 29), "Africa/Cairo")).toMatchObject({
+      currentOffsetHours: 3,
+      standardOffsetHours: 2,
+      observesDaylightSaving: true,
+      daylightSavingActive: true,
+    });
+    expect(formatUtcOffset(3)).toBe("UTC+03:00");
+    expect(formatUtcOffset(-3.5)).toBe("UTC-03:30");
   });
 
   it("calculates accurate offline prayer times for Cairo in summer (DST)", () => {
@@ -61,24 +79,30 @@ describe("prayerCalculation", () => {
   });
 
   it("parses Aladhan timing values while removing timezone suffixes", () => {
-    expect(
-      parseAladhanPrayerTimes({
-        data: {
-          timings: {
-            Fajr: "04:31 (EEST)",
-            Dhuhr: "13:01 (EEST)",
-            Asr: "16:38 (EEST)",
-            Maghrib: "19:50 (EEST)",
-            Isha: "21:20 (EEST)",
-          },
+    const payload = {
+      data: {
+        timings: {
+          Fajr: "04:31 (EEST)",
+          Dhuhr: "13:01 (EEST)",
+          Asr: "16:38 (EEST)",
+          Maghrib: "19:50 (EEST)",
+          Isha: "21:20 (EEST)",
         },
-      }),
-    ).toEqual({
+        meta: { timezone: "Africa/Cairo" },
+      },
+    };
+    const expectedTimes = {
       fajr: "04:31",
       dhuhr: "13:01",
       asr: "16:38",
       maghrib: "19:50",
       isha: "21:20",
+    };
+
+    expect(parseAladhanPrayerTimes(payload)).toEqual(expectedTimes);
+    expect(parseAladhanPrayerData(payload)).toEqual({
+      times: expectedTimes,
+      timeZone: "Africa/Cairo",
     });
     expect(parseAladhanPrayerTimes({ data: { timings: { Fajr: "invalid" } } })).toBeNull();
   });

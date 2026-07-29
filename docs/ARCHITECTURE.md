@@ -1,0 +1,144 @@
+# Application architecture
+
+This document describes Azkarapp's runtime structure and the boundaries maintainers must preserve. Update it whenever ownership, persistence, remote services, build behavior, or navigation materially changes.
+
+## Runtime overview
+
+```mermaid
+flowchart TD
+  Entry["main.tsx"] --> App["App.tsx application shell"]
+  App --> State["Validated local AppStateSnapshot"]
+  App --> Screens["Lazy-loaded screens"]
+  App --> Hooks["Focused orchestration hooks"]
+  Hooks --> Supabase["Supabase service boundary"]
+  Screens --> Content["Static content and domain services"]
+  State --> Storage["localStorage"]
+  Hooks --> State
+  Supabase --> State
+  App --> PWA["Service worker and update lifecycle"]
+```
+
+`App.tsx` owns the current view, shared preference state, profile/session state, and screen composition. Screens receive explicit typed props. Hooks isolate multi-step behaviors such as authentication, remote synchronization, audio, reminders, and reading sessions.
+
+## Startup and state lifecycle
+
+1. `main.tsx` mounts the React application and global styles.
+2. `App.tsx` calls `loadAppState()` once and uses the normalized snapshot to initialize React state.
+3. `normalizeAppState()` validates every persisted field, applies defaults, repairs legacy values, and drops unsafe collection entries.
+4. `appStateSnapshot` recomposes the authoritative serializable state from React values.
+5. A persistence effect writes the snapshot through `saveAppState()`.
+6. When authenticated sync returns remote data, `mergeAppStates()` applies deterministic merge rules and the result is normalized again before rendering.
+
+Never render untrusted persisted or remote data directly.
+
+## State ownership
+
+| Concern                                             | Owner                                                        |
+| --------------------------------------------------- | ------------------------------------------------------------ |
+| Navigation/view and application shell               | `src/app/App.tsx`                                            |
+| Serializable types                                  | `src/app/types.ts`                                           |
+| Defaults, migration, validation, merge, persistence | `src/app/state.ts`                                           |
+| Completion-day calculations                         | `src/app/progress.ts`                                        |
+| Screen-local form and transient UI state            | Owning screen/panel                                          |
+| Remote account synchronization                      | `src/app/hooks/useRemoteAccountSync.ts`                      |
+| Authentication operations                           | `src/app/hooks/useAuthHandlers.ts` and `src/lib/supabase.ts` |
+| Reading-session mutations                           | `src/app/hooks/useSessionHandlers.ts`                        |
+| Prayer calculation and Aladhan boundary             | `src/app/content/prayerCalculation.ts`                       |
+
+When adding a persisted field:
+
+1. Add it to the relevant type in `types.ts`.
+2. Add a safe default in `DEFAULT_APP_STATE`.
+3. Normalize it in `normalizeAppState()`.
+4. Define merge behavior in `mergeAppStates()`.
+5. Include it in `App.tsx`'s serialized snapshot and remote-state application.
+6. Add corruption, round-trip, and merge tests in `state.test.ts`.
+7. Document user-visible or operational effects.
+
+## Navigation and screen loading
+
+The application uses a typed `View` state and browser history rather than a route framework. `push`, `pop`, and pop-state handling keep browser navigation synchronized with the displayed screen. Major screens are lazy loaded through `React.lazy` and wrapped by the shared suspense fallback.
+
+Rules:
+
+- New top-level destinations require a `View` member and an `App.tsx` rendering branch.
+- Back actions must preserve predictable browser behavior.
+- Settings subsections use `SettingsSubScreen` within `SettingsScreen`.
+- The Azkar tab always opens the collection index, not an implicit prior category.
+
+## Presentation boundaries
+
+- `screens/` composes pages and coordinates user interaction.
+- `components/` owns reusable visual and behavioral patterns.
+- `components/ui/` contains vendored or low-level primitives.
+- `content/` owns static azkar/category data and domain computations.
+- `i18n/` owns translated product copy.
+- `styles/` owns semantic tokens, font loading, Tailwind integration, safe areas, and global RTL behavior.
+- `lib/` owns external SDK boundaries.
+
+Do not place `localStorage`, Supabase, or raw network calls inside reusable visual components.
+
+## Localization and direction
+
+The selected `AppLanguage` controls document language and layout direction. Arabic is RTL; English is LTR unless the accessibility force-RTL preference is active.
+
+- Use logical CSS positioning where possible.
+- Preserve semantic DOM and keyboard order.
+- Isolate mixed-direction values with `dir="ltr"`, `dir="rtl"`, or `dir="auto"`.
+- Zikr text uses the `zikr-text` contract even when embedded in non-reader screens.
+- Product copy should be added to `i18n`; tightly scoped domain diagnostics may be bilingual inline until promoted to shared copy.
+
+See `DESIGN_SYSTEM.md` for the authoritative typography, icon, geometry, and motion contracts.
+
+## Local persistence and privacy
+
+The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys, such as the daily prayer-time cache.
+
+Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
+
+Geolocation is requested only after a user action. Coordinates and timezone preferences remain in application state and are sent to Aladhan only to retrieve prayer timings. No service-role Supabase credential belongs in the browser.
+
+## Remote synchronization
+
+Supabase is optional. Without its environment variables, guest/local mode remains functional.
+
+The sync layer:
+
+- Treats local state as the immediate UI source
+- Uses the authenticated account ID for ownership
+- Merges settings and ledgers deterministically
+- Deduplicates saved IDs and completion records
+- Surfaces recoverable sync state without blocking local reading
+
+Database schema changes require an ordered migration and corresponding application/tests in the same change.
+
+## Offline and PWA behavior
+
+The production service worker precaches the application shell and versioned build assets. The app exposes install/update UI and quick actions for common collections.
+
+Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, OTP, or fresh Aladhan values—must fail safely and retain local behavior.
+
+## Testing strategy
+
+| Layer                          | Expected coverage                              |
+| ------------------------------ | ---------------------------------------------- |
+| Pure domain functions          | Colocated Vitest tests                         |
+| Persistence and merge behavior | `src/app/state.test.ts`                        |
+| React behavior                 | Testing Library where DOM interaction matters  |
+| Complete user flows            | Playwright in `e2e/`                           |
+| Accessibility                  | axe-core plus keyboard/touch-target assertions |
+| Production constraints         | Vite build and bundle-budget script            |
+
+`pnpm check` must remain deterministic and network-independent. Tests for network services mock parsing/boundary behavior; a live API smoke test is operational evidence, not a unit-test dependency.
+
+## Extension checklist
+
+Before adding a feature:
+
+- Identify its owning layer and state owner.
+- Reuse existing primitives, tokens, icon exports, and localization patterns.
+- Define offline and failure behavior.
+- Avoid introducing a runtime dependency when a platform API or existing utility is sufficient.
+- Add automated coverage proportional to risk.
+- Update the README and relevant domain document.
+- Run `pnpm check` and relevant Playwright specs.

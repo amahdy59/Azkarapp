@@ -130,6 +130,13 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
+  await page.getByRole("button", { name: /Prayer Times & Location/ }).click();
+  await expect(page.getByRole("heading", { name: "Location & Prayer Times", exact: true })).toBeVisible();
+  await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
+  await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
+  await expectNoWcagViolations(page);
+  await page.getByRole("button", { name: "Back" }).click();
+
   const destinations = [
     { row: "Content sources & corrections", heading: "Content sources & corrections" },
     { row: "Account & data Activate account", heading: "Account & data" },

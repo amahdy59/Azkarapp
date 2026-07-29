@@ -62,6 +62,7 @@ export const DEFAULT_LOCATION: LocationSettings = {
 };
 
 const CACHE_KEY_PREFIX = "azkarapp.prayer_times_cache.";
+const TIME_ZONE_CACHE_KEY_PREFIX = "azkarapp.prayer_time_zone.";
 const PRAYER_NAMES: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
 const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
 
@@ -71,6 +72,10 @@ function dateKey(date: Date): string {
 
 function getCacheKey(date: Date, lat: number, lng: number, method: number): string {
   return `${CACHE_KEY_PREFIX}${dateKey(date)}_${lat.toFixed(3)}_${lng.toFixed(3)}_${method}`;
+}
+
+function getTimeZoneCacheKey(lat: number, lng: number): string {
+  return `${TIME_ZONE_CACHE_KEY_PREFIX}${lat.toFixed(3)}_${lng.toFixed(3)}`;
 }
 
 function isPrayerTimes(value: unknown): value is PrayerTimes {
@@ -97,6 +102,24 @@ function setCachedPrayerTimes(date: Date, lat: number, lng: number, method: numb
     window.localStorage.setItem(getCacheKey(date, lat, lng, method), JSON.stringify(times));
   } catch {
     // Prayer times still work through the in-memory offline calculation.
+  }
+}
+
+function getCachedTimeZone(lat: number, lng: number): string | undefined {
+  if (typeof window === "undefined") return undefined;
+  try {
+    return window.localStorage.getItem(getTimeZoneCacheKey(lat, lng)) || undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+function setCachedTimeZone(lat: number, lng: number, timeZone: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(getTimeZoneCacheKey(lat, lng), timeZone);
+  } catch {
+    // The browser/device timezone remains available as an offline fallback.
   }
 }
 
@@ -164,6 +187,40 @@ export function getTimeZoneOffsetHours(date: Date, timeZone?: string): number {
   } catch {
     return -date.getTimezoneOffset() / 60;
   }
+}
+
+export interface TimeZoneStatus {
+  timeZone: string;
+  currentOffsetHours: number;
+  standardOffsetHours: number;
+  observesDaylightSaving: boolean;
+  daylightSavingActive: boolean;
+}
+
+export function getTimeZoneStatus(date: Date = new Date(), timeZone?: string): TimeZoneStatus {
+  const resolvedTimeZone = timeZone || Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+  const offsets = Array.from({ length: 12 }, (_, month) =>
+    getTimeZoneOffsetHours(new Date(date.getFullYear(), month, 15, 12), resolvedTimeZone),
+  );
+  const standardOffsetHours = Math.min(...offsets);
+  const currentOffsetHours = getTimeZoneOffsetHours(date, resolvedTimeZone);
+  const observesDaylightSaving = offsets.some((offset) => offset !== standardOffsetHours);
+
+  return {
+    timeZone: resolvedTimeZone,
+    currentOffsetHours,
+    standardOffsetHours,
+    observesDaylightSaving,
+    daylightSavingActive: observesDaylightSaving && currentOffsetHours > standardOffsetHours,
+  };
+}
+
+export function formatUtcOffset(offsetHours: number): string {
+  const sign = offsetHours >= 0 ? "+" : "-";
+  const absoluteMinutes = Math.round(Math.abs(offsetHours) * 60);
+  const hours = Math.floor(absoluteMinutes / 60);
+  const minutes = absoluteMinutes % 60;
+  return `UTC${sign}${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
 
 /**
@@ -252,6 +309,15 @@ function parseApiTime(value: unknown): string | null {
 }
 
 export function parseAladhanPrayerTimes(payload: unknown): PrayerTimes | null {
+  return parseAladhanPrayerData(payload)?.times ?? null;
+}
+
+export interface AladhanPrayerData {
+  times: PrayerTimes;
+  timeZone?: string;
+}
+
+export function parseAladhanPrayerData(payload: unknown): AladhanPrayerData | null {
   if (!payload || typeof payload !== "object") return null;
   const data = (payload as { data?: unknown }).data;
   if (!data || typeof data !== "object") return null;
@@ -265,17 +331,23 @@ export function parseAladhanPrayerTimes(payload: unknown): PrayerTimes | null {
     maghrib: parseApiTime(source.Maghrib),
     isha: parseApiTime(source.Isha),
   };
-  return Object.values(parsed).every(Boolean) ? (parsed as PrayerTimes) : null;
+  if (!Object.values(parsed).every(Boolean)) return null;
+  const meta = (data as { meta?: unknown }).meta;
+  const timeZone =
+    meta && typeof meta === "object" && typeof (meta as { timezone?: unknown }).timezone === "string"
+      ? (meta as { timezone: string }).timezone
+      : undefined;
+  return { times: parsed as PrayerTimes, timeZone };
 }
 
-export async function fetchAladhanPrayerTimes(
+export async function fetchAladhanPrayerData(
   date: Date = new Date(),
   latitude: number = DEFAULT_LOCATION.latitude ?? 30.0444,
   longitude: number = DEFAULT_LOCATION.longitude ?? 31.2357,
   methodId: number = DEFAULT_LOCATION.calculationMethod,
-): Promise<PrayerTimes | null> {
+): Promise<AladhanPrayerData | null> {
   const cached = getCachedPrayerTimes(date, latitude, longitude, methodId);
-  if (cached) return cached;
+  if (cached) return { times: cached, timeZone: getCachedTimeZone(latitude, longitude) };
 
   const apiDate = `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
   const query = new URLSearchParams({
@@ -291,14 +363,26 @@ export async function fetchAladhanPrayerTimes(
       signal: controller.signal,
     });
     if (!response.ok) return null;
-    const times = parseAladhanPrayerTimes(await response.json());
-    if (times) setCachedPrayerTimes(date, latitude, longitude, methodId, times);
-    return times;
+    const prayerData = parseAladhanPrayerData(await response.json());
+    if (prayerData) {
+      setCachedPrayerTimes(date, latitude, longitude, methodId, prayerData.times);
+      if (prayerData.timeZone) setCachedTimeZone(latitude, longitude, prayerData.timeZone);
+    }
+    return prayerData;
   } catch {
     return null;
   } finally {
     window.clearTimeout(timeoutId);
   }
+}
+
+export async function fetchAladhanPrayerTimes(
+  date: Date = new Date(),
+  latitude: number = DEFAULT_LOCATION.latitude ?? 30.0444,
+  longitude: number = DEFAULT_LOCATION.longitude ?? 31.2357,
+  methodId: number = DEFAULT_LOCATION.calculationMethod,
+): Promise<PrayerTimes | null> {
+  return (await fetchAladhanPrayerData(date, latitude, longitude, methodId))?.times ?? null;
 }
 
 export function getPrayerTimes(date: Date = new Date(), location?: LocationSettings): PrayerTimes {
@@ -308,7 +392,13 @@ export function getPrayerTimes(date: Date = new Date(), location?: LocationSetti
   const cached = getCachedPrayerTimes(date, latitude, longitude, method);
   const baseTimes =
     cached ??
-    calculateOfflinePrayerTimes(date, latitude, longitude, method, location?.timeZone ?? DEFAULT_LOCATION.timeZone);
+    calculateOfflinePrayerTimes(
+      date,
+      latitude,
+      longitude,
+      method,
+      location?.timeZone ?? getCachedTimeZone(latitude, longitude) ?? DEFAULT_LOCATION.timeZone,
+    );
   return applyPrayerAdjustments(baseTimes, location?.adjustments);
 }
 

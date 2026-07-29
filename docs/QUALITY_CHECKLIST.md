@@ -10,10 +10,10 @@ Every pull request must pass `pnpm check` and `pnpm test:e2e`.
 | ------------------- | ------------------------------------------------------------------------------------------- |
 | Type safety         | Strict TypeScript and `tsc --noEmit`                                                        |
 | Code hygiene        | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                            |
-| Critical data logic | Unit tests for persistence, corruption recovery, merging, and localization                  |
+| Critical data logic | Unit tests for persistence, merging, localization, prayer calculation, timezone, and DST    |
 | Accessibility       | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks |
 | Performance         | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                        |
-| Supply chain        | Production dependency audit in the quality workflow                                         |
+| Supply chain        | `pnpm audit:prod` during dependency updates and release review                              |
 | Secrets             | Runtime environment variables; `.env*` excluded except `.env.example`                       |
 | Deployment          | The Pages workflow runs all non-browser quality gates before building                       |
 
@@ -28,6 +28,7 @@ Current per-file production budgets are 550 KiB JavaScript, 140 KiB CSS, and 1 M
 5. Search before creating a utility or component. Explain every new runtime dependency in the pull request.
 6. Use theme variables and shared components before adding one-off colors, spacing, or motion.
 7. AI-assisted code must be identified in the pull request and read, understood, tested, and reviewed by a human. Generated imports and prototypes are not evidence of correctness.
+8. Update the README and relevant `docs/` source of truth when behavior, state, APIs, environment variables, or operational procedures change.
 
 ## Performance and resilience rules
 
@@ -61,6 +62,7 @@ Automation cannot prove the following. Complete and date this table for a releas
 | RTL                     | Arabic onboarding, navigation, category, reader, counter, and settings have correct order and icon direction | Pending                  |
 | Safe areas              | iOS notch/home indicator and Android cutout do not cover controls                                            | Pending                  |
 | Poor connectivity       | Offline banner appears; local reading/progress works; sync recovers after reconnect                          | Pending                  |
+| Prayer time and DST     | Effective timezone/offset match the detected location; online and offline results use the selected method    | Pending                  |
 | Performance             | Record cold load, interaction responsiveness, and React Profiler evidence on a representative mobile device  | Pending                  |
 | Media access            | Audio alternatives/transcripts and image descriptions are correct wherever media is introduced               | Pending                  |
 
