@@ -164,7 +164,21 @@ test("garden visibility preference persists and keeps Home quiet when disabled",
   await expect(page.getByRole("button", { name: /My progress.*Garden hidden/i })).toBeVisible();
 });
 
-test("Arabic garden mirrors collection order and provides non-color completion cues", async ({ page }) => {
+test("month view shows the calendar without the removed summary card", async ({ page }) => {
+  await seedReturningGardenUser(page, { completedToday: ["morning"] });
+  await openReturningHome(page);
+
+  await page.getByRole("button", { name: "Settings", exact: true }).click();
+  await page.getByRole("button", { name: /My progress.*Garden shown/i }).click();
+  await page.getByRole("tab", { name: "Month", exact: true }).click();
+
+  await expect(page.getByTestId("garden-month-calendar")).toBeVisible();
+  await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
+  await expect(page.getByText("Full Palms", { exact: true })).toHaveCount(0);
+});
+
+test("Arabic garden stacks aligned collection pills to the right of the palm", async ({ page }) => {
   await seedReturningGardenUser(page, { language: "ar", completedToday: ["morning"] });
   await openReturningHome(page);
 
@@ -175,17 +189,24 @@ test("Arabic garden mirrors collection order and provides non-color completion c
   const morning = page.getByTestId("garden-category-morning");
   const evening = page.getByTestId("garden-category-evening");
   const beforeSleep = page.getByTestId("garden-category-before_sleep");
+  const palmEmblem = page.getByTestId("today-palm-emblem");
   const morningBox = await morning.boundingBox();
   const eveningBox = await evening.boundingBox();
   const beforeSleepBox = await beforeSleep.boundingBox();
+  const palmBox = await palmEmblem.boundingBox();
   expect(morningBox).not.toBeNull();
   expect(eveningBox).not.toBeNull();
   expect(beforeSleepBox).not.toBeNull();
-  if (!morningBox || !eveningBox || !beforeSleepBox) return;
+  expect(palmBox).not.toBeNull();
+  if (!morningBox || !eveningBox || !beforeSleepBox || !palmBox) return;
 
-  expect(morningBox.x).toBeGreaterThan(eveningBox.x);
-  expect(beforeSleepBox.x).toBeCloseTo(eveningBox.x, 0);
-  expect(beforeSleepBox.width).toBeGreaterThan(morningBox.width);
+  expect(palmBox.x + palmBox.width).toBeLessThan(morningBox.x);
+  expect(morningBox.x).toBeCloseTo(eveningBox.x, 0);
+  expect(eveningBox.x).toBeCloseTo(beforeSleepBox.x, 0);
+  expect(morningBox.width).toBeCloseTo(eveningBox.width, 0);
+  expect(eveningBox.width).toBeCloseTo(beforeSleepBox.width, 0);
+  expect(morningBox.y).toBeLessThan(eveningBox.y);
+  expect(eveningBox.y).toBeLessThan(beforeSleepBox.y);
   await expect(morning).toHaveAttribute("data-state", "complete");
   await expect(evening).toHaveAttribute("data-state", "pending");
 

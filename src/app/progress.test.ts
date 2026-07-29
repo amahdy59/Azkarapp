@@ -3,6 +3,7 @@ import { getCategoryTotal } from "./content/azkar";
 import {
   CATEGORY_IDS,
   deriveDailyCompletionsFromLegacySessions,
+  getFirstIncompleteIndex,
   getGardenSummary,
   getNextIncompleteIndex,
   getProgressDayKey,
@@ -167,6 +168,12 @@ describe("quiet garden progress", () => {
   it("wraps to an earlier unfinished zikr instead of treating the final index as collection completion", () => {
     expect(getNextIncompleteIndex(4, new Set([2, 3]), 3)).toBe(0);
     expect(getNextIncompleteIndex(4, new Set([0, 1, 2, 3]), 3)).toBeNull();
+  });
+
+  it("resumes at the first unfinished zikr in collection order", () => {
+    expect(getFirstIncompleteIndex(6, new Set([0, 1, 2]))).toBe(3);
+    expect(getFirstIncompleteIndex(6, new Set([0, 2, 3]))).toBe(1);
+    expect(getFirstIncompleteIndex(3, new Set([0, 1, 2]))).toBeNull();
   });
 
   it("calculates daily usage streak for consecutive active days", () => {

@@ -2,7 +2,12 @@ import { useCallback, useState } from "react";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, View } from "../types";
 import type { StoredSession } from "../state";
 import { getAzkarByCategory } from "../content/azkar";
-import { getNextIncompleteIndex, recordDailyCollectionCompletion, type GrowthEvent } from "../progress";
+import {
+  getFirstIncompleteIndex,
+  getNextIncompleteIndex,
+  recordDailyCollectionCompletion,
+  type GrowthEvent,
+} from "../progress";
 import { t } from "../i18n";
 
 export function useSessionHandlers({
@@ -85,6 +90,11 @@ export function useSessionHandlers({
     setActiveIdx(i);
     setSessionStart(Date.now());
     push("reader");
+  };
+
+  const resumeCategory = (catId: CategoryId) => {
+    const nextIndex = getFirstIncompleteIndex(getAzkarByCategory(catId).length, completed[catId] ?? []);
+    openReader(catId, nextIndex ?? 0);
   };
 
   const repeatCategory = (catId: CategoryId) => {
@@ -216,6 +226,7 @@ export function useSessionHandlers({
     handleResetCategory,
     openCategory,
     openReader,
+    resumeCategory,
     repeatCategory,
     leaveReader,
     toggleSavedZikr,

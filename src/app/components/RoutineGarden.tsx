@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { createDailyCompletionIndex, getMonthGardenDays, getYearGardenStats } from "../gardenViews";
 import { Check, CircleIcon } from "./icons";
 import {
   getGardenSummary,
@@ -467,62 +468,15 @@ export function TodayRoutineGarden({
 
   const targetYear = displayDate.getFullYear();
   const targetMonth = displayDate.getMonth();
-  const daysInMonth = new Date(targetYear, targetMonth + 1, 0).getDate();
-
-  const completionsByDayKey = new Map<string, Set<CategoryId>>();
-  for (const record of dailyCompletions) {
-    const set = completionsByDayKey.get(record.dayKey) ?? new Set<CategoryId>();
-    set.add(record.category);
-    completionsByDayKey.set(record.dayKey, set);
-  }
-
-  const monthDayRecords: {
-    dayKey: string;
-    dayNum: number;
-    completedCount: number;
-    isPalm: boolean;
-  }[] = [];
-
-  for (let d = 1; d <= daysInMonth; d++) {
-    const dayKey = `${targetYear}-${padZero(targetMonth + 1)}-${padZero(d)}`;
-    const cats = completionsByDayKey.get(dayKey) ?? new Set<CategoryId>();
-    const isPalm = MAIN_CATEGORY_IDS.every((c) => cats.has(c));
-    monthDayRecords.push({
-      dayKey,
-      dayNum: d,
-      completedCount: cats.size,
-      isPalm,
-    });
-  }
-
-  const activeMonthDays = monthDayRecords.filter((d) => d.completedCount > 0).length;
-  const monthPalms = monthDayRecords.filter((d) => d.isPalm).length;
-  const monthAdherenceRate = Math.round((activeMonthDays / daysInMonth) * 100);
-
-  let maxStreakInMonth = 0;
-  let currentStreakInMonth = 0;
-  for (const d of monthDayRecords) {
-    if (d.completedCount > 0) {
-      currentStreakInMonth++;
-      if (currentStreakInMonth > maxStreakInMonth) maxStreakInMonth = currentStreakInMonth;
-    } else {
-      currentStreakInMonth = 0;
-    }
-  }
-
-  const yearCompletions = dailyCompletions.filter((r) => r.dayKey.startsWith(`${targetYear}-`));
-  const yearCompletionsByDay = new Map<string, Set<CategoryId>>();
-  for (const r of yearCompletions) {
-    const set = yearCompletionsByDay.get(r.dayKey) ?? new Set<CategoryId>();
-    set.add(r.category);
-    yearCompletionsByDay.set(r.dayKey, set);
-  }
-  let yearTotalPalms = 0;
-  let yearTotalAzkar = 0;
-  for (const cats of yearCompletionsByDay.values()) {
-    if (MAIN_CATEGORY_IDS.every((c) => cats.has(c))) yearTotalPalms++;
-    yearTotalAzkar += cats.size;
-  }
+  const completionsByDayKey = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
+  const monthDayRecords = useMemo(
+    () => getMonthGardenDays(completionsByDayKey, targetYear, targetMonth),
+    [completionsByDayKey, targetMonth, targetYear],
+  );
+  const yearStats = useMemo(
+    () => getYearGardenStats(completionsByDayKey, targetYear),
+    [completionsByDayKey, targetYear],
+  );
 
   const monthNames = isArabic
     ? calendarType === "hijri"
@@ -665,44 +619,105 @@ export function TodayRoutineGarden({
           </h3>
 
           <div
-            className={`relative mb-4 flex h-28 w-28 flex-col items-center justify-center rounded-full transition-all duration-700 ${
-              isTodayPalm
-                ? "border-3 border-amber-500 bg-amber-500/10 shadow-md shadow-amber-500/20 dark:bg-amber-500/15"
-                : "border-2 border-amber-500/30 bg-amber-500/5 shadow-inner dark:bg-amber-500/5"
-            } p-1.5`}
+            className="mb-3.5 grid w-full grid-cols-[7rem_minmax(0,1fr)] items-center gap-3"
+            data-testid="today-palm-layout"
+            dir="ltr"
           >
-            <PalmTreeMark
-              size={64}
-              className={`transition-all duration-700 ${
-                isTodayPalm ? "opacity-100 filter-none" : "grayscale opacity-35 contrast-75"
-              }`}
-            />
-
             <div
-              data-testid="today-leaf-count"
-              title={
+              data-testid="today-palm-emblem"
+              className={`relative flex h-28 w-28 flex-col items-center justify-center rounded-full p-1.5 transition-all duration-700 ${
                 isTodayPalm
-                  ? isArabic
-                    ? "اكتملت نخلة اليوم (٣ / ٣)"
-                    : "Today's palm complete (3 of 3)"
-                  : isArabic
-                    ? `نخلة اليوم (${formatNumerals(summary.today.goldenLeafCount, language)} / ٣)`
-                    : `Today's palm in progress (${summary.today.goldenLeafCount} of 3)`
-              }
-              className="absolute -bottom-3 flex items-center gap-1.5 rounded-full bg-amber-950 px-3 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
+                  ? "border-3 border-amber-500 bg-amber-500/10 shadow-md shadow-amber-500/20 dark:bg-amber-500/15"
+                  : "border-2 border-amber-500/30 bg-amber-500/5 shadow-inner dark:bg-amber-500/5"
+              }`}
             >
-              {isTodayPalm && <PalmTreeMark size={14} filled />}
-              <span>
-                {isTodayPalm
-                  ? isArabic
-                    ? "مكتملة (٣ / ٣)"
-                    : "Complete (3 / 3)"
-                  : `${formatNumerals(summary.today.goldenLeafCount, language)} / ${formatNumerals(3, language)}`}
-              </span>
+              <PalmTreeMark
+                size={64}
+                className={`transition-all duration-700 ${
+                  isTodayPalm ? "opacity-100 filter-none" : "grayscale opacity-35 contrast-75"
+                }`}
+              />
+
+              <div
+                data-testid="today-leaf-count"
+                title={
+                  isTodayPalm
+                    ? isArabic
+                      ? "اكتملت نخلة اليوم (٣ / ٣)"
+                      : "Today's palm complete (3 of 3)"
+                    : isArabic
+                      ? `نخلة اليوم (${formatNumerals(summary.today.goldenLeafCount, language)} / ٣)`
+                      : `Today's palm in progress (${summary.today.goldenLeafCount} of 3)`
+                }
+                className="absolute -bottom-3 flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-amber-950 px-3 py-1 text-[0.75rem] font-extrabold text-amber-400 shadow-md dark:bg-black dark:text-amber-300"
+              >
+                {isTodayPalm && <PalmTreeMark size={14} filled />}
+                <span>
+                  {isTodayPalm
+                    ? isArabic
+                      ? "مكتملة (٣ / ٣)"
+                      : "Complete (3 / 3)"
+                    : `${formatNumerals(summary.today.goldenLeafCount, language)} / ${formatNumerals(3, language)}`}
+                </span>
+              </div>
             </div>
+
+            <ul
+              aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
+              className="flex min-w-0 flex-col gap-2"
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              {[
+                {
+                  id: "morning" as const,
+                  name: isArabic ? "أذكار الصباح" : "Morning Azkar",
+                  state: summary.today.completedCategories.includes("morning") ? "complete" : "pending",
+                },
+                {
+                  id: "evening" as const,
+                  name: isArabic ? "أذكار المساء" : "Evening Azkar",
+                  state: summary.today.completedCategories.includes("evening") ? "complete" : "pending",
+                },
+                {
+                  id: "before_sleep" as const,
+                  name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
+                  state: summary.today.completedCategories.includes("before_sleep") ? "complete" : "pending",
+                },
+              ].map((col) => (
+                <li
+                  key={col.id}
+                  data-testid={`garden-category-${col.id}`}
+                  data-state={col.state}
+                  aria-label={`${col.name}: ${col.state === "complete" ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "غير مكتمل" : "Pending"}`}
+                  dir={isArabic ? "rtl" : "ltr"}
+                  className={`flex min-h-10 w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[0.8125rem] font-extrabold transition-all ${
+                    col.state === "complete"
+                      ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
+                      : "border-border/50 bg-muted/20 text-muted-foreground/60"
+                  }`}
+                >
+                  <span className="min-w-0 flex-1 text-start leading-5">{col.name}</span>
+                  {col.state === "complete" ? (
+                    <Check
+                      data-slot="collection-status"
+                      size={16}
+                      className="shrink-0 text-amber-600 dark:text-amber-400"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <CircleIcon
+                      data-slot="collection-status"
+                      size={16}
+                      className="shrink-0 text-muted-foreground/40"
+                      aria-hidden="true"
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          <p className="mt-1 text-[0.8125rem] font-medium text-muted-foreground">
+          <p className="text-[0.8125rem] font-medium text-muted-foreground">
             {isTodayPalm
               ? isArabic
                 ? "تهانينا! نمت نخلتك اليوم بتمام أذكار الحماية"
@@ -711,60 +726,6 @@ export function TodayRoutineGarden({
                 ? "أكمل أذكار الصباح والمساء والنوم لكسب نخلة اليوم"
                 : "Complete Morning, Evening, and Before Sleep Azkar to earn today's palm"}
           </p>
-
-          <ul
-            aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-            className="mt-3.5 grid w-full grid-cols-2 gap-2"
-          >
-            {[
-              {
-                id: "morning" as const,
-                name: isArabic ? "أذكار الصباح" : "Morning Azkar",
-                state: summary.today.completedCategories.includes("morning") ? "complete" : "pending",
-              },
-              {
-                id: "evening" as const,
-                name: isArabic ? "أذكار المساء" : "Evening Azkar",
-                state: summary.today.completedCategories.includes("evening") ? "complete" : "pending",
-              },
-              {
-                id: "before_sleep" as const,
-                name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
-                state: summary.today.completedCategories.includes("before_sleep") ? "complete" : "pending",
-              },
-            ].map((col) => (
-              <li
-                key={col.id}
-                data-testid={`garden-category-${col.id}`}
-                data-state={col.state}
-                aria-label={`${col.name}: ${col.state === "complete" ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "غير مكتمل" : "Pending"}`}
-                className={`flex min-h-10 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[0.8125rem] font-extrabold transition-all ${
-                  col.id === "before_sleep" ? "col-span-2" : ""
-                } ${
-                  col.state === "complete"
-                    ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
-                    : "border-border/50 bg-muted/20 text-muted-foreground/60"
-                }`}
-              >
-                <span className="min-w-0 flex-1 text-start leading-5">{col.name}</span>
-                {col.state === "complete" ? (
-                  <Check
-                    data-slot="collection-status"
-                    size={16}
-                    className="shrink-0 text-amber-600 dark:text-amber-400"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <CircleIcon
-                    data-slot="collection-status"
-                    size={16}
-                    className="shrink-0 text-muted-foreground/40"
-                    aria-hidden="true"
-                  />
-                )}
-              </li>
-            ))}
-          </ul>
         </div>
       )}
 
@@ -775,39 +736,11 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "month" && (
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 text-center shadow-xs">
-            <div className="flex flex-col items-center justify-center">
-              <span className="flex items-center justify-center gap-1 text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
-                <span role="img" aria-label="Streak flame" className="text-[1rem]">
-                  🔥
-                </span>
-                {formatNumerals(maxStreakInMonth, language)} {isArabic ? "يوم" : "days"}
-              </span>
-              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
-                {t(language, "garden.longestStreak")}
-              </span>
-            </div>
-            <div className="flex flex-col items-center justify-center border-x border-border/60 px-1">
-              <span className="block text-[1.125rem] font-black text-emerald-600 dark:text-emerald-400">
-                {formatNumerals(monthAdherenceRate, language)}%
-              </span>
-              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
-                {t(language, "garden.adherence")}
-              </span>
-            </div>
-            <div className="flex flex-col items-center justify-center">
-              <span className="flex items-center justify-center gap-1 text-[1.125rem] font-black text-amber-500">
-                <PalmTreeMark size={18} filled={monthPalms > 0} />
-                {formatNumerals(monthPalms, language)}
-              </span>
-              <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
-                {t(language, "garden.fullPalms")}
-              </span>
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-xs">
+        <div>
+          <div
+            className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-xs"
+            data-testid="garden-month-calendar"
+          >
             <div className="mb-3 grid grid-cols-7 gap-2 text-center">
               {(isArabic
                 ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
@@ -973,9 +906,9 @@ export function TodayRoutineGarden({
             {/* Bottom Summary Footer */}
             <div className="mt-4 border-t border-border/60 pt-3 text-center text-[0.75rem] font-extrabold text-muted-foreground">
               {t(language, "garden.yearSummaryFooter", {
-                azkar: formatNumerals(yearTotalAzkar, language),
-                days: formatNumerals(yearCompletionsByDay.size, language),
-                palms: formatNumerals(yearTotalPalms, language),
+                azkar: formatNumerals(yearStats.totalCollections, language),
+                days: formatNumerals(yearStats.activeDays, language),
+                palms: formatNumerals(yearStats.totalPalms, language),
               })}
             </div>
           </div>

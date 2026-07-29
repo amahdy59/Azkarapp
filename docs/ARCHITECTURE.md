@@ -109,6 +109,34 @@ The sync layer:
 - Merges settings and ledgers deterministically
 - Deduplicates saved IDs and completion records
 - Surfaces recoverable sync state without blocking local reading
+- Loads the Supabase SDK on demand so guest/offline startup does not pay the account-client cost
+- Reads the newest 100 sessions through `(user_id, completed_at desc)` and sends at most the same bounded page
+- Reads the append-only completion ledger with keyset pagination over its `(user_id, day_key, category)` primary key
+- Uses atomic upserts; completion rows conflict on `(user_id, day_key, category)` and are idempotent
+- Caches known completion keys per authenticated user to avoid resending already-synchronized ledger rows
+
+All account tables enable RLS. Policies compare `(select auth.uid())` with the indexed owner column so identity is evaluated once per query. `user_settings`, `user_progress`, and `daily_collection_completions` use owner-prefixed primary keys; `session_history` uses `session_history_user_completed_idx` for owner filtering, newest-first reads, and cascade performance.
+
+For production query review, run representative authenticated plans in Supabase:
+
+```sql
+explain (analyze, buffers)
+select id, category, completed_at
+from public.session_history
+where user_id = '<test-user-uuid>'
+order by completed_at desc
+limit 100;
+
+explain (analyze, buffers)
+select day_key, category, time_zone
+from public.daily_collection_completions
+where user_id = '<test-user-uuid>'
+  and (day_key, category) > (date '2026-01-01', 'evening')
+order by day_key, category
+limit 500;
+```
+
+Expected evidence is an index scan using `session_history_user_completed_idx` and the completion-ledger primary key, with no material rows removed by filtering. Save plan output with release evidence when realistic production-sized data is available.
 
 Database schema changes require an ordered migration and corresponding application/tests in the same change.
 

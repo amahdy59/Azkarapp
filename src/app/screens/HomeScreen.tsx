@@ -2,14 +2,14 @@ import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
+import { getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getGardenSummary } from "../progress";
+import { getFirstIncompleteIndex, getGardenSummary } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings } from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
@@ -24,10 +24,6 @@ export type HomeAction = {
 
 function suggestedCategoryId(date: Date, location?: LocationSettings): CategoryId {
   return getTimeOfDayZikr(date, "en", location).categoryId;
-}
-
-function getNextIndex(completed: Set<number>, totalCount: number) {
-  return Array.from({ length: totalCount }, (_, index) => index).find((index) => !completed.has(index)) ?? 0;
 }
 
 export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar", location?: LocationSettings) {
@@ -75,7 +71,7 @@ export function getHomeAction(
     if (done > 0 && done < totalCount) {
       return {
         categoryId,
-        index: getNextIndex(completed[categoryId], totalCount),
+        index: getFirstIncompleteIndex(totalCount, completed[categoryId]) ?? 0,
         completedCount: done,
         totalCount,
         kind: "resume",
@@ -117,7 +113,7 @@ export function HomeScreen({
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
-  onResume: (category: CategoryId, index: number) => void;
+  onResume: (category: CategoryId) => void;
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
   onOpenShareModal?: () => void;
@@ -155,12 +151,10 @@ export function HomeScreen({
     [now, language, locationSettings],
   );
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
-  const categoryAzkar = getAzkarByCategory(reminderInfo.categoryId);
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<number>();
 
   const totalCount = getCategoryTotal(reminderInfo.categoryId);
   const doneCount = doneSet.size;
-  const nextIdx = Array.from({ length: categoryAzkar.length }, (_, i) => i).find((i) => !doneSet.has(i)) ?? 0;
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
@@ -297,7 +291,7 @@ export function HomeScreen({
                       if (actionKind === "again") {
                         onRepeat(reminderInfo.categoryId);
                       } else {
-                        onResume(reminderInfo.categoryId, nextIdx);
+                        onResume(reminderInfo.categoryId);
                       }
                     }}
                     aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}

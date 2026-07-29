@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./e2e",
+  testIgnore: ["**/.*", "**/*-temp.spec.ts"],
   fullyParallel: true,
   workers: 3,
   retries: process.env.CI ? 2 : 0,
@@ -17,6 +18,16 @@ export default defineConfig({
     {
       name: "tablet-chromium",
       use: { ...devices["iPad Pro 11"], browserName: "chromium", channel: process.env.CI ? undefined : "chrome" },
+    },
+    {
+      name: "desktop-firefox-smoke",
+      grep: /@cross-browser/,
+      use: { ...devices["Desktop Firefox"] },
+    },
+    {
+      name: "mobile-webkit-smoke",
+      grep: /@cross-browser/,
+      use: { ...devices["iPhone 14"] },
     },
   ],
   webServer: {

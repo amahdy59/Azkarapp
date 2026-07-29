@@ -8,7 +8,7 @@ async function enterAsEnglishGuest(page: Page) {
   await page.getByTestId("continue-as-guest").click();
 }
 
-test("Azkar tab opens the library and exposes search", async ({ page }) => {
+test("@cross-browser Azkar tab opens the library and exposes search", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
@@ -34,4 +34,32 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
 
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Azkar:/ }).first()).toBeVisible();
+});
+
+test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", progressDayStartHour: 4 },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: {
+          morning: [0, 1, 2],
+          evening: [0, 1, 2],
+          before_sleep: [0, 1, 2],
+        },
+        sessions: [],
+        dailyCompletions: [],
+        savedZikrIds: [],
+      }),
+    );
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await expect(page.getByTestId("home-primary-cta")).toContainText("Continue");
+  await page.getByTestId("home-primary-cta").click();
+
+  await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-index", "3");
 });

@@ -116,7 +116,7 @@ function expectSanitizedBoundaryState(state: AppStateSnapshot, expectedAccountId
 describe("useRemoteAccountSync account boundaries", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    authMocks.subscribeToAuthChanges.mockReturnValue(vi.fn());
+    authMocks.subscribeToAuthChanges.mockResolvedValue(vi.fn());
     authMocks.syncRemoteState.mockResolvedValue(undefined);
   });
 

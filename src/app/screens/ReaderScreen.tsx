@@ -539,6 +539,7 @@ export function ReaderScreen({
     <ScreenContainer
       className="relative !pb-0"
       data-testid="reader-screen"
+      data-zikr-index={idx}
       dir={direction}
       style={categoryThemeStyles}
       onClick={handleSurfaceTap}

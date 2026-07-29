@@ -1,6 +1,6 @@
 import type { Session } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
-import { normalizePhoneNumber, profileFromSession, REMOTE_SESSION_PAGE_SIZE } from "./auth";
+import { getSessionsForRemoteSync, normalizePhoneNumber, profileFromSession, REMOTE_SESSION_PAGE_SIZE } from "./auth";
 
 describe("normalizePhoneNumber", () => {
   it.each([
@@ -49,5 +49,22 @@ describe("profileFromSession", () => {
 describe("remote history bounds", () => {
   it("keeps the initial remote history page deliberately bounded", () => {
     expect(REMOTE_SESSION_PAGE_SIZE).toBe(100);
+  });
+
+  it("syncs only the newest bounded session page", () => {
+    const sessions = Array.from({ length: REMOTE_SESSION_PAGE_SIZE + 5 }, (_, index) => ({
+      id: `session-${index}`,
+      category: "morning" as const,
+      completedAt: new Date(2026, 0, index + 1).toISOString(),
+      completedCount: 1,
+      totalCount: 1,
+      durationSeconds: 1,
+      isComplete: true,
+    }));
+
+    const selected = getSessionsForRemoteSync(sessions);
+    expect(selected).toHaveLength(REMOTE_SESSION_PAGE_SIZE);
+    expect(selected[0]?.id).toBe("session-104");
+    expect(selected.at(-1)?.id).toBe("session-5");
   });
 });

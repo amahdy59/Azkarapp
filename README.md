@@ -70,12 +70,13 @@ Copy `.env.example` to `.env` only when Supabase or hosted legal pages are requi
 cp .env.example .env
 ```
 
-| Variable                 | Required | Purpose                       |
-| ------------------------ | -------- | ----------------------------- |
-| `VITE_SUPABASE_URL`      | No       | Supabase project URL          |
-| `VITE_SUPABASE_ANON_KEY` | No       | Public Supabase anonymous key |
-| `VITE_TERMS_URL`         | No       | Hosted terms URL              |
-| `VITE_PRIVACY_URL`       | No       | Hosted privacy URL            |
+| Variable                  | Required | Purpose                                     |
+| ------------------------- | -------- | ------------------------------------------- |
+| `VITE_SUPABASE_URL`       | No       | Supabase project URL                        |
+| `VITE_SUPABASE_ANON_KEY`  | No       | Public Supabase anonymous key               |
+| `VITE_TERMS_URL`          | No       | Hosted terms URL                            |
+| `VITE_PRIVACY_URL`        | No       | Hosted privacy URL                          |
+| `VITE_TELEMETRY_ENDPOINT` | No       | Privacy-safe error and Web Vitals collector |
 
 Never commit `.env` or service-role credentials. The app remains usable as a local guest when Supabase variables are absent.
 

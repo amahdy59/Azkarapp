@@ -25,21 +25,15 @@ function categoryFromShortcutUrl(): CategoryId | null {
   return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
 }
 
-import { BottomNav, Header } from "./components/LayoutShells";
-import { ScreenContainer } from "./components/ScreenContainer";
-import { TodayRoutineGarden } from "./components/RoutineGarden";
-import { getGardenSummary } from "./progress";
+import { BottomNav } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { FloatingAudioPlayer } from "./components/FloatingAudioPlayer";
-import { ShareableCardModal } from "./components/ShareableCardModal";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ScreenFallback } from "./components/ScreenFallback";
 import { PwaNotice } from "./components/PwaNotice";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
-import { FridayModeScreen } from "./screens/FridayModeScreen";
 import { t } from "./i18n";
-import { formatHijriDateWithTime } from "./formatting";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { useForegroundReminders } from "./hooks/useForegroundReminders";
 import { useAuthHandlers, type ConfirmDialogOptions } from "./hooks/useAuthHandlers";
@@ -67,6 +61,15 @@ const SettingsScreen = lazy(() =>
   import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
 );
 const SearchScreen = lazy(() => import("./screens/SearchScreen").then((module) => ({ default: module.SearchScreen })));
+const ProgressScreen = lazy(() =>
+  import("./screens/ProgressScreen").then((module) => ({ default: module.ProgressScreen })),
+);
+const FridayModeScreen = lazy(() =>
+  import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
+);
+const ProgressShareModal = lazy(() =>
+  import("./components/ProgressShareModal").then((module) => ({ default: module.ProgressShareModal })),
+);
 const SplashScreen = lazy(() =>
   import("./screens/onboarding/SplashScreen").then((module) => ({ default: module.SplashScreen })),
 );
@@ -266,6 +269,7 @@ export default function App() {
     handleResetCategory,
     openCategory,
     openReader,
+    resumeCategory,
     repeatCategory,
     leaveReader,
     toggleSavedZikr,
@@ -652,7 +656,7 @@ export default function App() {
                 quietProgressEnabled={quietProgressEnabled}
                 progressDayStartHour={progressDayStartHour}
                 locationSettings={locationSettings}
-                onResume={(catId, i) => openReader(catId, i)}
+                onResume={resumeCategory}
                 onRepeat={repeatCategory}
                 onOpenFridayMode={() => push("friday")}
                 onOpenShareModal={() => setShowShareModal(true)}
@@ -673,17 +677,14 @@ export default function App() {
               />
             )}
             {view === "progress" && (
-              <ScreenContainer dir={layoutDirection} className="px-page py-4 overflow-y-auto">
-                <Header title={t(selectedLang, "common.progress")} language={selectedLang} />
-                <TodayRoutineGarden
-                  summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}
-                  language={selectedLang}
-                  hideTabs={false}
-                  calendarType={calendarType}
-                  dailyCompletions={dailyCompletions}
-                  onOpenShareModal={() => setShowShareModal(true)}
-                />
-              </ScreenContainer>
+              <ProgressScreen
+                dailyCompletions={dailyCompletions}
+                progressDayStartHour={progressDayStartHour}
+                calendarType={calendarType}
+                language={selectedLang}
+                direction={layoutDirection}
+                onOpenShareModal={() => setShowShareModal(true)}
+              />
             )}
             {view === "friday" && <FridayModeScreen isArabic={isArabic} direction={layoutDirection} onBack={pop} />}
             {view === "category" && (
@@ -814,17 +815,9 @@ export default function App() {
 
         {/* Share Achievement Modal */}
         {showShareModal && (
-          <ShareableCardModal
-            palms={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).lifetimePalms}
-            golden={
-              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.goldenLeafCount ??
-              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.leafCount
-            }
-            green={
-              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.greenLeafCount ??
-              getGardenSummary(dailyCompletions, new Date(), progressDayStartHour).today.extraLeafCount
-            }
-            dateStr={formatHijriDateWithTime(new Date(), selectedLang)}
+          <ProgressShareModal
+            dailyCompletions={dailyCompletions}
+            progressDayStartHour={progressDayStartHour}
             language={selectedLang}
             onClose={() => setShowShareModal(false)}
           />

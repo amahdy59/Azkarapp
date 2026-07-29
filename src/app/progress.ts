@@ -443,3 +443,18 @@ export function getNextIncompleteIndex(total: number, completed: Iterable<number
   }
   return null;
 }
+
+/** Returns the first unfinished item in collection order; null means the collection is complete. */
+export function getFirstIncompleteIndex(total: number, completed: Iterable<number>) {
+  if (!Number.isInteger(total) || total <= 0) {
+    return null;
+  }
+
+  const completedIndexes = new Set(completed);
+  for (let index = 0; index < total; index += 1) {
+    if (!completedIndexes.has(index)) {
+      return index;
+    }
+  }
+  return null;
+}

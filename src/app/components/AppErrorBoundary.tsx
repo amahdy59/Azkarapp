@@ -1,4 +1,5 @@
 import React from "react";
+import { reportError } from "../../lib/observability";
 import { resetStoredSettings } from "../state";
 
 interface ErrorBoundaryState {
@@ -15,6 +16,7 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
 
   componentDidCatch(error: Error) {
     console.error("Azkar recovered from a render error", error);
+    reportError(error, "react-render");
   }
 
   private resetPreferences = () => {

@@ -122,19 +122,30 @@ export function useRemoteAccountSync({
 
     void hydrateSession();
 
-    const unsubscribe = subscribeToAuthChanges((session) => {
-      if (!active) {
-        return;
-      }
-
-      if (!session) {
+    let unsubscribe = () => {};
+    void subscribeToAuthChanges((session) => {
+      if (active && !session) {
         if (!latestState.current.profile.isGuest || latestState.current.profile.accountUserId) {
           onRemoteState(clearPrivateAppData(latestState.current));
         }
         onRemoteHydrationChange(false);
         setAuthSessionLoaded(true);
       }
-    });
+    })
+      .then((cleanup) => {
+        if (active) {
+          unsubscribe = cleanup;
+        } else {
+          cleanup();
+        }
+      })
+      .catch((error) => {
+        if (active) {
+          setSyncError(
+            error instanceof Error ? error.message : t(initialState.settings.language, "syncStatus.restoreError"),
+          );
+        }
+      });
 
     return () => {
       active = false;

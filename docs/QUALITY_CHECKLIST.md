@@ -6,18 +6,19 @@ This document makes the project checklist auditable. A recommendation is **met**
 
 Every pull request must pass `pnpm check` and `pnpm test:e2e`.
 
-| Concern             | Evidence                                                                                    |
-| ------------------- | ------------------------------------------------------------------------------------------- |
-| Type safety         | Strict TypeScript and `tsc --noEmit`                                                        |
-| Code hygiene        | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                            |
-| Critical data logic | Unit tests for persistence, merging, localization, prayer calculation, timezone, and DST    |
-| Accessibility       | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks |
-| Performance         | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                        |
-| Supply chain        | `pnpm audit:prod` during dependency updates and release review                              |
-| Secrets             | Runtime environment variables; `.env*` excluded except `.env.example`                       |
-| Deployment          | The Pages workflow runs all non-browser quality gates before building                       |
+| Concern               | Evidence                                                                                                     |
+| --------------------- | ------------------------------------------------------------------------------------------------------------ |
+| Type safety           | Strict TypeScript and `tsc --noEmit`                                                                         |
+| Code hygiene          | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                                             |
+| Critical data logic   | Unit tests and enforced coverage thresholds for persistence, merging, progress, prayer calculation, and auth |
+| Accessibility         | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks                  |
+| Browser compatibility | Full Chromium viewport matrix plus Firefox desktop and WebKit mobile core-flow smoke tests                   |
+| Performance           | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                                         |
+| Supply chain          | `pnpm audit:prod` during dependency updates and release review                                               |
+| Secrets               | Runtime environment variables; `.env*` excluded except `.env.example`                                        |
+| Deployment            | The Pages workflow runs all non-browser quality gates before building                                        |
 
-Current per-file production budgets are 550 KiB JavaScript, 140 KiB CSS, and 1 MiB for another asset. The CSS ceiling reflects the Midnight/Light/OLED semantic theme contract and accessible motion system. Reducing a budget is encouraged; any increase requires a fresh production measurement and justification in the pull request.
+Current per-file production budgets are 450 KiB JavaScript, 120 KiB CSS, and 1 MiB for another asset, with compressed ceilings of 130 KiB per JavaScript file and 20 KiB per CSS file. The complete initial route graph, derived from Vite's build manifest, must remain below 200 KiB gzip including HTML, static JavaScript imports, and CSS. Reducing a budget is encouraged; any increase requires a fresh production measurement and justification in the pull request.
 
 ## Architecture rules
 

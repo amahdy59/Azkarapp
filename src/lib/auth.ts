@@ -1,8 +1,8 @@
-import type { Session } from "@supabase/supabase-js";
+import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state";
 import { DEFAULT_APP_STATE, mergeAppStates } from "../app/state";
 import { mergeDailyCompletions, normalizeDailyCompletions } from "../app/progress";
-import { isSupabaseConfigured, supabase } from "./supabase";
+import { getSupabaseClient, isSupabaseConfigured } from "./supabase";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
 const REMOTE_DAILY_COMPLETION_PAGE_SIZE = 500;
@@ -43,16 +43,17 @@ export function normalizePhoneNumber(input: string) {
   return `+${digits}`;
 }
 
-function assertSupabase() {
-  if (!supabase || !isSupabaseConfigured) {
+async function assertSupabase(): Promise<SupabaseClient> {
+  const client = await getSupabaseClient();
+  if (!client || !isSupabaseConfigured) {
     throw new Error("Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.");
   }
 
-  return supabase;
+  return client;
 }
 
 export async function requestPhoneOtp(phone: string) {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const normalizedPhone = normalizePhoneNumber(phone);
   const { error } = await client.auth.signInWithOtp({ phone: normalizedPhone });
   if (error) {
@@ -62,7 +63,7 @@ export async function requestPhoneOtp(phone: string) {
 }
 
 export async function resendPhoneOtp(phone: string) {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const normalizedPhone = normalizePhoneNumber(phone);
   const { error } = await client.auth.resend({ type: "sms", phone: normalizedPhone });
   if (error) {
@@ -72,7 +73,7 @@ export async function resendPhoneOtp(phone: string) {
 }
 
 export async function verifyPhoneOtp(phone: string, token: string) {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const normalizedPhone = normalizePhoneNumber(phone);
   const { data, error } = await client.auth.verifyOtp({
     phone: normalizedPhone,
@@ -88,7 +89,7 @@ export async function verifyPhoneOtp(phone: string, token: string) {
 }
 
 export async function getCurrentSession() {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const { data, error } = await client.auth.getSession();
   if (error) {
     throw error;
@@ -97,15 +98,15 @@ export async function getCurrentSession() {
 }
 
 export async function signOutSupabase() {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const { error } = await client.auth.signOut();
   if (error) {
     throw error;
   }
 }
 
-export function subscribeToAuthChanges(callback: (session: Session | null) => void) {
-  const client = assertSupabase();
+export async function subscribeToAuthChanges(callback: (session: Session | null) => void) {
+  const client = await assertSupabase();
   const { data } = client.auth.onAuthStateChange((_event, session) => {
     callback(session);
   });
@@ -179,19 +180,22 @@ function dailyCompletionKey(record: { dayKey: string; category: StoredSession["c
   return `${record.dayKey}:${record.category}`;
 }
 
-async function loadAllRemoteDailyCompletions(client: ReturnType<typeof assertSupabase>, userId: string) {
+async function loadAllRemoteDailyCompletions(client: SupabaseClient, userId: string) {
   const rows: RemoteDailyCompletionRow[] = [];
-  let start = 0;
+  let cursor: Pick<RemoteDailyCompletionRow, "day_key" | "category"> | null = null;
 
   while (true) {
-    const { data, error } = await client
+    let query = client
       .from("daily_collection_completions")
       .select("day_key, category, time_zone")
       .eq("user_id", userId)
       .order("day_key", { ascending: true })
       .order("category", { ascending: true })
-      .range(start, start + REMOTE_DAILY_COMPLETION_PAGE_SIZE - 1)
-      .returns<RemoteDailyCompletionRow[]>();
+      .limit(REMOTE_DAILY_COMPLETION_PAGE_SIZE);
+    if (cursor) {
+      query = query.or(`day_key.gt.${cursor.day_key},and(day_key.eq.${cursor.day_key},category.gt.${cursor.category})`);
+    }
+    const { data, error } = await query.returns<RemoteDailyCompletionRow[]>();
 
     if (error) {
       if (isMissingDailyCompletionTable(error)) {
@@ -205,12 +209,20 @@ async function loadAllRemoteDailyCompletions(client: ReturnType<typeof assertSup
     if (page.length < REMOTE_DAILY_COMPLETION_PAGE_SIZE) {
       return { rows, tableAvailable: true };
     }
-    start += REMOTE_DAILY_COMPLETION_PAGE_SIZE;
+    const last = page.at(-1);
+    if (!last) return { rows, tableAvailable: true };
+    cursor = { day_key: last.day_key, category: last.category };
   }
 }
 
+export function getSessionsForRemoteSync(sessions: StoredSession[]) {
+  return [...sessions]
+    .sort((left, right) => Date.parse(right.completedAt) - Date.parse(left.completedAt))
+    .slice(0, REMOTE_SESSION_PAGE_SIZE);
+}
+
 export async function loadRemoteState(session: Session, localState: AppStateSnapshot) {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const userId = session.user.id;
 
   const [profileResult, settingsResult, progressResult, sessionsResult, dailyCompletionResult] = await Promise.all([
@@ -318,7 +330,7 @@ export async function syncRemoteState(
   state: AppStateSnapshot,
   streaks: { currentStreak: number; longestStreak: number },
 ) {
-  const client = assertSupabase();
+  const client = await assertSupabase();
   const userId = session.user.id;
 
   const profilePayload = {
@@ -426,7 +438,7 @@ export async function syncRemoteState(
 
   if (state.sessions.length > 0) {
     const { error: sessionError } = await client.from("session_history").upsert(
-      state.sessions.map((item) => ({
+      getSessionsForRemoteSync(state.sessions).map((item) => ({
         id: item.id,
         user_id: userId,
         category: item.category,
