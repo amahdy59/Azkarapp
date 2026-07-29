@@ -66,7 +66,7 @@ const en = {
     morningTitle: "Time for Morning Azkar",
     morningDesc: "Morning Azkar are read after Fajr prayer until sunrise",
     eveningTitle: "Time for Evening Azkar",
-    eveningDesc: "Evening Azkar are read after Asr prayer until Maghrib",
+    eveningDesc: "The preferred window is after Asr prayer until Maghrib",
     beforeSleepTitle: "Time for Before Sleep Azkar",
     beforeSleepDesc: "Before Sleep Azkar are read after Isha prayer and before sleep",
     completedTitle: "Completed {name} • May Allah accept",

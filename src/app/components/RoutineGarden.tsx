@@ -2,6 +2,7 @@ import { useState } from "react";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { Check, CircleIcon } from "./icons";
 import {
   getGardenSummary,
   MAIN_CATEGORY_IDS,
@@ -713,7 +714,7 @@ export function TodayRoutineGarden({
 
           <ul
             aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-            className="mt-3.5 grid w-full grid-cols-3 gap-1.5 sm:gap-2"
+            className="mt-3.5 grid w-full grid-cols-2 gap-2"
           >
             {[
               {
@@ -737,26 +738,29 @@ export function TodayRoutineGarden({
                 data-testid={`garden-category-${col.id}`}
                 data-state={col.state}
                 aria-label={`${col.name}: ${col.state === "complete" ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "غير مكتمل" : "Pending"}`}
-                className={`flex items-center justify-center gap-1.5 rounded-xl border px-2 py-1.5 text-[0.75rem] sm:text-[0.8125rem] font-extrabold transition-all ${
+                className={`flex min-h-10 items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[0.8125rem] font-extrabold transition-all ${
+                  col.id === "before_sleep" ? "col-span-2" : ""
+                } ${
                   col.state === "complete"
                     ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
                     : "border-border/50 bg-muted/20 text-muted-foreground/60"
                 }`}
               >
-                <span className="truncate">{col.name}</span>
+                <span className="min-w-0 flex-1 text-start leading-5">{col.name}</span>
                 {col.state === "complete" ? (
-                  <span className="flex shrink-0 items-center gap-0.5 text-amber-500">
-                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={3}>
-                      <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                    <span className="text-[0.75rem] font-black text-amber-600 dark:text-amber-400">✓</span>
-                  </span>
+                  <Check
+                    data-slot="collection-status"
+                    size={16}
+                    className="shrink-0 text-amber-600 dark:text-amber-400"
+                    aria-hidden="true"
+                  />
                 ) : (
-                  <span className="flex shrink-0 items-center text-muted-foreground/40 font-normal">
-                    <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                      <circle cx="12" cy="12" r="9" />
-                    </svg>
-                  </span>
+                  <CircleIcon
+                    data-slot="collection-status"
+                    size={16}
+                    className="shrink-0 text-muted-foreground/40"
+                    aria-hidden="true"
+                  />
                 )}
               </li>
             ))}

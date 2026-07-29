@@ -1,7 +1,24 @@
-import { describe, expect, it } from "vitest";
-import { getHomeAction } from "./HomeScreen";
+import { beforeEach, describe, expect, it } from "vitest";
+import { getHomeAction, getTimeOfDayZikr } from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
-import type { CategoryId } from "../types";
+import { getEstimatedPrayerTimes } from "../content/prayerTimes";
+import type { CategoryId, LocationSettings } from "../types";
+
+const cairo: LocationSettings = {
+  latitude: 30.0444,
+  longitude: 31.2357,
+  cityName: "Cairo",
+  calculationMethod: 5,
+  autoDetect: false,
+  timeZone: "Africa/Cairo",
+};
+
+function atTime(date: Date, time: string, minuteDelta = 0) {
+  const [hours = "0", minutes = "0"] = time.split(":");
+  const result = new Date(date);
+  result.setHours(Number(hours), Number(minutes) + minuteDelta, 0, 0);
+  return result;
+}
 
 function progress(values: Partial<Record<CategoryId, number[]>> = {}) {
   const result = {} as Record<CategoryId, Set<number>>;
@@ -12,6 +29,8 @@ function progress(values: Partial<Record<CategoryId, number[]>> = {}) {
 }
 
 describe("getHomeAction", () => {
+  beforeEach(() => window.localStorage.clear());
+
   it("resumes an interrupted collection before suggesting a fresh one", () => {
     const action = getHomeAction(progress({ evening: [0, 1] }), new Date(2026, 6, 17, 9));
 
@@ -19,8 +38,20 @@ describe("getHomeAction", () => {
   });
 
   it("uses time of day only as a suggestion for a new session", () => {
-    const action = getHomeAction(progress(), new Date(2026, 6, 17, 15));
+    const date = new Date(2026, 6, 17, 12);
+    const asr = getEstimatedPrayerTimes(date, cairo).asr;
+    const action = getHomeAction(progress(), atTime(date, asr), cairo);
 
     expect(action).toMatchObject({ categoryId: "evening", index: 0, kind: "start" });
+  });
+
+  it("switches recommendations at the calculated local Asr and Isha boundaries", () => {
+    const date = new Date(2026, 6, 17, 12);
+    const times = getEstimatedPrayerTimes(date, cairo);
+
+    expect(getTimeOfDayZikr(atTime(date, times.asr, -1), "en", cairo).categoryId).toBe("morning");
+    expect(getTimeOfDayZikr(atTime(date, times.asr), "en", cairo).categoryId).toBe("evening");
+    expect(getTimeOfDayZikr(atTime(date, times.isha, -1), "en", cairo).categoryId).toBe("evening");
+    expect(getTimeOfDayZikr(atTime(date, times.isha), "en", cairo).categoryId).toBe("before_sleep");
   });
 });

@@ -4,7 +4,7 @@ import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden"
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getNextPrayerCountdown } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -22,28 +22,29 @@ export type HomeAction = {
   kind: HomeActionKind;
 };
 
-function suggestedCategoryId(date: Date): CategoryId {
-  const hour = date.getHours();
-  if (hour >= 20 || hour < 4) {
-    return "before_sleep";
-  }
-  return hour >= 15 ? "evening" : "morning";
+function suggestedCategoryId(date: Date, location?: LocationSettings): CategoryId {
+  return getTimeOfDayZikr(date, "en", location).categoryId;
 }
 
 function getNextIndex(completed: Set<number>, totalCount: number) {
   return Array.from({ length: totalCount }, (_, index) => index).find((index) => !completed.has(index)) ?? 0;
 }
 
-export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar") {
-  const hour = now.getHours() + now.getMinutes() / 60;
-  if (hour >= 4 && hour < 15.5) {
+export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar", location?: LocationSettings) {
+  const prayerTimes = getEstimatedPrayerTimes(now, location);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const fajrMinutes = timeToMinutes(prayerTimes.fajr);
+  const asrMinutes = timeToMinutes(prayerTimes.asr);
+  const ishaMinutes = timeToMinutes(prayerTimes.isha);
+
+  if (currentMinutes >= fajrMinutes && currentMinutes < asrMinutes) {
     return {
       categoryId: "morning" as CategoryId,
       title: t(language, "home.morningTitle"),
       desc: t(language, "home.morningDesc"),
     };
   }
-  if (hour >= 15.5 && hour < 20) {
+  if (currentMinutes >= asrMinutes && currentMinutes < ishaMinutes) {
     return {
       categoryId: "evening" as CategoryId,
       title: t(language, "home.eveningTitle"),
@@ -58,8 +59,12 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
 }
 
 /** Chooses one calm, useful next action without blocking access to any collection. */
-export function getHomeAction(completed: Record<CategoryId, Set<number>>, now: Date = new Date()): HomeAction {
-  const suggestedId = suggestedCategoryId(now);
+export function getHomeAction(
+  completed: Record<CategoryId, Set<number>>,
+  now: Date = new Date(),
+  location?: LocationSettings,
+): HomeAction {
+  const suggestedId = suggestedCategoryId(now, location);
   const categoryIds = [suggestedId, ...CATEGORIES.map((category) => category.id)].filter(
     (id, index, values) => values.indexOf(id) === index,
   ) as CategoryId[];
@@ -145,7 +150,10 @@ export function HomeScreen({
 
   const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
 
-  const reminderInfo = useMemo(() => getTimeOfDayZikr(now, language), [now, language]);
+  const reminderInfo = useMemo(
+    () => getTimeOfDayZikr(now, language, locationSettings),
+    [now, language, locationSettings],
+  );
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
   const categoryAzkar = getAzkarByCategory(reminderInfo.categoryId);
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<number>();
@@ -174,19 +182,19 @@ export function HomeScreen({
         <PalmTreeReward summary={gardenSummary} language={language} bare />
 
         <div
-          className="flex w-full items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30"
+          className="grid w-full grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-1.5 py-1.5 text-center shadow-2xs backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30"
           data-testid="prayer-header-card"
         >
-          <div className="flex min-w-0 flex-1 items-center justify-center px-1.5" data-testid="hijri-date" dir="auto">
+          <div className="flex min-w-0 items-center justify-center px-1" data-testid="hijri-date" dir="auto">
             <span className="font-sans text-[0.6875rem] leading-4 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
               {formatHijriDate(now, language)}
             </span>
           </div>
 
-          <span className="my-0.5 w-px shrink-0 self-stretch bg-amber-700/25 dark:bg-amber-200/25" aria-hidden="true" />
+          <span className="h-5 w-px self-center bg-amber-700/25 dark:bg-amber-200/25" aria-hidden="true" />
 
           <div
-            className="flex shrink-0 items-center justify-center px-1.5"
+            className="flex min-w-0 items-center justify-center px-1"
             data-testid="next-prayer"
             dir="auto"
             title={

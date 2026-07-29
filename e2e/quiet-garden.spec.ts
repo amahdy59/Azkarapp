@@ -184,13 +184,24 @@ test("Arabic garden mirrors collection order and provides non-color completion c
   if (!morningBox || !eveningBox || !beforeSleepBox) return;
 
   expect(morningBox.x).toBeGreaterThan(eveningBox.x);
-  expect(eveningBox.x).toBeGreaterThan(beforeSleepBox.x);
+  expect(beforeSleepBox.x).toBeCloseTo(eveningBox.x, 0);
+  expect(beforeSleepBox.width).toBeGreaterThan(morningBox.width);
   await expect(morning).toHaveAttribute("data-state", "complete");
   await expect(evening).toHaveAttribute("data-state", "pending");
 
-  const completeStatus = morning.locator("span").last();
-  await expect(completeStatus).toHaveText("✓");
   expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
   await expect(morning.locator("svg")).toHaveCount(1);
   await expect(evening.locator("svg")).toHaveCount(1);
+  await expect(morning).toContainText("أذكار الصباح");
+  await expect(evening).toContainText("أذكار المساء");
+  await expect(beforeSleep).toContainText("أذكار النوم");
+  expect(await morning.textContent()).not.toContain("✓");
+  for (const tracker of [morning, evening, beforeSleep]) {
+    expect(
+      await tracker.evaluate((element) => ({
+        fits: element.scrollWidth <= element.clientWidth,
+        usesEllipsis: getComputedStyle(element.querySelector("span")!).textOverflow === "ellipsis",
+      })),
+    ).toEqual({ fits: true, usesEllipsis: false });
+  }
 });

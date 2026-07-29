@@ -15,6 +15,8 @@ The Home prayer header displays the next prayer and a live countdown. Settings â
 
 The five calculated prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha.
 
+Home also uses the same calculated boundaries for its featured collection: Morning from Fajr to Asr, Evening from Asr to Isha, and Before Sleep from Isha to the following Fajr. The preferred Evening reading window is communicated as after Asr until Maghrib.
+
 ## Resolution flow
 
 ```mermaid

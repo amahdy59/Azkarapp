@@ -73,9 +73,10 @@ Rules:
 - Category totals are derived from the content collection at runtime. Do not maintain duplicate display totals in category metadata.
 - Arabic group cards use an explicit physical LTR grid so visual placement is deterministic: Arabic text occupies the right column with its own `dir="rtl"`, the category icon sits to its left, and the back/entry chevron is the far-left element. English mirrors that physical grid.
 - Group progress fills from the reading start edge: right-to-left for Arabic and left-to-right for English. DOM and tab order remain stable in both languages.
-- The featured “start your zikr” card is time-aware: Morning from 05:00–14:59, Evening from 15:00–20:59, and Before Sleep from 21:00–04:59 local device time. It always opens the first zikr in the selected group.
+- The featured “start your zikr” card uses the selected location's calculated prayer boundaries: Morning from Fajr until Asr, Evening from Asr until Isha, and Before Sleep from Isha until the following Fajr. Copy identifies after Asr until Maghrib as the preferred Evening window without hiding the collection afterward.
 - Each featured state uses its approved scene asset from `src/assets/home`: `morning-scene.png` for Morning, `evening-scene.png` for Evening, and `before-sleep-scene.png` for Before Sleep. Artwork is decorative, sits behind all copy, fills the card, and uses the theme-owned `--featured-scene-opacity` token plus a semantic card/background overlay for legibility in Light, Midnight, and Dark/OLED modes.
 - Featured-card Arabic copy is right aligned and uses RTL semantics. Zikr excerpts retain the `zikr-text` typography contract; decorative artwork has empty alternative text.
+- The daily palm trackers use two balanced columns with Before Sleep spanning the second row. Labels wrap without ellipsis, and each tracker contains exactly one status icon: a check when complete or a circle when pending.
 
 ## Benefit sheet contract
 
