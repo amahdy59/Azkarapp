@@ -1,7 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { BookOpen, Check, ChevronUp, Heart, Share2, MoreVertical, RotateCcw, List, Bookmark, ChevronLeft, ChevronRight } from "../components/icons";
+import {
+  BookOpen,
+  Check,
+  ChevronUp,
+  Heart,
+  Share2,
+  MoreVertical,
+  RotateCcw,
+  List,
+  Bookmark,
+  ChevronLeft,
+  ChevronRight,
+} from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -293,8 +305,14 @@ export function ReaderScreen({
   let displayArabicText = z.arabicText;
   if (z.hasBasmalah || z.isSurah) {
     displayArabicText = displayArabicText
-      .replace(/^(بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ|بِسْمِ\s+اللَّهِ\s+الرَّحْمَنِ\s+الرَّحِيمِ|بِسْمِ\s+اللهِ\s+الرَّحْمٰنِ\s+الرَّحِيْمِ)[\.\s\u06d4]*/, "")
-      .replace(/^\u0628\u0650\u0633\u0652\u0645\u0650\s+\u0627\u0644\u0644\u0651\u064e\u0647\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650[\.\s]*/, "")
+      .replace(
+        /^(بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ|بِسْمِ\s+اللَّهِ\s+الرَّحْمَنِ\s+الرَّحِيمِ|بِسْمِ\s+اللهِ\s+الرَّحْمٰنِ\s+الرَّحِيْمِ)[\.\s\u06d4]*/,
+        "",
+      )
+      .replace(
+        /^\u0628\u0650\u0633\u0652\u0645\u0650\s+\u0627\u0644\u0644\u0651\u064e\u0647\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650[\.\s]*/,
+        "",
+      )
       .trim();
   }
 
@@ -507,7 +525,11 @@ export function ReaderScreen({
             >
               <MoreVertical size={20} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground" sideOffset={8}>
+            <DropdownMenuContent
+              align="end"
+              className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+              sideOffset={8}
+            >
               {/* Navigation Items */}
               <DropdownMenuItem
                 disabled={idx === 0}
