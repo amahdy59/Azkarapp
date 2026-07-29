@@ -690,8 +690,14 @@ export function ReaderScreen({
             justCompleted ? "zikr-step-exit" : "zikr-step-enter"
           }`}
         >
-          {/* Inner wrapper starts from top (`justify-start pt-1`), expanding content naturally down to the counter */}
-          <div className="flex min-h-full flex-col justify-start pt-1 pb-2 items-center">{renderReadingContent()}</div>
+          {/* Inner wrapper vertically centers short/medium Zikrs; long Surahs start at top to scroll naturally */}
+          <div
+            className={`flex min-h-full flex-col ${
+              isLongContent ? "justify-start pt-1" : "justify-center my-auto"
+            } pb-2 items-center`}
+          >
+            {renderReadingContent()}
+          </div>
         </div>
 
         {/* Lower section: Counter panel — shrink-0 ensures it is always pinned and never covered */}

@@ -138,4 +138,6 @@ export interface AppStateSnapshot {
   dailyCompletions: DailyCollectionCompletion[];
   /** Stable content IDs saved by the user for quick return and account sync. */
   savedZikrIds: string[];
+  /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
+  lastActiveDayKey?: string;
 }

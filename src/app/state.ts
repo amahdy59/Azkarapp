@@ -12,6 +12,7 @@ import {
   CATEGORY_IDS,
   DEFAULT_PROGRESS_DAY_START_HOUR,
   deriveDailyCompletionsFromLegacySessions,
+  getProgressDayKey,
   mergeDailyCompletions,
   normalizeDailyCompletions,
 } from "./progress";
@@ -210,6 +211,20 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     ? normalizeDailyCompletions(parsed.dailyCompletions)
     : deriveDailyCompletionsFromLegacySessions(sessions, progressDayStartHour);
 
+  const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
+  const lastActiveDayKey = typeof parsed.lastActiveDayKey === "string" ? parsed.lastActiveDayKey : "";
+  const isNewDay = lastActiveDayKey !== "" && lastActiveDayKey !== currentDayKey;
+
+  const completed = Object.fromEntries(
+    CATEGORY_IDS.map((id) => {
+      const isDailyRoutine = ["morning", "evening", "before_sleep", "waking_up", "after_prayer"].includes(id);
+      if (isNewDay && isDailyRoutine) {
+        return [id, []];
+      }
+      return [id, normalizeCompletedIndexes(parsed.completed?.[id], id)];
+    }),
+  ) as Record<CategoryId, number[]>;
+
   return {
     settings: {
       language:
@@ -279,14 +294,13 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ? parsed.profile.accountUserId
           : DEFAULT_APP_STATE.profile.accountUserId,
     },
-    completed: Object.fromEntries(
-      CATEGORY_IDS.map((id) => [id, normalizeCompletedIndexes(parsed.completed?.[id], id)]),
-    ) as Record<CategoryId, number[]>,
+    completed,
     sessions,
     dailyCompletions,
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
+    lastActiveDayKey: currentDayKey,
   };
 }
 
