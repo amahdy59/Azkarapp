@@ -175,6 +175,22 @@ export function CategoryScreen({
           onClick={() => onZikr(index)}
           className="interactive-elem min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
         >
+          {isArabic && z.hasSeekRefuge && (
+            <div className="mb-2 text-center pointer-events-none">
+              <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+              </p>
+            </div>
+          )}
+
+          {isArabic && (z.hasBasmalah || z.isSurah) && (
+            <div className="mb-2 text-center pointer-events-none">
+              <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+              </p>
+            </div>
+          )}
+
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
             dir={isArabic ? "rtl" : "ltr"}

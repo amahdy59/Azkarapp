@@ -957,6 +957,11 @@ body {
   }
 }
 
+.font-arabic,
+.zikr-text {
+  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+}
+
 .animate-leaf-float-core {
   animation: leaf-float-core 1.5s ease-out both;
 }

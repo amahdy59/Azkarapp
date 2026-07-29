@@ -349,6 +349,12 @@ const GENERIC_PREFERRED_TIMINGS = new Set<string>([
   "Upon rising in the morning.",
   "After Fajr / upon rising in the morning.",
   "During the day; suitable to include in morning/evening routine.",
+  "Recited before sleeping.",
+  "Before sleeping, after lying down.",
+  "When lying down to sleep.",
+  "At night before sleeping.",
+  "Before sleeping.",
+  "Before sleeping every night.",
 ]);
 
 export function hasSpecificRecommendedTiming(zikr: Zikr): boolean {
