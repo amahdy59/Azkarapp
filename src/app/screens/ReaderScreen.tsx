@@ -316,6 +316,8 @@ export function ReaderScreen({
       .trim();
   }
 
+  const isLongContent = z.isSurah || z.arabicText.length > 250;
+
   const renderReadingContent = () => (
     <div
       className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
@@ -342,15 +344,6 @@ export function ReaderScreen({
           <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
             بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
           </p>
-        </div>
-      )}
-
-      {hasSpecificRecommendedTiming(z) && (
-        <div className="mb-3.5 text-center pointer-events-none">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-[0.75rem] font-bold text-emerald-900 dark:text-emerald-200">
-            <span aria-hidden="true">📜</span>
-            <span>{getLocalizedPreferredTiming(z, language)}</span>
-          </span>
         </div>
       )}
 
@@ -420,63 +413,115 @@ export function ReaderScreen({
     </div>
   );
 
-  const renderCounterPanel = () => (
-    <div className="flex flex-col px-5 pb-3" data-testid="counter-panel">
-      <div className="flex flex-col">
-        <div
-          role="button"
-          data-testid="counter-surface"
-          tabIndex={0}
-          aria-disabled={complete}
-          aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-          className={`flex touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
-          onKeyDown={(event) => {
-            if (event.key === " " || event.key === "Enter") {
-              event.preventDefault();
-              handleTap();
-            }
-          }}
-        >
-          <div
-            className={`counter-ring-stage pointer-events-none relative flex h-[150px] w-[150px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+  const renderCounterPanel = () => {
+    if (isLongContent) {
+      return (
+        <div className="px-5 pb-2" data-testid="counter-panel">
+          <button
+            type="button"
+            data-testid="counter-surface"
+            disabled={complete}
+            onClick={handleTap}
+            onKeyDown={(event) => {
+              if (event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                handleTap();
+              }
+            }}
+            aria-disabled={complete}
+            aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
+            className={`w-full min-h-[48px] px-4 py-2.5 rounded-2xl flex items-center justify-between font-bold text-[0.9375rem] transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] ${
+              complete
+                ? "bg-emerald-500/15 text-emerald-950 dark:text-emerald-100 border border-emerald-500/30 shadow-none cursor-default"
+                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md cursor-pointer"
+            }`}
           >
-            <PulseRings trigger={pulse} size={150} count={count} total={z.repetitionCount} />
-            <CounterRing count={count} total={z.repetitionCount} size={150} />
-            <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="flex items-center gap-2.5">
               {complete ? (
-                <div
-                  className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
-                  data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
-                >
-                  <span className="counter-check-mark">
-                    <Check size={36} strokeWidth={2.5} />
-                  </span>
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
+                  <Check size={18} strokeWidth={2.5} />
                 </div>
               ) : (
-                <>
-                  <p
-                    className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
-                    key={count}
-                    dir="ltr"
-                    style={{
-                      fontFamily: counterNumeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums lining-nums",
-                    }}
-                  >
-                    {localizedCount}
-                  </p>
-                  <p
-                    className="text-[0.75rem] text-foreground"
-                    dir="ltr"
-                    style={{
-                      fontFamily: counterNumeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums lining-nums",
-                    }}
-                  >
-                    {localizedRatio}
-                  </p>
-                </>
+                <span
+                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-[0.8125rem] font-extrabold"
+                  style={{ fontFamily: counterNumeralFontFamily(language) }}
+                >
+                  {localizedCount}
+                </span>
               )}
+              <span>{complete ? t(language, "reader.completedSurah") : t(language, "reader.tapWhenFinished")}</span>
+            </div>
+
+            <div
+              className="flex items-center gap-2 text-[0.8125rem] opacity-90"
+              style={{ fontFamily: counterNumeralFontFamily(language) }}
+            >
+              <span>{localizedRatio}</span>
+              {!complete && <Check size={16} />}
+            </div>
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col px-5 pb-3" data-testid="counter-panel">
+        <div className="flex flex-col">
+          <div
+            role="button"
+            data-testid="counter-surface"
+            tabIndex={0}
+            aria-disabled={complete}
+            aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
+            className={`flex touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
+            onKeyDown={(event) => {
+              if (event.key === " " || event.key === "Enter") {
+                event.preventDefault();
+                handleTap();
+              }
+            }}
+          >
+            <div
+              className={`counter-ring-stage pointer-events-none relative flex h-[150px] w-[150px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+            >
+              <PulseRings trigger={pulse} size={150} count={count} total={z.repetitionCount} />
+              <CounterRing count={count} total={z.repetitionCount} size={150} />
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                {complete ? (
+                  <div
+                    className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+                    data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+                  >
+                    <span className="counter-check-mark">
+                      <Check size={36} strokeWidth={2.5} />
+                    </span>
+                  </div>
+                ) : (
+                  <>
+                    <p
+                      className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
+                      key={count}
+                      dir="ltr"
+                      style={{
+                        fontFamily: counterNumeralFontFamily(language),
+                        fontVariantNumeric: "tabular-nums lining-nums",
+                      }}
+                    >
+                      {localizedCount}
+                    </p>
+                    <p
+                      className="text-[0.75rem] text-foreground"
+                      dir="ltr"
+                      style={{
+                        fontFamily: counterNumeralFontFamily(language),
+                        fontVariantNumeric: "tabular-nums lining-nums",
+                      }}
+                    >
+                      {localizedRatio}
+                    </p>
+                  </>
+                )}
+              </div>
             </div>
           </div>
 
@@ -489,8 +534,8 @@ export function ReaderScreen({
           </p>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
 

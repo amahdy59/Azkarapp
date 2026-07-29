@@ -575,6 +575,8 @@ const en = {
     prev: "Prev",
     next: "Next",
     undo: "Undo",
+    tapWhenFinished: "Tap when finished",
+    completedSurah: "Completed",
   },
   auth: {
     welcome: "Welcome to Azkar",
