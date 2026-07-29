@@ -2060,86 +2060,44 @@ const TRAVEL_AZKAR: Zikr[] = [
     category: "travel",
     orderIndex: 0,
     arabicText:
-      "اللَّهُ أَكبَرُ (٣×) سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ",
+      "اللَّهُ أَكبَرُ (٣×) سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ\n\nاللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى\n\nاللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ",
     transliteration:
-      "Allahu Akbar (3x), Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun",
+      "Allahu Akbar (3x). Subhanalladhi sakhkhara lana hadha wa ma kunna lahu muqrinina wa inna ila Rabbina lamunqalibun.\n\nAllahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa wa minal-'amali ma tarda.\n\nAllahumma antas-sahibu fis-safari wal-khalifatu fil-ahl.",
     translation:
-      "Allah is the Greatest (3x). Glory be to Him Who subjected this to us and we were not capable of it, and indeed to our Lord we will return.",
-    benefit: "Recited when mounting a vehicle.",
+      "Allah is the Greatest (3×). Glory be to Him Who has subjected this to us, and we could never have it (by our efforts). And verily, to our Lord we indeed are to return.\n\nO Allah, we ask You on this our journey for righteousness, piety, and deeds that please You.\n\nO Allah, You are the Companion during travel and the Guardian over the family.",
+    benefit:
+      "Recited when mounting a vehicle and setting out on a journey — all three phrases from the same narration of Ibn ʿUmar.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2602; Hisn al-Muslim 75.",
+    sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2600, 2602; Hisn al-Muslim 75–76.",
     hadithText:
-      "عن ابن عمر رضي الله عنهما أن رسول الله ﷺ كان إذا استوى على بعيره خارجاً إلى سفر كبر ثلاثاً ثم قال: «سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ...».",
+      "عن ابن عمر رضي الله عنهما أن رسول الله ﷺ كان إذا استوى على بعيره خارجاً إلى سفر كبَّر ثلاثاً، ثم قال: «سُبحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقرِنِينَ وَإِنَّا إِلَى رَبِّنَا لَمُنقَلِبُونَ، اللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى، اللَّهُمَّ هَوِّن عَلَينَا سَفَرَنَا هَذَا وَاطوِ عَنَّا بُعدَهُ، اللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ».",
     authenticityNote: "Sahih Muslim.",
-  },
-  {
-    id: "tr-ref-2",
-    category: "travel",
-    orderIndex: 1,
-    arabicText: "اللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى",
-    transliteration: "Allahumma inna nas'aluka fi safarina hadhal-birra wat-taqwa wa minal-'amali ma tarda",
-    translation: "O Allah, we ask You on this our journey for righteousness and piety, and deeds pleasing to You.",
-    benefit: "Recited when setting out on travel.",
-    repetitionCount: 1,
-    countLabel: "1",
-    sourceReference: "Sahih Muslim 1342; Hisn al-Muslim 76.",
-    hadithText:
-      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان يقول في سفره: «اللَّهُمَّ إِنَّا نَسأَلُكَ فِي سَفَرِنَا هَذَا البِرَّ وَالتَّقوَى وَمِنَ العَمَلِ مَا تَرضَى».",
-    authenticityNote: "Sahih Muslim.",
-  },
-  {
-    id: "tr-ref-3",
-    category: "travel",
-    orderIndex: 2,
-    arabicText: "اللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ",
-    transliteration: "Allahumma antas-sahibu fis-safari wal-khalifatu fil-ahl",
-    translation: "O Allah, You are the Companion during travel and the Successor over the family.",
-    benefit: "Recited when setting out.",
-    repetitionCount: 1,
-    countLabel: "1",
-    sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2600; Hisn al-Muslim 76.",
-    hadithText:
-      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان يقول: «اللَّهُمَّ أَنتَ الصَّاحِبُ فِي السَّفَرِ وَالخَلِيفَةُ فِي الأَهلِ».",
-    authenticityNote: "Sahih Muslim.",
+    notes: "sourceUrl: https://sunnah.com/muslim:1342a",
   },
   {
     id: "tr-ref-4",
     category: "travel",
-    orderIndex: 3,
+    orderIndex: 1,
     arabicText:
-      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ وَسُوءِ المَنظَرِ فِي المَالِ وَالأَهلِ",
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ وَسُوءِ المَنظَرِ فِي المَالِ وَالأَهلِ\n\nآيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ",
     transliteration:
-      "Allahumma inni a'udhu bika min wa'tha'is-safari wa ka'abatil-munqalabi wa su'il-manzari fil-mali wal-ahl",
+      "Allahumma inni a'udhu bika min wa'tha'is-safari wa ka'abatil-munqalabi wa su'il-manzari fil-mali wal-ahl.\n\nA'ibuna ta'ibuna 'abiduna li-Rabbina hamidun.",
     translation:
-      "O Allah, I seek refuge in You from the difficulties of travel, from the depressing sight of what I return to, and from the affliction of my wealth and family.",
-    benefit: "Recited when returning from travel.",
+      "O Allah, I seek refuge in You from the hardships of travel, from returning to a depressing sight, and from finding misfortune in wealth and family.\n\nWe return, repentant, worshipping and praising our Lord.",
+    benefit: "Recited when returning from travel — both phrases narrated from Ibn ʿUmar and Anas ibn Mālik.",
     repetitionCount: 1,
     countLabel: "1",
-    sourceReference: "Sahih Muslim 1343; Hisn al-Muslim 77.",
+    sourceReference: "Sahih Muslim 1343; Sahih al-Bukhari 3/418; Hisn al-Muslim 77–78.",
     hadithText:
-      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان إذا رجع كبر على كل شرف... وقال: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ...».",
-    authenticityNote: "Sahih Muslim.",
-  },
-  {
-    id: "tr-ref-5",
-    category: "travel",
-    orderIndex: 4,
-    arabicText: "آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ",
-    transliteration: "A'ibuna ta'ibuna 'abiduna li-Rabbina hamidun",
-    translation: "We return, repenting, worshipping, and praising our Lord.",
-    benefit: "Recited upon returning from travel.",
-    repetitionCount: 1,
-    countLabel: "1",
-    sourceReference: "Sahih al-Bukhari 3/418; Sahih Muslim 1345; Hisn al-Muslim 78.",
-    hadithText:
-      "عن أنس بن مالك رضي الله عنه قال: أقبلنا مع النبي ﷺ حتى إذا كنا بظهر المدينة قال: «آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ» فما زال يقولها حتى قدمنا المدينة.",
-    authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
+      "عن ابن عمر رضي الله عنهما أن النبي ﷺ كان إذا قفل من الغزو أو الحج أو العمرة يكبر على كل شرف من الأرض ثلاث تكبيرات ثم يقول: «لا إله إلا الله وحده لا شريك له... آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِن وَعثَاءِ السَّفَرِ وَكَآبَةِ المُنقَلَبِ وَسُوءِ المَنظَرِ فِي المَالِ وَالأَهلِ». رواه مسلم.",
+    authenticityNote: "Sahih Muslim and Sahih al-Bukhari.",
+    notes: "sourceUrl: https://sunnah.com/muslim:1343b",
   },
   {
     id: "tr-ref-6",
     category: "travel",
-    orderIndex: 5,
+    orderIndex: 2,
     arabicText: "اللَّهُمَّ اجعَل لَنَا فِيهَا قَرَارًا وَرِزقًا حَسَنًا",
     transliteration: "Allahummaj'al lana fiha qararan wa rizqan hasana",
     translation: "O Allah, make for us a stable settlement and good provision in it.",
@@ -2150,11 +2108,12 @@ const TRAVEL_AZKAR: Zikr[] = [
     hadithText:
       "عن صهيب رضي الله عنه أن النبي ﷺ لم ير قرية يريد دخولها إلا قال حين يراها: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ... اجعَل لَنَا فِيهَا قَرَارًا وَرِزقًا حَسَنًا».",
     authenticityNote: "Hasan.",
+    notes: "sourceUrl: https://sunnah.com/hisn%3A80",
   },
   {
     id: "tr-ref-7",
     category: "travel",
-    orderIndex: 6,
+    orderIndex: 3,
     arabicText: "اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَ هَذِهِ القَريَةِ وَخَيرَ أَهلِهَا وَأَعُوذُ بِكَ مِن شَرِّهَا",
     transliteration: "Allahumma inni as'aluka khayra hadhihil-qaryati wa khayra ahliha wa a'udhu bika min sharriha",
     translation:
@@ -2166,6 +2125,7 @@ const TRAVEL_AZKAR: Zikr[] = [
     hadithText:
       "عن صهيب رضي الله عنه أن النبي ﷺ كان يقول إذا دخل قرية: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَ هَذِهِ القَريَةِ وَخَيرَ أَهلِهَا وَأَعُوذُ بِكَ مِن شَرِّهَا».",
     authenticityNote: "Hasan.",
+    notes: "sourceUrl: https://sunnah.com/hisn%3A80",
   },
 ];
 

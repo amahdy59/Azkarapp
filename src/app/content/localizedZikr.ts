@@ -109,6 +109,10 @@ const ARABIC_BENEFITS: Readonly<Record<string, string>> = {
   "Said when putting on a new garment.": "يُقال عند لبس الثوب الجديد.",
   "Said to someone wearing a new garment.": "يُقال لمن لبس ثوبًا جديدًا.",
   "Said before undressing to shield from jinn.": "يُقال عند خلع الثوب للحجاب عن أعين الجن.",
+  "Recited when mounting a vehicle and setting out on a journey — all three phrases from the same narration of Ibn ʿUmar.":
+    "يُقال عند ركوب الدابة والشروع في السفر — والعبارات الثلاث مروية في حديث واحد عن ابن عمر.",
+  "Recited when returning from travel — both phrases narrated from Ibn ʿUmar and Anas ibn Mālik.":
+    "يُقال عند الرجوع من السفر — والجملتان مرويتان عن ابن عمر وأنس بن مالك رضي الله عنهم.",
   "Recited when mounting a vehicle.": "يُقال عند ركوب الدابة أو الوسيلة.",
   "Recited when setting out on travel.": "يُقال عند الشروع في السفر.",
   "Recited when setting out.": "يُقال عند الانطلاق.",

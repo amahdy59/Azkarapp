@@ -4,7 +4,7 @@ import { Search, Bookmark, ChevronNext } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ProgressBar } from "../components/ProgressBar";
 import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
-import { CATEGORIES } from "../content/categories";
+import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
@@ -76,6 +76,8 @@ export function AzkarLibraryScreen({
               {CATEGORIES.map((category) => {
                 const total = getCategoryTotal(category.id);
                 const done = completed[category.id]?.size ?? 0;
+                const isOccasional = isOccasionalCategory(category.id);
+
                 return (
                   <button
                     key={category.id}
@@ -84,14 +86,16 @@ export function AzkarLibraryScreen({
                     dir={direction}
                     onClick={() => onCategory(category.id)}
                     className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    aria-label={`${isArabic ? category.nameArabic : category.name}, ${t(
-                      language,
-                      "library.progressOfTotal",
-                      {
-                        done: formatNumerals(done, language),
-                        total: formatNumerals(total, language),
-                      },
-                    )}`}
+                    aria-label={
+                      isOccasional
+                        ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
+                            isArabic ? "أذكار" : "supplications"
+                          }`
+                        : `${isArabic ? category.nameArabic : category.name}, ${t(language, "library.progressOfTotal", {
+                            done: formatNumerals(done, language),
+                            total: formatNumerals(total, language),
+                          })}`
+                    }
                   >
                     <span
                       data-slot="category-icon"
@@ -104,23 +108,31 @@ export function AzkarLibraryScreen({
                       <span className="block text-[1rem] font-bold text-foreground">
                         {isArabic ? category.nameArabic : category.name}
                       </span>
-                      <div className="mt-2 flex flex-col gap-1">
-                        <ProgressBar
-                          value={done}
-                          max={total}
-                          height={5}
-                          trackColor="var(--muted)"
-                          fillColor="var(--primary)"
-                          direction={direction}
-                          aria-label={t(language, "library.complete")}
-                        />
-                        <span className="block text-[0.8125rem] text-muted-foreground">
-                          {t(language, "library.progressOfTotal", {
-                            done: formatNumerals(done, language),
-                            total: formatNumerals(total, language),
-                          })}
-                        </span>
-                      </div>
+                      {isOccasional ? (
+                        <div className="mt-1 flex items-center gap-1.5">
+                          <span className="text-[0.8125rem] font-semibold text-muted-foreground">
+                            {formatNumerals(total, language)} {isArabic ? "أذكار سياقية" : "Occasional supplications"}
+                          </span>
+                        </div>
+                      ) : (
+                        <div className="mt-2 flex flex-col gap-1">
+                          <ProgressBar
+                            value={done}
+                            max={total}
+                            height={5}
+                            trackColor="var(--muted)"
+                            fillColor="var(--primary)"
+                            direction={direction}
+                            aria-label={t(language, "library.complete")}
+                          />
+                          <span className="block text-[0.8125rem] text-muted-foreground">
+                            {t(language, "library.progressOfTotal", {
+                              done: formatNumerals(done, language),
+                              total: formatNumerals(total, language),
+                            })}
+                          </span>
+                        </div>
+                      )}
                     </span>
                     <ChevronNext
                       data-slot="category-chevron"
