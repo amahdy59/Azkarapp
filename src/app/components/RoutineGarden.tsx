@@ -770,24 +770,28 @@ export function TodayRoutineGarden({
       {activeTab === "month" && (
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-3 rounded-2xl border border-border/80 bg-background/80 p-4 text-center shadow-xs">
-            <div>
-              <span className="block text-[1.25rem] font-black text-foreground">
+            <div className="flex flex-col items-center justify-center">
+              <span className="flex items-center justify-center gap-1 text-[1.125rem] font-black text-amber-600 dark:text-amber-400">
+                <span role="img" aria-label="Streak flame" className="text-[1rem]">
+                  🔥
+                </span>
                 {formatNumerals(maxStreakInMonth, language)} {isArabic ? "يوم" : "days"}
               </span>
               <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
                 {t(language, "garden.longestStreak")}
               </span>
             </div>
-            <div className="border-x border-border/60 px-1">
-              <span className="block text-[1.25rem] font-black text-emerald-600 dark:text-emerald-400">
+            <div className="flex flex-col items-center justify-center border-x border-border/60 px-1">
+              <span className="block text-[1.125rem] font-black text-emerald-600 dark:text-emerald-400">
                 {formatNumerals(monthAdherenceRate, language)}%
               </span>
               <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
                 {t(language, "garden.adherence")}
               </span>
             </div>
-            <div>
-              <span className="block text-[1.25rem] font-black text-amber-500">
+            <div className="flex flex-col items-center justify-center">
+              <span className="flex items-center justify-center gap-1 text-[1.125rem] font-black text-amber-500">
+                <PalmTreeMark size={18} filled={monthPalms > 0} />
                 {formatNumerals(monthPalms, language)}
               </span>
               <span className="mt-0.5 block text-[0.75rem] font-bold text-muted-foreground">
@@ -820,12 +824,12 @@ export function TodayRoutineGarden({
                 const tileBg = isPalm
                   ? "bg-amber-500/20 border border-amber-400/80 text-amber-500 font-black shadow-xs dark:bg-amber-500/25"
                   : completedCount > 0
-                    ? "bg-emerald-500/25 text-emerald-900 dark:text-emerald-300 font-semibold border border-emerald-500/30"
+                    ? "bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-semibold"
                     : "bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/40 border border-transparent";
 
                 const tileTitle = isArabic
-                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة 🌴" : completedCount > 0 ? "نشط" : "غير نشط"}`
-                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed 🌴" : completedCount > 0 ? "Active" : "Inactive"}`;
+                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة 🌴" : completedCount > 0 ? "نشط 🔥" : "غير نشط"}`
+                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed 🌴" : completedCount > 0 ? "Active 🔥" : "Inactive"}`;
 
                 return (
                   <button
@@ -836,7 +840,7 @@ export function TodayRoutineGarden({
                     tabIndex={0}
                     className={`interactive-elem flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tileBg}`}
                   >
-                    <span>{isPalm ? "🌴" : completedCount > 0 ? "✨" : ""}</span>
+                    <span>{isPalm ? "🌴" : completedCount > 0 ? "🔥" : ""}</span>
                     <span className="text-[0.625rem] opacity-80">{formatNumerals(day.dayNum, language)}</span>
                   </button>
                 );
@@ -854,8 +858,13 @@ export function TodayRoutineGarden({
               <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "garden.yearMapTitle")}</h3>
               <div className="flex items-center gap-2 text-[0.6875rem] font-bold text-muted-foreground">
                 <span>{t(language, "garden.legendLess")}</span>
-                <span className="h-4 w-4 rounded-[4px] bg-muted/40 dark:bg-zinc-800/60" title="0" />
-                <span className="h-4 w-4 rounded-[4px] bg-emerald-500/30 border border-emerald-500/40" title="Active" />
+                <span className="h-4 w-4 rounded-[4px] bg-muted/40 dark:bg-zinc-800/60" title="Inactive" />
+                <span
+                  className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10 text-[0.55rem]"
+                  title="Streak Active (🔥)"
+                >
+                  🔥
+                </span>
                 <span
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
                   title="Palm Tree (🌴)"
@@ -927,12 +936,12 @@ export function TodayRoutineGarden({
                           const tileBg = isPalm
                             ? "bg-amber-500/25 border border-amber-400/80 text-amber-500 font-black shadow-2xs"
                             : hasActivity
-                              ? "bg-emerald-500/30 border border-emerald-500/40 text-emerald-700 dark:text-emerald-300"
+                              ? "bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400"
                               : "bg-muted/30 dark:bg-zinc-800/40 border border-transparent";
 
                           const tileTitle = isArabic
-                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة 🌴" : hasActivity ? "نشط" : "غير نشط"}`
-                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed 🌴" : hasActivity ? "Active" : "Inactive"}`;
+                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة 🌴" : hasActivity ? "نشط 🔥" : "غير نشط"}`
+                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed 🌴" : hasActivity ? "Active 🔥" : "Inactive"}`;
 
                           return (
                             <button
@@ -943,7 +952,7 @@ export function TodayRoutineGarden({
                               tabIndex={0}
                               className={`interactive-elem flex h-4.5 w-full items-center justify-center rounded-[3px] text-[0.55rem] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${tileBg}`}
                             >
-                              {isPalm ? "🌴" : ""}
+                              {isPalm ? "🌴" : hasActivity ? "🔥" : ""}
                             </button>
                           );
                         })}
