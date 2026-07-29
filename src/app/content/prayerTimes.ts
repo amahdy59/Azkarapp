@@ -1,3 +1,6 @@
+import type { LocationSettings } from "../types";
+import { getPrayerTimes } from "./prayerCalculation";
+
 export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
 export interface PrayerTimes {
@@ -8,31 +11,9 @@ export interface PrayerTimes {
   isha: string; // e.g. "19:45"
 }
 
-// Estimates approximate prayer times based on current date for Islamic Zikr notifications
-export function getEstimatedPrayerTimes(date: Date = new Date()): PrayerTimes {
-  const month = date.getMonth(); // 0-11
-
-  // Seasonal adjustment tables for middle-eastern / standard latitudes
-  const fajrHours = [5, 5, 4, 4, 3, 3, 3, 4, 4, 4, 5, 5];
-  const fajrMins = [15, 0, 40, 15, 45, 30, 40, 0, 15, 30, 0, 15];
-
-  const maghribHours = [17, 17, 18, 18, 19, 19, 19, 18, 18, 17, 17, 17];
-  const maghribMins = [15, 40, 0, 20, 0, 15, 10, 45, 15, 45, 15, 0];
-
-  const fH = fajrHours[month] ?? 4;
-  const fM = fajrMins[month] ?? 30;
-  const mH = maghribHours[month] ?? 18;
-  const mM = maghribMins[month] ?? 30;
-
-  const pad = (n: number) => (n < 10 ? `0${n}` : `${n}`);
-
-  return {
-    fajr: `${pad(fH)}:${pad(fM)}`,
-    dhuhr: "12:15",
-    asr: "15:30",
-    maghrib: `${pad(mH)}:${pad(mM)}`,
-    isha: "19:45",
-  };
+/** Resolves exact or calculated prayer times for a date and location settings */
+export function getEstimatedPrayerTimes(date: Date = new Date(), location?: LocationSettings): PrayerTimes {
+  return getPrayerTimes(date, location);
 }
 
 /** Converts "HH:MM" time string to total minutes from midnight */
@@ -42,12 +23,15 @@ export function timeToMinutes(timeStr: string): number {
 }
 
 /** Determines which prayer period the current time falls into or follows */
-export function getCurrentPrayerPeriod(date: Date = new Date()): {
+export function getCurrentPrayerPeriod(
+  date: Date = new Date(),
+  location?: LocationSettings,
+): {
   currentPrayer: PrayerName;
   isFajrOrMaghrib: boolean;
   prayerTimes: PrayerTimes;
 } {
-  const times = getEstimatedPrayerTimes(date);
+  const times = getEstimatedPrayerTimes(date, location);
   const nowMins = date.getHours() * 60 + date.getMinutes();
 
   const fajrM = timeToMinutes(times.fajr);
@@ -113,8 +97,12 @@ const PRAYER_NAMES_EN: Record<PrayerName, string> = {
   isha: "Isha",
 };
 
-export function getNextPrayerCountdown(date: Date = new Date(), language: "ar" | "en" = "ar"): NextPrayerInfo {
-  const times = getEstimatedPrayerTimes(date);
+export function getNextPrayerCountdown(
+  date: Date = new Date(),
+  language: "ar" | "en" = "ar",
+  location?: LocationSettings,
+): NextPrayerInfo {
+  const times = getEstimatedPrayerTimes(date, location);
   const nowMins = date.getHours() * 60 + date.getMinutes();
 
   const prayers: { name: PrayerName; mins: number }[] = [

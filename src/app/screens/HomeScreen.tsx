@@ -4,12 +4,13 @@ import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden"
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getCurrentPrayerPeriod, getNextPrayerCountdown } from "../content/prayerTimes";
+import { getNextPrayerCountdown } from "../content/prayerTimes";
+import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings } from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
 
@@ -97,6 +98,7 @@ export function HomeScreen({
   language,
   direction,
   calendarType = "hijri",
+  locationSettings,
   onResume,
   onRepeat,
   onOpenFridayMode,
@@ -109,6 +111,7 @@ export function HomeScreen({
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  locationSettings?: LocationSettings;
   onResume: (category: CategoryId, index: number) => void;
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
@@ -116,22 +119,32 @@ export function HomeScreen({
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
+  const [, setPrayerTimesRevision] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(timer);
   }, []);
 
+  const prayerDateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
+
+  useEffect(() => {
+    let active = true;
+    triggerBackgroundPrayerTimesRefresh(new Date(), locationSettings, () => {
+      if (active) setPrayerTimesRevision((revision) => revision + 1);
+    });
+    return () => {
+      active = false;
+    };
+  }, [locationSettings, prayerDateKey]);
+
   const gardenSummary = useMemo(
     () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
     [dailyCompletions, now, progressDayStartHour],
   );
 
-  // Real-time prayer tracking & Next Prayer Countdown
-  const _prayerInfo = useMemo(() => getCurrentPrayerPeriod(now), [now]);
-  const nextPrayerInfo = useMemo(() => getNextPrayerCountdown(now, language), [now, language]);
+  const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
 
-  // Determine which category to feature based on time of day
   const reminderInfo = useMemo(() => getTimeOfDayZikr(now, language), [now, language]);
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
   const categoryAzkar = getAzkarByCategory(reminderInfo.categoryId);
@@ -155,43 +168,32 @@ export function HomeScreen({
 
   return (
     <ScreenContainer dir={direction} className="px-page">
-      {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Status Header & Dual Glass Micro-Chips */}
       <header className="flex w-full shrink-0 flex-col gap-2.5 px-1 pt-1 pb-3" dir={direction}>
-        {/* Badges section */}
         <PalmTreeReward summary={gardenSummary} language={language} bare />
 
-        {/* Dual Floating Glass Micro-Chips (Islamic Date & Next Prayer Countdown) */}
-        <div className="flex w-full items-center justify-between gap-2 px-0.5 pt-0.5">
-          {/* Glass Chip 1: Islamic Date */}
+        <div className="flex w-full flex-col items-center justify-between gap-2 px-0.5 pt-0.5 min-[390px]:flex-row">
           <div
-            className="flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3.5 py-1.5 backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30 shadow-2xs"
+            className="flex w-full items-center justify-center rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[390px]:min-w-0 min-[390px]:flex-1 dark:border-amber-500/30 dark:bg-amber-950/30"
             data-testid="hijri-date"
             dir="auto"
           >
-            <span aria-hidden="true" className="shrink-0 text-[0.875rem]">
-              🌙
-            </span>
-            <span className="truncate text-[0.8125rem] font-extrabold text-amber-950 dark:text-amber-100 font-sans">
+            <span className="whitespace-nowrap font-sans text-[0.75rem] font-extrabold text-amber-950 min-[430px]:text-[0.8125rem] dark:text-amber-100">
               {formatHijriDate(now, language)}
             </span>
           </div>
 
-          {/* Glass Chip 2: Next Prayer & Remaining Time */}
           <div
-            className="flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3.5 py-1.5 backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30 shadow-2xs"
+            className="flex w-full items-center justify-center rounded-full border border-amber-500/25 bg-amber-500/10 px-2.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[390px]:w-auto min-[390px]:shrink-0 dark:border-amber-500/30 dark:bg-amber-950/30"
+            data-testid="next-prayer"
             dir="auto"
             title={
               isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
             }
           >
-            <span aria-hidden="true" className="shrink-0 text-[0.8125rem]">
-              🕌
-            </span>
             <span
-              className="text-[0.8125rem] font-extrabold text-amber-950 dark:text-amber-100 font-sans"
+              className="whitespace-nowrap font-sans text-[0.75rem] font-extrabold text-amber-950 min-[430px]:text-[0.8125rem] dark:text-amber-100"
               style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
             >
               {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
@@ -201,7 +203,6 @@ export function HomeScreen({
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
-        {/* Friday Special Routine Banner — ONLY ON FRIDAYS */}
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button

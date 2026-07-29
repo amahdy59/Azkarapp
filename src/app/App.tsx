@@ -9,11 +9,13 @@ import type {
   BeforeInstallPromptEvent,
   CategoryId,
   ColorBlindSupport,
+  LocationSettings,
   ReminderSettings,
   TextSizeOption,
   ThemeMode,
   View,
 } from "./types";
+import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { isSupabaseConfigured } from "../lib/supabase";
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
@@ -121,6 +123,9 @@ export default function App() {
     initialState.settings.colorBlindSupport,
   );
   const [reminders, setReminders] = useState<ReminderSettings>(initialState.settings.reminders);
+  const [locationSettings, setLocationSettings] = useState<LocationSettings>(
+    initialState.settings.location ?? DEFAULT_LOCATION,
+  );
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
@@ -197,6 +202,7 @@ export default function App() {
         forceRtl,
         colorBlindSupport,
         reminders,
+        location: locationSettings,
         weeklyGoalDays,
         quietProgressEnabled,
         progressDayStartHour,
@@ -224,6 +230,7 @@ export default function App() {
       lastPhoneNumber,
       reduceMotion,
       reminders,
+      locationSettings,
       weeklyGoalDays,
       quietProgressEnabled,
       progressDayStartHour,
@@ -329,6 +336,7 @@ export default function App() {
       setForceRtl(state.settings.forceRtl);
       setColorBlindSupport(state.settings.colorBlindSupport);
       setReminders(state.settings.reminders);
+      setLocationSettings(state.settings.location ?? DEFAULT_LOCATION);
       setWeeklyGoalDays(state.settings.weeklyGoalDays);
       setQuietProgressEnabled(state.settings.quietProgressEnabled);
       setProgressDayStartHour(state.settings.progressDayStartHour);
@@ -643,6 +651,7 @@ export default function App() {
                 dailyCompletions={dailyCompletions}
                 quietProgressEnabled={quietProgressEnabled}
                 progressDayStartHour={progressDayStartHour}
+                locationSettings={locationSettings}
                 onResume={(catId, i) => openReader(catId, i)}
                 onRepeat={repeatCategory}
                 onOpenFridayMode={() => push("friday")}
@@ -758,6 +767,7 @@ export default function App() {
                 forceRtl={forceRtl}
                 colorBlindSupport={colorBlindSupport}
                 reminders={reminders}
+                locationSettings={locationSettings}
                 weeklyGoalDays={weeklyGoalDays}
                 quietProgressEnabled={quietProgressEnabled}
                 progressDayStartHour={progressDayStartHour}
@@ -777,6 +787,7 @@ export default function App() {
                 onForceRtlChange={setForceRtl}
                 onColorBlindSupportChange={setColorBlindSupport}
                 onRemindersChange={setReminders}
+                onLocationChange={setLocationSettings}
                 onWeeklyGoalDaysChange={setWeeklyGoalDays}
                 onQuietProgressEnabledChange={setQuietProgressEnabled}
                 onProgressDayStartHourChange={setProgressDayStartHour}

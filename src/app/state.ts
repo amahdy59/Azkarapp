@@ -4,6 +4,7 @@ import type {
   ArabicFontOption,
   CategoryId,
   ColorBlindSupport,
+  LocationSettings,
   ReminderSettings,
   StoredSession,
   ThemeMode,
@@ -17,6 +18,7 @@ import {
   normalizeDailyCompletions,
 } from "./progress";
 import { getCategoryTotal } from "./content/azkar";
+import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
 
@@ -48,6 +50,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     quietProgressEnabled: true,
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
     calendarType: "hijri",
+    location: DEFAULT_LOCATION,
   },
   profile: {
     displayName: "Guest",
@@ -199,6 +202,49 @@ function isStoredSession(value: unknown): value is StoredSession {
   );
 }
 
+function normalizeLocation(value: unknown, fallback: LocationSettings = DEFAULT_LOCATION): LocationSettings {
+  const location = value && typeof value === "object" ? (value as Partial<LocationSettings>) : {};
+  const validLatitude =
+    typeof location.latitude === "number" &&
+    Number.isFinite(location.latitude) &&
+    location.latitude >= -90 &&
+    location.latitude <= 90;
+  const validLongitude =
+    typeof location.longitude === "number" &&
+    Number.isFinite(location.longitude) &&
+    location.longitude >= -180 &&
+    location.longitude <= 180;
+  const calculationMethod =
+    typeof location.calculationMethod === "number" && CALCULATION_METHODS[location.calculationMethod]
+      ? location.calculationMethod
+      : fallback.calculationMethod;
+  const adjustmentSource = location.adjustments && typeof location.adjustments === "object" ? location.adjustments : {};
+  const adjustmentNames = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+  const adjustments = Object.fromEntries(
+    adjustmentNames.map((name) => {
+      const value = adjustmentSource[name];
+      return [
+        name,
+        typeof value === "number" && Number.isFinite(value) ? Math.max(-120, Math.min(120, Math.round(value))) : 0,
+      ];
+    }),
+  ) as NonNullable<LocationSettings["adjustments"]>;
+
+  return {
+    latitude: validLatitude ? location.latitude : fallback.latitude,
+    longitude: validLongitude ? location.longitude : fallback.longitude,
+    cityName:
+      typeof location.cityName === "string" && location.cityName.trim()
+        ? location.cityName.trim().slice(0, 100)
+        : fallback.cityName,
+    calculationMethod,
+    autoDetect: typeof location.autoDetect === "boolean" ? location.autoDetect : fallback.autoDetect,
+    timeZone:
+      typeof location.timeZone === "string" && location.timeZone.trim() ? location.timeZone.trim() : fallback.timeZone,
+    adjustments,
+  };
+}
+
 /** Converts untrusted persisted or remote data into a complete, render-safe snapshot. */
 export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[] = []): AppStateSnapshot {
   const parsed = value && typeof value === "object" ? (value as Partial<AppStateSnapshot>) : {};
@@ -277,6 +323,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         settings?.calendarType === "hijri" || settings?.calendarType === "gregorian"
           ? settings.calendarType
           : (DEFAULT_APP_STATE.settings.calendarType ?? "hijri"),
+      location: normalizeLocation(settings?.location),
     },
     profile: {
       displayName:
@@ -515,6 +562,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         incoming.settings?.calendarType === "hijri" || incoming.settings?.calendarType === "gregorian"
           ? incoming.settings.calendarType
           : (safeBase.settings.calendarType ?? "hijri"),
+      location: normalizeLocation(incoming.settings?.location, safeBase.settings.location ?? DEFAULT_LOCATION),
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || safeBase.profile.displayName,

@@ -101,6 +101,22 @@ export interface StoredSession {
   isComplete: boolean;
 }
 
+export interface LocationSettings {
+  latitude?: number;
+  longitude?: number;
+  cityName?: string;
+  calculationMethod: number;
+  autoDetect: boolean;
+  timeZone?: string;
+  adjustments?: {
+    fajr?: number;
+    dhuhr?: number;
+    asr?: number;
+    maghrib?: number;
+    isha?: number;
+  };
+}
+
 export interface UserSettingsState {
   language: AppLanguage;
   darkMode: boolean;
@@ -120,6 +136,7 @@ export interface UserSettingsState {
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  location?: LocationSettings;
 }
 
 export interface UserProfileState {

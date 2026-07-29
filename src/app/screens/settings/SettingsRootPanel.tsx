@@ -8,12 +8,13 @@ import {
   Globe,
   HelpCircle,
   Info,
+  MapPin,
   Moon,
   User,
 } from "../../components/icons";
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
-import type { AppLanguage, ThemeMode } from "../../types";
+import type { AppLanguage, LocationSettings, ThemeMode } from "../../types";
 import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
@@ -45,6 +46,7 @@ export function SettingsRootPanel({
   isSyncing,
   syncError,
   quietProgressEnabled,
+  locationSettings,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
@@ -58,6 +60,7 @@ export function SettingsRootPanel({
   isSyncing: boolean;
   syncError: string;
   quietProgressEnabled: boolean;
+  locationSettings?: LocationSettings;
 }) {
   return (
     <div className="flex-1 overflow-y-auto pb-8">
@@ -126,6 +129,13 @@ export function SettingsRootPanel({
           </div>
         </div>
 
+        <SettingsRowItem
+          iconBg={iconBackground}
+          icon={<MapPin size={20} className="text-primary" />}
+          label={language === "ar" ? "مواقيت الصلاة والموقع" : "Prayer Times & Location"}
+          right={<RowValue value={locationSettings?.cityName || (language === "ar" ? "القاهرة" : "Cairo")} />}
+          onPress={() => onNav("notifications")}
+        />
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Bell size={20} className="text-primary" />}

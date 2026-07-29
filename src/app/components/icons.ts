@@ -55,6 +55,7 @@ export {
   LinkExternal01 as ExternalLink,
   List,
   LogOut01 as LogOut,
+  MarkerPin01 as MapPin,
   Menu02 as Menu,
   MessageChatCircle as MessageChat,
   Minus as MinusIcon,

@@ -27,6 +27,16 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await enterEnglishGuestMode(page);
   await expectNoHorizontalOverflow(page, "Home");
+  for (const testId of ["hijri-date", "next-prayer"]) {
+    const chip = page.getByTestId(testId);
+    await expect(chip).toBeVisible();
+    expect(
+      await chip.evaluate((element) => ({
+        fits: element.scrollWidth <= element.clientWidth,
+        hasRemovedIcon: /[🌙🕌]/u.test(element.textContent ?? ""),
+      })),
+    ).toEqual({ fits: true, hasRemovedIcon: false });
+  }
 
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();

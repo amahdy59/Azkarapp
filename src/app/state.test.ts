@@ -102,6 +102,32 @@ describe("app state persistence", () => {
     expect(state.settings.progressDayStartHour).toBe(4);
   });
 
+  it("normalizes prayer location, method, timezone, and manual adjustments", () => {
+    const state = normalizeAppState({
+      settings: {
+        location: {
+          latitude: 31.2,
+          longitude: 29.9,
+          cityName: "  Alexandria  ",
+          calculationMethod: 4,
+          autoDetect: false,
+          timeZone: "Africa/Cairo",
+          adjustments: { fajr: -3.4, isha: 500 },
+        },
+      },
+    });
+
+    expect(state.settings.location).toEqual({
+      latitude: 31.2,
+      longitude: 29.9,
+      cityName: "Alexandria",
+      calculationMethod: 4,
+      autoDetect: false,
+      timeZone: "Africa/Cairo",
+      adjustments: { fajr: -3, dhuhr: 0, asr: 0, maghrib: 0, isha: 120 },
+    });
+  });
+
   it("drops out-of-range completion indexes from untrusted storage", () => {
     const state = normalizeAppState({
       completed: {

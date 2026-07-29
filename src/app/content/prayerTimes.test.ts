@@ -15,14 +15,14 @@ describe("prayerTimes", () => {
   });
 
   it("identifies Asr window in the afternoon", () => {
-    const afternoon = new Date(2026, 6, 28, 16, 0); // 4:00 PM
+    const afternoon = new Date(2026, 6, 28, 17, 0); // After calculated Cairo Asr
     const period = getCurrentPrayerPeriod(afternoon);
     expect(period.currentPrayer).toBe("asr");
     expect(period.isFajrOrMaghrib).toBe(false);
   });
 
   it("identifies Maghrib window in the evening", () => {
-    const evening = new Date(2026, 6, 28, 19, 30); // 7:30 PM (Maghrib in July is ~19:10)
+    const evening = new Date(2026, 6, 28, 20, 0); // After calculated Cairo Maghrib
     const period = getCurrentPrayerPeriod(evening);
     expect(period.currentPrayer).toBe("maghrib");
     expect(period.isFajrOrMaghrib).toBe(true);

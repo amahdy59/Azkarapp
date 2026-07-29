@@ -124,6 +124,11 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
+  for (const testId of ["hijri-date", "next-prayer"]) {
+    const chip = page.getByTestId(testId);
+    await expect(chip).toBeVisible();
+    expect(await chip.evaluate((element) => element.scrollWidth <= element.clientWidth)).toBe(true);
+  }
   await page.getByTestId("nav-azkar").click();
 
   const card = page.getByTestId("category-card-morning");

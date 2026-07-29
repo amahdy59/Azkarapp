@@ -7,6 +7,7 @@ import type {
   ArabicFontOption,
   ColorBlindSupport,
   DailyCollectionCompletion,
+  LocationSettings,
   ReminderSettings,
   StoredSession,
   TextSizeOption,
@@ -46,6 +47,7 @@ interface SettingsScreenProps {
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
   reminders: ReminderSettings;
+  locationSettings?: LocationSettings;
   weeklyGoalDays: number;
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
@@ -65,6 +67,7 @@ interface SettingsScreenProps {
   onForceRtlChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
   onRemindersChange: (value: ReminderSettings) => void;
+  onLocationChange?: (value: LocationSettings) => void;
   onWeeklyGoalDaysChange: (value: number) => void;
   onQuietProgressEnabledChange: (value: boolean) => void;
   onProgressDayStartHourChange: (value: number) => void;
@@ -96,6 +99,7 @@ export function SettingsScreen({
   forceRtl,
   colorBlindSupport,
   reminders,
+  locationSettings,
   weeklyGoalDays,
   quietProgressEnabled,
   progressDayStartHour,
@@ -115,6 +119,7 @@ export function SettingsScreen({
   onForceRtlChange,
   onColorBlindSupportChange,
   onRemindersChange,
+  onLocationChange,
   onWeeklyGoalDaysChange,
   onQuietProgressEnabledChange,
   onProgressDayStartHourChange,
@@ -182,6 +187,7 @@ export function SettingsScreen({
               isSyncing={isSyncing}
               syncError={syncError}
               quietProgressEnabled={quietProgressEnabled}
+              locationSettings={locationSettings}
             />
           </motion.div>
         )}
@@ -247,7 +253,9 @@ export function SettingsScreen({
             <NotificationsPanel
               language={language}
               reminders={reminders}
+              locationSettings={locationSettings}
               onRemindersChange={onRemindersChange}
+              onLocationChange={onLocationChange}
               onBack={goBack}
             />
           </motion.div>
