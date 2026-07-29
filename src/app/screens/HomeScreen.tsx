@@ -5,7 +5,7 @@ import { TranquilityCompletionCard } from "../components/TranquilityCompletionCa
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getCurrentPrayerPeriod } from "../content/prayerTimes";
-import { formatNumerals } from "../formatting";
+import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
@@ -157,9 +157,39 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Status Header — Badges only (Elevate style: clean, card-less top status bar) */}
-      <header className="w-full shrink-0 px-1 pt-1 pb-3">
+      {/* Top Status Header & Date/Time — Clean, Card-less Header Bar */}
+      <header className="flex w-full shrink-0 flex-col gap-2 px-1 pt-1 pb-3" dir={direction}>
+        {/* Badges section */}
         <PalmTreeReward summary={gardenSummary} language={language} bare />
+
+        {/* Islamic Date & Live Clock Row — Clean & Card-less */}
+        <div className="flex w-full items-center justify-between gap-3 px-1">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span aria-hidden="true" className="shrink-0 text-[0.95rem]">
+              🌙
+            </span>
+            <span
+              className="truncate text-[0.8125rem] font-bold text-muted-foreground"
+              data-testid="hijri-date"
+              dir="auto"
+            >
+              {formatHijriDate(now, language)}
+            </span>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-muted/60 px-2.5 py-1 text-muted-foreground">
+            <span aria-hidden="true" className="text-[0.75rem]">
+              🕒
+            </span>
+            <span
+              className="text-[0.8125rem] font-bold"
+              dir="auto"
+              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+            >
+              {now.toLocaleTimeString(isArabic ? "ar-SA" : "en-US", { hour: "numeric", minute: "numeric" })}
+            </span>
+          </div>
+        </div>
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
