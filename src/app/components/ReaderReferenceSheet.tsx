@@ -97,7 +97,7 @@ export function ReaderReferenceSheet({
             type="button"
             onClick={onClose}
             aria-label={t(language, "reader.closeReference")}
-            className="absolute top-1 flex h-11 w-11 items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="absolute top-1 flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             style={{ insetInlineEnd: 12 }}
           >
             <X size={18} />

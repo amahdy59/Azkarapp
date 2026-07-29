@@ -207,7 +207,7 @@ export function PalmTreeReward({
 
   const content = (
     <div
-      className="flex w-full items-center justify-around"
+      className="flex w-full items-center justify-between px-2 py-1"
       aria-label={
         isArabic
           ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
@@ -218,20 +218,20 @@ export function PalmTreeReward({
         <span className="text-[1.25rem]" role="img" aria-label="Streak flame">
           🔥
         </span>
-        <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
+        <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400 font-sans">
           {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
         </span>
       </div>
-      <span className="h-4 w-px bg-amber-500/30" />
+      <span className="h-4 w-px bg-border/40" />
       <div className="flex items-center gap-1" title={isArabic ? "أوراق اليوم" : "Today's Leaves"}>
         {Array.from({ length: maxLeaves }).map((_, i) => (
-          <GoldenLeafMark key={i} size={18} filled={i < todayLeaves} />
+          <GoldenLeafMark key={i} size={19} filled={i < todayLeaves} />
         ))}
       </div>
-      <span className="h-4 w-px bg-amber-500/30" />
+      <span className="h-4 w-px bg-border/40" />
       <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
-        <PalmTreeMark size={26} filled={summary.lifetimePalms > 0} />
-        <span className="text-[0.9375rem] font-black text-amber-500">
+        <PalmTreeMark size={24} filled={summary.lifetimePalms > 0} />
+        <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400 font-sans">
           {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
         </span>
       </div>
@@ -241,7 +241,7 @@ export function PalmTreeReward({
   if (bare) return content;
 
   return (
-    <div className="flex w-full items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-sm dark:bg-amber-500/15">
+    <div className="flex w-full items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-xs dark:bg-amber-500/15">
       {content}
     </div>
   );

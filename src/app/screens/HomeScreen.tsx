@@ -5,7 +5,7 @@ import { TranquilityCompletionCard } from "../components/TranquilityCompletionCa
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getCurrentPrayerPeriod } from "../content/prayerTimes";
-import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
+import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
@@ -157,47 +157,9 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Combined Header Card — Badges & Date/Clock */}
-      <header className="w-full shrink-0 px-0 pt-0 pb-2">
-        <div
-          className="flex w-full flex-col gap-2.5 rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-xs dark:bg-amber-950/30 dark:border-amber-500/20"
-          dir={direction}
-        >
-          {/* Badges section */}
-          <PalmTreeReward summary={gardenSummary} language={language} bare />
-
-          {/* Light line separator */}
-          <div className="h-px w-full bg-amber-500/20 dark:bg-amber-500/20" />
-
-          {/* Islamic Date & Live Clock section */}
-          <div className="flex w-full items-center justify-between gap-3">
-            <div className="flex items-center gap-2 min-w-0">
-              <span aria-hidden="true" className="shrink-0 text-[1.05rem]">
-                🌙
-              </span>
-              <span
-                className="truncate text-[0.84375rem] font-black text-amber-950 dark:text-amber-100"
-                data-testid="hijri-date"
-                dir="auto"
-              >
-                {formatHijriDate(now, language)}
-              </span>
-            </div>
-
-            <div className="flex shrink-0 items-center gap-1.5 rounded-xl border border-amber-500/30 bg-amber-500/20 px-2.5 py-1 dark:bg-amber-900/40">
-              <span aria-hidden="true" className="text-[0.75rem]">
-                🕒
-              </span>
-              <span
-                className="text-[0.8125rem] font-black text-amber-950 dark:text-amber-100"
-                dir="auto"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-              >
-                {now.toLocaleTimeString(isArabic ? "ar-SA" : "en-US", { hour: "numeric", minute: "numeric" })}
-              </span>
-            </div>
-          </div>
-        </div>
+      {/* Top Status Header — Badges only (Elevate style: clean, card-less top status bar) */}
+      <header className="w-full shrink-0 px-1 pt-1 pb-3">
+        <PalmTreeReward summary={gardenSummary} language={language} bare />
       </header>
 
       <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
