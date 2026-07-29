@@ -678,6 +678,7 @@ export function TodayRoutineGarden({
             />
 
             <div
+              data-testid="today-leaf-count"
               title={
                 isTodayPalm
                   ? isArabic
