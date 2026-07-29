@@ -311,7 +311,7 @@ export function ReaderScreen({
       .trim();
   }
 
-  const isLongContent = z.isSurah || z.arabicText.length > 250;
+  const isLongContent = Boolean(z.isSurah || z.surahNameArabic);
 
   const renderReadingContent = () => (
     <div
@@ -518,15 +518,15 @@ export function ReaderScreen({
                 )}
               </div>
             </div>
-          </div>
 
-          {/* Reserved-height hint: always rendered to prevent layout reflow, animated out on complete */}
-          <p
-            className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${complete ? " hint-hidden" : ""}`}
-            aria-hidden={complete}
-          >
-            {complete ? "" : t(language, "reader.tapAnywhere")}
-          </p>
+            {/* Reserved-height hint: always rendered to prevent layout reflow, animated out on complete */}
+            <p
+              className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${complete ? " hint-hidden" : ""}`}
+              aria-hidden={complete}
+            >
+              {complete ? "" : t(language, "reader.tapAnywhere")}
+            </p>
+          </div>
         </div>
       </div>
     );
