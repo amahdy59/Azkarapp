@@ -558,80 +558,102 @@ export function ReaderScreen({
         onBack={onBack}
         language={language}
         right={
-          <DropdownMenu dir={direction}>
-            <DropdownMenuTrigger
-              aria-label={t(language, "reader.menu")}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
+          <div className="flex items-center gap-0.5">
+            <button
+              type="button"
+              onClick={onPrev}
+              disabled={idx === 0}
+              aria-label={t(language, "reader.prev")}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-foreground/45 transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-foreground/45 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
-              <MoreVertical size={20} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
-              sideOffset={8}
+              {direction === "rtl" ? <ChevronRight size={19} /> : <ChevronLeft size={19} />}
+            </button>
+
+            <button
+              type="button"
+              onClick={onNext}
+              disabled={idx === azkar.length - 1}
+              aria-label={t(language, "reader.next")}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-foreground/45 transition-colors hover:bg-muted/70 hover:text-foreground disabled:opacity-20 disabled:hover:bg-transparent disabled:hover:text-foreground/45 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
-              {/* Navigation Items */}
-              <DropdownMenuItem
-                disabled={idx === 0}
-                onClick={onPrev}
-                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+              {direction === "rtl" ? <ChevronLeft size={19} /> : <ChevronRight size={19} />}
+            </button>
+
+            <DropdownMenu dir={direction}>
+              <DropdownMenuTrigger
+                aria-label={t(language, "reader.menu")}
+                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
               >
-                <div className="flex items-center gap-2.5">
-                  {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-                  <span>{t(language, "reader.prev")}</span>
-                </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                disabled={idx === azkar.length - 1}
-                onClick={onNext}
-                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                <MoreVertical size={20} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                sideOffset={8}
               >
-                <div className="flex items-center gap-2.5">
-                  {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-                  <span>{t(language, "reader.next")}</span>
-                </div>
-              </DropdownMenuItem>
+                {/* Navigation Items */}
+                <DropdownMenuItem
+                  disabled={idx === 0}
+                  onClick={onPrev}
+                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                    <span>{t(language, "reader.prev")}</span>
+                  </div>
+                </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+                <DropdownMenuItem
+                  disabled={idx === azkar.length - 1}
+                  onClick={onNext}
+                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+                    <span>{t(language, "reader.next")}</span>
+                  </div>
+                </DropdownMenuItem>
 
-              {/* Zikr Action Items */}
-              <DropdownMenuItem
-                onClick={handleReset}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <RotateCcw size={18} />
-                {t(language, "reader.resetCounter")}
-              </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
-              <DropdownMenuItem
-                onClick={handleToggleSaved}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
-                {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
-              </DropdownMenuItem>
+                {/* Zikr Action Items */}
+                <DropdownMenuItem
+                  onClick={handleReset}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <RotateCcw size={18} />
+                  {t(language, "reader.resetCounter")}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={() => void handleShare()}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <Share2 size={18} />
-                {t(language, "reader.share")}
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleToggleSaved}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
+                  {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
+                </DropdownMenuItem>
 
-              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+                <DropdownMenuItem
+                  onClick={() => void handleShare()}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <Share2 size={18} />
+                  {t(language, "reader.share")}
+                </DropdownMenuItem>
 
-              {/* View All */}
-              <DropdownMenuItem
-                onClick={onBack}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <List size={18} />
-                {t(language, "reader.viewAllAzkar")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+                {/* View All */}
+                <DropdownMenuItem
+                  onClick={onBack}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <List size={18} />
+                  {t(language, "reader.viewAllAzkar")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
 
