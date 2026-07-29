@@ -201,14 +201,17 @@ export function PalmTreeReward({
 }) {
   const streak = summary.currentUsageStreak ?? summary.activeDaysLast7 ?? 0;
   const isArabic = language === "ar";
+  // Today's golden leaves = how many of the 3 core categories (morning/evening/sleep) completed today
+  const todayLeaves = summary.today.goldenLeafCount;
+  const maxLeaves = 3;
 
   const content = (
     <div
       className="flex w-full items-center justify-around"
       aria-label={
         isArabic
-          ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
-          : `Daily streak: ${streak} days, Palms: ${summary.lifetimePalms}`
+          ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
+          : `Daily streak: ${streak} days, Today's leaves: ${todayLeaves} of ${maxLeaves}, Palms: ${summary.lifetimePalms}`
       }
     >
       <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
@@ -217,6 +220,15 @@ export function PalmTreeReward({
         </span>
         <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
           {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
+        </span>
+      </div>
+      <span className="h-4 w-px bg-amber-500/30" />
+      <div className="flex items-center gap-1" title={isArabic ? "أوراق اليوم" : "Today's Leaves"}>
+        {Array.from({ length: maxLeaves }).map((_, i) => (
+          <GoldenLeafMark key={i} size={18} filled={i < todayLeaves} />
+        ))}
+        <span className="ms-0.5 text-[0.875rem] font-black text-amber-600 dark:text-amber-400">
+          {formatNumerals(todayLeaves, language)}/{formatNumerals(maxLeaves, language)}
         </span>
       </div>
       <span className="h-4 w-px bg-amber-500/30" />
