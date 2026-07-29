@@ -40,6 +40,8 @@ export {
   DotsGrid as GripVerticalIcon,
   DotsHorizontal as MoreHorizontal,
   DotsHorizontal as MoreHorizontalIcon,
+  DotsVertical as MoreVertical,
+  DotsVertical as MoreVerticalIcon,
   Download01 as Download,
   Eye,
   File06 as FileText,

@@ -43,7 +43,7 @@ describe("localized zikr supporting content", () => {
 
   it("identifies specific recommended timing versus generic category default timing", () => {
     const genericZikr = ALL_AZKAR.find((z) => z.id === "m-hm-75a")!;
-    const specificZikr = ALL_AZKAR.find((z) => z.id === "m-hm-92")!;
+    const specificZikr = ALL_AZKAR.find((z) => z.id === "ap-ref-7")!;
 
     expect(hasSpecificRecommendedTiming(genericZikr)).toBe(false);
     expect(hasSpecificRecommendedTiming(specificZikr)).toBe(true);

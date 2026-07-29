@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
-import { BookOpen, Check, ChevronUp, Heart, Share2, Menu, RotateCcw, List, Bookmark } from "../components/icons";
+import { BookOpen, Check, ChevronUp, Heart, Share2, MoreVertical, RotateCcw, List, Bookmark, ChevronLeft, ChevronRight } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
@@ -10,7 +10,12 @@ import { ProgressBar } from "../components/ProgressBar";
 import { CounterRing, PulseRings } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
-import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedSourceReference,
+  getLocalizedZikrBenefit,
+  hasSpecificRecommendedTiming,
+} from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -19,6 +24,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
@@ -284,6 +290,14 @@ export function ReaderScreen({
     </div>
   );
 
+  let displayArabicText = z.arabicText;
+  if (z.hasBasmalah || z.isSurah) {
+    displayArabicText = displayArabicText
+      .replace(/^(بِسْمِ\s+اللَّهِ\s+الرَّحْمَٰنِ\s+الرَّحِيمِ|بِسْمِ\s+اللَّهِ\s+الرَّحْمَنِ\s+الرَّحِيمِ|بِسْمِ\s+اللهِ\s+الرَّحْمٰنِ\s+الرَّحِيْمِ)[\.\s\u06d4]*/, "")
+      .replace(/^\u0628\u0650\u0633\u0652\u0645\u0650\s+\u0627\u0644\u0644\u0651\u064e\u0647\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0652\u0645\u064e\u0646\u0650\s+\u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u0650[\.\s]*/, "")
+      .trim();
+  }
+
   const renderReadingContent = () => (
     <div
       className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
@@ -297,8 +311,43 @@ export function ReaderScreen({
         }
       }}
     >
+      {z.hasSeekRefuge && (
+        <div className="mb-3 text-center pointer-events-none">
+          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+            أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+          </p>
+        </div>
+      )}
+
+      {(z.hasBasmalah || z.isSurah) && (
+        <div className="mb-3 text-center pointer-events-none">
+          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+          </p>
+        </div>
+      )}
+
+      {hasSpecificRecommendedTiming(z) && (
+        <div className="mb-3.5 text-center pointer-events-none">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-[0.75rem] font-bold text-emerald-900 dark:text-emerald-200">
+            <span aria-hidden="true">📜</span>
+            <span>{getLocalizedPreferredTiming(z, language)}</span>
+          </span>
+        </div>
+      )}
+
+      <p
+        className="zikr-text text-center font-medium leading-[2.1] text-foreground pointer-events-none"
+        data-testid="zikr-text"
+        dir="rtl"
+        lang="ar"
+        style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+      >
+        {displayArabicText}
+      </p>
+
       {(z.isSurah || z.surahNameArabic) && (
-        <div className="mb-3 text-center">
+        <div className="mt-4 mb-2 text-center pointer-events-none">
           <div className="inline-flex items-center gap-1.5 border border-amber-700/25 dark:border-amber-500/25 rounded-lg px-2.5 py-1 bg-amber-500/10 dark:bg-amber-950/30">
             {z.surahType && (
               <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">
@@ -319,41 +368,6 @@ export function ReaderScreen({
           </div>
         </div>
       )}
-
-      {z.hasSeekRefuge && (
-        <div className="mb-3 text-center">
-          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-            أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-          </p>
-        </div>
-      )}
-
-      {(z.hasBasmalah || z.isSurah) && (
-        <div className="mb-3 text-center">
-          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </p>
-        </div>
-      )}
-
-      {z.preferredTiming && (
-        <div className="mb-3.5 text-center">
-          <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-[0.75rem] font-bold text-emerald-900 dark:text-emerald-200">
-            <span aria-hidden="true">📜</span>
-            <span>{z.preferredTiming}</span>
-          </span>
-        </div>
-      )}
-
-      <p
-        className="zikr-text text-center font-medium leading-[2.1] text-foreground pointer-events-none"
-        data-testid="zikr-text"
-        dir="rtl"
-        lang="ar"
-        style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-      >
-        {z.arabicText}
-      </p>
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
@@ -489,11 +503,37 @@ export function ReaderScreen({
           <DropdownMenu dir={direction}>
             <DropdownMenuTrigger
               aria-label={t(language, "reader.menu")}
-              className="ui-icon-button shrink-0 border border-border-control bg-background focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
             >
-              <Menu size={18} />
+              <MoreVertical size={20} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-[200px] rounded-2xl p-2" sideOffset={8}>
+            <DropdownMenuContent align="end" className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground" sideOffset={8}>
+              {/* Navigation Items */}
+              <DropdownMenuItem
+                disabled={idx === 0}
+                onClick={onPrev}
+                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-2.5">
+                  {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                  <span>{t(language, "reader.prev")}</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuItem
+                disabled={idx === azkar.length - 1}
+                onClick={onNext}
+                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+              >
+                <div className="flex items-center gap-2.5">
+                  {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+                  <span>{t(language, "reader.next")}</span>
+                </div>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+              {/* Zikr Action Items */}
               <DropdownMenuItem
                 onClick={handleReset}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
@@ -501,13 +541,15 @@ export function ReaderScreen({
                 <RotateCcw size={18} />
                 {t(language, "reader.resetCounter")}
               </DropdownMenuItem>
+
               <DropdownMenuItem
-                onClick={onBack}
+                onClick={handleToggleSaved}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
-                <List size={18} />
-                {t(language, "reader.viewAllAzkar")}
+                <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
+                {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
               </DropdownMenuItem>
+
               <DropdownMenuItem
                 onClick={() => void handleShare()}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
@@ -515,12 +557,16 @@ export function ReaderScreen({
                 <Share2 size={18} />
                 {t(language, "reader.share")}
               </DropdownMenuItem>
+
+              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+              {/* View All */}
               <DropdownMenuItem
-                onClick={handleToggleSaved}
+                onClick={onBack}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
               >
-                <Bookmark size={18} className={isSaved ? "fill-current" : ""} />
-                {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
+                <List size={18} />
+                {t(language, "reader.viewAllAzkar")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
