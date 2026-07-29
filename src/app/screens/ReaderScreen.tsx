@@ -648,7 +648,38 @@ export function ReaderScreen({
       </div>
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex flex-col min-h-0 justify-between select-none" key={z.id}>
+      <div className="flex-1 flex flex-col min-h-0 justify-between select-none relative" key={z.id}>
+        {/* Top-positioned Navigation Arrows: Flanking the top of the Zikr card without overlapping or squishing text */}
+        <div className="absolute top-1 left-2.5 right-2.5 z-20 flex items-center justify-between pointer-events-none">
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrev();
+            }}
+            disabled={idx === 0}
+            title={t(language, "reader.prev")}
+            aria-label={t(language, "reader.prev")}
+            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/40 transition-all hover:bg-muted/70 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/40"
+          >
+            {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
+          </button>
+
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onNext();
+            }}
+            disabled={idx === azkar.length - 1}
+            title={t(language, "reader.next")}
+            aria-label={t(language, "reader.next")}
+            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/40 transition-all hover:bg-muted/70 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/40"
+          >
+            {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+          </button>
+        </div>
+
         {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
             within this region; the counter below is always visible and never covered. */}
         <div
@@ -657,37 +688,7 @@ export function ReaderScreen({
           }`}
         >
           {/* Inner wrapper keeps short azkar vertically centered; long content simply overflows into the scroll. */}
-          <div className="flex min-h-full items-center justify-between gap-1.5 px-2">
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onPrev();
-              }}
-              disabled={idx === 0}
-              title={t(language, "reader.prev")}
-              aria-label={t(language, "reader.prev")}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/35 transition-all hover:bg-muted/60 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/35"
-            >
-              {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
-            </button>
-
-            <div className="flex-1 min-w-0">{renderReadingContent()}</div>
-
-            <button
-              type="button"
-              onClick={(e) => {
-                e.stopPropagation();
-                onNext();
-              }}
-              disabled={idx === azkar.length - 1}
-              title={t(language, "reader.next")}
-              aria-label={t(language, "reader.next")}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/35 transition-all hover:bg-muted/60 hover:text-foreground/80 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:text-foreground/35"
-            >
-              {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
-            </button>
-          </div>
+          <div className="flex min-h-full items-center justify-center">{renderReadingContent()}</div>
         </div>
 
         {/* Lower section: Counter panel — shrink-0 ensures it is always pinned and never covered */}
