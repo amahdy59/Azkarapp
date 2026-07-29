@@ -3,6 +3,7 @@ import { X, Share2 } from "../components/icons";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { PalmTreeMark } from "./RoutineGarden";
 
 interface ShareableCardModalProps {
   palms: number;
@@ -65,7 +66,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         >
           {/* Logo Badge */}
           <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-amber-600 dark:text-amber-400">
-            <span className="text-[1.25rem]">🌴</span>
+            <PalmTreeMark size={20} filled />
             <span>{t(language, "common.azkar")}</span>
           </div>
 
@@ -80,7 +81,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           {/* Stats Badge Pill Row */}
           <div className="my-5 flex w-full items-center justify-around rounded-2xl border border-amber-500/30 bg-card/90 py-3 px-4 shadow-sm">
             <div className="flex flex-col items-center gap-1">
-              <span className="text-[1.25rem]">🌴</span>
+              <PalmTreeMark size={24} filled />
               <span className="text-[0.9375rem] font-black text-amber-500">{formatNumerals(palms, language)}</span>
               <span className="text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "shareModal.palms")}

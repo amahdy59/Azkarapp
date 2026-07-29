@@ -560,7 +560,7 @@ export function TodayRoutineGarden({
               aria-label={t(language, "garden.shareAchievementAria")}
               title={t(language, "garden.shareAchievementAria")}
             >
-              <span>🌴</span>
+              <PalmTreeMark size={18} filled />
               <span>{t(language, "garden.shareAchievement")}</span>
             </button>
           )}
@@ -678,8 +678,7 @@ export function TodayRoutineGarden({
             />
 
             <div
-              data-testid="today-leaf-count"
-              aria-label={
+              title={
                 isTodayPalm
                   ? isArabic
                     ? "اكتملت نخلة اليوم (٣ / ٣)"
@@ -690,9 +689,12 @@ export function TodayRoutineGarden({
               }
               className="absolute -bottom-3 flex items-center gap-1.5 rounded-full bg-amber-950 px-3 py-1 text-[0.75rem] font-extrabold text-amber-400 border border-amber-500/50 shadow-md dark:bg-black dark:text-amber-300"
             >
+              {isTodayPalm && <PalmTreeMark size={14} filled />}
               <span>
                 {isTodayPalm
-                  ? "🌴 " + (isArabic ? "مكتملة (٣ / ٣)" : "Complete (3 / 3)")
+                  ? isArabic
+                    ? "مكتملة (٣ / ٣)"
+                    : "Complete (3 / 3)"
                   : `${formatNumerals(summary.today.goldenLeafCount, language)} / ${formatNumerals(3, language)}`}
               </span>
             </div>
@@ -701,8 +703,8 @@ export function TodayRoutineGarden({
           <p className="mt-1 text-[0.8125rem] font-medium text-muted-foreground">
             {isTodayPalm
               ? isArabic
-                ? "تهانينا! نمت نخلتك اليوم بتمام أذكار الحماية 🌴"
-                : "Congratulations! Your palm has grown today after completing all 3 protection azkar 🌴"
+                ? "تهانينا! نمت نخلتك اليوم بتمام أذكار الحماية"
+                : "Congratulations! Your palm has grown today after completing all 3 protection azkar"
               : isArabic
                 ? "أكمل أذكار الصباح والمساء والنوم لكسب نخلة اليوم"
                 : "Complete Morning, Evening, and Before Sleep Azkar to earn today's palm"}
@@ -828,8 +830,8 @@ export function TodayRoutineGarden({
                     : "bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/40 border border-transparent";
 
                 const tileTitle = isArabic
-                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة 🌴" : completedCount > 0 ? "نشط 🔥" : "غير نشط"}`
-                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed 🌴" : completedCount > 0 ? "Active 🔥" : "Inactive"}`;
+                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة" : completedCount > 0 ? "نشط 🔥" : "غير نشط"}`
+                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed" : completedCount > 0 ? "Active 🔥" : "Inactive"}`;
 
                 return (
                   <button
@@ -840,7 +842,7 @@ export function TodayRoutineGarden({
                     tabIndex={0}
                     className={`interactive-elem flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tileBg}`}
                   >
-                    <span>{isPalm ? "🌴" : completedCount > 0 ? "🔥" : ""}</span>
+                    <span>{isPalm ? <PalmTreeMark size={14} filled /> : completedCount > 0 ? "🔥" : ""}</span>
                     <span className="text-[0.625rem] opacity-80">{formatNumerals(day.dayNum, language)}</span>
                   </button>
                 );
@@ -867,9 +869,9 @@ export function TodayRoutineGarden({
                 </span>
                 <span
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
-                  title="Palm Tree (🌴)"
+                  title="Palm Tree"
                 >
-                  🌴
+                  <PalmTreeMark size={10} filled />
                 </span>
                 <span>{t(language, "garden.legendMore")}</span>
               </div>
@@ -940,8 +942,8 @@ export function TodayRoutineGarden({
                               : "bg-muted/30 dark:bg-zinc-800/40 border border-transparent";
 
                           const tileTitle = isArabic
-                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة 🌴" : hasActivity ? "نشط 🔥" : "غير نشط"}`
-                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed 🌴" : hasActivity ? "Active 🔥" : "Inactive"}`;
+                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة" : hasActivity ? "نشط 🔥" : "غير نشط"}`
+                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed" : hasActivity ? "Active 🔥" : "Inactive"}`;
 
                           return (
                             <button
@@ -952,7 +954,7 @@ export function TodayRoutineGarden({
                               tabIndex={0}
                               className={`interactive-elem flex h-4.5 w-full items-center justify-center rounded-[3px] text-[0.55rem] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${tileBg}`}
                             >
-                              {isPalm ? "🌴" : hasActivity ? "🔥" : ""}
+                              {isPalm ? <PalmTreeMark size={9} filled /> : hasActivity ? "🔥" : ""}
                             </button>
                           );
                         })}
