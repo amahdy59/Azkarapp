@@ -1,6 +1,6 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { CheckCircle2 } from "../../components/icons";
-import { LeafMark, TodayRoutineGarden } from "../../components/RoutineGarden";
+import { PalmTreeMark, TodayRoutineGarden } from "../../components/RoutineGarden";
 import { CATEGORIES } from "../../content/categories";
 import { formatNumerals } from "../../formatting";
 import { t } from "../../i18n";
@@ -55,7 +55,7 @@ export function ProgressPanel({
           aria-label={t(language, "progressPanel.gardenToggle")}
         >
           <SettingsToggleRow
-            icon={<LeafMark size={22} />}
+            icon={<PalmTreeMark size={22} />}
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             label={t(language, "progressPanel.gardenToggle")}
             description={t(language, "progressPanel.gardenToggleHint")}
