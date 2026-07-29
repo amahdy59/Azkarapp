@@ -4,8 +4,8 @@ import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden"
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getCategoryTotal, getAzkarByCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getCurrentPrayerPeriod } from "../content/prayerTimes";
-import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
+import { getCurrentPrayerPeriod, getNextPrayerCountdown } from "../content/prayerTimes";
+import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getGardenSummary } from "../progress";
@@ -127,8 +127,9 @@ export function HomeScreen({
     [dailyCompletions, now, progressDayStartHour],
   );
 
-  // Real-time prayer tracking
+  // Real-time prayer tracking & Next Prayer Countdown
   const _prayerInfo = useMemo(() => getCurrentPrayerPeriod(now), [now]);
+  const nextPrayerInfo = useMemo(() => getNextPrayerCountdown(now, language), [now, language]);
 
   // Determine which category to feature based on time of day
   const reminderInfo = useMemo(() => getTimeOfDayZikr(now, language), [now, language]);
@@ -157,36 +158,43 @@ export function HomeScreen({
       {/* Accessibility: visually-hidden page title for screen readers */}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top Status Header & Date/Time — Clean, Card-less Header Bar */}
-      <header className="flex w-full shrink-0 flex-col gap-2 px-1 pt-1 pb-3" dir={direction}>
+      {/* Top Status Header & Dual Glass Micro-Chips */}
+      <header className="flex w-full shrink-0 flex-col gap-2.5 px-1 pt-1 pb-3" dir={direction}>
         {/* Badges section */}
         <PalmTreeReward summary={gardenSummary} language={language} bare />
 
-        {/* Islamic Date & Live Clock Row — Clean & Card-less */}
-        <div className="flex w-full items-center justify-between gap-3 px-1">
-          <div className="flex items-center gap-1.5 min-w-0">
-            <span aria-hidden="true" className="shrink-0 text-[0.95rem]">
+        {/* Dual Floating Glass Micro-Chips (Islamic Date & Next Prayer Countdown) */}
+        <div className="flex w-full items-center justify-between gap-2 px-0.5 pt-0.5">
+          {/* Glass Chip 1: Islamic Date */}
+          <div
+            className="flex min-w-0 flex-1 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3.5 py-1.5 backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30 shadow-2xs"
+            data-testid="hijri-date"
+            dir="auto"
+          >
+            <span aria-hidden="true" className="shrink-0 text-[0.875rem]">
               🌙
             </span>
-            <span
-              className="truncate text-[0.8125rem] font-bold text-muted-foreground"
-              data-testid="hijri-date"
-              dir="auto"
-            >
+            <span className="truncate text-[0.8125rem] font-extrabold text-amber-950 dark:text-amber-100 font-sans">
               {formatHijriDate(now, language)}
             </span>
           </div>
 
-          <div className="flex shrink-0 items-center gap-1.5 rounded-lg bg-muted/60 px-2.5 py-1 text-muted-foreground">
-            <span aria-hidden="true" className="text-[0.75rem]">
-              🕒
+          {/* Glass Chip 2: Next Prayer & Remaining Time */}
+          <div
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-amber-500/25 bg-amber-500/10 px-3.5 py-1.5 backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30 shadow-2xs"
+            dir="auto"
+            title={
+              isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
+            }
+          >
+            <span aria-hidden="true" className="shrink-0 text-[0.8125rem]">
+              🕌
             </span>
             <span
-              className="text-[0.8125rem] font-bold"
-              dir="auto"
-              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              className="text-[0.8125rem] font-extrabold text-amber-950 dark:text-amber-100 font-sans"
+              style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
             >
-              {now.toLocaleTimeString(isArabic ? "ar-SA" : "en-US", { hour: "numeric", minute: "numeric" })}
+              {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
             </span>
           </div>
         </div>

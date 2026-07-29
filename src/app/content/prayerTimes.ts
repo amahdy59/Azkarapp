@@ -87,3 +87,70 @@ export function formatPrayerTimeLabel(time24: string, isArabic: boolean): string
   h = h % 12 || 12;
   return `${h}:${m} ${period}`;
 }
+
+export interface NextPrayerInfo {
+  name: PrayerName;
+  nameArabic: string;
+  nameEnglish: string;
+  time24: string;
+  remainingMinutes: number;
+  formattedCountdown: string;
+}
+
+const PRAYER_NAMES_AR: Record<PrayerName, string> = {
+  fajr: "الفجر",
+  dhuhr: "الظهر",
+  asr: "العصر",
+  maghrib: "المغرب",
+  isha: "العشاء",
+};
+
+const PRAYER_NAMES_EN: Record<PrayerName, string> = {
+  fajr: "Fajr",
+  dhuhr: "Dhuhr",
+  asr: "Asr",
+  maghrib: "Maghrib",
+  isha: "Isha",
+};
+
+export function getNextPrayerCountdown(date: Date = new Date(), language: "ar" | "en" = "ar"): NextPrayerInfo {
+  const times = getEstimatedPrayerTimes(date);
+  const nowMins = date.getHours() * 60 + date.getMinutes();
+
+  const prayers: { name: PrayerName; mins: number }[] = [
+    { name: "fajr", mins: timeToMinutes(times.fajr) },
+    { name: "dhuhr", mins: timeToMinutes(times.dhuhr) },
+    { name: "asr", mins: timeToMinutes(times.asr) },
+    { name: "maghrib", mins: timeToMinutes(times.maghrib) },
+    { name: "isha", mins: timeToMinutes(times.isha) },
+  ];
+
+  const found = prayers.find((p) => p.mins > nowMins);
+  const target = found ?? prayers[0];
+  const targetName: PrayerName = target?.name ?? "fajr";
+  const targetMins: number = target?.mins ?? 285;
+
+  const remainingMins = found ? targetMins - nowMins : 24 * 60 - nowMins + targetMins;
+
+  const hours = Math.floor(remainingMins / 60);
+  const mins = remainingMins % 60;
+  const isArabic = language === "ar";
+
+  const formattedCountdown =
+    hours > 0
+      ? isArabic
+        ? `باقي ${hours} س ${mins} د`
+        : `${hours}h ${mins}m left`
+      : isArabic
+        ? `باقي ${mins} د`
+        : `${mins}m left`;
+
+  return {
+    name: targetName,
+    nameArabic: PRAYER_NAMES_AR[targetName],
+    nameEnglish: PRAYER_NAMES_EN[targetName],
+    time24: times[targetName],
+    remainingMinutes: remainingMins,
+    formattedCountdown,
+  };
+}
