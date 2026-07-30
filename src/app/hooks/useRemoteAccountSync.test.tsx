@@ -44,7 +44,7 @@ function privateState(profile: AppStateSnapshot["profile"]): AppStateSnapshot {
     profile,
     completed: {
       ...DEFAULT_APP_STATE.completed,
-      morning: [0, 1],
+      morning: ["m-hm-75a", "m-hm-75"],
     },
     sessions: [
       {
@@ -148,7 +148,7 @@ describe("useRemoteAccountSync account boundaries", () => {
       ...sanitizedState,
       completed: {
         ...DEFAULT_APP_STATE.completed,
-        evening: [0],
+        evening: ["e-hm-75a"],
       },
     };
     await act(async () => {

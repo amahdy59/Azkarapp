@@ -1,6 +1,13 @@
 import type { Session } from "@supabase/supabase-js";
 import { describe, expect, it } from "vitest";
-import { getSessionsForRemoteSync, normalizePhoneNumber, profileFromSession, REMOTE_SESSION_PAGE_SIZE } from "./auth";
+import {
+  buildRemoteSettingsJson,
+  getSessionsForRemoteSync,
+  normalizePhoneNumber,
+  profileFromSession,
+  REMOTE_SESSION_PAGE_SIZE,
+} from "./auth";
+import { DEFAULT_APP_STATE } from "../app/state";
 
 describe("normalizePhoneNumber", () => {
   it.each([
@@ -44,6 +51,15 @@ describe("profileFromSession", () => {
 
     expect(profileFromSession(session, "").displayName).toBe("User 4567");
   });
+
+  it("returns the guest profile and preserves the entered phone before authentication", () => {
+    expect(profileFromSession(null, "+966500000000")).toEqual({
+      displayName: "Guest",
+      lastPhoneNumber: "+966500000000",
+      isGuest: true,
+      accountUserId: "",
+    });
+  });
 });
 
 describe("remote history bounds", () => {
@@ -66,5 +82,26 @@ describe("remote history bounds", () => {
     expect(selected).toHaveLength(REMOTE_SESSION_PAGE_SIZE);
     expect(selected[0]?.id).toBe("session-104");
     expect(selected.at(-1)?.id).toBe("session-5");
+  });
+});
+
+describe("remote settings", () => {
+  it("includes prayer location and calculation preferences in account sync", () => {
+    const location = {
+      latitude: 21.4225,
+      longitude: 39.8262,
+      cityName: "Makkah",
+      calculationMethod: 4,
+      autoDetect: true,
+      timeZone: "Asia/Riyadh",
+      adjustments: { fajr: -2, dhuhr: 0, asr: 1, maghrib: 0, isha: 3 },
+    };
+
+    expect(
+      buildRemoteSettingsJson({
+        ...DEFAULT_APP_STATE,
+        settings: { ...DEFAULT_APP_STATE.settings, location },
+      }).location,
+    ).toEqual(location);
   });
 });

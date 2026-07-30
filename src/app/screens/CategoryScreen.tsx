@@ -27,7 +27,7 @@ export function CategoryScreen({
   onPlayAllAudio,
 }: {
   catId: CategoryId;
-  completed: Set<number>;
+  completed: Set<string>;
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onZikr: (i: number) => void;
@@ -40,7 +40,7 @@ export function CategoryScreen({
   const azkar = getAzkarByCategory(catId);
   const cat = CATEGORIES.find((c) => c.id === catId)!;
   const done = completed.size;
-  const resumeIdx = azkar.findIndex((_, i) => !completed.has(i));
+  const resumeIdx = azkar.findIndex((zikr) => !completed.has(zikr.id));
   const language = isArabic ? "ar" : "en";
   const isOccasional = isOccasionalCategory(catId);
 
@@ -48,12 +48,12 @@ export function CategoryScreen({
 
   const remainingAzkar = azkar
     .map((z, i) => ({ z, index: i }))
-    .filter((x) => !completed.has(x.index))
+    .filter((x) => !completed.has(x.z.id))
     .sort((a, b) => a.z.orderIndex - b.z.orderIndex);
 
   const completedAzkar = azkar
     .map((z, i) => ({ z, index: i }))
-    .filter((x) => completed.has(x.index))
+    .filter((x) => completed.has(x.z.id))
     .sort((a, b) => a.z.orderIndex - b.z.orderIndex);
 
   const handleToggle = (index: number) => {
@@ -65,7 +65,7 @@ export function CategoryScreen({
   };
 
   const handleCardTap = (index: number, repetitionCount: number) => {
-    const isAlreadyDone = completed.has(index);
+    const isAlreadyDone = azkar[index] ? completed.has(azkar[index].id) : false;
     if (isAlreadyDone) {
       setCardCounts((prev) => ({ ...prev, [index]: 0 }));
       handleToggle(index);
@@ -80,9 +80,9 @@ export function CategoryScreen({
       handleToggle(index);
 
       // Smooth auto-scroll to next incomplete card
-      const nextIncomplete = azkar.findIndex((_, i) => i > index && !completed.has(i));
+      const nextIncomplete = azkar.findIndex((zikr, i) => i > index && !completed.has(zikr.id));
       const targetIndex =
-        nextIncomplete !== -1 ? nextIncomplete : azkar.findIndex((_, i) => i !== index && !completed.has(i));
+        nextIncomplete !== -1 ? nextIncomplete : azkar.findIndex((zikr, i) => i !== index && !completed.has(zikr.id));
 
       if (targetIndex !== -1) {
         setTimeout(() => {

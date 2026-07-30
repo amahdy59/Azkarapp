@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { getHomeAction, getTimeOfDayZikr } from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
+import { getAzkarByCategory } from "../content/azkar";
 import type { CategoryId, LocationSettings } from "../types";
 
 const cairo: LocationSettings = {
@@ -21,9 +22,10 @@ function atTime(date: Date, time: string, minuteDelta = 0) {
 }
 
 function progress(values: Partial<Record<CategoryId, number[]>> = {}) {
-  const result = {} as Record<CategoryId, Set<number>>;
+  const result = {} as Record<CategoryId, Set<string>>;
   for (const id of CATEGORY_IDS) {
-    result[id] = new Set(values[id] ?? []);
+    const zikrs = getAzkarByCategory(id);
+    result[id] = new Set((values[id] ?? []).map((index) => zikrs[index]?.id).filter(Boolean) as string[]);
   }
   return result;
 }

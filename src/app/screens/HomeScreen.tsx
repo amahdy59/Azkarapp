@@ -2,14 +2,14 @@ import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getCategoryTotal } from "../content/azkar";
+import { getAzkarByCategory, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { getFirstIncompleteIndex, getGardenSummary } from "../progress";
+import { getFirstIncompleteZikrIndex, getGardenSummary } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings } from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
@@ -56,7 +56,7 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
 
 /** Chooses one calm, useful next action without blocking access to any collection. */
 export function getHomeAction(
-  completed: Record<CategoryId, Set<number>>,
+  completed: Record<CategoryId, Set<string>>,
   now: Date = new Date(),
   location?: LocationSettings,
 ): HomeAction {
@@ -71,7 +71,7 @@ export function getHomeAction(
     if (done > 0 && done < totalCount) {
       return {
         categoryId,
-        index: getFirstIncompleteIndex(totalCount, completed[categoryId]) ?? 0,
+        index: getFirstIncompleteZikrIndex(getAzkarByCategory(categoryId), completed[categoryId]) ?? 0,
         completedCount: done,
         totalCount,
         kind: "resume",
@@ -105,7 +105,7 @@ export function HomeScreen({
   onOpenFridayMode,
   onOpenShareModal: _onOpenShareModal,
 }: {
-  completed: Record<CategoryId, Set<number>>;
+  completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -151,7 +151,7 @@ export function HomeScreen({
     [now, language, locationSettings],
   );
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
-  const doneSet = completed[reminderInfo.categoryId] ?? new Set<number>();
+  const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 
   const totalCount = getCategoryTotal(reminderInfo.categoryId);
   const doneCount = doneSet.size;

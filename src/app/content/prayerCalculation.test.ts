@@ -13,6 +13,16 @@ import {
 } from "./prayerCalculation";
 
 describe("prayerCalculation", () => {
+  it("keeps Arabic calculation-method labels as valid readable Unicode", () => {
+    expect(Object.values(CALCULATION_METHODS).map((method) => method.nameArabic)).toEqual([
+      "جامعة العلوم الإسلامية بكراتشي",
+      "الجمعية الإسلامية لأمريكا الشمالية (ISNA)",
+      "رابطة العالم الإسلامي",
+      "جامعة أم القرى بمكة المكرمة",
+      "الهيئة المصرية العامة للمساحة",
+    ]);
+    expect(Object.values(CALCULATION_METHODS).every((method) => !/[ØÙ]/.test(method.nameArabic))).toBe(true);
+  });
   beforeEach(() => window.localStorage.clear());
 
   it("has Egyptian General Authority of Survey as method 5", () => {
