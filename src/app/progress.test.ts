@@ -50,6 +50,17 @@ describe("quiet garden progress", () => {
     expect(third.records).toHaveLength(3);
   });
 
+  it("upgrades a core leaf to complete without recording a second leaf", () => {
+    const now = new Date(2026, 6, 18, 10);
+    const core = recordDailyCollectionCompletion([], "morning", now, 4, "core");
+    const complete = recordDailyCollectionCompletion(core.records, "morning", now, 4, "complete");
+
+    expect(core.records[0]?.completionLevel).toBe("core");
+    expect(complete.records).toHaveLength(1);
+    expect(complete.records[0]?.completionLevel).toBe("complete");
+    expect(complete.event.kind).toBe("repeat");
+  });
+
   it("emits extra_leaf for the first completion of a non-core category and repeat on subsequent completions", () => {
     const now = new Date(2026, 6, 18, 10);
     const first = recordDailyCollectionCompletion([], "travel", now, 4);

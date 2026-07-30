@@ -153,6 +153,7 @@ export function normalizeDailyCompletions(value: unknown): DailyCollectionComple
       dayKey: record.dayKey,
       category: record.category,
       timeZone: record.timeZone.trim(),
+      completionLevel: record.completionLevel === "core" ? "core" : "complete",
     });
   }
 
@@ -177,6 +178,7 @@ export function deriveDailyCompletionsFromLegacySessions(
         dayKey: getProgressDayKey(new Date(session.completedAt), boundaryHour),
         category: session.category,
         timeZone,
+        completionLevel: session.completionLevel === "core" ? "core" : "complete",
       })),
   );
 }
@@ -186,22 +188,31 @@ export function recordDailyCollectionCompletion(
   category: CategoryId,
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
+  completionLevel: "core" | "complete" = "complete",
 ) {
   const dayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records);
   const dayRecords = normalized.filter((record) => record.dayKey === dayKey);
-  const existing = dayRecords.some((record) => record.category === category);
+  const existing = dayRecords.find((record) => record.category === category);
   const isMainCategory = MAIN_CATEGORY_IDS.includes(category);
 
   if (existing) {
     const leafCount = dayRecords.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+    const upgraded =
+      existing.completionLevel === "core" && completionLevel === "complete"
+        ? normalized.map((record) =>
+            record.dayKey === dayKey && record.category === category
+              ? { ...record, completionLevel: "complete" as const }
+              : record,
+          )
+        : normalized;
     return {
-      records: normalized,
+      records: upgraded,
       event: { kind: "repeat", category, dayKey, leafCount } satisfies GrowthEvent,
     };
   }
 
-  const next = mergeDailyCompletions(normalized, [{ dayKey, category, timeZone: currentTimeZone() }]);
+  const next = mergeDailyCompletions(normalized, [{ dayKey, category, timeZone: currentTimeZone(), completionLevel }]);
   const leafCount = next
     .filter((record) => record.dayKey === dayKey)
     .filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;

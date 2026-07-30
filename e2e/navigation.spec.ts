@@ -45,7 +45,7 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
         settings: { language: "en", themeMode: "midnight", progressDayStartHour: 4 },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: {
-          morning: ["m-hm-75a", "m-hm-77m", "m-hm-78m"],
+          morning: ["m-hm-77m", "m-hm-78m", "m-hm-75"],
           evening: ["e-hm-75a", "e-hm-77e", "e-hm-78e"],
           before_sleep: ["s-hm-100", "s-hm-101", "s-hm-99-ikhlas"],
         },
@@ -70,10 +70,15 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
     window.localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
-        settings: { language: "en", themeMode: "midnight", progressDayStartHour: 4 },
+        settings: {
+          language: "en",
+          themeMode: "midnight",
+          progressDayStartHour: 4,
+          routineModes: { morning: "complete", evening: "core", before_sleep: "core" },
+        },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: {
-          morning: ["m-hm-75a", "m-hm-77m", "m-hm-78m", "m-hm-89m", "m-hm-75"],
+          morning: ["m-hm-77m", "m-hm-78m", "m-hm-75"],
           evening: [],
           before_sleep: [],
         },
@@ -89,18 +94,19 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   await page.getByTestId("home-primary-cta").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
-  await page.getByRole("button", { name: /Morning Azkar, 5 of 25 complete/ }).click();
+  await page.getByRole("button", { name: /Morning Azkar, 3 of 25 complete/ }).click();
 
-  const introductionCard = page.getByRole("button", {
-    name: "All praise is due to Allah alone, and prayers and peace be upon the one after whom there is no Prophet.",
-    exact: true,
-  });
-  const ikhlasCard = page.getByRole("button", { name: /Say: He is Allah, One/ });
-  const introductionBox = await introductionCard.boundingBox();
-  const ikhlasBox = await ikhlasCard.boundingBox();
-  expect(introductionBox).not.toBeNull();
-  expect(ikhlasBox).not.toBeNull();
-  expect(introductionBox!.y).toBeLessThan(ikhlasBox!.y);
+  await expect(page.getByText("Collection introduction", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText(
+      "All praise is due to Allah alone, and prayers and peace be upon the one after whom there is no Prophet.",
+      { exact: true },
+    ),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Begin", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Qur’anic protection", exact: true })).toBeVisible();
+  await expect(page.locator('[data-ritual-group="three_quls"]')).toHaveCount(1);
+  await expect(page.getByText("Core", { exact: true })).not.toHaveCount(0);
 
   await page.getByRole("button", { name: "Reset Progress", exact: true }).click();
 

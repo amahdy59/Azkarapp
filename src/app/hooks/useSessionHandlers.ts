@@ -1,7 +1,14 @@
 import { useCallback, useState } from "react";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion, View } from "../types";
+import type {
+  AppLanguage,
+  CategoryId,
+  DailyCollectionCompletion,
+  RoutineCategoryId,
+  RoutineMode,
+  View,
+} from "../types";
 import type { StoredSession } from "../state";
-import { getAzkarByCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import {
   getFirstIncompleteZikrIndex,
   getNextIncompleteIndex,
@@ -25,6 +32,8 @@ export function useSessionHandlers({
   setSavedZikrIds,
   progressDayStartHour,
   selectedLang,
+  routineModes,
+  setRoutineModes,
   push,
   pop,
   setView,
@@ -44,6 +53,8 @@ export function useSessionHandlers({
   setSavedZikrIds: React.Dispatch<React.SetStateAction<Set<string>>>;
   progressDayStartHour: number;
   selectedLang: AppLanguage;
+  routineModes: Record<RoutineCategoryId, RoutineMode>;
+  setRoutineModes: React.Dispatch<React.SetStateAction<Record<RoutineCategoryId, RoutineMode>>>;
   push: (to: View) => void;
   pop: () => void;
   setView: (view: View) => void;
@@ -60,6 +71,8 @@ export function useSessionHandlers({
   const [sessionStart, setSessionStart] = useState(Date.now());
   const [isRepeatSession, setIsRepeatSession] = useState(false);
   const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
+  const modeFor = (catId: CategoryId): RoutineMode => (isRoutineCategory(catId) ? routineModes[catId] : "complete");
+  const sessionAzkar = (catId: CategoryId, mode = modeFor(catId)) => getAzkarForMode(catId, mode);
 
   const handleResetCategory = (catId: CategoryId) => {
     showConfirm(
@@ -86,7 +99,10 @@ export function useSessionHandlers({
     push("category");
   };
 
-  const openReader = (catId: CategoryId, i: number) => {
+  const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode) => {
+    if (modeOverride && isRoutineCategory(catId)) {
+      setRoutineModes((previous) => ({ ...previous, [catId]: modeOverride }));
+    }
     setActiveCat(catId);
     setActiveIdx(i);
     setSessionStart(Date.now());
@@ -94,7 +110,7 @@ export function useSessionHandlers({
   };
 
   const resumeCategory = (catId: CategoryId) => {
-    const nextIndex = getFirstIncompleteZikrIndex(getAzkarByCategory(catId), completed[catId] ?? []);
+    const nextIndex = getFirstIncompleteZikrIndex(sessionAzkar(catId), completed[catId] ?? []);
     openReader(catId, nextIndex ?? 0);
   };
 
@@ -126,7 +142,7 @@ export function useSessionHandlers({
   );
 
   const markComplete = (idx: number) => {
-    const azkar = getAzkarByCategory(activeCat);
+    const azkar = sessionAzkar(activeCat);
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {
       return;
@@ -157,7 +173,14 @@ export function useSessionHandlers({
     }
 
     const completedAt = new Date();
-    const growth = recordDailyCollectionCompletion(dailyCompletions, activeCat, completedAt, progressDayStartHour);
+    const completionLevel = modeFor(activeCat);
+    const growth = recordDailyCollectionCompletion(
+      dailyCompletions,
+      activeCat,
+      completedAt,
+      progressDayStartHour,
+      completionLevel,
+    );
     setDailyCompletions(growth.records);
     setLastGrowthEvent(growth.event);
     setSessions((prev) => [
@@ -169,6 +192,7 @@ export function useSessionHandlers({
         totalCount: azkar.length,
         durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
         isComplete: true,
+        completionLevel,
       },
       ...prev,
     ]);
@@ -179,7 +203,7 @@ export function useSessionHandlers({
   };
 
   const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
-    const azkar = getAzkarByCategory(catId);
+    const azkar = sessionAzkar(catId);
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {
       return;
@@ -198,16 +222,22 @@ export function useSessionHandlers({
       [catId]: setForCat,
     }));
 
-    if (!wasCompleted && setForCat.size === azkar.length) {
+    if (!wasCompleted && azkar.every((zikr) => setForCat.has(zikr.id))) {
       const completedAt = new Date();
-      const growth = recordDailyCollectionCompletion(dailyCompletions, catId, completedAt, progressDayStartHour);
+      const growth = recordDailyCollectionCompletion(
+        dailyCompletions,
+        catId,
+        completedAt,
+        progressDayStartHour,
+        modeFor(catId),
+      );
       setDailyCompletions(growth.records);
       setLastGrowthEvent(growth.event);
     }
   };
 
   const advanceAfterCompletion = (idx: number) => {
-    const azkar = getAzkarByCategory(activeCat);
+    const azkar = sessionAzkar(activeCat);
     const zikrId = azkar[idx]?.id;
     if (!zikrId) {
       pop();

@@ -106,7 +106,12 @@ describe("app state persistence", () => {
     });
 
     expect(migrated.dailyCompletions).toEqual([
-      { dayKey: "2026-07-17", category: "morning", timeZone: expect.any(String) },
+      {
+        dayKey: "2026-07-17",
+        category: "morning",
+        timeZone: expect.any(String),
+        completionLevel: "complete",
+      },
     ]);
 
     const afterBoundaryChange = normalizeAppState({
@@ -167,7 +172,7 @@ describe("app state persistence", () => {
       },
     });
 
-    expect(state.completed.morning).toEqual(["m-hm-75a", "m-hm-77m"]);
+    expect(state.completed.morning).toEqual(["m-hm-77m"]);
   });
 
   it("clears account-owned private data while preserving device preferences", () => {
@@ -184,7 +189,7 @@ describe("app state persistence", () => {
       },
       completed: {
         ...DEFAULT_APP_STATE.completed,
-        morning: ["m-hm-75a"],
+        morning: ["m-hm-77m"],
       },
       sessions: [
         {
@@ -316,8 +321,18 @@ describe("state merging", () => {
     });
 
     expect(merged.dailyCompletions).toEqual([
-      { dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" },
-      { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
+      {
+        dayKey: "2026-07-18",
+        category: "morning",
+        timeZone: "Africa/Cairo",
+        completionLevel: "complete",
+      },
+      {
+        dayKey: "2026-07-18",
+        category: "evening",
+        timeZone: "Africa/Cairo",
+        completionLevel: "complete",
+      },
     ]);
   });
 });

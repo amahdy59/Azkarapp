@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getAzkarByCategory, getCategoryTotal } from "../content/azkar";
+import { getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
@@ -10,7 +10,14 @@ import { formatHijriDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getFirstIncompleteZikrIndex, getGardenSummary } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings } from "../types";
+import type {
+  AppLanguage,
+  CategoryId,
+  DailyCollectionCompletion,
+  LocationSettings,
+  RoutineCategoryId,
+  RoutineMode,
+} from "../types";
 
 type HomeActionKind = "resume" | "start" | "again";
 
@@ -59,6 +66,11 @@ export function getHomeAction(
   completed: Record<CategoryId, Set<string>>,
   now: Date = new Date(),
   location?: LocationSettings,
+  routineModes: Record<RoutineCategoryId, RoutineMode> = {
+    morning: "core",
+    evening: "core",
+    before_sleep: "core",
+  },
 ): HomeAction {
   const suggestedId = suggestedCategoryId(now, location);
   const categoryIds = [suggestedId, ...CATEGORIES.map((category) => category.id)].filter(
@@ -66,12 +78,20 @@ export function getHomeAction(
   ) as CategoryId[];
 
   for (const categoryId of categoryIds) {
-    const done = completed[categoryId]?.size ?? 0;
-    const totalCount = getCategoryTotal(categoryId);
+    const mode = isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete";
+    const visibleAzkar = getAzkarForMode(categoryId, mode);
+    const progress = isRoutineCategory(categoryId)
+      ? getRoutineProgress(categoryId, mode, completed[categoryId] ?? [])
+      : {
+          done: visibleAzkar.filter((zikr) => completed[categoryId]?.has(zikr.id)).length,
+          total: visibleAzkar.length,
+        };
+    const done = progress.done;
+    const totalCount = progress.total;
     if (done > 0 && done < totalCount) {
       return {
         categoryId,
-        index: getFirstIncompleteZikrIndex(getAzkarByCategory(categoryId), completed[categoryId]) ?? 0,
+        index: getFirstIncompleteZikrIndex(visibleAzkar, completed[categoryId]) ?? 0,
         completedCount: done,
         totalCount,
         kind: "resume",
@@ -80,14 +100,24 @@ export function getHomeAction(
   }
 
   for (const categoryId of categoryIds) {
-    const done = completed[categoryId]?.size ?? 0;
-    const totalCount = getCategoryTotal(categoryId);
+    const mode = isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete";
+    const visibleAzkar = getAzkarForMode(categoryId, mode);
+    const progress = isRoutineCategory(categoryId)
+      ? getRoutineProgress(categoryId, mode, completed[categoryId] ?? [])
+      : {
+          done: visibleAzkar.filter((zikr) => completed[categoryId]?.has(zikr.id)).length,
+          total: visibleAzkar.length,
+        };
+    const done = progress.done;
+    const totalCount = progress.total;
     if (done === 0) {
       return { categoryId, index: 0, completedCount: done, totalCount, kind: "start" };
     }
   }
 
-  const totalCount = getCategoryTotal(suggestedId);
+  const totalCount = isRoutineCategory(suggestedId)
+    ? getRoutineProgress(suggestedId, routineModes[suggestedId], completed[suggestedId] ?? []).total
+    : getAzkarForMode(suggestedId, "complete").length;
   return { categoryId: suggestedId, index: 0, completedCount: totalCount, totalCount, kind: "again" };
 }
 
@@ -104,6 +134,7 @@ export function HomeScreen({
   onRepeat,
   onOpenFridayMode,
   onOpenShareModal: _onOpenShareModal,
+  routineModes,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -117,6 +148,7 @@ export function HomeScreen({
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
   onOpenShareModal?: () => void;
+  routineModes: Record<RoutineCategoryId, RoutineMode>;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -153,8 +185,16 @@ export function HomeScreen({
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 
-  const totalCount = getCategoryTotal(reminderInfo.categoryId);
-  const doneCount = doneSet.size;
+  const reminderMode = isRoutineCategory(reminderInfo.categoryId) ? routineModes[reminderInfo.categoryId] : "complete";
+  const visibleReminderAzkar = getAzkarForMode(reminderInfo.categoryId, reminderMode);
+  const reminderProgress = isRoutineCategory(reminderInfo.categoryId)
+    ? getRoutineProgress(reminderInfo.categoryId, reminderMode, doneSet)
+    : {
+        done: visibleReminderAzkar.filter((zikr) => doneSet.has(zikr.id)).length,
+        total: visibleReminderAzkar.length,
+      };
+  const totalCount = reminderProgress.total;
+  const doneCount = reminderProgress.done;
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";

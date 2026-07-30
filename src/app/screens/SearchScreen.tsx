@@ -76,6 +76,7 @@ export function SearchScreen({
     q.trim().length < 2
       ? []
       : ALL_AZKAR.filter((z) => {
+          if (z.isCollectionIntroduction) return false;
           const lq = q.toLowerCase();
           return (
             z.arabicText.includes(q) ||

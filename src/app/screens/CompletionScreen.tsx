@@ -3,11 +3,11 @@ import confetti from "canvas-confetti";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarByCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -25,6 +25,8 @@ export function CompletionScreen({
   onHome,
   language,
   direction,
+  completionLevel = "complete",
+  onContinueComplete,
 }: {
   catId: CategoryId;
   sessionStart: number;
@@ -35,9 +37,11 @@ export function CompletionScreen({
   onHome: () => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  completionLevel?: RoutineMode;
+  onContinueComplete?: () => void;
 }) {
   const cat = CATEGORIES.find((item) => item.id === catId)!;
-  const azkarCount = getAzkarByCategory(catId).length;
+  const azkarCount = getAzkarForMode(catId, completionLevel).length;
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
   const isArabic = language === "ar";
   const [shareStatus, setShareStatus] = useState("");
@@ -174,6 +178,20 @@ export function CompletionScreen({
         {formatHijriDate(new Date(), language)}
       </p>
       <div className="mt-3 grid gap-3">
+        {isRoutineCategory(catId) && completionLevel === "core" && onContinueComplete && (
+          <button
+            type="button"
+            onClick={onContinueComplete}
+            className="flex min-h-[48px] items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 font-bold text-amber-900 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-amber-200"
+          >
+            {t(language, "category.continueAdditional", {
+              count: formatNumerals(
+                getAzkarForMode(catId, "complete").filter((zikr) => !zikr.includedInCore).length,
+                language,
+              ),
+            })}
+          </button>
+        )}
         <button
           type="button"
           onClick={onHome}

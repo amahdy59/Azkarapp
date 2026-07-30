@@ -25,7 +25,7 @@ function session(userId = "account-a") {
 
 const guestWithProgress = {
   ...DEFAULT_APP_STATE,
-  completed: { ...DEFAULT_APP_STATE.completed, morning: ["m-hm-75a"] },
+  completed: { ...DEFAULT_APP_STATE.completed, morning: ["m-hm-77m"] },
   sessions: [
     {
       id: "guest-session",
@@ -37,7 +37,7 @@ const guestWithProgress = {
       isComplete: false,
     },
   ],
-  savedZikrIds: ["m-hm-75a"],
+  savedZikrIds: ["m-hm-77m"],
 };
 
 describe("prepareAuthenticatedState", () => {
@@ -46,9 +46,9 @@ describe("prepareAuthenticatedState", () => {
   it("keeps guest progress for the merge choice and assigns the authenticated owner", async () => {
     const result = await prepareAuthenticatedState(session(), guestWithProgress, async () => "merge");
 
-    expect(result?.completed.morning).toEqual(["m-hm-75a"]);
+    expect(result?.completed.morning).toEqual(["m-hm-77m"]);
     expect(result?.sessions).toHaveLength(1);
-    expect(result?.savedZikrIds).toEqual(["m-hm-75a"]);
+    expect(result?.savedZikrIds).toEqual(["m-hm-77m"]);
     expect(result?.profile).toMatchObject({
       displayName: "Ahmed",
       email: "ahmed@example.com",

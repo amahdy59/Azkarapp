@@ -2,8 +2,14 @@ import { useState } from "react";
 import { Check, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
-import { getAzkarByCategory } from "../content/azkar";
-import type { CategoryId, Zikr } from "../types";
+import {
+  getAzkarByCategory,
+  getAzkarForMode,
+  getCollectionIntroduction,
+  getRoutineStepCount,
+  isRoutineCategory,
+} from "../content/azkar";
+import type { CategoryId, RitualGroupId, RoutineMode, Zikr, ZikrGroupId } from "../types";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
@@ -25,6 +31,8 @@ export function CategoryScreen({
   onRepeat,
   onBack,
   onPlayAllAudio,
+  routineMode = "complete",
+  onRoutineModeChange,
 }: {
   catId: CategoryId;
   completed: Set<string>;
@@ -36,17 +44,83 @@ export function CategoryScreen({
   onRepeat: () => void;
   onBack: () => void;
   onPlayAllAudio?: () => void;
+  routineMode?: RoutineMode;
+  onRoutineModeChange?: (mode: RoutineMode) => void;
 }) {
-  const azkar = getAzkarByCategory(catId);
+  const isMainRoutine = isRoutineCategory(catId);
+  const allAzkar = getAzkarByCategory(catId);
+  const azkar = getAzkarForMode(catId, isMainRoutine ? routineMode : "complete");
+  const introduction = getCollectionIntroduction(catId);
   const cat = CATEGORIES.find((c) => c.id === catId)!;
-  const done = completed.size;
+  const completedItemCount = azkar.filter((zikr) => completed.has(zikr.id)).length;
   const resumeIdx = azkar.findIndex((zikr) => !completed.has(zikr.id));
   const language = isArabic ? "ar" : "en";
   const isOccasional = isOccasionalCategory(catId);
 
   const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
+  const [preparationSteps, setPreparationSteps] = useState<Set<string>>(() => new Set());
+  const orderedAzkar = azkar.map((z, i) => ({ z, index: i }));
+  const groupedAzkar = orderedAzkar.reduce<Array<{ groupId: ZikrGroupId; items: typeof orderedAzkar }>>(
+    (groups, item) => {
+      const groupId = item.z.groupId ?? "ask";
+      const existing = groups.find((group) => group.groupId === groupId);
+      if (existing) {
+        existing.items.push(item);
+      } else {
+        groups.push({ groupId, items: [item] });
+      }
+      return groups;
+    },
+    [],
+  );
 
-  const orderedAzkar = azkar.map((z, i) => ({ z, index: i })).sort((a, b) => a.z.orderIndex - b.z.orderIndex);
+  const groupLabel = (groupId: ZikrGroupId) => {
+    const keys: Record<ZikrGroupId, string> = {
+      begin: "category.groupBegin",
+      quran_protection: "category.groupQuranProtection",
+      dua_protection: "category.groupDuaProtection",
+      renew: "category.groupRenew",
+      ask: "category.groupAsk",
+      repeat: "category.groupRepeat",
+      prepare: "category.prepareTitle",
+      settle: "category.groupSettle",
+      final: "category.groupFinal",
+    };
+    return t(language, keys[groupId]);
+  };
+
+  const ritualChunks = (items: typeof orderedAzkar) =>
+    items.reduce<Array<{ ritualGroupId?: RitualGroupId; items: typeof orderedAzkar }>>((chunks, item) => {
+      const previous = chunks.at(-1);
+      if (item.z.ritualGroupId && previous?.ritualGroupId === item.z.ritualGroupId) {
+        previous.items.push(item);
+      } else {
+        chunks.push({ ritualGroupId: item.z.ritualGroupId, items: [item] });
+      }
+      return chunks;
+    }, []);
+
+  const stepProgress = (items: typeof orderedAzkar) => {
+    const rituals = new Map<RitualGroupId, typeof orderedAzkar>();
+    const standalone = items.filter((item) => {
+      if (!item.z.ritualGroupId) return true;
+      const ritualItems = rituals.get(item.z.ritualGroupId) ?? [];
+      ritualItems.push(item);
+      rituals.set(item.z.ritualGroupId, ritualItems);
+      return false;
+    });
+    return {
+      total: standalone.length + rituals.size,
+      done:
+        standalone.filter(({ z }) => completed.has(z.id)).length +
+        [...rituals.values()].filter((ritualItems) => ritualItems.every(({ z }) => completed.has(z.id))).length,
+    };
+  };
+
+  const headerProgress =
+    isMainRoutine && routineMode === "core"
+      ? stepProgress(orderedAzkar)
+      : { done: completedItemCount, total: azkar.length };
 
   const handleToggle = (index: number) => {
     if (onToggleZikr) {
@@ -172,6 +246,16 @@ export function CategoryScreen({
           onClick={() => onZikr(index)}
           className="interactive-elem min-h-[44px] min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
         >
+          {isMainRoutine && routineMode === "complete" && z.includedInCore && (
+            <span className="mb-2 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[0.6875rem] font-extrabold text-primary">
+              {t(language, "category.coreBadge")}
+            </span>
+          )}
+          {catId === "before_sleep" && z.groupId === "final" && (
+            <span className="mb-2 inline-flex rounded-full bg-amber-500/15 px-2.5 py-1 text-[0.6875rem] font-extrabold text-amber-800 dark:text-amber-200">
+              {t(language, "category.finalWords")}
+            </span>
+          )}
           {isArabic && z.hasSeekRefuge && (
             <div className="mb-2 text-center pointer-events-none">
               <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
@@ -255,6 +339,35 @@ export function CategoryScreen({
 
       {!isOccasional && (
         <div className="shrink-0 border-b border-border px-5 py-4">
+          {isMainRoutine && (
+            <div
+              className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
+              role="group"
+              aria-label={`${t(language, "category.core")} / ${t(language, "category.complete")}`}
+            >
+              {(["core", "complete"] as const).map((mode) => {
+                const selected = routineMode === mode;
+                const count =
+                  mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length;
+                return (
+                  <button
+                    key={mode}
+                    type="button"
+                    aria-pressed={selected}
+                    onClick={() => onRoutineModeChange?.(mode)}
+                    className={`min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                      selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                    }`}
+                  >
+                    {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
+                      count: formatNumerals(count, language),
+                    })}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
           <div className="mb-2 flex items-center justify-between">
             <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
             <p
@@ -263,14 +376,14 @@ export function CategoryScreen({
               style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
             >
               {t(language, "category.counterProgress", {
-                current: formatNumerals(done, language),
-                total: formatNumerals(azkar.length, language),
+                current: formatNumerals(headerProgress.done, language),
+                total: formatNumerals(headerProgress.total, language),
               })}
             </p>
           </div>
           <ProgressBar
-            value={done}
-            max={azkar.length}
+            value={headerProgress.done}
+            max={headerProgress.total}
             height={8}
             trackColor="var(--card)"
             fillColor="var(--primary)"
@@ -278,8 +391,23 @@ export function CategoryScreen({
             aria-label={t(language, "category.dailyProgress")}
           />
 
+          {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
+            <button
+              type="button"
+              onClick={() => onRoutineModeChange?.("complete")}
+              className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
+            >
+              <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
+              <span className="text-[0.75rem] font-bold">
+                {t(language, "category.continueAdditional", {
+                  count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
+                })}
+              </span>
+            </button>
+          )}
+
           <div className="mt-4 flex w-full gap-3">
-            {done < azkar.length ? (
+            {completedItemCount < azkar.length ? (
               <>
                 <button
                   type="button"
@@ -287,7 +415,7 @@ export function CategoryScreen({
                   className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <span className="leading-none">
-                    {done === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                    {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
                   </span>
                   <span className="text-[1.125rem] leading-none" aria-hidden="true">
                     {direction === "rtl" ? "←" : "→"}
@@ -309,7 +437,7 @@ export function CategoryScreen({
                   <Volume2 size={16} />
                   <span>{t(language, "category.playAll")}</span>
                 </button>
-                {done > 0 && (
+                {completedItemCount > 0 && (
                   <button
                     type="button"
                     onClick={onReset}
@@ -358,8 +486,126 @@ export function CategoryScreen({
       )}
 
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
+        {introduction && (
+          <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <h2 className="text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200">
+                {t(language, "category.introductionLabel")}
+              </h2>
+              <span className="rounded-full bg-card/80 px-2.5 py-1 text-[0.6875rem] font-bold text-muted-foreground">
+                {t(language, "category.optional")}
+              </span>
+            </div>
+            <p
+              className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
+              dir={isArabic ? "rtl" : "ltr"}
+              lang={isArabic ? "ar" : "en"}
+            >
+              {isArabic ? introduction.arabicText : introduction.translation}
+            </p>
+          </aside>
+        )}
+
+        {catId === "before_sleep" && (
+          <section className="mb-5 rounded-2xl border border-border bg-card p-4" aria-labelledby="sleep-prepare-title">
+            <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
+              {t(language, "category.prepareTitle")}
+            </h2>
+            <div className="mt-3 grid gap-2">
+              {(
+                [
+                  ["wudu", "category.prepareWudu"],
+                  ["dust", "category.prepareDustBed"],
+                  ["right", "category.prepareRightSide"],
+                ] as const
+              ).map(([id, labelKey]) => (
+                <label key={id} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-muted/60 px-3">
+                  <input
+                    type="checkbox"
+                    checked={preparationSteps.has(id)}
+                    onChange={() =>
+                      setPreparationSteps((previous) => {
+                        const next = new Set(previous);
+                        if (next.has(id)) next.delete(id);
+                        else next.add(id);
+                        return next;
+                      })
+                    }
+                    className="size-5 accent-primary"
+                  />
+                  <span className="text-[0.8125rem] font-bold text-foreground">{t(language, labelKey)}</span>
+                </label>
+              ))}
+            </div>
+          </section>
+        )}
+
         {isOccasional ? (
           <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
+        ) : isMainRoutine ? (
+          <div className="mb-6 flex flex-col gap-6">
+            {groupedAzkar.map((group) => {
+              const groupProgress = stepProgress(group.items);
+              return (
+                <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <h2 id={`group-${group.groupId}`} className="text-[0.875rem] font-extrabold text-foreground">
+                      {groupLabel(group.groupId)}
+                    </h2>
+                    <span
+                      className="text-[0.75rem] font-bold text-muted-foreground"
+                      style={{ fontFamily: numeralFontFamily(language) }}
+                    >
+                      {t(language, "category.groupProgress", {
+                        done: formatNumerals(groupProgress.done, language),
+                        total: formatNumerals(groupProgress.total, language),
+                      })}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-col gap-3.5">
+                    {ritualChunks(group.items).map((chunk, chunkIndex) =>
+                      chunk.ritualGroupId ? (
+                        <div
+                          key={chunk.ritualGroupId}
+                          className="rounded-3xl border border-primary/25 bg-primary/5 p-3"
+                          data-ritual-group={chunk.ritualGroupId}
+                        >
+                          <div className="mb-3 px-1">
+                            <h3 className="text-[0.8125rem] font-extrabold text-primary">
+                              {t(
+                                language,
+                                chunk.ritualGroupId === "three_quls"
+                                  ? "category.ritualThreeQuls"
+                                  : "category.ritualTasbih",
+                              )}
+                            </h3>
+                            <p className="mt-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground">
+                              {t(
+                                language,
+                                chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
+                                  ? "category.ritualSleepInstruction"
+                                  : chunk.ritualGroupId === "three_quls"
+                                    ? "category.ritualThreeQulsInstruction"
+                                    : "category.ritualTasbihInstruction",
+                              )}
+                            </p>
+                          </div>
+                          <div className="flex flex-col gap-3">
+                            {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
+                          </div>
+                        </div>
+                      ) : (
+                        <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-3.5">
+                          {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
         ) : (
           <div className="mb-6 flex flex-col gap-3.5">
             {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
