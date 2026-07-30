@@ -46,15 +46,7 @@ export function CategoryScreen({
 
   const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
 
-  const remainingAzkar = azkar
-    .map((z, i) => ({ z, index: i }))
-    .filter((x) => !completed.has(x.z.id))
-    .sort((a, b) => a.z.orderIndex - b.z.orderIndex);
-
-  const completedAzkar = azkar
-    .map((z, i) => ({ z, index: i }))
-    .filter((x) => completed.has(x.z.id))
-    .sort((a, b) => a.z.orderIndex - b.z.orderIndex);
+  const orderedAzkar = azkar.map((z, i) => ({ z, index: i })).sort((a, b) => a.z.orderIndex - b.z.orderIndex);
 
   const handleToggle = (index: number) => {
     if (onToggleZikr) {
@@ -369,39 +361,9 @@ export function CategoryScreen({
         {isOccasional ? (
           <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
         ) : (
-          <>
-            {remainingAzkar.length > 0 && (
-              <div className="mb-6">
-                <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-[0.8125rem] font-bold text-muted-foreground">
-                    {t(language, "category.remaining")}
-                  </h2>
-                  <span className="text-[0.75rem] font-semibold text-muted-foreground">
-                    {t(language, "category.remainingCount", { count: formatNumerals(remainingAzkar.length, language) })}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-3.5">
-                  {remainingAzkar.map(({ z, index }) => renderZikrCard({ z, index }, false))}
-                </div>
-              </div>
-            )}
-
-            {completedAzkar.length > 0 && (
-              <div className="mb-6">
-                <div className="mb-3 flex items-center justify-between">
-                  <h2 className="text-[0.8125rem] font-bold text-muted-foreground">
-                    {t(language, "category.completed")}
-                  </h2>
-                  <span className="text-[0.75rem] font-semibold text-muted-foreground">
-                    {t(language, "category.completedCount", { count: formatNumerals(completedAzkar.length, language) })}
-                  </span>
-                </div>
-                <div className="flex flex-col gap-3.5">
-                  {completedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, true))}
-                </div>
-              </div>
-            )}
-          </>
+          <div className="mb-6 flex flex-col gap-3.5">
+            {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
+          </div>
         )}
       </div>
     </ScreenContainer>

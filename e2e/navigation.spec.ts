@@ -63,3 +63,55 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
 
   await expect(page.getByTestId("reader-screen")).toHaveAttribute("data-zikr-index", "3");
 });
+
+test("collection keeps canonical order and reset stays inside the app canvas", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", progressDayStartHour: 4 },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: {
+          morning: ["m-hm-75a", "m-hm-77m", "m-hm-78m", "m-hm-89m", "m-hm-75"],
+          evening: [],
+          before_sleep: [],
+        },
+        sessions: [],
+        dailyCompletions: [],
+        savedZikrIds: [],
+      }),
+    );
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await page.getByTestId("home-primary-cta").click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByRole("button", { name: /Morning Azkar, 5 of 25 complete/ }).click();
+
+  const introductionCard = page.getByRole("button", {
+    name: "All praise is due to Allah alone, and prayers and peace be upon the one after whom there is no Prophet.",
+    exact: true,
+  });
+  const ikhlasCard = page.getByRole("button", { name: /Say: He is Allah, One/ });
+  const introductionBox = await introductionCard.boundingBox();
+  const ikhlasBox = await ikhlasCard.boundingBox();
+  expect(introductionBox).not.toBeNull();
+  expect(ikhlasBox).not.toBeNull();
+  expect(introductionBox!.y).toBeLessThan(ikhlasBox!.y);
+
+  await page.getByRole("button", { name: "Reset Progress", exact: true }).click();
+
+  const shellBox = await page.locator(".app-shell").boundingBox();
+  const dialogBox = await page.getByRole("alertdialog").boundingBox();
+  expect(shellBox).not.toBeNull();
+  expect(dialogBox).not.toBeNull();
+  expect(dialogBox!.x).toBeGreaterThanOrEqual(shellBox!.x);
+  expect(dialogBox!.x + dialogBox!.width).toBeLessThanOrEqual(shellBox!.x + shellBox!.width);
+
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
+  await expect(page.getByText("0 of 25", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Reset Progress", exact: true })).toHaveCount(0);
+});
