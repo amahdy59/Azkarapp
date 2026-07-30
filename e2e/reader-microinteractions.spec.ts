@@ -127,6 +127,28 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   }
 });
 
+test("the adaptive counter stays circular when content fits and only compacts when space is constrained", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await openFirstMorningZikr(page);
+
+  const counterSurface = page.getByTestId("counter-surface");
+  await expect(counterSurface).toHaveAttribute("data-counter-shape", "circle");
+  await expect(counterSurface).toHaveCSS("border-radius", "82px");
+
+  const counterPanel = page.getByTestId("counter-panel");
+  await expect(counterPanel.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
+  await expect(counterPanel.getByRole("button", { name: "Next", exact: true })).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 420 });
+  await expect(counterSurface).toHaveAttribute("data-counter-shape", "compact");
+  await expect.poll(async () => Math.round((await counterSurface.boundingBox())?.height ?? 0)).toBe(76);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(counterSurface).toHaveAttribute("data-counter-shape", "circle");
+});
+
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 560 });
   await openFirstMorningZikr(page);

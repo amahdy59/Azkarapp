@@ -1,7 +1,9 @@
 create table if not exists public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   display_name text,
+  email text,
   phone text,
+  avatar_url text,
   preferred_language text not null default 'en',
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -28,12 +30,25 @@ create table if not exists public.user_progress (
 create table if not exists public.session_history (
   id text primary key,
   user_id uuid not null references public.profiles (id) on delete cascade,
-  category text not null check (category in ('morning', 'evening', 'before_sleep')),
+  category text not null check (
+    category in (
+      'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
+      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
+      'distress_anxiety', 'illness_ruqyah', 'social_community',
+      'natural_events', 'miscellaneous'
+    )
+  ),
   completed_count integer not null default 0,
   total_count integer not null default 0,
   duration_seconds integer not null default 0,
   is_complete boolean not null default false,
-  completed_at timestamptz not null default now()
+  completed_at timestamptz not null default now(),
+  constraint session_history_counts_nonnegative check (
+    completed_count >= 0
+    and total_count >= 0
+    and duration_seconds >= 0
+    and completed_count <= total_count
+  )
 );
 
 create index if not exists session_history_user_completed_idx
@@ -44,10 +59,24 @@ on public.session_history (user_id, completed_at desc);
 create table if not exists public.daily_collection_completions (
   user_id uuid not null references public.profiles (id) on delete cascade,
   day_key date not null,
-  category text not null check (category in ('morning', 'evening', 'before_sleep')),
+  category text not null check (
+    category in (
+      'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
+      'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
+      'distress_anxiety', 'illness_ruqyah', 'social_community',
+      'natural_events', 'miscellaneous'
+    )
+  ),
   time_zone text not null default 'local',
   created_at timestamptz not null default now(),
   primary key (user_id, day_key, category)
+);
+
+create table if not exists public.saved_zikr (
+  user_id uuid not null references public.profiles (id) on delete cascade,
+  zikr_id text not null,
+  created_at timestamptz not null default now(),
+  primary key (user_id, zikr_id)
 );
 
 alter table public.profiles enable row level security;
@@ -55,6 +84,7 @@ alter table public.user_settings enable row level security;
 alter table public.user_progress enable row level security;
 alter table public.session_history enable row level security;
 alter table public.daily_collection_completions enable row level security;
+alter table public.saved_zikr enable row level security;
 
 drop policy if exists "profiles_select_own" on public.profiles;
 create policy "profiles_select_own"
@@ -109,3 +139,40 @@ for all
 to authenticated
 using ((select auth.uid()) = user_id)
 with check ((select auth.uid()) = user_id);
+
+drop policy if exists "saved_zikr_select_own" on public.saved_zikr;
+create policy "saved_zikr_select_own"
+on public.saved_zikr
+for select
+to authenticated
+using ((select auth.uid()) = user_id);
+
+drop policy if exists "saved_zikr_insert_own" on public.saved_zikr;
+create policy "saved_zikr_insert_own"
+on public.saved_zikr
+for insert
+to authenticated
+with check ((select auth.uid()) = user_id);
+
+drop policy if exists "saved_zikr_delete_own" on public.saved_zikr;
+create policy "saved_zikr_delete_own"
+on public.saved_zikr
+for delete
+to authenticated
+using ((select auth.uid()) = user_id);
+
+revoke all on table
+  public.profiles,
+  public.user_settings,
+  public.user_progress,
+  public.session_history,
+  public.daily_collection_completions,
+  public.saved_zikr
+from anon;
+
+grant select, insert, update on table public.profiles to authenticated;
+grant select, insert, update on table public.user_settings to authenticated;
+grant select, insert, update on table public.user_progress to authenticated;
+grant select, insert, update on table public.session_history to authenticated;
+grant select, insert, update on table public.daily_collection_completions to authenticated;
+grant select, insert, delete on table public.saved_zikr to authenticated;

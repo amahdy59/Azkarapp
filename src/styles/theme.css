@@ -637,6 +637,163 @@ body {
   transform-origin: center;
 }
 
+.adaptive-counter-surface {
+  position: relative;
+  display: flex;
+  flex: none;
+  touch-action: manipulation;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--foreground);
+  background: var(--card);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 8%, transparent);
+  cursor: pointer;
+  isolation: isolate;
+}
+
+.adaptive-counter-surface:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--ring),
+    0 8px 24px color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+
+.adaptive-counter-surface:disabled {
+  cursor: default;
+}
+
+.adaptive-counter-track,
+.adaptive-counter-progress {
+  fill: none;
+  stroke-width: 8;
+  vector-effect: non-scaling-stroke;
+  transition: rx 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.adaptive-counter-track {
+  stroke: var(--muted);
+}
+
+.adaptive-counter-progress {
+  stroke: var(--primary);
+  stroke-linecap: round;
+  transition:
+    stroke-dashoffset 180ms cubic-bezier(0.4, 0, 0.2, 1),
+    rx 520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.adaptive-counter-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+
+.adaptive-counter-content .tap-anywhere-hint {
+  min-height: auto;
+  margin-top: 8px;
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  text-align: center;
+}
+
+.adaptive-counter-content.is-compact {
+  flex-direction: row;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 12px 22px;
+}
+
+.adaptive-counter-content.is-compact .adaptive-counter-numerals {
+  display: flex;
+  height: 48px;
+  min-width: 48px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--primary) 10%, var(--card));
+}
+
+.adaptive-counter-content.is-compact .counter-number {
+  font-size: 1rem;
+  line-height: 1.1rem;
+}
+
+.adaptive-counter-content.is-compact .tap-anywhere-hint {
+  flex: 1;
+  margin-top: 0;
+  font-size: 0.8125rem;
+}
+
+.adaptive-counter-pulse {
+  pointer-events: none;
+  position: absolute;
+  inset: 7px;
+  border: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+  border-radius: inherit;
+  opacity: 0;
+  animation: adaptive-counter-pulse 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.adaptive-counter-nav {
+  display: flex;
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-control);
+  border-radius: 9999px;
+  color: var(--foreground);
+  background: var(--card);
+  transition:
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.adaptive-counter-nav.is-compact {
+  border-radius: 14px;
+}
+
+.adaptive-counter-nav:hover:not(:disabled) {
+  background: var(--muted);
+  transform: translateY(-1px);
+}
+
+.adaptive-counter-nav:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.adaptive-counter-nav:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+.adaptive-counter-nav:disabled {
+  opacity: 0.25;
+}
+
+@keyframes adaptive-counter-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
 .counter-ring-ready {
   animation: counter-ready-breathe 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -676,6 +833,24 @@ body {
   color: var(--primary-foreground);
   background: var(--primary);
   box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.adaptive-counter-content.is-compact .counter-check-mark {
+  width: 48px;
+  height: 48px;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .adaptive-counter-track,
+  .adaptive-counter-progress,
+  .adaptive-counter-nav {
+    transition-duration: 0.01ms;
+  }
+
+  .adaptive-counter-pulse {
+    animation: none;
+  }
 }
 
 .counter-complete-cue .counter-check-mark svg path {

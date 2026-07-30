@@ -9,6 +9,8 @@ export function AccountDataPanel({
   isGuest,
   isSyncing,
   syncError,
+  syncStatus,
+  lastSuccessfulSyncAt,
   sessionCount,
   savedCount,
   onActivateAccount,
@@ -16,12 +18,15 @@ export function AccountDataPanel({
   onExportData,
   onResetPreferences,
   onClearLocalData,
+  onDeleteAccount,
   onBack,
 }: {
   language: AppLanguage;
   isGuest: boolean;
   isSyncing: boolean;
   syncError: string;
+  syncStatus: "offline" | "needs-attention" | "syncing" | "up-to-date";
+  lastSuccessfulSyncAt: string;
   sessionCount: number;
   savedCount: number;
   onActivateAccount: () => void;
@@ -29,13 +34,25 @@ export function AccountDataPanel({
   onExportData: () => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
+  onDeleteAccount: () => void;
   onBack: () => void;
 }) {
-  const syncStatus = syncError
-    ? t(language, "accountData.needsAttention")
-    : isSyncing
-      ? t(language, "accountData.syncing")
-      : t(language, "accountData.upToDate");
+  const syncStatusLabel =
+    syncStatus === "offline"
+      ? language === "ar"
+        ? "محفوظ محلياً دون اتصال"
+        : "Saved locally while offline"
+      : syncError
+        ? t(language, "accountData.needsAttention")
+        : isSyncing
+          ? t(language, "accountData.syncing")
+          : t(language, "accountData.upToDate");
+  const lastSyncLabel = lastSuccessfulSyncAt
+    ? new Intl.DateTimeFormat(language === "ar" ? "ar" : "en", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      }).format(new Date(lastSuccessfulSyncAt))
+    : "";
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
@@ -55,7 +72,12 @@ export function AccountDataPanel({
               </p>
               {!isGuest && (
                 <p className="mt-2 text-[0.75rem] font-semibold text-foreground">
-                  {t(language, "accountData.syncStatus")}: {syncStatus}
+                  {t(language, "accountData.syncStatus")}: {syncStatusLabel}
+                </p>
+              )}
+              {!isGuest && lastSyncLabel && (
+                <p className="mt-1 text-[0.75rem] text-muted-foreground">
+                  {language === "ar" ? "آخر مزامنة ناجحة" : "Last successful sync"}: {lastSyncLabel}
                 </p>
               )}
             </div>
@@ -103,6 +125,20 @@ export function AccountDataPanel({
             onPress={onClearLocalData}
             destructive
           />
+          {!isGuest && (
+            <DataAction
+              icon={<LogOut size={20} aria-hidden="true" />}
+              title={language === "ar" ? "حذف الحساب" : "Delete account"}
+              body={
+                language === "ar"
+                  ? "نزّل بياناتك ثم احذف الحساب والنسخة السحابية نهائياً."
+                  : "Export your data, then permanently remove your account and cloud copy."
+              }
+              action={language === "ar" ? "تصدير وحذف الحساب" : "Export and delete account"}
+              onPress={onDeleteAccount}
+              destructive
+            />
+          )}
         </div>
       </div>
     </div>

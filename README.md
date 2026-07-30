@@ -11,7 +11,7 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 - Online Aladhan prayer timings with daily caching and an astronomical offline fallback
 - Automatic geolocation, coordinate-derived IANA timezone detection, DST handling, calculation methods, and manual minute adjustments
 - Local progress, saved zikr, sessions, reminders, accessibility preferences, and theme persistence
-- Optional Supabase phone OTP authentication and cross-device synchronization
+- Optional Supabase Google, email OTP, and feature-flagged Apple authentication with cross-device synchronization
 - Installable PWA, offline app shell, update prompts, and quick actions
 - Responsive RTL/LTR layouts with WCAG-oriented automated checks
 
@@ -70,13 +70,18 @@ Copy `.env.example` to `.env` only when Supabase or hosted legal pages are requi
 cp .env.example .env
 ```
 
-| Variable                  | Required | Purpose                                     |
-| ------------------------- | -------- | ------------------------------------------- |
-| `VITE_SUPABASE_URL`       | No       | Supabase project URL                        |
-| `VITE_SUPABASE_ANON_KEY`  | No       | Public Supabase anonymous key               |
-| `VITE_TERMS_URL`          | No       | Hosted terms URL                            |
-| `VITE_PRIVACY_URL`        | No       | Hosted privacy URL                          |
-| `VITE_TELEMETRY_ENDPOINT` | No       | Privacy-safe error and Web Vitals collector |
+| Variable                        | Required | Purpose                                                |
+| ------------------------------- | -------- | ------------------------------------------------------ |
+| `VITE_SUPABASE_URL`             | No       | Supabase project URL                                   |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | No       | Preferred public browser key                           |
+| `VITE_SUPABASE_ANON_KEY`        | No       | Legacy public key fallback                             |
+| `VITE_APP_URL`                  | No       | Canonical app URL used to construct the OAuth callback |
+| `VITE_TERMS_URL`                | No       | Hosted terms URL                                       |
+| `VITE_PRIVACY_URL`              | No       | Hosted privacy URL                                     |
+| `VITE_GOOGLE_AUTH_ENABLED`      | No       | Shows Google only when set to `true`                   |
+| `VITE_EMAIL_AUTH_ENABLED`       | No       | Shows six-digit email OTP only when set to `true`      |
+| `VITE_APPLE_AUTH_ENABLED`       | No       | Shows Apple only when set to `true`                    |
+| `VITE_TELEMETRY_ENDPOINT`       | No       | Privacy-safe error and Web Vitals collector            |
 
 Never commit `.env` or service-role credentials. The app remains usable as a local guest when Supabase variables are absent.
 
@@ -144,14 +149,22 @@ Signed-in users can synchronize:
 - Idempotent daily collection completions
 
 Local state remains the immediate source for rendering. Remote failures must not remove local reading or progress functionality.
+Precise location coordinates, navigation, audio state, notification permission, installation state, and temporary UI state
+remain device-local.
 
 ### Supabase setup
 
 1. Create `.env` from `.env.example`.
-2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`.
+2. Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (or the legacy `VITE_SUPABASE_ANON_KEY`).
 3. Apply [`supabase/schema.sql`](supabase/schema.sql) to a new project.
 4. Apply files in `supabase/migrations/` in filename order for an existing project.
-5. Configure the desired phone OTP provider and redirect settings in Supabase.
+5. Configure the Supabase Site URL and redirect allowlist:
+   - `https://amahdy59.github.io/Azkarapp/?view=auth-callback`
+   - `http://localhost:5173/?view=auth-callback`
+6. Configure Google, email, or Apple externally, then enable only its matching Vite feature flag.
+7. Deploy `supabase/functions/delete-account` before enabling account deletion.
+
+Google requires a Google Cloud OAuth client ID and secret. Apple requires an Apple Developer account, Services ID, Team ID, Key ID, and signing key; its web OAuth secret must be rotated every six months. Public email OTP requires custom SMTP. These credentials are intentionally never stored in this repository.
 
 Row-level security and private ownership rules in the schema are part of the application contract; do not bypass them from client code.
 
@@ -178,7 +191,7 @@ Pushes to `main` trigger:
 1. `.github/workflows/quality.yml` — installs dependencies, runs `pnpm check`, and executes Playwright.
 2. `.github/workflows/deploy-pages.yml` — verifies the build, creates the GitHub Pages artifact, and deploys it.
 
-Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` as repository secrets if account features are required in production.
+Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_SUPABASE_URL` as an Actions variable and a publishable key as `VITE_SUPABASE_PUBLISHABLE_KEY` (a secret is acceptable despite the key being public). Provider flags are Actions variables and should remain false until the corresponding provider is configured.
 
 ## Maintenance workflow
 

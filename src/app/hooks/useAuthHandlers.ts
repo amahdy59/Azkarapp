@@ -1,17 +1,22 @@
 import { useState } from "react";
+import type { Session } from "@supabase/supabase-js";
 import type { AppLanguage, AppStateSnapshot, View } from "../types";
 import {
+  getCurrentSession,
   loadRemoteState,
-  normalizePhoneNumber,
   profileFromSession,
-  requestPhoneOtp,
-  resendPhoneOtp,
+  requestEmailOtp,
+  resendEmailOtp,
+  signInWithOAuthProvider,
   signOutSupabase,
-  verifyPhoneOtp,
+  updateAccountDisplayName,
+  verifyEmailOtp,
 } from "../../lib/auth";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { clearPrivateAppData } from "../state";
 import { t } from "../i18n";
+
+export type GuestMigrationDecision = "merge" | "discard" | "cancel";
 
 export interface ConfirmDialogOptions {
   title: string;
@@ -22,30 +27,61 @@ export interface ConfirmDialogOptions {
   destructive?: boolean;
 }
 
+export function hasPrivateProgress(state: AppStateSnapshot) {
+  return (
+    state.sessions.length > 0 ||
+    state.dailyCompletions.length > 0 ||
+    state.savedZikrIds.length > 0 ||
+    Object.values(state.completed).some((items) => items.length > 0)
+  );
+}
+
+export async function prepareAuthenticatedState(
+  session: Session,
+  localState: AppStateSnapshot,
+  requestGuestMigrationDecision: () => Promise<GuestMigrationDecision>,
+) {
+  const knownDifferentOwner =
+    Boolean(localState.profile.accountUserId) && localState.profile.accountUserId !== session.user.id;
+
+  let decision: GuestMigrationDecision = "merge";
+  if (!localState.profile.accountUserId && localState.profile.isGuest && hasPrivateProgress(localState)) {
+    decision = await requestGuestMigrationDecision();
+  }
+  if (decision === "cancel") {
+    await signOutSupabase();
+    return null;
+  }
+
+  const mayUseLocalPrivateData = !knownDifferentOwner && decision === "merge";
+  const base = mayUseLocalPrivateData ? localState : clearPrivateAppData(localState);
+  return {
+    ...base,
+    profile: profileFromSession(session, base.profile),
+  };
+}
+
 export function useAuthHandlers({
   selectedLang,
-  lastPhoneNumber,
-  setLastPhoneNumber,
-  setDisplayName: _setDisplayName,
-  setIsGuest: _setIsGuest,
+  email,
+  setEmail,
   setRemoteSyncReady,
   appStateSnapshot,
   applyStateSnapshot,
   markOnboardingComplete,
+  requestGuestMigrationDecision,
   showConfirm,
-  setPendingConfirm,
   setView,
   setActiveTab,
 }: {
   selectedLang: AppLanguage;
-  lastPhoneNumber: string;
-  setLastPhoneNumber: (phone: string) => void;
-  setDisplayName: (name: string) => void;
-  setIsGuest: (isGuest: boolean) => void;
+  email: string;
+  setEmail: (email: string) => void;
   setRemoteSyncReady: (ready: boolean) => void;
   appStateSnapshot: AppStateSnapshot;
   applyStateSnapshot: (state: AppStateSnapshot) => void;
   markOnboardingComplete: () => void;
+  requestGuestMigrationDecision: () => Promise<GuestMigrationDecision>;
   showConfirm: (
     title: string,
     description: string,
@@ -54,14 +90,33 @@ export function useAuthHandlers({
     onConfirm: () => void,
     destructive?: boolean,
   ) => void;
-  setPendingConfirm: React.Dispatch<React.SetStateAction<ConfirmDialogOptions | null>>;
   setView: (view: View) => void;
   setActiveTab: (tab: "home" | "azkar" | "progress" | "settings") => void;
 }) {
   const [isSendingOtp, setIsSendingOtp] = useState(false);
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
+  const [isCompletingProfile, setIsCompletingProfile] = useState(false);
   const [authError, setAuthError] = useState("");
+
+  const finishSession = async (session: Session) => {
+    setRemoteSyncReady(false);
+    const hydrationBase = await prepareAuthenticatedState(session, appStateSnapshot, requestGuestMigrationDecision);
+    if (!hydrationBase) {
+      setView("home");
+      return;
+    }
+    applyStateSnapshot(hydrationBase);
+    const mergedState = await loadRemoteState(session, hydrationBase, {
+      preserveLocalPreferences: appStateSnapshot.profile.isGuest,
+    });
+    applyStateSnapshot(mergedState);
+    setRemoteSyncReady(true);
+    markOnboardingComplete();
+    const needsName = !mergedState.profile.displayName.trim() || mergedState.profile.displayName === "Guest";
+    setView(needsName ? "profile-completion" : "home");
+    setActiveTab("home");
+  };
 
   const handleOpenAccountAuth = () => {
     setAuthError("");
@@ -69,12 +124,12 @@ export function useAuthHandlers({
     setActiveTab("settings");
   };
 
-  const handleSendOtp = async (phone: string) => {
+  const handleSendOtp = async (value: string) => {
     try {
       setAuthError("");
       setIsSendingOtp(true);
-      const normalizedPhone = isSupabaseConfigured ? await requestPhoneOtp(phone) : normalizePhoneNumber(phone);
-      setLastPhoneNumber(normalizedPhone);
+      const normalizedEmail = await requestEmailOtp(value);
+      setEmail(normalizedEmail);
       setView("otp");
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.sendCodeError"));
@@ -87,73 +142,9 @@ export function useAuthHandlers({
     try {
       setAuthError("");
       setIsVerifyingOtp(true);
-      setRemoteSyncReady(false);
-      const session = await verifyPhoneOtp(lastPhoneNumber, token);
-      if (!session) {
-        throw new Error(t(selectedLang, "auth.verifyCodeError"));
-      }
-
-      const privateGuestDataExists =
-        appStateSnapshot.sessions.length > 0 ||
-        appStateSnapshot.dailyCompletions.length > 0 ||
-        appStateSnapshot.savedZikrIds.length > 0 ||
-        Object.values(appStateSnapshot.completed).some((items) => items.length > 0);
-      const legacyIdentityMatches =
-        !appStateSnapshot.profile.accountUserId &&
-        !appStateSnapshot.profile.isGuest &&
-        Boolean(session.user.phone) &&
-        normalizePhoneNumber(appStateSnapshot.profile.lastPhoneNumber) ===
-          normalizePhoneNumber(session.user.phone ?? "");
-      let hydrationBase = appStateSnapshot;
-      if (appStateSnapshot.profile.accountUserId && appStateSnapshot.profile.accountUserId !== session.user.id) {
-        hydrationBase = clearPrivateAppData(appStateSnapshot);
-      } else if (
-        !appStateSnapshot.profile.accountUserId &&
-        !appStateSnapshot.profile.isGuest &&
-        !legacyIdentityMatches
-      ) {
-        hydrationBase = clearPrivateAppData(appStateSnapshot);
-      } else if (
-        !appStateSnapshot.profile.accountUserId &&
-        appStateSnapshot.profile.isGuest &&
-        privateGuestDataExists
-      ) {
-        await new Promise<void>((resolve) => {
-          showConfirm(
-            t(selectedLang, "auth.mergeTitle"),
-            t(selectedLang, "auth.mergeGuestProgress"),
-            t(selectedLang, "auth.mergeConfirm"),
-            t(selectedLang, "common.skip"),
-            () => resolve(),
-            false,
-          );
-          setPendingConfirm((prev) =>
-            prev
-              ? {
-                  ...prev,
-                  onConfirm: () => resolve(),
-                }
-              : null,
-          );
-        }).catch(() => {
-          hydrationBase = clearPrivateAppData(appStateSnapshot);
-        });
-      }
-
-      if (hydrationBase !== appStateSnapshot) {
-        hydrationBase = {
-          ...hydrationBase,
-          profile: profileFromSession(session, hydrationBase.profile.lastPhoneNumber),
-        };
-        applyStateSnapshot(hydrationBase);
-      }
-
-      const mergedState = await loadRemoteState(session, hydrationBase);
-      applyStateSnapshot(mergedState);
-      setRemoteSyncReady(true);
-      markOnboardingComplete();
-      setView("home");
-      setActiveTab("home");
+      const session = await verifyEmailOtp(email, token);
+      if (!session) throw new Error(t(selectedLang, "auth.verifyCodeError"));
+      await finishSession(session);
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
     } finally {
@@ -165,11 +156,57 @@ export function useAuthHandlers({
     try {
       setAuthError("");
       setIsResendingOtp(true);
-      await resendPhoneOtp(lastPhoneNumber);
+      await resendEmailOtp(email);
     } catch (error) {
       setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.resendCodeError"));
     } finally {
       setIsResendingOtp(false);
+    }
+  };
+
+  const handleOAuth = async (provider: "google" | "apple") => {
+    try {
+      setAuthError("");
+      await signInWithOAuthProvider(provider);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
+    }
+  };
+
+  const handleAuthCallback = async () => {
+    try {
+      setAuthError("");
+      const params = new URLSearchParams(window.location.search);
+      const callbackError = params.get("error_description") || params.get("error");
+      if (callbackError) throw new Error(callbackError);
+      const session = await getCurrentSession();
+      if (!session) throw new Error(t(selectedLang, "auth.verifyCodeError"));
+      await finishSession(session);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
+      setView("login");
+    } finally {
+      const cleanUrl = new URL(window.location.href);
+      cleanUrl.search = "";
+      cleanUrl.hash = "";
+      window.history.replaceState({ view: "home" }, "", cleanUrl);
+    }
+  };
+
+  const handleCompleteProfile = async (displayName: string) => {
+    try {
+      setAuthError("");
+      setIsCompletingProfile(true);
+      await updateAccountDisplayName(displayName);
+      applyStateSnapshot({
+        ...appStateSnapshot,
+        profile: { ...appStateSnapshot.profile, displayName: displayName.trim() },
+      });
+      setView("home");
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : "Could not save your display name.");
+    } finally {
+      setIsCompletingProfile(false);
     }
   };
 
@@ -183,9 +220,7 @@ export function useAuthHandlers({
         try {
           setAuthError("");
           setRemoteSyncReady(false);
-          if (isSupabaseConfigured) {
-            await signOutSupabase();
-          }
+          if (isSupabaseConfigured) await signOutSupabase();
           applyStateSnapshot(clearPrivateAppData(appStateSnapshot));
           setView("login");
           setActiveTab("home");
@@ -201,12 +236,16 @@ export function useAuthHandlers({
     isSendingOtp,
     isVerifyingOtp,
     isResendingOtp,
+    isCompletingProfile,
     authError,
     setAuthError,
     handleOpenAccountAuth,
     handleSendOtp,
     handleVerifyOtp,
     handleResendOtp,
+    handleOAuth,
+    handleAuthCallback,
+    handleCompleteProfile,
     handleSignOut,
   };
 }

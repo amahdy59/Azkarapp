@@ -34,8 +34,10 @@ export type View =
   | "onboard1"
   | "language"
   | "login"
-  | "phone"
+  | "email"
   | "otp"
+  | "auth-callback"
+  | "profile-completion"
   // Phase 2 — Arabic onboarding (shown when device locale is Arabic)
   | "ar_onboard1"
   // Phase 3
@@ -141,7 +143,9 @@ export interface UserSettingsState {
 
 export interface UserProfileState {
   displayName: string;
-  lastPhoneNumber: string;
+  email: string;
+  phone: string;
+  avatarUrl: string;
   isGuest: boolean;
   /** Supabase user ID that owns the locally cached private progress. Empty for guest data. */
   accountUserId: string;

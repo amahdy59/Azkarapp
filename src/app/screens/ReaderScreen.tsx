@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, useReducedMotion } from "motion/react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import {
@@ -19,7 +20,7 @@ import { CATEGORIES } from "../content/categories";
 import { getAzkarByCategory } from "../content/azkar";
 import type { AppLanguage, ArabicFontOption, CategoryId, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterRing, PulseRings } from "../components/ZikrComponents";
+import { AdaptiveCounterTrack } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
@@ -152,9 +153,13 @@ export function ReaderScreen({
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
+  const [useCompactCounter, setUseCompactCounter] = useState(false);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
+  const prefersReducedMotion = useReducedMotion();
 
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const readerMainRef = useRef<HTMLDivElement | null>(null);
+  const readingContentRef = useRef<HTMLDivElement | null>(null);
 
   const {
     count,
@@ -193,6 +198,34 @@ export function ReaderScreen({
       }
     };
   }, []);
+
+  useEffect(() => {
+    const main = readerMainRef.current;
+    const content = readingContentRef.current;
+    if (!main || !content) return;
+
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        // Reserve the full circular counter footprint. The compact form is only
+        // selected when the reading would otherwise collide with or hide it.
+        const circularCounterFootprint = 206;
+        const readingFootprint = content.scrollHeight + 24;
+        setUseCompactCounter(readingFootprint + circularCounterFootprint > main.clientHeight);
+      });
+    };
+
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(main);
+    observer.observe(content);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [z?.id, arabicFont, textSize, showTranslation, showTransliteration, language]);
 
   if (!z || !category) {
     return null;
@@ -315,6 +348,7 @@ export function ReaderScreen({
 
   const renderReadingContent = () => (
     <div
+      ref={readingContentRef}
       className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
       role="button"
       tabIndex={0}
@@ -409,124 +443,101 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => {
-    if (isLongContent) {
-      return (
-        <div className="px-5 pb-2" data-testid="counter-panel">
+    return (
+      <div className="px-3 pb-3" data-testid="counter-panel">
+        <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
           <button
             type="button"
-            data-testid="counter-surface"
-            disabled={complete}
-            onClick={handleTap}
-            onKeyDown={(event) => {
-              if (event.key === " " || event.key === "Enter") {
-                event.preventDefault();
-                handleTap();
-              }
+            onClick={(event) => {
+              event.stopPropagation();
+              onPrev();
             }}
-            aria-disabled={complete}
-            aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-            className={`w-full min-h-[48px] px-4 py-2.5 rounded-2xl flex items-center justify-between font-bold text-[0.9375rem] transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] ${
-              complete
-                ? "bg-emerald-500/15 text-emerald-950 dark:text-emerald-100 border border-emerald-500/30 shadow-none cursor-default"
-                : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-md cursor-pointer"
-            }`}
+            disabled={idx === 0}
+            title={t(language, "reader.prev")}
+            aria-label={t(language, "reader.prev")}
+            className={`adaptive-counter-nav ${useCompactCounter ? "is-compact" : ""}`}
           >
-            <div className="flex items-center gap-2.5">
-              {complete ? (
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
-                  <Check size={18} strokeWidth={2.5} />
-                </div>
-              ) : (
-                <span
-                  className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary-foreground/20 text-[0.8125rem] font-extrabold"
-                  style={{ fontFamily: counterNumeralFontFamily(language) }}
-                >
-                  {localizedCount}
-                </span>
-              )}
-              <span>{complete ? t(language, "reader.completedSurah") : t(language, "reader.tapWhenFinished")}</span>
-            </div>
-
-            <div
-              className="flex items-center gap-2 text-[0.8125rem] opacity-90"
-              style={{ fontFamily: counterNumeralFontFamily(language) }}
-            >
-              <span>{localizedRatio}</span>
-              {!complete && <Check size={16} />}
-            </div>
+            {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
           </button>
-        </div>
-      );
-    }
 
-    return (
-      <div className="flex flex-col px-5 pb-3" data-testid="counter-panel">
-        <div className="flex flex-col">
-          <div
-            role="button"
-            data-testid="counter-surface"
-            tabIndex={0}
-            aria-disabled={complete}
-            aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
-            className={`flex touch-manipulation select-none flex-col items-center justify-center rounded-3xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${count === 0 && !complete ? "counter-ready" : ""}`}
-            onKeyDown={(event) => {
-              if (event.key === " " || event.key === "Enter") {
-                event.preventDefault();
+          <div className="flex min-w-0 flex-1 justify-center">
+            <motion.button
+              type="button"
+              data-testid="counter-surface"
+              data-counter-shape={useCompactCounter ? "compact" : "circle"}
+              disabled={complete}
+              onClick={(event) => {
+                event.stopPropagation();
                 handleTap();
-              }
-            }}
-          >
-            <div
-              className={`counter-ring-stage pointer-events-none relative flex h-[150px] w-[150px] items-center justify-center ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+              }}
+              aria-disabled={complete}
+              aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
+              className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
+              initial={false}
+              animate={{
+                width: useCompactCounter ? "100%" : 164,
+                height: useCompactCounter ? 76 : 164,
+                borderRadius: useCompactCounter ? 24 : 82,
+              }}
+              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
+              whileTap={complete || prefersReducedMotion ? undefined : { scale: 0.975 }}
             >
-              <PulseRings trigger={pulse} size={150} count={count} total={z.repetitionCount} />
-              <CounterRing count={count} total={z.repetitionCount} size={150} />
-              <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={useCompactCounter} />
+              <span key={pulse} className="adaptive-counter-pulse" aria-hidden="true" />
+
+              <div className={`adaptive-counter-content ${useCompactCounter ? "is-compact" : ""}`}>
                 {complete ? (
                   <div
                     className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
                     data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
                   >
                     <span className="counter-check-mark">
-                      <Check size={36} strokeWidth={2.5} />
+                      <Check size={useCompactCounter ? 28 : 36} strokeWidth={2.5} />
                     </span>
                   </div>
                 ) : (
                   <>
-                    <p
-                      className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
-                      key={count}
-                      dir="ltr"
-                      style={{
-                        fontFamily: counterNumeralFontFamily(language),
-                        fontVariantNumeric: "tabular-nums lining-nums",
-                      }}
-                    >
-                      {localizedCount}
-                    </p>
-                    <p
-                      className="text-[0.75rem] text-foreground"
-                      dir="ltr"
-                      style={{
-                        fontFamily: counterNumeralFontFamily(language),
-                        fontVariantNumeric: "tabular-nums lining-nums",
-                      }}
-                    >
-                      {localizedRatio}
-                    </p>
+                    <div className="adaptive-counter-numerals" dir="ltr">
+                      <p
+                        className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
+                        key={count}
+                        style={{
+                          fontFamily: counterNumeralFontFamily(language),
+                          fontVariantNumeric: "tabular-nums lining-nums",
+                        }}
+                      >
+                        {localizedCount}
+                      </p>
+                      <p
+                        className="text-[0.75rem] text-muted-foreground"
+                        style={{
+                          fontFamily: counterNumeralFontFamily(language),
+                          fontVariantNumeric: "tabular-nums lining-nums",
+                        }}
+                      >
+                        {localizedRatio}
+                      </p>
+                    </div>
+                    <p className="tap-anywhere-hint font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
                   </>
                 )}
               </div>
-            </div>
-
-            {/* Reserved-height hint: always rendered to prevent layout reflow, animated out on complete */}
-            <p
-              className={`tap-anywhere-hint text-[10px] font-bold text-foreground mt-2${complete ? " hint-hidden" : ""}`}
-              aria-hidden={complete}
-            >
-              {complete ? "" : t(language, "reader.tapAnywhere")}
-            </p>
+            </motion.button>
           </div>
+
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onNext();
+            }}
+            disabled={idx === azkar.length - 1}
+            title={t(language, "reader.next")}
+            aria-label={t(language, "reader.next")}
+            className={`adaptive-counter-nav ${useCompactCounter ? "is-compact" : ""}`}
+          >
+            {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
+          </button>
         </div>
       </div>
     );
@@ -649,41 +660,7 @@ export function ReaderScreen({
       </div>
 
       {/* Main Layout Area */}
-      <div className="flex-1 flex flex-col min-h-0 justify-between select-none relative group" key={z.id}>
-        {/* Navigation Arrows positioned at vertical middle of screen canvas (top-[42%] -translate-y-1/2)
-            Default state when idle: near-invisible opacity-10 so reading is 100% peaceful.
-            On hover/touch/focus of screen or Zikr card: smoothly fades in (opacity-75).
-            On hover directly over arrow button: opacity-100 bg-muted/80 text-foreground. */}
-        <div className="absolute top-[42%] -translate-y-1/2 left-1.5 right-1.5 z-20 flex items-center justify-between pointer-events-none opacity-10 transition-opacity duration-300 group-hover:opacity-75 group-focus-within:opacity-75 group-active:opacity-75">
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onPrev();
-            }}
-            disabled={idx === 0}
-            title={t(language, "reader.prev")}
-            aria-label={t(language, "reader.prev")}
-            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/80 transition-all hover:bg-muted/90 hover:text-foreground hover:scale-105 hover:opacity-100 active:scale-95 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:scale-100"
-          >
-            {direction === "rtl" ? <ChevronRight size={24} /> : <ChevronLeft size={24} />}
-          </button>
-
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onNext();
-            }}
-            disabled={idx === azkar.length - 1}
-            title={t(language, "reader.next")}
-            aria-label={t(language, "reader.next")}
-            className="pointer-events-auto flex h-11 w-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-full text-foreground/80 transition-all hover:bg-muted/90 hover:text-foreground hover:scale-105 hover:opacity-100 active:scale-95 focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring disabled:opacity-15 disabled:hover:bg-transparent disabled:hover:scale-100"
-          >
-            {direction === "rtl" ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
-          </button>
-        </div>
-
+      <div ref={readerMainRef} className="flex-1 flex flex-col min-h-0 justify-between select-none relative">
         {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
             within this region; the counter below is always visible and never covered. */}
         <div
@@ -697,7 +674,9 @@ export function ReaderScreen({
               isLongContent ? "justify-start pt-1" : "justify-center my-auto"
             } pb-2 items-center`}
           >
-            {renderReadingContent()}
+            <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
+              {renderReadingContent()}
+            </div>
           </div>
         </div>
 

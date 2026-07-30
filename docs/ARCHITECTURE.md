@@ -96,16 +96,31 @@ The versioned local state key is `azkarapp.state.v1`. Additional narrow caches u
 
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
 
-Geolocation is requested only after a user action. Coordinates and timezone preferences remain in application state and are sent to Aladhan only to retrieve prayer timings. No service-role Supabase credential belongs in the browser.
+Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to
+Supabase, and are sent to Aladhan only to retrieve prayer timings. No service-role Supabase credential belongs in the
+browser.
 
 ## Remote synchronization
 
 Supabase is optional. Without its environment variables, guest/local mode remains functional.
 
+Authentication is provider-neutral:
+
+- Google and Apple use Supabase OAuth with PKCE and the query-string callback view.
+- Email uses a six-digit OTP; no password or SMS path exists.
+- Provider buttons are compiled behind `VITE_*_AUTH_ENABLED` flags and remain hidden by default.
+- The callback removes temporary OAuth query/hash material after session restoration.
+- Profile metadata is normalized from `full_name`, `name`, `display_name`, `avatar_url`, `picture`, then the email prefix.
+- If no usable name exists (notably possible with Apple), a profile-completion view is required.
+
 The sync layer:
 
 - Treats local state as the immediate UI source
 - Uses the authenticated account ID for ownership
+- Serializes uploads so state changes cannot create overlapping remote writes
+- Debounces updates, retries recoverable failures, and resumes after the browser returns online
+- Records the last successful sync time without making local reading depend on remote success
+- Never uploads precise location coordinates
 - Merges settings and ledgers deterministically
 - Deduplicates saved IDs and completion records
 - Surfaces recoverable sync state without blocking local reading
@@ -115,7 +130,7 @@ The sync layer:
 - Uses atomic upserts; completion rows conflict on `(user_id, day_key, category)` and are idempotent
 - Caches known completion keys per authenticated user to avoid resending already-synchronized ledger rows
 
-All account tables enable RLS. Policies compare `(select auth.uid())` with the indexed owner column so identity is evaluated once per query. `user_settings`, `user_progress`, and `daily_collection_completions` use owner-prefixed primary keys; `session_history` uses `session_history_user_completed_idx` for owner filtering, newest-first reads, and cascade performance.
+All account tables enable RLS. Policies compare `(select auth.uid())` with the indexed owner column so identity is evaluated once per query. `user_settings`, `user_progress`, `daily_collection_completions`, and `saved_zikr` use owner-prefixed primary keys; `session_history` uses `session_history_user_completed_idx` for owner filtering, newest-first reads, and cascade performance. Anonymous privileges are explicitly revoked, and authenticated grants are limited to the operations the browser performs.
 
 For production query review, run representative authenticated plans in Supabase:
 
@@ -144,7 +159,7 @@ Database schema changes require an ordered migration and corresponding applicati
 
 The production service worker precaches the application shell and versioned build assets. The app exposes install/update UI and quick actions for common collections.
 
-Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, OTP, or fresh Aladhan values—must fail safely and retain local behavior.
+Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, OAuth, or fresh Aladhan values—must fail safely and retain local behavior.
 
 ## Testing strategy
 

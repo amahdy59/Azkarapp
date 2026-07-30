@@ -176,7 +176,9 @@ describe("app state persistence", () => {
       settings: { ...DEFAULT_APP_STATE.settings, themeMode: "light" },
       profile: {
         displayName: "Ahmed",
-        lastPhoneNumber: "+201000000000",
+        email: "ahmed@example.com",
+        phone: "+201000000000",
+        avatarUrl: "",
         isGuest: false,
         accountUserId: "account-a",
       },
@@ -234,6 +236,42 @@ describe("state merging", () => {
     const merged = mergeAppStates(base, { savedZikrIds: ["m-hm-75", "e-hm-79"] });
 
     expect(merged.savedZikrIds).toEqual(["e-hm-79", "m-hm-75"]);
+  });
+
+  it("merges sessions by stable ID and keeps the incoming version", () => {
+    const baseSession = {
+      id: "stable-session",
+      category: "morning" as const,
+      completedAt: "2026-07-30T05:00:00.000Z",
+      completedCount: 1,
+      totalCount: 2,
+      durationSeconds: 30,
+      isComplete: false,
+    };
+    const merged = mergeAppStates(
+      { ...DEFAULT_APP_STATE, sessions: [baseSession] },
+      {
+        sessions: [
+          { ...baseSession, completedCount: 2, isComplete: true },
+          { ...baseSession, id: "second-session", completedAt: "2026-07-30T06:00:00.000Z" },
+        ],
+      },
+    );
+
+    expect(merged.sessions).toHaveLength(2);
+    expect(merged.sessions.find((item) => item.id === "stable-session")).toMatchObject({
+      completedCount: 2,
+      isComplete: true,
+    });
+  });
+
+  it("migrates the legacy phone profile field without retaining phone auth behavior", () => {
+    const state = normalizeAppState({
+      profile: { displayName: "Legacy", lastPhoneNumber: "+201000000000", isGuest: false },
+    });
+
+    expect(state.profile.phone).toBe("+201000000000");
+    expect(state.profile.email).toBe("");
   });
 
   it("normalizes invalid remote preferences during merge", () => {

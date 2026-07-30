@@ -54,7 +54,9 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   },
   profile: {
     displayName: "Guest",
-    lastPhoneNumber: "",
+    email: "",
+    phone: "",
+    avatarUrl: "",
     isGuest: true,
     accountUserId: "",
   },
@@ -334,6 +336,7 @@ function normalizeLocation(value: unknown, fallback: LocationSettings = DEFAULT_
 export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[] = []): AppStateSnapshot {
   const parsed = value && typeof value === "object" ? (value as Partial<AppStateSnapshot>) : {};
   const settings = parsed.settings as Partial<AppStateSnapshot["settings"]> | undefined;
+  const legacyProfile = parsed.profile as unknown as { lastPhoneNumber?: unknown } | undefined;
   const progressDayStartHour = isProgressDayStartHour(settings?.progressDayStartHour)
     ? settings.progressDayStartHour
     : DEFAULT_APP_STATE.settings.progressDayStartHour;
@@ -415,10 +418,17 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         typeof parsed.profile?.displayName === "string" && parsed.profile.displayName.trim()
           ? parsed.profile.displayName.trim()
           : DEFAULT_APP_STATE.profile.displayName,
-      lastPhoneNumber:
-        typeof parsed.profile?.lastPhoneNumber === "string"
-          ? parsed.profile.lastPhoneNumber
-          : DEFAULT_APP_STATE.profile.lastPhoneNumber,
+      email: typeof parsed.profile?.email === "string" ? parsed.profile.email.trim() : DEFAULT_APP_STATE.profile.email,
+      phone:
+        typeof parsed.profile?.phone === "string"
+          ? parsed.profile.phone
+          : typeof legacyProfile?.lastPhoneNumber === "string"
+            ? legacyProfile.lastPhoneNumber
+            : DEFAULT_APP_STATE.profile.phone,
+      avatarUrl:
+        typeof parsed.profile?.avatarUrl === "string"
+          ? parsed.profile.avatarUrl.trim()
+          : DEFAULT_APP_STATE.profile.avatarUrl,
       isGuest:
         typeof parsed.profile?.isGuest === "boolean" ? parsed.profile.isGuest : DEFAULT_APP_STATE.profile.isGuest,
       accountUserId:
@@ -648,7 +658,9 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     },
     profile: {
       displayName: incoming.profile?.displayName?.trim() || safeBase.profile.displayName,
-      lastPhoneNumber: incoming.profile?.lastPhoneNumber ?? safeBase.profile.lastPhoneNumber,
+      email: incoming.profile?.email?.trim() ?? safeBase.profile.email,
+      phone: incoming.profile?.phone ?? safeBase.profile.phone,
+      avatarUrl: incoming.profile?.avatarUrl?.trim() ?? safeBase.profile.avatarUrl,
       isGuest: incoming.profile?.isGuest ?? safeBase.profile.isGuest,
       accountUserId: incoming.profile?.accountUserId ?? safeBase.profile.accountUserId,
     },

@@ -41,8 +41,15 @@ jobs:
       - name: Build app for GitHub Pages
         run: pnpm build:pages
         env:
-          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.VITE_SUPABASE_PUBLISHABLE_KEY }}
           VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+          VITE_APP_URL: https://amahdy59.github.io/Azkarapp/
+          VITE_TERMS_URL: https://amahdy59.github.io/Azkarapp/terms.html
+          VITE_PRIVACY_URL: https://amahdy59.github.io/Azkarapp/privacy.html
+          VITE_GOOGLE_AUTH_ENABLED: ${{ vars.VITE_GOOGLE_AUTH_ENABLED }}
+          VITE_EMAIL_AUTH_ENABLED: ${{ vars.VITE_EMAIL_AUTH_ENABLED }}
+          VITE_APPLE_AUTH_ENABLED: ${{ vars.VITE_APPLE_AUTH_ENABLED }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

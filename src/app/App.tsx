@@ -16,7 +16,7 @@ import type {
   View,
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
-import { isSupabaseConfigured } from "../lib/supabase";
+import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
@@ -36,7 +36,7 @@ import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
-import { useAuthHandlers, type ConfirmDialogOptions } from "./hooks/useAuthHandlers";
+import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
 import {
@@ -85,17 +85,25 @@ const LanguageScreen = lazy(() =>
 const LoginScreen = lazy(() =>
   import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.LoginScreen })),
 );
-const PhoneInputScreen = lazy(() =>
-  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.PhoneInputScreen })),
+const EmailInputScreen = lazy(() =>
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.EmailInputScreen })),
 );
 const OTPScreen = lazy(() =>
   import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.OTPScreen })),
+);
+const AuthCallbackScreen = lazy(() =>
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.AuthCallbackScreen })),
+);
+const ProfileCompletionScreen = lazy(() =>
+  import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.ProfileCompletionScreen })),
 );
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const initialState = useRef(loadAppState()).current;
-  const [view, setView] = useState<View>("splash");
+  const [view, setView] = useState<View>(() =>
+    new URLSearchParams(window.location.search).get("view") === "auth-callback" ? "auth-callback" : "splash",
+  );
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
       return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
@@ -152,7 +160,9 @@ export default function App() {
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
-  const [lastPhoneNumber, setLastPhoneNumber] = useState(initialState.profile.lastPhoneNumber);
+  const [email, setEmail] = useState(initialState.profile.email);
+  const [phone, setPhone] = useState(initialState.profile.phone);
+  const [avatarUrl, setAvatarUrl] = useState(initialState.profile.avatarUrl);
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
@@ -169,6 +179,25 @@ export default function App() {
 
   // ── Confirmation dialog state ──────────────────────────────────────────────
   const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogOptions | null>(null);
+  const [guestMigrationOpen, setGuestMigrationOpen] = useState(false);
+  const guestMigrationResolver = useRef<((decision: GuestMigrationDecision) => void) | null>(null);
+
+  const requestGuestMigrationDecision = useCallback(
+    () =>
+      new Promise<GuestMigrationDecision>((resolve) => {
+        guestMigrationResolver.current?.("cancel");
+        guestMigrationResolver.current = resolve;
+        setGuestMigrationOpen(true);
+      }),
+    [],
+  );
+
+  const resolveGuestMigration = useCallback((decision: GuestMigrationDecision) => {
+    const resolve = guestMigrationResolver.current;
+    guestMigrationResolver.current = null;
+    setGuestMigrationOpen(false);
+    resolve?.(decision);
+  }, []);
 
   const showConfirm = useCallback(
     (
@@ -215,7 +244,7 @@ export default function App() {
         progressDayStartHour,
         calendarType,
       },
-      profile: { displayName, lastPhoneNumber, isGuest, accountUserId },
+      profile: { displayName, email, phone, avatarUrl, isGuest, accountUserId },
       completed: fromCompletedSets(completed),
       sessions,
       dailyCompletions,
@@ -230,11 +259,13 @@ export default function App() {
       completed,
       darkMode,
       displayName,
+      email,
       forceRtl,
       hapticFeedback,
       highContrast,
       isGuest,
-      lastPhoneNumber,
+      phone,
+      avatarUrl,
       reduceMotion,
       reminders,
       locationSettings,
@@ -315,19 +346,21 @@ export default function App() {
     isSendingOtp,
     isVerifyingOtp,
     isResendingOtp,
+    isCompletingProfile,
     authError,
     setAuthError,
     handleOpenAccountAuth,
     handleSendOtp,
     handleVerifyOtp,
     handleResendOtp,
+    handleOAuth,
+    handleAuthCallback,
+    handleCompleteProfile,
     handleSignOut,
   } = useAuthHandlers({
     selectedLang,
-    lastPhoneNumber,
-    setLastPhoneNumber,
-    setDisplayName,
-    setIsGuest,
+    email,
+    setEmail,
     setRemoteSyncReady,
     appStateSnapshot,
     applyStateSnapshot: useCallback((state: AppStateSnapshot) => {
@@ -349,7 +382,9 @@ export default function App() {
       setQuietProgressEnabled(state.settings.quietProgressEnabled);
       setProgressDayStartHour(state.settings.progressDayStartHour);
       setDisplayName(state.profile.displayName);
-      setLastPhoneNumber(state.profile.lastPhoneNumber);
+      setEmail(state.profile.email);
+      setPhone(state.profile.phone);
+      setAvatarUrl(state.profile.avatarUrl);
       setIsGuest(state.profile.isGuest);
       setAccountUserId(state.profile.accountUserId);
       setDailyCompletions(state.dailyCompletions);
@@ -365,13 +400,13 @@ export default function App() {
       setSavedZikrIds(new Set(state.savedZikrIds));
     }, []),
     markOnboardingComplete,
+    requestGuestMigrationDecision,
     showConfirm,
-    setPendingConfirm,
     setView,
     setActiveTab,
   });
 
-  const { handleExportData, handleResetPreferences, handleClearLocalData } = useSettingsHandlers({
+  const { handleExportData, handleResetPreferences, handleClearLocalData, handleDeleteAccount } = useSettingsHandlers({
     selectedLang,
     appStateSnapshot,
     showConfirm,
@@ -400,7 +435,9 @@ export default function App() {
     setQuietProgressEnabled(state.settings.quietProgressEnabled);
     setProgressDayStartHour(state.settings.progressDayStartHour);
     setDisplayName(state.profile.displayName);
-    setLastPhoneNumber(state.profile.lastPhoneNumber);
+    setEmail(state.profile.email);
+    setPhone(state.profile.phone);
+    setAvatarUrl(state.profile.avatarUrl);
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
@@ -418,8 +455,10 @@ export default function App() {
 
   const {
     isSyncing: isSyncingRemote,
+    lastSuccessfulSyncAt,
     retry: retrySync,
     syncError,
+    syncStatus,
   } = useRemoteAccountSync({
     initialState,
     state: appStateSnapshot,
@@ -429,6 +468,8 @@ export default function App() {
     remoteSyncReady,
     onRemoteState: applyStateSnapshot,
     onRemoteHydrationChange: setRemoteSyncReady,
+    requestGuestMigrationDecision,
+    skipInitialHydration: view === "auth-callback",
   });
 
   useForegroundReminders({ reminders, dailyCompletions, progressDayStartHour, language: selectedLang });
@@ -601,11 +642,13 @@ export default function App() {
             {view === "login" && (
               <LoginScreen
                 language={selectedLang}
-                phoneAuthEnabled={isSupabaseConfigured}
-                onPhone={() => {
+                providerFlags={authProviderFlags}
+                onGoogle={() => void handleOAuth("google")}
+                onEmail={() => {
                   setAuthError("");
-                  setView("phone");
+                  setView("email");
                 }}
+                onApple={() => void handleOAuth("apple")}
                 onGuest={() => {
                   markOnboardingComplete();
                   setDisplayName("Guest");
@@ -615,10 +658,10 @@ export default function App() {
                 }}
               />
             )}
-            {view === "phone" && (
-              <PhoneInputScreen
+            {view === "email" && (
+              <EmailInputScreen
                 language={selectedLang}
-                initialPhone={lastPhoneNumber}
+                initialEmail={email}
                 errorMessage={authError}
                 isSending={isSendingOtp}
                 onSend={handleSendOtp}
@@ -636,7 +679,7 @@ export default function App() {
             {view === "otp" && (
               <OTPScreen
                 language={selectedLang}
-                maskedPhone={lastPhoneNumber}
+                maskedEmail={email}
                 errorMessage={authError}
                 isVerifying={isVerifyingOtp}
                 isResending={isResendingOtp}
@@ -644,12 +687,27 @@ export default function App() {
                 onResend={handleResendOtp}
                 onBack={() => {
                   setAuthError("");
-                  setView("phone");
+                  setView("email");
                 }}
                 onDifferent={() => {
                   setAuthError("");
-                  setView("phone");
+                  setView("email");
                 }}
+              />
+            )}
+            {view === "auth-callback" && (
+              <AuthCallbackScreen
+                language={selectedLang}
+                errorMessage={authError}
+                onReady={() => void handleAuthCallback()}
+              />
+            )}
+            {view === "profile-completion" && (
+              <ProfileCompletionScreen
+                language={selectedLang}
+                errorMessage={authError}
+                isSaving={isCompletingProfile}
+                onSave={(name) => void handleCompleteProfile(name)}
               />
             )}
 
@@ -761,6 +819,8 @@ export default function App() {
                 isGuest={isGuest}
                 isSyncing={isSyncingRemote}
                 syncError={syncError}
+                syncStatus={syncStatus}
+                lastSuccessfulSyncAt={lastSuccessfulSyncAt}
                 sessions={sessions}
                 dailyCompletions={dailyCompletions}
                 savedCount={savedZikrIds.size}
@@ -804,6 +864,7 @@ export default function App() {
                 onExportData={handleExportData}
                 onResetPreferences={handleResetPreferences}
                 onClearLocalData={handleClearLocalData}
+                onDeleteAccount={handleDeleteAccount}
                 onBack={pop}
               />
             )}
@@ -905,6 +966,23 @@ export default function App() {
       </div>
 
       {/* Accessible confirmation dialog */}
+      {guestMigrationOpen && (
+        <ConfirmDialog
+          open
+          title={selectedLang === "ar" ? "بيانات الزائر" : "Guest progress found"}
+          description={
+            selectedLang === "ar"
+              ? "اختر ما تريد فعله ببيانات هذا الجهاز قبل فتح الحساب."
+              : "Choose what to do with this device’s guest progress before opening the account."
+          }
+          confirmLabel={selectedLang === "ar" ? "دمج التقدم مع الحساب" : "Merge guest progress"}
+          secondaryLabel={selectedLang === "ar" ? "حذف تقدم الزائر" : "Discard guest progress"}
+          cancelLabel={selectedLang === "ar" ? "إلغاء والبقاء كزائر" : "Cancel and remain a guest"}
+          onConfirm={() => resolveGuestMigration("merge")}
+          onSecondary={() => resolveGuestMigration("discard")}
+          onCancel={() => resolveGuestMigration("cancel")}
+        />
+      )}
       {pendingConfirm && (
         <ConfirmDialog
           open={true}

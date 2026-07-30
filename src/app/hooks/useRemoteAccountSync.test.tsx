@@ -25,7 +25,7 @@ vi.mock("../../lib/auth", async (importOriginal) => {
   };
 });
 
-import { useRemoteAccountSync } from "./useRemoteAccountSync";
+import { createSerializedTaskQueue, useRemoteAccountSync } from "./useRemoteAccountSync";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -75,6 +75,7 @@ function accountSession(userId: string): Session {
 function renderRemoteSync(initialState: AppStateSnapshot) {
   const onRemoteState = vi.fn();
   const onRemoteHydrationChange = vi.fn();
+  const requestGuestMigrationDecision = vi.fn().mockResolvedValue("discard");
 
   const hook = renderHook(() => {
     const [remoteSyncReady, setRemoteSyncReady] = useState(false);
@@ -91,19 +92,22 @@ function renderRemoteSync(initialState: AppStateSnapshot) {
       remoteSyncReady,
       onRemoteState,
       onRemoteHydrationChange: handleHydrationChange,
+      requestGuestMigrationDecision,
     });
 
     return { ...sync, remoteSyncReady };
   });
 
-  return { ...hook, onRemoteState, onRemoteHydrationChange };
+  return { ...hook, onRemoteState, onRemoteHydrationChange, requestGuestMigrationDecision };
 }
 
 function expectSanitizedBoundaryState(state: AppStateSnapshot, expectedAccountId: string) {
   expect(state.settings.themeMode).toBe("light");
   expect(state.profile).toEqual({
     displayName: "Remote owner",
-    lastPhoneNumber: "+201000000002",
+    email: "",
+    phone: "+201000000002",
+    avatarUrl: "",
     isGuest: false,
     accountUserId: expectedAccountId,
   });
@@ -125,7 +129,9 @@ describe("useRemoteAccountSync account boundaries", () => {
     const remoteHydration = deferred<AppStateSnapshot>();
     const initialState = privateState({
       displayName: "Account A",
-      lastPhoneNumber: "+201000000001",
+      email: "",
+      phone: "+201000000001",
+      avatarUrl: "",
       isGuest: false,
       accountUserId: "account-a",
     });
@@ -166,18 +172,19 @@ describe("useRemoteAccountSync account boundaries", () => {
     const remoteHydration = deferred<AppStateSnapshot>();
     const initialState = privateState({
       displayName: "Guest",
-      lastPhoneNumber: "",
+      email: "",
+      phone: "",
+      avatarUrl: "",
       isGuest: true,
       accountUserId: "",
     });
     authMocks.getCurrentSession.mockResolvedValue(session);
     authMocks.loadRemoteState.mockReturnValue(remoteHydration.promise);
-    const confirm = vi.spyOn(window, "confirm").mockReturnValue(false);
-
-    const { result, onRemoteState, onRemoteHydrationChange } = renderRemoteSync(initialState);
+    const { result, onRemoteState, onRemoteHydrationChange, requestGuestMigrationDecision } =
+      renderRemoteSync(initialState);
 
     await waitFor(() => expect(authMocks.loadRemoteState).toHaveBeenCalledOnce());
-    expect(confirm).toHaveBeenCalledOnce();
+    expect(requestGuestMigrationDecision).toHaveBeenCalledOnce();
     expect(onRemoteState).toHaveBeenCalledOnce();
     const sanitizedState = onRemoteState.mock.calls[0]?.[0] as AppStateSnapshot;
     expectSanitizedBoundaryState(sanitizedState, "account-b");
@@ -199,5 +206,40 @@ describe("useRemoteAccountSync account boundaries", () => {
     expect(result.current.remoteSyncReady).toBe(false);
     expect(onRemoteHydrationChange).not.toHaveBeenCalledWith(true);
     expect(onRemoteState).toHaveBeenCalledOnce();
+  });
+});
+
+describe("serialized sync queue", () => {
+  it("never overlaps remote uploads and continues after a failure", async () => {
+    const queue = createSerializedTaskQueue();
+    const first = deferred<void>();
+    const order: string[] = [];
+    let active = 0;
+    let maximumActive = 0;
+
+    const firstTask = queue.enqueue(async () => {
+      active += 1;
+      maximumActive = Math.max(maximumActive, active);
+      order.push("first:start");
+      await first.promise;
+      active -= 1;
+      order.push("first:end");
+      throw new Error("recoverable");
+    });
+    const secondTask = queue.enqueue(async () => {
+      active += 1;
+      maximumActive = Math.max(maximumActive, active);
+      order.push("second:start");
+      active -= 1;
+      order.push("second:end");
+    });
+
+    await waitFor(() => expect(order).toEqual(["first:start"]));
+    first.resolve();
+    await expect(firstTask).rejects.toThrow("recoverable");
+    await secondTask;
+
+    expect(maximumActive).toBe(1);
+    expect(order).toEqual(["first:start", "first:end", "second:start", "second:end"]);
   });
 });

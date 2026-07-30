@@ -18,6 +18,8 @@ interface ConfirmDialogProps {
   cancelLabel: string;
   onConfirm: () => void;
   onCancel: () => void;
+  secondaryLabel?: string;
+  onSecondary?: () => void;
   /** When true, the confirm button uses destructive (red) styling */
   destructive?: boolean;
   /** Optional extra content rendered inside the dialog body */
@@ -41,6 +43,8 @@ export function ConfirmDialog({
   cancelLabel,
   onConfirm,
   onCancel,
+  secondaryLabel,
+  onSecondary,
   destructive = false,
   children,
 }: ConfirmDialogProps) {
@@ -71,6 +75,15 @@ export function ConfirmDialog({
           >
             {cancelLabel}
           </AlertDialogCancel>
+          {secondaryLabel && onSecondary && (
+            <button
+              type="button"
+              onClick={onSecondary}
+              className="h-11 rounded-xl border border-border-control bg-muted px-5 text-[0.9375rem] font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {secondaryLabel}
+            </button>
+          )}
           <AlertDialogAction
             onClick={onConfirm}
             className={`h-11 rounded-xl px-5 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${

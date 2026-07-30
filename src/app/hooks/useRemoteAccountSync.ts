@@ -1,16 +1,26 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { AppStateSnapshot } from "../types";
 import { clearPrivateAppData } from "../state";
-import {
-  getCurrentSession,
-  loadRemoteState,
-  normalizePhoneNumber,
-  profileFromSession,
-  subscribeToAuthChanges,
-  syncRemoteState,
-} from "../../lib/auth";
+import { getCurrentSession, loadRemoteState, subscribeToAuthChanges, syncRemoteState } from "../../lib/auth";
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { t } from "../i18n";
+import { prepareAuthenticatedState, type GuestMigrationDecision } from "./useAuthHandlers";
+
+const LAST_SYNC_STORAGE_KEY = "azkarapp.last-successful-sync.v1";
+
+async function wait(milliseconds: number) {
+  await new Promise<void>((resolve) => window.setTimeout(resolve, milliseconds));
+}
+
+export function createSerializedTaskQueue() {
+  let tail: Promise<void> = Promise.resolve();
+  return {
+    enqueue(task: () => Promise<void>) {
+      tail = tail.catch(() => undefined).then(task);
+      return tail;
+    },
+  };
+}
 
 export function useRemoteAccountSync({
   initialState,
@@ -21,6 +31,8 @@ export function useRemoteAccountSync({
   remoteSyncReady,
   onRemoteState,
   onRemoteHydrationChange,
+  requestGuestMigrationDecision,
+  skipInitialHydration = false,
 }: {
   initialState: AppStateSnapshot;
   state: AppStateSnapshot;
@@ -30,21 +42,40 @@ export function useRemoteAccountSync({
   remoteSyncReady: boolean;
   onRemoteState: (state: AppStateSnapshot) => void;
   onRemoteHydrationChange: (ready: boolean) => void;
+  requestGuestMigrationDecision: () => Promise<GuestMigrationDecision>;
+  skipInitialHydration?: boolean;
 }) {
   const [authSessionLoaded, setAuthSessionLoaded] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncError, setSyncError] = useState("");
   const [retryToken, setRetryToken] = useState(0);
   const [hydrationRetryToken, setHydrationRetryToken] = useState(0);
+  const [lastSuccessfulSyncAt, setLastSuccessfulSyncAt] = useState(() => {
+    try {
+      return window.localStorage.getItem(LAST_SYNC_STORAGE_KEY) ?? "";
+    } catch {
+      return "";
+    }
+  });
   const latestState = useRef(state);
-  const guestMergeDecisions = useRef(new Map<string, boolean>());
+  const guestMigrationDecisionRef = useRef(requestGuestMigrationDecision);
+  const syncQueue = useRef(createSerializedTaskQueue());
+  const mounted = useRef(true);
 
   useEffect(() => {
     latestState.current = state;
-  }, [state]);
+    guestMigrationDecisionRef.current = requestGuestMigrationDecision;
+  }, [requestGuestMigrationDecision, state]);
+
+  useEffect(
+    () => () => {
+      mounted.current = false;
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    if (!isSupabaseConfigured || skipInitialHydration) {
       setAuthSessionLoaded(true);
       return;
     }
@@ -60,47 +91,22 @@ export function useRemoteAccountSync({
         }
 
         if (session) {
-          const privateGuestDataExists =
-            initialState.sessions.length > 0 ||
-            initialState.dailyCompletions.length > 0 ||
-            initialState.savedZikrIds.length > 0 ||
-            Object.values(initialState.completed).some((items) => items.length > 0);
-          const legacyIdentityMatches =
-            !initialState.profile.accountUserId &&
-            !initialState.profile.isGuest &&
-            Boolean(session.user.phone) &&
-            normalizePhoneNumber(initialState.profile.lastPhoneNumber) ===
-              normalizePhoneNumber(session.user.phone ?? "");
-          const knownDifferentOwner =
-            Boolean(initialState.profile.accountUserId) && initialState.profile.accountUserId !== session.user.id;
-          const shouldMergeGuestProgress =
-            !initialState.profile.accountUserId && initialState.profile.isGuest && privateGuestDataExists
-              ? (guestMergeDecisions.current.get(session.user.id) ??
-                (() => {
-                  const decision = window.confirm(t(initialState.settings.language, "auth.mergeGuestProgress"));
-                  guestMergeDecisions.current.set(session.user.id, decision);
-                  return decision;
-                })())
-              : true;
-          const mayUseLocalPrivateData =
-            !knownDifferentOwner &&
-            (initialState.profile.accountUserId === session.user.id ||
-              legacyIdentityMatches ||
-              (!initialState.profile.accountUserId && initialState.profile.isGuest && shouldMergeGuestProgress));
-          const hydrationBase = mayUseLocalPrivateData
-            ? {
-                ...initialState,
-                profile: { ...initialState.profile, accountUserId: session.user.id },
-              }
-            : {
-                ...clearPrivateAppData(initialState),
-                profile: profileFromSession(session, initialState.profile.lastPhoneNumber),
-              };
-          if (!mayUseLocalPrivateData) {
-            // Never leave another account's private data visible while a remote restore is pending or has failed.
+          const hydrationBase = await prepareAuthenticatedState(
+            session,
+            initialState,
+            guestMigrationDecisionRef.current,
+          );
+          if (!hydrationBase) {
+            onRemoteHydrationChange(false);
+            return;
+          }
+          const localPrivateDataWasCleared = hydrationBase.sessions.length === 0 && initialState.sessions.length > 0;
+          if (localPrivateDataWasCleared || initialState.profile.accountUserId !== session.user.id) {
             onRemoteState(hydrationBase);
           }
-          const mergedState = await loadRemoteState(session, hydrationBase);
+          const mergedState = await loadRemoteState(session, hydrationBase, {
+            preserveLocalPreferences: initialState.profile.isGuest,
+          });
           if (active) {
             setSyncError("");
             onRemoteState(mergedState);
@@ -151,44 +157,70 @@ export function useRemoteAccountSync({
       active = false;
       unsubscribe();
     };
-  }, [hydrationRetryToken, initialState, onRemoteHydrationChange, onRemoteState]);
+  }, [hydrationRetryToken, initialState, onRemoteHydrationChange, onRemoteState, skipInitialHydration]);
 
   useEffect(() => {
     if (!isSupabaseConfigured || !authSessionLoaded || isGuest || !remoteSyncReady) {
       return;
     }
 
-    let cancelled = false;
+    const enqueueRemoteState = () => {
+      const snapshot = latestState.current;
+      void syncQueue.current
+        .enqueue(async () => {
+          if (!mounted.current) return;
+          if (!navigator.onLine) {
+            setSyncError(t(snapshot.settings.language, "syncStatus.offlineNotice"));
+            return;
+          }
+          setIsSyncing(true);
+          let lastError: unknown;
+          for (let attempt = 0; attempt < 3; attempt += 1) {
+            try {
+              const session = await getCurrentSession();
+              if (!session) return;
+              await syncRemoteState(session, snapshot, { currentStreak, longestStreak });
+              if (mounted.current) {
+                const syncedAt = new Date().toISOString();
+                setLastSuccessfulSyncAt(syncedAt);
+                setSyncError("");
+                try {
+                  window.localStorage.setItem(LAST_SYNC_STORAGE_KEY, syncedAt);
+                } catch {
+                  // Sync success is not invalidated by unavailable local storage.
+                }
+              }
+              return;
+            } catch (error) {
+              lastError = error;
+              if (!navigator.onLine || attempt === 2) break;
+              await wait(500 * 2 ** attempt);
+            }
+          }
+          if (mounted.current) {
+            setSyncError(
+              lastError instanceof Error ? lastError.message : t(snapshot.settings.language, "syncStatus.pushError"),
+            );
+          }
+        })
+        .finally(() => {
+          if (mounted.current) setIsSyncing(false);
+        });
+    };
 
-    const pushRemoteState = async () => {
-      try {
-        setIsSyncing(true);
-        const session = await getCurrentSession();
-        if (!session || cancelled) {
-          return;
-        }
+    const timer = window.setTimeout(enqueueRemoteState, 500);
+    return () => window.clearTimeout(timer);
+  }, [authSessionLoaded, currentStreak, isGuest, longestStreak, remoteSyncReady, retryToken, state]);
 
-        await syncRemoteState(session, state, { currentStreak, longestStreak });
-        if (!cancelled) {
-          setSyncError("");
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setSyncError(error instanceof Error ? error.message : t(state.settings.language, "syncStatus.pushError"));
-        }
-      } finally {
-        if (!cancelled) {
-          setIsSyncing(false);
-        }
+  useEffect(() => {
+    const handleOnline = () => {
+      if (!isGuest && remoteSyncReady) {
+        setRetryToken((value) => value + 1);
       }
     };
-
-    const timer = window.setTimeout(() => void pushRemoteState(), 350);
-    return () => {
-      cancelled = true;
-      window.clearTimeout(timer);
-    };
-  }, [authSessionLoaded, currentStreak, isGuest, longestStreak, remoteSyncReady, retryToken, state]);
+    window.addEventListener("online", handleOnline);
+    return () => window.removeEventListener("online", handleOnline);
+  }, [isGuest, remoteSyncReady]);
 
   const retry = useCallback(() => {
     if (remoteSyncReady) {
@@ -198,5 +230,13 @@ export function useRemoteAccountSync({
     }
   }, [remoteSyncReady]);
 
-  return { isSyncing, retry, syncError };
+  const syncStatus: "offline" | "needs-attention" | "syncing" | "up-to-date" = !navigator.onLine
+    ? "offline"
+    : syncError
+      ? "needs-attention"
+      : isSyncing
+        ? "syncing"
+        : "up-to-date";
+
+  return { isSyncing, lastSuccessfulSyncAt, retry, syncError, syncStatus };
 }

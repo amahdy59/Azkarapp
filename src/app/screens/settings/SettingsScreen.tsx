@@ -33,6 +33,8 @@ interface SettingsScreenProps {
   isGuest: boolean;
   isSyncing: boolean;
   syncError: string;
+  syncStatus: "offline" | "needs-attention" | "syncing" | "up-to-date";
+  lastSuccessfulSyncAt: string;
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
   savedCount: number;
@@ -76,6 +78,7 @@ interface SettingsScreenProps {
   onExportData: () => void;
   onResetPreferences: () => void;
   onClearLocalData: () => void;
+  onDeleteAccount: () => void;
   onBack: () => void;
 }
 
@@ -85,6 +88,8 @@ export function SettingsScreen({
   isGuest,
   isSyncing,
   syncError,
+  syncStatus,
+  lastSuccessfulSyncAt,
   sessions,
   dailyCompletions,
   savedCount,
@@ -128,6 +133,7 @@ export function SettingsScreen({
   onExportData,
   onResetPreferences,
   onClearLocalData,
+  onDeleteAccount,
   onBack,
 }: SettingsScreenProps) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
@@ -298,6 +304,8 @@ export function SettingsScreen({
               isGuest={isGuest}
               isSyncing={isSyncing}
               syncError={syncError}
+              syncStatus={syncStatus}
+              lastSuccessfulSyncAt={lastSuccessfulSyncAt}
               sessionCount={sessions.length}
               savedCount={savedCount}
               onActivateAccount={onActivateAccount}
@@ -305,6 +313,7 @@ export function SettingsScreen({
               onExportData={onExportData}
               onResetPreferences={onResetPreferences}
               onClearLocalData={onClearLocalData}
+              onDeleteAccount={onDeleteAccount}
               onBack={goBack}
             />
           </motion.div>

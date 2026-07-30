@@ -75,6 +75,40 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   );
 }
 
+export function AdaptiveCounterTrack({ count, total, compact }: { count: number; total: number; compact: boolean }) {
+  const progress = total > 0 ? Math.min(1, count / total) : 0;
+
+  return (
+    <svg
+      className="absolute inset-0 h-full w-full overflow-visible"
+      viewBox="0 0 100 100"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+    >
+      <rect
+        className="adaptive-counter-track"
+        x="4"
+        y="4"
+        width="92"
+        height="92"
+        rx={compact ? 18 : 46}
+        pathLength="1"
+      />
+      <rect
+        className="adaptive-counter-progress"
+        x="4"
+        y="4"
+        width="92"
+        height="92"
+        rx={compact ? 18 : 46}
+        pathLength="1"
+        strokeDasharray="1"
+        strokeDashoffset={1 - progress}
+      />
+    </svg>
+  );
+}
+
 export function WaveformBars({ active }: { active: boolean }) {
   const heights = [0.35, 0.75, 0.55, 1, 0.6, 0.8, 0.4];
 

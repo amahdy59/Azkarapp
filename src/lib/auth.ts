@@ -1,47 +1,14 @@
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state";
+import type { UserProfileState } from "../app/types";
 import { DEFAULT_APP_STATE, mergeAppStates } from "../app/state";
 import { mergeDailyCompletions, normalizeDailyCompletions } from "../app/progress";
-import { getSupabaseClient, isSupabaseConfigured } from "./supabase";
+import { getAuthCallbackUrl, getSupabaseClient, isSupabaseConfigured } from "./supabase";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
 const REMOTE_DAILY_COMPLETION_PAGE_SIZE = 500;
 const syncedDailyCompletionKeysByUser = new Map<string, Set<string>>();
 const dailyCompletionTableAvailability = new Map<string, boolean>();
-
-export function normalizePhoneNumber(input: string) {
-  const trimmed = input.trim();
-  if (!trimmed) {
-    return "";
-  }
-
-  if (trimmed.startsWith("+")) {
-    return `+${trimmed.slice(1).replace(/\D/g, "")}`;
-  }
-
-  const digits = trimmed.replace(/\D/g, "");
-  if (!digits) {
-    return "";
-  }
-
-  if (digits.startsWith("00")) {
-    return `+${digits.slice(2)}`;
-  }
-
-  if (digits.startsWith("966")) {
-    return `+${digits}`;
-  }
-
-  if (digits.startsWith("0")) {
-    return `+966${digits.slice(1)}`;
-  }
-
-  if (digits.length <= 10) {
-    return `+966${digits}`;
-  }
-
-  return `+${digits}`;
-}
 
 async function assertSupabase(): Promise<SupabaseClient> {
   const client = await getSupabaseClient();
@@ -52,33 +19,30 @@ async function assertSupabase(): Promise<SupabaseClient> {
   return client;
 }
 
-export async function requestPhoneOtp(phone: string) {
+export async function requestEmailOtp(email: string) {
   const client = await assertSupabase();
-  const normalizedPhone = normalizePhoneNumber(phone);
-  const { error } = await client.auth.signInWithOtp({ phone: normalizedPhone });
+  const normalizedEmail = email.trim().toLowerCase();
+  const { error } = await client.auth.signInWithOtp({
+    email: normalizedEmail,
+    options: { shouldCreateUser: true },
+  });
   if (error) {
     throw error;
   }
-  return normalizedPhone;
+  return normalizedEmail;
 }
 
-export async function resendPhoneOtp(phone: string) {
-  const client = await assertSupabase();
-  const normalizedPhone = normalizePhoneNumber(phone);
-  const { error } = await client.auth.resend({ type: "sms", phone: normalizedPhone });
-  if (error) {
-    throw error;
-  }
-  return normalizedPhone;
+export async function resendEmailOtp(email: string) {
+  return requestEmailOtp(email);
 }
 
-export async function verifyPhoneOtp(phone: string, token: string) {
+export async function verifyEmailOtp(email: string, token: string) {
   const client = await assertSupabase();
-  const normalizedPhone = normalizePhoneNumber(phone);
+  const normalizedEmail = email.trim().toLowerCase();
   const { data, error } = await client.auth.verifyOtp({
-    phone: normalizedPhone,
+    email: normalizedEmail,
     token,
-    type: "sms",
+    type: "email",
   });
 
   if (error) {
@@ -86,6 +50,23 @@ export async function verifyPhoneOtp(phone: string, token: string) {
   }
 
   return data.session;
+}
+
+export async function signInWithOAuthProvider(provider: "google" | "apple") {
+  const client = await assertSupabase();
+  try {
+    window.sessionStorage.setItem("azkarapp.auth-return-view", "home");
+  } catch {
+    // The callback can safely fall back to Home when session storage is unavailable.
+  }
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: getAuthCallbackUrl() },
+  });
+  if (error) {
+    throw error;
+  }
+  return data;
 }
 
 export async function getCurrentSession() {
@@ -114,18 +95,34 @@ export async function subscribeToAuthChanges(callback: (session: Session | null)
   return () => data.subscription.unsubscribe();
 }
 
-export function profileFromSession(session: Session | null, fallbackPhone: string) {
+function metadataString(metadata: Record<string, unknown> | undefined, ...keys: string[]) {
+  for (const key of keys) {
+    const value = metadata?.[key];
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+  return "";
+}
+
+export function profileFromSession(
+  session: Session | null,
+  fallback: Partial<UserProfileState> = DEFAULT_APP_STATE.profile,
+): UserProfileState {
   const user = session?.user;
+  const email = user?.email?.trim() || fallback.email?.trim() || "";
+  const metadata = user?.user_metadata as Record<string, unknown> | undefined;
   const displayName =
-    typeof user?.user_metadata?.display_name === "string" && user.user_metadata.display_name.trim()
-      ? user.user_metadata.display_name.trim()
-      : user?.phone
-        ? `User ${user.phone.slice(-4)}`
-        : DEFAULT_APP_STATE.profile.displayName;
+    metadataString(metadata, "full_name", "name", "display_name") ||
+    (email.includes("@") ? email.split("@")[0]?.trim() : "") ||
+    fallback.displayName?.trim() ||
+    DEFAULT_APP_STATE.profile.displayName;
 
   return {
     displayName,
-    lastPhoneNumber: user?.phone ?? fallbackPhone,
+    email,
+    phone: user?.phone ?? fallback.phone ?? "",
+    avatarUrl: metadataString(metadata, "avatar_url", "picture") || fallback.avatarUrl?.trim() || "",
     isGuest: !user,
     accountUserId: user?.id ?? "",
   };
@@ -133,7 +130,9 @@ export function profileFromSession(session: Session | null, fallbackPhone: strin
 
 type RemoteProfileRow = {
   display_name: string | null;
+  email: string | null;
   phone: string | null;
+  avatar_url: string | null;
   preferred_language: AppLanguage | null;
 };
 
@@ -160,7 +159,6 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     weeklyGoalDays: state.settings.weeklyGoalDays,
     quietProgressEnabled: state.settings.quietProgressEnabled,
     progressDayStartHour: state.settings.progressDayStartHour,
-    location: state.settings.location,
     savedZikrIds: state.savedZikrIds,
   };
 }
@@ -188,6 +186,10 @@ type RemoteDailyCompletionRow = {
   day_key: string;
   category: StoredSession["category"];
   time_zone: string;
+};
+
+type RemoteSavedZikrRow = {
+  zikr_id: string;
 };
 
 function isMissingDailyCompletionTable(error: unknown) {
@@ -244,36 +246,49 @@ export function getSessionsForRemoteSync(sessions: StoredSession[]) {
     .slice(0, REMOTE_SESSION_PAGE_SIZE);
 }
 
-export async function loadRemoteState(session: Session, localState: AppStateSnapshot) {
+export async function loadRemoteState(
+  session: Session,
+  localState: AppStateSnapshot,
+  options: { preserveLocalPreferences?: boolean } = {},
+) {
   const client = await assertSupabase();
   const userId = session.user.id;
 
-  const [profileResult, settingsResult, progressResult, sessionsResult, dailyCompletionResult] = await Promise.all([
-    client
-      .from("profiles")
-      .select("display_name, phone, preferred_language")
-      .eq("id", userId)
-      .maybeSingle<RemoteProfileRow>(),
-    client
-      .from("user_settings")
-      .select("dark_mode, settings_json")
-      .eq("user_id", userId)
-      .maybeSingle<RemoteSettingsRow>(),
-    client.from("user_progress").select("completed").eq("user_id", userId).maybeSingle<RemoteProgressRow>(),
-    client
-      .from("session_history")
-      .select("id, category, completed_at, completed_count, total_count, duration_seconds, is_complete")
-      .eq("user_id", userId)
-      .order("completed_at", { ascending: false })
-      .limit(REMOTE_SESSION_PAGE_SIZE)
-      .returns<RemoteSessionRow[]>(),
-    loadAllRemoteDailyCompletions(client, userId),
-  ]);
+  const [profileResult, settingsResult, progressResult, sessionsResult, dailyCompletionResult, savedZikrResult] =
+    await Promise.all([
+      client
+        .from("profiles")
+        .select("display_name, email, phone, avatar_url, preferred_language")
+        .eq("id", userId)
+        .maybeSingle<RemoteProfileRow>(),
+      client
+        .from("user_settings")
+        .select("dark_mode, settings_json")
+        .eq("user_id", userId)
+        .maybeSingle<RemoteSettingsRow>(),
+      client.from("user_progress").select("completed").eq("user_id", userId).maybeSingle<RemoteProgressRow>(),
+      client
+        .from("session_history")
+        .select("id, category, completed_at, completed_count, total_count, duration_seconds, is_complete")
+        .eq("user_id", userId)
+        .order("completed_at", { ascending: false })
+        .limit(REMOTE_SESSION_PAGE_SIZE)
+        .returns<RemoteSessionRow[]>(),
+      loadAllRemoteDailyCompletions(client, userId),
+      client.from("saved_zikr").select("zikr_id").eq("user_id", userId).returns<RemoteSavedZikrRow[]>(),
+    ]);
 
   for (const result of [profileResult, settingsResult, progressResult, sessionsResult]) {
     if (result.error) {
       throw result.error;
     }
+  }
+  const savedZikrTableMissing =
+    savedZikrResult.error?.code === "42P01" ||
+    savedZikrResult.error?.code === "PGRST205" ||
+    savedZikrResult.error?.message?.includes("saved_zikr") === true;
+  if (savedZikrResult.error && !savedZikrTableMissing) {
+    throw savedZikrResult.error;
   }
 
   const profile = profileResult.data;
@@ -305,30 +320,36 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
   );
 
   const remoteState: Partial<AppStateSnapshot> = {
-    settings: {
-      language: profile?.preferred_language ?? localState.settings.language,
-      darkMode: settings?.dark_mode ?? localState.settings.darkMode,
-      themeMode: settings?.settings_json?.themeMode ?? localState.settings.themeMode,
-      showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
-      showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
-      textSize: settings?.settings_json?.textSize ?? localState.settings.textSize,
-      arabicFont: settings?.settings_json?.arabicFont ?? localState.settings.arabicFont,
-      highContrast: settings?.settings_json?.highContrast ?? localState.settings.highContrast,
-      boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
-      reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
-      hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
-      forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
-      colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
-      reminders: settings?.settings_json?.reminders ?? localState.settings.reminders,
-      weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
-      quietProgressEnabled: settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
-      progressDayStartHour: settings?.settings_json?.progressDayStartHour ?? localState.settings.progressDayStartHour,
-      location: settings?.settings_json?.location ?? localState.settings.location,
-    },
+    settings: options.preserveLocalPreferences
+      ? localState.settings
+      : {
+          language: profile?.preferred_language ?? localState.settings.language,
+          darkMode: settings?.dark_mode ?? localState.settings.darkMode,
+          themeMode: settings?.settings_json?.themeMode ?? localState.settings.themeMode,
+          showTransliteration: settings?.settings_json?.showTransliteration ?? localState.settings.showTransliteration,
+          showTranslation: settings?.settings_json?.showTranslation ?? localState.settings.showTranslation,
+          textSize: settings?.settings_json?.textSize ?? localState.settings.textSize,
+          arabicFont: settings?.settings_json?.arabicFont ?? localState.settings.arabicFont,
+          highContrast: settings?.settings_json?.highContrast ?? localState.settings.highContrast,
+          boldText: settings?.settings_json?.boldText ?? localState.settings.boldText,
+          reduceMotion: settings?.settings_json?.reduceMotion ?? localState.settings.reduceMotion,
+          hapticFeedback: settings?.settings_json?.hapticFeedback ?? localState.settings.hapticFeedback,
+          forceRtl: settings?.settings_json?.forceRtl ?? localState.settings.forceRtl,
+          colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
+          reminders: settings?.settings_json?.reminders ?? localState.settings.reminders,
+          weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
+          quietProgressEnabled:
+            settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
+          progressDayStartHour:
+            settings?.settings_json?.progressDayStartHour ?? localState.settings.progressDayStartHour,
+          // Precise coordinates and prayer calculation settings are device-local.
+          location: localState.settings.location,
+        },
     profile: {
-      displayName:
-        profile?.display_name?.trim() || profileFromSession(session, localState.profile.lastPhoneNumber).displayName,
-      lastPhoneNumber: profile?.phone ?? session.user.phone ?? localState.profile.lastPhoneNumber,
+      displayName: profile?.display_name?.trim() || profileFromSession(session, localState.profile).displayName,
+      email: profile?.email?.trim() || session.user.email?.trim() || localState.profile.email,
+      phone: profile?.phone ?? session.user.phone ?? localState.profile.phone,
+      avatarUrl: profile?.avatar_url?.trim() || profileFromSession(session, localState.profile).avatarUrl,
       isGuest: false,
       accountUserId: userId,
     },
@@ -343,7 +364,9 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       isComplete: item.is_complete,
     })),
     ...(remoteDailyCompletions.length > 0 ? { dailyCompletions: remoteDailyCompletions } : {}),
-    savedZikrIds: settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds,
+    savedZikrIds: savedZikrTableMissing
+      ? (settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds)
+      : (savedZikrResult.data ?? []).map((row) => row.zikr_id),
   };
 
   return mergeAppStates(localState, remoteState);
@@ -360,7 +383,9 @@ export async function syncRemoteState(
   const profilePayload = {
     id: userId,
     display_name: state.profile.displayName,
-    phone: normalizePhoneNumber(state.profile.lastPhoneNumber) || session.user.phone || null,
+    email: state.profile.email || session.user.email || null,
+    phone: state.profile.phone || session.user.phone || null,
+    avatar_url: state.profile.avatarUrl || null,
     preferred_language: state.settings.language,
     updated_at: new Date().toISOString(),
   };
@@ -460,4 +485,49 @@ export async function syncRemoteState(
       throw sessionError;
     }
   }
+
+  const { data: existingSavedRows, error: existingSavedError } = await client
+    .from("saved_zikr")
+    .select("zikr_id")
+    .eq("user_id", userId)
+    .returns<RemoteSavedZikrRow[]>();
+  const savedTableMissing =
+    existingSavedError?.code === "42P01" ||
+    existingSavedError?.code === "PGRST205" ||
+    existingSavedError?.message?.includes("saved_zikr") === true;
+  if (existingSavedError && !savedTableMissing) {
+    throw existingSavedError;
+  }
+  if (!savedTableMissing) {
+    const desired = new Set(state.savedZikrIds);
+    const existing = new Set((existingSavedRows ?? []).map((row) => row.zikr_id));
+    const additions = [...desired].filter((zikrId) => !existing.has(zikrId));
+    const removals = [...existing].filter((zikrId) => !desired.has(zikrId));
+    if (additions.length > 0) {
+      const { error } = await client
+        .from("saved_zikr")
+        .upsert(additions.map((zikrId) => ({ user_id: userId, zikr_id: zikrId })));
+      if (error) throw error;
+    }
+    if (removals.length > 0) {
+      const { error } = await client.from("saved_zikr").delete().eq("user_id", userId).in("zikr_id", removals);
+      if (error) throw error;
+    }
+  }
+}
+
+export async function updateAccountDisplayName(displayName: string) {
+  const client = await assertSupabase();
+  const normalized = displayName.trim();
+  if (!normalized) {
+    throw new Error("Enter a display name.");
+  }
+  const { error } = await client.auth.updateUser({ data: { display_name: normalized } });
+  if (error) throw error;
+}
+
+export async function deleteCurrentAccount() {
+  const client = await assertSupabase();
+  const { error } = await client.functions.invoke("delete-account", { body: { confirm: true } });
+  if (error) throw error;
 }
