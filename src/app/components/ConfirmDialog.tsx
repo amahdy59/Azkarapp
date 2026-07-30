@@ -44,6 +44,8 @@ export function ConfirmDialog({
   destructive = false,
   children,
 }: ConfirmDialogProps) {
+  const appShell = typeof document === "undefined" ? undefined : document.querySelector<HTMLElement>(".app-shell");
+
   return (
     <AlertDialog
       open={open}
@@ -51,7 +53,10 @@ export function ConfirmDialog({
         if (!isOpen) onCancel();
       }}
     >
-      <AlertDialogContent className="rounded-2xl border border-border bg-background p-6 shadow-xl">
+      <AlertDialogContent
+        portalContainer={appShell}
+        className="rounded-2xl border border-border bg-background p-6 shadow-xl"
+      >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-[1.0625rem] font-bold text-foreground">{title}</AlertDialogTitle>
           <AlertDialogDescription className="mt-2 text-[0.875rem] leading-relaxed text-muted-foreground">
