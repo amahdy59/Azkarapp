@@ -20,6 +20,11 @@ export type TextSizeOption = "small" | "medium" | "large";
 export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
+export type RoutineCategoryId = "morning" | "evening" | "before_sleep";
+export type RoutineMode = "core" | "complete";
+export type ZikrGroupId =
+  "begin" | "quran_protection" | "dua_protection" | "renew" | "ask" | "repeat" | "prepare" | "settle" | "final";
+export type RitualGroupId = "three_quls" | "tasbih_fatimah";
 
 export type View =
   | "home"
@@ -66,6 +71,8 @@ export interface DailyCollectionCompletion {
   dayKey: string;
   category: CategoryId;
   timeZone: string;
+  /** Core earns the category leaf; Complete upgrades that same leaf. */
+  completionLevel?: RoutineMode;
 }
 
 export interface Zikr {
@@ -84,6 +91,12 @@ export interface Zikr {
   sourceUrl?: string;
   category: CategoryId;
   orderIndex: number;
+  groupId?: ZikrGroupId;
+  groupOrder?: number;
+  itemOrder?: number;
+  includedInCore?: boolean;
+  ritualGroupId?: RitualGroupId;
+  isCollectionIntroduction?: boolean;
   isSurah?: boolean;
   surahNameArabic?: string;
   surahNameEnglish?: string;
@@ -101,6 +114,7 @@ export interface StoredSession {
   totalCount: number;
   durationSeconds: number;
   isComplete: boolean;
+  completionLevel?: RoutineMode;
 }
 
 export interface LocationSettings {
@@ -138,6 +152,7 @@ export interface UserSettingsState {
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
+  routineModes: Record<RoutineCategoryId, RoutineMode>;
   location?: LocationSettings;
 }
 

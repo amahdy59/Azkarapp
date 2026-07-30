@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { CATEGORIES } from "./categories";
-import { getAzkarByCategory, getCategoryTotal } from "./azkar";
+import {
+  getAzkarByCategory,
+  getAzkarForMode,
+  getCategoryTotal,
+  getCollectionIntroduction,
+  getRoutineStepCount,
+} from "./azkar";
 
 describe("azkar content totals", () => {
   it("derives every category total from its content collection", () => {
@@ -20,7 +26,6 @@ describe("azkar content totals", () => {
 
   it("keeps the audited morning, evening, and before-sleep arrangements", () => {
     expect(getAzkarByCategory("morning").map((item) => item.id)).toEqual([
-      "m-hm-75a",
       "m-hm-77m",
       "m-hm-78m",
       "m-hm-89m",
@@ -28,6 +33,7 @@ describe("azkar content totals", () => {
       "m-hm-76a",
       "m-hm-76b",
       "m-hm-76c",
+      "m-hm-97",
       "m-hm-86",
       "m-hm-84",
       "m-hm-82",
@@ -48,7 +54,6 @@ describe("azkar content totals", () => {
     ]);
 
     expect(getAzkarByCategory("evening").map((item) => item.id)).toEqual([
-      "e-hm-75a",
       "e-hm-77e",
       "e-hm-78e",
       "e-hm-89e",
@@ -94,6 +99,34 @@ describe("azkar content totals", () => {
       "s-hm-106-allahu-akbar",
       "s-hm-111",
     ]);
+  });
+
+  it("keeps introductions optional and outside routine counters", () => {
+    expect(getCollectionIntroduction("morning")?.id).toBe("m-hm-75a");
+    expect(getCollectionIntroduction("evening")?.id).toBe("e-hm-75a");
+    expect(getCollectionIntroduction("before_sleep")).toBeUndefined();
+    expect(getAzkarByCategory("morning").some((zikr) => zikr.isCollectionIntroduction)).toBe(false);
+    expect(getAzkarByCategory("evening").some((zikr) => zikr.isCollectionIntroduction)).toBe(false);
+  });
+
+  it("assigns semantic groups, core membership, and grouped rituals to every main routine item", () => {
+    for (const category of ["morning", "evening", "before_sleep"] as const) {
+      for (const zikr of getAzkarByCategory(category)) {
+        expect(zikr.groupId, zikr.id).toBeTruthy();
+        expect(zikr.groupOrder, zikr.id).toBeTypeOf("number");
+        expect(zikr.itemOrder, zikr.id).toBeTypeOf("number");
+        expect(zikr.includedInCore, zikr.id).toBeTypeOf("boolean");
+      }
+      expect(getAzkarForMode(category, "core").every((zikr) => zikr.includedInCore)).toBe(true);
+      expect(getRoutineStepCount(category, "core")).toBeLessThanOrEqual(getAzkarForMode(category, "core").length);
+    }
+
+    expect(
+      getAzkarByCategory("before_sleep")
+        .slice(-4)
+        .map((zikr) => zikr.id),
+    ).toEqual(["s-hm-106-subhanallah", "s-hm-106-alhamdulillah", "s-hm-106-allahu-akbar", "s-hm-111"]);
+    expect(getAzkarByCategory("before_sleep").at(-1)?.groupId).toBe("final");
   });
 
   it("passes comprehensive authenticity & content completeness audit across all zikrs", () => {

@@ -44,7 +44,7 @@ function privateState(profile: AppStateSnapshot["profile"]): AppStateSnapshot {
     profile,
     completed: {
       ...DEFAULT_APP_STATE.completed,
-      morning: ["m-hm-75a", "m-hm-75"],
+      morning: ["m-hm-77m", "m-hm-75"],
     },
     sessions: [
       {

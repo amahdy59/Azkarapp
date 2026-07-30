@@ -50,6 +50,11 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     quietProgressEnabled: true,
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
     calendarType: "hijri",
+    routineModes: {
+      morning: "core",
+      evening: "core",
+      before_sleep: "core",
+    },
     location: DEFAULT_LOCATION,
   },
   profile: {
@@ -92,6 +97,16 @@ function isColorBlindSupport(value: string): value is ColorBlindSupport {
 
 function isThemeMode(value: string): value is ThemeMode {
   return ["midnight", "light", "dark"].includes(value);
+}
+
+function normalizeRoutineModes(value: unknown): AppStateSnapshot["settings"]["routineModes"] {
+  const candidate =
+    value && typeof value === "object" ? (value as Partial<AppStateSnapshot["settings"]["routineModes"]>) : {};
+  return {
+    morning: candidate.morning === "complete" ? "complete" : "core",
+    evening: candidate.evening === "complete" ? "complete" : "core",
+    before_sleep: candidate.before_sleep === "complete" ? "complete" : "core",
+  };
 }
 
 /** Pre-arrangement order used only to migrate legacy numeric completion indexes safely. */
@@ -256,7 +271,12 @@ function dedupeSavedZikrIds(values: unknown): string[] {
     return [];
   }
 
-  return [...new Set(values.filter((value): value is string => typeof value === "string" && value.length > 0))].sort();
+  const validIds = new Set(CATEGORY_IDS.flatMap((category) => getAzkarByCategory(category).map((zikr) => zikr.id)));
+  return [
+    ...new Set(
+      values.filter((value): value is string => typeof value === "string" && value.length > 0 && validIds.has(value)),
+    ),
+  ].sort();
 }
 
 function loadLegacySavedZikrIds() {
@@ -411,6 +431,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         settings?.calendarType === "hijri" || settings?.calendarType === "gregorian"
           ? settings.calendarType
           : (DEFAULT_APP_STATE.settings.calendarType ?? "hijri"),
+      routineModes: normalizeRoutineModes(settings?.routineModes),
       location: normalizeLocation(settings?.location),
     },
     profile: {
@@ -654,6 +675,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         incoming.settings?.calendarType === "hijri" || incoming.settings?.calendarType === "gregorian"
           ? incoming.settings.calendarType
           : (safeBase.settings.calendarType ?? "hijri"),
+      routineModes: normalizeRoutineModes(incoming.settings?.routineModes ?? safeBase.settings.routineModes),
       location: normalizeLocation(incoming.settings?.location, safeBase.settings.location ?? DEFAULT_LOCATION),
     },
     profile: {

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
-import { getAzkarByCategory } from "./content/azkar";
+import { getAzkarForMode, isRoutineCategory } from "./content/azkar";
 import type {
   AppLanguage,
   AppStateSnapshot,
@@ -11,6 +11,7 @@ import type {
   ColorBlindSupport,
   LocationSettings,
   ReminderSettings,
+  RoutineMode,
   TextSizeOption,
   ThemeMode,
   View,
@@ -115,8 +116,10 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
+  const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
 
-  const activeAzkarList = useMemo(() => getAzkarByCategory(activeCat), [activeCat]);
+  const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
+  const activeAzkarList = useMemo(() => getAzkarForMode(activeCat, activeRoutineMode), [activeCat, activeRoutineMode]);
   const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx, setActiveIdx);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
@@ -243,6 +246,7 @@ export default function App() {
         quietProgressEnabled,
         progressDayStartHour,
         calendarType,
+        routineModes,
       },
       profile: { displayName, email, phone, avatarUrl, isGuest, accountUserId },
       completed: fromCompletedSets(completed),
@@ -272,6 +276,7 @@ export default function App() {
       weeklyGoalDays,
       quietProgressEnabled,
       progressDayStartHour,
+      routineModes,
       selectedLang,
       sessions,
       dailyCompletions,
@@ -326,6 +331,8 @@ export default function App() {
     setSavedZikrIds,
     progressDayStartHour,
     selectedLang,
+    routineModes,
+    setRoutineModes,
     push,
     pop,
     setView,
@@ -381,6 +388,7 @@ export default function App() {
       setWeeklyGoalDays(state.settings.weeklyGoalDays);
       setQuietProgressEnabled(state.settings.quietProgressEnabled);
       setProgressDayStartHour(state.settings.progressDayStartHour);
+      setRoutineModes(state.settings.routineModes);
       setDisplayName(state.profile.displayName);
       setEmail(state.profile.email);
       setPhone(state.profile.phone);
@@ -434,6 +442,7 @@ export default function App() {
     setWeeklyGoalDays(state.settings.weeklyGoalDays);
     setQuietProgressEnabled(state.settings.quietProgressEnabled);
     setProgressDayStartHour(state.settings.progressDayStartHour);
+    setRoutineModes(state.settings.routineModes);
     setDisplayName(state.profile.displayName);
     setEmail(state.profile.email);
     setPhone(state.profile.phone);
@@ -590,7 +599,7 @@ export default function App() {
   };
 
   const showBottomNav = ["home", "library", "category", "reader", "settings", "search", "progress"].includes(view);
-  const azkar = getAzkarByCategory(activeCat);
+  const azkar = activeAzkarList;
 
   return (
     <div className="app-viewport flex items-center justify-center">
@@ -726,6 +735,7 @@ export default function App() {
                 language={selectedLang}
                 calendarType={calendarType}
                 direction={layoutDirection}
+                routineModes={routineModes}
               />
             )}
             {view === "library" && (
@@ -734,7 +744,7 @@ export default function App() {
                 language={selectedLang}
                 direction={layoutDirection}
                 onCategory={openCategory}
-                onZikr={openReader}
+                onZikr={(catId, index) => openReader(catId, index, "complete")}
                 onSearch={() => push("search")}
                 savedZikrIds={savedZikrIds}
               />
@@ -765,6 +775,12 @@ export default function App() {
                   openReader(activeCat, 0);
                   audioPlayer.toggleAutoPlayAll();
                   audioPlayer.playTrackAtIndex(0);
+                }}
+                routineMode={activeRoutineMode}
+                onRoutineModeChange={(mode) => {
+                  if (isRoutineCategory(activeCat)) {
+                    setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
+                  }
                 }}
               />
             )}
@@ -810,6 +826,16 @@ export default function App() {
                 onHome={goHome}
                 language={selectedLang}
                 direction={layoutDirection}
+                completionLevel={activeRoutineMode}
+                onContinueComplete={
+                  isRoutineCategory(activeCat)
+                    ? () => {
+                        const completeAzkar = getAzkarForMode(activeCat, "complete");
+                        const nextIndex = completeAzkar.findIndex((zikr) => !completed[activeCat].has(zikr.id));
+                        openReader(activeCat, Math.max(0, nextIndex), "complete");
+                      }
+                    : undefined
+                }
               />
             )}
             {view === "settings" && (
@@ -874,7 +900,7 @@ export default function App() {
                 direction={layoutDirection}
                 onBack={pop}
                 onZikr={(catId, i) => {
-                  openReader(catId, i);
+                  openReader(catId, i, "complete");
                 }}
               />
             )}

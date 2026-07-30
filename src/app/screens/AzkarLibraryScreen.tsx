@@ -30,7 +30,10 @@ export function AzkarLibraryScreen({
 }) {
   const [section, setSection] = useState<LibrarySection>("collections");
   const isArabic = language === "ar";
-  const savedAzkar = useMemo(() => ALL_AZKAR.filter((zikr) => savedZikrIds.has(zikr.id)), [savedZikrIds]);
+  const savedAzkar = useMemo(
+    () => ALL_AZKAR.filter((zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id)),
+    [savedZikrIds],
+  );
 
   return (
     <ScreenContainer dir={direction}>

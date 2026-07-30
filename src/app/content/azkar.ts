@@ -1,4 +1,4 @@
-import type { CategoryId, Zikr } from "../types";
+import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrGroupId } from "../types";
 
 const MORNING_AZKAR: Zikr[] = [
   {
@@ -2704,6 +2704,220 @@ const MISCELLANEOUS_AZKAR: Zikr[] = [
   },
 ];
 
+const eveningPerfectWords = EVENING_AZKAR.find((zikr) => zikr.id === "e-hm-97");
+if (eveningPerfectWords) {
+  MORNING_AZKAR.push({
+    ...eveningPerfectWords,
+    id: "m-hm-97",
+    category: "morning",
+    orderIndex: 0,
+  });
+}
+
+type ArrangementItem = {
+  id: string;
+  core: boolean;
+  ritualGroupId?: RitualGroupId;
+};
+
+type ArrangementGroup = {
+  groupId: ZikrGroupId;
+  items: ArrangementItem[];
+};
+
+const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
+  morning: [
+    {
+      groupId: "begin",
+      items: [
+        { id: "m-hm-77m", core: true },
+        { id: "m-hm-78m", core: true },
+        { id: "m-hm-89m", core: false },
+      ],
+    },
+    {
+      groupId: "quran_protection",
+      items: [
+        { id: "m-hm-75", core: true },
+        { id: "m-hm-76a", core: true, ritualGroupId: "three_quls" },
+        { id: "m-hm-76b", core: true, ritualGroupId: "three_quls" },
+        { id: "m-hm-76c", core: true, ritualGroupId: "three_quls" },
+      ],
+    },
+    {
+      groupId: "dua_protection",
+      items: [
+        { id: "m-hm-97", core: true },
+        { id: "m-hm-86", core: true },
+        { id: "m-hm-84", core: true },
+        { id: "m-hm-82", core: false },
+        { id: "m-hm-85", core: false },
+        { id: "m-hm-83", core: false },
+      ],
+    },
+    {
+      groupId: "renew",
+      items: [
+        { id: "m-hm-79", core: true },
+        { id: "m-hm-87", core: true },
+        { id: "m-hm-90m", core: false },
+        { id: "m-hm-80m", core: false },
+        { id: "m-hm-81m", core: false },
+      ],
+    },
+    {
+      groupId: "ask",
+      items: [
+        { id: "m-hm-88", core: true },
+        { id: "m-hm-95", core: true },
+      ],
+    },
+    {
+      groupId: "repeat",
+      items: [
+        { id: "m-hm-91", core: true },
+        { id: "m-hm-93", core: false },
+        { id: "m-hm-94", core: false },
+        { id: "m-hm-96", core: false },
+        { id: "m-hm-98", core: false },
+      ],
+    },
+  ],
+  evening: [
+    {
+      groupId: "begin",
+      items: [
+        { id: "e-hm-77e", core: true },
+        { id: "e-hm-78e", core: true },
+        { id: "e-hm-89e", core: false },
+      ],
+    },
+    {
+      groupId: "quran_protection",
+      items: [
+        { id: "e-hm-75", core: true },
+        { id: "e-hm-76a", core: true, ritualGroupId: "three_quls" },
+        { id: "e-hm-76b", core: true, ritualGroupId: "three_quls" },
+        { id: "e-hm-76c", core: true, ritualGroupId: "three_quls" },
+      ],
+    },
+    {
+      groupId: "dua_protection",
+      items: [
+        { id: "e-hm-86", core: true },
+        { id: "e-hm-97", core: true },
+        { id: "e-hm-84", core: true },
+        { id: "e-hm-82", core: false },
+        { id: "e-hm-85", core: false },
+        { id: "e-hm-83", core: false },
+      ],
+    },
+    {
+      groupId: "renew",
+      items: [
+        { id: "e-hm-79", core: true },
+        { id: "e-hm-87", core: true },
+        { id: "e-hm-90e", core: false },
+        { id: "e-hm-80e", core: false },
+        { id: "e-hm-81e", core: false },
+      ],
+    },
+    {
+      groupId: "ask",
+      items: [{ id: "e-hm-88", core: true }],
+    },
+    {
+      groupId: "repeat",
+      items: [
+        { id: "e-hm-91", core: true },
+        { id: "e-hm-92", core: false },
+        { id: "e-hm-96", core: false },
+        { id: "e-hm-98", core: false },
+      ],
+    },
+  ],
+  before_sleep: [
+    {
+      groupId: "quran_protection",
+      items: [
+        { id: "s-hm-100", core: true },
+        { id: "s-hm-101", core: true },
+        { id: "s-hm-99-ikhlas", core: true, ritualGroupId: "three_quls" },
+        { id: "s-hm-99-falaq", core: true, ritualGroupId: "three_quls" },
+        { id: "s-hm-99-nas", core: true, ritualGroupId: "three_quls" },
+        { id: "s-hm-109a", core: false },
+        { id: "s-hm-110a", core: false },
+        { id: "s-hm-110b", core: false },
+      ],
+    },
+    {
+      groupId: "ask",
+      items: [
+        { id: "s-hm-102", core: true },
+        { id: "s-hm-105", core: true },
+        { id: "s-hm-104", core: true },
+        { id: "s-hm-108", core: false },
+        { id: "s-hm-107", core: false },
+        { id: "s-hm-109", core: false },
+      ],
+    },
+    {
+      groupId: "settle",
+      items: [
+        { id: "s-hm-106-subhanallah", core: true, ritualGroupId: "tasbih_fatimah" },
+        { id: "s-hm-106-alhamdulillah", core: true, ritualGroupId: "tasbih_fatimah" },
+        { id: "s-hm-106-allahu-akbar", core: true, ritualGroupId: "tasbih_fatimah" },
+      ],
+    },
+    {
+      groupId: "final",
+      items: [{ id: "s-hm-111", core: true }],
+    },
+  ],
+};
+
+const ROUTINE_INTRODUCTION_IDS: Record<"morning" | "evening", string> = {
+  morning: "m-hm-75a",
+  evening: "e-hm-75a",
+};
+
+function applyRoutineArrangement(category: RoutineCategoryId, azkar: Zikr[]) {
+  const byId = new Map(azkar.map((zikr) => [zikr.id, zikr]));
+  let orderIndex = 0;
+
+  for (const [groupOrder, group] of ROUTINE_ARRANGEMENTS[category].entries()) {
+    for (const [itemOrder, item] of group.items.entries()) {
+      const zikr = byId.get(item.id);
+      if (!zikr) {
+        throw new Error(`Missing arranged zikr: ${category}:${item.id}`);
+      }
+      Object.assign(zikr, {
+        orderIndex,
+        groupId: group.groupId,
+        groupOrder,
+        itemOrder,
+        includedInCore: item.core,
+        ...(item.ritualGroupId ? { ritualGroupId: item.ritualGroupId } : {}),
+      });
+      orderIndex += 1;
+    }
+  }
+
+  const introductionId =
+    category === "morning" || category === "evening" ? ROUTINE_INTRODUCTION_IDS[category] : undefined;
+  if (introductionId) {
+    const introduction = byId.get(introductionId);
+    if (introduction) {
+      introduction.isCollectionIntroduction = true;
+      introduction.includedInCore = false;
+    }
+  }
+}
+
+applyRoutineArrangement("morning", MORNING_AZKAR);
+applyRoutineArrangement("evening", EVENING_AZKAR);
+applyRoutineArrangement("before_sleep", SLEEP_AZKAR);
+
 const ALL_AZKAR = [
   ...MORNING_AZKAR,
   ...EVENING_AZKAR,
@@ -2723,8 +2937,61 @@ const ALL_AZKAR = [
   ...MISCELLANEOUS_AZKAR,
 ];
 
+const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>
+  cat === "morning" || cat === "evening" || cat === "before_sleep";
+
 const getAzkarByCategory = (cat: CategoryId) =>
-  ALL_AZKAR.filter((z) => z.category === cat).sort((a, b) => a.orderIndex - b.orderIndex);
+  ALL_AZKAR.filter((z) => z.category === cat && !z.isCollectionIntroduction).sort(
+    (a, b) => a.orderIndex - b.orderIndex,
+  );
+
+const getAzkarForMode = (cat: CategoryId, mode: RoutineMode = "complete") => {
+  const azkar = getAzkarByCategory(cat);
+  return isRoutineCategory(cat) && mode === "core" ? azkar.filter((zikr) => zikr.includedInCore) : azkar;
+};
+
+const getCollectionIntroduction = (cat: CategoryId) =>
+  ALL_AZKAR.find((zikr) => zikr.category === cat && zikr.isCollectionIntroduction);
+
+const getRoutineStepCount = (cat: RoutineCategoryId, mode: RoutineMode) => {
+  const seenRituals = new Set<RitualGroupId>();
+  return getAzkarForMode(cat, mode).reduce((count, zikr) => {
+    if (!zikr.ritualGroupId) {
+      return count + 1;
+    }
+    if (seenRituals.has(zikr.ritualGroupId)) {
+      return count;
+    }
+    seenRituals.add(zikr.ritualGroupId);
+    return count + 1;
+  }, 0);
+};
+
+const getRoutineProgress = (cat: RoutineCategoryId, mode: RoutineMode, completedIds: Iterable<string>) => {
+  const azkar = getAzkarForMode(cat, mode);
+  const completed = new Set(completedIds);
+  if (mode === "complete") {
+    return {
+      done: azkar.filter((zikr) => completed.has(zikr.id)).length,
+      total: azkar.length,
+    };
+  }
+
+  const ritualItems = new Map<RitualGroupId, Zikr[]>();
+  const standalone = azkar.filter((zikr) => {
+    if (!zikr.ritualGroupId) return true;
+    const items = ritualItems.get(zikr.ritualGroupId) ?? [];
+    items.push(zikr);
+    ritualItems.set(zikr.ritualGroupId, items);
+    return false;
+  });
+  return {
+    done:
+      standalone.filter((zikr) => completed.has(zikr.id)).length +
+      [...ritualItems.values()].filter((items) => items.every((zikr) => completed.has(zikr.id))).length,
+    total: standalone.length + ritualItems.size,
+  };
+};
 
 const getCategoryTotal = (cat: CategoryId) => getAzkarByCategory(cat).length;
 
@@ -2751,6 +3018,12 @@ export {
   NATURAL_EVENTS_AZKAR,
   MISCELLANEOUS_AZKAR,
   ZIKR_LABELS,
+  ROUTINE_ARRANGEMENTS,
+  getAzkarForMode,
   getAzkarByCategory,
+  getCollectionIntroduction,
   getCategoryTotal,
+  getRoutineProgress,
+  getRoutineStepCount,
+  isRoutineCategory,
 };

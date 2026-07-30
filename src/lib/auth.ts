@@ -159,7 +159,9 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     weeklyGoalDays: state.settings.weeklyGoalDays,
     quietProgressEnabled: state.settings.quietProgressEnabled,
     progressDayStartHour: state.settings.progressDayStartHour,
+    routineModes: state.settings.routineModes,
     savedZikrIds: state.savedZikrIds,
+    dailyCompletions: state.dailyCompletions,
   };
 }
 
@@ -308,13 +310,20 @@ export async function loadRemoteState(
     );
   }
 
+  const settingsDailyCompletions = normalizeDailyCompletions(settings?.settings_json?.dailyCompletions);
+  const settingsCompletionLevels = new Map(
+    settingsDailyCompletions.map((record) => [dailyCompletionKey(record), record.completionLevel ?? "complete"]),
+  );
   const remoteDailyCompletions = mergeDailyCompletions(
-    normalizeDailyCompletions(settings?.settings_json?.dailyCompletions),
+    settingsDailyCompletions,
     normalizeDailyCompletions(
       dailyCompletionResult.rows.map((record) => ({
         dayKey: record.day_key,
         category: record.category,
         timeZone: record.time_zone,
+        completionLevel: settingsCompletionLevels.get(
+          dailyCompletionKey({ dayKey: record.day_key, category: record.category }),
+        ),
       })),
     ),
   );
@@ -342,6 +351,7 @@ export async function loadRemoteState(
             settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
           progressDayStartHour:
             settings?.settings_json?.progressDayStartHour ?? localState.settings.progressDayStartHour,
+          routineModes: settings?.settings_json?.routineModes ?? localState.settings.routineModes,
           // Precise coordinates and prayer calculation settings are device-local.
           location: localState.settings.location,
         },
