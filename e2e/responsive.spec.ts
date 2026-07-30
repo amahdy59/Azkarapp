@@ -112,7 +112,11 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
           colorBlindSupport: "none",
         },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
-        completed: { morning: [0, 1, 2, 3, 4, 5, 6, 7], evening: [], before_sleep: [] },
+        completed: {
+          morning: ["m-hm-75a", "m-hm-77m", "m-hm-78m", "m-hm-89m", "m-hm-75", "m-hm-76a", "m-hm-76b", "m-hm-76c"],
+          evening: [],
+          before_sleep: [],
+        },
         sessions: [],
       }),
     );
