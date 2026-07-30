@@ -18,9 +18,32 @@ describe("app state persistence", () => {
   });
 
   it("round-trips a valid state", () => {
-    const state = { ...DEFAULT_APP_STATE, profile: { ...DEFAULT_APP_STATE.profile, displayName: "Ahmed" } };
+    const state = {
+      ...DEFAULT_APP_STATE,
+      settings: {
+        ...DEFAULT_APP_STATE.settings,
+        location: {
+          ...DEFAULT_APP_STATE.settings.location!,
+          latitude: 31.2001,
+          longitude: 29.9187,
+          cityName: "Alexandria",
+          calculationMethod: 4,
+        },
+      },
+      profile: { ...DEFAULT_APP_STATE.profile, displayName: "Ahmed" },
+    };
     saveAppState(state);
-    expect(loadAppState().profile.displayName).toBe("Ahmed");
+    expect(loadAppState()).toMatchObject({
+      profile: { displayName: "Ahmed" },
+      settings: {
+        location: {
+          latitude: 31.2001,
+          longitude: 29.9187,
+          cityName: "Alexandria",
+          calculationMethod: 4,
+        },
+      },
+    });
   });
 
   it("recovers safely from corrupt storage", () => {
@@ -128,10 +151,10 @@ describe("app state persistence", () => {
     });
   });
 
-  it("drops out-of-range completion indexes from untrusted storage", () => {
+  it("migrates legacy completion indexes by the pre-arrangement order and drops invalid indexes", () => {
     const state = normalizeAppState({
       completed: {
-        morning: [0, 999],
+        morning: [0, 5, 999],
         evening: [],
         before_sleep: [],
         waking_up: [],
@@ -144,7 +167,7 @@ describe("app state persistence", () => {
       },
     });
 
-    expect(state.completed.morning).toEqual([0]);
+    expect(state.completed.morning).toEqual(["m-hm-75a", "m-hm-77m"]);
   });
 
   it("clears account-owned private data while preserving device preferences", () => {
@@ -159,7 +182,7 @@ describe("app state persistence", () => {
       },
       completed: {
         ...DEFAULT_APP_STATE.completed,
-        morning: [0],
+        morning: ["m-hm-75a"],
       },
       sessions: [
         {
@@ -190,20 +213,20 @@ describe("state merging", () => {
     const incoming = {
       completed: {
         ...DEFAULT_APP_STATE.completed,
-        morning: [2, 2, 1],
+        morning: ["m-hm-76a", "m-hm-76a", "m-hm-75"],
       },
     };
     const merged = mergeAppStates(DEFAULT_APP_STATE, incoming);
-    expect(merged.completed.morning).toEqual([1, 2]);
+    expect(merged.completed.morning).toEqual(["m-hm-75", "m-hm-76a"]);
   });
 
   it("serializes completion sets in stable order", () => {
     expect(
       fromCompletedSets({
         ...toCompletedSets(DEFAULT_APP_STATE.completed),
-        morning: new Set([2, 1]),
+        morning: new Set(["m-hm-76a", "m-hm-75"]),
       }).morning,
-    ).toEqual([1, 2]);
+    ).toEqual(["m-hm-75", "m-hm-76a"]);
   });
 
   it("merges saved zikr without duplicates", () => {
@@ -219,6 +242,23 @@ describe("state merging", () => {
     } as unknown as Parameters<typeof mergeAppStates>[1];
 
     expect(mergeAppStates(DEFAULT_APP_STATE, incoming).settings).toEqual(DEFAULT_APP_STATE.settings);
+  });
+
+  it("restores a remote prayer location over the local location", () => {
+    const remoteLocation = {
+      latitude: 24.7136,
+      longitude: 46.6753,
+      cityName: "Riyadh",
+      calculationMethod: 4,
+      autoDetect: true,
+      timeZone: "Asia/Riyadh",
+    };
+
+    expect(
+      mergeAppStates(DEFAULT_APP_STATE, {
+        settings: { ...DEFAULT_APP_STATE.settings, location: remoteLocation },
+      }).settings.location,
+    ).toMatchObject(remoteLocation);
   });
 
   it("normalizes completely untrusted snapshots", () => {

@@ -1,4 +1,4 @@
-import { getCategoryTotal } from "./content/azkar";
+import { getAzkarByCategory } from "./content/azkar";
 import type { CategoryId, DailyCollectionCompletion, StoredSession } from "./types";
 
 export const CATEGORY_IDS: CategoryId[] = [
@@ -396,7 +396,7 @@ export function getGardenSummary(
 
 /** Clears only fully completed collections from an older progress day; partial reading progress remains resumable. */
 export function resetStaleCompletedCollections(
-  completed: Record<CategoryId, Set<number>>,
+  completed: Record<CategoryId, Set<string>>,
   records: DailyCollectionCompletion[],
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
@@ -410,13 +410,11 @@ export function resetStaleCompletedCollections(
 
   return Object.fromEntries(
     CATEGORY_IDS.map((category) => {
-      const categoryProgress = completed[category] ?? new Set<number>();
-      const isFull = Array.from({ length: getCategoryTotal(category) }, (_, index) => index).every((index) =>
-        categoryProgress.has(index),
-      );
-      return [category, isFull && !completedToday.has(category) ? new Set<number>() : new Set(categoryProgress)];
+      const categoryProgress = completed[category] ?? new Set<string>();
+      const isFull = getAzkarByCategory(category).every((zikr) => categoryProgress.has(zikr.id));
+      return [category, isFull && !completedToday.has(category) ? new Set<string>() : new Set(categoryProgress)];
     }),
-  ) as Record<CategoryId, Set<number>>;
+  ) as Record<CategoryId, Set<string>>;
 }
 
 export function millisecondsUntilNextProgressDay(now = new Date(), boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR) {
@@ -454,6 +452,33 @@ export function getFirstIncompleteIndex(total: number, completed: Iterable<numbe
   for (let index = 0; index < total; index += 1) {
     if (!completedIndexes.has(index)) {
       return index;
+    }
+  }
+  return null;
+}
+
+/** Returns the first unfinished item index while completion is stored by stable zikr ID. */
+export function getFirstIncompleteZikrIndex(zikrs: ReadonlyArray<{ id: string }>, completedIds: Iterable<string>) {
+  const completed = new Set(completedIds);
+  const index = zikrs.findIndex((zikr) => !completed.has(zikr.id));
+  return index < 0 ? null : index;
+}
+
+/** Returns the next unfinished item index, wrapping once, using stable zikr IDs. */
+export function getNextIncompleteZikrIndex(
+  zikrs: ReadonlyArray<{ id: string }>,
+  completedIds: Iterable<string>,
+  currentIndex: number,
+) {
+  if (zikrs.length === 0) {
+    return null;
+  }
+  const completed = new Set(completedIds);
+  for (let offset = 1; offset <= zikrs.length; offset += 1) {
+    const candidate = (currentIndex + offset + zikrs.length) % zikrs.length;
+    const zikr = zikrs[candidate];
+    if (zikr && !completed.has(zikr.id)) {
+      return candidate;
     }
   }
   return null;

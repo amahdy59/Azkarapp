@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
 import {
@@ -128,6 +128,7 @@ export function NotificationsPanel({
   const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
   const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
+  const locationRequestId = useRef(0);
   const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
 
   useEffect(() => {
@@ -138,25 +139,35 @@ export function NotificationsPanel({
   }, [locationSettings?.cityName, locationSettings?.latitude, locationSettings?.longitude, locationSettings?.timeZone]);
 
   const handleDetectLocation = async () => {
+    const requestId = ++locationRequestId.current;
     setIsDetectingLocation(true);
     setLocationStatus(null);
     const coords = await detectUserCoordinates();
+    if (requestId !== locationRequestId.current) return;
 
     if (coords && onLocationChange) {
-      const prayerData = await fetchAladhanPrayerData(
-        new Date(),
-        coords.latitude,
-        coords.longitude,
-        locationSettings?.calculationMethod ?? DEFAULT_LOCATION.calculationMethod,
-      );
-      onLocationChange({
-        ...(locationSettings ?? { calculationMethod: 5, autoDetect: true }),
+      const detectedLocation: LocationSettings = {
+        ...(locationSettings ?? DEFAULT_LOCATION),
         latitude: coords.latitude,
         longitude: coords.longitude,
         cityName: `${coords.latitude.toFixed(2)}°, ${coords.longitude.toFixed(2)}°`,
         autoDetect: true,
-        timeZone: prayerData?.timeZone ?? coords.timeZone ?? DEFAULT_LOCATION.timeZone,
-      });
+        timeZone: coords.timeZone ?? DEFAULT_LOCATION.timeZone,
+      };
+      onLocationChange(detectedLocation);
+
+      const prayerData = await fetchAladhanPrayerData(
+        new Date(),
+        coords.latitude,
+        coords.longitude,
+        detectedLocation.calculationMethod,
+      );
+      if (prayerData && requestId === locationRequestId.current) {
+        onLocationChange({
+          ...detectedLocation,
+          timeZone: prayerData.timeZone ?? detectedLocation.timeZone,
+        });
+      }
       setLocationStatus(
         isArabic ? "تم تحديث الموقع والمنطقة الزمنية بنجاح." : "Location and time zone updated successfully.",
       );
@@ -167,14 +178,32 @@ export function NotificationsPanel({
           : "Could not detect location. Please check browser location permissions.",
       );
     }
-    setIsDetectingLocation(false);
+    if (requestId === locationRequestId.current) {
+      setIsDetectingLocation(false);
+    }
   };
 
-  const handleMethodChange = (methodId: number) => {
-    if (onLocationChange) {
+  const handleMethodChange = async (methodId: number) => {
+    if (!onLocationChange) return;
+    const requestId = ++locationRequestId.current;
+    setIsDetectingLocation(false);
+
+    const updatedLocation = {
+      ...(locationSettings ?? DEFAULT_LOCATION),
+      calculationMethod: methodId,
+    };
+    onLocationChange(updatedLocation);
+
+    const prayerData = await fetchAladhanPrayerData(
+      new Date(),
+      updatedLocation.latitude ?? DEFAULT_LOCATION.latitude,
+      updatedLocation.longitude ?? DEFAULT_LOCATION.longitude,
+      methodId,
+    );
+    if (prayerData && requestId === locationRequestId.current) {
       onLocationChange({
-        ...(locationSettings ?? DEFAULT_LOCATION),
-        calculationMethod: methodId,
+        ...updatedLocation,
+        timeZone: prayerData.timeZone ?? updatedLocation.timeZone,
       });
     }
   };
@@ -197,6 +226,7 @@ export function NotificationsPanel({
       );
       return;
     }
+    locationRequestId.current += 1;
     onLocationChange?.({
       ...(locationSettings ?? DEFAULT_LOCATION),
       latitude,
@@ -353,7 +383,7 @@ export function NotificationsPanel({
               <select
                 id="calculation-method-select"
                 value={locationSettings?.calculationMethod ?? 5}
-                onChange={(e) => handleMethodChange(Number(e.target.value))}
+                onChange={(e) => void handleMethodChange(Number(e.target.value))}
                 className="w-full h-11 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] font-semibold text-foreground"
               >
                 {Object.values(CALCULATION_METHODS).map((m) => (

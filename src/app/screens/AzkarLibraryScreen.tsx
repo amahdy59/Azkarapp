@@ -3,7 +3,7 @@ import { CatIcon } from "../components/CatIcon";
 import { Search, Bookmark, ChevronNext } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ProgressBar } from "../components/ProgressBar";
-import { ALL_AZKAR, getCategoryTotal } from "../content/azkar";
+import { ALL_AZKAR, getAzkarByCategory, getCategoryTotal } from "../content/azkar";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -20,7 +20,7 @@ export function AzkarLibraryScreen({
   onSearch,
   savedZikrIds,
 }: {
-  completed: Record<CategoryId, Set<number>>;
+  completed: Record<CategoryId, Set<string>>;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onCategory: (category: CategoryId) => void;
@@ -160,7 +160,12 @@ export function AzkarLibraryScreen({
                   <button
                     key={zikr.id}
                     type="button"
-                    onClick={() => onZikr(zikr.category, zikr.orderIndex)}
+                    onClick={() =>
+                      onZikr(
+                        zikr.category,
+                        getAzkarByCategory(zikr.category).findIndex((item) => item.id === zikr.id),
+                      )
+                    }
                     className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                       isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation

@@ -35,7 +35,7 @@ import { PwaNotice } from "./components/PwaNotice";
 import { useAudioPlayer } from "./hooks/useAudioPlayer";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
-import { useForegroundReminders } from "./hooks/useForegroundReminders";
+import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
 import { useAuthHandlers, type ConfirmDialogOptions } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
@@ -129,6 +129,10 @@ export default function App() {
   const [locationSettings, setLocationSettings] = useState<LocationSettings>(
     initialState.settings.location ?? DEFAULT_LOCATION,
   );
+  const handleLocationChange = useCallback((location: LocationSettings) => {
+    setLocationSettings(location);
+    setReminders((current) => getLocationBasedReminders(current, location));
+  }, []);
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
@@ -137,7 +141,7 @@ export default function App() {
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
-  const [completed, setCompleted] = useState<Record<CategoryId, Set<number>>>(() =>
+  const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
       toCompletedSets(initialState.completed),
       initialState.dailyCompletions,
@@ -391,6 +395,7 @@ export default function App() {
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
     setReminders(state.settings.reminders);
+    setLocationSettings(state.settings.location ?? DEFAULT_LOCATION);
     setWeeklyGoalDays(state.settings.weeklyGoalDays);
     setQuietProgressEnabled(state.settings.quietProgressEnabled);
     setProgressDayStartHour(state.settings.progressDayStartHour);
@@ -713,7 +718,9 @@ export default function App() {
                 direction={layoutDirection}
                 themeMode={themeMode}
                 isDone={
-                  isRepeatSession ? repeatCompleted.has(activeIdx) : (completed[activeCat]?.has(activeIdx) ?? false)
+                  isRepeatSession
+                    ? repeatCompleted.has(activeIdx)
+                    : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
                 }
                 collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
                 hapticFeedback={hapticFeedback}
@@ -788,7 +795,7 @@ export default function App() {
                 onForceRtlChange={setForceRtl}
                 onColorBlindSupportChange={setColorBlindSupport}
                 onRemindersChange={setReminders}
-                onLocationChange={setLocationSettings}
+                onLocationChange={handleLocationChange}
                 onWeeklyGoalDaysChange={setWeeklyGoalDays}
                 onQuietProgressEnabledChange={setQuietProgressEnabled}
                 onProgressDayStartHourChange={setProgressDayStartHour}

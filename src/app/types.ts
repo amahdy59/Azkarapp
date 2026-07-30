@@ -150,7 +150,8 @@ export interface UserProfileState {
 export interface AppStateSnapshot {
   settings: UserSettingsState;
   profile: UserProfileState;
-  completed: Record<CategoryId, number[]>;
+  /** Stable zikr IDs; legacy numeric indexes are migrated when state is loaded. */
+  completed: Record<CategoryId, string[]>;
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
   /** Stable content IDs saved by the user for quick return and account sync. */

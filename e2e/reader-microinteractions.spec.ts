@@ -15,7 +15,7 @@ async function openReturningGuestHome(page: Page, language: "en" | "ar") {
           reduceMotion: true,
         },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
-        completed: { morning: [0], evening: [], before_sleep: [] },
+        completed: { morning: ["m-hm-75a"], evening: [], before_sleep: [] },
         sessions: [],
       }),
     );

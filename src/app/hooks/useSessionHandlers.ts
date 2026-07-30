@@ -3,8 +3,9 @@ import type { AppLanguage, CategoryId, DailyCollectionCompletion, View } from ".
 import type { StoredSession } from "../state";
 import { getAzkarByCategory } from "../content/azkar";
 import {
-  getFirstIncompleteIndex,
+  getFirstIncompleteZikrIndex,
   getNextIncompleteIndex,
+  getNextIncompleteZikrIndex,
   recordDailyCollectionCompletion,
   type GrowthEvent,
 } from "../progress";
@@ -34,8 +35,8 @@ export function useSessionHandlers({
   setActiveCat: (cat: CategoryId) => void;
   activeIdx: number;
   setActiveIdx: React.Dispatch<React.SetStateAction<number>>;
-  completed: Record<CategoryId, Set<number>>;
-  setCompleted: React.Dispatch<React.SetStateAction<Record<CategoryId, Set<number>>>>;
+  completed: Record<CategoryId, Set<string>>;
+  setCompleted: React.Dispatch<React.SetStateAction<Record<CategoryId, Set<string>>>>;
   dailyCompletions: DailyCollectionCompletion[];
   setDailyCompletions: (records: DailyCollectionCompletion[]) => void;
   setLastGrowthEvent: (event: GrowthEvent | null) => void;
@@ -93,7 +94,7 @@ export function useSessionHandlers({
   };
 
   const resumeCategory = (catId: CategoryId) => {
-    const nextIndex = getFirstIncompleteIndex(getAzkarByCategory(catId).length, completed[catId] ?? []);
+    const nextIndex = getFirstIncompleteZikrIndex(getAzkarByCategory(catId), completed[catId] ?? []);
     openReader(catId, nextIndex ?? 0);
   };
 
@@ -126,25 +127,33 @@ export function useSessionHandlers({
 
   const markComplete = (idx: number) => {
     const azkar = getAzkarByCategory(activeCat);
-    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
-    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
-    effectiveProgress.add(idx);
+    const zikrId = azkar[idx]?.id;
+    if (!zikrId) {
+      return;
+    }
+    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => completed[activeCat].has(zikr.id));
 
     if (isRepeatSession) {
+      const effectiveProgress = new Set(repeatCompleted);
+      effectiveProgress.add(idx);
       setRepeatCompleted((previous) => new Set(previous).add(idx));
+      if (
+        canonicalCollectionWasAlreadyComplete ||
+        getNextIncompleteIndex(azkar.length, effectiveProgress, idx) !== null
+      ) {
+        return;
+      }
     } else {
+      const effectiveProgress = new Set(completed[activeCat]);
+      effectiveProgress.add(zikrId);
       setCompleted((prev) => {
         const updated = new Set(prev[activeCat]);
-        updated.add(idx);
+        updated.add(zikrId);
         return { ...prev, [activeCat]: updated };
       });
-    }
-
-    if (
-      (!isRepeatSession && canonicalCollectionWasAlreadyComplete) ||
-      getNextIncompleteIndex(azkar.length, effectiveProgress, idx) !== null
-    ) {
-      return;
+      if (canonicalCollectionWasAlreadyComplete || getNextIncompleteZikrIndex(azkar, effectiveProgress, idx) !== null) {
+        return;
+      }
     }
 
     const completedAt = new Date();
@@ -171,13 +180,17 @@ export function useSessionHandlers({
 
   const toggleZikrCompletion = (catId: CategoryId, idx: number) => {
     const azkar = getAzkarByCategory(catId);
+    const zikrId = azkar[idx]?.id;
+    if (!zikrId) {
+      return;
+    }
     const setForCat = new Set(completed[catId] ?? new Set());
-    const wasCompleted = setForCat.has(idx);
+    const wasCompleted = setForCat.has(zikrId);
 
     if (wasCompleted) {
-      setForCat.delete(idx);
+      setForCat.delete(zikrId);
     } else {
-      setForCat.add(idx);
+      setForCat.add(zikrId);
     }
 
     setCompleted((prev) => ({
@@ -195,15 +208,20 @@ export function useSessionHandlers({
 
   const advanceAfterCompletion = (idx: number) => {
     const azkar = getAzkarByCategory(activeCat);
-    const canonicalCollectionWasAlreadyComplete = azkar.every((_, itemIndex) => completed[activeCat].has(itemIndex));
+    const zikrId = azkar[idx]?.id;
+    if (!zikrId) {
+      pop();
+      return;
+    }
+    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => completed[activeCat].has(zikr.id));
     if (!isRepeatSession && canonicalCollectionWasAlreadyComplete) {
       pop();
       return;
     }
 
-    const effectiveProgress = new Set(isRepeatSession ? repeatCompleted : completed[activeCat]);
-    effectiveProgress.add(idx);
-    const nextIncomplete = getNextIncompleteIndex(azkar.length, effectiveProgress, idx);
+    const nextIncomplete = isRepeatSession
+      ? getNextIncompleteIndex(azkar.length, new Set(repeatCompleted).add(idx), idx)
+      : getNextIncompleteZikrIndex(azkar, new Set(completed[activeCat]).add(zikrId), idx);
 
     if (nextIncomplete !== null) {
       setActiveIdx(nextIncomplete);

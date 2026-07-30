@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getCategoryTotal } from "./content/azkar";
+import { getAzkarByCategory } from "./content/azkar";
 import {
   CATEGORY_IDS,
   deriveDailyCompletionsFromLegacySessions,
@@ -26,7 +26,7 @@ function session(category: CategoryId, completedAt: Date, isComplete = true): St
 }
 
 function fullProgress(category: CategoryId) {
-  return new Set(Array.from({ length: getCategoryTotal(category) }, (_, index) => index));
+  return new Set(getAzkarByCategory(category).map((zikr) => zikr.id));
 }
 
 describe("quiet garden progress", () => {
@@ -149,20 +149,20 @@ describe("quiet garden progress", () => {
   });
 
   it("clears stale full collections while preserving partial progress", () => {
-    const emptyCompletedSets = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<number>()])) as Record<
+    const emptyCompletedSets = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>()])) as Record<
       CategoryId,
-      Set<number>
+      Set<string>
     >;
 
     const completed = {
       ...emptyCompletedSets,
       morning: fullProgress("morning"),
-      evening: new Set([0, 1]),
+      evening: new Set(["e-hm-75a", "e-hm-75"]),
     };
     const reset = resetStaleCompletedCollections(completed, [], new Date(2026, 6, 18, 12), 4);
 
     expect(reset.morning.size).toBe(0);
-    expect([...reset.evening]).toEqual([0, 1]);
+    expect([...reset.evening]).toEqual(["e-hm-75a", "e-hm-75"]);
   });
 
   it("wraps to an earlier unfinished zikr instead of treating the final index as collection completion", () => {

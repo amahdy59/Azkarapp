@@ -142,6 +142,29 @@ type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
   dailyCompletions?: AppStateSnapshot["dailyCompletions"];
 };
 
+export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettingsJson {
+  return {
+    language: state.settings.language,
+    themeMode: state.settings.themeMode,
+    showTransliteration: state.settings.showTransliteration,
+    showTranslation: state.settings.showTranslation,
+    textSize: state.settings.textSize,
+    arabicFont: state.settings.arabicFont,
+    highContrast: state.settings.highContrast,
+    boldText: state.settings.boldText,
+    reduceMotion: state.settings.reduceMotion,
+    hapticFeedback: state.settings.hapticFeedback,
+    forceRtl: state.settings.forceRtl,
+    colorBlindSupport: state.settings.colorBlindSupport,
+    reminders: state.settings.reminders,
+    weeklyGoalDays: state.settings.weeklyGoalDays,
+    quietProgressEnabled: state.settings.quietProgressEnabled,
+    progressDayStartHour: state.settings.progressDayStartHour,
+    location: state.settings.location,
+    savedZikrIds: state.savedZikrIds,
+  };
+}
+
 type RemoteSettingsRow = {
   dark_mode: boolean;
   settings_json?: RemoteSettingsJson | null;
@@ -300,6 +323,7 @@ export async function loadRemoteState(session: Session, localState: AppStateSnap
       weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
       quietProgressEnabled: settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
       progressDayStartHour: settings?.settings_json?.progressDayStartHour ?? localState.settings.progressDayStartHour,
+      location: settings?.settings_json?.location ?? localState.settings.location,
     },
     profile: {
       displayName:
@@ -385,25 +409,7 @@ export async function syncRemoteState(
     }
   }
 
-  const settingsJson: RemoteSettingsJson = {
-    language: state.settings.language,
-    themeMode: state.settings.themeMode,
-    showTransliteration: state.settings.showTransliteration,
-    showTranslation: state.settings.showTranslation,
-    textSize: state.settings.textSize,
-    arabicFont: state.settings.arabicFont,
-    highContrast: state.settings.highContrast,
-    boldText: state.settings.boldText,
-    reduceMotion: state.settings.reduceMotion,
-    hapticFeedback: state.settings.hapticFeedback,
-    forceRtl: state.settings.forceRtl,
-    colorBlindSupport: state.settings.colorBlindSupport,
-    reminders: state.settings.reminders,
-    weeklyGoalDays: state.settings.weeklyGoalDays,
-    quietProgressEnabled: state.settings.quietProgressEnabled,
-    progressDayStartHour: state.settings.progressDayStartHour,
-    savedZikrIds: state.savedZikrIds,
-  };
+  const settingsJson = buildRemoteSettingsJson(state);
   if (!tableAvailable) {
     const { data: currentSettings, error: currentSettingsError } = await client
       .from("user_settings")

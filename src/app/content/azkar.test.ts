@@ -18,6 +18,84 @@ describe("azkar content totals", () => {
     }
   });
 
+  it("keeps the audited morning, evening, and before-sleep arrangements", () => {
+    expect(getAzkarByCategory("morning").map((item) => item.id)).toEqual([
+      "m-hm-75a",
+      "m-hm-77m",
+      "m-hm-78m",
+      "m-hm-89m",
+      "m-hm-75",
+      "m-hm-76a",
+      "m-hm-76b",
+      "m-hm-76c",
+      "m-hm-86",
+      "m-hm-84",
+      "m-hm-82",
+      "m-hm-85",
+      "m-hm-83",
+      "m-hm-79",
+      "m-hm-87",
+      "m-hm-90m",
+      "m-hm-80m",
+      "m-hm-81m",
+      "m-hm-88",
+      "m-hm-95",
+      "m-hm-91",
+      "m-hm-93",
+      "m-hm-94",
+      "m-hm-96",
+      "m-hm-98",
+    ]);
+
+    expect(getAzkarByCategory("evening").map((item) => item.id)).toEqual([
+      "e-hm-75a",
+      "e-hm-77e",
+      "e-hm-78e",
+      "e-hm-89e",
+      "e-hm-75",
+      "e-hm-76a",
+      "e-hm-76b",
+      "e-hm-76c",
+      "e-hm-86",
+      "e-hm-97",
+      "e-hm-84",
+      "e-hm-82",
+      "e-hm-85",
+      "e-hm-83",
+      "e-hm-79",
+      "e-hm-87",
+      "e-hm-90e",
+      "e-hm-80e",
+      "e-hm-81e",
+      "e-hm-88",
+      "e-hm-91",
+      "e-hm-92",
+      "e-hm-96",
+      "e-hm-98",
+    ]);
+
+    expect(getAzkarByCategory("before_sleep").map((item) => item.id)).toEqual([
+      "s-hm-100",
+      "s-hm-101",
+      "s-hm-99-ikhlas",
+      "s-hm-99-falaq",
+      "s-hm-99-nas",
+      "s-hm-109a",
+      "s-hm-110a",
+      "s-hm-110b",
+      "s-hm-102",
+      "s-hm-105",
+      "s-hm-104",
+      "s-hm-108",
+      "s-hm-107",
+      "s-hm-109",
+      "s-hm-106-subhanallah",
+      "s-hm-106-alhamdulillah",
+      "s-hm-106-allahu-akbar",
+      "s-hm-111",
+    ]);
+  });
+
   it("passes comprehensive authenticity & content completeness audit across all zikrs", () => {
     const missingHadith: string[] = [];
     for (const category of CATEGORIES) {

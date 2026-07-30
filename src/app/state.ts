@@ -17,7 +17,7 @@ import {
   mergeDailyCompletions,
   normalizeDailyCompletions,
 } from "./progress";
-import { getCategoryTotal } from "./content/azkar";
+import { getAzkarByCategory } from "./content/azkar";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
@@ -58,7 +58,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     isGuest: true,
     accountUserId: "",
   },
-  completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, number[]>,
+  completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
   sessions: [],
   dailyCompletions: [],
   savedZikrIds: [],
@@ -91,6 +91,83 @@ function isColorBlindSupport(value: string): value is ColorBlindSupport {
 function isThemeMode(value: string): value is ThemeMode {
   return ["midnight", "light", "dark"].includes(value);
 }
+
+/** Pre-arrangement order used only to migrate legacy numeric completion indexes safely. */
+const LEGACY_ROUTINE_ORDER: Partial<Record<CategoryId, string[]>> = {
+  morning: [
+    "m-hm-75a",
+    "m-hm-75",
+    "m-hm-76a",
+    "m-hm-76b",
+    "m-hm-76c",
+    "m-hm-77m",
+    "m-hm-89m",
+    "m-hm-90m",
+    "m-hm-78m",
+    "m-hm-79",
+    "m-hm-80m",
+    "m-hm-81m",
+    "m-hm-82",
+    "m-hm-83",
+    "m-hm-84",
+    "m-hm-85",
+    "m-hm-86",
+    "m-hm-87",
+    "m-hm-88",
+    "m-hm-91",
+    "m-hm-93",
+    "m-hm-94",
+    "m-hm-95",
+    "m-hm-96",
+    "m-hm-98",
+  ],
+  evening: [
+    "e-hm-75a",
+    "e-hm-75",
+    "e-hm-76a",
+    "e-hm-76b",
+    "e-hm-76c",
+    "e-hm-77e",
+    "e-hm-89e",
+    "e-hm-90e",
+    "e-hm-78e",
+    "e-hm-79",
+    "e-hm-80e",
+    "e-hm-81e",
+    "e-hm-82",
+    "e-hm-83",
+    "e-hm-84",
+    "e-hm-85",
+    "e-hm-86",
+    "e-hm-87",
+    "e-hm-88",
+    "e-hm-91",
+    "e-hm-92",
+    "e-hm-96",
+    "e-hm-97",
+    "e-hm-98",
+  ],
+  before_sleep: [
+    "s-hm-99-ikhlas",
+    "s-hm-99-falaq",
+    "s-hm-99-nas",
+    "s-hm-100",
+    "s-hm-101",
+    "s-hm-109a",
+    "s-hm-110a",
+    "s-hm-110b",
+    "s-hm-106-subhanallah",
+    "s-hm-106-alhamdulillah",
+    "s-hm-106-allahu-akbar",
+    "s-hm-102",
+    "s-hm-105",
+    "s-hm-104",
+    "s-hm-108",
+    "s-hm-107",
+    "s-hm-109",
+    "s-hm-111",
+  ],
+};
 
 function isTime(value: unknown): value is string {
   if (typeof value !== "string" || !/^[0-9]{2}:[0-9]{2}$/.test(value)) {
@@ -149,19 +226,27 @@ function normalizeReminders(
   };
 }
 
-function dedupeAndSort(values: unknown): number[] {
+function normalizeCompletedIds(values: unknown, category: CategoryId) {
   if (!Array.isArray(values)) {
     return [];
   }
 
-  return [...new Set(values.filter((value): value is number => Number.isInteger(value) && value >= 0))].sort(
-    (a, b) => a - b,
-  );
-}
-
-function normalizeCompletedIndexes(values: unknown, category: CategoryId) {
-  const total = getCategoryTotal(category);
-  return dedupeAndSort(values).filter((value) => value < total);
+  const zikrIds = getAzkarByCategory(category).map((zikr) => zikr.id);
+  const legacyZikrIds = LEGACY_ROUTINE_ORDER[category] ?? zikrIds;
+  const validIds = new Set(zikrIds);
+  return [
+    ...new Set(
+      values
+        .map((value) =>
+          typeof value === "string"
+            ? value
+            : Number.isInteger(value) && Number(value) >= 0
+              ? legacyZikrIds[Number(value)]
+              : undefined,
+        )
+        .filter((value): value is string => typeof value === "string" && validIds.has(value)),
+    ),
+  ].sort();
 }
 
 function dedupeSavedZikrIds(values: unknown): string[] {
@@ -267,9 +352,9 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       if (isNewDay && isDailyRoutine) {
         return [id, []];
       }
-      return [id, normalizeCompletedIndexes(parsed.completed?.[id], id)];
+      return [id, normalizeCompletedIds(parsed.completed?.[id], id)];
     }),
-  ) as Record<CategoryId, number[]>;
+  ) as Record<CategoryId, string[]>;
 
   return {
     settings: {
@@ -442,13 +527,13 @@ export function clearStoredAppData() {
 }
 
 /**
- * Converts arrays of completed Azkar indices into sets for optimized lookup.
+ * Converts arrays of completed zikr IDs into sets for optimized lookup.
  *
  * @param {AppStateSnapshot["completed"]} completed - The plain object containing arrays of completed indices.
- * @returns {Record<CategoryId, Set<number>>} A dictionary mapping category IDs to sets of completed indices.
+ * @returns {Record<CategoryId, Set<string>>} A dictionary mapping category IDs to sets of completed zikr IDs.
  */
-export function toCompletedSets(completed: AppStateSnapshot["completed"]): Record<CategoryId, Set<number>> {
-  const result = {} as Record<CategoryId, Set<number>>;
+export function toCompletedSets(completed: AppStateSnapshot["completed"]): Record<CategoryId, Set<string>> {
+  const result = {} as Record<CategoryId, Set<string>>;
   for (const id of CATEGORY_IDS) {
     result[id] = new Set(completed[id] ?? []);
   }
@@ -456,15 +541,15 @@ export function toCompletedSets(completed: AppStateSnapshot["completed"]): Recor
 }
 
 /**
- * Converts sets of completed Azkar indices back into sorted arrays for persistence.
+ * Converts sets of completed zikr IDs back into sorted arrays for persistence.
  *
- * @param {Record<CategoryId, Set<number>>} completed - The dictionary mapping category IDs to sets of completed indices.
- * @returns {AppStateSnapshot["completed"]} A plain object containing sorted arrays of completed indices.
+ * @param {Record<CategoryId, Set<string>>} completed - The dictionary mapping category IDs to completed zikr IDs.
+ * @returns {AppStateSnapshot["completed"]} A plain object containing sorted zikr ID arrays.
  */
-export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): AppStateSnapshot["completed"] {
+export function fromCompletedSets(completed: Record<CategoryId, Set<string>>): AppStateSnapshot["completed"] {
   const result = {} as AppStateSnapshot["completed"];
   for (const id of CATEGORY_IDS) {
-    result[id] = [...(completed[id] ?? [])].sort((a, b) => a - b);
+    result[id] = [...(completed[id] ?? [])].sort();
   }
   return result;
 }
@@ -479,12 +564,9 @@ export function fromCompletedSets(completed: Record<CategoryId, Set<number>>): A
  */
 export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStateSnapshot>): AppStateSnapshot {
   const safeBase = normalizeAppState(base);
-  const completed = {} as Record<CategoryId, number[]>;
+  const completed = {} as Record<CategoryId, string[]>;
   for (const id of CATEGORY_IDS) {
-    completed[id] = normalizeCompletedIndexes(
-      [...(safeBase.completed[id] ?? []), ...(incoming.completed?.[id] ?? [])],
-      id,
-    );
+    completed[id] = normalizeCompletedIds([...(safeBase.completed[id] ?? []), ...(incoming.completed?.[id] ?? [])], id);
   }
 
   const sessions = new Map<string, StoredSession>();
@@ -595,7 +677,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
   return {
     ...safeState,
     profile: { ...DEFAULT_APP_STATE.profile },
-    completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, number[]>,
+    completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
     sessions: [],
     dailyCompletions: [],
     savedZikrIds: [],

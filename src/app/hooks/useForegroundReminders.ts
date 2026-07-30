@@ -1,7 +1,8 @@
 import { useEffect } from "react";
+import { getEstimatedPrayerTimes, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion, ReminderSettings } from "../types";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings, ReminderSettings } from "../types";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 90_000;
@@ -12,6 +13,23 @@ type DueReminder = {
   kind: ReminderKind;
   category: CategoryId;
 };
+
+export function synchronizeReminderTimes(reminders: ReminderSettings, prayerTimes: PrayerTimes): ReminderSettings {
+  return {
+    ...reminders,
+    morning: { ...reminders.morning, time: prayerTimes.fajr },
+    evening: { ...reminders.evening, time: prayerTimes.asr },
+    before_sleep: { ...reminders.before_sleep, time: prayerTimes.isha },
+  };
+}
+
+export function getLocationBasedReminders(
+  reminders: ReminderSettings,
+  location: LocationSettings,
+  date = new Date(),
+): ReminderSettings {
+  return synchronizeReminderTimes(reminders, getEstimatedPrayerTimes(date, location));
+}
 
 function didCompleteCategoryToday(
   dailyCompletions: DailyCollectionCompletion[],
