@@ -70,36 +70,39 @@ Copy `.env.example` to `.env` only when Supabase or hosted legal pages are requi
 cp .env.example .env
 ```
 
-| Variable                        | Required | Purpose                                                |
-| ------------------------------- | -------- | ------------------------------------------------------ |
-| `VITE_SUPABASE_URL`             | No       | Supabase project URL                                   |
-| `VITE_SUPABASE_PUBLISHABLE_KEY` | No       | Preferred public browser key                           |
-| `VITE_SUPABASE_ANON_KEY`        | No       | Legacy public key fallback                             |
-| `VITE_APP_URL`                  | No       | Canonical app URL used to construct the OAuth callback |
-| `VITE_TERMS_URL`                | No       | Hosted terms URL                                       |
-| `VITE_PRIVACY_URL`              | No       | Hosted privacy URL                                     |
-| `VITE_GOOGLE_AUTH_ENABLED`      | No       | Shows Google only when set to `true`                   |
-| `VITE_EMAIL_AUTH_ENABLED`       | No       | Shows six-digit email OTP only when set to `true`      |
-| `VITE_APPLE_AUTH_ENABLED`       | No       | Shows Apple only when set to `true`                    |
-| `VITE_TELEMETRY_ENDPOINT`       | No       | Privacy-safe error and Web Vitals collector            |
+| Variable                        | Required    | Purpose                                                        |
+| ------------------------------- | ----------- | -------------------------------------------------------------- |
+| `VITE_SUPABASE_URL`             | No          | Supabase project URL                                           |
+| `VITE_SUPABASE_PUBLISHABLE_KEY` | No          | Preferred public browser key                                   |
+| `VITE_SUPABASE_ANON_KEY`        | No          | Legacy public key fallback                                     |
+| `VITE_APP_URL`                  | No          | Canonical app URL used to construct the OAuth callback         |
+| `VITE_TERMS_URL`                | No          | Hosted terms URL                                               |
+| `VITE_PRIVACY_URL`              | No          | Hosted privacy URL                                             |
+| `VITE_GOOGLE_AUTH_ENABLED`      | No          | Shows Google only when set to `true`                           |
+| `VITE_EMAIL_AUTH_ENABLED`       | No          | Shows six-digit email OTP only when set to `true`              |
+| `VITE_APPLE_AUTH_ENABLED`       | No          | Shows Apple only when set to `true`                            |
+| `VITE_TELEMETRY_ENDPOINT`       | No          | Privacy-safe error and Web Vitals collector                    |
+| `VITE_AUDIO_BASE_URL`           | Conditional | Public audio origin; required when approved audio assets exist |
 
 Never commit `.env` or service-role credentials. The app remains usable as a local guest when Supabase variables are absent.
 
 ## Commands
 
-| Command            | Purpose                                                                                   |
-| ------------------ | ----------------------------------------------------------------------------------------- |
-| `pnpm dev`         | Start the Vite development server                                                         |
-| `pnpm build`       | Create the production build in `dist/`                                                    |
-| `pnpm build:pages` | Build with the GitHub Pages base path                                                     |
-| `pnpm preview`     | Preview the production build locally                                                      |
-| `pnpm check`       | Run formatting check, ESLint, TypeScript, unit tests, production build, and bundle budget |
-| `pnpm test:run`    | Run all unit tests once                                                                   |
-| `pnpm test:e2e`    | Run Playwright tests across desktop, mobile, and tablet Chromium                          |
-| `pnpm lint`        | Run ESLint with zero warnings allowed                                                     |
-| `pnpm typecheck`   | Run strict TypeScript checking                                                            |
-| `pnpm format`      | Format the repository with Prettier                                                       |
-| `pnpm audit:prod`  | Audit production dependencies                                                             |
+| Command                        | Purpose                                                                                   |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| `pnpm dev`                     | Start the Vite development server                                                         |
+| `pnpm build`                   | Create the production build in `dist/`                                                    |
+| `pnpm build:pages`             | Build with the GitHub Pages base path                                                     |
+| `pnpm preview`                 | Preview the production build locally                                                      |
+| `pnpm check`                   | Run formatting check, ESLint, TypeScript, unit tests, production build, and bundle budget |
+| `pnpm test:run`                | Run all unit tests once                                                                   |
+| `pnpm test:e2e`                | Run Playwright tests across desktop, mobile, and tablet Chromium                          |
+| `pnpm lint`                    | Run ESLint with zero warnings allowed                                                     |
+| `pnpm typecheck`               | Run strict TypeScript checking                                                            |
+| `pnpm format`                  | Format the repository with Prettier                                                       |
+| `pnpm audit:prod`              | Audit production dependencies                                                             |
+| `pnpm validate:audio`          | Validate manifest, mappings, metadata, Qur'an ranges, and hosted audio                    |
+| `pnpm report:audio -- --write` | Regenerate the approved/unmatched audio mapping report                                    |
 
 Run `pnpm check` and `pnpm test:e2e` before merging or releasing.
 
@@ -211,6 +214,7 @@ Documentation sources of truth:
 - [Engineering and release checklist](docs/QUALITY_CHECKLIST.md)
 - [Design-spec implementation coverage](docs/DESIGN_SPEC_COVERAGE.md)
 - [Content authoring and review](docs/CONTENT_AUTHORING.md)
+- [Adding and operating application audio](docs/audio/adding-your-own-audio.md)
 
 ## Known constraints
 
