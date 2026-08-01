@@ -1,22 +1,25 @@
 import type { Zikr } from "../types";
 
-/** Reviewed Friday collection: 20 essential items followed by 15 optional additions. */
-export const FRIDAY_DUAS: Zikr[] = [
+/**
+ * General reviewed collection: 20 essential items followed by optional additions.
+ * Existing `friday-dua-*` IDs are retained because content IDs are stable contracts.
+ */
+export const COMPREHENSIVE_DUAS: Zikr[] = [
   {
-    id: "friday-duas-introduction",
+    id: "comprehensive-duas-introduction",
     arabicText:
-      "تضم هذه المجموعة ٢٠ دعاءً أساسيًا و١٥ دعاءً إضافيًا لمن اتسع وقته. ترتيبها تعليمي وعملي، وليس ترتيبًا تعبديًا ثابتًا، ولا يُنسب لساعة الإجابة عدد مخصوص أو ضمان مرتبط بإكمال القائمة.",
+      "تضم هذه المجموعة أدعية جامعة صحيحة أو حسنة في الجملة، مع بيان سياق كل دعاء ودرجة ما يحتاج إلى تنبيه. يمكن قراءتها يوم الجمعة أو في أي وقت مناسب؛ وترتيبها تعليمي وعملي، وليس ترتيبًا تعبديًا ثابتًا.",
     transliteration: "",
     translation:
-      "This collection contains 20 essential supplications and 15 additional supplications for those with more time. Its order is educational and practical, not a prescribed ritual order; no fixed Friday count or guaranteed reward is tied to completing the list.",
+      "This collection contains comprehensive supplications with each dua's context and any necessary grading note. It may be read on Friday or at any suitable time; its order is educational and practical, not a prescribed ritual sequence.",
     benefit:
-      "Use the collection as a flexible guide: a sincere personal supplication may be made at any point, and items may be repeated without treating an unsupported number as Sunnah.",
+      "Use the collection as a flexible guide. Make personal supplications at any point, preserve context-specific timings, and never treat an unsupported count as Sunnah.",
     benefitArabic:
       "تُستخدم المجموعة دليلًا مرنًا؛ ويجوز الدعاء بالحاجة الخاصة وتكرار الدعاء دون اعتقاد عدد غير ثابت في السنة.",
     repetitionCount: 1,
-    sourceReference: "Editorial guidance supplied with the reviewed Friday collection.",
-    sourceReferenceArabic: "ضوابط تحريرية مرفقة بالمجموعة المراجعة لأدعية يوم الجمعة.",
-    hadithText: "هذا ترتيب تعليمي وعملي، وليس ترتيبًا تعبديًا ثابتًا ورد عن النبي ﷺ.",
+    sourceReference: "Editorial guidance for the reviewed comprehensive dua collection.",
+    sourceReferenceArabic: "ضوابط تحريرية للمجموعة المراجعة من الأدعية الجامعة.",
+    hadithText: "هذه الأدعية ليست مخصوصة بيوم الجمعة، وترتيبها ليس ترتيبًا تعبديًا ثابتًا.",
     category: "miscellaneous",
     orderIndex: 0,
     isCollectionIntroduction: true,
@@ -589,7 +592,7 @@ export const FRIDAY_DUAS: Zikr[] = [
     benefit:
       "A Prophetic request for bodily, hearing, and sight well-being and protection from disbelief, poverty, and grave punishment.",
     benefitArabic:
-      "دعاء العافية في البدن والسمع والبصر — في قائمة الجمعة العامة يمكن عرضه من دون إلزام بثلاث مرات؛ أما داخل قسم أذكار الصباح والمساء فيُعرض عداده ثلاث مرات.",
+      "دعاء العافية في البدن والسمع والبصر — في المجموعة العامة يُعرض دون إلزام بثلاث مرات؛ أما داخل أذكار الصباح والمساء فيُعرض عداده ثلاث مرات.",
     repetitionCount: 1,
     sourceReference: "Sunan Abu Dawud 5090.",
     sourceReferenceArabic:
@@ -654,6 +657,249 @@ export const FRIDAY_DUAS: Zikr[] = [
       "علّمه النبي ﷺ لعائشة رضي الله عنها لتقوله في ليلة القدر. وهو دعاء صحيح عام المعنى، يجوز الدعاء به في الجمعة وغيرها، لكنه ليس مخصوصًا بيوم الجمعة. جامع الترمذي 3513، صحيح.",
     category: "miscellaneous",
     orderIndex: 35,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-36",
+    arabicText: "اللَّهُمَّ اغْفِرْ لِي، وَارْحَمْنِي، وَاهْدِنِي، وَعَافِنِي، وَارْزُقْنِي.",
+    transliteration: "",
+    translation: "O Allah, forgive me, have mercy on me, guide me, grant me well-being, and provide for me.",
+    benefit:
+      "Five essential needs in one concise supplication: forgiveness, mercy, guidance, well-being, and lawful provision.",
+    benefitArabic:
+      "دعاء جامع لخمس حاجات أساسية — عافني: ارزقني السلامة في الدين والبدن والحياة. — ارزقني: ارزقني رزقًا حلالًا نافعًا.",
+    repetitionCount: 1,
+    sourceReference: "Sahih Muslim 2697b.",
+    sourceReferenceArabic: "صحيح مسلم 2697ب.",
+    hadithText: "علّم النبي ﷺ هذه الكلمات لمن دخل في الإسلام، وأمره أن يدعو بها.",
+    sourceUrl: "https://sunnah.com/muslim%3A2697b",
+    attributionType: "taught_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 36,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-37",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَسْأَلُكَ بِأَنَّكَ أَنْتَ اللَّهُ، الْأَحَدُ الصَّمَدُ، الَّذِي لَمْ يَلِدْ وَلَمْ يُولَدْ، وَلَمْ يَكُنْ لَهُ كُفُوًا أَحَدٌ.",
+    transliteration: "",
+    translation:
+      "O Allah, I ask You by virtue of the fact that You are Allah, the One, the Self-Sufficient Master upon whom all depend; You neither beget nor were begotten, and none is equal or comparable to You.",
+    benefit:
+      "A man invoked Allah with these words, and the Prophet ﷺ confirmed that he had asked by Allah's Greatest Name. State your personal request after this invocation.",
+    benefitArabic:
+      "دعاء باسم الله الأعظم — الأحد: الواحد المتفرد. — الصمد: الكامل المقصود في الحوائج. — كفوًا: مثيلًا أو نظيرًا. ثم يدعو الشخص بحاجته الخاصة.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Ibn Majah 3857; Sahih (Darussalam).",
+    sourceReferenceArabic: "سنن ابن ماجه 3857؛ صحيح بحسب تصنيف دار السلام.",
+    hadithText:
+      "سمع النبي ﷺ رجلًا يدعو بهذه الكلمات، فقال: «لقد سأل الله باسمه الأعظم الذي إذا سئل به أعطى، وإذا دعي به أجاب».",
+    sourceUrl: "https://sunnah.com/ibnmajah%3A3857",
+    attributionType: "approved_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 37,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-38",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَسْأَلُكَ بِأَنَّ لَكَ الْحَمْدَ، لَا إِلَهَ إِلَّا أَنْتَ، وَحْدَكَ لَا شَرِيكَ لَكَ، الْمَنَّانُ، بَدِيعُ السَّمَاوَاتِ وَالْأَرْضِ، ذُو الْجَلَالِ وَالْإِكْرَامِ.",
+    transliteration: "",
+    translation:
+      "O Allah, I ask You because all praise belongs to You. None has the right to be worshipped except You alone, without partner: the Bestower of abundant favors, the incomparable Originator of the heavens and the earth, the Possessor of majesty and honor.",
+    benefit:
+      "Another invocation approved by the Prophet ﷺ as asking Allah by His Greatest Name; it may be followed by one's personal request.",
+    benefitArabic:
+      "دعاء باسم الله الأعظم — المنان: كثير العطاء والإنعام. — بديع السماوات والأرض: خالقهما على غير مثال سابق. — ذو الجلال والإكرام: صاحب العظمة والفضل المطلق.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Ibn Majah 3858; Hasan (Darussalam).",
+    sourceReferenceArabic: "سنن ابن ماجه 3858؛ حسن بحسب تصنيف دار السلام.",
+    hadithText:
+      "سمع النبي ﷺ رجلًا يدعو بهذه الكلمات، فقال: «لقد سأل الله باسمه الأعظم الذي إذا سئل به أعطى، وإذا دعي به أجاب».",
+    sourceUrl: "https://sunnah.com/ibnmajah%3A3858",
+    attributionType: "approved_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 38,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-39",
+    arabicText: "اللَّهُمَّ اهْدِنِي وَسَدِّدْنِي.",
+    transliteration: "",
+    translation: "O Allah, guide me and make me correct and steadfast in what I say and do.",
+    benefit: "A concise request for both clear guidance and sound, straight conduct in decisions, speech, and action.",
+    benefitArabic: "اهدني: دلني على الطريق الصحيح ووفقني لاتباعه. — سددني: اجعل قولي وعملي وقراري مستقيمًا مصيبًا.",
+    repetitionCount: 1,
+    sourceReference: "Sahih Muslim 2725a.",
+    sourceReferenceArabic: "صحيح مسلم 2725أ.",
+    hadithText: "علّم النبي ﷺ عليًا رضي الله عنه هذا الدعاء، وأرشده أن يستحضر هداية الطريق واستقامة السهم.",
+    sourceUrl: "https://sunnah.com/muslim%3A2725a",
+    attributionType: "taught_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 39,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-40",
+    arabicText: "اللَّهُمَّ أَلْهِمْنِي رُشْدِي، وَأَعِذْنِي مِنْ شَرِّ نَفْسِي.",
+    transliteration: "",
+    translation: "O Allah, inspire me with sound guidance and protect me from the evil within my own soul.",
+    benefit:
+      "A request for sound judgment and protection from pride, desire, anger, negligence, and other harms of the self.",
+    benefitArabic:
+      "ألهمني: أيقظ في قلبي ووفقني. — رشدي: الصواب في الاعتقاد والحكم والعمل. — شر نفسي: ما فيها من هوى وغضب وغفلة وميل إلى المعصية.",
+    repetitionCount: 1,
+    sourceReference:
+      "Jami' at-Tirmidhi 3483; Tirmidhi called it Hasan Gharib, while the displayed Darussalam grading is Da'if.",
+    sourceReferenceArabic: "جامع الترمذي 3483؛ وصفه الترمذي بالحسن الغريب، بينما يظهر تصنيف دار السلام: ضعيف.",
+    hadithText: "علّم النبي ﷺ حصينًا هذا الدعاء بعد إسلامه.",
+    authenticityNote:
+      "Grading differs on the cited page: Tirmidhi says Hasan Gharib; the displayed Darussalam classification is Da'if.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3483",
+    attributionType: "taught_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 40,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-41",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَسْأَلُكَ حُبَّكَ، وَحُبَّ مَنْ يُحِبُّكَ، وَالْعَمَلَ الَّذِي يُبَلِّغُنِي حُبَّكَ. اللَّهُمَّ اجْعَلْ حُبَّكَ أَحَبَّ إِلَيَّ مِنْ نَفْسِي، وَأَهْلِي، وَمِنَ الْمَاءِ الْبَارِدِ.",
+    transliteration: "",
+    translation:
+      "O Allah, I ask You for Your love, the love of those who love You, and the deeds that will bring me to Your love. O Allah, make Your love dearer to me than myself, my family, and cold water.",
+    benefit:
+      "A supplication of Prophet Dawud asking for Allah's love, the love of those who love Him, and deeds that lead to His love.",
+    benefitArabic:
+      "دعاء نبي الله داود عليه السلام — يبلغني حبك: يوصلني إلى محبتك ورضاك. — الماء البارد: كناية عن شيء شديد المحبة عند المحتاج إليه.",
+    repetitionCount: 1,
+    sourceReference: "Jami' at-Tirmidhi 3490; Hasan (Darussalam).",
+    sourceReferenceArabic: "جامع الترمذي 3490؛ حسن بحسب تصنيف دار السلام.",
+    hadithText: "روى النبي ﷺ أن هذا كان من دعاء داود عليه السلام.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3490",
+    attributionType: "reported_by_prophet_from_another_prophet",
+    category: "miscellaneous",
+    orderIndex: 41,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-42",
+    arabicText: "رَبِّ اغْفِرْ لِي، وَتُبْ عَلَيَّ، إِنَّكَ أَنْتَ التَّوَّابُ الرَّحِيمُ.",
+    transliteration: "",
+    translation:
+      "My Lord, forgive me and accept my repentance. You are truly the One who repeatedly accepts repentance, the Most Merciful.",
+    benefit:
+      "The Companions counted the Prophet ﷺ saying this one hundred times in a single gathering. The count belongs to that reported context and is not Friday-specific; fewer repetitions remain permissible.",
+    benefitArabic:
+      "تب علي: اقبل توبتي ووفقني للثبات عليها. — التواب: كثير التوفيق للتوبة والقبول لها. عُدَّت مائة مرة في مجلس واحد، وليس العدد مخصوصًا بالجمعة.",
+    repetitionCount: 100,
+    sourceReference: "Sunan Abi Dawud 1516; Sahih (al-Albani).",
+    sourceReferenceArabic: "سنن أبي داود 1516؛ صحيح بحسب تصنيف الألباني.",
+    hadithText: "عدّ الصحابة النبي ﷺ يقول هذا الدعاء مائة مرة في المجلس الواحد.",
+    sourceUrl: "https://sunnah.com/abudawud%3A1516",
+    attributionType: "said_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 42,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-43",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَسْأَلُكَ فِعْلَ الْخَيْرَاتِ، وَتَرْكَ الْمُنْكَرَاتِ، وَحُبَّ الْمَسَاكِينِ، وَأَنْ تَغْفِرَ لِي وَتَرْحَمَنِي، وَإِذَا أَرَدْتَ فِتْنَةَ قَوْمٍ فَتَوَفَّنِي غَيْرَ مَفْتُونٍ، وَأَسْأَلُكَ حُبَّكَ، وَحُبَّ مَنْ يُحِبُّكَ، وَحُبَّ عَمَلٍ يُقَرِّبُنِي إِلَى حُبِّكَ.",
+    transliteration: "",
+    translation:
+      "O Allah, I ask You to enable me to perform good deeds, abandon evil deeds, and love the needy. Forgive me and have mercy on me. When You decree a trial through which people may be led astray, take me to You without allowing me to be overcome by that trial. I ask You for Your love, the love of those who love You, and the love of every deed that brings me closer to Your love.",
+    benefit:
+      "A comprehensive request for righteous action, avoidance of evil, mercy toward the needy, protection during trials, and every path leading to Allah's love.",
+    benefitArabic:
+      "الخيرات: الأعمال الصالحة النافعة. — المنكرات: ما أنكره الشرع من اعتقاد أو قول أو عمل. — المساكين: من لا تكفيهم مواردهم. — غير مفتون: محفوظًا من الضلال بالفتنة.",
+    repetitionCount: 1,
+    sourceReference: "Jami' at-Tirmidhi 3235; Hasan (Darussalam).",
+    sourceReferenceArabic: "جامع الترمذي 3235؛ حسن بحسب تصنيف دار السلام.",
+    hadithText: "علّم النبي ﷺ هذا الدعاء، وقال: «إنها حق فادرسوها ثم تعلموها».",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3235",
+    attributionType: "taught_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 43,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-44",
+    arabicText: "اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلًا مُتَقَبَّلًا.",
+    transliteration: "",
+    translation:
+      "O Allah, I ask You for beneficial knowledge, wholesome and lawful provision, and deeds that are accepted.",
+    benefit:
+      "The Prophet ﷺ said this after completing the Fajr prayer; that primary context remains important even when it appears in this general collection.",
+    benefitArabic: "دعاء يجمع العلم النافع والرزق الحلال الطيب والعمل المقبول، وسياقه الأصلي بعد السلام من صلاة الفجر.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Ibn Majah 925; Sahih (Darussalam).",
+    sourceReferenceArabic: "سنن ابن ماجه 925؛ صحيح بحسب تصنيف دار السلام.",
+    preferredTiming: "Recited after Fajr prayer.",
+    hadithText: "كان النبي ﷺ يقوله إذا صلى الصبح حين يسلم.",
+    sourceUrl: "https://sunnah.com/ibnmajah%3A925",
+    attributionType: "said_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 44,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-45",
+    arabicText: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ مُنْكَرَاتِ الْأَخْلَاقِ، وَالْأَعْمَالِ، وَالْأَهْوَاءِ.",
+    transliteration: "",
+    translation: "O Allah, I seek refuge in You from reprehensible character, evil actions, and corrupt desires.",
+    benefit:
+      "A refuge from corrupt traits such as arrogance, envy, cruelty, and dishonesty; from evil acts; and from desires that oppose truth and guidance.",
+    benefitArabic:
+      "منكرات الأخلاق: الصفات المذمومة كالكبر والحسد والقسوة والكذب. — الأهواء: الميول والشهوات المخالفة للحق والهدى.",
+    repetitionCount: 1,
+    sourceReference: "Jami' at-Tirmidhi 3591; Sahih (Darussalam).",
+    sourceReferenceArabic: "جامع الترمذي 3591؛ صحيح بحسب تصنيف دار السلام.",
+    hadithText: "كان النبي ﷺ يتعوذ بهذه الكلمات من فساد الأخلاق والأعمال والأهواء.",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3591",
+    attributionType: "said_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 45,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-46",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْبَرَصِ، وَالْجُنُونِ، وَالْجُذَامِ، وَمِنْ سَيِّئِ الْأَسْقَامِ.",
+    transliteration: "",
+    translation: "O Allah, I seek refuge in You from leukoderma, insanity, leprosy, and severe or harmful diseases.",
+    benefit:
+      "A Prophetic refuge from serious illnesses. Here al-baras is translated as leukoderma or loss of skin pigmentation, not elephantiasis.",
+    benefitArabic: "البرص: فقدان صبغة الجلد. — الجذام: مرض الجذام. — سيئ الأسقام: الأمراض الشديدة المؤذية أو المنفرة.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 1554; Sahih (al-Albani).",
+    sourceReferenceArabic: "سنن أبي داود 1554؛ صحيح بحسب تصنيف الألباني.",
+    hadithText: "كان النبي ﷺ يستعيذ بهذه الكلمات من الأمراض الشديدة.",
+    sourceUrl: "https://sunnah.com/abudawud%3A1554",
+    attributionType: "said_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 46,
+    includedInCore: false,
+  },
+  {
+    id: "comprehensive-dua-47",
+    arabicText:
+      "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْفَقْرِ، وَالْقِلَّةِ، وَالذِّلَّةِ، وَأَعُوذُ بِكَ مِنْ أَنْ أَظْلِمَ أَوْ أُظْلَمَ.",
+    transliteration: "",
+    translation:
+      "O Allah, I seek refuge in You from poverty, insufficiency, and humiliation, and I seek refuge in You from wronging others or being wronged.",
+    benefit:
+      "A refuge from genuine insufficiency and degrading dependence, and from both sides of injustice: committing it or suffering it.",
+    benefitArabic:
+      "القلة: عدم كفاية ما يحتاج إليه الإنسان حقًا. — الذلة: الهوان والاعتماد المهين. — أظلم أو أُظلم: أرتكب الظلم أو يقع عليّ.",
+    repetitionCount: 1,
+    sourceReference: "Sunan Abi Dawud 1544; Sahih (al-Albani).",
+    sourceReferenceArabic: "سنن أبي داود 1544؛ صحيح بحسب تصنيف الألباني.",
+    hadithText: "كان النبي ﷺ يستعيذ من الفقر والقلة والذلة ومن الظلم وقوعًا وإيقاعًا.",
+    sourceUrl: "https://sunnah.com/abudawud%3A1544",
+    attributionType: "said_by_prophet",
+    category: "miscellaneous",
+    orderIndex: 47,
     includedInCore: false,
   },
 ];

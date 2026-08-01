@@ -4,7 +4,7 @@ Azkarapp keeps reviewed devotional content in `src/app/content` and treats wordi
 
 ## Add an item to an existing collection
 
-1. Open the collection in `src/app/content/azkar.ts`, or its dedicated file such as `fridayDuas.ts`.
+1. Open the collection in `src/app/content/azkar.ts`, or its dedicated file such as `comprehensiveDuas.ts`.
 2. Copy a nearby `Zikr` object and change every field deliberately.
 3. Add or update the colocated tests in `azkar.test.ts` and `localizedZikr.test.ts`.
 4. Run `pnpm format`, `pnpm typecheck`, `pnpm test:run`, and `pnpm build`.
@@ -23,6 +23,7 @@ Use this minimal shape:
   sourceReference: "Sahih Muslim 0000.",
   sourceReferenceArabic: "صحيح مسلم ٠٠٠٠.",
   hadithText: "النص أو السياق العربي الداعم عند توفره.",
+  attributionType: "taught_by_prophet",
   category: "existing_category",
   orderIndex: 1,
 }
@@ -38,6 +39,7 @@ Use this minimal shape:
 - `repetitionCount`: use a number greater than `1` only when the cited evidence establishes that count for the displayed context.
 - `sourceReference` / `sourceReferenceArabic`: cite collection and number precisely. Arabic content should use the direct Arabic field instead of relying on automatic name replacement.
 - `hadithText`: supporting Arabic evidence or context shown under “Evidence”; do not use it for an uncited claim.
+- `attributionType`: distinguish what the report actually says: the Prophet ﷺ said, taught, or approved the words; reported them from another prophet; or the dua is Qur'anic or from a Companion.
 - `orderIndex`: unique inside the category. Reordering must not change IDs.
 - `sourceUrl`, `preferredTiming`, `authenticityNote`, and `notes`: optional; add only when reviewed and useful to the reader.
 
@@ -60,4 +62,4 @@ Use this minimal shape:
 - Confirm every category has content, IDs and order indexes are unique, and no displayed text contains placeholders or truncation.
 - Run `pnpm check`; for layout or interaction changes also run the relevant Playwright spec or `pnpm test:e2e`.
 
-The Friday collection is the reference example for route-specific content: `fridayDuas.ts` contains an optional introduction, 20 essential items, and 15 additional items with direct Arabic benefits and sources. It is imported only by the lazy Friday screen, keeping substantial occasional content out of the initial app bundle.
+The comprehensive dua collection is the reference example for route-specific content: `comprehensiveDuas.ts` contains an optional introduction, 20 essential items, and reviewed additional items with direct Arabic benefits, sources, contexts, and attribution types. It is imported only by the lazy Friday screen, where it is offered for convenient reading without claiming the duas are Friday-specific.

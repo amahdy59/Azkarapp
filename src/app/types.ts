@@ -25,6 +25,13 @@ export type RoutineMode = "core" | "complete";
 export type ZikrGroupId =
   "begin" | "quran_protection" | "dua_protection" | "renew" | "ask" | "repeat" | "prepare" | "settle" | "final";
 export type RitualGroupId = "three_quls" | "tasbih_fatimah";
+export type ZikrAttributionType =
+  | "said_by_prophet"
+  | "taught_by_prophet"
+  | "approved_by_prophet"
+  | "reported_by_prophet_from_another_prophet"
+  | "quranic_supplication"
+  | "companion_supplication";
 
 export type View =
   | "home"
@@ -91,6 +98,7 @@ export interface Zikr {
   preferredTiming?: string;
   hadithText?: string;
   authenticityNote?: string;
+  attributionType?: ZikrAttributionType;
   notes?: string;
   sourceUrl?: string;
   category: CategoryId;

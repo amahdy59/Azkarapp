@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { ALL_AZKAR } from "./azkar";
-import { FRIDAY_DUAS } from "./fridayDuas";
+import { COMPREHENSIVE_DUAS } from "./comprehensiveDuas";
 import {
   getLocalizedPreferredTiming,
   getLocalizedSourceReference,
@@ -43,7 +43,7 @@ describe("localized zikr supporting content", () => {
   });
 
   it("prefers direct reviewed Arabic benefit and source fields", () => {
-    const fridayDua = FRIDAY_DUAS.find((zikr) => zikr.id === "friday-dua-01")!;
+    const fridayDua = COMPREHENSIVE_DUAS.find((zikr) => zikr.id === "friday-dua-01")!;
 
     expect(getLocalizedZikrBenefit(fridayDua, "ar")).toBe(fridayDua.benefitArabic);
     expect(getLocalizedSourceReference(fridayDua, "ar")).toBe(fridayDua.sourceReferenceArabic);

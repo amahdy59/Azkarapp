@@ -2,10 +2,22 @@ import { useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { formatNumerals } from "../formatting";
-import type { AppLanguage } from "../types";
+import type { AppLanguage, ZikrAttributionType } from "../types";
 import { Sparkles, BookOpen, Heart, CheckCircle2, RotateCcw } from "../components/icons";
 import { t } from "../i18n";
-import { FRIDAY_DUAS } from "../content/fridayDuas";
+import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
+
+const ATTRIBUTION_LABELS: Record<ZikrAttributionType, { en: string; ar: string }> = {
+  said_by_prophet: { en: "Said by the Prophet ﷺ", ar: "قاله النبي ﷺ" },
+  taught_by_prophet: { en: "Taught by the Prophet ﷺ", ar: "علّمه النبي ﷺ" },
+  approved_by_prophet: { en: "Approved by the Prophet ﷺ", ar: "أقرّه النبي ﷺ" },
+  reported_by_prophet_from_another_prophet: {
+    en: "Reported by the Prophet ﷺ from another prophet",
+    ar: "رواه النبي ﷺ عن نبي آخر",
+  },
+  quranic_supplication: { en: "Qur'anic supplication", ar: "دعاء قرآني" },
+  companion_supplication: { en: "Companion supplication", ar: "دعاء صحابي" },
+};
 
 // ─── Weekly-reset key ─────────────────────────────────────────────────────────
 // Returns an ISO-week string like "2025-W03" so the Surah Al-Kahf checkbox
@@ -34,11 +46,17 @@ export function FridayModeScreen({
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const [expandedDuaId, setExpandedDuaId] = useState<string | null>(null);
-  const introduction = FRIDAY_DUAS.find((dua) => dua.isCollectionIntroduction);
-  const duas = FRIDAY_DUAS.filter((dua) => !dua.isCollectionIntroduction);
+  const introduction = COMPREHENSIVE_DUAS.find((dua) => dua.isCollectionIntroduction);
+  const duas = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
+  const additionalDuas = duas.slice(20);
   const duaGroups = [
     { label: t(language, "friday.essentialDuas"), items: duas.slice(0, 20) },
-    { label: t(language, "friday.additionalDuas"), items: duas.slice(20) },
+    {
+      label: t(language, "friday.additionalDuas", {
+        count: formatNumerals(additionalDuas.length, language),
+      }),
+      items: additionalDuas,
+    },
   ];
 
   // Salawat counter — lifetime running total, intentionally never auto-resets
@@ -255,6 +273,12 @@ export function FridayModeScreen({
                             {dua.translation}
                           </p>
                         )}
+                        {dua.repetitionCount > 1 && (
+                          <span className="mt-3 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[0.75rem] font-extrabold text-primary">
+                            {isArabic ? "العدد الوارد" : "Reported count"}:{" "}
+                            {formatNumerals(dua.repetitionCount, language)}
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -270,6 +294,16 @@ export function FridayModeScreen({
 
                     {expanded && (
                       <div id={`${dua.id}-details`} className="mt-3 space-y-3 border-t border-border pt-3 text-start">
+                        {dua.attributionType && (
+                          <div>
+                            <h5 className="text-[0.75rem] font-black text-muted-foreground">
+                              {isArabic ? "نسبة الدعاء" : "Attribution"}
+                            </h5>
+                            <p className="mt-1 text-[0.875rem] font-semibold leading-6 text-foreground">
+                              {ATTRIBUTION_LABELS[dua.attributionType][language]}
+                            </p>
+                          </div>
+                        )}
                         <div>
                           <h5 className="text-[0.75rem] font-black text-muted-foreground">
                             {t(language, "friday.benefitLabel")}

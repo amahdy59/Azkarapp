@@ -97,9 +97,9 @@ const ar = {
     kahfCompleted: "تمت القراءة",
     kahfHadith:
       "«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»",
-    duasHeading: "مجموعة أدعية يوم الجمعة",
+    duasHeading: "الأدعية الجامعة",
     essentialDuas: "الأدعية الأساسية العشرون",
-    additionalDuas: "خمسة عشر دعاءً إضافيًا",
+    additionalDuas: "أدعية إضافية ({count})",
     showBenefit: "عرض الفائدة والمصدر",
     hideBenefit: "إخفاء الفائدة والمصدر",
     benefitLabel: "الفائدة",
