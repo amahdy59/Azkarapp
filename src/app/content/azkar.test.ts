@@ -11,7 +11,9 @@ import {
 import { QURAN_PASSAGES } from "./quranPassages";
 
 describe("azkar content totals", () => {
-  const eagerCategories = CATEGORIES.filter((category) => category.id !== "comprehensive_duas");
+  const eagerCategories = CATEGORIES.filter(
+    (category) => category.id !== "comprehensive_duas" && category.id !== "friday_kahf",
+  );
 
   it("derives every category total from its content collection", () => {
     for (const category of eagerCategories) {

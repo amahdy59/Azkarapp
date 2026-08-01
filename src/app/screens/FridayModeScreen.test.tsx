@@ -1,33 +1,49 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { FridayModeScreen } from "./FridayModeScreen";
 
-describe("FridayModeScreen dua collection", () => {
-  it("shows both groups and expands a dua's benefit and source", () => {
+describe("FridayModeScreen", () => {
+  beforeEach(() => localStorage.clear());
+  afterEach(cleanup);
+
+  it("launches Al-Kahf at the displayed verse progress", () => {
+    const onStartKahf = vi.fn();
+    render(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={35}
+        onBack={() => undefined}
+        onStartKahf={onStartKahf}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText("Ayah 35 of 110")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Continue reading" }));
+    expect(onStartKahf).toHaveBeenCalledOnce();
+  });
+
+  it("keeps the Sunnahs as a weekly checklist and the duas behind one action", () => {
     const onStartDuasSession = vi.fn();
     render(
       <FridayModeScreen
         isArabic={false}
         direction="ltr"
+        kahfCompletedCount={0}
         onBack={() => undefined}
+        onStartKahf={() => undefined}
         onStartDuasSession={onStartDuasSession}
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Comprehensive Duas" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Essential 20" })).toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "27 Additional Duas" })).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Start Session" }));
+    const ghusl = screen.getByRole("checkbox", { name: "Perform ghusl" });
+    expect(ghusl).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(ghusl);
+    expect(ghusl).toHaveAttribute("aria-checked", "true");
+
+    fireEvent.click(screen.getByRole("button", { name: "Comprehensive Duas" }));
     expect(onStartDuasSession).toHaveBeenCalledOnce();
-
-    const detailButtons = screen.getAllByRole("button", { name: "Show benefit and source" });
-    expect(detailButtons).toHaveLength(47);
-    expect(screen.getByText("Reported count: 100")).toBeInTheDocument();
-    fireEvent.click(detailButtons[35]!);
-
-    expect(screen.getByText("Attribution")).toBeInTheDocument();
-    expect(screen.getByText("Taught by the Prophet ﷺ")).toBeInTheDocument();
-    expect(screen.getByText("Benefit")).toBeInTheDocument();
-    expect(screen.getByText("Sahih Muslim 2697b.")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Show benefit and source" })).not.toBeInTheDocument();
   });
 });

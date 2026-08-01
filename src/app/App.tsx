@@ -18,6 +18,7 @@ import type {
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
+import { FRIDAY_KAHF_WEEK_KEY, getIsoWeekKey } from "./fridayProgress";
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
@@ -42,6 +43,7 @@ import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
 import {
   getPalmStreakSummary,
+  getFirstIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
   resetStaleCompletedCollections,
   type GrowthEvent,
@@ -108,9 +110,12 @@ const AudioContentReviewScreen = lazy(() =>
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
   const initialState = useRef(loadAppState()).current;
-  const [view, setView] = useState<View>(() =>
-    new URLSearchParams(window.location.search).get("view") === "auth-callback" ? "auth-callback" : "splash",
-  );
+  const [view, setView] = useState<View>(() => {
+    const requestedView = new URLSearchParams(window.location.search).get("view");
+    if (requestedView === "auth-callback") return "auth-callback";
+    if (requestedView === "friday") return "friday";
+    return "splash";
+  });
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
       return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
@@ -170,6 +175,22 @@ export default function App() {
       initialState.settings.progressDayStartHour,
     ),
   );
+
+  const ensureCurrentFridayWeek = useCallback(() => {
+    const currentWeek = getIsoWeekKey();
+    try {
+      if (window.localStorage.getItem(FRIDAY_KAHF_WEEK_KEY) === currentWeek) return true;
+      window.localStorage.setItem(FRIDAY_KAHF_WEEK_KEY, currentWeek);
+    } catch {
+      // Keep the in-memory reset when persistent storage is unavailable.
+    }
+    setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+    return false;
+  }, []);
+
+  useEffect(() => {
+    ensureCurrentFridayWeek();
+  }, [ensureCurrentFridayWeek]);
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -788,7 +809,10 @@ export default function App() {
                 locationSettings={locationSettings}
                 onResume={resumeCategory}
                 onRepeat={repeatCategory}
-                onOpenFridayMode={() => push("friday")}
+                onOpenFridayMode={() => {
+                  ensureCurrentFridayWeek();
+                  push("friday");
+                }}
                 onOpenShareModal={() => setShowShareModal(true)}
                 language={selectedLang}
                 calendarType={calendarType}
@@ -821,7 +845,19 @@ export default function App() {
               <FridayModeScreen
                 isArabic={isArabic}
                 direction={layoutDirection}
+                kahfCompletedCount={completed.friday_kahf.size}
                 onBack={pop}
+                onStartKahf={() => {
+                  const sameWeek = ensureCurrentFridayWeek();
+                  const kahf = getAzkarForMode("friday_kahf");
+                  const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
+                  if (nextIndex === null) {
+                    setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+                    openReader("friday_kahf", 0);
+                    return;
+                  }
+                  openReader("friday_kahf", nextIndex);
+                }}
                 onStartDuasSession={() => openCategory("comprehensive_duas")}
               />
             )}

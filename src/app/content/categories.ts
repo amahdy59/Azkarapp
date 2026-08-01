@@ -12,6 +12,7 @@ export const CATEGORIES: Array<{
   { id: "waking_up", name: "Waking Up", nameArabic: "أذكار الاستيقاظ", icon: "sun" },
   { id: "after_prayer", name: "After Prayer", nameArabic: "أذكار بعد الصلاة", icon: "book-open" },
   { id: "comprehensive_duas", name: "Comprehensive Duas", nameArabic: "الأدعية الجامعة", icon: "book-open" },
+  { id: "friday_kahf", name: "Surah Al-Kahf", nameArabic: "سورة الكهف", icon: "book-open" },
   { id: "home", name: "Home", nameArabic: "أذكار المنزل", icon: "home" },
   { id: "mosque", name: "Mosque", nameArabic: "أذكار المسجد", icon: "building" },
   { id: "food_drink", name: "Eating & Drinking", nameArabic: "الطعام والشراب", icon: "coffee" },

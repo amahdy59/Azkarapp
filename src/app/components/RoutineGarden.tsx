@@ -1063,7 +1063,7 @@ export function GrowthEventStatus({ event, language }: { event: GrowthEvent; lan
         <span className="mt-1 block text-[0.75rem] leading-5 text-muted-foreground">
           {t(language, "garden.eventHint", {
             count: formatNumerals(event.leafCount, language),
-            total: formatNumerals(CATEGORIES.length, language),
+            total: formatNumerals(CATEGORIES.filter((category) => category.id !== "friday_kahf").length, language),
           })}
         </span>
       </span>

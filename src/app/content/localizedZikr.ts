@@ -339,6 +339,7 @@ export function getLocalizedSourceReference(zikr: Zikr, language: AppLanguage) {
 }
 
 const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
+  "Friday.": "يوم الجمعة.",
   "Morning: after Fajr until sunrise. Evening: after ‘Asr until sunset as a strong recommended dhikr sitting.":
     "تُقال في الصباح عقب صلاة الفجر حتى طلوع الشمس، وفي المساء عقب صلاة العصر حتى غروب الشمس.",
   "Morning after Fajr; evening after ‘Asr/sunset window.":

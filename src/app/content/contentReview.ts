@@ -280,7 +280,13 @@ export function applyContentReview(items: ZikrDraft[]): Zikr[] {
     .map((item) => {
       const audioAssetId = APPROVED_AUDIO_ASSIGNMENTS[item.id];
       return Object.assign(item, {
-        canonicalKey: CANONICAL_KEY_BY_ID[item.id] ?? `zikr:${item.id}`,
+        canonicalKey:
+          CANONICAL_KEY_BY_ID[item.id] ??
+          (item.id === "friday-kahf-089" || item.id === "friday-kahf-092"
+            ? "quran-018-089-092"
+            : item.id.startsWith("friday-kahf-")
+              ? `quran-018-${item.id.slice(-3)}`
+              : `zikr:${item.id}`),
         audioBehavior: getAudioBehavior(item),
         ...(audioAssetId ? { audioAssetId } : {}),
       }) as Zikr;

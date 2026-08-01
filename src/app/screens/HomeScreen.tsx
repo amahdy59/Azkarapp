@@ -75,7 +75,9 @@ export function getHomeAction(
   const suggestedId = suggestedCategoryId(now, location);
   const categoryIds = [
     suggestedId,
-    ...CATEGORIES.filter((category) => category.id !== "comprehensive_duas").map((category) => category.id),
+    ...CATEGORIES.filter((category) => category.id !== "comprehensive_duas" && category.id !== "friday_kahf").map(
+      (category) => category.id,
+    ),
   ].filter((id, index, values) => values.indexOf(id) === index) as CategoryId[];
 
   for (const categoryId of categoryIds) {

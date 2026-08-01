@@ -82,7 +82,7 @@ export function AzkarLibraryScreen({
         {section === "collections" ? (
           <>
             <div className="space-y-3">
-              {CATEGORIES.map((category) => {
+              {CATEGORIES.filter((category) => category.id !== "friday_kahf").map((category) => {
                 const isComprehensiveDuas = category.id === "comprehensive_duas";
                 const total = isComprehensiveDuas ? COMPREHENSIVE_DUA_ITEMS.length : getCategoryTotal(category.id);
                 const done = isComprehensiveDuas

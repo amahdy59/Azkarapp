@@ -15,6 +15,7 @@ export type CategoryId =
   | "illness_ruqyah"
   | "social_community"
   | "natural_events"
+  | "friday_kahf"
   | "comprehensive_duas"
   | "miscellaneous";
 export type TextSizeOption = "small" | "medium" | "large";
