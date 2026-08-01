@@ -1,12 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { CATEGORIES } from "./categories";
 import {
+  ALL_AZKAR,
   getAzkarByCategory,
   getAzkarForMode,
   getCategoryTotal,
   getCollectionIntroduction,
   getRoutineStepCount,
 } from "./azkar";
+import { QURAN_PASSAGES } from "./quranPassages";
 
 describe("azkar content totals", () => {
   it("derives every category total from its content collection", () => {
@@ -175,8 +177,33 @@ describe("azkar content totals", () => {
     // Verify Ayat Al-Kursi in after_prayer is untruncated
     const afterPrayerAzkar = getAzkarByCategory("after_prayer");
     const ayatKursiAfterPrayer = afterPrayerAzkar.find((z) => z.id === "ap-ref-9");
-    expect(ayatKursiAfterPrayer?.arabicText).not.toContain("...");
-    expect(ayatKursiAfterPrayer?.arabicText).toContain("وَهُوَ الْعَلِيُّ الْعَظِيمُ");
+    expect(ayatKursiAfterPrayer?.arabicText).toBe(QURAN_PASSAGES.ayatAlKursi.arabicText);
+  });
+
+  it("keeps every displayed text and transliteration complete", () => {
+    for (const zikr of ALL_AZKAR) {
+      expect(zikr.arabicText, zikr.id).not.toContain("...");
+      expect(zikr.transliteration, zikr.id).not.toContain("...");
+      expect(zikr.translation, zikr.id).not.toContain("...");
+    }
+
+    const morningIkhlas = ALL_AZKAR.find((zikr) => zikr.id === "m-hm-76a");
+    const sleepIkhlas = ALL_AZKAR.find((zikr) => zikr.id === "s-hm-99-ikhlas");
+    expect(morningIkhlas?.arabicText).toBe(QURAN_PASSAGES.alIkhlas.arabicText);
+    expect(sleepIkhlas?.translation).toBe(QURAN_PASSAGES.alIkhlas.translation);
+  });
+
+  it("does not present reviewed weak or fabricated special virtues as authentic practice", () => {
+    expect(ALL_AZKAR.some((zikr) => zikr.id === "ap-ref-11")).toBe(false);
+    for (const id of ["m-hm-83", "e-hm-83", "da-ref-5"]) {
+      const zikr = ALL_AZKAR.find((item) => item.id === id);
+      expect(zikr?.repetitionCount, id).toBe(1);
+      expect(zikr?.sourceReference, id).toBe("Qur’an 9:129.");
+    }
+
+    const eclipse = ALL_AZKAR.find((zikr) => zikr.id === "ne-ref-6");
+    expect(eclipse?.sourceReference).toContain("Sunan Abu Dawud 1191");
+    expect(eclipse?.benefit).toContain("supplicate");
   });
 
   it("verifies Tasbeeh items after prayer are split into individual cards", () => {

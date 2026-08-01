@@ -1,4 +1,5 @@
 import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrGroupId } from "../types";
+import { applyContentReview } from "./contentReview";
 
 const MORNING_AZKAR: Zikr[] = [
   {
@@ -2918,7 +2919,7 @@ applyRoutineArrangement("morning", MORNING_AZKAR);
 applyRoutineArrangement("evening", EVENING_AZKAR);
 applyRoutineArrangement("before_sleep", SLEEP_AZKAR);
 
-const ALL_AZKAR = [
+const ALL_AZKAR = applyContentReview([
   ...MORNING_AZKAR,
   ...EVENING_AZKAR,
   ...SLEEP_AZKAR,
@@ -2935,7 +2936,7 @@ const ALL_AZKAR = [
   ...SOCIAL_COMMUNITY_AZKAR,
   ...NATURAL_EVENTS_AZKAR,
   ...MISCELLANEOUS_AZKAR,
-];
+]);
 
 const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>
   cat === "morning" || cat === "evening" || cat === "before_sleep";

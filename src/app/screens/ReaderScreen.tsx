@@ -28,6 +28,7 @@ import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } fr
 import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
+import { QuranPrelude, QuranSurahFooter } from "../components/QuranChrome";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -360,21 +361,7 @@ export function ReaderScreen({
         }
       }}
     >
-      {z.hasSeekRefuge && (
-        <div className="mb-3 text-center pointer-events-none">
-          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-            أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-          </p>
-        </div>
-      )}
-
-      {(z.hasBasmalah || z.isSurah) && (
-        <div className="mb-3 text-center pointer-events-none">
-          <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-            بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-          </p>
-        </div>
-      )}
+      <QuranPrelude zikr={z} className="pointer-events-none" />
 
       <p
         className="zikr-text text-center font-medium leading-[2.1] text-foreground pointer-events-none"
@@ -386,28 +373,7 @@ export function ReaderScreen({
         {displayArabicText}
       </p>
 
-      {(z.isSurah || z.surahNameArabic) && (
-        <div className="mt-4 mb-2 text-center pointer-events-none">
-          <div className="inline-flex items-center gap-1.5 border border-amber-700/25 dark:border-amber-500/25 rounded-lg px-2.5 py-1 bg-amber-500/10 dark:bg-amber-950/30">
-            {z.surahType && (
-              <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">
-                {z.surahType}
-              </span>
-            )}
-            <span className="text-[0.875rem] font-bold font-arabic text-amber-950 dark:text-amber-100">
-              {z.isSurah && z.surahNameArabic ? `سُورَةُ ${z.surahNameArabic}` : (z.surahNameArabic ?? "القرآن الكريم")}
-            </span>
-            {z.verseCount && (
-              <span
-                className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80"
-                style={{ fontFamily: counterNumeralFontFamily(language) }}
-              >
-                آيَاتُهَا {formatNumerals(z.verseCount, language)}
-              </span>
-            )}
-          </div>
-        </div>
-      )}
+      <QuranSurahFooter zikr={z} language={language} />
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
