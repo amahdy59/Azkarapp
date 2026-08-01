@@ -19,6 +19,17 @@ const ATTRIBUTION_LABELS: Record<ZikrAttributionType, { en: string; ar: string }
   companion_supplication: { en: "Companion supplication", ar: "دعاء صحابي" },
 };
 
+const COMPREHENSIVE_DUA_COPY = {
+  en: {
+    guidanceHeading: "About this collection",
+    availability: "Available anytime • Also featured in Friday Mode",
+  },
+  ar: {
+    guidanceHeading: "عن هذه المجموعة",
+    availability: "متاحة في كل وقت • وتظهر أيضًا ضمن فضائل الجمعة",
+  },
+} as const;
+
 // ─── Weekly-reset key ─────────────────────────────────────────────────────────
 // Returns an ISO-week string like "2025-W03" so the Surah Al-Kahf checkbox
 // automatically un-ticks on the first use of a new Friday week.
@@ -39,12 +50,15 @@ export function FridayModeScreen({
   isArabic,
   direction,
   onBack,
+  duasOnly = false,
 }: {
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onBack: () => void;
+  duasOnly?: boolean;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const comprehensiveDuaCopy = COMPREHENSIVE_DUA_COPY[language];
   const [expandedDuaId, setExpandedDuaId] = useState<string | null>(null);
   const introduction = COMPREHENSIVE_DUAS.find((dua) => dua.isCollectionIntroduction);
   const duas = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
@@ -111,127 +125,140 @@ export function FridayModeScreen({
 
   return (
     <ScreenContainer dir={direction} className="px-0">
-      <Header onBack={onBack} title={t(language, "friday.title")} subtitle={t(language, "friday.subtitle")} />
+      <Header
+        onBack={onBack}
+        title={t(language, duasOnly ? "friday.duasHeading" : "friday.title")}
+        subtitle={duasOnly ? comprehensiveDuaCopy.availability : t(language, "friday.subtitle")}
+      />
 
       <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4 space-y-6">
-        {/* Banner Card */}
-        <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-start shadow-md dark:bg-amber-500/15">
-          <div className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-2xl bg-amber-500 text-slate-950 shadow-sm">
-              <Sparkles size={24} />
+        {!duasOnly && (
+          <>
+            {/* Banner Card */}
+            <div className="relative overflow-hidden rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-start shadow-md dark:bg-amber-500/15">
+              <div className="flex items-center gap-3">
+                <div className="flex size-11 items-center justify-center rounded-2xl bg-amber-500 text-slate-950 shadow-sm">
+                  <Sparkles size={24} />
+                </div>
+                <div>
+                  <h2 className="text-[1.125rem] font-black text-foreground">{t(language, "friday.bannerHeading")}</h2>
+                  <p className="mt-0.5 text-[0.8125rem] font-semibold text-muted-foreground">
+                    {t(language, "friday.bannerHadith")}
+                  </p>
+                </div>
+              </div>
             </div>
-            <div>
-              <h2 className="text-[1.125rem] font-black text-foreground">{t(language, "friday.bannerHeading")}</h2>
-              <p className="mt-0.5 text-[0.8125rem] font-semibold text-muted-foreground">
-                {t(language, "friday.bannerHadith")}
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* Salawat Counter Card */}
-        <section aria-labelledby="salawat-heading" className="rounded-3xl border border-border bg-card p-5 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Heart size={20} className="text-rose-500 fill-rose-500/20" />
-              <h3 id="salawat-heading" className="text-[1rem] font-black text-foreground">
-                {t(language, "friday.salawatHeading")}
-              </h3>
-            </div>
-            {salawatCount > 0 && (
-              <button
-                type="button"
-                onClick={handleResetSalawat}
-                className="flex items-center gap-1 text-[0.75rem] font-extrabold text-muted-foreground hover:text-destructive transition-colors"
-                aria-label={t(language, "friday.salawatResetAriaLabel")}
-              >
-                <RotateCcw size={14} />
-                <span>{t(language, "friday.salawatResetLabel")}</span>
-              </button>
-            )}
-          </div>
-
-          <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
-            {t(language, "friday.salawatText")}
-          </p>
-
-          {/* Interactive Counter Circle Button */}
-          <div className="my-6 flex justify-center">
-            <button
-              type="button"
-              onClick={handleIncrementSalawat}
-              aria-label={t(language, "friday.salawatCounterAriaLabel", {
-                count: formatNumerals(salawatCount, language),
-              })}
-              className="group relative flex size-36 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/10 shadow-xl transition-all hover:bg-amber-500/20 dark:bg-amber-500/15"
+            {/* Salawat Counter Card */}
+            <section
+              aria-labelledby="salawat-heading"
+              className="rounded-3xl border border-border bg-card p-5 shadow-lg"
             >
-              <span className="text-[2.25rem] font-black text-amber-600 dark:text-amber-400">
-                {formatNumerals(salawatCount, language)}
-              </span>
-              <span className="text-[0.75rem] font-black text-muted-foreground group-hover:text-foreground">
-                {t(language, "friday.salawatTapHint")}
-              </span>
-            </button>
-          </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Heart size={20} className="text-rose-500 fill-rose-500/20" />
+                  <h3 id="salawat-heading" className="text-[1rem] font-black text-foreground">
+                    {t(language, "friday.salawatHeading")}
+                  </h3>
+                </div>
+                {salawatCount > 0 && (
+                  <button
+                    type="button"
+                    onClick={handleResetSalawat}
+                    className="flex items-center gap-1 text-[0.75rem] font-extrabold text-muted-foreground hover:text-destructive transition-colors"
+                    aria-label={t(language, "friday.salawatResetAriaLabel")}
+                  >
+                    <RotateCcw size={14} />
+                    <span>{t(language, "friday.salawatResetLabel")}</span>
+                  </button>
+                )}
+              </div>
 
-          {/* Milestones Progress */}
-          <div className="grid grid-cols-3 gap-2 text-center">
-            {milestones.map((target) => {
-              const reached = salawatCount >= target;
-              return (
-                <div
-                  key={target}
-                  className={`rounded-2xl border p-2.5 transition-all ${
-                    reached
-                      ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                      : "border-border/70 bg-muted/40 text-muted-foreground"
+              <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
+                {t(language, "friday.salawatText")}
+              </p>
+
+              {/* Interactive Counter Circle Button */}
+              <div className="my-6 flex justify-center">
+                <button
+                  type="button"
+                  onClick={handleIncrementSalawat}
+                  aria-label={t(language, "friday.salawatCounterAriaLabel", {
+                    count: formatNumerals(salawatCount, language),
+                  })}
+                  className="group relative flex size-36 flex-col items-center justify-center rounded-full border-4 border-amber-500/80 bg-amber-500/10 shadow-xl transition-all hover:bg-amber-500/20 dark:bg-amber-500/15"
+                >
+                  <span className="text-[2.25rem] font-black text-amber-600 dark:text-amber-400">
+                    {formatNumerals(salawatCount, language)}
+                  </span>
+                  <span className="text-[0.75rem] font-black text-muted-foreground group-hover:text-foreground">
+                    {t(language, "friday.salawatTapHint")}
+                  </span>
+                </button>
+              </div>
+
+              {/* Milestones Progress */}
+              <div className="grid grid-cols-3 gap-2 text-center">
+                {milestones.map((target) => {
+                  const reached = salawatCount >= target;
+                  return (
+                    <div
+                      key={target}
+                      className={`rounded-2xl border p-2.5 transition-all ${
+                        reached
+                          ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                          : "border-border/70 bg-muted/40 text-muted-foreground"
+                      }`}
+                    >
+                      <span className="block text-[0.875rem] font-black">{formatNumerals(target, language)}</span>
+                      <span className="block text-[0.6875rem] font-bold">
+                        {reached ? t(language, "friday.milestoneDone") : t(language, "friday.milestoneTarget")}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
+
+            {/* Surah Al-Kahf Card */}
+            <section aria-labelledby="kahf-heading" className="rounded-3xl border border-border bg-card p-5 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <BookOpen size={20} className="text-amber-500" />
+                  <h3 id="kahf-heading" className="text-[1rem] font-black text-foreground">
+                    {t(language, "friday.kahfHeading")}
+                  </h3>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleToggleKahf}
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.75rem] font-black transition-all ${
+                    surahKahfRead
+                      ? "bg-emerald-500 text-slate-950"
+                      : "border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                   }`}
                 >
-                  <span className="block text-[0.875rem] font-black">{formatNumerals(target, language)}</span>
-                  <span className="block text-[0.6875rem] font-bold">
-                    {reached ? t(language, "friday.milestoneDone") : t(language, "friday.milestoneTarget")}
+                  <CheckCircle2 size={15} />
+                  <span>
+                    {surahKahfRead ? t(language, "friday.kahfCompleted") : t(language, "friday.kahfMarkDone")}
                   </span>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                </button>
+              </div>
 
-        {/* Surah Al-Kahf Card */}
-        <section aria-labelledby="kahf-heading" className="rounded-3xl border border-border bg-card p-5 shadow-lg">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <BookOpen size={20} className="text-amber-500" />
-              <h3 id="kahf-heading" className="text-[1rem] font-black text-foreground">
-                {t(language, "friday.kahfHeading")}
-              </h3>
-            </div>
+              <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
+                {t(language, "friday.kahfHadith")}
+              </p>
+            </section>
+          </>
+        )}
 
-            <button
-              type="button"
-              onClick={handleToggleKahf}
-              className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.75rem] font-black transition-all ${
-                surahKahfRead
-                  ? "bg-emerald-500 text-slate-950"
-                  : "border border-amber-500/40 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-              }`}
-            >
-              <CheckCircle2 size={15} />
-              <span>{surahKahfRead ? t(language, "friday.kahfCompleted") : t(language, "friday.kahfMarkDone")}</span>
-            </button>
-          </div>
-
-          <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
-            {t(language, "friday.kahfHadith")}
-          </p>
-        </section>
-
-        <section aria-labelledby="friday-duas-heading" className="space-y-4">
+        <section aria-labelledby="comprehensive-duas-heading" className="space-y-4">
           <div className="rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-start">
             <div className="flex items-center gap-2">
               <BookOpen size={20} className="shrink-0 text-amber-600 dark:text-amber-400" />
-              <h3 id="friday-duas-heading" className="text-[1rem] font-black text-foreground">
-                {t(language, "friday.duasHeading")}
+              <h3 id="comprehensive-duas-heading" className="text-[1rem] font-black text-foreground">
+                {duasOnly ? comprehensiveDuaCopy.guidanceHeading : t(language, "friday.duasHeading")}
               </h3>
             </div>
             {introduction && (

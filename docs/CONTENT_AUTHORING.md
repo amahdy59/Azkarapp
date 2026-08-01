@@ -62,4 +62,4 @@ Use this minimal shape:
 - Confirm every category has content, IDs and order indexes are unique, and no displayed text contains placeholders or truncation.
 - Run `pnpm check`; for layout or interaction changes also run the relevant Playwright spec or `pnpm test:e2e`.
 
-The comprehensive dua collection is the reference example for route-specific content: `comprehensiveDuas.ts` contains an optional introduction, 20 essential items, and reviewed additional items with direct Arabic benefits, sources, contexts, and attribution types. It is imported only by the lazy Friday screen, where it is offered for convenient reading without claiming the duas are Friday-specific.
+The comprehensive dua collection is the reference example for route-specific content: `comprehensiveDuas.ts` contains an optional introduction, 20 essential items, and reviewed additional items with direct Arabic benefits, sources, contexts, and attribution types. Its always-visible Azkar Library card and Friday Mode both open the same lazy-loaded content, avoiding duplication and keeping the collection available every day without claiming the duas are Friday-specific.

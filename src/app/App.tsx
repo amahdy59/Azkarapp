@@ -744,6 +744,7 @@ export default function App() {
                 language={selectedLang}
                 direction={layoutDirection}
                 onCategory={openCategory}
+                onComprehensiveDuas={() => push("comprehensive_duas")}
                 onZikr={(catId, index) => openReader(catId, index, "complete")}
                 onSearch={() => push("search")}
                 savedZikrIds={savedZikrIds}
@@ -759,7 +760,14 @@ export default function App() {
                 onOpenShareModal={() => setShowShareModal(true)}
               />
             )}
-            {view === "friday" && <FridayModeScreen isArabic={isArabic} direction={layoutDirection} onBack={pop} />}
+            {(view === "friday" || view === "comprehensive_duas") && (
+              <FridayModeScreen
+                isArabic={isArabic}
+                direction={layoutDirection}
+                onBack={pop}
+                duasOnly={view === "comprehensive_duas"}
+              />
+            )}
             {view === "category" && (
               <CategoryScreen
                 catId={activeCat}

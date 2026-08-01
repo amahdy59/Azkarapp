@@ -38,6 +38,7 @@ export type View =
   | "library"
   | "progress"
   | "friday"
+  | "comprehensive_duas"
   | "category"
   | "reader"
   | "completion"
