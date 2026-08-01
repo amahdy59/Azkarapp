@@ -5,6 +5,7 @@ import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import { Sparkles, BookOpen, Heart, CheckCircle2, RotateCcw } from "../components/icons";
 import { t } from "../i18n";
+import { FRIDAY_DUAS } from "../content/fridayDuas";
 
 // ─── Weekly-reset key ─────────────────────────────────────────────────────────
 // Returns an ISO-week string like "2025-W03" so the Surah Al-Kahf checkbox
@@ -32,6 +33,13 @@ export function FridayModeScreen({
   onBack: () => void;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const [expandedDuaId, setExpandedDuaId] = useState<string | null>(null);
+  const introduction = FRIDAY_DUAS.find((dua) => dua.isCollectionIntroduction);
+  const duas = FRIDAY_DUAS.filter((dua) => !dua.isCollectionIntroduction);
+  const duaGroups = [
+    { label: t(language, "friday.essentialDuas"), items: duas.slice(0, 20) },
+    { label: t(language, "friday.additionalDuas"), items: duas.slice(20) },
+  ];
 
   // Salawat counter — lifetime running total, intentionally never auto-resets
   const [salawatCount, setSalawatCount] = useState<number>(() => {
@@ -198,6 +206,107 @@ export function FridayModeScreen({
           <p className="mt-2 text-[0.8125rem] leading-relaxed text-muted-foreground text-start">
             {t(language, "friday.kahfHadith")}
           </p>
+        </section>
+
+        <section aria-labelledby="friday-duas-heading" className="space-y-4">
+          <div className="rounded-3xl border border-amber-500/30 bg-amber-500/10 p-5 text-start">
+            <div className="flex items-center gap-2">
+              <BookOpen size={20} className="shrink-0 text-amber-600 dark:text-amber-400" />
+              <h3 id="friday-duas-heading" className="text-[1rem] font-black text-foreground">
+                {t(language, "friday.duasHeading")}
+              </h3>
+            </div>
+            {introduction && (
+              <p className="mt-3 text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
+                {isArabic ? introduction.arabicText : introduction.translation}
+              </p>
+            )}
+          </div>
+
+          {duaGroups.map((group) => (
+            <div key={group.label} className="space-y-3">
+              <h4 className="px-1 text-[0.875rem] font-black text-foreground">{group.label}</h4>
+              {group.items.map((dua) => {
+                const expanded = expandedDuaId === dua.id;
+                const itemNumber = formatNumerals(dua.orderIndex, language);
+                return (
+                  <article key={dua.id} className="rounded-2xl border border-border bg-card p-4 shadow-sm">
+                    <div className="flex items-start gap-3">
+                      <span
+                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-[0.75rem] font-black text-amber-700 dark:text-amber-300"
+                        aria-hidden="true"
+                      >
+                        {itemNumber}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="zikr-text text-right text-[1.0625rem] font-semibold leading-8 text-foreground"
+                          dir="rtl"
+                          lang="ar"
+                        >
+                          {dua.arabicText}
+                        </p>
+                        {!isArabic && (
+                          <p
+                            className="mt-3 text-left text-[0.875rem] leading-6 text-muted-foreground"
+                            dir="ltr"
+                            lang="en"
+                          >
+                            {dua.translation}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      aria-expanded={expanded}
+                      aria-controls={`${dua.id}-details`}
+                      onClick={() => setExpandedDuaId(expanded ? null : dua.id)}
+                      className="mt-4 min-h-11 w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-3 text-[0.8125rem] font-extrabold text-amber-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-amber-200"
+                    >
+                      {t(language, expanded ? "friday.hideBenefit" : "friday.showBenefit")}
+                    </button>
+
+                    {expanded && (
+                      <div id={`${dua.id}-details`} className="mt-3 space-y-3 border-t border-border pt-3 text-start">
+                        <div>
+                          <h5 className="text-[0.75rem] font-black text-muted-foreground">
+                            {t(language, "friday.benefitLabel")}
+                          </h5>
+                          <p className="mt-1 text-[0.875rem] font-semibold leading-6 text-foreground">
+                            {isArabic ? dua.benefitArabic : dua.benefit}
+                          </p>
+                        </div>
+                        {dua.hadithText && (
+                          <div>
+                            <h5 className="text-[0.75rem] font-black text-muted-foreground">
+                              {t(language, "friday.evidenceLabel")}
+                            </h5>
+                            <p
+                              className="zikr-text mt-1 text-right text-[0.875rem] leading-6 text-foreground"
+                              dir="rtl"
+                              lang="ar"
+                            >
+                              {dua.hadithText}
+                            </p>
+                          </div>
+                        )}
+                        <div>
+                          <h5 className="text-[0.75rem] font-black text-muted-foreground">
+                            {t(language, "friday.sourceLabel")}
+                          </h5>
+                          <p className="mt-1 text-[0.8125rem] font-semibold leading-5 text-muted-foreground">
+                            {isArabic ? dua.sourceReferenceArabic : dua.sourceReference}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </article>
+                );
+              })}
+            </div>
+          ))}
         </section>
       </div>
     </ScreenContainer>

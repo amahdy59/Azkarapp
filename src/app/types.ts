@@ -81,9 +81,13 @@ export interface Zikr {
   transliteration: string;
   translation: string;
   benefit: string;
+  /** Reviewed Arabic copy for the benefit UI; falls back to the legacy localization table. */
+  benefitArabic?: string;
   repetitionCount: number;
   countLabel?: string;
   sourceReference: string;
+  /** Reviewed Arabic source copy; falls back to localized source-name replacement. */
+  sourceReferenceArabic?: string;
   preferredTiming?: string;
   hadithText?: string;
   authenticityNote?: string;

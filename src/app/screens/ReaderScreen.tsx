@@ -390,7 +390,7 @@ export function ReaderScreen({
               </p>
             </section>
           )}
-          {showTransliteration && (
+          {showTransliteration && z.transliteration && (
             <section aria-labelledby="reader-transliteration-title">
               <h2
                 id="reader-transliteration-title"

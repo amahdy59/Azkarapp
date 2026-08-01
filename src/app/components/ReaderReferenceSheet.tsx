@@ -3,7 +3,11 @@ import { Check, Copy, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { ScrollArea } from "./ui/scroll-area";
-import { getLocalizedPreferredTiming, getLocalizedSourceReference } from "../content/localizedZikr";
+import {
+  getLocalizedPreferredTiming,
+  getLocalizedSourceReference,
+  getLocalizedZikrBenefit,
+} from "../content/localizedZikr";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
@@ -29,6 +33,7 @@ export function ReaderReferenceSheet({
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
+  const benefit = getLocalizedZikrBenefit(zikr, language);
 
   useEffect(() => {
     return () => {
@@ -123,25 +128,48 @@ export function ReaderReferenceSheet({
                   {copyAction("translation", zikr.translation, t(language, "reader.copyTranslation"), "ltr")}
                 </section>
 
-                <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+                {zikr.transliteration && (
+                  <>
+                    <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
 
-                <section className="flex flex-col gap-4">
+                    <section className="flex flex-col gap-4">
+                      <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
+                        {t(language, "reader.transliterationLabel")}
+                      </h3>
+                      <p
+                        className="latin-ui text-left text-[1.125rem] leading-[1.5] text-muted-foreground"
+                        lang="en"
+                        dir="ltr"
+                      >
+                        {zikr.transliteration}
+                      </p>
+                      {copyAction(
+                        "transliteration",
+                        zikr.transliteration,
+                        t(language, "reader.copyTransliteration"),
+                        "ltr",
+                      )}
+                    </section>
+                  </>
+                )}
+              </>
+            )}
+
+            {benefit && (
+              <>
+                <div className="h-px w-full bg-foreground/10" aria-hidden="true" />
+                <section className="flex flex-col gap-3">
                   <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
-                    {t(language, "reader.transliterationLabel")}
+                    {t(language, "reader.benefitLabel")}
                   </h3>
                   <p
-                    className="latin-ui text-left text-[1.125rem] leading-[1.5] text-muted-foreground"
-                    lang="en"
-                    dir="ltr"
+                    className="max-w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-start text-[0.9375rem] font-semibold leading-7 text-foreground"
+                    lang={isArabic ? "ar" : "en"}
+                    dir={direction}
                   >
-                    {zikr.transliteration}
+                    {benefit}
                   </p>
-                  {copyAction(
-                    "transliteration",
-                    zikr.transliteration,
-                    t(language, "reader.copyTransliteration"),
-                    "ltr",
-                  )}
+                  {copyAction("benefit", benefit, t(language, "reader.copyBenefit"), direction)}
                 </section>
               </>
             )}

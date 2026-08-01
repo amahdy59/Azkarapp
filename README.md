@@ -210,6 +210,7 @@ Documentation sources of truth:
 - [Design and interaction system](docs/DESIGN_SYSTEM.md)
 - [Engineering and release checklist](docs/QUALITY_CHECKLIST.md)
 - [Design-spec implementation coverage](docs/DESIGN_SPEC_COVERAGE.md)
+- [Content authoring and review](docs/CONTENT_AUTHORING.md)
 
 ## Known constraints
 

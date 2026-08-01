@@ -308,13 +308,20 @@ export function getLocalizedZikrBenefit(zikr: Zikr, language: AppLanguage) {
   }
 
   return (
-    ARABIC_BENEFITS_BY_ID[zikr.id] ?? ARABIC_BENEFITS[zikr.benefit] ?? "وردت فائدة هذا الذكر في المصدر المذكور أدناه."
+    zikr.benefitArabic ??
+    ARABIC_BENEFITS_BY_ID[zikr.id] ??
+    ARABIC_BENEFITS[zikr.benefit] ??
+    "وردت فائدة هذا الذكر في المصدر المذكور أدناه."
   );
 }
 
 export function getLocalizedSourceReference(zikr: Zikr, language: AppLanguage) {
   if (language === "en") {
     return zikr.sourceReference;
+  }
+
+  if (zikr.sourceReferenceArabic) {
+    return zikr.sourceReferenceArabic;
   }
 
   let localized = zikr.sourceReference
