@@ -8,7 +8,7 @@ import type {
   View,
 } from "../types";
 import type { StoredSession } from "../state";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import {
   getFirstIncompleteZikrIndex,
   getNextIncompleteIndex,
@@ -91,7 +91,11 @@ export function useSessionHandlers({
     );
   };
 
-  const openCategory = (catId: CategoryId) => {
+  const openCategory = async (catId: CategoryId) => {
+    if (catId === "comprehensive_duas") {
+      const { COMPREHENSIVE_DUAS } = await import("../content/comprehensiveDuas");
+      registerLazyCollection(catId, COMPREHENSIVE_DUAS);
+    }
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
     setActiveCat(catId);

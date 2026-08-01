@@ -26,22 +26,29 @@ const VERSES = ${JSON.stringify(verses, null, 2)} as const;
 const arabicNumber = (value: number) =>
   String(value).replace(/\\d/g, (digit) => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]!);
 
-export const FRIDAY_KAHF: ZikrDraft[] = VERSES.map((verse, index) => ({
-  id: \`friday-kahf-\${String(verse.id).padStart(3, "0")}\`,
-  category: "friday_kahf",
-  orderIndex: index,
-  arabicText: \`\${index === 0 ? "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ\\n\\n" : ""}\${verse.text} ﴿\${arabicNumber(verse.id)}﴾\`,
-  transliteration: verse.transliteration,
-  translation: verse.translation,
-  benefit: "An ayah from Surah Al-Kahf.",
-  benefitArabic: "آية من سورة الكهف.",
-  repetitionCount: 1,
-  countLabel: "1",
-  sourceReference: \`Qur'an 18:\${verse.id}.\`,
-  sourceReferenceArabic: \`القرآن الكريم، سورة الكهف (١٨:\${arabicNumber(verse.id)}).\`,
-  hadithText: verse.text,
-  preferredTiming: "Friday.",
-}));
+export const FRIDAY_KAHF: ZikrDraft[] = [
+  {
+    id: "friday-kahf",
+    category: "friday_kahf",
+    orderIndex: 0,
+    isSurah: true,
+    surahNameArabic: "الكَهْف",
+    surahNameEnglish: "Al-Kahf",
+    surahType: "Meccan",
+    verseCount: 110,
+    hasBasmalah: true,
+    arabicText: VERSES.map((verse) => \`\${verse.text} ﴿\${arabicNumber(verse.id)}﴾\`).join(" "),
+    transliteration: VERSES.map((verse) => verse.transliteration).join(" "),
+    translation: VERSES.map((verse, index) => \`\${verse.translation} (\${index + 1})\`).join(" "),
+    benefit: "Recite Surah Al-Kahf on Friday.",
+    benefitArabic: "تُقرأ سورة الكهف يوم الجمعة.",
+    repetitionCount: 1,
+    countLabel: "1",
+    sourceReference: "Qur'an 18:1-110.",
+    sourceReferenceArabic: "القرآن الكريم، سورة الكهف (١٨:١-١١٠).",
+    preferredTiming: "Friday.",
+  },
+];
 `;
 
 await writeFile(new URL("../src/app/content/fridayKahf.ts", import.meta.url), output, "utf8");

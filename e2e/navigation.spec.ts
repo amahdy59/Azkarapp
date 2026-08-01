@@ -46,7 +46,7 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: {
           morning: ["m-hm-77m", "m-hm-78m", "m-hm-75"],
-          evening: ["e-hm-75a", "e-hm-77e", "e-hm-78e"],
+          evening: ["e-hm-77e", "e-hm-78e", "e-hm-75"],
           before_sleep: ["s-hm-100", "s-hm-101", "s-hm-99-ikhlas"],
         },
         sessions: [],

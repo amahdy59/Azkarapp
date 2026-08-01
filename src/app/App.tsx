@@ -18,7 +18,7 @@ import type {
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
-import { FRIDAY_KAHF_WEEK_KEY, getIsoWeekKey } from "./fridayProgress";
+import { FRIDAY_KAHF_WEEK_KEY, fridayKahfOpenedKey, getIsoWeekKey } from "./fridayProgress";
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
@@ -73,6 +73,9 @@ const ProgressScreen = lazy(() =>
 const FridayModeScreen = lazy(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
+const FridaySalawatScreen = lazy(() =>
+  import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
+);
 const ProgressShareModal = lazy(() =>
   import("./components/ProgressShareModal").then((module) => ({ default: module.ProgressShareModal })),
 );
@@ -116,6 +119,7 @@ export default function App() {
     if (requestedView === "friday") return "friday";
     return "splash";
   });
+  const initialHistoryView = useRef(view).current;
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
       return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
@@ -588,6 +592,12 @@ export default function App() {
   useEffect(() => saveAppState(appStateSnapshot), [appStateSnapshot]);
 
   useEffect(() => {
+    if (!window.history.state?.view) {
+      window.history.replaceState({ view: initialHistoryView }, "", window.location.href);
+    }
+  }, [initialHistoryView]);
+
+  useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       if (e.state && e.state.view) {
         setView(e.state.view);
@@ -637,7 +647,17 @@ export default function App() {
     }
   };
 
-  const showBottomNav = ["home", "library", "category", "reader", "settings", "search", "progress"].includes(view);
+  const showBottomNav = [
+    "home",
+    "library",
+    "category",
+    "reader",
+    "settings",
+    "search",
+    "progress",
+    "friday",
+    "friday_salawat",
+  ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
   const activeZikrHasAudio = activeZikr ? getAudioCoverage([activeZikr]).available === 1 : false;
@@ -845,9 +865,15 @@ export default function App() {
               <FridayModeScreen
                 isArabic={isArabic}
                 direction={layoutDirection}
-                kahfCompletedCount={completed.friday_kahf.size}
+                kahfCompletedCount={completed.friday_kahf.has("friday-kahf") ? 1 : 0}
+                duasCompletedCount={completed.comprehensive_duas.size}
                 onBack={pop}
                 onStartKahf={() => {
+                  try {
+                    window.localStorage.setItem(fridayKahfOpenedKey(), "true");
+                  } catch {
+                    // Opening the reader does not depend on storage.
+                  }
                   const sameWeek = ensureCurrentFridayWeek();
                   const kahf = getAzkarForMode("friday_kahf");
                   const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
@@ -858,7 +884,18 @@ export default function App() {
                   }
                   openReader("friday_kahf", nextIndex);
                 }}
-                onStartDuasSession={() => openCategory("comprehensive_duas")}
+                onOpenSalawat={() => push("friday_salawat")}
+                onStartDuasSession={() => void openCategory("comprehensive_duas")}
+              />
+            )}
+            {view === "friday_salawat" && (
+              <FridaySalawatScreen
+                language={selectedLang}
+                direction={layoutDirection}
+                onBack={() => {
+                  window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                  setView("friday");
+                }}
               />
             )}
             {view === "category" && (
@@ -904,9 +941,23 @@ export default function App() {
                 showTransliteration={showTransliteration}
                 textSize={textSize}
                 savedZikrIds={savedZikrIds}
-                onBack={leaveReader}
+                onBack={
+                  activeCat === "friday_kahf"
+                    ? () => {
+                        window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                        setView("friday");
+                      }
+                    : leaveReader
+                }
                 onComplete={markComplete}
-                onAdvance={advanceAfterCompletion}
+                onAdvance={
+                  activeCat === "friday_kahf"
+                    ? () => {
+                        window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                        setView("friday");
+                      }
+                    : advanceAfterCompletion
+                }
                 onNext={() => {
                   if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
                 }}

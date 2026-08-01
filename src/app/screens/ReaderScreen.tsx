@@ -359,11 +359,13 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <div
       ref={readingContentRef}
-      className="w-full mt-1 cursor-pointer touch-manipulation rounded-2xl px-4 pb-2 pt-2 transition-colors hover:bg-muted/50 active:bg-muted"
-      role="button"
-      tabIndex={0}
-      aria-label={t(language, "reader.tapAnywhere")}
+      className={`mt-1 w-full rounded-2xl px-4 pb-2 pt-2 ${z.isSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
+      role={z.isSurah ? undefined : "button"}
+      tabIndex={z.isSurah ? undefined : 0}
+      aria-label={z.isSurah ? undefined : t(language, "reader.tapAnywhere")}
+      data-prevent-count={z.isSurah ? "true" : undefined}
       onKeyDown={(event) => {
+        if (z.isSurah) return;
         if (event.key === " " || event.key === "Enter") {
           event.preventDefault();
           handleTap();

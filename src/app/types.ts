@@ -47,6 +47,7 @@ export type View =
   | "library"
   | "progress"
   | "friday"
+  | "friday_salawat"
   | "category"
   | "reader"
   | "completion"
