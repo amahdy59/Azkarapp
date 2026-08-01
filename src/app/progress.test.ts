@@ -3,6 +3,7 @@ import { getAzkarByCategory } from "./content/azkar";
 import {
   CATEGORY_IDS,
   deriveDailyCompletionsFromLegacySessions,
+  getCategoryStreak,
   getFirstIncompleteIndex,
   getGardenSummary,
   getNextIncompleteIndex,
@@ -195,5 +196,28 @@ describe("quiet garden progress", () => {
     ];
     const summary = getGardenSummary(records, new Date(2026, 6, 18, 12), 4);
     expect(summary.currentUsageStreak).toBe(3);
+  });
+
+  it("calculates a streak for the completed category only", () => {
+    const records: DailyCollectionCompletion[] = [
+      { dayKey: "2026-07-15", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-16", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-17", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" },
+    ];
+
+    expect(getCategoryStreak(records, "morning", new Date(2026, 6, 18, 12), 4)).toBe(4);
+    expect(getCategoryStreak(records, "evening", new Date(2026, 6, 18, 12), 4)).toBe(1);
+  });
+
+  it("resets a category streak after a missed day", () => {
+    const records: DailyCollectionCompletion[] = [
+      { dayKey: "2026-07-15", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-18", category: "morning", timeZone: "Africa/Cairo" },
+    ];
+
+    expect(getCategoryStreak(records, "morning", new Date(2026, 6, 18, 12), 4)).toBe(2);
   });
 });
