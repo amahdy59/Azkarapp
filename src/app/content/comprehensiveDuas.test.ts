@@ -7,6 +7,7 @@ describe("comprehensive duas content", () => {
 
   it("keeps 20 essential and 27 additional duas in stable order", () => {
     expect(introduction?.id).toBe("comprehensive-duas-introduction");
+    expect(COMPREHENSIVE_DUAS.every((dua) => dua.category === "comprehensive_duas")).toBe(true);
     expect(duas).toHaveLength(47);
     expect(duas.slice(0, 20).every((dua) => dua.includedInCore)).toBe(true);
     expect(duas.slice(20).every((dua) => !dua.includedInCore)).toBe(true);

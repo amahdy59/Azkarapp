@@ -65,6 +65,16 @@ describe("app state persistence", () => {
     expect(loadAppState().savedZikrIds).toEqual(["m-hm-75"]);
   });
 
+  it("preserves valid comprehensive-dua session progress and saved items", () => {
+    const state = normalizeAppState({
+      completed: { comprehensive_duas: ["friday-dua-01", "comprehensive-dua-47", "bad-dua"] },
+      savedZikrIds: ["comprehensive-dua-36", "bad-dua"],
+    });
+
+    expect(state.completed.comprehensive_duas).toEqual(["comprehensive-dua-47", "friday-dua-01"]);
+    expect(state.savedZikrIds).toEqual(["comprehensive-dua-36"]);
+  });
+
   it("repairs malformed nested settings instead of exposing them to the renderer", () => {
     window.localStorage.setItem(
       "azkarapp.state.v1",

@@ -73,9 +73,10 @@ export function getHomeAction(
   },
 ): HomeAction {
   const suggestedId = suggestedCategoryId(now, location);
-  const categoryIds = [suggestedId, ...CATEGORIES.map((category) => category.id)].filter(
-    (id, index, values) => values.indexOf(id) === index,
-  ) as CategoryId[];
+  const categoryIds = [
+    suggestedId,
+    ...CATEGORIES.filter((category) => category.id !== "comprehensive_duas").map((category) => category.id),
+  ].filter((id, index, values) => values.indexOf(id) === index) as CategoryId[];
 
   for (const categoryId of categoryIds) {
     const mode = isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete";

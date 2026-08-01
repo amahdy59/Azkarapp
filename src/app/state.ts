@@ -17,7 +17,7 @@ import {
   mergeDailyCompletions,
   normalizeDailyCompletions,
 } from "./progress";
-import { getAzkarByCategory } from "./content/azkar";
+import { ALL_AZKAR, getAzkarByCategory } from "./content/azkar";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
 
 export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from "./types";
@@ -243,12 +243,15 @@ function normalizeReminders(
   };
 }
 
+const isLazyZikrId = (value: string) => /^(friday|comprehensive)-dua-/.test(value);
+
 function normalizeCompletedIds(values: unknown, category: CategoryId) {
   if (!Array.isArray(values)) {
     return [];
   }
 
   const zikrIds = getAzkarByCategory(category).map((zikr) => zikr.id);
+  const acceptsLazyIds = zikrIds.length === 0;
   const legacyZikrIds = LEGACY_ROUTINE_ORDER[category] ?? zikrIds;
   const validIds = new Set(zikrIds);
   return [
@@ -261,7 +264,10 @@ function normalizeCompletedIds(values: unknown, category: CategoryId) {
               ? legacyZikrIds[Number(value)]
               : undefined,
         )
-        .filter((value): value is string => typeof value === "string" && validIds.has(value)),
+        .filter(
+          (value): value is string =>
+            typeof value === "string" && (acceptsLazyIds ? isLazyZikrId(value) : validIds.has(value)),
+        ),
     ),
   ].sort();
 }
@@ -271,10 +277,12 @@ function dedupeSavedZikrIds(values: unknown): string[] {
     return [];
   }
 
-  const validIds = new Set(CATEGORY_IDS.flatMap((category) => getAzkarByCategory(category).map((zikr) => zikr.id)));
   return [
     ...new Set(
-      values.filter((value): value is string => typeof value === "string" && value.length > 0 && validIds.has(value)),
+      values.filter(
+        (value): value is string =>
+          typeof value === "string" && (ALL_AZKAR.some((zikr) => zikr.id === value) || isLazyZikrId(value)),
+      ),
     ),
   ].sort();
 }

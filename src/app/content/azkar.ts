@@ -2938,13 +2938,19 @@ const ALL_AZKAR = applyContentReview([
   ...MISCELLANEOUS_AZKAR,
 ]);
 
+const LAZY_AZKAR: Partial<Record<CategoryId, Zikr[]>> = {};
+
+const registerLazyCollection = (category: CategoryId, items: Zikr[]) => {
+  LAZY_AZKAR[category] = items;
+};
+
 const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>
   cat === "morning" || cat === "evening" || cat === "before_sleep";
 
 const getAzkarByCategory = (cat: CategoryId) =>
-  ALL_AZKAR.filter((z) => z.category === cat && !z.isCollectionIntroduction).sort(
-    (a, b) => a.orderIndex - b.orderIndex,
-  );
+  (LAZY_AZKAR[cat] ?? ALL_AZKAR)
+    .filter((z) => z.category === cat && !z.isCollectionIntroduction)
+    .sort((a, b) => a.orderIndex - b.orderIndex);
 
 const getAzkarForMode = (cat: CategoryId, mode: RoutineMode = "complete") => {
   const azkar = getAzkarByCategory(cat);
@@ -2952,7 +2958,7 @@ const getAzkarForMode = (cat: CategoryId, mode: RoutineMode = "complete") => {
 };
 
 const getCollectionIntroduction = (cat: CategoryId) =>
-  ALL_AZKAR.find((zikr) => zikr.category === cat && zikr.isCollectionIntroduction);
+  (LAZY_AZKAR[cat] ?? ALL_AZKAR).find((zikr) => zikr.category === cat && zikr.isCollectionIntroduction);
 
 const getRoutineStepCount = (cat: RoutineCategoryId, mode: RoutineMode) => {
   const seenRituals = new Set<RitualGroupId>();
@@ -3027,4 +3033,5 @@ export {
   getRoutineProgress,
   getRoutineStepCount,
   isRoutineCategory,
+  registerLazyCollection,
 };

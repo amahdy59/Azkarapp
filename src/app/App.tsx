@@ -744,7 +744,6 @@ export default function App() {
                 language={selectedLang}
                 direction={layoutDirection}
                 onCategory={openCategory}
-                onComprehensiveDuas={() => push("comprehensive_duas")}
                 onZikr={(catId, index) => openReader(catId, index, "complete")}
                 onSearch={() => push("search")}
                 savedZikrIds={savedZikrIds}
@@ -760,12 +759,12 @@ export default function App() {
                 onOpenShareModal={() => setShowShareModal(true)}
               />
             )}
-            {(view === "friday" || view === "comprehensive_duas") && (
+            {view === "friday" && (
               <FridayModeScreen
                 isArabic={isArabic}
                 direction={layoutDirection}
                 onBack={pop}
-                duasOnly={view === "comprehensive_duas"}
+                onStartDuasSession={() => openCategory("comprehensive_duas")}
               />
             )}
             {view === "category" && (
@@ -779,11 +778,15 @@ export default function App() {
                 onReset={() => handleResetCategory(activeCat)}
                 onRepeat={() => repeatCategory(activeCat)}
                 onBack={pop}
-                onPlayAllAudio={() => {
-                  openReader(activeCat, 0);
-                  audioPlayer.toggleAutoPlayAll();
-                  audioPlayer.playTrackAtIndex(0);
-                }}
+                onPlayAllAudio={
+                  activeCat === "comprehensive_duas"
+                    ? undefined
+                    : () => {
+                        openReader(activeCat, 0);
+                        audioPlayer.toggleAutoPlayAll();
+                        audioPlayer.playTrackAtIndex(0);
+                      }
+                }
                 routineMode={activeRoutineMode}
                 onRoutineModeChange={(mode) => {
                   if (isRoutineCategory(activeCat)) {

@@ -7,6 +7,7 @@ export const CATEGORY_IDS: CategoryId[] = [
   "before_sleep",
   "waking_up",
   "after_prayer",
+  "comprehensive_duas",
   "home",
   "mosque",
   "food_drink",

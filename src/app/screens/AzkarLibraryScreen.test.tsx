@@ -5,15 +5,14 @@ import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen comprehensive duas", () => {
   it("keeps the collection available from the Azkar Library every day", () => {
-    const onComprehensiveDuas = vi.fn();
+    const onCategory = vi.fn();
 
     render(
       <AzkarLibraryScreen
         completed={{} as Record<CategoryId, Set<string>>}
         language="en"
         direction="ltr"
-        onCategory={() => undefined}
-        onComprehensiveDuas={onComprehensiveDuas}
+        onCategory={onCategory}
         onZikr={() => undefined}
         onSearch={() => undefined}
         savedZikrIds={new Set()}
@@ -21,10 +20,10 @@ describe("AzkarLibraryScreen comprehensive duas", () => {
     );
 
     const card = screen.getByRole("button", {
-      name: "Comprehensive Duas. Available anytime • Also featured in Friday Mode",
+      name: "Comprehensive Duas, 0 of 47 complete",
     });
     fireEvent.click(card);
 
-    expect(onComprehensiveDuas).toHaveBeenCalledOnce();
+    expect(onCategory).toHaveBeenCalledWith("comprehensive_duas");
   });
 });

@@ -15,6 +15,7 @@ export type CategoryId =
   | "illness_ruqyah"
   | "social_community"
   | "natural_events"
+  | "comprehensive_duas"
   | "miscellaneous";
 export type TextSizeOption = "small" | "medium" | "large";
 export type ArabicFontOption = "ibm_plex" | "noto_sans";
@@ -38,7 +39,6 @@ export type View =
   | "library"
   | "progress"
   | "friday"
-  | "comprehensive_duas"
   | "category"
   | "reader"
   | "completion"

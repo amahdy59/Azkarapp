@@ -11,6 +11,7 @@ export const CATEGORIES: Array<{
   { id: "before_sleep", name: "Before Sleep Azkar", nameArabic: "أذكار النوم", icon: "stars" },
   { id: "waking_up", name: "Waking Up", nameArabic: "أذكار الاستيقاظ", icon: "sun" },
   { id: "after_prayer", name: "After Prayer", nameArabic: "أذكار بعد الصلاة", icon: "book-open" },
+  { id: "comprehensive_duas", name: "Comprehensive Duas", nameArabic: "الأدعية الجامعة", icon: "book-open" },
   { id: "home", name: "Home", nameArabic: "أذكار المنزل", icon: "home" },
   { id: "mosque", name: "Mosque", nameArabic: "أذكار المسجد", icon: "building" },
   { id: "food_drink", name: "Eating & Drinking", nameArabic: "الطعام والشراب", icon: "coffee" },
@@ -30,6 +31,7 @@ export const ROUTINE_CATEGORY_IDS: ReadonlySet<CategoryId> = new Set([
   "before_sleep",
   "waking_up",
   "after_prayer",
+  "comprehensive_duas",
 ]);
 
 export function isOccasionalCategory(catId: CategoryId): boolean {

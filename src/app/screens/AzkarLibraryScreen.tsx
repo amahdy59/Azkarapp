@@ -1,27 +1,24 @@
 import { useMemo, useState } from "react";
 import { CatIcon } from "../components/CatIcon";
-import { Search, Bookmark, ChevronNext, BookOpen } from "../components/icons";
+import { Search, Bookmark, ChevronNext } from "../components/icons";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ProgressBar } from "../components/ProgressBar";
-import { ALL_AZKAR, getAzkarByCategory, getCategoryTotal } from "../content/azkar";
+import { ALL_AZKAR, getAzkarByCategory, getCategoryTotal, registerLazyCollection } from "../content/azkar";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
+import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 
 type LibrarySection = "collections" | "saved";
 
-const DUA_AVAILABILITY = {
-  en: "Available anytime • Also featured in Friday Mode",
-  ar: "متاحة في كل وقت • وتظهر أيضًا ضمن فضائل الجمعة",
-} as const;
+const COMPREHENSIVE_DUA_ITEMS = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
 
 export function AzkarLibraryScreen({
   completed,
   language,
   direction,
   onCategory,
-  onComprehensiveDuas,
   onZikr,
   onSearch,
   savedZikrIds,
@@ -30,16 +27,17 @@ export function AzkarLibraryScreen({
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onCategory: (category: CategoryId) => void;
-  onComprehensiveDuas: () => void;
   onZikr: (category: CategoryId, index: number) => void;
   onSearch: () => void;
   savedZikrIds: Set<string>;
 }) {
   const [section, setSection] = useState<LibrarySection>("collections");
   const isArabic = language === "ar";
-  const duaAvailability = DUA_AVAILABILITY[language];
   const savedAzkar = useMemo(
-    () => ALL_AZKAR.filter((zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id)),
+    () =>
+      [...ALL_AZKAR, ...COMPREHENSIVE_DUA_ITEMS].filter(
+        (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
+      ),
     [savedZikrIds],
   );
 
@@ -84,34 +82,12 @@ export function AzkarLibraryScreen({
         {section === "collections" ? (
           <>
             <div className="space-y-3">
-              <button
-                type="button"
-                data-testid="comprehensive-duas-card"
-                dir={direction}
-                onClick={onComprehensiveDuas}
-                className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-amber-500/35 bg-amber-500/10 p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                aria-label={`${t(language, "friday.duasHeading")}. ${duaAvailability}`}
-              >
-                <span
-                  className="flex size-11 shrink-0 items-center justify-center rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300"
-                  aria-hidden="true"
-                >
-                  <BookOpen size={24} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block text-[1rem] font-bold text-foreground">
-                    {t(language, "friday.duasHeading")}
-                  </span>
-                  <span className="mt-1 block text-[0.8125rem] font-semibold text-muted-foreground">
-                    {duaAvailability}
-                  </span>
-                </span>
-                <ChevronNext size={22} className="text-muted-foreground" aria-hidden="true" />
-              </button>
-
               {CATEGORIES.map((category) => {
-                const total = getCategoryTotal(category.id);
-                const done = completed[category.id]?.size ?? 0;
+                const isComprehensiveDuas = category.id === "comprehensive_duas";
+                const total = isComprehensiveDuas ? COMPREHENSIVE_DUA_ITEMS.length : getCategoryTotal(category.id);
+                const done = isComprehensiveDuas
+                  ? COMPREHENSIVE_DUA_ITEMS.filter((dua) => completed[category.id]?.has(dua.id)).length
+                  : (completed[category.id]?.size ?? 0);
                 const isOccasional = isOccasionalCategory(category.id);
 
                 return (
@@ -120,7 +96,12 @@ export function AzkarLibraryScreen({
                     type="button"
                     data-testid={`category-card-${category.id}`}
                     dir={direction}
-                    onClick={() => onCategory(category.id)}
+                    onClick={() => {
+                      if (isComprehensiveDuas) {
+                        registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+                      }
+                      onCategory(category.id);
+                    }}
                     className="flex min-h-[82px] w-full items-center gap-4 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={
                       isOccasional
@@ -196,12 +177,16 @@ export function AzkarLibraryScreen({
                   <button
                     key={zikr.id}
                     type="button"
-                    onClick={() =>
-                      onZikr(
-                        zikr.category,
-                        getAzkarByCategory(zikr.category).findIndex((item) => item.id === zikr.id),
-                      )
-                    }
+                    onClick={() => {
+                      const isComprehensiveDuas = zikr.category === "comprehensive_duas";
+                      const index = (
+                        isComprehensiveDuas ? COMPREHENSIVE_DUA_ITEMS : getAzkarByCategory(zikr.category)
+                      ).findIndex((item) => item.id === zikr.id);
+                      if (isComprehensiveDuas) {
+                        registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+                      }
+                      onZikr(zikr.category, index);
+                    }}
                     className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border bg-card p-4 text-start focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                       isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation

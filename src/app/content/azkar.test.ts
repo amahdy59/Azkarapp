@@ -11,8 +11,10 @@ import {
 import { QURAN_PASSAGES } from "./quranPassages";
 
 describe("azkar content totals", () => {
+  const eagerCategories = CATEGORIES.filter((category) => category.id !== "comprehensive_duas");
+
   it("derives every category total from its content collection", () => {
-    for (const category of CATEGORIES) {
+    for (const category of eagerCategories) {
       const items = getAzkarByCategory(category.id);
       expect(getCategoryTotal(category.id)).toBe(items.length);
       expect(items.length).toBeGreaterThan(0);
@@ -20,7 +22,7 @@ describe("azkar content totals", () => {
   });
 
   it("keeps order indexes unique within each category", () => {
-    for (const category of CATEGORIES) {
+    for (const category of eagerCategories) {
       const indexes = getAzkarByCategory(category.id).map((item) => item.orderIndex);
       expect(new Set(indexes).size).toBe(indexes.length);
     }
@@ -133,7 +135,7 @@ describe("azkar content totals", () => {
 
   it("passes comprehensive authenticity & content completeness audit across all zikrs", () => {
     const missingHadith: string[] = [];
-    for (const category of CATEGORIES) {
+    for (const category of eagerCategories) {
       const items = getAzkarByCategory(category.id);
       for (const item of items) {
         expect(item.id).toBeTruthy();
