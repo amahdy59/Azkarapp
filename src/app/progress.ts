@@ -304,6 +304,36 @@ export function getUsageStreakSummary(
   return { currentUsageStreak, longestUsageStreak };
 }
 
+/** Counts consecutive progress days on which one specific collection was completed. */
+export function getCategoryStreak(
+  records: DailyCollectionCompletion[],
+  category: CategoryId,
+  now = new Date(),
+  boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
+) {
+  const todayKey = getProgressDayKey(now, boundaryHour);
+  const completedKeys = normalizeDailyCompletions(records)
+    .filter((record) => record.category === category && record.dayKey <= todayKey)
+    .map((record) => record.dayKey)
+    .sort();
+
+  const latest = completedKeys.at(-1);
+  if (!latest || dayOrdinal(todayKey) - dayOrdinal(latest) > 1) {
+    return 0;
+  }
+
+  let streak = 1;
+  for (let index = completedKeys.length - 1; index > 0; index -= 1) {
+    const current = completedKeys[index];
+    const previous = completedKeys[index - 1];
+    if (!current || !previous || dayOrdinal(current) - dayOrdinal(previous) !== 1) {
+      break;
+    }
+    streak += 1;
+  }
+  return streak;
+}
+
 export function getPalmStreakSummary(
   records: DailyCollectionCompletion[],
   now = new Date(),
