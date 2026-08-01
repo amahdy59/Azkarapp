@@ -3,6 +3,7 @@ import { Check } from "./icons";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import type { AppLanguage, Zikr } from "../types";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
+import { QuranPrelude, QuranSurahFooter } from "./QuranChrome";
 
 export interface MushafZikrCardProps {
   zikr: Zikr;
@@ -121,23 +122,7 @@ export function MushafZikrCard({
         className="w-full text-start p-5 sm:p-6 cursor-pointer hover:bg-amber-500/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onSelect && onSelect(index)}
       >
-        {/* Seek Refuge Header if applicable */}
-        {zikr.hasSeekRefuge && (
-          <div className="mb-3 text-center">
-            <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-              أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-            </p>
-          </div>
-        )}
-
-        {/* Basmalah Header if applicable */}
-        {(zikr.hasBasmalah || zikr.isSurah) && (
-          <div className="mb-4 text-center">
-            <p className="font-arabic text-[1.125rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-            </p>
-          </div>
-        )}
+        <QuranPrelude zikr={zikr} />
 
         {/* Arabic Text rendered Mushaf style */}
         <div
@@ -176,12 +161,14 @@ export function MushafZikrCard({
           })}
         </div>
 
+        <QuranSurahFooter zikr={zikr} language={language} />
+
         {/* Hadith / Source Reference Footer */}
         {zikr.sourceReference && (
           <div className="mt-4 pt-3 border-t border-amber-700/15 dark:border-amber-600/15 flex items-center justify-between text-[0.75rem] font-medium text-muted-foreground">
             <span className="truncate">{getLocalizedSourceReference(zikr, language)}</span>
             {zikr.benefit && (
-              <span className="italic text-amber-800 dark:text-amber-300 truncate max-w-[60%]">
+              <span className="max-w-[60%] line-clamp-2 text-start italic leading-4 text-amber-800 dark:text-amber-300">
                 {getLocalizedZikrBenefit(zikr, language)}
               </span>
             )}
