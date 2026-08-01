@@ -5,6 +5,7 @@ import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { loadAppState } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { startPerformanceMonitoring } from "./lib/observability.ts";
+import { AudioProvider } from "./app/audio/AudioProvider.tsx";
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
@@ -17,9 +18,11 @@ startPerformanceMonitoring();
 
 createRoot(document.getElementById("root")!).render(
   <AppErrorBoundary>
-    <Suspense fallback={null}>
-      <Root />
-    </Suspense>
+    <AudioProvider>
+      <Suspense fallback={null}>
+        <Root />
+      </Suspense>
+    </AudioProvider>
   </AppErrorBoundary>,
 );
 
@@ -28,6 +31,14 @@ const updateServiceWorker = registerSW({
     window.dispatchEvent(new Event("azkar-update-available"));
   },
 });
+
+if ("caches" in window) {
+  void import("./app/audio/audioOfflineCache.ts")
+    .then(({ cleanupStaleAudioDownloads }) => cleanupStaleAudioDownloads())
+    .catch(() => {
+      // Offline cleanup is best-effort and must not block reading the app.
+    });
+}
 
 window.addEventListener("azkar-apply-update", () => {
   void updateServiceWorker(true);

@@ -29,11 +29,11 @@ function categoryFromShortcutUrl(): CategoryId | null {
 import { BottomNav } from "./components/LayoutShells";
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
-import { FloatingAudioPlayer } from "./components/FloatingAudioPlayer";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ScreenFallback } from "./components/ScreenFallback";
 import { PwaNotice } from "./components/PwaNotice";
-import { useAudioPlayer } from "./hooks/useAudioPlayer";
+import { useAudioController } from "./audio/useAudioController";
+import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
@@ -55,6 +55,9 @@ const CategoryScreen = lazy(() =>
   import("./screens/CategoryScreen").then((module) => ({ default: module.CategoryScreen })),
 );
 const ReaderScreen = lazy(() => import("./screens/ReaderScreen").then((module) => ({ default: module.ReaderScreen })));
+const FloatingAudioPlayer = lazy(() =>
+  import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
+);
 const CompletionScreen = lazy(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
@@ -98,6 +101,9 @@ const AuthCallbackScreen = lazy(() =>
 const ProfileCompletionScreen = lazy(() =>
   import("./screens/auth/RevampedAuthScreens").then((module) => ({ default: module.ProfileCompletionScreen })),
 );
+const AudioContentReviewScreen = lazy(() =>
+  import("./screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
+);
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
 export default function App() {
@@ -113,6 +119,9 @@ export default function App() {
     }
   });
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showAudioReview, setShowAudioReview] = useState(
+    () => import.meta.env.DEV && new URLSearchParams(window.location.search).get("audio-review") === "1",
+  );
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
@@ -120,7 +129,8 @@ export default function App() {
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
   const activeAzkarList = useMemo(() => getAzkarForMode(activeCat, activeRoutineMode), [activeCat, activeRoutineMode]);
-  const audioPlayer = useAudioPlayer(activeAzkarList, activeIdx, setActiveIdx);
+  const audioController = useAudioController();
+  const audioCoverage = useMemo(() => getAudioCoverage(activeAzkarList), [activeAzkarList]);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
@@ -339,6 +349,14 @@ export default function App() {
     setActiveTab,
     showConfirm,
   });
+
+  useEffect(() => {
+    const plan = audioController.state.plan;
+    const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
+    if (view !== "reader" || !plan || plan.context.category !== activeCat || !playingZikrId) return;
+    const matchingIndex = activeAzkarList.findIndex((zikr) => zikr.id === playingZikrId);
+    if (matchingIndex >= 0 && matchingIndex !== activeIdx) setActiveIdx(matchingIndex);
+  }, [activeAzkarList, activeCat, activeIdx, audioController.state.entryIndex, audioController.state.plan, view]);
 
   const markOnboardingComplete = useCallback(() => {
     setHasCompletedOnboarding(true);
@@ -600,6 +618,46 @@ export default function App() {
 
   const showBottomNav = ["home", "library", "category", "reader", "settings", "search", "progress"].includes(view);
   const azkar = activeAzkarList;
+  const activeZikr = azkar[activeIdx];
+  const activeZikrHasAudio = activeZikr ? getAudioCoverage([activeZikr]).available === 1 : false;
+
+  const startAudio = (items: typeof azkar, source: "single" | "full-session", repeatPrescribed = false) => {
+    const plan = buildPlaybackPlan({
+      zikrs: items,
+      context: { category: activeCat, routineMode: activeRoutineMode, source },
+      mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
+      preferences: audioController.preferences,
+    });
+    return audioController.startPlan(plan);
+  };
+
+  const startPlayAllAudio = () => {
+    const playAvailable = () => {
+      const plan = buildPlaybackPlan({
+        zikrs: azkar,
+        context: { category: activeCat, routineMode: activeRoutineMode, source: "full-session" },
+        preferences: audioController.preferences,
+      });
+      const firstZikrId = plan.entries[0]?.zikrId;
+      if (!firstZikrId || !audioController.startPlan(plan)) return;
+      const firstIndex = azkar.findIndex((zikr) => zikr.id === firstZikrId);
+      openReader(activeCat, Math.max(0, firstIndex));
+    };
+
+    if (audioCoverage.unavailable > 0) {
+      showConfirm(
+        selectedLang === "ar" ? "تغطية الصوت" : "Audio coverage",
+        selectedLang === "ar"
+          ? `الصوت متاح لـ ${audioCoverage.available} من ${audioCoverage.total}. غير متاح لـ ${audioCoverage.unavailable}.`
+          : `Audio is available for ${audioCoverage.available} of ${audioCoverage.total} items. ${audioCoverage.unavailable} are unavailable.`,
+        selectedLang === "ar" ? "تشغيل المتاح" : "Play available",
+        t(selectedLang, "common.cancel"),
+        playAvailable,
+      );
+      return;
+    }
+    playAvailable();
+  };
 
   return (
     <div className="app-viewport flex items-center justify-center">
@@ -779,14 +837,9 @@ export default function App() {
                 onRepeat={() => repeatCategory(activeCat)}
                 onBack={pop}
                 onPlayAllAudio={
-                  activeCat === "comprehensive_duas"
-                    ? undefined
-                    : () => {
-                        openReader(activeCat, 0);
-                        audioPlayer.toggleAutoPlayAll();
-                        audioPlayer.playTrackAtIndex(0);
-                      }
+                  activeCat === "comprehensive_duas" || audioCoverage.available === 0 ? undefined : startPlayAllAudio
                 }
+                audioCoverage={audioCoverage}
                 routineMode={activeRoutineMode}
                 onRoutineModeChange={(mode) => {
                   if (isRoutineCategory(activeCat)) {
@@ -799,6 +852,7 @@ export default function App() {
               <ReaderScreen
                 catId={activeCat}
                 idx={activeIdx}
+                routineMode={activeRoutineMode}
                 isArabic={isArabic}
                 direction={layoutDirection}
                 themeMode={themeMode}
@@ -824,6 +878,15 @@ export default function App() {
                   if (activeIdx > 0) setActiveIdx((i) => i - 1);
                 }}
                 onToggleSaved={toggleSavedZikr}
+                audioAvailable={activeZikrHasAudio}
+                onPlayAudio={
+                  activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
+                }
+                onRepeatAudio={
+                  activeZikrHasAudio && activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
+                    ? () => void startAudio([activeZikr], "single", true)
+                    : undefined
+                }
               />
             )}
             {view === "completion" && (
@@ -928,26 +991,22 @@ export default function App() {
           />
         )}
 
+        {import.meta.env.DEV && showAudioReview && (
+          <Suspense fallback={<ScreenFallback language={selectedLang} />}>
+            <AudioContentReviewScreen
+              onClose={() => {
+                audioController.stop();
+                setShowAudioReview(false);
+              }}
+            />
+          </Suspense>
+        )}
+
         {/* Floating Audio Player */}
-        {(audioPlayer.isPlaying || audioPlayer.isBuffering) && (
-          <FloatingAudioPlayer
-            title={audioPlayer.currentZikr?.arabicText ?? ""}
-            isPlaying={audioPlayer.isPlaying}
-            isBuffering={audioPlayer.isBuffering}
-            currentTime={audioPlayer.currentTime}
-            duration={audioPlayer.duration}
-            playbackRate={audioPlayer.playbackRate}
-            autoPlayAll={audioPlayer.autoPlayAll}
-            reciter={audioPlayer.reciter}
-            language={selectedLang}
-            onTogglePlayPause={audioPlayer.togglePlayPause}
-            onNext={audioPlayer.playNext}
-            onPrev={audioPlayer.playPrev}
-            onSetSpeed={audioPlayer.setPlaybackRate}
-            onSetReciter={audioPlayer.setReciter}
-            onToggleAutoPlayAll={audioPlayer.toggleAutoPlayAll}
-            onClose={audioPlayer.stop}
-          />
+        {audioController.state.plan && (
+          <Suspense fallback={null}>
+            <FloatingAudioPlayer controller={audioController} language={selectedLang} />
+          </Suspense>
         )}
 
         {(updateAvailable || (installPrompt && sessions.length > 0 && !installDismissed)) && (

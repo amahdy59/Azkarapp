@@ -14,11 +14,12 @@ import {
   Bookmark,
   ChevronLeft,
   ChevronRight,
+  Volume2,
 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
-import { getAzkarByCategory } from "../content/azkar";
-import type { AppLanguage, ArabicFontOption, CategoryId, TextSizeOption, ThemeMode } from "../types";
+import { getAzkarForMode } from "../content/azkar";
+import type { AppLanguage, ArabicFontOption, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { AdaptiveCounterTrack } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -107,6 +108,7 @@ const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
 export function ReaderScreen({
   catId,
   idx,
+  routineMode,
   isArabic,
   direction,
   themeMode,
@@ -124,9 +126,13 @@ export function ReaderScreen({
   onNext,
   onPrev,
   onToggleSaved,
+  audioAvailable,
+  onPlayAudio,
+  onRepeatAudio,
 }: {
   catId: CategoryId;
   idx: number;
+  routineMode: RoutineMode;
   isArabic: boolean;
   direction: "ltr" | "rtl";
   themeMode: ThemeMode;
@@ -144,8 +150,11 @@ export function ReaderScreen({
   onNext: () => void;
   onPrev: () => void;
   onToggleSaved: (zikrId: string) => void;
+  audioAvailable: boolean;
+  onPlayAudio?: () => void;
+  onRepeatAudio?: () => void;
 }) {
-  const azkar = getAzkarByCategory(catId);
+  const azkar = getAzkarForMode(catId, routineMode);
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
@@ -517,6 +526,7 @@ export function ReaderScreen({
       className="relative !pb-0"
       data-testid="reader-screen"
       data-zikr-index={idx}
+      data-zikr-id={z.id}
       dir={direction}
       style={categoryThemeStyles}
       onClick={handleSurfaceTap}
@@ -574,6 +584,33 @@ export function ReaderScreen({
               <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
               {/* Zikr Action Items */}
+              <DropdownMenuItem
+                disabled={!audioAvailable}
+                onClick={onPlayAudio}
+                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+              >
+                <Volume2 size={18} />
+                {audioAvailable
+                  ? language === "ar"
+                    ? "تشغيل مرة واحدة"
+                    : "Play audio once"
+                  : language === "ar"
+                    ? "الصوت غير متاح"
+                    : "Audio unavailable"}
+              </DropdownMenuItem>
+
+              {onRepeatAudio && (
+                <DropdownMenuItem
+                  onClick={onRepeatAudio}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <RotateCcw size={18} />
+                  {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
+                </DropdownMenuItem>
+              )}
+
+              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
               <DropdownMenuItem
                 onClick={handleReset}
                 className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"

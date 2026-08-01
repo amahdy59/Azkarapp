@@ -31,6 +31,7 @@ export function CategoryScreen({
   onRepeat,
   onBack,
   onPlayAllAudio,
+  audioCoverage,
   routineMode = "complete",
   onRoutineModeChange,
 }: {
@@ -44,6 +45,7 @@ export function CategoryScreen({
   onRepeat: () => void;
   onBack: () => void;
   onPlayAllAudio?: () => void;
+  audioCoverage?: { available: number; unavailable: number; total: number };
   routineMode?: RoutineMode;
   onRoutineModeChange?: (mode: RoutineMode) => void;
 }) {
@@ -432,10 +434,19 @@ export function CategoryScreen({
                       : "opacity-75 cursor-not-allowed"
                   }`}
                   aria-label={t(language, "category.playAllAudio")}
-                  title={t(language, "category.playAllAudio")}
+                  title={
+                    audioCoverage
+                      ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
+                      : t(language, "category.playAllAudio")
+                  }
                 >
                   <Volume2 size={16} />
-                  <span>{t(language, "category.playAll")}</span>
+                  <span>
+                    {t(language, "category.playAll")}
+                    {audioCoverage
+                      ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
+                      : ""}
+                  </span>
                 </button>
                 {completedItemCount > 0 && (
                   <button

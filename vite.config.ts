@@ -1,8 +1,9 @@
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 
 function figmaAssetResolver() {
   return {
@@ -19,6 +20,10 @@ function figmaAssetResolver() {
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
+  const audioBaseUrl = loadEnv(mode, process.cwd(), "").VITE_AUDIO_BASE_URL?.replace(/\/+$/, "");
+  const audioUrlPattern = audioBaseUrl
+    ? new RegExp(`^${audioBaseUrl.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}/`)
+    : undefined;
 
   return {
     base: appBase,
@@ -76,6 +81,21 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
+          runtimeCaching: audioUrlPattern
+            ? [
+                {
+                  urlPattern: audioUrlPattern,
+                  handler: "CacheFirst",
+                  method: "GET",
+                  options: {
+                    cacheName: `azkar-audio-v${AUDIO_MANIFEST_VERSION}`,
+                    rangeRequests: true,
+                    // Only explicit verified downloads enter this cache.
+                    cacheableResponse: { statuses: [418] },
+                  },
+                },
+              ]
+            : [],
         },
       }),
     ],
@@ -93,6 +113,10 @@ export default defineConfig(({ mode }) => {
           manualChunks: {
             vendor: ["react", "react-dom"],
             motion: ["motion"],
+            audio: [
+              path.resolve(__dirname, "src/app/audio/AudioProvider.tsx"),
+              path.resolve(__dirname, "src/app/audio/buildPlaybackPlan.ts"),
+            ],
           },
         },
       },

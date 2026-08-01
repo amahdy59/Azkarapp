@@ -26,6 +26,13 @@ export type RoutineMode = "core" | "complete";
 export type ZikrGroupId =
   "begin" | "quran_protection" | "dua_protection" | "renew" | "ask" | "repeat" | "prepare" | "settle" | "final";
 export type RitualGroupId = "three_quls" | "tasbih_fatimah";
+export type ZikrAudioMode = "play-once" | "repeat-prescribed-count" | "repeat-custom";
+export interface ZikrAudioBehavior {
+  defaultMode: "play-once";
+  supportedModes: ZikrAudioMode[];
+  repetitionUnit?: "zikr" | "ritual-round";
+  recommendedMaxAutoRepeat?: number;
+}
 export type ZikrAttributionType =
   | "said_by_prophet"
   | "taught_by_prophet"
@@ -85,6 +92,11 @@ export interface DailyCollectionCompletion {
 
 export interface Zikr {
   id: string;
+  /** Stable content identity shared by category-specific instances with identical wording. */
+  canonicalKey: string;
+  /** Exact approved manifest reference. Never inferred from text, citations, or ordering. */
+  audioAssetId?: string;
+  audioBehavior: ZikrAudioBehavior;
   arabicText: string;
   transliteration: string;
   translation: string;
@@ -118,6 +130,10 @@ export interface Zikr {
   hasBasmalah?: boolean;
   hasSeekRefuge?: boolean;
 }
+
+/** Authoring shape; content is finalized and validated before it reaches the application. */
+export type ZikrDraft = Omit<Zikr, "canonicalKey" | "audioBehavior"> &
+  Partial<Pick<Zikr, "canonicalKey" | "audioBehavior">>;
 
 export interface StoredSession {
   id: string;

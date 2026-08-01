@@ -1,212 +1,281 @@
-import { Play, Pause, SkipForward, SkipBack, X } from "../components/icons";
+import { Pause, Play, RotateCcw, SkipBack, SkipForward, X } from "./icons";
 import type { AppLanguage } from "../types";
-import type { PlaybackRate, ReciterOption } from "../hooks/useAudioPlayer";
+import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
-import { t } from "../i18n";
 
-interface FloatingAudioPlayerProps {
-  title: string;
-  isPlaying: boolean;
-  isBuffering: boolean;
-  currentTime: number;
-  duration: number;
-  playbackRate: PlaybackRate;
-  autoPlayAll: boolean;
-  reciter?: ReciterOption;
-  language: AppLanguage;
-  onTogglePlayPause: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-  onSetSpeed: (rate: PlaybackRate) => void;
-  onSetReciter?: (reciter: ReciterOption) => void;
-  onToggleAutoPlayAll: () => void;
-  onClose: () => void;
+const COPY = {
+  en: {
+    region: "Audio player",
+    play: "Play audio",
+    pause: "Pause audio",
+    previous: "Previous zikr",
+    next: "Next zikr",
+    replay: "Replay this zikr",
+    stop: "Stop audio and close player",
+    seek: "Seek audio",
+    options: "Audio options",
+    speed: "Playback speed",
+    voice: "Voice or reciter",
+    playOnce: "Play once",
+    repeat: "Repeat prescribed count",
+    retry: "Retry",
+    skip: "Skip this item",
+    buffering: "Buffering audio",
+    loading: "Loading audio",
+    ended: "Queue complete",
+    trackChanged: "Track changed",
+    repetitionCompleted: "Audio repetition completed",
+    queueCompleted: "Audio queue completed",
+  },
+  ar: {
+    region: "مشغل الصوت",
+    play: "تشغيل الصوت",
+    pause: "إيقاف الصوت مؤقتًا",
+    previous: "الذكر السابق",
+    next: "الذكر التالي",
+    replay: "إعادة تشغيل هذا الذكر",
+    stop: "إيقاف الصوت وإغلاق المشغل",
+    seek: "تقديم أو تأخير الصوت",
+    options: "خيارات الصوت",
+    speed: "سرعة التشغيل",
+    voice: "الصوت أو القارئ",
+    playOnce: "تشغيل مرة واحدة",
+    repeat: "تكرار العدد المحدد",
+    retry: "إعادة المحاولة",
+    skip: "تخطي هذا الذكر",
+    buffering: "جارٍ تحميل الصوت",
+    loading: "جارٍ تجهيز الصوت",
+    ended: "اكتمل التشغيل",
+    trackChanged: "تم تغيير المقطع",
+    repetitionCompleted: "اكتمل تكرار الصوت",
+    queueCompleted: "اكتملت قائمة الصوت",
+  },
+} as const;
+
+function formatTime(seconds: number, language: AppLanguage) {
+  const safeSeconds = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
+  const minutes = Math.floor(safeSeconds / 60);
+  const remainder = safeSeconds % 60;
+  return formatNumerals(`${minutes}:${remainder.toString().padStart(2, "0")}`, language);
 }
 
-function formatTime(seconds: number, language: AppLanguage): string {
-  if (isNaN(seconds) || seconds <= 0) return formatNumerals("0:00", language);
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  const timeStr = `${mins}:${secs < 10 ? "0" : ""}${secs}`;
-  return formatNumerals(timeStr, language);
+function accessibleTime(current: number, duration: number, language: AppLanguage) {
+  const describe = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainder = Math.floor(seconds % 60);
+    return language === "ar"
+      ? `${formatNumerals(minutes, language)} دقيقة و${formatNumerals(remainder, language)} ثانية`
+      : `${minutes} minute${minutes === 1 ? "" : "s"} ${remainder} second${remainder === 1 ? "" : "s"}`;
+  };
+  return language === "ar"
+    ? `${describe(current)} من ${describe(duration)}`
+    : `${describe(current)} of ${describe(duration)}`;
 }
 
-export function FloatingAudioPlayer({
-  title,
-  isPlaying,
-  isBuffering,
-  currentTime,
-  duration,
-  playbackRate,
-  autoPlayAll,
-  reciter = "alafasy",
-  language,
-  onTogglePlayPause,
-  onNext,
-  onPrev,
-  onSetSpeed,
-  onSetReciter,
-  onToggleAutoPlayAll,
-  onClose,
-}: FloatingAudioPlayerProps) {
-  const isArabic = language === "ar";
-  const direction = isArabic ? "rtl" : "ltr";
-  const speeds: PlaybackRate[] = [0.8, 1.0, 1.25];
+export function FloatingAudioPlayer({ controller, language }: { controller: AudioController; language: AppLanguage }) {
+  const { state, currentEntry, currentSegment } = controller;
+  if (!state.plan || !currentEntry) return null;
 
-  const reciterNameKey =
-    reciter === "alafasy"
-      ? "audioPlayer.reciterAlafasy"
-      : reciter === "ghamdi"
-        ? "audioPlayer.reciterGhamdi"
-        : "audioPlayer.reciterAbdulbasit";
+  const copy = COPY[language];
+  const direction = language === "ar" ? "rtl" : "ltr";
+  const isPlaying = state.status === "playing";
+  const isBusy = state.status === "loading" || state.status === "buffering";
+  const queuePosition = `${formatNumerals(state.entryIndex + 1, language)} / ${formatNumerals(state.plan.entries.length, language)}`;
+  const repetitionPosition =
+    currentEntry.repetitions > 1
+      ? `${formatNumerals(state.repetitionIndex + 1, language)} / ${formatNumerals(currentEntry.repetitions, language)}`
+      : null;
+  const title = language === "ar" ? currentEntry.titleArabic : currentEntry.titleEnglish;
+  const liveMessage =
+    state.status === "error"
+      ? state.error?.message
+      : state.announcement === "queue-completed"
+        ? copy.queueCompleted
+        : state.announcement === "repetition-completed"
+          ? copy.repetitionCompleted
+          : state.announcement === "track-changed"
+            ? `${copy.trackChanged}: ${title}`
+            : "";
+  const repeatEnabled = currentEntry.repetitions > 1;
+  const canRepeat = currentEntry.supportedModes.includes("repeat-prescribed-count");
 
   return (
-    <div
-      role="region"
-      aria-label={t(language, "audioPlayer.regionAria")}
+    <section
+      aria-label={copy.region}
       dir={direction}
-      className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-amber-500/30 bg-card/95 p-3 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-[#18181B]/95"
+      className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-1rem)] max-w-lg -translate-x-1/2 rounded-2xl border border-amber-500/30 bg-card/95 p-3 shadow-2xl backdrop-blur-md dark:border-white/10 dark:bg-[#18181B]/95"
     >
-      {/* Title & Controls Header */}
-      <div className="flex items-center justify-between gap-2">
-        {/* Track Title */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        {liveMessage}
+      </div>
+
+      <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 text-start">
-          <p className="truncate text-[0.8125rem] font-black text-foreground">{title}</p>
-          <span className="text-[0.6875rem] font-semibold text-muted-foreground" dir="ltr">
-            {formatTime(currentTime, language)} / {formatTime(duration, language)}
-          </span>
+          <p className="truncate text-[0.875rem] font-black text-foreground">{title}</p>
+          <p className="mt-0.5 text-[0.75rem] font-semibold text-muted-foreground">
+            {queuePosition}
+            {repetitionPosition ? ` · ${repetitionPosition}` : ""}
+          </p>
+          {isBusy && (
+            <p className="mt-1 text-[0.75rem] font-semibold text-amber-700 dark:text-amber-300" role="status">
+              {state.status === "buffering" ? copy.buffering : copy.loading}
+            </p>
+          )}
         </div>
 
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          {/* Previous Track — 44px touch target */}
+        <div className="flex shrink-0 flex-wrap justify-end gap-1">
           <button
             type="button"
-            onClick={onPrev}
-            aria-label={t(language, "audioPlayer.previous")}
-            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
+            onClick={controller.previous}
+            disabled={state.entryIndex === 0}
+            aria-label={copy.previous}
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40"
           >
-            <SkipBack size={18} className="rtl:rotate-180" />
+            <SkipBack size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
-
-          {/* Play / Pause Toggle — 44px touch target */}
           <button
             type="button"
-            onClick={onTogglePlayPause}
-            aria-label={isPlaying ? t(language, "audioPlayer.pause") : t(language, "audioPlayer.play")}
-            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all"
+            onClick={isPlaying ? controller.pause : controller.play}
+            aria-label={isPlaying ? copy.pause : copy.play}
+            className="flex size-11 items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md transition-colors hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            {isBuffering ? (
-              <svg
-                className="animate-spin"
-                width={18}
-                height={18}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2.5}
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="10" strokeOpacity="0.25" />
-                <path d="M12 2a10 10 0 0 1 10 10" />
-              </svg>
-            ) : isPlaying ? (
-              <Pause size={18} className="fill-current" />
-            ) : (
-              <Play size={18} className="fill-current translate-x-0.5 rtl:-translate-x-0.5" />
-            )}
+            {isPlaying ? <Pause size={19} aria-hidden="true" /> : <Play size={19} aria-hidden="true" />}
           </button>
-
-          {/* Next Track — 44px touch target */}
           <button
             type="button"
-            onClick={onNext}
-            aria-label={t(language, "audioPlayer.next")}
-            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
+            onClick={controller.next}
+            disabled={state.entryIndex === state.plan.entries.length - 1}
+            aria-label={copy.next}
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40"
           >
-            <SkipForward size={18} className="rtl:rotate-180" />
+            <SkipForward size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
-
-          {/* Auto-Play All / Single Item Toggle — 44px touch target */}
           <button
             type="button"
-            onClick={onToggleAutoPlayAll}
-            aria-label={autoPlayAll ? t(language, "audioPlayer.modePlayAll") : t(language, "audioPlayer.modeSingle")}
-            title={autoPlayAll ? t(language, "audioPlayer.playAll") : t(language, "audioPlayer.playSingle")}
-            className={`flex h-11 min-h-[44px] px-2.5 items-center gap-1 rounded-xl text-[0.75rem] font-bold transition-all ${
-              autoPlayAll
-                ? "bg-amber-500/20 text-amber-700 dark:text-amber-300 ring-1 ring-amber-500/50"
-                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
+            onClick={controller.stop}
+            aria-label={copy.stop}
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
-            <svg
-              width={14}
-              height={14}
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="17 1 21 5 17 9" />
-              <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-              <polyline points="7 23 3 19 7 15" />
-              <path d="M21 13v2a4 4 0 0 1-4 4H3" />
-            </svg>
-            <span>{autoPlayAll ? t(language, "audioPlayer.all") : t(language, "audioPlayer.single")}</span>
+            <X size={18} aria-hidden="true" />
           </button>
+        </div>
+      </div>
 
-          {/* Reciter Selector — 44px touch target */}
-          {onSetReciter && (
+      <div className="mt-3 flex items-center gap-3" dir="ltr">
+        <span className="w-10 text-center text-[0.6875rem] font-semibold text-muted-foreground">
+          {formatTime(state.currentTime, language)}
+        </span>
+        <input
+          type="range"
+          min={0}
+          max={Math.max(0, state.duration)}
+          step={1}
+          value={Math.min(state.currentTime, state.duration || 0)}
+          disabled={state.duration <= 0}
+          onChange={(event) => controller.seek(Number(event.currentTarget.value))}
+          aria-label={copy.seek}
+          aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
+          className="h-11 min-w-0 flex-1 accent-amber-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        />
+        <span className="w-10 text-center text-[0.6875rem] font-semibold text-muted-foreground">
+          {formatTime(state.duration, language)}
+        </span>
+      </div>
+
+      {state.status === "error" && (
+        <div className="mt-2 rounded-xl border border-destructive/30 bg-destructive/10 p-3" role="alert">
+          <p className="text-[0.8125rem] font-semibold text-destructive">{state.error?.message}</p>
+          <div className="mt-2 flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={() => {
-                const options: ReciterOption[] = ["alafasy", "ghamdi", "abdulbasit"];
-                const nextIdx = (options.indexOf(reciter) + 1) % options.length;
-                onSetReciter(options[nextIdx]!);
-              }}
-              aria-label={t(language, "audioPlayer.currentReciter", { name: t(language, reciterNameKey) })}
-              title={t(language, "audioPlayer.currentReciter", { name: t(language, reciterNameKey) })}
-              className="flex h-11 min-h-[44px] px-2.5 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-[0.6875rem] font-bold text-amber-700 dark:text-amber-300 hover:bg-amber-500/20 active:scale-95 transition-all"
+              onClick={controller.retry}
+              className="min-h-11 rounded-xl bg-primary px-4 font-bold text-primary-foreground"
             >
-              🎙️ {t(language, reciterNameKey)}
+              {copy.retry}
             </button>
+            <button
+              type="button"
+              onClick={controller.skip}
+              className="min-h-11 rounded-xl border border-border px-4 font-bold text-foreground"
+            >
+              {copy.skip}
+            </button>
+            <button
+              type="button"
+              onClick={controller.stop}
+              className="min-h-11 rounded-xl border border-destructive/40 px-4 font-bold text-destructive"
+            >
+              {copy.stop}
+            </button>
+          </div>
+        </div>
+      )}
+
+      <details className="mt-2 rounded-xl border border-border bg-muted/30">
+        <summary className="flex min-h-11 cursor-pointer items-center px-3 text-[0.8125rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+          {copy.options}
+        </summary>
+        <div className="grid gap-3 border-t border-border p-3 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={controller.replay}
+            className="flex min-h-11 items-center justify-center gap-2 rounded-xl border border-border bg-background px-3 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            <RotateCcw size={17} aria-hidden="true" />
+            {copy.replay}
+          </button>
+
+          <label className="grid gap-1 text-[0.75rem] font-bold text-muted-foreground">
+            {copy.speed}
+            <select
+              value={state.playbackRate}
+              onChange={(event) => controller.setPlaybackRate(Number(event.currentTarget.value))}
+              className="min-h-11 rounded-xl border border-border-control bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {[0.8, 1, 1.25, 1.5, 2].map((rate) => (
+                <option key={rate} value={rate}>
+                  {formatNumerals(rate, language)}×
+                </option>
+              ))}
+            </select>
+          </label>
+
+          {currentEntry.availableVoiceIds.length > 1 && (
+            <label className="grid gap-1 text-[0.75rem] font-bold text-muted-foreground">
+              {copy.voice}
+              <select
+                value={state.currentVoiceId ?? currentEntry.defaultVoiceId}
+                onChange={(event) => controller.setVoice(event.currentTarget.value)}
+                className="min-h-11 rounded-xl border border-border-control bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                {currentEntry.availableVoiceIds.map((voiceId) => (
+                  <option key={voiceId} value={voiceId}>
+                    {currentEntry.segmentsByVoice[voiceId]?.[0]?.voiceName ?? voiceId}
+                  </option>
+                ))}
+              </select>
+            </label>
           )}
 
-          {/* Speed Selector — 44px touch target */}
-          <button
-            type="button"
-            onClick={() => {
-              const nextIdx = (speeds.indexOf(playbackRate) + 1) % speeds.length;
-              onSetSpeed(speeds[nextIdx]!);
-            }}
-            aria-label={t(language, "audioPlayer.speed", { rate: formatNumerals(playbackRate, language) })}
-            className="flex h-11 min-h-[44px] px-2.5 items-center justify-center rounded-xl border border-border text-[0.75rem] font-extrabold text-foreground hover:bg-muted active:scale-95 transition-all"
-          >
-            {formatNumerals(playbackRate, language)}x
-          </button>
+          {currentSegment && (
+            <p className="text-[0.75rem] leading-5 text-muted-foreground sm:col-span-2">
+              <span className="font-bold text-foreground">{currentSegment.voiceName}</span>
+              {` · ${currentSegment.sourceName} · ${currentSegment.attribution}`}
+            </p>
+          )}
 
-          {/* Close Player — 44px touch target */}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t(language, "audioPlayer.close")}
-            className="flex size-11 min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all"
-          >
-            <X size={18} />
-          </button>
+          {canRepeat && (
+            <button
+              type="button"
+              aria-pressed={repeatEnabled}
+              onClick={() => controller.setPlaybackMode(repeatEnabled ? "play-once" : "repeat-prescribed-count")}
+              className="min-h-11 rounded-xl border border-border bg-background px-3 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {repeatEnabled ? copy.playOnce : copy.repeat}
+            </button>
+          )}
         </div>
-      </div>
-
-      {/* Track Progress Bar */}
-      <div className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-muted">
-        <div
-          className="h-full bg-amber-500 transition-all duration-300"
-          style={{ width: `${duration > 0 ? (currentTime / duration) * 100 : 0}%` }}
-        />
-      </div>
-    </div>
+      </details>
+    </section>
   );
 }

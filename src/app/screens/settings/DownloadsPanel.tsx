@@ -1,14 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
-import { CheckCircle2, CloudOff, Database, RotateCcw } from "../../components/icons";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CheckCircle2, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
+import { getAzkarForMode } from "../../content/azkar";
+import { loadAudioPreferences } from "../../audio/audioPreferences";
+import {
+  downloadAudioForZikrs,
+  estimateAudioDownloadBytes,
+  getDownloadedAudioSummary,
+  removeDownloadedAudio,
+} from "../../audio/audioOfflineCache";
 
 type OfflineStatus = {
   cacheCount: number;
   serviceWorkerReady: boolean;
   usageBytes?: number;
   quotaBytes?: number;
+  downloadedAudioAssets: number;
+  downloadedAudioBytes: number;
 };
 
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
@@ -23,6 +33,17 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [status, setStatus] = useState<OfflineStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const audioPreferences = useMemo(loadAudioPreferences, []);
+  const audioCollections = useMemo(
+    () =>
+      (["morning", "evening", "before_sleep"] as const).map((category) => {
+        const zikrs = getAzkarForMode(category, "core");
+        return { category, zikrs, byteSize: estimateAudioDownloadBytes(zikrs, audioPreferences) };
+      }),
+    [audioPreferences],
+  );
 
   const refreshStatus = useCallback(async () => {
     try {
@@ -35,11 +56,14 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         navigator.storage?.estimate ? navigator.storage.estimate() : Promise.resolve({} as StorageEstimate),
       ]);
 
+      const audioSummary = getDownloadedAudioSummary();
       setStatus({
         serviceWorkerReady: Boolean(registration?.active),
         cacheCount: cacheNames.length,
         usageBytes: storage.usage,
         quotaBytes: storage.quota,
+        downloadedAudioAssets: audioSummary.assetCount,
+        downloadedAudioBytes: audioSummary.byteSize,
       });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : "Could not inspect offline storage.");
@@ -50,7 +74,28 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
   useEffect(() => {
     void refreshStatus();
+    return () => abortRef.current?.abort();
   }, [refreshStatus]);
+
+  const downloadCollection = async (collection: (typeof audioCollections)[number]) => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setErrorMessage("");
+    setDownloadProgress({ completed: 0, total: collection.byteSize });
+    try {
+      await downloadAudioForZikrs(collection.zikrs, audioPreferences, {
+        signal: controller.signal,
+        onProgress: (completed, total) => setDownloadProgress({ completed, total }),
+      });
+      await refreshStatus();
+    } catch (error) {
+      if (!controller.signal.aborted)
+        setErrorMessage(error instanceof Error ? error.message : "Audio download failed.");
+    } finally {
+      abortRef.current = null;
+      setDownloadProgress(null);
+    }
+  };
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background">
@@ -115,6 +160,14 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                     <dt className="text-muted-foreground">{t(language, "downloads.quota")}</dt>
                     <dd className="font-medium text-foreground">{formatMegabytes(status.quotaBytes, language)}</dd>
                   </div>
+                  <div className="flex justify-between gap-3">
+                    <dt className="text-muted-foreground">
+                      {language === "ar" ? "الصوت المحمّل" : "Downloaded audio"}
+                    </dt>
+                    <dd className="font-medium text-foreground">
+                      {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
+                    </dd>
+                  </div>
                 </dl>
               ) : null}
             </div>
@@ -135,6 +188,82 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               {errorMessage || t(language, "downloads.statusError")}
             </p>
           )}
+        </section>
+
+        <section className="mt-4 rounded-2xl border border-border bg-card p-5" aria-labelledby="audio-downloads-title">
+          <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">
+            {language === "ar" ? "تنزيلات الصوت الاختيارية" : "Optional audio downloads"}
+          </h2>
+          <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
+            {language === "ar"
+              ? "تُنزّل الملفات المعتمدة كاملة فقط، ويمكن حذفها في أي وقت."
+              : "Only complete, approved recordings are downloaded. You can remove them at any time."}
+          </p>
+
+          <div className="mt-4 grid gap-2">
+            {audioCollections.map((collection) => {
+              const label =
+                collection.category === "morning"
+                  ? language === "ar"
+                    ? "أذكار الصباح المختصرة"
+                    : "Morning Core"
+                  : collection.category === "evening"
+                    ? language === "ar"
+                      ? "أذكار المساء المختصرة"
+                      : "Evening Core"
+                    : language === "ar"
+                      ? "أذكار النوم المختصرة"
+                      : "Before-Sleep Core";
+              return (
+                <button
+                  key={collection.category}
+                  type="button"
+                  disabled={collection.byteSize === 0 || downloadProgress !== null}
+                  onClick={() => void downloadCollection(collection)}
+                  className="flex min-h-11 items-center justify-between gap-3 rounded-xl border border-border bg-background px-3 text-start font-semibold text-foreground disabled:opacity-50"
+                >
+                  <span className="flex items-center gap-2">
+                    <Download size={18} aria-hidden="true" />
+                    {label}
+                  </span>
+                  <span className="text-[0.75rem] text-muted-foreground">
+                    {collection.byteSize > 0
+                      ? formatMegabytes(collection.byteSize, language)
+                      : language === "ar"
+                        ? "غير متاح"
+                        : "Unavailable"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {downloadProgress && (
+            <div className="mt-3" role="status">
+              <progress
+                className="w-full"
+                max={Math.max(1, downloadProgress.total)}
+                value={downloadProgress.completed}
+              />
+              <button
+                type="button"
+                onClick={() => abortRef.current?.abort()}
+                className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border font-semibold text-foreground"
+              >
+                <X size={18} aria-hidden="true" />
+                {language === "ar" ? "إلغاء التنزيل" : "Cancel download"}
+              </button>
+            </div>
+          )}
+
+          <button
+            type="button"
+            disabled={!status?.downloadedAudioAssets || downloadProgress !== null}
+            onClick={() => void removeDownloadedAudio().then(refreshStatus)}
+            className="mt-3 min-h-11 w-full rounded-xl border border-destructive/40 px-4 font-semibold text-destructive disabled:opacity-50"
+          >
+            {language === "ar" ? "حذف الصوت المحمّل" : "Remove downloaded audio"}
+          </button>
         </section>
       </div>
     </div>

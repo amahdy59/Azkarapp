@@ -1,7 +1,7 @@
-import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrGroupId } from "../types";
+import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrDraft, ZikrGroupId } from "../types";
 import { applyContentReview } from "./contentReview";
 
-const MORNING_AZKAR: Zikr[] = [
+const MORNING_AZKAR: ZikrDraft[] = [
   {
     id: "m-hm-75a",
     category: "morning",
@@ -548,7 +548,7 @@ const MORNING_AZKAR: Zikr[] = [
   },
 ];
 
-const EVENING_AZKAR: Zikr[] = [
+const EVENING_AZKAR: ZikrDraft[] = [
   {
     id: "e-hm-75a",
     category: "evening",
@@ -1073,7 +1073,7 @@ const EVENING_AZKAR: Zikr[] = [
   },
 ];
 
-const SLEEP_AZKAR: Zikr[] = [
+const SLEEP_AZKAR: ZikrDraft[] = [
   {
     id: "s-hm-99-ikhlas",
     category: "before_sleep",
@@ -1440,7 +1440,7 @@ const SLEEP_AZKAR: Zikr[] = [
   },
 ];
 
-const WAKING_UP_AZKAR: Zikr[] = [
+const WAKING_UP_AZKAR: ZikrDraft[] = [
   {
     id: "wu-hm-1",
     category: "waking_up",
@@ -1478,7 +1478,7 @@ const WAKING_UP_AZKAR: Zikr[] = [
   },
 ];
 
-const HOME_AZKAR: Zikr[] = [
+const HOME_AZKAR: ZikrDraft[] = [
   {
     id: "home-hm-15",
     category: "home",
@@ -1513,7 +1513,7 @@ const HOME_AZKAR: Zikr[] = [
   },
 ];
 
-const MOSQUE_AZKAR: Zikr[] = [
+const MOSQUE_AZKAR: ZikrDraft[] = [
   {
     id: "msq-hm-20",
     category: "mosque",
@@ -1550,7 +1550,7 @@ const MOSQUE_AZKAR: Zikr[] = [
   },
 ];
 
-const AFTER_PRAYER_AZKAR: Zikr[] = [
+const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "ap-ref-1",
     category: "after_prayer",
@@ -1782,7 +1782,7 @@ const AFTER_PRAYER_AZKAR: Zikr[] = [
   },
 ];
 
-const RESTROOM_AZKAR: Zikr[] = [
+const RESTROOM_AZKAR: ZikrDraft[] = [
   {
     id: "pur-ref-1",
     category: "restroom",
@@ -1878,7 +1878,7 @@ const RESTROOM_AZKAR: Zikr[] = [
   },
 ];
 
-const FOOD_DRINK_AZKAR: Zikr[] = [
+const FOOD_DRINK_AZKAR: ZikrDraft[] = [
   {
     id: "fd-ref-1",
     category: "food_drink",
@@ -1988,7 +1988,7 @@ const FOOD_DRINK_AZKAR: Zikr[] = [
   },
 ];
 
-const CLOTHING_AZKAR: Zikr[] = [
+const CLOTHING_AZKAR: ZikrDraft[] = [
   {
     id: "clo-ref-1",
     category: "clothing",
@@ -2055,7 +2055,7 @@ const CLOTHING_AZKAR: Zikr[] = [
   },
 ];
 
-const TRAVEL_AZKAR: Zikr[] = [
+const TRAVEL_AZKAR: ZikrDraft[] = [
   {
     id: "tr-ref-1",
     category: "travel",
@@ -2115,7 +2115,7 @@ const TRAVEL_AZKAR: Zikr[] = [
   },
 ];
 
-const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
+const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
   {
     id: "da-ref-1",
     category: "distress_anxiety",
@@ -2219,7 +2219,7 @@ const DISTRESS_ANXIETY_AZKAR: Zikr[] = [
   },
 ];
 
-const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
+const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
   {
     id: "ir-ref-1",
     category: "illness_ruqyah",
@@ -2321,7 +2321,7 @@ const ILLNESS_RUQYAH_AZKAR: Zikr[] = [
   },
 ];
 
-const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
+const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
   {
     id: "sc-ref-1",
     category: "social_community",
@@ -2461,7 +2461,7 @@ const SOCIAL_COMMUNITY_AZKAR: Zikr[] = [
   },
 ];
 
-const NATURAL_EVENTS_AZKAR: Zikr[] = [
+const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
   {
     id: "ne-ref-1",
     category: "natural_events",
@@ -2557,7 +2557,7 @@ const NATURAL_EVENTS_AZKAR: Zikr[] = [
   },
 ];
 
-const MISCELLANEOUS_AZKAR: Zikr[] = [
+const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
   {
     id: "misc-ref-1",
     category: "miscellaneous",
@@ -2882,7 +2882,7 @@ const ROUTINE_INTRODUCTION_IDS: Record<"morning" | "evening", string> = {
   evening: "e-hm-75a",
 };
 
-function applyRoutineArrangement(category: RoutineCategoryId, azkar: Zikr[]) {
+function applyRoutineArrangement(category: RoutineCategoryId, azkar: ZikrDraft[]) {
   const byId = new Map(azkar.map((zikr) => [zikr.id, zikr]));
   let orderIndex = 0;
 
@@ -2940,8 +2940,8 @@ const ALL_AZKAR = applyContentReview([
 
 const LAZY_AZKAR: Partial<Record<CategoryId, Zikr[]>> = {};
 
-const registerLazyCollection = (category: CategoryId, items: Zikr[]) => {
-  LAZY_AZKAR[category] = items;
+const registerLazyCollection = (category: CategoryId, items: ZikrDraft[]) => {
+  LAZY_AZKAR[category] = applyContentReview(items);
 };
 
 const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>

@@ -1,4 +1,5 @@
-import type { Zikr } from "../types";
+import type { Zikr, ZikrAudioBehavior, ZikrDraft } from "../types";
+import { APPROVED_AUDIO_ASSIGNMENTS } from "../audio/audioAssignments";
 import { QURAN_PASSAGES } from "./quranPassages";
 
 const QURAN_CONTENT_BY_ID = {
@@ -44,6 +45,94 @@ const SHARED_ZIKR_ALIASES: Readonly<Record<string, string>> = {
   "fd-ref-1": "pur-ref-1",
   "clo-ref-4": "pur-ref-1",
 };
+
+/** Explicit identities only. No text similarity or citation matching is used. */
+const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
+  "m-hm-75": "quran-002-255",
+  "e-hm-75": "quran-002-255",
+  "s-hm-100": "quran-002-255",
+  "ap-ref-9": "quran-002-255",
+  "m-hm-76a": "quran-112",
+  "e-hm-76a": "quran-112",
+  "s-hm-99-ikhlas": "quran-112",
+  "m-hm-76b": "quran-113",
+  "e-hm-76b": "quran-113",
+  "s-hm-99-falaq": "quran-113",
+  "m-hm-76c": "quran-114",
+  "e-hm-76c": "quran-114",
+  "s-hm-99-nas": "quran-114",
+  "s-hm-101": "quran-002-285-286",
+  "s-hm-109a": "quran-109",
+  "s-hm-110a": "quran-032",
+  "s-hm-110b": "quran-067",
+  "m-hm-75a": "zikr:collection-opening",
+  "e-hm-75a": "zikr:collection-opening",
+  "m-hm-79": "zikr:sayyid-al-istighfar",
+  "e-hm-79": "zikr:sayyid-al-istighfar",
+  "misc-ref-8": "zikr:sayyid-al-istighfar",
+  "friday-dua-02": "zikr:sayyid-al-istighfar",
+  "m-hm-82": "zikr:daily-wellbeing",
+  "e-hm-82": "zikr:daily-wellbeing",
+  "m-hm-83": "quran-009-129-excerpt",
+  "e-hm-83": "quran-009-129-excerpt",
+  "da-ref-5": "quran-009-129-excerpt",
+  "m-hm-84": "zikr:pardon-and-wellbeing",
+  "e-hm-84": "zikr:pardon-and-wellbeing",
+  "m-hm-85": "zikr:refuge-from-self-and-shaytan",
+  "e-hm-85": "zikr:refuge-from-self-and-shaytan",
+  "s-hm-109": "zikr:refuge-from-self-and-shaytan",
+  "m-hm-86": "zikr:bismillah-no-harm",
+  "e-hm-86": "zikr:bismillah-no-harm",
+  "misc-ref-9": "zikr:bismillah-no-harm",
+  "m-hm-87": "zikr:contentment-with-faith",
+  "e-hm-87": "zikr:contentment-with-faith",
+  "m-hm-88": "zikr:ya-hayyu-ya-qayyum",
+  "e-hm-88": "zikr:ya-hayyu-ya-qayyum",
+  "m-hm-91": "zikr:subhanallah-wa-bihamdih",
+  "e-hm-91": "zikr:subhanallah-wa-bihamdih",
+  "misc-ref-3": "zikr:subhanallah-wa-bihamdih",
+  "m-hm-93": "zikr:tahlil-complete",
+  "e-hm-92": "zikr:tahlil-complete",
+  "ap-ref-3": "zikr:tahlil-complete",
+  "ap-tasbeeh-tawhid": "zikr:tahlil-complete",
+  "misc-ref-2": "zikr:tahlil-complete",
+  "m-hm-96": "zikr:astaghfirullah-wa-atubu-ilayh",
+  "e-hm-96": "zikr:astaghfirullah-wa-atubu-ilayh",
+  "m-hm-97": "zikr:perfect-words-refuge",
+  "e-hm-97": "zikr:perfect-words-refuge",
+  "m-hm-98": "zikr:salawat-short",
+  "e-hm-98": "zikr:salawat-short",
+  "s-hm-106-subhanallah": "zikr:subhanallah",
+  "ap-tasbeeh-subhanallah": "zikr:subhanallah",
+  "s-hm-106-alhamdulillah": "zikr:alhamdulillah",
+  "ap-tasbeeh-alhamdulillah": "zikr:alhamdulillah",
+  "s-hm-106-allahu-akbar": "zikr:allahu-akbar",
+  "ap-tasbeeh-allahuakbar": "zikr:allahu-akbar",
+  "pur-ref-1": "zikr:bismillah",
+  "fd-ref-1": "zikr:bismillah",
+  "clo-ref-4": "zikr:bismillah",
+  "da-ref-4": "zikr:distress-refuge",
+  "friday-dua-12": "zikr:distress-refuge",
+  "da-ref-2": "zikr:allahumma-rahmataka-arju",
+  "friday-dua-20": "zikr:allahumma-rahmataka-arju",
+  "friday-dua-32": "zikr:daily-wellbeing",
+  "misc-ref-1": "zikr:subhanallah-great",
+  "comprehensive-dua-39": "zikr:subhanallah-great",
+  "ap-ref-10": "zikr:refuge-from-cowardice",
+  "comprehensive-dua-44": "zikr:refuge-from-cowardice",
+};
+
+function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {
+  const prescribedRepeatIsSuitable = item.repetitionCount > 1 && item.repetitionCount <= 10;
+  return {
+    defaultMode: "play-once",
+    supportedModes: prescribedRepeatIsSuitable
+      ? ["play-once", "repeat-prescribed-count", "repeat-custom"]
+      : ["play-once"],
+    repetitionUnit: item.ritualGroupId === "three_quls" ? "ritual-round" : "zikr",
+    ...(prescribedRepeatIsSuitable ? { recommendedMaxAutoRepeat: item.repetitionCount } : {}),
+  };
+}
 
 const BENEFIT_OVERRIDES: Readonly<Record<string, string>> = {
   "m-hm-75": "Protection from the jinn until evening.",
@@ -156,7 +245,7 @@ const TEXT_OVERRIDES: Readonly<Record<string, Partial<Zikr>>> = {
   },
 };
 
-export function applyContentReview(items: Zikr[]): Zikr[] {
+export function applyContentReview(items: ZikrDraft[]): Zikr[] {
   const byId = new Map(items.map((item) => [item.id, item]));
 
   for (const item of items) {
@@ -186,5 +275,14 @@ export function applyContentReview(items: Zikr[]): Zikr[] {
   }
 
   // Abu Dawud 5079 is graded weak by al-Albani, so its special seven-times card is not presented.
-  return items.filter((item) => item.id !== "ap-ref-11");
+  return items
+    .filter((item) => item.id !== "ap-ref-11")
+    .map((item) => {
+      const audioAssetId = APPROVED_AUDIO_ASSIGNMENTS[item.id];
+      return Object.assign(item, {
+        canonicalKey: CANONICAL_KEY_BY_ID[item.id] ?? `zikr:${item.id}`,
+        audioBehavior: getAudioBehavior(item),
+        ...(audioAssetId ? { audioAssetId } : {}),
+      }) as Zikr;
+    });
 }

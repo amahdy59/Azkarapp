@@ -50,6 +50,7 @@ jobs:
           VITE_GOOGLE_AUTH_ENABLED: ${{ vars.VITE_GOOGLE_AUTH_ENABLED }}
           VITE_EMAIL_AUTH_ENABLED: ${{ vars.VITE_EMAIL_AUTH_ENABLED }}
           VITE_APPLE_AUTH_ENABLED: ${{ vars.VITE_APPLE_AUTH_ENABLED }}
+          VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

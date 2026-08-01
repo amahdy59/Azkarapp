@@ -1,10 +1,11 @@
-import type { Zikr } from "../types";
+import type { ZikrDraft } from "../types";
+import { applyContentReview } from "./contentReview";
 
 /**
  * General reviewed collection: 20 essential items followed by optional additions.
  * Existing `friday-dua-*` IDs are retained because content IDs are stable contracts.
  */
-export const COMPREHENSIVE_DUAS: Zikr[] = [
+const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
   {
     id: "comprehensive-duas-introduction",
     arabicText:
@@ -903,3 +904,5 @@ export const COMPREHENSIVE_DUAS: Zikr[] = [
     includedInCore: false,
   },
 ];
+
+export const COMPREHENSIVE_DUAS = applyContentReview(COMPREHENSIVE_DUA_DRAFTS);
