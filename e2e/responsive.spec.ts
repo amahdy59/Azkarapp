@@ -60,10 +60,14 @@ test("the production shell does not render simulated device chrome", async ({ pa
   expect(simulatedHomeIndicators).toBe(0);
 });
 
-test("the typography contract assigns each content type to its approved family", async ({ page }) => {
+test("@cross-browser typography assigns UI and zikr text to their approved families", async ({ page }) => {
   await page.goto("/");
 
-  const families = await page.evaluate(() => {
+  const families = await page.evaluate(async () => {
+    const [uiFaces, zikrFaces] = await Promise.all([
+      document.fonts.load('400 16px "Noto Sans Arabic Variable"', "واجهة عربية"),
+      document.fonts.load('400 16px "IBM Plex Sans Arabic"', "سُبْحَانَ اللَّهِ"),
+    ]);
     const fixture = document.createElement("div");
     fixture.innerHTML = `
       <span data-font="english">English interface</span>
@@ -83,19 +87,31 @@ test("the typography contract assigns each content type to its approved family",
     const zikr = getComputedStyle(fixture.querySelector('[data-font="zikr"]')!).fontFamily;
     document.documentElement.style.setProperty("--font-size", "14px");
     const inputSize = getComputedStyle(fixture.querySelector('[data-font="input"]')!).fontSize;
-    const textSizeAdjust = getComputedStyle(document.documentElement).webkitTextSizeAdjust;
+    const rootStyle = getComputedStyle(document.documentElement);
+    const textSizeAdjust =
+      rootStyle.getPropertyValue("-webkit-text-size-adjust") || rootStyle.getPropertyValue("text-size-adjust");
 
     fixture.remove();
-    return { english, arabic, mixedEnglish, zikr, inputSize, textSizeAdjust };
+    return {
+      english,
+      arabic,
+      mixedEnglish,
+      zikr,
+      inputSize,
+      textSizeAdjust,
+      uiFaces: uiFaces.length,
+      zikrFaces: zikrFaces.length,
+    };
   });
 
-  expect(families.english).toContain("system-ui");
-  expect(families.arabic).toContain("system-ui");
-  expect(families.mixedEnglish).toContain("system-ui");
-  expect(families.zikr).toContain("Noto Naskh Arabic");
-  expect(families.zikr).toContain("Geeza Pro");
+  expect(families.english).toContain("Noto Sans Arabic Variable");
+  expect(families.arabic).toContain("Noto Sans Arabic Variable");
+  expect(families.mixedEnglish).toContain("Noto Sans Arabic Variable");
+  expect(families.zikr).toContain("IBM Plex Sans Arabic");
+  expect(families.uiFaces).toBeGreaterThan(0);
+  expect(families.zikrFaces).toBeGreaterThan(0);
   expect(families.inputSize).toBe("16px");
-  expect(families.textSizeAdjust).toBe("100%");
+  if (families.textSizeAdjust) expect(families.textSizeAdjust).toBe("100%");
 });
 
 test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {

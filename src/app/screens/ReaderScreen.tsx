@@ -19,7 +19,7 @@ import {
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
-import type { AppLanguage, ArabicFontOption, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
+import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { AdaptiveCounterTrack } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -118,7 +118,6 @@ export function ReaderScreen({
   isDone,
   collectionCompletedCount,
   hapticFeedback,
-  arabicFont,
   showTranslation,
   showTransliteration,
   textSize,
@@ -142,7 +141,6 @@ export function ReaderScreen({
   isDone: boolean;
   collectionCompletedCount: number;
   hapticFeedback: boolean;
-  arabicFont: ArabicFontOption;
   showTranslation: boolean;
   showTransliteration: boolean;
   textSize: TextSizeOption;
@@ -243,7 +241,7 @@ export function ReaderScreen({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [z?.id, arabicFont, textSize, showTranslation, showTransliteration, language]);
+  }, [z?.id, textSize, showTranslation, showTransliteration, language]);
 
   if (!z || !category) {
     return null;
@@ -256,7 +254,7 @@ export function ReaderScreen({
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
-  const readingFontFamily = arabicFont === "noto_sans" ? "var(--font-ui-arabic)" : "var(--font-reading-arabic)";
+  const readingFontFamily = "var(--font-reading-arabic)";
 
   const handleToggleSaved = () => {
     onToggleSaved(z.id);

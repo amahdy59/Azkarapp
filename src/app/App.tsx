@@ -5,7 +5,6 @@ import { getAzkarForMode, isRoutineCategory } from "./content/azkar";
 import type {
   AppLanguage,
   AppStateSnapshot,
-  ArabicFontOption,
   BeforeInstallPromptEvent,
   CategoryId,
   ColorBlindSupport,
@@ -147,7 +146,6 @@ function AppContent() {
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
-  const [arabicFont, setArabicFont] = useState<ArabicFontOption>(initialState.settings.arabicFont);
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
@@ -271,7 +269,6 @@ function AppContent() {
         showTransliteration,
         showTranslation,
         textSize,
-        arabicFont,
         highContrast,
         boldText,
         reduceMotion,
@@ -295,7 +292,6 @@ function AppContent() {
     [
       boldText,
       accountUserId,
-      arabicFont,
       calendarType,
       colorBlindSupport,
       completed,
@@ -422,7 +418,6 @@ function AppContent() {
       setShowTransliteration(state.settings.showTransliteration);
       setShowTranslation(state.settings.showTranslation);
       setTextSize(state.settings.textSize);
-      setArabicFont(state.settings.arabicFont);
       setHighContrast(state.settings.highContrast);
       setBoldText(state.settings.boldText);
       setReduceMotion(state.settings.reduceMotion);
@@ -476,7 +471,6 @@ function AppContent() {
     setShowTransliteration(state.settings.showTransliteration);
     setShowTranslation(state.settings.showTranslation);
     setTextSize(state.settings.textSize);
-    setArabicFont(state.settings.arabicFont);
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
@@ -943,7 +937,6 @@ function AppContent() {
                 }
                 collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
                 hapticFeedback={hapticFeedback}
-                arabicFont={arabicFont}
                 showTranslation={showTranslation}
                 showTransliteration={showTransliteration}
                 textSize={textSize}
@@ -1019,7 +1012,6 @@ function AppContent() {
                 dailyCompletions={dailyCompletions}
                 savedCount={savedZikrIds.size}
                 textSize={textSize}
-                arabicFont={arabicFont}
                 showTranslation={showTranslation}
                 showTransliteration={showTransliteration}
                 highContrast={highContrast}
@@ -1039,7 +1031,6 @@ function AppContent() {
                 onThemeModeChange={setThemeMode}
                 onCalendarTypeChange={setCalendarType}
                 onTextSizeChange={setTextSize}
-                onArabicFontChange={setArabicFont}
                 onShowTranslationChange={setShowTranslation}
                 onShowTransliterationChange={setShowTransliteration}
                 onHighContrastChange={setHighContrast}

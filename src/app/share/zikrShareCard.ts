@@ -159,8 +159,9 @@ const PALETTES: Record<ThemeMode, CardPalette> = {
   },
 };
 
-const ARABIC_FONT = '"Noto Naskh Arabic", "Geeza Pro", "Times New Roman", Tahoma, serif';
-const LATIN_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+const ARABIC_ZIKR_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif';
+const ARABIC_UI_FONT = '"Noto Sans Arabic Variable", "Noto Sans Arabic", sans-serif';
+const LATIN_UI_FONT = '"Noto Sans Arabic Variable", system-ui, sans-serif';
 
 type ResolvedZikrShareCardLabels = Required<Omit<ZikrShareCardLabels, "repetitions">> & {
   repetitions: (count: number) => string;
@@ -434,7 +435,7 @@ function drawChip(
   palette: CardPalette,
   direction: "ltr" | "rtl",
 ) {
-  ctx.font = `700 25px ${direction === "rtl" ? ARABIC_FONT : LATIN_FONT}`;
+  ctx.font = `700 25px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
   const width = Math.min(430, Math.max(128, ctx.measureText(text).width + 58));
   fillRoundedRect(ctx, centerX - width / 2, y, width, 52, 26, palette.surfaceRaised);
   ctx.strokeStyle = palette.border;
@@ -464,7 +465,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         minFontSize: 34,
         lineHeightRatio: 1.62,
         maxLines: 21,
-        fontFamily: ARABIC_FONT,
+        fontFamily: ARABIC_ZIKR_FONT,
         fontWeight: 600,
         textColor: palette.foreground,
       };
@@ -476,7 +477,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         minFontSize: 25,
         lineHeightRatio: 1.5,
         maxLines: 9,
-        fontFamily: LATIN_FONT,
+        fontFamily: LATIN_UI_FONT,
         fontWeight: 500,
         textColor: palette.foreground,
       };
@@ -488,7 +489,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         minFontSize: 23,
         lineHeightRatio: 1.5,
         maxLines: 7,
-        fontFamily: LATIN_FONT,
+        fontFamily: LATIN_UI_FONT,
         fontWeight: 400,
         textColor: palette.secondary,
       };
@@ -500,7 +501,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         minFontSize: 24,
         lineHeightRatio: 1.5,
         maxLines: 5,
-        fontFamily: section.direction === "rtl" ? ARABIC_FONT : LATIN_FONT,
+        fontFamily: section.direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT,
         fontWeight: 500,
         textColor: palette.foreground,
       };
@@ -512,7 +513,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
         minFontSize: 20,
         lineHeightRatio: 1.45,
         maxLines: 4,
-        fontFamily: section.direction === "rtl" ? ARABIC_FONT : LATIN_FONT,
+        fontFamily: section.direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT,
         fontWeight: 500,
         textColor: palette.muted,
       };
@@ -673,7 +674,7 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillStyle = palette.foreground;
-  ctx.font = `700 46px ${direction === "rtl" ? ARABIC_FONT : LATIN_FONT}`;
+  ctx.font = `700 46px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
   ctx.fillText(labels.brandName, ZIKR_SHARE_CARD_WIDTH / 2, 176);
 
   const chips: string[] = [];
@@ -746,13 +747,13 @@ export function renderZikrShareCard(input: ZikrShareCardInput) {
   ctx.textAlign = "center";
   ctx.textBaseline = "top";
   ctx.fillStyle = palette.secondary;
-  ctx.font = `600 28px ${direction === "rtl" ? ARABIC_FONT : LATIN_FONT}`;
+  ctx.font = `600 28px ${direction === "rtl" ? ARABIC_UI_FONT : LATIN_UI_FONT}`;
   ctx.fillText(labels.footer, ZIKR_SHARE_CARD_WIDTH / 2, 2720, 850);
 
   if (input.appUrl?.trim()) {
     ctx.direction = "ltr";
     ctx.fillStyle = palette.muted;
-    ctx.font = `500 22px ${LATIN_FONT}`;
+    ctx.font = `500 22px ${LATIN_UI_FONT}`;
     ctx.fillText(input.appUrl.trim(), ZIKR_SHARE_CARD_WIDTH / 2, 2782, 850);
   }
 
@@ -799,8 +800,9 @@ export function generateZikrShareCard(input: ZikrShareCardInput): GeneratedZikrS
 export async function prepareZikrShareCardFonts() {
   if (typeof document === "undefined" || !document.fonts) return;
   await Promise.allSettled([
-    document.fonts.load(`600 62px ${ARABIC_FONT}`, "اللَّهُمَّ"),
-    document.fonts.load(`700 46px ${LATIN_FONT}`, "Azkar"),
+    document.fonts.load(`600 62px ${ARABIC_ZIKR_FONT}`, "اللَّهُمَّ"),
+    document.fonts.load(`700 46px ${ARABIC_UI_FONT}`, "أذكار"),
+    document.fonts.load(`700 46px ${LATIN_UI_FONT}`, "Azkar"),
   ]);
 }
 

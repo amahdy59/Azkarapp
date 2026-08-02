@@ -32,7 +32,6 @@ describe("ReaderScreen audio identity", () => {
         isDone={false}
         collectionCompletedCount={0}
         hapticFeedback={false}
-        arabicFont="ibm_plex"
         showTranslation
         showTransliteration
         textSize="medium"
@@ -65,7 +64,6 @@ describe("ReaderScreen audio identity", () => {
         isDone={false}
         collectionCompletedCount={0}
         hapticFeedback={false}
-        arabicFont="ibm_plex"
         showTranslation={false}
         showTransliteration={false}
         textSize="medium"
@@ -115,7 +113,6 @@ describe("ReaderScreen audio identity", () => {
         isDone={false}
         collectionCompletedCount={0}
         hapticFeedback={false}
-        arabicFont="ibm_plex"
         showTranslation={false}
         showTransliteration={false}
         textSize="medium"

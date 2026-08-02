@@ -1,7 +1,7 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { AlignRight, Check, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
 import { t } from "../../i18n";
-import type { AppLanguage, ArabicFontOption, ColorBlindSupport, TextSizeOption } from "../../types";
+import type { AppLanguage, ColorBlindSupport, TextSizeOption } from "../../types";
 import { RowValue, SectionLabel, SettingsRowItem, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 
 function formatColorBlindSupport(value: ColorBlindSupport, language: AppLanguage) {
@@ -36,7 +36,6 @@ export function AccessibilityPanel({
   language,
   direction,
   textSize,
-  arabicFont,
   showTranslation,
   showTransliteration,
   highContrast,
@@ -48,7 +47,6 @@ export function AccessibilityPanel({
   calendarType = "hijri",
   onCalendarTypeChange,
   onTextSizeChange,
-  onArabicFontChange,
   onShowTranslationChange,
   onShowTransliterationChange,
   onHighContrastChange,
@@ -63,7 +61,6 @@ export function AccessibilityPanel({
   direction: "ltr" | "rtl";
   calendarType?: "hijri" | "gregorian";
   textSize: TextSizeOption;
-  arabicFont: ArabicFontOption;
   showTranslation: boolean;
   showTransliteration: boolean;
   highContrast: boolean;
@@ -74,7 +71,6 @@ export function AccessibilityPanel({
   colorBlindSupport: ColorBlindSupport;
   onCalendarTypeChange?: (val: "hijri" | "gregorian") => void;
   onTextSizeChange: (value: TextSizeOption) => void;
-  onArabicFontChange: (value: ArabicFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
   onShowTransliterationChange: (value: boolean) => void;
   onHighContrastChange: (value: boolean) => void;
@@ -260,23 +256,6 @@ export function AccessibilityPanel({
             right={<RowValue value={t(language, "settings.alwaysOn")} withChevron={false} />}
             hasDivider={false}
           />
-        </div>
-        <div className="mx-4 mt-3">
-          <p className="mb-2 text-[0.8125rem] font-semibold text-muted-foreground">
-            {t(language, "settings.arabicFont")}
-          </p>
-          <div className="grid grid-cols-2 gap-2">
-            <PanelOptionButton
-              active={arabicFont === "ibm_plex"}
-              label={t(language, "settings.fontPlex")}
-              onClick={() => onArabicFontChange("ibm_plex")}
-            />
-            <PanelOptionButton
-              active={arabicFont === "noto_sans"}
-              label={t(language, "settings.fontNoto")}
-              onClick={() => onArabicFontChange("noto_sans")}
-            />
-          </div>
         </div>
       </div>
     </div>

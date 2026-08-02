@@ -4,7 +4,6 @@ import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import type {
   AppLanguage,
-  ArabicFontOption,
   ColorBlindSupport,
   DailyCollectionCompletion,
   LocationSettings,
@@ -39,7 +38,6 @@ interface SettingsScreenProps {
   dailyCompletions: DailyCollectionCompletion[];
   savedCount: number;
   textSize: TextSizeOption;
-  arabicFont: ArabicFontOption;
   showTranslation: boolean;
   showTransliteration: boolean;
   highContrast: boolean;
@@ -59,7 +57,6 @@ interface SettingsScreenProps {
   onThemeModeChange: (value: ThemeMode) => void;
   onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
   onTextSizeChange: (value: TextSizeOption) => void;
-  onArabicFontChange: (value: ArabicFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
   onShowTransliterationChange: (value: boolean) => void;
   onHighContrastChange: (value: boolean) => void;
@@ -93,7 +90,6 @@ export function SettingsScreen({
   dailyCompletions,
   savedCount,
   textSize,
-  arabicFont,
   showTranslation,
   showTransliteration,
   highContrast,
@@ -113,7 +109,6 @@ export function SettingsScreen({
   onThemeModeChange,
   onCalendarTypeChange,
   onTextSizeChange,
-  onArabicFontChange,
   onShowTranslationChange,
   onShowTransliterationChange,
   onHighContrastChange,
@@ -210,7 +205,6 @@ export function SettingsScreen({
               calendarType={calendarType}
               onCalendarTypeChange={onCalendarTypeChange}
               textSize={textSize}
-              arabicFont={arabicFont}
               showTranslation={showTranslation}
               showTransliteration={showTransliteration}
               highContrast={highContrast}
@@ -220,7 +214,6 @@ export function SettingsScreen({
               forceRtl={forceRtl}
               colorBlindSupport={colorBlindSupport}
               onTextSizeChange={onTextSizeChange}
-              onArabicFontChange={onArabicFontChange}
               onShowTranslationChange={onShowTranslationChange}
               onShowTransliterationChange={onShowTransliterationChange}
               onHighContrastChange={onHighContrastChange}

@@ -21,7 +21,6 @@ export const CATEGORY_IDS = [
 ] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 export type TextSizeOption = "small" | "medium" | "large";
-export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
 export type RoutineCategoryId = "morning" | "evening" | "before_sleep";
@@ -173,7 +172,6 @@ export interface UserSettingsState {
   showTransliteration: boolean;
   showTranslation: boolean;
   textSize: TextSizeOption;
-  arabicFont: ArabicFontOption;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;

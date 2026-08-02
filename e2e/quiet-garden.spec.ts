@@ -55,7 +55,6 @@ async function seedReturningGardenUser(
             showTransliteration: false,
             showTranslation: false,
             textSize: "medium",
-            arabicFont: "ibm_plex",
             highContrast: false,
             boldText: false,
             reduceMotion: true,

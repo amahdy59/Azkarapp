@@ -1,7 +1,6 @@
 import type {
   AppLanguage,
   AppStateSnapshot,
-  ArabicFontOption,
   CategoryId,
   ColorBlindSupport,
   LocationSettings,
@@ -34,7 +33,6 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     showTransliteration: false,
     showTranslation: false,
     textSize: "medium",
-    arabicFont: "ibm_plex",
     highContrast: false,
     boldText: false,
     reduceMotion: false,
@@ -78,10 +76,6 @@ function isLanguage(value: string): value is AppLanguage {
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
   return ["small", "medium", "large"].includes(value);
-}
-
-function isArabicFont(value: string): value is ArabicFontOption {
-  return ["ibm_plex", "noto_sans"].includes(value);
 }
 
 function isWeeklyGoalDays(value: unknown): value is number {
@@ -415,10 +409,6 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           : DEFAULT_APP_STATE.settings.showTranslation,
       textSize:
         settings?.textSize && isTextSize(settings.textSize) ? settings.textSize : DEFAULT_APP_STATE.settings.textSize,
-      arabicFont:
-        settings?.arabicFont && isArabicFont(settings.arabicFont)
-          ? settings.arabicFont
-          : DEFAULT_APP_STATE.settings.arabicFont,
       highContrast:
         typeof settings?.highContrast === "boolean" ? settings.highContrast : DEFAULT_APP_STATE.settings.highContrast,
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
@@ -653,10 +643,6 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         incoming.settings?.textSize && isTextSize(incoming.settings.textSize)
           ? incoming.settings.textSize
           : safeBase.settings.textSize,
-      arabicFont:
-        incoming.settings?.arabicFont && isArabicFont(incoming.settings.arabicFont)
-          ? incoming.settings.arabicFont
-          : safeBase.settings.arabicFont,
       highContrast:
         typeof incoming.settings?.highContrast === "boolean"
           ? incoming.settings.highContrast
