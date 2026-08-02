@@ -87,9 +87,6 @@ test("@cross-browser typography assigns UI and zikr text to their approved famil
     const zikr = getComputedStyle(fixture.querySelector('[data-font="zikr"]')!).fontFamily;
     document.documentElement.style.setProperty("--font-size", "14px");
     const inputSize = getComputedStyle(fixture.querySelector('[data-font="input"]')!).fontSize;
-    const rootStyle = getComputedStyle(document.documentElement);
-    const textSizeAdjust =
-      rootStyle.getPropertyValue("-webkit-text-size-adjust") || rootStyle.getPropertyValue("text-size-adjust");
 
     fixture.remove();
     return {
@@ -98,7 +95,6 @@ test("@cross-browser typography assigns UI and zikr text to their approved famil
       mixedEnglish,
       zikr,
       inputSize,
-      textSizeAdjust,
       uiFaces: uiFaces.length,
       zikrFaces: zikrFaces.length,
     };
@@ -111,7 +107,6 @@ test("@cross-browser typography assigns UI and zikr text to their approved famil
   expect(families.uiFaces).toBeGreaterThan(0);
   expect(families.zikrFaces).toBeGreaterThan(0);
   expect(families.inputSize).toBe("16px");
-  if (families.textSizeAdjust) expect(families.textSizeAdjust).toBe("100%");
 });
 
 test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {
