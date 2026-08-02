@@ -1,5 +1,4 @@
 import { useState, useEffect, useMemo } from "react";
-import { ProgressBar } from "../components/ProgressBar";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
@@ -217,53 +216,95 @@ export function HomeScreen({
 
   const isFriday = now.getDay() === 5;
 
+  const bgPath =
+    reminderInfo.categoryId === "morning"
+      ? "/morning_sky.webp"
+      : reminderInfo.categoryId === "evening"
+        ? "/evening_sky.webp"
+        : "/sleep_sky.webp";
+
   return (
-    <ScreenContainer dir={direction} className="px-page">
+    <ScreenContainer dir={direction} className="px-0 relative overflow-hidden">
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      <header className="flex w-full shrink-0 flex-col gap-2.5 px-1 pt-1 pb-3" dir={direction}>
-        <PalmTreeReward summary={gardenSummary} language={language} bare />
+      {/* Atmospheric Background Sky Image & Backdrop Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
+        <img
+          src={bgPath}
+          alt=""
+          className="absolute inset-0 size-full object-cover object-center transition-all duration-700"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/60 via-[#080c14]/40 to-[#080c14]" />
+      </div>
 
-        <div
-          className="grid w-full grid-cols-1 items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-1.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[360px]:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] dark:border-amber-500/30 dark:bg-amber-950/30"
-          data-testid="prayer-header-card"
-        >
-          <div className="flex min-w-0 items-center justify-center px-1" data-testid="hijri-date" dir="auto">
-            <span className="font-sans text-[0.6875rem] leading-5 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
-              {formatDisplayDate(now, language, calendarType)}
-            </span>
-          </div>
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pt-2 pb-6">
+        {/* Header & Gamification Bar */}
+        <header className="flex w-full shrink-0 flex-col gap-3 pt-1 pb-3" dir={direction}>
+          <PalmTreeReward summary={gardenSummary} language={language} bare />
 
-          <span
-            className="my-1 h-px w-full self-center bg-amber-700/25 min-[360px]:my-0 min-[360px]:h-5 min-[360px]:w-px dark:bg-amber-200/25"
-            aria-hidden="true"
-          />
-
+          {/* Time & Date Info Pill */}
           <div
-            className="flex min-w-0 items-center justify-center px-1"
-            data-testid="next-prayer"
-            dir="auto"
-            title={
-              isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
-            }
+            className="flex h-[42px] w-full items-center justify-between rounded-[20px] border border-[#1f293d] bg-black/40 px-4 text-xs font-semibold backdrop-blur-md shadow-xs"
+            data-testid="prayer-header-card"
           >
-            <span
-              className="text-balance font-sans text-[0.6875rem] leading-5 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
-              style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
+            <div
+              className="flex min-w-0 items-center gap-1.5 text-slate-100"
+              data-testid="next-prayer"
+              dir="auto"
+              title={
+                isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
+              }
             >
-              {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
-            </span>
-          </div>
-        </div>
-      </header>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FBBF24"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+              </svg>
+              <span className="truncate font-sans font-bold" style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
+                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} •{" "}
+                {nextPrayerInfo.formattedCountdown}
+              </span>
+            </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto pt-1 pb-4">
+            <span className="h-4 w-px bg-white/20" aria-hidden="true" />
+
+            <div className="flex min-w-0 items-center gap-1.5 text-slate-100" data-testid="hijri-date" dir="auto">
+              <span className="truncate font-sans font-bold">{formatDisplayDate(now, language, calendarType)}</span>
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FBBF24"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                <line x1="16" y1="2" x2="16" y2="6" />
+                <line x1="8" y1="2" x2="8" y2="6" />
+                <line x1="3" y1="10" x2="21" y2="10" />
+              </svg>
+            </div>
+          </div>
+        </header>
+
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button
               type="button"
               onClick={onOpenFridayMode}
-              className="group flex w-full items-center justify-between rounded-2xl border border-amber-500/40 bg-amber-500/10 p-3.5 text-start shadow-md hover:bg-amber-500/15 transition-all dark:bg-amber-500/15"
+              className="group flex w-full items-center justify-between rounded-2xl border border-amber-500/40 bg-black/50 backdrop-blur-md p-3.5 text-start shadow-md hover:bg-black/60 transition-all"
             >
               <div className="flex items-center gap-3">
                 <span className="flex size-10 items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-black text-[1.125rem] shadow-sm">
@@ -283,7 +324,7 @@ export function HomeScreen({
           </section>
         )}
 
-        {/* Hero Zikr Section: Tranquility Card if complete, active card if incomplete */}
+        {/* Hero Zikr Banner */}
         {isComplete ? (
           <TranquilityCompletionCard
             categoryId={reminderInfo.categoryId}
@@ -292,78 +333,122 @@ export function HomeScreen({
             onReview={onRepeat}
           />
         ) : (
-          <section aria-labelledby="current-zikr-heading" className="mb-4">
-            <div
-              className={`relative overflow-hidden rounded-3xl border p-4 transition-all shadow-md ${
-                reminderInfo.categoryId === "morning"
-                  ? "border-amber-300/80 bg-gradient-to-br from-amber-100/90 via-amber-50 to-orange-100/80 dark:border-amber-500/30 dark:from-[#2c1c0a] dark:via-[#1e1408] dark:to-[#140e05]"
-                  : reminderInfo.categoryId === "evening"
-                    ? "border-orange-300/80 bg-gradient-to-br from-orange-100/90 via-amber-50 to-rose-100/80 dark:border-orange-500/30 dark:from-[#2e160a] dark:via-[#1f1008] dark:to-[#140a05]"
-                    : "border-sky-300/80 bg-gradient-to-br from-sky-100/90 via-indigo-50 to-blue-100/80 dark:border-sky-500/30 dark:from-[#0c1c38] dark:via-[#081226] dark:to-[#050c19]"
-              }`}
-            >
-              {/* Card Content Overlay */}
-              <div className="flex flex-col justify-between text-start">
-                <div>
-                  <h2 id="current-zikr-heading" className="text-[1.25rem] font-black tracking-wide text-foreground">
-                    {reminderInfo.title}
-                  </h2>
-                  <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
-                    {reminderInfo.desc}
-                  </p>
-                  <span className="mt-2 inline-flex rounded-full bg-background/70 px-2.5 py-1 text-[0.6875rem] font-bold text-foreground">
-                    {routineSummary}
-                  </span>
+          <section aria-labelledby="current-zikr-heading" className="mb-5">
+            <div className="flex flex-col gap-4 text-start">
+              {/* Hero Text Block */}
+              <div className="flex flex-col gap-1 px-1 pt-2">
+                <p className="text-[1.25rem] font-medium text-slate-200" dir="auto">
+                  {isArabic ? "حان وقت" : "Time for"}
+                </p>
+                <h2
+                  id="current-zikr-heading"
+                  className="text-[2.25rem] font-black text-[#fbbf24] tracking-wide"
+                  dir="auto"
+                >
+                  {reminderInfo.title}
+                </h2>
+                <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
+                  {reminderInfo.desc}
+                </p>
+              </div>
 
-                  {doneCount > 0 && (
-                    <div className="mt-3.5">
-                      <ProgressBar
-                        value={doneCount}
-                        max={totalCount}
-                        height={6}
-                        trackColor="var(--muted)"
-                        direction={direction}
-                        aria-label={t(language, "home.progressOf", {
-                          done: formatNumerals(doneCount, language),
-                          total: formatNumerals(totalCount, language),
-                        })}
-                      />
-                      <span className="mt-1.5 block text-[0.75rem] font-extrabold text-foreground dark:text-slate-200">
-                        {t(language, "home.progressOf", {
-                          done: formatNumerals(doneCount, language),
-                          total: formatNumerals(totalCount, language),
-                        })}
-                      </span>
-                    </div>
-                  )}
+              {/* Routine Mode Selector Pill */}
+              <div className="flex h-[40px] w-full items-center rounded-[20px] border border-[#1f293d] bg-[#080c14]/80 p-1 shadow-inner backdrop-blur-md">
+                <div
+                  className={`flex flex-1 items-center justify-center rounded-[16px] h-full transition-all text-xs font-semibold ${
+                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400"
+                  }`}
+                >
+                  {isArabic ? "الكاملة" : "Complete"}
                 </div>
-
-                <div className="mt-4 flex items-center justify-start">
-                  <button
-                    type="button"
-                    data-testid="home-primary-cta"
-                    onClick={() => {
-                      if (actionKind === "again") {
-                        onRepeat(reminderInfo.categoryId);
-                      } else {
-                        onResume(reminderInfo.categoryId);
-                      }
-                    }}
-                    aria-label={`${ctaLabel}. ${routineSummary}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                    className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
-                  >
-                    <span>{ctaLabel}</span>
-                    <span className="text-[1.125rem] leading-none transition-transform" aria-hidden="true">
-                      {direction === "rtl" ? "←" : "→"}
-                    </span>
-                  </button>
+                <div
+                  className={`flex flex-1 items-center justify-center rounded-[16px] h-full transition-all text-xs font-semibold ${
+                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 opacity-60"
+                  }`}
+                >
+                  {isArabic ? "المختصرة" : "Abbreviated"}
                 </div>
               </div>
+
+              {/* Info Row: Duration & Count */}
+              <div className="flex items-center justify-between px-3 text-xs text-[#9ca3af]" dir="auto">
+                <div className="flex items-center gap-1.5">
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                  <span>{isArabic ? "٦ دقائق تقريباً" : "~6 mins"}</span>
+                </div>
+
+                <span className="size-1 rounded-full bg-gray-500" aria-hidden="true" />
+
+                <div className="flex items-center gap-1.5 font-semibold text-white">
+                  <span>{routineSummary}</span>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Primary CTA Button */}
+              <button
+                type="button"
+                data-testid="home-primary-cta"
+                onClick={() => {
+                  if (actionKind === "again") {
+                    onRepeat(reminderInfo.categoryId);
+                  } else {
+                    onResume(reminderInfo.categoryId);
+                  }
+                }}
+                aria-label={`${ctaLabel}. ${routineSummary}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
+                className="interactive-elem group flex h-[50px] w-full items-center justify-between rounded-[25px] bg-[#fbbf24] px-5 text-[1rem] font-bold text-[#080c14] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
+              >
+                <div className="flex size-[20px] items-center justify-center shrink-0">
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                    className={direction === "rtl" ? "" : "rotate-180"}
+                  >
+                    <line x1="19" y1="12" x2="5" y2="12" />
+                    <polyline points="12 19 5 12 12 5" />
+                  </svg>
+                </div>
+                <span className="font-sans tracking-wide">{ctaLabel}</span>
+              </button>
             </div>
           </section>
         )}
 
-        {/* Leaves & Progress Garden (Daily Progress) */}
+        {/* Leaves & Progress Garden (Daily Progress Card) */}
         {quietProgressEnabled && (
           <TodayRoutineGarden
             summary={gardenSummary}

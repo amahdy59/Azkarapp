@@ -138,6 +138,36 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
   );
 }
 
+/** Golden Palm Tree Mark — matching Figma's tree-palm vector in golden amber (#E4A84A). */
+export function GoldenPalmMark({
+  className = "",
+  size = 28,
+  color = "#E4A84A",
+}: {
+  className?: string;
+  size?: number;
+  color?: string;
+}) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 28 28"
+      fill="none"
+      className={className}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path
+        d="M11.6665 9.33358H6.99944L5.83268 8.16686L4.66592 9.33358H2.3324C2.3324 6.11344 5.20263 3.5 8.74958 3.5C12.2965 3.5 15.1668 6.11344 15.1668 9.33358C15.7501 11.667 18.667 19.2507 16.3335 25.6676H11.6665C12.6349 23.3342 13.4166 21.0007 12.8332 18.0839M15.1668 8.33036C16.3482 7.4569 17.7811 6.9902 19.2504 7.00031C22.7974 7.00031 25.6676 9.61375 25.6676 12.8339H22.1673L21.0006 11.6672L19.8338 12.8339H16.3335M6.8712 11.3292C4.36267 13.8376 4.18765 17.7111 6.46283 19.9979L11.4099 15.0394L15.5286 10.9208C13.2534 8.63409 9.37973 8.82076 6.8712 11.3292Z"
+        stroke={color}
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 /** PalmTreeMark — detailed date palm tree SVG. */
 export function PalmTreeMark({
   filled = true,
@@ -237,7 +267,7 @@ export function PalmTreeReward({
       </div>
       <span className="h-4 w-px bg-border/40" />
       <div className="flex min-w-0 items-center justify-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
-        <PalmTreeMark size={24} filled={summary.lifetimePalms > 0} />
+        <GoldenPalmMark size={20} color="#E4A84A" />
         <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-600 min-[360px]:text-[0.875rem] dark:text-amber-400 font-sans">
           {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
         </span>
@@ -455,12 +485,6 @@ export function TodayRoutineGarden({
   const summary =
     offset === 0 && activeTab === "day" ? initialSummary : getGardenSummary(dailyCompletions, displayDate);
 
-  const { today } = summary;
-  const isTodayPalm =
-    today.isPalm ||
-    (today.completedCategories.includes("morning") &&
-      today.completedCategories.includes("evening") &&
-      today.completedCategories.includes("before_sleep"));
   const totalPalms = summary.lifetimePalms;
   const streak = summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0;
 
@@ -618,58 +642,69 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="flex flex-col items-center py-0.5 text-center">
-          <h3 className="mb-2 text-[1.0625rem] font-black text-foreground dark:text-white">
-            {isArabic ? "نخلة اليوم (أذكار الحماية)" : "Today's practice"}
-          </h3>
+        <div className="relative flex flex-col gap-4 overflow-hidden rounded-[24px] border border-[rgba(182,135,70,0.14)] bg-[#141a2a]/95 p-4 text-start shadow-xl backdrop-blur-md">
+          {/* Background Islamic Corner Pattern Overlay */}
+          <div className="absolute top-0 right-0 pointer-events-none opacity-10" aria-hidden="true">
+            <img
+              src="/islamic-corner-pattern.svg"
+              alt=""
+              className="w-[180px] h-[200px] object-contain object-top-right"
+            />
+          </div>
 
+          {/* Header Section */}
+          <div className="relative z-10 flex flex-col gap-1">
+            <div className="flex items-center justify-start gap-2">
+              <h3 className="text-[1.125rem] font-bold text-[#f0ece6]">{isArabic ? "وردك اليوم" : "Today's Wird"}</h3>
+              <GoldenLeafMark size={16} filled />
+            </div>
+            <p className="text-[0.8125rem] text-[#a5a7af]">
+              {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
+            </p>
+          </div>
+
+          {/* Main Split Row */}
           <div
-            className="mb-3.5 grid w-full grid-cols-[7rem_minmax(0,1fr)] items-center gap-3"
+            className="relative z-10 grid w-full grid-cols-1 items-center gap-4 min-[360px]:grid-cols-[120px_minmax(0,1fr)]"
             data-testid="today-palm-layout"
-            dir="ltr"
           >
-            <div
-              data-testid="today-palm-emblem"
-              className={`relative flex h-28 w-28 flex-col items-center justify-center rounded-full p-1.5 transition-all duration-700 ${
-                isTodayPalm
-                  ? "border-3 border-amber-500 bg-amber-500/10 shadow-md shadow-amber-500/20 dark:bg-amber-500/15"
-                  : "border-2 border-amber-500/30 bg-amber-500/5 shadow-inner dark:bg-amber-500/5"
-              }`}
-            >
-              <PalmTreeMark
-                size={64}
-                className={`transition-all duration-700 ${
-                  isTodayPalm ? "opacity-100 filter-none" : "grayscale opacity-35 contrast-75"
-                }`}
-              />
+            {/* Left Column: Palm Progress Ring */}
+            <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
+              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-black/30 p-2 shadow-inner">
+                {/* Circular Progress Arc */}
+                <svg width="100" height="100" viewBox="0 0 100 100" className="absolute inset-0 size-full -rotate-90">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" strokeWidth="6" fill="none" />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    stroke="#E4A84A"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={264}
+                    strokeDashoffset={264 - (264 * summary.today.goldenLeafCount) / 3}
+                    strokeLinecap="round"
+                    className="transition-all duration-700"
+                  />
+                </svg>
+                <GoldenPalmMark size={32} color="#E4A84A" className="relative z-10" />
+              </div>
 
-              <div
-                data-testid="today-leaf-count"
-                title={
-                  isTodayPalm
-                    ? isArabic
-                      ? "اكتملت نخلة اليوم (٣ / ٣)"
-                      : "Today's palm complete (3 of 3)"
-                    : isArabic
-                      ? `نخلة اليوم (${formatNumerals(summary.today.goldenLeafCount, language)} / ٣)`
-                      : `Today's palm in progress (${summary.today.goldenLeafCount} of 3)`
-                }
-                className="absolute -bottom-3 flex items-center gap-1.5 rounded-full border border-amber-500/50 bg-amber-950 px-3 py-1 text-[0.75rem] font-extrabold text-amber-400 shadow-md dark:bg-black dark:text-amber-300"
-              >
-                {isTodayPalm && <PalmTreeMark size={14} filled />}
-                <span>
-                  {isTodayPalm
-                    ? isArabic
-                      ? "مكتملة (٣ / ٣)"
-                      : "Complete (3 / 3)"
-                    : `${formatNumerals(summary.today.goldenLeafCount, language)} / ${formatNumerals(3, language)}`}
+              <div className="flex flex-col items-center" data-testid="today-leaf-count">
+                <span className="text-[1.375rem] font-bold text-[#f0ece6]">
+                  {formatNumerals(summary.today.goldenLeafCount, language)} {isArabic ? "من" : "of"}{" "}
+                  {formatNumerals(3, language)}
+                </span>
+                <span className="text-[0.75rem] text-[#a5a7af]">
+                  {isArabic ? "أوراد مكتملة اليوم" : "routines completed today"}
                 </span>
               </div>
             </div>
 
+            {/* Right Column: Zikr Routine List */}
             <ul
               aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-              className="flex min-w-0 flex-col gap-2"
+              className="flex flex-1 flex-col gap-2 min-w-0"
               dir={isArabic ? "rtl" : "ltr"}
             >
               {[
@@ -688,35 +723,62 @@ export function TodayRoutineGarden({
                   name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
                   state: summary.today.completedCategories.includes("before_sleep") ? "complete" : "pending",
                 },
-              ].map((col) => (
-                <li
-                  key={col.id}
-                  data-testid={`garden-category-${col.id}`}
-                  data-state={col.state}
-                  aria-label={`${col.name}: ${col.state === "complete" ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "غير مكتمل" : "Pending"}`}
-                  dir={isArabic ? "rtl" : "ltr"}
-                  className={`flex min-h-10 w-full items-center justify-between gap-2 rounded-xl border px-3 py-2 text-[0.8125rem] font-extrabold transition-all ${
-                    col.state === "complete"
-                      ? "border-amber-500/40 bg-amber-500/10 text-amber-950 dark:border-amber-500/30 dark:bg-amber-950/40 dark:text-amber-100"
-                      : "border-border/50 bg-muted/20 text-muted-foreground/60"
-                  }`}
-                >
-                  <span className="min-w-0 flex-1 text-start leading-5">{col.name}</span>
-                  <GoldenLeafMark filled={col.state === "complete"} size={20} className="shrink-0" />
-                </li>
-              ))}
+              ].map((col) => {
+                const isDone = col.state === "complete";
+                return (
+                  <li
+                    key={col.id}
+                    data-testid={`garden-category-${col.id}`}
+                    data-state={col.state}
+                    aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
+                    className={`flex items-center justify-between gap-2 rounded-[12px] px-3 py-2.5 transition-all ${
+                      isDone
+                        ? "border border-[rgba(182,135,70,0.2)] bg-[#1e2637]/80 text-[#f0ece6]"
+                        : "bg-[#141a2a]/40 text-[#a5a7af]"
+                    }`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`flex size-[18px] items-center justify-center rounded-full shrink-0 ${
+                          isDone ? "bg-[#e4a84a] text-slate-950" : "border border-gray-600 bg-transparent"
+                        }`}
+                      >
+                        {isDone && (
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="3.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          >
+                            <polyline points="20 6 9 17 4 12" />
+                          </svg>
+                        )}
+                      </div>
+                      <span className="text-[0.8125rem] font-medium">{col.name}</span>
+                    </div>
+
+                    <span className={`text-[0.6875rem] ${isDone ? "font-semibold text-[#e4a84a]" : "text-[#626671]"}`}>
+                      {isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started"}
+                    </span>
+                  </li>
+                );
+              })}
             </ul>
           </div>
 
-          <p className="text-[0.8125rem] font-medium text-muted-foreground">
-            {isTodayPalm
-              ? isArabic
-                ? "تهانينا! نمت نخلتك اليوم بتمام أذكار الحماية"
-                : "Congratulations! Your palm has grown today after completing all 3 protection azkar"
-              : isArabic
-                ? "أكمل أذكار الصباح والمساء والنوم لكسب نخلة اليوم"
-                : "Complete Morning, Evening, and Before Sleep Azkar to earn today's palm"}
-          </p>
+          {/* Encouragement Banner */}
+          <div className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] border border-[rgba(182,135,70,0.08)] bg-[rgba(20,26,42,0.6)] px-3 py-2 text-center text-[0.71875rem] font-medium text-[#a5a7af]">
+            <span>✨</span>
+            <span>
+              {isArabic
+                ? "القليل الدائم، خير من الكثير المنقطع"
+                : "Constant small deeds are better than intermittent large ones"}
+            </span>
+          </div>
         </div>
       )}
 
