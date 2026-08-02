@@ -138,7 +138,7 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
   );
 }
 
-/** Golden Palm Tree Mark — matching Figma's tree-palm vector in golden amber (#E4A84A). */
+/** Golden Palm Tree Mark — matching Figma's date palm tree vector in golden amber (#E4A84A). */
 export function GoldenPalmMark({
   className = "",
   size = 28,
@@ -150,20 +150,36 @@ export function GoldenPalmMark({
 }) {
   return (
     <svg
+      viewBox="0 0 64 64"
       width={size}
       height={size}
-      viewBox="0 0 28 28"
       fill="none"
       className={className}
       aria-hidden="true"
       focusable="false"
     >
-      <path
-        d="M11.6665 9.33358H6.99944L5.83268 8.16686L4.66592 9.33358H2.3324C2.3324 6.11344 5.20263 3.5 8.74958 3.5C12.2965 3.5 15.1668 6.11344 15.1668 9.33358C15.7501 11.667 18.667 19.2507 16.3335 25.6676H11.6665C12.6349 23.3342 13.4166 21.0007 12.8332 18.0839M15.1668 8.33036C16.3482 7.4569 17.7811 6.9902 19.2504 7.00031C22.7974 7.00031 25.6676 9.61375 25.6676 12.8339H22.1673L21.0006 11.6672L19.8338 12.8339H16.3335M6.8712 11.3292C4.36267 13.8376 4.18765 17.7111 6.46283 19.9979L11.4099 15.0394L15.5286 10.9208C13.2534 8.63409 9.37973 8.82076 6.8712 11.3292Z"
-        stroke={color}
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <ellipse cx="32" cy="62" rx="10" ry="2.2" fill={color} fillOpacity="0.2" />
+      <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" fill="#78350F" fillOpacity="0.9" />
+      <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" fill="#92400E" fillOpacity="0.95" />
+      <path d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z" fill="#B45309" />
+      <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" fill="#D97706" />
+
+      {/* Date clusters */}
+      <circle cx="28" cy="29" r="2.2" fill={color} />
+      <circle cx="26.5" cy="31.2" r="1.8" fill="#D97706" />
+      <circle cx="36" cy="29" r="2.2" fill={color} />
+      <circle cx="37.5" cy="31.2" r="1.8" fill="#D97706" />
+
+      {/* Canopy in Golden Amber Fronds */}
+      <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" fill={color} />
+      <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" fill="#D97706" />
+      <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" fill={color} />
+      <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" fill="#B45309" />
+      <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" fill="#D97706" />
+      <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" fill="#92400E" />
+      <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" fill="#B45309" />
+      <path d="M32 26 C22 24.5 13.5 30 6.5 40 C14 36.5 23 31.5 32 26 Z" fill="#B45309" />
+      <path d="M32 26 C42 24.5 50.5 30 57.5 40 C50 36.5 41 31.5 32 26 Z" fill="#92400E" />
     </svg>
   );
 }

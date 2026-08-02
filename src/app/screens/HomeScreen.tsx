@@ -345,7 +345,7 @@ export function HomeScreen({
                   className="text-[2.25rem] font-black text-[#fbbf24] tracking-wide"
                   dir="auto"
                 >
-                  {reminderInfo.title}
+                  {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                 </h2>
                 <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
                   {reminderInfo.desc}

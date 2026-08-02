@@ -54,68 +54,67 @@ export function TranquilityCompletionCard({
     return quote ?? REFLECTION_QUOTES[0]!;
   }, []);
 
-  const completedTitle = t(language, "home.completedTitle", { name: categoryName });
+  const completedTitle = isArabic ? `أكملت ${categoryName}` : `Completed ${categoryName}`;
   const completedSubtitle = t(language, "home.completedSubtitle");
   const reviewLabel = t(language, "home.reviewAction", { name: categoryName });
 
   return (
-    <section aria-label={completedTitle} className="mb-4">
-      <div className="relative overflow-hidden rounded-3xl border border-emerald-500/40 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-teal-500/15 p-5 shadow-md transition-all dark:border-emerald-500/30 dark:from-emerald-950/40 dark:via-emerald-950/20 dark:to-teal-950/30">
-        {/* Subtle Decorative Mosque Arch Watermark */}
-        <div className="pointer-events-none absolute -bottom-6 -end-6 opacity-10 dark:opacity-15" aria-hidden="true">
-          <svg className="size-40 text-emerald-600 dark:text-emerald-400" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L10 5H14L12 2ZM12 6C8 6 5 9 5 13V21H19V13C19 9 16 6 12 6ZM12 8C14.5 8 16.5 10 17 13H7C7.5 10 9.5 8 12 8ZM9 15H15V21H9V15Z" />
+    <section aria-label={completedTitle} className="mb-5">
+      <div className="flex flex-col items-center gap-4 text-center">
+        {/* Title & Subtitle */}
+        <div className="flex flex-col items-center gap-2 pt-2">
+          <h2 className="text-[1.75rem] font-bold tracking-tight text-white" dir="auto">
+            {completedTitle}
+          </h2>
+          <p className="text-[0.8125rem] font-normal text-[#94a3b8]" dir="auto">
+            {completedSubtitle}
+          </p>
+        </div>
+
+        {/* Diamond Separator */}
+        <div className="flex w-full items-center gap-3 opacity-60">
+          <div className="h-px flex-1 bg-[#64748b]" />
+          <div className="flex items-center gap-1.5 text-[#fbbf24]">
+            <span className="size-2 rotate-45 bg-[#fbbf24]" />
+            <span className="size-2 rotate-45 bg-[#fbbf24]" />
+          </div>
+          <div className="h-px flex-1 bg-[#64748b]" />
+        </div>
+
+        {/* Quranic Quote Card */}
+        <div className="flex w-full flex-col gap-2 rounded-2xl border border-white/10 bg-black/40 p-4 text-center backdrop-blur-md">
+          <p className="text-[0.9375rem] font-medium leading-relaxed text-white" dir="auto">
+            «{isArabic ? todayQuote.arabic : todayQuote.english}»
+          </p>
+          <span className="text-[0.75rem] font-normal text-[#64748b]" dir="auto">
+            {todayQuote.reference}
+          </span>
+        </div>
+
+        {/* Re-read Golden Button */}
+        <button
+          type="button"
+          onClick={() => onReview(categoryId)}
+          dir={direction}
+          className="interactive-elem group flex h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#d4a020] px-5 text-[0.9375rem] font-bold text-[#050914] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
+          aria-label={reviewLabel}
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="23 4 23 10 17 10" />
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" />
           </svg>
-        </div>
-
-        <div className="relative z-10 flex flex-col gap-4 text-start" dir={direction}>
-          {/* Header Row: Mosque Icon + Acceptance Prayer */}
-          <div className="flex items-start gap-3.5">
-            <div
-              className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/20 text-[1.4rem] shadow-xs dark:bg-emerald-500/30"
-              aria-hidden="true"
-            >
-              🕌
-            </div>
-            <div>
-              <h2 className="text-[1.125rem] font-black tracking-wide text-emerald-950 dark:text-emerald-100">
-                {completedTitle}
-              </h2>
-              <p className="mt-0.5 text-[0.8125rem] font-semibold leading-relaxed text-emerald-900/80 dark:text-emerald-200/80">
-                {completedSubtitle}
-              </p>
-            </div>
-          </div>
-
-          {/* Daily Spiritual Reflection / Quote Card */}
-          <div className="rounded-2xl border border-emerald-500/20 bg-background/60 p-3.5 backdrop-blur-xs dark:bg-slate-900/50">
-            <div className="flex items-center gap-1.5 text-[0.75rem] font-extrabold text-emerald-700 dark:text-emerald-400">
-              <span aria-hidden="true">✨</span>
-              <span>{isArabic ? "نفحة من الذكر" : "Daily Spiritual Reflection"}</span>
-            </div>
-            <p className="mt-1.5 text-[0.875rem] font-bold leading-relaxed text-foreground">
-              «{isArabic ? todayQuote.arabic : todayQuote.english}»
-            </p>
-            <span className="mt-1 block text-[0.75rem] font-semibold text-muted-foreground">
-              — {todayQuote.reference}
-            </span>
-          </div>
-
-          {/* Action Row: Review Button */}
-          <div className="flex items-center justify-start pt-1">
-            <button
-              type="button"
-              onClick={() => onReview(categoryId)}
-              className="interactive-elem group inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-2xl border border-emerald-500/40 bg-emerald-500/15 px-5 py-2.5 text-[0.875rem] font-black text-emerald-950 hover:bg-emerald-500/25 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 transition-all dark:bg-emerald-500/20 dark:text-emerald-100 dark:hover:bg-emerald-500/30"
-              aria-label={reviewLabel}
-            >
-              <span>{reviewLabel}</span>
-              <span className="text-[1.125rem] leading-none transition-transform" aria-hidden="true">
-                🔄
-              </span>
-            </button>
-          </div>
-        </div>
+          <span className="font-sans">{reviewLabel}</span>
+        </button>
       </div>
     </section>
   );
