@@ -263,7 +263,7 @@ export function PalmTreeReward({
       }
     >
       <div className="flex min-w-0 items-center justify-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
-        <GoldenPalmMark size={20} color="#E4A84A" />
+        <PalmTreeMark size={20} />
         <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-500 min-[360px]:text-[0.875rem] font-sans">
           {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
         </span>

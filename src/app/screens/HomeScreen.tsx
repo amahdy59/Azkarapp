@@ -219,9 +219,9 @@ export function HomeScreen({
   const isFriday = now.getDay() === 5;
 
   const bgImageMap = {
-    morning: `${import.meta.env.BASE_URL}morning_sky.webp`,
-    evening: `${import.meta.env.BASE_URL}evening_sky.webp`,
-    before_sleep: `${import.meta.env.BASE_URL}sleep_sky.webp`,
+    morning: "/Morning.png",
+    evening: "/Evening.png",
+    before_sleep: "/Before%20Sleep.png",
   };
 
   const bgSrc = bgImageMap[reminderInfo.categoryId as keyof typeof bgImageMap] ?? bgImageMap.morning;
@@ -241,72 +241,32 @@ export function HomeScreen({
       </div>
 
       {/* Fixed Header & Gamification Bar */}
-      <div className="relative z-20 shrink-0 px-page pt-2 pb-2">
-        <header className="flex w-full flex-col gap-3 pt-1 pb-1" dir={direction}>
+      <div className="relative z-20 shrink-0 px-page pt-2 pb-1">
+        <header className="flex w-full flex-col gap-2 pt-1 pb-1" dir={direction}>
           <PalmTreeReward summary={gardenSummary} language={language} bare />
 
           {/* Time & Date Info Pill */}
           <div
-            className="flex h-[42px] w-full items-center justify-between rounded-[20px] border border-[#1f293d] bg-black/40 px-4 text-xs font-semibold backdrop-blur-md shadow-xs"
-            data-testid="prayer-header-card"
+            className={`flex h-[42px] w-full items-center justify-between rounded-[20px] border border-[#1f293d] bg-black/40 px-4 text-xs font-semibold backdrop-blur-md shadow-xs ${
+              isArabic ? "flex-row" : "flex-row-reverse"
+            }`}
           >
-            {/* Date (First in DOM -> Right in RTL) */}
-            <div className="flex min-w-0 items-center gap-1.5 text-slate-100" data-testid="hijri-date" dir="auto">
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#FBBF24"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
-                <line x1="16" y1="2" x2="16" y2="6" />
-                <line x1="8" y1="2" x2="8" y2="6" />
-                <line x1="3" y1="10" x2="21" y2="10" />
-              </svg>
-              <span className="truncate font-sans font-bold">{formatDisplayDate(now, language, calendarType)}</span>
-            </div>
-
-            <span className="h-4 w-px bg-white/20" aria-hidden="true" />
-
-            {/* Next Prayer (Second in DOM -> Left in RTL) */}
-            <div
-              className="flex min-w-0 items-center gap-2 text-slate-100"
-              data-testid="next-prayer"
-              dir="auto"
-              title={
-                isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
-              }
-            >
-              <span className="truncate font-sans font-bold" style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
-                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} •{" "}
-                {nextPrayerInfo.formattedCountdown}
+            {/* Left side (in RTL): Prayer timing */}
+            <div className="flex items-center gap-2 text-white">
+              <span className="text-[#fbbf24]">
+                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
               </span>
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#FBBF24"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-              </svg>
+              <span className="text-slate-300">{nextPrayerInfo.formattedCountdown}</span>
             </div>
+
+            {/* Right side (in RTL): Date */}
+            <div className="text-slate-300 whitespace-nowrap">{formatDisplayDate(now, language, calendarType)}</div>
           </div>
         </header>
       </div>
 
       {/* Scrollable Content Area */}
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
+      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button
@@ -344,13 +304,13 @@ export function HomeScreen({
           <section aria-labelledby="current-zikr-heading" className="mb-5">
             <div className="flex flex-col gap-4 text-start">
               {/* Hero Text Block */}
-              <div className="flex flex-col gap-1 px-1 pt-2">
+              <div className="flex flex-col gap-1 px-1 pt-1">
                 <p className="text-[1.125rem] font-medium text-slate-200" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
                 <h2
                   id="current-zikr-heading"
-                  className="text-3xl font-black text-[#fbbf24] tracking-wide"
+                  className="text-2xl font-black text-[#fbbf24] tracking-wide"
                   dir="auto"
                   style={{ lineHeight: "1.3" }}
                 >
@@ -362,7 +322,7 @@ export function HomeScreen({
               </div>
 
               {/* Routine Mode Selector Pill */}
-              <div className="flex h-[44px] w-full items-center rounded-[22px] border border-[#1f293d] bg-[#080c14]/80 p-1 shadow-inner backdrop-blur-md">
+              <div className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5">
                 <button
                   type="button"
                   onClick={() => {
@@ -370,8 +330,10 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
-                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.8125rem] font-bold ${
+                    reminderMode === "complete"
+                      ? "bg-amber-500 text-slate-950 shadow-md"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
@@ -383,8 +345,10 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
-                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.8125rem] font-bold ${
+                    reminderMode === "core"
+                      ? "bg-amber-500 text-slate-950 shadow-md"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}
@@ -411,10 +375,7 @@ export function HomeScreen({
                   <span>{isArabic ? "٦ دقائق تقريباً" : "~6 mins"}</span>
                 </div>
 
-                <span className="size-1 rounded-full bg-gray-500" aria-hidden="true" />
-
                 <div className="flex items-center gap-1.5 font-semibold text-white">
-                  <span>{routineSummary}</span>
                   <svg
                     width="16"
                     height="16"
@@ -429,6 +390,7 @@ export function HomeScreen({
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                   </svg>
+                  <span>{routineSummary}</span>
                 </div>
               </div>
 
@@ -447,7 +409,9 @@ export function HomeScreen({
                 className="interactive-elem group relative flex h-[52px] w-full items-center justify-center rounded-[26px] bg-[#fbbf24] px-5 text-[1.0625rem] font-bold text-[#080c14] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
               >
                 <span className="font-sans">{ctaLabel}</span>
-                <div className="absolute end-5 flex items-center justify-center transition-transform group-hover:-translate-x-1">
+                <div
+                  className={`absolute ${isArabic ? "start-5 rotate-180 group-hover:-translate-x-1" : "end-5 group-hover:translate-x-1"} flex items-center justify-center transition-transform`}
+                >
                   <svg
                     width="20"
                     height="20"
@@ -458,10 +422,8 @@ export function HomeScreen({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
-                    className={direction === "rtl" ? "" : "rotate-180"}
                   >
-                    <line x1="19" y1="12" x2="5" y2="12" />
-                    <polyline points="12 19 5 12 12 5" />
+                    <polyline points="9 18 15 12 9 6" />
                   </svg>
                 </div>
               </button>
@@ -479,7 +441,7 @@ export function HomeScreen({
             dailyCompletions={dailyCompletions}
           />
         )}
-      </div>
+      </main>
     </ScreenContainer>
   );
 }
