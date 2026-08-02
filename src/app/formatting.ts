@@ -50,7 +50,7 @@ export function formatHijriDateWithTime(date: Date = new Date(), language: AppLa
       minute: "numeric",
     });
     const timeStr = timeFormatter.format(date);
-    return `${dateStr} • ${timeStr}`;
+    return `${dateStr} ${timeStr}`;
   } catch {
     return formatHijriDate(date, language);
   }

@@ -8,6 +8,7 @@ import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculatio
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary } from "../progress";
 import type {
   AppLanguage,
@@ -218,27 +219,12 @@ export function HomeScreen({
 
   const isFriday = now.getDay() === 5;
 
-  const bgImageMap = {
-    morning: "/Morning.png",
-    evening: "/Evening.png",
-    before_sleep: "/Before%20Sleep.png",
-  };
-
-  const bgSrc = bgImageMap[reminderInfo.categoryId as keyof typeof bgImageMap] ?? bgImageMap.morning;
-
   return (
     <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col">
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
-      <div className="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
-        <img
-          src={bgSrc}
-          alt=""
-          className="absolute inset-0 size-full object-cover object-center transition-all duration-700"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/40 via-[#080c14]/80 to-[#080c14]" />
-      </div>
+      <TimeOfDayBackground categoryId={reminderInfo.categoryId} />
 
       {/* Fixed Header & Gamification Bar */}
       <div className="relative z-20 shrink-0 px-page pt-2 pb-1">

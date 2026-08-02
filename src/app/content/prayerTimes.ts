@@ -124,14 +124,9 @@ export function getNextPrayerCountdown(
   const mins = remainingMins % 60;
   const isArabic = language === "ar";
 
-  const formattedCountdown =
-    hours > 0
-      ? isArabic
-        ? `باقي ${hours} س ${mins} د`
-        : `${hours}h ${mins}m left`
-      : isArabic
-        ? `باقي ${mins} د`
-        : `${mins}m left`;
+  const hh = hours.toString().padStart(2, "0");
+  const mm = mins.toString().padStart(2, "0");
+  const formattedCountdown = isArabic ? `باقي ${hh}:${mm}` : `${hh}:${mm} left`;
 
   return {
     name: targetName,
