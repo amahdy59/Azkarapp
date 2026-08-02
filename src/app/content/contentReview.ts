@@ -65,6 +65,7 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "s-hm-109a": "quran-109",
   "s-hm-110a": "quran-032",
   "s-hm-110b": "quran-067",
+  "friday-kahf": "quran-018",
   "m-hm-75a": "zikr:collection-opening",
   "e-hm-75a": "zikr:collection-opening",
   "m-hm-79": "zikr:sayyid-al-istighfar",

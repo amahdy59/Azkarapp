@@ -53,7 +53,9 @@ export function useZikrCounter({
     setComplete(initialCount >= (z?.repetitionCount ?? 1));
     setJustCompleted(false);
     setReaderAnnouncement(
-      initialCount > 0 ? t(language, "reader.counterReadyComplete") : t(language, "reader.tapAnywhere"),
+      initialCount > 0
+        ? t(language, "reader.counterReadyComplete")
+        : t(language, z.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"),
     );
   }, [idx, isDone, language, z]);
 
@@ -125,7 +127,7 @@ export function useZikrCounter({
     setCount(0);
     setComplete(false);
     setJustCompleted(false);
-    setReaderAnnouncement(t(language, "reader.tapAnywhere"));
+    setReaderAnnouncement(t(language, z?.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
     setPulse((value) => value + 1);
   };
 

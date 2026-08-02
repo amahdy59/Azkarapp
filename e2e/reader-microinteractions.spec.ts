@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 
 type ReadingDirection = "ltr" | "rtl";
@@ -57,6 +58,28 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
+async function openFridayKahf(page: Page) {
+  await page.clock.setFixedTime(new Date("2026-07-31T12:00:00"));
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", forceRtl: false, reduceMotion: true },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+  });
+
+  await page.goto("/");
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await page.getByRole("button", { name: /Friday Companion/ }).click();
+  await page.getByRole("button", { name: "Start reading", exact: true }).click();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
+}
+
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 
@@ -104,6 +127,40 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.locator("footer").click({ position: { x: 2, y: 2 } });
+  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+});
+
+test("full surahs count only from the counter and expose sourced difficult-word help", async ({ page }) => {
+  await openFridayKahf(page);
+
+  const reader = page.getByTestId("reader-screen");
+  const counter = page.getByTestId("counter-surface");
+  await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
+  await expect(counter).toHaveAccessibleName(/Tap counter when finished.*0 \/ 1/);
+
+  await reader.click({ position: { x: 2, y: 320 } });
+  await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
+
+  const difficultWords = page.getByTestId("quran-word-help");
+  expect(await difficultWords.count()).toBeGreaterThan(0);
+  await difficultWords.first().click();
+
+  const meaningSheet = page.getByTestId("quran-word-meaning-sheet");
+  await expect(meaningSheet).toBeVisible();
+  await expect(meaningSheet.getByRole("link", { name: /Muyassar of Ghareeb Al-Qur'an/ })).toHaveAttribute(
+    "href",
+    "https://qurancomplex.gov.sa/en/techquran/dev/",
+  );
+  const accessibility = await new AxeBuilder({ page })
+    .include('[data-testid="quran-word-meaning-sheet"]')
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .disableRules(["color-contrast"])
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
+  await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
+
+  await meaningSheet.getByRole("button", { name: "Close word meaning", exact: true }).click();
+  await counter.click();
   await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
 });
 

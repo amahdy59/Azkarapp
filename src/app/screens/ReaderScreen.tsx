@@ -30,6 +30,9 @@ import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../format
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahFooter } from "../components/QuranChrome";
+import { QuranWordText } from "../components/QuranWordText";
+import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
+import { getQuranWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -164,6 +167,7 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [useCompactCounter, setUseCompactCounter] = useState(false);
+  const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const prefersReducedMotion = useReducedMotion();
 
@@ -210,6 +214,10 @@ export function ReaderScreen({
   }, []);
 
   useEffect(() => {
+    setSelectedWordMeanings(null);
+  }, [z?.id]);
+
+  useEffect(() => {
     const main = readerMainRef.current;
     const content = readingContentRef.current;
     if (!main || !content) return;
@@ -243,6 +251,8 @@ export function ReaderScreen({
 
   const localizedCount = formatNumerals(count, language);
   const localizedRatio = formatRatio(count, z.repetitionCount, language);
+  const counterInstruction = t(language, z.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere");
+  const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
@@ -374,15 +384,25 @@ export function ReaderScreen({
     >
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
-      <p
-        className="zikr-text text-center font-medium leading-[2.1] text-foreground pointer-events-none"
-        data-testid="zikr-text"
-        dir="rtl"
-        lang="ar"
-        style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-      >
-        {displayArabicText}
-      </p>
+      {z.isSurah && wordMeanings.length > 0 ? (
+        <QuranWordText
+          text={displayArabicText}
+          meanings={wordMeanings}
+          language={language}
+          style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+          onSelectMeanings={setSelectedWordMeanings}
+        />
+      ) : (
+        <p
+          className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
+          data-testid="zikr-text"
+          dir="rtl"
+          lang="ar"
+          style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+        >
+          {displayArabicText}
+        </p>
+      )}
 
       <QuranSurahFooter zikr={z} language={language} />
 
@@ -448,7 +468,7 @@ export function ReaderScreen({
                 handleTap();
               }}
               aria-disabled={complete}
-              aria-label={`${complete ? t(language, "reader.completed") : t(language, "reader.tapAnywhere")} ${localizedRatio}`}
+              aria-label={`${complete ? t(language, "reader.completed") : counterInstruction} ${localizedRatio}`}
               className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
               initial={false}
               animate={{
@@ -495,7 +515,7 @@ export function ReaderScreen({
                         {localizedRatio}
                       </p>
                     </div>
-                    <p className="tap-anywhere-hint font-bold text-foreground">{t(language, "reader.tapAnywhere")}</p>
+                    <p className="tap-anywhere-hint font-bold text-foreground">{counterInstruction}</p>
                   </>
                 )}
               </div>
@@ -529,9 +549,10 @@ export function ReaderScreen({
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
+      data-counting-mode={z.isSurah ? "counter-only" : "canvas"}
       dir={direction}
       style={categoryThemeStyles}
-      onClick={handleSurfaceTap}
+      onClick={z.isSurah ? undefined : handleSurfaceTap}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -701,6 +722,12 @@ export function ReaderScreen({
           onAnnouncement={setShareMessage}
         />
       )}
+      <QuranWordMeaningSheet
+        meanings={selectedWordMeanings}
+        language={language}
+        direction={direction}
+        onClose={() => setSelectedWordMeanings(null)}
+      />
     </ScreenContainer>
   );
 }

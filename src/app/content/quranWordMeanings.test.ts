@@ -1,0 +1,39 @@
+import { describe, expect, it } from "vitest";
+import { ALL_AZKAR } from "./azkar";
+import { applyContentReview } from "./contentReview";
+import { FRIDAY_KAHF } from "./fridayKahf";
+import { buildQuranTextSegments, getQuranSurahNumber, getQuranWordMeanings } from "./quranWordMeanings";
+
+const fridaySurah = applyContentReview(FRIDAY_KAHF.map((zikr) => ({ ...zikr })))[0]!;
+const fullSurahs = [...ALL_AZKAR.filter((zikr) => zikr.isSurah), fridaySurah].filter(
+  (zikr, index, collection) =>
+    collection.findIndex((candidate) => candidate.canonicalKey === zikr.canonicalKey) === index,
+);
+
+describe("Quran difficult-word meanings", () => {
+  it("covers every full surah currently available in the app", () => {
+    expect(fullSurahs.map(getQuranSurahNumber).sort((left, right) => (left ?? 0) - (right ?? 0))).toEqual([
+      18, 32, 67, 109, 112, 113, 114,
+    ]);
+
+    for (const surah of fullSurahs) {
+      expect(getQuranWordMeanings(surah).length, surah.canonicalKey).toBeGreaterThan(0);
+    }
+  });
+
+  it("aligns every sourced phrase without altering the Quran text", () => {
+    for (const surah of fullSurahs) {
+      const meanings = getQuranWordMeanings(surah);
+      const segments = buildQuranTextSegments(surah.arabicText, meanings);
+      const matchedMeanings = segments.flatMap((segment) => segment.meanings ?? []);
+      const matchedIds = new Set(matchedMeanings.map((meaning) => meaning.id));
+
+      expect(segments.map((segment) => segment.text).join(""), surah.canonicalKey).toBe(surah.arabicText);
+      expect(
+        meanings.filter((meaning) => !matchedIds.has(meaning.id)).map((meaning) => meaning.word),
+        surah.canonicalKey,
+      ).toEqual([]);
+      expect(matchedMeanings.length, surah.canonicalKey).toBe(meanings.length);
+    }
+  });
+});
