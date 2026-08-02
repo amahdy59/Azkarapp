@@ -256,10 +256,7 @@ export function ReaderScreen({
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
-  const readingFontFamily =
-    arabicFont === "noto_sans"
-      ? "'Noto Sans Arabic', sans-serif"
-      : "'IBM Plex Sans Arabic', 'Noto Sans Arabic', sans-serif";
+  const readingFontFamily = arabicFont === "noto_sans" ? "var(--font-ui-arabic)" : "var(--font-reading-arabic)";
 
   const handleToggleSaved = () => {
     onToggleSaved(z.id);

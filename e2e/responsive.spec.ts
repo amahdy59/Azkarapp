@@ -70,6 +70,7 @@ test("the typography contract assigns each content type to its approved family",
       <span data-font="arabic">واجهة عربية</span>
       <span data-font="mixed-english" class="latin-ui" lang="en" dir="ltr">English inside Arabic UI</span>
       <span data-font="zikr" class="zikr-text" lang="ar" dir="rtl">سُبْحَانَ اللَّهِ</span>
+      <input data-font="input" aria-label="Font test" />
     `;
     document.body.append(fixture);
 
@@ -80,15 +81,21 @@ test("the typography contract assigns each content type to its approved family",
     const arabic = getComputedStyle(fixture.querySelector('[data-font="arabic"]')!).fontFamily;
     const mixedEnglish = getComputedStyle(fixture.querySelector('[data-font="mixed-english"]')!).fontFamily;
     const zikr = getComputedStyle(fixture.querySelector('[data-font="zikr"]')!).fontFamily;
+    document.documentElement.style.setProperty("--font-size", "14px");
+    const inputSize = getComputedStyle(fixture.querySelector('[data-font="input"]')!).fontSize;
+    const textSizeAdjust = getComputedStyle(document.documentElement).webkitTextSizeAdjust;
 
     fixture.remove();
-    return { english, arabic, mixedEnglish, zikr };
+    return { english, arabic, mixedEnglish, zikr, inputSize, textSizeAdjust };
   });
 
-  expect(families.english).toContain("Segoe UI");
-  expect(families.arabic).toContain("Tahoma");
-  expect(families.mixedEnglish).toContain("Segoe UI");
-  expect(families.zikr).toContain("Traditional Arabic");
+  expect(families.english).toContain("system-ui");
+  expect(families.arabic).toContain("system-ui");
+  expect(families.mixedEnglish).toContain("system-ui");
+  expect(families.zikr).toContain("Noto Naskh Arabic");
+  expect(families.zikr).toContain("Geeza Pro");
+  expect(families.inputSize).toBe("16px");
+  expect(families.textSizeAdjust).toBe("100%");
 });
 
 test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {

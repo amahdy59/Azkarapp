@@ -159,8 +159,8 @@ const PALETTES: Record<ThemeMode, CardPalette> = {
   },
 };
 
-const ARABIC_FONT = '"IBM Plex Sans Arabic", "Noto Sans Arabic", Tahoma, Arial, sans-serif';
-const LATIN_FONT = 'Inter, "Atkinson Hyperlegible", Arial, sans-serif';
+const ARABIC_FONT = '"Noto Naskh Arabic", "Geeza Pro", "Times New Roman", Tahoma, serif';
+const LATIN_FONT = 'system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
 
 type ResolvedZikrShareCardLabels = Required<Omit<ZikrShareCardLabels, "repetitions">> & {
   repetitions: (count: number) => string;

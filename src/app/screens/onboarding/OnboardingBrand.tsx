@@ -14,10 +14,9 @@ export function BrandLockup({ compact = false }: { compact?: boolean }) {
     <div className="flex flex-col items-center text-primary" aria-label="Azkar">
       <BrandCrescent size={compact ? 44 : 96} />
       <p
-        className={
+        className={`font-arabic ${
           compact ? "-mt-1 text-[1.25rem] font-bold leading-7" : "-mt-1 text-[2.625rem] font-bold leading-[56px]"
-        }
-        style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}
+        }`}
         lang="ar"
         dir="rtl"
       >
@@ -51,11 +50,7 @@ export function WelcomeArtwork({ arabic = false }: { arabic?: boolean }) {
         <BrandCrescent size={arabic ? 124 : 140} />
       </div>
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-primary">
-        <p
-          className="text-[2.375rem] font-bold leading-[44px]"
-          style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}
-          lang="ar"
-        >
+        <p className="font-arabic text-[2.375rem] font-bold leading-[44px]" lang="ar">
           أذكار
         </p>
         <p className="text-[0.6875rem] font-bold tracking-[1.2px]">AZKAR</p>

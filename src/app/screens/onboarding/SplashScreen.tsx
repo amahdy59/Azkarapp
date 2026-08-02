@@ -29,8 +29,8 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
         <BrandLockup />
         <div className="my-7 h-px w-20 bg-primary" />
         <p
-          className="text-[0.875rem] font-medium uppercase tracking-[0.56px] text-muted-foreground"
-          style={arabic ? { fontFamily: "'IBM Plex Sans Arabic', sans-serif" } : undefined}
+          className={`${arabic ? "arabic-ui" : "latin-ui"} text-[0.875rem] font-medium uppercase tracking-[0.56px] text-muted-foreground`}
+          lang={arabic ? "ar" : "en"}
           dir={arabic ? "rtl" : "ltr"}
         >
           {arabic ? "الذكر اليومي للمسلم" : "Daily Remembrance"}

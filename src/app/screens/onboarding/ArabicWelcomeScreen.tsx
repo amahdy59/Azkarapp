@@ -8,10 +8,7 @@ export function ArabicWelcomeScreen({ onNext, onSkip }: { onNext: () => void; on
       <div className="h-[320px] shrink-0">
         <WelcomeArtwork arabic />
       </div>
-      <div
-        className="flex flex-1 flex-col items-center gap-7 px-6 pb-7 pt-5"
-        style={{ fontFamily: "'IBM Plex Sans Arabic', sans-serif" }}
-      >
+      <div className="arabic-ui flex flex-1 flex-col items-center gap-7 px-6 pb-7 pt-5" lang="ar">
         <h1 className="text-center text-[1.625rem] font-bold leading-9 text-foreground">
           {t("ar", "onboarding.title")}
         </h1>

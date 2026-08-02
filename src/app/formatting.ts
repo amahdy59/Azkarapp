@@ -13,15 +13,11 @@ export function formatNumerals(value: number | string, language: AppLanguage) {
 }
 
 export function numeralFontFamily(language: AppLanguage) {
-  return language === "ar"
-    ? "'Noto Sans Arabic', 'Noto Naskh Arabic', sans-serif"
-    : "'Atkinson Hyperlegible', 'Inter', sans-serif";
+  return language === "ar" ? "var(--font-ui-arabic)" : "var(--font-ui-latin)";
 }
 
 export function counterNumeralFontFamily(language: AppLanguage) {
-  return language === "ar"
-    ? "'Noto Sans Arabic', 'Noto Naskh Arabic', sans-serif"
-    : "'DM Mono', 'Atkinson Hyperlegible', monospace";
+  return language === "ar" ? "var(--font-ui-arabic)" : "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace";
 }
 
 export function formatRatio(current: number | string, total: number | string, language: AppLanguage) {
