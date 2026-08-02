@@ -89,7 +89,7 @@ export function BottomNav({
                 <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`whitespace-nowrap font-sans text-[0.625rem] font-semibold leading-tight min-[360px]:text-[0.6875rem] ${on ? "text-primary" : "text-muted-foreground"}`}
+                className={`whitespace-nowrap font-sans text-[0.625rem] font-semibold leading-6 min-[360px]:text-[0.6875rem] ${on ? "text-primary" : "text-muted-foreground"}`}
                 dir="auto"
               >
                 {label}

@@ -229,7 +229,7 @@ export function HomeScreen({
           data-testid="prayer-header-card"
         >
           <div className="flex min-w-0 items-center justify-center px-1" data-testid="hijri-date" dir="auto">
-            <span className="font-sans text-[0.6875rem] leading-4 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
+            <span className="font-sans text-[0.6875rem] leading-5 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
               {formatHijriDate(now, language)}
             </span>
           </div>
@@ -248,7 +248,7 @@ export function HomeScreen({
             }
           >
             <span
-              className="text-balance font-sans text-[0.6875rem] leading-4 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
+              className="text-balance font-sans text-[0.6875rem] leading-5 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
               style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
             >
               {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
