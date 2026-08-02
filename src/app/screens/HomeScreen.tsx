@@ -222,7 +222,7 @@ export function HomeScreen({
       : reminderInfo.categoryId === "evening"
         ? "/evening_sky.webp"
         : "/sleep_sky.webp";
-    const bgSrc = `${import.meta.env.BASE_URL}${bgPath.replace(/^\//, "")}`;
+  const bgSrc = `${import.meta.env.BASE_URL}${bgPath.replace(/^\//, "")}`;
 
   return (
     <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col">
@@ -305,7 +305,6 @@ export function HomeScreen({
 
       {/* Scrollable Content Area */}
       <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
-
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button
