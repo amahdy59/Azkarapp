@@ -80,10 +80,58 @@ describe("ReaderScreen audio identity", () => {
       />,
     );
 
+    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
+    expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
+
+    fireEvent.click(screen.getByTestId("reader-screen"));
     fireEvent.click(screen.getByTestId("zikr-text"));
     expect(onComplete).not.toHaveBeenCalled();
 
+    const difficultWord = screen.getAllByTestId("quran-word-help")[0]!;
+    fireEvent.click(difficultWord);
+    expect(screen.getByTestId("quran-word-meaning-sheet")).toBeVisible();
+    expect(screen.getByRole("link", { name: /الميسر في غريب القرآن/ })).toHaveAttribute(
+      "href",
+      "https://qurancomplex.gov.sa/en/techquran/dev/",
+    );
+    expect(onComplete).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByLabelText("إغلاق معنى الكلمة"));
+
     fireEvent.click(screen.getByTestId("counter-surface"));
+    expect(onComplete).toHaveBeenCalledOnce();
+  });
+
+  it("keeps tap-anywhere counting for non-surah adhkar", () => {
+    const onComplete = vi.fn();
+
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={2}
+        routineMode="core"
+        isArabic={false}
+        direction="ltr"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        arabicFont="ibm_plex"
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={onComplete}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "canvas");
+    fireEvent.click(screen.getByTestId("reader-screen"));
     expect(onComplete).toHaveBeenCalledOnce();
   });
 });
