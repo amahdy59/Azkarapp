@@ -81,7 +81,6 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
 
-    fireEvent.click(screen.getByTestId("reader-screen"));
     fireEvent.click(screen.getByTestId("zikr-text"));
     expect(onComplete).not.toHaveBeenCalled();
 
@@ -97,6 +96,38 @@ describe("ReaderScreen audio identity", () => {
 
     fireEvent.click(screen.getByTestId("counter-surface"));
     expect(onComplete).toHaveBeenCalledOnce();
+  });
+
+  it("allows tapping the empty canvas area between text and counter to count zikr for small surahs", () => {
+    const onComplete = vi.fn();
+
+    render(
+      <ReaderScreen
+        catId="morning"
+        idx={5}
+        routineMode="complete"
+        isArabic
+        direction="rtl"
+        themeMode="light"
+        isDone={false}
+        collectionCompletedCount={0}
+        hapticFeedback={false}
+        showTranslation={false}
+        showTransliteration={false}
+        textSize="medium"
+        savedZikrIds={new Set()}
+        onBack={() => undefined}
+        onComplete={onComplete}
+        onAdvance={() => undefined}
+        onNext={() => undefined}
+        onPrev={() => undefined}
+        onToggleSaved={() => undefined}
+        audioAvailable={false}
+      />,
+    );
+
+    fireEvent.click(screen.getByTestId("reader-screen"));
+    expect(onComplete).not.toHaveBeenCalled(); // repetitionCount for Al-Ikhlas is 3, so 1 tap should count but not complete yet
   });
 
   it("keeps tap-anywhere counting for non-surah adhkar", () => {

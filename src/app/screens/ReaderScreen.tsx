@@ -379,7 +379,7 @@ export function ReaderScreen({
     >
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
-      {z.isSurah && wordMeanings.length > 0 ? (
+      {wordMeanings.length > 0 ? (
         <QuranWordText
           text={displayArabicText}
           meanings={wordMeanings}
@@ -547,7 +547,7 @@ export function ReaderScreen({
       data-counting-mode={z.isSurah ? "counter-only" : "canvas"}
       dir={direction}
       style={categoryThemeStyles}
-      onClick={z.isSurah ? undefined : handleSurfaceTap}
+      onClick={handleSurfaceTap}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}

@@ -6,7 +6,7 @@ import { getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../conte
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
-import { formatHijriDate, formatNumerals } from "../formatting";
+import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { getFirstIncompleteZikrIndex, getGardenSummary } from "../progress";
@@ -230,7 +230,7 @@ export function HomeScreen({
         >
           <div className="flex min-w-0 items-center justify-center px-1" data-testid="hijri-date" dir="auto">
             <span className="font-sans text-[0.6875rem] leading-5 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100">
-              {formatHijriDate(now, language)}
+              {formatDisplayDate(now, language, calendarType)}
             </span>
           </div>
 

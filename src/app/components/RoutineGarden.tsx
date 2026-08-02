@@ -3,7 +3,6 @@ import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { createDailyCompletionIndex, getMonthGardenDays, getYearGardenStats } from "../gardenViews";
-import { Check, CircleIcon } from "./icons";
 import {
   getGardenSummary,
   MAIN_CATEGORY_IDS,
@@ -703,21 +702,7 @@ export function TodayRoutineGarden({
                   }`}
                 >
                   <span className="min-w-0 flex-1 text-start leading-5">{col.name}</span>
-                  {col.state === "complete" ? (
-                    <Check
-                      data-slot="collection-status"
-                      size={16}
-                      className="shrink-0 text-amber-600 dark:text-amber-400"
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <CircleIcon
-                      data-slot="collection-status"
-                      size={16}
-                      className="shrink-0 text-muted-foreground/40"
-                      aria-hidden="true"
-                    />
-                  )}
+                  <GoldenLeafMark filled={col.state === "complete"} size={20} className="shrink-0" />
                 </li>
               ))}
             </ul>
@@ -943,24 +928,32 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
             className="flex items-center justify-between rounded-xl border border-border/70 bg-background/80 px-4 py-2.5"
           >
             <span className="text-[0.875rem] font-bold text-foreground">{weekday}</span>
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-1 rounded-lg bg-amber-500/10 px-2.5 py-1 text-[0.75rem] font-extrabold text-amber-500">
-                <PalmTreeMark size={16} filled={day.isPalm} />
-                <span>
-                  {day.isPalm
-                    ? isArabic
-                      ? "نخلة مكتملة"
-                      : "Palm Completed"
-                    : isArabic
-                      ? "قيد الإكمال"
-                      : "In Progress"}
-                </span>
-              </div>
-              <div className="flex items-center gap-1 rounded-lg bg-muted/40 px-2.5 py-1 text-[0.75rem] font-extrabold text-muted-foreground">
-                <span>
-                  {formatNumerals(azkarCount, language)} {isArabic ? "أذكار" : "azkar"}
-                </span>
-              </div>
+            <div className="flex items-center gap-2">
+              {day.isPalm ? (
+                <div
+                  className="flex size-9 items-center justify-center rounded-xl border border-amber-400/80 bg-amber-500/20 text-amber-500 shadow-2xs dark:bg-amber-500/25"
+                  title={isArabic ? "نخلة مكتملة" : "Palm Completed"}
+                  aria-label={isArabic ? "نخلة مكتملة" : "Palm Completed"}
+                >
+                  <PalmTreeMark size={22} filled />
+                </div>
+              ) : azkarCount > 0 ? (
+                <div
+                  className="flex size-9 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  title={isArabic ? "نشط" : "In Progress"}
+                  aria-label={isArabic ? "نشط" : "In Progress"}
+                >
+                  <GoldenLeafMark size={20} filled />
+                </div>
+              ) : (
+                <div
+                  className="flex size-9 items-center justify-center rounded-xl border border-transparent bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/30"
+                  title={isArabic ? "غير نشط" : "Inactive"}
+                  aria-label={isArabic ? "غير نشط" : "Inactive"}
+                >
+                  <GoldenLeafMark size={20} filled={false} />
+                </div>
+              )}
             </div>
           </div>
         );

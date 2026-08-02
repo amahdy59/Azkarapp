@@ -36,4 +36,24 @@ describe("Quran difficult-word meanings", () => {
       expect(matchedMeanings.length, surah.canonicalKey).toBe(meanings.length);
     }
   });
+
+  it("provides word meanings for Ayat al-Kursi and the last ayas of Al-Baqarah", () => {
+    const ayatAlKursi = ALL_AZKAR.find((z) => z.canonicalKey === "quran-002-255")!;
+    const lastTwoBaqarah = ALL_AZKAR.find((z) => z.canonicalKey === "quran-002-285-286")!;
+
+    expect(ayatAlKursi).toBeDefined();
+    expect(lastTwoBaqarah).toBeDefined();
+
+    const meaningsKursi = getQuranWordMeanings(ayatAlKursi);
+    const meaningsBaqarah = getQuranWordMeanings(lastTwoBaqarah);
+
+    expect(meaningsKursi.length).toBeGreaterThan(0);
+    expect(meaningsBaqarah.length).toBeGreaterThan(0);
+
+    const segmentsKursi = buildQuranTextSegments(ayatAlKursi.arabicText, meaningsKursi);
+    expect(segmentsKursi.map((s) => s.text).join("")).toBe(ayatAlKursi.arabicText);
+
+    const segmentsBaqarah = buildQuranTextSegments(lastTwoBaqarah.arabicText, meaningsBaqarah);
+    expect(segmentsBaqarah.map((s) => s.text).join("")).toBe(lastTwoBaqarah.arabicText);
+  });
 });

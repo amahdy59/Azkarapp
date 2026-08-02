@@ -100,7 +100,6 @@ function getAyahRanges(text: string) {
 }
 
 export function getQuranSurahNumber(zikr: Pick<Zikr, "canonicalKey" | "isSurah">) {
-  if (!zikr.isSurah) return null;
   const match = /^quran-(\d{3})(?:-|$)/.exec(zikr.canonicalKey);
   return match ? Number(match[1]) : null;
 }

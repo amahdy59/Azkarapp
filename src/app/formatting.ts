@@ -55,3 +55,26 @@ export function formatHijriDateWithTime(date: Date = new Date(), language: AppLa
     return formatHijriDate(date, language);
   }
 }
+
+export function formatDisplayDate(
+  date: Date = new Date(),
+  language: AppLanguage = "ar",
+  calendarType: "hijri" | "gregorian" = "hijri",
+): string {
+  if (calendarType === "gregorian") {
+    try {
+      const locale = language === "ar" ? "ar-EG" : "en-US";
+      const formatter = new Intl.DateTimeFormat(locale, {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+      const formatted = formatter.format(date);
+      return language === "ar" ? `${formatted} م` : `${formatted} AD`;
+    } catch {
+      return date.toLocaleDateString();
+    }
+  }
+  return formatHijriDate(date, language);
+}

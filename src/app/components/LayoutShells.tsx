@@ -37,7 +37,7 @@ export function Header({
   language?: AppLanguage;
 }) {
   return (
-    <div className="flex w-full shrink-0 h-12 items-center gap-2 px-1 pt-0 pb-1">
+    <div className="flex w-full shrink-0 h-12 items-center gap-2 px-4 pt-0 pb-1">
       {onBack && (
         <IconButton onClick={onBack} label={t(language, "common.back")}>
           <ArrowPrevious size={20} className="text-foreground" />
