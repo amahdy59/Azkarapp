@@ -11,6 +11,7 @@ import {
   type GrowthEvent,
 } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
+import { Flame } from "lucide-react";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -257,19 +258,14 @@ export function PalmTreeReward({
       className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 py-1"
       aria-label={
         isArabic
-          ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
-          : `Daily streak: ${streak} days, Today's leaves: ${todayLeaves} of ${maxLeaves}, Palms: ${summary.lifetimePalms}`
+          ? `أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، السلسلة اليومية: ${formatNumerals(streak, language)} أيام`
+          : `Palms: ${summary.lifetimePalms}, Today's leaves: ${todayLeaves} of ${maxLeaves}, Daily streak: ${streak} days`
       }
     >
-      <div
-        className="flex min-w-0 items-center justify-center gap-1"
-        title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
-      >
-        <span className="text-[1.25rem]" role="img" aria-label={t(language, "garden.streakFlame")}>
-          🔥
-        </span>
-        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-600 min-[360px]:text-[0.875rem] dark:text-amber-400 font-sans">
-          {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
+      <div className="flex min-w-0 items-center justify-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
+        <GoldenPalmMark size={20} color="#E4A84A" />
+        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-500 min-[360px]:text-[0.875rem] font-sans">
+          {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
         </span>
       </div>
       <span className="h-4 w-px bg-border/40" />
@@ -282,10 +278,13 @@ export function PalmTreeReward({
         ))}
       </div>
       <span className="h-4 w-px bg-border/40" />
-      <div className="flex min-w-0 items-center justify-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
-        <GoldenPalmMark size={20} color="#E4A84A" />
-        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-600 min-[360px]:text-[0.875rem] dark:text-amber-400 font-sans">
-          {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
+      <div
+        className="flex min-w-0 items-center justify-center gap-1"
+        title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+      >
+        <Flame className="h-[1.125rem] w-[1.125rem] text-[#F59E0B]" strokeWidth={2.5} />
+        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-500 min-[360px]:text-[0.875rem] font-sans">
+          {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
         </span>
       </div>
     </div>

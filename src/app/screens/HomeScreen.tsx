@@ -218,13 +218,13 @@ export function HomeScreen({
 
   const isFriday = now.getDay() === 5;
 
-  const bgPath =
-    reminderInfo.categoryId === "morning"
-      ? "/morning_sky.webp"
-      : reminderInfo.categoryId === "evening"
-        ? "/evening_sky.webp"
-        : "/sleep_sky.webp";
-  const bgSrc = `${import.meta.env.BASE_URL}${bgPath.replace(/^\//, "")}`;
+  const bgImageMap = {
+    morning: `${import.meta.env.BASE_URL}morning_sky.webp`,
+    evening: `${import.meta.env.BASE_URL}evening_sky.webp`,
+    before_sleep: `${import.meta.env.BASE_URL}sleep_sky.webp`,
+  };
+
+  const bgSrc = bgImageMap[reminderInfo.categoryId as keyof typeof bgImageMap] ?? bgImageMap.morning;
 
   return (
     <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col">
@@ -275,7 +275,7 @@ export function HomeScreen({
 
             {/* Next Prayer (Second in DOM -> Left in RTL) */}
             <div
-              className="flex min-w-0 items-center gap-1.5 text-slate-100"
+              className="flex min-w-0 items-center gap-2 text-slate-100"
               data-testid="next-prayer"
               dir="auto"
               title={
