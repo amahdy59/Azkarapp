@@ -838,6 +838,9 @@ function AppContent() {
                 calendarType={calendarType}
                 direction={layoutDirection}
                 routineModes={routineModes}
+                onSetRoutineMode={(categoryId, mode) => {
+                  setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
+                }}
               />
             )}
             {view === "library" && (

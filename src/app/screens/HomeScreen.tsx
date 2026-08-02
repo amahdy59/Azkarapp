@@ -136,6 +136,7 @@ export function HomeScreen({
   onRepeat,
   onOpenFridayMode,
   routineModes,
+  onSetRoutineMode,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -149,6 +150,7 @@ export function HomeScreen({
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
+  onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -363,7 +365,11 @@ export function HomeScreen({
               <div className="flex h-[44px] w-full items-center rounded-[22px] border border-[#1f293d] bg-[#080c14]/80 p-1 shadow-inner backdrop-blur-md">
                 <button
                   type="button"
-                  onClick={() => setReminderMode("complete")}
+                  onClick={() => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, "complete");
+                    }
+                  }}
                   className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
                     reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
                   }`}
@@ -372,7 +378,11 @@ export function HomeScreen({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setReminderMode("core")}
+                  onClick={() => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, "core");
+                    }
+                  }}
                   className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
                     reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
                   }`}
