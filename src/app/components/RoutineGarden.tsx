@@ -11,7 +11,7 @@ import {
   type GrowthEvent,
 } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Flame } from "lucide-react";
+import { Flame, Heart } from "./icons";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -680,43 +680,10 @@ export function TodayRoutineGarden({
 
           {/* Main Split Row */}
           <div
-            className="relative z-10 grid w-full grid-cols-1 items-center gap-4 min-[360px]:grid-cols-[120px_minmax(0,1fr)]"
+            className="relative z-10 grid w-full grid-cols-1 items-center gap-4 min-[360px]:grid-cols-[minmax(0,1fr)_120px]"
             data-testid="today-palm-layout"
           >
-            {/* Left Column: Palm Progress Ring */}
-            <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
-              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-black/30 p-2 shadow-inner">
-                {/* Circular Progress Arc */}
-                <svg width="100" height="100" viewBox="0 0 100 100" className="absolute inset-0 size-full -rotate-90">
-                  <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" strokeWidth="6" fill="none" />
-                  <circle
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    stroke="#E4A84A"
-                    strokeWidth="6"
-                    fill="none"
-                    strokeDasharray={264}
-                    strokeDashoffset={264 - (264 * summary.today.goldenLeafCount) / 3}
-                    strokeLinecap="round"
-                    className="transition-all duration-700"
-                  />
-                </svg>
-                <GoldenPalmMark size={32} color="#E4A84A" className="relative z-10" />
-              </div>
-
-              <div className="flex flex-col items-center" data-testid="today-leaf-count">
-                <span className="text-[1.375rem] font-bold text-[#f0ece6]">
-                  {formatNumerals(summary.today.goldenLeafCount, language)} {isArabic ? "من" : "of"}{" "}
-                  {formatNumerals(3, language)}
-                </span>
-                <span className="text-[0.75rem] text-[#a5a7af]">
-                  {isArabic ? "أوراد مكتملة اليوم" : "routines completed today"}
-                </span>
-              </div>
-            </div>
-
-            {/* Right Column: Zikr Routine List */}
+            {/* Right Column: Zikr Routine List (First in DOM -> Right in RTL) */}
             <ul
               aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
               className="flex flex-1 flex-col gap-2 min-w-0"
@@ -755,7 +722,7 @@ export function TodayRoutineGarden({
                     <div className="flex items-center gap-2">
                       <div
                         className={`flex size-[18px] items-center justify-center rounded-full shrink-0 ${
-                          isDone ? "bg-[#e4a84a] text-slate-950" : "border border-gray-600 bg-transparent"
+                          isDone ? "bg-[#f59e0b] text-slate-950" : "border border-gray-600 bg-transparent"
                         }`}
                       >
                         {isDone && (
@@ -776,23 +743,47 @@ export function TodayRoutineGarden({
                       <span className="text-[0.8125rem] font-medium">{col.name}</span>
                     </div>
 
-                    <span className={`text-[0.6875rem] ${isDone ? "font-semibold text-[#e4a84a]" : "text-[#626671]"}`}>
-                      {isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started"}
-                    </span>
+                    <GoldenLeafMark size={18} filled={isDone} className="shrink-0" />
                   </li>
                 );
               })}
             </ul>
+
+            {/* Left Column: Palm Progress Ring (Second in DOM -> Left in RTL) */}
+            <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
+              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-black/30 p-2 shadow-inner">
+                {/* Circular Progress Arc */}
+                <svg width="100" height="100" viewBox="0 0 100 100" className="absolute inset-0 size-full -rotate-90">
+                  <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" strokeWidth="6" fill="none" />
+                  <circle
+                    cx="50"
+                    cy="50"
+                    r="42"
+                    stroke="#E4A84A"
+                    strokeWidth="6"
+                    fill="none"
+                    strokeDasharray={264}
+                    strokeDashoffset={264 - (264 * summary.today.goldenLeafCount) / 3}
+                    strokeLinecap="round"
+                    className="transition-all duration-700"
+                  />
+                </svg>
+                <GoldenPalmMark size={32} color="#E4A84A" className="relative z-10" />
+              </div>
+            </div>
           </div>
 
           {/* Encouragement Banner */}
-          <div className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] border border-[rgba(182,135,70,0.08)] bg-[rgba(20,26,42,0.6)] px-3 py-2 text-center text-[0.71875rem] font-medium text-[#a5a7af]">
-            <span>✨</span>
-            <span>
+          <div
+            className="relative z-10 flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(182,135,70,0.08)] bg-[rgba(20,26,42,0.6)] px-4 py-2.5 text-center text-[0.75rem] font-medium text-[#a5a7af]"
+            dir="rtl"
+          >
+            <span className="flex-1 text-center font-sans">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}
             </span>
+            <Heart className="h-[1.125rem] w-[1.125rem] text-[#a5a7af] shrink-0" strokeWidth={2} />
           </div>
         </div>
       )}
