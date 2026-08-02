@@ -222,24 +222,25 @@ export function HomeScreen({
       : reminderInfo.categoryId === "evening"
         ? "/evening_sky.webp"
         : "/sleep_sky.webp";
+    const bgSrc = `${import.meta.env.BASE_URL}${bgPath.replace(/^\//, "")}`;
 
   return (
-    <ScreenContainer dir={direction} className="px-0 relative overflow-hidden">
+    <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col">
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
       <div className="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
         <img
-          src={bgPath}
+          src={bgSrc}
           alt=""
           className="absolute inset-0 size-full object-cover object-center transition-all duration-700"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/60 via-[#080c14]/40 to-[#080c14]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/40 via-[#080c14]/80 to-[#080c14]" />
       </div>
 
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pt-2 pb-6">
-        {/* Header & Gamification Bar */}
-        <header className="flex w-full shrink-0 flex-col gap-3 pt-1 pb-3" dir={direction}>
+      {/* Fixed Header & Gamification Bar */}
+      <div className="relative z-20 shrink-0 px-page pt-2 pb-2">
+        <header className="flex w-full flex-col gap-3 pt-1 pb-1" dir={direction}>
           <PalmTreeReward summary={gardenSummary} language={language} bare />
 
           {/* Time & Date Info Pill */}
@@ -247,38 +248,8 @@ export function HomeScreen({
             className="flex h-[42px] w-full items-center justify-between rounded-[20px] border border-[#1f293d] bg-black/40 px-4 text-xs font-semibold backdrop-blur-md shadow-xs"
             data-testid="prayer-header-card"
           >
-            <div
-              className="flex min-w-0 items-center gap-1.5 text-slate-100"
-              data-testid="next-prayer"
-              dir="auto"
-              title={
-                isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
-              }
-            >
-              <svg
-                width="15"
-                height="15"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="#FBBF24"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <circle cx="12" cy="12" r="4" />
-                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
-              </svg>
-              <span className="truncate font-sans font-bold" style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
-                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} •{" "}
-                {nextPrayerInfo.formattedCountdown}
-              </span>
-            </div>
-
-            <span className="h-4 w-px bg-white/20" aria-hidden="true" />
-
+            {/* Date (First in DOM -> Right in RTL) */}
             <div className="flex min-w-0 items-center gap-1.5 text-slate-100" data-testid="hijri-date" dir="auto">
-              <span className="truncate font-sans font-bold">{formatDisplayDate(now, language, calendarType)}</span>
               <svg
                 width="14"
                 height="14"
@@ -295,9 +266,45 @@ export function HomeScreen({
                 <line x1="8" y1="2" x2="8" y2="6" />
                 <line x1="3" y1="10" x2="21" y2="10" />
               </svg>
+              <span className="truncate font-sans font-bold">{formatDisplayDate(now, language, calendarType)}</span>
+            </div>
+
+            <span className="h-4 w-px bg-white/20" aria-hidden="true" />
+
+            {/* Next Prayer (Second in DOM -> Left in RTL) */}
+            <div
+              className="flex min-w-0 items-center gap-1.5 text-slate-100"
+              data-testid="next-prayer"
+              dir="auto"
+              title={
+                isArabic ? `الصلاة القادمة: ${nextPrayerInfo.nameArabic}` : `Next Prayer: ${nextPrayerInfo.nameEnglish}`
+              }
+            >
+              <span className="truncate font-sans font-bold" style={{ fontVariantNumeric: "tabular-nums lining-nums" }}>
+                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} •{" "}
+                {nextPrayerInfo.formattedCountdown}
+              </span>
+              <svg
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="#FBBF24"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+              >
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
+              </svg>
             </div>
           </div>
         </header>
+      </div>
+
+      {/* Scrollable Content Area */}
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
 
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
@@ -337,13 +344,14 @@ export function HomeScreen({
             <div className="flex flex-col gap-4 text-start">
               {/* Hero Text Block */}
               <div className="flex flex-col gap-1 px-1 pt-2">
-                <p className="text-[1.25rem] font-medium text-slate-200" dir="auto">
+                <p className="text-[1.125rem] font-medium text-slate-200" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
                 <h2
                   id="current-zikr-heading"
-                  className="text-[2.25rem] font-black text-[#fbbf24] tracking-wide"
+                  className="text-3xl font-black text-[#fbbf24] tracking-wide"
                   dir="auto"
+                  style={{ lineHeight: "1.3" }}
                 >
                   {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                 </h2>
@@ -353,21 +361,25 @@ export function HomeScreen({
               </div>
 
               {/* Routine Mode Selector Pill */}
-              <div className="flex h-[40px] w-full items-center rounded-[20px] border border-[#1f293d] bg-[#080c14]/80 p-1 shadow-inner backdrop-blur-md">
-                <div
-                  className={`flex flex-1 items-center justify-center rounded-[16px] h-full transition-all text-xs font-semibold ${
-                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400"
+              <div className="flex h-[44px] w-full items-center rounded-[22px] border border-[#1f293d] bg-[#080c14]/80 p-1 shadow-inner backdrop-blur-md">
+                <button
+                  type="button"
+                  onClick={() => setReminderMode("complete")}
+                  className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
+                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
-                </div>
-                <div
-                  className={`flex flex-1 items-center justify-center rounded-[16px] h-full transition-all text-xs font-semibold ${
-                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 opacity-60"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setReminderMode("core")}
+                  className={`flex flex-1 items-center justify-center rounded-[18px] h-full transition-all text-[0.8125rem] font-bold ${
+                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-gray-400 hover:text-gray-200"
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}
-                </div>
+                </button>
               </div>
 
               {/* Info Row: Duration & Count */}
@@ -423,12 +435,13 @@ export function HomeScreen({
                   }
                 }}
                 aria-label={`${ctaLabel}. ${routineSummary}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                className="interactive-elem group flex h-[50px] w-full items-center justify-between rounded-[25px] bg-[#fbbf24] px-5 text-[1rem] font-bold text-[#080c14] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
+                className="interactive-elem group relative flex h-[52px] w-full items-center justify-center rounded-[26px] bg-[#fbbf24] px-5 text-[1.0625rem] font-bold text-[#080c14] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
               >
-                <div className="flex size-[20px] items-center justify-center shrink-0">
+                <span className="font-sans">{ctaLabel}</span>
+                <div className="absolute end-5 flex items-center justify-center transition-transform group-hover:-translate-x-1">
                   <svg
-                    width="18"
-                    height="18"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -442,7 +455,6 @@ export function HomeScreen({
                     <polyline points="12 19 5 12 12 5" />
                   </svg>
                 </div>
-                <span className="font-sans tracking-wide">{ctaLabel}</span>
               </button>
             </div>
           </section>
