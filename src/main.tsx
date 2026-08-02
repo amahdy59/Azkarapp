@@ -10,7 +10,9 @@ import { registerSW } from "virtual:pwa-register";
 
 const App = lazy(() => import("./app/App.tsx"));
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
-const isMarketingLanding = window.location.pathname.replace(/\/$/, "").endsWith("/landing");
+const isMarketingLanding =
+  window.location.pathname.replace(/\/$/, "").endsWith("/landing") ||
+  new URLSearchParams(window.location.search).get("view") === "landing";
 const Root = isMarketingLanding ? MarketingLanding : App;
 const initialAppearance = loadAppState().settings;
 applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
