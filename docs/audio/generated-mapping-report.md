@@ -1,11 +1,11 @@
 # Generated audio mapping report
 
-Generated: 2026-08-01T12:25:13.866Z
+Generated: 2026-08-02T03:21:38.167Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
 | Zikr instances            |   191 |
-| Total canonical zikrs     |   149 |
+| Total canonical zikrs     |   148 |
 | Approved audio mappings   |     0 |
 | Pending assets            |     0 |
 | Unmatched zikrs           |   191 |
@@ -32,13 +32,13 @@ Generated: 2026-08-01T12:25:13.866Z
 - `zikr:ya-hayyu-ya-qayyum`: `m-hm-88`, `e-hm-88`
 - `zikr:subhanallah-wa-bihamdih`: `m-hm-91`, `e-hm-91`, `misc-ref-3`
 - `zikr:tahlil-complete`: `m-hm-93`, `e-hm-92`, `ap-ref-3`, `ap-tasbeeh-tawhid`, `misc-ref-2`
+- `zikr:beneficial-knowledge-provision-accepted-deeds`: `m-hm-95`, `ap-ref-10`, `comprehensive-dua-44`
 - `zikr:astaghfirullah-wa-atubu-ilayh`: `m-hm-96`, `e-hm-96`
 - `zikr:salawat-short`: `m-hm-98`, `e-hm-98`
 - `zikr:perfect-words-refuge`: `m-hm-97`, `e-hm-97`
 - `zikr:subhanallah`: `s-hm-106-subhanallah`, `ap-tasbeeh-subhanallah`
 - `zikr:alhamdulillah`: `s-hm-106-alhamdulillah`, `ap-tasbeeh-alhamdulillah`
 - `zikr:allahu-akbar`: `s-hm-106-allahu-akbar`, `ap-tasbeeh-allahuakbar`
-- `zikr:refuge-from-cowardice`: `ap-ref-10`, `comprehensive-dua-44`
 - `zikr:bismillah`: `pur-ref-1`, `fd-ref-1`, `clo-ref-4`
 - `zikr:allahumma-rahmataka-arju`: `da-ref-2`, `friday-dua-20`
 - `zikr:distress-refuge`: `da-ref-4`, `friday-dua-12`
@@ -68,7 +68,7 @@ Generated: 2026-08-01T12:25:13.866Z
 - `m-hm-91` — `zikr:subhanallah-wa-bihamdih`
 - `m-hm-93` — `zikr:tahlil-complete`
 - `m-hm-94` — `zikr:m-hm-94`
-- `m-hm-95` — `zikr:m-hm-95`
+- `m-hm-95` — `zikr:beneficial-knowledge-provision-accepted-deeds`
 - `m-hm-96` — `zikr:astaghfirullah-wa-atubu-ilayh`
 - `m-hm-98` — `zikr:salawat-short`
 - `m-hm-97` — `zikr:perfect-words-refuge`
@@ -132,7 +132,7 @@ Generated: 2026-08-01T12:25:13.866Z
 - `ap-ref-6` — `zikr:ap-ref-6`
 - `ap-ref-7` — `zikr:ap-ref-7`
 - `ap-ref-8` — `zikr:ap-ref-8`
-- `ap-ref-10` — `zikr:refuge-from-cowardice`
+- `ap-ref-10` — `zikr:beneficial-knowledge-provision-accepted-deeds`
 - `pur-ref-1` — `zikr:bismillah`
 - `pur-ref-2` — `zikr:pur-ref-2`
 - `pur-ref-3` — `zikr:pur-ref-3`
@@ -233,7 +233,7 @@ Generated: 2026-08-01T12:25:13.866Z
 - `comprehensive-dua-41` — `zikr:comprehensive-dua-41`
 - `comprehensive-dua-42` — `zikr:comprehensive-dua-42`
 - `comprehensive-dua-43` — `zikr:comprehensive-dua-43`
-- `comprehensive-dua-44` — `zikr:refuge-from-cowardice`
+- `comprehensive-dua-44` — `zikr:beneficial-knowledge-provision-accepted-deeds`
 - `comprehensive-dua-45` — `zikr:comprehensive-dua-45`
 - `comprehensive-dua-46` — `zikr:comprehensive-dua-46`
 - `comprehensive-dua-47` — `zikr:comprehensive-dua-47`

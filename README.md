@@ -92,11 +92,11 @@ Never commit `.env` or service-role credentials. The app remains usable as a loc
 | ------------------------------ | ----------------------------------------------------------------------------------------- |
 | `pnpm dev`                     | Start the Vite development server                                                         |
 | `pnpm build`                   | Create the production build in `dist/`                                                    |
-| `pnpm build:pages`             | Build with the GitHub Pages base path                                                     |
+| `pnpm build:pages`             | Build with the GitHub Pages base path and enforce the bundle budget                       |
 | `pnpm preview`                 | Preview the production build locally                                                      |
 | `pnpm check`                   | Run formatting check, ESLint, TypeScript, unit tests, production build, and bundle budget |
 | `pnpm test:run`                | Run all unit tests once                                                                   |
-| `pnpm test:e2e`                | Run Playwright tests across desktop, mobile, and tablet Chromium                          |
+| `pnpm test:e2e`                | Run Playwright tests across desktop Chromium, Firefox, WebKit, mobile, and tablet         |
 | `pnpm lint`                    | Run ESLint with zero warnings allowed                                                     |
 | `pnpm typecheck`               | Run strict TypeScript checking                                                            |
 | `pnpm format`                  | Format the repository with Prettier                                                       |
@@ -119,9 +119,8 @@ src/
 │  ├─ App.tsx           Application shell, navigation, and state composition
 │  ├─ state.ts          State defaults, validation, persistence, and merge rules
 │  └─ types.ts          Shared application/domain types
-├─ assets/              Static artwork and media
 ├─ lib/                 External service boundaries such as Supabase
-└─ styles/              Theme tokens, fonts, Tailwind, and global behavior
+└─ styles/              Theme tokens, offline typography, Tailwind, and global behavior
 
 e2e/                    Playwright browser and accessibility coverage
 supabase/               Database schema and ordered migrations

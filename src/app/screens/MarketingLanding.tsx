@@ -1,10 +1,14 @@
-import { BarChart3, Check, Headphones, MoonStar, Smartphone } from "../components/icons";
+import { BarChart3, BookOpen, Check, MoonStar, Smartphone } from "../components/icons";
 
 import { ArrowNext } from "../components/icons";
 
 export default function MarketingLanding() {
   return (
-    <div className="marketing-landing theme-midnight h-dvh overflow-y-auto bg-background text-foreground">
+    <div
+      className="marketing-landing theme-midnight h-dvh overflow-y-auto bg-background text-foreground"
+      lang="en"
+      dir="ltr"
+    >
       <header className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-6">
         <a href="./" className="flex items-center gap-2 text-[1.25rem] font-extrabold">
           <MoonStar className="text-primary" /> Azkar
@@ -13,7 +17,7 @@ export default function MarketingLanding() {
           Open app
         </a>
       </header>
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <section className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
           <div>
             <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-primary">
@@ -23,8 +27,8 @@ export default function MarketingLanding() {
               Build a lasting azkar habit.
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-8 text-muted-foreground">
-              Morning, Evening, and Sleep remembrance with guided counting, audio, bilingual Arabic and English, and
-              private progress tracking.
+              Morning, Evening, and Sleep remembrance with guided counting, bilingual Arabic and English, offline
+              reading, and private progress tracking.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a
@@ -73,9 +77,9 @@ export default function MarketingLanding() {
                 body: "Tap, swipe, and continue with clear session progress.",
               },
               {
-                Icon: Headphones,
-                title: "Listen and read",
-                body: "Audio support alongside Arabic, transliteration, and translation.",
+                Icon: BookOpen,
+                title: "Read clearly",
+                body: "Arabic remembrance with optional transliteration and translation.",
               },
               {
                 Icon: BarChart3,

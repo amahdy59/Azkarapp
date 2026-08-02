@@ -147,7 +147,23 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
 test("marketing landing page has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await page.goto("/landing");
   await expect(page.getByRole("heading", { name: "Build a lasting azkar habit." })).toBeVisible();
+  await expect(page.locator("html")).toHaveAttribute("lang", "en");
+  await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
   await expectNoWcagViolations(page);
+});
+
+test("search results expose concise accessible names", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-azkar").click();
+  await page.getByRole("button", { name: "Search adhkar and duas" }).click();
+  await page.getByRole("textbox", { name: "Search adhkar and duas" }).fill("sleep");
+
+  const results = page.getByTestId("search-result");
+  await expect(results.first()).toBeVisible();
+  const names = await results.evaluateAll((buttons) =>
+    buttons.map((button) => button.getAttribute("aria-label") ?? ""),
+  );
+  expect(names.every((name) => name.length > 0 && name.length < 120)).toBe(true);
 });
 
 test("home and settings flows have no automatically detectable WCAG A/AA violations", async ({ page }) => {

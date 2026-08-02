@@ -7,7 +7,7 @@ import type {
   RoutineMode,
   View,
 } from "../types";
-import type { StoredSession } from "../state";
+import { MAX_STORED_SESSIONS, type StoredSession } from "../state";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import {
   getFirstIncompleteZikrIndex,
@@ -187,19 +187,21 @@ export function useSessionHandlers({
     );
     setDailyCompletions(growth.records);
     setLastGrowthEvent(growth.event);
-    setSessions((prev) => [
-      {
-        id: `${activeCat}-${completedAt.getTime()}`,
-        category: activeCat,
-        completedAt: completedAt.toISOString(),
-        completedCount: azkar.length,
-        totalCount: azkar.length,
-        durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
-        isComplete: true,
-        completionLevel,
-      },
-      ...prev,
-    ]);
+    setSessions((prev) =>
+      [
+        {
+          id: `${activeCat}-${completedAt.getTime()}`,
+          category: activeCat,
+          completedAt: completedAt.toISOString(),
+          completedCount: azkar.length,
+          totalCount: azkar.length,
+          durationSeconds: Math.max(1, Math.round((Date.now() - sessionStart) / 1000)),
+          isComplete: true,
+          completionLevel,
+        },
+        ...prev,
+      ].slice(0, MAX_STORED_SESSIONS),
+    );
 
     if (activeCat === "after_prayer") {
       setCompleted((prev) => ({ ...prev, after_prayer: new Set() }));

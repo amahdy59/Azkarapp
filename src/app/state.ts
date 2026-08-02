@@ -24,6 +24,7 @@ export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from ".
 
 const STORAGE_KEY = "azkarapp.state.v1";
 const LEGACY_SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
+export const MAX_STORED_SESSIONS = 500;
 
 export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
@@ -304,7 +305,7 @@ function isStoredSession(value: unknown): value is StoredSession {
   return (
     typeof session.id === "string" &&
     typeof session.category === "string" &&
-    (CATEGORY_IDS as string[]).includes(session.category) &&
+    (CATEGORY_IDS as readonly string[]).includes(session.category) &&
     typeof session.completedAt === "string" &&
     !Number.isNaN(Date.parse(session.completedAt)) &&
     typeof session.completedCount === "number" &&
@@ -315,6 +316,12 @@ function isStoredSession(value: unknown): value is StoredSession {
     Number.isFinite(session.durationSeconds) &&
     typeof session.isComplete === "boolean"
   );
+}
+
+function newestSessions(sessions: StoredSession[]) {
+  return sessions
+    .sort((a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime())
+    .slice(0, MAX_STORED_SESSIONS);
 }
 
 function normalizeLocation(value: unknown, fallback: LocationSettings = DEFAULT_LOCATION): LocationSettings {
@@ -368,7 +375,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
   const progressDayStartHour = isProgressDayStartHour(settings?.progressDayStartHour)
     ? settings.progressDayStartHour
     : DEFAULT_APP_STATE.settings.progressDayStartHour;
-  const sessions = Array.isArray(parsed.sessions) ? parsed.sessions.filter(isStoredSession) : [];
+  const sessions = newestSessions(Array.isArray(parsed.sessions) ? parsed.sessions.filter(isStoredSession) : []);
   const dailyCompletions = Array.isArray(parsed.dailyCompletions)
     ? normalizeDailyCompletions(parsed.dailyCompletions)
     : deriveDailyCompletionsFromLegacySessions(sessions, progressDayStartHour);
@@ -507,16 +514,18 @@ export function loadAppState(): AppStateSnapshot {
  *
  * @param {AppStateSnapshot} state - The application state to be saved.
  */
-export function saveAppState(state: AppStateSnapshot) {
+export function saveAppState(state: AppStateSnapshot): boolean {
   if (typeof window === "undefined") {
-    return;
+    return false;
   }
 
   try {
     const dayKey = getProgressDayKey(new Date(), state.settings.progressDayStartHour);
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(normalizeAppState({ ...state, lastActiveDayKey: dayKey })));
+    return true;
   } catch {
     // Storage can be denied or full. Persistence failure must never blank the app.
+    return false;
   }
 }
 
@@ -695,9 +704,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       accountUserId: incoming.profile?.accountUserId ?? safeBase.profile.accountUserId,
     },
     completed,
-    sessions: [...sessions.values()].sort(
-      (a, b) => new Date(b.completedAt).getTime() - new Date(a.completedAt).getTime(),
-    ),
+    sessions: newestSessions([...sessions.values()]),
     dailyCompletions: mergeDailyCompletions(
       safeBase.dailyCompletions,
       Array.isArray(incoming.dailyCompletions)

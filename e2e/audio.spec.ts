@@ -20,8 +20,7 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
 test("unreviewed audio is unavailable and never autoplays", async ({ page }) => {
   await enterEnglishGuestMode(page);
   const playAll = page.getByRole("button", { name: "Play All Audio" });
-  await expect(playAll).toBeDisabled();
-  await expect(playAll).toContainText("0/");
+  await expect(playAll).toHaveCount(0);
   expect(await page.evaluate(() => (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls)).toBe(0);
 });
 

@@ -42,7 +42,7 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Azkar Library");
 
-  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+ complete/ }).click();
+  await page.getByTestId("category-card-morning").click();
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Category");
 
@@ -60,4 +60,31 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await page.getByRole("button", { name: "Settings", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
   await expectNoHorizontalOverflow(page, "Settings");
+});
+
+test("Arabic large text remains readable at 320px", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await enterEnglishGuestMode(page);
+
+  await page.getByTestId("nav-settings").click();
+  await page.getByRole("button", { name: "Accessibility", exact: true }).click();
+  await page.getByTestId("text-size-option-large").click();
+  await page.getByRole("button", { name: "Back", exact: true }).click();
+  await page.getByTestId("settings-language-ar").click();
+  await page.getByTestId("nav-home").click();
+
+  await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  await expectNoHorizontalOverflow(page, "Arabic large-text Home");
+
+  const clipped = await page
+    .locator('[data-testid="prayer-header-card"] span, [data-testid^="nav-"] span:last-child')
+    .evaluateAll((elements) =>
+      elements.flatMap((element) =>
+        element.scrollWidth > element.clientWidth + 1 || element.scrollHeight > element.clientHeight + 1
+          ? [element.textContent?.trim()]
+          : [],
+      ),
+    );
+  expect(clipped).toEqual([]);
 });

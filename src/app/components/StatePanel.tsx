@@ -61,13 +61,3 @@ export function StatePanel({
     </section>
   );
 }
-
-export function ContentSkeleton() {
-  return (
-    <div className="space-y-3" role="status" aria-label="Loading content">
-      {[0, 1, 2].map((item) => (
-        <div key={item} className="h-[72px] animate-pulse rounded-xl border border-border bg-card" />
-      ))}
-    </div>
-  );
-}

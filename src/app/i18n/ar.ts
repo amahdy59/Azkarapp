@@ -22,6 +22,8 @@ const ar = {
     skip: "تخطي",
     comingSoon: "قريباً",
     loading: "جارٍ التحميل",
+    dismiss: "إخفاء",
+    skipToMain: "تخطى إلى المحتوى الرئيسي",
   },
   onboarding: {
     title: "رفيقك اليومي للذكر",
@@ -38,6 +40,11 @@ const ar = {
     restoreError: "تعذرت استعادة بيانات حسابك.",
     pushError: "تعذرت مزامنة حسابك.",
     offlineNotice: "أنت غير متصل بالإنترنت. تستمر القراءة والتقدم محلياً؛ وستُستأنف المزامنة عند الاتصال.",
+  },
+  persistence: {
+    title: "لا يتم حفظ التقدم",
+    body: "مساحة التخزين غير متاحة أو ممتلئة. أبقِ الصفحة مفتوحة، ثم أعد المحاولة بعد توفير مساحة.",
+    retry: "إعادة محاولة الحفظ",
   },
   home: {
     title: "الأذكار",
@@ -148,6 +155,7 @@ const ar = {
     removeAriaLabel: "إزالة {term} من عمليات البحث الأخيرة",
     resultsSingular: "نتيجة واحدة للبحث عن «{query}»",
     resultsPlural: "{count} نتيجة للبحث عن «{query}»",
+    resultAriaLabel: "{title}، ضمن {category}",
     emptyTitle: "لم يتم العثور على أذكار",
     emptyDescription: "جرّب كلمة أخرى بالعربية أو الإنجليزية أو بالتهجئة اللاتينية.",
     emptyAction: "مسح البحث",
@@ -352,6 +360,7 @@ const ar = {
     todayStats: "إحصائيات اليوم",
   },
   garden: {
+    streakFlame: "سلسلة المواظبة اليومية",
     todayTitle: "ممارستك اليوم",
     todayCollections: "تقدم مجموعات اليوم",
     leafProgress: "{count} من {total} أوراق",
@@ -503,7 +512,6 @@ const ar = {
     completed: "مكتمل",
     playAllAudio: "تشغيل الصوتي للكل",
     playAll: "تشغيل الكل",
-    audioComingSoon: "الصوت (قريباً)",
     resetProgress: "إعادة تعيين التقدم",
     completedToggle: "مكتمل — انقر للإلغاء",
     remainingToggle: "غير مكتمل — انقر للتحديد",

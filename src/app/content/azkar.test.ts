@@ -197,6 +197,19 @@ describe("azkar content totals", () => {
     expect(sleepIkhlas?.translation).toBe(QURAN_PASSAGES.alIkhlas.translation);
   });
 
+  it("keeps the accepted-deeds morning dua consistent with its canonical duplicate", () => {
+    const morningDua = ALL_AZKAR.find((zikr) => zikr.id === "m-hm-95");
+    const afterPrayerDua = ALL_AZKAR.find((zikr) => zikr.id === "ap-ref-10");
+
+    expect(morningDua?.arabicText).toContain("\u0648\u064e\u0639\u064e\u0645\u064e\u0644\u064b\u0627");
+    expect(morningDua?.arabicText).not.toContain("\u0648\u064e\u0639\u064e\u0644\u064e\u0645\u064e\u0644\u064b\u0627");
+    expect(afterPrayerDua?.arabicText).toContain("\u0648\u064e\u0639\u064e\u0645\u064e\u0644\u064b\u0627");
+    expect(afterPrayerDua?.arabicText).not.toContain(
+      "\u0648\u064e\u0639\u064e\u0644\u064e\u0645\u064e\u0644\u064b\u0627",
+    );
+    expect(afterPrayerDua?.canonicalKey).toBe(morningDua?.canonicalKey);
+  });
+
   it("does not present reviewed weak or fabricated special virtues as authentic practice", () => {
     expect(ALL_AZKAR.some((zikr) => zikr.id === "ap-ref-11")).toBe(false);
     for (const id of ["m-hm-83", "e-hm-83", "da-ref-5"]) {

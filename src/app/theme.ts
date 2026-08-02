@@ -1,4 +1,5 @@
 import type { AppLanguage, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
+import { t } from "./i18n";
 
 export const T = {
   bg: "#0A1228",
@@ -73,6 +74,8 @@ export function applyAppAppearance({
   root.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
   root.dataset.colorBlindSupport = colorBlindSupport;
   root.style.colorScheme = themeMode === "light" && !highContrast ? "light" : "dark";
+  const skipLink = document.querySelector<HTMLAnchorElement>(".skip-link");
+  if (skipLink) skipLink.textContent = t(language, "common.skipToMain");
 
   let metaThemeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
   if (!metaThemeColor) {

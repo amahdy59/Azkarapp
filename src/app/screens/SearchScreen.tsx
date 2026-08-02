@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useDeferredValue, useMemo, useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
@@ -68,23 +68,23 @@ export function SearchScreen({
 }) {
   const isArabic = language === "ar";
   const [q, setQ] = useState("");
+  const deferredQuery = useDeferredValue(q.trim());
 
   // Load per-language history from localStorage; no hardcoded defaults.
   const [recents, setRecents] = useState<string[]>(() => loadRecents(language));
 
-  const results =
-    q.trim().length < 2
-      ? []
-      : ALL_AZKAR.filter((z) => {
-          if (z.isCollectionIntroduction) return false;
-          const lq = q.toLowerCase();
-          return (
-            z.arabicText.includes(q) ||
-            z.translation.toLowerCase().includes(lq) ||
-            z.transliteration.toLowerCase().includes(lq) ||
-            (ZIKR_LABELS[z.id] ?? "").toLowerCase().includes(lq)
-          );
-        });
+  const results = useMemo(() => {
+    if (deferredQuery.length < 2) return [];
+    const normalizedQuery = deferredQuery.toLowerCase();
+    return ALL_AZKAR.filter(
+      (zikr) =>
+        !zikr.isCollectionIntroduction &&
+        (zikr.arabicText.includes(deferredQuery) ||
+          zikr.translation.toLowerCase().includes(normalizedQuery) ||
+          zikr.transliteration.toLowerCase().includes(normalizedQuery) ||
+          (ZIKR_LABELS[zikr.id] ?? "").toLowerCase().includes(normalizedQuery)),
+    );
+  }, [deferredQuery]);
 
   const handleSubmit = (term: string) => {
     const trimmed = term.trim();
@@ -197,15 +197,23 @@ export function SearchScreen({
               results.map((z) => {
                 const zIdx = getAzkarByCategory(z.category).findIndex((a) => a.id === z.id);
                 const category = CATEGORIES.find((item) => item.id === z.category)!;
-                const label = isArabic ? z.arabicText.split("\n")[0] : z.translation;
+                const label = (isArabic ? z.arabicText.split("\n")[0] : z.translation) ?? z.id;
                 const subtitle = isArabic ? category.nameArabic : z.transliteration;
+                const accessibleTitle = isArabic
+                  ? (z.surahNameArabic ?? label.slice(0, 48))
+                  : (z.surahNameEnglish ?? ZIKR_LABELS[z.id] ?? label.split(".")[0] ?? label);
                 return (
                   <button
                     key={z.id}
+                    data-testid="search-result"
                     onClick={() => {
                       handleSubmit(q);
                       onZikr(z.category, zIdx);
                     }}
+                    aria-label={t(language, "search.resultAriaLabel", {
+                      title: accessibleTitle,
+                      category: isArabic ? category.nameArabic : category.name,
+                    })}
                     className="flex h-[72px] w-full items-center justify-between rounded-2xl border border-border bg-card px-4 transition-all"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">

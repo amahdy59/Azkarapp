@@ -1,28 +1,41 @@
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
-import App from "./app/App.tsx";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { loadAppState } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { startPerformanceMonitoring } from "./lib/observability.ts";
-import { AudioProvider } from "./app/audio/AudioProvider.tsx";
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
 
+const App = lazy(() => import("./app/App.tsx"));
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
-const Root = window.location.pathname.replace(/\/$/, "").endsWith("/landing") ? MarketingLanding : App;
+const isMarketingLanding = window.location.pathname.replace(/\/$/, "").endsWith("/landing");
+const Root = isMarketingLanding ? MarketingLanding : App;
 const initialAppearance = loadAppState().settings;
-applyAppAppearance(initialAppearance);
+applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
 startPerformanceMonitoring();
+
+document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
+  event.preventDefault();
+  const focusMainContent = () => {
+    const mainContent = document.getElementById("main-content");
+    mainContent?.focus();
+    return Boolean(mainContent);
+  };
+  if (focusMainContent()) return;
+
+  const observer = new MutationObserver(() => {
+    if (focusMainContent()) observer.disconnect();
+  });
+  observer.observe(document.getElementById("root")!, { childList: true, subtree: true });
+});
 
 createRoot(document.getElementById("root")!).render(
   <AppErrorBoundary>
-    <AudioProvider>
-      <Suspense fallback={null}>
-        <Root />
-      </Suspense>
-    </AudioProvider>
+    <Suspense fallback={null}>
+      <Root />
+    </Suspense>
   </AppErrorBoundary>,
 );
 
@@ -32,7 +45,7 @@ const updateServiceWorker = registerSW({
   },
 });
 
-if ("caches" in window) {
+if (!isMarketingLanding && "caches" in window) {
   void import("./app/audio/audioOfflineCache.ts")
     .then(({ cleanupStaleAudioDownloads }) => cleanupStaleAudioDownloads())
     .catch(() => {

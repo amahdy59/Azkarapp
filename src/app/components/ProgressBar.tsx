@@ -13,7 +13,7 @@ export function ProgressBar({
   trackColor?: string;
   fillColor?: string;
   direction?: "ltr" | "rtl";
-  "aria-label"?: string;
+  "aria-label": string;
 }) {
   const pct = max > 0 ? Math.min(100, (value / max) * 100) : 0;
   return (
@@ -25,7 +25,7 @@ export function ProgressBar({
       aria-valuenow={value}
       aria-valuemin={0}
       aria-valuemax={max}
-      aria-label={ariaLabel || "Progress bar"}
+      aria-label={ariaLabel}
       dir={direction}
     >
       <div

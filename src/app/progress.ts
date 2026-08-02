@@ -1,26 +1,7 @@
 import { getAzkarByCategory } from "./content/azkar";
-import type { CategoryId, DailyCollectionCompletion, StoredSession } from "./types";
+import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type StoredSession } from "./types";
 
-export const CATEGORY_IDS: CategoryId[] = [
-  "morning",
-  "evening",
-  "before_sleep",
-  "waking_up",
-  "after_prayer",
-  "comprehensive_duas",
-  "friday_kahf",
-  "home",
-  "mosque",
-  "food_drink",
-  "restroom",
-  "clothing",
-  "travel",
-  "distress_anxiety",
-  "illness_ruqyah",
-  "social_community",
-  "natural_events",
-  "miscellaneous",
-];
+export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
 

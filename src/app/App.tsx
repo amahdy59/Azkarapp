@@ -34,6 +34,7 @@ import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ScreenFallback } from "./components/ScreenFallback";
 import { PwaNotice } from "./components/PwaNotice";
 import { useAudioController } from "./audio/useAudioController";
+import { AudioProvider } from "./audio/AudioProvider";
 import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
 import { t } from "./i18n";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
@@ -111,7 +112,7 @@ const AudioContentReviewScreen = lazy(() =>
 );
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
-export default function App() {
+function AppContent() {
   const initialState = useRef(loadAppState()).current;
   const [view, setView] = useState<View>(() => {
     const requestedView = new URLSearchParams(window.location.search).get("view");
@@ -205,6 +206,8 @@ export default function App() {
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [persistenceError, setPersistenceError] = useState(false);
+  const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installDismissed, setInstallDismissed] = useState(() => {
@@ -589,7 +592,11 @@ export default function App() {
     });
   }, [boldText, colorBlindSupport, forceRtl, themeMode, highContrast, reduceMotion, selectedLang, textSize]);
 
-  useEffect(() => saveAppState(appStateSnapshot), [appStateSnapshot]);
+  useEffect(() => {
+    const saved = saveAppState(appStateSnapshot);
+    setPersistenceError(!saved);
+    if (saved) setPersistenceNoticeDismissed(false);
+  }, [appStateSnapshot]);
 
   useEffect(() => {
     if (!window.history.state?.view) {
@@ -833,7 +840,6 @@ export default function App() {
                   ensureCurrentFridayWeek();
                   push("friday");
                 }}
-                onOpenShareModal={() => setShowShareModal(true)}
                 language={selectedLang}
                 calendarType={calendarType}
                 direction={layoutDirection}
@@ -849,6 +855,7 @@ export default function App() {
                 onZikr={(catId, index) => openReader(catId, index, "complete")}
                 onSearch={() => push("search")}
                 savedZikrIds={savedZikrIds}
+                routineModes={routineModes}
               />
             )}
             {view === "progress" && (
@@ -1052,7 +1059,6 @@ export default function App() {
                 onResetPreferences={handleResetPreferences}
                 onClearLocalData={handleClearLocalData}
                 onDeleteAccount={handleDeleteAccount}
-                onBack={pop}
               />
             )}
             {view === "search" && (
@@ -1096,16 +1102,27 @@ export default function App() {
           </Suspense>
         )}
 
-        {(updateAvailable || (installPrompt && sessions.length > 0 && !installDismissed)) && (
+        {((persistenceError && !persistenceNoticeDismissed) ||
+          updateAvailable ||
+          (installPrompt && sessions.length > 0 && !installDismissed)) && (
           <div
             className="absolute inset-x-0 z-40"
             style={{
               bottom: showBottomNav
-                ? "calc(4rem + env(safe-area-inset-bottom))"
+                ? "calc(4.5rem + env(safe-area-inset-bottom))"
                 : "max(0.75rem, env(safe-area-inset-bottom))",
             }}
           >
-            {updateAvailable ? (
+            {persistenceError && !persistenceNoticeDismissed ? (
+              <PwaNotice
+                title={t(selectedLang, "persistence.title")}
+                body={t(selectedLang, "persistence.body")}
+                actionLabel={t(selectedLang, "persistence.retry")}
+                dismissLabel={t(selectedLang, "common.dismiss")}
+                onAction={() => setPersistenceError(!saveAppState(appStateSnapshot))}
+                onDismiss={() => setPersistenceNoticeDismissed(true)}
+              />
+            ) : updateAvailable ? (
               <PwaNotice
                 title={t(selectedLang, "pwa.updateTitle")}
                 body={t(selectedLang, "pwa.updateBody")}
@@ -1182,5 +1199,13 @@ export default function App() {
         />
       )}
     </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AudioProvider>
+      <AppContent />
+    </AudioProvider>
   );
 }

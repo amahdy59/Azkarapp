@@ -1,23 +1,25 @@
 export type AppLanguage = "en" | "ar";
-export type CategoryId =
-  | "morning"
-  | "evening"
-  | "before_sleep"
-  | "waking_up"
-  | "home"
-  | "mosque"
-  | "after_prayer"
-  | "restroom"
-  | "food_drink"
-  | "clothing"
-  | "travel"
-  | "distress_anxiety"
-  | "illness_ruqyah"
-  | "social_community"
-  | "natural_events"
-  | "friday_kahf"
-  | "comprehensive_duas"
-  | "miscellaneous";
+export const CATEGORY_IDS = [
+  "morning",
+  "evening",
+  "before_sleep",
+  "waking_up",
+  "after_prayer",
+  "comprehensive_duas",
+  "friday_kahf",
+  "home",
+  "mosque",
+  "food_drink",
+  "restroom",
+  "clothing",
+  "travel",
+  "distress_anxiety",
+  "illness_ruqyah",
+  "social_community",
+  "natural_events",
+  "miscellaneous",
+] as const;
+export type CategoryId = (typeof CATEGORY_IDS)[number];
 export type TextSizeOption = "small" | "medium" | "large";
 export type ArabicFontOption = "ibm_plex" | "noto_sans";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";

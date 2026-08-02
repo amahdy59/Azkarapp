@@ -35,7 +35,7 @@ create table if not exists public.session_history (
       'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
       'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
       'distress_anxiety', 'illness_ruqyah', 'social_community',
-      'natural_events', 'miscellaneous'
+      'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
     )
   ),
   completed_count integer not null default 0,
@@ -64,7 +64,7 @@ create table if not exists public.daily_collection_completions (
       'morning', 'evening', 'before_sleep', 'waking_up', 'home', 'mosque',
       'after_prayer', 'restroom', 'food_drink', 'clothing', 'travel',
       'distress_anxiety', 'illness_ruqyah', 'social_community',
-      'natural_events', 'miscellaneous'
+      'natural_events', 'friday_kahf', 'comprehensive_duas', 'miscellaneous'
     )
   ),
   time_zone text not null default 'local',

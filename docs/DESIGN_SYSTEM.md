@@ -11,26 +11,26 @@ This is the implementation source of truth for visual and interaction decisions.
 | Additional Midnight screens | Nodes `443:2376` and `450:2648`                                             |
 | Theme modes                 | Light, Midnight, and Dark/OLED variable modes in the Figma appearance panel |
 | Semantic tokens             | `src/styles/theme.css`                                                      |
-| Font loading                | `src/styles/fonts.css`                                                      |
+| Typography                  | Offline system-family stacks in `src/styles/theme.css`                      |
 | Shared shell/navigation     | `src/app/components/LayoutShells.tsx`                                       |
 | Reader implementation       | `src/app/screens/ReaderScreen.tsx`                                          |
 | Product icon library        | Untitled UI Icons via `src/app/components/icons.ts`                         |
 
 ## Typography contract
 
-The following assignments are fixed. Do not substitute a visually similar font or restore legacy Amiri/Noto Naskh declarations.
+The app uses offline system-family stacks so first render, installed-PWA use, and privacy do not depend on a third-party font service.
 
 | Content                                                   | Typeface                               | CSS contract                                                                           | Direction                    |
 | --------------------------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------- |
-| English UI                                                | Inter                                  | Default `body` family; `font-sans` or `latin-ui` for explicit mixed-language fragments | LTR                          |
-| Arabic UI, labels, navigation, settings, and instructions | Noto Sans Arabic                       | Inherited from `[lang="ar"] body`; `arabic-ui` for explicit mixed-language fragments   | RTL                          |
-| Zikr, du'a, Qur'anic, and Arabic evidence text            | IBM Plex Sans Arabic                   | Add the `zikr-text` class and `lang="ar"`                                              | RTL                          |
+| English UI                                                | Native sans-serif stack                | Default `body` family; `font-sans` or `latin-ui` for explicit mixed-language fragments | LTR                          |
+| Arabic UI, labels, navigation, settings, and instructions | Native Arabic-capable sans-serif stack | Inherited from `[lang="ar"] body`; `arabic-ui` for explicit mixed-language fragments   | RTL                          |
+| Zikr, du'a, Qur'anic, and Arabic evidence text            | Native Arabic reading stack            | Add the `zikr-text` class and `lang="ar"`                                              | RTL                          |
 | Numeric counters                                          | Existing numeral formatter/font helper | `counterNumeralFontFamily` or `numeralFontFamily`                                      | LTR inside the numeric group |
 
 Rules:
 
 - A zikr excerpt remains zikr content even when it appears on Home, Category, onboarding, reader, counter, or reference surfaces; use `zikr-text` in every location.
-- English interface copy uses Inter. Arabic interface copy uses Noto Sans Arabic. The document `lang` and `dir` are set by `App.tsx` and screens may repeat `dir` at layout boundaries to make behavior explicit.
+- English and Arabic interface copy use the corresponding offline system stacks. The document `lang` and `dir` are set by `App.tsx` and screens may repeat `dir` at layout boundaries to make behavior explicit.
 - Mixed-direction controls must use logical CSS properties (`start`, `end`, `ms`, `me`) or a deliberately isolated `dir="ltr"` physical layout. Arabic text inside that layout gets its own `dir="rtl"` or `dir="auto"`.
 - Do not encode direction by reversing arrays. Keep semantic DOM/tab order stable and mirror only directional icons.
 
@@ -76,7 +76,7 @@ Rules:
 - Arabic group cards use an explicit physical LTR grid so visual placement is deterministic: Arabic text occupies the right column with its own `dir="rtl"`, the category icon sits to its left, and the back/entry chevron is the far-left element. English mirrors that physical grid.
 - Group progress fills from the reading start edge: right-to-left for Arabic and left-to-right for English. DOM and tab order remain stable in both languages.
 - The featured “start your zikr” card uses the selected location's calculated prayer boundaries: Morning from Fajr until Asr, Evening from Asr until Isha, and Before Sleep from Isha until the following Fajr. Copy identifies after Asr until Maghrib as the preferred Evening window without hiding the collection afterward.
-- Each featured state uses its approved scene asset from `src/assets/home`: `morning-scene.png` for Morning, `evening-scene.png` for Evening, and `before-sleep-scene.png` for Before Sleep. Artwork is decorative, sits behind all copy, fills the card, and uses the theme-owned `--featured-scene-opacity` token plus a semantic card/background overlay for legibility in Light, Midnight, and Dark/OLED modes.
+- Each featured state uses a lightweight semantic CSS gradient for Morning, Evening, or Before Sleep; contrast must remain legible in Light, Midnight, and Dark/OLED modes without downloading decorative imagery.
 - Featured-card Arabic copy is right aligned and uses RTL semantics. Zikr excerpts retain the `zikr-text` typography contract; decorative artwork has empty alternative text.
 - The daily palm trackers use two balanced columns with Before Sleep spanning the second row. Labels wrap without ellipsis, and each tracker contains exactly one status icon: a check when complete or a circle when pending.
 

@@ -67,7 +67,7 @@ export function SettingsRowItem({
         {icon}
       </div>
       <p
-        className={`min-w-0 flex-1 text-start text-[1rem] font-semibold font-sans`}
+        className="min-w-0 flex-1 break-words text-start font-sans text-[1rem] font-semibold leading-6"
         style={{ color: labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
       >
         {label}
@@ -82,13 +82,13 @@ export function SettingsRowItem({
         <button
           type="button"
           onClick={onPress}
-          className="flex min-h-16 w-full items-center gap-3 px-4 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="flex min-h-16 w-full items-center gap-3 px-4 py-3 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
           style={{ background: "var(--card)" }}
         >
           {content}
         </button>
       ) : (
-        <div className="flex min-h-16 w-full items-center gap-3 px-4" style={{ background: "var(--card)" }}>
+        <div className="flex min-h-16 w-full items-center gap-3 px-4 py-3" style={{ background: "var(--card)" }}>
           {content}
         </div>
       )}

@@ -48,7 +48,7 @@ test("the production shell does not render simulated device chrome", async ({ pa
   const navigation = page.getByRole("navigation", { name: "Bottom Navigation" });
   await expect(navigation).toBeVisible();
   await expect(shell.getByText("9:41", { exact: true })).toHaveCount(0);
-  await expect(navigation).toHaveCSS("height", "64px");
+  await expect(navigation).toHaveCSS("height", "72px");
 
   const simulatedHomeIndicators = await navigation.locator("span").evaluateAll(
     (spans) =>
@@ -85,10 +85,10 @@ test("the typography contract assigns each content type to its approved family",
     return { english, arabic, mixedEnglish, zikr };
   });
 
-  expect(families.english).toContain("Inter");
-  expect(families.arabic).toContain("Noto Sans Arabic");
-  expect(families.mixedEnglish).toContain("Inter");
-  expect(families.zikr).toContain("IBM Plex Sans Arabic");
+  expect(families.english).toContain("Segoe UI");
+  expect(families.arabic).toContain("Tahoma");
+  expect(families.mixedEnglish).toContain("Segoe UI");
+  expect(families.zikr).toContain("Traditional Arabic");
 });
 
 test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {

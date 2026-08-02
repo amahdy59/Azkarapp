@@ -22,6 +22,8 @@ const en = {
     skip: "Skip",
     comingSoon: "Coming Soon",
     loading: "Loading",
+    dismiss: "Dismiss",
+    skipToMain: "Skip to main content",
   },
   onboarding: {
     title: "Your Daily Companion for Dhikr",
@@ -38,6 +40,11 @@ const en = {
     restoreError: "Could not restore your account data.",
     pushError: "Could not sync your account.",
     offlineNotice: "You’re offline. Reading and progress continue locally; account sync will resume when connected.",
+  },
+  persistence: {
+    title: "Progress is not being saved",
+    body: "Storage is unavailable or full. Keep this page open, free storage if needed, then retry.",
+    retry: "Retry saving",
   },
   home: {
     title: "Azkar",
@@ -146,6 +153,7 @@ const en = {
     removeAriaLabel: "Remove {term} from recent searches",
     resultsSingular: '1 result for "{query}"',
     resultsPlural: '{count} results for "{query}"',
+    resultAriaLabel: "{title}, in {category}",
     emptyTitle: "No azkar found",
     emptyDescription: "Try another word in Arabic, English, or transliteration.",
     emptyAction: "Clear search",
@@ -362,6 +370,7 @@ const en = {
     todayStats: "Today's stats",
   },
   garden: {
+    streakFlame: "Daily streak",
     todayTitle: "Today's practice",
     todayCollections: "Today's collection progress",
     leafProgress: "{count} of {total} leaves",
@@ -514,7 +523,6 @@ const en = {
     completed: "Completed",
     playAllAudio: "Play All Audio",
     playAll: "Play All",
-    audioComingSoon: "Audio (Coming Soon)",
     resetProgress: "Reset Progress",
     completedToggle: "Completed — tap to uncheck",
     remainingToggle: "Not completed — tap to check",

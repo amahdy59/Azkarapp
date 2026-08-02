@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import type {
@@ -79,7 +79,6 @@ interface SettingsScreenProps {
   onResetPreferences: () => void;
   onClearLocalData: () => void;
   onDeleteAccount: () => void;
-  onBack: () => void;
 }
 
 export function SettingsScreen({
@@ -134,7 +133,6 @@ export function SettingsScreen({
   onResetPreferences,
   onClearLocalData,
   onDeleteAccount,
-  onBack,
 }: SettingsScreenProps) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
   const goBack = () => setSub("root");
@@ -169,7 +167,7 @@ export function SettingsScreen({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
-      <AnimatePresence mode="wait" initial={false}>
+      <>
         {sub === "root" && (
           <motion.div
             key="root"
@@ -179,7 +177,7 @@ export function SettingsScreen({
             exit="exit"
             className="absolute inset-0 flex h-full w-full flex-col"
           >
-            <Header title={t(language, "common.settings")} onBack={onBack} language={language} />
+            <Header title={t(language, "common.settings")} language={language} />
             <SettingsRootPanel
               onNav={setSub}
               language={language}
@@ -372,7 +370,7 @@ export function SettingsScreen({
             />
           </motion.div>
         )}
-      </AnimatePresence>
+      </>
     </div>
   );
 }

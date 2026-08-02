@@ -1,6 +1,7 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_APP_STATE,
+  MAX_STORED_SESSIONS,
   clearPrivateAppData,
   fromCompletedSets,
   loadAppState,
@@ -32,7 +33,7 @@ describe("app state persistence", () => {
       },
       profile: { ...DEFAULT_APP_STATE.profile, displayName: "Ahmed" },
     };
-    saveAppState(state);
+    expect(saveAppState(state)).toBe(true);
     expect(loadAppState()).toMatchObject({
       profile: { displayName: "Ahmed" },
       settings: {
@@ -44,6 +45,31 @@ describe("app state persistence", () => {
         },
       },
     });
+  });
+
+  it("reports storage write failures without throwing", () => {
+    const write = vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
+      throw new DOMException("Storage full", "QuotaExceededError");
+    });
+
+    expect(saveAppState(DEFAULT_APP_STATE)).toBe(false);
+    write.mockRestore();
+  });
+
+  it("retains only the newest bounded session history", () => {
+    const sessions = Array.from({ length: MAX_STORED_SESSIONS + 5 }, (_, index) => ({
+      id: `session-${index}`,
+      category: "morning" as const,
+      completedAt: new Date(2026, 0, 1, 0, index).toISOString(),
+      completedCount: 1,
+      totalCount: 1,
+      durationSeconds: 1,
+      isComplete: true,
+    }));
+
+    const normalized = normalizeAppState({ sessions });
+    expect(normalized.sessions).toHaveLength(MAX_STORED_SESSIONS);
+    expect(normalized.sessions[0]?.id).toBe(`session-${MAX_STORED_SESSIONS + 4}`);
   });
 
   it("recovers safely from corrupt storage", () => {

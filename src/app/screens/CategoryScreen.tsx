@@ -423,31 +423,27 @@ export function CategoryScreen({
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={onPlayAllAudio}
-                  disabled={!onPlayAllAudio}
-                  aria-disabled={!onPlayAllAudio}
-                  className={`flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 dark:text-amber-300 transition-all ${
-                    onPlayAllAudio
-                      ? "hover:bg-amber-500/20 active:scale-95 cursor-pointer shadow-xs"
-                      : "opacity-75 cursor-not-allowed"
-                  }`}
-                  aria-label={t(language, "category.playAllAudio")}
-                  title={
-                    audioCoverage
-                      ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
-                      : t(language, "category.playAllAudio")
-                  }
-                >
-                  <Volume2 size={16} />
-                  <span>
-                    {t(language, "category.playAll")}
-                    {audioCoverage
-                      ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
-                      : ""}
-                  </span>
-                </button>
+                {onPlayAllAudio && (
+                  <button
+                    type="button"
+                    onClick={onPlayAllAudio}
+                    className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
+                    aria-label={t(language, "category.playAllAudio")}
+                    title={
+                      audioCoverage
+                        ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
+                        : t(language, "category.playAllAudio")
+                    }
+                  >
+                    <Volume2 size={16} />
+                    <span>
+                      {t(language, "category.playAll")}
+                      {audioCoverage
+                        ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
+                        : ""}
+                    </span>
+                  </button>
+                )}
                 {completedItemCount > 0 && (
                   <button
                     type="button"

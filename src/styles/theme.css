@@ -139,26 +139,26 @@
 }
 
 body {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 .font-sans,
 .latin-ui {
-  font-family: "Inter", system-ui, sans-serif;
+  font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
 [lang="ar"] body {
-  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif;
 }
 
 .arabic-ui,
 [lang="ar"] .font-sans:not(.latin-ui) {
-  font-family: "Noto Sans Arabic", "Inter", sans-serif;
+  font-family: Tahoma, "Segoe UI", Arial, sans-serif;
 }
 
 .zikr-text,
 [lang="ar"] .zikr-text {
-  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+  font-family: "Traditional Arabic", Tahoma, "Segoe UI", serif;
 }
 
 :root[data-color-blind-support="deuteranopia"] {
@@ -1134,7 +1134,7 @@ body {
 
 .font-arabic,
 .zikr-text {
-  font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", sans-serif;
+  font-family: "Traditional Arabic", Tahoma, "Segoe UI", serif;
 }
 
 .animate-leaf-float-core {

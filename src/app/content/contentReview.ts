@@ -119,8 +119,9 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "friday-dua-32": "zikr:daily-wellbeing",
   "misc-ref-1": "zikr:subhanallah-great",
   "comprehensive-dua-39": "zikr:subhanallah-great",
-  "ap-ref-10": "zikr:refuge-from-cowardice",
-  "comprehensive-dua-44": "zikr:refuge-from-cowardice",
+  "m-hm-95": "zikr:beneficial-knowledge-provision-accepted-deeds",
+  "ap-ref-10": "zikr:beneficial-knowledge-provision-accepted-deeds",
+  "comprehensive-dua-44": "zikr:beneficial-knowledge-provision-accepted-deeds",
 };
 
 function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {

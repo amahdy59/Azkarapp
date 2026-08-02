@@ -73,7 +73,7 @@ Rules:
 - `components/ui/` contains vendored or low-level primitives.
 - `content/` owns static azkar/category data and domain computations.
 - `i18n/` owns translated product copy.
-- `styles/` owns semantic tokens, font loading, Tailwind integration, safe areas, and global RTL behavior.
+- `styles/` owns semantic tokens, offline system typography, Tailwind integration, safe areas, and global RTL behavior.
 - `lib/` owns external SDK boundaries.
 
 Do not place `localStorage`, Supabase, or raw network calls inside reusable visual components.
@@ -92,7 +92,7 @@ See `DESIGN_SYSTEM.md` for the authoritative typography, icon, geometry, and mot
 
 ## Local persistence and privacy
 
-The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys, such as the daily prayer-time cache.
+The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys, such as the daily prayer-time cache. Local session history retains the newest 500 entries to keep persistence bounded. Failed writes are surfaced in the application with retry and dismiss actions instead of failing silently.
 
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
 
@@ -157,7 +157,7 @@ Database schema changes require an ordered migration and corresponding applicati
 
 ## Offline and PWA behavior
 
-The production service worker precaches the application shell and versioned build assets. The app exposes install/update UI and quick actions for common collections.
+The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections.
 
 Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, OAuth, or fresh Aladhan values—must fail safely and retain local behavior.
 

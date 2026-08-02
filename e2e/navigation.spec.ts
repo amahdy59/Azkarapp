@@ -15,7 +15,7 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: "Search adhkar and duas", exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: /Morning Azkar, \d+ of \d+ complete/ }).click();
+  await page.getByTestId("category-card-morning").click();
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();
   await expect(page.getByText(/\d+ of \d+/).first()).toBeVisible();
 
@@ -94,7 +94,7 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   await page.getByTestId("home-primary-cta").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
-  await page.getByRole("button", { name: /Morning Azkar, 3 of 25 complete/ }).click();
+  await page.getByTestId("category-card-morning").click();
 
   await expect(page.getByText("Collection introduction", { exact: true })).toBeVisible();
   await expect(

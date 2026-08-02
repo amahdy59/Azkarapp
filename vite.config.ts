@@ -5,18 +5,6 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
 
-function figmaAssetResolver() {
-  return {
-    name: "figma-asset-resolver",
-    resolveId(id: string) {
-      if (id.startsWith("figma:asset/")) {
-        const filename = id.replace("figma:asset/", "");
-        return path.resolve(__dirname, "src/assets", filename);
-      }
-    },
-  };
-}
-
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
@@ -28,7 +16,6 @@ export default defineConfig(({ mode }) => {
   return {
     base: appBase,
     plugins: [
-      figmaAssetResolver(),
       // The React and Tailwind plugins are both required for Make, even if
       // Tailwind is not being actively used - do not remove them.
       react(),
@@ -81,21 +68,38 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,svg,png,woff2}"],
-          runtimeCaching: audioUrlPattern
-            ? [
-                {
-                  urlPattern: audioUrlPattern,
-                  handler: "CacheFirst",
-                  method: "GET",
-                  options: {
-                    cacheName: `azkar-audio-v${AUDIO_MANIFEST_VERSION}`,
-                    rangeRequests: true,
-                    // Only explicit verified downloads enter this cache.
-                    cacheableResponse: { statuses: [418] },
+          globIgnores: [
+            "**/ReaderScreen-*.js",
+            "**/SettingsScreen-*.js",
+            "**/FridayModeScreen-*.js",
+            "**/comprehensiveDuas-*.js",
+          ],
+          runtimeCaching: [
+            {
+              urlPattern: /\/assets\/.*\.(?:js|css)$/,
+              handler: "StaleWhileRevalidate" as const,
+              method: "GET" as const,
+              options: {
+                cacheName: "azkar-routes-v1",
+                expiration: { maxEntries: 80, maxAgeSeconds: 30 * 24 * 60 * 60 },
+              },
+            },
+            ...(audioUrlPattern
+              ? [
+                  {
+                    urlPattern: audioUrlPattern,
+                    handler: "CacheFirst" as const,
+                    method: "GET" as const,
+                    options: {
+                      cacheName: `azkar-audio-v${AUDIO_MANIFEST_VERSION}`,
+                      rangeRequests: true,
+                      // Only explicit verified downloads enter this cache.
+                      cacheableResponse: { statuses: [418] },
+                    },
                   },
-                },
-              ]
-            : [],
+                ]
+              : []),
+          ],
         },
       }),
     ],

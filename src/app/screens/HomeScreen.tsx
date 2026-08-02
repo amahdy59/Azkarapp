@@ -136,7 +136,6 @@ export function HomeScreen({
   onResume,
   onRepeat,
   onOpenFridayMode,
-  onOpenShareModal: _onOpenShareModal,
   routineModes,
 }: {
   completed: Record<CategoryId, Set<string>>;
@@ -150,7 +149,6 @@ export function HomeScreen({
   onResume: (category: CategoryId) => void;
   onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
-  onOpenShareModal?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
 }) {
   const isArabic = language === "ar";
@@ -158,8 +156,13 @@ export function HomeScreen({
   const [, setPrayerTimesRevision] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(timer);
+    let timer: ReturnType<typeof setTimeout>;
+    const updateAtNextMinute = () => {
+      setNow(new Date());
+      timer = setTimeout(updateAtNextMinute, 60_050 - (Date.now() % 60_000));
+    };
+    timer = setTimeout(updateAtNextMinute, 60_050 - (Date.now() % 60_000));
+    return () => clearTimeout(timer);
   }, []);
 
   const prayerDateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
@@ -198,6 +201,9 @@ export function HomeScreen({
       };
   const totalCount = reminderProgress.total;
   const doneCount = reminderProgress.done;
+  const routineSummary = t(language, `category.${reminderMode}Summary`, {
+    count: formatNumerals(totalCount, language),
+  });
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
@@ -219,7 +225,7 @@ export function HomeScreen({
         <PalmTreeReward summary={gardenSummary} language={language} bare />
 
         <div
-          className="grid w-full grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-1.5 py-1.5 text-center shadow-2xs backdrop-blur-md dark:border-amber-500/30 dark:bg-amber-950/30"
+          className="grid w-full grid-cols-1 items-stretch rounded-2xl border border-amber-500/25 bg-amber-500/10 px-1.5 py-1.5 text-center shadow-2xs backdrop-blur-md min-[360px]:grid-cols-[minmax(0,1fr)_1px_minmax(0,1fr)] dark:border-amber-500/30 dark:bg-amber-950/30"
           data-testid="prayer-header-card"
         >
           <div className="flex min-w-0 items-center justify-center px-1" data-testid="hijri-date" dir="auto">
@@ -228,7 +234,10 @@ export function HomeScreen({
             </span>
           </div>
 
-          <span className="h-5 w-px self-center bg-amber-700/25 dark:bg-amber-200/25" aria-hidden="true" />
+          <span
+            className="my-1 h-px w-full self-center bg-amber-700/25 min-[360px]:my-0 min-[360px]:h-5 min-[360px]:w-px dark:bg-amber-200/25"
+            aria-hidden="true"
+          />
 
           <div
             className="flex min-w-0 items-center justify-center px-1"
@@ -239,7 +248,7 @@ export function HomeScreen({
             }
           >
             <span
-              className="whitespace-nowrap font-sans text-[0.6875rem] font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
+              className="text-balance font-sans text-[0.6875rem] leading-4 font-extrabold text-amber-950 min-[390px]:text-[0.75rem] dark:text-amber-100"
               style={{ fontVariantNumeric: "tabular-nums lining-nums" }}
             >
               {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish} • {nextPrayerInfo.formattedCountdown}
@@ -302,6 +311,9 @@ export function HomeScreen({
                   <p className="mt-1 text-[0.8125rem] font-semibold leading-relaxed text-muted-foreground">
                     {reminderInfo.desc}
                   </p>
+                  <span className="mt-2 inline-flex rounded-full bg-background/70 px-2.5 py-1 text-[0.6875rem] font-bold text-foreground">
+                    {routineSummary}
+                  </span>
 
                   {doneCount > 0 && (
                     <div className="mt-3.5">
@@ -337,7 +349,7 @@ export function HomeScreen({
                         onResume(reminderInfo.categoryId);
                       }
                     }}
-                    aria-label={`${ctaLabel}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
+                    aria-label={`${ctaLabel}. ${routineSummary}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
                     className="interactive-elem group inline-flex w-full min-h-[48px] items-center justify-center gap-2.5 rounded-2xl px-6 py-3 text-[0.9375rem] font-black text-slate-950 bg-amber-500 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 transition-all shadow-md"
                   >
                     <span>{ctaLabel}</span>
