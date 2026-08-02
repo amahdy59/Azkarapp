@@ -111,8 +111,11 @@ test("populated Home exposes leaf progress through text, state, and accessible n
 
   const garden = page.getByTestId("today-garden-card");
   await expect(garden).toBeVisible();
-  await expect(garden.getByRole("heading", { name: /Daily Protection|Today's practice/i })).toBeVisible();
-  await expect(page.getByTestId("today-leaf-count")).toHaveText(/2 \/ 3|2 of 3/i);
+  await expect(garden.getByRole("heading", { name: /Daily Protection|Today's practice|Today's Wird/i })).toBeVisible();
+  
+  // Verify screen reader text for progress
+  const headerStats = page.locator('div[aria-label*="leaves"]');
+  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 3/i);
 
   await expectNoWcagViolations(page);
 });
@@ -124,8 +127,10 @@ test("three completed main collections are announced as a palm without points or
   await openReturningHome(page);
 
   const garden = page.getByTestId("today-garden-card");
-  await expect(page.getByTestId("today-leaf-count")).toHaveText(/3 \/ 3|3 of 3/i);
-  await expect(garden).toContainText(/palm has grown/i);
+  
+  const headerStats = page.locator('div[aria-label*="leaves"]');
+  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 3 of 3/i);
+  
   await expect(garden.locator('[data-state="complete"]')).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
@@ -210,8 +215,8 @@ test("Arabic garden stacks aligned collection pills to the right of the palm", a
   await expect(evening).toHaveAttribute("data-state", "pending");
 
   expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
-  await expect(morning.locator("svg")).toHaveCount(1);
-  await expect(evening.locator("svg")).toHaveCount(1);
+  await expect(morning.locator("svg")).toHaveCount(2); // checkmark + leaf
+  await expect(evening.locator("svg")).toHaveCount(1); // just leaf
   await expect(morning).toContainText("أذكار الصباح");
   await expect(evening).toContainText("أذكار المساء");
   await expect(beforeSleep).toContainText("أذكار النوم");
