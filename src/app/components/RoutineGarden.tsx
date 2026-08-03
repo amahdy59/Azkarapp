@@ -507,14 +507,6 @@ export function TodayRoutineGarden({
     setOffset(0);
   };
 
-  const currentHour = new Date().getHours();
-  const activeTimeRoutineId =
-    currentHour >= 4 && currentHour < 12
-      ? "morning"
-      : currentHour >= 12 && currentHour < 20
-        ? "evening"
-        : "before_sleep";
-
   const targetYear = displayDate.getFullYear();
   const targetMonth = displayDate.getMonth();
   const completionsByDayKey = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
