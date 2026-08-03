@@ -41,8 +41,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-export const COUNTER_ADVANCE_DELAY_MS = 500;
-
 const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   generating: "reader.shareCardGenerating",
   openingShareSheet: "reader.shareCardOpening",
@@ -362,20 +360,9 @@ export function ReaderScreen({
   const isLongContent = Boolean(z.isSurah || z.surahNameArabic);
 
   const renderReadingContent = () => (
-    <div
+    <article
       ref={readingContentRef}
       className={`mt-1 w-full rounded-2xl px-4 pb-2 pt-2 ${z.isSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
-      role={z.isSurah ? undefined : "button"}
-      tabIndex={z.isSurah ? undefined : 0}
-      aria-label={z.isSurah ? undefined : t(language, "reader.tapAnywhere")}
-      data-prevent-count={z.isSurah ? "true" : undefined}
-      onKeyDown={(event) => {
-        if (z.isSurah) return;
-        if (event.key === " " || event.key === "Enter") {
-          event.preventDefault();
-          handleTap();
-        }
-      }}
     >
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
@@ -431,7 +418,7 @@ export function ReaderScreen({
           )}
         </div>
       )}
-    </div>
+    </article>
   );
 
   const renderCounterPanel = () => {
@@ -547,6 +534,7 @@ export function ReaderScreen({
       data-counting-mode={z.isSurah ? "counter-only" : "canvas"}
       dir={direction}
       style={categoryThemeStyles}
+      screenName={isArabic ? category.nameArabic : category.name}
       onClick={handleSurfaceTap}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}

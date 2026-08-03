@@ -768,14 +768,7 @@ export function TodayRoutineGarden({
                     className="transition-all duration-700"
                   />
                 </svg>
-                <img
-                  src={`${import.meta.env.BASE_URL}${summary.today.goldenLeafCount >= 3 ? "colored palm tree.png" : "dimmed palm tree.png"}`}
-                  width={32}
-                  height={44}
-                  alt=""
-                  aria-hidden="true"
-                  className="relative z-10"
-                />
+                <PalmTreeMark size={32} filled={summary.today.goldenLeafCount >= 3} className="relative z-10" />
               </div>
             </div>
           </div>

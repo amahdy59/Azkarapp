@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { COUNTER_ADVANCE_DELAY_MS } from "../screens/ReaderScreen";
+import { COUNTER_ADVANCE_DELAY_MS } from "../constants/reader";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { Zikr, AppLanguage } from "../types";
@@ -117,6 +117,16 @@ export function useZikrCounter({
   };
 
   const handleSurfaceTap = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    if (z?.isSurah) {
+      return;
+    }
+
+    // If user is selecting text, don't count the tap
+    const selection = typeof window !== "undefined" ? window.getSelection() : null;
+    if (selection && selection.toString().length > 0) {
+      return;
+    }
+
     if (suppressTap.current || shouldIgnoreCountTap(event.target)) {
       return;
     }

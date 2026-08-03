@@ -1,0 +1,1 @@
+export const COUNTER_ADVANCE_DELAY_MS = 500;

@@ -220,7 +220,11 @@ export function HomeScreen({
   const isFriday = now.getDay() === 5;
 
   return (
-    <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col">
+    <ScreenContainer
+      dir={direction}
+      className="px-0 relative overflow-hidden flex flex-col"
+      screenName={t(language, "home.title")}
+    >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
@@ -238,7 +242,7 @@ export function HomeScreen({
             }`}
           >
             {/* Left side (in RTL): Prayer timing */}
-            <div className="flex items-center gap-2 text-white">
+            <div data-testid="next-prayer" className="flex items-center gap-2 text-white">
               <span className="text-[#fbbf24]">
                 {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
               </span>
@@ -246,7 +250,9 @@ export function HomeScreen({
             </div>
 
             {/* Right side (in RTL): Date */}
-            <div className="text-slate-300 whitespace-nowrap">{formatDisplayDate(now, language, calendarType)}</div>
+            <div data-testid="hijri-date" className="text-slate-300 whitespace-nowrap">
+              {formatDisplayDate(now, language, calendarType)}
+            </div>
           </div>
         </header>
       </div>
@@ -291,7 +297,7 @@ export function HomeScreen({
             <div className="flex flex-col gap-4 text-start">
               {/* Hero Text Block */}
               <div className="flex flex-col gap-1 px-1 pt-1">
-                <p className="text-[1.125rem] font-medium text-slate-200" dir="auto">
+                <p className="text-[1.125rem] font-medium text-[#e2e8f0]" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
                 <h2
@@ -308,9 +314,14 @@ export function HomeScreen({
               </div>
 
               {/* Routine Mode Selector Pill */}
-              <div className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5">
+              <div
+                className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5"
+                role="group"
+                aria-label={isArabic ? "وضع الورد" : "Routine mode"}
+              >
                 <button
                   type="button"
+                  aria-pressed={reminderMode === "complete"}
                   onClick={() => {
                     if (isRoutineCategory(reminderInfo.categoryId)) {
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
@@ -326,6 +337,7 @@ export function HomeScreen({
                 </button>
                 <button
                   type="button"
+                  aria-pressed={reminderMode === "core"}
                   onClick={() => {
                     if (isRoutineCategory(reminderInfo.categoryId)) {
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
