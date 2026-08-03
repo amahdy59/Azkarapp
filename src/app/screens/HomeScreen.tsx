@@ -209,10 +209,7 @@ export function HomeScreen({
   });
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
-  const estimatedMinutes = useMemo(
-    () => estimateCompletionMinutes(visibleReminderAzkar),
-    [visibleReminderAzkar],
-  );
+  const estimatedMinutes = useMemo(() => estimateCompletionMinutes(visibleReminderAzkar), [visibleReminderAzkar]);
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
