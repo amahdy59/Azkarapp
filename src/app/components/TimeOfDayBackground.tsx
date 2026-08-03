@@ -44,4 +44,3 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
     </div>
   );
 }
-

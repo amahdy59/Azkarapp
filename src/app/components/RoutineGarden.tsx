@@ -227,10 +227,7 @@ export function PalmTreeReward({
         }
       >
         {/* Streak — start side */}
-        <div
-          className="flex items-center gap-1"
-          title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
-        >
+        <div className="flex items-center gap-1" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
           <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
             {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
           </span>
@@ -238,10 +235,7 @@ export function PalmTreeReward({
         </div>
 
         {/* Palms — end side */}
-        <div
-          className="flex items-center gap-1"
-          title={isArabic ? "أشجار النخيل" : "Palms"}
-        >
+        <div className="flex items-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
           <PalmTreeMark size={18} />
           <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
             {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
@@ -740,9 +734,7 @@ export function TodayRoutineGarden({
                       </div>
                       <span
                         className={`text-[0.8125rem] font-bold ${
-                          isDone
-                            ? "text-slate-900 dark:text-[#f0ece6]"
-                            : "text-slate-600 dark:text-[#f0ece6]"
+                          isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-600 dark:text-[#f0ece6]"
                         }`}
                       >
                         {col.name}
@@ -781,7 +773,7 @@ export function TodayRoutineGarden({
 
             {/* Left Column: Palm Progress Ring (Second in DOM -> Left in RTL) */}
             <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
-            <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-[rgba(20,26,42,0.6)] p-2">
+              <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-[rgba(20,26,42,0.6)] p-2">
                 {/* Circular Progress Arc */}
                 <svg width="110" height="110" viewBox="0 0 110 110" className="absolute inset-0 size-full -rotate-90">
                   <circle

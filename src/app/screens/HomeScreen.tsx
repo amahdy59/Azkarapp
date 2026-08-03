@@ -244,7 +244,10 @@ export function HomeScreen({
             dir="auto"
           >
             {/* Date */}
-            <div data-testid="hijri-date" className="flex items-center gap-2 text-foreground/80 dark:text-[#e2e8f0] whitespace-nowrap">
+            <div
+              data-testid="hijri-date"
+              className="flex items-center gap-2 text-foreground/80 dark:text-[#e2e8f0] whitespace-nowrap"
+            >
               <Calendar className="h-[14px] w-[14px] shrink-0 text-[#835806] dark:text-[#e2a84a]" />
               <span>{formatDisplayDate(now, language, calendarType)}</span>
             </div>
@@ -412,7 +415,10 @@ export function HomeScreen({
               {/* Progress Text & Bar */}
               {doneCount > 0 && (
                 <div className="flex flex-col gap-2 w-full mt-2">
-                  <div className="flex justify-start text-[0.8125rem] font-medium text-foreground/70 dark:text-[#e2e8f0]" dir="auto">
+                  <div
+                    className="flex justify-start text-[0.8125rem] font-medium text-foreground/70 dark:text-[#e2e8f0]"
+                    dir="auto"
+                  >
                     {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                     {formatNumerals(totalCount, language)}
                   </div>
