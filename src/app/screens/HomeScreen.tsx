@@ -240,23 +240,23 @@ export function HomeScreen({
 
           {/* Time & Date Info Pill */}
           <div
-            className="flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[#1f293d] bg-white/5 px-4 text-xs font-medium backdrop-blur-md shadow-xs"
+            className="flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-black/10 bg-black/5 px-4 text-xs font-medium backdrop-blur-md shadow-xs dark:border-[#1f293d] dark:bg-white/5"
             dir="auto"
           >
             {/* Date */}
-            <div data-testid="hijri-date" className="flex items-center gap-2 text-[#e2e8f0] whitespace-nowrap">
-              <Calendar className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
+            <div data-testid="hijri-date" className="flex items-center gap-2 text-foreground/80 dark:text-[#e2e8f0] whitespace-nowrap">
+              <Calendar className="h-[14px] w-[14px] shrink-0 text-[#835806] dark:text-[#e2a84a]" />
               <span>{formatDisplayDate(now, language, calendarType)}</span>
             </div>
 
-            <div className="h-3 w-px bg-white/20 shrink-0 mx-2" />
+            <div className="h-3 w-px bg-foreground/20 shrink-0 mx-2" />
 
             {/* Prayer timing */}
-            <div data-testid="next-prayer" className="flex items-center gap-2 text-[#e2e8f0]">
-              <Sun className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
+            <div data-testid="next-prayer" className="flex items-center gap-2 text-foreground/80 dark:text-[#e2e8f0]">
+              <Sun className="h-[14px] w-[14px] shrink-0 text-[#835806] dark:text-[#e2a84a]" />
               <span className="flex items-center gap-1">
                 <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-                <span className="text-white" dir="ltr">
+                <span className="text-foreground dark:text-white" dir="ltr">
                   {nextPrayerInfo.formattedCountdown}
                 </span>
               </span>
@@ -305,25 +305,25 @@ export function HomeScreen({
             <div className="flex flex-col gap-4 text-start">
               {/* Hero Text Block */}
               <div className="flex w-full flex-col items-start gap-2 p-2">
-                <p className="text-[1.125rem] font-medium text-[#e2e8f0]" dir="auto">
+                <p className="text-[1.125rem] font-medium text-foreground/70 dark:text-[#e2e8f0]" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
                 <h2
                   id="current-zikr-heading"
-                  className="text-2xl font-black text-[#fbbf24] tracking-wide"
+                  className="text-2xl font-black text-[#835806] dark:text-[#fbbf24] tracking-wide"
                   dir="auto"
                   style={{ lineHeight: "1.3" }}
                 >
                   {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                 </h2>
-                <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
+                <p className="text-[0.8125rem] font-normal text-foreground/50 dark:text-[#9ca3af]" dir="auto">
                   {reminderInfo.desc}
                 </p>
               </div>
 
-              {/* Routine Mode Selector Pill — "الكاملة" (Full) selected by default on right in RTL */}
+              {/* Routine Mode Selector Pill */}
               <div
-                className="flex min-h-[48px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-0.5 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
+                className="flex min-h-[48px] w-full items-center rounded-[16px] bg-black/5 p-0.5 backdrop-blur-md border border-black/10 dark:bg-[rgba(14,18,27,0.40)] dark:border-[rgba(182,135,70,0.14)]"
                 role="group"
                 aria-label={isArabic ? "وضع الورد" : "Routine mode"}
               >
@@ -337,8 +337,8 @@ export function HomeScreen({
                   }}
                   className={`flex min-h-[44px] flex-1 items-center justify-center rounded-xl transition-all text-[0.875rem] font-medium ${
                     reminderMode === "complete"
-                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
-                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
+                      ? "bg-white text-[#835806] shadow-xs dark:bg-[rgba(30,38,55,0.80)] dark:text-[#e2a84a]"
+                      : "text-foreground/40 hover:text-foreground/70 dark:text-[#a5a7af] dark:hover:text-[#e2e8f0]"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
@@ -353,8 +353,8 @@ export function HomeScreen({
                   }}
                   className={`flex min-h-[44px] flex-1 items-center justify-center rounded-xl transition-all text-[0.875rem] font-medium ${
                     reminderMode === "core"
-                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
-                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
+                      ? "bg-white text-[#835806] shadow-xs dark:bg-[rgba(30,38,55,0.80)] dark:text-[#e2a84a]"
+                      : "text-foreground/40 hover:text-foreground/70 dark:text-[#a5a7af] dark:hover:text-[#e2e8f0]"
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}
@@ -363,7 +363,7 @@ export function HomeScreen({
 
               {/* Info Row Pill */}
               <div
-                className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] bg-[rgba(14,18,27,0.40)] border border-[rgba(182,135,70,0.14)] text-[0.8125rem] text-[#a5a7af]"
+                className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] bg-black/5 border border-black/10 text-[0.8125rem] text-foreground/60 dark:bg-[rgba(14,18,27,0.40)] dark:border-[rgba(182,135,70,0.14)] dark:text-[#a5a7af]"
                 dir="auto"
               >
                 <div className="flex items-center gap-1.5">
@@ -377,14 +377,14 @@ export function HomeScreen({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
-                    className="text-[#e2a84a]"
+                    className="text-[#835806] dark:text-[#e2a84a]"
                   >
                     <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
                     <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                   </svg>
                   <span>{routineSummary}</span>
                 </div>
-                <span className="text-white/30">•</span>
+                <span className="text-foreground/20 dark:text-white/30">•</span>
                 <div className="flex items-center gap-1.5">
                   <svg
                     width="16"
@@ -396,7 +396,7 @@ export function HomeScreen({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
-                    className="text-[#e2a84a]"
+                    className="text-[#835806] dark:text-[#e2a84a]"
                   >
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
@@ -412,11 +412,11 @@ export function HomeScreen({
               {/* Progress Text & Bar */}
               {doneCount > 0 && (
                 <div className="flex flex-col gap-2 w-full mt-2">
-                  <div className="flex justify-start text-[0.8125rem] font-medium text-[#e2e8f0]" dir="auto">
+                  <div className="flex justify-start text-[0.8125rem] font-medium text-foreground/70 dark:text-[#e2e8f0]" dir="auto">
                     {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                     {formatNumerals(totalCount, language)}
                   </div>
-                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(14,18,27,0.4)]">
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-black/10 dark:bg-[rgba(14,18,27,0.4)]">
                     <div
                       className="h-full rounded-full bg-[#e2a84a] transition-all duration-500 ease-out"
                       style={{

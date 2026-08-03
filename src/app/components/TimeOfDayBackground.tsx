@@ -15,6 +15,7 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
 
   return (
     <div className="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
+      {/* Sky photo — dark mode only */}
       <img
         src={`${base}webp/860w/${name}-860w.webp`}
         srcSet={`
@@ -29,11 +30,12 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
         loading="eager"
         fetchPriority="high"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none hidden dark:block"
         style={{ objectPosition: positions[name] }}
       />
+      {/* Gradient overlay — dark mode only */}
       <div
-        className="absolute inset-0"
+        className="absolute inset-0 hidden dark:block"
         style={{
           background:
             "linear-gradient(to bottom, rgba(8,12,20,0) 0%, rgba(8,12,20,0.15) 30%, rgba(8,12,20,0.72) 65%, rgba(8,12,20,0.93) 82%, #080c14 100%)",
@@ -42,3 +44,4 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
     </div>
   );
 }
+

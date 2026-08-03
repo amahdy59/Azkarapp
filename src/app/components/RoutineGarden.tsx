@@ -214,6 +214,43 @@ export function PalmTreeReward({
   const todayLeaves = summary.today.goldenLeafCount;
   const maxLeaves = 3;
 
+  // Bare mode: compact 2-column row matching Figma gamification header
+  // (streak on start side, palms on end side — leaves shown only in the Wird card)
+  if (bare) {
+    return (
+      <div
+        className="flex w-full items-center justify-between py-1"
+        aria-label={
+          isArabic
+            ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
+            : `Daily streak: ${streak} days, Palms: ${summary.lifetimePalms}`
+        }
+      >
+        {/* Streak — start side */}
+        <div
+          className="flex items-center gap-1"
+          title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+        >
+          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
+            {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
+          </span>
+          <Flame className="h-[1rem] w-[1rem] text-[#835806] dark:text-[#fbbf24]" strokeWidth={2.5} />
+        </div>
+
+        {/* Palms — end side */}
+        <div
+          className="flex items-center gap-1"
+          title={isArabic ? "أشجار النخيل" : "Palms"}
+        >
+          <PalmTreeMark size={18} />
+          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
+            {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   const content = (
     <div
       className="grid w-full grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1 py-1"
@@ -250,8 +287,6 @@ export function PalmTreeReward({
       </div>
     </div>
   );
-
-  if (bare) return content;
 
   return (
     <div className="flex w-full items-center justify-center rounded-2xl border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 shadow-xs dark:bg-amber-500/15">
@@ -622,13 +657,19 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 text-start bg-white dark:bg-[#1e1e1e] shadow-sm border border-slate-100 dark:border-[#2a2a2a]">
+        <div
+          className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-[24px] p-5 text-start shadow-sm bg-white dark:bg-[rgba(14,18,27,0.85)]"
+          style={{
+            border: "1px solid rgba(182, 135, 70, 0.14)",
+            boxShadow: "inset 0px -1px 1px 0px rgba(255,255,255,0.03), inset 0px 2px 6px 0px rgba(0,0,0,0.1)",
+          }}
+        >
           {/* Header Section */}
           <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
-            <h3 className="text-[1.25rem] font-bold text-slate-900 dark:text-white">
+            <h3 className="text-[1.125rem] font-bold text-foreground dark:text-[#f0ece6]">
               {isArabic ? "وردك اليوم" : "Today's Wird"}
             </h3>
-            <p className="text-[0.875rem] font-medium text-muted-foreground">
+            <p className="text-[0.8125rem] font-normal text-[#835806] dark:text-[#d4a020]">
               {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
             </p>
           </div>
@@ -668,18 +709,18 @@ export function TodayRoutineGarden({
                     data-testid={`garden-category-${col.id}`}
                     data-state={col.state}
                     aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
-                    className={`flex items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all w-full shrink-0 border ${
+                    className={`flex items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all w-full shrink-0 ${
                       isDone
-                        ? "border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-transparent dark:bg-[#2c3140] dark:text-white"
-                        : "border-slate-200 bg-transparent text-slate-700 dark:border-slate-700/60 dark:text-slate-300"
+                        ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
+                        : "border border-slate-200 bg-slate-50 text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`flex size-[22px] items-center justify-center rounded-full shrink-0 ${
+                        className={`flex size-[22px] items-center justify-center rounded-[8px] shrink-0 ${
                           isDone
                             ? "bg-[#F59E0B] text-white dark:bg-[#E4A84A] dark:text-[#18181B]"
-                            : "border-[1.5px] border-slate-400 bg-transparent dark:border-slate-500"
+                            : "border-[1.5px] border-slate-400 bg-transparent dark:border-slate-600"
                         }`}
                       >
                         {isDone && (
@@ -698,7 +739,11 @@ export function TodayRoutineGarden({
                         )}
                       </div>
                       <span
-                        className={`text-[1rem] font-bold ${isDone ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}
+                        className={`text-[0.8125rem] font-bold ${
+                          isDone
+                            ? "text-slate-900 dark:text-[#f0ece6]"
+                            : "text-slate-600 dark:text-[#f0ece6]"
+                        }`}
                       >
                         {col.name}
                       </span>
@@ -736,7 +781,7 @@ export function TodayRoutineGarden({
 
             {/* Left Column: Palm Progress Ring (Second in DOM -> Left in RTL) */}
             <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
-              <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-black/20 p-2">
+            <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-[rgba(20,26,42,0.6)] p-2">
                 {/* Circular Progress Arc */}
                 <svg width="110" height="110" viewBox="0 0 110 110" className="absolute inset-0 size-full -rotate-90">
                   <circle
@@ -744,7 +789,7 @@ export function TodayRoutineGarden({
                     cy="55"
                     r="48"
                     stroke="currentColor"
-                    className="text-slate-200 dark:text-white/5"
+                    className="text-slate-200 dark:text-[#1e2635]"
                     strokeWidth="6"
                     fill="none"
                   />
@@ -779,15 +824,19 @@ export function TodayRoutineGarden({
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-between gap-2 rounded-[12px] bg-slate-50 dark:bg-[#2c3140] px-4 py-3 text-center text-[0.875rem] font-bold text-slate-600 dark:text-slate-300 w-full"
+            className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] px-3 py-2 text-center text-[0.875rem] font-medium w-full"
+            style={{
+              background: "rgba(20, 26, 42, 0.6)",
+              border: "1px solid rgba(182, 135, 70, 0.08)",
+            }}
             dir="rtl"
           >
-            <span className="flex-1 text-center font-sans">
+            <Heart className="h-[0.75rem] w-[0.75rem] text-[#a5a7af] shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-center font-sans text-[#a5a7af] text-[11.5px]">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}
             </span>
-            <Heart className="h-[1.25rem] w-[1.25rem] text-slate-400 dark:text-slate-400 shrink-0" strokeWidth={2.5} />
           </div>
         </div>
       )}
