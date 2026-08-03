@@ -429,7 +429,7 @@ export function HomeScreen({
                 onClick={() => {
                   onResume(reminderInfo.categoryId);
                 }}
-                className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98]"
+                className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#d99f43] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98]"
               >
                 {direction === "rtl" ? (
                   <svg
