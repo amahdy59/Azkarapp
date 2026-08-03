@@ -667,7 +667,7 @@ export function TodayRoutineGarden({
             <h3 className="text-[1.25rem] font-bold text-slate-900 dark:text-white">
               {isArabic ? "وردك اليوم" : "Today's Wird"}
             </h3>
-            <p className="text-[0.875rem] text-slate-500 dark:text-slate-400">
+            <p className="text-[0.875rem] font-medium text-muted-foreground">
               {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
             </p>
           </div>

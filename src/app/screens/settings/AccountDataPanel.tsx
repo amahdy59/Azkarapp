@@ -188,7 +188,9 @@ function DataAction({
         type="button"
         onClick={onPress}
         className={`mt-3 min-h-11 w-full rounded-xl px-4 text-[0.8125rem] font-semibold ${
-          destructive ? "border border-destructive/60 text-destructive" : "bg-muted text-foreground"
+          destructive
+            ? "border border-destructive/60 text-destructive"
+            : "border border-border bg-card text-foreground hover:bg-muted"
         }`}
       >
         {action}

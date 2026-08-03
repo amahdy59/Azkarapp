@@ -42,7 +42,12 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
     window.localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
-        settings: { language: "en", themeMode: "midnight", progressDayStartHour: 4 },
+        settings: {
+          language: "en",
+          themeMode: "midnight",
+          progressDayStartHour: 4,
+          routineModes: { morning: "core", evening: "core", before_sleep: "core" },
+        },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: {
           morning: ["m-hm-77m", "m-hm-78m", "m-hm-75"],
