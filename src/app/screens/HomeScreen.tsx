@@ -323,7 +323,7 @@ export function HomeScreen({
 
               {/* Routine Mode Selector Pill — "الكاملة" (Full) selected by default on right in RTL */}
               <div
-                className="flex h-[44px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-1 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
+                className="flex min-h-[48px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-0.5 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
                 role="group"
                 aria-label={isArabic ? "وضع الورد" : "Routine mode"}
               >
@@ -335,7 +335,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-xl transition-all text-[0.875rem] font-medium ${
                     reminderMode === "complete"
                       ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
                       : "text-[#a5a7af] hover:text-[#e2e8f0]"
@@ -351,7 +351,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-xl transition-all text-[0.875rem] font-medium ${
                     reminderMode === "core"
                       ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
                       : "text-[#a5a7af] hover:text-[#e2e8f0]"
