@@ -32,7 +32,13 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
         className="absolute inset-0 h-full w-full object-cover pointer-events-none"
         style={{ objectPosition: positions[name] }}
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#080c14]/40 via-[#080c14]/80 to-[#080c14]" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(to bottom, rgba(8,12,20,0) 0%, rgba(8,12,20,0.15) 30%, rgba(8,12,20,0.72) 65%, rgba(8,12,20,0.93) 82%, #080c14 100%)",
+        }}
+      />
     </div>
   );
 }

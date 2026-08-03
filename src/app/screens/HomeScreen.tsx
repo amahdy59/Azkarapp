@@ -240,7 +240,7 @@ export function HomeScreen({
 
           {/* Time & Date Info Pill */}
           <div
-            className="flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[rgba(182,135,70,0.14)] bg-white/5 px-4 text-xs font-medium backdrop-blur-md shadow-xs"
+            className="flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[#1f293d] bg-white/5 px-4 text-xs font-medium backdrop-blur-md shadow-xs"
             dir="auto"
           >
             {/* Date */}
