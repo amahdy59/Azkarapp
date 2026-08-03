@@ -334,7 +334,7 @@ export function HomeScreen({
                     }
                   }}
                   className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold ${
-                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9]/80 hover:text-white"
+                    reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
@@ -348,7 +348,7 @@ export function HomeScreen({
                     }
                   }}
                   className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold ${
-                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9]/80 hover:text-white"
+                    reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}

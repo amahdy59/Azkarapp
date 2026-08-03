@@ -222,8 +222,8 @@ export function PalmTreeReward({
         className="flex w-full items-center justify-between py-1"
         aria-label={
           isArabic
-            ? `السلسلة اليومية: ${formatNumerals(streak, language)} أيام، أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}`
-            : `Daily streak: ${streak} days, Palms: ${summary.lifetimePalms}`
+            ? `أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، السلسلة اليومية: ${formatNumerals(streak, language)} أيام`
+            : `Palms: ${summary.lifetimePalms}, Today's leaves: ${todayLeaves} of ${maxLeaves}, Daily streak: ${streak} days`
         }
       >
         {/* Streak — start side */}
@@ -524,11 +524,7 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className={
-        hideTabs
-          ? "mb-5 transition-all"
-          : "mb-5 rounded-3xl border border-border/80 bg-card p-3.5 shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]"
-      }
+      className="mb-5 w-full transition-all"
     >
       {!hideTabs && (
         <div className="mb-3 flex items-center justify-between gap-3 text-start">
