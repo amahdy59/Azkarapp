@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
-import { COUNTER_ADVANCE_DELAY_MS } from "../screens/ReaderScreen";
+import { COUNTER_ADVANCE_DELAY_MS } from "../constants/reader";
 import { useZikrCounter } from "./useZikrCounter";
 
 afterEach(() => vi.useRealTimers());

@@ -317,7 +317,7 @@ export function HomeScreen({
               <div
                 className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5"
                 role="group"
-                aria-label={t(language, "home.routineModeSelector", "Routine mode")}
+                aria-label={isArabic ? "وضع الورد" : "Routine mode"}
               >
                 <button
                   type="button"
