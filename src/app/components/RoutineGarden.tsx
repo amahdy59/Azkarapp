@@ -657,7 +657,16 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="relative flex flex-col gap-4 overflow-hidden rounded-[24px] border border-[rgba(182,135,70,0.14)] bg-[#141a2a]/95 p-4 text-start shadow-xl backdrop-blur-md">
+        <div
+          className="relative flex w-full flex-col items-center gap-4 overflow-hidden rounded-[24px] p-4 text-start backdrop-blur-md"
+          style={{
+            border: "1px solid rgba(182, 135, 70, 0.14)",
+            background:
+              "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.00) 60%, rgba(0, 0, 0, 0.35) 100%), radial-gradient(83.33% 83.33% at 58.33% 16.67%, rgba(167, 117, 53, 0.14) 0%, rgba(167, 117, 53, 0.06) 50%, rgba(167, 117, 53, 0.00) 100%), radial-gradient(41.67% 41.67% at 58.33% 58.33%, rgba(89, 96, 113, 0.25) 0%, rgba(89, 96, 113, 0.08) 60%, rgba(89, 96, 113, 0.00) 100%), rgba(20, 26, 42, 0.20)",
+            boxShadow:
+              "0 -1px 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 6px 0 rgba(0, 0, 0, 0.20) inset, 0 4px 16px 0 rgba(0, 0, 0, 0.30)",
+          }}
+        >
           {/* Background Islamic Corner Pattern Overlay */}
           <div className="absolute top-0 right-0 pointer-events-none opacity-10" aria-hidden="true">
             <img
@@ -713,16 +722,16 @@ export function TodayRoutineGarden({
                     data-testid={`garden-category-${col.id}`}
                     data-state={col.state}
                     aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
-                    className={`flex items-center justify-between gap-2 rounded-[12px] px-3 py-2.5 transition-all ${
+                    className={`flex items-center justify-between gap-2 rounded-[12px] px-[12px] py-[10px] transition-all w-full shrink-0 ${
                       isDone
-                        ? "border border-[rgba(182,135,70,0.2)] bg-[#1e2637]/80 text-[#f0ece6]"
-                        : "bg-[#141a2a]/40 text-[#a5a7af]"
+                        ? "border border-[rgba(182,135,70,0.14)] bg-[rgba(30,38,55,0.80)] text-[#f0ece6]"
+                        : "bg-[rgba(20,26,42,0.40)] text-[#a5a7af]"
                     }`}
                   >
                     <div className="flex items-center gap-2">
                       <div
-                        className={`flex size-[18px] items-center justify-center rounded-full shrink-0 ${
-                          isDone ? "bg-[#f59e0b] text-slate-950" : "border border-gray-600 bg-transparent"
+                        className={`flex size-[20px] items-center justify-center rounded-full shrink-0 ${
+                          isDone ? "bg-[#e2a84a] text-slate-950" : "border-2 border-[#5c606b] bg-transparent"
                         }`}
                       >
                         {isDone && (
@@ -740,10 +749,14 @@ export function TodayRoutineGarden({
                           </svg>
                         )}
                       </div>
-                      <span className="text-[0.8125rem] font-medium">{col.name}</span>
+                      <span className="text-[0.9375rem] font-medium">{col.name}</span>
                     </div>
 
-                    <GoldenLeafMark size={18} filled={isDone} className="shrink-0" />
+                    <GoldenLeafMark
+                      size={20}
+                      filled={isDone}
+                      className={`shrink-0 ${isDone ? "" : "grayscale opacity-50"}`}
+                    />
                   </li>
                 );
               })}
