@@ -327,22 +327,6 @@ export function HomeScreen({
               >
                 <button
                   type="button"
-                  aria-pressed={reminderMode === "complete"}
-                  onClick={() => {
-                    if (isRoutineCategory(reminderInfo.categoryId)) {
-                      onSetRoutineMode?.(reminderInfo.categoryId, "complete");
-                    }
-                  }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
-                    reminderMode === "complete"
-                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
-                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
-                  }`}
-                >
-                  {isArabic ? "الكاملة" : "Complete"}
-                </button>
-                <button
-                  type="button"
                   aria-pressed={reminderMode === "core"}
                   onClick={() => {
                     if (isRoutineCategory(reminderInfo.categoryId)) {
@@ -356,6 +340,22 @@ export function HomeScreen({
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={reminderMode === "complete"}
+                  onClick={() => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, "complete");
+                    }
+                  }}
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
+                    reminderMode === "complete"
+                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
+                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
+                  }`}
+                >
+                  {isArabic ? "الكاملة" : "Complete"}
                 </button>
               </div>
 
