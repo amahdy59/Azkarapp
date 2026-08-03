@@ -461,6 +461,7 @@ export function TodayRoutineGarden({
   onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
+  onSelectCategory,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -468,27 +469,33 @@ export function TodayRoutineGarden({
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
+  onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
 
   const isArabic = language === "ar";
 
-  const displayDate = new Date();
-  if (offset !== 0) {
-    if (activeTab === "day") {
-      displayDate.setDate(displayDate.getDate() + offset);
-    } else if (activeTab === "week") {
-      displayDate.setDate(displayDate.getDate() + offset * 7);
-    } else if (activeTab === "month") {
-      displayDate.setMonth(displayDate.getMonth() + offset);
-    } else if (activeTab === "year") {
-      displayDate.setFullYear(displayDate.getFullYear() + offset);
+  const displayDate = useMemo(() => {
+    const d = new Date();
+    if (offset !== 0) {
+      if (activeTab === "day") {
+        d.setDate(d.getDate() + offset);
+      } else if (activeTab === "week") {
+        d.setDate(d.getDate() + offset * 7);
+      } else if (activeTab === "month") {
+        d.setMonth(d.getMonth() + offset);
+      } else if (activeTab === "year") {
+        d.setFullYear(d.getFullYear() + offset);
+      }
     }
-  }
+    return d;
+  }, [activeTab, offset]);
 
-  const summary =
-    offset === 0 && activeTab === "day" ? initialSummary : getGardenSummary(dailyCompletions, displayDate);
+  const summary = useMemo(
+    () => (offset === 0 && activeTab === "day" ? initialSummary : getGardenSummary(dailyCompletions, displayDate)),
+    [initialSummary, dailyCompletions, displayDate, offset, activeTab],
+  );
 
   const totalPalms = summary.lifetimePalms;
   const streak = summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0;
@@ -499,6 +506,14 @@ export function TodayRoutineGarden({
     setActiveTab(tab);
     setOffset(0);
   };
+
+  const currentHour = new Date().getHours();
+  const activeTimeRoutineId =
+    currentHour >= 4 && currentHour < 12
+      ? "morning"
+      : currentHour >= 12 && currentHour < 20
+        ? "evening"
+        : "before_sleep";
 
   const targetYear = displayDate.getFullYear();
   const targetMonth = displayDate.getMonth();
@@ -520,6 +535,24 @@ export function TodayRoutineGarden({
       ? HIJRI_MONTH_NAMES_EN
       : GREGORIAN_MONTH_NAMES_EN;
 
+  const completedCount = summary.today.completedCategories.length;
+  const dynamicSubtitle =
+    completedCount === 0
+      ? isArabic
+        ? "أكمل أوراد اليوم لتنمو نخلتك"
+        : "Complete today's routines to grow your palm"
+      : completedCount === 1
+        ? isArabic
+          ? "بداية ممتازة! أكمل وردين آخرين لنخلة كاملة 🌴"
+          : "Great start! Complete 2 more routines for a full palm 🌴"
+        : completedCount === 2
+          ? isArabic
+            ? "أوشكت على الانتهاء! متبقي ورد واحد فقط 🌴"
+            : "Almost there! 1 more routine for a full palm 🌴"
+          : isArabic
+            ? "ماشاء الله! اكتملت جميع أوراد اليوم 🌴"
+            : "Masha'Allah! All today's routines completed! 🌴";
+
   return (
     <section
       data-testid="today-garden-card"
@@ -532,12 +565,12 @@ export function TodayRoutineGarden({
             <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
               {t(language, "garden.todayTitle")}
             </h2>
-            <p className="mt-0.5 text-[0.8125rem] font-medium text-muted-foreground">
+            <p className="mt-0.5 text-[0.8125rem] font-semibold text-slate-600 dark:text-amber-300">
               {activeTab === "month"
                 ? t(language, "garden.oasisFor", { date: dateLabel })
                 : activeTab === "year"
                   ? t(language, "garden.growthYear")
-                  : t(language, "garden.nurtureGarden")}
+                  : dynamicSubtitle}
             </p>
           </div>
 
@@ -545,7 +578,7 @@ export function TodayRoutineGarden({
             <button
               type="button"
               onClick={onOpenShareModal}
-              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950"
+              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
               aria-label={t(language, "garden.shareAchievementAria")}
               title={t(language, "garden.shareAchievementAria")}
             >
@@ -561,7 +594,7 @@ export function TodayRoutineGarden({
           <div
             role="tablist"
             aria-label={t(language, "garden.viewMode")}
-            className="mb-4 flex rounded-2xl bg-muted/60 p-1"
+            className="mb-4 flex rounded-2xl bg-muted/60 p-1 dark:bg-muted/30"
           >
             {(["day", "week", "month", "year"] as const).map((tab) => {
               const isActive = activeTab === tab;
@@ -579,7 +612,7 @@ export function TodayRoutineGarden({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab)}
-                  className={`flex flex-1 min-h-[44px] items-center justify-center rounded-xl py-2 text-[0.875rem] font-extrabold transition-all ${
+                  className={`flex flex-1 min-h-[44px] items-center justify-center rounded-xl py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                     isActive ? "bg-amber-500 text-slate-950 shadow-md" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -589,13 +622,13 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/80 bg-background/90 px-3 py-2 shadow-sm">
+          <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/80 bg-card px-3 py-2 shadow-sm dark:border-white/10">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
               aria-label={t(language, "garden.prevPeriod")}
               title={t(language, "garden.prevPeriod")}
-              className="flex size-10 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95 shrink-0"
+              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
             >
               <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                 <polyline points={isArabic ? "9 18 15 12 9 6" : "15 18 9 12 15 6"} />
@@ -606,6 +639,8 @@ export function TodayRoutineGarden({
               className="px-2 text-center text-[0.9375rem] font-black tracking-wide text-foreground"
               data-testid="garden-view-date"
               dir="auto"
+              aria-live="polite"
+              aria-atomic="true"
             >
               {dateLabel}
             </span>
@@ -616,7 +651,7 @@ export function TodayRoutineGarden({
               disabled={offset >= 0}
               aria-label={t(language, "garden.nextPeriod")}
               title={t(language, "garden.nextPeriod")}
-              className="flex size-10 items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shrink-0"
+              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
             >
               <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
                 <polyline points={isArabic ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
@@ -632,14 +667,14 @@ export function TodayRoutineGarden({
             <span className="text-[1.25rem]" role="img" aria-label={t(language, "garden.streakFlame")}>
               🔥
             </span>
-            <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+            <span className="text-[1rem] font-black text-amber-700 dark:text-amber-300">
               {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
             </span>
           </div>
           <span className="h-4 w-px bg-amber-500/30" />
           <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
             <PalmTreeMark size={24} filled={totalPalms > 0} />
-            <span className="text-[1rem] font-black text-amber-500">
+            <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
               {formatNumerals(totalPalms, language)} {isArabic ? "نخلة" : "palms"}
             </span>
           </div>
@@ -653,9 +688,7 @@ export function TodayRoutineGarden({
             <h3 className="text-[1.125rem] font-bold text-[#111827] dark:text-[#f0ece6]">
               {isArabic ? "وردك اليوم" : "Today's Wird"}
             </h3>
-            <p className="text-[0.8125rem] font-normal text-[#6b7280] dark:text-[#d4a020]">
-              {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
-            </p>
+            <p className="text-[0.8125rem] font-semibold text-slate-600 dark:text-amber-300">{dynamicSubtitle}</p>
           </div>
 
           {/* Main Split Row */}
@@ -663,10 +696,10 @@ export function TodayRoutineGarden({
             className="relative z-10 grid w-full grid-cols-1 items-center gap-4 min-[360px]:grid-cols-[minmax(0,1fr)_120px]"
             data-testid="today-palm-layout"
           >
-            {/* Right Column: Zikr Routine List (First in DOM -> Right in RTL) */}
+            {/* Right Column: Zikr Routine List */}
             <ul
               aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-              className="flex flex-1 flex-col gap-2 min-w-0"
+              className="flex flex-1 flex-col gap-2.5 min-w-0"
               dir={isArabic ? "rtl" : "ltr"}
             >
               {[
@@ -687,19 +720,11 @@ export function TodayRoutineGarden({
                 },
               ].map((col) => {
                 const isDone = col.state === "complete";
-                return (
-                  <li
-                    key={col.id}
-                    data-testid={`garden-category-${col.id}`}
-                    data-state={col.state}
-                    aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
-                    className={`flex items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all w-full shrink-0 ${
-                      isDone
-                        ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
-                        : "border border-slate-200 bg-slate-50 text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
+                const isCurrentTimeRoutine = col.id === activeTimeRoutineId;
+
+                const rowContent = (
+                  <div className="flex w-full items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
                       <div
                         className={`flex size-[22px] items-center justify-center rounded-[8px] shrink-0 ${
                           isDone
@@ -722,16 +747,41 @@ export function TodayRoutineGarden({
                           </svg>
                         )}
                       </div>
+
                       <span
-                        className={`text-[0.8125rem] font-bold ${
-                          isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-600 dark:text-[#f0ece6]"
+                        className={`text-[0.875rem] font-bold truncate ${
+                          isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-700 dark:text-[#f0ece6]"
                         }`}
                       >
                         {col.name}
                       </span>
+
+                      {isCurrentTimeRoutine && !isDone && (
+                        <span className="shrink-0 rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[0.6875rem] font-extrabold text-amber-700 dark:text-amber-300">
+                          {isArabic ? "الآن" : "Now"}
+                        </span>
+                      )}
                     </div>
 
-                    <div className="shrink-0">
+                    <div className="flex items-center gap-2 shrink-0">
+                      {onSelectCategory && (
+                        <span className="flex items-center gap-1 text-[0.75rem] font-extrabold text-amber-600 dark:text-amber-400">
+                          {isDone ? (isArabic ? "عرض" : "View") : isArabic ? "ابدأ" : "Start"}
+                          <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className={isArabic ? "rotate-180" : ""}
+                          >
+                            <polyline points="9 18 15 12 9 6" />
+                          </svg>
+                        </span>
+                      )}
                       <svg
                         viewBox="0 0 24 24"
                         width="20"
@@ -756,16 +806,51 @@ export function TodayRoutineGarden({
                         />
                       </svg>
                     </div>
+                  </div>
+                );
+
+                return (
+                  <li
+                    key={col.id}
+                    data-testid={`garden-category-${col.id}`}
+                    data-state={col.state}
+                    aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
+                    className="w-full shrink-0"
+                  >
+                    {onSelectCategory ? (
+                      <button
+                        type="button"
+                        onClick={() => onSelectCategory(col.id)}
+                        className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] text-start transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                          isDone
+                            ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 hover:bg-[#FFF3DF] dark:border-[rgba(182,135,70,0.25)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6] dark:hover:bg-[rgba(38,48,70,0.9)]"
+                            : isCurrentTimeRoutine
+                              ? "border-2 border-amber-500/70 bg-amber-50/60 text-slate-900 hover:border-amber-500 dark:border-amber-500/50 dark:bg-[rgba(35,30,20,0.6)] dark:text-[#f0ece6]"
+                              : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6] dark:hover:bg-[rgba(26,34,54,0.6)]"
+                        }`}
+                      >
+                        {rowContent}
+                      </button>
+                    ) : (
+                      <div
+                        className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all ${
+                          isDone
+                            ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
+                            : "border border-slate-200 bg-slate-50 text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
+                        }`}
+                      >
+                        {rowContent}
+                      </div>
+                    )}
                   </li>
                 );
               })}
             </ul>
 
-            {/* Left Column: Palm Progress Ring (Second in DOM -> Left in RTL) */}
-            <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
-              <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-[rgba(20,26,42,0.6)] p-2">
-                {/* Circular Progress Arc */}
-                <svg width="110" height="110" viewBox="0 0 110 110" className="absolute inset-0 size-full -rotate-90">
+            {/* Left Column: Interactive Palm Progress Display */}
+            <div className="relative flex flex-col items-center justify-center p-2">
+              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-amber-500/5 dark:bg-amber-500/10">
+                <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 110 110">
                   <circle
                     cx="55"
                     cy="55"
@@ -806,11 +891,11 @@ export function TodayRoutineGarden({
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] px-3 py-2 text-center text-[0.875rem] font-medium w-full bg-[#f3f4f6] dark:bg-[rgba(20,26,42,0.6)] border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.08)]"
+            className="relative z-10 flex items-center justify-center gap-2 rounded-[12px] px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-[#f3f4f6] dark:bg-[rgba(20,26,42,0.6)] border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.12)]"
             dir="rtl"
           >
-            <Heart className="h-[0.75rem] w-[0.75rem] text-[#6b7280] dark:text-[#a5a7af] shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-center font-sans text-[#6b7280] dark:text-[#a5a7af] text-[11.5px]">
+            <Heart className="h-[0.875rem] w-[0.875rem] text-rose-500 dark:text-rose-400 shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-center font-sans text-slate-700 dark:text-slate-200 text-[12.5px] font-semibold leading-relaxed">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}

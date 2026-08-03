@@ -863,6 +863,7 @@ function AppContent() {
                 language={selectedLang}
                 direction={layoutDirection}
                 onOpenShareModal={() => setShowShareModal(true)}
+                onSelectCategory={openCategory}
               />
             )}
             {view === "friday" && (

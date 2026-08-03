@@ -3,7 +3,7 @@ import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import { getGardenSummary } from "../progress";
-import type { AppLanguage, DailyCollectionCompletion } from "../types";
+import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 
 export function ProgressScreen({
   dailyCompletions,
@@ -12,6 +12,7 @@ export function ProgressScreen({
   language,
   direction,
   onOpenShareModal,
+  onSelectCategory,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
@@ -19,6 +20,7 @@ export function ProgressScreen({
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onOpenShareModal: () => void;
+  onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
   return (
     <ScreenContainer dir={direction} className="px-page py-4 overflow-y-auto">
@@ -30,6 +32,7 @@ export function ProgressScreen({
         calendarType={calendarType}
         dailyCompletions={dailyCompletions}
         onOpenShareModal={onOpenShareModal}
+        onSelectCategory={onSelectCategory}
       />
     </ScreenContainer>
   );
