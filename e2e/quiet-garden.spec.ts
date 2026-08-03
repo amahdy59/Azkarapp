@@ -215,8 +215,8 @@ test("Arabic garden stacks aligned collection pills to the right of the palm", a
   await expect(evening).toHaveAttribute("data-state", "pending");
 
   expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
-  await expect(morning.locator("svg")).toHaveCount(2); // checkmark + leaf
-  await expect(evening.locator("svg")).toHaveCount(1); // just leaf
+  await expect(morning.locator("svg")).toHaveCount(1); // leaf indicator
+  await expect(evening.locator("svg")).toHaveCount(1); // leaf indicator
   await expect(morning).toContainText("أذكار الصباح");
   await expect(evening).toContainText("أذكار المساء");
   await expect(beforeSleep).toContainText("أذكار النوم");

@@ -355,60 +355,39 @@ export function HomeScreen({
                 </button>
               </div>
 
-              {/* Info Row Pill */}
-              <div
-                className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] text-[0.8125rem] text-white"
-                dir="auto"
-              >
-                <div className="flex items-center gap-1.5">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className="text-[#e2a84a]"
-                  >
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-                  </svg>
-                  <span>{routineSummary}</span>
-                </div>
-                <span className="text-white/40">•</span>
-                <div className="flex items-center gap-1.5">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                    className="text-[#e2a84a]"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
-                  </svg>
-                  <span>
-                    {isArabic
-                      ? `${formatNumerals(estimatedMinutes, language)} دقائق تقريباً`
-                      : `~${estimatedMinutes} mins`}
-                  </span>
-                </div>
-              </div>
-
               {/* Progress Text & Bar */}
-              {doneCount > 0 && (
-                <div className="flex flex-col gap-2 w-full mt-2">
-                  <div className="flex justify-start text-[0.8125rem] font-medium text-white" dir="auto">
-                    {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
-                    {formatNumerals(totalCount, language)}
+              {totalCount > 0 && (
+                <div className="flex flex-col gap-2 w-full mt-1">
+                  <div
+                    className="flex w-full items-center justify-between text-[0.8125rem] font-semibold text-white"
+                    dir="auto"
+                  >
+                    <span>
+                      {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
+                      {formatNumerals(totalCount, language)}
+                    </span>
+                    <div className="flex items-center gap-1.5 text-white/90">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden="true"
+                        className="text-[#e2a84a]"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                      </svg>
+                      <span>
+                        {isArabic
+                          ? `${formatNumerals(estimatedMinutes, language)} دقائق تقريباً`
+                          : `~${estimatedMinutes} mins`}
+                      </span>
+                    </div>
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/20">
                     <div

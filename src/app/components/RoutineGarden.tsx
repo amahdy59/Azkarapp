@@ -688,7 +688,7 @@ export function TodayRoutineGarden({
             <h3 className="text-[1.125rem] font-bold text-[#111827] dark:text-[#f0ece6]">
               {isArabic ? "وردك اليوم" : "Today's Wird"}
             </h3>
-            <p className="text-[0.8125rem] font-semibold text-slate-600 dark:text-amber-300">{dynamicSubtitle}</p>
+            <p className="text-[0.8125rem] font-medium text-[#6b7280] dark:text-[#d4a020]">{dynamicSubtitle}</p>
           </div>
 
           {/* Main Split Row */}
@@ -724,32 +724,9 @@ export function TodayRoutineGarden({
 
                 const rowContent = (
                   <div className="flex w-full items-center justify-between gap-3">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={`flex size-[22px] items-center justify-center rounded-[8px] shrink-0 ${
-                          isDone
-                            ? "bg-[#F59E0B] text-white dark:bg-[#E4A84A] dark:text-[#18181B]"
-                            : "border-[1.5px] border-slate-400 bg-transparent dark:border-slate-600"
-                        }`}
-                      >
-                        {isDone && (
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          >
-                            <polyline points="20 6 9 17 4 12" />
-                          </svg>
-                        )}
-                      </div>
-
+                    <div className="flex items-center gap-2.5 min-w-0">
                       <span
-                        className={`text-[0.875rem] font-bold truncate ${
+                        className={`text-[0.875rem] font-bold ${
                           isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-700 dark:text-[#f0ece6]"
                         }`}
                       >
@@ -848,7 +825,7 @@ export function TodayRoutineGarden({
             </ul>
 
             {/* Left Column: Interactive Palm Progress Display */}
-            <div className="relative flex flex-col items-center justify-center p-2">
+            <div className="relative flex flex-col items-center justify-center p-2" data-testid="today-palm-emblem">
               <div className="relative flex size-[110px] items-center justify-center rounded-full bg-amber-500/5 dark:bg-amber-500/10">
                 <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 110 110">
                   <circle
