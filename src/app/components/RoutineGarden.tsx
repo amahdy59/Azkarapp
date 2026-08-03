@@ -720,69 +720,39 @@ export function TodayRoutineGarden({
                 },
               ].map((col) => {
                 const isDone = col.state === "complete";
-                const isCurrentTimeRoutine = col.id === activeTimeRoutineId;
-
                 const rowContent = (
-                  <div className="flex w-full items-center justify-between gap-3">
-                    <div className="flex items-center gap-2.5 min-w-0">
-                      <span
-                        className={`text-[0.875rem] font-bold ${
-                          isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-700 dark:text-[#f0ece6]"
-                        }`}
-                      >
-                        {col.name}
-                      </span>
+                  <div className="flex w-full items-center justify-between gap-2.5">
+                    <span
+                      className={`text-[0.875rem] font-bold whitespace-nowrap ${
+                        isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-700 dark:text-[#f0ece6]"
+                      }`}
+                    >
+                      {col.name}
+                    </span>
 
-                      {isCurrentTimeRoutine && !isDone && (
-                        <span className="shrink-0 rounded-full border border-amber-500/40 bg-amber-500/15 px-2 py-0.5 text-[0.6875rem] font-extrabold text-amber-700 dark:text-amber-300">
-                          {isArabic ? "الآن" : "Now"}
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      {onSelectCategory && (
-                        <span className="flex items-center gap-1 text-[0.75rem] font-extrabold text-amber-600 dark:text-amber-400">
-                          {isDone ? (isArabic ? "عرض" : "View") : isArabic ? "ابدأ" : "Start"}
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2.5"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className={isArabic ? "rotate-180" : ""}
-                          >
-                            <polyline points="9 18 15 12 9 6" />
-                          </svg>
-                        </span>
-                      )}
-                      <svg
-                        viewBox="0 0 24 24"
-                        width="20"
-                        height="20"
-                        fill="none"
-                        aria-hidden="true"
-                        className={isDone ? "text-[#F59E0B]" : "text-slate-400 dark:text-slate-500"}
-                      >
-                        <path
-                          d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-                          stroke="currentColor"
-                          strokeOpacity={isDone ? 1 : 0.6}
-                          strokeWidth="2"
-                          strokeLinejoin="round"
-                        />
-                        <path
-                          d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-                          stroke="currentColor"
-                          strokeOpacity={isDone ? 1 : 0.6}
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    </div>
+                    <svg
+                      viewBox="0 0 24 24"
+                      width="20"
+                      height="20"
+                      fill="none"
+                      aria-hidden="true"
+                      className={`shrink-0 ${isDone ? "text-[#F59E0B]" : "text-slate-400 dark:text-slate-500"}`}
+                    >
+                      <path
+                        d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
+                        stroke="currentColor"
+                        strokeOpacity={isDone ? 1 : 0.6}
+                        strokeWidth="2"
+                        strokeLinejoin="round"
+                      />
+                      <path
+                        d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
+                        stroke="currentColor"
+                        strokeOpacity={isDone ? 1 : 0.6}
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
                   </div>
                 );
 
@@ -798,22 +768,20 @@ export function TodayRoutineGarden({
                       <button
                         type="button"
                         onClick={() => onSelectCategory(col.id)}
-                        className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] text-start transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[12px] px-[12px] py-[10px] text-start transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                           isDone
-                            ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 hover:bg-[#FFF3DF] dark:border-[rgba(182,135,70,0.25)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6] dark:hover:bg-[rgba(38,48,70,0.9)]"
-                            : isCurrentTimeRoutine
-                              ? "border-2 border-amber-500/70 bg-amber-50/60 text-slate-900 hover:border-amber-500 dark:border-amber-500/50 dark:bg-[rgba(35,30,20,0.6)] dark:text-[#f0ece6]"
-                              : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6] dark:hover:bg-[rgba(26,34,54,0.6)]"
+                            ? "border border-[#fed7aa] bg-[#fff7ed] text-slate-900 hover:bg-[#fff3df] dark:border-[rgba(182,135,70,0.25)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6] dark:hover:bg-[rgba(38,48,70,0.9)]"
+                            : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6] dark:hover:bg-[rgba(26,34,54,0.6)]"
                         }`}
                       >
                         {rowContent}
                       </button>
                     ) : (
                       <div
-                        className={`flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all ${
+                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[12px] px-[12px] py-[10px] transition-all ${
                           isDone
-                            ? "border border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
-                            : "border border-slate-200 bg-slate-50 text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
+                            ? "border border-[#fed7aa] bg-[#fff7ed] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
+                            : "border border-slate-200 bg-white text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
                         }`}
                       >
                         {rowContent}
