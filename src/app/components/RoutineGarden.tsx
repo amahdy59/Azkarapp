@@ -11,7 +11,7 @@ import {
   type GrowthEvent,
 } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Flame, Heart } from "./icons";
+import { Flame, Heart, Sun, Moon } from "./icons";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -749,14 +749,35 @@ export function TodayRoutineGarden({
                           </svg>
                         )}
                       </div>
-                      <span className="text-[0.9375rem] font-medium">{col.name}</span>
+                      <div className="flex flex-col gap-1 items-start">
+                        <span
+                          className={`text-[0.9375rem] font-medium leading-none ${isDone ? "text-[#f0ece6]" : "text-[#a5a7af]"}`}
+                        >
+                          {col.name}
+                        </span>
+                        <span
+                          className={`text-[0.6875rem] leading-none ${isDone ? "text-[#a5a7af]" : "text-[#5c606b]"}`}
+                        >
+                          {col.id === "morning" || col.id === "evening"
+                            ? isArabic
+                              ? "١٢ ذكراً"
+                              : "12 zikr"
+                            : isArabic
+                              ? "١٠ ذكراً"
+                              : "10 zikr"}
+                        </span>
+                      </div>
                     </div>
 
-                    <GoldenLeafMark
-                      size={20}
-                      filled={isDone}
-                      className={`shrink-0 ${isDone ? "" : "grayscale opacity-50"}`}
-                    />
+                    {col.id === "morning" || col.id === "evening" ? (
+                      <Sun
+                        className={`h-[1.125rem] w-[1.125rem] shrink-0 ${isDone ? "text-[#e2a84a]" : "text-[#5c606b]"}`}
+                      />
+                    ) : (
+                      <Moon
+                        className={`h-[1.125rem] w-[1.125rem] shrink-0 ${isDone ? "text-[#e2a84a]" : "text-[#5c606b]"}`}
+                      />
+                    )}
                   </li>
                 );
               })}

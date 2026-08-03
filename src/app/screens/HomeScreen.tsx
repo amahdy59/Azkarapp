@@ -238,21 +238,24 @@ export function HomeScreen({
 
           {/* Time & Date Info Pill */}
           <div
-            className={`flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[#1f293d] bg-white/10 px-4 text-xs font-semibold backdrop-blur-md shadow-xs ${
-              isArabic ? "flex-row" : "flex-row-reverse"
-            }`}
+            className="flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[rgba(182,135,70,0.14)] bg-white/5 px-4 text-xs font-medium backdrop-blur-md shadow-xs"
+            dir="auto"
           >
-            {/* Left side (in RTL): Prayer timing */}
-            <div data-testid="next-prayer" className="flex items-center gap-2 text-[#fbbf24]">
-              <Sun className="h-4 w-4 shrink-0" />
-              <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-              <span>{nextPrayerInfo.formattedCountdown}</span>
+            {/* Date */}
+            <div data-testid="hijri-date" className="flex items-center gap-2 text-[#e2e8f0] whitespace-nowrap">
+              <Calendar className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
+              <span>{formatDisplayDate(now, language, calendarType)}</span>
             </div>
 
-            {/* Right side (in RTL): Date */}
-            <div data-testid="hijri-date" className="flex items-center gap-2 text-[#fbbf24] whitespace-nowrap">
-              <span>{formatDisplayDate(now, language, calendarType)}</span>
-              <Calendar className="h-4 w-4 shrink-0" />
+            <div className="h-3 w-px bg-white/20 shrink-0 mx-2" />
+
+            {/* Prayer timing */}
+            <div data-testid="next-prayer" className="flex items-center gap-2 text-[#e2e8f0]">
+              <Sun className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
+              <span className="flex items-center gap-1">
+                <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
+                <span className="text-white" dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+              </span>
             </div>
           </div>
         </header>
@@ -312,11 +315,9 @@ export function HomeScreen({
                 <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
                   {reminderInfo.desc}
                 </p>
-              </div>
-
-              {/* Routine Mode Selector Pill */}
+                        {/* Routine Mode Selector Pill */}
               <div
-                className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5"
+                className="flex h-[44px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-1 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
                 role="group"
                 aria-label={isArabic ? "وضع الورد" : "Routine mode"}
               >
@@ -328,10 +329,10 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.8125rem] font-bold ${
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
                     reminderMode === "complete"
-                      ? "bg-amber-500 text-slate-950 shadow-md"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
+                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
@@ -344,18 +345,18 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
                     }
                   }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.8125rem] font-bold ${
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
                     reminderMode === "core"
-                      ? "bg-amber-500 text-slate-950 shadow-md"
-                      : "text-muted-foreground hover:text-foreground"
+                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
+                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
                   }`}
                 >
                   {isArabic ? "المختصرة" : "Abbreviated"}
                 </button>
               </div>
 
-              {/* Info Row: Duration & Count */}
-              <div className="flex items-center justify-between px-3 text-xs text-[#9ca3af]" dir="auto">
+              {/* Info Row Pill */}
+              <div className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] bg-[rgba(14,18,27,0.40)] border border-[rgba(182,135,70,0.14)] text-[0.8125rem] text-[#a5a7af]" dir="auto">
                 <div className="flex items-center gap-1.5">
                   <svg
                     width="16"
@@ -367,14 +368,15 @@ export function HomeScreen({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
+                    className="text-[#e2a84a]"
                   >
-                    <circle cx="12" cy="12" r="10" />
-                    <polyline points="12 6 12 12 16 14" />
+                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
                   </svg>
-                  <span>{isArabic ? "٦ دقائق تقريباً" : "~6 mins"}</span>
+                  <span>{routineSummary}</span>
                 </div>
-
-                <div className="flex items-center gap-1.5 font-semibold text-white">
+                <span className="text-white/30">•</span>
+                <div className="flex items-center gap-1.5">
                   <svg
                     width="16"
                     height="16"
@@ -385,47 +387,61 @@ export function HomeScreen({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     aria-hidden="true"
+                    className="text-[#e2a84a]"
                   >
-                    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
                   </svg>
-                  <span>{routineSummary}</span>
+                  <span>{isArabic ? "٦ دقائق تقريباً" : "~6 mins"}</span>
                 </div>
               </div>
+
+              {/* Progress Text & Bar */}
+              {doneCount > 0 && (
+                <div className="flex flex-col gap-2 w-full mt-2">
+                  <div className="flex justify-start text-[0.8125rem] font-medium text-[#e2e8f0]" dir="auto">
+                    {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"} {formatNumerals(totalCount, language)}
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(14,18,27,0.4)]">
+                    <div
+                      className="h-full rounded-full bg-[#e2a84a] transition-all duration-500 ease-out"
+                      style={{
+                        width: `${Math.min(100, Math.max(0, (doneCount / totalCount) * 100))}%`,
+                        transformOrigin: direction === "rtl" ? "right" : "left",
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Primary CTA Button */}
               <button
                 type="button"
                 data-testid="home-primary-cta"
                 onClick={() => {
-                  if (actionKind === "again") {
-                    onRepeat(reminderInfo.categoryId);
-                  } else {
-                    onResume(reminderInfo.categoryId);
-                  }
+                  onResume(reminderInfo.categoryId);
                 }}
-                aria-label={`${ctaLabel}. ${routineSummary}. ${formatNumerals(doneCount, language)} ${isArabic ? "من" : "of"} ${formatNumerals(totalCount, language)}`}
-                className="interactive-elem group relative flex h-[52px] w-full items-center justify-center rounded-[26px] bg-[#fbbf24] px-5 text-[1.0625rem] font-bold text-[#080c14] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
+                className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98]"
               >
-                <span className="font-sans">{ctaLabel}</span>
-                <div
-                  className={`absolute ${isArabic ? "start-5 rotate-180 group-hover:-translate-x-1" : "end-5 group-hover:translate-x-1"} flex items-center justify-center transition-transform`}
-                >
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden="true"
-                  >
-                    <polyline points="9 18 15 12 9 6" />
-                  </svg>
-                </div>
+                {direction === "rtl" ? (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                ) : (
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                )}
+                <span>{ctaLabel}</span>
               </button>
+
+              {/* Resume Text */}
+              {actionKind === "continue" && (
+                <div className="mt-1 flex items-center justify-center gap-1.5 text-[0.8125rem] font-medium text-[#a5a7af]">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#e2a84a]"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                  <span>
+                    {isArabic
+                      ? `استكمل من الذكر ${formatNumerals(doneCount + 1, language)}`
+                      : `Resume from Zikr ${doneCount + 1}`}
+                  </span>
+                </div>
+              )}
             </div>
           </section>
         )}
