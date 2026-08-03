@@ -3006,6 +3006,35 @@ const ZIKR_LABELS: Record<string, string> = Object.fromEntries(
   ALL_AZKAR.map((z) => [z.id, z.translation.split(".")[0] ?? z.transliteration]),
 );
 
+/** Estimates expected completion time in minutes based on total text length and repetitions of visible azkar. */
+function estimateCompletionMinutes(azkar: Zikr[]): number {
+  if (!azkar || azkar.length === 0) return 0;
+
+  let totalSeconds = 0;
+  for (const zikr of azkar) {
+    if (zikr.isCollectionIntroduction) continue;
+    const text = zikr.arabicText || "";
+    const words = text.trim().split(/\s+/).filter(Boolean).length;
+    const reps = zikr.repetitionCount || 1;
+
+    // Recitation pace: ~2.2 words per second + pause per rep
+    const baseSecPerRep = Math.max(1.2, words / 2.2);
+
+    let zikrSeconds = 0;
+    if (reps > 10) {
+      // High repetition count (e.g. 33x, 100x) speeds up rhythm per rep
+      const fastSecPerRep = Math.min(baseSecPerRep * 0.35, 0.6);
+      zikrSeconds = 10 * baseSecPerRep + (reps - 10) * fastSecPerRep;
+    } else {
+      zikrSeconds = reps * baseSecPerRep;
+    }
+
+    totalSeconds += zikrSeconds;
+  }
+
+  return Math.max(1, Math.round(totalSeconds / 60));
+}
+
 export {
   ALL_AZKAR,
   EVENING_AZKAR,
@@ -3033,5 +3062,6 @@ export {
   getRoutineProgress,
   getRoutineStepCount,
   isRoutineCategory,
+  estimateCompletionMinutes,
   registerLazyCollection,
 };

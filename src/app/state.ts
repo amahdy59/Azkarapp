@@ -50,9 +50,9 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
     calendarType: "hijri",
     routineModes: {
-      morning: "core",
-      evening: "core",
-      before_sleep: "core",
+      morning: "complete",
+      evening: "complete",
+      before_sleep: "complete",
     },
     location: DEFAULT_LOCATION,
   },
@@ -98,9 +98,9 @@ function normalizeRoutineModes(value: unknown): AppStateSnapshot["settings"]["ro
   const candidate =
     value && typeof value === "object" ? (value as Partial<AppStateSnapshot["settings"]["routineModes"]>) : {};
   return {
-    morning: candidate.morning === "complete" ? "complete" : "core",
-    evening: candidate.evening === "complete" ? "complete" : "core",
-    before_sleep: candidate.before_sleep === "complete" ? "complete" : "core",
+    morning: candidate.morning === "core" ? "core" : "complete",
+    evening: candidate.evening === "core" ? "core" : "complete",
+    before_sleep: candidate.before_sleep === "core" ? "core" : "complete",
   };
 }
 

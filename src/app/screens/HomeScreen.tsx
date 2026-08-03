@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from "react";
 import { Sun, Calendar } from "../components/icons";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
+import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
@@ -68,9 +68,9 @@ export function getHomeAction(
   now: Date = new Date(),
   location?: LocationSettings,
   routineModes: Record<RoutineCategoryId, RoutineMode> = {
-    morning: "core",
-    evening: "core",
-    before_sleep: "core",
+    morning: "complete",
+    evening: "complete",
+    before_sleep: "complete",
   },
 ): HomeAction {
   const suggestedId = suggestedCategoryId(now, location);
@@ -209,6 +209,11 @@ export function HomeScreen({
   });
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
+  const estimatedMinutes = useMemo(
+    () => estimateCompletionMinutes(visibleReminderAzkar),
+    [visibleReminderAzkar],
+  );
+
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
   const ctaLabel =
@@ -319,28 +324,12 @@ export function HomeScreen({
                 </p>
               </div>
 
-              {/* Routine Mode Selector Pill */}
+              {/* Routine Mode Selector Pill — "الكاملة" (Full) selected by default on right in RTL */}
               <div
                 className="flex h-[44px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-1 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
                 role="group"
                 aria-label={isArabic ? "وضع الورد" : "Routine mode"}
               >
-                <button
-                  type="button"
-                  aria-pressed={reminderMode === "core"}
-                  onClick={() => {
-                    if (isRoutineCategory(reminderInfo.categoryId)) {
-                      onSetRoutineMode?.(reminderInfo.categoryId, "core");
-                    }
-                  }}
-                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
-                    reminderMode === "core"
-                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
-                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
-                  }`}
-                >
-                  {isArabic ? "المختصرة" : "Abbreviated"}
-                </button>
                 <button
                   type="button"
                   aria-pressed={reminderMode === "complete"}
@@ -351,11 +340,27 @@ export function HomeScreen({
                   }}
                   className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
                     reminderMode === "complete"
-                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a]"
+                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
                       : "text-[#a5a7af] hover:text-[#e2e8f0]"
                   }`}
                 >
                   {isArabic ? "الكاملة" : "Complete"}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={reminderMode === "core"}
+                  onClick={() => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, "core");
+                    }
+                  }}
+                  className={`flex flex-1 items-center justify-center rounded-xl h-full transition-all text-[0.875rem] font-medium ${
+                    reminderMode === "core"
+                      ? "bg-[rgba(30,38,55,0.80)] text-[#e2a84a] shadow-xs"
+                      : "text-[#a5a7af] hover:text-[#e2e8f0]"
+                  }`}
+                >
+                  {isArabic ? "المختصرة" : "Abbreviated"}
                 </button>
               </div>
 
@@ -399,7 +404,11 @@ export function HomeScreen({
                     <circle cx="12" cy="12" r="10" />
                     <polyline points="12 6 12 12 16 14" />
                   </svg>
-                  <span>{isArabic ? "٦ دقائق تقريباً" : "~6 mins"}</span>
+                  <span>
+                    {isArabic
+                      ? `${formatNumerals(estimatedMinutes, language)} دقائق تقريباً`
+                      : `~${estimatedMinutes} mins`}
+                  </span>
                 </div>
               </div>
 
