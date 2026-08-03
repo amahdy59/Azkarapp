@@ -297,7 +297,7 @@ export function HomeScreen({
           <section aria-labelledby="current-zikr-heading" className="mb-5">
             <div className="flex flex-col gap-4 text-start">
               {/* Hero Text Block */}
-              <div className="flex flex-col gap-1 px-1 pt-1">
+              <div className="flex w-full flex-col items-start gap-2 p-2">
                 <p className="text-[1.125rem] font-medium text-[#e2e8f0]" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
