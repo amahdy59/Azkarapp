@@ -20,6 +20,7 @@ export {
   Check,
   Check as CheckIcon,
   CheckCircle as CheckCircle2,
+  Calendar,
   Clock,
   ChevronDown,
   ChevronDown as ChevronDownIcon,

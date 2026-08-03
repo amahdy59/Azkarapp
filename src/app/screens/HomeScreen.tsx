@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
+import { Sun, Calendar } from "../components/icons";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
@@ -237,21 +238,21 @@ export function HomeScreen({
 
           {/* Time & Date Info Pill */}
           <div
-            className={`flex h-[42px] w-full items-center justify-between rounded-[20px] border border-[#1f293d] bg-black/40 px-4 text-xs font-semibold backdrop-blur-md shadow-xs ${
+            className={`flex h-[40px] w-full shrink-0 items-center justify-between rounded-[20px] border border-[#1f293d] bg-white/10 px-4 text-xs font-semibold backdrop-blur-md shadow-xs ${
               isArabic ? "flex-row" : "flex-row-reverse"
             }`}
           >
             {/* Left side (in RTL): Prayer timing */}
-            <div data-testid="next-prayer" className="flex items-center gap-2 text-white">
-              <span className="text-[#fbbf24]">
-                {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
-              </span>
-              <span className="text-slate-300">{nextPrayerInfo.formattedCountdown}</span>
+            <div data-testid="next-prayer" className="flex items-center gap-2 text-[#fbbf24]">
+              <Sun className="h-4 w-4 shrink-0" />
+              <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
+              <span>{nextPrayerInfo.formattedCountdown}</span>
             </div>
 
             {/* Right side (in RTL): Date */}
-            <div data-testid="hijri-date" className="text-slate-300 whitespace-nowrap">
-              {formatDisplayDate(now, language, calendarType)}
+            <div data-testid="hijri-date" className="flex items-center gap-2 text-[#fbbf24] whitespace-nowrap">
+              <span>{formatDisplayDate(now, language, calendarType)}</span>
+              <Calendar className="h-4 w-4 shrink-0" />
             </div>
           </div>
         </header>
