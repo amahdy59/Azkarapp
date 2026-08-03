@@ -3020,14 +3020,8 @@ function estimateCompletionMinutes(azkar: Zikr[]): number {
     // Recitation pace: ~2.2 words per second + pause per rep
     const baseSecPerRep = Math.max(1.2, words / 2.2);
 
-    let zikrSeconds = 0;
-    if (reps > 10) {
-      // High repetition count (e.g. 33x, 100x) speeds up rhythm per rep
-      const fastSecPerRep = Math.min(baseSecPerRep * 0.35, 0.6);
-      zikrSeconds = 10 * baseSecPerRep + (reps - 10) * fastSecPerRep;
-    } else {
-      zikrSeconds = reps * baseSecPerRep;
-    }
+    const zikrSeconds =
+      reps > 10 ? 10 * baseSecPerRep + (reps - 10) * Math.min(baseSecPerRep * 0.35, 0.6) : reps * baseSecPerRep;
 
     totalSeconds += zikrSeconds;
   }
