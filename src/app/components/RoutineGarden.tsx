@@ -661,9 +661,7 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div
-          className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 text-start bg-white dark:bg-[#1e1e1e] shadow-sm border border-slate-100 dark:border-[#2a2a2a]"
-        >
+        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 text-start bg-white dark:bg-[#1e1e1e] shadow-sm border border-slate-100 dark:border-[#2a2a2a]">
           {/* Header Section */}
           <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
             <h3 className="text-[1.25rem] font-bold text-slate-900 dark:text-white">
@@ -780,7 +778,15 @@ export function TodayRoutineGarden({
               <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-black/20 p-2">
                 {/* Circular Progress Arc */}
                 <svg width="110" height="110" viewBox="0 0 110 110" className="absolute inset-0 size-full -rotate-90">
-                  <circle cx="55" cy="55" r="48" stroke="currentColor" className="text-slate-200 dark:text-white/5" strokeWidth="6" fill="none" />
+                  <circle
+                    cx="55"
+                    cy="55"
+                    r="48"
+                    stroke="currentColor"
+                    className="text-slate-200 dark:text-white/5"
+                    strokeWidth="6"
+                    fill="none"
+                  />
                   <circle
                     cx="55"
                     cy="55"
@@ -796,17 +802,61 @@ export function TodayRoutineGarden({
                 </svg>
                 <div className="relative z-10 opacity-70 dark:opacity-60 text-slate-700 dark:text-slate-300">
                   <svg viewBox="0 0 64 64" width="48" height="48" fill="none" aria-hidden="true">
-                    <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
-                    <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path
+                      d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
+                    <path
+                      d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                    />
                   </svg>
                 </div>
               </div>
