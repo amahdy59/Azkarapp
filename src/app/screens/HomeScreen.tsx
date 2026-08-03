@@ -204,9 +204,6 @@ export function HomeScreen({
       };
   const totalCount = reminderProgress.total;
   const doneCount = reminderProgress.done;
-  const routineSummary = t(language, `category.${reminderMode}Summary`, {
-    count: formatNumerals(totalCount, language),
-  });
   const isComplete = doneCount >= totalCount && totalCount > 0;
 
   const estimatedMinutes = useMemo(() => estimateCompletionMinutes(visibleReminderAzkar), [visibleReminderAzkar]);
