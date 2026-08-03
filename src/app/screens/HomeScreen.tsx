@@ -462,30 +462,6 @@ export function HomeScreen({
                 )}
                 <span>{ctaLabel}</span>
               </button>
-
-              {/* Resume Text */}
-              {actionKind === "continue" && (
-                <div className="mt-1 flex items-center justify-center gap-1.5 text-[0.8125rem] font-medium text-[#a5a7af]">
-                  <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="text-[#e2a84a]"
-                  >
-                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                  <span>
-                    {isArabic
-                      ? `استكمل من الذكر ${formatNumerals(doneCount + 1, language)}`
-                      : `Resume from Zikr ${doneCount + 1}`}
-                  </span>
-                </div>
-              )}
             </div>
           </section>
         )}

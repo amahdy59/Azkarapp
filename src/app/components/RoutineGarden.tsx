@@ -534,7 +534,11 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className="mb-5 rounded-3xl border border-border/80 bg-card p-3.5 shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]"
+      className={
+        hideTabs
+          ? "mb-5 transition-all"
+          : "mb-5 rounded-3xl border border-border/80 bg-card p-3.5 shadow-lg transition-all dark:border-white/10 dark:bg-[#18181B]"
+      }
     >
       {!hideTabs && (
         <div className="mb-3 flex items-center justify-between gap-3 text-start">
@@ -658,31 +662,14 @@ export function TodayRoutineGarden({
 
       {activeTab === "day" && (
         <div
-          className="relative flex w-full flex-col items-center gap-4 overflow-hidden rounded-[24px] p-4 text-start backdrop-blur-md"
-          style={{
-            border: "1px solid rgba(182, 135, 70, 0.14)",
-            background:
-              "linear-gradient(180deg, rgba(0, 0, 0, 0.00) 0%, rgba(0, 0, 0, 0.00) 60%, rgba(0, 0, 0, 0.35) 100%), radial-gradient(83.33% 83.33% at 58.33% 16.67%, rgba(167, 117, 53, 0.14) 0%, rgba(167, 117, 53, 0.06) 50%, rgba(167, 117, 53, 0.00) 100%), radial-gradient(41.67% 41.67% at 58.33% 58.33%, rgba(89, 96, 113, 0.25) 0%, rgba(89, 96, 113, 0.08) 60%, rgba(89, 96, 113, 0.00) 100%), rgba(20, 26, 42, 0.20)",
-            boxShadow:
-              "0 -1px 1px 0 rgba(255, 255, 255, 0.03) inset, 0 2px 6px 0 rgba(0, 0, 0, 0.20) inset, 0 4px 16px 0 rgba(0, 0, 0, 0.30)",
-          }}
+          className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 text-start bg-white dark:bg-[#1e1e1e] shadow-sm border border-slate-100 dark:border-[#2a2a2a]"
         >
-          {/* Background Islamic Corner Pattern Overlay */}
-          <div className="absolute top-0 right-0 pointer-events-none opacity-10" aria-hidden="true">
-            <img
-              src="/islamic-corner-pattern.svg"
-              alt=""
-              className="w-[180px] h-[200px] object-contain object-top-right"
-            />
-          </div>
-
           {/* Header Section */}
-          <div className="relative z-10 flex flex-col gap-1">
-            <div className="flex items-center justify-start gap-2">
-              <h3 className="text-[1.125rem] font-bold text-[#f0ece6]">{isArabic ? "وردك اليوم" : "Today's Wird"}</h3>
-              <GoldenLeafMark size={16} filled />
-            </div>
-            <p className="text-[0.8125rem] text-[#a5a7af]">
+          <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
+            <h3 className="text-[1.25rem] font-bold text-slate-900 dark:text-white">
+              {isArabic ? "وردك اليوم" : "Today's Wird"}
+            </h3>
+            <p className="text-[0.875rem] text-slate-500 dark:text-slate-400">
               {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
             </p>
           </div>
@@ -722,22 +709,24 @@ export function TodayRoutineGarden({
                     data-testid={`garden-category-${col.id}`}
                     data-state={col.state}
                     aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
-                    className={`flex items-center justify-between gap-2 rounded-[12px] px-[12px] py-[10px] transition-all w-full shrink-0 ${
+                    className={`flex items-center justify-between gap-3 rounded-[16px] px-[16px] py-[12px] transition-all w-full shrink-0 border ${
                       isDone
-                        ? "border border-[rgba(182,135,70,0.14)] bg-[rgba(30,38,55,0.80)] text-[#f0ece6]"
-                        : "bg-[rgba(20,26,42,0.40)] text-[#a5a7af]"
+                        ? "border-[#F59E0B] bg-[#FFF8ED] text-slate-900 dark:border-transparent dark:bg-[#2c3140] dark:text-white"
+                        : "border-slate-200 bg-transparent text-slate-700 dark:border-slate-700/60 dark:text-slate-300"
                     }`}
                   >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div
-                        className={`flex size-[20px] items-center justify-center rounded-full shrink-0 ${
-                          isDone ? "bg-[#e2a84a] text-slate-950" : "border-2 border-[#5c606b] bg-transparent"
+                        className={`flex size-[22px] items-center justify-center rounded-full shrink-0 ${
+                          isDone
+                            ? "bg-[#F59E0B] text-white dark:bg-[#E4A84A] dark:text-[#18181B]"
+                            : "border-[1.5px] border-slate-400 bg-transparent dark:border-slate-500"
                         }`}
                       >
                         {isDone && (
                           <svg
-                            width="12"
-                            height="12"
+                            width="14"
+                            height="14"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
@@ -749,35 +738,38 @@ export function TodayRoutineGarden({
                           </svg>
                         )}
                       </div>
-                      <div className="flex flex-col gap-1 items-start">
-                        <span
-                          className={`text-[0.9375rem] font-medium leading-none ${isDone ? "text-[#f0ece6]" : "text-[#a5a7af]"}`}
-                        >
-                          {col.name}
-                        </span>
-                        <span
-                          className={`text-[0.6875rem] leading-none ${isDone ? "text-[#a5a7af]" : "text-[#5c606b]"}`}
-                        >
-                          {col.id === "morning" || col.id === "evening"
-                            ? isArabic
-                              ? "١٢ ذكراً"
-                              : "12 zikr"
-                            : isArabic
-                              ? "١٠ ذكراً"
-                              : "10 zikr"}
-                        </span>
-                      </div>
+                      <span
+                        className={`text-[1rem] font-bold ${isDone ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}
+                      >
+                        {col.name}
+                      </span>
                     </div>
 
-                    {col.id === "morning" || col.id === "evening" ? (
-                      <Sun
-                        className={`h-[1.125rem] w-[1.125rem] shrink-0 ${isDone ? "text-[#e2a84a]" : "text-[#5c606b]"}`}
-                      />
-                    ) : (
-                      <Moon
-                        className={`h-[1.125rem] w-[1.125rem] shrink-0 ${isDone ? "text-[#e2a84a]" : "text-[#5c606b]"}`}
-                      />
-                    )}
+                    <div className="shrink-0">
+                      <svg
+                        viewBox="0 0 24 24"
+                        width="20"
+                        height="20"
+                        fill="none"
+                        aria-hidden="true"
+                        className={isDone ? "text-[#F59E0B]" : "text-slate-400 dark:text-slate-500"}
+                      >
+                        <path
+                          d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
+                          stroke="currentColor"
+                          strokeOpacity={isDone ? 1 : 0.6}
+                          strokeWidth="2"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
+                          stroke="currentColor"
+                          strokeOpacity={isDone ? 1 : 0.6}
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    </div>
                   </li>
                 );
               })}
@@ -785,31 +777,45 @@ export function TodayRoutineGarden({
 
             {/* Left Column: Palm Progress Ring (Second in DOM -> Left in RTL) */}
             <div className="flex flex-col items-center gap-2 text-center" data-testid="today-palm-emblem">
-              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-black/30 p-2 shadow-inner">
+              <div className="relative flex size-[120px] items-center justify-center rounded-full bg-slate-50 dark:bg-black/20 p-2">
                 {/* Circular Progress Arc */}
-                <svg width="100" height="100" viewBox="0 0 100 100" className="absolute inset-0 size-full -rotate-90">
-                  <circle cx="50" cy="50" r="42" stroke="rgba(255,255,255,0.08)" strokeWidth="6" fill="none" />
+                <svg width="110" height="110" viewBox="0 0 110 110" className="absolute inset-0 size-full -rotate-90">
+                  <circle cx="55" cy="55" r="48" stroke="currentColor" className="text-slate-200 dark:text-white/5" strokeWidth="6" fill="none" />
                   <circle
-                    cx="50"
-                    cy="50"
-                    r="42"
-                    stroke="#E4A84A"
+                    cx="55"
+                    cy="55"
+                    r="48"
+                    stroke="#F59E0B"
                     strokeWidth="6"
                     fill="none"
-                    strokeDasharray={264}
-                    strokeDashoffset={264 - (264 * summary.today.goldenLeafCount) / 3}
+                    strokeDasharray={301.6}
+                    strokeDashoffset={301.6 - (301.6 * summary.today.goldenLeafCount) / 3}
                     strokeLinecap="round"
                     className="transition-all duration-700"
                   />
                 </svg>
-                <PalmTreeMark size={32} filled={summary.today.goldenLeafCount >= 3} className="relative z-10" />
+                <div className="relative z-10 opacity-70 dark:opacity-60 text-slate-700 dark:text-slate-300">
+                  <svg viewBox="0 0 64 64" width="48" height="48" fill="none" aria-hidden="true">
+                    <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                    <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" stroke="currentColor" strokeWidth="2.5" />
+                  </svg>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-between gap-2 rounded-[10px] border border-[rgba(182,135,70,0.08)] bg-[rgba(20,26,42,0.6)] px-4 py-2.5 text-center text-[0.75rem] font-medium text-[#a5a7af]"
+            className="relative z-10 flex items-center justify-between gap-2 rounded-[12px] bg-slate-50 dark:bg-[#2c3140] px-4 py-3 text-center text-[0.875rem] font-bold text-slate-600 dark:text-slate-300 w-full"
             dir="rtl"
           >
             <span className="flex-1 text-center font-sans">
@@ -817,7 +823,7 @@ export function TodayRoutineGarden({
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}
             </span>
-            <Heart className="h-[1.125rem] w-[1.125rem] text-[#a5a7af] shrink-0" strokeWidth={2} />
+            <Heart className="h-[1.25rem] w-[1.25rem] text-slate-400 dark:text-slate-400 shrink-0" strokeWidth={2.5} />
           </div>
         </div>
       )}
