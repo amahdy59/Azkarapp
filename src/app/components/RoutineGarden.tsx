@@ -228,16 +228,16 @@ export function PalmTreeReward({
       >
         {/* Streak — start side */}
         <div className="flex items-center gap-1" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
-          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
+          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#fbbf24] font-sans">
             {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
           </span>
-          <Flame className="h-[1rem] w-[1rem] text-[#835806] dark:text-[#fbbf24]" strokeWidth={2.5} />
+          <Flame className="h-[1rem] w-[1rem] text-[#fbbf24]" strokeWidth={2.5} />
         </div>
 
         {/* Palms — end side */}
         <div className="flex items-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
           <PalmTreeMark size={18} />
-          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#835806] dark:text-[#fbbf24] font-sans">
+          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#fbbf24] font-sans">
             {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
           </span>
         </div>
@@ -651,19 +651,13 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div
-          className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-[24px] p-5 text-start shadow-sm bg-white dark:bg-[rgba(14,18,27,0.85)]"
-          style={{
-            border: "1px solid rgba(182, 135, 70, 0.14)",
-            boxShadow: "inset 0px -1px 1px 0px rgba(255,255,255,0.03), inset 0px 2px 6px 0px rgba(0,0,0,0.1)",
-          }}
-        >
+        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-[24px] p-5 text-start border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.14)] bg-white dark:bg-[rgba(14,18,27,0.85)] shadow-[0px_6px_18px_0px_rgba(0,0,0,0.08)] dark:shadow-sm">
           {/* Header Section */}
           <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
-            <h3 className="text-[1.125rem] font-bold text-foreground dark:text-[#f0ece6]">
+            <h3 className="text-[1.125rem] font-bold text-[#111827] dark:text-[#f0ece6]">
               {isArabic ? "وردك اليوم" : "Today's Wird"}
             </h3>
-            <p className="text-[0.8125rem] font-normal text-[#835806] dark:text-[#d4a020]">
+            <p className="text-[0.8125rem] font-normal text-[#6b7280] dark:text-[#d4a020]">
               {isArabic ? "أكمل أوراد اليوم لتنمو نخلتك" : "Complete today's routines to grow your palm"}
             </p>
           </div>
@@ -816,15 +810,11 @@ export function TodayRoutineGarden({
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] px-3 py-2 text-center text-[0.875rem] font-medium w-full"
-            style={{
-              background: "rgba(20, 26, 42, 0.6)",
-              border: "1px solid rgba(182, 135, 70, 0.08)",
-            }}
+            className="relative z-10 flex items-center justify-center gap-2 rounded-[10px] px-3 py-2 text-center text-[0.875rem] font-medium w-full bg-[#f3f4f6] dark:bg-[rgba(20,26,42,0.6)] border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.08)]"
             dir="rtl"
           >
-            <Heart className="h-[0.75rem] w-[0.75rem] text-[#a5a7af] shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-center font-sans text-[#a5a7af] text-[11.5px]">
+            <Heart className="h-[0.75rem] w-[0.75rem] text-[#6b7280] dark:text-[#a5a7af] shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-center font-sans text-[#6b7280] dark:text-[#a5a7af] text-[11.5px]">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}
