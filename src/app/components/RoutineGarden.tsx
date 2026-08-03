@@ -139,7 +139,47 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
   );
 }
 
-/** Golden Palm Tree Mark — matching Figma's date palm tree vector in golden amber (#E4A84A). */
+/** Single unified Palm Tree vector matching public/palm-tree.svg across the app. */
+export function PalmTreeMark({
+  filled = true,
+  className = "",
+  size = 32,
+  color,
+  strokeWidth = 3.5,
+}: {
+  filled?: boolean;
+  className?: string;
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      width={size}
+      height={size}
+      fill="none"
+      stroke={color || "currentColor"}
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`${className} ${!filled && !color ? "opacity-40" : ""}`}
+      aria-hidden="true"
+      focusable="false"
+    >
+      {/* Left lower frond */}
+      <path d="M48 38 C32 30 15 32 8 46 C15 48 20 44 26 39 C22 47 20 54 28 58 C32 50 40 43 48 38 Z" />
+      {/* Left upper frond */}
+      <path d="M48 35 C38 18 25 10 10 14 C12 21 17 24 24 22 C18 28 16 34 24 38 C32 34 40 35 48 35 Z" />
+      {/* Right frond */}
+      <path d="M50 35 C62 18 78 18 88 28 C80 32 74 28 68 33 C76 36 78 44 68 45 C60 41 55 38 50 35 Z" />
+      {/* Trunk */}
+      <path d="M43 38 C34 48 32 62 38 82 C38 88 45 88 56 88 C59 88 60 82 59 78 C53 78 48 76 45 74 C43 60 45 48 51 38" />
+    </svg>
+  );
+}
+
+/** Golden Palm Tree Mark — matching golden amber (#E4A84A). */
 export function GoldenPalmMark({
   className = "",
   size = 28,
@@ -149,86 +189,7 @@ export function GoldenPalmMark({
   size?: number;
   color?: string;
 }) {
-  return (
-    <svg
-      viewBox="0 0 64 64"
-      width={size}
-      height={size}
-      fill="none"
-      className={className}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <ellipse cx="32" cy="62" rx="10" ry="2.2" fill={color} fillOpacity="0.2" />
-      <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" fill="#78350F" fillOpacity="0.9" />
-      <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" fill="#92400E" fillOpacity="0.95" />
-      <path d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z" fill="#B45309" />
-      <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" fill="#D97706" />
-
-      {/* Date clusters */}
-      <circle cx="28" cy="29" r="2.2" fill={color} />
-      <circle cx="26.5" cy="31.2" r="1.8" fill="#D97706" />
-      <circle cx="36" cy="29" r="2.2" fill={color} />
-      <circle cx="37.5" cy="31.2" r="1.8" fill="#D97706" />
-
-      {/* Canopy in Golden Amber Fronds */}
-      <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" fill={color} />
-      <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" fill="#D97706" />
-      <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" fill={color} />
-      <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" fill="#B45309" />
-      <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" fill="#D97706" />
-      <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" fill="#92400E" />
-      <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" fill="#B45309" />
-      <path d="M32 26 C22 24.5 13.5 30 6.5 40 C14 36.5 23 31.5 32 26 Z" fill="#B45309" />
-      <path d="M32 26 C42 24.5 50.5 30 57.5 40 C50 36.5 41 31.5 32 26 Z" fill="#92400E" />
-    </svg>
-  );
-}
-
-/** PalmTreeMark — detailed date palm tree SVG. */
-export function PalmTreeMark({
-  filled = true,
-  className = "",
-  size = 32,
-}: {
-  filled?: boolean;
-  className?: string;
-  size?: number;
-}) {
-  return (
-    <svg
-      viewBox="0 0 64 64"
-      width={size}
-      height={size}
-      fill="none"
-      className={`${className} ${filled ? "opacity-100" : "opacity-45"}`}
-      aria-hidden="true"
-      focusable="false"
-    >
-      <ellipse cx="32" cy="62" rx="10" ry="2.2" fill="currentColor" fillOpacity="0.12" />
-      <path d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z" fill="#78350F" fillOpacity="0.9" />
-      <path d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z" fill="#92400E" fillOpacity="0.95" />
-      <path d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z" fill="#B45309" />
-      <path d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z" fill="#D97706" />
-
-      {/* Date clusters */}
-      <circle cx="28" cy="29" r="2.2" fill="#F59E0B" />
-      <circle cx="26.5" cy="31.2" r="1.8" fill="#D97706" />
-      <circle cx="36" cy="29" r="2.2" fill="#F59E0B" />
-      <circle cx="37.5" cy="31.2" r="1.8" fill="#D97706" />
-
-      {/* Canopy */}
-      <path d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z" fill="#10B981" />
-      <path d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z" fill="#059669" />
-      <path d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z" fill="#10B981" />
-      <path d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z" fill="#047857" />
-      <path d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z" fill="#059669" />
-      <path d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z" fill="#065F46" />
-      <path d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z" fill="#047857" />
-      <path d="M32 26 C22 24.5 13.5 30 6.5 40 C14 36.5 23 31.5 32 26 Z" fill="#047857" />
-      <path d="M32 26 C42 24.5 50.5 30 57.5 40 C50 36.5 41 31.5 32 26 Z" fill="#065F46" />
-    </svg>
-  );
+  return <PalmTreeMark size={size} color={color} className={className} />;
 }
 
 export function PalmMark({ className = "", size = 32 }: { className?: string; size?: number }) {
@@ -800,64 +761,17 @@ export function TodayRoutineGarden({
                     className="transition-all duration-700"
                   />
                 </svg>
-                <div className="relative z-10 opacity-70 dark:opacity-60 text-slate-700 dark:text-slate-300">
-                  <svg viewBox="0 0 64 64" width="48" height="48" fill="none" aria-hidden="true">
-                    <path
-                      d="M27.5 61.5 L32 58.5 L36.5 61.5 L35.5 53.5 L32 51 L28.5 53.5 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M28.5 53.5 L32 51 L35.5 53.5 L34.5 45.5 L32 43.5 L29.5 45.5 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M29.5 45.5 L32 43.5 L34.5 45.5 L33.8 37.5 L32 35.5 L30.2 37.5 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M30.2 37.5 L32 35.5 L33.8 37.5 L33.2 29.5 L32 27 L30.8 29.5 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C30.8 16.5 31.2 8.5 32 3 C32.8 8.5 33.2 16.5 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C26 15.5 17.5 8.5 11 6.5 C17.5 13.5 25 20 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C38 15.5 46.5 8.5 53 6.5 C46.5 13.5 39 20 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C22.5 18 11.5 14 3.5 15 C11.5 20.2 22 24 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C41.5 18 52.5 14 60.5 15 C52.5 20.2 42 24 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C21.5 21.5 10.5 22.5 2.5 27.5 C11 28.5 22 27.2 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                    <path
-                      d="M32 26 C42.5 21.5 53.5 22.5 61.5 27.5 C53 28.5 42 27.2 32 26 Z"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                    />
-                  </svg>
+                <div className="relative z-10">
+                  <PalmTreeMark
+                    size={48}
+                    className={
+                      summary.today.goldenLeafCount === 3
+                        ? "text-[#F59E0B] drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]"
+                        : summary.today.goldenLeafCount > 0
+                          ? "text-[#E4A84A]"
+                          : "text-slate-400 dark:text-slate-500 opacity-40"
+                    }
+                  />
                 </div>
               </div>
             </div>
