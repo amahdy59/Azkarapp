@@ -126,7 +126,7 @@ export function useZikrCounter({
     if (selection && selection.toString().length > 0) {
       return;
     }
-    
+
     if (suppressTap.current || shouldIgnoreCountTap(event.target)) {
       return;
     }

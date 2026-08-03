@@ -112,7 +112,7 @@ test("populated Home exposes leaf progress through text, state, and accessible n
   const garden = page.getByTestId("today-garden-card");
   await expect(garden).toBeVisible();
   await expect(garden.getByRole("heading", { name: /Daily Protection|Today's practice|Today's Wird/i })).toBeVisible();
-  
+
   // Verify screen reader text for progress
   const headerStats = page.locator('div[aria-label*="leaves"]');
   await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 3/i);
@@ -127,10 +127,10 @@ test("three completed main collections are announced as a palm without points or
   await openReturningHome(page);
 
   const garden = page.getByTestId("today-garden-card");
-  
+
   const headerStats = page.locator('div[aria-label*="leaves"]');
   await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 3 of 3/i);
-  
+
   await expect(garden.locator('[data-state="complete"]')).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });

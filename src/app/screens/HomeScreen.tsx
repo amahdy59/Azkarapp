@@ -220,7 +220,11 @@ export function HomeScreen({
   const isFriday = now.getDay() === 5;
 
   return (
-    <ScreenContainer dir={direction} className="px-0 relative overflow-hidden flex flex-col" screenName={t(language, "home.title")}>
+    <ScreenContainer
+      dir={direction}
+      className="px-0 relative overflow-hidden flex flex-col"
+      screenName={t(language, "home.title")}
+    >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
@@ -246,7 +250,9 @@ export function HomeScreen({
             </div>
 
             {/* Right side (in RTL): Date */}
-            <div data-testid="hijri-date" className="text-slate-300 whitespace-nowrap">{formatDisplayDate(now, language, calendarType)}</div>
+            <div data-testid="hijri-date" className="text-slate-300 whitespace-nowrap">
+              {formatDisplayDate(now, language, calendarType)}
+            </div>
           </div>
         </header>
       </div>
@@ -308,7 +314,7 @@ export function HomeScreen({
               </div>
 
               {/* Routine Mode Selector Pill */}
-              <div 
+              <div
                 className="flex h-[44px] w-full items-center rounded-2xl bg-black/50 p-1 backdrop-blur-md shadow-sm border border-white/5"
                 role="group"
                 aria-label={t(language, "home.routineModeSelector", "Routine mode")}

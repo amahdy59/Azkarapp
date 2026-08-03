@@ -21,9 +21,7 @@ export function useScreenFocus(screenName?: string) {
 
     // Attempt to find the main landmark or a suitable heading
     const focusTarget =
-      document.querySelector("main") ||
-      document.querySelector("h1") ||
-      document.getElementById("main-content");
+      document.querySelector("main") || document.querySelector("h1") || document.getElementById("main-content");
 
     if (focusTarget) {
       // Temporarily make the target focusable if it isn't naturally
@@ -31,9 +29,9 @@ export function useScreenFocus(screenName?: string) {
       if (prevTabIndex === null) {
         focusTarget.setAttribute("tabindex", "-1");
       }
-      
+
       (focusTarget as HTMLElement).focus({ preventScroll: true });
-      
+
       // Clean up tabindex if we added it temporarily
       const handleBlur = () => {
         if (prevTabIndex === null) {

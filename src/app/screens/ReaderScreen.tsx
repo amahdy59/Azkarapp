@@ -41,7 +41,6 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 
-
 const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   generating: "reader.shareCardGenerating",
   openingShareSheet: "reader.shareCardOpening",
