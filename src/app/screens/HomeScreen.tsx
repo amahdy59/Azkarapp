@@ -254,7 +254,9 @@ export function HomeScreen({
               <Sun className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
               <span className="flex items-center gap-1">
                 <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-                <span className="text-white" dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+                <span className="text-white" dir="ltr">
+                  {nextPrayerInfo.formattedCountdown}
+                </span>
               </span>
             </div>
           </div>
@@ -315,7 +317,9 @@ export function HomeScreen({
                 <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
                   {reminderInfo.desc}
                 </p>
-                        {/* Routine Mode Selector Pill */}
+              </div>
+
+              {/* Routine Mode Selector Pill */}
               <div
                 className="flex h-[44px] w-full items-center rounded-[16px] bg-[rgba(14,18,27,0.40)] p-1 backdrop-blur-md border border-[rgba(182,135,70,0.14)]"
                 role="group"
@@ -356,7 +360,10 @@ export function HomeScreen({
               </div>
 
               {/* Info Row Pill */}
-              <div className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] bg-[rgba(14,18,27,0.40)] border border-[rgba(182,135,70,0.14)] text-[0.8125rem] text-[#a5a7af]" dir="auto">
+              <div
+                className="flex h-[40px] w-full items-center justify-center gap-3 rounded-[12px] bg-[rgba(14,18,27,0.40)] border border-[rgba(182,135,70,0.14)] text-[0.8125rem] text-[#a5a7af]"
+                dir="auto"
+              >
                 <div className="flex items-center gap-1.5">
                   <svg
                     width="16"
@@ -400,7 +407,8 @@ export function HomeScreen({
               {doneCount > 0 && (
                 <div className="flex flex-col gap-2 w-full mt-2">
                   <div className="flex justify-start text-[0.8125rem] font-medium text-[#e2e8f0]" dir="auto">
-                    {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"} {formatNumerals(totalCount, language)}
+                    {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
+                    {formatNumerals(totalCount, language)}
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-[rgba(14,18,27,0.4)]">
                     <div
@@ -424,9 +432,33 @@ export function HomeScreen({
                 className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98]"
               >
                 {direction === "rtl" ? (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                  </svg>
                 ) : (
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                    <polyline points="12 5 19 12 12 19"></polyline>
+                  </svg>
                 )}
                 <span>{ctaLabel}</span>
               </button>
@@ -434,7 +466,19 @@ export function HomeScreen({
               {/* Resume Text */}
               {actionKind === "continue" && (
                 <div className="mt-1 flex items-center justify-center gap-1.5 text-[0.8125rem] font-medium text-[#a5a7af]">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-[#e2a84a]"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="text-[#e2a84a]"
+                  >
+                    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+                  </svg>
                   <span>
                     {isArabic
                       ? `استكمل من الذكر ${formatNumerals(doneCount + 1, language)}`
