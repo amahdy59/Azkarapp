@@ -77,6 +77,7 @@ export {
   Stars01 as Stars,
   Star01 as Star,
   Stars01 as Sparkles,
+  Sliders01 as SlidersHorizontal,
   Sun,
   SwitchHorizontal01 as SwitchHorizontal,
   TrendUp01 as Sprout,
