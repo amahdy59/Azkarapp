@@ -7,6 +7,7 @@ import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/a
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import type { AppLanguage } from "../types";
 import { BookOpen, Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
+import { AdaptiveCounterTrack, PulseRings } from "../components/ZikrComponents";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -44,7 +45,6 @@ export function CustomCounterScreen({
   const isTargetComplete = isTargetMode && count >= target;
 
   const handleTap = () => {
-    // If target is reached and completion modal is active, tapping prompts action
     if (isTargetComplete) {
       setShowCompletionDialog(true);
       return;
@@ -58,12 +58,17 @@ export function CustomCounterScreen({
       vibrate(8);
     }
 
-    // Check if target reached
     if (isTargetMode && nextCount >= target) {
       setShowCompletionDialog(true);
       if (hapticFeedback) {
         vibrate([30, 50, 40, 50, 60]);
       }
+    }
+  };
+
+  const handleUndo = () => {
+    if (count > 0) {
+      setCount((prev) => prev - 1);
     }
   };
 
@@ -74,14 +79,12 @@ export function CustomCounterScreen({
   };
 
   const handleContinueCounting = () => {
-    // Increment lap count and continue counting seamlessly into the next set
     setLaps((prev) => prev + 1);
     setShowCompletionDialog(false);
   };
 
   const handleSelectAuthenticZikr = (item: AuthenticZikrItem) => {
     setSelectedAuthentic(item);
-    // Keep user's preferred target or reset to recommended
     if (item.recommendedTarget > 0 && target !== 0) {
       setTarget(item.recommendedTarget);
     }
@@ -92,7 +95,7 @@ export function CustomCounterScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative flex flex-col">
-      {/* Top Navigation Header */}
+      {/* Header */}
       <Header
         title={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
         onBack={onBack}
@@ -110,34 +113,36 @@ export function CustomCounterScreen({
       />
 
       <main className="flex min-h-0 flex-1 flex-col justify-between px-5 pb-6 pt-2">
-        {/* Zikr Selection Bar & Target Presets */}
-        <div className="mb-3 space-y-3">
-          {/* Authentic Zikr Selector Bar */}
+        {/* Top Controls: Zikr Card & Target Picker */}
+        <div className="space-y-3">
+          {/* Selected Authentic Zikr Card */}
           <button
             type="button"
             onClick={() => setShowLibrarySheet(true)}
-            className="interactive-elem flex w-full items-center justify-between gap-3 rounded-2xl border border-primary/30 bg-primary/10 px-4 py-3 text-start text-primary transition-all hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="interactive-elem flex w-full items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-start shadow-sm transition-all hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <div className="flex items-center gap-3 overflow-hidden">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
-                <BookOpen size={18} />
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <BookOpen size={20} />
               </div>
-              <div className="truncate">
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="text-[0.75rem] font-bold text-primary">
-                    {isArabic ? "الذكر المأثور (اضغط للتغيير):" : "Authentic Zikr (Tap to change):"}
+                  <span className="text-[0.75rem] font-bold text-muted-foreground">
+                    {isArabic ? "الذكر المأثور:" : "Selected Dhikr:"}
                   </span>
-                  <span className="rounded-full bg-primary/20 px-2 py-0.2 text-[0.6875rem] font-semibold text-primary">
+                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[0.6875rem] font-extrabold text-primary">
                     {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn}
                   </span>
                 </div>
-                <p className="truncate text-[0.9375rem] font-extrabold text-foreground">{activeText}</p>
+                <p className="truncate text-[1rem] font-extrabold leading-6 text-foreground" dir="rtl">
+                  {activeText}
+                </p>
               </div>
             </div>
-            <ChevronDown size={18} className="shrink-0 text-primary" />
+            <ChevronDown size={20} className="shrink-0 text-muted-foreground" />
           </button>
 
-          {/* Target Preset Selector Row (Default is Free / 0) */}
+          {/* Target Presets */}
           <CounterTargetPicker
             activeTarget={target}
             onTargetChange={(newTarget) => {
@@ -151,110 +156,115 @@ export function CustomCounterScreen({
           />
         </div>
 
-        {/* Hero Zikr Card & Tap Surface */}
-        <div className="flex flex-1 flex-col items-center justify-center space-y-6 py-4">
-          {/* Authentic Zikr Text Display */}
-          <div className="max-w-md text-center">
-            <p
-              className="text-[1.375rem] font-extrabold leading-loose text-foreground"
-              dir="rtl"
-              style={{ fontFamily: "Amiri, Scheherazade New, serif" }}
-            >
-              "{activeText}"
-            </p>
-
-            {/* Hadith Virtue Badge */}
-            {selectedAuthentic.virtueAr && (
-              <div className="mt-3 flex items-center justify-center gap-1.5 text-[0.8125rem] font-medium text-amber-700 dark:text-amber-300">
-                <Sparkles size={16} className="shrink-0 text-amber-500" />
-                <p>{isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}</p>
-              </div>
-            )}
-          </div>
-
-          {/* Central Interactive Counter Ring */}
+        {/* Central Counter Display Surface */}
+        <div className="my-auto flex flex-col items-center justify-center py-6">
           <div className="relative flex items-center justify-center">
+            <PulseRings trigger={pulse} size={220} count={count} total={target} />
+
             <button
               type="button"
               onClick={handleTap}
               aria-label={isArabic ? "اضغط للتسبيح" : "Tap to count"}
-              className={`interactive-elem relative flex h-56 w-56 flex-col items-center justify-center rounded-full border-4 border-primary/30 bg-card p-4 shadow-xl transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-ring ${
-                isTargetComplete ? "border-green-500 bg-green-500/10 shadow-green-500/20" : ""
-              }`}
+              className={`adaptive-counter-surface counter-ring-stage ${count === 0 ? "counter-ring-ready" : ""}`}
+              style={{ width: 210, height: 210, borderRadius: 105 }}
             >
-              {/* Pulse Ring effect */}
-              <span
-                key={pulse}
-                className="pointer-events-none absolute inset-0 rounded-full border-2 border-primary/40 animate-ping"
-                style={{ animationDuration: "350ms" }}
-              />
-
-              {isTargetComplete ? (
-                <div className="flex flex-col items-center text-green-600 dark:text-green-400">
-                  <Check size={52} strokeWidth={3} className="mb-1 animate-bounce" />
-                  <p className="text-[1.125rem] font-extrabold">{isArabic ? "أتممت الهدف!" : "Target Completed!"}</p>
-                  <p className="text-[0.75rem] opacity-80">
-                    {formatNumerals(count, language)} / {formatNumerals(target, language)}
-                  </p>
-                </div>
-              ) : (
-                <>
-                  <span
-                    className="text-[3rem] font-black leading-none text-foreground"
-                    style={{
-                      fontFamily: numeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums",
-                    }}
-                  >
-                    {formatNumerals(count, language)}
-                  </span>
-
-                  {isTargetMode ? (
-                    <span className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">
-                      / {formatNumerals(target, language)}{" "}
-                      {laps > 0 && `(${isArabic ? `الجولة ${formatNumerals(laps + 1, language)}` : `Lap ${laps + 1}`})`}
+              <AdaptiveCounterTrack count={count} total={target} compact={false} />
+              <div className="adaptive-counter-content">
+                {isTargetComplete ? (
+                  <div className="counter-complete-cue">
+                    <span className="counter-check-mark">
+                      <Check size={36} strokeWidth={2.5} />
                     </span>
-                  ) : (
-                    <span className="mt-1 text-[0.75rem] font-semibold text-primary">
-                      {isArabic ? "تسبيح حر (مفتوح)" : "Free Counter (Unlimited)"}
+                    <span className="mt-2 text-[0.875rem] font-extrabold text-foreground">
+                      {isArabic ? "أتممت الهدف!" : "Target Completed!"}
                     </span>
-                  )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="adaptive-counter-numerals" dir="ltr">
+                      <p
+                        className="counter-number text-[2.75rem] font-black leading-none text-foreground"
+                        style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
+                      >
+                        {formatNumerals(count, language)}
+                      </p>
+                      {isTargetMode ? (
+                        <p
+                          className="mt-1 text-[0.8125rem] font-bold text-muted-foreground"
+                          style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
+                        >
+                          {isArabic ? "من" : "of"} {formatNumerals(target, language)}{" "}
+                          {laps > 0 &&
+                            `(${isArabic ? `الجولة ${formatNumerals(laps + 1, language)}` : `Lap ${laps + 1}`})`}
+                        </p>
+                      ) : (
+                        <p className="mt-1 text-[0.75rem] font-bold text-primary">
+                          {isArabic ? "عداد حر" : "Free Counter"}
+                        </p>
+                      )}
+                    </div>
+                    <p className="tap-anywhere-hint font-bold text-foreground">
+                      {isArabic ? "اضغط للتسبيح" : "Tap to count"}
+                    </p>
+                  </>
+                )}
+              </div>
+            </button>
+          </div>
 
-                  <span className="mt-3 text-[0.75rem] font-medium text-muted-foreground">
-                    {isArabic ? "اضغط للتسبيح" : "Tap to count"}
-                  </span>
-                </>
-              )}
+          {/* Quick Counter Action Buttons (Undo & Reset) */}
+          <div className="mt-6 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={handleUndo}
+              disabled={count === 0}
+              className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <RotateCcw size={16} />
+              <span>{isArabic ? "تراجع" : "Undo"}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleReset}
+              disabled={count === 0 && laps === 0}
+              className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <RotateCcw size={16} />
+              <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
             </button>
           </div>
         </div>
 
-        {/* Bottom Bar Buttons */}
-        <div className="flex items-center justify-between gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleReset}
-            className="interactive-elem flex h-12 flex-1 items-center justify-center gap-2 rounded-xl border border-border bg-card text-[0.875rem] font-bold text-foreground transition-all hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <RotateCcw size={18} />
-            <span>{isArabic ? "إعادة العداد" : "Reset Counter"}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setShowLibrarySheet(true)}
-            className="interactive-elem flex h-12 flex-1 items-center justify-center gap-2 rounded-xl bg-primary text-[0.875rem] font-bold text-primary-foreground transition-all hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <BookOpen size={18} />
-            <span>{isArabic ? "الأذكار المأثورة" : "Authentic Library"}</span>
-          </button>
-        </div>
+        {/* Virtue & Source Information Card */}
+        {selectedAuthentic.virtueAr && (
+          <div className="rounded-2xl border border-border/80 bg-card/60 p-4 backdrop-blur-sm">
+            <div className="flex items-start gap-3">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                <Sparkles size={18} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between gap-2">
+                  <h4 className="text-[0.8125rem] font-extrabold text-foreground">
+                    {isArabic ? "الفضل والحديث:" : "Virtue & Reference:"}
+                  </h4>
+                  <span className="text-[0.6875rem] font-bold text-amber-600 dark:text-amber-400">
+                    {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
+                  </span>
+                </div>
+                <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
+                  {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
-      {/* Target Completion Modal Option (Reset vs Continue) */}
+      {/* Target Completion Choice Modal (Reset vs Continue) */}
       {showCompletionDialog && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
         >
@@ -264,8 +274,8 @@ export function CustomCounterScreen({
             className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
             onClick={() => setShowCompletionDialog(false)}
           />
-          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
+          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-card p-6 text-center shadow-2xl">
+            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
               <Check size={32} strokeWidth={3} />
             </div>
 
@@ -305,7 +315,7 @@ export function CustomCounterScreen({
         </div>
       )}
 
-      {/* Authentic Zikr Selection Drawer */}
+      {/* Authentic Zikr Selection Sheet */}
       <AuthenticZikrLibrarySheet
         isOpen={showLibrarySheet}
         onClose={() => setShowLibrarySheet(false)}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from "react";
-import { Sun, Calendar } from "../components/icons";
+import { Sun, Calendar, Sparkles } from "../components/icons";
 import { TodayRoutineGarden, PalmTreeReward } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
@@ -460,10 +460,10 @@ export function HomeScreen({
           <button
             type="button"
             onClick={onOpenCustomCounter}
-            className="interactive-elem mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-all hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="interactive-elem mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-[0.875rem] font-bold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <span>✨</span>
-            <span>{isArabic ? "المسبحة الإلكترونية والأذكار المأثورة" : "Tasbeeh Counter & Authentic Zikr"}</span>
+            <Sparkles size={18} className="shrink-0 text-primary" aria-hidden="true" />
+            <span>{isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}</span>
           </button>
         )}
       </main>
