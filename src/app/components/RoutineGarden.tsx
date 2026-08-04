@@ -11,7 +11,7 @@ import {
   type GrowthEvent,
 } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Flame, Heart } from "./icons";
+import { Heart } from "./icons";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
