@@ -63,6 +63,9 @@ const FloatingAudioPlayer = lazy(() =>
 const CompletionScreen = lazy(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
+const CustomCounterScreen = lazy(() =>
+  import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
+);
 const SettingsScreen = lazy(() =>
   import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
 );
@@ -1068,6 +1071,9 @@ function AppContent() {
                   openReader(catId, i, "complete");
                 }}
               />
+            )}
+            {view === "custom_counter" && (
+              <CustomCounterScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
             )}
           </Suspense>
         </main>
