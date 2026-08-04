@@ -909,14 +909,43 @@ textarea {
   animation: zikr-step-enter 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-/* Hide native scrollbar inside the app shell — Radix ScrollArea provides its own overlay thumb */
-.app-shell,
-.app-shell * {
-  scrollbar-width: none;
+/* Hide native scrollbar on compact touch screens; show elegant thin scrollbars on tablet & desktop */
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: none;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.app-shell *::-webkit-scrollbar {
-  display: none;
+@media (min-width: 768px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--primary) 45%, var(--muted-foreground) 30%) transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+    height: 6px;
+  }
+
+  .app-shell *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--primary) 35%, var(--muted-foreground) 30%);
+    border-radius: 9999px;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
 }
 
 /* Radix ScrollArea auto-hide overlay scrollbar (type="hover") */

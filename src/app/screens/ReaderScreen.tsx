@@ -228,6 +228,81 @@ export function ReaderScreen({
     };
   }, [z?.id, textSize, showTranslation, showTransliteration, language]);
 
+  const handleToggleSaved = useCallback(() => {
+    if (z) onToggleSaved(z.id);
+  }, [z, onToggleSaved]);
+
+  // Desktop & Tablet Keyboard Navigation (Space to count, Arrow keys for Zikr navigation, R to reset, Esc to return)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          (activeEl as HTMLElement).isContentEditable ||
+          activeEl.getAttribute("role") === "textbox")
+      ) {
+        return;
+      }
+
+      if (benefitOpen || selectedWordMeanings) {
+        if (e.key === "Escape") {
+          if (selectedWordMeanings) setSelectedWordMeanings(null);
+          else if (benefitOpen) setBenefitOpen(false);
+        }
+        return;
+      }
+
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        handleTap();
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        if (direction === "rtl") {
+          if (idx > 0) onPrev();
+        } else {
+          if (idx < azkar.length - 1) onNext();
+        }
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        if (direction === "rtl") {
+          if (idx < azkar.length - 1) onNext();
+        } else {
+          if (idx > 0) onPrev();
+        }
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onBack();
+      } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
+        e.preventDefault();
+        handleReset();
+      } else if (e.key === "s" || e.key === "S" || e.key === "س") {
+        e.preventDefault();
+        handleToggleSaved();
+      } else if (e.key === "b" || e.key === "B" || e.key === "ف") {
+        e.preventDefault();
+        setHasOpenedBenefit(true);
+        setBenefitOpen(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [
+    direction,
+    idx,
+    azkar.length,
+    onPrev,
+    onNext,
+    onBack,
+    handleTap,
+    handleReset,
+    handleToggleSaved,
+    benefitOpen,
+    selectedWordMeanings,
+  ]);
+
   if (!z || !category) {
     return null;
   }
@@ -238,10 +313,6 @@ export function ReaderScreen({
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
   const readingFontFamily = "var(--font-reading-arabic)";
-
-  const handleToggleSaved = () => {
-    onToggleSaved(z.id);
-  };
 
   const handleShare = async () => {
     setIsSharing(true);
@@ -451,6 +522,40 @@ export function ReaderScreen({
           >
             {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
           </button>
+        </div>
+
+        {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
+        <div className="hidden md:flex items-center justify-center gap-3 mt-3 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+              Space
+            </kbd>
+            <span>{isArabic ? "التسبيح" : "Count"}</span>
+          </span>
+          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+              →
+            </kbd>
+            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+              ←
+            </kbd>
+            <span>{isArabic ? "الانتقال" : "Navigate"}</span>
+          </span>
+          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+              R
+            </kbd>
+            <span>{isArabic ? "إعادة" : "Reset"}</span>
+          </span>
+          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+          <span className="flex items-center gap-1">
+            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+              Esc
+            </kbd>
+            <span>{isArabic ? "رجوع" : "Back"}</span>
+          </span>
         </div>
       </div>
     );

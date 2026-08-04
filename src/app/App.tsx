@@ -649,7 +649,61 @@ function AppContent() {
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
-  }, [hasCompletedOnboarding]);
+  }, [hasCompletedOnboarding, setView, setActiveTab]);
+
+  // Global Keyboard Shortcuts (Cmd+K / Ctrl+K / '/' for search; Alt+1..5 for tabs)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          (activeEl as HTMLElement).isContentEditable ||
+          activeEl.getAttribute("role") === "textbox")
+      ) {
+        return;
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setView("search");
+        return;
+      }
+
+      if (e.key === "/" && view !== "reader" && view !== "custom_counter") {
+        e.preventDefault();
+        setView("search");
+        return;
+      }
+
+      if (e.altKey) {
+        if (e.key === "1") {
+          e.preventDefault();
+          setActiveTab("home");
+          setView("home");
+        } else if (e.key === "2") {
+          e.preventDefault();
+          setActiveTab("azkar");
+          setView("library");
+        } else if (e.key === "3") {
+          e.preventDefault();
+          setActiveTab("progress");
+          setView("progress");
+        } else if (e.key === "4") {
+          e.preventDefault();
+          setActiveTab("settings");
+          setView("settings");
+        } else if (e.key === "5") {
+          e.preventDefault();
+          setView("custom_counter");
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [view, setView, setActiveTab]);
 
   useEffect(() => {
     if (view !== "home") {

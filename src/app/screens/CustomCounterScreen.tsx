@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
@@ -44,7 +44,7 @@ export function CustomCounterScreen({
   const isTargetMode = target > 0;
   const isTargetComplete = isTargetMode && count >= target;
 
-  const handleTap = () => {
+  const handleTap = useCallback(() => {
     if (isTargetComplete) {
       setShowCompletionDialog(true);
       return;
@@ -64,13 +64,13 @@ export function CustomCounterScreen({
         vibrate([30, 50, 40, 50, 60]);
       }
     }
-  };
+  }, [isTargetComplete, count, hapticFeedback, isTargetMode, target]);
 
-  const handleUndo = () => {
+  const handleUndo = useCallback(() => {
     if (count > 0) {
       setCount((prev) => prev - 1);
     }
-  };
+  }, [count]);
 
   const handleReset = () => {
     setCount(0);
@@ -92,6 +92,44 @@ export function CustomCounterScreen({
     setLaps(0);
     setShowCompletionDialog(false);
   };
+
+  // Keyboard navigation for Tasbeeh Counter (Space to count, R to reset, Backspace to undo, Esc to return)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl &&
+        (activeEl.tagName === "INPUT" ||
+          activeEl.tagName === "TEXTAREA" ||
+          (activeEl as HTMLElement).isContentEditable ||
+          activeEl.getAttribute("role") === "textbox")
+      ) {
+        return;
+      }
+
+      if (showLibrarySheet) {
+        if (e.key === "Escape") setShowLibrarySheet(false);
+        return;
+      }
+
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        handleTap();
+      } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
+        e.preventDefault();
+        handleReset();
+      } else if (e.key === "Backspace") {
+        e.preventDefault();
+        handleUndo();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onBack();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onBack, showLibrarySheet, isTargetComplete, count, target, handleTap, handleUndo]);
 
   return (
     <ScreenContainer dir={direction} className="relative flex flex-col page-content-center">
@@ -186,6 +224,37 @@ export function CustomCounterScreen({
               <RotateCcw size={16} />
               <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
             </button>
+          </div>
+
+          {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
+          <div className="hidden md:flex items-center justify-center gap-3 mt-4 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                Space
+              </kbd>
+              <span>{isArabic ? "التسبيح" : "Count"}</span>
+            </span>
+            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                R
+              </kbd>
+              <span>{isArabic ? "إعادة" : "Reset"}</span>
+            </span>
+            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                Backspace
+              </kbd>
+              <span>{isArabic ? "تراجع" : "Undo"}</span>
+            </span>
+            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+            <span className="flex items-center gap-1">
+              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                Esc
+              </kbd>
+              <span>{isArabic ? "رجوع" : "Back"}</span>
+            </span>
           </div>
         </div>
 
