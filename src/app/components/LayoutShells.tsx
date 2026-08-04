@@ -182,7 +182,10 @@ export function NavSidebar({
   };
 
   return (
-    <nav aria-label={t(language, "common.bottomNavigation")} className="app-sidebar nav-sidebar flex flex-col justify-between h-full">
+    <nav
+      aria-label={t(language, "common.bottomNavigation")}
+      className="app-sidebar nav-sidebar flex flex-col justify-between h-full"
+    >
       <div className="flex flex-col gap-1">
         {/* App brand / identity */}
         <div className="nav-sidebar-brand flex items-center gap-3 px-3 py-4 mb-2 border-b border-border/40">
@@ -211,7 +214,9 @@ export function NavSidebar({
               <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
                 <Icon size={20} />
               </span>
-              <span className="font-semibold" dir="auto">{label}</span>
+              <span className="font-semibold" dir="auto">
+                {label}
+              </span>
             </button>
           );
         })}
@@ -229,9 +234,7 @@ export function NavSidebar({
               <Globe size={18} className="text-primary" />
               <span>{isArabic ? "English" : "العربية"}</span>
             </div>
-            <span className="text-[0.6875rem] font-bold uppercase text-muted-foreground">
-              {language.toUpperCase()}
-            </span>
+            <span className="text-[0.6875rem] font-bold uppercase text-muted-foreground">{language.toUpperCase()}</span>
           </button>
         )}
 
@@ -242,12 +245,14 @@ export function NavSidebar({
             className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors"
           >
             <div className="flex items-center gap-2.5">
-              {themeMode === "dark" ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-primary" />}
+              {themeMode === "dark" ? (
+                <Sun size={18} className="text-amber-400" />
+              ) : (
+                <Moon size={18} className="text-primary" />
+              )}
               <span>{isArabic ? "المظهر" : "Theme"}</span>
             </div>
-            <span className="text-[0.6875rem] font-bold capitalize text-muted-foreground">
-              {themeMode}
-            </span>
+            <span className="text-[0.6875rem] font-bold capitalize text-muted-foreground">{themeMode}</span>
           </button>
         )}
       </div>

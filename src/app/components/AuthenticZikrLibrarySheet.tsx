@@ -191,15 +191,11 @@ export function AuthenticZikrLibrarySheet({
                 </div>
 
                 {!isArabic && (
-                  <p className="latin-ui text-[0.875rem] text-muted-foreground leading-relaxed">
-                    {item.textEn}
-                  </p>
+                  <p className="latin-ui text-[0.875rem] text-muted-foreground leading-relaxed">{item.textEn}</p>
                 )}
 
                 <div className="flex items-center justify-between pt-1 border-t border-border/40 text-[0.75rem] font-medium text-muted-foreground">
-                  <span className="text-primary font-semibold">
-                    {isArabic ? item.sourceRefAr : item.sourceRefEn}
-                  </span>
+                  <span className="text-primary font-semibold">{isArabic ? item.sourceRefAr : item.sourceRefEn}</span>
                   {item.recommendedTarget && (
                     <span className="rounded-md bg-muted px-2 py-0.5 text-[0.6875rem] font-bold text-foreground">
                       {formatNumerals(item.recommendedTarget, language)} {isArabic ? "مرة" : "times"}

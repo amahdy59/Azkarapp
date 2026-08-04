@@ -23,8 +23,7 @@ function WordMeaningContent({
   onClose: () => void;
   variant: "sheet" | "dialog";
 }) {
-  const sourceName =
-    language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish;
+  const sourceName = language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish;
 
   return (
     <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
@@ -67,7 +66,11 @@ function WordMeaningContent({
             <div key={meaning.id} className="flex flex-col gap-3">
               {/* Featured Word & Ayah Header Card */}
               <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
-                <p className="zikr-text text-[1.375rem] font-extrabold leading-relaxed text-primary" lang="ar" dir="rtl">
+                <p
+                  className="zikr-text text-[1.375rem] font-extrabold leading-relaxed text-primary"
+                  lang="ar"
+                  dir="rtl"
+                >
                   {meaning.word}
                 </p>
                 <p className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">

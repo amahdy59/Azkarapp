@@ -583,7 +583,9 @@ export function HomeScreen({
                           style={{ height: `${barPercent}%` }}
                         />
                       </div>
-                      <span className={`text-[0.625rem] font-bold ${day.isToday ? "text-[#fbbf24]" : "text-muted-foreground"}`}>
+                      <span
+                        className={`text-[0.625rem] font-bold ${day.isToday ? "text-[#fbbf24]" : "text-muted-foreground"}`}
+                      >
                         {day.label}
                       </span>
                     </div>
