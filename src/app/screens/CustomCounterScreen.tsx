@@ -4,10 +4,10 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibrarySheet";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
-import { formatNumerals, numeralFontFamily } from "../formatting";
+import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import { Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
-import { AdaptiveCounterTrack, PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
+import { PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {

@@ -1,10 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import {
   BookOpen,
-  Check,
   ChevronUp,
   Heart,
   Share2,
@@ -26,7 +24,6 @@ import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
-import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahFooter } from "../components/QuranChrome";
@@ -165,34 +162,24 @@ export function ReaderScreen({
   const [useCompactCounter, setUseCompactCounter] = useState(false);
   const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
-  const prefersReducedMotion = useReducedMotion();
 
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingContentRef = useRef<HTMLDivElement | null>(null);
 
-  const {
-    count,
-    pulse,
-    complete,
-    justCompleted,
-    readerAnnouncement,
-    suppressTap,
-    handleTap,
-    handleSurfaceTap,
-    handleReset,
-  } = useZikrCounter({
-    z,
-    idx,
-    isDone,
-    language,
-    azkarLength: azkar.length,
-    collectionCompletedCount,
-    hapticFeedback,
-    vibrate,
-    onComplete,
-    onAdvance,
-  });
+  const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
+    useZikrCounter({
+      z,
+      idx,
+      isDone,
+      language,
+      azkarLength: azkar.length,
+      collectionCompletedCount,
+      hapticFeedback,
+      vibrate,
+      onComplete,
+      onAdvance,
+    });
 
   const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGestures({
     direction,
@@ -245,8 +232,6 @@ export function ReaderScreen({
     return null;
   }
 
-  const localizedCount = formatNumerals(count, language);
-  const localizedRatio = formatRatio(count, z.repetitionCount, language);
   const counterInstruction = t(language, z.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere");
   const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);

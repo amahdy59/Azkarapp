@@ -157,11 +157,11 @@ export function ZikrCounterSurface({
         ? `مكتمل ${localizedRatio}`
         : `Completed ${localizedRatio}`
       : isArabic
-      ? "مكتمل"
-      : "Completed"
+        ? "مكتمل"
+        : "Completed"
     : total > 0
-    ? `${activeInstruction} ${localizedRatio}`
-    : activeInstruction;
+      ? `${activeInstruction} ${localizedRatio}`
+      : activeInstruction;
 
   const handlePointerDown = () => {
     if (disabled || complete) return;

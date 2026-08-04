@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { AdaptiveCounterTrack, ZikrCounterSurface } from "../components/ZikrComponents";
-import { Check, CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
+import { ZikrCounterSurface } from "../components/ZikrComponents";
+import { CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { counterNumeralFontFamily, formatNumerals, formatRatio } from "../formatting";
+import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import type { AppLanguage } from "../types";
 
