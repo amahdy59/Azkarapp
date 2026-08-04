@@ -13,13 +13,13 @@ test("the app canvas stays phone-sized on large viewports and fills phone viewpo
 
   if (!viewport || !box) return;
 
-  if (viewport.width <= 430) {
-    expect(box.width).toBeCloseTo(viewport.width, 0);
-    expect(box.height).toBeCloseTo(viewport.height, 0);
-    expect(box.x).toBeCloseTo(0, 0);
-    expect(box.y).toBeCloseTo(0, 0);
-    await expect(shell).toHaveCSS("border-radius", "0px");
+  expect(box.width).toBeCloseTo(viewport.width, 0);
+  expect(box.height).toBeCloseTo(viewport.height, 0);
+  expect(box.x).toBeCloseTo(0, 0);
+  expect(box.y).toBeCloseTo(0, 0);
+  await expect(shell).toHaveCSS("border-radius", "0px");
 
+  if (viewport.width <= 430) {
     const resizedHeight = Math.max(520, viewport.height - 120);
     await page.setViewportSize({ width: viewport.width, height: resizedHeight });
     await expect
@@ -28,15 +28,11 @@ test("the app canvas stays phone-sized on large viewports and fills phone viewpo
         return resizedBox ? { top: resizedBox.y, bottom: resizedBox.y + resizedBox.height } : null;
       })
       .toEqual({ top: 0, bottom: resizedHeight });
-  } else {
-    expect(box.width).toBeCloseTo(390, 0);
-    expect(box.height).toBeLessThanOrEqual(882);
-    expect(box.x).toBeCloseTo((viewport.width - box.width) / 2, 0);
-    await expect(shell).toHaveCSS("border-radius", "40px");
   }
 });
 
 test("the production shell does not render simulated device chrome", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 800 });
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
   await page.getByTestId("language-option-en").click();

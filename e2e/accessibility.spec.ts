@@ -175,7 +175,7 @@ test("home and settings flows have no automatically detectable WCAG A/AA violati
   await expectNoWcagViolations(page);
 
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Accessibility", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Accessibility", exact: true }).first()).toBeVisible();
   await expectNoWcagViolations(page);
 });
 

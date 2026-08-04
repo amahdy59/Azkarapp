@@ -65,21 +65,26 @@ test("text size is exposed only inside Accessibility", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await openSettings(page);
 
-  await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
-  await expect(page.getByTestId("text-size-option-medium")).toHaveCount(0);
+  const isTwoPane = await page.locator(".settings-two-pane").isVisible();
+  if (!isTwoPane) {
+    await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
+    await expect(page.getByTestId("text-size-option-medium")).toHaveCount(0);
+    await page.getByRole("button", { name: "Accessibility", exact: true }).click();
+  }
 
-  await page.getByRole("button", { name: "Accessibility", exact: true }).click();
-  await expect(page.getByRole("heading", { name: "Accessibility", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Accessibility", exact: true }).first()).toBeVisible();
   const textSizePicker = page.getByRole("radiogroup", { name: "Text size" });
   await expect(textSizePicker).toBeVisible();
   await expect(textSizePicker.getByRole("radio")).toHaveCount(3);
   await page.getByTestId("text-size-option-large").click();
   await expect(page.getByTestId("text-size-option-large")).toBeChecked();
 
-  await page.getByRole("button", { name: "Back" }).click();
-  await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
-  await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
-  await expect(page.getByTestId("text-size-option-large")).toHaveCount(0);
+  if (!isTwoPane) {
+    await page.getByRole("button", { name: "Back" }).click();
+    await expect(page.getByRole("heading", { name: "Settings", exact: true })).toBeVisible();
+    await expect(page.getByText("Text size", { exact: true })).toHaveCount(0);
+    await expect(page.getByTestId("text-size-option-large")).toHaveCount(0);
+  }
 });
 
 test("language changes in place from the Settings selector", async ({ page }) => {

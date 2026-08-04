@@ -137,7 +137,7 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
         return (
           <button
             key={id}
-            data-testid={`nav-rail-${id}`}
+            data-testid={`nav-${id}`}
             onClick={() => onChange(id)}
             aria-current={on ? "page" : undefined}
             className="nav-rail-item"
@@ -165,7 +165,7 @@ export function NavSidebar({
   active,
   onChange,
   isArabic = false,
-  themeMode = "system",
+  themeMode = "dark",
   onThemeModeChange,
   onLanguageChange,
 }: NavProps) {
@@ -206,7 +206,7 @@ export function NavSidebar({
           return (
             <button
               key={id}
-              data-testid={`nav-sidebar-${id}`}
+              data-testid={`nav-${id}`}
               onClick={() => onChange(id)}
               aria-current={on ? "page" : undefined}
               className={`nav-sidebar-item ${on ? "active-sidebar-link" : ""}`}

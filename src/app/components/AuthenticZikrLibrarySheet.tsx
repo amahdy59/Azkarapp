@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from "react";
-import { Search, BookOpen, Check, Sparkles, X } from "./icons";
+import { Search, BookOpen, Sparkles, X } from "./icons";
 import {
   AUTHENTIC_AZKAR_COLLECTION,
   getAuthenticZikrCategories,

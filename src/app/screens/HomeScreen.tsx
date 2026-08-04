@@ -254,7 +254,7 @@ export function HomeScreen({
 
   const streakDays = gardenSummary.currentUsageStreak ?? gardenSummary.activeDaysLast7 ?? 0;
   const activeDaysThisWeek = gardenSummary.activeDaysLast7 ?? 0;
-  const totalDays = gardenSummary.totalActiveDays ?? gardenSummary.lifetimePalms * 3;
+  const totalDays = gardenSummary.lifetimePalms * 3 + gardenSummary.today.goldenLeafCount;
 
   return (
     <ScreenContainer

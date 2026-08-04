@@ -244,7 +244,7 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
 });
 
 test("benefit sheet rises from the bottom edge of the centered app canvas", async ({ page }) => {
-  await page.setViewportSize({ width: 1000, height: 1000 });
+  await page.setViewportSize({ width: 390, height: 800 });
   await openFirstMorningZikr(page);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
