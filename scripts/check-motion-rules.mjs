@@ -12,9 +12,11 @@
  */
 
 import { readFileSync, readdirSync, statSync } from "node:fs";
-import { join, extname } from "node:path";
+import { join, extname, dirname } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const SRC_DIR = new globalThis.URL("../src", import.meta.url).pathname.replace(/^\/([A-Z]:)/, "$1");
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const SRC_DIR = join(__dirname, "..", "src");
 const MAX_DURATION_MS = 600;
 
 // Known exceptions documented in MOTION_SYSTEM.md
@@ -25,6 +27,12 @@ const INFINITE_EXCEPTIONS = new Set([
 const DURATION_EXCEPTIONS = new Set([
   "celebration-glow", // 900ms — completion emphasis, one-shot
   "counter-ready-glow", // 720ms — counter readiness, one-shot
+  "leaf-float-core", // 1.5s — garden celebration, one-shot
+  "leaf-float-extra", // 1.1s — garden celebration, one-shot
+  "pulse-horizontal-ltr", // 1.2s — directional hint, finite (3 iterations)
+  "pulse-horizontal-rtl", // 1.2s — directional hint, finite (3 iterations)
+  "palm-glow-pulse", // 2.4s — garden completion glow, finite (3 iterations)
+  "waveform", // 1s — functional audio player visualizer, infinite while playing
 ]);
 
 /** Collect all files recursively. */
