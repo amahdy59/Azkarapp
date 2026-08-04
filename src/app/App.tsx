@@ -49,34 +49,58 @@ import {
   type GrowthEvent,
 } from "./progress";
 
-const HomeScreen = lazy(() => import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })));
-const AzkarLibraryScreen = lazy(() =>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function lazyWithRetry<T extends React.ComponentType<any>>(
+  factory: () => Promise<{ default: T }>,
+): React.LazyExoticComponent<T> {
+  return lazy(async () => {
+    try {
+      return await factory();
+    } catch (error) {
+      const hasRefreshed = sessionStorage.getItem("azkar-lazy-refreshed");
+      if (!hasRefreshed) {
+        sessionStorage.setItem("azkar-lazy-refreshed", "true");
+        window.location.reload();
+      }
+      throw error;
+    }
+  });
+}
+
+const HomeScreen = lazyWithRetry(() =>
+  import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })),
+);
+const AzkarLibraryScreen = lazyWithRetry(() =>
   import("./screens/AzkarLibraryScreen").then((module) => ({ default: module.AzkarLibraryScreen })),
 );
-const CategoryScreen = lazy(() =>
+const CategoryScreen = lazyWithRetry(() =>
   import("./screens/CategoryScreen").then((module) => ({ default: module.CategoryScreen })),
 );
-const ReaderScreen = lazy(() => import("./screens/ReaderScreen").then((module) => ({ default: module.ReaderScreen })));
-const FloatingAudioPlayer = lazy(() =>
+const ReaderScreen = lazyWithRetry(() =>
+  import("./screens/ReaderScreen").then((module) => ({ default: module.ReaderScreen })),
+);
+const FloatingAudioPlayer = lazyWithRetry(() =>
   import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
 );
-const CompletionScreen = lazy(() =>
+const CompletionScreen = lazyWithRetry(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
-const CustomCounterScreen = lazy(() =>
+const CustomCounterScreen = lazyWithRetry(() =>
   import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
 );
-const SettingsScreen = lazy(() =>
+const SettingsScreen = lazyWithRetry(() =>
   import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
 );
-const SearchScreen = lazy(() => import("./screens/SearchScreen").then((module) => ({ default: module.SearchScreen })));
-const ProgressScreen = lazy(() =>
+const SearchScreen = lazyWithRetry(() =>
+  import("./screens/SearchScreen").then((module) => ({ default: module.SearchScreen })),
+);
+const ProgressScreen = lazyWithRetry(() =>
   import("./screens/ProgressScreen").then((module) => ({ default: module.ProgressScreen })),
 );
-const FridayModeScreen = lazy(() =>
+const FridayModeScreen = lazyWithRetry(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
-const FridaySalawatScreen = lazy(() =>
+const FridaySalawatScreen = lazyWithRetry(() =>
   import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
 );
 const ProgressShareModal = lazy(() =>
