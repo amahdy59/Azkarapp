@@ -139,13 +139,13 @@ export function BudMark({ className = "", size = 14 }: { className?: string; siz
   );
 }
 
-/** Single unified Palm Tree vector matching public/palm-tree.svg across the app. */
+/** Single unified Palm Tree vector matching public/palm tree.svg across the app. */
 export function PalmTreeMark({
   filled = true,
   className = "",
   size = 32,
   color,
-  strokeWidth = 3.5,
+  strokeWidth = 4,
 }: {
   filled?: boolean;
   className?: string;
@@ -155,6 +155,7 @@ export function PalmTreeMark({
 }) {
   return (
     <svg
+      xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 100 100"
       width={size}
       height={size}
@@ -217,6 +218,8 @@ export function PalmTreeReward({
   // Bare mode: compact 2-column row matching Figma gamification header
   // (streak on start side, palms on end side — leaves shown only in the Wird card)
   if (bare) {
+    const hasStreak = streak > 0;
+    const hasPalms = summary.lifetimePalms > 0;
     return (
       <div
         className="flex w-full items-center justify-between rounded-[20px] border border-white/15 bg-black/25 px-4 py-2 backdrop-blur-md"
@@ -227,23 +230,30 @@ export function PalmTreeReward({
         }
       >
         {/* Streak — start side */}
-        <div className="flex items-center gap-1" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
-          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#fbbf24] font-sans">
+        <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
+          <span
+            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasStreak ? "text-[#fbbf24]" : "text-white/40 opacity-60"}`}
+          >
             {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
           </span>
-          <Flame className="h-[1rem] w-[1rem] text-[#fbbf24]" strokeWidth={2.5} />
+          <PalmTreeMark size={18} filled={hasStreak} className={hasStreak ? "text-[#fbbf24]" : "text-white/40"} />
         </div>
 
         {/* Palms — end side */}
-        <div className="flex items-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
-          <PalmTreeMark size={18} />
-          <span className="whitespace-nowrap text-[0.875rem] font-black leading-tight text-[#fbbf24] font-sans">
+        <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
+          <PalmTreeMark size={18} filled={hasPalms} className={hasPalms ? "text-[#fbbf24]" : "text-white/40"} />
+          <span
+            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasPalms ? "text-[#fbbf24]" : "text-white/40 opacity-60"}`}
+          >
             {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
           </span>
         </div>
       </div>
     );
   }
+
+  const hasPalms = summary.lifetimePalms > 0;
+  const hasStreak = streak > 0;
 
   const content = (
     <div
@@ -255,8 +265,14 @@ export function PalmTreeReward({
       }
     >
       <div className="flex min-w-0 items-center justify-center gap-1" title={isArabic ? "أشجار النخيل" : "Palms"}>
-        <PalmTreeMark size={20} />
-        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-500 min-[360px]:text-[0.875rem] font-sans">
+        <PalmTreeMark
+          size={20}
+          filled={hasPalms}
+          className={hasPalms ? "text-amber-500" : "text-muted-foreground/40"}
+        />
+        <span
+          className={`whitespace-nowrap text-[0.75rem] font-black leading-tight min-[360px]:text-[0.875rem] font-sans ${hasPalms ? "text-amber-500" : "text-muted-foreground/60"}`}
+        >
           {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
         </span>
       </div>
@@ -274,8 +290,14 @@ export function PalmTreeReward({
         className="flex min-w-0 items-center justify-center gap-1"
         title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
       >
-        <Flame className="h-[1.125rem] w-[1.125rem] text-[#F59E0B]" strokeWidth={2.5} />
-        <span className="whitespace-nowrap text-[0.75rem] font-black leading-tight text-amber-500 min-[360px]:text-[0.875rem] font-sans">
+        <PalmTreeMark
+          size={18}
+          filled={hasStreak}
+          className={hasStreak ? "text-amber-500" : "text-muted-foreground/40"}
+        />
+        <span
+          className={`whitespace-nowrap text-[0.75rem] font-black leading-tight min-[360px]:text-[0.875rem] font-sans ${hasStreak ? "text-amber-500" : "text-muted-foreground/60"}`}
+        >
           {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
         </span>
       </div>
@@ -656,19 +678,27 @@ export function TodayRoutineGarden({
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 py-2.5 px-3 shadow-xs dark:bg-amber-500/15">
           <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
-            <Flame
-              className="h-[1.25rem] w-[1.25rem] text-amber-500"
-              strokeWidth={2.5}
-              aria-hidden="true"
+            <PalmTreeMark
+              size={22}
+              filled={streak > 0}
+              className={streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}
             />
-            <span className="text-[1rem] font-black text-amber-700 dark:text-amber-300">
+            <span
+              className={`text-[1rem] font-black ${streak > 0 ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground/60"}`}
+            >
               {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
             </span>
           </div>
           <span className="h-4 w-px bg-amber-500/30" />
           <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
-            <PalmTreeMark size={24} filled={totalPalms > 0} />
-            <span className="text-[1rem] font-black text-amber-600 dark:text-amber-400">
+            <PalmTreeMark
+              size={24}
+              filled={totalPalms > 0}
+              className={totalPalms > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground/40"}
+            />
+            <span
+              className={`text-[1rem] font-black ${totalPalms > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground/60"}`}
+            >
               {formatNumerals(totalPalms, language)} {isArabic ? "نخلة" : "palms"}
             </span>
           </div>
@@ -894,7 +924,15 @@ export function TodayRoutineGarden({
                     tabIndex={0}
                     className={`interactive-elem flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tileBg}`}
                   >
-                    <span>{isPalm ? <PalmTreeMark size={14} filled /> : completedCount > 0 ? <Flame className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" /> : ""}</span>
+                    <span>
+                      {isPalm ? (
+                        <PalmTreeMark size={14} filled />
+                      ) : completedCount > 0 ? (
+                        <PalmTreeMark size={12} filled className="text-amber-500" aria-hidden="true" />
+                      ) : (
+                        ""
+                      )}
+                    </span>
                     <span className="text-[0.625rem] opacity-80">{formatNumerals(day.dayNum, language)}</span>
                   </button>
                 );
@@ -917,7 +955,7 @@ export function TodayRoutineGarden({
                   title={isArabic ? "يوم نشط" : "Streak Active"}
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10"
                 >
-                  <Flame className="h-3 w-3 text-amber-500" strokeWidth={2.5} />
+                  <PalmTreeMark size={11} filled className="text-amber-500" />
                 </span>
                 <span
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
@@ -1006,7 +1044,13 @@ export function TodayRoutineGarden({
                               tabIndex={0}
                               className={`interactive-elem flex h-4.5 w-full items-center justify-center rounded-[3px] text-[0.55rem] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${tileBg}`}
                             >
-                              {isPalm ? <PalmTreeMark size={9} filled /> : hasActivity ? <Flame className="h-2.5 w-2.5 text-amber-500" strokeWidth={2.5} aria-hidden="true" /> : ""}
+                              {isPalm ? (
+                                <PalmTreeMark size={9} filled />
+                              ) : hasActivity ? (
+                                <PalmTreeMark size={9} filled className="text-amber-500" aria-hidden="true" />
+                              ) : (
+                                ""
+                              )}
                             </button>
                           );
                         })}
