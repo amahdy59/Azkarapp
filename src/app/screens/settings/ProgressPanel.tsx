@@ -55,7 +55,13 @@ export function ProgressPanel({
           aria-label={t(language, "progressPanel.gardenToggle")}
         >
           <SettingsToggleRow
-            icon={<PalmTreeMark size={22} />}
+            icon={
+              <PalmTreeMark
+                size={22}
+                filled={quietProgressEnabled}
+                className={quietProgressEnabled ? "text-amber-500" : "text-muted-foreground/40"}
+              />
+            }
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             label={t(language, "progressPanel.gardenToggle")}
             description={t(language, "progressPanel.gardenToggleHint")}

@@ -66,7 +66,11 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         >
           {/* Logo Badge */}
           <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-amber-600 dark:text-amber-400">
-            <PalmTreeMark size={20} filled />
+            <PalmTreeMark
+              size={20}
+              filled={palms > 0}
+              className={palms > 0 ? "text-amber-600 dark:text-amber-400" : "text-slate-400 opacity-40"}
+            />
             <span>{t(language, "common.azkar")}</span>
           </div>
 
@@ -81,8 +85,16 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           {/* Stats Badge Pill Row */}
           <div className="my-5 flex w-full items-center justify-around rounded-2xl border border-amber-500/30 bg-card/90 py-3 px-4 shadow-sm">
             <div className="flex flex-col items-center gap-1">
-              <PalmTreeMark size={24} filled />
-              <span className="text-[0.9375rem] font-black text-amber-500">{formatNumerals(palms, language)}</span>
+              <PalmTreeMark
+                size={24}
+                filled={palms > 0}
+                className={palms > 0 ? "text-amber-500" : "text-muted-foreground/40"}
+              />
+              <span
+                className={`text-[0.9375rem] font-black ${palms > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
+              >
+                {formatNumerals(palms, language)}
+              </span>
               <span className="text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "shareModal.palms")}
               </span>
