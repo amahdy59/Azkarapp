@@ -255,14 +255,16 @@ export function CustomCounterScreen({
       {showCompletionDialog && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4"
-          onClick={() => setShowCompletionDialog(false)}
           role="dialog"
           aria-modal="true"
         >
-          <div
-            className="w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl text-center"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <button
+            type="button"
+            aria-label={isArabic ? "إغلاق" : "Close"}
+            className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
+            onClick={() => setShowCompletionDialog(false)}
+          />
+          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-card p-6 shadow-2xl text-center">
             <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
               <Check size={32} strokeWidth={3} />
             </div>

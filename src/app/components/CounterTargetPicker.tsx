@@ -86,14 +86,16 @@ export function CounterTargetPicker({
       {showCustomModal && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          onClick={() => setShowCustomModal(false)}
           role="dialog"
           aria-modal="true"
         >
-          <div
-            className="w-full max-w-sm rounded-2xl border border-border bg-card p-5 shadow-xl"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <button
+            type="button"
+            aria-label={isArabic ? "إغلاق" : "Close"}
+            className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
+            onClick={() => setShowCustomModal(false)}
+          />
+          <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-5 shadow-xl">
             <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">
               {isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
             </h3>
@@ -111,6 +113,7 @@ export function CounterTargetPicker({
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
                 className="h-12 w-full rounded-xl border border-border bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
 
