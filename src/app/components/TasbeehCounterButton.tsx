@@ -2,13 +2,7 @@ import React from "react";
 import { ChevronNext } from "./icons";
 import type { AppLanguage } from "../types";
 
-export function TasbeehIcon({
-  size = 26,
-  className = "",
-}: {
-  size?: number;
-  className?: string;
-}) {
+export function TasbeehIcon({ size = 26, className = "" }: { size?: number; className?: string }) {
   return (
     <svg
       width={size}
