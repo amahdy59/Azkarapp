@@ -1073,7 +1073,12 @@ function AppContent() {
               />
             )}
             {view === "custom_counter" && (
-              <CustomCounterScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
+              <CustomCounterScreen
+                isArabic={selectedLang === "ar"}
+                direction={layoutDirection}
+                onBack={pop}
+                hapticFeedback={hapticFeedback}
+              />
             )}
           </Suspense>
         </main>
