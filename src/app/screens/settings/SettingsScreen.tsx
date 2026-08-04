@@ -143,7 +143,7 @@ export function SettingsScreen({
         initial: { x: direction === "rtl" ? "-100%" : "100%", opacity: 0 },
         animate: { x: 0, opacity: 1 },
         exit: { x: direction === "rtl" ? "-100%" : "100%", opacity: 0 },
-        transition: { type: "spring", stiffness: 380, damping: 33 },
+        transition: { type: "tween", duration: 0.22, ease: [0.16, 1, 0.3, 1] },
       };
 
   const rootVariants = reduceMotion

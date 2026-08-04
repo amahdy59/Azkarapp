@@ -9,6 +9,7 @@ import {
   getLocalizedZikrBenefit,
 } from "../content/localizedZikr";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
+import { FormattedBenefit } from "./FormattedBenefit";
 
 type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
 
@@ -162,13 +163,7 @@ export function ReaderReferenceSheet({
                   <h3 className="text-start text-[0.875rem] font-semibold tracking-[0.02em] text-muted-foreground">
                     {t(language, "reader.benefitLabel")}
                   </h3>
-                  <p
-                    className="max-w-full rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2.5 text-start text-[0.9375rem] font-semibold leading-7 text-foreground"
-                    lang={isArabic ? "ar" : "en"}
-                    dir={direction}
-                  >
-                    {benefit}
-                  </p>
+                  <FormattedBenefit text={benefit} isArabic={isArabic} direction={direction} />
                   {copyAction("benefit", benefit, t(language, "reader.copyBenefit"), direction)}
                 </section>
               </>

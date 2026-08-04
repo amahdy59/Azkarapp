@@ -111,7 +111,26 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
 
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1 text-start">
-          <p className="truncate text-[0.875rem] font-black text-foreground">{title}</p>
+          <div className="flex items-center gap-2">
+            <p className="truncate text-[0.875rem] font-black text-foreground">{title}</p>
+            {isPlaying && (
+              <div className="flex items-end gap-0.5 h-3.5 shrink-0" aria-hidden="true">
+                <span className="w-0.5 bg-amber-500 rounded-full waveform-bar h-3" style={{ animationDelay: "0ms" }} />
+                <span
+                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-2"
+                  style={{ animationDelay: "150ms" }}
+                />
+                <span
+                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-3.5"
+                  style={{ animationDelay: "300ms" }}
+                />
+                <span
+                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-1.5"
+                  style={{ animationDelay: "450ms" }}
+                />
+              </div>
+            )}
+          </div>
           <p className="mt-0.5 text-[0.75rem] font-semibold text-muted-foreground">
             {queuePosition}
             {repetitionPosition ? ` · ${repetitionPosition}` : ""}
@@ -129,7 +148,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             onClick={controller.previous}
             disabled={state.entryIndex === 0}
             aria-label={copy.previous}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
           >
             <SkipBack size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
@@ -137,7 +156,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             type="button"
             onClick={isPlaying ? controller.pause : controller.play}
             aria-label={isPlaying ? copy.pause : copy.play}
-            className="flex size-11 items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md transition-colors hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md transition-all duration-150 active:scale-95 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {isPlaying ? <Pause size={19} aria-hidden="true" /> : <Play size={19} aria-hidden="true" />}
           </button>
@@ -146,7 +165,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             onClick={controller.next}
             disabled={state.entryIndex === state.plan.entries.length - 1}
             aria-label={copy.next}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
           >
             <SkipForward size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
@@ -154,7 +173,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             type="button"
             onClick={controller.stop}
             aria-label={copy.stop}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <X size={18} aria-hidden="true" />
           </button>
