@@ -30,6 +30,7 @@ export function AzkarLibraryScreen({
   onSearch,
   savedZikrIds,
   routineModes,
+  onOpenCustomCounter,
 }: {
   completed: Record<CategoryId, Set<string>>;
   language: AppLanguage;
@@ -39,6 +40,7 @@ export function AzkarLibraryScreen({
   onSearch: () => void;
   savedZikrIds: Set<string>;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
+  onOpenCustomCounter?: () => void;
 }) {
   const [section, setSection] = useState<LibrarySection>("collections");
   const isArabic = language === "ar";
@@ -184,6 +186,16 @@ export function AzkarLibraryScreen({
                 );
               })}
             </div>
+            {onOpenCustomCounter && (
+              <button
+                type="button"
+                onClick={onOpenCustomCounter}
+                className="interactive-elem mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-all hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <span>✨</span>
+                <span>{isArabic ? "المسبحة الإلكترونية والأذكار المأثورة" : "Tasbeeh Counter & Authentic Zikr"}</span>
+              </button>
+            )}
             <p className="px-4 pt-5 text-center text-[0.75rem] leading-5 text-muted-foreground">
               {t(language, "library.reviewNotice")}
             </p>

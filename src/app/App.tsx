@@ -117,6 +117,7 @@ function AppContent() {
     const requestedView = new URLSearchParams(window.location.search).get("view");
     if (requestedView === "auth-callback") return "auth-callback";
     if (requestedView === "friday") return "friday";
+    if (requestedView === "custom_counter") return "custom_counter";
     return "splash";
   });
   const initialHistoryView = useRef(view).current;
@@ -658,6 +659,7 @@ function AppContent() {
     "progress",
     "friday",
     "friday_salawat",
+    "custom_counter",
   ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];

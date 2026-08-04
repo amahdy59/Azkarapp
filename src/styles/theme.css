@@ -356,46 +356,6 @@ textarea {
 }
 
 @layer components {
-  /* Universal Active Press Microinteractions */
-  button:not(:disabled):not(.no-press),
-  [role="button"]:not([aria-disabled="true"]):not(.no-press),
-  a[href]:not(.no-press),
-  .interactive-elem {
-    transition:
-      transform 120ms cubic-bezier(0.2, 0, 0, 1),
-      opacity 120ms ease,
-      background-color 120ms ease,
-      border-color 120ms ease,
-      box-shadow 120ms ease;
-    touch-action: manipulation;
-  }
-
-  button:not(:disabled):not(.no-press):active,
-  [role="button"]:not([aria-disabled="true"]):not(.no-press):active,
-  a[href]:not(.no-press):active,
-  .interactive-elem:active {
-    transform: scale(0.96);
-    opacity: 0.92;
-  }
-
-  .reduce-motion button,
-  .reduce-motion [role="button"],
-  .reduce-motion a,
-  .reduce-motion .interactive-elem {
-    transition: none !important;
-    transform: none !important;
-  }
-
-  /* Elastic Overscroll & Container Boundaries */
-  html,
-  body,
-  .scroll-container,
-  main,
-  [data-radix-scroll-area-viewport] {
-    overscroll-behavior-y: contain;
-    -webkit-overflow-scrolling: touch;
-  }
-
   .ui-surface {
     border: var(--ds-stroke) solid var(--border);
     border-radius: var(--ds-radius-card);
@@ -1208,6 +1168,45 @@ textarea {
 }
 .animate-palm-glow-pulse {
   animation: palm-glow-pulse 2.4s ease-in-out infinite;
+}
+
+/* ─── Universal Press Micro-interactions ─────────────────────────────
+   Placed OUTSIDE @layer so they override Tailwind utility classes
+   (transition-all, transition-colors, etc.) which live in @layer utilities.
+   ──────────────────────────────────────────────────────────────────── */
+
+button:not(:disabled):not(.no-press),
+[role="button"]:not([aria-disabled="true"]):not(.no-press),
+a[href]:not(.no-press),
+.interactive-elem {
+  touch-action: manipulation;
+}
+
+button:not(:disabled):not(.no-press):active,
+[role="button"]:not([aria-disabled="true"]):not(.no-press):active,
+a[href]:not(.no-press):active,
+.interactive-elem:active {
+  transform: scale(0.96) !important;
+  opacity: 0.88;
+}
+
+/* Elastic Overscroll & Container Boundaries */
+html,
+body,
+.scroll-container,
+main,
+[data-radix-scroll-area-viewport] {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduce-motion overrides for press effects */
+.reduce-motion button,
+.reduce-motion [role="button"],
+.reduce-motion a,
+.reduce-motion .interactive-elem {
+  transition: none !important;
+  transform: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
