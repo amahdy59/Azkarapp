@@ -345,9 +345,9 @@ export function CategoryScreen({
             <div
               className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
               role="group"
-              aria-label={`${t(language, "category.core")} / ${t(language, "category.complete")}`}
+              aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
             >
-              {(["core", "complete"] as const).map((mode) => {
+              {(["complete", "core"] as const).map((mode) => {
                 const selected = routineMode === mode;
                 const count =
                   mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length;

@@ -7,7 +7,7 @@ import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/a
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import type { AppLanguage } from "../types";
 import { Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
-import { AdaptiveCounterTrack, PulseRings } from "../components/ZikrComponents";
+import { AdaptiveCounterTrack, PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
 
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -153,67 +153,16 @@ export function CustomCounterScreen({
           <div className="relative flex items-center justify-center">
             <PulseRings trigger={pulse} size={220} count={count} total={target} />
 
-            <button
-              type="button"
-              onClick={handleTap}
-              aria-label={isArabic ? "اضغط للتسبيح" : "Tap to count"}
-              className={`adaptive-counter-surface counter-ring-stage ${count === 0 ? "counter-ring-ready" : ""}`}
-              style={{ width: 210, height: 210, borderRadius: 105 }}
-            >
-              <AdaptiveCounterTrack count={count} total={target} compact={false} />
-              <div className="adaptive-counter-content">
-                {isTargetComplete ? (
-                  <div className="counter-complete-cue">
-                    <span className="counter-check-mark">
-                      <Check size={36} strokeWidth={2.5} />
-                    </span>
-                    <span className="mt-2 text-[0.875rem] font-extrabold text-foreground">
-                      {isArabic ? "أتممت الهدف!" : "Target Completed!"}
-                    </span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
-                      <p
-                        className="counter-number text-[2.75rem] font-black leading-none text-foreground"
-                        style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                      >
-                        {formatNumerals(count, language)}
-                      </p>
-                      {isTargetMode ? (
-                        <p
-                          className="mt-1 text-[0.8125rem] font-bold text-muted-foreground"
-                          style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                        >
-                          {isArabic ? "من" : "of"} {formatNumerals(target, language)}{" "}
-                          {laps > 0 &&
-                            `(${isArabic ? `الجولة ${formatNumerals(laps + 1, language)}` : `Lap ${laps + 1}`})`}
-                        </p>
-                      ) : (
-                        <p className="mt-1 text-[0.75rem] font-bold text-primary">
-                          {isArabic ? "عداد حر" : "Free Counter"}
-                        </p>
-                      )}
-                    </div>
-
-                    <div className="my-2 h-[1.5px] w-8 bg-border/60 rounded-full" aria-hidden="true" />
-
-                    <p className="tap-anywhere-hint font-bold text-foreground text-xs">
-                      {isArabic ? "اضغط للتسبيح" : "Tap to count"}
-                    </p>
-
-                    {isTargetMode && count < target && (
-                      <p
-                        className="mt-1 text-[0.75rem] font-extrabold text-primary"
-                        style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                      >
-                        {isArabic ? `${formatNumerals(target - count, language)} متبقٍ` : `${target - count} remaining`}
-                      </p>
-                    )}
-                  </>
-                )}
-              </div>
-            </button>
+            <ZikrCounterSurface
+              count={count}
+              total={target}
+              compact={false}
+              complete={isTargetComplete}
+              onTap={handleTap}
+              language={language}
+              instructionText={isArabic ? "اضغط للتسبيح" : "Tap to count"}
+              testId="custom-counter-surface"
+            />
           </div>
 
           {/* Quick Counter Action Buttons (Undo & Reset) */}

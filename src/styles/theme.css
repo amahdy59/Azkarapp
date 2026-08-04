@@ -691,6 +691,13 @@ textarea {
   box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
+.adaptive-counter-surface.is-pressed,
+.adaptive-counter-surface:active:not(:disabled) {
+  transform: scale(0.985);
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
 .adaptive-counter-surface:focus-visible {
   outline: none;
   box-shadow:

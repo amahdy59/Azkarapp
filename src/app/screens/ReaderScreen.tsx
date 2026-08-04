@@ -21,7 +21,7 @@ import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
-import { AdaptiveCounterTrack } from "../components/ZikrComponents";
+import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
@@ -422,11 +422,6 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => {
-    const remainingCount = z.repetitionCount > 1 ? z.repetitionCount - count : 0;
-    const remainingText = isArabic
-      ? `${formatNumerals(remainingCount, language)} متبقٍ`
-      : `${remainingCount} remaining`;
-
     return (
       <div className="px-3 pb-3" data-testid="counter-panel">
         <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
@@ -439,146 +434,22 @@ export function ReaderScreen({
             disabled={idx === 0}
             title={t(language, "reader.prev")}
             aria-label={t(language, "reader.prev")}
-            className={`adaptive-counter-nav ${useCompactCounter ? "is-compact" : ""}`}
+            className="adaptive-counter-nav"
           >
             {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
           </button>
 
           <div className="flex min-w-0 flex-1 justify-center">
-            <motion.button
-              type="button"
-              data-testid="counter-surface"
-              data-counter-shape={useCompactCounter ? "compact" : "circle"}
-              disabled={complete}
-              onClick={(event) => {
-                event.stopPropagation();
-                handleTap();
-              }}
-              aria-disabled={complete}
-              aria-label={`${complete ? t(language, "reader.completed") : counterInstruction} ${localizedRatio}`}
-              className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""}`}
-              initial={false}
-              animate={{
-                width: useCompactCounter ? "100%" : 164,
-                height: useCompactCounter ? 76 : 164,
-                borderRadius: useCompactCounter ? 24 : 82,
-              }}
-              transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
-              whileTap={complete || prefersReducedMotion ? undefined : { scale: 0.975 }}
-            >
-              {!useCompactCounter && <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={false} />}
-              <span key={pulse} className="adaptive-counter-pulse" aria-hidden="true" />
-
-              <div className={`adaptive-counter-content ${useCompactCounter ? "is-compact" : ""}`}>
-                {useCompactCounter ? (
-                  /* Compact Action Surface Layout: Mini Circle Badge + Vertical Divider + Action Text */
-                  <div className="flex w-full h-full items-center justify-between gap-3 px-1">
-                    <div className="relative flex size-[52px] shrink-0 items-center justify-center rounded-full bg-primary/10">
-                      <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={true} />
-                      {complete ? (
-                        <Check size={24} strokeWidth={2.5} className="text-primary" />
-                      ) : (
-                        <div className="flex flex-col items-center justify-center text-center leading-none" dir="ltr">
-                          <span
-                            className="text-[0.9375rem] font-extrabold text-foreground"
-                            style={{
-                              fontFamily: counterNumeralFontFamily(language),
-                              fontVariantNumeric: "tabular-nums lining-nums",
-                            }}
-                          >
-                            {localizedCount}
-                          </span>
-                          {z.repetitionCount > 1 && (
-                            <span
-                              className="text-[0.625rem] font-bold text-muted-foreground mt-0.5"
-                              style={{
-                                fontFamily: counterNumeralFontFamily(language),
-                                fontVariantNumeric: "tabular-nums lining-nums",
-                              }}
-                            >
-                              /{formatNumerals(z.repetitionCount, language)}
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="h-8 w-[1px] bg-border/60 shrink-0" aria-hidden="true" />
-
-                    <div className="flex min-w-0 flex-1 flex-col justify-center text-start">
-                      <p className="text-[0.9375rem] font-extrabold text-foreground truncate">
-                        {complete ? (isArabic ? "أتممت الهدف" : "Target Completed") : counterInstruction}
-                      </p>
-                      <p className="text-[0.8125rem] font-bold text-primary mt-0.5 truncate">
-                        {complete
-                          ? isArabic
-                            ? "مكتمل ✓"
-                            : "Done ✓"
-                          : remainingCount > 0
-                            ? remainingText
-                            : isArabic
-                              ? "اضغط للتسبيح"
-                              : "Tap to count"}
-                      </p>
-                    </div>
-                  </div>
-                ) : (
-                  /* Focused Mode Layout: Centered Circle with Count, Ratio, Divider & Instruction */
-                  <>
-                    {complete ? (
-                      <div
-                        className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
-                        data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
-                      >
-                        <span className="counter-check-mark">
-                          <Check size={36} strokeWidth={2.5} />
-                        </span>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
-                          <p
-                            className="counter-number text-[2rem] font-black leading-none text-foreground"
-                            key={count}
-                            style={{
-                              fontFamily: counterNumeralFontFamily(language),
-                              fontVariantNumeric: "tabular-nums lining-nums",
-                            }}
-                          >
-                            {localizedCount}
-                          </p>
-                          <p
-                            className="text-[0.75rem] font-bold text-muted-foreground mt-1"
-                            style={{
-                              fontFamily: counterNumeralFontFamily(language),
-                              fontVariantNumeric: "tabular-nums lining-nums",
-                            }}
-                          >
-                            {localizedRatio}
-                          </p>
-                        </div>
-
-                        <div className="my-1.5 h-[1.5px] w-7 bg-border/60 rounded-full" aria-hidden="true" />
-
-                        <p className="tap-anywhere-hint font-bold text-foreground text-xs">{counterInstruction}</p>
-
-                        {remainingCount > 0 && (
-                          <p
-                            className="text-[0.6875rem] font-extrabold text-primary mt-0.5"
-                            style={{
-                              fontFamily: counterNumeralFontFamily(language),
-                              fontVariantNumeric: "tabular-nums lining-nums",
-                            }}
-                          >
-                            {remainingText}
-                          </p>
-                        )}
-                      </>
-                    )}
-                  </>
-                )}
-              </div>
-            </motion.button>
+            <ZikrCounterSurface
+              count={count}
+              total={z.repetitionCount}
+              compact={useCompactCounter}
+              complete={complete}
+              onTap={handleTap}
+              language={language}
+              instructionText={counterInstruction}
+              testId="counter-surface"
+            />
           </div>
 
           <button
@@ -590,7 +461,7 @@ export function ReaderScreen({
             disabled={idx === azkar.length - 1}
             title={t(language, "reader.next")}
             aria-label={t(language, "reader.next")}
-            className={`adaptive-counter-nav ${useCompactCounter ? "is-compact" : ""}`}
+            className="adaptive-counter-nav"
           >
             {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
           </button>

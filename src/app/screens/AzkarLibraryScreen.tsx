@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { CatIcon } from "../components/CatIcon";
-import { Search, Bookmark, ChevronNext, Sparkles } from "../components/icons";
+import { Search, Bookmark, ChevronNext } from "../components/icons";
+import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ProgressBar } from "../components/ProgressBar";
 import {
@@ -187,14 +188,9 @@ export function AzkarLibraryScreen({
               })}
             </div>
             {onOpenCustomCounter && (
-              <button
-                type="button"
-                onClick={onOpenCustomCounter}
-                className="interactive-elem mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-4 text-[0.875rem] font-bold text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-              >
-                <Sparkles size={18} className="shrink-0 text-primary" aria-hidden="true" />
-                <span>{isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}</span>
-              </button>
+              <div className="mt-4">
+                <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
+              </div>
             )}
             <p className="px-4 pt-5 text-center text-[0.75rem] leading-5 text-muted-foreground">
               {t(language, "library.reviewNotice")}

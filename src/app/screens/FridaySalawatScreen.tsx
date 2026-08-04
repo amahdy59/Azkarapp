@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { AdaptiveCounterTrack } from "../components/ZikrComponents";
+import { AdaptiveCounterTrack, ZikrCounterSurface } from "../components/ZikrComponents";
 import { Check, CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -116,59 +116,16 @@ export function FridaySalawatScreen({
         </section>
 
         <section className="flex flex-col items-center" aria-live="polite">
-          <button
-            type="button"
-            data-testid="salawat-counter"
-            disabled={complete}
-            onClick={increment}
-            aria-label={`${copy.tap}: ${formatRatio(progress.count, progress.target, language)}`}
-            className={`adaptive-counter-surface counter-ring-stage ${progress.count === 0 ? "counter-ring-ready" : ""}`}
-            style={{ width: 180, height: 180, borderRadius: 90 }}
-          >
-            <AdaptiveCounterTrack count={progress.count} total={progress.target} compact={false} />
-            <div className="adaptive-counter-content">
-              {complete ? (
-                <div className="counter-complete-cue flex flex-col items-center justify-center">
-                  <span className="counter-check-mark">
-                    <Check size={36} strokeWidth={2.5} />
-                  </span>
-                  <span className="mt-2 text-[0.75rem] font-black text-foreground">{copy.completed}</span>
-                </div>
-              ) : (
-                <>
-                  <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
-                    <p
-                      className="counter-number text-[2rem] font-black leading-none text-foreground"
-                      style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                    >
-                      {formatNumerals(progress.count, language)}
-                    </p>
-                    <p
-                      className="text-[0.75rem] font-bold text-muted-foreground mt-1"
-                      style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                    >
-                      {formatRatio(progress.count, progress.target, language)}
-                    </p>
-                  </div>
-
-                  <div className="my-1.5 h-[1.5px] w-7 bg-border/60 rounded-full" aria-hidden="true" />
-
-                  <p className="tap-anywhere-hint font-bold text-foreground text-xs">{copy.tap}</p>
-
-                  {progress.target > progress.count && (
-                    <p
-                      className="mt-0.5 text-[0.6875rem] font-extrabold text-primary"
-                      style={{ fontFamily: counterNumeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
-                    >
-                      {language === "ar"
-                        ? `${formatNumerals(progress.target - progress.count, language)} متبقٍ`
-                        : `${progress.target - progress.count} remaining`}
-                    </p>
-                  )}
-                </>
-              )}
-            </div>
-          </button>
+          <ZikrCounterSurface
+            count={progress.count}
+            total={progress.target}
+            compact={false}
+            complete={complete}
+            onTap={increment}
+            language={language}
+            instructionText={copy.tap}
+            testId="salawat-counter"
+          />
 
           <button
             type="button"
