@@ -11,7 +11,7 @@ import {
   type GrowthEvent,
 } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Heart } from "./icons";
+import { Heart, Zap } from "./icons";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -236,7 +236,11 @@ export function PalmTreeReward({
           >
             {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
           </span>
-          <PalmTreeMark size={18} filled={hasStreak} className={hasStreak ? "text-[#fbbf24]" : "text-white/40"} />
+          <Zap
+            className={`h-[1rem] w-[1rem] ${hasStreak ? "text-[#fbbf24]" : "text-white/40"}`}
+            strokeWidth={2.5}
+            aria-hidden="true"
+          />
         </div>
 
         {/* Palms — end side */}
@@ -290,10 +294,10 @@ export function PalmTreeReward({
         className="flex min-w-0 items-center justify-center gap-1"
         title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
       >
-        <PalmTreeMark
-          size={18}
-          filled={hasStreak}
-          className={hasStreak ? "text-amber-500" : "text-muted-foreground/40"}
+        <Zap
+          className={`h-[1.125rem] w-[1.125rem] ${hasStreak ? "text-amber-500" : "text-muted-foreground/40"}`}
+          strokeWidth={2.5}
+          aria-hidden="true"
         />
         <span
           className={`whitespace-nowrap text-[0.75rem] font-black leading-tight min-[360px]:text-[0.875rem] font-sans ${hasStreak ? "text-amber-500" : "text-muted-foreground/60"}`}
@@ -678,10 +682,10 @@ export function TodayRoutineGarden({
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 py-2.5 px-3 shadow-xs dark:bg-amber-500/15">
           <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
-            <PalmTreeMark
-              size={22}
-              filled={streak > 0}
-              className={streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}
+            <Zap
+              className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}
+              strokeWidth={2.5}
+              aria-hidden="true"
             />
             <span
               className={`text-[1rem] font-black ${streak > 0 ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground/60"}`}
@@ -928,7 +932,7 @@ export function TodayRoutineGarden({
                       {isPalm ? (
                         <PalmTreeMark size={14} filled />
                       ) : completedCount > 0 ? (
-                        <PalmTreeMark size={12} filled className="text-amber-500" aria-hidden="true" />
+                        <Zap className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
                       ) : (
                         ""
                       )}
@@ -955,7 +959,7 @@ export function TodayRoutineGarden({
                   title={isArabic ? "يوم نشط" : "Streak Active"}
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10"
                 >
-                  <PalmTreeMark size={11} filled className="text-amber-500" />
+                  <Zap className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
                 </span>
                 <span
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
@@ -1047,7 +1051,7 @@ export function TodayRoutineGarden({
                               {isPalm ? (
                                 <PalmTreeMark size={9} filled />
                               ) : hasActivity ? (
-                                <PalmTreeMark size={9} filled className="text-amber-500" aria-hidden="true" />
+                                <Zap className="h-2.5 w-2.5 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
                               ) : (
                                 ""
                               )}

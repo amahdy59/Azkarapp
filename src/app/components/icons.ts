@@ -92,5 +92,7 @@ export {
   Map01 as Plane,
   XClose as X,
   XClose as XIcon,
+  Zap,
   Zap as Flame,
+  Zap as Spark,
 } from "@untitledui/icons";
