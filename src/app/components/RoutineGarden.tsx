@@ -477,7 +477,7 @@ export function TodayRoutineGarden({
   summary: initialSummary,
   language,
   hideTabs = false,
-  onOpenShareModal,
+  onOpenShareModal: _onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
   onSelectCategory,
@@ -570,36 +570,6 @@ export function TodayRoutineGarden({
       aria-label={t(language, "garden.todayTitle")}
       className="mb-5 w-full transition-all"
     >
-      {!hideTabs && (
-        <div className="mb-3 flex items-center justify-between gap-3 text-start">
-          <div>
-            <h2 className="text-[1.25rem] font-extrabold text-foreground dark:text-white">
-              {t(language, "garden.todayTitle")}
-            </h2>
-            <p className="mt-0.5 text-[0.8125rem] font-semibold text-slate-600 dark:text-amber-300">
-              {activeTab === "month"
-                ? t(language, "garden.oasisFor", { date: dateLabel })
-                : activeTab === "year"
-                  ? t(language, "garden.growthYear")
-                  : dynamicSubtitle}
-            </p>
-          </div>
-
-          {onOpenShareModal && (
-            <button
-              type="button"
-              onClick={onOpenShareModal}
-              className="flex h-[44px] min-h-[44px] min-w-[44px] items-center justify-center gap-1.5 rounded-xl bg-amber-500 px-3.5 text-[0.875rem] font-bold text-slate-950 shadow-sm hover:bg-amber-400 transition-all shrink-0 dark:bg-amber-400 dark:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
-              aria-label={t(language, "garden.shareAchievementAria")}
-              title={t(language, "garden.shareAchievementAria")}
-            >
-              <PalmTreeMark size={18} filled />
-              <span>{t(language, "garden.shareAchievement")}</span>
-            </button>
-          )}
-        </div>
-      )}
-
       {!hideTabs && (
         <>
           <div
