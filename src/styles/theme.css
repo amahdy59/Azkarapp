@@ -1,6 +1,14 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
+  --motion-duration-press: 90ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-standard: 220ms;
+  --motion-duration-emphasis: 360ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --motion-scale-pressed: 0.98;
   --font-size: 16px;
   --font-ui-latin: "Noto Sans Arabic Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-arabic:
@@ -390,7 +398,7 @@ textarea {
 
   .ui-icon-button:active {
     background: var(--muted);
-    transform: scale(0.96);
+    transform: scale(var(--motion-scale-pressed));
   }
 
   .ui-icon-button:disabled {
@@ -580,10 +588,10 @@ textarea {
 }
 @keyframes nav-active-cue {
   0% {
-    transform: translateY(2px) scale(0.86);
+    transform: translateY(1px) scale(0.92);
   }
   70% {
-    transform: translateY(-1px) scale(1.06);
+    transform: translateY(-1px) scale(1.04);
   }
   100% {
     transform: translateY(0) scale(1);
@@ -1089,10 +1097,10 @@ textarea {
 }
 
 .animate-pulse-horizontal {
-  animation: pulse-horizontal-ltr 1.2s infinite ease-in-out;
+  animation: pulse-horizontal-ltr 1.2s ease-in-out 3;
 }
 [dir="rtl"] .animate-pulse-horizontal {
-  animation: pulse-horizontal-rtl 1.2s infinite ease-in-out;
+  animation: pulse-horizontal-rtl 1.2s ease-in-out 3;
 }
 .element-pop {
   animation: favorite-pop 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
@@ -1128,15 +1136,15 @@ textarea {
 }
 @keyframes leaf-appear {
   0% {
-    transform: scale(0) rotate(-25deg);
+    transform: scale(0.6);
     opacity: 0;
   }
   55% {
-    transform: scale(1.2) rotate(6deg);
+    transform: scale(1.08);
     opacity: 1;
   }
   100% {
-    transform: scale(1) rotate(0deg);
+    transform: scale(1);
     opacity: 1;
   }
 }
@@ -1167,7 +1175,7 @@ textarea {
   animation: leaf-appear 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
 }
 .animate-palm-glow-pulse {
-  animation: palm-glow-pulse 2.4s ease-in-out infinite;
+  animation: palm-glow-pulse 2.4s ease-in-out 3;
 }
 
 /* ─── Universal Press Micro-interactions ─────────────────────────────
@@ -1180,33 +1188,161 @@ button:not(:disabled):not(.no-press),
 a[href]:not(.no-press),
 .interactive-elem {
   touch-action: manipulation;
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    opacity var(--motion-duration-press) var(--motion-ease-standard);
 }
 
 button:not(:disabled):not(.no-press):active,
 [role="button"]:not([aria-disabled="true"]):not(.no-press):active,
 a[href]:not(.no-press):active,
 .interactive-elem:active {
-  transform: scale(0.96) !important;
+  transform: scale(var(--motion-scale-pressed)) !important;
   opacity: 0.88;
 }
 
 /* Elastic Overscroll & Container Boundaries */
-html,
-body,
 .scroll-container,
-main,
 [data-radix-scroll-area-viewport] {
   overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
 }
 
 /* Reduce-motion overrides for press effects */
+.reduce-motion button:active,
+.reduce-motion [role="button"]:active,
+.reduce-motion a:active,
+.reduce-motion .interactive-elem:active {
+  opacity: 0.88;
+}
+
 .reduce-motion button,
 .reduce-motion [role="button"],
 .reduce-motion a,
 .reduce-motion .interactive-elem {
-  transition: none !important;
+  transition: opacity var(--motion-duration-press) var(--motion-ease-standard) !important;
   transform: none !important;
+}
+
+/* ─── Per-component Reduced Motion Alternatives ─────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .counter-number {
+    animation: none;
+    opacity: 1;
+  }
+
+  .counter-ring-ready {
+    animation: none;
+  }
+
+  .counter-ring-ready::after {
+    animation: none;
+  }
+
+  .counter-complete-cue {
+    animation: none;
+    opacity: 1;
+  }
+
+  .counter-complete-cue .counter-check-mark svg path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+
+  .celebration-pop {
+    animation: none;
+    opacity: 1;
+  }
+
+  .celebration-glow::before {
+    animation: none;
+    opacity: 0;
+  }
+
+  .nav-active-cue {
+    animation: none;
+  }
+
+  .favorite-pop {
+    animation: none;
+  }
+
+  .element-pop {
+    animation: none;
+  }
+
+  .waveform-bar {
+    animation: none;
+    transform: scaleY(0.6);
+  }
+
+  .animate-palm-glow-pulse {
+    animation: none;
+    opacity: 0.65;
+  }
+
+  .animate-pulse-horizontal {
+    animation: none;
+  }
+
+  .animate-leaf-appear {
+    animation: none;
+    opacity: 1;
+  }
+
+  .animate-leaf-float-core,
+  .animate-leaf-float-extra {
+    animation: none;
+  }
+
+  .zikr-step-enter {
+    animation: none;
+    opacity: 1;
+  }
+
+  .zikr-step-exit {
+    animation: none;
+    opacity: 0;
+  }
+
+  .completion-screen-enter {
+    animation: none;
+    opacity: 1;
+  }
+
+  .summary-item-enter {
+    animation: none;
+    opacity: 1;
+  }
+
+  .fade-in {
+    animation: none;
+    opacity: 1;
+  }
+
+  .slide-up {
+    animation: none;
+    opacity: 1;
+  }
+
+  .menu-pop {
+    animation: none;
+    opacity: 1;
+  }
+
+  .scrim-in {
+    animation: none;
+  }
+
+  .tap-anywhere-hint.hint-hidden {
+    animation: none;
+    opacity: 0;
+  }
+
+  .pulse-ring {
+    animation: none;
+    opacity: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

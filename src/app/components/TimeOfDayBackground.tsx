@@ -30,7 +30,7 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
         loading="eager"
         fetchPriority="high"
         decoding="async"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none"
+        className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-[360ms] ease-out"
         style={{ objectPosition: positions[name] }}
       />
       {/* Dark mode: fade to near-black */}

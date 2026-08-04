@@ -8,7 +8,7 @@ describe("CustomCounterScreen Component", () => {
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
     expect(screen.getByText("المسبحة الإلكترونية")).toBeInTheDocument();
-    expect(screen.getByText("الذكر المأثور:")).toBeInTheDocument();
+    expect(screen.getByText("الذكر المأثور")).toBeInTheDocument();
     expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
     expect(screen.getAllByText("اضغط للتسبيح")[0]).toBeInTheDocument();
   });

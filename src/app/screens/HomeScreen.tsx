@@ -332,7 +332,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                     }
                   }}
-                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-colors duration-150 text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
                     reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
@@ -346,7 +346,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
                     }
                   }}
-                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-colors duration-150 text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
                     reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
@@ -390,11 +390,13 @@ export function HomeScreen({
                   </div>
                   <div className="h-1.5 w-full overflow-hidden rounded-full bg-white/20">
                     <div
-                      className="h-full rounded-full bg-[#fbbf24] transition-all duration-500 ease-out"
-                      style={{
-                        width: `${Math.min(100, Math.max(0, (doneCount / totalCount) * 100))}%`,
-                        transformOrigin: direction === "rtl" ? "right" : "left",
-                      }}
+                      className="h-full w-full rounded-full bg-[#fbbf24] transition-[transform] duration-500 ease-out origin-[--bar-origin]"
+                      style={
+                        {
+                          transform: `scaleX(${Math.min(1, Math.max(0, doneCount / totalCount))})`,
+                          "--bar-origin": direction === "rtl" ? "right" : "left",
+                        } as React.CSSProperties
+                      }
                     />
                   </div>
                 </div>

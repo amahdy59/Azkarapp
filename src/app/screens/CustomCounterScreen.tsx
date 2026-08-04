@@ -6,7 +6,7 @@ import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibraryShe
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import type { AppLanguage } from "../types";
-import { BookOpen, Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
+import { Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
 import { AdaptiveCounterTrack, PulseRings } from "../components/ZikrComponents";
 
 function vibrate(pattern: number | number[]) {
@@ -121,25 +121,17 @@ export function CustomCounterScreen({
             onClick={() => setShowLibrarySheet(true)}
             className="interactive-elem flex w-full items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-start shadow-sm transition-all hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <div className="flex min-w-0 items-center gap-3">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <BookOpen size={20} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <span className="text-[0.75rem] font-bold text-muted-foreground">
-                    {isArabic ? "الذكر المأثور:" : "Selected Dhikr:"}
-                  </span>
-                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[0.6875rem] font-extrabold text-primary">
-                    {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn}
-                  </span>
-                </div>
-                <p className="truncate text-[1rem] font-extrabold leading-6 text-foreground" dir="rtl">
-                  {activeText}
-                </p>
-              </div>
+            <div className="min-w-0 flex-1 space-y-1">
+              <span className="block text-[0.75rem] font-bold text-muted-foreground">
+                {isArabic ? "الذكر المأثور" : "Selected Dhikr"}
+              </span>
+              <p className="truncate text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
+                {activeText}
+              </p>
             </div>
-            <ChevronDown size={20} className="shrink-0 text-muted-foreground" />
+            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
+              <ChevronDown size={18} />
+            </div>
           </button>
 
           {/* Target Presets */}
