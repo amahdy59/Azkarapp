@@ -3,6 +3,25 @@ import { ArrowPrevious, BarChart3, BookOpen, Home, Settings } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
+// ─── Shared nav tab definition ────────────────────────────────────────────────
+
+type NavTab = "home" | "azkar" | "progress" | "settings";
+
+interface NavProps {
+  active: NavTab;
+  onChange: (t: NavTab) => void;
+  isArabic?: boolean;
+}
+
+function getNavTabs(language: AppLanguage) {
+  return [
+    { id: "home" as const, label: t(language, "common.home"), Icon: Home },
+    { id: "azkar" as const, label: t(language, "common.azkar"), Icon: BookOpen },
+    { id: "progress" as const, label: t(language, "common.progress"), Icon: BarChart3 },
+    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
+  ];
+}
+
 export function IconButton({
   label,
   className = "",
@@ -52,22 +71,9 @@ export function Header({
   );
 }
 
-export function BottomNav({
-  active,
-  onChange,
-  isArabic = false,
-}: {
-  active: "home" | "azkar" | "progress" | "settings";
-  onChange: (t: "home" | "azkar" | "progress" | "settings") => void;
-  isArabic?: boolean;
-}) {
+export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
-  const tabs = [
-    { id: "home" as const, label: t(language, "common.home"), Icon: Home },
-    { id: "azkar" as const, label: t(language, "common.azkar"), Icon: BookOpen },
-    { id: "progress" as const, label: t(language, "common.progress"), Icon: BarChart3 },
-    { id: "settings" as const, label: t(language, "common.settings"), Icon: Settings },
-  ];
+  const tabs = getNavTabs(language);
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
@@ -98,6 +104,83 @@ export function BottomNav({
           );
         })}
       </div>
+    </nav>
+  );
+}
+
+// ─── Nav Rail (Expanded 900px+) ───────────────────────────────────────────────
+
+/**
+ * Vertical navigation rail for expanded viewports (900–1199px).
+ * Shows icon + short label in a single column. Replaces BottomNav at this
+ * breakpoint.
+ */
+export function NavRail({ active, onChange, isArabic = false }: NavProps) {
+  const language: AppLanguage = isArabic ? "ar" : "en";
+  const tabs = getNavTabs(language);
+  return (
+    <nav
+      aria-label={t(language, "common.bottomNavigation")}
+      className="app-rail flex flex-col items-center gap-1 py-4 px-1"
+    >
+      {tabs.map(({ id, label, Icon }) => {
+        const on = active === id;
+        return (
+          <button
+            key={id}
+            data-testid={`nav-rail-${id}`}
+            onClick={() => onChange(id)}
+            aria-current={on ? "page" : undefined}
+            className="nav-rail-item"
+          >
+            <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
+              <Icon size={22} />
+            </span>
+            <span className="nav-rail-label" dir="auto">
+              {label}
+            </span>
+          </button>
+        );
+      })}
+    </nav>
+  );
+}
+
+// ─── Nav Sidebar (Large 1200px+) ──────────────────────────────────────────────
+
+/**
+ * Labeled sidebar navigation for large viewports (1200px+).
+ * Shows icon + full label in a persistent left/right column.
+ */
+export function NavSidebar({ active, onChange, isArabic = false }: NavProps) {
+  const language: AppLanguage = isArabic ? "ar" : "en";
+  const tabs = getNavTabs(language);
+  return (
+    <nav aria-label={t(language, "common.bottomNavigation")} className="app-sidebar nav-sidebar">
+      {/* App brand / identity */}
+      <div className="nav-sidebar-brand" aria-hidden="true">
+        <span className="text-[1.0625rem] font-extrabold text-foreground font-sans">أذكار</span>
+        <span className="text-[1.0625rem] font-extrabold text-muted-foreground font-sans">Azkar</span>
+      </div>
+
+      {/* Primary nav items */}
+      {tabs.map(({ id, label, Icon }) => {
+        const on = active === id;
+        return (
+          <button
+            key={id}
+            data-testid={`nav-sidebar-${id}`}
+            onClick={() => onChange(id)}
+            aria-current={on ? "page" : undefined}
+            className="nav-sidebar-item"
+          >
+            <span className={on ? "nav-active-cue flex" : "flex"} key={`${id}-${on}`}>
+              <Icon size={20} />
+            </span>
+            <span dir="auto">{label}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

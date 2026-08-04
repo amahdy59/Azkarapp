@@ -26,7 +26,9 @@ function categoryFromShortcutUrl(): CategoryId | null {
   return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
 }
 
-import { BottomNav } from "./components/LayoutShells";
+import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
+import { useLayoutMode } from "./hooks/useLayoutMode";
+
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { ConfirmDialog } from "./components/ConfirmDialog";
@@ -166,6 +168,8 @@ function AppContent() {
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
   const activeAzkarList = useMemo(() => getAzkarForMode(activeCat, activeRoutineMode), [activeCat, activeRoutineMode]);
+  const layoutMode = useLayoutMode();
+
   const audioController = useAudioController();
   const audioCoverage = useMemo(() => getAudioCoverage(activeAzkarList), [activeAzkarList]);
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
@@ -730,9 +734,13 @@ function AppContent() {
     playAvailable();
   };
 
+  const showBottomNavArea = layoutMode === "compact" || layoutMode === "medium";
+  const showRail = layoutMode === "expanded";
+  const showSidebar = layoutMode === "large";
+
   return (
     <div className="app-viewport flex items-center justify-center">
-      <div className="app-shell relative flex flex-col overflow-hidden bg-background shadow-2xl">
+      <div className="app-shell relative overflow-hidden bg-background shadow-2xl">
         <NetworkStatus language={selectedLang} />
         {isSupabaseConfigured && !isGuest && (
           <SyncStatus
@@ -743,369 +751,376 @@ function AppContent() {
           />
         )}
 
-        <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
-          <Suspense fallback={<ScreenFallback language={selectedLang} />}>
-            {/* Phase 2 — onboarding flow */}
-            {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
-            {view === "onboard1" && (
-              <EnglishOnboarding1Screen
-                onNext={() => setView("login")}
-                onSkip={() => {
-                  markOnboardingComplete();
-                  setView("home");
-                  setActiveTab("home");
-                }}
-              />
-            )}
-            {/* Arabic onboarding — shown for Arabic-locale devices */}
-            {view === "ar_onboard1" && (
-              <ArOnboarding1Screen
-                onNext={() => setView("login")}
-                onSkip={() => {
-                  markOnboardingComplete();
-                  setView("home");
-                  setActiveTab("home");
-                }}
-              />
-            )}
-            {view === "language" && (
-              <LanguageScreen
-                initialLanguage={selectedLang}
-                onContinue={(lang) => {
-                  setSelectedLang(lang);
-                  setView(lang === "ar" ? "ar_onboard1" : "onboard1");
-                }}
-              />
-            )}
-            {view === "login" && (
-              <LoginScreen
-                language={selectedLang}
-                providerFlags={authProviderFlags}
-                onGoogle={() => void handleOAuth("google")}
-                onEmail={() => {
-                  setAuthError("");
-                  setView("email");
-                }}
-                onApple={() => void handleOAuth("apple")}
-                onGuest={() => {
-                  markOnboardingComplete();
-                  setDisplayName("Guest");
-                  setIsGuest(true);
-                  setView("home");
-                  setActiveTab("home");
-                }}
-              />
-            )}
-            {view === "email" && (
-              <EmailInputScreen
-                language={selectedLang}
-                initialEmail={email}
-                errorMessage={authError}
-                isSending={isSendingOtp}
-                onSend={handleSendOtp}
-                onBack={() => {
-                  setAuthError("");
-                  setView("login");
-                }}
-                onSkip={() => {
-                  markOnboardingComplete();
-                  setView("home");
-                  setActiveTab("home");
-                }}
-              />
-            )}
-            {view === "otp" && (
-              <OTPScreen
-                language={selectedLang}
-                maskedEmail={email}
-                errorMessage={authError}
-                isVerifying={isVerifyingOtp}
-                isResending={isResendingOtp}
-                onVerify={handleVerifyOtp}
-                onResend={handleResendOtp}
-                onBack={() => {
-                  setAuthError("");
-                  setView("email");
-                }}
-                onDifferent={() => {
-                  setAuthError("");
-                  setView("email");
-                }}
-              />
-            )}
-            {view === "auth-callback" && (
-              <AuthCallbackScreen
-                language={selectedLang}
-                errorMessage={authError}
-                onReady={() => void handleAuthCallback()}
-              />
-            )}
-            {view === "profile-completion" && (
-              <ProfileCompletionScreen
-                language={selectedLang}
-                errorMessage={authError}
-                isSaving={isCompletingProfile}
-                onSave={(name) => void handleCompleteProfile(name)}
-              />
-            )}
+        {/* Adaptive navigation — only one renders at a time */}
+        {showRail && <NavRail active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
+        {showSidebar && <NavSidebar active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
 
-            {/* Phase 1 — core app */}
-            {view === "home" && (
-              <HomeScreen
-                completed={completed}
-                dailyCompletions={dailyCompletions}
-                quietProgressEnabled={quietProgressEnabled}
-                progressDayStartHour={progressDayStartHour}
-                locationSettings={locationSettings}
-                onResume={resumeCategory}
-                onRepeat={repeatCategory}
-                onOpenFridayMode={() => {
-                  ensureCurrentFridayWeek();
-                  push("friday");
-                }}
-                language={selectedLang}
-                calendarType={calendarType}
-                direction={layoutDirection}
-                routineModes={routineModes}
-                onSetRoutineMode={(categoryId, mode) => {
-                  setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
-                }}
-                onOpenCustomCounter={() => push("custom_counter")}
-              />
-            )}
-            {view === "library" && (
-              <AzkarLibraryScreen
-                completed={completed}
-                language={selectedLang}
-                direction={layoutDirection}
-                onCategory={openCategory}
-                onZikr={(catId, index) => openReader(catId, index, "complete")}
-                onSearch={() => push("search")}
-                savedZikrIds={savedZikrIds}
-                routineModes={routineModes}
-              />
-            )}
-            {view === "progress" && (
-              <ProgressScreen
-                dailyCompletions={dailyCompletions}
-                progressDayStartHour={progressDayStartHour}
-                calendarType={calendarType}
-                language={selectedLang}
-                direction={layoutDirection}
-                onOpenShareModal={() => setShowShareModal(true)}
-                onSelectCategory={openCategory}
-              />
-            )}
-            {view === "friday" && (
-              <FridayModeScreen
-                isArabic={isArabic}
-                direction={layoutDirection}
-                kahfCompletedCount={completed.friday_kahf.has("friday-kahf") ? 1 : 0}
-                duasCompletedCount={completed.comprehensive_duas.size}
-                onBack={pop}
-                onStartKahf={() => {
-                  try {
-                    window.localStorage.setItem(fridayKahfOpenedKey(), "true");
-                  } catch {
-                    // Opening the reader does not depend on storage.
+        <div className="app-main">
+          <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
+            <Suspense fallback={<ScreenFallback language={selectedLang} />}>
+              {/* Phase 2 — onboarding flow */}
+              {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
+              {view === "onboard1" && (
+                <EnglishOnboarding1Screen
+                  onNext={() => setView("login")}
+                  onSkip={() => {
+                    markOnboardingComplete();
+                    setView("home");
+                    setActiveTab("home");
+                  }}
+                />
+              )}
+              {/* Arabic onboarding — shown for Arabic-locale devices */}
+              {view === "ar_onboard1" && (
+                <ArOnboarding1Screen
+                  onNext={() => setView("login")}
+                  onSkip={() => {
+                    markOnboardingComplete();
+                    setView("home");
+                    setActiveTab("home");
+                  }}
+                />
+              )}
+              {view === "language" && (
+                <LanguageScreen
+                  initialLanguage={selectedLang}
+                  onContinue={(lang) => {
+                    setSelectedLang(lang);
+                    setView(lang === "ar" ? "ar_onboard1" : "onboard1");
+                  }}
+                />
+              )}
+              {view === "login" && (
+                <LoginScreen
+                  language={selectedLang}
+                  providerFlags={authProviderFlags}
+                  onGoogle={() => void handleOAuth("google")}
+                  onEmail={() => {
+                    setAuthError("");
+                    setView("email");
+                  }}
+                  onApple={() => void handleOAuth("apple")}
+                  onGuest={() => {
+                    markOnboardingComplete();
+                    setDisplayName("Guest");
+                    setIsGuest(true);
+                    setView("home");
+                    setActiveTab("home");
+                  }}
+                />
+              )}
+              {view === "email" && (
+                <EmailInputScreen
+                  language={selectedLang}
+                  initialEmail={email}
+                  errorMessage={authError}
+                  isSending={isSendingOtp}
+                  onSend={handleSendOtp}
+                  onBack={() => {
+                    setAuthError("");
+                    setView("login");
+                  }}
+                  onSkip={() => {
+                    markOnboardingComplete();
+                    setView("home");
+                    setActiveTab("home");
+                  }}
+                />
+              )}
+              {view === "otp" && (
+                <OTPScreen
+                  language={selectedLang}
+                  maskedEmail={email}
+                  errorMessage={authError}
+                  isVerifying={isVerifyingOtp}
+                  isResending={isResendingOtp}
+                  onVerify={handleVerifyOtp}
+                  onResend={handleResendOtp}
+                  onBack={() => {
+                    setAuthError("");
+                    setView("email");
+                  }}
+                  onDifferent={() => {
+                    setAuthError("");
+                    setView("email");
+                  }}
+                />
+              )}
+              {view === "auth-callback" && (
+                <AuthCallbackScreen
+                  language={selectedLang}
+                  errorMessage={authError}
+                  onReady={() => void handleAuthCallback()}
+                />
+              )}
+              {view === "profile-completion" && (
+                <ProfileCompletionScreen
+                  language={selectedLang}
+                  errorMessage={authError}
+                  isSaving={isCompletingProfile}
+                  onSave={(name) => void handleCompleteProfile(name)}
+                />
+              )}
+
+              {/* Phase 1 — core app */}
+              {view === "home" && (
+                <HomeScreen
+                  completed={completed}
+                  dailyCompletions={dailyCompletions}
+                  quietProgressEnabled={quietProgressEnabled}
+                  progressDayStartHour={progressDayStartHour}
+                  locationSettings={locationSettings}
+                  onResume={resumeCategory}
+                  onRepeat={repeatCategory}
+                  onOpenFridayMode={() => {
+                    ensureCurrentFridayWeek();
+                    push("friday");
+                  }}
+                  language={selectedLang}
+                  calendarType={calendarType}
+                  direction={layoutDirection}
+                  routineModes={routineModes}
+                  onSetRoutineMode={(categoryId, mode) => {
+                    setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
+                  }}
+                  onOpenCustomCounter={() => push("custom_counter")}
+                />
+              )}
+              {view === "library" && (
+                <AzkarLibraryScreen
+                  completed={completed}
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onCategory={openCategory}
+                  onZikr={(catId, index) => openReader(catId, index, "complete")}
+                  onSearch={() => push("search")}
+                  savedZikrIds={savedZikrIds}
+                  routineModes={routineModes}
+                />
+              )}
+              {view === "progress" && (
+                <ProgressScreen
+                  dailyCompletions={dailyCompletions}
+                  progressDayStartHour={progressDayStartHour}
+                  calendarType={calendarType}
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onOpenShareModal={() => setShowShareModal(true)}
+                  onSelectCategory={openCategory}
+                />
+              )}
+              {view === "friday" && (
+                <FridayModeScreen
+                  isArabic={isArabic}
+                  direction={layoutDirection}
+                  kahfCompletedCount={completed.friday_kahf.has("friday-kahf") ? 1 : 0}
+                  duasCompletedCount={completed.comprehensive_duas.size}
+                  onBack={pop}
+                  onStartKahf={() => {
+                    try {
+                      window.localStorage.setItem(fridayKahfOpenedKey(), "true");
+                    } catch {
+                      // Opening the reader does not depend on storage.
+                    }
+                    const sameWeek = ensureCurrentFridayWeek();
+                    const kahf = getAzkarForMode("friday_kahf");
+                    const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
+                    if (nextIndex === null) {
+                      setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+                      openReader("friday_kahf", 0);
+                      return;
+                    }
+                    openReader("friday_kahf", nextIndex);
+                  }}
+                  onOpenSalawat={() => push("friday_salawat")}
+                  onStartDuasSession={() => void openCategory("comprehensive_duas")}
+                />
+              )}
+              {view === "friday_salawat" && (
+                <FridaySalawatScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onBack={() => {
+                    window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                    setView("friday");
+                  }}
+                />
+              )}
+              {view === "category" && (
+                <CategoryScreen
+                  catId={activeCat}
+                  completed={completed[activeCat] ?? new Set()}
+                  isArabic={isArabic}
+                  direction={layoutDirection}
+                  onZikr={(i) => openReader(activeCat, i)}
+                  onToggleZikr={(i) => toggleZikrCompletion(activeCat, i)}
+                  onReset={() => handleResetCategory(activeCat)}
+                  onRepeat={() => repeatCategory(activeCat)}
+                  onBack={pop}
+                  onPlayAllAudio={
+                    activeCat === "comprehensive_duas" || audioCoverage.available === 0 ? undefined : startPlayAllAudio
                   }
-                  const sameWeek = ensureCurrentFridayWeek();
-                  const kahf = getAzkarForMode("friday_kahf");
-                  const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
-                  if (nextIndex === null) {
-                    setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
-                    openReader("friday_kahf", 0);
-                    return;
+                  audioCoverage={audioCoverage}
+                  routineMode={activeRoutineMode}
+                  onRoutineModeChange={(mode) => {
+                    if (isRoutineCategory(activeCat)) {
+                      setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
+                    }
+                  }}
+                />
+              )}
+              {view === "reader" && (
+                <ReaderScreen
+                  catId={activeCat}
+                  idx={activeIdx}
+                  routineMode={activeRoutineMode}
+                  isArabic={isArabic}
+                  direction={layoutDirection}
+                  themeMode={themeMode}
+                  isDone={
+                    isRepeatSession
+                      ? repeatCompleted.has(activeIdx)
+                      : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
                   }
-                  openReader("friday_kahf", nextIndex);
-                }}
-                onOpenSalawat={() => push("friday_salawat")}
-                onStartDuasSession={() => void openCategory("comprehensive_duas")}
-              />
-            )}
-            {view === "friday_salawat" && (
-              <FridaySalawatScreen
-                language={selectedLang}
-                direction={layoutDirection}
-                onBack={() => {
-                  window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                  setView("friday");
-                }}
-              />
-            )}
-            {view === "category" && (
-              <CategoryScreen
-                catId={activeCat}
-                completed={completed[activeCat] ?? new Set()}
-                isArabic={isArabic}
-                direction={layoutDirection}
-                onZikr={(i) => openReader(activeCat, i)}
-                onToggleZikr={(i) => toggleZikrCompletion(activeCat, i)}
-                onReset={() => handleResetCategory(activeCat)}
-                onRepeat={() => repeatCategory(activeCat)}
-                onBack={pop}
-                onPlayAllAudio={
-                  activeCat === "comprehensive_duas" || audioCoverage.available === 0 ? undefined : startPlayAllAudio
-                }
-                audioCoverage={audioCoverage}
-                routineMode={activeRoutineMode}
-                onRoutineModeChange={(mode) => {
-                  if (isRoutineCategory(activeCat)) {
-                    setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
+                  collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
+                  hapticFeedback={hapticFeedback}
+                  showTranslation={showTranslation}
+                  showTransliteration={showTransliteration}
+                  textSize={textSize}
+                  savedZikrIds={savedZikrIds}
+                  onBack={
+                    activeCat === "friday_kahf"
+                      ? () => {
+                          window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                          setView("friday");
+                        }
+                      : leaveReader
                   }
-                }}
-              />
-            )}
-            {view === "reader" && (
-              <ReaderScreen
-                catId={activeCat}
-                idx={activeIdx}
-                routineMode={activeRoutineMode}
-                isArabic={isArabic}
-                direction={layoutDirection}
-                themeMode={themeMode}
-                isDone={
-                  isRepeatSession
-                    ? repeatCompleted.has(activeIdx)
-                    : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
-                }
-                collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
-                hapticFeedback={hapticFeedback}
-                showTranslation={showTranslation}
-                showTransliteration={showTransliteration}
-                textSize={textSize}
-                savedZikrIds={savedZikrIds}
-                onBack={
-                  activeCat === "friday_kahf"
-                    ? () => {
-                        window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                        setView("friday");
-                      }
-                    : leaveReader
-                }
-                onComplete={markComplete}
-                onAdvance={
-                  activeCat === "friday_kahf"
-                    ? () => {
-                        window.history.replaceState({ view: "friday" }, "", "?view=friday");
-                        setView("friday");
-                      }
-                    : advanceAfterCompletion
-                }
-                onNext={() => {
-                  if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
-                }}
-                onPrev={() => {
-                  if (activeIdx > 0) setActiveIdx((i) => i - 1);
-                }}
-                onToggleSaved={toggleSavedZikr}
-                audioAvailable={activeZikrHasAudio}
-                onPlayAudio={
-                  activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
-                }
-                onRepeatAudio={
-                  activeZikrHasAudio && activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
-                    ? () => void startAudio([activeZikr], "single", true)
-                    : undefined
-                }
-              />
-            )}
-            {view === "completion" && (
-              <CompletionScreen
-                catId={activeCat}
-                sessionStart={sessionStart}
-                dailyCompletions={dailyCompletions}
-                growthEvent={lastGrowthEvent}
-                quietProgressEnabled={quietProgressEnabled}
-                progressDayStartHour={progressDayStartHour}
-                onHome={goHome}
-                language={selectedLang}
-                direction={layoutDirection}
-                completionLevel={activeRoutineMode}
-                onContinueComplete={
-                  isRoutineCategory(activeCat)
-                    ? () => {
-                        const completeAzkar = getAzkarForMode(activeCat, "complete");
-                        const nextIndex = completeAzkar.findIndex((zikr) => !completed[activeCat].has(zikr.id));
-                        openReader(activeCat, Math.max(0, nextIndex), "complete");
-                      }
-                    : undefined
-                }
-              />
-            )}
-            {view === "settings" && (
-              <SettingsScreen
-                themeMode={themeMode}
-                language={selectedLang}
-                isGuest={isGuest}
-                isSyncing={isSyncingRemote}
-                syncError={syncError}
-                syncStatus={syncStatus}
-                lastSuccessfulSyncAt={lastSuccessfulSyncAt}
-                sessions={sessions}
-                dailyCompletions={dailyCompletions}
-                savedCount={savedZikrIds.size}
-                textSize={textSize}
-                showTranslation={showTranslation}
-                showTransliteration={showTransliteration}
-                highContrast={highContrast}
-                boldText={boldText}
-                reduceMotion={reduceMotion}
-                hapticFeedback={hapticFeedback}
-                forceRtl={forceRtl}
-                colorBlindSupport={colorBlindSupport}
-                reminders={reminders}
-                locationSettings={locationSettings}
-                weeklyGoalDays={weeklyGoalDays}
-                quietProgressEnabled={quietProgressEnabled}
-                progressDayStartHour={progressDayStartHour}
-                calendarType={calendarType}
-                direction={layoutDirection}
-                onLanguageChange={setSelectedLang}
-                onThemeModeChange={setThemeMode}
-                onCalendarTypeChange={setCalendarType}
-                onTextSizeChange={setTextSize}
-                onShowTranslationChange={setShowTranslation}
-                onShowTransliterationChange={setShowTransliteration}
-                onHighContrastChange={setHighContrast}
-                onBoldTextChange={setBoldText}
-                onReduceMotionChange={setReduceMotion}
-                onHapticFeedbackChange={setHapticFeedback}
-                onForceRtlChange={setForceRtl}
-                onColorBlindSupportChange={setColorBlindSupport}
-                onRemindersChange={setReminders}
-                onLocationChange={handleLocationChange}
-                onWeeklyGoalDaysChange={setWeeklyGoalDays}
-                onQuietProgressEnabledChange={setQuietProgressEnabled}
-                onProgressDayStartHourChange={setProgressDayStartHour}
-                onActivateAccount={handleOpenAccountAuth}
-                onSignOut={handleSignOut}
-                onExportData={handleExportData}
-                onResetPreferences={handleResetPreferences}
-                onClearLocalData={handleClearLocalData}
-                onDeleteAccount={handleDeleteAccount}
-              />
-            )}
-            {view === "search" && (
-              <SearchScreen
-                language={selectedLang}
-                direction={layoutDirection}
-                onBack={pop}
-                onZikr={(catId, i) => {
-                  openReader(catId, i, "complete");
-                }}
-              />
-            )}
-            {view === "custom_counter" && (
-              <CustomCounterScreen
-                isArabic={selectedLang === "ar"}
-                direction={layoutDirection}
-                onBack={pop}
-                hapticFeedback={hapticFeedback}
-              />
-            )}
-          </Suspense>
-        </main>
+                  onComplete={markComplete}
+                  onAdvance={
+                    activeCat === "friday_kahf"
+                      ? () => {
+                          window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                          setView("friday");
+                        }
+                      : advanceAfterCompletion
+                  }
+                  onNext={() => {
+                    if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
+                  }}
+                  onPrev={() => {
+                    if (activeIdx > 0) setActiveIdx((i) => i - 1);
+                  }}
+                  onToggleSaved={toggleSavedZikr}
+                  audioAvailable={activeZikrHasAudio}
+                  onPlayAudio={
+                    activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
+                  }
+                  onRepeatAudio={
+                    activeZikrHasAudio && activeZikr?.audioBehavior.supportedModes.includes("repeat-prescribed-count")
+                      ? () => void startAudio([activeZikr], "single", true)
+                      : undefined
+                  }
+                />
+              )}
+              {view === "completion" && (
+                <CompletionScreen
+                  catId={activeCat}
+                  sessionStart={sessionStart}
+                  dailyCompletions={dailyCompletions}
+                  growthEvent={lastGrowthEvent}
+                  quietProgressEnabled={quietProgressEnabled}
+                  progressDayStartHour={progressDayStartHour}
+                  onHome={goHome}
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  completionLevel={activeRoutineMode}
+                  onContinueComplete={
+                    isRoutineCategory(activeCat)
+                      ? () => {
+                          const completeAzkar = getAzkarForMode(activeCat, "complete");
+                          const nextIndex = completeAzkar.findIndex((zikr) => !completed[activeCat].has(zikr.id));
+                          openReader(activeCat, Math.max(0, nextIndex), "complete");
+                        }
+                      : undefined
+                  }
+                />
+              )}
+              {view === "settings" && (
+                <SettingsScreen
+                  themeMode={themeMode}
+                  language={selectedLang}
+                  isGuest={isGuest}
+                  isSyncing={isSyncingRemote}
+                  syncError={syncError}
+                  syncStatus={syncStatus}
+                  lastSuccessfulSyncAt={lastSuccessfulSyncAt}
+                  sessions={sessions}
+                  dailyCompletions={dailyCompletions}
+                  savedCount={savedZikrIds.size}
+                  textSize={textSize}
+                  showTranslation={showTranslation}
+                  showTransliteration={showTransliteration}
+                  highContrast={highContrast}
+                  boldText={boldText}
+                  reduceMotion={reduceMotion}
+                  hapticFeedback={hapticFeedback}
+                  forceRtl={forceRtl}
+                  colorBlindSupport={colorBlindSupport}
+                  reminders={reminders}
+                  locationSettings={locationSettings}
+                  weeklyGoalDays={weeklyGoalDays}
+                  quietProgressEnabled={quietProgressEnabled}
+                  progressDayStartHour={progressDayStartHour}
+                  calendarType={calendarType}
+                  direction={layoutDirection}
+                  onLanguageChange={setSelectedLang}
+                  onThemeModeChange={setThemeMode}
+                  onCalendarTypeChange={setCalendarType}
+                  onTextSizeChange={setTextSize}
+                  onShowTranslationChange={setShowTranslation}
+                  onShowTransliterationChange={setShowTransliteration}
+                  onHighContrastChange={setHighContrast}
+                  onBoldTextChange={setBoldText}
+                  onReduceMotionChange={setReduceMotion}
+                  onHapticFeedbackChange={setHapticFeedback}
+                  onForceRtlChange={setForceRtl}
+                  onColorBlindSupportChange={setColorBlindSupport}
+                  onRemindersChange={setReminders}
+                  onLocationChange={handleLocationChange}
+                  onWeeklyGoalDaysChange={setWeeklyGoalDays}
+                  onQuietProgressEnabledChange={setQuietProgressEnabled}
+                  onProgressDayStartHourChange={setProgressDayStartHour}
+                  onActivateAccount={handleOpenAccountAuth}
+                  onSignOut={handleSignOut}
+                  onExportData={handleExportData}
+                  onResetPreferences={handleResetPreferences}
+                  onClearLocalData={handleClearLocalData}
+                  onDeleteAccount={handleDeleteAccount}
+                />
+              )}
+              {view === "search" && (
+                <SearchScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onBack={pop}
+                  onZikr={(catId, i) => {
+                    openReader(catId, i, "complete");
+                  }}
+                />
+              )}
+              {view === "custom_counter" && (
+                <CustomCounterScreen
+                  isArabic={selectedLang === "ar"}
+                  direction={layoutDirection}
+                  onBack={pop}
+                  hapticFeedback={hapticFeedback}
+                />
+              )}
+            </Suspense>
+          </main>
+        </div>
+        {/* end app-main */}
 
         {/* Share Achievement Modal */}
         {showShareModal && (
@@ -1141,9 +1156,10 @@ function AppContent() {
           <div
             className="absolute inset-x-0 z-40"
             style={{
-              bottom: showBottomNav
-                ? "calc(4.5rem + env(safe-area-inset-bottom))"
-                : "max(0.75rem, env(safe-area-inset-bottom))",
+              bottom:
+                showBottomNav && showBottomNavArea
+                  ? "calc(4.5rem + env(safe-area-inset-bottom))"
+                  : "max(0.75rem, env(safe-area-inset-bottom))",
             }}
           >
             {persistenceError && !persistenceNoticeDismissed ? (
@@ -1194,8 +1210,12 @@ function AppContent() {
           </div>
         )}
 
-        {/* Bottom nav */}
-        {showBottomNav && <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
+        {/* Bottom nav — compact and medium only, shown in its own grid area */}
+        {showBottomNav && showBottomNavArea && (
+          <div className="app-bottom-nav">
+            <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />
+          </div>
+        )}
       </div>
 
       {/* Accessible confirmation dialog */}

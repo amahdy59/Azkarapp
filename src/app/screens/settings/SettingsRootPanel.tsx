@@ -61,6 +61,8 @@ export function SettingsRootPanel({
   syncError: string;
   quietProgressEnabled: boolean;
   locationSettings?: LocationSettings;
+  /** When set, highlights the matching row (two-pane layout). */
+  activeSub?: SettingsSubScreen;
 }) {
   return (
     <div className="flex-1 overflow-y-auto pb-8">

@@ -590,7 +590,7 @@ export function ReaderScreen({
         }
       />
 
-      <div className="shrink-0 px-5 pb-3 pt-2">
+      <div className="shrink-0 px-5 pb-3 pt-2 reader-column">
         <ProgressBar
           value={readingProgressValue}
           max={azkar.length}
@@ -603,7 +603,10 @@ export function ReaderScreen({
       </div>
 
       {/* Main Layout Area */}
-      <div ref={readerMainRef} className="flex-1 flex flex-col min-h-0 justify-between select-none relative">
+      <div
+        ref={readerMainRef}
+        className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
+      >
         {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
             within this region; the counter below is always visible and never covered. */}
         <div

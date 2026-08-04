@@ -90,10 +90,10 @@ export function AzkarLibraryScreen({
         </div>
       </header>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5" role="tabpanel">
+      <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center" role="tabpanel">
         {section === "collections" ? (
           <>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {CATEGORIES.filter((category) => category.id !== "friday_kahf").map((category) => {
                 const isComprehensiveDuas = category.id === "comprehensive_duas";
                 const routineMode = isRoutineCategory(category.id) ? routineModes[category.id] : "complete";

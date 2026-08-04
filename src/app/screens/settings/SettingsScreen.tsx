@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
+import { useLayoutMode } from "../../hooks/useLayoutMode";
 import type {
   AppLanguage,
   ColorBlindSupport,
@@ -131,6 +132,10 @@ export function SettingsScreen({
 }: SettingsScreenProps) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
   const goBack = () => setSub("root");
+  const layoutMode = useLayoutMode();
+  const isTwoPaneLayout = layoutMode === "expanded" || layoutMode === "large";
+  // On two-pane layout, auto-select accessibility panel if user hasn't chosen one
+  const effectiveSub = isTwoPaneLayout && sub === "root" ? "accessibility" : sub;
 
   const panelVariants = reduceMotion
     ? {
@@ -162,16 +167,11 @@ export function SettingsScreen({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
-      <>
-        {sub === "root" && (
-          <motion.div
-            key="root"
-            variants={rootVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
+      {isTwoPaneLayout ? (
+        /* ── Two-pane layout (Expanded 900px+) ── */
+        <div className="settings-two-pane h-full">
+          {/* Left: category list */}
+          <div className="settings-nav-pane">
             <Header title={t(language, "common.settings")} language={language} />
             <SettingsRootPanel
               onNav={setSub}
@@ -187,183 +187,158 @@ export function SettingsScreen({
               syncError={syncError}
               quietProgressEnabled={quietProgressEnabled}
               locationSettings={locationSettings}
+              activeSub={effectiveSub}
             />
-          </motion.div>
-        )}
-        {sub === "accessibility" && (
-          <motion.div
-            key="accessibility"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <AccessibilityPanel
-              language={language}
-              direction={direction}
-              calendarType={calendarType}
-              onCalendarTypeChange={onCalendarTypeChange}
-              textSize={textSize}
-              showTranslation={showTranslation}
-              showTransliteration={showTransliteration}
-              highContrast={highContrast}
-              boldText={boldText}
-              reduceMotion={reduceMotion}
-              hapticFeedback={hapticFeedback}
-              forceRtl={forceRtl}
-              colorBlindSupport={colorBlindSupport}
-              onTextSizeChange={onTextSizeChange}
-              onShowTranslationChange={onShowTranslationChange}
-              onShowTransliterationChange={onShowTransliterationChange}
-              onHighContrastChange={onHighContrastChange}
-              onBoldTextChange={onBoldTextChange}
-              onReduceMotionChange={onReduceMotionChange}
-              onHapticFeedbackChange={onHapticFeedbackChange}
-              onForceRtlChange={onForceRtlChange}
-              onColorBlindSupportChange={onColorBlindSupportChange}
-              onBack={goBack}
-            />
-          </motion.div>
-        )}
-        {sub === "downloads" && (
-          <motion.div
-            key="downloads"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <DownloadsPanel language={language} onBack={goBack} />
-          </motion.div>
-        )}
-        {sub === "notifications" && (
-          <motion.div
-            key="notifications"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <NotificationsPanel
-              language={language}
-              reminders={reminders}
-              locationSettings={locationSettings}
-              onRemindersChange={onRemindersChange}
-              onLocationChange={onLocationChange}
-              onBack={goBack}
-            />
-          </motion.div>
-        )}
-        {sub === "progress" && (
-          <motion.div
-            key="progress"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <ProgressPanel
-              language={language}
-              direction={direction}
-              sessions={sessions}
-              dailyCompletions={dailyCompletions}
-              quietProgressEnabled={quietProgressEnabled}
-              progressDayStartHour={progressDayStartHour}
-              weeklyGoalDays={weeklyGoalDays}
-              onQuietProgressEnabledChange={onQuietProgressEnabledChange}
-              onProgressDayStartHourChange={onProgressDayStartHourChange}
-              onWeeklyGoalDaysChange={onWeeklyGoalDaysChange}
-              onBack={goBack}
-            />
-          </motion.div>
-        )}
-        {sub === "account-data" && (
-          <motion.div
-            key="account-data"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <AccountDataPanel
-              language={language}
-              isGuest={isGuest}
-              isSyncing={isSyncing}
-              syncError={syncError}
-              syncStatus={syncStatus}
-              lastSuccessfulSyncAt={lastSuccessfulSyncAt}
-              sessionCount={sessions.length}
-              savedCount={savedCount}
-              onActivateAccount={onActivateAccount}
-              onSignOut={onSignOut}
-              onExportData={onExportData}
-              onResetPreferences={onResetPreferences}
-              onClearLocalData={onClearLocalData}
-              onDeleteAccount={onDeleteAccount}
-              onBack={goBack}
-            />
-          </motion.div>
-        )}
-        {sub === "help" && (
-          <motion.div
-            key="help"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <HelpPanel language={language} onBack={goBack} />
-          </motion.div>
-        )}
-        {sub === "legal" && (
-          <motion.div
-            key="legal"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <LegalPanel language={language} onBack={goBack} />
-          </motion.div>
-        )}
-        {sub === "sources" && (
-          <motion.div
-            key="sources"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <SourcesPanel language={language} onBack={goBack} />
-          </motion.div>
-        )}
-        {sub === "about" && (
-          <motion.div
-            key="about"
-            variants={panelVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="absolute inset-0 flex h-full w-full flex-col"
-          >
-            <AboutPanel
-              language={language}
-              onHelp={() => setSub("help")}
-              onLegal={() => setSub("legal")}
-              onSources={() => setSub("sources")}
-              onBack={goBack}
-            />
-          </motion.div>
-        )}
-      </>
+          </div>
+          {/* Right: detail panel */}
+          <div className="settings-detail-pane">
+            <div className="settings-form-inner">{renderSubPanel(effectiveSub)}</div>
+          </div>
+        </div>
+      ) : (
+        /* ── Compact/medium: existing slide-in animation ── */
+        <>
+          {sub === "root" && (
+            <motion.div
+              key="root"
+              variants={rootVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="absolute inset-0 flex h-full w-full flex-col"
+            >
+              <Header title={t(language, "common.settings")} language={language} />
+              <SettingsRootPanel
+                onNav={setSub}
+                language={language}
+                direction={direction}
+                themeMode={themeMode}
+                highContrast={highContrast}
+                onThemeModeChange={onThemeModeChange}
+                onDisableHighContrast={() => onHighContrastChange(false)}
+                onLanguageChange={onLanguageChange}
+                isGuest={isGuest}
+                isSyncing={isSyncing}
+                syncError={syncError}
+                quietProgressEnabled={quietProgressEnabled}
+                locationSettings={locationSettings}
+              />
+            </motion.div>
+          )}
+          {sub !== "root" && (
+            <motion.div
+              key={sub}
+              variants={panelVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="absolute inset-0 flex h-full w-full flex-col"
+            >
+              {renderSubPanel(sub)}
+            </motion.div>
+          )}
+        </>
+      )}
     </div>
   );
+
+  function renderSubPanel(panel: SettingsSubScreen) {
+    switch (panel) {
+      case "accessibility":
+        return (
+          <AccessibilityPanel
+            language={language}
+            direction={direction}
+            calendarType={calendarType}
+            onCalendarTypeChange={onCalendarTypeChange}
+            textSize={textSize}
+            showTranslation={showTranslation}
+            showTransliteration={showTransliteration}
+            highContrast={highContrast}
+            boldText={boldText}
+            reduceMotion={reduceMotion}
+            hapticFeedback={hapticFeedback}
+            forceRtl={forceRtl}
+            colorBlindSupport={colorBlindSupport}
+            onTextSizeChange={onTextSizeChange}
+            onShowTranslationChange={onShowTranslationChange}
+            onShowTransliterationChange={onShowTransliterationChange}
+            onHighContrastChange={onHighContrastChange}
+            onBoldTextChange={onBoldTextChange}
+            onReduceMotionChange={onReduceMotionChange}
+            onHapticFeedbackChange={onHapticFeedbackChange}
+            onForceRtlChange={onForceRtlChange}
+            onColorBlindSupportChange={onColorBlindSupportChange}
+            onBack={goBack}
+          />
+        );
+      case "downloads":
+        return <DownloadsPanel language={language} onBack={goBack} />;
+      case "notifications":
+        return (
+          <NotificationsPanel
+            language={language}
+            reminders={reminders}
+            locationSettings={locationSettings}
+            onRemindersChange={onRemindersChange}
+            onLocationChange={onLocationChange}
+            onBack={goBack}
+          />
+        );
+      case "progress":
+        return (
+          <ProgressPanel
+            language={language}
+            direction={direction}
+            sessions={sessions}
+            dailyCompletions={dailyCompletions}
+            quietProgressEnabled={quietProgressEnabled}
+            progressDayStartHour={progressDayStartHour}
+            weeklyGoalDays={weeklyGoalDays}
+            onQuietProgressEnabledChange={onQuietProgressEnabledChange}
+            onProgressDayStartHourChange={onProgressDayStartHourChange}
+            onWeeklyGoalDaysChange={onWeeklyGoalDaysChange}
+            onBack={goBack}
+          />
+        );
+      case "account-data":
+        return (
+          <AccountDataPanel
+            language={language}
+            isGuest={isGuest}
+            isSyncing={isSyncing}
+            syncError={syncError}
+            syncStatus={syncStatus}
+            lastSuccessfulSyncAt={lastSuccessfulSyncAt}
+            sessionCount={sessions.length}
+            savedCount={savedCount}
+            onActivateAccount={onActivateAccount}
+            onSignOut={onSignOut}
+            onExportData={onExportData}
+            onResetPreferences={onResetPreferences}
+            onClearLocalData={onClearLocalData}
+            onDeleteAccount={onDeleteAccount}
+            onBack={goBack}
+          />
+        );
+      case "help":
+        return <HelpPanel language={language} onBack={goBack} />;
+      case "legal":
+        return <LegalPanel language={language} onBack={goBack} />;
+      case "sources":
+        return <SourcesPanel language={language} onBack={goBack} />;
+      case "about":
+        return (
+          <AboutPanel
+            language={language}
+            onHelp={() => setSub("help")}
+            onLegal={() => setSub("legal")}
+            onSources={() => setSub("sources")}
+            onBack={goBack}
+          />
+        );
+      default:
+        return null;
+    }
+  }
 }

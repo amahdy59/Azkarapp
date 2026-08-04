@@ -264,7 +264,7 @@ export function HomeScreen({
       </div>
 
       {/* Scrollable Content Area */}
-      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
+      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center">
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button

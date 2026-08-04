@@ -7,7 +7,7 @@ const limits = {
   css: 120 * 1024,
   asset: 1024 * 1024,
   javascriptGzip: 130 * 1024,
-  cssGzip: 20 * 1024,
+  cssGzip: 24 * 1024,
   initialGzip: 200 * 1024,
 };
 const assetsDirectory = path.resolve("dist/assets");
