@@ -676,16 +676,26 @@ textarea {
   overflow: hidden;
   color: var(--foreground);
   background: var(--card);
-  box-shadow: 0 8px 24px color-mix(in srgb, var(--foreground) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 80%, transparent);
+  box-shadow: 0 4px 20px color-mix(in srgb, var(--foreground) 6%, transparent);
   cursor: pointer;
   isolation: isolate;
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.adaptive-counter-surface:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
 .adaptive-counter-surface:focus-visible {
   outline: none;
   box-shadow:
     0 0 0 3px var(--ring),
-    0 8px 24px color-mix(in srgb, var(--foreground) 8%, transparent);
+    0 6px 24px color-mix(in srgb, var(--primary) 15%, transparent);
 }
 
 .adaptive-counter-surface:disabled {
@@ -695,21 +705,17 @@ textarea {
 .adaptive-counter-track,
 .adaptive-counter-progress {
   fill: none;
-  stroke-width: 8;
   vector-effect: non-scaling-stroke;
-  transition: rx 520ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .adaptive-counter-track {
-  stroke: var(--muted);
+  stroke: color-mix(in srgb, var(--muted-foreground) 20%, var(--card));
 }
 
 .adaptive-counter-progress {
   stroke: var(--primary);
   stroke-linecap: round;
-  transition:
-    stroke-dashoffset 180ms cubic-bezier(0.4, 0, 0.2, 1),
-    rx 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: stroke-dashoffset 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .adaptive-counter-content {
@@ -721,50 +727,28 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 18px;
+  padding: 16px;
 }
 
 .adaptive-counter-content .tap-anywhere-hint {
   min-height: auto;
-  margin-top: 8px;
-  font-size: 0.6875rem;
-  line-height: 1rem;
+  font-size: 0.75rem;
+  line-height: 1.1rem;
   text-align: center;
 }
 
 .adaptive-counter-content.is-compact {
   flex-direction: row;
-  gap: 16px;
-  justify-content: space-between;
-  padding: 12px 22px;
-}
-
-.adaptive-counter-content.is-compact .adaptive-counter-numerals {
-  display: flex;
-  height: 48px;
-  min-width: 48px;
-  flex-direction: column;
+  gap: 14px;
   align-items: center;
-  justify-content: center;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--primary) 10%, var(--card));
-}
-
-.adaptive-counter-content.is-compact .counter-number {
-  font-size: 1rem;
-  line-height: 1.1rem;
-}
-
-.adaptive-counter-content.is-compact .tap-anywhere-hint {
-  flex: 1;
-  margin-top: 0;
-  font-size: 0.8125rem;
+  justify-content: space-between;
+  padding: 10px 18px;
 }
 
 .adaptive-counter-pulse {
   pointer-events: none;
   position: absolute;
-  inset: 7px;
+  inset: 6px;
   border: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
   border-radius: inherit;
   opacity: 0;
@@ -773,28 +757,33 @@ textarea {
 
 .adaptive-counter-nav {
   display: flex;
-  width: 44px;
-  height: 44px;
-  min-width: 44px;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-control);
   border-radius: 9999px;
   color: var(--foreground);
   background: var(--card);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
   transition:
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
     border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
     background-color 160ms ease,
+    border-color 160ms ease,
     transform 160ms ease,
     opacity 160ms ease;
 }
 
 .adaptive-counter-nav.is-compact {
-  border-radius: 14px;
+  height: 76px;
+  border-radius: 20px;
 }
 
 .adaptive-counter-nav:hover:not(:disabled) {
   background: var(--muted);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
   transform: translateY(-1px);
 }
 

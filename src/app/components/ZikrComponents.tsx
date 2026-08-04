@@ -75,35 +75,31 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   );
 }
 
-export function AdaptiveCounterTrack({ count, total, compact }: { count: number; total: number; compact: boolean }) {
+export function AdaptiveCounterTrack({ count, total, compact }: { count: number; total: number; compact?: boolean }) {
   const progress = total > 0 ? Math.min(1, count / total) : 0;
+  const strokeWidth = compact ? 8 : 7;
+  const r = 50 - strokeWidth / 2 - 2;
+  const circ = 2 * Math.PI * r;
 
   return (
     <svg
-      className="absolute inset-0 h-full w-full overflow-visible"
+      className="absolute inset-0 h-full w-full overflow-visible pointer-events-none"
       viewBox="0 0 100 100"
-      preserveAspectRatio="none"
       aria-hidden="true"
     >
-      <rect
-        className="adaptive-counter-track"
-        x="4"
-        y="4"
-        width="92"
-        height="92"
-        rx={compact ? 18 : 46}
-        pathLength="1"
-      />
-      <rect
+      <circle className="adaptive-counter-track" cx="50" cy="50" r={r} strokeWidth={strokeWidth} fill="none" />
+      <circle
         className="adaptive-counter-progress"
-        x="4"
-        y="4"
-        width="92"
-        height="92"
-        rx={compact ? 18 : 46}
-        pathLength="1"
-        strokeDasharray="1"
-        strokeDashoffset={1 - progress}
+        cx="50"
+        cy="50"
+        r={r}
+        strokeWidth={strokeWidth}
+        fill="none"
+        strokeLinecap="round"
+        strokeDasharray={circ}
+        strokeDashoffset={circ * (1 - progress)}
+        transform="rotate(-90 50 50)"
+        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1)" }}
       />
     </svg>
   );

@@ -173,7 +173,7 @@ export function CustomCounterScreen({
                   </div>
                 ) : (
                   <>
-                    <div className="adaptive-counter-numerals" dir="ltr">
+                    <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
                       <p
                         className="counter-number text-[2.75rem] font-black leading-none text-foreground"
                         style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
@@ -195,9 +195,21 @@ export function CustomCounterScreen({
                         </p>
                       )}
                     </div>
-                    <p className="tap-anywhere-hint font-bold text-foreground">
+
+                    <div className="my-2 h-[1.5px] w-8 bg-border/60 rounded-full" aria-hidden="true" />
+
+                    <p className="tap-anywhere-hint font-bold text-foreground text-xs">
                       {isArabic ? "اضغط للتسبيح" : "Tap to count"}
                     </p>
+
+                    {isTargetMode && count < target && (
+                      <p
+                        className="mt-1 text-[0.75rem] font-extrabold text-primary"
+                        style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums" }}
+                      >
+                        {isArabic ? `${formatNumerals(target - count, language)} متبقٍ` : `${target - count} remaining`}
+                      </p>
+                    )}
                   </>
                 )}
               </div>

@@ -422,6 +422,11 @@ export function ReaderScreen({
   );
 
   const renderCounterPanel = () => {
+    const remainingCount = z.repetitionCount > 1 ? z.repetitionCount - count : 0;
+    const remainingText = isArabic
+      ? `${formatNumerals(remainingCount, language)} متبقٍ`
+      : `${remainingCount} remaining`;
+
     return (
       <div className="px-3 pb-3" data-testid="counter-panel">
         <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
@@ -461,43 +466,115 @@ export function ReaderScreen({
               transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.52, ease: [0.22, 1, 0.36, 1] }}
               whileTap={complete || prefersReducedMotion ? undefined : { scale: 0.975 }}
             >
-              <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={useCompactCounter} />
+              {!useCompactCounter && <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={false} />}
               <span key={pulse} className="adaptive-counter-pulse" aria-hidden="true" />
 
               <div className={`adaptive-counter-content ${useCompactCounter ? "is-compact" : ""}`}>
-                {complete ? (
-                  <div
-                    className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
-                    data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
-                  >
-                    <span className="counter-check-mark">
-                      <Check size={useCompactCounter ? 28 : 36} strokeWidth={2.5} />
-                    </span>
-                  </div>
-                ) : (
-                  <>
-                    <div className="adaptive-counter-numerals" dir="ltr">
-                      <p
-                        className="counter-number text-[1.5rem] font-extrabold leading-8 text-foreground"
-                        key={count}
-                        style={{
-                          fontFamily: counterNumeralFontFamily(language),
-                          fontVariantNumeric: "tabular-nums lining-nums",
-                        }}
-                      >
-                        {localizedCount}
+                {useCompactCounter ? (
+                  /* Compact Action Surface Layout: Mini Circle Badge + Vertical Divider + Action Text */
+                  <div className="flex w-full h-full items-center justify-between gap-3 px-1">
+                    <div className="relative flex size-[52px] shrink-0 items-center justify-center rounded-full bg-primary/10">
+                      <AdaptiveCounterTrack count={count} total={z.repetitionCount} compact={true} />
+                      {complete ? (
+                        <Check size={24} strokeWidth={2.5} className="text-primary" />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center text-center leading-none" dir="ltr">
+                          <span
+                            className="text-[0.9375rem] font-extrabold text-foreground"
+                            style={{
+                              fontFamily: counterNumeralFontFamily(language),
+                              fontVariantNumeric: "tabular-nums lining-nums",
+                            }}
+                          >
+                            {localizedCount}
+                          </span>
+                          {z.repetitionCount > 1 && (
+                            <span
+                              className="text-[0.625rem] font-bold text-muted-foreground mt-0.5"
+                              style={{
+                                fontFamily: counterNumeralFontFamily(language),
+                                fontVariantNumeric: "tabular-nums lining-nums",
+                              }}
+                            >
+                              /{formatNumerals(z.repetitionCount, language)}
+                            </span>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="h-8 w-[1px] bg-border/60 shrink-0" aria-hidden="true" />
+
+                    <div className="flex min-w-0 flex-1 flex-col justify-center text-start">
+                      <p className="text-[0.9375rem] font-extrabold text-foreground truncate">
+                        {complete ? (isArabic ? "أتممت الهدف" : "Target Completed") : counterInstruction}
                       </p>
-                      <p
-                        className="text-[0.75rem] text-muted-foreground"
-                        style={{
-                          fontFamily: counterNumeralFontFamily(language),
-                          fontVariantNumeric: "tabular-nums lining-nums",
-                        }}
-                      >
-                        {localizedRatio}
+                      <p className="text-[0.8125rem] font-bold text-primary mt-0.5 truncate">
+                        {complete
+                          ? isArabic
+                            ? "مكتمل ✓"
+                            : "Done ✓"
+                          : remainingCount > 0
+                            ? remainingText
+                            : isArabic
+                              ? "اضغط للتسبيح"
+                              : "Tap to count"}
                       </p>
                     </div>
-                    <p className="tap-anywhere-hint font-bold text-foreground">{counterInstruction}</p>
+                  </div>
+                ) : (
+                  /* Focused Mode Layout: Centered Circle with Count, Ratio, Divider & Instruction */
+                  <>
+                    {complete ? (
+                      <div
+                        className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+                        data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+                      >
+                        <span className="counter-check-mark">
+                          <Check size={36} strokeWidth={2.5} />
+                        </span>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
+                          <p
+                            className="counter-number text-[2rem] font-black leading-none text-foreground"
+                            key={count}
+                            style={{
+                              fontFamily: counterNumeralFontFamily(language),
+                              fontVariantNumeric: "tabular-nums lining-nums",
+                            }}
+                          >
+                            {localizedCount}
+                          </p>
+                          <p
+                            className="text-[0.75rem] font-bold text-muted-foreground mt-1"
+                            style={{
+                              fontFamily: counterNumeralFontFamily(language),
+                              fontVariantNumeric: "tabular-nums lining-nums",
+                            }}
+                          >
+                            {localizedRatio}
+                          </p>
+                        </div>
+
+                        <div className="my-1.5 h-[1.5px] w-7 bg-border/60 rounded-full" aria-hidden="true" />
+
+                        <p className="tap-anywhere-hint font-bold text-foreground text-xs">{counterInstruction}</p>
+
+                        {remainingCount > 0 && (
+                          <p
+                            className="text-[0.6875rem] font-extrabold text-primary mt-0.5"
+                            style={{
+                              fontFamily: counterNumeralFontFamily(language),
+                              fontVariantNumeric: "tabular-nums lining-nums",
+                            }}
+                          >
+                            {remainingText}
+                          </p>
+                        )}
+                      </>
+                    )}
                   </>
                 )}
               </div>
