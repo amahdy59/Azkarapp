@@ -1,16 +1,20 @@
 import React from "react";
-import { ArrowPrevious, BarChart3, BookOpen, Home, Settings } from "./icons";
+import { ArrowPrevious, BarChart3, BookOpen, Home, Settings, Globe, Moon, Sun } from "./icons";
+import { PalmTreeMark } from "./RoutineGarden";
 import { t } from "../i18n";
-import type { AppLanguage } from "../types";
+import type { AppLanguage, ThemeMode } from "../types";
 
 // ─── Shared nav tab definition ────────────────────────────────────────────────
 
-type NavTab = "home" | "azkar" | "progress" | "settings";
+export type NavTab = "home" | "azkar" | "progress" | "settings";
 
-interface NavProps {
+export interface NavProps {
   active: NavTab;
   onChange: (t: NavTab) => void;
   isArabic?: boolean;
+  themeMode?: ThemeMode;
+  onThemeModeChange?: (mode: ThemeMode) => void;
+  onLanguageChange?: (lang: AppLanguage) => void;
 }
 
 function getNavTabs(language: AppLanguage) {
@@ -121,8 +125,13 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
-      className="app-rail flex flex-col items-center gap-1 py-4 px-1"
+      className="app-rail flex flex-col items-center gap-2 py-4 px-1"
     >
+      {/* Brand icon */}
+      <div className="flex items-center justify-center p-2 mb-2" aria-hidden="true">
+        <PalmTreeMark size={28} className="text-primary" />
+      </div>
+
       {tabs.map(({ id, label, Icon }) => {
         const on = active === id;
         return (
@@ -150,37 +159,98 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
 
 /**
  * Labeled sidebar navigation for large viewports (1200px+).
- * Shows icon + full label in a persistent left/right column.
+ * Shows palm brand header, full labeled item links, and bottom quick controls.
  */
-export function NavSidebar({ active, onChange, isArabic = false }: NavProps) {
+export function NavSidebar({
+  active,
+  onChange,
+  isArabic = false,
+  themeMode = "system",
+  onThemeModeChange,
+  onLanguageChange,
+}: NavProps) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const tabs = getNavTabs(language);
+
+  const toggleLang = () => {
+    onLanguageChange?.(isArabic ? "en" : "ar");
+  };
+
+  const toggleTheme = () => {
+    const nextMode: ThemeMode = themeMode === "dark" ? "light" : "dark";
+    onThemeModeChange?.(nextMode);
+  };
+
   return (
-    <nav aria-label={t(language, "common.bottomNavigation")} className="app-sidebar nav-sidebar">
-      {/* App brand / identity */}
-      <div className="nav-sidebar-brand" aria-hidden="true">
-        <span className="text-[1.0625rem] font-extrabold text-foreground font-sans">أذكار</span>
-        <span className="text-[1.0625rem] font-extrabold text-muted-foreground font-sans">Azkar</span>
+    <nav aria-label={t(language, "common.bottomNavigation")} className="app-sidebar nav-sidebar flex flex-col justify-between h-full">
+      <div className="flex flex-col gap-1">
+        {/* App brand / identity */}
+        <div className="nav-sidebar-brand flex items-center gap-3 px-3 py-4 mb-2 border-b border-border/40">
+          <PalmTreeMark size={32} className="text-primary shrink-0" />
+          <div className="flex flex-col leading-tight">
+            <span className="text-[1.125rem] font-extrabold text-foreground font-sans">
+              {isArabic ? "تطبيق الأذكار" : "Azkar App"}
+            </span>
+            <span className="text-[0.75rem] font-semibold text-muted-foreground font-sans">
+              {isArabic ? "حصنك اليومي" : "Daily Fortress"}
+            </span>
+          </div>
+        </div>
+
+        {/* Primary nav items */}
+        {tabs.map(({ id, label, Icon }) => {
+          const on = active === id;
+          return (
+            <button
+              key={id}
+              data-testid={`nav-sidebar-${id}`}
+              onClick={() => onChange(id)}
+              aria-current={on ? "page" : undefined}
+              className={`nav-sidebar-item ${on ? "active-sidebar-link" : ""}`}
+            >
+              <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
+                <Icon size={20} />
+              </span>
+              <span className="font-semibold" dir="auto">{label}</span>
+            </button>
+          );
+        })}
       </div>
 
-      {/* Primary nav items */}
-      {tabs.map(({ id, label, Icon }) => {
-        const on = active === id;
-        return (
+      {/* Quick controls footer (Language & Theme toggle) */}
+      <div className="flex flex-col gap-2 p-3 mt-auto border-t border-border/40">
+        {onLanguageChange && (
           <button
-            key={id}
-            data-testid={`nav-sidebar-${id}`}
-            onClick={() => onChange(id)}
-            aria-current={on ? "page" : undefined}
-            className="nav-sidebar-item"
+            type="button"
+            onClick={toggleLang}
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors"
           >
-            <span className={on ? "nav-active-cue flex" : "flex"} key={`${id}-${on}`}>
-              <Icon size={20} />
+            <div className="flex items-center gap-2.5">
+              <Globe size={18} className="text-primary" />
+              <span>{isArabic ? "English" : "العربية"}</span>
+            </div>
+            <span className="text-[0.6875rem] font-bold uppercase text-muted-foreground">
+              {language.toUpperCase()}
             </span>
-            <span dir="auto">{label}</span>
           </button>
-        );
-      })}
+        )}
+
+        {onThemeModeChange && (
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors"
+          >
+            <div className="flex items-center gap-2.5">
+              {themeMode === "dark" ? <Sun size={18} className="text-amber-400" /> : <Moon size={18} className="text-primary" />}
+              <span>{isArabic ? "المظهر" : "Theme"}</span>
+            </div>
+            <span className="text-[0.6875rem] font-bold capitalize text-muted-foreground">
+              {themeMode}
+            </span>
+          </button>
+        )}
+      </div>
     </nav>
   );
 }

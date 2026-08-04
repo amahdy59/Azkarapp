@@ -1647,3 +1647,30 @@ a[href]:not(.no-press):active,
       border-color 180ms ease;
   }
 }
+
+/* Dashboard Home Grid System */
+.home-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  width: 100%;
+}
+
+.home-grid-full {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 48rem) {
+  .home-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem;
+  }
+}
+
+@media (min-width: 75rem) {
+  .home-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+

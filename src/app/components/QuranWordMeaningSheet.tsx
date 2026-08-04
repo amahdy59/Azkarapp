@@ -23,44 +23,54 @@ function WordMeaningContent({
   onClose: () => void;
   variant: "sheet" | "dialog";
 }) {
-  const sourceName = language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish;
+  const sourceName =
+    language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish;
 
   return (
-    <>
+    <div className="flex flex-col h-full max-h-[inherit] overflow-hidden">
       {/* Drag handle (sheet only) */}
       {variant === "sheet" && (
-        <div className="flex shrink-0 justify-center pt-2.5 pb-1">
-          <div className="h-1.5 w-10 rounded-full bg-muted-foreground/25" aria-hidden="true" />
+        <div className="flex shrink-0 justify-center pt-3 pb-1">
+          <div className="h-1.5 w-12 rounded-full bg-muted-foreground/30" aria-hidden="true" />
         </div>
       )}
 
       {/* Header */}
-      <div className="relative flex min-h-12 shrink-0 items-center justify-between px-5 pb-2 pt-1 border-b border-border/40">
-        <div className="flex items-center gap-2">
-          <BookOpen size={18} className="text-primary shrink-0" aria-hidden="true" />
-          <h2 className="text-[1.0625rem] font-bold text-foreground">{t(language, "reader.wordMeaningTitle")}</h2>
+      <div className="flex shrink-0 items-center justify-between px-6 py-4 border-b border-border/40">
+        <div className="flex items-center gap-3">
+          <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+            <BookOpen size={20} aria-hidden="true" />
+          </div>
+          <div>
+            <h2 className="text-[1.125rem] font-extrabold text-foreground leading-snug">
+              {t(language, "reader.wordMeaningTitle")}
+            </h2>
+            <p className="text-[0.75rem] font-medium text-muted-foreground">
+              {language === "ar" ? "معاني كلمات القرآن الكريمة" : "Quranic Word Meanings & Exegesis"}
+            </p>
+          </div>
         </div>
         <button
           type="button"
           onClick={onClose}
           aria-label={t(language, "reader.closeWordMeaning")}
-          className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
         >
           <X size={18} />
         </button>
       </div>
 
       {/* Scrollable main content */}
-      <ScrollArea className="min-h-0 flex-1 overscroll-contain" dir={direction}>
-        <div className="flex flex-col gap-4 px-5 pb-6 pt-3">
+      <ScrollArea className="min-h-0 flex-1 overscroll-contain px-6 py-4" dir={direction}>
+        <div className="flex flex-col gap-5 pb-4">
           {meanings.map((meaning) => (
             <div key={meaning.id} className="flex flex-col gap-3">
               {/* Featured Word & Ayah Header Card */}
-              <div className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3.5 text-center">
-                <p className="zikr-text text-[1.25rem] font-bold leading-relaxed text-primary" lang="ar" dir="rtl">
+              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
+                <p className="zikr-text text-[1.375rem] font-extrabold leading-relaxed text-primary" lang="ar" dir="rtl">
                   {meaning.word}
                 </p>
-                <p className="mt-1 text-[0.75rem] font-semibold text-muted-foreground">
+                <p className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">
                   {t(language, "reader.ayahLabel", {
                     ayah: formatNumerals(meaning.ayahNumber, language),
                   })}
@@ -69,15 +79,15 @@ function WordMeaningContent({
 
               {/* Section Title */}
               <div className="flex items-center gap-2 mt-1">
-                <span className="h-3.5 w-1 rounded-full bg-primary" aria-hidden="true" />
+                <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
                 <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
                   {t(language, "reader.wordMeaningLabel")}
                 </h3>
               </div>
 
               {/* Explanation Card */}
-              <div className="rounded-2xl border border-border/50 bg-card/80 dark:bg-muted/40 p-4 shadow-sm">
-                <p className="text-right text-[1rem] font-medium leading-8 text-foreground" lang="ar" dir="rtl">
+              <div className="rounded-2xl border border-border/60 bg-card p-4.5 shadow-sm">
+                <p className="text-right text-[1.0625rem] font-medium leading-8 text-foreground" lang="ar" dir="rtl">
                   {meaning.explanationArabic}
                 </p>
               </div>
@@ -111,7 +121,7 @@ function WordMeaningContent({
           </a>
         </div>
       </ScrollArea>
-    </>
+    </div>
   );
 }
 
@@ -144,11 +154,11 @@ export function QuranWordMeaningSheet({
 
   if (!isOpen || !meanings) return null;
 
-  // Medium+ → centered modal dialog
+  // Medium+ → Desktop / Tablet Modal Dialog
   if (useDialog) {
     return (
       <div
-        className="word-meaning-dialog-positioner"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
         role="dialog"
         aria-modal="true"
         aria-label={t(language, "reader.wordMeaningTitle")}
@@ -162,11 +172,11 @@ export function QuranWordMeaningSheet({
           type="button"
           tabIndex={-1}
           aria-hidden="true"
-          className="absolute inset-0 border-none bg-black/40 backdrop-blur-sm scrim-in cursor-default"
+          className="fixed inset-0 border-none bg-black/60 backdrop-blur-md cursor-default animate-in fade-in-0 duration-200"
           onClick={onClose}
         />
         {/* Dialog card */}
-        <div className="word-meaning-dialog relative flex flex-col">
+        <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
           <WordMeaningContent
             meanings={meanings}
             language={language}
@@ -179,7 +189,7 @@ export function QuranWordMeaningSheet({
     );
   }
 
-  // Compact → bottom sheet (Radix Drawer, unchanged from original)
+  // Compact → Mobile Bottom Sheet (Vaul Drawer)
   return (
     <Drawer
       open={isOpen}
@@ -191,7 +201,7 @@ export function QuranWordMeaningSheet({
         data-testid="quran-word-meaning-sheet"
         data-prevent-count="true"
         aria-describedby="quran-word-meaning-description"
-        className="fixed inset-x-0 bottom-0 z-50 mx-auto flex w-full max-w-[390px] flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[85vh] shadow-[0_-12px_36px_rgba(0,0,0,0.4)] border-t border-border/40"
+        className="fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[88vh] shadow-[0_-12px_36px_rgba(0,0,0,0.4)] border-t border-border/40 pb-safe"
         dir={direction}
       >
         <DrawerTitle className="sr-only">{t(language, "reader.wordMeaningTitle")}</DrawerTitle>

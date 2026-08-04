@@ -753,7 +753,16 @@ function AppContent() {
 
         {/* Adaptive navigation — only one renders at a time */}
         {showRail && <NavRail active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
-        {showSidebar && <NavSidebar active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
+        {showSidebar && (
+          <NavSidebar
+            active={activeTab}
+            onChange={handleNavTab}
+            isArabic={isArabic}
+            themeMode={themeMode}
+            onThemeModeChange={setThemeMode}
+            onLanguageChange={setSelectedLang}
+          />
+        )}
 
         <div className="app-main">
           <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
@@ -875,6 +884,11 @@ function AppContent() {
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");
+                  }}
+                  onOpenProgress={() => {
+                    window.history.replaceState({ view: "progress" }, "", "?view=progress");
+                    setView("progress");
+                    setActiveTab("progress");
                   }}
                   language={selectedLang}
                   calendarType={calendarType}
