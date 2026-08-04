@@ -82,10 +82,10 @@ export function AuthenticZikrLibrarySheet({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
             aria-label={t(language, "common.close") || "Close"}
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 

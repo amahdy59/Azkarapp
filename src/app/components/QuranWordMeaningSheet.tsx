@@ -50,9 +50,9 @@ export function QuranWordMeaningSheet({
             type="button"
             onClick={onClose}
             aria-label={t(language, "reader.closeWordMeaning")}
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <X size={16} />
+            <X size={18} />
           </button>
         </div>
 
