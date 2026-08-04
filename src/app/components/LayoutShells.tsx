@@ -37,14 +37,14 @@ export function Header({
   language?: AppLanguage;
 }) {
   return (
-    <div className="flex w-full shrink-0 h-12 items-center gap-2 px-4 pt-0 pb-1">
+    <div className="flex w-full shrink-0 items-center gap-2 px-4 pt-0 pb-1" style={{ minHeight: 56 }}>
       {onBack && (
         <IconButton onClick={onBack} label={t(language, "common.back")}>
           <ArrowPrevious size={20} className="text-foreground" />
         </IconButton>
       )}
       <div className="flex-1 min-w-0">
-        <h1 className="font-semibold truncate text-[1.0625rem] leading-6 text-foreground font-sans">{title}</h1>
+        <h1 className="font-extrabold truncate text-[1.5rem] leading-tight text-foreground font-sans">{title}</h1>
         {subtitle && <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}

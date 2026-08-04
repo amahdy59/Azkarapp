@@ -219,7 +219,7 @@ export function PalmTreeReward({
   if (bare) {
     return (
       <div
-        className="flex w-full items-center justify-between py-1"
+        className="flex w-full items-center justify-between rounded-[20px] border border-white/15 bg-black/25 px-4 py-2 backdrop-blur-md"
         aria-label={
           isArabic
             ? `أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، السلسلة اليومية: ${formatNumerals(streak, language)} أيام`
@@ -656,9 +656,11 @@ export function TodayRoutineGarden({
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 py-2.5 px-3 shadow-xs dark:bg-amber-500/15">
           <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
-            <span className="text-[1.25rem]" role="img" aria-label={t(language, "garden.streakFlame")}>
-              🔥
-            </span>
+            <Flame
+              className="h-[1.25rem] w-[1.25rem] text-amber-500"
+              strokeWidth={2.5}
+              aria-hidden="true"
+            />
             <span className="text-[1rem] font-black text-amber-700 dark:text-amber-300">
               {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
             </span>
@@ -728,7 +730,7 @@ export function TodayRoutineGarden({
                       height="20"
                       fill="none"
                       aria-hidden="true"
-                      className={`shrink-0 ${isDone ? "text-[#F59E0B]" : "text-slate-400 dark:text-slate-500"}`}
+                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-slate-500 dark:text-slate-400"}`}
                     >
                       <path
                         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
@@ -880,8 +882,8 @@ export function TodayRoutineGarden({
                     : "bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/40 border border-transparent";
 
                 const tileTitle = isArabic
-                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة" : completedCount > 0 ? "نشط 🔥" : "غير نشط"}`
-                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed" : completedCount > 0 ? "Active 🔥" : "Inactive"}`;
+                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة" : completedCount > 0 ? "نشط ⚡" : "غير نشط"}`
+                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed" : completedCount > 0 ? "Active ⚡" : "Inactive"}`;
 
                 return (
                   <button
@@ -892,7 +894,7 @@ export function TodayRoutineGarden({
                     tabIndex={0}
                     className={`interactive-elem flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tileBg}`}
                   >
-                    <span>{isPalm ? <PalmTreeMark size={14} filled /> : completedCount > 0 ? "🔥" : ""}</span>
+                    <span>{isPalm ? <PalmTreeMark size={14} filled /> : completedCount > 0 ? <Flame className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" /> : ""}</span>
                     <span className="text-[0.625rem] opacity-80">{formatNumerals(day.dayNum, language)}</span>
                   </button>
                 );
@@ -912,10 +914,10 @@ export function TodayRoutineGarden({
                 <span>{t(language, "garden.legendLess")}</span>
                 <span className="h-4 w-4 rounded-[4px] bg-muted/40 dark:bg-zinc-800/60" title="Inactive" />
                 <span
-                  className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10 text-[0.55rem]"
-                  title="Streak Active (🔥)"
+                  title={isArabic ? "يوم نشط" : "Streak Active"}
+                  className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10"
                 >
-                  🔥
+                  <Flame className="h-3 w-3 text-amber-500" strokeWidth={2.5} />
                 </span>
                 <span
                   className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
@@ -992,8 +994,8 @@ export function TodayRoutineGarden({
                               : "bg-muted/30 dark:bg-zinc-800/40 border border-transparent";
 
                           const tileTitle = isArabic
-                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة" : hasActivity ? "نشط 🔥" : "غير نشط"}`
-                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed" : hasActivity ? "Active 🔥" : "Inactive"}`;
+                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة" : hasActivity ? "نشط ⚡" : "غير نشط"}`
+                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed" : hasActivity ? "Active ⚡" : "Inactive"}`;
 
                           return (
                             <button
@@ -1004,7 +1006,7 @@ export function TodayRoutineGarden({
                               tabIndex={0}
                               className={`interactive-elem flex h-4.5 w-full items-center justify-center rounded-[3px] text-[0.55rem] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${tileBg}`}
                             >
-                              {isPalm ? <PalmTreeMark size={9} filled /> : hasActivity ? "🔥" : ""}
+                              {isPalm ? <PalmTreeMark size={9} filled /> : hasActivity ? <Flame className="h-2.5 w-2.5 text-amber-500" strokeWidth={2.5} aria-hidden="true" /> : ""}
                             </button>
                           );
                         })}

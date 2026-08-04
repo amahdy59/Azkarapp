@@ -21,7 +21,7 @@ export function SubHeader({
       <IconButton onClick={onBack} label={t(language, "common.back")}>
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
-      <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px]">{title}</h1>
+      <h1 className="text-[1.5rem] font-extrabold text-foreground font-sans leading-tight">{title}</h1>
       <div style={{ width: 44 }} className="flex justify-end items-center">
         {right}
       </div>

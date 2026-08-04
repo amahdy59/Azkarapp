@@ -66,7 +66,7 @@ export function TranquilityCompletionCard({
           <h2 className="text-[1.75rem] font-bold tracking-tight text-white" dir="auto">
             {completedTitle}
           </h2>
-          <p className="text-[0.8125rem] font-normal text-[#94a3b8]" dir="auto">
+          <p className="text-[0.8125rem] font-normal text-white/70" dir="auto">
             {completedSubtitle}
           </p>
         </div>
@@ -86,7 +86,7 @@ export function TranquilityCompletionCard({
           <p className="text-[0.9375rem] font-medium leading-relaxed text-white" dir="auto">
             «{isArabic ? todayQuote.arabic : todayQuote.english}»
           </p>
-          <span className="text-[0.75rem] font-normal text-[#64748b]" dir="auto">
+          <span className="text-[0.75rem] font-normal text-white/50" dir="auto">
             {todayQuote.reference}
           </span>
         </div>

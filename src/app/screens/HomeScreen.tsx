@@ -298,8 +298,8 @@ export function HomeScreen({
         ) : (
           <section aria-labelledby="current-zikr-heading" className="mb-5">
             <div className="flex flex-col gap-4 text-start">
-              {/* Hero Text Block */}
-              <div className="flex w-full flex-col items-start gap-2 p-2">
+              {/* Hero Text Block — frosted scrim ensures text contrast on photo bg */}
+              <div className="flex w-full flex-col items-start gap-3 rounded-2xl border border-white/10 bg-black/30 px-4 py-3 backdrop-blur-md">
                 <p className="text-[1.125rem] font-medium text-white" dir="auto">
                   {isArabic ? "حان وقت" : "Time for"}
                 </p>
@@ -311,7 +311,7 @@ export function HomeScreen({
                 >
                   {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                 </h2>
-                <p className="text-[0.8125rem] font-normal text-[#9ca3af]" dir="auto">
+                <p className="text-[0.8125rem] font-medium text-white/75" dir="auto">
                   {reminderInfo.desc}
                 </p>
               </div>
@@ -330,7 +330,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                     }
                   }}
-                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
                     reminderMode === "complete" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
@@ -344,7 +344,7 @@ export function HomeScreen({
                       onSetRoutineMode?.(reminderInfo.categoryId, "core");
                     }
                   }}
-                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold ${
+                  className={`flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all text-[0.875rem] font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-inset ${
                     reminderMode === "core" ? "bg-white/10 text-[#fbbf24]" : "text-[#f2eee9] hover:text-white"
                   }`}
                 >
@@ -405,7 +405,7 @@ export function HomeScreen({
                 onClick={() => {
                   onResume(reminderInfo.categoryId);
                 }}
-                className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#d99f43] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98]"
+                className="mt-2 flex h-[52px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#d99f43] bg-gradient-to-r from-[#d99f43] to-[#eeb962] text-[1.0625rem] font-bold text-[#141a2a] shadow-lg transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-offset-2 focus-visible:ring-offset-black/60"
               >
                 {direction === "rtl" ? (
                   <svg
