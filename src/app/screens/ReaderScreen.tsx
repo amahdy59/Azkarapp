@@ -430,6 +430,7 @@ export function ReaderScreen({
               total={z.repetitionCount}
               compact={useCompactCounter}
               complete={complete}
+              justCompleted={justCompleted}
               onTap={handleTap}
               language={language}
               instructionText={counterInstruction}

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { motion, useReducedMotion } from "motion/react";
+import { motion } from "motion/react";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
@@ -116,13 +116,13 @@ export interface ZikrCounterSurfaceProps {
   total: number;
   compact?: boolean;
   complete?: boolean;
-  disabled?: boolean;
+  justCompleted?: boolean;
   onTap: () => void;
   language: AppLanguage;
-  direction?: "ltr" | "rtl";
   instructionText?: string;
-  testId?: string;
   className?: string;
+  disabled?: boolean;
+  testId?: string;
 }
 
 export function ZikrCounterSurface({
@@ -130,17 +130,17 @@ export function ZikrCounterSurface({
   total,
   compact = false,
   complete = false,
-  disabled = false,
+  justCompleted = false,
   onTap,
   language,
   instructionText,
-  testId = "counter-surface",
   className = "",
+  disabled = false,
+  testId = "counter-surface",
 }: ZikrCounterSurfaceProps) {
-  const prefersReducedMotion = useReducedMotion();
-  const [isPressed, setIsPressed] = useState(false);
   const isArabic = language === "ar";
-  const remainingCount = total > 0 ? Math.max(0, total - count) : 0;
+  const [isPressed, setIsPressed] = useState(false);
+  const remainingCount = total > 1 ? total - count : 0;
 
   const defaultInstruction = isArabic ? "اضغط للتسبيح" : "Tap to count";
   const activeInstruction = instructionText || defaultInstruction;
@@ -150,7 +150,6 @@ export function ZikrCounterSurface({
   const localizedRatio = total > 0 ? `${localizedCount} / ${localizedTotal}` : localizedCount;
   const remainingText = isArabic ? `${formatNumerals(remainingCount, language)} متبقٍ` : `${remainingCount} remaining`;
 
-  // Accessible Name per Section 1 specification
   const accessibleName = complete
     ? total > 0
       ? isArabic
@@ -172,12 +171,12 @@ export function ZikrCounterSurface({
     setIsPressed(false);
   };
 
-  const handlePointerLeave = () => {
+  const handlePointerCancel = () => {
     setIsPressed(false);
   };
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
     if (disabled || complete) return;
     onTap();
   };
@@ -188,33 +187,35 @@ export function ZikrCounterSurface({
       data-testid={testId}
       data-counter-shape={compact ? "compact" : "circle"}
       disabled={disabled || complete}
-      aria-disabled={disabled || complete}
-      aria-label={accessibleName}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
-      onPointerLeave={handlePointerLeave}
-      onPointerCancel={handlePointerLeave}
-      className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${
-        isPressed ? "is-pressed" : ""
-      } ${className}`}
+      onPointerCancel={handlePointerCancel}
+      onPointerLeave={handlePointerCancel}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          if (!disabled && !complete) onTap();
+        }
+      }}
+      aria-disabled={disabled || complete}
+      aria-label={accessibleName}
+      className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${className}`}
       initial={false}
       animate={{
         width: compact ? "100%" : 164,
         height: compact ? 76 : 164,
         borderRadius: compact ? 24 : 82,
       }}
-      transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
-      whileTap={disabled || complete || prefersReducedMotion ? undefined : { scale: 0.985 }}
+      transition={{ duration: 0.26, ease: [0.2, 0, 0.2, 1] }}
+      whileTap={complete ? undefined : { scale: 0.985 }}
     >
       {!compact && <AdaptiveCounterTrack count={count} total={total} compact={false} />}
-      <span className="adaptive-counter-pulse" aria-hidden="true" />
 
       <div className={`adaptive-counter-content ${compact ? "is-compact" : ""}`}>
         {compact ? (
-          /* Compact Action Surface Layout: Leading Mini Ring Badge + Vertical Divider + Action Text */
-          <div className="flex w-full h-full items-center justify-between gap-3.5 px-1">
-            <div className="relative flex size-[54px] shrink-0 items-center justify-center rounded-full bg-primary/10">
+          <div className="flex w-full h-full items-center justify-between gap-3 px-1">
+            <div className="relative flex size-[52px] shrink-0 items-center justify-center rounded-full bg-primary/10">
               <AdaptiveCounterTrack count={count} total={total} compact={true} />
               {complete ? (
                 <Check size={24} strokeWidth={2.5} className="text-primary" />
@@ -229,7 +230,7 @@ export function ZikrCounterSurface({
                   >
                     {localizedCount}
                   </span>
-                  {total > 0 && (
+                  {total > 1 && (
                     <span
                       className="text-[0.625rem] font-bold text-muted-foreground mt-0.5"
                       style={{
@@ -237,7 +238,7 @@ export function ZikrCounterSurface({
                         fontVariantNumeric: "tabular-nums lining-nums",
                       }}
                     >
-                      /{localizedTotal}
+                      /{formatNumerals(total, language)}
                     </span>
                   )}
                 </div>
@@ -264,16 +265,20 @@ export function ZikrCounterSurface({
             </div>
           </div>
         ) : (
-          /* Focused Mode Layout: Centered Circle with Count, Ratio, Divider & Instruction */
           <>
             {complete ? (
-              <div className="counter-complete-cue flex flex-col items-center justify-center">
+              <div
+                className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+                data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+              >
                 <span className="counter-check-mark">
                   <Check size={36} strokeWidth={2.5} />
                 </span>
-                <span className="mt-2 text-[0.75rem] font-black text-foreground">
-                  {isArabic ? "أتممت الهدف" : "Target completed"}
-                </span>
+                {!justCompleted && (
+                  <span className="mt-2 text-[0.75rem] font-black text-foreground">
+                    {isArabic ? "أتممت الهدف" : "Target completed"}
+                  </span>
+                )}
               </div>
             ) : (
               <>

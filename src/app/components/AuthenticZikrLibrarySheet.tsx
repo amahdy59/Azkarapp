@@ -58,7 +58,12 @@ export function AuthenticZikrLibrarySheet({
       aria-modal="true"
       aria-labelledby="authentic-sheet-title"
     >
-      <div className="relative z-10 flex max-h-[85vh] w-full max-w-lg flex-col rounded-t-3xl border-t border-border bg-card p-5 shadow-2xl transition-transform">
+      <div className="relative z-10 flex max-h-[85vh] w-full max-w-lg flex-col rounded-t-[1.75rem] border-t border-border/40 bg-card p-5 shadow-[0_-12px_36px_rgba(0,0,0,0.4)] transition-transform">
+        {/* Drag Handle Bar */}
+        <div className="flex shrink-0 justify-center pb-3 -mt-2">
+          <div className="h-1.5 w-10 rounded-full bg-muted-foreground/25" aria-hidden="true" />
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between pb-3">
           <div className="flex items-center gap-2.5">
@@ -66,7 +71,7 @@ export function AuthenticZikrLibrarySheet({
               <BookOpen size={20} aria-hidden="true" />
             </div>
             <div>
-              <h2 id="authentic-sheet-title" className="text-[1.125rem] font-bold text-foreground">
+              <h2 id="authentic-sheet-title" className="text-[1.0625rem] font-bold text-foreground">
                 {isArabic ? "مكتبة الأذكار المأثورة الموثقة" : "Authentic Verified Zikr Library"}
               </h2>
               <p className="text-[0.75rem] text-muted-foreground">
@@ -77,10 +82,10 @@ export function AuthenticZikrLibrarySheet({
           <button
             type="button"
             onClick={onClose}
-            className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
             aria-label={t(language, "common.close") || "Close"}
           >
-            <X size={20} />
+            <X size={16} />
           </button>
         </div>
 

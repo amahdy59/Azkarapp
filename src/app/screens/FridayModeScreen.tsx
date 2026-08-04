@@ -151,7 +151,7 @@ export function FridayModeScreen({
   ];
 
   return (
-    <ScreenContainer dir={direction} className="px-0">
+    <ScreenContainer dir={direction} className="px-0" data-testid="friday-mode-screen">
       <Header
         onBack={onBack}
         title={t(language, "friday.title")}

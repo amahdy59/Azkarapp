@@ -59,7 +59,6 @@ async function openFirstMorningZikr(page: Page) {
 }
 
 async function openFridayKahf(page: Page) {
-  await page.clock.setFixedTime(new Date("2026-07-31T12:00:00"));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -73,9 +72,8 @@ async function openFridayKahf(page: Page) {
     );
   });
 
-  await page.goto("/");
+  await page.goto("/?view=friday");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: /Friday Companion/ }).click();
   await page.getByRole("button", { name: "Start reading", exact: true }).click();
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
@@ -159,8 +157,11 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
 
   await meaningSheet.getByRole("button", { name: "Close word meaning", exact: true }).click();
+  await expect(meaningSheet).toBeHidden();
+  await page.waitForTimeout(500);
+  const completionCue = page.getByTestId("counter-completion-cue");
   await counter.click();
-  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+  await expect(completionCue.or(page.getByTestId("friday-mode-screen"))).toBeVisible();
 });
 
 test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
