@@ -139,6 +139,7 @@ export function HomeScreen({
   onOpenFridayMode,
   routineModes,
   onSetRoutineMode,
+  onOpenCustomCounter,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -153,6 +154,7 @@ export function HomeScreen({
   onOpenFridayMode?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
+  onOpenCustomCounter?: () => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -262,6 +264,35 @@ export function HomeScreen({
 
       {/* Scrollable Content Area */}
       <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6">
+        {onOpenCustomCounter && (
+          <section className="mb-4">
+            <button
+              type="button"
+              onClick={onOpenCustomCounter}
+              className="interactive-elem flex w-full items-center justify-between rounded-2xl border border-primary/40 bg-card/90 p-4 text-start shadow-md backdrop-blur-md transition-all hover:bg-card hover:border-primary"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground font-black text-[1.25rem] shadow-sm">
+                  ✨
+                </div>
+                <div>
+                  <h3 className="text-[1rem] font-extrabold text-foreground">
+                    {isArabic ? "المسبحة الإلكترونية الأذكار المأثورة" : "Tasbeeh Counter & Authentic Zikr"}
+                  </h3>
+                  <p className="text-[0.75rem] font-medium text-muted-foreground">
+                    {isArabic
+                      ? "عداد 100، 1000، 33 ومكتبة الأذكار الصحيحة"
+                      : "Counter 100, 1000, 33 & Hadith collection"}
+                  </p>
+                </div>
+              </div>
+              <span className="text-[1.25rem] font-bold text-primary transition-transform">
+                {direction === "rtl" ? "←" : "→"}
+              </span>
+            </button>
+          </section>
+        )}
+
         {isFriday && onOpenFridayMode && (
           <section className="mb-4">
             <button

@@ -66,7 +66,8 @@ export type View =
   // Phase 3
   | "settings"
   // Phase 4
-  | "search";
+  | "search"
+  | "custom_counter";
 
 export type BeforeInstallPromptEvent = Event & {
   prompt: () => Promise<void>;

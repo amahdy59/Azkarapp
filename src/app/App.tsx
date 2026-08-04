@@ -841,6 +841,7 @@ function AppContent() {
                 onSetRoutineMode={(categoryId, mode) => {
                   setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
                 }}
+                onOpenCustomCounter={() => push("custom_counter")}
               />
             )}
             {view === "library" && (
