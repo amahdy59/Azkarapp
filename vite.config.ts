@@ -67,7 +67,7 @@ export default defineConfig(({ mode }) => {
           ],
         },
         workbox: {
-          globPatterns: ["**/*.{js,css,html,svg,png,webp,woff2}"],
+          globPatterns: ["**/*.{js,css,html,svg,png,webp,avif,woff2}"],
           globIgnores: [
             "**/ReaderScreen-*.js",
             "**/SettingsScreen-*.js",

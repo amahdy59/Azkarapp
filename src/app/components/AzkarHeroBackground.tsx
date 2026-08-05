@@ -2,6 +2,12 @@ import type { CSSProperties } from "react";
 import { azkarBackgrounds, toSrcSet, type AzkarBackgroundKey } from "./azkar-backgrounds";
 import "./azkar-hero-background.css";
 
+const getAssetUrl = (path: string) => {
+  const base = import.meta.env.BASE_URL || "/";
+  const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  return `${cleanBase}${path}`;
+};
+
 interface AzkarHeroBackgroundProps {
   kind: AzkarBackgroundKey;
   priority?: boolean;
@@ -11,7 +17,7 @@ interface AzkarHeroBackgroundProps {
 export function AzkarHeroBackground({ kind, priority = false, className = "" }: AzkarHeroBackgroundProps) {
   const asset = azkarBackgrounds[kind];
   const style = {
-    "--azkar-bg-placeholder": `url(${asset.placeholder})`,
+    "--azkar-bg-placeholder": `url(${getAssetUrl(asset.placeholder)})`,
     "--azkar-bg-position": asset.objectPosition,
   } as CSSProperties;
 
@@ -20,7 +26,7 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
       <source type="image/avif" srcSet={toSrcSet(asset.avif)} sizes={asset.sizes} />
       <source type="image/webp" srcSet={toSrcSet(asset.webp)} sizes={asset.sizes} />
       <img
-        src={asset.webp[1]?.src || asset.webp[0]?.src || ""}
+        src={getAssetUrl(asset.webp[1]?.src || asset.webp[0]?.src || "")}
         alt=""
         aria-hidden="true"
         width={1280}

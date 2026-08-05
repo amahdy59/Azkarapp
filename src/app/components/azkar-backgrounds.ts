@@ -154,5 +154,7 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
 } as const;
 
 export function toSrcSet(items: readonly { src: string; width: number }[]): string {
-  return items.map(({ src, width }) => `${src} ${width}w`).join(", ");
+  const base = import.meta.env.BASE_URL || "/";
+  const cleanBase = base.endsWith("/") ? base.slice(0, -1) : base;
+  return items.map(({ src, width }) => `${cleanBase}${src} ${width}w`).join(", ");
 }
