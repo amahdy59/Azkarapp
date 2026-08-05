@@ -241,7 +241,7 @@ export function HomeScreen({
       <div className="relative z-20 shrink-0 px-page pt-2 pb-1">
         <header className="flex w-full flex-col pt-1 pb-1" dir={direction}>
           <div
-            className="flex min-h-[48px] w-full shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-[22px] border border-white/20 bg-black/35 px-4 py-2.5 text-xs font-semibold backdrop-blur-xl shadow-md"
+            className="flex min-h-[48px] w-full shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs font-semibold"
             dir="auto"
             aria-label={
               isArabic
@@ -249,8 +249,37 @@ export function HomeScreen({
                 : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of 3, Daily streak: ${streakDays} days`
             }
           >
-            {/* Start side: Date & Next Prayer info */}
-            <div className="flex flex-wrap items-center gap-3 text-white">
+            {/* Start side: Streak & Palms Gamification Badges */}
+            <div className="flex items-center gap-2.5">
+              {/* Streak */}
+              <div
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-[#fbbf24] backdrop-blur-md shadow-xs"
+                title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+              >
+                <span>
+                  {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
+                </span>
+                <Zap className="h-3.5 w-3.5 text-[#fbbf24]" strokeWidth={2.5} aria-hidden="true" />
+              </div>
+
+              {/* Palms */}
+              <div
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-[#fbbf24] backdrop-blur-md shadow-xs"
+                title={isArabic ? "أشجار النخيل" : "Palms"}
+              >
+                <PalmTreeMark
+                  size={16}
+                  filled={gardenSummary.lifetimePalms > 0}
+                  className={gardenSummary.lifetimePalms > 0 ? "text-[#fbbf24]" : "text-white/40"}
+                />
+                <span>
+                  {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
+                </span>
+              </div>
+            </div>
+
+            {/* End side: Date & Next Prayer info */}
+            <div className="flex flex-wrap items-center gap-3 rounded-full border border-white/15 bg-black/25 px-3.5 py-1.5 backdrop-blur-md shadow-xs text-white">
               {/* Date */}
               <div data-testid="hijri-date" className="flex items-center gap-2 text-white whitespace-nowrap">
                 <Calendar className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" />
@@ -268,35 +297,6 @@ export function HomeScreen({
                 </span>
               </div>
             </div>
-
-            {/* End side: Streak & Palms Gamification Badges */}
-            <div className="flex items-center gap-2.5">
-              {/* Streak */}
-              <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-black text-[#fbbf24] shadow-xs"
-                title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
-              >
-                <span>
-                  {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
-                </span>
-                <Zap className="h-3.5 w-3.5 text-[#fbbf24]" strokeWidth={2.5} aria-hidden="true" />
-              </div>
-
-              {/* Palms */}
-              <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-black text-[#fbbf24] shadow-xs"
-                title={isArabic ? "أشجار النخيل" : "Palms"}
-              >
-                <PalmTreeMark
-                  size={16}
-                  filled={gardenSummary.lifetimePalms > 0}
-                  className={gardenSummary.lifetimePalms > 0 ? "text-[#fbbf24]" : "text-white/40"}
-                />
-                <span>
-                  {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
-                </span>
-              </div>
-            </div>
           </div>
         </header>
       </div>
@@ -307,10 +307,10 @@ export function HomeScreen({
         aria-label={t(language, "app.name")}
         className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
-        <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-5 w-full">
-          {/* Top Row: Hero Zikr Banner (2 cols) & Today's Wird Routine Card (1 col) */}
+        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-5 w-full">
+          {/* Top Row: Hero Zikr Banner (3 cols) & Today's Wird Routine Card (2 cols) */}
           {isComplete ? (
-            <div className="xl:col-span-2">
+            <div className="lg:col-span-3">
               <TranquilityCompletionCard
                 categoryId={reminderInfo.categoryId}
                 language={language}
@@ -321,23 +321,23 @@ export function HomeScreen({
           ) : (
             <section
               aria-labelledby="current-zikr-heading"
-              className="xl:col-span-2 flex flex-col justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-5 md:p-6 backdrop-blur-xl shadow-xl transition-all"
+              className="glass-panel lg:col-span-3 flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 p-5 md:p-6 backdrop-blur-xl shadow-md transition-all"
             >
               <div className="flex flex-col gap-4 text-start">
                 {/* Hero Text & Category Header */}
-                <div className="flex w-full flex-col items-start gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3.5 backdrop-blur-md">
-                  <p className="text-[1.125rem] font-medium text-white/90" dir="auto">
+                <div className="flex w-full flex-col items-start gap-1 mb-2 px-1">
+                  <p className="text-[1.125rem] font-bold text-foreground drop-shadow-sm" dir="auto">
                     {isArabic ? "حان وقت" : "Time for"}
                   </p>
                   <h2
                     id="current-zikr-heading"
-                    className="text-2xl md:text-3xl font-black text-[#fbbf24] tracking-wide"
+                    className="text-2xl md:text-3xl font-black text-[#fbbf24] tracking-wide drop-shadow-md"
                     dir="auto"
                     style={{ lineHeight: "1.3" }}
                   >
                     {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                   </h2>
-                  <p className="text-[0.8125rem] font-medium text-white/80" dir="auto">
+                  <p className="text-[0.875rem] font-semibold text-muted-foreground drop-shadow-sm" dir="auto">
                     {reminderInfo.desc}
                   </p>
                 </div>
@@ -462,7 +462,7 @@ export function HomeScreen({
 
           {/* Today's Wird Routine Card ("وردك اليوم") */}
           {quietProgressEnabled && (
-            <div className="xl:col-span-1">
+            <div className="lg:col-span-2 flex w-full">
               <TodayRoutineGarden
                 summary={gardenSummary}
                 language={language}
