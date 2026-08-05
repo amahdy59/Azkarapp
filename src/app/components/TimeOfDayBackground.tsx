@@ -2,7 +2,7 @@ import React from "react";
 import { AzkarHeroBackground } from "./AzkarHeroBackground";
 import type { AzkarBackgroundKey } from "./azkar-backgrounds";
 
-export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
+export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: string }) {
   let kind: AzkarBackgroundKey = "morning";
 
   if (categoryId === "evening") {

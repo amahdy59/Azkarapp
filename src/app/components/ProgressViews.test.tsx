@@ -7,10 +7,14 @@ import type { DailyCollectionCompletion } from "../types";
 const mockSummary: GardenSummary = {
   today: {
     dayKey: "2026-08-05",
+    date: new Date("2026-08-05"),
     completedCategories: ["morning"],
-    isFullDay: false,
-    earnedLeaf: true,
-    earnedPalm: false,
+    goldenLeafCount: 1,
+    greenLeafCount: 0,
+    leafCount: 1,
+    extraLeafCount: 0,
+    isPalm: false,
+    isToday: true,
   },
   yesterday: null,
   activeDaysLast30: 20,

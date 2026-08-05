@@ -599,7 +599,7 @@ export function TodayRoutineGarden({
           summary={summary}
           language={language}
           dailyCompletions={dailyCompletions}
-          referenceDate={viewReferenceDate}
+          referenceDate={displayDate}
         />
       )}
 
