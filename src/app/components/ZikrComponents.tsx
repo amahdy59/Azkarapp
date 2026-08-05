@@ -72,10 +72,11 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
         stroke="var(--primary)"
         strokeWidth="10"
         fill="none"
-        strokeLinecap="round"
+        strokeLinecap={count === 0 ? "butt" : "round"}
         strokeDasharray={circ}
         strokeDashoffset={circ * (1 - pct)}
-        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1)" }}
+        opacity={count === 0 ? 0 : 1}
+        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1), opacity 180ms" }}
       />
     </svg>
   );
@@ -101,11 +102,12 @@ export function AdaptiveCounterTrack({ count, total, compact }: { count: number;
         r={r}
         strokeWidth={strokeWidth}
         fill="none"
-        strokeLinecap="round"
+        strokeLinecap={count === 0 ? "butt" : "round"}
         strokeDasharray={circ}
         strokeDashoffset={circ * (1 - progress)}
         transform="rotate(-90 50 50)"
-        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1)" }}
+        opacity={count === 0 ? 0 : 1}
+        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1), opacity 180ms" }}
       />
     </svg>
   );

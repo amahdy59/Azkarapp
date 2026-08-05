@@ -72,7 +72,7 @@ export function TasbeehCounterButton({
       </div>
       <ChevronNext
         size={20}
-        className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 group-hover:text-foreground"
+        className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:scale-x-[-1] group-hover:text-foreground"
         aria-hidden="true"
       />
     </button>

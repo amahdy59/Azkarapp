@@ -245,7 +245,7 @@ export function FridayModeScreen({
           {salawatComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
           ) : (
-            <ChevronNext size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+            <ChevronNext size={20} className="shrink-0 text-muted-foreground rtl:scale-x-[-1]" aria-hidden="true" />
           )}
         </button>
 
@@ -288,7 +288,7 @@ export function FridayModeScreen({
           {duasComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
           ) : (
-            <ChevronNext size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+            <ChevronNext size={20} className="shrink-0 text-muted-foreground rtl:scale-x-[-1]" aria-hidden="true" />
           )}
         </button>
       </div>

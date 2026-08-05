@@ -307,10 +307,10 @@ export function HomeScreen({
         aria-label={t(language, "app.name")}
         className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
-        <div className="home-grid w-full">
+        <div className="flex flex-col xl:grid xl:grid-cols-3 gap-4 xl:gap-5 w-full">
           {/* Top Row: Hero Zikr Banner (2 cols) & Today's Wird Routine Card (1 col) */}
           {isComplete ? (
-            <div className="lg:col-span-2">
+            <div className="xl:col-span-2">
               <TranquilityCompletionCard
                 categoryId={reminderInfo.categoryId}
                 language={language}
@@ -321,7 +321,7 @@ export function HomeScreen({
           ) : (
             <section
               aria-labelledby="current-zikr-heading"
-              className="lg:col-span-2 flex flex-col justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-5 md:p-6 backdrop-blur-xl shadow-xl transition-all"
+              className="xl:col-span-2 flex flex-col justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-5 md:p-6 backdrop-blur-xl shadow-xl transition-all"
             >
               <div className="flex flex-col gap-4 text-start">
                 {/* Hero Text & Category Header */}
@@ -462,7 +462,7 @@ export function HomeScreen({
 
           {/* Today's Wird Routine Card ("وردك اليوم") */}
           {quietProgressEnabled && (
-            <div className="lg:col-span-1">
+            <div className="xl:col-span-1">
               <TodayRoutineGarden
                 summary={gardenSummary}
                 language={language}

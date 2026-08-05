@@ -682,7 +682,7 @@ export function TodayRoutineGarden({
 
           {/* Main Split Row */}
           <div
-            className="relative z-10 grid w-full grid-cols-1 items-center gap-4 min-[360px]:grid-cols-[minmax(0,1fr)_120px]"
+            className="relative z-10 grid w-full grid-cols-1 items-center gap-6 sm:grid-cols-[minmax(0,1fr)_130px] sm:gap-4"
             data-testid="today-palm-layout"
           >
             {/* Right Column: Zikr Routine List */}
@@ -713,7 +713,7 @@ export function TodayRoutineGarden({
                   <div className="flex w-full items-center justify-between gap-2.5">
                     <span
                       className={`text-[0.875rem] font-bold whitespace-nowrap ${
-                        isDone ? "text-foreground font-black" : "text-foreground/90"
+                        isDone ? "text-slate-950 dark:text-white font-black" : "text-slate-800 dark:text-slate-200"
                       }`}
                     >
                       {col.name}
@@ -725,7 +725,7 @@ export function TodayRoutineGarden({
                       height="20"
                       fill="none"
                       aria-hidden="true"
-                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-muted-foreground"}`}
+                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-slate-600 dark:text-slate-400"}`}
                     >
                       <path
                         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
@@ -759,8 +759,8 @@ export function TodayRoutineGarden({
                         onClick={() => onSelectCategory(col.id)}
                         className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-start transition-all backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                           isDone
-                            ? "border border-amber-500/40 bg-amber-500/15 text-foreground hover:bg-amber-500/25 shadow-xs"
-                            : "border border-white/20 dark:border-white/10 bg-black/10 dark:bg-black/40 text-foreground hover:bg-black/20 dark:hover:bg-black/50 shadow-xs"
+                            ? "border border-amber-500/40 bg-amber-500/20 hover:bg-amber-500/30 shadow-xs"
+                            : "border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 shadow-xs"
                         }`}
                       >
                         {rowContent}
@@ -769,8 +769,8 @@ export function TodayRoutineGarden({
                       <div
                         className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 transition-all backdrop-blur-md ${
                           isDone
-                            ? "border border-amber-500/40 bg-amber-500/15 text-foreground shadow-xs"
-                            : "border border-white/20 dark:border-white/10 bg-black/10 dark:bg-black/40 text-foreground shadow-xs"
+                            ? "border border-amber-500/40 bg-amber-500/20 shadow-xs"
+                            : "border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 shadow-xs"
                         }`}
                       >
                         {rowContent}
@@ -825,11 +825,11 @@ export function TodayRoutineGarden({
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-black/10 dark:bg-black/40 border border-white/15 dark:border-white/10 backdrop-blur-md"
+            className="relative z-10 flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md"
             dir="rtl"
           >
             <Heart className="h-4 w-4 text-rose-500 dark:text-rose-400 shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-center font-sans text-foreground text-[12.5px] font-semibold leading-relaxed">
+            <span className="flex-1 text-center font-sans text-slate-800 dark:text-slate-200 text-[12.5px] font-semibold leading-relaxed">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}
