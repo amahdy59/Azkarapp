@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Sun, Calendar, Zap, Clock, ChevronLeftIcon, ChevronRightIcon } from "../components/icons";
+import { Sun, Calendar, Zap, Clock, ArrowLeft, ArrowRight } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -237,9 +237,9 @@ export function HomeScreen({
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
       <TimeOfDayBackground categoryId={reminderInfo.categoryId} />
 
-      {/* Fixed Unified Header & Gamification Bar */}
-      <div className="relative z-20 shrink-0 px-page pt-2 pb-1">
-        <header className="flex w-full flex-col pt-1 pb-1" dir={direction}>
+      {/* Absolute Header floating above everything for scrolling translucency */}
+      <div className="absolute top-0 inset-x-0 z-30 px-page pt-2 pb-2 pointer-events-none">
+        <header className="flex w-full flex-col pointer-events-auto" dir={direction}>
           <div
             className="flex min-h-[48px] w-full shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs font-semibold"
             dir="auto"
@@ -305,7 +305,7 @@ export function HomeScreen({
       <main
         tabIndex={0}
         aria-label={t(language, "app.name")}
-        className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="absolute inset-0 z-10 overflow-y-auto overflow-x-hidden px-page pb-24 pt-[76px] outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-5 w-full">
           {/* Top Row: Hero Zikr Banner (3 cols) & Today's Wird Routine Card (2 cols) */}
@@ -321,7 +321,7 @@ export function HomeScreen({
           ) : (
             <section
               aria-labelledby="current-zikr-heading"
-              className="glass-panel lg:col-span-3 flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 p-5 md:p-6 backdrop-blur-xl shadow-md transition-all"
+              className="lg:col-span-3 flex flex-col justify-between p-2 md:p-4 transition-all"
             >
               <div className="flex flex-col gap-4 text-start">
                 {/* Hero Text & Category Header */}
@@ -423,37 +423,13 @@ export function HomeScreen({
                   onClick={() => {
                     onResume(reminderInfo.categoryId);
                   }}
-                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-offset-2 cursor-pointer"
+                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-offset-2 cursor-pointer group"
                 >
                   <span>{ctaLabel}</span>
                   {direction === "rtl" ? (
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="19" y1="12" x2="5" y2="12"></line>
-                      <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
+                    <ArrowLeft size={20} className="shrink-0 transition-transform group-hover:-translate-x-1" />
                   ) : (
-                    <svg
-                      width="20"
-                      height="20"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
+                    <ArrowRight size={20} className="shrink-0 transition-transform group-hover:translate-x-1" />
                   )}
                 </button>
               </div>
@@ -598,7 +574,7 @@ export function HomeScreen({
                     className="mt-1 flex h-[48px] min-h-[44px] items-center justify-center gap-2 rounded-2xl bg-[#e2a84a] px-6 text-[0.9375rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] cursor-pointer"
                   >
                     <span>{isArabic ? "عرض الأذكار" : "View Friday Azkar"}</span>
-                    {direction === "rtl" ? <ChevronLeftIcon size={18} /> : <ChevronRightIcon size={18} />}
+                    {direction === "rtl" ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
                   </button>
                 )}
               </div>

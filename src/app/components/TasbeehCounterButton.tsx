@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronNext } from "./icons";
+import { ArrowLeft, ArrowRight } from "./icons";
 import type { AppLanguage } from "../types";
 
 export function TasbeehIcon({ size = 26, className = "" }: { size?: number; className?: string }) {
@@ -70,11 +70,19 @@ export function TasbeehCounterButton({
           {isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
         </span>
       </div>
-      <ChevronNext
-        size={20}
-        className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:scale-x-[-1] group-hover:text-foreground"
-        aria-hidden="true"
-      />
+      {direction === "rtl" ? (
+        <ArrowLeft
+          size={20}
+          className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:-translate-x-1 group-hover:text-foreground"
+          aria-hidden="true"
+        />
+      ) : (
+        <ArrowRight
+          size={20}
+          className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 group-hover:text-foreground"
+          aria-hidden="true"
+        />
+      )}
     </button>
   );
 }
