@@ -230,62 +230,62 @@ export function CustomCounterScreen({
               </button>
             </div>
 
-          {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
-          <div className="hidden md:flex items-center justify-center gap-3 mt-4 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-                Space
-              </kbd>
-              <span>{isArabic ? "التسبيح" : "Count"}</span>
-            </span>
-            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-                R
-              </kbd>
-              <span>{isArabic ? "إعادة" : "Reset"}</span>
-            </span>
-            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-                Backspace
-              </kbd>
-              <span>{isArabic ? "تراجع" : "Undo"}</span>
-            </span>
-            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-                Esc
-              </kbd>
-              <span>{isArabic ? "رجوع" : "Back"}</span>
-            </span>
-          </div>
-        </div>
-
-        {/* Virtue & Source Information Card */}
-        {selectedAuthentic.virtueAr && (
-          <div className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4 backdrop-blur-xl shadow-lg shadow-black/5">
-            <div className="flex items-start gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <Sparkles size={18} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between gap-2">
-                  <h4 className="text-[0.8125rem] font-extrabold text-foreground">
-                    {isArabic ? "الفضل والحديث:" : "Virtue & Reference:"}
-                  </h4>
-                  <span className="text-[0.6875rem] font-bold text-amber-600 dark:text-amber-400">
-                    {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
-                  </span>
-                </div>
-                <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
-                  {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
-                </p>
-              </div>
+            {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
+            <div className="hidden md:flex items-center justify-center gap-3 mt-4 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                  Space
+                </kbd>
+                <span>{isArabic ? "التسبيح" : "Count"}</span>
+              </span>
+              <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                  R
+                </kbd>
+                <span>{isArabic ? "إعادة" : "Reset"}</span>
+              </span>
+              <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                  Backspace
+                </kbd>
+                <span>{isArabic ? "تراجع" : "Undo"}</span>
+              </span>
+              <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+              <span className="flex items-center gap-1">
+                <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+                  Esc
+                </kbd>
+                <span>{isArabic ? "رجوع" : "Back"}</span>
+              </span>
             </div>
           </div>
-        )}
-      </main>
+
+          {/* Virtue & Source Information Card */}
+          {selectedAuthentic.virtueAr && (
+            <div className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4 backdrop-blur-xl shadow-lg shadow-black/5">
+              <div className="flex items-start gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                  <Sparkles size={18} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center justify-between gap-2">
+                    <h4 className="text-[0.8125rem] font-extrabold text-foreground">
+                      {isArabic ? "الفضل والحديث:" : "Virtue & Reference:"}
+                    </h4>
+                    <span className="text-[0.6875rem] font-bold text-amber-600 dark:text-amber-400">
+                      {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
+                    </span>
+                  </div>
+                  <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
+                    {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </main>
       </div>
 
       {/* Target Completion Choice Modal (Reset vs Continue) */}

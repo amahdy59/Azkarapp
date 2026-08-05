@@ -110,7 +110,11 @@ export function SettingsRootPanel({
             </span>
             <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.language")}</h3>
           </div>
-          <div className="flex bg-muted/80 p-1 rounded-xl" role="radiogroup" aria-label={t(language, "settings.language")}>
+          <div
+            className="flex bg-muted/80 p-1 rounded-xl"
+            role="radiogroup"
+            aria-label={t(language, "settings.language")}
+          >
             {LANGUAGES_LIST.map((opt) => {
               const selected = language === opt.code;
               return (

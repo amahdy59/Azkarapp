@@ -24,7 +24,9 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
       onClick={onClick}
       aria-pressed={active}
       className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-white/40 dark:border-white/10 bg-card text-foreground"
+        active
+          ? "border-primary bg-primary text-primary-foreground"
+          : "border-white/40 dark:border-white/10 bg-card text-foreground"
       }`}
     >
       {label}

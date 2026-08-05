@@ -6,7 +6,6 @@ import {
   getMonthDetailedStats,
   getYearDetailedStats,
   createDailyCompletionIndex,
-  type DailyCompletionIndex,
 } from "../gardenViews";
 import { type GardenSummary } from "../progress";
 import {
@@ -153,9 +152,7 @@ export function ProgressDayView({
             {isArabic ? "المعدل الأسبوعي" : "Weekly rate"}
           </span>
           <div className="flex items-center justify-center gap-1 text-amber-600 dark:text-amber-400">
-            <span className="text-[0.9375rem] sm:text-[1rem] font-black">
-              %{formatNumerals(weeklyRate, language)}
-            </span>
+            <span className="text-[0.9375rem] sm:text-[1rem] font-black">%{formatNumerals(weeklyRate, language)}</span>
             <Sprout className="h-4 w-4 text-emerald-500" strokeWidth={2.5} />
           </div>
         </div>
@@ -178,13 +175,17 @@ export function ProgressDayView({
               <span className="block text-[0.875rem] sm:text-[1rem] font-black text-foreground">
                 {formatNumerals(completedCount, language)} {isArabic ? "من 3" : "of 3"}
               </span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">{isArabic ? "مكتملة" : "Completed"}</span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">
+                {isArabic ? "مكتملة" : "Completed"}
+              </span>
             </div>
             <div>
               <span className="block text-[0.875rem] sm:text-[1rem] font-black text-foreground">
                 %{formatNumerals(progressPercent, language)}
               </span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">{isArabic ? "نسبة الإنجاز" : "Completion"}</span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">
+                {isArabic ? "نسبة الإنجاز" : "Completion"}
+              </span>
             </div>
             <div>
               <div className="flex items-center justify-center gap-1">
@@ -193,7 +194,9 @@ export function ProgressDayView({
                 </span>
                 <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />
               </div>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">{isArabic ? "سلسلة حالية" : "Streak"}</span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">
+                {isArabic ? "سلسلة حالية" : "Streak"}
+              </span>
             </div>
           </div>
 
@@ -304,10 +307,7 @@ export function ProgressWeekView({
   referenceDate?: Date;
 }) {
   const isArabic = isAr(language);
-  const completionIndex = useMemo(
-    () => createDailyCompletionIndex(dailyCompletions),
-    [dailyCompletions],
-  );
+  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
 
   const weekStats = useMemo(
     () => getWeekGardenStats(completionIndex, referenceDate, language),
@@ -326,9 +326,7 @@ export function ProgressWeekView({
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أكثر ورد فاتك" : "Most missed"}
           </span>
-          <span className="text-[0.875rem] font-black text-foreground truncate max-w-full">
-            {mostMissedName}
-          </span>
+          <span className="text-[0.875rem] font-black text-foreground truncate max-w-full">{mostMissedName}</span>
         </div>
 
         {/* Best Streak Card */}
@@ -569,10 +567,7 @@ export function ProgressMonthView({
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
 }) {
   const isArabic = isAr(language);
-  const completionIndex = useMemo(
-    () => createDailyCompletionIndex(dailyCompletions),
-    [dailyCompletions],
-  );
+  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
 
   const monthStats = useMemo(
     () => getMonthDetailedStats(completionIndex, targetYear, targetMonth),
@@ -731,7 +726,9 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
               <div>
                 <h4 className="text-[0.9375rem] font-black text-foreground">
-                  {isArabic ? `تفاصيل اليوم (${formatNumerals(selectedDayNum, language)})` : `Day ${selectedDayNum} Details`}
+                  {isArabic
+                    ? `تفاصيل اليوم (${formatNumerals(selectedDayNum, language)})`
+                    : `Day ${selectedDayNum} Details`}
                 </h4>
                 <span className="text-[0.6875rem] font-semibold text-muted-foreground">
                   {selectedDayRecord?.dayKey}
@@ -819,15 +816,9 @@ export function ProgressYearView({
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
 }) {
   const isArabic = isAr(language);
-  const completionIndex = useMemo(
-    () => createDailyCompletionIndex(dailyCompletions),
-    [dailyCompletions],
-  );
+  const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
 
-  const yearStats = useMemo(
-    () => getYearDetailedStats(completionIndex, targetYear),
-    [completionIndex, targetYear],
-  );
+  const yearStats = useMemo(() => getYearDetailedStats(completionIndex, targetYear), [completionIndex, targetYear]);
 
   const monthNames = isArabic ? HIJRI_MONTH_NAMES_AR : GREGORIAN_MONTH_NAMES_EN;
   const bestMonthName = monthNames[yearStats.bestMonthIndex] || monthNames[2];
@@ -897,7 +888,7 @@ export function ProgressYearView({
           {/* Bar Chart */}
           <div className="flex-1 flex items-end justify-between gap-1.5 pt-6 pb-2 min-h-[140px]">
             {yearStats.months.map((m, idx) => {
-              const rate = m.completionRate || (idx === 2 ? 92 : 50 + (idx * 7) % 35);
+              const rate = m.completionRate || (idx === 2 ? 92 : 50 + ((idx * 7) % 35));
               const isBest = idx === (yearStats.bestMonthIndex || 2);
 
               return (
@@ -977,7 +968,7 @@ export function ProgressYearView({
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
         {yearStats.months.map((m, idx) => {
           const isBest = idx === (yearStats.bestMonthIndex || 2);
-          const rate = m.completionRate || (idx === 2 ? 92 : 65 + (idx * 5) % 25);
+          const rate = m.completionRate || (idx === 2 ? 92 : 65 + ((idx * 5) % 25));
 
           return (
             <div

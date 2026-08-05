@@ -82,7 +82,10 @@ export function ProgressPanel({
             />
 
             {/* Weekly goal */}
-            <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="weekly-goal-title">
+            <section
+              className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+              aria-labelledby="weekly-goal-title"
+            >
               <div className="flex items-baseline justify-between gap-3">
                 <h2 id="weekly-goal-title" className="text-[0.9375rem] font-bold text-foreground">
                   {t(language, "progressPanel.weeklyGoal")}
@@ -134,7 +137,10 @@ export function ProgressPanel({
             </section>
           </>
         ) : (
-          <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" data-testid="garden-hidden-state">
+          <section
+            className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+            data-testid="garden-hidden-state"
+          >
             <h2 className="text-[0.9375rem] font-bold text-foreground">
               {t(language, "progressPanel.gardenHiddenTitle")}
             </h2>
@@ -144,7 +150,10 @@ export function ProgressPanel({
           </section>
         )}
 
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="progress-day-boundary-title">
+        <section
+          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          aria-labelledby="progress-day-boundary-title"
+        >
           <h2 id="progress-day-boundary-title" className="text-[0.9375rem] font-bold text-foreground">
             {t(language, "progressPanel.dayBoundaryTitle")}
           </h2>

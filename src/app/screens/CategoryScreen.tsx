@@ -343,112 +343,147 @@ export function CategoryScreen({
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 
-      {!isOccasional && (
-        <div className="shrink-0 border-b border-border px-5 py-4">
-          {isMainRoutine && (
-            <div
-              className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
-              role="group"
-              aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
-            >
-              {(["complete", "core"] as const).map((mode) => {
-                const selected = routineMode === mode;
-                const count =
-                  mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length;
-                return (
-                  <button
-                    key={mode}
-                    type="button"
-                    aria-pressed={selected}
-                    onClick={() => onRoutineModeChange?.(mode)}
-                    className={`min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                      selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
-                    }`}
-                  >
-                    {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
-                      count: formatNumerals(count, language),
-                    })}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mb-2 flex items-center justify-between">
-            <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
-            <p
-              className="text-[0.8125rem] font-bold text-muted-foreground"
-              dir="auto"
-              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-            >
-              {t(language, "category.counterProgress", {
-                current: formatNumerals(headerProgress.done, language),
-                total: formatNumerals(headerProgress.total, language),
-              })}
-            </p>
-          </div>
-          <ProgressBar
-            value={headerProgress.done}
-            max={headerProgress.total}
-            height={8}
-            trackColor="var(--card)"
-            fillColor="var(--primary)"
-            direction={direction}
-            aria-label={t(language, "category.dailyProgress")}
-          />
-
-          {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
-            <button
-              type="button"
-              onClick={() => onRoutineModeChange?.("complete")}
-              className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
-            >
-              <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
-              <span className="text-[0.75rem] font-bold">
-                {t(language, "category.continueAdditional", {
-                  count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
+        {!isOccasional && (
+          <div className="shrink-0 border-b border-border px-5 py-4">
+            {isMainRoutine && (
+              <div
+                className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
+                role="group"
+                aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
+              >
+                {(["complete", "core"] as const).map((mode) => {
+                  const selected = routineMode === mode;
+                  const count =
+                    mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length;
+                  return (
+                    <button
+                      key={mode}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => onRoutineModeChange?.(mode)}
+                      className={`min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                        selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                      }`}
+                    >
+                      {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
+                        count: formatNumerals(count, language),
+                      })}
+                    </button>
+                  );
                 })}
-              </span>
-            </button>
-          )}
+              </div>
+            )}
 
-          <div className="mt-4 flex w-full gap-3">
-            {completedItemCount < azkar.length ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => onZikr(Math.max(0, resumeIdx))}
-                  className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  <span className="leading-none">
-                    {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
-                  </span>
-                  <span className="text-[1.125rem] leading-none" aria-hidden="true">
-                    {direction === "rtl" ? "←" : "→"}
-                  </span>
-                </button>
-                {onPlayAllAudio && (
+            <div className="mb-2 flex items-center justify-between">
+              <p className="text-[0.8125rem] font-bold text-muted-foreground">
+                {t(language, "category.dailyProgress")}
+              </p>
+              <p
+                className="text-[0.8125rem] font-bold text-muted-foreground"
+                dir="auto"
+                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+              >
+                {t(language, "category.counterProgress", {
+                  current: formatNumerals(headerProgress.done, language),
+                  total: formatNumerals(headerProgress.total, language),
+                })}
+              </p>
+            </div>
+            <ProgressBar
+              value={headerProgress.done}
+              max={headerProgress.total}
+              height={8}
+              trackColor="var(--card)"
+              fillColor="var(--primary)"
+              direction={direction}
+              aria-label={t(language, "category.dailyProgress")}
+            />
+
+            {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
+              <button
+                type="button"
+                onClick={() => onRoutineModeChange?.("complete")}
+                className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
+              >
+                <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
+                <span className="text-[0.75rem] font-bold">
+                  {t(language, "category.continueAdditional", {
+                    count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
+                  })}
+                </span>
+              </button>
+            )}
+
+            <div className="mt-4 flex w-full gap-3">
+              {completedItemCount < azkar.length ? (
+                <>
                   <button
                     type="button"
-                    onClick={onPlayAllAudio}
-                    className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
-                    aria-label={t(language, "category.playAllAudio")}
-                    title={
-                      audioCoverage
-                        ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
-                        : t(language, "category.playAllAudio")
-                    }
+                    onClick={() => onZikr(Math.max(0, resumeIdx))}
+                    className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
-                    <Volume2 size={16} />
-                    <span>
-                      {t(language, "category.playAll")}
-                      {audioCoverage
-                        ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
-                        : ""}
+                    <span className="leading-none">
+                      {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                    </span>
+                    <span className="text-[1.125rem] leading-none" aria-hidden="true">
+                      {direction === "rtl" ? "←" : "→"}
                     </span>
                   </button>
-                )}
-                {completedItemCount > 0 && (
+                  {onPlayAllAudio && (
+                    <button
+                      type="button"
+                      onClick={onPlayAllAudio}
+                      className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
+                      aria-label={t(language, "category.playAllAudio")}
+                      title={
+                        audioCoverage
+                          ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
+                          : t(language, "category.playAllAudio")
+                      }
+                    >
+                      <Volume2 size={16} />
+                      <span>
+                        {t(language, "category.playAll")}
+                        {audioCoverage
+                          ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
+                          : ""}
+                      </span>
+                    </button>
+                  )}
+                  {completedItemCount > 0 && (
+                    <button
+                      type="button"
+                      onClick={onReset}
+                      className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                      aria-label={t(language, "category.resetProgress")}
+                    >
+                      <RotateCcw size={18} />
+                    </button>
+                  )}
+                </>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={onRepeat}
+                    className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    {isArabic ? (
+                      <>
+                        <span className="text-[0.9375rem] font-bold leading-none">
+                          {t(language, "category.readAgain")}
+                        </span>
+                        <RotateCcw size={18} className="shrink-0" />
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw size={18} className="shrink-0" />
+                        <span className="text-[0.9375rem] font-bold leading-none">
+                          {t(language, "category.readAgain")}
+                        </span>
+                      </>
+                    )}
+                  </button>
                   <button
                     type="button"
                     onClick={onReset}
@@ -457,177 +492,150 @@ export function CategoryScreen({
                   >
                     <RotateCcw size={18} />
                   </button>
-                )}
-              </>
-            ) : (
-              <>
-                <button
-                  type="button"
-                  onClick={onRepeat}
-                  className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  {isArabic ? (
-                    <>
-                      <span className="text-[0.9375rem] font-bold leading-none">
-                        {t(language, "category.readAgain")}
-                      </span>
-                      <RotateCcw size={18} className="shrink-0" />
-                    </>
-                  ) : (
-                    <>
-                      <RotateCcw size={18} className="shrink-0" />
-                      <span className="text-[0.9375rem] font-bold leading-none">
-                        {t(language, "category.readAgain")}
-                      </span>
-                    </>
-                  )}
-                </button>
-                <button
-                  type="button"
-                  onClick={onReset}
-                  className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
-                  aria-label={t(language, "category.resetProgress")}
-                >
-                  <RotateCcw size={18} />
-                </button>
-              </>
-            )}
+                </>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <div
-        role="region"
-        aria-label={isArabic ? cat.nameArabic : cat.name}
-        tabIndex={0}
-        className="flex flex-1 flex-col overflow-y-auto px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-      >
-        {introduction && (
-          <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
-            <div className="mb-2 flex items-center justify-between gap-3">
-              <h2 className="text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200">
-                {t(language, "category.introductionLabel")}
-              </h2>
-              <span className="rounded-full bg-card/80 px-2.5 py-1 text-[0.6875rem] font-bold text-muted-foreground">
-                {t(language, "category.optional")}
-              </span>
-            </div>
-            <p
-              className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
-              dir={isArabic ? "rtl" : "ltr"}
-              lang={isArabic ? "ar" : "en"}
+        <div
+          role="region"
+          aria-label={isArabic ? cat.nameArabic : cat.name}
+          tabIndex={0}
+          className="flex flex-1 flex-col overflow-y-auto px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        >
+          {introduction && (
+            <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <h2 className="text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200">
+                  {t(language, "category.introductionLabel")}
+                </h2>
+                <span className="rounded-full bg-card/80 px-2.5 py-1 text-[0.6875rem] font-bold text-muted-foreground">
+                  {t(language, "category.optional")}
+                </span>
+              </div>
+              <p
+                className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
+                dir={isArabic ? "rtl" : "ltr"}
+                lang={isArabic ? "ar" : "en"}
+              >
+                {isArabic ? introduction.arabicText : introduction.translation}
+              </p>
+            </aside>
+          )}
+
+          {catId === "before_sleep" && (
+            <section
+              className="mb-5 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+              aria-labelledby="sleep-prepare-title"
             >
-              {isArabic ? introduction.arabicText : introduction.translation}
-            </p>
-          </aside>
-        )}
+              <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
+                {t(language, "category.prepareTitle")}
+              </h2>
+              <div className="mt-3 grid gap-2">
+                {(
+                  [
+                    ["wudu", "category.prepareWudu"],
+                    ["dust", "category.prepareDustBed"],
+                    ["right", "category.prepareRightSide"],
+                  ] as const
+                ).map(([id, labelKey]) => (
+                  <label
+                    key={id}
+                    className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-muted/60 px-3"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={preparationSteps.has(id)}
+                      onChange={() =>
+                        setPreparationSteps((previous) => {
+                          const next = new Set(previous);
+                          if (next.has(id)) next.delete(id);
+                          else next.add(id);
+                          return next;
+                        })
+                      }
+                      className="size-5 accent-primary"
+                    />
+                    <span className="text-[0.8125rem] font-bold text-foreground">{t(language, labelKey)}</span>
+                  </label>
+                ))}
+              </div>
+            </section>
+          )}
 
-        {catId === "before_sleep" && (
-          <section className="mb-5 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="sleep-prepare-title">
-            <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
-              {t(language, "category.prepareTitle")}
-            </h2>
-            <div className="mt-3 grid gap-2">
-              {(
-                [
-                  ["wudu", "category.prepareWudu"],
-                  ["dust", "category.prepareDustBed"],
-                  ["right", "category.prepareRightSide"],
-                ] as const
-              ).map(([id, labelKey]) => (
-                <label key={id} className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-muted/60 px-3">
-                  <input
-                    type="checkbox"
-                    checked={preparationSteps.has(id)}
-                    onChange={() =>
-                      setPreparationSteps((previous) => {
-                        const next = new Set(previous);
-                        if (next.has(id)) next.delete(id);
-                        else next.add(id);
-                        return next;
-                      })
-                    }
-                    className="size-5 accent-primary"
-                  />
-                  <span className="text-[0.8125rem] font-bold text-foreground">{t(language, labelKey)}</span>
-                </label>
-              ))}
-            </div>
-          </section>
-        )}
+          {isOccasional ? (
+            <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
+          ) : isMainRoutine ? (
+            <div className="mb-6 flex flex-col gap-6">
+              {groupedAzkar.map((group) => {
+                const groupProgress = stepProgress(group.items);
+                return (
+                  <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
+                    <div className="mb-3 flex items-center justify-between gap-3">
+                      <h2 id={`group-${group.groupId}`} className="text-[0.875rem] font-extrabold text-foreground">
+                        {groupLabel(group.groupId)}
+                      </h2>
+                      <span
+                        className="text-[0.75rem] font-bold text-muted-foreground"
+                        style={{ fontFamily: numeralFontFamily(language) }}
+                      >
+                        {t(language, "category.groupProgress", {
+                          done: formatNumerals(groupProgress.done, language),
+                          total: formatNumerals(groupProgress.total, language),
+                        })}
+                      </span>
+                    </div>
 
-        {isOccasional ? (
-          <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
-        ) : isMainRoutine ? (
-          <div className="mb-6 flex flex-col gap-6">
-            {groupedAzkar.map((group) => {
-              const groupProgress = stepProgress(group.items);
-              return (
-                <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h2 id={`group-${group.groupId}`} className="text-[0.875rem] font-extrabold text-foreground">
-                      {groupLabel(group.groupId)}
-                    </h2>
-                    <span
-                      className="text-[0.75rem] font-bold text-muted-foreground"
-                      style={{ fontFamily: numeralFontFamily(language) }}
-                    >
-                      {t(language, "category.groupProgress", {
-                        done: formatNumerals(groupProgress.done, language),
-                        total: formatNumerals(groupProgress.total, language),
-                      })}
-                    </span>
-                  </div>
-
-                  <div className="flex flex-col gap-3.5">
-                    {ritualChunks(group.items).map((chunk, chunkIndex) =>
-                      chunk.ritualGroupId ? (
-                        <div
-                          key={chunk.ritualGroupId}
-                          className="rounded-3xl border border-primary/25 bg-primary/5 p-3"
-                          data-ritual-group={chunk.ritualGroupId}
-                        >
-                          <div className="mb-3 px-1">
-                            <h3 className="text-[0.8125rem] font-extrabold text-primary">
-                              {t(
-                                language,
-                                chunk.ritualGroupId === "three_quls"
-                                  ? "category.ritualThreeQuls"
-                                  : "category.ritualTasbih",
-                              )}
-                            </h3>
-                            <p className="mt-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground">
-                              {t(
-                                language,
-                                chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
-                                  ? "category.ritualSleepInstruction"
-                                  : chunk.ritualGroupId === "three_quls"
-                                    ? "category.ritualThreeQulsInstruction"
-                                    : "category.ritualTasbihInstruction",
-                              )}
-                            </p>
+                    <div className="flex flex-col gap-3.5">
+                      {ritualChunks(group.items).map((chunk, chunkIndex) =>
+                        chunk.ritualGroupId ? (
+                          <div
+                            key={chunk.ritualGroupId}
+                            className="rounded-3xl border border-primary/25 bg-primary/5 p-3"
+                            data-ritual-group={chunk.ritualGroupId}
+                          >
+                            <div className="mb-3 px-1">
+                              <h3 className="text-[0.8125rem] font-extrabold text-primary">
+                                {t(
+                                  language,
+                                  chunk.ritualGroupId === "three_quls"
+                                    ? "category.ritualThreeQuls"
+                                    : "category.ritualTasbih",
+                                )}
+                              </h3>
+                              <p className="mt-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground">
+                                {t(
+                                  language,
+                                  chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
+                                    ? "category.ritualSleepInstruction"
+                                    : chunk.ritualGroupId === "three_quls"
+                                      ? "category.ritualThreeQulsInstruction"
+                                      : "category.ritualTasbihInstruction",
+                                )}
+                              </p>
+                            </div>
+                            <div className="flex flex-col gap-3">
+                              {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
+                            </div>
                           </div>
-                          <div className="flex flex-col gap-3">
+                        ) : (
+                          <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-3.5">
                             {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
                           </div>
-                        </div>
-                      ) : (
-                        <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-3.5">
-                          {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
-                        </div>
-                      ),
-                    )}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        ) : (
-          <div className="mb-6 flex flex-col gap-3.5">
-            {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
-          </div>
-        )}
-      </div>
+                        ),
+                      )}
+                    </div>
+                  </section>
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mb-6 flex flex-col gap-3.5">
+              {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
+            </div>
+          )}
+        </div>
       </div>
     </ScreenContainer>
   );

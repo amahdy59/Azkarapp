@@ -1,11 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import {
-  ProgressDayView,
-  ProgressWeekView,
-  ProgressMonthView,
-  ProgressYearView,
-} from "./ProgressViews";
+import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { GardenSummary } from "../progress";
 import type { DailyCollectionCompletion } from "../types";
 
@@ -52,11 +47,7 @@ const mockCompletions: DailyCollectionCompletion[] = [
 describe("ProgressViews components", () => {
   it("renders ProgressDayView with routine list and stats in Arabic", () => {
     render(
-      <ProgressDayView
-        summary={mockSummary}
-        language="ar"
-        dynamicSubtitle="أكملت 1 من أصل 3 أوراد رئيسية اليوم"
-      />
+      <ProgressDayView summary={mockSummary} language="ar" dynamicSubtitle="أكملت 1 من أصل 3 أوراد رئيسية اليوم" />,
     );
 
     expect(screen.getByText("وردك اليوم")).toBeInTheDocument();
@@ -72,7 +63,7 @@ describe("ProgressViews components", () => {
         language="ar"
         dailyCompletions={mockCompletions}
         referenceDate={new Date(2026, 7, 5)}
-      />
+      />,
     );
 
     expect(screen.getByText("التزامك هذا الأسبوع")).toBeInTheDocument();
@@ -80,27 +71,14 @@ describe("ProgressViews components", () => {
   });
 
   it("renders ProgressMonthView with calendar matrix in Arabic", () => {
-    render(
-      <ProgressMonthView
-        language="ar"
-        targetYear={2026}
-        targetMonth={7}
-        dailyCompletions={mockCompletions}
-      />
-    );
+    render(<ProgressMonthView language="ar" targetYear={2026} targetMonth={7} dailyCompletions={mockCompletions} />);
 
     expect(screen.getByTestId("garden-month-calendar")).toBeInTheDocument();
     expect(screen.getByText("انتظامك تحسن هذا الشهر")).toBeInTheDocument();
   });
 
   it("renders ProgressYearView with monthly completion rate and heatmaps in Arabic", () => {
-    render(
-      <ProgressYearView
-        language="ar"
-        targetYear={2026}
-        dailyCompletions={mockCompletions}
-      />
-    );
+    render(<ProgressYearView language="ar" targetYear={2026} dailyCompletions={mockCompletions} />);
 
     expect(screen.getByText("معدل الاكتمال الشهري")).toBeInTheDocument();
     expect(screen.getByText("نظرة سريعة")).toBeInTheDocument();

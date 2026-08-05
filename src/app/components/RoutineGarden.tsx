@@ -2,14 +2,7 @@ import { useMemo, useState } from "react";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { createDailyCompletionIndex, getMonthGardenDays, getYearGardenStats } from "../gardenViews";
-import {
-  getGardenSummary,
-  MAIN_CATEGORY_IDS,
-  type GardenMilestoneId,
-  type GardenSummary,
-  type GrowthEvent,
-} from "../progress";
+import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
@@ -363,70 +356,6 @@ function getGregorianDetails(date: Date, language: AppLanguage) {
   }
 }
 
-const HIJRI_MONTH_NAMES_AR = [
-  "محرم",
-  "صفر",
-  "ربيع الأول",
-  "ربيع الآخر",
-  "جمادى الأولى",
-  "جمادى الآخرة",
-  "رجب",
-  "شعبان",
-  "رمضان",
-  "شوال",
-  "ذو القعدة",
-  "ذو الحجة",
-];
-
-const HIJRI_MONTH_NAMES_EN = [
-  "Muharram",
-  "Safar",
-  "Rabi' I",
-  "Rabi' II",
-  "Jumada I",
-  "Jumada II",
-  "Rajab",
-  "Sha'ban",
-  "Ramadan",
-  "Shawwal",
-  "Dhu al-Qi'dah",
-  "Dhu al-Hijjah",
-];
-
-const GREGORIAN_MONTH_NAMES_AR = [
-  "يناير",
-  "فبراير",
-  "مارس",
-  "أبريل",
-  "مايو",
-  "يونيو",
-  "يوليو",
-  "أغسطس",
-  "سبتمبر",
-  "أكتوبر",
-  "نوفمبر",
-  "ديسمبر",
-];
-
-const GREGORIAN_MONTH_NAMES_EN = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-function padZero(val: number) {
-  return String(val).padStart(2, "0");
-}
-
 const ARABIC_WEEK_ORDINALS = ["الأول", "الثاني", "الثالث", "الرابع", "الخامس"];
 
 export function getGardenDateLabel(
@@ -529,23 +458,6 @@ export function TodayRoutineGarden({
 
   const targetYear = displayDate.getFullYear();
   const targetMonth = displayDate.getMonth();
-  const completionsByDayKey = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
-  const monthDayRecords = useMemo(
-    () => getMonthGardenDays(completionsByDayKey, targetYear, targetMonth),
-    [completionsByDayKey, targetMonth, targetYear],
-  );
-  const yearStats = useMemo(
-    () => getYearGardenStats(completionsByDayKey, targetYear),
-    [completionsByDayKey, targetYear],
-  );
-
-  const monthNames = isArabic
-    ? calendarType === "hijri"
-      ? HIJRI_MONTH_NAMES_AR
-      : GREGORIAN_MONTH_NAMES_AR
-    : calendarType === "hijri"
-      ? HIJRI_MONTH_NAMES_EN
-      : GREGORIAN_MONTH_NAMES_EN;
 
   const completedCount = summary.today.completedCategories.length;
   const dynamicSubtitle =
@@ -701,11 +613,7 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "year" && (
-        <ProgressYearView
-          language={language}
-          targetYear={targetYear}
-          dailyCompletions={dailyCompletions}
-        />
+        <ProgressYearView language={language} targetYear={targetYear} dailyCompletions={dailyCompletions} />
       )}
     </section>
   );

@@ -296,7 +296,10 @@ export function NotificationsPanel({
       <SubHeader title={t(language, "notifications.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
         {/* Location & Prayer Times Section */}
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="prayer-location-title">
+        <section
+          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          aria-labelledby="prayer-location-title"
+        >
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
@@ -487,7 +490,10 @@ export function NotificationsPanel({
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="notification-availability">
+        <section
+          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          aria-labelledby="notification-availability"
+        >
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
@@ -506,7 +512,10 @@ export function NotificationsPanel({
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="notification-permission">
+        <section
+          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          aria-labelledby="notification-permission"
+        >
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"

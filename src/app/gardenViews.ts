@@ -171,7 +171,11 @@ export function getWeekGardenStats(
   };
 }
 
-export function getMonthGardenDays(index: DailyCompletionIndex, year: number, zeroBasedMonth: number): MonthGardenDay[] {
+export function getMonthGardenDays(
+  index: DailyCompletionIndex,
+  year: number,
+  zeroBasedMonth: number,
+): MonthGardenDay[] {
   const daysInMonth = new Date(year, zeroBasedMonth + 1, 0).getDate();
   const todayKey = formatDayKey(new Date());
 
@@ -345,7 +349,8 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     });
   }
 
-  const overallCompletionRate = totalPossibleAllYear > 0 ? Math.round((totalCollections / totalPossibleAllYear) * 100) : 0;
+  const overallCompletionRate =
+    totalPossibleAllYear > 0 ? Math.round((totalCollections / totalPossibleAllYear) * 100) : 0;
 
   let mostConsistentRoutine: CategoryId = "morning";
   if (eveningTotal > morningTotal && eveningTotal >= sleepTotal) {
