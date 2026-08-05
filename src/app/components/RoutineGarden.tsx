@@ -10,8 +10,9 @@ import {
   type GardenSummary,
   type GrowthEvent,
 } from "../progress";
+import { ProgressDayView, ProgressWeekView, ProgressMonthView } from "./ProgressViews";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
-import { Heart, Zap } from "./icons";
+import { Zap } from "./icons";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -575,7 +576,7 @@ export function TodayRoutineGarden({
           <div
             role="tablist"
             aria-label={t(language, "garden.viewMode")}
-            className="mb-4 flex rounded-2xl bg-muted/60 p-1 dark:bg-muted/30"
+            className="mb-4 flex rounded-full bg-muted/60 p-1 dark:bg-muted/30"
           >
             {(["day", "week", "month", "year"] as const).map((tab) => {
               const isActive = activeTab === tab;
@@ -593,7 +594,7 @@ export function TodayRoutineGarden({
                   role="tab"
                   aria-selected={isActive}
                   onClick={() => handleTabChange(tab)}
-                  className={`flex flex-1 min-h-[44px] items-center justify-center rounded-xl py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                  className={`flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                     isActive ? "bg-amber-500 text-slate-950 shadow-md" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
@@ -673,243 +674,28 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="glass-panel relative flex w-full max-w-[44rem] mx-auto flex-col items-center gap-5 overflow-hidden rounded-[2rem] p-5 md:p-6 text-start border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 backdrop-blur-xl shadow-md transition-all">
-          {/* Header Section */}
-          <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
-            <h3 className="text-[1.125rem] font-bold text-foreground">{isArabic ? "وردك اليوم" : "Today's Wird"}</h3>
-            <p className="text-[0.8125rem] font-semibold text-muted-foreground">{dynamicSubtitle}</p>
-          </div>
-
-          {/* Main Split Row */}
-          <div
-            className="relative z-10 grid w-full grid-cols-1 items-center gap-6 sm:grid-cols-[minmax(0,1fr)_130px] sm:gap-4"
-            data-testid="today-palm-layout"
-          >
-            {/* Right Column: Zikr Routine List */}
-            <ul
-              aria-label={isArabic ? "تقدم المجموعات اليومية" : "Today's collection progress"}
-              className="flex flex-1 flex-col gap-2.5 min-w-0"
-              dir={isArabic ? "rtl" : "ltr"}
-            >
-              {[
-                {
-                  id: "morning" as const,
-                  name: isArabic ? "أذكار الصباح" : "Morning Azkar",
-                  state: summary.today.completedCategories.includes("morning") ? "complete" : "pending",
-                },
-                {
-                  id: "evening" as const,
-                  name: isArabic ? "أذكار المساء" : "Evening Azkar",
-                  state: summary.today.completedCategories.includes("evening") ? "complete" : "pending",
-                },
-                {
-                  id: "before_sleep" as const,
-                  name: isArabic ? "أذكار النوم" : "Before Sleep Azkar",
-                  state: summary.today.completedCategories.includes("before_sleep") ? "complete" : "pending",
-                },
-              ].map((col) => {
-                const isDone = col.state === "complete";
-                const rowContent = (
-                  <div className="flex w-full items-center justify-between gap-2.5">
-                    <span
-                      className={`text-[0.875rem] font-bold whitespace-nowrap ${
-                        isDone ? "text-slate-950 dark:text-white font-black" : "text-slate-800 dark:text-slate-200"
-                      }`}
-                    >
-                      {col.name}
-                    </span>
-
-                    <svg
-                      viewBox="0 0 24 24"
-                      width="20"
-                      height="20"
-                      fill="none"
-                      aria-hidden="true"
-                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-slate-600 dark:text-slate-400"}`}
-                    >
-                      <path
-                        d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-                        stroke="currentColor"
-                        strokeOpacity={isDone ? 1 : 0.6}
-                        strokeWidth="2"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-                        stroke="currentColor"
-                        strokeOpacity={isDone ? 1 : 0.6}
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                      />
-                    </svg>
-                  </div>
-                );
-
-                return (
-                  <li
-                    key={col.id}
-                    data-testid={`garden-category-${col.id}`}
-                    data-state={col.state}
-                    aria-label={`${col.name}: ${isDone ? (isArabic ? "مكتمل" : "Complete") : isArabic ? "لم تبدأ بعد" : "Not started yet"}`}
-                    className="w-full shrink-0"
-                  >
-                    {onSelectCategory ? (
-                      <button
-                        type="button"
-                        onClick={() => onSelectCategory(col.id)}
-                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-start transition-all backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
-                          isDone
-                            ? "border border-amber-500/40 bg-amber-500/20 hover:bg-amber-500/30 shadow-xs"
-                            : "border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 shadow-xs"
-                        }`}
-                      >
-                        {rowContent}
-                      </button>
-                    ) : (
-                      <div
-                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 transition-all backdrop-blur-md ${
-                          isDone
-                            ? "border border-amber-500/40 bg-amber-500/20 shadow-xs"
-                            : "border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 shadow-xs"
-                        }`}
-                      >
-                        {rowContent}
-                      </div>
-                    )}
-                  </li>
-                );
-              })}
-            </ul>
-
-            {/* Left Column: Interactive Palm Progress Display */}
-            <div className="relative flex flex-col items-center justify-center p-2" data-testid="today-palm-emblem">
-              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 backdrop-blur-md">
-                <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 110 110">
-                  <circle
-                    cx="55"
-                    cy="55"
-                    r="48"
-                    stroke="currentColor"
-                    className="text-slate-300/40 dark:text-[#1e2635]"
-                    strokeWidth="6"
-                    fill="none"
-                  />
-                  <circle
-                    cx="55"
-                    cy="55"
-                    r="48"
-                    stroke="#F59E0B"
-                    strokeWidth="6"
-                    fill="none"
-                    strokeDasharray={301.6}
-                    strokeDashoffset={301.6 - (301.6 * summary.today.goldenLeafCount) / 3}
-                    strokeLinecap="round"
-                    className="transition-all duration-700"
-                  />
-                </svg>
-                <div className="relative z-10">
-                  <PalmTreeMark
-                    size={48}
-                    className={
-                      summary.today.goldenLeafCount === 3
-                        ? "text-[#F59E0B] drop-shadow-[0_0_12px_rgba(245,158,11,0.5)]"
-                        : summary.today.goldenLeafCount > 0
-                          ? "text-[#E4A84A]"
-                          : "text-slate-400 dark:text-slate-500 opacity-40"
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Encouragement Banner */}
-          <div
-            className="relative z-10 flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 backdrop-blur-md"
-            dir="rtl"
-          >
-            <Heart className="h-4 w-4 text-rose-500 dark:text-rose-400 shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-center font-sans text-slate-800 dark:text-slate-200 text-[12.5px] font-semibold leading-relaxed">
-              {isArabic
-                ? "القليل الدائم، خير من الكثير المنقطع"
-                : "Constant small deeds are better than intermittent large ones"}
-            </span>
-          </div>
-        </div>
+        <ProgressDayView
+          summary={summary}
+          language={language}
+          dynamicSubtitle={dynamicSubtitle}
+          onSelectCategory={onSelectCategory}
+        />
       )}
 
-      {activeTab === "week" && (
-        <div className="space-y-2.5">
-          <SevenDayGarden summary={summary} language={language} />
-        </div>
-      )}
+      {activeTab === "week" && <ProgressWeekView summary={summary} language={language} />}
 
       {activeTab === "month" && (
-        <div>
-          <div
-            className="rounded-2xl border border-border/80 bg-background/70 p-4 shadow-xs"
-            data-testid="garden-month-calendar"
-          >
-            <div className="mb-3 grid grid-cols-7 gap-2 text-center">
-              {(isArabic
-                ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
-                : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
-              ).map((header) => (
-                <span key={header} className="text-[0.75rem] font-bold text-muted-foreground">
-                  {header}
-                </span>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 gap-2">
-              {/* Empty leading offset tiles for Month View */}
-              {Array.from({ length: (new Date(targetYear, targetMonth, 1).getDay() + 1) % 7 }).map((_, oIdx) => (
-                <div key={`month-offset-${oIdx}`} className="aspect-square w-full bg-transparent" />
-              ))}
-
-              {monthDayRecords.map((day) => {
-                const isPalm = day.isPalm;
-                const completedCount = day.completedCount;
-                const tileBg = isPalm
-                  ? "bg-amber-500/20 border border-amber-400/80 text-amber-500 font-black shadow-xs dark:bg-amber-500/25"
-                  : completedCount > 0
-                    ? "bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400 font-semibold"
-                    : "bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/40 border border-transparent";
-
-                const tileTitle = isArabic
-                  ? `${day.dayKey}: ${isPalm ? "نخلة مكتملة" : completedCount > 0 ? "نشط ⚡" : "غير نشط"}`
-                  : `${day.dayKey}: ${isPalm ? "Palm Tree Completed" : completedCount > 0 ? "Active ⚡" : "Inactive"}`;
-
-                return (
-                  <button
-                    key={day.dayKey}
-                    type="button"
-                    title={tileTitle}
-                    aria-label={tileTitle}
-                    tabIndex={0}
-                    className={`interactive-elem flex aspect-square flex-col items-center justify-center rounded-xl text-[0.75rem] font-black transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${tileBg}`}
-                  >
-                    <span>
-                      {isPalm ? (
-                        <PalmTreeMark size={14} filled />
-                      ) : completedCount > 0 ? (
-                        <Zap className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                    <span className="text-[0.625rem] opacity-80">{formatNumerals(day.dayNum, language)}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <ProgressMonthView
+          monthDayRecords={monthDayRecords}
+          language={language}
+          targetYear={targetYear}
+          targetMonth={targetMonth}
+        />
       )}
 
       {activeTab === "year" && (
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-border/80 bg-background/80 p-4 shadow-xs">
+        <div className="w-full max-w-[44rem] mx-auto p-4 bg-card border border-border rounded-[1.5rem] shadow-sm fade-in">
+          <div className="rounded-2xl">
             {/* Year Map Header & Legend */}
             <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
               <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "garden.yearMapTitle")}</h3>

@@ -308,9 +308,7 @@ export function ZikrCounterSurface({
                   )}
                 </div>
 
-                <div className="my-1.5 h-[1.5px] w-7 bg-border/60 rounded-full" aria-hidden="true" />
-
-                <p className="tap-anywhere-hint font-bold text-foreground text-xs">{activeInstruction}</p>
+                <div className="my-1.5 h-[1.5px] w-7 bg-transparent rounded-full" aria-hidden="true" />
 
                 {remainingCount > 0 && (
                   <p

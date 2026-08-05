@@ -117,10 +117,6 @@ export function useZikrCounter({
   };
 
   const handleSurfaceTap = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-    if (z?.isSurah) {
-      return;
-    }
-
     // If user is selecting text, don't count the tap
     const selection = typeof window !== "undefined" ? window.getSelection() : null;
     if (selection && selection.toString().length > 0) {

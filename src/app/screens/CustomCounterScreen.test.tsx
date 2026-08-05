@@ -10,15 +10,15 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.getByText("المسبحة الإلكترونية")).toBeInTheDocument();
     expect(screen.getByText("الذكر المأثور")).toBeInTheDocument();
     expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
-    expect(screen.getAllByText("اضغط للتسبيح")[0]).toBeInTheDocument();
+    expect(screen.getAllByTestId("custom-counter-surface")[0]).toBeInTheDocument();
   });
 
   it("increments counter on tap and supports undo/reset", () => {
     const onBack = vi.fn();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
-    const tapButtons = screen.getAllByRole("button", { name: "اضغط للتسبيح" });
-    fireEvent.click(tapButtons[0]!);
+    const tapButton = screen.getAllByTestId("custom-counter-surface")[0]!;
+    fireEvent.click(tapButton);
 
     expect(screen.getByText("١")).toBeInTheDocument();
     const undoButton = screen.getAllByText("تراجع")[0]?.closest("button");

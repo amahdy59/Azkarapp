@@ -15,11 +15,11 @@
     "Noto Sans Arabic Variable", "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
-  --background: #000000;
+  --background: #080808;
   --foreground: #f2f2ea;
-  --card: #050505;
+  --card: #0c0c0c;
   --card-foreground: #e3e8f2;
-  --popover: #050505;
+  --popover: #0c0c0c;
   --popover-foreground: #f2f2ea;
   --primary: #d7a528;
   --primary-foreground: #000000;
@@ -220,9 +220,9 @@ textarea {
 .high-contrast {
   --background: #02050d;
   --foreground: #ffffff;
-  --card: #000000;
+  --card: #050505;
   --card-foreground: #ffffff;
-  --popover: #000000;
+  --popover: #050505;
   --popover-foreground: #ffffff;
   --primary: #ffd75e;
   --primary-foreground: #000000;

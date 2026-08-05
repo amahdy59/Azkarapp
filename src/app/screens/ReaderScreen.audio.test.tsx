@@ -49,7 +49,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-75");
   });
 
-  it("only completes a full surah from its counter", () => {
+  it("completes a full surah when tapping anywhere", () => {
     registerLazyCollection("friday_kahf", FRIDAY_KAHF);
     const onComplete = vi.fn();
 
@@ -81,8 +81,12 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
 
+    // Now tapping anywhere completes the surah
     fireEvent.click(screen.getByTestId("zikr-text"));
-    expect(onComplete).not.toHaveBeenCalled();
+    expect(onComplete).toHaveBeenCalledOnce();
+
+    // Clear mock to test the next interaction
+    onComplete.mockClear();
 
     const difficultWord = screen.getAllByTestId("quran-word-help")[0]!;
     fireEvent.click(difficultWord);
@@ -93,9 +97,6 @@ describe("ReaderScreen audio identity", () => {
     );
     expect(onComplete).not.toHaveBeenCalled();
     fireEvent.click(screen.getByLabelText("إغلاق معنى الكلمة"));
-
-    fireEvent.click(screen.getByTestId("counter-surface"));
-    expect(onComplete).toHaveBeenCalledOnce();
   });
 
   it("allows tapping the empty canvas area between text and counter to count zikr for small surahs", () => {
