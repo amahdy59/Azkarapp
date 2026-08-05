@@ -268,7 +268,7 @@ export function ProgressDayView({
                       type="button"
                       onClick={() => onSelectCategory?.(col.id)}
                       aria-label={col.name}
-                      className="p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+                      className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-white/40 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
                     >
                       {isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
                     </button>
@@ -670,7 +670,13 @@ export function ProgressMonthView({
                   type="button"
                   key={day.dayKey}
                   onClick={() => setSelectedDayNum(day.dayNum)}
-                  className={`flex flex-col items-center justify-center aspect-square rounded-[1rem] border transition-all ${
+                  aria-label={
+                    isArabic
+                      ? `اليوم ${formatNumerals(day.dayNum, language)}، ${isPalm ? "مكتمل" : count > 0 ? `جزئي ${formatNumerals(count, language)} من 3` : "لم يبدأ"}`
+                      : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 3` : "Unstarted"}`
+                  }
+                  aria-pressed={isSelected}
+                  className={`flex flex-col items-center justify-center aspect-square rounded-[1rem] border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                     isSelected
                       ? "border-amber-500 ring-2 ring-amber-500/50 bg-amber-500/20 scale-105 z-10"
                       : isPalm

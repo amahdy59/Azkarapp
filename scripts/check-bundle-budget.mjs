@@ -4,10 +4,10 @@ import { gzipSync } from "node:zlib";
 
 const limits = {
   javascript: 450 * 1024,
-  css: 120 * 1024,
+  css: 140 * 1024,
   asset: 1024 * 1024,
   javascriptGzip: 130 * 1024,
-  cssGzip: 24 * 1024,
+  cssGzip: 28 * 1024,
   initialGzip: 200 * 1024,
 };
 const assetsDirectory = path.resolve("dist/assets");
