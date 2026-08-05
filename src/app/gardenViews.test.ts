@@ -59,4 +59,22 @@ describe("garden view selectors", () => {
     expect(yearStats.totalPalms).toBe(2);
     expect(yearStats.bestMonthIndex).toBe(1); // Feb
   });
+
+  it("correctly identifies evening or sleep as the best routine when dominant", () => {
+    const eveningDominant: DailyCollectionCompletion[] = [
+      { dayKey: "2024-03-01", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-02", category: "evening", timeZone: "Africa/Cairo" },
+    ];
+    const eveningIndex = createDailyCompletionIndex(eveningDominant);
+    expect(getMonthDetailedStats(eveningIndex, 2024, 2).bestRoutine).toBe("evening");
+    expect(getYearDetailedStats(eveningIndex, 2024).mostConsistentRoutine).toBe("evening");
+
+    const sleepDominant: DailyCollectionCompletion[] = [
+      { dayKey: "2024-03-01", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-02", category: "before_sleep", timeZone: "Africa/Cairo" },
+    ];
+    const sleepIndex = createDailyCompletionIndex(sleepDominant);
+    expect(getMonthDetailedStats(sleepIndex, 2024, 2).bestRoutine).toBe("before_sleep");
+    expect(getYearDetailedStats(sleepIndex, 2024).mostConsistentRoutine).toBe("before_sleep");
+  });
 });
