@@ -27,7 +27,7 @@ const mockSummary: GardenSummary = {
   longestPalmRhythm: 7,
   currentUsageStreak: 5,
   longestUsageStreak: 14,
-  messageKind: "great_start",
+  messageKind: "partial",
   yesterdayLeafCount: 2,
   milestones: [],
 };
