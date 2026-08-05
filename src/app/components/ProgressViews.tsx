@@ -205,7 +205,10 @@ export function ProgressMonthView({
     : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
-    <div className="w-full max-w-[44rem] mx-auto p-4 bg-card border border-border rounded-[1.5rem] shadow-sm fade-in">
+    <div
+      data-testid="garden-month-calendar"
+      className="w-full max-w-[44rem] mx-auto p-4 bg-card border border-border rounded-[1.5rem] shadow-sm fade-in"
+    >
       <div className="flex justify-between items-center mb-4 px-2">
         <h4 className="text-[1.125rem] font-bold text-foreground">{monthName}</h4>
       </div>

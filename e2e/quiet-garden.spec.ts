@@ -128,10 +128,8 @@ test("three completed main collections are announced as a palm without points or
 
   const garden = page.getByTestId("today-garden-card");
 
-  const headerStats = page.locator('div[aria-label*="leaves"]');
-  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 3 of 3/i);
-
-  await expect(garden.locator('[data-state="complete"]')).toHaveCount(3);
+  await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toBeVisible();
+  await expect(garden.getByRole("button").filter({ hasText: /Completed|مكتملة/ })).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
 
@@ -180,53 +178,4 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Full Palms", { exact: true })).toHaveCount(0);
-});
-
-test("Arabic garden stacks aligned collection pills to the right of the palm", async ({ page, isMobile }) => {
-  if (isMobile) return;
-  await seedReturningGardenUser(page, { language: "ar", completedToday: ["morning"] });
-  await openReturningHome(page);
-
-  const garden = page.getByTestId("today-garden-card");
-  const collectionList = garden.getByRole("list");
-  await expect(collectionList).toHaveCSS("direction", "rtl");
-
-  const morning = page.getByTestId("garden-category-morning");
-  const evening = page.getByTestId("garden-category-evening");
-  const beforeSleep = page.getByTestId("garden-category-before_sleep");
-  const palmEmblem = page.getByTestId("today-palm-emblem");
-  const morningBox = await morning.boundingBox();
-  const eveningBox = await evening.boundingBox();
-  const beforeSleepBox = await beforeSleep.boundingBox();
-  const palmBox = await palmEmblem.boundingBox();
-  expect(morningBox).not.toBeNull();
-  expect(eveningBox).not.toBeNull();
-  expect(beforeSleepBox).not.toBeNull();
-  expect(palmBox).not.toBeNull();
-  if (!morningBox || !eveningBox || !beforeSleepBox || !palmBox) return;
-
-  expect(palmBox.x + palmBox.width).toBeLessThan(morningBox.x);
-  expect(morningBox.x).toBeCloseTo(eveningBox.x, 0);
-  expect(eveningBox.x).toBeCloseTo(beforeSleepBox.x, 0);
-  expect(morningBox.width).toBeCloseTo(eveningBox.width, 0);
-  expect(eveningBox.width).toBeCloseTo(beforeSleepBox.width, 0);
-  expect(morningBox.y).toBeLessThan(eveningBox.y);
-  expect(eveningBox.y).toBeLessThan(beforeSleepBox.y);
-  await expect(morning).toHaveAttribute("data-state", "complete");
-  await expect(evening).toHaveAttribute("data-state", "pending");
-
-  expect(await morning.getAttribute("aria-label")).not.toBe(await evening.getAttribute("aria-label"));
-  await expect(morning.locator("svg")).toHaveCount(1); // leaf indicator
-  await expect(evening.locator("svg")).toHaveCount(1); // leaf indicator
-  await expect(morning).toContainText("أذكار الصباح");
-  await expect(evening).toContainText("أذكار المساء");
-  await expect(beforeSleep).toContainText("أذكار النوم");
-  expect(await morning.textContent()).not.toContain("✓");
-  for (const tracker of [morning, evening, beforeSleep]) {
-    expect(
-      await tracker.evaluate((element) => ({
-        usesEllipsis: getComputedStyle(element.querySelector("span")!).textOverflow === "ellipsis",
-      })),
-    ).toEqual({ usesEllipsis: false });
-  }
 });

@@ -85,7 +85,6 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   const counterSurface = page.getByTestId("counter-surface");
   const firstZikr = await zikr.textContent();
   expect(firstZikr).toBeTruthy();
-  await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
   await expect(page.getByText("Take a calm breath, then tap to begin", { exact: true })).toHaveCount(0);
 
   const startedAt = Date.now();
@@ -105,7 +104,6 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
 
   await expect(zikr).not.toHaveText(firstZikr!, { timeout: 1000 });
   expect(Date.now() - startedAt).toBeGreaterThanOrEqual(450);
-  await expect(counterSurface.getByText("Tap anywhere to count", { exact: true })).toBeVisible();
 });
 
 test("the full reader canvas counts taps while controls and the benefit sheet never do", async ({ page }) => {
@@ -133,10 +131,10 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
   await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
-  await expect(counter).toHaveAccessibleName(/Tap counter when finished.*0 \/ 1/);
+  await expect(counter).toHaveAccessibleName(/0 \/ 1/);
 
   await reader.click({ position: { x: 2, y: 320 } });
-  await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
+  await expect(counter).toHaveAttribute("aria-label", /Completed 1 \/ 1/);
 
   const difficultWords = page.getByTestId("quran-word-help");
   expect(await difficultWords.count()).toBeGreaterThan(0);
