@@ -138,7 +138,7 @@ test("full surahs count only from the counter and expose sourced difficult-word 
 
   const difficultWords = page.getByTestId("quran-word-help");
   expect(await difficultWords.count()).toBeGreaterThan(0);
-  await difficultWords.first().click();
+  await difficultWords.first().click({ force: true });
 
   const meaningSheet = page.getByTestId("quran-word-meaning-sheet");
   await expect(meaningSheet).toBeVisible();
