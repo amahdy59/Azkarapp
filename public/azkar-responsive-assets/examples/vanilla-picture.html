@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Azkar responsive background example</title>
+  <link rel="preload" as="image" href="/assets/backgrounds/evening/evening-1280.avif" type="image/avif" fetchpriority="high">
+  <link rel="stylesheet" href="./vanilla.css">
+</head>
+<body>
+  <section class="azkar-hero" aria-labelledby="evening-title">
+    <picture class="azkar-hero__media" aria-hidden="true">
+      <source type="image/avif" srcset="/assets/backgrounds/evening/evening-768.avif 768w, /assets/backgrounds/evening/evening-1280.avif 1280w, /assets/backgrounds/evening/evening-1600.avif 1600w" sizes="(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px">
+      <source type="image/webp" srcset="/assets/backgrounds/evening/evening-768.webp 768w, /assets/backgrounds/evening/evening-1280.webp 1280w, /assets/backgrounds/evening/evening-1600.webp 1600w" sizes="(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px">
+      <img src="/assets/backgrounds/evening/evening-1280.webp" width="1280" height="720" alt="" decoding="async" fetchpriority="high">
+    </picture>
+    <div class="azkar-hero__overlay" aria-hidden="true"></div>
+    <div class="azkar-hero__content">
+      <p>حان وقت</p>
+      <h1 id="evening-title">أذكار المساء</h1>
+    </div>
+  </section>
+</body>
+</html>

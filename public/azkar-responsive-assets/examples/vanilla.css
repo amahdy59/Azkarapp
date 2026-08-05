@@ -1,0 +1,63 @@
+.azkar-hero {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: var(--radius-3xl, 24px);
+  min-height: clamp(20rem, 42vw, 28rem);
+  background: #0b1426;
+  color: #fff;
+}
+
+.azkar-hero__media,
+.azkar-hero__media::before,
+.azkar-hero__media img,
+.azkar-hero__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.azkar-hero__media {
+  z-index: -2;
+  display: block;
+  background: var(--azkar-bg-placeholder) center / cover no-repeat;
+}
+
+.azkar-hero__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--azkar-bg-position, center);
+}
+
+/* RTL-friendly text-safe overlay: stronger on the logical end/right where Arabic text sits. */
+.azkar-hero__overlay {
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgb(5 12 27 / 18%) 0%, rgb(5 12 27 / 44%) 54%, rgb(5 12 27 / 78%) 100%),
+    linear-gradient(270deg, rgb(5 12 27 / 76%) 0%, rgb(5 12 27 / 44%) 42%, rgb(5 12 27 / 12%) 76%);
+}
+
+[dir="ltr"] .azkar-hero__overlay {
+  background:
+    linear-gradient(180deg, rgb(5 12 27 / 18%) 0%, rgb(5 12 27 / 44%) 54%, rgb(5 12 27 / 78%) 100%),
+    linear-gradient(90deg, rgb(5 12 27 / 76%) 0%, rgb(5 12 27 / 44%) 42%, rgb(5 12 27 / 12%) 76%);
+}
+
+.azkar-hero__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: inherit;
+  max-width: 44rem;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .azkar-hero__media img {
+    transition: none;
+  }
+}
