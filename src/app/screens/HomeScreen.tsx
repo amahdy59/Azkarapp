@@ -2,7 +2,7 @@
 import { useState, useEffect, useMemo } from "react";
 import { Sun, Calendar, Zap, Sparkles, ChevronRightIcon, ChevronLeftIcon, BarChart3, Clock } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
-import { TodayRoutineGarden, PalmTreeReward, GoldenPalmMark } from "../components/RoutineGarden";
+import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
@@ -268,31 +268,65 @@ export function HomeScreen({
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
       <TimeOfDayBackground categoryId={reminderInfo.categoryId} />
 
-      {/* Fixed Header & Gamification Bar */}
+      {/* Fixed Unified Header & Gamification Bar */}
       <div className="relative z-20 shrink-0 px-page pt-2 pb-1">
-        <header className="flex w-full flex-col gap-2 pt-1 pb-1" dir={direction}>
-          <PalmTreeReward summary={gardenSummary} language={language} bare />
-
-          {/* Time & Date Info Pill — Flex wrap for small screens (320-360px) to prevent truncation */}
+        <header className="flex w-full flex-col pt-1 pb-1" dir={direction}>
           <div
-            className="flex min-h-[40px] w-full shrink-0 flex-wrap items-center justify-between gap-y-1 rounded-[20px] border border-[#1f293d] bg-white/10 px-4 py-1.5 text-xs font-medium backdrop-blur-md shadow-xs"
+            className="flex min-h-[48px] w-full shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 rounded-[22px] border border-white/20 bg-black/35 px-4 py-2.5 text-xs font-semibold backdrop-blur-xl shadow-md"
             dir="auto"
+            aria-label={
+              isArabic
+                ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من 3، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
+                : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of 3, Daily streak: ${streakDays} days`
+            }
           >
-            {/* Date */}
-            <div data-testid="hijri-date" className="flex items-center gap-2 text-white whitespace-nowrap">
-              <Calendar className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
-              <span>{formatDisplayDate(now, language, calendarType)}</span>
+            {/* Start side: Date & Next Prayer info */}
+            <div className="flex flex-wrap items-center gap-3 text-white">
+              {/* Date */}
+              <div data-testid="hijri-date" className="flex items-center gap-2 text-white whitespace-nowrap">
+                <Calendar className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" />
+                <span className="text-[0.8125rem] font-medium">{formatDisplayDate(now, language, calendarType)}</span>
+              </div>
+
+              <div className="hidden sm:block h-3.5 w-px bg-white/25 shrink-0" />
+
+              {/* Prayer timing */}
+              <div data-testid="next-prayer" className="flex items-center gap-2 text-white whitespace-nowrap">
+                <Sun className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" />
+                <span className="flex items-center gap-1 text-[0.8125rem] font-medium">
+                  <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
+                  <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+                </span>
+              </div>
             </div>
 
-            <div className="hidden sm:block h-3 w-px bg-white/20 shrink-0 mx-1" />
+            {/* End side: Streak & Palms Gamification Badges */}
+            <div className="flex items-center gap-2.5">
+              {/* Streak */}
+              <div
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-black text-[#fbbf24] shadow-xs"
+                title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+              >
+                <span>
+                  {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
+                </span>
+                <Zap className="h-3.5 w-3.5 text-[#fbbf24]" strokeWidth={2.5} aria-hidden="true" />
+              </div>
 
-            {/* Prayer timing */}
-            <div data-testid="next-prayer" className="flex items-center gap-2 text-white whitespace-nowrap">
-              <Sun className="h-[14px] w-[14px] shrink-0 text-[#e2a84a]" />
-              <span className="flex items-center gap-1">
-                <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-                <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-              </span>
+              {/* Palms */}
+              <div
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[0.8125rem] font-black text-[#fbbf24] shadow-xs"
+                title={isArabic ? "أشجار النخيل" : "Palms"}
+              >
+                <PalmTreeMark
+                  size={16}
+                  filled={gardenSummary.lifetimePalms > 0}
+                  className={gardenSummary.lifetimePalms > 0 ? "text-[#fbbf24]" : "text-white/40"}
+                />
+                <span>
+                  {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
+                </span>
+              </div>
             </div>
           </div>
         </header>

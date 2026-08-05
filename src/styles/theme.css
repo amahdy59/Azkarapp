@@ -1511,7 +1511,7 @@ a[href]:not(.no-press):active,
 @media (min-width: 56.25rem) {
   .settings-two-pane {
     display: grid;
-    grid-template-columns: 17rem minmax(0, 1fr);
+    grid-template-columns: minmax(21rem, 24rem) minmax(0, 1fr);
     height: 100%;
     overflow: hidden;
   }

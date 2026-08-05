@@ -59,21 +59,20 @@ export function TasbeehCounterButton({
       type="button"
       onClick={onClick}
       dir={direction}
-      className="interactive-elem group relative flex h-[56px] min-h-[52px] w-full items-center justify-between rounded-full border border-amber-600/40 dark:border-amber-400/50 bg-card px-5 text-foreground transition-all duration-200 shadow-xs hover:border-amber-600/70 dark:hover:border-amber-400/80 hover:bg-amber-500/5 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99]"
+      className="interactive-elem group relative flex min-h-[60px] w-full items-center justify-between rounded-2xl border border-border/60 bg-card p-4 text-foreground shadow-xs transition-all duration-200 hover:border-primary/50 hover:bg-muted/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.99] cursor-pointer"
       aria-label={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
     >
       <div className="flex items-center gap-3.5 min-w-0">
-        <TasbeehIcon
-          size={26}
-          className="shrink-0 text-amber-700 dark:text-amber-400 transition-transform duration-200 group-hover:scale-110"
-        />
-        <span className="text-[1.0625rem] font-extrabold tracking-tight text-foreground truncate">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-transform duration-200 group-hover:scale-105">
+          <TasbeehIcon size={24} className="shrink-0" />
+        </div>
+        <span className="text-[1rem] md:text-[1.0625rem] font-extrabold tracking-tight text-foreground truncate">
           {isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
         </span>
       </div>
       <ChevronNext
-        size={22}
-        className="shrink-0 text-amber-700 dark:text-amber-400 transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180"
+        size={20}
+        className="shrink-0 text-muted-foreground transition-transform duration-200 group-hover:translate-x-1 rtl:group-hover:-translate-x-1 rtl:rotate-180 group-hover:text-foreground"
         aria-hidden="true"
       />
     </button>

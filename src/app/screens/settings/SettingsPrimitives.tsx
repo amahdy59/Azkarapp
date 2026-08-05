@@ -67,7 +67,7 @@ export function SettingsRowItem({
         {icon}
       </div>
       <p
-        className="min-w-0 flex-1 break-words text-start font-sans text-[1rem] font-semibold leading-6"
+        className="min-w-0 flex-1 break-normal text-start font-sans text-[0.9375rem] md:text-[1rem] font-semibold leading-snug"
         style={{ color: labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
       >
         {label}
