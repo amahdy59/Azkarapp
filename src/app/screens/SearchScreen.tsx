@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useDeferredValue, useMemo, useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
@@ -146,7 +147,12 @@ export function SearchScreen({
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-5">
+      <div
+        role="region"
+        aria-label={t(language, "search.placeholder")}
+        tabIndex={0}
+        className="flex-1 overflow-y-auto px-5 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      >
         {/* Recent searches — shown when input is empty and there is history */}
         {!q && recents.length > 0 && (
           <div className="mb-6">

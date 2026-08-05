@@ -227,7 +227,7 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
 
   const dimensions = await sheet.evaluate((element) => {
     const bounds = element.getBoundingClientRect();
-    const viewport = element.querySelector<HTMLElement>('[data-slot="scroll-area-viewport"]');
+    const viewport = element.querySelector<HTMLElement>(".reference-scroll, [data-slot='scroll-area-viewport']");
     return {
       height: bounds.height,
       bottom: bounds.bottom,

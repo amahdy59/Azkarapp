@@ -1,8 +1,8 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useEffect, useRef, useState } from "react";
 import { BookOpen, Check, Copy, X } from "./icons";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
-import { ScrollArea } from "./ui/scroll-area";
 import {
   getLocalizedPreferredTiming,
   getLocalizedSourceReference,
@@ -106,7 +106,13 @@ function ReferenceContent({
       </div>
 
       {/* Scrollable Main Content Area */}
-      <ScrollArea className="reference-scroll min-h-0 flex-1 overscroll-contain px-6 py-4" dir={direction}>
+      <div
+        role="region"
+        aria-label={t(language, "reader.referencesButton")}
+        className="reference-scroll min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        tabIndex={0}
+        dir={direction}
+      >
         <div className="reference-sheet-content flex flex-col gap-4 pb-4">
           {/* Arabic Zikr Card Header */}
           {isArabic ? (
@@ -251,7 +257,7 @@ function ReferenceContent({
             </div>
           </div>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

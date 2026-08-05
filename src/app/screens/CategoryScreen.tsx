@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
 import { Check, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
@@ -492,7 +493,12 @@ export function CategoryScreen({
         </div>
       )}
 
-      <div className="flex flex-1 flex-col overflow-y-auto px-5 py-4">
+      <div
+        role="region"
+        aria-label={isArabic ? cat.nameArabic : cat.name}
+        tabIndex={0}
+        className="flex flex-1 flex-col overflow-y-auto px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      >
         {introduction && (
           <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
             <div className="mb-2 flex items-center justify-between gap-3">

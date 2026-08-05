@@ -1,10 +1,10 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { ExternalLink, Info, BookOpen, X } from "./icons";
 import { QURAN_WORD_MEANING_SOURCE, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
-import { ScrollArea } from "./ui/scroll-area";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 import { useEffect } from "react";
 
@@ -60,7 +60,13 @@ function WordMeaningContent({
       </div>
 
       {/* Scrollable main content */}
-      <ScrollArea className="min-h-0 flex-1 overscroll-contain px-6 py-4" dir={direction}>
+      <div
+        role="region"
+        aria-label={t(language, "reader.wordMeaningTitle")}
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring"
+        tabIndex={0}
+        dir={direction}
+      >
         <div className="flex flex-col gap-5 pb-4">
           {meanings.map((meaning) => (
             <div key={meaning.id} className="flex flex-col gap-3">
@@ -80,17 +86,15 @@ function WordMeaningContent({
                 </p>
               </div>
 
-              {/* Section Title */}
-              <div className="flex items-center gap-2 mt-1">
-                <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                  {t(language, "reader.wordMeaningLabel")}
-                </h3>
-              </div>
-
-              {/* Explanation Card */}
-              <div className="rounded-2xl border border-border/60 bg-card p-4.5 shadow-sm">
-                <p className="text-right text-[1.0625rem] font-medium leading-8 text-foreground" lang="ar" dir="rtl">
+              {/* Exegesis & Meaning Card */}
+              <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                  <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                    {t(language, "reader.wordMeaningTitle")}
+                  </h3>
+                </div>
+                <p className="text-[1rem] leading-7 font-medium text-foreground" lang="ar" dir="rtl">
                   {meaning.explanationArabic}
                 </p>
               </div>
@@ -123,7 +127,7 @@ function WordMeaningContent({
             </div>
           </a>
         </div>
-      </ScrollArea>
+      </div>
     </div>
   );
 }

@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
 import { Sun, Calendar, Zap, Sparkles, ChevronRightIcon, ChevronLeftIcon, BarChart3, Clock } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
@@ -298,7 +299,11 @@ export function HomeScreen({
       </div>
 
       {/* Scrollable Content Area */}
-      <main className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center">
+      <main
+        tabIndex={0}
+        aria-label={t(language, "app.name")}
+        className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-page pb-6 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+      >
         <div className="home-grid w-full">
           {/* Friday Special Banner */}
           {isFriday && onOpenFridayMode && (

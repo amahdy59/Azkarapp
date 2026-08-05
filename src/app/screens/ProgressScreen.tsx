@@ -23,7 +23,11 @@ export function ProgressScreen({
   onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
   return (
-    <ScreenContainer dir={direction} className="px-page py-4 overflow-y-auto page-content-center">
+    <ScreenContainer
+      dir={direction}
+      tabIndex={0}
+      className="px-page py-4 overflow-y-auto page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+    >
       <Header title={t(language, "common.progress")} language={language} />
       <TodayRoutineGarden
         summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}

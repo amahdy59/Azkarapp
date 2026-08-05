@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -375,7 +376,7 @@ export function ReaderScreen({
           setBenefitOpen(true);
         }}
         aria-haspopup="dialog"
-        className="interactive-elem ui-control flex min-h-[44px] min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="interactive-elem ui-control flex md:hidden min-h-[44px] min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         <BookOpen className="shrink-0" size={17} />
         <span className="truncate" dir="auto">
@@ -591,107 +592,126 @@ export function ReaderScreen({
         onBack={onBack}
         language={language}
         right={
-          <DropdownMenu dir={direction}>
-            <DropdownMenuTrigger
-              aria-label={t(language, "reader.menu")}
-              className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={(event) => {
+                event.stopPropagation();
+                setHasOpenedBenefit(true);
+                setBenefitOpen(true);
+              }}
+              className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              aria-label={t(language, "reader.referencesButton")}
+              title={t(language, "reader.referencesButton")}
             >
-              <MoreVertical size={20} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
-              sideOffset={8}
-            >
-              {/* Navigation Items */}
-              <DropdownMenuItem
-                disabled={idx === 0}
-                onClick={onPrev}
-                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+              <BookOpen className="shrink-0 text-primary" size={16} />
+              <span className="truncate" dir="auto">
+                {t(language, "reader.referencesButton")}
+              </span>
+            </button>
+
+            <DropdownMenu dir={direction}>
+              <DropdownMenuTrigger
+                aria-label={t(language, "reader.menu")}
+                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
               >
-                <div className="flex items-center gap-2.5">
-                  {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-                  <span>{t(language, "reader.prev")}</span>
-                </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuItem
-                disabled={idx === azkar.length - 1}
-                onClick={onNext}
-                className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                <MoreVertical size={20} />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                sideOffset={8}
               >
-                <div className="flex items-center gap-2.5">
-                  {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-                  <span>{t(language, "reader.next")}</span>
-                </div>
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-              {/* Zikr Action Items */}
-              <DropdownMenuItem
-                disabled={!audioAvailable}
-                onClick={onPlayAudio}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-              >
-                <Volume2 size={18} />
-                {audioAvailable
-                  ? language === "ar"
-                    ? "تشغيل مرة واحدة"
-                    : "Play audio once"
-                  : language === "ar"
-                    ? "الصوت غير متاح"
-                    : "Audio unavailable"}
-              </DropdownMenuItem>
-
-              {onRepeatAudio && (
+                {/* Navigation Items */}
                 <DropdownMenuItem
-                  onClick={onRepeatAudio}
+                  disabled={idx === 0}
+                  onClick={onPrev}
+                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+                    <span>{t(language, "reader.prev")}</span>
+                  </div>
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  disabled={idx === azkar.length - 1}
+                  onClick={onNext}
+                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+                >
+                  <div className="flex items-center gap-2.5">
+                    {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+                    <span>{t(language, "reader.next")}</span>
+                  </div>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+                {/* Zikr Action Items */}
+                <DropdownMenuItem
+                  disabled={!audioAvailable}
+                  onClick={onPlayAudio}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+                >
+                  <Volume2 size={18} />
+                  {audioAvailable
+                    ? language === "ar"
+                      ? "تشغيل مرة واحدة"
+                      : "Play audio once"
+                    : language === "ar"
+                      ? "الصوت غير متاح"
+                      : "Audio unavailable"}
+                </DropdownMenuItem>
+
+                {onRepeatAudio && (
+                  <DropdownMenuItem
+                    onClick={onRepeatAudio}
+                    className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                  >
+                    <RotateCcw size={18} />
+                    {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
+                  </DropdownMenuItem>
+                )}
+
+                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+                <DropdownMenuItem
+                  onClick={handleReset}
                   className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
                 >
                   <RotateCcw size={18} />
-                  {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
+                  {t(language, "reader.resetCounter")}
                 </DropdownMenuItem>
-              )}
 
-              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+                <DropdownMenuItem
+                  onClick={handleToggleSaved}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
+                  {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={handleReset}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <RotateCcw size={18} />
-                {t(language, "reader.resetCounter")}
-              </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => void handleShare()}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <Share2 size={18} />
+                  {t(language, "reader.share")}
+                </DropdownMenuItem>
 
-              <DropdownMenuItem
-                onClick={handleToggleSaved}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
-                {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
-              </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
-              <DropdownMenuItem
-                onClick={() => void handleShare()}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <Share2 size={18} />
-                {t(language, "reader.share")}
-              </DropdownMenuItem>
-
-              <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-              {/* View All */}
-              <DropdownMenuItem
-                onClick={onBack}
-                className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-              >
-                <List size={18} />
-                {t(language, "reader.viewAllAzkar")}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                {/* View All */}
+                <DropdownMenuItem
+                  onClick={onBack}
+                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                >
+                  <List size={18} />
+                  {t(language, "reader.viewAllAzkar")}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
 
@@ -713,9 +733,12 @@ export function ReaderScreen({
         className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
       >
         {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
-            within this region; the counter below is always visible and never covered. */}
+          within this region; the counter below is always visible and never covered. */}
         <div
-          className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 ${
+          role="region"
+          tabIndex={0}
+          aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+          className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
             justCompleted ? "zikr-step-exit" : "zikr-step-enter"
           }`}
         >
