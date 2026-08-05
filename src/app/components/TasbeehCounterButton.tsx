@@ -59,7 +59,7 @@ export function TasbeehCounterButton({
       type="button"
       onClick={onClick}
       dir={direction}
-      className="interactive-elem group relative flex min-h-[64px] w-full items-center justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-4 md:p-5 text-foreground backdrop-blur-xl shadow-md transition-all duration-200 hover:border-amber-500/40 hover:bg-card/95 dark:hover:bg-black/60 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] active:scale-[0.99] cursor-pointer"
+      className="interactive-elem group relative flex min-h-[4.5rem] w-full items-center justify-between rounded-[2rem] border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 p-4 md:p-5 text-foreground backdrop-blur-xl shadow-sm transition-all duration-300 hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md dark:hover:bg-black/65 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] active:scale-[0.99] cursor-pointer"
       aria-label={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
     >
       <div className="flex items-center gap-3.5 min-w-0">

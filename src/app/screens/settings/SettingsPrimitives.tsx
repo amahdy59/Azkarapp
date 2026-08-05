@@ -5,6 +5,8 @@ import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../../components/ui/select";
 
+import { useLayoutMode } from "../../hooks/useLayoutMode";
+
 export function SubHeader({
   title,
   onBack,
@@ -16,6 +18,18 @@ export function SubHeader({
   right?: React.ReactNode;
   language?: AppLanguage;
 }) {
+  const layoutMode = useLayoutMode();
+  const isTwoPane = layoutMode === "expanded" || layoutMode === "large";
+
+  if (isTwoPane) {
+    return (
+      <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
+        <h1 className="text-2xl font-extrabold text-foreground font-sans leading-tight">{title}</h1>
+        <div className="flex justify-end items-center">{right}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-between px-4 shrink-0" style={{ height: 56 }}>
       <IconButton onClick={onBack} label={t(language, "common.back")}>

@@ -981,8 +981,8 @@ function AppContent() {
                 <FridayModeScreen
                   isArabic={isArabic}
                   direction={layoutDirection}
-                  kahfCompletedCount={completed.friday_kahf.has("friday-kahf") ? 1 : 0}
-                  duasCompletedCount={completed.comprehensive_duas.size}
+                  kahfCompletedCount={completed.friday_kahf?.has("friday-kahf") ? 1 : 0}
+                  duasCompletedCount={completed.comprehensive_duas?.size ?? 0}
                   onBack={pop}
                   onStartKahf={() => {
                     try {

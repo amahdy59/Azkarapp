@@ -673,7 +673,7 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 md:p-6 text-start border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 backdrop-blur-xl shadow-xl transition-all">
+        <div className="glass-panel relative flex w-full max-w-[44rem] mx-auto flex-col items-center gap-5 overflow-hidden rounded-[2rem] p-5 md:p-6 text-start border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 backdrop-blur-xl shadow-md transition-all">
           {/* Header Section */}
           <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
             <h3 className="text-[1.125rem] font-bold text-foreground">{isArabic ? "وردك اليوم" : "Today's Wird"}</h3>

@@ -1,52 +1,25 @@
 import React from "react";
+import { AzkarHeroBackground } from "./AzkarHeroBackground";
+import type { AzkarBackgroundKey } from "./azkar-backgrounds";
 
 export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
-  const base = import.meta.env.BASE_URL;
-
-  let name = "morning";
-  let fallbackPng = "Morning.png";
+  let kind: AzkarBackgroundKey = "morning";
 
   if (categoryId === "evening") {
-    name = "evening";
-    fallbackPng = "Evening.png";
+    kind = "evening";
   } else if (categoryId === "before_sleep") {
-    name = "before-sleep";
-    fallbackPng = "Before Sleep.png";
+    kind = "sleep";
   } else if (categoryId.includes("friday")) {
-    name = "morning";
-    fallbackPng = "Morning.png";
+    kind = "friday";
   }
-
-  const positions: Record<string, string> = {
-    morning: "36% 50%",
-    evening: "38% 50%",
-    "before-sleep": "64% 50%",
-  };
 
   return (
     <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
-      {/* Responsive Sky Background Picture Element */}
-      <picture>
-        <source
-          type="image/webp"
-          srcSet={`
-            ${base}webp/430w/${name}-430w.webp 430w,
-            ${base}webp/860w/${name}-860w.webp 860w,
-            ${base}webp/master/${name}-master.webp 1200w
-          `}
-          sizes="(max-width: 430px) 430px, (max-width: 860px) 860px, 100vw"
-        />
-        <img
-          src={`${base}${fallbackPng}`}
-          alt=""
-          aria-hidden="true"
-          loading="eager"
-          fetchPriority="high"
-          decoding="async"
-          className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-[360ms] ease-out"
-          style={{ objectPosition: positions[name] || "50% 50%" }}
-        />
-      </picture>
+      <AzkarHeroBackground
+        kind={kind}
+        priority={true}
+        className="w-full h-full absolute inset-0 transition-opacity duration-[360ms] ease-out"
+      />
 
       {/* Dark mode: fade to near-black */}
       <div

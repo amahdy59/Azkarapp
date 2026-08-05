@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
@@ -71,16 +71,38 @@ export function FridaySalawatScreen({
   const [progress, setProgress] = useState(readFridaySalawatProgress);
   const complete = progress.count >= progress.target;
 
-  const persist = (count: number, target: FridaySalawatTarget) => {
+  const persist = useCallback((count: number, target: FridaySalawatTarget) => {
     const next = { count, target };
     setProgress(next);
     writeFridaySalawatProgress(next);
-  };
+  }, []);
 
-  const increment = () => {
+  const increment = useCallback(() => {
     if (complete) return;
     persist(progress.count + 1, progress.target);
-  };
+  }, [complete, persist, progress.count, progress.target]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const activeEl = document.activeElement;
+      if (
+        activeEl?.tagName === "INPUT" ||
+        activeEl?.tagName === "TEXTAREA" ||
+        (activeEl as HTMLElement)?.isContentEditable
+      ) {
+        return;
+      }
+      if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        increment();
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        onBack();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [increment, onBack]);
 
   return (
     <ScreenContainer dir={direction} className="px-0 relative">
