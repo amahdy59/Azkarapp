@@ -157,9 +157,9 @@ export function getWeekGardenStats(
 
   routineCounts.sort((a, b) => a.count - b.count);
   const lowest = routineCounts[0];
-  const highest = routineCounts[routineCounts.length - 1];
-  const mostMissedRoutine = lowest && lowest.count < 7 ? lowest.id : null;
-  const bestRoutine = highest ? highest.id : ("morning" as CategoryId);
+  const highest = routineCounts[2];
+  const mostMissedRoutine = lowest.count < 7 ? lowest.id : null;
+  const bestRoutine = highest.id;
 
   return {
     days,
@@ -246,7 +246,7 @@ export function getMonthDetailedStats(
     }
   }
 
-  const completionRate = daysInMonth > 0 ? Math.round((totalCompletions / (daysInMonth * 3)) * 100) : 0;
+  const completionRate = Math.round((totalCompletions / (daysInMonth * 3)) * 100);
 
   let bestRoutine: CategoryId = "morning";
   if (eveningCount > morningCount && eveningCount >= sleepCount) {
@@ -351,8 +351,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     });
   }
 
-  const overallCompletionRate =
-    totalPossibleAllYear > 0 ? Math.round((totalCollections / totalPossibleAllYear) * 100) : 0;
+  const overallCompletionRate = Math.round((totalCollections / totalPossibleAllYear) * 100);
 
   let mostConsistentRoutine: CategoryId = "morning";
   if (eveningTotal > morningTotal && eveningTotal >= sleepTotal) {
