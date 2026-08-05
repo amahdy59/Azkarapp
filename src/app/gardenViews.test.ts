@@ -77,4 +77,43 @@ describe("garden view selectors", () => {
     expect(getMonthDetailedStats(sleepIndex, 2024, 2).bestRoutine).toBe("before_sleep");
     expect(getYearDetailedStats(sleepIndex, 2024).mostConsistentRoutine).toBe("before_sleep");
   });
+
+  it("handles English locale, perfect week, and streak tracking in weekly stats", () => {
+    // Test English locale
+    const index = createDailyCompletionIndex(records);
+    const enWeekStats = getWeekGardenStats(index, new Date(2024, 1, 1), "en");
+    expect(enWeekStats.days).toHaveLength(7);
+
+    // Perfect week (all 7 days complete all 3 categories)
+    const perfectWeekRecords: DailyCollectionCompletion[] = [];
+    for (let i = 0; i < 7; i++) {
+      const dayKey = `2024-02-0${i + 3}`; // Feb 3 to 9 (starts Sat)
+      perfectWeekRecords.push(
+        { dayKey, category: "morning", timeZone: "Africa/Cairo" },
+        { dayKey, category: "evening", timeZone: "Africa/Cairo" },
+        { dayKey, category: "before_sleep", timeZone: "Africa/Cairo" },
+      );
+    }
+    const perfectIndex = createDailyCompletionIndex(perfectWeekRecords);
+    const perfectStats = getWeekGardenStats(perfectIndex, new Date(2024, 1, 3), "ar");
+    expect(perfectStats.mostMissedRoutine).toBeNull();
+    expect(perfectStats.bestStreakDays).toBe(7);
+
+    // Broken streak followed by smaller streak (2 days, 1 miss, 1 day)
+    const brokenStreakRecords: DailyCollectionCompletion[] = [
+      { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "before_sleep", timeZone: "Africa/Cairo" },
+      // Feb 5 missed
+      { dayKey: "2024-02-06", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-06", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-06", category: "before_sleep", timeZone: "Africa/Cairo" },
+    ];
+    const brokenIndex = createDailyCompletionIndex(brokenStreakRecords);
+    const brokenStats = getWeekGardenStats(brokenIndex, new Date(2024, 1, 3), "ar");
+    expect(brokenStats.bestStreakDays).toBe(2);
+  });
 });
