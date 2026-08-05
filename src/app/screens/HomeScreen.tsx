@@ -325,19 +325,25 @@ export function HomeScreen({
             >
               <div className="flex flex-col gap-4 text-start">
                 {/* Hero Text & Category Header */}
-                <div className="flex w-full flex-col items-start gap-1 mb-2 px-1">
-                  <p className="text-[1.125rem] font-bold text-foreground drop-shadow-sm" dir="auto">
+                <div className="flex w-full flex-col items-start gap-1.5 mb-2 px-1">
+                  <p
+                    className="text-[1.125rem] font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
+                    dir="auto"
+                  >
                     {isArabic ? "حان وقت" : "Time for"}
                   </p>
                   <h2
                     id="current-zikr-heading"
-                    className="text-2xl md:text-3xl font-black text-[#fbbf24] tracking-wide drop-shadow-md"
+                    className="text-3xl md:text-4xl font-black text-[#fbbf24] tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     dir="auto"
                     style={{ lineHeight: "1.3" }}
                   >
                     {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                   </h2>
-                  <p className="text-[0.875rem] font-semibold text-muted-foreground drop-shadow-sm" dir="auto">
+                  <p
+                    className="text-[0.875rem] font-bold text-white bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full w-fit mt-1 shadow-sm border border-white/10"
+                    dir="auto"
+                  >
                     {reminderInfo.desc}
                   </p>
                 </div>
