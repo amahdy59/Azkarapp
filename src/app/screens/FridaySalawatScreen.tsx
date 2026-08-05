@@ -3,6 +3,7 @@ import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import type { AppLanguage } from "../types";
@@ -82,7 +83,8 @@ export function FridaySalawatScreen({
   };
 
   return (
-    <ScreenContainer dir={direction} className="px-0">
+    <ScreenContainer dir={direction} className="px-0 relative">
+      <TimeOfDayBackground categoryId="friday" />
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-5 pb-8 pt-3">

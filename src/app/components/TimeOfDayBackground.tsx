@@ -4,8 +4,18 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
   const base = import.meta.env.BASE_URL;
 
   let name = "morning";
-  if (categoryId === "evening") name = "evening";
-  else if (categoryId === "before_sleep") name = "before-sleep";
+  let fallbackPng = "Morning.png";
+
+  if (categoryId === "evening") {
+    name = "evening";
+    fallbackPng = "Evening.png";
+  } else if (categoryId === "before_sleep") {
+    name = "before-sleep";
+    fallbackPng = "Before Sleep.png";
+  } else if (categoryId.includes("friday")) {
+    name = "morning";
+    fallbackPng = "Morning.png";
+  }
 
   const positions: Record<string, string> = {
     morning: "36% 50%",
@@ -14,25 +24,30 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
   };
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-0" aria-hidden="true">
-      {/* Sky photo — visible in both modes */}
-      <img
-        src={`${base}webp/860w/${name}-860w.webp`}
-        srcSet={`
-          ${base}webp/430w/${name}-430w.webp 430w,
-          ${base}webp/860w/${name}-860w.webp 860w
-        `}
-        sizes="(max-width: 430px) 100vw, 390px"
-        width={860}
-        height={1529}
-        alt=""
-        aria-hidden="true"
-        loading="eager"
-        fetchPriority="high"
-        decoding="async"
-        className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-[360ms] ease-out"
-        style={{ objectPosition: positions[name] }}
-      />
+    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+      {/* Responsive Sky Background Picture Element */}
+      <picture>
+        <source
+          type="image/webp"
+          srcSet={`
+            ${base}webp/430w/${name}-430w.webp 430w,
+            ${base}webp/860w/${name}-860w.webp 860w,
+            ${base}webp/master/${name}-master.webp 1200w
+          `}
+          sizes="(max-width: 430px) 430px, (max-width: 860px) 860px, 100vw"
+        />
+        <img
+          src={`${base}${fallbackPng}`}
+          alt=""
+          aria-hidden="true"
+          loading="eager"
+          fetchPriority="high"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover pointer-events-none transition-opacity duration-[360ms] ease-out"
+          style={{ objectPosition: positions[name] || "50% 50%" }}
+        />
+      </picture>
+
       {/* Dark mode: fade to near-black */}
       <div
         className="absolute inset-0 hidden dark:block"
@@ -41,7 +56,7 @@ export function TimeOfDayBackground({ categoryId }: { categoryId: string }) {
             "linear-gradient(to bottom, rgba(8,12,20,0) 0%, rgba(8,12,20,0.15) 30%, rgba(8,12,20,0.72) 65%, rgba(8,12,20,0.93) 82%, #080c14 100%)",
         }}
       />
-      {/* Light mode: fade to white (per Figma node 839:1645) */}
+      {/* Light mode: fade to white */}
       <div
         className="absolute inset-0 dark:hidden"
         style={{

@@ -18,6 +18,7 @@ import {
 import { t } from "../i18n";
 import { fridayChecklistKey, fridayKahfOpenedKey, readFridaySalawatProgress } from "../fridayProgress";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { registerLazyCollection } from "../content/azkar";
 
 registerLazyCollection("friday_kahf", FRIDAY_KAHF);
@@ -151,7 +152,8 @@ export function FridayModeScreen({
   ];
 
   return (
-    <ScreenContainer dir={direction} className="px-0" data-testid="friday-mode-screen">
+    <ScreenContainer dir={direction} className="px-0 relative" data-testid="friday-mode-screen">
+      <TimeOfDayBackground categoryId="friday" />
       <Header
         onBack={onBack}
         title={t(language, "friday.title")}
