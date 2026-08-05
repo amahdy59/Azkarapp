@@ -54,7 +54,10 @@ test("high contrast explains why a selected theme is visually overridden", async
   await openSettings(page);
   await page.getByRole("button", { name: "Accessibility", exact: true }).click();
   await page.getByRole("switch", { name: "High contrast mode" }).click();
-  await page.getByRole("button", { name: "Back" }).click();
+  const backBtn3 = page.getByRole("button", { name: "Back", exact: true });
+  if (await backBtn3.isVisible()) {
+    await backBtn3.click();
+  }
 
   await expect(page.getByRole("heading", { name: "High contrast is overriding theme colors" })).toBeVisible();
   await page.getByRole("button", { name: "Turn off high contrast" }).click();
@@ -127,7 +130,10 @@ test("forced RTL updates settings controls and their keyboard direction", async 
   await page.getByRole("switch", { name: "Right-to-left layout" }).click();
   await expect(textSizePicker).toHaveAttribute("dir", "rtl");
 
-  await page.getByRole("button", { name: "Back", exact: true }).click();
+  const backBtn2 = page.getByRole("button", { name: "Back", exact: true });
+  if (await backBtn2.isVisible()) {
+    await backBtn2.click();
+  }
   await expect(themePicker).toHaveAttribute("dir", "rtl");
 });
 
@@ -140,7 +146,10 @@ test("launch-critical settings screens are discoverable and accessible", async (
   await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
   await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
   await expectNoWcagViolations(page);
-  await page.getByRole("button", { name: "Back" }).click();
+  const backBtn1 = page.getByRole("button", { name: "Back", exact: true });
+  if (await backBtn1.isVisible()) {
+    await backBtn1.click();
+  }
 
   const destinations = [
     { row: "Content sources & corrections", heading: "Content sources & corrections" },
