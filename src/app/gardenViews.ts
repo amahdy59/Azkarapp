@@ -156,8 +156,8 @@ export function getWeekGardenStats(
   ];
 
   routineCounts.sort((a, b) => a.count - b.count);
-  const lowest = routineCounts[0];
-  const highest = routineCounts[2];
+  const lowest = routineCounts[0]!;
+  const highest = routineCounts[2]!;
   const mostMissedRoutine = lowest.count < 7 ? lowest.id : null;
   const bestRoutine = highest.id;
 
