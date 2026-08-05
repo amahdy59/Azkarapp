@@ -134,11 +134,11 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   await expect(counter).toHaveAccessibleName(/0 \/ 1/);
 
   await reader.click({ position: { x: 2, y: 320 } });
-  await expect(counter).toHaveAttribute("aria-label", /Completed 1 \/ 1/);
+  await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
 
   const difficultWords = page.getByTestId("quran-word-help");
   expect(await difficultWords.count()).toBeGreaterThan(0);
-  await difficultWords.first().click({ force: true });
+  await difficultWords.first().click();
 
   const meaningSheet = page.getByTestId("quran-word-meaning-sheet");
   await expect(meaningSheet).toBeVisible();

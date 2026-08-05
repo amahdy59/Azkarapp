@@ -117,6 +117,12 @@ export function useZikrCounter({
   };
 
   const handleSurfaceTap = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    // For full surahs (long chapters like Surah Al-Kahf, Al-Mulk), tapping the reading text/canvas
+    // should NOT count so users can scroll/read without accidentally completing. Only the counter button counts.
+    if (z?.isSurah) {
+      return;
+    }
+
     // If user is selecting text, don't count the tap
     const selection = typeof window !== "undefined" ? window.getSelection() : null;
     if (selection && selection.toString().length > 0) {

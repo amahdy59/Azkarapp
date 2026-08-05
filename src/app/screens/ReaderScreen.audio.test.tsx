@@ -81,9 +81,9 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
 
-    // Now tapping anywhere completes the surah
+    // Tapping reading text does not advance full surahs
     fireEvent.click(screen.getByTestId("zikr-text"));
-    expect(onComplete).toHaveBeenCalledOnce();
+    expect(onComplete).not.toHaveBeenCalled();
 
     // Clear mock to test the next interaction
     onComplete.mockClear();
