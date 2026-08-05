@@ -673,13 +673,11 @@ export function TodayRoutineGarden({
       )}
 
       {activeTab === "day" && (
-        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-[24px] p-5 text-start border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.14)] bg-white dark:bg-[rgba(14,18,27,0.85)] shadow-[0px_6px_18px_0px_rgba(0,0,0,0.08)] dark:shadow-sm">
+        <div className="relative flex w-full flex-col items-center gap-5 overflow-hidden rounded-3xl p-5 md:p-6 text-start border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 backdrop-blur-xl shadow-xl transition-all">
           {/* Header Section */}
           <div className="relative z-10 flex flex-col items-center justify-center gap-1 w-full text-center">
-            <h3 className="text-[1.125rem] font-bold text-[#111827] dark:text-[#f0ece6]">
-              {isArabic ? "وردك اليوم" : "Today's Wird"}
-            </h3>
-            <p className="text-[0.8125rem] font-medium text-[#6b7280] dark:text-[#d4a020]">{dynamicSubtitle}</p>
+            <h3 className="text-[1.125rem] font-bold text-foreground">{isArabic ? "وردك اليوم" : "Today's Wird"}</h3>
+            <p className="text-[0.8125rem] font-semibold text-muted-foreground">{dynamicSubtitle}</p>
           </div>
 
           {/* Main Split Row */}
@@ -715,7 +713,7 @@ export function TodayRoutineGarden({
                   <div className="flex w-full items-center justify-between gap-2.5">
                     <span
                       className={`text-[0.875rem] font-bold whitespace-nowrap ${
-                        isDone ? "text-slate-900 dark:text-[#f0ece6]" : "text-slate-700 dark:text-[#f0ece6]"
+                        isDone ? "text-foreground font-black" : "text-foreground/90"
                       }`}
                     >
                       {col.name}
@@ -727,7 +725,7 @@ export function TodayRoutineGarden({
                       height="20"
                       fill="none"
                       aria-hidden="true"
-                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-slate-500 dark:text-slate-400"}`}
+                      className={`shrink-0 ${isDone ? "text-[#B45309] dark:text-[#F59E0B]" : "text-muted-foreground"}`}
                     >
                       <path
                         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
@@ -759,20 +757,20 @@ export function TodayRoutineGarden({
                       <button
                         type="button"
                         onClick={() => onSelectCategory(col.id)}
-                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[12px] px-[12px] py-[10px] text-start transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 text-start transition-all backdrop-blur-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                           isDone
-                            ? "border border-[#fed7aa] bg-[#fff7ed] text-slate-900 hover:bg-[#fff3df] dark:border-[rgba(182,135,70,0.25)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6] dark:hover:bg-[rgba(38,48,70,0.9)]"
-                            : "border border-slate-200 bg-white text-slate-700 hover:border-slate-300 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6] dark:hover:bg-[rgba(26,34,54,0.6)]"
+                            ? "border border-amber-500/40 bg-amber-500/15 text-foreground hover:bg-amber-500/25 shadow-xs"
+                            : "border border-white/20 dark:border-white/10 bg-black/10 dark:bg-black/40 text-foreground hover:bg-black/20 dark:hover:bg-black/50 shadow-xs"
                         }`}
                       >
                         {rowContent}
                       </button>
                     ) : (
                       <div
-                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-[12px] px-[12px] py-[10px] transition-all ${
+                        className={`flex min-h-[44px] w-full items-center justify-between gap-3 rounded-2xl px-3.5 py-2.5 transition-all backdrop-blur-md ${
                           isDone
-                            ? "border border-[#fed7aa] bg-[#fff7ed] text-slate-900 dark:border-[rgba(182,135,70,0.14)] dark:bg-[rgba(30,38,55,0.8)] dark:text-[#f0ece6]"
-                            : "border border-slate-200 bg-white text-slate-700 dark:border-transparent dark:bg-[rgba(20,26,42,0.4)] dark:text-[#f0ece6]"
+                            ? "border border-amber-500/40 bg-amber-500/15 text-foreground shadow-xs"
+                            : "border border-white/20 dark:border-white/10 bg-black/10 dark:bg-black/40 text-foreground shadow-xs"
                         }`}
                       >
                         {rowContent}
@@ -785,14 +783,14 @@ export function TodayRoutineGarden({
 
             {/* Left Column: Interactive Palm Progress Display */}
             <div className="relative flex flex-col items-center justify-center p-2" data-testid="today-palm-emblem">
-              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-amber-500/5 dark:bg-amber-500/10">
+              <div className="relative flex size-[110px] items-center justify-center rounded-full bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/20 backdrop-blur-md">
                 <svg className="absolute inset-0 size-full -rotate-90" viewBox="0 0 110 110">
                   <circle
                     cx="55"
                     cy="55"
                     r="48"
                     stroke="currentColor"
-                    className="text-slate-200 dark:text-[#1e2635]"
+                    className="text-slate-300/40 dark:text-[#1e2635]"
                     strokeWidth="6"
                     fill="none"
                   />
@@ -827,11 +825,11 @@ export function TodayRoutineGarden({
 
           {/* Encouragement Banner */}
           <div
-            className="relative z-10 flex items-center justify-center gap-2 rounded-[12px] px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-[#f3f4f6] dark:bg-[rgba(20,26,42,0.6)] border border-[#e5e7eb] dark:border-[rgba(182,135,70,0.12)]"
+            className="relative z-10 flex items-center justify-center gap-2 rounded-2xl px-3.5 py-2.5 text-center text-[0.875rem] font-medium w-full bg-black/10 dark:bg-black/40 border border-white/15 dark:border-white/10 backdrop-blur-md"
             dir="rtl"
           >
-            <Heart className="h-[0.875rem] w-[0.875rem] text-rose-500 dark:text-rose-400 shrink-0" strokeWidth={2} />
-            <span className="flex-1 text-center font-sans text-slate-700 dark:text-slate-200 text-[12.5px] font-semibold leading-relaxed">
+            <Heart className="h-4 w-4 text-rose-500 dark:text-rose-400 shrink-0" strokeWidth={2} />
+            <span className="flex-1 text-center font-sans text-foreground text-[12.5px] font-semibold leading-relaxed">
               {isArabic
                 ? "القليل الدائم، خير من الكثير المنقطع"
                 : "Constant small deeds are better than intermittent large ones"}

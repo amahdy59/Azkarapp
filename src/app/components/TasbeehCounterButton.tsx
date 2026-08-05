@@ -59,14 +59,14 @@ export function TasbeehCounterButton({
       type="button"
       onClick={onClick}
       dir={direction}
-      className="interactive-elem group relative flex min-h-[60px] w-full items-center justify-between rounded-2xl border border-border/60 bg-card p-4 text-foreground shadow-xs transition-all duration-200 hover:border-primary/50 hover:bg-muted/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-[0.99] cursor-pointer"
+      className="interactive-elem group relative flex min-h-[64px] w-full items-center justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-4 md:p-5 text-foreground backdrop-blur-xl shadow-md transition-all duration-200 hover:border-amber-500/40 hover:bg-card/95 dark:hover:bg-black/60 hover:shadow-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] active:scale-[0.99] cursor-pointer"
       aria-label={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
     >
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 transition-transform duration-200 group-hover:scale-105">
+        <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-500 border border-amber-500/30 backdrop-blur-md transition-transform duration-200 group-hover:scale-105">
           <TasbeehIcon size={24} className="shrink-0" />
         </div>
-        <span className="text-[1rem] md:text-[1.0625rem] font-extrabold tracking-tight text-foreground truncate">
+        <span className="text-[1rem] md:text-[1.0625rem] font-black tracking-tight text-foreground truncate">
           {isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
         </span>
       </div>

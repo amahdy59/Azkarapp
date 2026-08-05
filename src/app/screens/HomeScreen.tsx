@@ -537,26 +537,28 @@ export function HomeScreen({
             </div>
 
             {/* Card 4: Resume Reading / "تابع من حيث توقفت" */}
-            <div className="flex flex-col justify-between rounded-3xl border border-amber-500/30 bg-amber-500/10 dark:bg-amber-500/15 p-4 backdrop-blur-xl shadow-md transition-all">
+            <div className="flex flex-col justify-between rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-4 backdrop-blur-xl shadow-md transition-all">
               <div className="flex items-center justify-between">
-                <span className="text-[0.8125rem] font-extrabold text-amber-700 dark:text-amber-300">
+                <span className="text-[0.8125rem] font-extrabold text-foreground">
                   {isArabic ? "تابع من حيث توقفت" : "Resume Reading"}
                 </span>
-                <span className="text-lg">📖</span>
+                <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
+                  📖
+                </span>
               </div>
-              <div className="mt-2 text-start flex items-end justify-between gap-2">
+              <div className="mt-3 text-start flex items-end justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <p className="text-[0.9375rem] font-extrabold text-foreground truncate" dir="auto">
+                  <p className="text-[0.9375rem] font-black text-foreground truncate" dir="auto">
                     {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                   </p>
-                  <p className="text-[0.75rem] font-semibold text-muted-foreground" dir="auto">
-                    {isArabic ? "آخر قراءة: أمس" : "Last read: Yesterday"}
+                  <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
+                    {isArabic ? "آخر قراءة: اليوم" : "Last read: Today"}
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => onResume(reminderInfo.categoryId)}
-                  className="flex min-h-[36px] items-center justify-center rounded-xl bg-[#d99f43] px-3.5 text-xs font-black text-[#141a2a] hover:bg-[#eeb962] transition-colors cursor-pointer shrink-0"
+                  className="flex min-h-[36px] items-center justify-center rounded-xl bg-[#e2a84a] px-3.5 text-xs font-black text-slate-950 hover:bg-[#ebd074] transition-colors cursor-pointer shrink-0 shadow-xs"
                 >
                   {isArabic ? "متابعة" : "Resume"}
                 </button>
@@ -566,11 +568,11 @@ export function HomeScreen({
 
           {/* Bottom Section: Special Friday Banner ("أذكار يوم الجمعة") */}
           <section className="home-grid-full my-1">
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-black/50 to-amber-900/30 dark:from-amber-950/60 dark:via-black/70 dark:to-amber-900/40 p-6 backdrop-blur-xl shadow-xl transition-all">
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-3xl border border-white/20 dark:border-white/10 bg-card/85 dark:bg-black/50 p-6 backdrop-blur-xl shadow-xl transition-all">
               {/* Left Side (RTL Start): Dome Artwork + Titles + Description + CTA */}
               <div className="flex flex-1 flex-col items-start gap-3 text-start z-10">
                 <div className="flex items-center gap-3">
-                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-500 border border-amber-500/30 shadow-xs">
+                  <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-500 border border-amber-500/30 shadow-xs backdrop-blur-md">
                     <span className="text-2xl">🕌</span>
                   </div>
                   <div>
@@ -602,8 +604,8 @@ export function HomeScreen({
               </div>
 
               {/* Right Side (RTL End): Virtues Checklist */}
-              <div className="flex flex-col gap-2.5 rounded-2xl border border-amber-500/20 bg-amber-500/10 dark:bg-amber-500/15 p-4 z-10 w-full md:w-auto min-w-[270px] text-start shadow-xs">
-                <p className="text-[0.8125rem] font-black text-amber-700 dark:text-amber-300">
+              <div className="flex flex-col gap-2.5 rounded-2xl border border-white/10 bg-black/10 dark:bg-black/40 p-4 z-10 w-full md:w-auto min-w-[270px] text-start shadow-xs backdrop-blur-md">
+                <p className="text-[0.8125rem] font-black text-amber-600 dark:text-amber-400">
                   {isArabic ? "من فضائل أذكار الجمعة" : "Virtues of Friday Azkar"}
                 </p>
                 <div className="flex items-center gap-2 text-xs font-bold text-foreground">
