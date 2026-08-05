@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
@@ -134,10 +135,11 @@ export function CompletionScreen({
 
   return (
     <div
-      className="completion-screen-enter h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
+      className="completion-screen-enter relative h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
       dir={direction}
     >
-      <div className="mx-auto flex min-h-full w-full max-w-md flex-col">
+      <TimeOfDayBackground categoryId={catId} />
+      <div className="relative z-10 mx-auto flex min-h-full w-full max-w-md flex-col">
         <p className="sr-only" role="status" aria-live="polite">
           {t(language, "completion.sessionComplete", { category: categoryName })}
         </p>
@@ -164,13 +166,13 @@ export function CompletionScreen({
         )}
 
         <section
-          className="mt-7 grid grid-cols-2 overflow-hidden rounded-2xl border border-border-control bg-card"
+          className="mt-7 grid grid-cols-2 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5"
           aria-label={t(language, "completion.sessionSummary")}
         >
           {stats.map(({ value, label }, index) => (
             <article
               key={label}
-              className={`summary-item-enter flex min-h-[92px] flex-col items-center justify-center p-4 ${index === 0 ? "border-e border-border-control" : ""}`}
+              className={`summary-item-enter flex min-h-[92px] flex-col items-center justify-center p-4 ${index === 0 ? "border-e border-white/30 dark:border-white/10" : ""}`}
               style={{ animationDelay: `${180 + index * 55}ms` }}
             >
               <p

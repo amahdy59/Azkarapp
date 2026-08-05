@@ -53,7 +53,7 @@ export function CounterTargetPicker({
               className={`interactive-elem h-9 shrink-0 rounded-full px-3.5 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-sm"
-                  : "border border-border bg-card text-muted-foreground hover:bg-muted"
+                  : "border border-white/40 dark:border-white/10 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
               }`}
             >
               {preset.label}
@@ -68,7 +68,7 @@ export function CounterTargetPicker({
           className={`interactive-elem flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             ![10, 33, 100, 1000, 0].includes(activeTarget)
               ? "bg-primary text-primary-foreground shadow-sm"
-              : "border border-border bg-card text-muted-foreground hover:bg-muted"
+              : "border border-white/40 dark:border-white/10 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
           }`}
         >
           <SlidersHorizontal size={14} />
@@ -95,7 +95,7 @@ export function CounterTargetPicker({
             className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
             onClick={() => setShowCustomModal(false)}
           />
-          <div className="relative z-10 w-full max-w-sm rounded-2xl border border-border bg-card p-5 shadow-xl">
+          <div className="relative z-10 w-full max-w-sm rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-6 shadow-2xl backdrop-blur-xl">
             <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">
               {isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
             </h3>

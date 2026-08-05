@@ -67,7 +67,7 @@ export function SettingsRootPanel({
   return (
     <div className="flex-1 overflow-y-auto pb-8">
       <SectionLabel label={t(language, "settings.preferences")} />
-      <div className="mx-4 rounded-2xl border border-border bg-card p-4">
+      <div className="mx-4 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
         <div className="mb-3 flex items-center gap-3">
           <span
             className="flex size-9 shrink-0 items-center justify-center rounded-xl"
@@ -80,7 +80,7 @@ export function SettingsRootPanel({
         </div>
         <ThemeModeSelector language={language} direction={direction} value={themeMode} onChange={onThemeModeChange} />
         {highContrast && (
-          <aside className="mt-3 rounded-xl border border-primary/40 bg-primary/10 p-3" aria-live="polite">
+          <aside className="mt-3 rounded-2xl border border-primary/40 bg-primary/10 p-3" aria-live="polite">
             <h4 className="text-[0.875rem] font-semibold text-foreground">
               {t(language, "appearance.highContrastTitle")}
             </h4>
@@ -98,8 +98,8 @@ export function SettingsRootPanel({
         )}
       </div>
 
-      <div className="mx-4 mt-3 overflow-hidden rounded-2xl border border-border bg-card">
-        <div className="p-4 border-b border-border">
+      <div className="mx-4 mt-3 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="p-4 border-b border-border/50">
           <div className="mb-3 flex items-center gap-3">
             <span
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
@@ -110,7 +110,7 @@ export function SettingsRootPanel({
             </span>
             <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.language")}</h3>
           </div>
-          <div className="flex bg-muted p-1 rounded-xl" role="radiogroup" aria-label={t(language, "settings.language")}>
+          <div className="flex bg-muted/80 p-1 rounded-xl" role="radiogroup" aria-label={t(language, "settings.language")}>
             {LANGUAGES_LIST.map((opt) => {
               const selected = language === opt.code;
               return (
@@ -149,7 +149,7 @@ export function SettingsRootPanel({
       </div>
 
       <SectionLabel label={t(language, "settings.contentSection")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Download size={20} className="text-primary" />}
@@ -168,7 +168,7 @@ export function SettingsRootPanel({
       </div>
 
       <SectionLabel label={t(language, "settings.accessibilitySection")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<User size={20} className="text-primary" />}
@@ -180,7 +180,7 @@ export function SettingsRootPanel({
       </div>
 
       <SectionLabel label={t(language, "settings.progressSection")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<BarChart3 size={20} className="text-primary" />}
@@ -192,7 +192,7 @@ export function SettingsRootPanel({
       </div>
 
       <SectionLabel label={t(language, "settings.accountSection")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Database size={20} className="text-primary" />}
@@ -216,7 +216,7 @@ export function SettingsRootPanel({
       </div>
 
       <SectionLabel label={t(language, "settings.supportSection")} />
-      <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+      <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<HelpCircle size={20} className="text-primary" />}

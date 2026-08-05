@@ -8,7 +8,7 @@ const CORRECTION_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
 
 export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBack: () => void }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "sources.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-3 overflow-y-auto px-4 pb-8 pt-4">
         <InformationCard
@@ -32,7 +32,7 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           body={t(language, "sources.interpretationBody")}
         />
 
-        <section className="rounded-2xl border border-border bg-card p-4">
+        <section className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <MessageChat size={20} aria-hidden="true" />

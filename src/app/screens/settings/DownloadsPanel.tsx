@@ -98,10 +98,10 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   };
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
-      <div className="flex-1 overflow-y-auto px-4 pb-8 pt-3">
-        <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="offline-content-title">
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
+        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="offline-content-title">
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
@@ -120,7 +120,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           </div>
         </section>
 
-        <section className="mt-4 rounded-2xl border border-border bg-card p-5" aria-labelledby="offline-status-title">
+        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="offline-status-title">
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
@@ -190,7 +190,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           )}
         </section>
 
-        <section className="mt-4 rounded-2xl border border-border bg-card p-5" aria-labelledby="audio-downloads-title">
+        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="audio-downloads-title">
           <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">
             {language === "ar" ? "تنزيلات الصوت الاختيارية" : "Optional audio downloads"}
           </h2>

@@ -17,7 +17,7 @@
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
   --background: #080808;
   --foreground: #f2f2ea;
-  --card: #0c0c0c;
+  --card: rgba(14, 14, 18, 0.72);
   --card-foreground: #e3e8f2;
   --popover: #0c0c0c;
   --popover-foreground: #f2f2ea;
@@ -47,7 +47,7 @@
   color-scheme: dark;
   --background: #0d0d0d;
   --foreground: #f5f0e8;
-  --card: #171717;
+  --card: rgba(23, 23, 23, 0.72);
   --card-foreground: #d4d0e0;
   --popover: #171717;
   --popover-foreground: #f5f0e8;
@@ -78,7 +78,7 @@
   color-scheme: light;
   --background: #f8f5f0;
   --foreground: #171717;
-  --card: #ffffff;
+  --card: rgba(255, 255, 255, 0.72);
   --card-foreground: #4a4570;
   --popover: #ffffff;
   --popover-foreground: #171717;
@@ -108,7 +108,7 @@
   color-scheme: dark;
   --background: #0a1228;
   --foreground: #f5f0e8;
-  --card: #111b35;
+  --card: rgba(17, 27, 53, 0.72);
   --card-foreground: #d4d0e0;
   --popover: #111b35;
   --popover-foreground: #f5f0e8;
@@ -1718,4 +1718,29 @@ a[href]:not(.no-press):active,
 [data-theme="light"] .glass-panel::after {
   opacity: 0.1;
   mix-blend-mode: color-burn;
+}
+
+/* Universal Glassmorphic Card Backdrop & Styling */
+.bg-card,
+.glass-card,
+.wird-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-card,
+.wird-card {
+  background-color: var(--card);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+}
+
+.dark .glass-card,
+.dark .wird-card,
+.theme-dark .glass-card,
+.theme-dark .wird-card,
+.theme-midnight .glass-card,
+.theme-midnight .wird-card {
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }

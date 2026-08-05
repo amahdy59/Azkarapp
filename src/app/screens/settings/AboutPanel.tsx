@@ -33,10 +33,10 @@ export function AboutPanel({
   onBack: () => void;
 }) {
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "about.title")} onBack={onBack} language={language} />
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-4 py-4">
-        <div className="flex flex-col items-center gap-4 rounded-2xl border border-border bg-card p-8">
+        <div className="flex flex-col items-center gap-4 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-8 backdrop-blur-xl shadow-lg shadow-black/5">
           <CrescentMark size={36} />
           <div className="flex flex-col items-center gap-1.5">
             <p className="font-sans text-[1.5rem] font-bold text-foreground">Azkar</p>
@@ -51,7 +51,7 @@ export function AboutPanel({
 
         <div>
           <SectionLabel label={t(language, "about.contentSource")} />
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
             <AboutRow
               icon={
                 <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground">
@@ -78,7 +78,7 @@ export function AboutPanel({
 
         <div>
           <SectionLabel label={t(language, "about.support")} />
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
             <SupportRow
               icon={<MessageChat size={18} className="text-background" />}
               label={t(language, "about.sendFeedback")}
@@ -101,7 +101,7 @@ export function AboutPanel({
 
         <div className="pb-8">
           <SectionLabel label={t(language, "about.legal")} />
-          <div className="overflow-hidden rounded-2xl border border-border bg-card">
+          <div className="overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
             <SupportRow
               icon={<Info size={18} className="text-background" />}
               label={t(language, "about.privacy")}

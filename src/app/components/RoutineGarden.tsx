@@ -10,7 +10,7 @@ import {
   type GardenSummary,
   type GrowthEvent,
 } from "../progress";
-import { ProgressDayView, ProgressWeekView, ProgressMonthView } from "./ProgressViews";
+import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
 
@@ -604,7 +604,7 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          <div className="mb-4 flex items-center justify-between rounded-2xl border border-border/80 bg-card px-3 py-2 shadow-sm dark:border-white/10">
+          <div className="mb-4 flex items-center justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
@@ -644,7 +644,7 @@ export function TodayRoutineGarden({
       )}
 
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-around rounded-2xl border border-amber-500/30 bg-amber-500/10 py-2.5 px-3 shadow-xs dark:bg-amber-500/15">
+        <div className="mb-4 flex items-center justify-around rounded-[2rem] border border-amber-500/30 bg-amber-500/10 py-3 px-3 shadow-sm backdrop-blur-sm dark:bg-amber-500/15">
           <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
             <Zap
               className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}
@@ -652,7 +652,7 @@ export function TodayRoutineGarden({
               aria-hidden="true"
             />
             <span
-              className={`text-[1rem] font-black ${streak > 0 ? "text-amber-700 dark:text-amber-300" : "text-muted-foreground/60"}`}
+              className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
             </span>
@@ -660,12 +660,12 @@ export function TodayRoutineGarden({
           <span className="h-4 w-px bg-amber-500/30" />
           <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
             <PalmTreeMark
-              size={24}
+              size={20}
               filled={totalPalms > 0}
-              className={totalPalms > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground/40"}
+              className={totalPalms > 0 ? "text-amber-500" : "text-muted-foreground/40"}
             />
             <span
-              className={`text-[1rem] font-black ${totalPalms > 0 ? "text-amber-600 dark:text-amber-400" : "text-muted-foreground/60"}`}
+              className={`text-[0.875rem] font-black leading-tight ${totalPalms > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(totalPalms, language)} {isArabic ? "نخلة" : "palms"}
             </span>
@@ -682,146 +682,30 @@ export function TodayRoutineGarden({
         />
       )}
 
-      {activeTab === "week" && <ProgressWeekView summary={summary} language={language} />}
+      {activeTab === "week" && (
+        <ProgressWeekView
+          summary={summary}
+          language={language}
+          dailyCompletions={dailyCompletions}
+          referenceDate={viewReferenceDate}
+        />
+      )}
 
       {activeTab === "month" && (
         <ProgressMonthView
-          monthDayRecords={monthDayRecords}
           language={language}
           targetYear={targetYear}
           targetMonth={targetMonth}
+          dailyCompletions={dailyCompletions}
         />
       )}
 
       {activeTab === "year" && (
-        <div className="w-full max-w-[44rem] mx-auto p-4 bg-card border border-border rounded-[1.5rem] shadow-sm fade-in">
-          <div className="rounded-2xl">
-            {/* Year Map Header & Legend */}
-            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border/60 pb-3">
-              <h3 className="text-[0.9375rem] font-black text-foreground">{t(language, "garden.yearMapTitle")}</h3>
-              <div className="flex items-center gap-2 text-[0.6875rem] font-bold text-muted-foreground">
-                <span>{t(language, "garden.legendLess")}</span>
-                <span className="h-4 w-4 rounded-[4px] bg-muted/40 dark:bg-zinc-800/60" title="Inactive" />
-                <span
-                  title={isArabic ? "يوم نشط" : "Streak Active"}
-                  className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-500/30 bg-amber-500/10"
-                >
-                  <Zap className="h-3 w-3 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
-                </span>
-                <span
-                  className="flex h-4 w-4 items-center justify-center rounded-[4px] border border-amber-400 bg-amber-500/20 text-[0.55rem]"
-                  title="Palm Tree"
-                >
-                  <PalmTreeMark size={10} filled />
-                </span>
-                <span>{t(language, "garden.legendMore")}</span>
-              </div>
-            </div>
-
-            {/* Weekday Column Headers */}
-            <div className="mt-3 flex items-center gap-2">
-              <span className="w-20 shrink-0 text-[0.6875rem] font-bold text-transparent select-none">Month</span>
-              <div className="grid flex-1 grid-cols-7 gap-1 text-center text-[0.625rem] font-extrabold text-muted-foreground">
-                {(isArabic
-                  ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
-                  : ["Sat", "Sun", "Mon", "Tue", "Wed", "Thu", "Fri"]
-                ).map((wd) => (
-                  <span key={wd} className="truncate">
-                    {wd}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {/* 12 Months Blocks grouped into 4 Quarters */}
-            <div className="mt-3 space-y-3">
-              {monthNames.map((monthName, mIdx) => {
-                const quarterIndex = Math.floor(mIdx / 3);
-                const isQuarterStart = mIdx % 3 === 0;
-                const quarterKey = `garden.quarter${quarterIndex + 1}` as const;
-
-                const daysInM = new Date(targetYear, mIdx + 1, 0).getDate();
-                const firstDayDate = new Date(targetYear, mIdx, 1);
-                const startOffset = (firstDayDate.getDay() + 1) % 7;
-
-                const monthStr = padZero(mIdx + 1);
-
-                return (
-                  <div key={monthName} className="space-y-1">
-                    {isQuarterStart && (
-                      <div className="my-2.5 flex items-center gap-2">
-                        <span className="h-px flex-1 bg-border/60" />
-                        <span className="text-[0.6875rem] font-extrabold text-muted-foreground/80">
-                          {t(language, quarterKey)}
-                        </span>
-                        <span className="h-px flex-1 bg-border/60" />
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                      <span className="w-20 shrink-0 truncate text-start text-[0.75rem] font-extrabold text-foreground">
-                        {monthName}
-                      </span>
-                      <div className="grid flex-1 grid-cols-7 gap-1">
-                        {/* Empty leading offset tiles */}
-                        {Array.from({ length: startOffset }).map((_, oIdx) => (
-                          <div key={`offset-${oIdx}`} className="h-4.5 w-full bg-transparent" />
-                        ))}
-
-                        {/* Actual days of month */}
-                        {Array.from({ length: daysInM }, (_, dIdx) => {
-                          const dNum = dIdx + 1;
-                          const dayKey = `${targetYear}-${monthStr}-${padZero(dNum)}`;
-                          const cats = completionsByDayKey.get(dayKey) ?? new Set<CategoryId>();
-                          const isPalm = MAIN_CATEGORY_IDS.every((c) => cats.has(c));
-                          const hasActivity = cats.size > 0;
-
-                          const tileBg = isPalm
-                            ? "bg-amber-500/25 border border-amber-400/80 text-amber-500 font-black shadow-2xs"
-                            : hasActivity
-                              ? "bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 text-amber-600 dark:text-amber-400"
-                              : "bg-muted/30 dark:bg-zinc-800/40 border border-transparent";
-
-                          const tileTitle = isArabic
-                            ? `${monthName} ${formatNumerals(dNum, language)}: ${isPalm ? "نخلة مكتملة" : hasActivity ? "نشط ⚡" : "غير نشط"}`
-                            : `${monthName} ${dNum}: ${isPalm ? "Palm Tree Completed" : hasActivity ? "Active ⚡" : "Inactive"}`;
-
-                          return (
-                            <button
-                              key={dayKey}
-                              type="button"
-                              title={tileTitle}
-                              aria-label={tileTitle}
-                              tabIndex={0}
-                              className={`interactive-elem flex h-4.5 w-full items-center justify-center rounded-[3px] text-[0.55rem] transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring ${tileBg}`}
-                            >
-                              {isPalm ? (
-                                <PalmTreeMark size={9} filled />
-                              ) : hasActivity ? (
-                                <Zap className="h-2.5 w-2.5 text-amber-500" strokeWidth={2.5} aria-hidden="true" />
-                              ) : (
-                                ""
-                              )}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Bottom Summary Footer */}
-            <div className="mt-4 border-t border-border/60 pt-3 text-center text-[0.75rem] font-extrabold text-muted-foreground">
-              {t(language, "garden.yearSummaryFooter", {
-                azkar: formatNumerals(yearStats.totalCollections, language),
-                days: formatNumerals(yearStats.activeDays, language),
-                palms: formatNumerals(yearStats.totalPalms, language),
-              })}
-            </div>
-          </div>
-        </div>
+        <ProgressYearView
+          language={language}
+          targetYear={targetYear}
+          dailyCompletions={dailyCompletions}
+        />
       )}
     </section>
   );

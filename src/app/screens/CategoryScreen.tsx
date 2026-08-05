@@ -15,6 +15,7 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import {
   getLocalizedPreferredTiming,
   getLocalizedZikrBenefit,
@@ -190,7 +191,7 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/80 bg-card p-4.5 text-start transition-all shadow-xs hover:border-amber-500/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-white/40 dark:border-white/10 bg-card p-4.5 text-start transition-all shadow-lg shadow-black/5 backdrop-blur-xl hover:border-amber-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
@@ -237,10 +238,10 @@ export function CategoryScreen({
       <div
         key={z.id}
         id={`zikr-card-${index}`}
-        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-xs ${
+        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all backdrop-blur-xl shadow-lg shadow-black/5 ${
           isCardCompleted
-            ? "border-emerald-500/30 bg-emerald-500/5 dark:bg-emerald-950/20"
-            : "border-border/80 bg-card hover:border-primary/40 hover:shadow-md"
+            ? "border-emerald-500/30 bg-emerald-500/15 dark:bg-emerald-950/30"
+            : "border-white/40 dark:border-white/10 bg-card hover:border-primary/40 hover:shadow-xl"
         }`}
       >
         {/* Card Header & Text — Clicking text opens full Reader */}
@@ -337,8 +338,10 @@ export function CategoryScreen({
   };
 
   return (
-    <ScreenContainer dir={direction}>
-      <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
+    <ScreenContainer dir={direction} className="relative">
+      <TimeOfDayBackground categoryId={catId} />
+      <div className="relative z-10 flex flex-col min-h-screen">
+        <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 
       {!isOccasional && (
         <div className="shrink-0 border-b border-border px-5 py-4">
@@ -520,7 +523,7 @@ export function CategoryScreen({
         )}
 
         {catId === "before_sleep" && (
-          <section className="mb-5 rounded-2xl border border-border bg-card p-4" aria-labelledby="sleep-prepare-title">
+          <section className="mb-5 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="sleep-prepare-title">
             <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
               {t(language, "category.prepareTitle")}
             </h2>
@@ -624,6 +627,7 @@ export function CategoryScreen({
             {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
           </div>
         )}
+      </div>
       </div>
     </ScreenContainer>
   );

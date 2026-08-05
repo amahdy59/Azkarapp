@@ -55,10 +55,10 @@ export function AccountDataPanel({
     : "";
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "accountData.title")} onBack={onBack} language={language} />
-      <div className="flex-1 overflow-y-auto px-4 pb-8">
-        <section className="mt-4 rounded-2xl border border-border bg-card p-4">
+      <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
+        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
           <div className="flex items-start gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
               {isGuest ? <User size={22} aria-hidden="true" /> : <Wifi size={22} aria-hidden="true" />}
@@ -93,16 +93,18 @@ export function AccountDataPanel({
           </button>
         </section>
 
-        <SectionLabel label={t(language, "accountData.yourData")} />
-        <section className="rounded-2xl border border-border bg-card p-4">
-          <p className="text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
-          <dl className="mt-4 grid grid-cols-2 gap-3">
-            <DataCount label={t(language, "accountData.sessions")} value={sessionCount} />
-            <DataCount label={t(language, "accountData.savedItems")} value={savedCount} />
-          </dl>
-        </section>
+        <div>
+          <SectionLabel label={t(language, "accountData.yourData")} />
+          <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
+            <p className="text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
+            <dl className="mt-4 grid grid-cols-2 gap-3">
+              <DataCount label={t(language, "accountData.sessions")} value={sessionCount} />
+              <DataCount label={t(language, "accountData.savedItems")} value={savedCount} />
+            </dl>
+          </section>
+        </div>
 
-        <div className="mt-4 flex flex-col gap-3">
+        <div className="flex flex-col gap-3">
           <DataAction
             icon={<Download size={20} aria-hidden="true" />}
             title={t(language, "accountData.exportTitle")}
@@ -147,7 +149,7 @@ export function AccountDataPanel({
 
 function DataCount({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-xl bg-muted p-3">
+    <div className="rounded-xl bg-muted/60 p-3 border border-border/50">
       <dt className="text-[0.75rem] text-muted-foreground">{label}</dt>
       <dd className="mt-1 text-[1.375rem] font-bold text-foreground">{value}</dd>
     </div>
@@ -170,7 +172,7 @@ function DataAction({
   destructive?: boolean;
 }) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-4">
+    <section className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
       <div className="flex items-start gap-3">
         <span
           className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${

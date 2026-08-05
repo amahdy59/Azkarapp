@@ -46,12 +46,12 @@ export function ProgressPanel({
   const isArabic = language === "ar";
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "progressPanel.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         {/* Garden toggle */}
         <section
-          className="overflow-hidden rounded-2xl border border-border bg-card"
+          className="overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5"
           aria-label={t(language, "progressPanel.gardenToggle")}
         >
           <SettingsToggleRow
@@ -82,7 +82,7 @@ export function ProgressPanel({
             />
 
             {/* Weekly goal */}
-            <section className="rounded-2xl border border-border bg-card p-5" aria-labelledby="weekly-goal-title">
+            <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="weekly-goal-title">
               <div className="flex items-baseline justify-between gap-3">
                 <h2 id="weekly-goal-title" className="text-[0.9375rem] font-bold text-foreground">
                   {t(language, "progressPanel.weeklyGoal")}
@@ -134,7 +134,7 @@ export function ProgressPanel({
             </section>
           </>
         ) : (
-          <section className="rounded-2xl border border-border bg-card p-5" data-testid="garden-hidden-state">
+          <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" data-testid="garden-hidden-state">
             <h2 className="text-[0.9375rem] font-bold text-foreground">
               {t(language, "progressPanel.gardenHiddenTitle")}
             </h2>
@@ -144,7 +144,7 @@ export function ProgressPanel({
           </section>
         )}
 
-        <section className="rounded-2xl border border-border bg-card p-4" aria-labelledby="progress-day-boundary-title">
+        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5" aria-labelledby="progress-day-boundary-title">
           <h2 id="progress-day-boundary-title" className="text-[0.9375rem] font-bold text-foreground">
             {t(language, "progressPanel.dayBoundaryTitle")}
           </h2>
@@ -182,7 +182,7 @@ export function ProgressPanel({
             {completedSessions.slice(0, 5).map((session) => (
               <article
                 key={session.id}
-                className="flex min-h-[70px] items-center gap-3 rounded-xl border border-border bg-card px-4"
+                className="flex min-h-[70px] items-center gap-3 rounded-[1.25rem] border border-white/40 dark:border-white/10 bg-card px-4 backdrop-blur-xl shadow-lg shadow-black/5"
               >
                 <div className="min-w-0 flex-1 text-start">
                   <p className="text-[0.875rem] font-semibold text-foreground">
@@ -204,7 +204,7 @@ export function ProgressPanel({
               </article>
             ))}
             {completedSessions.length === 0 && (
-              <p className="rounded-xl border border-dashed border-border p-6 text-center text-[0.8125rem] text-muted-foreground">
+              <p className="rounded-[1.25rem] border border-dashed border-border p-6 text-center text-[0.8125rem] text-muted-foreground">
                 {t(language, "progressPanel.noSessions")}
               </p>
             )}

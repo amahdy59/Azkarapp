@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibrarySheet";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
@@ -93,37 +94,38 @@ export function CustomCounterScreen({
     setShowCompletionDialog(false);
   };
 
-  // Keyboard navigation for Tasbeeh Counter (Space to count, R to reset, Backspace to undo, Esc to return)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
       if (
         activeEl &&
-        (activeEl.tagName === "INPUT" ||
-          activeEl.tagName === "TEXTAREA" ||
-          (activeEl as HTMLElement).isContentEditable ||
-          activeEl.getAttribute("role") === "textbox")
+        (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.getAttribute("role") === "search")
       ) {
         return;
       }
 
-      if (showLibrarySheet) {
-        if (e.key === "Escape") setShowLibrarySheet(false);
-        return;
-      }
-
-      if (e.key === " " || e.code === "Space") {
+      if (e.key === "Escape") {
         e.preventDefault();
-        handleTap();
+        if (showLibrarySheet) {
+          setShowLibrarySheet(false);
+        } else {
+          onBack();
+        }
+      } else if (e.key === " " || e.code === "Space") {
+        e.preventDefault();
+        if (!showLibrarySheet) {
+          handleTap();
+        }
       } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
         e.preventDefault();
-        handleReset();
+        if (!showLibrarySheet) {
+          handleReset();
+        }
       } else if (e.key === "Backspace") {
         e.preventDefault();
-        handleUndo();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        onBack();
+        if (!showLibrarySheet) {
+          handleUndo();
+        }
       }
     };
 
@@ -133,98 +135,100 @@ export function CustomCounterScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative flex flex-col page-content-center">
-      {/* Header */}
-      <Header
-        title={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
-        onBack={onBack}
-        language={language}
-        right={
-          <button
-            type="button"
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={isArabic ? "الصوت والاهتزاز" : "Sound & Haptics"}
-          >
-            <Volume2 size={20} className={soundEnabled ? "text-primary" : "text-muted-foreground/40"} />
-          </button>
-        }
-      />
+      <TimeOfDayBackground categoryId="night" />
+      <div className="relative z-10 flex flex-col min-h-screen flex-1">
+        {/* Header */}
+        <Header
+          title={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
+          onBack={onBack}
+          language={language}
+          right={
+            <button
+              type="button"
+              onClick={() => setSoundEnabled(!soundEnabled)}
+              className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={isArabic ? "الصوت والاهتزاز" : "Sound & Haptics"}
+            >
+              <Volume2 size={20} className={soundEnabled ? "text-primary" : "text-muted-foreground/40"} />
+            </button>
+          }
+        />
 
-      <main className="flex min-h-0 flex-1 flex-col justify-between px-5 pb-6 pt-2">
-        {/* Top Controls: Zikr Card & Target Picker */}
-        <div className="space-y-3">
-          {/* Selected Authentic Zikr Card */}
-          <button
-            type="button"
-            onClick={() => setShowLibrarySheet(true)}
-            className="interactive-elem flex w-full items-center justify-between gap-3 rounded-2xl border border-border bg-card p-4 text-start shadow-sm transition-all hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            <div className="min-w-0 flex-1 space-y-1">
-              <span className="block text-[0.75rem] font-bold text-muted-foreground">
-                {isArabic ? "الذكر المأثور" : "Selected Dhikr"}
-              </span>
-              <p className="truncate text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
-                {activeText}
-              </p>
-            </div>
-            <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
-              <ChevronDown size={18} />
-            </div>
-          </button>
+        <main className="flex min-h-0 flex-1 flex-col justify-between px-5 pb-6 pt-2">
+          {/* Top Controls: Zikr Card & Target Picker */}
+          <div className="space-y-3">
+            {/* Selected Authentic Zikr Card */}
+            <button
+              type="button"
+              onClick={() => setShowLibrarySheet(true)}
+              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="min-w-0 flex-1 space-y-1">
+                <span className="block text-[0.75rem] font-bold text-muted-foreground">
+                  {isArabic ? "الذكر المأثور" : "Selected Dhikr"}
+                </span>
+                <p className="truncate text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
+                  {activeText}
+                </p>
+              </div>
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
+                <ChevronDown size={18} />
+              </div>
+            </button>
 
-          {/* Target Presets */}
-          <CounterTargetPicker
-            activeTarget={target}
-            onTargetChange={(newTarget) => {
-              setTarget(newTarget);
-              setCount(0);
-              setLaps(0);
-              setShowCompletionDialog(false);
-            }}
-            language={language}
-            direction={direction}
-          />
-        </div>
-
-        {/* Central Counter Display Surface */}
-        <div className="my-auto flex flex-col items-center justify-center py-6">
-          <div className="relative flex items-center justify-center">
-            <PulseRings trigger={pulse} size={220} count={count} total={target} />
-
-            <ZikrCounterSurface
-              count={count}
-              total={target}
-              compact={false}
-              complete={isTargetComplete}
-              onTap={handleTap}
+            {/* Target Presets */}
+            <CounterTargetPicker
+              activeTarget={target}
+              onTargetChange={(newTarget) => {
+                setTarget(newTarget);
+                setCount(0);
+                setLaps(0);
+                setShowCompletionDialog(false);
+              }}
               language={language}
-              instructionText={isArabic ? "اضغط للتسبيح" : "Tap to count"}
-              testId="custom-counter-surface"
+              direction={direction}
             />
           </div>
 
-          {/* Quick Counter Action Buttons (Undo & Reset) */}
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <button
-              type="button"
-              onClick={handleUndo}
-              disabled={count === 0}
-              className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <RotateCcw size={16} />
-              <span>{isArabic ? "تراجع" : "Undo"}</span>
-            </button>
+          {/* Central Counter Display Surface */}
+          <div className="my-auto flex flex-col items-center justify-center py-6">
+            <div className="relative flex items-center justify-center">
+              <PulseRings trigger={pulse} size={220} count={count} total={target} />
 
-            <button
-              type="button"
-              onClick={handleReset}
-              disabled={count === 0 && laps === 0}
-              className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-[0.875rem] font-bold text-foreground transition-colors hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <RotateCcw size={16} />
-              <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
-            </button>
-          </div>
+              <ZikrCounterSurface
+                count={count}
+                total={target}
+                compact={false}
+                complete={isTargetComplete}
+                onTap={handleTap}
+                language={language}
+                instructionText=""
+                testId="custom-counter-surface"
+              />
+            </div>
+
+            {/* Quick Counter Action Buttons (Undo & Reset) */}
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={count === 0}
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/40 dark:border-white/10 bg-card px-4 text-[0.875rem] font-bold text-foreground backdrop-blur-xl shadow-lg shadow-black/5 hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+              >
+                <RotateCcw size={16} />
+                <span>{isArabic ? "تراجع" : "Undo"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={count === 0 && laps === 0}
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-white/40 dark:border-white/10 bg-card px-4 text-[0.875rem] font-bold text-foreground backdrop-blur-xl shadow-lg shadow-black/5 hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+              >
+                <RotateCcw size={16} />
+                <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
+              </button>
+            </div>
 
           {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
           <div className="hidden md:flex items-center justify-center gap-3 mt-4 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
@@ -260,7 +264,7 @@ export function CustomCounterScreen({
 
         {/* Virtue & Source Information Card */}
         {selectedAuthentic.virtueAr && (
-          <div className="rounded-2xl border border-border/80 bg-card/60 p-4 backdrop-blur-sm">
+          <div className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4 backdrop-blur-xl shadow-lg shadow-black/5">
             <div className="flex items-start gap-3">
               <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 <Sparkles size={18} />
@@ -282,6 +286,7 @@ export function CustomCounterScreen({
           </div>
         )}
       </main>
+      </div>
 
       {/* Target Completion Choice Modal (Reset vs Continue) */}
       {showCompletionDialog && (
@@ -296,7 +301,7 @@ export function CustomCounterScreen({
             className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
             onClick={() => setShowCompletionDialog(false)}
           />
-          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border bg-card p-6 text-center shadow-2xl">
+          <div className="relative z-10 w-full max-w-sm rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-6 text-center shadow-2xl backdrop-blur-xl">
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
               <Check size={32} strokeWidth={3} />
             </div>

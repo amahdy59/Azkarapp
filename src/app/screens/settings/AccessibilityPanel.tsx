@@ -23,8 +23,8 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-11 flex-1 rounded-xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
-        active ? "border-primary bg-primary text-primary-foreground" : "border-border-control bg-card text-foreground"
+      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
+        active ? "border-primary bg-primary text-primary-foreground" : "border-white/40 dark:border-white/10 bg-card text-foreground"
       }`}
     >
       {label}
@@ -84,7 +84,7 @@ export function AccessibilityPanel({
   const colorBlindOptions: ColorBlindSupport[] = ["none", "deuteranopia", "protanopia", "tritanopia"];
 
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background">
+    <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "settings.accessibility")} onBack={onBack} language={language} />
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.visual")} />
@@ -102,20 +102,20 @@ export function AccessibilityPanel({
           >
             <RadioGroupPrimitive.Item
               value="hijri"
-              className={`min-h-11 rounded-xl border px-3 text-[0.8125rem] font-bold ${
+              className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
                 calendarType === "hijri"
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border-control bg-card text-foreground"
+                  : "border-white/40 dark:border-white/10 bg-card text-foreground"
               }`}
             >
               {language === "ar" ? "التقويم الهجري (الافتراضي)" : "Hijri (Default)"}
             </RadioGroupPrimitive.Item>
             <RadioGroupPrimitive.Item
               value="gregorian"
-              className={`min-h-11 rounded-xl border px-3 text-[0.8125rem] font-bold ${
+              className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
                 calendarType === "gregorian"
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border-control bg-card text-foreground"
+                  : "border-white/40 dark:border-white/10 bg-card text-foreground"
               }`}
             >
               {language === "ar" ? "التقويم الميلادي" : "Gregorian"}
@@ -147,10 +147,10 @@ export function AccessibilityPanel({
                   key={option.value}
                   value={option.value}
                   data-testid={`text-size-option-${option.value}`}
-                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-[1.5rem] border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring backdrop-blur-xl shadow-sm ${
                     selected
                       ? "border-primary bg-primary/10 text-foreground"
-                      : "border-border-control bg-card text-muted-foreground"
+                      : "border-white/40 dark:border-white/10 bg-card text-muted-foreground"
                   }`}
                 >
                   <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
@@ -168,7 +168,7 @@ export function AccessibilityPanel({
           </RadioGroupPrimitive.Root>
         </section>
 
-        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Contrast size={20} className="text-primary" />}
@@ -208,7 +208,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.motion")} />
-        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Pause size={20} className="text-primary" />}
@@ -227,7 +227,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.reading")} />
-        <div className="mx-4 overflow-hidden rounded-2xl border border-border bg-card">
+        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<TypeIcon size={20} className="text-primary" />}
