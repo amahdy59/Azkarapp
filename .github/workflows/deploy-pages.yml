@@ -51,7 +51,7 @@ jobs:
         id: playwright-cache
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-browsers-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+          key: playwright-browsers-v2-${{ runner.os }}-${{ env.ImageOS }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright browsers
         if: steps.playwright-cache.outputs.cache-hit != 'true'
