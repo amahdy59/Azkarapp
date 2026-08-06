@@ -11,6 +11,7 @@ import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculatio
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { StatCard, CompactActionCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
 import type {
@@ -460,93 +461,38 @@ export function HomeScreen({
           {/* Middle Row: 4 Compact Stat & Resume Cards (Side-by-side on Desktop & Tablet) */}
           <div className="home-grid-full grid grid-cols-2 md:grid-cols-4 gap-3.5 my-1">
             {/* Card 1: Streak / "سلسلة المتابعة" */}
-            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-[0.8125rem] font-extrabold text-foreground">
-                  {isArabic ? "سلسلة المتابعة" : "Streak"}
-                </span>
-                <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                  <Zap size={18} />
-                </span>
-              </div>
-              <div className="mt-3 text-start">
-                <p className="text-2xl md:text-3xl font-black text-foreground" dir="auto">
-                  {formatNumerals(streakDays, language)}
-                </p>
-                <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
-                  {isArabic ? "أيام متتالية" : "consecutive days"}
-                </p>
-              </div>
-            </div>
+            <StatCard
+              title={isArabic ? "سلسلة المتابعة" : "Streak"}
+              icon={<Zap size={18} />}
+              value={formatNumerals(streakDays, language)}
+              subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
+            />
 
             {/* Card 2: This Week / "هذا الأسبوع" */}
-            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-[0.8125rem] font-extrabold text-foreground">
-                  {isArabic ? "هذا الأسبوع" : "This Week"}
-                </span>
-                <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                  <Calendar size={18} />
-                </span>
-              </div>
-              <div className="mt-3 text-start">
-                <p className="text-2xl md:text-3xl font-black text-foreground" dir="auto">
-                  {formatNumerals(activeDaysThisWeek, language)}
-                </p>
-                <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
-                  {isArabic ? "من ٧ أيام" : "of 7 days"}
-                </p>
-              </div>
-            </div>
+            <StatCard
+              title={isArabic ? "هذا الأسبوع" : "This Week"}
+              icon={<Calendar size={18} />}
+              value={formatNumerals(activeDaysThisWeek, language)}
+              subtitle={isArabic ? "من ٧ أيام" : "of 7 days"}
+            />
 
             {/* Card 3: Total Azkar / "إجمالي الأذكار" */}
-            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-[0.8125rem] font-extrabold text-foreground">
-                  {isArabic ? "إجمالي الأذكار" : "Total Days"}
-                </span>
-                <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                  <GoldenPalmMark size={18} />
-                </span>
-              </div>
-              <div className="mt-3 text-start">
-                <p className="text-2xl md:text-3xl font-black text-foreground" dir="auto">
-                  {formatNumerals(totalDays, language)}
-                </p>
-                <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
-                  {isArabic ? "يوماً" : "days active"}
-                </p>
-              </div>
-            </div>
+            <StatCard
+              title={isArabic ? "إجمالي الأذكار" : "Total Days"}
+              icon={<GoldenPalmMark size={18} />}
+              value={formatNumerals(totalDays, language)}
+              subtitle={isArabic ? "يوماً" : "days active"}
+            />
 
             {/* Card 4: Resume Reading / "تابع من حيث توقفت" */}
-            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
-              <div className="flex items-center justify-between">
-                <span className="text-[0.8125rem] font-extrabold text-foreground">
-                  {isArabic ? "تابع من حيث توقفت" : "Resume Reading"}
-                </span>
-                <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-                  📖
-                </span>
-              </div>
-              <div className="mt-3 text-start flex items-end justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <p className="text-[0.9375rem] font-black text-foreground truncate" dir="auto">
-                    {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
-                  </p>
-                  <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
-                    {isArabic ? "آخر قراءة: اليوم" : "Last read: Today"}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onResume(reminderInfo.categoryId)}
-                  className="flex min-h-[36px] items-center justify-center rounded-xl bg-[#e2a84a] px-3.5 text-xs font-black text-slate-950 hover:bg-[#ebd074] transition-colors cursor-pointer shrink-0 shadow-xs"
-                >
-                  {isArabic ? "متابعة" : "Resume"}
-                </button>
-              </div>
-            </div>
+            <CompactActionCard
+              title={isArabic ? "تابع من حيث توقفت" : "Resume Reading"}
+              icon="📖"
+              contentTitle={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
+              contentSubtitle={isArabic ? "آخر قراءة: اليوم" : "Last read: Today"}
+              actionLabel={isArabic ? "متابعة" : "Resume"}
+              onAction={() => onResume(reminderInfo.categoryId)}
+            />
           </div>
 
           {/* Bottom Section: Special Friday Banner ("أذكار يوم الجمعة") */}

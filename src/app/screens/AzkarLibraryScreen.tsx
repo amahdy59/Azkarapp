@@ -1,10 +1,9 @@
 import { useMemo, useState } from "react";
-import { CatIcon } from "../components/CatIcon";
-import { Search, Bookmark, ChevronNext } from "../components/icons";
+import { Search, Bookmark } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
-import { ProgressBar } from "../components/ProgressBar";
+import { CategoryCard } from "../components/CategoryCard";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -124,19 +123,22 @@ export function AzkarLibraryScreen({
                   });
 
                   return (
-                    <button
+                    <CategoryCard
                       key={category.id}
-                      type="button"
-                      data-testid={`category-card-${category.id}`}
-                      dir={direction}
-                      onClick={() => {
-                        if (isComprehensiveDuas) {
-                          registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
-                        }
-                        onCategory(category.id);
-                      }}
-                      className="flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      aria-label={
+                      id={category.id}
+                      title={isArabic ? category.nameArabic : category.name}
+                      icon={category.icon}
+                      direction={direction}
+                      isOccasional={isOccasional}
+                      totalCount={total}
+                      completedCount={done}
+                      routineSummary={routineSummary}
+                      progressText={t(language, "library.progressOfTotal", {
+                        done: formatNumerals(done, language),
+                        total: formatNumerals(total, language),
+                      })}
+                      occasionalSubtitle={`${formatNumerals(total, language)} ${isArabic ? "أذكار سياقية" : "Occasional supplications"}`}
+                      ariaLabel={
                         isOccasional
                           ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
                               isArabic ? "أذكار" : "supplications"
@@ -145,52 +147,13 @@ export function AzkarLibraryScreen({
                               .filter(Boolean)
                               .join(", ")
                       }
-                    >
-                      <span
-                        data-slot="category-icon"
-                        className="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary/10"
-                        aria-hidden="true"
-                      >
-                        <CatIcon type={category.icon} size={24} color="var(--primary)" />
-                      </span>
-                      <span data-slot="category-copy" className="min-w-0 flex-1">
-                        <span className="block text-[1rem] font-bold text-foreground">
-                          {isArabic ? category.nameArabic : category.name}
-                        </span>
-                        {isOccasional ? (
-                          <div className="mt-1 flex items-center gap-1.5">
-                            <span className="text-[0.8125rem] font-semibold text-muted-foreground">
-                              {formatNumerals(total, language)} {isArabic ? "أذكار سياقية" : "Occasional supplications"}
-                            </span>
-                          </div>
-                        ) : (
-                          <div className="mt-2 flex flex-col gap-1">
-                            <ProgressBar
-                              value={done}
-                              max={total}
-                              height={5}
-                              trackColor="var(--muted)"
-                              fillColor="var(--primary)"
-                              direction={direction}
-                              aria-label={progressLabel}
-                            />
-                            <span className="block text-[0.8125rem] text-muted-foreground">
-                              {routineSummary ? `${routineSummary} · ` : ""}
-                              {t(language, "library.progressOfTotal", {
-                                done: formatNumerals(done, language),
-                                total: formatNumerals(total, language),
-                              })}
-                            </span>
-                          </div>
-                        )}
-                      </span>
-                      <ChevronNext
-                        data-slot="category-chevron"
-                        size={22}
-                        className="text-muted-foreground"
-                        aria-hidden="true"
-                      />
-                    </button>
+                      onClick={() => {
+                        if (isComprehensiveDuas) {
+                          registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+                        }
+                        onCategory(category.id);
+                      }}
+                    />
                   );
                 })}
               </div>
