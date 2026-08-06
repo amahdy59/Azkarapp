@@ -22,7 +22,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -109,7 +109,7 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: build
     outputs:
       page_url: ${{ steps.deployment.outputs.page_url }}
@@ -123,7 +123,7 @@ jobs:
   verify-production:
     timeout-minutes: 10
     needs: deploy
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     permissions:
       contents: none
     steps:
