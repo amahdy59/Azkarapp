@@ -2875,6 +2875,49 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
       items: [{ id: "s-hm-111", core: true }],
     },
   ],
+  after_prayer: [
+    {
+      groupId: "begin",
+      items: [
+        // Shared after every obligatory prayer (core)
+        { id: "ap-ref-1", core: true },
+        { id: "ap-ref-2", core: true },
+      ],
+    },
+    {
+      groupId: "quran_protection",
+      items: [
+        { id: "ap-ref-9", core: true }, // Ayat al-Kursi
+      ],
+    },
+    {
+      groupId: "renew",
+      items: [
+        { id: "ap-ref-3", core: true },
+        { id: "ap-ref-4", core: true },
+      ],
+    },
+    {
+      groupId: "repeat",
+      items: [
+        { id: "ap-tasbeeh-subhanallah", core: true, ritualGroupId: "tasbih_fatimah" },
+        { id: "ap-tasbeeh-alhamdulillah", core: true, ritualGroupId: "tasbih_fatimah" },
+        { id: "ap-tasbeeh-allahuakbar", core: true, ritualGroupId: "tasbih_fatimah" },
+        { id: "ap-tasbeeh-tawhid", core: true },
+      ],
+    },
+    {
+      groupId: "ask",
+      items: [
+        { id: "ap-ref-6", core: true },
+        { id: "ap-ref-8", core: false }, // comprehensive dua — complete mode only
+        // Fajr & Maghrib specific — complete mode only (no per-prayer detection yet)
+        { id: "ap-ref-7", core: false }, // 10× Tawhid after Fajr/Maghrib
+        { id: "ap-ref-11", core: false }, // 7× protection after Fajr/Maghrib
+        { id: "ap-ref-10", core: false }, // Fajr dua for knowledge/provision
+      ],
+    },
+  ],
 };
 
 const ROUTINE_INTRODUCTION_IDS: Record<"morning" | "evening", string> = {
@@ -2918,6 +2961,7 @@ function applyRoutineArrangement(category: RoutineCategoryId, azkar: ZikrDraft[]
 applyRoutineArrangement("morning", MORNING_AZKAR);
 applyRoutineArrangement("evening", EVENING_AZKAR);
 applyRoutineArrangement("before_sleep", SLEEP_AZKAR);
+applyRoutineArrangement("after_prayer", AFTER_PRAYER_AZKAR);
 
 const ALL_AZKAR = applyContentReview([
   ...MORNING_AZKAR,
@@ -2945,7 +2989,7 @@ const registerLazyCollection = (category: CategoryId, items: ZikrDraft[]) => {
 };
 
 const isRoutineCategory = (cat: CategoryId): cat is RoutineCategoryId =>
-  cat === "morning" || cat === "evening" || cat === "before_sleep";
+  cat === "morning" || cat === "evening" || cat === "before_sleep" || cat === "after_prayer";
 
 const getAzkarByCategory = (cat: CategoryId) =>
   (LAZY_AZKAR[cat] ?? ALL_AZKAR)

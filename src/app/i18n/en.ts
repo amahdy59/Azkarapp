@@ -177,6 +177,7 @@ const en = {
     morning: "Morning reminder",
     evening: "Evening reminder",
     before_sleep: "Before Sleep reminder",
+    after_prayer: "After Prayer Azkar",
     enabled: "On",
     disabled: "Off",
     onlyIfIncomplete: "Only when unfinished",

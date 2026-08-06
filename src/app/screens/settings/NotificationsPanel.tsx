@@ -13,7 +13,7 @@ import type { AppLanguage, LocationSettings, ReminderSettings } from "../../type
 import { SubHeader } from "./SettingsPrimitives";
 
 type BrowserNotificationPermission = NotificationPermission | "unsupported";
-type ReminderKind = "morning" | "evening" | "before_sleep";
+type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 
 function readNotificationPermission(): BrowserNotificationPermission {
   if (typeof window === "undefined" || !("Notification" in window)) {
@@ -289,7 +289,11 @@ export function NotificationsPanel({
     updateSchedule(kind, { enabled: enabling });
   };
 
-  const anyReminderEnabled = reminders.morning.enabled || reminders.evening.enabled || reminders.before_sleep.enabled;
+  const anyReminderEnabled =
+    reminders.morning.enabled ||
+    reminders.evening.enabled ||
+    reminders.before_sleep.enabled ||
+    reminders.after_prayer.enabled;
 
   return (
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
@@ -567,7 +571,7 @@ export function NotificationsPanel({
             </p>
           </div>
           <div className="space-y-3">
-            {(["morning", "evening", "before_sleep"] as const).map((kind) => (
+            {(["morning", "evening", "before_sleep", "after_prayer"] as const).map((kind) => (
               <ReminderScheduleRow
                 key={kind}
                 kind={kind}

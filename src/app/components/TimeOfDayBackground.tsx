@@ -9,6 +9,8 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
     kind = "evening";
   } else if (categoryId === "before_sleep") {
     kind = "sleep";
+  } else if (categoryId === "after_prayer") {
+    kind = "prayer";
   } else if (categoryId.includes("friday")) {
     kind = "friday";
   }
@@ -29,12 +31,12 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
             "linear-gradient(to bottom, rgba(8,12,20,0) 0%, rgba(8,12,20,0.15) 30%, rgba(8,12,20,0.72) 65%, rgba(8,12,20,0.93) 82%, #080c14 100%)",
         }}
       />
-      {/* Light mode: fade to white */}
+      {/* Light mode: fade to white — start color is transparent white (not gray) */}
       <div
         className="absolute inset-0 dark:hidden"
         style={{
           background:
-            "linear-gradient(to bottom, rgba(102,102,102,0) 0%, rgba(102,102,102,0) 65.8%, rgba(255,255,255,0.7) 79.9%, rgba(255,255,255,0.9) 90.6%, rgb(255,255,255) 100%)",
+            "linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 65.8%, rgba(255,255,255,0.7) 79.9%, rgba(255,255,255,0.9) 90.6%, rgb(255,255,255) 100%)",
         }}
       />
     </div>

@@ -179,6 +179,7 @@ const ar = {
     morning: "تذكير الصباح",
     evening: "تذكير المساء",
     before_sleep: "تذكير أذكار النوم",
+    after_prayer: "أذكار ما بعد الصلاة",
     enabled: "مفعّل",
     disabled: "متوقف",
     onlyIfIncomplete: "عند عدم الإكمال فقط",

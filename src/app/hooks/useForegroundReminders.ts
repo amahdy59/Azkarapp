@@ -7,7 +7,7 @@ import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettin
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
 const REMINDER_WINDOW_MS = 90_000;
 
-type ReminderKind = "morning" | "evening" | "before_sleep";
+type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
 
 type DueReminder = {
   kind: ReminderKind;
@@ -60,6 +60,7 @@ export function getDueReminder(
     { kind: "morning", category: "morning" },
     { kind: "evening", category: "evening" },
     { kind: "before_sleep", category: "before_sleep" },
+    { kind: "after_prayer", category: "after_prayer" },
   ];
 
   for (const candidate of candidates) {

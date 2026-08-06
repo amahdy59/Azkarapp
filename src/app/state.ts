@@ -43,6 +43,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
       morning: { enabled: false, time: "07:30" },
       evening: { enabled: false, time: "18:30" },
       before_sleep: { enabled: false, time: "22:00" },
+      after_prayer: { enabled: false, time: "14:00" },
       onlyWhenIncomplete: true,
     },
     weeklyGoalDays: 4,
@@ -53,6 +54,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
       morning: "complete",
       evening: "complete",
       before_sleep: "complete",
+      after_prayer: "complete",
     },
     location: DEFAULT_LOCATION,
   },
@@ -101,6 +103,7 @@ function normalizeRoutineModes(value: unknown): AppStateSnapshot["settings"]["ro
     morning: candidate.morning === "core" ? "core" : "complete",
     evening: candidate.evening === "core" ? "core" : "complete",
     before_sleep: candidate.before_sleep === "core" ? "core" : "complete",
+    after_prayer: candidate.after_prayer === "core" ? "core" : "complete",
   };
 }
 
@@ -213,6 +216,13 @@ function normalizeReminders(
         : defaultReminders.before_sleep.enabled,
     time: isTime(fallback?.before_sleep?.time) ? fallback.before_sleep.time : defaultReminders.before_sleep.time,
   };
+  const afterPrayerFallback = {
+    enabled:
+      typeof fallback?.after_prayer?.enabled === "boolean"
+        ? fallback.after_prayer.enabled
+        : defaultReminders.after_prayer.enabled,
+    time: isTime(fallback?.after_prayer?.time) ? fallback.after_prayer.time : defaultReminders.after_prayer.time,
+  };
   return {
     morning: {
       enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : morningFallback.enabled,
@@ -228,6 +238,13 @@ function normalizeReminders(
           ? candidate.before_sleep.enabled
           : beforeSleepFallback.enabled,
       time: isTime(candidate?.before_sleep?.time) ? candidate.before_sleep.time : beforeSleepFallback.time,
+    },
+    after_prayer: {
+      enabled:
+        typeof candidate?.after_prayer?.enabled === "boolean"
+          ? candidate.after_prayer.enabled
+          : afterPrayerFallback.enabled,
+      time: isTime(candidate?.after_prayer?.time) ? candidate.after_prayer.time : afterPrayerFallback.time,
     },
     onlyWhenIncomplete:
       typeof candidate?.onlyWhenIncomplete === "boolean"

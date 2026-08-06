@@ -72,6 +72,7 @@ export function getHomeAction(
     morning: "complete",
     evening: "complete",
     before_sleep: "complete",
+    after_prayer: "complete",
   },
 ): HomeAction {
   const suggestedId = suggestedCategoryId(now, location);

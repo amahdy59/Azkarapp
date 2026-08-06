@@ -1,4 +1,4 @@
-export type AzkarBackgroundKey = "morning" | "evening" | "sleep" | "friday";
+export type AzkarBackgroundKey = "morning" | "evening" | "sleep" | "friday" | "prayer";
 
 export interface ResponsiveBackgroundAsset {
   alt: "";
@@ -150,6 +150,42 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
       },
     ],
     placeholder: "/assets/backgrounds/friday/friday-placeholder.webp",
+  },
+  prayer: {
+    alt: "",
+    decorative: true,
+    // Slightly higher crop than evening to show more sky — peaceful post-prayer feel
+    objectPosition: "52% 40%",
+    sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
+    avif: [
+      {
+        src: "/assets/backgrounds/evening/evening-768.avif",
+        width: 768,
+      },
+      {
+        src: "/assets/backgrounds/evening/evening-1280.avif",
+        width: 1280,
+      },
+      {
+        src: "/assets/backgrounds/evening/evening-1600.avif",
+        width: 1600,
+      },
+    ],
+    webp: [
+      {
+        src: "/assets/backgrounds/evening/evening-768.webp",
+        width: 768,
+      },
+      {
+        src: "/assets/backgrounds/evening/evening-1280.webp",
+        width: 1280,
+      },
+      {
+        src: "/assets/backgrounds/evening/evening-1600.webp",
+        width: 1600,
+      },
+    ],
+    placeholder: "/assets/backgrounds/evening/evening-placeholder.webp",
   },
 } as const;
 

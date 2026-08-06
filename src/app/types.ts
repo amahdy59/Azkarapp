@@ -23,7 +23,7 @@ export type CategoryId = (typeof CATEGORY_IDS)[number];
 export type TextSizeOption = "small" | "medium" | "large";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
-export type RoutineCategoryId = "morning" | "evening" | "before_sleep";
+export type RoutineCategoryId = "morning" | "evening" | "before_sleep" | "after_prayer";
 export type RoutineMode = "core" | "complete";
 export type ZikrGroupId =
   "begin" | "quran_protection" | "dua_protection" | "renew" | "ask" | "repeat" | "prepare" | "settle" | "final";
@@ -82,6 +82,7 @@ export interface ReminderSettings {
   morning: ReminderSchedule;
   evening: ReminderSchedule;
   before_sleep: ReminderSchedule;
+  after_prayer: ReminderSchedule;
   onlyWhenIncomplete: boolean;
 }
 

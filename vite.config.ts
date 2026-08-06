@@ -73,6 +73,16 @@ export default defineConfig(({ mode }) => {
             "**/SettingsScreen-*.js",
             "**/FridayModeScreen-*.js",
             "**/comprehensiveDuas-*.js",
+            "Before Sleep.png",
+            "Evening.png",
+            "Morning.png",
+            "colored palm tree.png",
+            "dimmed palm tree.png",
+            "azkar-responsive-assets/**",
+            "webp/**",
+            "evening_sky.webp",
+            "morning_sky.webp",
+            "sleep_sky.webp",
           ],
           runtimeCaching: [
             {

@@ -12,7 +12,7 @@ describe("AzkarLibraryScreen comprehensive duas", () => {
         completed={{} as Record<CategoryId, Set<string>>}
         language="en"
         direction="ltr"
-        routineModes={{ morning: "core", evening: "core", before_sleep: "core" }}
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
         onCategory={onCategory}
         onZikr={() => undefined}
         onSearch={() => undefined}
