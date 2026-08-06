@@ -23,14 +23,13 @@ Record user-approved product, design and architectural decisions here. Do not er
 
 ## DEC-001 — Wide-screen shell strategy
 
-- **Date:** Pending
-- **Status:** Proposed
+- **Date:** 2026-08-06
+- **Status:** Approved
 - **Owner:** Product owner
 - **Related phase:** Phase 00 / Phase 04
 - **Context:** Existing design documentation preserves a centered mobile-sized canvas on wide viewports, while the current UX improvement direction favors a more productive desktop layout.
 - **Options considered:** Preserve mobile canvas; fully fluid desktop; hybrid shell.
-- **Decision:** Pending approval.
-- **Recommended option:** Hybrid shell—responsive dashboards and settings, constrained reader/focused flows.
+- **Decision:** Hybrid shell—responsive dashboards and settings, constrained reader/focused flows.
 - **Why:** It uses desktop space effectively without making devotional reading lines too wide.
 - **Consequences:** Requires updates to `docs/DESIGN_SYSTEM.md`, responsive Playwright tests, shell components and screenshots.
 - **Tests/evidence required:** Mobile, tablet and desktop viewport matrix; Arabic/English; reader measure; keyboard navigation.
