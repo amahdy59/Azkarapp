@@ -229,3 +229,4 @@ pnpm install --frozen-lockfile
 pnpm check
 pnpm test:e2e
 pnpm build:pages
+```
