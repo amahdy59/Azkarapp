@@ -10,9 +10,11 @@ permissions:
   pages: write
   id-token: write
 
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# Do NOT cancel in-progress runs so GitHub Pages deployments can complete gracefully and release the environment lock.
 concurrency:
   group: "pages"
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   build:
