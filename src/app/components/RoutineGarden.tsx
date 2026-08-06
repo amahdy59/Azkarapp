@@ -481,7 +481,7 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className="mb-5 w-full transition-all"
+      className="w-full transition-all"
     >
       {!hideTabs && (
         <>

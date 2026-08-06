@@ -307,7 +307,7 @@ export function HomeScreen({
         aria-label={t(language, "app.name")}
         className="absolute inset-0 z-10 overflow-y-auto overflow-x-hidden px-page pb-24 pt-[76px] outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
-        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-5 w-full">
+        <div className="flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-5 w-full items-start">
           {/* Top Row: Hero Zikr Banner (3 cols) & Today's Wird Routine Card (2 cols) */}
           {isComplete ? (
             <div className="lg:col-span-3">
@@ -321,11 +321,11 @@ export function HomeScreen({
           ) : (
             <section
               aria-labelledby="current-zikr-heading"
-              className="lg:col-span-3 flex flex-col justify-between p-2 md:p-4 transition-all"
+              className="lg:col-span-3 flex flex-col justify-between p-1 md:p-2 transition-all"
             >
-              <div className="flex flex-col gap-4 text-start">
+              <div className="flex flex-col gap-3 text-start">
                 {/* Hero Text & Category Header */}
-                <div className="flex w-full flex-col items-start gap-1.5 mb-2 px-1">
+                <div className="flex w-full flex-col items-start gap-1 px-1">
                   <p
                     className="text-[1.125rem] font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
                     dir="auto"
@@ -336,7 +336,7 @@ export function HomeScreen({
                     id="current-zikr-heading"
                     className="text-3xl md:text-4xl font-black text-[#fbbf24] tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     dir="auto"
-                    style={{ lineHeight: "1.3" }}
+                    style={{ lineHeight: "1.25" }}
                   >
                     {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
                   </h2>
@@ -350,7 +350,7 @@ export function HomeScreen({
 
                 {/* Routine Mode Selector Pill (Abbreviated vs Complete) */}
                 <div
-                  className="flex min-h-[48px] w-full items-center rounded-[20px] bg-black/40 p-1 border border-white/15 dark:border-white/10"
+                  className="flex min-h-[44px] w-full items-center rounded-[20px] bg-black/40 p-1 border border-white/15 dark:border-white/10"
                   role="group"
                   aria-label={isArabic ? "وضع الورد" : "Routine mode"}
                 >

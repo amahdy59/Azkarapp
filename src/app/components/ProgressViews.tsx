@@ -21,7 +21,6 @@ import {
   Sprout,
   Sparkles,
 } from "./icons";
-import { PalmTreeMark } from "./RoutineGarden";
 
 function isAr(language: AppLanguage) {
   return language === "ar";
@@ -79,13 +78,11 @@ export function ProgressDayView({
   summary,
   language,
   dynamicSubtitle,
-  weeklyRate = 67,
   onSelectCategory,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   dynamicSubtitle: string;
-  weeklyRate?: number;
   onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
   const isArabic = isAr(language);
@@ -120,44 +117,6 @@ export function ProgressDayView({
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
-      {/* Top 3 Stat Cards */}
-      <div className="grid grid-cols-3 gap-3">
-        {/* Palm Tree Growth Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
-          <div className="flex items-center justify-center gap-1.5 mb-1 text-amber-600 dark:text-amber-400">
-            <span className="text-[0.875rem] sm:text-[0.9375rem] font-black">{isArabic ? "نخلة" : "Palm"}</span>
-            <PalmTreeMark size={20} color="#E4A84A" filled={summary.lifetimePalms > 0} />
-          </div>
-          <span className="text-[0.75rem] font-bold text-muted-foreground line-clamp-1">
-            {isArabic ? "استمر في نمو نخلتك" : "Keep growing palm"}
-          </span>
-        </div>
-
-        {/* Current Streak Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
-          <span className="text-[0.75rem] font-bold text-muted-foreground mb-1">
-            {isArabic ? "سلسلة حالية" : "Current streak"}
-          </span>
-          <div className="flex items-center justify-center gap-1 text-amber-500">
-            <span className="text-[0.9375rem] sm:text-[1rem] font-black text-foreground">
-              {formatNumerals(summary.currentUsageStreak ?? 0, language)} {isArabic ? "أيام" : "days"}
-            </span>
-            <Zap className="h-4 w-4 fill-amber-500/20" strokeWidth={2.5} />
-          </div>
-        </div>
-
-        {/* Weekly Completion Rate Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
-          <span className="text-[0.75rem] font-bold text-muted-foreground mb-1">
-            {isArabic ? "المعدل الأسبوعي" : "Weekly rate"}
-          </span>
-          <div className="flex items-center justify-center gap-1 text-amber-600 dark:text-amber-400">
-            <span className="text-[0.9375rem] sm:text-[1rem] font-black">%{formatNumerals(weeklyRate, language)}</span>
-            <Sprout className="h-4 w-4 text-emerald-500" strokeWidth={2.5} />
-          </div>
-        </div>
-      </div>
-
       {/* Main Today's Wird Container Card */}
       <div className="w-full rounded-[2rem] bg-card border border-white/40 dark:border-white/10 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
         {/* Title and subtitle */}
