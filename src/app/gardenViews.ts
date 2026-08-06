@@ -31,6 +31,7 @@ export interface WeekGardenStats {
   morningCompletedCount: number;
   eveningCompletedCount: number;
   sleepCompletedCount: number;
+  afterPrayerCompletedCount: number;
   completedDaysCount: number;
   mostMissedRoutine: CategoryId | null;
   bestStreakDays: number;
@@ -105,6 +106,7 @@ export function getWeekGardenStats(
   let morningCompletedCount = 0;
   let eveningCompletedCount = 0;
   let sleepCompletedCount = 0;
+  let afterPrayerCompletedCount = 0;
   let completedDaysCount = 0;
   let currentRun = 0;
   let bestStreakDays = 0;
@@ -121,12 +123,14 @@ export function getWeekGardenStats(
     const hasMorning = categories.has("morning");
     const hasEvening = categories.has("evening");
     const hasSleep = categories.has("before_sleep");
+    const hasAfterPrayer = categories.has("after_prayer");
 
     if (hasMorning) morningCompletedCount++;
     if (hasEvening) eveningCompletedCount++;
     if (hasSleep) sleepCompletedCount++;
+    if (hasAfterPrayer) afterPrayerCompletedCount++;
 
-    const isPalm = hasMorning && hasEvening && hasSleep;
+    const isPalm = hasMorning && hasEvening && hasSleep && hasAfterPrayer;
     if (isPalm) {
       completedDaysCount++;
       currentRun++;
@@ -153,11 +157,12 @@ export function getWeekGardenStats(
     { id: "morning" as CategoryId, count: morningCompletedCount },
     { id: "evening" as CategoryId, count: eveningCompletedCount },
     { id: "before_sleep" as CategoryId, count: sleepCompletedCount },
+    { id: "after_prayer" as CategoryId, count: afterPrayerCompletedCount },
   ];
 
   routineCounts.sort((a, b) => a.count - b.count);
   const lowest = routineCounts[0]!;
-  const highest = routineCounts[2]!;
+  const highest = routineCounts[3]!;
   const mostMissedRoutine = lowest.count < 7 ? lowest.id : null;
   const bestRoutine = highest.id;
 
@@ -166,6 +171,7 @@ export function getWeekGardenStats(
     morningCompletedCount,
     eveningCompletedCount,
     sleepCompletedCount,
+    afterPrayerCompletedCount,
     completedDaysCount,
     mostMissedRoutine,
     bestStreakDays,
@@ -236,7 +242,7 @@ export function getMonthDetailedStats(
 
     if (day.completedCount > 0) {
       totalActiveDays++;
-      totalCompletions += Math.min(3, day.completedCount);
+      totalCompletions += Math.min(4, day.completedCount);
     }
 
     for (const cat of day.categories) {
@@ -246,7 +252,7 @@ export function getMonthDetailedStats(
     }
   }
 
-  const completionRate = Math.round((totalCompletions / (daysInMonth * 3)) * 100);
+  const completionRate = Math.round((totalCompletions / (daysInMonth * 4)) * 100);
 
   let bestRoutine: CategoryId = "morning";
   if (eveningCount > morningCount && eveningCount >= sleepCount) {
@@ -300,7 +306,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
 
   for (let m = 0; m < 12; m++) {
     const daysInMonth = new Date(year, m + 1, 0).getDate();
-    totalPossibleAllYear += daysInMonth * 3;
+    totalPossibleAllYear += daysInMonth * 4;
     let monthCompletions = 0;
     let fullDaysCount = 0;
     let activeDaysCount = 0;
@@ -324,7 +330,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       if (count > 0) {
         activeDaysCount++;
         activeDays++;
-        monthCompletions += Math.min(3, count);
+        monthCompletions += Math.min(4, count);
         totalCollections += count;
       }
 
@@ -336,7 +342,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       dayCells.push({ dayNum: d, level, isPalm });
     }
 
-    const completionRate = Math.round((monthCompletions / (daysInMonth * 3)) * 100);
+    const completionRate = Math.round((monthCompletions / (daysInMonth * 4)) * 100);
     if (completionRate > bestMonthRate) {
       bestMonthRate = completionRate;
       bestMonthIndex = m;

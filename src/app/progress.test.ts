@@ -36,19 +36,20 @@ describe("quiet garden progress", () => {
     expect(getProgressDayKey(new Date(2026, 6, 18, 4, 0), 4)).toBe("2026-07-18");
   });
 
-  it("records one leaf per main category and creates a palm for the three main categories", () => {
+  it("records one leaf per main category and creates a palm for the four main categories", () => {
     const now = new Date(2026, 6, 18, 10);
     const first = recordDailyCollectionCompletion([], "morning", now, 4);
     const duplicate = recordDailyCollectionCompletion(first.records, "morning", now, 4);
 
-    const state = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
-    const third = recordDailyCollectionCompletion(state.records, "before_sleep", now, 4);
+    const second = recordDailyCollectionCompletion(duplicate.records, "evening", now, 4);
+    const third = recordDailyCollectionCompletion(second.records, "before_sleep", now, 4);
+    const fourth = recordDailyCollectionCompletion(third.records, "after_prayer", now, 4);
 
     expect(first.event.kind).toBe("leaf");
     expect(duplicate.event.kind).toBe("repeat");
     expect(duplicate.records).toHaveLength(1);
-    expect(third.event).toMatchObject({ kind: "palm", leafCount: 3 });
-    expect(third.records).toHaveLength(3);
+    expect(fourth.event).toMatchObject({ kind: "palm", leafCount: 4 });
+    expect(fourth.records).toHaveLength(4);
   });
 
   it("upgrades a core leaf to complete without recording a second leaf", () => {

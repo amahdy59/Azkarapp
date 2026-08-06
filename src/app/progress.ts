@@ -2,7 +2,7 @@ import { getAzkarByCategory } from "./content/azkar";
 import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type StoredSession } from "./types";
 
 export { CATEGORY_IDS } from "./types";
-export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
+export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep", "after_prayer"];
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
 
 export type GrowthEventKind = "leaf" | "palm" | "repeat" | "extra_leaf";

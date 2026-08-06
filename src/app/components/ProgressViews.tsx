@@ -8,6 +8,7 @@ import {
   createDailyCompletionIndex,
 } from "../gardenViews";
 import { type GardenSummary } from "../progress";
+import { GoldenLeafMark } from "./RoutineGarden";
 import {
   Zap,
   ChevronLeft,
@@ -87,31 +88,27 @@ export function ProgressDayView({
 }) {
   const isArabic = isAr(language);
   const completedToday = summary.today.completedCategories;
-  const completedCount = completedToday.length;
-  const progressRatio = Math.min(1, completedCount / 3);
-  const progressPercent = Math.round(progressRatio * 100);
 
   const categories = [
     {
       id: "morning" as const,
       name: isArabic ? "أذكار الصباح" : "Morning Azkar",
-      meta: isArabic ? "43 ذكراً • 5 دقائق" : "43 Azkar • 5 mins",
-      time: completedToday.includes("morning") ? (isArabic ? "7:12 ص" : "7:12 AM") : "--:--",
       icon: <Sun size={20} className="text-amber-500" />,
     },
     {
       id: "evening" as const,
       name: isArabic ? "أذكار المساء" : "Evening Azkar",
-      meta: isArabic ? "42 ذكراً • 6 دقائق" : "42 Azkar • 6 mins",
-      time: completedToday.includes("evening") ? (isArabic ? "6:45 م" : "6:45 PM") : "--:--",
       icon: <Sun size={20} className="text-orange-500" />,
     },
     {
       id: "before_sleep" as const,
       name: isArabic ? "أذكار النوم" : "Sleep Azkar",
-      meta: isArabic ? "23 ذكراً • 3 دقائق" : "23 Azkar • 3 mins",
-      time: completedToday.includes("before_sleep") ? (isArabic ? "10:30 م" : "10:30 PM") : "--:--",
       icon: <Moon size={20} className="text-indigo-400" />,
+    },
+    {
+      id: "after_prayer" as const,
+      name: isArabic ? "أذكار ما بعد الصلاة" : "After Prayer Azkar",
+      icon: <Sparkles size={20} className="text-emerald-500" />,
     },
   ];
 
@@ -120,124 +117,45 @@ export function ProgressDayView({
       {/* Main Today's Wird Container Card */}
       <div className="w-full rounded-[2rem] bg-card border border-white/40 dark:border-white/10 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
         {/* Title and subtitle */}
-        <div className="flex flex-col items-center text-center mb-4">
+        <div className="flex flex-col items-center text-center mb-5">
           <h3 className="text-[1.375rem] md:text-[1.5rem] font-black text-foreground tracking-tight mb-1">
             {isArabic ? "وردك اليوم" : "Today's Wird"}
           </h3>
           <p className="text-[0.8125rem] sm:text-[0.875rem] font-semibold text-muted-foreground">{dynamicSubtitle}</p>
         </div>
 
-        {/* Sub-header mini metrics */}
-        <div className="rounded-[1.5rem] border border-white/30 dark:border-white/10 bg-white/40 dark:bg-white/5 p-3.5 mb-5 shadow-2xs backdrop-blur-md">
-          <div className="grid grid-cols-3 divide-x divide-white/40 dark:divide-white/10 rtl:divide-x-reverse text-center mb-3">
-            <div>
-              <span className="block text-[0.875rem] sm:text-[1rem] font-black text-foreground">
-                {formatNumerals(completedCount, language)} {isArabic ? "من 3" : "of 3"}
-              </span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "مكتملة" : "Completed"}
-              </span>
-            </div>
-            <div>
-              <span className="block text-[0.875rem] sm:text-[1rem] font-black text-foreground">
-                %{formatNumerals(progressPercent, language)}
-              </span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "نسبة الإنجاز" : "Completion"}
-              </span>
-            </div>
-            <div>
-              <div className="flex items-center justify-center gap-1">
-                <span className="text-[0.875rem] sm:text-[1rem] font-black text-foreground">
-                  {formatNumerals(summary.currentUsageStreak ?? 0, language)} {isArabic ? "أيام" : "days"}
-                </span>
-                <Zap className="h-3.5 w-3.5 text-amber-500 fill-amber-500/20" />
-              </div>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "سلسلة حالية" : "Streak"}
-              </span>
-            </div>
-          </div>
-
-          {/* Linear Progress Bar */}
-          <div className="w-full h-2.5 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-            <div
-              className="h-full bg-gradient-to-r from-amber-500 to-amber-400 transition-all duration-700 ease-out rounded-full"
-              style={{ width: `${progressPercent}%` }}
-            />
-          </div>
-        </div>
-
         {/* Categories / Routines List */}
-        <ul className="flex flex-col gap-3 w-full mb-5">
+        <ul className="flex flex-col gap-2.5 w-full mb-4">
           {categories.map((col) => {
             const isDone = completedToday.includes(col.id);
             return (
               <li key={col.id}>
-                <div
-                  className={`w-full min-h-[4.25rem] flex items-center justify-between p-3.5 sm:p-4 rounded-[1.5rem] border transition-all ${
+                <button
+                  type="button"
+                  onClick={() => onSelectCategory?.(col.id)}
+                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-[1.25rem] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
                     isDone
-                      ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs"
-                      : "bg-white/40 dark:bg-white/5 border-white/40 dark:border-white/10 text-foreground"
+                      ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs hover:bg-amber-500/15"
+                      : "bg-white/40 dark:bg-white/5 border-white/40 dark:border-white/10 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
                   }`}
+                  aria-label={`${col.name} - ${isDone ? (isArabic ? "مكتملة" : "Completed") : isArabic ? "غير مكتملة" : "Not completed"}`}
                 >
-                  {/* Left (or Right in RTL): Routine Icon + Name + Meta */}
-                  <div className="flex items-center gap-3">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 dark:bg-white/10 shadow-2xs">
+                  {/* Routine Icon + Name */}
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 dark:bg-white/10 shadow-2xs shrink-0">
                       {col.icon}
                     </div>
-                    <div>
-                      <h4 className="text-[1rem] font-bold text-foreground leading-snug">{col.name}</h4>
-                      <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                        {isDone ? (
-                          <span className="text-emerald-600 dark:text-emerald-400">
-                            {isArabic ? "مكتملة" : "Completed"}
-                          </span>
-                        ) : (
-                          <span className="text-amber-600 dark:text-amber-400">
-                            {isArabic ? "غير مكتملة" : "Not completed"}
-                          </span>
-                        )}
-                      </span>
-                    </div>
+                    <span className="text-[1rem] font-bold text-foreground truncate">{col.name}</span>
                   </div>
 
-                  {/* Right (or Left in RTL): Counts, Time, Action Button */}
-                  <div className="flex items-center gap-3 sm:gap-4">
-                    <div className="hidden sm:flex flex-col items-end text-end">
-                      <span className="text-[0.75rem] font-bold text-muted-foreground">{col.meta}</span>
-                      <span className="text-[0.6875rem] font-semibold text-muted-foreground/80">{col.time}</span>
-                    </div>
-
-                    {isDone ? (
-                      <button
-                        type="button"
-                        onClick={() => onSelectCategory?.(col.id)}
-                        className="interactive-elem px-3.5 py-1.5 min-h-[44px] text-[0.8125rem] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-full shadow-2xs hover:bg-emerald-500/25 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 flex items-center gap-1.5"
-                      >
-                        <Check size={16} strokeWidth={2.5} />
-                        <span>{isArabic ? "مكتملة" : "Completed"}</span>
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => onSelectCategory?.(col.id)}
-                        className="interactive-elem px-4 py-2 min-h-[44px] text-[0.8125rem] font-extrabold bg-amber-500 text-slate-950 rounded-full shadow-sm hover:bg-amber-400 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                      >
-                        {isArabic ? "ابدأ الآن" : "Start now"}
-                      </button>
-                    )}
-
-                    <button
-                      type="button"
-                      onClick={() => onSelectCategory?.(col.id)}
-                      aria-label={col.name}
-                      className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl text-muted-foreground/60 hover:text-foreground hover:bg-white/40 dark:hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
-                    >
-                      {isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-                    </button>
+                  {/* Leaf Indicator + Chevron */}
+                  <div className="flex items-center gap-3 shrink-0">
+                    <GoldenLeafMark size={22} filled={isDone} />
+                    <span className="text-muted-foreground/60">
+                      {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
+                    </span>
                   </div>
-                </div>
+                </button>
               </li>
             );
           })}
@@ -245,7 +163,7 @@ export function ProgressDayView({
 
         {/* Motivational Quote Pill Banner */}
         <div className="w-full rounded-[1.25rem] border border-white/40 dark:border-white/10 bg-white/40 dark:bg-white/5 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
-          <p className="text-[0.875rem] font-bold text-foreground">
+          <p className="text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground">
             {isArabic
               ? "« القليل الدائم، خير من الكثير المنقطع »"
               : "« Consistent small deeds are better than intermittent large ones »"}
