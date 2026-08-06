@@ -364,7 +364,7 @@ export function HomeScreen({
                         onSetRoutineMode?.(reminderInfo.categoryId, "complete");
                       }
                     }}
-                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] ${
+                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       reminderMode === "complete"
                         ? "bg-[#d99f43] text-[#141a2a] shadow-md"
                         : "text-white/80 hover:text-white"
@@ -380,7 +380,7 @@ export function HomeScreen({
                         onSetRoutineMode?.(reminderInfo.categoryId, "core");
                       }
                     }}
-                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] ${
+                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                       reminderMode === "core"
                         ? "bg-[#d99f43] text-[#141a2a] shadow-md"
                         : "text-white/80 hover:text-white"
@@ -431,7 +431,7 @@ export function HomeScreen({
                   onClick={() => {
                     onResume(reminderInfo.categoryId);
                   }}
-                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#fbbf24] focus-visible:ring-offset-2 cursor-pointer group"
+                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer group"
                 >
                   <span>{ctaLabel}</span>
                   {direction === "rtl" ? (

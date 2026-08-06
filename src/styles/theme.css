@@ -40,6 +40,12 @@
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: #d7a528;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
 }
 
 .dark,
@@ -71,6 +77,12 @@
   --nav-active: #d4a020;
   --nav-inactive: #b0aed0;
   --counter-zone: #171717;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
 }
 
 .light-mode,
@@ -102,6 +114,12 @@
   --nav-active: #835806;
   --nav-inactive: #8e8aaa;
   --counter-zone: #f2eee9;
+  --success: #14663d;
+  --success-foreground: #ffffff;
+  --warning: #8a5a0a;
+  --warning-foreground: #ffffff;
+  --info: #1f5fa8;
+  --info-foreground: #ffffff;
 }
 
 .theme-midnight {
@@ -132,11 +150,15 @@
   --nav-active: #d4a020;
   --nav-inactive: #b0aed0;
   --counter-zone: #111b35;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
 }
 
 :root {
-  --success: #5ec88a;
-  --warning: #b87b10;
   --sleep: #9f7aea;
   --ds-control-height-compact: 2.75rem;
   --ds-control-height: 3rem;
@@ -148,8 +170,20 @@
   --ds-radius-card: 1.25rem;
   --ds-radius-overlay: 1.5rem;
   --ds-focus-width: 3px;
+  --ds-focus-offset: 2px;
   --radius-full: 9999px;
+  /* Two elevation levels only, per docs/DESIGN_SYSTEM.md. Raised = cards/rows;
+     overlay = sheets/dialogs/menus. Values reused from the pre-existing
+     glass-card and reference-dialog shadows so no surface visibly jumps. */
+  --ds-shadow-raised: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.4);
 }
+
+/* --border/--border-subtle and --input/--border-control are intentionally
+   identical per theme today (two visual weights expressed as four names: a
+   passive separator pair and a stronger control-boundary pair). Keep both
+   pairs distinct if a future theme needs to diverge them; don't treat the
+   duplication as a bug. */
 
 body {
   font-family: var(--font-ui-latin);
@@ -241,6 +275,12 @@ textarea {
   --input-background: #111111;
   --switch-background: #ffffff;
   --ring: #ffd75e;
+  --success: #6fe0a0;
+  --success-foreground: #000000;
+  --warning: #ffc93c;
+  --warning-foreground: #000000;
+  --info: #7cc0ff;
+  --info-foreground: #000000;
 }
 
 .bold-text {
@@ -286,12 +326,20 @@ textarea {
   --color-input-background: var(--input-background);
   --color-switch-background: var(--switch-background);
   --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
   --radius-sm: var(--ds-radius-small);
   --radius-md: var(--ds-radius-small);
   --radius-lg: var(--ds-radius-control);
   --radius-xl: var(--ds-radius-control);
   --radius-2xl: var(--ds-radius-card);
   --radius-3xl: var(--ds-radius-overlay);
+  --shadow-raised: var(--ds-shadow-raised);
+  --shadow-overlay: var(--ds-shadow-overlay);
 }
 
 @layer utilities {
@@ -1528,30 +1576,6 @@ a[href]:not(.no-press):active,
   }
 }
 
-/* Word-Meaning Dialog */
-@media (min-width: 37.5rem) {
-  .word-meaning-dialog-positioner {
-    position: fixed;
-    inset: 0;
-    z-index: 50;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 1.5rem;
-  }
-  .word-meaning-dialog {
-    width: min(640px, calc(100vw - 48px));
-    max-height: min(85dvh, 720px);
-    border-radius: 1.5rem;
-    background: var(--background);
-    border: 1px solid var(--border);
-    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
-}
-
 /* Nav Rail & Sidebar Styles */
 .nav-rail-item {
   display: flex;
@@ -1720,8 +1744,10 @@ a[href]:not(.no-press):active,
   mix-blend-mode: color-burn;
 }
 
-/* Universal Glassmorphic Card Backdrop & Styling */
-.bg-card,
+/* Glassmorphic Card Backdrop & Styling — opt-in only (DEC-003: functional/
+   devotional content uses stable opaque surfaces). .bg-card itself stays
+   opaque; reach for .glass-card/.wird-card explicitly on decorative,
+   non-functional surfaces only. */
 .glass-card,
 .wird-card {
   backdrop-filter: blur(16px);

@@ -310,7 +310,7 @@ export function ReaderReferenceSheet({
           className="fixed inset-0 border-none bg-black/60 backdrop-blur-md cursor-default animate-in fade-in-0 duration-200"
           onClick={onClose}
         />
-        <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+        <div className="relative z-10 flex flex-col w-full max-w-[var(--content-reading)] max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
           <ReferenceContent
             zikr={zikr}
             language={language}

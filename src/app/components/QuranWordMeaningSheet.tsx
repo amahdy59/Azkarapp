@@ -183,7 +183,7 @@ export function QuranWordMeaningSheet({
           onClick={onClose}
         />
         {/* Dialog card */}
-        <div className="relative z-10 flex flex-col w-full max-w-2xl max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
+        <div className="relative z-10 flex flex-col w-full max-w-[var(--content-reading)] max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
           <WordMeaningContent
             meanings={meanings}
             language={language}

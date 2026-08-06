@@ -98,3 +98,139 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** Progress microcopy and garden states emphasize reflection over punishment.
 - **Tests/evidence required:** ProgressScreen content review and i18n copy verification.
 - **Supersedes:** None
+
+---
+
+## DEC-006 — Status token scope (success/warning/info)
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02
+- **Context:** `--success`/`--warning` existed as a single global (non-theme-aware) pair, unused anywhere in `src`, and would fail AA contrast if ever used as text on the light theme. No `--info` token existed despite being documented as a required semantic family.
+- **Options considered:** Leave as-is until a component needs them; make theme-aware now with paired `-foreground` tokens.
+- **Decision:** Made `--success`/`--warning`/`--info` theme-aware (base/dark/light/midnight/high-contrast) with paired `-foreground` tokens, mapped into `@theme inline` as `bg-success`/`text-warning`/etc. utilities.
+- **Why:** Prevents the next component that reaches for a status color from either failing contrast on light theme or bypassing the token system with a raw Tailwind palette color (as `ProgressViews.tsx`/`RoutineGarden.tsx` already had).
+- **Consequences:** New hex values on light theme were hand-computed against the WCAG luminance formula, not verified with an automated tool — flagged for manual verification.
+- **Files/contracts to update:** `src/styles/theme.css`, `docs/DESIGN_SYSTEM.md`, `docs/agent/DESIGN_SYSTEM_DELTA.md`.
+- **Tests/evidence required:** Contrast verification with a real tool before/soon after release; `theme.test.ts` token assertions.
+- **Supersedes:** None
+
+---
+
+## DEC-007 — `bg-card` opaque by default (DEC-003 reconciliation)
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** User (asked directly during Phase 02 implementation)
+- **Related phase:** Phase 02
+- **Context:** DEC-003 approved stable opaque surfaces for functional/devotional content, but `theme.css` applied `backdrop-filter: blur(16px)` to `.bg-card` itself — the utility nearly every card in the app uses — making glassmorphism the default, not an opt-in, which conflicted with DEC-003 and with `docs/DESIGN_SYSTEM.md`'s "Opaque, high-contrast cards" line.
+- **Options considered:** (a) Make `bg-card` opaque by default, move blur to an explicit `.glass-card`/`.wird-card` opt-in; (b) keep `bg-card` translucent, reinterpret DEC-003 as Reader/counter-only; (c) per-surface-type decision.
+- **Decision:** Option (a) — `bg-card` is opaque by default; `.glass-card`/`.wird-card` remain the explicit opt-in for decorative, non-functional surfaces only.
+- **Why:** Directly matches DEC-003's language and `docs/DESIGN_SYSTEM.md`'s existing "Opaque, high-contrast cards" contract; lowest contrast risk.
+- **Consequences:** Visual look of most cards app-wide changes (loses backdrop blur) unless they explicitly opt into `.glass-card`/`.wird-card`.
+- **Files/contracts to update:** `src/styles/theme.css`, `docs/DESIGN_SYSTEM.md`.
+- **Tests/evidence required:** Before/after screenshots across Light/Dark/Midnight.
+- **Supersedes:** None (reconciles ambiguity left open by DEC-003)
+
+---
+
+## DEC-008 — Shadow/elevation token set
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02
+- **Context:** No shadow token existed; components used Tailwind's raw default shadow scale ad hoc (`shadow-sm`/`-lg`/`-xl`/`-2xl` all appeared on nominally-equivalent card surfaces), conflicting with `docs/DESIGN_SYSTEM.md`'s "three levels only" elevation rule.
+- **Options considered:** Full elevation redesign with new values; smallest-delta token set reusing existing shadow values already in use.
+- **Decision:** Added exactly two new tokens, `--ds-shadow-raised`/`--ds-shadow-overlay`, mapped to `shadow-raised`/`shadow-overlay` Tailwind utilities, using the pre-existing `.glass-card` and `.word-meaning-dialog` shadow values so no surface's shadow visibly changes yet.
+- **Why:** Makes the documented "three levels" (flat/raised/overlay) achievable without inventing new visual values or a redesign.
+- **Consequences:** Existing `shadow-lg`/`shadow-xl`/etc. call sites are not migrated yet — deferred to Phase 03 as a wide, low-risk find/replace.
+- **Files/contracts to update:** `src/styles/theme.css`, `docs/DESIGN_SYSTEM.md`.
+- **Tests/evidence required:** Visual check once Phase 03 migrates call sites.
+- **Supersedes:** None
+
+---
+
+## DEC-009 — Focus-ring color-token bypass fix
+
+- **Date:** 2026-08-06
+- **Status:** Approved (implemented — color only; width/opacity normalization deferred, see DEC-013)
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02
+- **Context:** `HomeScreen.tsx` (reminder toggle, primary CTA), `TasbeehCounterButton.tsx`, `ProgressViews.tsx`, and `RoutineGarden.tsx` used a raw hex (`#fbbf24`) or raw Tailwind palette color (`amber-500`) for their focus ring instead of the `--ring` token, meaning colorblind-support mode (which remaps `--ring`) gave zero benefit on those controls.
+- **Options considered:** Fix only the token bypass now; bundle with a full width/opacity normalization across all ~30 files with a `focus-visible:ring-*` override.
+- **Decision:** Fixed the token bypass only (7 call sites → `ring-ring`); left width (`ring-1`/`ring-2`/`ring-[3px]`) and opacity (`ring-ring`/`ring-ring/40`/`ring-ring/50`) variance untouched.
+- **Why:** The color bypass is an unambiguous accessibility defect (breaks an already-shipped colorblind feature). The width/opacity question is cosmetic and touches far more files with genuine judgment calls (e.g. scroll-container vs. primary-control treatment) — bundling it risked a rushed, under-reviewed pass across ~30 files.
+- **Consequences:** Focus rings are now always token-colored; visible width/opacity is still inconsistent app-wide pending DEC-013.
+- **Files/contracts to update:** `src/app/screens/HomeScreen.tsx`, `src/app/components/TasbeehCounterButton.tsx`, `src/app/components/ProgressViews.tsx`, `src/app/components/RoutineGarden.tsx`.
+- **Tests/evidence required:** `pnpm test:e2e` (accessibility, responsive suites).
+- **Supersedes:** None
+
+---
+
+## DEC-010 — Reader/modal max-width compliance fix
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02 / Phase 07
+- **Context:** `QuranWordMeaningSheet.tsx` and `ReaderReferenceSheet.tsx` used `max-w-2xl` (672px) for their desktop dialog variant, exceeding DEC-004's approved ~430–600px cap. A separate, orphaned `.word-meaning-dialog` CSS rule (640px, unreferenced by any component) also would have violated the cap had it ever been wired up.
+- **Options considered:** Leave as-is; cap both dialogs at the DEC-004 limit and delete the orphaned CSS.
+- **Decision:** Both dialogs now use `max-w-[var(--content-reading)]` (600px, the same token `.reader-column` uses). The orphaned `.word-meaning-dialog`/`.word-meaning-dialog-positioner` CSS was deleted.
+- **Why:** Brings implementation in line with an already-approved decision; reuses the existing token instead of a new magic number.
+- **Consequences:** Desktop word-meaning and reference dialogs are narrower (600px vs. 672px).
+- **Files/contracts to update:** `src/app/components/QuranWordMeaningSheet.tsx`, `src/app/components/ReaderReferenceSheet.tsx`, `src/styles/theme.css`.
+- **Tests/evidence required:** Tablet/desktop visual check of both dialogs.
+- **Supersedes:** None
+
+---
+
+## DEC-011 — Remove duplicate hard-coded palette (`theme.ts` `T` object)
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02
+- **Context:** `src/app/theme.ts` exported a second, hand-maintained hex palette (`T`) duplicating `theme.css`'s values, with 24 of its 26 properties unused — a drift risk if either file were edited without the other.
+- **Options considered:** Keep for potential future use; remove and inline the two values actually consumed.
+- **Decision:** Removed `T`; the `theme-color` meta tag now uses two inlined literals with a comment pointing to `theme.css` as the source of truth.
+- **Why:** Eliminates a second source of truth for colors that was already drifting (unused) from the real token file.
+- **Consequences:** None — values were already identical; PWA `theme-color` behavior is unchanged.
+- **Files/contracts to update:** `src/app/theme.ts`.
+- **Tests/evidence required:** `pnpm typecheck`, manual PWA chrome-color spot check.
+- **Supersedes:** None
+
+---
+
+## DEC-012 — Border-token aliasing documented, not collapsed
+
+- **Date:** 2026-08-06
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 02 analysis)
+- **Related phase:** Phase 02
+- **Context:** `--border`/`--border-subtle` and `--input`/`--border-control` are set to identical values in every theme — four token names expressing two visual weights.
+- **Options considered:** Collapse to two token names (wider rename across every consumer); keep four names with a comment documenting the intentional aliasing.
+- **Decision:** Kept all four names; added a comment in `theme.css` explaining the aliasing is intentional (a passive-separator pair and a stronger control-boundary pair) so it isn't "fixed" as a bug later.
+- **Why:** Lowest-risk option; a rename touches every consumer of these tokens for a purely cosmetic naming cleanup.
+- **Consequences:** None functionally; a future theme could diverge the two pairs if needed.
+- **Files/contracts to update:** `src/styles/theme.css`.
+- **Tests/evidence required:** None (comment-only change).
+- **Supersedes:** None
+
+---
+
+## DEC-013 — Focus-ring width/opacity mechanism normalization (deferred)
+
+- **Date:** 2026-08-06
+- **Status:** Proposed
+- **Owner:** Unassigned
+- **Related phase:** Phase 02 (follow-up) / Phase 03
+- **Context:** Roughly 30 files apply `focus-visible:ring-*` overrides with at least 4 different widths (`ring-1`/`ring-2`/`ring-[2px]`/`ring-[3px]`) and inconsistent opacity (`ring-ring`, `ring-ring/40`, `ring-ring/50`), on top of the shared `Button` primitive's own distinct border+translucent-ring treatment. `--ds-focus-offset: 2px` was added in Phase 02 as a token to converge on.
+- **Options considered:** Standardize on the existing global `outline`-based `:focus-visible` rule (already token-driven, zero per-component classes needed); standardize on the Tailwind `ring-*` box-shadow approach app-wide instead.
+- **Decision:** Not yet made — flagged as the highest-blast-radius item from the Phase 02 analysis and deliberately excluded from this phase's diff.
+- **Why:** ~30-file mechanical change deserves its own reviewable, revertible commit rather than being bundled with unrelated token work.
+- **Consequences:** Focus-ring width/opacity remains visually inconsistent across the app until this is resolved.
+- **Files/contracts to update:** TBD — depends on which mechanism is chosen.
+- **Tests/evidence required:** Full `pnpm test:e2e` re-run (interacts with keyboard-navigation and accessibility suites).
+- **Supersedes:** None

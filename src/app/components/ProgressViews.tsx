@@ -133,7 +133,7 @@ export function ProgressDayView({
                 <button
                   type="button"
                   onClick={() => onSelectCategory?.(col.id)}
-                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
+                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
                     isDone
                       ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs hover:bg-amber-500/15"
                       : "bg-muted/40 border-border/40 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
@@ -558,7 +558,7 @@ export function ProgressMonthView({
                       : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 3` : "Unstarted"}`
                   }
                   aria-pressed={isSelected}
-                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     isSelected
                       ? "border-amber-500 ring-2 ring-amber-500/50 bg-amber-500/20 scale-105 z-10"
                       : isPalm

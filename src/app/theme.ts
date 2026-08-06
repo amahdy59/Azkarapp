@@ -1,34 +1,11 @@
 import type { AppLanguage, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
 import { t } from "./i18n";
 
-export const T = {
-  bg: "#0A1228",
-  surface: "#111B35",
-  surfaceEl: "#182040",
-  gold: "#C8941A",
-  goldLight: "#E8B420",
-  teal: "#1A7060",
-  tealBg: "#0A2B25",
-  textPrimary: "#F5F0E8",
-  textSec: "#D4D0E0",
-  textMuted: "#9290B0",
-  border: "#182040",
-  success: "#2D7A50",
-  danger: "#C0392B",
-  bgLight: "#F8F5F0",
-  surfLight: "#FFFFFF",
-  surfElLight: "#F2EEE9",
-  goldDark: "#A87614",
-  textDarkL: "#1A1228",
-  textSecL: "#4A4570",
-  textMutedL: "#8E8AAA",
-  borderLight: "#E5E0D8",
-} as const;
-
 const PRODUCT_THEME_CLASSES = ["theme-midnight", "theme-light", "theme-dark"] as const;
+/** Mirrors the --background value per theme in src/styles/theme.css, for the theme-color meta tag. */
 const THEME_BACKGROUND: Record<ThemeMode, string> = {
-  midnight: T.bg,
-  light: T.bgLight,
+  midnight: "#0A1228",
+  light: "#F8F5F0",
   dark: "#0D0D0D",
 };
 

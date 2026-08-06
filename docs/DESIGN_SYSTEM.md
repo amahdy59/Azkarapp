@@ -48,7 +48,7 @@ Rules:
 
 - Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets. Documented set: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
 - Radius roles are 8 px for compact internal elements, 12-14 px for controls, 16-20 px for standard cards, and 24 px for major containers and sheets. Full-radius for chips and compact segmented controls only.
-- Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card.
+- Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
 - Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.
 - Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs and toggles. Meaningful control boundaries must reach 3:1 non-text contrast.
 - All focusable controls use the semantic ring color and a 3 px visible focus indicator.
@@ -65,12 +65,12 @@ Gold should not be the default for small text, low-contrast metadata, every icon
 
 Semantic tokens are defined for:
 
-- Background and Surface (Opaque, high-contrast cards and reading areas)
+- Background and Surface (Opaque, high-contrast cards and reading areas). `bg-card` is opaque by default in every theme; the blurred/translucent glass treatment (`.glass-card`/`.wird-card`) is an explicit opt-in reserved for decorative, non-functional surfaces, never the default for functional or devotional content.
 - Text strong/default/muted
 - Primary and on-primary
 - Border passive/control
 - Focus
-- Success/warning/error/info
+- Success/warning/error/info — `--success`/`--warning`/`--info`/`--destructive` each ship with a paired `-foreground` token, defined per theme (including light theme, where the saturated hue is darkened to hold AA text/badge contrast) and mapped to `bg-success`/`text-warning`/etc. Tailwind utilities.
 - Progress track/fill
 - Scrim
 

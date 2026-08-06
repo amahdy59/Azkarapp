@@ -6,8 +6,11 @@
 @import "tw-animate-css";
 
 @theme {
-  --radius-card: 1rem;
-  --radius-btn: 0.75rem;
-  --radius-sheet: 1.5rem;
   --spacing-page: 1rem;
+}
+
+@theme inline {
+  /* rounded-btn aliases the control radius so button-radius controls stay
+     consistent with the rest of the geometry scale (theme.css). */
+  --radius-btn: var(--ds-radius-control);
 }
