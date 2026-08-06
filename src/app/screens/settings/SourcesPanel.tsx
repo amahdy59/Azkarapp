@@ -32,7 +32,7 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           body={t(language, "sources.interpretationBody")}
         />
 
-        <section className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
+        <section className="rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
           <div className="flex items-start gap-3">
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
               <MessageChat size={20} aria-hidden="true" />

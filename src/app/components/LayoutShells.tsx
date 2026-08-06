@@ -81,7 +81,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
   return (
     <nav
       aria-label={t(language, "common.bottomNavigation")}
-      className="flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-[0_-1px_3px_rgba(0,0,0,0.05)]"
+      className="flex h-[calc(4.5rem+env(safe-area-inset-bottom))] shrink-0 bg-card pb-[env(safe-area-inset-bottom)] shadow-sm"
     >
       <div className="flex min-h-0 flex-1 items-center justify-between px-2 min-[390px]:px-6">
         {tabs.map(({ id, label, Icon }) => {

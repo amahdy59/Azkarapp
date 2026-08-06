@@ -73,12 +73,12 @@ export function TranquilityCompletionCard({
 
         {/* Diamond Separator */}
         <div className="flex w-full items-center gap-3 opacity-60">
-          <div className="h-px flex-1 bg-[#64748b]" />
-          <div className="flex items-center gap-1.5 text-[#fbbf24]">
-            <span className="size-2 rotate-45 bg-[#fbbf24]" />
-            <span className="size-2 rotate-45 bg-[#fbbf24]" />
+          <div className="h-px flex-1 bg-border-subtle" />
+          <div className="flex items-center gap-1.5 text-primary">
+            <span className="size-2 rotate-45 bg-primary" />
+            <span className="size-2 rotate-45 bg-primary" />
           </div>
-          <div className="h-px flex-1 bg-[#64748b]" />
+          <div className="h-px flex-1 bg-border-subtle" />
         </div>
 
         {/* Quranic Quote Card */}
@@ -96,7 +96,7 @@ export function TranquilityCompletionCard({
           type="button"
           onClick={() => onReview(categoryId)}
           dir={direction}
-          className="interactive-elem group flex h-[48px] w-full items-center justify-center gap-2 rounded-[16px] bg-[#d4a020] px-5 text-[0.9375rem] font-bold text-[#050914] shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
+          className="interactive-elem group flex h-[48px] w-full items-center justify-center gap-2 rounded-2xl bg-primary px-5 text-[0.9375rem] font-bold text-primary-foreground shadow-lg hover:bg-amber-400 active:scale-[0.99] transition-all"
           aria-label={reviewLabel}
         >
           <svg

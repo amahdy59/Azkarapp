@@ -102,7 +102,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="offline-content-title"
         >
           <div className="flex items-start gap-3">
@@ -124,7 +124,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         </section>
 
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="offline-status-title"
         >
           <div className="flex items-start gap-3">
@@ -197,7 +197,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         </section>
 
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="audio-downloads-title"
         >
           <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">

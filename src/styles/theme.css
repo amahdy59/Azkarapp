@@ -17,7 +17,7 @@
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
   --background: #080808;
   --foreground: #f2f2ea;
-  --card: rgba(14, 14, 18, 0.72);
+  --card: #0c0c0c;
   --card-foreground: #e3e8f2;
   --popover: #0c0c0c;
   --popover-foreground: #f2f2ea;
@@ -47,7 +47,7 @@
   color-scheme: dark;
   --background: #0d0d0d;
   --foreground: #f5f0e8;
-  --card: rgba(23, 23, 23, 0.72);
+  --card: #171717;
   --card-foreground: #d4d0e0;
   --popover: #171717;
   --popover-foreground: #f5f0e8;
@@ -78,7 +78,7 @@
   color-scheme: light;
   --background: #f8f5f0;
   --foreground: #171717;
-  --card: rgba(255, 255, 255, 0.72);
+  --card: #ffffff;
   --card-foreground: #4a4570;
   --popover: #ffffff;
   --popover-foreground: #171717;
@@ -108,7 +108,7 @@
   color-scheme: dark;
   --background: #0a1228;
   --foreground: #f5f0e8;
-  --card: rgba(17, 27, 53, 0.72);
+  --card: #111b35;
   --card-foreground: #d4d0e0;
   --popover: #111b35;
   --popover-foreground: #f5f0e8;
@@ -1385,7 +1385,7 @@ a[href]:not(.no-press):active,
 
 /* Adaptive Layout Tokens */
 :root {
-  --content-reading: 46rem;
+  --content-reading: 37.5rem;
   --content-form: 40rem;
   --content-dashboard: 90rem;
   --content-app-shell: 100rem;

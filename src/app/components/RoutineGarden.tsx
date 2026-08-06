@@ -209,7 +209,7 @@ export function PalmTreeReward({
     const hasPalms = summary.lifetimePalms > 0;
     return (
       <div
-        className="flex w-full items-center justify-between rounded-[20px] border border-white/15 bg-black/25 px-4 py-2 backdrop-blur-md"
+        className="flex w-full items-center justify-between rounded-2xl border border-white/15 bg-black/25 px-4 py-2 backdrop-blur-md"
         aria-label={
           isArabic
             ? `أشجار النخيل: ${formatNumerals(summary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(todayLeaves, language)} من ${formatNumerals(maxLeaves, language)}، السلسلة اليومية: ${formatNumerals(streak, language)} أيام`
@@ -219,12 +219,12 @@ export function PalmTreeReward({
         {/* Streak — start side */}
         <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
           <span
-            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasStreak ? "text-[#fbbf24]" : "text-white/40 opacity-60"}`}
+            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasStreak ? "text-primary" : "text-white/40 opacity-60"}`}
           >
             {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
           </span>
           <Zap
-            className={`h-[1rem] w-[1rem] ${hasStreak ? "text-[#fbbf24]" : "text-white/40"}`}
+            className={`h-[1rem] w-[1rem] ${hasStreak ? "text-primary" : "text-white/40"}`}
             strokeWidth={2.5}
             aria-hidden="true"
           />
@@ -232,9 +232,9 @@ export function PalmTreeReward({
 
         {/* Palms — end side */}
         <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
-          <PalmTreeMark size={18} filled={hasPalms} className={hasPalms ? "text-[#fbbf24]" : "text-white/40"} />
+          <PalmTreeMark size={18} filled={hasPalms} className={hasPalms ? "text-primary" : "text-white/40"} />
           <span
-            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasPalms ? "text-[#fbbf24]" : "text-white/40 opacity-60"}`}
+            className={`whitespace-nowrap text-[0.875rem] font-black leading-tight font-sans ${hasPalms ? "text-primary" : "text-white/40 opacity-60"}`}
           >
             {formatNumerals(summary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
           </span>
@@ -516,7 +516,7 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          <div className="mb-4 flex items-center justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-xl">
+          <div className="mb-4 flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-xl">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}
@@ -556,7 +556,7 @@ export function TodayRoutineGarden({
       )}
 
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-around rounded-[2rem] border border-amber-500/30 bg-amber-500/10 py-3 px-3 shadow-sm backdrop-blur-sm dark:bg-amber-500/15">
+        <div className="mb-4 flex items-center justify-around rounded-3xl border border-amber-500/30 bg-amber-500/10 py-3 px-3 shadow-sm backdrop-blur-sm dark:bg-amber-500/15">
           <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
             <Zap
               className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}

@@ -166,7 +166,7 @@ export function CompletionScreen({
         )}
 
         <section
-          className="mt-7 grid grid-cols-2 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5"
+          className="mt-7 grid grid-cols-2 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5"
           aria-label={t(language, "completion.sessionSummary")}
         >
           {stats.map(({ value, label }, index) => (

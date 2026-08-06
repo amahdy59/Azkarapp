@@ -115,7 +115,7 @@ export function ProgressDayView({
   return (
     <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
       {/* Main Today's Wird Container Card */}
-      <div className="w-full rounded-[2rem] bg-card border border-white/40 dark:border-white/10 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
+      <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
         {/* Title and subtitle */}
         <div className="flex flex-col items-center text-center mb-5">
           <h3 className="text-[1.375rem] md:text-[1.5rem] font-black text-foreground tracking-tight mb-1">
@@ -133,10 +133,10 @@ export function ProgressDayView({
                 <button
                   type="button"
                   onClick={() => onSelectCategory?.(col.id)}
-                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-[1.25rem] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
+                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
                     isDone
                       ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs hover:bg-amber-500/15"
-                      : "bg-white/40 dark:bg-white/5 border-white/40 dark:border-white/10 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
+                      : "bg-muted/40 border-border/40 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
                   }`}
                   aria-label={`${col.name} - ${isDone ? (isArabic ? "مكتملة" : "Completed") : isArabic ? "غير مكتملة" : "Not completed"}`}
                 >
@@ -162,7 +162,7 @@ export function ProgressDayView({
         </ul>
 
         {/* Motivational Quote Pill Banner */}
-        <div className="w-full rounded-[1.25rem] border border-white/40 dark:border-white/10 bg-white/40 dark:bg-white/5 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
+        <div className="w-full rounded-2xl border border-border/40 bg-muted/40 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
           <p className="text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground">
             {isArabic
               ? "« القليل الدائم، خير من الكثير المنقطع »"
@@ -203,7 +203,7 @@ export function ProgressWeekView({
       {/* Top 3 Stat Cards */}
       <div className="grid grid-cols-3 gap-3">
         {/* Most Missed Routine Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Moon size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أكثر ورد فاتك" : "Most missed"}
@@ -212,7 +212,7 @@ export function ProgressWeekView({
         </div>
 
         {/* Best Streak Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أفضل سلسلة" : "Best streak"}
@@ -224,7 +224,7 @@ export function ProgressWeekView({
         </div>
 
         {/* Completed Days Card */}
-        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <CheckCircle2 size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أيام مكتملة" : "Completed days"}
@@ -237,7 +237,7 @@ export function ProgressWeekView({
       </div>
 
       {/* Main Weekly Commitment Matrix Card */}
-      <div className="w-full rounded-[2rem] bg-card border border-white/40 dark:border-white/10 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
+      <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-xl shadow-black/5 backdrop-blur-xl">
         <h3 className="text-[1.125rem] md:text-[1.25rem] font-black text-foreground mb-4 text-start">
           {isArabic ? "التزامك هذا الأسبوع" : "Your commitment this week"}
         </h3>
@@ -354,7 +354,7 @@ export function ProgressWeekView({
       {/* Bottom Row: Insight Card & Routine Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insight Card */}
-        <div className="p-5 rounded-[1.75rem] bg-emerald-500/10 border border-emerald-500/30 shadow-lg shadow-black/5 backdrop-blur-xl flex items-center gap-4">
+        <div className="p-5 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 shadow-lg shadow-black/5 backdrop-blur-xl flex items-center gap-4">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shrink-0">
             <Sparkles size={24} />
           </div>
@@ -373,7 +373,7 @@ export function ProgressWeekView({
         </div>
 
         {/* Routine Summary Progress Bars Card */}
-        <div className="p-5 rounded-[1.75rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl flex flex-col justify-center gap-3">
+        <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl flex flex-col justify-center gap-3">
           <h4 className="text-[0.875rem] font-black text-foreground mb-1">
             {isArabic ? "ملخص الأوراد هذا الأسبوع" : "Weekly routines summary"}
           </h4>
@@ -476,7 +476,7 @@ export function ProgressMonthView({
       {/* Top 4 Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Best Routine */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Sun size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أفضل ورد" : "Best routine"}
@@ -487,7 +487,7 @@ export function ProgressMonthView({
         </div>
 
         {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أطول سلسلة" : "Longest streak"}
@@ -498,7 +498,7 @@ export function ProgressMonthView({
         </div>
 
         {/* Full Days */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Calendar size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أيام كاملة" : "Full days"}
@@ -509,7 +509,7 @@ export function ProgressMonthView({
         </div>
 
         {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Sprout size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "معدل الاكتمال" : "Completion rate"}
@@ -525,7 +525,7 @@ export function ProgressMonthView({
         {/* Calendar Grid Card (2 Columns on desktop) */}
         <div
           data-testid="garden-month-calendar"
-          className="md:col-span-2 p-5 rounded-[2rem] bg-card border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 backdrop-blur-xl"
+          className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-xl shadow-black/5 backdrop-blur-xl"
         >
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-2 text-center">
@@ -558,7 +558,7 @@ export function ProgressMonthView({
                       : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 3` : "Unstarted"}`
                   }
                   aria-pressed={isSelected}
-                  className={`flex flex-col items-center justify-center aspect-square rounded-[1rem] border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
+                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 ${
                     isSelected
                       ? "border-amber-500 ring-2 ring-amber-500/50 bg-amber-500/20 scale-105 z-10"
                       : isPalm
@@ -610,7 +610,7 @@ export function ProgressMonthView({
         {/* Selected Day Details & Monthly Insight Card (1 Column on desktop) */}
         <div className="flex flex-col gap-4">
           {/* Day Details Card */}
-          <div className="p-5 rounded-[2rem] bg-card border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col gap-3">
+          <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col gap-3">
             <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
               <div>
                 <h4 className="text-[0.9375rem] font-black text-foreground">
@@ -626,7 +626,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Morning Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-amber-500" />
                 <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار الصباح" : "Morning Azkar"}</span>
@@ -641,7 +641,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Evening Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-orange-500" />
                 <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار المساء" : "Evening Azkar"}</span>
@@ -656,7 +656,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Sleep Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Moon size={16} className="text-indigo-400" />
                 <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار النوم" : "Sleep Azkar"}</span>
@@ -672,7 +672,7 @@ export function ProgressMonthView({
           </div>
 
           {/* Month Improvement Insight */}
-          <div className="p-4 rounded-[1.75rem] bg-emerald-500/10 border border-emerald-500/30 shadow-lg shadow-black/5 backdrop-blur-xl flex items-start gap-3">
+          <div className="p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 shadow-lg shadow-black/5 backdrop-blur-xl flex items-start gap-3">
             <Sprout size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <h5 className="text-[0.875rem] font-black text-foreground mb-1">
@@ -716,7 +716,7 @@ export function ProgressYearView({
       {/* Top 4 Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Completion Rate */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Sprout size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "معدل الاكتمال" : "Completion rate"}
@@ -727,7 +727,7 @@ export function ProgressYearView({
         </div>
 
         {/* Longest Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Star size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أطول سلسلة" : "Longest streak"}
@@ -738,7 +738,7 @@ export function ProgressYearView({
         </div>
 
         {/* Current Streak */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "السلسلة الحالية" : "Current streak"}
@@ -749,7 +749,7 @@ export function ProgressYearView({
         </div>
 
         {/* Active Days */}
-        <div className="flex flex-col items-center justify-center p-3.5 rounded-[1.5rem] bg-card border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
+        <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl text-center">
           <Calendar size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {isArabic ? "أيام نشطة" : "Active days"}
@@ -763,7 +763,7 @@ export function ProgressYearView({
       {/* Middle Section: Monthly Bar Chart + Quick Glance */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Monthly Completion Bar Chart (2 Columns on desktop) */}
-        <div className="md:col-span-2 p-5 rounded-[2rem] bg-card border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col">
+        <div className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col">
           <div className="flex items-center justify-between mb-1">
             <h4 className="text-[0.9375rem] font-black text-foreground">
               {isArabic ? "معدل الاكتمال الشهري" : "Monthly completion rate"}
@@ -808,13 +808,13 @@ export function ProgressYearView({
         </div>
 
         {/* Quick Glance Card (1 Column on desktop) */}
-        <div className="p-5 rounded-[2rem] bg-card border border-white/40 dark:border-white/10 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col justify-between gap-3">
+        <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-xl shadow-black/5 backdrop-blur-xl flex flex-col justify-between gap-3">
           <h4 className="text-[0.9375rem] font-black text-foreground border-b border-white/20 dark:border-white/10 pb-2">
             {isArabic ? "نظرة سريعة" : "Quick glance"}
           </h4>
 
           {/* Best Month */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {isArabic ? "أفضل شهر" : "Best month"}
@@ -825,7 +825,7 @@ export function ProgressYearView({
           </div>
 
           {/* Most Consistent Routine */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {isArabic ? "أكثر ورد منتظم" : "Most consistent"}
@@ -838,7 +838,7 @@ export function ProgressYearView({
           </div>
 
           {/* Total Azkar Completed */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-white/40 dark:bg-white/5 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {isArabic ? "إجمالي الأذكار المكتملة" : "Total completed"}
@@ -861,10 +861,10 @@ export function ProgressYearView({
           return (
             <div
               key={idx}
-              className={`p-3 rounded-[1.25rem] bg-card border transition-all ${
+              className={`p-3 rounded-2xl bg-card border transition-all ${
                 isBest
                   ? "border-emerald-500/60 ring-1 ring-emerald-500/40 bg-emerald-500/5 shadow-md"
-                  : "border-white/40 dark:border-white/10"
+                  : "border-border/40"
               }`}
             >
               <div className="flex items-center justify-between mb-1.5 text-[0.75rem] font-extrabold">
@@ -893,7 +893,7 @@ export function ProgressYearView({
       </div>
 
       {/* Motivational Quote / Closing Prayer Card */}
-      <div className="p-4 rounded-[1.75rem] bg-white/40 dark:bg-white/5 border border-white/40 dark:border-white/10 shadow-lg shadow-black/5 backdrop-blur-xl flex items-center justify-center text-center">
+      <div className="p-4 rounded-3xl bg-muted/40 border border-border/40 shadow-lg shadow-black/5 backdrop-blur-xl flex items-center justify-center text-center">
         <p className="text-[0.875rem] font-bold text-foreground">
           {isArabic
             ? "« ما شاء الله! انتظامك هذا العام رائع. استمر في الورد وادعُ أن يجعله الله في ميزان حسناتك »"

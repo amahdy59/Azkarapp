@@ -51,7 +51,7 @@ function ReminderScheduleRow({
 }) {
   const label = t(language, `notifications.${kind}`);
   return (
-    <div className="rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
+    <div className="rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
       <div className="flex items-center gap-3">
         <span
           className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
@@ -301,7 +301,7 @@ export function NotificationsPanel({
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
         {/* Location & Prayer Times Section */}
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="prayer-location-title"
         >
           <div className="flex items-start gap-3">
@@ -495,7 +495,7 @@ export function NotificationsPanel({
         </section>
 
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="notification-availability"
         >
           <div className="flex items-start gap-3">
@@ -517,7 +517,7 @@ export function NotificationsPanel({
         </section>
 
         <section
-          className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
           aria-labelledby="notification-permission"
         >
           <div className="flex items-start gap-3">
@@ -584,7 +584,7 @@ export function NotificationsPanel({
           </div>
           <label
             htmlFor="only-when-incomplete"
-            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-[1.5rem] border border-white/40 dark:border-white/10 bg-card p-4 text-start backdrop-blur-xl shadow-lg shadow-black/5 focus-within:ring-[3px] focus-within:ring-ring"
+            className="mt-3 flex min-h-11 cursor-pointer items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start backdrop-blur-xl shadow-lg shadow-black/5 focus-within:ring-[3px] focus-within:ring-ring"
           >
             <input
               id="only-when-incomplete"

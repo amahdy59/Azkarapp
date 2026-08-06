@@ -46,12 +46,46 @@ Rules:
 
 ## Geometry and control contract
 
-- Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets.
-- Radius roles are 8 px for small elements, 14 px for controls, 20 px for cards, and 24 px for overlays. Pills and circles use the full-radius token.
-- Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px; controls with room should use the regular role.
-- Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs, toggles, outlined buttons, and other boundaries needed to identify an interactive control. Meaningful control boundaries must reach 3:1 non-text contrast against their adjacent surface.
-- All focusable controls use the semantic ring color and a 3 px visible focus indicator. Do not remove focus indication or stack competing ring and outline treatments.
-- Shared `IconButton`, UI `Button`, settings rows, and sheet primitives own these roles. Product screens must not reintroduce one-off sizes, strokes, or radii without documenting an exception here.
+- Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets. Documented set: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
+- Radius roles are 8 px for compact internal elements, 12-14 px for controls, 16-20 px for standard cards, and 24 px for major containers and sheets. Full-radius for chips and compact segmented controls only.
+- Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card.
+- Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.
+- Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs and toggles. Meaningful control boundaries must reach 3:1 non-text contrast.
+- All focusable controls use the semantic ring color and a 3 px visible focus indicator.
+
+## Color roles
+
+Gold should primarily indicate:
+
+- Primary action
+- Selected state
+- Limited brand emphasis
+
+Gold should not be the default for small text, low-contrast metadata, every icon and every border.
+
+Semantic tokens are defined for:
+
+- Background and Surface (Opaque, high-contrast cards and reading areas)
+- Text strong/default/muted
+- Primary and on-primary
+- Border passive/control
+- Focus
+- Success/warning/error/info
+- Progress track/fill
+- Scrim
+
+## Component states
+
+Every interactive component should define:
+
+- Default
+- Hover where applicable
+- Pressed
+- Focus-visible
+- Selected/checked
+- Disabled
+- Loading
+- Error where applicable
 
 ## Reader contract
 
@@ -137,8 +171,10 @@ Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease
 
 ## Responsive shell
 
-- At viewport widths up to 430 px, the app is full-bleed and uses `100vw × 100dvh`.
-- Above 430 px, preserve the centered 390 px mobile design canvas; do not stretch cards or reader content across tablet/desktop widths.
+- Mobile (≤500px): full-width app and bottom navigation.
+- Tablet (501px–1200px): rail/drawer with flexible content.
+- Desktop (≥1200px): responsive content container and persistent sidebar.
+- Reader/focused flows: constrained reading measure (~430px–600px maximum).
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 
 ## Change control

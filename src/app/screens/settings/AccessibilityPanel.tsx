@@ -24,9 +24,7 @@ function PanelOptionButton({ active, label, onClick }: { active: boolean; label:
       onClick={onClick}
       aria-pressed={active}
       className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
-        active
-          ? "border-primary bg-primary text-primary-foreground"
-          : "border-white/40 dark:border-white/10 bg-card text-foreground"
+        active ? "border-primary bg-primary text-primary-foreground" : "border-border/40 bg-card text-foreground"
       }`}
     >
       {label}
@@ -107,7 +105,7 @@ export function AccessibilityPanel({
               className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
                 calendarType === "hijri"
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-white/40 dark:border-white/10 bg-card text-foreground"
+                  : "border-border/40 bg-card text-foreground"
               }`}
             >
               {language === "ar" ? "التقويم الهجري (الافتراضي)" : "Hijri (Default)"}
@@ -117,7 +115,7 @@ export function AccessibilityPanel({
               className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
                 calendarType === "gregorian"
                   ? "border-primary bg-primary text-primary-foreground"
-                  : "border-white/40 dark:border-white/10 bg-card text-foreground"
+                  : "border-border/40 bg-card text-foreground"
               }`}
             >
               {language === "ar" ? "التقويم الميلادي" : "Gregorian"}
@@ -149,10 +147,10 @@ export function AccessibilityPanel({
                   key={option.value}
                   value={option.value}
                   data-testid={`text-size-option-${option.value}`}
-                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-[1.5rem] border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring backdrop-blur-xl shadow-sm ${
+                  className={`relative flex min-h-[76px] flex-col items-center justify-center gap-1 rounded-3xl border px-2 py-2 text-center transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring backdrop-blur-xl shadow-sm ${
                     selected
                       ? "border-primary bg-primary/10 text-foreground"
-                      : "border-white/40 dark:border-white/10 bg-card text-muted-foreground"
+                      : "border-border/40 bg-card text-muted-foreground"
                   }`}
                 >
                   <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
@@ -170,7 +168,7 @@ export function AccessibilityPanel({
           </RadioGroupPrimitive.Root>
         </section>
 
-        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Contrast size={20} className="text-primary" />}
@@ -210,7 +208,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.motion")} />
-        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Pause size={20} className="text-primary" />}
@@ -229,7 +227,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.reading")} />
-        <div className="mx-4 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<TypeIcon size={20} className="text-primary" />}

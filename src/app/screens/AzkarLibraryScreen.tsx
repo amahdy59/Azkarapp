@@ -64,14 +64,14 @@ export function AzkarLibraryScreen({
           <button
             type="button"
             onClick={onSearch}
-            className="interactive-elem mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-white/40 dark:border-white/10 bg-card px-4 text-start text-[0.875rem] text-muted-foreground shadow-lg shadow-black/5 backdrop-blur-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="interactive-elem mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 text-start text-[0.875rem] text-muted-foreground shadow-lg shadow-black/5 backdrop-blur-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={t(language, "library.search")}
           >
             <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
             <span>{t(language, "library.search")}</span>
           </button>
           <div
-            className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-white/40 dark:border-white/10 bg-card p-1 shadow-lg shadow-black/5 backdrop-blur-xl"
+            className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-lg shadow-black/5 backdrop-blur-xl"
             role="tablist"
             aria-label={t(language, "library.title")}
           >
@@ -135,7 +135,7 @@ export function AzkarLibraryScreen({
                         }
                         onCategory(category.id);
                       }}
-                      className="flex min-h-[82px] w-full items-center gap-4 rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={
                         isOccasional
                           ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
@@ -225,7 +225,7 @@ export function AzkarLibraryScreen({
                         }
                         onZikr(zikr.category, index);
                       }}
-                      className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-white/40 dark:border-white/10 bg-card p-4 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border/40 bg-card p-4 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

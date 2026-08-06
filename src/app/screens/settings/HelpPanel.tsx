@@ -20,7 +20,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "help.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
+        <section className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
           <HelpCircle size={24} className="text-primary" aria-hidden="true" />
           <h2 className="mt-3 text-[1.125rem] font-semibold text-foreground">{t(language, "help.introTitle")}</h2>
           <p className="mt-1 text-[0.875rem] leading-6 text-muted-foreground">{t(language, "help.introBody")}</p>
@@ -28,7 +28,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
 
         <div>
           <SectionLabel label={t(language, "help.faq")} />
-          <div className="overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+          <div className="overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
             {FAQ_ITEMS.map(({ question, answer, icon: Icon }) => (
               <details className="group border-b border-border last:border-b-0" key={question}>
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">
@@ -54,7 +54,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
           </div>
         </div>
 
-        <section className="rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
+        <section className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
           <h2 className="text-[0.9375rem] font-semibold text-foreground">{t(language, "help.stillNeedHelp")}</h2>
           <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "help.reportHint")}</p>
           <button

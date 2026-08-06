@@ -254,24 +254,24 @@ export function HomeScreen({
             <div className="flex items-center gap-2.5">
               {/* Streak */}
               <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-[#fbbf24] backdrop-blur-md shadow-xs"
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary backdrop-blur-md shadow-xs"
                 title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
               >
                 <span>
                   {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
                 </span>
-                <Zap className="h-3.5 w-3.5 text-[#fbbf24]" strokeWidth={2.5} aria-hidden="true" />
+                <Zap className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} aria-hidden="true" />
               </div>
 
               {/* Palms */}
               <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-[#fbbf24] backdrop-blur-md shadow-xs"
+                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary backdrop-blur-md shadow-xs"
                 title={isArabic ? "أشجار النخيل" : "Palms"}
               >
                 <PalmTreeMark
                   size={16}
                   filled={gardenSummary.lifetimePalms > 0}
-                  className={gardenSummary.lifetimePalms > 0 ? "text-[#fbbf24]" : "text-white/40"}
+                  className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-white/40"}
                 />
                 <span>
                   {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
@@ -335,7 +335,7 @@ export function HomeScreen({
                   </p>
                   <h2
                     id="current-zikr-heading"
-                    className="text-3xl md:text-4xl font-black text-[#fbbf24] tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    className="text-3xl md:text-4xl font-black text-primary tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     dir="auto"
                     style={{ lineHeight: "1.25" }}
                   >
@@ -351,7 +351,7 @@ export function HomeScreen({
 
                 {/* Routine Mode Selector Pill (Abbreviated vs Complete) */}
                 <div
-                  className="flex min-h-[44px] w-full items-center rounded-[20px] bg-black/40 p-1 border border-white/15 dark:border-white/10"
+                  className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/40 p-1 border border-white/15 dark:border-white/10"
                   role="group"
                   aria-label={isArabic ? "وضع الورد" : "Routine mode"}
                 >
@@ -411,7 +411,7 @@ export function HomeScreen({
                     </div>
                     <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
                       <div
-                        className="h-full w-full rounded-full bg-[#fbbf24] transition-[transform] duration-500 ease-out origin-[--bar-origin]"
+                        className="h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out origin-[--bar-origin]"
                         style={
                           {
                             transform: `scaleX(${Math.min(1, Math.max(0, doneCount / totalCount))})`,
@@ -460,7 +460,7 @@ export function HomeScreen({
           {/* Middle Row: 4 Compact Stat & Resume Cards (Side-by-side on Desktop & Tablet) */}
           <div className="home-grid-full grid grid-cols-2 md:grid-cols-4 gap-3.5 my-1">
             {/* Card 1: Streak / "سلسلة المتابعة" */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-[0.8125rem] font-extrabold text-foreground">
                   {isArabic ? "سلسلة المتابعة" : "Streak"}
@@ -480,7 +480,7 @@ export function HomeScreen({
             </div>
 
             {/* Card 2: This Week / "هذا الأسبوع" */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-[0.8125rem] font-extrabold text-foreground">
                   {isArabic ? "هذا الأسبوع" : "This Week"}
@@ -500,7 +500,7 @@ export function HomeScreen({
             </div>
 
             {/* Card 3: Total Azkar / "إجمالي الأذكار" */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-[0.8125rem] font-extrabold text-foreground">
                   {isArabic ? "إجمالي الأذكار" : "Total Days"}
@@ -520,7 +520,7 @@ export function HomeScreen({
             </div>
 
             {/* Card 4: Resume Reading / "تابع من حيث توقفت" */}
-            <div className="flex flex-col justify-between rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
               <div className="flex items-center justify-between">
                 <span className="text-[0.8125rem] font-extrabold text-foreground">
                   {isArabic ? "تابع من حيث توقفت" : "Resume Reading"}
@@ -551,7 +551,7 @@ export function HomeScreen({
 
           {/* Bottom Section: Special Friday Banner ("أذكار يوم الجمعة") */}
           <section className="home-grid-full my-1">
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-card p-6 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-3xl border border-border/40 bg-card p-6 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
               {/* Left Side (RTL Start): Dome Artwork + Titles + Description + CTA */}
               <div className="flex flex-1 flex-col items-start gap-3 text-start z-10">
                 <div className="flex items-center gap-3">

@@ -48,7 +48,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
       dir={direction}
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in"
     >
-      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-amber-500/30 bg-card p-6 shadow-2xl dark:border-white/10 dark:bg-[#18181B]">
+      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-amber-500/30 bg-card p-6 shadow-2xl dark:border-white/10 dark:bg-card">
         {/* Close Button — dynamically positioned based on direction */}
         <button
           type="button"

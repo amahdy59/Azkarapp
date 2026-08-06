@@ -208,7 +208,7 @@ export function QuranWordMeaningSheet({
         data-testid="quran-word-meaning-sheet"
         data-prevent-count="true"
         aria-describedby="quran-word-meaning-description"
-        className="fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[88vh] shadow-[0_-12px_36px_rgba(0,0,0,0.4)] border-t border-border/40 pb-safe"
+        className="fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[88vh] shadow-2xl border-t border-border/40 pb-safe"
         dir={direction}
       >
         <DrawerTitle className="sr-only">{t(language, "reader.wordMeaningTitle")}</DrawerTitle>
