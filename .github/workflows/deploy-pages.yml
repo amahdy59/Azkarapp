@@ -105,7 +105,7 @@ jobs:
           path: ./dist
 
   deploy:
-    timeout-minutes: 25
+    timeout-minutes: 30
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -124,6 +124,8 @@ jobs:
     timeout-minutes: 10
     needs: deploy
     runs-on: ubuntu-latest
+    permissions:
+      contents: none
     steps:
       - name: Verify production deployment
         run: |
@@ -131,14 +133,16 @@ jobs:
           const http = require('http');
           const https = require('https');
 
-          const baseUrl = '${{ needs.deploy.outputs.page_url }}'.replace(/\/$/, '') + '/';
-          const metaUrl = baseUrl + 'deployment-meta.json?cb=' + Date.now();
+          const rawUrl = '${{ needs.deploy.outputs.page_url }}';
+          const baseUrl = (rawUrl.endsWith('/') ? rawUrl : rawUrl + '/');
           const expectedSha = '${{ github.sha }}';
+          const cacheBust = Date.now();
 
           function fetchUrl(url, headers = {}) {
             return new Promise((resolve, reject) => {
               const client = url.startsWith('https') ? https : http;
-              client.get(url, { headers: { 'Cache-Control': 'no-cache', ...headers } }, (res) => {
+              const options = { headers: { 'Cache-Control': 'no-cache, no-store', 'Pragma': 'no-cache', ...headers } };
+              client.get(url, options, (res) => {
                 let data = '';
                 res.on('data', (chunk) => data += chunk);
                 res.on('end', () => resolve({ statusCode: res.statusCode, data, headers: res.headers }));
@@ -156,38 +160,98 @@ jobs:
             for (let attempt = 1; attempt <= maxAttempts; attempt++) {
               console.log(\`Attempt \${attempt}/\${maxAttempts}...\`);
               try {
-                // 1. Verify main page returns 200 and root element
-                const mainRes = await fetchUrl(baseUrl);
+                // 1. Main page: HTTP 200 and root element present
+                const mainRes = await fetchUrl(baseUrl + '?cb=' + cacheBust);
                 if (mainRes.statusCode !== 200) {
                   console.log(\`Main page status \${mainRes.statusCode}, retrying...\`);
                   await new Promise(r => setTimeout(r, delayMs));
                   continue;
                 }
-
-                if (!mainRes.data.includes('id=\"root\"') && !mainRes.data.includes('id=\'root\'')) {
+                if (!mainRes.data.includes('id=\"root\"') && !mainRes.data.includes(\"id='root'\")) {
                   console.log('Main page HTML missing root element, retrying...');
                   await new Promise(r => setTimeout(r, delayMs));
                   continue;
                 }
+                console.log('Main page OK (200, root element found)');
 
-                // 2. Verify metadata json
-                const metaRes = await fetchUrl(metaUrl);
+                // 2. Deployment metadata: reachable and SHA matches
+                const metaRes = await fetchUrl(baseUrl + 'deployment-meta.json?cb=' + cacheBust);
                 if (metaRes.statusCode !== 200) {
                   console.log(\`Metadata status \${metaRes.statusCode}, retrying...\`);
                   await new Promise(r => setTimeout(r, delayMs));
                   continue;
                 }
-
                 const meta = JSON.parse(metaRes.data);
                 console.log('Fetched production metadata:', meta);
-
                 if (meta.sha !== expectedSha) {
-                  console.log(\`Metadata SHA mismatch! Expected \${expectedSha}, got \${meta.sha}. Retrying...\`);
+                  console.log(\`SHA mismatch: expected \${expectedSha}, got \${meta.sha}. Retrying...\`);
                   await new Promise(r => setTimeout(r, delayMs));
                   continue;
                 }
+                console.log('Deployment metadata SHA verified');
 
-                console.log('SUCCESS: Production deployment verified successfully!');
+                // 3. PWA manifest reachable
+                const manifestRes = await fetchUrl(baseUrl + 'manifest.webmanifest?cb=' + cacheBust);
+                if (manifestRes.statusCode !== 200) {
+                  console.log(\`Manifest status \${manifestRes.statusCode}, retrying...\`);
+                  await new Promise(r => setTimeout(r, delayMs));
+                  continue;
+                }
+                console.log('PWA manifest OK');
+
+                // 4. Verify at least one JS asset referenced in the HTML is reachable
+                const jsAssetMatch = mainRes.data.match(/src=\"([^\"]*\/assets\/[^\"]+\.js[^\"]*)\"/);
+                if (jsAssetMatch) {
+                  const jsUrl = jsAssetMatch[1].startsWith('http')
+                    ? jsAssetMatch[1]
+                    : baseUrl.replace(/\/$/, '') + jsAssetMatch[1];
+                  const jsRes = await fetchUrl(jsUrl);
+                  if (jsRes.statusCode !== 200) {
+                    console.log(\`JS asset status \${jsRes.statusCode} for \${jsUrl}, retrying...\`);
+                    await new Promise(r => setTimeout(r, delayMs));
+                    continue;
+                  }
+                  console.log('JS asset OK:', jsUrl.split('/').pop());
+                } else {
+                  console.log('No JS asset reference found in HTML, skipping asset check');
+                }
+
+                // 5. Verify at least one CSS asset is reachable
+                const cssAssetMatch = mainRes.data.match(/href=\"([^\"]*\/assets\/[^\"]+\.css[^\"]*)\"/);
+                if (cssAssetMatch) {
+                  const cssUrl = cssAssetMatch[1].startsWith('http')
+                    ? cssAssetMatch[1]
+                    : baseUrl.replace(/\/$/, '') + cssAssetMatch[1];
+                  const cssRes = await fetchUrl(cssUrl);
+                  if (cssRes.statusCode !== 200) {
+                    console.log(\`CSS asset status \${cssRes.statusCode} for \${cssUrl}, retrying...\`);
+                    await new Promise(r => setTimeout(r, delayMs));
+                    continue;
+                  }
+                  console.log('CSS asset OK:', cssUrl.split('/').pop());
+                } else {
+                  console.log('No CSS asset reference found in HTML, skipping asset check');
+                }
+
+                // 6. Verify base path: /Azkarapp/ must appear in the HTML
+                if (!mainRes.data.includes('/Azkarapp/')) {
+                  console.log('WARNING: /Azkarapp/ base path not found in HTML. Application may have wrong base URL.');
+                }
+
+                // 7. Service worker / workbox script reachable
+                const swRes = await fetchUrl(baseUrl + 'sw.js?cb=' + cacheBust);
+                if (swRes.statusCode === 200) {
+                  console.log('Service worker OK');
+                } else {
+                  console.log(\`Service worker returned \${swRes.statusCode} — may be expected if offline shell is not separate\`);
+                }
+
+                console.log('');
+                console.log('SUCCESS: All production smoke tests passed!');
+                console.log('  SHA:', meta.sha);
+                console.log('  Built at:', meta.builtAt);
+                console.log('  Run ID:', meta.runId);
+                console.log('  Attempt:', meta.runAttempt);
                 process.exit(0);
               } catch (err) {
                 console.log('Error during attempt:', err.message);
