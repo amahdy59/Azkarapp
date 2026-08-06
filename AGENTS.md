@@ -163,3 +163,69 @@ Stop and ask for a decision when:
 - The correct responsive-shell target is unclear.
 - Tests expose a pre-existing failure that makes the phase result ambiguous.
 - The agent cannot verify a destructive change safely.
+
+## Autonomous main-branch release authority
+
+The user explicitly authorizes the coding agent to diagnose, repair, commit, and push changes directly to `main` when working on this repository.
+
+The agent is responsible for completing the full release cycle:
+
+1. Inspect the current repository and deployment state.
+2. Implement the requested application changes.
+3. Run all required local quality gates.
+4. Diagnose and repair any local, GitHub Actions, or GitHub Pages configuration problem.
+5. Commit the verified changes.
+6. Push the verified commit to `origin/main`.
+7. Monitor all workflows triggered by the push.
+8. Inspect logs for every failed job.
+9. Apply the smallest correct remediation.
+10. Commit and push remediation changes when required.
+11. Continue until:
+    - `Quality / verify` succeeds.
+    - `Deploy GitHub Pages / build` succeeds.
+    - `Deploy GitHub Pages / deploy` succeeds.
+    - The production application responds successfully.
+    - A production smoke test confirms that the expected application is live.
+
+### Allowed operations
+
+The agent may:
+
+- Run `git fetch`, `git pull --ff-only`, `git add`, `git commit`, and `git push`.
+- Push directly to `origin/main`.
+- Use authenticated GitHub CLI and GitHub API operations.
+- Inspect workflow runs, jobs, artifacts, deployments, environments, branch policies, repository variables, secrets metadata, and Pages settings.
+- Cancel stale or superseded workflow runs.
+- Rerun failed jobs or workflows.
+- Modify `.github/workflows/` when necessary.
+- Modify GitHub Pages and `github-pages` environment configuration when necessary.
+- Remove obsolete Pages deployment branch policies.
+- Normalize Pages to use GitHub Actions and `main`.
+- Increase deployment timeouts when evidence supports doing so.
+- Add post-deployment health checks.
+- Commit and push deployment remediation changes.
+
+### Mandatory safety constraints
+
+The agent must not:
+
+- Use `git push --force` or `--force-with-lease`.
+- Use `git reset --hard` against shared history.
+- Bypass hooks with `--no-verify`.
+- Delete or rewrite unrelated commits.
+- Disable tests or reduce coverage merely to obtain a green result.
+- weaken accessibility, security, bundle, type-safety, or content-integrity checks.
+- Expose secrets in logs, commits, reports, or workflow output.
+- Delete the GitHub Pages site except as a documented last resort and only after preserving its current configuration.
+- Change reviewed religious content as part of deployment remediation.
+- repeatedly push arbitrary changes merely to trigger a deployment.
+
+### Required local gate before every push
+
+Before pushing to `main`, the agent must run:
+
+```bash
+pnpm install --frozen-lockfile
+pnpm check
+pnpm test:e2e
+pnpm build:pages
