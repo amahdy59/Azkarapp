@@ -210,9 +210,14 @@ export function ProgressDayView({
                     </div>
 
                     {isDone ? (
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400">
-                        <Check size={18} strokeWidth={3} />
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => onSelectCategory?.(col.id)}
+                        className="interactive-elem px-3.5 py-1.5 min-h-[44px] text-[0.8125rem] font-bold bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 rounded-full shadow-2xs hover:bg-emerald-500/25 active:scale-95 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 flex items-center gap-1.5"
+                      >
+                        <Check size={16} strokeWidth={2.5} />
+                        <span>{isArabic ? "مكتملة" : "Completed"}</span>
+                      </button>
                     ) : (
                       <button
                         type="button"
