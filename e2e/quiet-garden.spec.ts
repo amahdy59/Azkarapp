@@ -115,21 +115,21 @@ test("populated Home exposes leaf progress through text, state, and accessible n
 
   // Verify screen reader text for progress
   const headerStats = page.locator('div[aria-label*="leaves"]');
-  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 3/i);
+  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 4/i);
 
   await expectNoWcagViolations(page);
 });
 
-test("three completed main collections are announced as a palm without points or rank", async ({ page }) => {
+test("four completed main collections are announced as a palm without points or rank", async ({ page }) => {
   await seedReturningGardenUser(page, {
-    completedToday: ["morning", "evening", "before_sleep"],
+    completedToday: ["morning", "evening", "before_sleep", "after_prayer"],
   });
   await openReturningHome(page);
 
   const garden = page.getByTestId("today-garden-card");
 
   await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toBeVisible();
-  await expect(garden.getByRole("button").filter({ hasText: /Completed|مكتملة/ })).toHaveCount(3);
+  await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(4);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
 

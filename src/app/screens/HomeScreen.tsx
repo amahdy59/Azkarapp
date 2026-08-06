@@ -12,7 +12,7 @@ import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
-import { getFirstIncompleteZikrIndex, getGardenSummary } from "../progress";
+import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
 import type {
   AppLanguage,
   CategoryId,
@@ -246,8 +246,8 @@ export function HomeScreen({
             dir="auto"
             aria-label={
               isArabic
-                ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من 3، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
-                : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of 3, Daily streak: ${streakDays} days`
+                ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
+                : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length}, Daily streak: ${streakDays} days`
             }
           >
             {/* Start side: Streak & Palms Gamification Badges */}
