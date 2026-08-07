@@ -362,3 +362,29 @@ test("reference dialog traps focus, restores it on close, and closes on Escape",
   await expect(sheet).toHaveCount(0);
   await expect(trigger).toBeFocused();
 });
+
+test("the counter completes from the keyboard, not only by pointer", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  const counterSurface = page.getByTestId("counter-surface");
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  // The counter is a real button, so it must be reachable and operable without
+  // a pointer — tap-anywhere counting is a convenience, not the only path.
+  await counterSurface.focus();
+  await expect(counterSurface).toBeFocused();
+  await page.keyboard.press("Enter");
+
+  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+});
+
+test("reader progress is announced politely rather than interrupting", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  // This region carries counting progress and completion. Assertive would cut
+  // off whatever the screen reader is currently saying — in a reader, usually
+  // the zikr itself.
+  const announcer = page.locator('[aria-live][aria-atomic="true"]').first();
+  await expect(announcer).toHaveAttribute("aria-live", "polite");
+  await expect(page.locator('[aria-live="assertive"]')).toHaveCount(0);
+});

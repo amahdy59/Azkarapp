@@ -609,3 +609,20 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** 10 unit tests for the normalizer, a `CategoryCard` test asserting the completion cue is non-colour, and four e2e tests (undiacritized matching, content-not-altered, live-region count, empty state). The search defect was proven in a real browser _before_ the fix and re-verified after. Full `pnpm check` + `pnpm test:e2e` (260 unit, 184 e2e).
 - **Not done / deferred:** taxonomy grouping (Step 1 item 4) is presentation-only per the phase's own prohibition on ID migration, and is left for a follow-up since it needs product input on group names. No search dependency was added, per the phase's prohibited list.
 - **Supersedes:** None
+
+---
+
+## DEC-033 — Phase 07: reader counter render waste and announcement urgency
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Claude (delegated — user asked to proceed through phases autonomously)
+- **Related phase:** Phase 07
+- **Context:** Step 1 analysis of the reader, count interaction, session state and announcements.
+- **Most of the phase's acceptance criteria were already met**, and are recorded as verified rather than changed: the tap-ignore list is thorough and also guards text selection and full surahs; `ZikrCounterSurface` is a real `<button>` so keyboard counting already worked; and every autoplay path originates in an explicit user gesture.
+- **Decisions:**
+  - **Removed dead `pulse` state from `useZikrCounter`.** `setPulse` fired on every tap and on reset but nothing consumed it — `CustomCounterScreen` maintains its own separate `pulse` for `PulseRings`. Each count was forcing an extra render on the app's hottest path for no observable effect.
+  - **Reader announcement region changed from `aria-live="assertive"` to `polite`.** The region carries counting progress and completion, none of which is urgent enough to interrupt a screen reader mid-sentence — and in a reader, that sentence is usually the zikr. `ZikrShareButton` already established the right precedent by reserving assertive for errors, so the reader was the inconsistent case. Trade-off accepted: polite announcements can be queued behind other speech, which is preferable to cutting off devotional content.
+- **Flagged, deliberately not fixed:** `handleReset` clears local counter state but does not undo the recorded completion — `onComplete` has already fired and `isDone` restores it on remount. This is Step 1 item 8, but resolving it means changing session state, which the phase's prohibited list excludes without separate approval. Recorded rather than silently changed.
+- **Tests/evidence required:** New `useZikrCounter.test.ts` (9 tests) covering counting, completion, the surface-tap guards, surah behaviour, reset and haptics gating — the hook had no direct coverage despite being the hottest logic in the app. Two new e2e tests for keyboard completion and the polite region. The announcement fix was verified by reverting it and confirming the test fails. Full `pnpm check` + `pnpm test:e2e` (268 unit, 190 e2e).
+- **Supersedes:** None
