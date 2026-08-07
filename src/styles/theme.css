@@ -23,6 +23,12 @@
   --popover-foreground: #f2f2ea;
   --primary: #d7a528;
   --primary-foreground: #000000;
+  /* Content sitting on the photographic hero scrim. That scrim is dark in
+     every theme, so these stay light-on-dark and must not follow --primary,
+     which is a dark gold (#835806) in Light and fails contrast there. */
+  --on-media: #ffffff;
+  --on-media-muted: rgba(255, 255, 255, 0.9);
+  --on-media-accent: #f0c14b;
   --secondary: #c5f2e5;
   --secondary-foreground: #081026;
   --muted: #0a0a0a;
@@ -310,6 +316,9 @@ textarea {
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-on-media: var(--on-media);
+  --color-on-media-muted: var(--on-media-muted);
+  --color-on-media-accent: var(--on-media-accent);
   --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);

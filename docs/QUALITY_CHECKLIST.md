@@ -53,18 +53,31 @@ Current per-file production budgets are 450 KiB JavaScript, 120 KiB CSS, and 1 M
 
 Automation cannot prove the following. Complete and date this table for a release candidate; attach screenshots or issue links where useful.
 
-| Test                    | Required result                                                                                              | Date / tester / evidence |
-| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------ |
-| Keyboard-only core flow | Logical order, visible focus, no traps; onboarding → category → reader → completion → settings               | Pending                  |
-| Screen reader           | VoiceOver, TalkBack, or NVDA completes the same core flow with understandable names and announcements        | Pending                  |
-| Text resize             | 200% browser zoom and largest app text setting do not hide content or actions                                | Pending                  |
-| Contrast                | Light, dark, high-contrast, and color-blind modes pass a contrast analyzer                                   | Pending                  |
-| Responsive layout       | 320 px mobile, 390 px mobile, tablet, and desktop reflow without clipping                                    | Pending                  |
-| RTL                     | Arabic onboarding, navigation, category, reader, counter, and settings have correct order and icon direction | Pending                  |
-| Safe areas              | iOS notch/home indicator and Android cutout do not cover controls                                            | Pending                  |
-| Poor connectivity       | Offline banner appears; local reading/progress works; sync recovers after reconnect                          | Pending                  |
-| Prayer time and DST     | Effective timezone/offset match the detected location; online and offline results use the selected method    | Pending                  |
-| Performance             | Record cold load, interaction responsiveness, and React Profiler evidence on a representative mobile device  | Pending                  |
-| Media access            | Audio alternatives/transcripts and image descriptions are correct wherever media is introduced               | Pending                  |
+| Test                    | Required result                                                                                              | Date / tester / evidence                                                                             |
+| ----------------------- | ------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| Keyboard-only core flow | Logical order, visible focus, no traps; onboarding → category → reader → completion → settings               | 2026-08-07 / automated / `e2e/manual-checklist.spec.ts` (partial: tab order, visible focus, no trap) |
+| Screen reader           | VoiceOver, TalkBack, or NVDA completes the same core flow with understandable names and announcements        | Pending                                                                                              |
+| Text resize             | 200% browser zoom and largest app text setting do not hide content or actions                                | 2026-08-07 / automated / `e2e/manual-checklist.spec.ts`                                              |
+| Contrast                | Light, dark, high-contrast, and color-blind modes pass a contrast analyzer                                   | 2026-08-07 / automated / `e2e/manual-checklist.spec.ts` (all 5 modes)                                |
+| Responsive layout       | 320 px mobile, 390 px mobile, tablet, and desktop reflow without clipping                                    | 2026-08-07 / automated / `e2e/manual-checklist.spec.ts`                                              |
+| RTL                     | Arabic onboarding, navigation, category, reader, counter, and settings have correct order and icon direction | Pending                                                                                              |
+| Safe areas              | iOS notch/home indicator and Android cutout do not cover controls                                            | Pending                                                                                              |
+| Poor connectivity       | Offline banner appears; local reading/progress works; sync recovers after reconnect                          | Pending                                                                                              |
+| Prayer time and DST     | Effective timezone/offset match the detected location; online and offline results use the selected method    | 2026-08-07 / automated / `e2e/manual-checklist.spec.ts`                                              |
+| Performance             | Record cold load, interaction responsiveness, and React Profiler evidence on a representative mobile device  | Pending                                                                                              |
+| Media access            | Audio alternatives/transcripts and image descriptions are correct wherever media is introduced               | Pending                                                                                              |
 
 Until every applicable row has dated evidence, the project must not claim complete manual checklist compliance.
+
+### Automated vs. manual rows
+
+Five rows above are now covered by `e2e/manual-checklist.spec.ts`, which runs in CI on every push. They are dated as automated evidence.
+
+The remaining rows are **not** automatable and stay `Pending` until a person does them:
+
+- **Screen reader** — needs a real VoiceOver/NVDA/TalkBack session. Automated keyboard coverage is not a substitute; it proves focus moves, not that announcements make sense.
+- **Safe areas** — needs real notch/cutout hardware.
+- **Performance** — needs a representative mobile device and profiler traces.
+- **Media access** — needs human review of alternatives and descriptions.
+
+The keyboard row is marked partial for the same reason: the automation proves tab order, focus visibility and absence of traps, but a human still has to confirm the flow is _sensible_.

@@ -344,18 +344,22 @@ export function HomeScreen({
                   aria-labelledby="current-zikr-heading"
                   className="lg:col-span-3 flex flex-col justify-between p-1 md:p-2 transition-all"
                 >
-                  <div className="flex flex-col gap-3 text-start">
+                  {/* The hero sits on a photo that fades to white in light mode,
+                      so its white text needs its own dark backing rather than
+                      relying on the page scrim. Without this, "Time for"
+                      measured 1.98:1 against a required 4.5:1. */}
+                  <div className="flex flex-col gap-3 rounded-3xl bg-black/45 p-3 text-start backdrop-blur-[2px] md:p-4">
                     {/* Hero Text & Category Header */}
                     <div className="flex w-full flex-col items-start gap-1 px-1">
                       <p
-                        className="text-[1.125rem] font-black text-white drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
+                        className="text-[1.125rem] font-black text-on-media drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
                         dir="auto"
                       >
                         {isArabic ? "حان وقت" : "Time for"}
                       </p>
                       <h2
                         id="current-zikr-heading"
-                        className="text-3xl md:text-4xl font-black text-primary tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                        className="text-3xl md:text-4xl font-black text-on-media-accent tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                         dir="auto"
                         style={{ lineHeight: "1.25" }}
                       >
@@ -379,10 +383,10 @@ export function HomeScreen({
                       }}
                       direction={direction}
                       aria-label={isArabic ? "وضع الورد" : "Routine mode"}
-                      className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/40 p-1 border border-white/15 dark:border-white/10"
+                      className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/55 p-1 border border-white/20 dark:border-white/10"
                       itemClassName={(selected) =>
                         `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                          selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/80 hover:text-white"
+                          selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/95 hover:text-white"
                         }`
                       }
                       options={[
@@ -395,14 +399,14 @@ export function HomeScreen({
                     {totalCount > 0 && (
                       <div className="flex flex-col gap-2 w-full mt-1">
                         <div
-                          className="flex w-full items-center justify-between text-[0.8125rem] font-bold text-foreground dark:text-white"
+                          className="flex w-full items-center justify-between text-[0.8125rem] font-bold text-on-media"
                           dir="auto"
                         >
                           <span>
                             {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                             {formatNumerals(totalCount, language)}
                           </span>
-                          <div className="flex items-center gap-1.5 text-muted-foreground dark:text-white/90">
+                          <div className="flex items-center gap-1.5 text-on-media-muted">
                             <Clock className="h-[14px] w-[14px] text-[#e2a84a]" />
                             <span>
                               {isArabic

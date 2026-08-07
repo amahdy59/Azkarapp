@@ -642,3 +642,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** New e2e test completes a zikr, confirms it reaches stored progress, steps back, resets, and asserts the entry is gone from `localStorage`. Verified by removing the fix and confirming the test fails. Full `pnpm check` + `pnpm test:e2e` (268 unit, 214 e2e).
 - **Process note:** the first version of this test was wrong and passed against unfixed code — it asserted on `completed.morning` while the fixture opens `waking_up`, so it was checking a permanently empty array. It was caught by the revert check, not by it passing. A test that has never been seen to fail is not evidence.
 - **Supersedes:** The "flagged, not fixed" entry in DEC-033.
+
+---
+
+## DEC-035 — Automate the machine-checkable manual-checklist rows; fix Light-theme hero contrast
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User
+- **Related phase:** Cross-cutting (feeds Phases 11–12)
+- **Context:** All 11 rows of the Manual release record in `docs/QUALITY_CHECKLIST.md` read `Pending`. The table conflated work that genuinely needs a human with work a machine can prove.
+- **Decision:** Added `e2e/manual-checklist.spec.ts` covering the five rows that do not need a person — contrast across all five modes, responsive reflow at 320/390/tablet/desktop, largest text setting and 200% zoom, prayer-time timezone/offset including offline, and keyboard tab order with visible focus and no traps. Those rows are now dated as automated evidence and run in CI on every push.
+- **Six rows deliberately remain `Pending`,** with the reason recorded next to them: screen reader (needs a real VoiceOver/NVDA/TalkBack session), safe areas (needs notch/cutout hardware), performance (needs a representative device), media alternatives (needs human review), RTL and poor connectivity (partially covered elsewhere but not to the row's full bar). The keyboard row is explicitly marked **partial** — automation proves focus moves and is visible, not that the flow makes sense.
+- **The automation immediately found a real defect,** which is the point of writing it: **Light theme failed contrast on Home.** The hero's hardcoded `text-white` measured **1.98:1** against a required 4.5:1, because the page scrim fades to _white_ in Light while the text assumed a dark backing. Two further failures at 3.91:1 and 4.46:1 on the routine selector and estimate row.
+- **Fix and its consequence:** a dark scrim now sits behind the hero column in every theme. That surfaced a fourth failure the first three had masked — the gold heading used `text-primary`, which is a **dark** gold (`#835806`) in Light and dropped to 1.07:1 once the backing darkened. Rather than hardcode a hex, added `--on-media` / `--on-media-muted` / `--on-media-accent` tokens: content over photography sits on a dark scrim in every theme, so it needs light-on-dark values that deliberately do **not** follow `--primary`.
+- **Tests/evidence required:** 13 tests in the new spec. Contrast is asserted per mode with a named failure message so a regression identifies the mode. Full `pnpm check` + `pnpm test:e2e` (268 unit, 253 e2e).
+- **Supersedes:** None
