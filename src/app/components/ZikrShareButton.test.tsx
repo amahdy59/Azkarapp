@@ -24,6 +24,14 @@ describe("ZikrShareButton", () => {
 
     const button = screen.getByRole("button", { name: "مشاركة الذكر" });
     expect(button).toHaveAttribute("aria-describedby");
-    expect(button).toHaveClass("min-h-11");
+
+    // Touch-target contract (docs/DESIGN_SYSTEM.md): at least 44 CSS px, and
+    // expressed as a *minimum* rather than a fixed height so a long or wrapped
+    // Arabic label (or 200% text scaling) grows the button instead of clipping.
+    const classes = button.className.split(/\s+/);
+    const minHeight = classes.find((cls) => /^min-h-\d+$/.test(cls));
+    expect(minHeight).toBeDefined();
+    expect(Number(minHeight!.replace("min-h-", "")) * 4).toBeGreaterThanOrEqual(44);
+    expect(classes.some((cls) => /^h-\d+$/.test(cls))).toBe(false);
   });
 });

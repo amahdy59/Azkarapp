@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Card } from "../../components/Card";
+import { Button } from "../../components/ui/button";
 import { CheckCircle2, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
@@ -162,15 +163,16 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             </div>
           </div>
 
-          <button
+          <Button
             type="button"
+            variant="outline"
             onClick={() => void refreshStatus()}
             disabled={isLoading}
-            className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-background px-4 font-semibold text-foreground disabled:opacity-60"
+            className="mt-4 w-full"
           >
             <RotateCcw size={18} aria-hidden="true" />
             {t(language, "downloads.refresh")}
-          </button>
+          </Button>
 
           {errorMessage && (
             <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
@@ -234,25 +236,27 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 max={Math.max(1, downloadProgress.total)}
                 value={downloadProgress.completed}
               />
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => abortRef.current?.abort()}
-                className="mt-2 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-border font-semibold text-foreground"
+                className="mt-2 w-full border-border"
               >
                 <X size={18} aria-hidden="true" />
                 {language === "ar" ? "إلغاء التنزيل" : "Cancel download"}
-              </button>
+              </Button>
             </div>
           )}
 
-          <button
+          <Button
             type="button"
+            variant="outline"
             disabled={!status?.downloadedAudioAssets || downloadProgress !== null}
             onClick={() => void removeDownloadedAudio().then(refreshStatus)}
-            className="mt-3 min-h-11 w-full rounded-xl border border-destructive/40 px-4 font-semibold text-destructive disabled:opacity-50"
+            className="mt-3 w-full border-destructive/40 text-destructive"
           >
             {language === "ar" ? "حذف الصوت المحمّل" : "Remove downloaded audio"}
-          </button>
+          </Button>
         </Card>
       </div>
     </div>

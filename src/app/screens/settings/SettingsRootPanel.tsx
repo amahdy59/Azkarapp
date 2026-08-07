@@ -16,6 +16,7 @@ import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, LocationSettings, ThemeMode } from "../../types";
 import { SegmentedControl } from "../../components/SegmentedControl";
+import { Button } from "../../components/ui/button";
 import { RowChevron, RowValue, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
@@ -87,13 +88,9 @@ export function SettingsRootPanel({
             <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
               {t(language, "appearance.highContrastBody")}
             </p>
-            <button
-              type="button"
-              onClick={onDisableHighContrast}
-              className="mt-2 min-h-11 rounded-xl bg-primary px-3 text-[0.75rem] font-semibold text-primary-foreground"
-            >
+            <Button type="button" size="sm" onClick={onDisableHighContrast} className="mt-2 text-[0.75rem]">
               {t(language, "appearance.disableHighContrast")}
-            </button>
+            </Button>
           </aside>
         )}
       </SettingsSection>

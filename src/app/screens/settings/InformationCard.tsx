@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card } from "../../components/Card";
+import { Button } from "../../components/ui/button";
 
 export function InformationCard({
   icon,
@@ -32,14 +33,10 @@ export function InformationCard({
         </div>
       </div>
       {actionLabel && onAction && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[0.8125rem] font-semibold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
+        <Button type="button" onClick={onAction} className="mt-3 w-full text-[0.8125rem]">
           {actionLabel}
           {actionIcon}
-        </button>
+        </Button>
       )}
     </Card>
   );

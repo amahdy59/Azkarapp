@@ -417,3 +417,26 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/components/Tabs.tsx` (new), `src/app/components/RoutineGarden.tsx`, `src/app/screens/AzkarLibraryScreen.tsx`.
 - **Tests/evidence required:** `Tabs.test.tsx` (new, 9 tests) covering roles, `aria-controls` wiring, roving tabindex, click activation, LTR/RTL arrow direction, wrap-around, and Home/End. Full `pnpm check` + `pnpm test:e2e` (145 passing).
 - **Supersedes:** None
+
+---
+
+## DEC-024 — Align `Button` to the app's conventions, then adopt it
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 8)
+- **Related phase:** Phase 03
+- **Context:** A complete, accessible `Button` primitive existed but was imported in exactly **one** file, while ~39 sites hand-rolled button classes. The Phase 03 analysis framed this purely as an adoption problem. Measuring the actual call sites showed the blocker was the component itself: the app's established convention is `min-h-11 rounded-xl bg-primary px-4 font-semibold`, while `Button` shipped shadcn's defaults of `font-medium` and — more importantly — a **fixed** `h-11`/`h-12` in its size variants.
+- **Options considered:** Migrate call sites onto `Button` as-is (restyles every migrated button to a lighter weight and a fixed height); pass `className` overrides at every site (no real consolidation); align `Button` to the documented conventions first, then migrate.
+- **Decision:** Aligned `Button` first — `font-medium` → `font-semibold`, and all size variants from fixed `h-*` to `min-h-*` — then migrated the standalone action buttons.
+- **Why:** The fixed height was a latent defect, not just a style mismatch. Arabic labels run longer than their English equivalents and `docs/QUALITY_CHECKLIST.md` still has a pending 200%-text-scaling row; a fixed-height button clips wrapped labels in exactly those cases. Every hand-rolled button in the app had independently used `min-h-11` — the convention was already right, and `Button` was the outlier.
+- **Consequences:**
+  - `Button` adoption went from 1 file to 10. Migrated: `StatePanel`, `InformationCard`, `PwaNotice`, `NotificationsPanel` (3 buttons), `AccountDataPanel` (2), `DownloadsPanel` (3), `SettingsRootPanel`.
+  - The `lg` size now resolves to `min-h-12` alone (tailwind-merge dedupes the base `min-h-11`), where it previously produced `min-h-11` + fixed `h-12`. Still ≥ the 44px target and now able to grow.
+  - This broke `ZikrShareButton.test.tsx`, which asserted the literal class `min-h-11`. Rather than swap in the new literal, the assertion was rewritten to test the actual contract: the button carries a `min-h-*` of at least 44px **and** no fixed `h-*` that could clip. That is a stronger test than the one it replaces.
+  - **`AppErrorBoundary.tsx` was deliberately left hand-rolled.** It renders only after the app has crashed; importing `Button` would pull Radix `Slot` and `cva` into the crash-recovery path, so a failure inside those libraries would break the very screen meant to recover from failures.
+  - Selected-state styling inside `SegmentedControl`, `Tabs`, and picker components was left alone — those are radio/tab items, not buttons, and are already covered by DEC-022/DEC-023.
+  - Buttons needing a primary-tinted outline (`border-primary text-primary`) use `variant="outline"` plus a colour override rather than a new variant, keeping the variant set small.
+- **Files/contracts to update:** `src/app/components/ui/button.tsx` and the 9 adopting files listed above.
+- **Tests/evidence required:** Strengthened `ZikrShareButton.test.tsx`; full `pnpm check` (237 unit tests) + `pnpm test:e2e` (145 passing).
+- **Supersedes:** None

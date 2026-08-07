@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Card } from "../../components/Card";
+import { Button } from "../../components/ui/button";
 import { Database, Download, LogOut, RotateCcw, User, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
@@ -83,15 +84,14 @@ export function AccountDataPanel({
               )}
             </div>
           </div>
-          <button
+          <Button
             type="button"
+            variant={isGuest ? "default" : "outline"}
             onClick={isGuest ? onActivateAccount : onSignOut}
-            className={`mt-4 min-h-11 w-full rounded-xl px-4 text-[0.875rem] font-semibold ${
-              isGuest ? "bg-primary text-primary-foreground" : "border border-destructive/60 text-destructive"
-            }`}
+            className={`mt-4 w-full text-[0.875rem] ${isGuest ? "" : "border-destructive/60 text-destructive"}`}
           >
             {t(language, isGuest ? "accountData.signIn" : "accountData.signOut")}
-          </button>
+          </Button>
         </Card>
 
         <div>
@@ -187,17 +187,14 @@ function DataAction({
           <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
         </div>
       </div>
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={onPress}
-        className={`mt-3 min-h-11 w-full rounded-xl px-4 text-[0.8125rem] font-semibold ${
-          destructive
-            ? "border border-destructive/60 text-destructive"
-            : "border border-border bg-card text-foreground hover:bg-muted"
-        }`}
+        className={`mt-3 w-full text-[0.8125rem] ${destructive ? "border-destructive/60 text-destructive" : "border-border bg-card"}`}
       >
         {action}
-      </button>
+      </Button>
     </Card>
   );
 }

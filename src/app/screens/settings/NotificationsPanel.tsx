@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { Button } from "../../components/ui/button";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
 import { InformationCard } from "./InformationCard";
@@ -362,12 +363,7 @@ export function NotificationsPanel({
           </div>
 
           <div className="mt-4 space-y-3">
-            <button
-              type="button"
-              onClick={handleDetectLocation}
-              disabled={isDetectingLocation}
-              className="min-h-11 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60 transition-colors"
-            >
+            <Button type="button" onClick={handleDetectLocation} disabled={isDetectingLocation} className="w-full">
               {isDetectingLocation
                 ? isArabic
                   ? "جارٍ تحديد الموقع..."
@@ -375,7 +371,7 @@ export function NotificationsPanel({
                 : isArabic
                   ? "تحديد موقعي تلقائيًا"
                   : "Detect My Location"}
-            </button>
+            </Button>
 
             {locationStatus && (
               <p className="text-[0.8125rem] font-medium text-foreground bg-muted p-2.5 rounded-lg">{locationStatus}</p>
@@ -449,13 +445,14 @@ export function NotificationsPanel({
                   className="h-11 min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
                 />
               </div>
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={handleManualLocationSave}
-                className="min-h-11 w-full rounded-xl border border-primary px-4 font-semibold text-primary transition-colors hover:bg-primary/5"
+                className="w-full border-primary text-primary hover:bg-primary/5"
               >
                 {isArabic ? "حفظ الموقع" : "Save Location"}
-              </button>
+              </Button>
             </fieldset>
 
             <fieldset className="border-t border-border pt-4">
@@ -527,16 +524,16 @@ export function NotificationsPanel({
           </div>
 
           {permission === "default" && (
-            <button
+            <Button
               type="button"
               onClick={() => void requestPermission()}
               disabled={isRequesting}
-              className="mt-4 min-h-11 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground disabled:opacity-60"
+              className="mt-4 w-full"
             >
               {isRequesting
                 ? t(language, "notifications.requestingPermission")
                 : t(language, "notifications.requestPermission")}
-            </button>
+            </Button>
           )}
 
           {hasRequestError && (

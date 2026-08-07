@@ -1,4 +1,5 @@
 import { AlertTriangle, Bookmark, CloudOff, Download, Search, VolumeX } from "./icons";
+import { Button } from "./ui/button";
 
 export type AppStateKind =
   "empty-search" | "empty-saved" | "network-error" | "offline" | "audio-error" | "download-error" | "interrupted";
@@ -52,13 +53,9 @@ export function StatePanel({
         {description ?? copy.description}
       </p>
       {actionLabel && onAction && (
-        <button
-          type="button"
-          onClick={onAction}
-          className="mt-4 min-h-11 rounded-xl bg-primary px-5 font-semibold text-primary-foreground"
-        >
+        <Button type="button" onClick={onAction} className="mt-4 px-5">
           {actionLabel}
-        </button>
+        </Button>
       )}
     </section>
   );
