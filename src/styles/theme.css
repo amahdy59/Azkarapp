@@ -1120,7 +1120,11 @@ textarea {
   outline-offset: 2px;
 }
 
-@media (max-width: 430px) {
+/* Full-bleed across the whole compact tier (up to 599px, where the fluid grid
+   takes over), so this matches useLayoutMode's 600px compact boundary. Ending
+   it at 430px used to leave 431–599px rendering a letterboxed 390px "phone
+   card" that belonged to no documented tier. */
+@media (max-width: 599px) {
   .app-viewport {
     height: 100dvh;
     min-height: 100dvh;
@@ -1495,7 +1499,11 @@ a[href]:not(.no-press):active,
   }
 }
 
-@media (min-width: 56.25rem) and (min-height: 31.25rem) {
+/* Width-only, matching useLayoutMode's contract. A min-height guard here used
+   to leave 900px+ / <500px-tall viewports with no navigation at all: JS said
+   "expanded" and dropped the bottom nav, while this query failed and hid the
+   rail. */
+@media (min-width: 56.25rem) {
   .app-shell {
     grid-template: "rail main" minmax(0, 1fr) / var(--nav-rail-width) minmax(0, 1fr);
   }

@@ -6,7 +6,7 @@ async function enterEnglishGuestMode(page: Page) {
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
+  await expect(page.getByRole("navigation")).toBeVisible();
 }
 
 async function expectNoHorizontalOverflow(page: Page, screenName: string) {

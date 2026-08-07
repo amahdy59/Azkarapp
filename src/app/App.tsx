@@ -28,6 +28,7 @@ function categoryFromShortcutUrl(): CategoryId | null {
 
 import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
 import { useLayoutMode } from "./hooks/useLayoutMode";
+import { useViewFocus } from "./hooks/useScreenFocus";
 
 import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
@@ -169,6 +170,7 @@ function AppContent() {
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
   const activeAzkarList = useMemo(() => getAzkarForMode(activeCat, activeRoutineMode), [activeCat, activeRoutineMode]);
   const layoutMode = useLayoutMode();
+  useViewFocus(view);
 
   const audioController = useAudioController();
   const audioCoverage = useMemo(() => getAudioCoverage(activeAzkarList), [activeAzkarList]);
@@ -354,13 +356,21 @@ function AppContent() {
     ],
   );
 
+  // Tracks how many entries *this app* has pushed. window.history.length counts
+  // the whole tab's session, so arriving from another site made it >1 already
+  // and Back navigated out of the app instead of home.
+  const inAppHistoryDepth = useRef(0);
+
   const push = useCallback((to: View) => {
     window.history.pushState({ view: to }, "", `?view=${to}`);
+    inAppHistoryDepth.current += 1;
     setView(to);
   }, []);
 
   const pop = useCallback(() => {
-    if (window.history.length > 1) {
+    if (inAppHistoryDepth.current > 0) {
+      // Do not decrement here — history.back() fires popstate, and the popstate
+      // handler owns the decrement so browser-Back and in-app back agree.
       window.history.back();
     } else {
       push("home");
@@ -632,6 +642,10 @@ function AppContent() {
 
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
+      // Keep the in-app depth counter in step with the browser's own Back
+      // button, not just our pop() helper, so the two never drift apart.
+      inAppHistoryDepth.current = Math.max(0, inAppHistoryDepth.current - 1);
+
       if (e.state && e.state.view) {
         setView(e.state.view);
         if (e.state.view === "settings") {
@@ -788,9 +802,11 @@ function AppContent() {
     playAvailable();
   };
 
-  const showBottomNavArea = layoutMode === "compact" || layoutMode === "medium";
-  const showRail = layoutMode === "expanded";
-  const showSidebar = layoutMode === "large";
+  // All three nav variants share the same view whitelist, so splash, onboarding
+  // and auth never render app navigation regardless of viewport.
+  const showBottomNavArea = showBottomNav && (layoutMode === "compact" || layoutMode === "medium");
+  const showRail = showBottomNav && layoutMode === "expanded";
+  const showSidebar = showBottomNav && layoutMode === "large";
 
   return (
     <div className="app-viewport flex items-center justify-center">
@@ -1224,10 +1240,9 @@ function AppContent() {
           <div
             className="absolute inset-x-0 z-40"
             style={{
-              bottom:
-                showBottomNav && showBottomNavArea
-                  ? "calc(4.5rem + env(safe-area-inset-bottom))"
-                  : "max(0.75rem, env(safe-area-inset-bottom))",
+              bottom: showBottomNavArea
+                ? "calc(4.5rem + env(safe-area-inset-bottom))"
+                : "max(0.75rem, env(safe-area-inset-bottom))",
             }}
           >
             {persistenceError && !persistenceNoticeDismissed ? (
@@ -1279,7 +1294,7 @@ function AppContent() {
         )}
 
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
-        {showBottomNav && showBottomNavArea && (
+        {showBottomNavArea && (
           <div className="app-bottom-nav">
             <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />
           </div>

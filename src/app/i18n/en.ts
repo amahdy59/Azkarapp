@@ -17,6 +17,7 @@ const en = {
     resending: "Resending...",
     back: "Back",
     bottomNavigation: "Bottom Navigation",
+    primaryNavigation: "Main Navigation",
     cancel: "Cancel",
     reset: "Reset",
     skip: "Skip",

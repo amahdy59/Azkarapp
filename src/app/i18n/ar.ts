@@ -17,6 +17,7 @@ const ar = {
     resending: "\u062c\u0627\u0631\u064d \u0625\u0639\u0627\u062f\u0629 \u0627\u0644\u0625\u0631\u0633\u0627\u0644...",
     back: "رجوع",
     bottomNavigation: "التنقل السفلي",
+    primaryNavigation: "التنقل الرئيسي",
     cancel: "إلغاء",
     reset: "إعادة تعيين",
     skip: "تخطي",

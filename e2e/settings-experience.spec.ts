@@ -7,7 +7,8 @@ async function enterEnglishGuestMode(page: Page) {
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
+  // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
+  await expect(page.getByRole("navigation")).toBeVisible();
 }
 
 async function openSettings(page: Page) {
@@ -232,5 +233,5 @@ test("onboarding is shown once and returning users resume at Home", async ({ pag
   await page.reload();
   await expect(page.getByRole("heading", { name: "Azkar", exact: true })).toBeVisible({ timeout: 5000 });
   await expect(page.getByRole("heading", { name: "Choose Your Language" })).toHaveCount(0);
-  await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
+  await expect(page.getByRole("navigation")).toBeVisible();
 });

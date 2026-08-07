@@ -482,3 +482,27 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `AzkarLibraryScreen`, `CategoryScreen`, `CompletionScreen`, `CustomCounterScreen`, `FridayModeScreen`, `FridaySalawatScreen`, `ProgressScreen`, `settings/SettingsScreen`.
 - **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (148 passing). Visual confirmation across Light/Dark/Midnight still owed with the rest of the Phase 02–03 screenshot debt.
 - **Supersedes:** None
+
+---
+
+## DEC-027 — Phase 04 shell and navigation defect fixes
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (three choices made directly; remainder delegated)
+- **Related phase:** Phase 04
+- **Context:** The Phase 04 analysis found the DEC-001 hybrid shell already ~80% implemented — typed `View` state, real History API, the four-tier CSS grid, three nav variants, `aria-current` throughout, the settings two-pane, and a DEC-004-compliant reader column all worked. What remained was a set of concrete defects rather than a build-out.
+- **Decisions and rationale:**
+  - **BottomNav active state was colour-only** (icon and label differed only by colour; both weights `font-semibold`; the sole non-colour cue was a 220 ms entrance animation that `prefers-reduced-motion` disables). Added a persistent 3 px `--primary` indicator bar plus `font-extrabold` on the active label. This failed an explicit Phase 04 acceptance criterion and WCAG "colour alone", on the variant most users see.
+  - **Navigation dead zone at ≥900 px wide × <500 px tall.** The rail's media query carried `and (min-height: 31.25rem)` while `useLayoutMode` is width-only, so JS chose `expanded` (dropping BottomNav) while CSS hid the rail — **no navigation at all**. Dropped the height term so CSS matches the hook's contract. User chose this over teaching the hook a height term, which would have shifted sheet-vs-dialog behaviour for `useLayoutMode`'s six consumers.
+  - **431–599 px rendered a letterboxed 390 px phone card** belonging to no documented tier. User chose extending full-bleed to 599 px, aligning CSS with `useLayoutMode`'s own 600 px compact boundary.
+  - **Focus never moved on view change.** `useScreenFocus` guarded on a per-instance `isFirstMount` ref, but screens are lazily mounted fresh on every navigation, so the guard was always true and it always returned early. Split into `useScreenFocus` (title only) and a new app-level `useViewFocus(view)` in `App.tsx`, where view identity actually persists.
+  - **Two `main` landmarks** — `App.tsx` rendered `#main-content` and `ScreenContainer` nested another inside it. `ScreenContainer` is now a `div`; `App.tsx` owns the single landmark.
+  - **All three navs announced as "Bottom Navigation".** Added `common.primaryNavigation` ("Main Navigation" / "التنقل الرئيسي") for the rail and sidebar.
+  - **Rail/sidebar rendered during splash, onboarding and auth.** All three variants now share the existing `showBottomNav` view whitelist.
+  - **Sidebar theme toggle was binary dark↔light in a three-theme app**, stranding Midnight users in Light. User chose to keep the sidebar controls (rather than remove them per Step 3 item 4) and fix the toggle, which now cycles midnight → dark → light with a matching icon and an `aria-label` naming the current theme.
+  - **`window.history.length > 1` back-guard** counted the whole browser tab's session, so arriving from another site made Back navigate _out of the app_. Replaced with an in-app depth counter, decremented in the `popstate` handler only (not in `pop()`, since `history.back()` fires `popstate` — decrementing in both would double-count). User scoped this to the narrow fix; the mixed `push`/`replaceState`/bare-`setView` pattern across onboarding is recorded but untouched.
+- **Consequences:** Renaming the rail/sidebar labels broke the shared `enterEnglishGuestMode` helpers in three specs, which waited on `getByRole("navigation", { name: "Bottom Navigation" })` — on desktop that had been resolving against the _sidebar_. Helpers are now tier-agnostic. This is the same selector-drift class as DEC-022 and again failed loudly rather than silently.
+- **Files/contracts to update:** `LayoutShells.tsx`, `App.tsx`, `hooks/useScreenFocus.ts`, `ScreenContainer.tsx`, `i18n/en.ts`, `i18n/ar.ts`, `styles/theme.css`, `docs/DESIGN_SYSTEM.md`, `docs/ARCHITECTURE.md`, four e2e specs.
+- **Tests/evidence required:** Seven new e2e tests (tier matrix, dead-zone regression, full-bleed band, onboarding nav suppression, `aria-current` + non-colour cue, single-`main` + focus-on-navigation). Dead-zone test verified to fail against the pre-fix CSS. Full `pnpm check` + `pnpm test:e2e` (166 passing).
+- **Supersedes:** None

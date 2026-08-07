@@ -12,7 +12,10 @@ export function ScreenContainer({ children, className = "", dir, screenName, ...
   useScreenFocus(screenName);
 
   return (
-    <main
+    // Deliberately a div, not <main>: App.tsx already renders the single
+    // #main-content landmark that wraps every screen. Nesting a second <main>
+    // inside it produced two main landmarks.
+    <div
       className={`scroll-container flex flex-1 min-h-0 w-full flex-col bg-background pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] ${className}`}
       dir={dir}
       {...props}
@@ -23,6 +26,6 @@ export function ScreenContainer({ children, className = "", dir, screenName, ...
         </div>
       )}
       {children}
-    </main>
+    </div>
   );
 }

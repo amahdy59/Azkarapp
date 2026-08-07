@@ -7,7 +7,8 @@ async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
   await page.getByTestId("confirm-language").click();
   await page.getByTestId("onboarding-get-started").click();
   await page.getByTestId("continue-as-guest").click();
-  await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
+  // Tier-agnostic: the shell mounts BottomNav, NavRail or NavSidebar by width.
+  await expect(page.getByRole("navigation")).toBeVisible();
 }
 
 async function expectNoWcagViolations(page: import("@playwright/test").Page) {

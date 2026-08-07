@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowPrevious, BarChart3, BookOpen, Home, Settings, Globe, Moon, Sun } from "./icons";
+import { ArrowPrevious, BarChart3, BookOpen, Home, Settings, Globe, Moon, Sun, Contrast } from "./icons";
 import { PalmTreeMark } from "./RoutineGarden";
 import { t } from "../i18n";
 import type { AppLanguage, ThemeMode } from "../types";
@@ -93,13 +93,22 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
               onClick={() => onChange(id)}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="relative flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
+              {/* Persistent non-color active cue. The selected state must not be
+                  conveyed by colour alone, and .nav-active-cue below is only a
+                  transient entrance animation that reduced-motion disables. */}
+              <span
+                aria-hidden="true"
+                className={`absolute inset-x-3 top-0 h-[3px] rounded-b-full ${on ? "bg-primary" : "bg-transparent"}`}
+              />
               <span className={on ? "nav-active-cue" : ""} key={`${id}-${on}`}>
                 <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`whitespace-nowrap font-sans text-[0.625rem] font-semibold leading-6 min-[360px]:text-[0.6875rem] ${on ? "text-primary" : "text-muted-foreground"}`}
+                className={`whitespace-nowrap font-sans text-[0.625rem] leading-6 min-[360px]:text-[0.6875rem] ${
+                  on ? "font-extrabold text-primary" : "font-semibold text-muted-foreground"
+                }`}
                 dir="auto"
               >
                 {label}
@@ -124,7 +133,7 @@ export function NavRail({ active, onChange, isArabic = false }: NavProps) {
   const tabs = getNavTabs(language);
   return (
     <nav
-      aria-label={t(language, "common.bottomNavigation")}
+      aria-label={t(language, "common.primaryNavigation")}
       className="app-rail flex flex-col items-center gap-2 py-4 px-1"
     >
       {/* Brand icon */}
@@ -176,14 +185,25 @@ export function NavSidebar({
     onLanguageChange?.(isArabic ? "en" : "ar");
   };
 
-  const toggleTheme = () => {
-    const nextMode: ThemeMode = themeMode === "dark" ? "light" : "dark";
+  // Cycle all three product themes. A binary dark<->light toggle would strand a
+  // Midnight user in Light with no way back from the sidebar.
+  const THEME_CYCLE: ThemeMode[] = ["midnight", "dark", "light"];
+  const themeLabelKeys = {
+    midnight: "settings.themeMidnight",
+    dark: "settings.themeDark",
+    light: "settings.themeLight",
+  } as const;
+  const ThemeIcon = themeMode === "light" ? Sun : themeMode === "dark" ? Contrast : Moon;
+
+  const cycleTheme = () => {
+    const currentIndex = THEME_CYCLE.indexOf(themeMode);
+    const nextMode = THEME_CYCLE[(currentIndex + 1) % THEME_CYCLE.length]!;
     onThemeModeChange?.(nextMode);
   };
 
   return (
     <nav
-      aria-label={t(language, "common.bottomNavigation")}
+      aria-label={t(language, "common.primaryNavigation")}
       className="app-sidebar nav-sidebar flex flex-col justify-between h-full"
     >
       <div className="flex flex-col gap-1">
@@ -241,18 +261,17 @@ export function NavSidebar({
         {onThemeModeChange && (
           <button
             type="button"
-            onClick={toggleTheme}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors"
+            onClick={cycleTheme}
+            aria-label={`${isArabic ? "المظهر" : "Theme"}: ${t(language, themeLabelKeys[themeMode])}`}
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="flex items-center gap-2.5">
-              {themeMode === "dark" ? (
-                <Sun size={18} className="text-amber-400" />
-              ) : (
-                <Moon size={18} className="text-primary" />
-              )}
+              <ThemeIcon size={18} className="text-primary" />
               <span>{isArabic ? "المظهر" : "Theme"}</span>
             </div>
-            <span className="text-[0.6875rem] font-bold capitalize text-muted-foreground">{themeMode}</span>
+            <span className="text-[0.6875rem] font-bold text-muted-foreground">
+              {t(language, themeLabelKeys[themeMode])}
+            </span>
           </button>
         )}
       </div>

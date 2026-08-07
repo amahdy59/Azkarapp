@@ -119,8 +119,9 @@ Every interactive component should define:
 
 ## Benefit sheet contract
 
-- The modal layer is positioned inside the app canvas rather than the browser viewport. Its sheet rises from and remains attached to the app canvas bottom edge on phone, tablet, and desktop.
-- Width is fluid up to the 390 px app canvas.
+- Sheets and dialogs are portaled to `document.body` by their Radix/Vaul primitives, so they are positioned against the browser viewport, not the app canvas. On compact viewports the sheet still rises from and stays attached to the bottom edge.
+- Width is fluid up to `--content-reading` (600 px), per DEC-004/DEC-010 — not the 390 px canvas.
+- Both presentations trap focus, restore focus to the trigger on close, dismiss on Escape, and lock background scroll (DEC-025).
 - Normal height is the smaller of 82 dynamic-viewport-height units and 720 px, capped at `100dvh - 12px`.
 - At heights of 560 px or less, height becomes `100dvh - 12px`.
 - Content scrolls inside the sheet with overscroll containment. The 64 px handle/close header remains outside the scroll viewport so dismissal is always reachable.
@@ -174,10 +175,20 @@ Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease
 
 ## Responsive shell
 
-- Mobile (≤500px): full-width app and bottom navigation.
-- Tablet (501px–1200px): rail/drawer with flexible content.
-- Desktop (≥1200px): responsive content container and persistent sidebar.
-- Reader/focused flows: constrained reading measure (~430px–600px maximum).
+Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in `src/styles/theme.css` must agree on these boundaries — a mismatch previously left one range with no navigation at all.
+
+| Tier       | Width        | Shell                               | Navigation          |
+| ---------- | ------------ | ----------------------------------- | ------------------- |
+| `compact`  | ≤599px       | Full-bleed, no rounded canvas       | Bottom navigation   |
+| `medium`   | 600px–899px  | Fluid grid, main + bottom-nav areas | Bottom navigation   |
+| `expanded` | 900px–1199px | Fluid grid, rail + main areas       | Vertical nav rail   |
+| `large`    | ≥1200px      | Fluid grid, sidebar + main areas    | Labeled nav sidebar |
+
+- There is no drawer/off-canvas navigation variant; exactly one nav component mounts per tier.
+- Navigation is hidden entirely on splash, onboarding and auth views at every tier.
+- Height is never part of tier selection. Short landscape viewports keep the navigation for their width.
+- Reader/focused flows: constrained reading measure (~430px–600px maximum), independent of tier.
+- Dashboard-tier screens opt into `.page-content-center` (max `--content-dashboard`); Settings uses its own two-pane with `--content-form` on the detail pane.
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 
 ## Change control

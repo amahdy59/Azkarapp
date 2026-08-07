@@ -59,10 +59,17 @@ When adding a persisted field:
 
 The application uses a typed `View` state and browser history rather than a route framework. `push`, `pop`, and pop-state handling keep browser navigation synchronized with the displayed screen. Major screens are lazy loaded through `React.lazy` and wrapped by the shared suspense fallback.
 
+A second, narrower `activeTab` state (`home | azkar | progress | settings`) drives which top-level destination the navigation highlights. It is derived from `View` and kept in sync in `App.tsx`; `View` remains the source of truth for what renders.
+
+The shell is adaptive. `useLayoutMode` returns one of four width-only tiers — `compact` (≤599px), `medium` (600–899px), `expanded` (900–1199px), `large` (≥1200px) — and `App.tsx` mounts exactly one navigation component per tier: `BottomNav` for compact and medium, `NavRail` for expanded, `NavSidebar` for large. The corresponding grid areas live in `src/styles/theme.css`; the JS boundaries and the CSS media queries must stay in agreement.
+
 Rules:
 
 - New top-level destinations require a `View` member and an `App.tsx` rendering branch.
-- Back actions must preserve predictable browser behavior.
+- Back actions must preserve predictable browser behavior. `pop()` uses an in-app history depth counter rather than `window.history.length`, so Back can never navigate out of the app.
+- Navigation is hidden on splash, onboarding and auth views at every tier, via a single shared view whitelist.
+- `App.tsx` owns the one `#main-content` landmark; screens must not render their own `<main>`.
+- Focus moves to `#main-content` on every view change (`useViewFocus`), skipping initial load.
 - Settings subsections use `SettingsSubScreen` within `SettingsScreen`.
 - The Azkar tab always opens the collection index, not an implicit prior category.
 
