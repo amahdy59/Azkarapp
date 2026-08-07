@@ -705,3 +705,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** 13 tests in `RoutineGarden.characterization.test.tsx`. Full `pnpm check` + `pnpm test:e2e` (288 unit, 256 e2e).
 - **Still open:** the split itself. The safety net now exists, so it can proceed as a separate reviewable change — which is the point of doing this first.
 - **Supersedes:** The deferral recorded in DEC-037.
+
+---
+
+## DEC-039 — CI Node mismatch, and verifying i18n completeness properly
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Claude (delegated)
+- **Related phase:** Cross-cutting / Phase 09
+- **Deployment defect found and fixed.** The Arabic mojibake guard from DEC-037 used `fs.globSync`, which only exists from **Node 22**. Local Node is 24, so it passed here; CI pins **Node 20**, where it threw `globSync is not a function` and failed the quality gate. A guard written to protect the build became the thing breaking it, and two subsequent pushes failed for the same reason before it was caught. Replaced with a recursive `readdirSync` walk (Node 10+) and `String.replaceAll` (Node 15+). Verified CI green and the live site serving current `HEAD`.
+- **Lesson recorded rather than glossed:** passing locally is not evidence of passing where the code runs. The pre-push hook runs the same commands but on the _local_ toolchain, so it cannot catch a runtime-version gap by construction.
+- **Phase 09 criterion "Arabic/English copy is complete" — verified, not assumed.** A first attempt used a regex over the i18n source files and reported **36 keys missing in Arabic and 15 in English**. All were **false positives**: the parser did not handle single-quoted strings, and spot-checking three of them found each present in both bundles. Reporting that as a defect would have been wrong.
+- **Decision:** replaced the throwaway regex with `src/app/i18n/parity.test.ts`, which imports both bundles and compares real key paths. Result: **full parity, no empty strings**. The criterion is genuinely met. The test also guards against empty-string values, which parity alone would miss, and was verified by removing a key and confirming it names `library.saved`.
+- **Tests/evidence required:** 3 parity tests; CI run green; live `deployment-meta.json` matching `HEAD`. Full `pnpm check` (291 unit).
+- **Supersedes:** None
