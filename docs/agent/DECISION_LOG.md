@@ -673,3 +673,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **A corrupted-Arabic near-miss, worth recording.** The Arabic group names shipped to the working tree as mojibake (`Ø£Ø°ÙØ§Ø± Ø§ÙÙÙÙ`) because the script that wrote them round-tripped UTF-8 through `unicode_escape`. **Every test passed** — unit, e2e and axe — because none of them asserted on Arabic copy. It was caught only by looking at a rendered screenshot. Added `src/app/i18n/encoding.test.ts`, which scans the whole Arabic bundle for Latin-1 mojibake sequences and reports the offending key path; verified by reintroducing the corruption and confirming it fails. This protects all Arabic copy, not just these five strings.
 - **Tests/evidence required:** `categoryGroups.test.ts` asserts every Library category appears in exactly one group, no group is empty, ids are unique, and `friday_kahf` is absent — so a future category cannot be silently dropped from the index. Browser check confirmed all 17 cards render across the five headings. Full `pnpm check` + `pnpm test:e2e` (274 unit, 253 e2e).
 - **Supersedes:** The "not done / deferred" taxonomy note in DEC-032.
+
+---
+
+## DEC-037 — Phase 08: the week grid was invisible to screen readers
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Claude (delegated — user asked to proceed through remaining phases autonomously)
+- **Related phase:** Phase 08
+- **Primary finding:** the Progress week grid rendered completion as **shape alone with no text**. A completed cell held an icon `<div>`; an incomplete cell held an empty bordered `<div>`. Neither carried a label. A screen reader therefore announced all 21 cells as blank, so the entire week view conveyed **nothing** — a direct failure of the phase's "charts are understandable without color or vision" criterion.
+- **Fix:** extracted `WeekStatusCell`, which renders an `sr-only` "Morning: Completed" / "Not completed" string and marks the visual shape `aria-hidden`. Added `scope="col"` to the header cells so column association is explicit during grid navigation.
+- **Verified already correct, deliberately unchanged:** the month calendar is well built — every day is a `<button>` with a descriptive `aria-label` covering complete / partial / unstarted. Streak copy is already gentle ("You kept up with {category} today"); no punitive language exists, so the phase's criterion on that is met without edits.
+- **A repeat mistake, and the systemic fix.** The Arabic strings in the new cell shipped as mojibake, exactly as in DEC-036, because the same script pattern round-tripped UTF-8 through `unicode_escape`. The DEC-036 guard did not catch it: that guard only scanned `ar.ts`, and this Arabic was inline in a component. The guard now scans **every** `src/**/*.{ts,tsx}` file and reports `file:line`; verified by reintroducing the corruption in `ProgressViews.tsx` and confirming it fails. Two occurrences of the same defect class in one session is a process signal, not bad luck — the check now covers the whole surface rather than the one file that failed first.
+- **Tests/evidence required:** e2e asserts 21 labelled cells, that the table text contains "Morning: Completed/Not completed", and that column headers are scoped. Browser check confirmed the rendered table text. Full `pnpm check` + `pnpm test:e2e` (275 unit, 256 e2e).
+- **Deferred, not done:** splitting `ProgressViews.tsx` (905 lines) and `RoutineGarden.tsx` (781 lines, **2.45% coverage**) is still outstanding. Refactoring a file that large with almost no coverage is how regressions get introduced silently; characterization tests should land before the split, and that is a larger piece of work than this fix.
+- **Supersedes:** None

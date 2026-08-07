@@ -200,3 +200,23 @@ test("Home lists the three time-of-day routines while Progress keeps all four", 
   await page.getByRole("button", { name: "Progress", exact: true }).click();
   await expect(page.getByRole("button", { name: /After Prayer Azkar/ }).first()).toBeVisible();
 });
+
+test("the week grid conveys completion as text, not shape alone", async ({ page }) => {
+  await seedReturningGardenUser(page, { completedToday: ["morning"] });
+  await openReturningHome(page);
+
+  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await page.getByRole("tab", { name: "Week", exact: true }).click();
+
+  const table = page.locator("table").first();
+  await expect(table).toBeVisible();
+
+  // Cells used to contain only an icon or an empty bordered circle, so a
+  // screen reader announced the whole grid as blank.
+  await expect(table.locator("td .sr-only")).toHaveCount(21);
+  await expect(table).toContainText(/Morning: (Completed|Not completed)/);
+
+  // Headers must be associated with their column for grid navigation.
+  const scoped = await table.locator("th[scope='col']").count();
+  expect(scoped).toBeGreaterThan(3);
+});

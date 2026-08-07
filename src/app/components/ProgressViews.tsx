@@ -189,6 +189,34 @@ export function ProgressDayView({
 // ────────────────────────────────────────────────────────────────────────────
 // WEEK VIEW (WEEKLY COMMITMENT MATRIX & ROUTINE PROGRESS BARS)
 // ────────────────────────────────────────────────────────────────────────────
+/**
+ * One completion cell in the week table.
+ *
+ * The mark used to be a bare icon (or an empty bordered circle for "not done")
+ * with no text and no label, so every cell in the week grid was announced as
+ * empty and the whole view conveyed nothing to a screen reader.
+ */
+function WeekStatusCell({ done, label, isArabic }: { done: boolean; label: string; isArabic: boolean }) {
+  const status = done ? (isArabic ? "مكتملة" : "Completed") : isArabic ? "غير مكتملة" : "Not completed";
+  return (
+    <td className="py-3 px-2">
+      <div className="flex justify-center">
+        <span className="sr-only">{`${label}: ${status}`}</span>
+        {done ? (
+          <div
+            aria-hidden="true"
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400"
+          >
+            <Check size={15} strokeWidth={3} />
+          </div>
+        ) : (
+          <div aria-hidden="true" className="w-6 h-6 rounded-full border-2 border-amber-500/50" />
+        )}
+      </div>
+    </td>
+  );
+}
+
 export function ProgressWeekView({
   summary,
   language,
@@ -259,25 +287,25 @@ export function ProgressWeekView({
           <table className="w-full border-collapse text-center">
             <thead>
               <tr className="border-b border-white/30 dark:border-white/10">
-                <th className="py-2.5 px-2 text-start text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-start text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar size={15} />
                     <span>{isArabic ? "اليوم" : "Day"}</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sun size={15} className="text-emerald-500" />
                     <span>{isArabic ? "أذكار الصباح" : "Morning"}</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sun size={15} className="text-amber-500" />
                     <span>{isArabic ? "أذكار المساء" : "Evening"}</span>
                   </div>
                 </th>
-                <th className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Moon size={15} className="text-indigo-400" />
                     <span>{isArabic ? "أذكار النوم" : "Sleep"}</span>
@@ -298,44 +326,23 @@ export function ProgressWeekView({
                     </span>
                   </td>
 
-                  {/* Morning Status */}
-                  <td className="py-3 px-2">
-                    <div className="flex justify-center">
-                      {day.morningStatus === "complete" ? (
-                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400">
-                          <Check size={15} strokeWidth={3} />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border-2 border-amber-500/50" />
-                      )}
-                    </div>
-                  </td>
+                  <WeekStatusCell
+                    done={day.morningStatus === "complete"}
+                    label={isArabic ? "أذكار الصباح" : "Morning"}
+                    isArabic={isArabic}
+                  />
 
-                  {/* Evening Status */}
-                  <td className="py-3 px-2">
-                    <div className="flex justify-center">
-                      {day.eveningStatus === "complete" ? (
-                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400">
-                          <Check size={15} strokeWidth={3} />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border-2 border-amber-500/50" />
-                      )}
-                    </div>
-                  </td>
+                  <WeekStatusCell
+                    done={day.eveningStatus === "complete"}
+                    label={isArabic ? "أذكار المساء" : "Evening"}
+                    isArabic={isArabic}
+                  />
 
-                  {/* Sleep Status */}
-                  <td className="py-3 px-2">
-                    <div className="flex justify-center">
-                      {day.sleepStatus === "complete" ? (
-                        <div className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400">
-                          <Check size={15} strokeWidth={3} />
-                        </div>
-                      ) : (
-                        <div className="w-6 h-6 rounded-full border-2 border-amber-500/50" />
-                      )}
-                    </div>
-                  </td>
+                  <WeekStatusCell
+                    done={day.sleepStatus === "complete"}
+                    label={isArabic ? "أذكار النوم" : "Sleep"}
+                    isArabic={isArabic}
+                  />
                 </tr>
               ))}
             </tbody>
