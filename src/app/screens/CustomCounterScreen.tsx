@@ -3,6 +3,7 @@ import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
+import { Modal } from "../components/ResponsiveSheet";
 import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibrarySheet";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
@@ -290,19 +291,16 @@ export function CustomCounterScreen({
 
       {/* Target Completion Choice Modal (Reset vs Continue) */}
       {showCompletionDialog && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
+        <Modal
+          open
+          onClose={() => setShowCompletionDialog(false)}
+          title={isArabic ? "ما شاء الله! أتممت الهدف" : "Goal Reached!"}
+          direction={isArabic ? "rtl" : "ltr"}
+          maxWidthClassName="max-w-sm"
+          className="p-6 text-center"
         >
-          <button
-            type="button"
-            aria-label={isArabic ? "إغلاق" : "Close"}
-            className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
-            onClick={() => setShowCompletionDialog(false)}
-          />
-          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 text-center shadow-2xl">
-            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
+          <div>
+            <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-success/20 text-success">
               <Check size={32} strokeWidth={3} />
             </div>
 
@@ -339,7 +337,7 @@ export function CustomCounterScreen({
               </button>
             </div>
           </div>
-        </div>
+        </Modal>
       )}
 
       {/* Authentic Zikr Selection Sheet */}

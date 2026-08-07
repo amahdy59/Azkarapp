@@ -4,9 +4,8 @@ import { QURAN_WORD_MEANING_SOURCE, type QuranWordMeaning } from "../content/qur
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
+import { ResponsiveSheet } from "./ResponsiveSheet";
 import { useLayoutMode } from "../hooks/useLayoutMode";
-import { useEffect } from "react";
 
 // ─── Shared content ───────────────────────────────────────────────────────────
 
@@ -147,79 +146,25 @@ export function QuranWordMeaningSheet({
 }) {
   const layoutMode = useLayoutMode();
   const isOpen = Boolean(meanings?.length);
-  const useDialog = layoutMode !== "compact";
-
-  // Close on Escape when dialog is open
-  useEffect(() => {
-    if (!isOpen || !useDialog) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, useDialog, onClose]);
 
   if (!isOpen || !meanings) return null;
 
-  // Medium+ → Desktop / Tablet Modal Dialog
-  if (useDialog) {
-    return (
-      <div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-        role="dialog"
-        aria-modal="true"
-        aria-label={t(language, "reader.wordMeaningTitle")}
-        aria-describedby="quran-word-meaning-description"
-        dir={direction}
-        data-testid="quran-word-meaning-sheet"
-        data-prevent-count="true"
-      >
-        {/* Backdrop button */}
-        <button
-          type="button"
-          tabIndex={-1}
-          aria-hidden="true"
-          className="fixed inset-0 border-none bg-black/60 backdrop-blur-md cursor-default animate-in fade-in-0 duration-200"
-          onClick={onClose}
-        />
-        {/* Dialog card */}
-        <div className="relative z-10 flex flex-col w-full max-w-[var(--content-reading)] max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
-          <WordMeaningContent
-            meanings={meanings}
-            language={language}
-            direction={direction}
-            onClose={onClose}
-            variant="dialog"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Compact → Mobile Bottom Sheet (Vaul Drawer)
   return (
-    <Drawer
+    <ResponsiveSheet
       open={isOpen}
-      onOpenChange={(open) => {
-        if (!open) onClose();
-      }}
+      onClose={onClose}
+      title={t(language, "reader.wordMeaningTitle")}
+      direction={direction}
+      testId="quran-word-meaning-sheet"
+      describedById="quran-word-meaning-description"
     >
-      <DrawerContent
-        data-testid="quran-word-meaning-sheet"
-        data-prevent-count="true"
-        aria-describedby="quran-word-meaning-description"
-        className="fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[88vh] shadow-2xl border-t border-border/40 pb-safe"
-        dir={direction}
-      >
-        <DrawerTitle className="sr-only">{t(language, "reader.wordMeaningTitle")}</DrawerTitle>
-        <WordMeaningContent
-          meanings={meanings}
-          language={language}
-          direction={direction}
-          onClose={onClose}
-          variant="sheet"
-        />
-      </DrawerContent>
-    </Drawer>
+      <WordMeaningContent
+        meanings={meanings}
+        language={language}
+        direction={direction}
+        onClose={onClose}
+        variant={layoutMode === "compact" ? "sheet" : "dialog"}
+      />
+    </ResponsiveSheet>
   );
 }

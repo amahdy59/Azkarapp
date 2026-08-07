@@ -8,7 +8,7 @@ import {
   getLocalizedSourceReference,
   getLocalizedZikrBenefit,
 } from "../content/localizedZikr";
-import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
+import { ResponsiveSheet } from "./ResponsiveSheet";
 import { FormattedBenefit } from "./FormattedBenefit";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 
@@ -278,76 +278,27 @@ export function ReaderReferenceSheet({
   onAnnouncement: (message: string) => void;
 }) {
   const layoutMode = useLayoutMode();
-  const useDialog = layoutMode !== "compact";
-
-  // Close on Escape when dialog is open
-  useEffect(() => {
-    if (!open || !useDialog) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [open, useDialog, onClose]);
 
   if (!open || !zikr) return null;
 
-  // Medium+ → Desktop / Tablet Modal Dialog
-  if (useDialog) {
-    return (
-      <div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
-        role="dialog"
-        aria-modal="true"
-        aria-label={t(language, "reader.referencesButton")}
-        dir={direction}
-        data-testid="reference-sheet"
-      >
-        <button
-          type="button"
-          tabIndex={-1}
-          aria-hidden="true"
-          className="fixed inset-0 border-none bg-black/60 backdrop-blur-md cursor-default animate-in fade-in-0 duration-200"
-          onClick={onClose}
-        />
-        <div className="relative z-10 flex flex-col w-full max-w-[var(--content-reading)] max-h-[85vh] rounded-3xl border border-border/60 bg-card shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200">
-          <ReferenceContent
-            zikr={zikr}
-            language={language}
-            direction={direction}
-            onClose={onClose}
-            onAnnouncement={onAnnouncement}
-            variant="dialog"
-          />
-        </div>
-      </div>
-    );
-  }
-
-  // Compact → Mobile Bottom Sheet (Vaul Drawer)
   return (
-    <Drawer
+    <ResponsiveSheet
       open={open}
-      onOpenChange={(isOpen) => {
-        if (!isOpen) onClose();
-      }}
+      onClose={onClose}
+      title={t(language, "reader.referencesButton")}
+      direction={direction}
+      testId="reference-sheet"
+      // `.reference-sheet` carries the sheet height rules in theme.css.
+      drawerClassName="reference-sheet"
     >
-      <DrawerContent
-        data-testid="reference-sheet"
-        aria-describedby={undefined}
-        className="reference-sheet fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] bg-background outline-none focus-visible:outline-none max-h-[88vh] shadow-2xl border-t border-border/40 pb-safe"
-        dir={direction}
-      >
-        <DrawerTitle className="sr-only">{t(language, "reader.referencesButton")}</DrawerTitle>
-        <ReferenceContent
-          zikr={zikr}
-          language={language}
-          direction={direction}
-          onClose={onClose}
-          onAnnouncement={onAnnouncement}
-          variant="sheet"
-        />
-      </DrawerContent>
-    </Drawer>
+      <ReferenceContent
+        zikr={zikr}
+        language={language}
+        direction={direction}
+        onClose={onClose}
+        onAnnouncement={onAnnouncement}
+        variant={layoutMode === "compact" ? "sheet" : "dialog"}
+      />
+    </ResponsiveSheet>
   );
 }

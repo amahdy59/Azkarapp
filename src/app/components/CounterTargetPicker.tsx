@@ -2,6 +2,7 @@ import { useState } from "react";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage } from "../types";
 import { SlidersHorizontal } from "./icons";
+import { Modal } from "./ResponsiveSheet";
 
 export type TargetPreset = 10 | 33 | 100 | 1000 | 0 | "custom";
 
@@ -84,18 +85,15 @@ export function CounterTargetPicker({
 
       {/* Custom Target Dialog */}
       {showCustomModal && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
+        <Modal
+          open
+          onClose={() => setShowCustomModal(false)}
+          title={isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
+          direction={isArabic ? "rtl" : "ltr"}
+          maxWidthClassName="max-w-sm"
+          className="p-6"
         >
-          <button
-            type="button"
-            aria-label={isArabic ? "إغلاق" : "Close"}
-            className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
-            onClick={() => setShowCustomModal(false)}
-          />
-          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 shadow-2xl">
+          <div>
             <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">
               {isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
             </h3>
@@ -147,7 +145,7 @@ export function CounterTargetPicker({
               </div>
             </form>
           </div>
-        </div>
+        </Modal>
       )}
     </div>
   );

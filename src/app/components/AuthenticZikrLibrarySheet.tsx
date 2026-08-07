@@ -1,5 +1,6 @@
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Search, BookOpen, Sparkles, X } from "./icons";
+import { ResponsiveSheet } from "./ResponsiveSheet";
 import {
   AUTHENTIC_AZKAR_COLLECTION,
   getAuthenticZikrCategories,
@@ -47,16 +48,6 @@ export function AuthenticZikrLibrarySheet({
     });
   }, [selectedCat, searchQuery]);
 
-  // Close on Escape when open
-  useEffect(() => {
-    if (!isOpen) return;
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [isOpen, onClose]);
-
   if (!isOpen) return null;
 
   const handleSelectAuthentic = (item: AuthenticZikrItem) => {
@@ -65,32 +56,14 @@ export function AuthenticZikrLibrarySheet({
   };
 
   return (
-    <div
-      className={`fixed inset-0 z-[100] flex ${
-        useDialog ? "items-center justify-center p-4 sm:p-6" : "items-end justify-center"
-      }`}
-      dir={direction}
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="authentic-sheet-title"
+    <ResponsiveSheet
+      open={isOpen}
+      onClose={onClose}
+      title={isArabic ? "مكتبة الأذكار المأثورة الموثقة" : "Authentic Verified Zikr Library"}
+      direction={direction}
+      maxWidthClassName="max-w-[var(--content-form)]"
     >
-      {/* Backdrop */}
-      <button
-        type="button"
-        tabIndex={-1}
-        aria-hidden="true"
-        className="fixed inset-0 border-none bg-black/60 backdrop-blur-md cursor-default animate-in fade-in-0 duration-200"
-        onClick={onClose}
-      />
-
-      {/* Modal / Sheet Card */}
-      <div
-        className={`relative z-10 flex flex-col w-full bg-card shadow-2xl overflow-hidden transition-transform animate-in fade-in-0 duration-200 ${
-          useDialog
-            ? "max-w-2xl max-h-[85vh] rounded-3xl border border-border/60 zoom-in-95"
-            : "max-w-lg max-h-[88vh] rounded-t-[1.75rem] border-t border-border/40 pb-safe"
-        }`}
-      >
+      <>
         {/* Drag Handle Bar (sheet only) */}
         {!useDialog && (
           <div className="flex shrink-0 justify-center pt-3 pb-1">
@@ -206,7 +179,7 @@ export function AuthenticZikrLibrarySheet({
             ))
           )}
         </div>
-      </div>
-    </div>
+      </>
+    </ResponsiveSheet>
   );
 }

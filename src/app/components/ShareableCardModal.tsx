@@ -4,6 +4,7 @@ import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { PalmTreeMark } from "./RoutineGarden";
+import { Modal } from "./ResponsiveSheet";
 
 interface ShareableCardModalProps {
   palms: number;
@@ -41,14 +42,15 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
   };
 
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label={t(language, "shareModal.dialogAria")}
-      dir={direction}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 p-4 backdrop-blur-sm animate-fade-in"
+    <Modal
+      open
+      onClose={onClose}
+      title={t(language, "shareModal.dialogAria")}
+      direction={direction}
+      maxWidthClassName="max-w-sm"
+      className="border-primary/30 p-6 dark:border-white/10"
     >
-      <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-amber-500/30 bg-card p-6 shadow-2xl dark:border-white/10 dark:bg-card">
+      <div className="relative">
         {/* Close Button — dynamically positioned based on direction */}
         <button
           type="button"
@@ -139,6 +141,6 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           </button>
         </div>
       </div>
-    </div>
+    </Modal>
   );
 }

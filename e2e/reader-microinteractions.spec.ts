@@ -334,3 +334,31 @@ for (const locale of [
     }
   });
 }
+
+test("reference dialog traps focus, restores it on close, and closes on Escape", async ({ page }) => {
+  // Desktop width so the reference surface renders as a centered dialog.
+  await page.setViewportSize({ width: 1110, height: 835 });
+  await openFirstMorningZikr(page);
+
+  const trigger = page.getByRole("button", { name: "Benefit", exact: true });
+  await trigger.click();
+
+  const sheet = page.getByTestId("reference-sheet");
+  await expect(sheet).toBeVisible();
+
+  // Focus containment: tabbing repeatedly must never escape the dialog. The
+  // hand-rolled overlays this replaced had no focus trap at all.
+  for (let i = 0; i < 12; i += 1) {
+    await page.keyboard.press("Tab");
+    const insideDialog = await page.evaluate(() => {
+      const dialog = document.querySelector('[data-testid="reference-sheet"]');
+      return Boolean(dialog && document.activeElement && dialog.contains(document.activeElement));
+    });
+    expect(insideDialog).toBe(true);
+  }
+
+  // Escape dismisses, and focus returns to the control that opened it.
+  await page.keyboard.press("Escape");
+  await expect(sheet).toHaveCount(0);
+  await expect(trigger).toBeFocused();
+});

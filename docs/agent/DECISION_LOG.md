@@ -440,3 +440,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/components/ui/button.tsx` and the 9 adopting files listed above.
 - **Tests/evidence required:** Strengthened `ZikrShareButton.test.tsx`; full `pnpm check` (237 unit tests) + `pnpm test:e2e` (145 passing).
 - **Supersedes:** None
+
+---
+
+## DEC-025 — `Modal`/`ResponsiveSheet`: real focus containment for all dialogs
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 9)
+- **Related phase:** Phase 03
+- **Context:** Six hand-rolled `role="dialog"` overlays existed with no focus containment, no focus restore, and (in three cases) no Escape handling — violating `docs/agent/ACCESSIBILITY_REQUIREMENTS.md` §9 ("dialogs have focus containment and reliable dismissal"). Three of them duplicated the same compact-vs-desktop branching logic.
+- **Options considered:** Hand-roll a focus trap; adopt `@radix-ui/react-dialog`.
+- **Decision:** Adopted `@radix-ui/react-dialog`, promoting it from a transitive to a direct dependency. Added `src/app/components/ResponsiveSheet.tsx` exporting `Modal` (centered Radix Dialog) and `ResponsiveSheet` (Vaul drawer on compact, `Modal` on medium+). Migrated all six overlays.
+- **Why (dependency justification per AGENTS.md):** `@radix-ui/react-dialog@1.1.6` was **already in the production bundle** — `@radix-ui/react-alert-dialog` (used by `ConfirmDialog`, mounted in `App.tsx`) depends on it. Promoting it to a direct dependency therefore costs **zero bundle bytes** and removes the fragility of importing through a transitive path. Focus trapping is also notoriously error-prone to hand-roll (containment, restore, scroll lock, `aria-hidden` on background, portal ordering), and the app already standardises on Radix elsewhere.
+- **Consequences / two real defects found while verifying:**
+  1. **Escape closed the reader underneath the dialog.** `ReaderScreen` treats Escape as "leave the reading session" and its guard only suppresses that while its own sheet state is open. With the dialog portaled, the same keypress reached both. Fixed by having `Modal` consume Escape (`onEscapeKeyDown` → `stopPropagation`) — correct behaviour for a modal regardless.
+  2. **Focus was not restored on close** (it fell to `<body>`). Radix and Vaul both restore focus, but only while their root stays mounted; every call site conditionally renders (`if (!open) return null`), tearing the root down in the same commit. Fixed with a `useRestoreFocusOnClose` effect-cleanup hook inside `ResponsiveSheet.tsx`, which runs after React commits the removal and so works for both mount patterns.
+     Neither defect would have been caught by the existing suite — both were found by writing a real-browser focus-trap test first.
+  - `ShareableCardModal`'s hardcoded `bg-green-500`/`amber-500` accents and `CustomCounterScreen`'s success badge were moved onto `bg-success`/`text-success` while in the file, continuing DEC-006/DEC-021.
+- **Files/contracts to update:** `package.json`; `src/app/components/ResponsiveSheet.tsx` (new); `QuranWordMeaningSheet.tsx`, `ReaderReferenceSheet.tsx`, `AuthenticZikrLibrarySheet.tsx`, `CounterTargetPicker.tsx`, `ShareableCardModal.tsx`, `CustomCounterScreen.tsx`.
+- **Tests/evidence required:** New `reader-microinteractions.spec.ts` test asserting focus containment across 12 Tab presses, Escape dismissal with the reader still mounted, and focus restore to the trigger. Full `pnpm check` (237 unit) + `pnpm test:e2e` (148 passing).
+- **Supersedes:** None
