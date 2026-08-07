@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
+import { InformationCard } from "./InformationCard";
 import {
   CALCULATION_METHODS,
   DEFAULT_LOCATION,
@@ -494,27 +495,11 @@ export function NotificationsPanel({
           </div>
         </section>
 
-        <section
-          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
-          aria-labelledby="notification-availability"
-        >
-          <div className="flex items-start gap-3">
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
-              aria-hidden="true"
-            >
-              <Info size={22} className="text-primary" />
-            </span>
-            <div>
-              <h2 id="notification-availability" className="text-[1.0625rem] font-semibold text-foreground">
-                {t(language, "notifications.availability")}
-              </h2>
-              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-                {t(language, "notifications.availabilityBody")}
-              </p>
-            </div>
-          </div>
-        </section>
+        <InformationCard
+          icon={<Info size={20} aria-hidden="true" />}
+          title={t(language, "notifications.availability")}
+          body={t(language, "notifications.availabilityBody")}
+        />
 
         <section
           className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"

@@ -334,3 +334,20 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/components/Card.tsx`, `src/app/screens/settings/SettingsPrimitives.tsx`, `src/app/screens/settings/SettingsRootPanel.tsx`.
 - **Tests/evidence required:** `SettingsSection.test.tsx` (new), extended `Card.test.tsx`, full `pnpm check` + `pnpm test:e2e`.
 - **Supersedes:** None
+
+---
+
+## DEC-020 — `InformationCard` gains an action slot; `Card` gains prop forwarding; adopted where the shape genuinely matches
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 3)
+- **Related phase:** Phase 03
+- **Context:** `HelpPanel.tsx`, `DownloadsPanel.tsx`, `AccountDataPanel.tsx`, `NotificationsPanel.tsx`, and `SourcesPanel.tsx` all had hand-rolled `rounded-3xl border bg-card ... shadow-lg` sections. On inspection, only some were genuine icon+title+body(+one action) matches for `InformationCard`; several others (`DownloadsPanel`'s status/audio sections, `AccountDataPanel`'s account-status block) have multiple paragraphs, `<dl>` tables, or multiple buttons — too rich for `InformationCard`'s simple shape. `Card` also didn't forward arbitrary props, so `aria-labelledby` (used throughout these sections) would have been silently dropped if used as a drop-in.
+- **Options considered:** Force every flagged block through `InformationCard` regardless of shape (matches the original Phase 03 analysis literally); classify each block individually and only adopt `InformationCard` where the anatomy genuinely matches, using the generic `Card` wrapper (content untouched) elsewhere.
+- **Decision:** Extended `CardProps` to spread arbitrary HTML attributes (fixes the `aria-labelledby` gap). Added `actionLabel`/`actionIcon`/`onAction` to `InformationCard`, built on `Card`. Adopted `InformationCard` for genuine matches: `HelpPanel`'s intro + "still need help" blocks, `SourcesPanel`'s correction block, `DownloadsPanel`'s bundled-content block, `NotificationsPanel`'s availability block. Wrapped the richer blocks (`DownloadsPanel`'s status/audio sections, `AccountDataPanel`'s account-status and data-summary sections) in plain `Card` only, keeping their custom content as-is. Left `AccountDataPanel`'s local `DataAction` component unmerged — it has a real `destructive` tone variant (different icon-badge color and an outline vs. filled button) plus an existing quirk where `destructive` mode silently ignores the passed `icon` prop in favor of a hardcoded `LogOut`; merging would have meant fixing or replicating that quirk rather than a safe dedup.
+- **Why:** Matches the phase's own instruction to classify each pattern individually rather than force a uniform merge; avoids either data-loss (dropped `aria-labelledby`) or an over-configured `InformationCard` trying to cover every shape.
+- **Consequences:** `NotificationsPanel.tsx` still has several more `shadow-lg` sections (`ReminderScheduleRow`, prayer-location, permission blocks) not touched in this batch — explicitly deferred to the separate, later "wider Card rollout" step rather than partially converting one large file inconsistently.
+- **Files/contracts to update:** `src/app/components/Card.tsx`, `src/app/screens/settings/InformationCard.tsx`, `HelpPanel.tsx`, `SourcesPanel.tsx`, `DownloadsPanel.tsx`, `AccountDataPanel.tsx`, `NotificationsPanel.tsx`.
+- **Tests/evidence required:** `InformationCard.test.tsx` (new), full `pnpm check` + `pnpm test:e2e`.
+- **Supersedes:** None

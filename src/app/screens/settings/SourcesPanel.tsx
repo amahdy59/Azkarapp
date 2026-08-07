@@ -32,29 +32,14 @@ export function SourcesPanel({ language, onBack }: { language: AppLanguage; onBa
           body={t(language, "sources.interpretationBody")}
         />
 
-        <section className="rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-              <MessageChat size={20} aria-hidden="true" />
-            </span>
-            <div className="min-w-0 flex-1">
-              <h2 className="text-[0.9375rem] font-semibold text-foreground">
-                {t(language, "sources.correctionTitle")}
-              </h2>
-              <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
-                {t(language, "sources.correctionBody")}
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => window.open(CORRECTION_URL, "_blank", "noopener,noreferrer")}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[0.8125rem] font-semibold text-primary-foreground"
-          >
-            {t(language, "sources.reportCorrection")}
-            <ExternalLink size={16} aria-hidden="true" />
-          </button>
-        </section>
+        <InformationCard
+          icon={<MessageChat size={20} aria-hidden="true" />}
+          title={t(language, "sources.correctionTitle")}
+          body={t(language, "sources.correctionBody")}
+          actionLabel={t(language, "sources.reportCorrection")}
+          actionIcon={<ExternalLink size={16} aria-hidden="true" />}
+          onAction={() => window.open(CORRECTION_URL, "_blank", "noopener,noreferrer")}
+        />
       </div>
     </div>
   );

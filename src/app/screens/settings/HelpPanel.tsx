@@ -1,6 +1,7 @@
 import { BarChart3, BookOpen, Bookmark, Bell, Database, ExternalLink, HelpCircle, Wifi } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
+import { InformationCard } from "./InformationCard";
 import { SectionLabel, SubHeader } from "./SettingsPrimitives";
 
 const ISSUE_URL = "https://github.com/amahdy59/Azkarapp/issues/new/choose";
@@ -20,11 +21,11 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "help.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <section className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
-          <HelpCircle size={24} className="text-primary" aria-hidden="true" />
-          <h2 className="mt-3 text-[1.125rem] font-semibold text-foreground">{t(language, "help.introTitle")}</h2>
-          <p className="mt-1 text-[0.875rem] leading-6 text-muted-foreground">{t(language, "help.introBody")}</p>
-        </section>
+        <InformationCard
+          icon={<HelpCircle size={20} aria-hidden="true" />}
+          title={t(language, "help.introTitle")}
+          body={t(language, "help.introBody")}
+        />
 
         <div>
           <SectionLabel label={t(language, "help.faq")} />
@@ -54,18 +55,14 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
           </div>
         </div>
 
-        <section className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
-          <h2 className="text-[0.9375rem] font-semibold text-foreground">{t(language, "help.stillNeedHelp")}</h2>
-          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "help.reportHint")}</p>
-          <button
-            type="button"
-            onClick={() => window.open(ISSUE_URL, "_blank", "noopener,noreferrer")}
-            className="mt-3 flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 text-[0.8125rem] font-semibold text-primary-foreground"
-          >
-            {t(language, "help.reportIssue")}
-            <ExternalLink size={16} aria-hidden="true" />
-          </button>
-        </section>
+        <InformationCard
+          icon={<HelpCircle size={20} aria-hidden="true" />}
+          title={t(language, "help.stillNeedHelp")}
+          body={t(language, "help.reportHint")}
+          actionLabel={t(language, "help.reportIssue")}
+          actionIcon={<ExternalLink size={16} aria-hidden="true" />}
+          onAction={() => window.open(ISSUE_URL, "_blank", "noopener,noreferrer")}
+        />
       </div>
     </div>
   );

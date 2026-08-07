@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Card } from "../../components/Card";
 import { CheckCircle2, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
+import { InformationCard } from "./InformationCard";
 import { SubHeader } from "./SettingsPrimitives";
 import { getAzkarForMode } from "../../content/azkar";
 import { loadAudioPreferences } from "../../audio/audioPreferences";
@@ -101,32 +103,13 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     <div className="slide-in-from-right flex h-full flex-col bg-background/50 backdrop-blur-md">
       <SubHeader title={t(language, "downloads.title")} onBack={onBack} language={language} />
       <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-8 pt-3">
-        <section
-          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
-          aria-labelledby="offline-content-title"
-        >
-          <div className="flex items-start gap-3">
-            <span
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
-              aria-hidden="true"
-            >
-              <CloudOff size={22} className="text-primary" />
-            </span>
-            <div>
-              <h2 id="offline-content-title" className="text-[1.0625rem] font-semibold text-foreground">
-                {t(language, "downloads.bundledTitle")}
-              </h2>
-              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-                {t(language, "downloads.bundledBody")}
-              </p>
-            </div>
-          </div>
-        </section>
+        <InformationCard
+          icon={<CloudOff size={20} aria-hidden="true" />}
+          title={t(language, "downloads.bundledTitle")}
+          body={t(language, "downloads.bundledBody")}
+        />
 
-        <section
-          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
-          aria-labelledby="offline-status-title"
-        >
+        <Card as="section" padding="lg" aria-labelledby="offline-status-title">
           <div className="flex items-start gap-3">
             <span
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-muted"
@@ -194,12 +177,9 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               {errorMessage || t(language, "downloads.statusError")}
             </p>
           )}
-        </section>
+        </Card>
 
-        <section
-          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
-          aria-labelledby="audio-downloads-title"
-        >
+        <Card as="section" padding="lg" aria-labelledby="audio-downloads-title">
           <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">
             {language === "ar" ? "تنزيلات الصوت الاختيارية" : "Optional audio downloads"}
           </h2>
@@ -273,7 +253,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           >
             {language === "ar" ? "حذف الصوت المحمّل" : "Remove downloaded audio"}
           </button>
-        </section>
+        </Card>
       </div>
     </div>
   );
