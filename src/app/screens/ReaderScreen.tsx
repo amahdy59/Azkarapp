@@ -120,6 +120,7 @@ export function ReaderScreen({
   savedZikrIds,
   onBack,
   onComplete,
+  onUncomplete,
   onAdvance,
   onNext,
   onPrev,
@@ -143,6 +144,8 @@ export function ReaderScreen({
   savedZikrIds: Set<string>;
   onBack: () => void;
   onComplete: (idx: number) => void;
+  /** Clears a recorded completion so an accidental tap is recoverable. */
+  onUncomplete?: (idx: number) => void;
   onAdvance: (idx: number) => void;
   onNext: () => void;
   onPrev: () => void;
@@ -181,6 +184,23 @@ export function ReaderScreen({
       onComplete,
       onAdvance,
     });
+
+  /**
+   * "Reset counter" also clears a recorded completion, so an accidental tap on
+   * the reader canvas is recoverable. Without this the count could be zeroed
+   * while the zikr stayed marked done, and `isDone` restored it on remount.
+   *
+   * Reuses the same un-complete path the collection list already uses, which
+   * deliberately does not revoke a palm that was already earned.
+   */
+  const handleResetCounter = useCallback(() => {
+    handleReset();
+    if (isDone) {
+      onUncomplete?.(idx);
+    }
+    // handleReset is stable for the life of the mounted zikr.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [idx, isDone, onUncomplete]);
 
   const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGestures({
     direction,
@@ -277,7 +297,7 @@ export function ReaderScreen({
         onBack();
       } else if (e.key === "r" || e.key === "R" || e.key === "ق") {
         e.preventDefault();
-        handleReset();
+        handleResetCounter();
       } else if (e.key === "s" || e.key === "S" || e.key === "س") {
         e.preventDefault();
         handleToggleSaved();
@@ -298,7 +318,7 @@ export function ReaderScreen({
     onNext,
     onBack,
     handleTap,
-    handleReset,
+    handleResetCounter,
     handleToggleSaved,
     benefitOpen,
     selectedWordMeanings,
@@ -681,7 +701,7 @@ export function ReaderScreen({
                 <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
                 <DropdownMenuItem
-                  onClick={handleReset}
+                  onClick={handleResetCounter}
                   className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
                 >
                   <RotateCcw size={18} />

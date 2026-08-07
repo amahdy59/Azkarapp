@@ -1086,6 +1086,7 @@ function AppContent() {
                       : leaveReader
                   }
                   onComplete={markComplete}
+                  onUncomplete={(i) => toggleZikrCompletion(activeCat, i)}
                   onAdvance={
                     activeCat === "friday_kahf"
                       ? () => {

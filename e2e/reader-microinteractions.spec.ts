@@ -388,3 +388,29 @@ test("reader progress is announced politely rather than interrupting", async ({ 
   await expect(announcer).toHaveAttribute("aria-live", "polite");
   await expect(page.locator('[aria-live="assertive"]')).toHaveCount(0);
 });
+
+test("resetting the counter clears an accidental completion from stored progress", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  const counterSurface = page.getByTestId("counter-surface");
+  const stored = () =>
+    page.evaluate(() => {
+      const raw = window.localStorage.getItem("azkarapp.state.v1");
+      return raw ? (JSON.parse(raw).completed?.waking_up ?? []) : [];
+    });
+
+  await counterSurface.click();
+  await expect.poll(stored).toHaveLength(1);
+
+  // Completing auto-advances, so recovery means stepping back to the zikr that
+  // was wrongly marked done and resetting it there.
+  await page.waitForTimeout(1200);
+  await page.keyboard.press("ArrowLeft");
+  await expect(counterSurface).toHaveAttribute("aria-label", /Completed/);
+
+  await page.keyboard.press("r");
+  await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
+
+  // Without clearing the record, isDone would restore the completion on remount.
+  await expect.poll(stored).toHaveLength(0);
+});

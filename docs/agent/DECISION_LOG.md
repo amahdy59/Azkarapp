@@ -626,3 +626,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Flagged, deliberately not fixed:** `handleReset` clears local counter state but does not undo the recorded completion — `onComplete` has already fired and `isDone` restores it on remount. This is Step 1 item 8, but resolving it means changing session state, which the phase's prohibited list excludes without separate approval. Recorded rather than silently changed.
 - **Tests/evidence required:** New `useZikrCounter.test.ts` (9 tests) covering counting, completion, the surface-tap guards, surah behaviour, reset and haptics gating — the hook had no direct coverage despite being the hottest logic in the app. Two new e2e tests for keyboard completion and the polite region. The announcement fix was verified by reverting it and confirming the test fails. Full `pnpm check` + `pnpm test:e2e` (268 unit, 190 e2e).
 - **Supersedes:** None
+
+---
+
+## DEC-034 — Accidental completions are recoverable from the reader
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (explicitly approved the session-state change Phase 07 had deferred)
+- **Related phase:** Phase 07 (follow-up)
+- **Context:** DEC-033 flagged that "Reset counter" cleared the local counter but left the recorded completion, so an accidental tap on the reader canvas was permanent. Phase 07's prohibited list required separate approval before touching session state.
+- **Decision:** "Reset counter" now also clears that zikr's recorded completion. Chosen over a separate "Mark as not completed" action to avoid adding a second, near-identical destructive control.
+- **Implementation is deliberately not new state logic.** `toggleZikrCompletion` already existed, was already wired to the collection list, and already handled un-completing safely. The reader now calls that same path via a new optional `onUncomplete` prop. Reusing it means the ledger semantics are unchanged and already covered by existing behaviour — notably that un-completing a zikr **does not revoke a palm that was already earned**, which is the conservative and correct choice for a devotional tracker.
+- **Behavioural note discovered while verifying:** completing a zikr auto-advances to the next one, so reset pressed immediately after a completion acts on the _next_ zikr, not the one just completed. Recovery therefore means stepping back to the affected zikr and resetting it there. This is a real constraint on the feature and is asserted directly in the test rather than glossed over.
+- **Tests/evidence required:** New e2e test completes a zikr, confirms it reaches stored progress, steps back, resets, and asserts the entry is gone from `localStorage`. Verified by removing the fix and confirming the test fails. Full `pnpm check` + `pnpm test:e2e` (268 unit, 214 e2e).
+- **Process note:** the first version of this test was wrong and passed against unfixed code — it asserted on `completed.morning` while the fixture opens `waking_up`, so it was checking a permanently empty array. It was caught by the revert check, not by it passing. A test that has never been seen to fail is not evidence.
+- **Supersedes:** The "flagged, not fixed" entry in DEC-033.
