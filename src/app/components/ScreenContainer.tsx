@@ -20,11 +20,10 @@ export function ScreenContainer({ children, className = "", dir, screenName, ...
       dir={dir}
       {...props}
     >
-      {screenName && (
-        <div className="sr-only" aria-live="polite" aria-atomic="true">
-          {screenName}
-        </div>
-      )}
+      {/* screenName drives document.title only. It used to also render an
+          sr-only live region, but every screen already carries a heading with
+          the same text, and since Phase 04 focus moves to #main-content on each
+          view change — so the region announced the screen name a second time. */}
       {children}
     </div>
   );

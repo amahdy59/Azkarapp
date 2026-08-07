@@ -55,7 +55,7 @@ export function AzkarLibraryScreen({
   );
 
   return (
-    <ScreenContainer dir={direction} className="relative">
+    <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
           <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>

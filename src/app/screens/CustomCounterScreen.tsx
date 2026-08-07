@@ -134,7 +134,11 @@ export function CustomCounterScreen({
   }, [onBack, showLibrarySheet, isTargetComplete, count, target, handleTap, handleUndo]);
 
   return (
-    <ScreenContainer dir={direction} className="relative flex flex-col page-content-center">
+    <ScreenContainer
+      dir={direction}
+      className="relative flex flex-col page-content-center"
+      screenName={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
+    >
       <div className="relative z-10 flex flex-col min-h-screen flex-1">
         {/* Header */}
         <Header

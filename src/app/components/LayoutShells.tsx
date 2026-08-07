@@ -229,7 +229,7 @@ export function NavSidebar({
               data-testid={`nav-${id}`}
               onClick={() => onChange(id)}
               aria-current={on ? "page" : undefined}
-              className={`nav-sidebar-item ${on ? "active-sidebar-link" : ""}`}
+              className="nav-sidebar-item"
             >
               <span className={on ? "nav-active-cue flex text-primary" : "flex"} key={`${id}-${on}`}>
                 <Icon size={20} />

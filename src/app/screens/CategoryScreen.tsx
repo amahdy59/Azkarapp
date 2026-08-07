@@ -338,7 +338,7 @@ export function CategoryScreen({
   };
 
   return (
-    <ScreenContainer dir={direction} className="relative">
+    <ScreenContainer dir={direction} className="relative" screenName={isArabic ? cat.nameArabic : cat.name}>
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 

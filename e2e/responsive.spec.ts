@@ -293,3 +293,30 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   const focusedId = await page.evaluate(() => document.activeElement?.id ?? "");
   expect(focusedId).toBe("main-content");
 });
+
+test("status banners get a full-width area above the nav, not an implicit row", async ({ page }) => {
+  await page.setViewportSize({ width: 1000, height: 800 });
+  await enterEnglishGuestMode(page);
+
+  // The wrapper always renders, so its geometry can be checked without going
+  // offline — which would trip lazyWithRetry's chunk-failure reload.
+  const status = page.locator(".app-status");
+  await expect(status).toHaveCount(1);
+
+  const { area, rect, railRect } = await page.evaluate(() => {
+    const el = document.querySelector(".app-status")!;
+    const rail = document.querySelector("nav")!;
+    return {
+      area: getComputedStyle(el).gridArea,
+      rect: el.getBoundingClientRect().toJSON(),
+      railRect: rail.getBoundingClientRect().toJSON(),
+    };
+  });
+
+  // As an unplaced grid child this landed in an implicit row inside the rail
+  // column. It must occupy the named status area, spanning the shell's width
+  // above the navigation.
+  expect(area).toContain("status");
+  expect(rect.width).toBeGreaterThan(900);
+  expect(rect.top).toBeLessThanOrEqual(railRect.top);
+});

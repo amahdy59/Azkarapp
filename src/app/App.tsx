@@ -811,15 +811,20 @@ function AppContent() {
   return (
     <div className="app-viewport flex items-center justify-center">
       <div className="app-shell relative overflow-hidden bg-background shadow-2xl">
-        <NetworkStatus language={selectedLang} />
-        {isSupabaseConfigured && !isGuest && (
-          <SyncStatus
-            isSyncing={isSyncingRemote}
-            errorMessage={syncError}
-            onRetry={retrySync}
-            language={selectedLang}
-          />
-        )}
+        {/* Both banners share one grid area, so they stack across the full shell
+            width instead of being auto-placed into an implicit row — which put
+            them underneath the rail on the expanded and large tiers. */}
+        <div className="app-status">
+          <NetworkStatus language={selectedLang} />
+          {isSupabaseConfigured && !isGuest && (
+            <SyncStatus
+              isSyncing={isSyncingRemote}
+              errorMessage={syncError}
+              onRetry={retrySync}
+              language={selectedLang}
+            />
+          )}
+        </div>
 
         {/* Adaptive navigation — only one renders at a time */}
         {showRail && <NavRail active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}

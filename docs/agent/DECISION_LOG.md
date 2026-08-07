@@ -568,3 +568,22 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `ProgressViews.tsx`, `RoutineGarden.tsx`, `HomeScreen.tsx`, `e2e/quiet-garden.spec.ts`.
 - **Tests/evidence required:** Existing all-complete test updated from 4 to 3 rendered rows, with the all-complete message left as the real assertion that palm maths is unchanged. New test asserts Home omits after-prayer while Progress still shows it. Full `pnpm check` + `pnpm test:e2e` (169 passing).
 - **Supersedes:** The four-row decision recorded in DEC-029.
+
+---
+
+## DEC-031 — Phase 04/05 cleanup: status grid area, dead CSS, screen titles
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Claude (delegated — user asked for the outstanding items to be closed out)
+- **Related phase:** Phase 04 (carry-over)
+- **Context:** Closing the tracked Phase 04 items that were deferred when the phase shipped.
+- **Decisions:**
+  - **`NetworkStatus`/`SyncStatus` now share one `.app-status` grid area** spanning the full shell width at the top of every tier. They had been unplaced grid children, so auto-placement put them in an implicit row _inside the rail column_ on the expanded and large tiers — a full-width offline banner rendering underneath the navigation rail. Both are wrapped in a single element so they stack rather than fighting over one named area.
+  - **Removed the dead context pane** (`.app-context`, `.app-shell[data-context-open]`, and the 90 rem grid template). `data-context-open` is never set anywhere in `src/`, so the entire third-column feature was unreachable CSS.
+  - **Removed `active-sidebar-link`** from `NavSidebar`. The class had no definition anywhere; the sidebar's active state is carried by `.nav-sidebar-item[aria-current="page"]`, which was verified before deletion.
+  - **`screenName` added to the six screens that omitted it**, but with a correction: the task had been recorded as "pass the prop", and doing so surfaced that `ScreenContainer` also rendered an **sr-only live region** with the same text as each screen's visible `Header` title. That duplicated the announcement — and, since Phase 04's `useViewFocus` moves focus to `#main-content` on every view change, made it a third redundancy. The live region was removed; `screenName` was kept for `document.title`, which genuinely was missing on those screens. A unit test caught this ("Found multiple elements with the text").
+  - **Added `useLayoutMode.test.ts`** covering every tier boundary (599/600/899/900/1199/1200), width-only behaviour, `matchMedia` subscribe/unsubscribe, and the no-`matchMedia` fallback. This hook's contract mismatch with `theme.css` caused the DEC-027 navigation dead zone, so its boundaries now have direct coverage.
+- **Consequences:** The offline banner's e2e test could not drive real offline state — `lazyWithRetry` reloads the page when a chunk fails, destroying the execution context. The test asserts the `.app-status` wrapper's computed grid area and geometry instead, which is deterministic and still catches the regression.
+- **Tests/evidence required:** Both CSS fixes verified by reverting them and confirming the new tests fail; the `useLayoutMode` suite verified by introducing an off-by-one at 900 px. Full `pnpm check` + `pnpm test:e2e` (249 unit, 172 e2e).
+- **Supersedes:** None

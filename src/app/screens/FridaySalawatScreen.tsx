@@ -104,7 +104,7 @@ export function FridaySalawatScreen({
   }, [increment, onBack]);
 
   return (
-    <ScreenContainer dir={direction} className="px-0 relative">
+    <ScreenContainer dir={direction} className="px-0 relative" screenName={copy.title}>
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
 
       <div className="relative z-10 flex flex-1 flex-col gap-5 overflow-y-auto px-5 pb-8 pt-3">

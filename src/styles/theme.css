@@ -1084,6 +1084,11 @@ textarea {
   transform: translateY(0);
 }
 
+.app-status {
+  grid-area: status;
+  min-width: 0;
+}
+
 .network-status {
   z-index: 20;
   background: var(--destructive);
@@ -1480,7 +1485,7 @@ a[href]:not(.no-press):active,
     border: none;
     box-shadow: none;
     display: grid;
-    grid-template: "main" minmax(0, 1fr) "bottom-nav" auto / minmax(0, 1fr);
+    grid-template: "status" auto "main" minmax(0, 1fr) "bottom-nav" auto / minmax(0, 1fr);
   }
   .app-main {
     grid-area: main;
@@ -1493,8 +1498,7 @@ a[href]:not(.no-press):active,
     grid-area: bottom-nav;
   }
   .app-rail,
-  .app-sidebar,
-  .app-context {
+  .app-sidebar {
     display: none;
   }
 }
@@ -1505,7 +1509,7 @@ a[href]:not(.no-press):active,
    rail. */
 @media (min-width: 56.25rem) {
   .app-shell {
-    grid-template: "rail main" minmax(0, 1fr) / var(--nav-rail-width) minmax(0, 1fr);
+    grid-template: "status status" auto "rail main" minmax(0, 1fr) / var(--nav-rail-width) minmax(0, 1fr);
   }
   .app-bottom-nav {
     display: none;
@@ -1525,7 +1529,7 @@ a[href]:not(.no-press):active,
 
 @media (min-width: 75rem) {
   .app-shell {
-    grid-template: "sidebar main" minmax(0, 1fr) / var(--nav-sidebar-width) minmax(0, 1fr);
+    grid-template: "status status" auto "sidebar main" minmax(0, 1fr) / var(--nav-sidebar-width) minmax(0, 1fr);
   }
   .app-rail {
     display: none;
@@ -1538,18 +1542,6 @@ a[href]:not(.no-press):active,
     background: var(--card);
     overflow-y: auto;
     overflow-x: hidden;
-  }
-}
-
-@media (min-width: 90rem) {
-  .app-shell[data-context-open="true"] {
-    grid-template: "sidebar main context" minmax(0, 1fr) / var(--nav-sidebar-width) minmax(0, 1fr) minmax(24rem, 29rem);
-  }
-  .app-shell[data-context-open="true"] .app-context {
-    display: block;
-    grid-area: context;
-    border-inline-start: 1px solid var(--border-subtle);
-    overflow-y: auto;
   }
 }
 
@@ -1693,7 +1685,6 @@ a[href]:not(.no-press):active,
 @media (prefers-reduced-motion: reduce) {
   .app-rail,
   .app-sidebar,
-  .app-context,
   .settings-two-pane {
     transition: none !important;
   }
