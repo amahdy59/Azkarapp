@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import ar from "./ar";
-import { readFileSync } from "node:fs";
-import { globSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
 /** Sequences that only appear when UTF-8 Arabic has been decoded as Latin-1. */
 const MOJIBAKE = /[\u00d8\u00d9\u00da\u00c3\u00c2][\u0080-\u00bf]/;
@@ -41,9 +41,23 @@ describe("source-file Arabic encoding", () => {
   // Arabic is written inline in components as well as in the i18n bundles, and
   // the same Latin-1 round trip corrupted ProgressViews.tsx after this guard
   // was first added for ar.ts alone. Scan the whole tree instead.
+  // Walked by hand rather than with fs.globSync: that only exists from Node 22,
+  // and CI pins Node 20, so using it turned this guard into a broken build.
+  function collectSourceFiles(dir: string, out: string[] = []): string[] {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const full = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        collectSourceFiles(full, out);
+      } else if (/\.tsx?$/.test(entry.name)) {
+        out.push(full);
+      }
+    }
+    return out;
+  }
+
   // This file documents the corruption by example, so it excludes itself.
-  const files = globSync("src/**/*.{ts,tsx}", { cwd: process.cwd() }).filter(
-    (file) => !file.split(/[\\/]/).join("/").endsWith("i18n/encoding.test.ts"),
+  const files = collectSourceFiles("src").filter(
+    (file) => !file.replaceAll("\\", "/").endsWith("i18n/encoding.test.ts"),
   );
 
   it("finds no mojibake in any source file", () => {
