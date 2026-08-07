@@ -5,6 +5,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
+import { TabList, tabPanelProps } from "../components/Tabs";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -70,33 +71,30 @@ export function AzkarLibraryScreen({
             <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
             <span>{t(language, "library.search")}</span>
           </button>
-          <div
-            className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
-            role="tablist"
+          <TabList
+            value={section}
+            onChange={setSection}
+            direction={direction}
+            idPrefix="library"
             aria-label={t(language, "library.title")}
-          >
-            {(["collections", "saved"] as const).map((value) => (
-              <button
-                key={value}
-                type="button"
-                role="tab"
-                aria-selected={section === value}
-                onClick={() => setSection(value)}
-                className={`min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  section === value ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
-                }`}
-              >
-                {t(language, `library.${value}`)}
-                {value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""}
-              </button>
-            ))}
-          </div>
+            className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
+            itemClassName={(selected) =>
+              `min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
+              }`
+            }
+            tabs={(["collections", "saved"] as const).map((value) => ({
+              value,
+              label: `${t(language, `library.${value}`)}${
+                value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
+              }`,
+            }))}
+          />
         </header>
 
         <div
-          tabIndex={0}
+          {...tabPanelProps("library", section)}
           className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-          role="tabpanel"
         >
           {section === "collections" ? (
             <>

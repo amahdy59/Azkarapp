@@ -4,6 +4,7 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
+import { TabList, tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
 
@@ -367,36 +368,35 @@ export function TodayRoutineGarden({
     >
       {!hideTabs && (
         <>
-          <div
-            role="tablist"
+          <TabList
+            value={activeTab}
+            onChange={handleTabChange}
+            direction={isArabic ? "rtl" : "ltr"}
+            idPrefix="garden"
             aria-label={t(language, "garden.viewMode")}
             className="mb-4 flex rounded-full bg-muted/60 p-1 dark:bg-muted/30"
-          >
-            {(["day", "week", "month", "year"] as const).map((tab) => {
-              const isActive = activeTab === tab;
-              const keyMap = {
-                day: "garden.tabDay",
-                week: "garden.tabWeek",
-                month: "garden.tabMonth",
-                year: "garden.tabYear",
-              } as const;
-
-              return (
-                <button
-                  key={tab}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  onClick={() => handleTabChange(tab)}
-                  className={`flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    isActive ? "bg-amber-500 text-slate-950 shadow-md" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {t(language, keyMap[tab])}
-                </button>
-              );
-            })}
-          </div>
+            itemClassName={(selected) =>
+              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                selected
+                  ? "bg-primary text-primary-foreground shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`
+            }
+            tabs={(["day", "week", "month", "year"] as const).map((tab) => ({
+              value: tab,
+              label: t(
+                language,
+                (
+                  {
+                    day: "garden.tabDay",
+                    week: "garden.tabWeek",
+                    month: "garden.tabMonth",
+                    year: "garden.tabYear",
+                  } as const
+                )[tab],
+              ),
+            }))}
+          />
 
           <div className="mb-4 flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-raised">
             <button
@@ -467,36 +467,41 @@ export function TodayRoutineGarden({
         </div>
       )}
 
-      {activeTab === "day" && (
-        <ProgressDayView
-          summary={summary}
-          language={language}
-          dynamicSubtitle={dynamicSubtitle}
-          onSelectCategory={onSelectCategory}
-        />
-      )}
+      <div
+        {...tabPanelProps("garden", activeTab)}
+        className="outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        {activeTab === "day" && (
+          <ProgressDayView
+            summary={summary}
+            language={language}
+            dynamicSubtitle={dynamicSubtitle}
+            onSelectCategory={onSelectCategory}
+          />
+        )}
 
-      {activeTab === "week" && (
-        <ProgressWeekView
-          summary={summary}
-          language={language}
-          dailyCompletions={dailyCompletions}
-          referenceDate={displayDate}
-        />
-      )}
+        {activeTab === "week" && (
+          <ProgressWeekView
+            summary={summary}
+            language={language}
+            dailyCompletions={dailyCompletions}
+            referenceDate={displayDate}
+          />
+        )}
 
-      {activeTab === "month" && (
-        <ProgressMonthView
-          language={language}
-          targetYear={targetYear}
-          targetMonth={targetMonth}
-          dailyCompletions={dailyCompletions}
-        />
-      )}
+        {activeTab === "month" && (
+          <ProgressMonthView
+            language={language}
+            targetYear={targetYear}
+            targetMonth={targetMonth}
+            dailyCompletions={dailyCompletions}
+          />
+        )}
 
-      {activeTab === "year" && (
-        <ProgressYearView language={language} targetYear={targetYear} dailyCompletions={dailyCompletions} />
-      )}
+        {activeTab === "year" && (
+          <ProgressYearView language={language} targetYear={targetYear} dailyCompletions={dailyCompletions} />
+        )}
+      </div>
     </section>
   );
 }

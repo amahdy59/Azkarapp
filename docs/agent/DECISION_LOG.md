@@ -389,3 +389,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/components/SegmentedControl.tsx` (new), `HomeScreen.tsx`, `CategoryScreen.tsx`, `SettingsRootPanel.tsx`, `onboarding/LanguageScreen.tsx`, `e2e/audio.spec.ts`, `e2e/settings-experience.spec.ts`.
 - **Tests/evidence required:** `SegmentedControl.test.tsx` (new, 6 tests) for roles/checked state/click/caller classes; real-browser keyboard assertions added to `e2e/settings-experience.spec.ts` (roving tabindex and arrow-key focus movement cannot be verified in jsdom — Radix leaves both items at `tabindex="-1"` without real layout, confirmed by probe). Full `pnpm check` + `pnpm test:e2e` (145 passing).
 - **Supersedes:** None
+
+---
+
+## DEC-023 — `TabList` primitive: complete tabs semantics and keyboard support
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 6)
+- **Related phase:** Phase 03
+- **Context:** Two independent `role="tablist"` implementations existed. Neither had `aria-controls`, a roving tabindex, or any keyboard navigation, so both violated `docs/agent/ACCESSIBILITY_REQUIREMENTS.md` §9 ("tabs expose `tablist`, `tab`, `tabpanel`, selected state and keyboard behavior"). `RoutineGarden.tsx`'s day/week/month/year switcher additionally had **no `role="tabpanel"` at all** — its four view components rendered as bare siblings, so the tabs pointed at nothing.
+- **Options considered:** Add `@radix-ui/react-tabs` (consistent with the Radix primitives already used elsewhere); hand-roll a small semantics primitive.
+- **Decision:** Hand-rolled `src/app/components/Tabs.tsx`, exporting `TabList` plus `tabPanelProps`/`tabId`/`tabPanelId` helpers. Migrated both call sites; `RoutineGarden.tsx`'s four conditional views are now wrapped in a real `tabpanel`.
+- **Why:** AGENTS.md requires that new runtime dependencies only be added when existing platform utilities cannot solve the problem. The APG tabs pattern needs no portal, focus trap, or positioning — it is roving tabindex, four key handlers, and id wiring (~110 lines). A hand-rolled version also let both call sites keep their existing DOM: in `AzkarLibraryScreen.tsx` the tab list sits in a `<header>` with the panel as a scrolling sibling, and in `RoutineGarden.tsx` a date-navigation bar sits between list and panel — neither fits Radix's `Root > List + Content` composition without restructuring.
+- **Consequences:**
+  - Both tab groups are now a single tab stop (roving tabindex) with Arrow/Home/End navigation and RTL-aware arrow direction — behavior that did not previously exist.
+  - `RoutineGarden.tsx` gains a `tabpanel` wrapper `<div>` around its four views. This is a new DOM element in the Progress tree; verified it does not disturb layout (no flex/grid parent depends on those children being direct siblings) and the full e2e suite passes unchanged.
+  - Existing e2e selectors (`getByRole("tab", { name: /Saved/ })` in `navigation.spec.ts`, `getByRole("tab", { name: "Month" })` in `quiet-garden.spec.ts`) continue to work — roles and accessible names are preserved, so unlike DEC-022 there was no selector drift here.
+  - `RoutineGarden.tsx`'s active-tab pill also moved off the raw `bg-amber-500 text-slate-950` palette onto `bg-primary text-primary-foreground`, continuing the DEC-009/DEC-021 token direction.
+- **Files/contracts to update:** `src/app/components/Tabs.tsx` (new), `src/app/components/RoutineGarden.tsx`, `src/app/screens/AzkarLibraryScreen.tsx`.
+- **Tests/evidence required:** `Tabs.test.tsx` (new, 9 tests) covering roles, `aria-controls` wiring, roving tabindex, click activation, LTR/RTL arrow direction, wrap-around, and Home/End. Full `pnpm check` + `pnpm test:e2e` (145 passing).
+- **Supersedes:** None
