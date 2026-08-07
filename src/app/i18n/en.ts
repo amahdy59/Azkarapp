@@ -133,6 +133,13 @@ const en = {
     sourceLabel: "Source",
   },
   library: {
+    groups: {
+      daily: "Daily Azkar",
+      place: "Place & Travel",
+      everyday: "Everyday Life",
+      hardship: "Hardship & Healing",
+      more: "More Azkar & Du'as",
+    },
     title: "Azkar Library",
     subtitle: "Search, continue, or save a remembrance for later.",
     search: "Search adhkar and duas",

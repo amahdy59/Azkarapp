@@ -38,3 +38,34 @@ export const ROUTINE_CATEGORY_IDS: ReadonlySet<CategoryId> = new Set([
 export function isOccasionalCategory(catId: CategoryId): boolean {
   return !ROUTINE_CATEGORY_IDS.has(catId);
 }
+
+/**
+ * Presentation-only grouping for the Library index.
+ *
+ * Category IDs, their order within a group, and all content are untouched —
+ * Phase 06 prohibits ID migration, and this exists purely so 17 collections
+ * scan as a short list of themes instead of one flat run.
+ *
+ * `friday_kahf` is deliberately absent: the Library already filters it out
+ * because it is reached through the Friday screen.
+ */
+export const CATEGORY_GROUPS: ReadonlyArray<{
+  id: string;
+  /** i18n key under `library.groups`. */
+  labelKey: string;
+  categories: readonly CategoryId[];
+}> = [
+  {
+    id: "daily",
+    labelKey: "daily",
+    categories: ["morning", "evening", "before_sleep", "waking_up", "after_prayer"],
+  },
+  { id: "place", labelKey: "place", categories: ["home", "mosque", "travel"] },
+  { id: "everyday", labelKey: "everyday", categories: ["food_drink", "restroom", "clothing"] },
+  { id: "hardship", labelKey: "hardship", categories: ["distress_anxiety", "illness_ruqyah"] },
+  {
+    id: "more",
+    labelKey: "more",
+    categories: ["comprehensive_duas", "social_community", "natural_events", "miscellaneous"],
+  },
+];

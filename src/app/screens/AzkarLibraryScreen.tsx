@@ -13,7 +13,7 @@ import {
   isRoutineCategory,
   registerLazyCollection,
 } from "../content/azkar";
-import { CATEGORIES, isOccasionalCategory } from "../content/categories";
+import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/categories";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -96,64 +96,77 @@ export function AzkarLibraryScreen({
         >
           {section === "collections" ? (
             <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                {CATEGORIES.filter((category) => category.id !== "friday_kahf").map((category) => {
-                  const isComprehensiveDuas = category.id === "comprehensive_duas";
-                  const routineMode = isRoutineCategory(category.id) ? routineModes[category.id] : "complete";
-                  const visibleItems = isComprehensiveDuas
-                    ? COMPREHENSIVE_DUA_ITEMS
-                    : getAzkarForMode(category.id, routineMode);
-                  const progress = isRoutineCategory(category.id)
-                    ? getRoutineProgress(category.id, routineMode, completed[category.id] ?? [])
-                    : {
-                        done: visibleItems.filter((item) => completed[category.id]?.has(item.id)).length,
-                        total: visibleItems.length,
-                      };
-                  const { done, total } = progress;
-                  const isOccasional = isOccasionalCategory(category.id);
-                  const routineSummary = isRoutineCategory(category.id)
-                    ? t(language, `category.${routineMode}Summary`, { count: formatNumerals(total, language) })
-                    : undefined;
-                  const progressLabel = t(language, "library.progressOfTotal", {
-                    done: formatNumerals(done, language),
-                    total: formatNumerals(total, language),
-                  });
-
-                  return (
-                    <CategoryCard
-                      key={category.id}
-                      id={category.id}
-                      title={isArabic ? category.nameArabic : category.name}
-                      icon={category.icon}
-                      direction={direction}
-                      isOccasional={isOccasional}
-                      totalCount={total}
-                      completedCount={done}
-                      routineSummary={routineSummary}
-                      progressText={t(language, "library.progressOfTotal", {
+              {CATEGORY_GROUPS.map((group) => (
+                <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
+                  <h2
+                    id={`library-group-${group.id}`}
+                    className="mb-2.5 text-[0.8125rem] font-bold uppercase tracking-wide text-muted-foreground"
+                    dir="auto"
+                  >
+                    {t(language, `library.groups.${group.labelKey}`)}
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {group.categories.map((categoryId) => {
+                      const category = CATEGORIES.find((item) => item.id === categoryId);
+                      if (!category) return null;
+                      const isComprehensiveDuas = category.id === "comprehensive_duas";
+                      const routineMode = isRoutineCategory(category.id) ? routineModes[category.id] : "complete";
+                      const visibleItems = isComprehensiveDuas
+                        ? COMPREHENSIVE_DUA_ITEMS
+                        : getAzkarForMode(category.id, routineMode);
+                      const progress = isRoutineCategory(category.id)
+                        ? getRoutineProgress(category.id, routineMode, completed[category.id] ?? [])
+                        : {
+                            done: visibleItems.filter((item) => completed[category.id]?.has(item.id)).length,
+                            total: visibleItems.length,
+                          };
+                      const { done, total } = progress;
+                      const isOccasional = isOccasionalCategory(category.id);
+                      const routineSummary = isRoutineCategory(category.id)
+                        ? t(language, `category.${routineMode}Summary`, { count: formatNumerals(total, language) })
+                        : undefined;
+                      const progressLabel = t(language, "library.progressOfTotal", {
                         done: formatNumerals(done, language),
                         total: formatNumerals(total, language),
-                      })}
-                      occasionalSubtitle={`${formatNumerals(total, language)} ${isArabic ? "أذكار سياقية" : "Occasional supplications"}`}
-                      ariaLabel={
-                        isOccasional
-                          ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
-                              isArabic ? "أذكار" : "supplications"
-                            }`
-                          : [isArabic ? category.nameArabic : category.name, routineSummary, progressLabel]
-                              .filter(Boolean)
-                              .join(", ")
-                      }
-                      onClick={() => {
-                        if (isComprehensiveDuas) {
-                          registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
-                        }
-                        onCategory(category.id);
-                      }}
-                    />
-                  );
-                })}
-              </div>
+                      });
+
+                      return (
+                        <CategoryCard
+                          key={category.id}
+                          id={category.id}
+                          title={isArabic ? category.nameArabic : category.name}
+                          icon={category.icon}
+                          direction={direction}
+                          isOccasional={isOccasional}
+                          totalCount={total}
+                          completedCount={done}
+                          routineSummary={routineSummary}
+                          progressText={t(language, "library.progressOfTotal", {
+                            done: formatNumerals(done, language),
+                            total: formatNumerals(total, language),
+                          })}
+                          occasionalSubtitle={`${formatNumerals(total, language)} ${isArabic ? "أذكار سياقية" : "Occasional supplications"}`}
+                          ariaLabel={
+                            isOccasional
+                              ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
+                                  isArabic ? "أذكار" : "supplications"
+                                }`
+                              : [isArabic ? category.nameArabic : category.name, routineSummary, progressLabel]
+                                  .filter(Boolean)
+                                  .join(", ")
+                          }
+                          onClick={() => {
+                            if (isComprehensiveDuas) {
+                              registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+                            }
+                            onCategory(category.id);
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                </section>
+              ))}
               {onOpenCustomCounter && (
                 <div className="mt-4">
                   <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />

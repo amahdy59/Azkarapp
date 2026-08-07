@@ -658,3 +658,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Fix and its consequence:** a dark scrim now sits behind the hero column in every theme. That surfaced a fourth failure the first three had masked — the gold heading used `text-primary`, which is a **dark** gold (`#835806`) in Light and dropped to 1.07:1 once the backing darkened. Rather than hardcode a hex, added `--on-media` / `--on-media-muted` / `--on-media-accent` tokens: content over photography sits on a dark scrim in every theme, so it needs light-on-dark values that deliberately do **not** follow `--primary`.
 - **Tests/evidence required:** 13 tests in the new spec. Contrast is asserted per mode with a named failure message so a regression identifies the mode. Full `pnpm check` + `pnpm test:e2e` (268 unit, 253 e2e).
 - **Supersedes:** None
+
+---
+
+## DEC-036 — Library taxonomy grouping
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (approved the proposed groups and names before implementation)
+- **Related phase:** Phase 06 (deferred item)
+- **Context:** Phase 06 Step 1 item 4 called for user-facing grouping without changing source content. It was deferred because group names are a religious-content decision, not a layout one. The grouping was proposed for review and approved as drafted.
+- **Decision:** Five presentation-only groups in `CATEGORY_GROUPS` — Daily Azkar (5), Place & Travel (3), Everyday Life (3), Hardship & Healing (2), More Azkar & Du'as (4). Built on the routine/occasional split the data already encodes rather than inventing a parallel taxonomy.
+- **Explicitly unchanged:** category IDs, ordering within groups, and all content. The phase prohibits ID migration and this respects that — `CATEGORY_GROUPS` references existing IDs and nothing else moves. `friday_kahf` stays ungrouped because the Library already filters it out; it is reached through the Friday screen.
+- **A corrupted-Arabic near-miss, worth recording.** The Arabic group names shipped to the working tree as mojibake (`Ø£Ø°ÙØ§Ø± Ø§ÙÙÙÙ`) because the script that wrote them round-tripped UTF-8 through `unicode_escape`. **Every test passed** — unit, e2e and axe — because none of them asserted on Arabic copy. It was caught only by looking at a rendered screenshot. Added `src/app/i18n/encoding.test.ts`, which scans the whole Arabic bundle for Latin-1 mojibake sequences and reports the offending key path; verified by reintroducing the corruption and confirming it fails. This protects all Arabic copy, not just these five strings.
+- **Tests/evidence required:** `categoryGroups.test.ts` asserts every Library category appears in exactly one group, no group is empty, ids are unique, and `friday_kahf` is absent — so a future category cannot be silently dropped from the index. Browser check confirmed all 17 cards render across the five headings. Full `pnpm check` + `pnpm test:e2e` (274 unit, 253 e2e).
+- **Supersedes:** The "not done / deferred" taxonomy note in DEC-032.
