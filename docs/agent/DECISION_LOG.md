@@ -689,3 +689,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** e2e asserts 21 labelled cells, that the table text contains "Morning: Completed/Not completed", and that column headers are scoped. Browser check confirmed the rendered table text. Full `pnpm check` + `pnpm test:e2e` (275 unit, 256 e2e).
 - **Deferred, not done:** splitting `ProgressViews.tsx` (905 lines) and `RoutineGarden.tsx` (781 lines, **2.45% coverage**) is still outstanding. Refactoring a file that large with almost no coverage is how regressions get introduced silently; characterization tests should land before the split, and that is a larger piece of work than this fix.
 - **Supersedes:** None
+
+---
+
+## DEC-038 — Characterization tests before splitting RoutineGarden
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (chose "characterization tests first" over splitting immediately)
+- **Related phase:** Phase 08
+- **Context:** `RoutineGarden.tsx` is 781 lines at **2.45% statement coverage** — the lowest in the codebase — and is scheduled to be split. Splitting it in that state would mean no test could tell a behaviour-preserving refactor from a regression.
+- **Decision:** land characterization tests first. Coverage moved **2.45% → 61.47% statements** (2.75% → 59.63% lines) with 13 tests.
+- **Written deliberately against observable output, not implementation**, so they survive the refactor they exist to protect: date-label shape per tab/language/calendar, filled-vs-unfilled marks being visually distinguishable, `GrowthEventStatus` remaining a polite live region with a distinct message per event kind, Arabic copy not silently falling back to English, and the summary components surviving an empty summary.
+- **A note on what "passing" proved.** `vitest` passed these tests while `tsc` rejected them — `GrowthEvent` requires `dayKey` and `leafCount`, which the fixtures omitted. Runtime green is not the same as correct; the type gate caught it.
+- **Tests/evidence required:** 13 tests in `RoutineGarden.characterization.test.tsx`. Full `pnpm check` + `pnpm test:e2e` (288 unit, 256 e2e).
+- **Still open:** the split itself. The safety net now exists, so it can proceed as a separate reviewable change — which is the point of doing this first.
+- **Supersedes:** The deferral recorded in DEC-037.
