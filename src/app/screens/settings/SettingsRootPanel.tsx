@@ -15,7 +15,7 @@ import {
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, LocationSettings, ThemeMode } from "../../types";
-import { RowChevron, RowValue, SectionLabel, SettingsRowItem } from "./SettingsPrimitives";
+import { RowChevron, RowValue, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
 
@@ -66,8 +66,7 @@ export function SettingsRootPanel({
 }) {
   return (
     <div className="flex-1 overflow-y-auto pb-8">
-      <SectionLabel label={t(language, "settings.preferences")} />
-      <div className="mx-4 rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.preferences")} variant="content">
         <div className="mb-3 flex items-center gap-3">
           <span
             className="flex size-9 shrink-0 items-center justify-center rounded-xl"
@@ -96,9 +95,9 @@ export function SettingsRootPanel({
             </button>
           </aside>
         )}
-      </div>
+      </SettingsSection>
 
-      <div className="mx-4 mt-3 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection className="mt-3">
         <div className="p-4 border-b border-border/50">
           <div className="mb-3 flex items-center gap-3">
             <span
@@ -150,10 +149,9 @@ export function SettingsRootPanel({
           onPress={() => onNav("notifications")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
 
-      <SectionLabel label={t(language, "settings.contentSection")} />
-      <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.contentSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Download size={20} className="text-primary" />}
@@ -169,10 +167,9 @@ export function SettingsRootPanel({
           onPress={() => onNav("sources")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
 
-      <SectionLabel label={t(language, "settings.accessibilitySection")} />
-      <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.accessibilitySection")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<User size={20} className="text-primary" />}
@@ -181,10 +178,9 @@ export function SettingsRootPanel({
           onPress={() => onNav("accessibility")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
 
-      <SectionLabel label={t(language, "settings.progressSection")} />
-      <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.progressSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<BarChart3 size={20} className="text-primary" />}
@@ -193,10 +189,9 @@ export function SettingsRootPanel({
           onPress={() => onNav("progress")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
 
-      <SectionLabel label={t(language, "settings.accountSection")} />
-      <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.accountSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<Database size={20} className="text-primary" />}
@@ -217,10 +212,9 @@ export function SettingsRootPanel({
           onPress={() => onNav("account-data")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
 
-      <SectionLabel label={t(language, "settings.supportSection")} />
-      <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+      <SettingsSection label={t(language, "settings.supportSection")}>
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<HelpCircle size={20} className="text-primary" />}
@@ -243,7 +237,7 @@ export function SettingsRootPanel({
           onPress={() => onNav("about")}
           hasDivider={false}
         />
-      </div>
+      </SettingsSection>
     </div>
   );
 }

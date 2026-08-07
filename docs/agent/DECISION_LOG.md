@@ -285,3 +285,52 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** None.
 - **Tests/evidence required:** None.
 - **Supersedes:** None
+
+---
+
+## DEC-017 — Delete dead `PalmTreeReward`, keep `HomeScreen`'s header as canonical
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 2, supersedes an earlier stated intent)
+- **Related phase:** Phase 03
+- **Context:** The Phase 03 analysis characterized `RoutineGarden.tsx`'s `PalmTreeReward` and `HomeScreen.tsx`'s hand-rolled streak/palm header as a byte-for-byte duplicate. Direct inspection found only the aria-label i18n string template matches; the actual visual markup differs (one shared bordered bar vs. two separate bordered pills). More importantly, `PalmTreeReward` hardcodes `maxLeaves = 3` ("3 core categories: morning/evening/sleep"), while `HomeScreen` correctly uses `MAIN_CATEGORY_IDS.length`, which is now 4 after the after-prayer tracking feature landed. `PalmTreeReward` was stale, not just unused (confirmed zero import sites anywhere in `src`).
+- **Options considered:** Merge by having `HomeScreen` adopt `PalmTreeReward` as originally planned; fix `PalmTreeReward`'s stale category count and then merge; delete `PalmTreeReward` outright since it's dead and its logic no longer matches current domain rules.
+- **Decision:** Deleted `PalmTreeReward` from `RoutineGarden.tsx`. `HomeScreen.tsx`'s implementation remains as-is (unchanged, already correct).
+- **Why:** Forcing a merge onto stale, unused code would have meant fixing/redesigning dead code rather than a safe dedup; deleting it removes the actual duplication risk (a second, drifted implementation of the same feature) with zero behavior change to any real screen.
+- **Consequences:** `GoldenLeafMark`/`PalmTreeMark`/`Zap` (used elsewhere in `RoutineGarden.tsx`) were kept; only the `PalmTreeReward` wrapper function was removed.
+- **Files/contracts to update:** `src/app/components/RoutineGarden.tsx`.
+- **Tests/evidence required:** `pnpm check` (lint confirms no orphaned imports).
+- **Supersedes:** The Phase 03 kickoff message's stated plan to have `HomeScreen` adopt `PalmTreeReward`.
+
+---
+
+## DEC-018 — `StatePanel` gains an `empty-saved` kind, adopted in `AzkarLibraryScreen`
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 2)
+- **Related phase:** Phase 03
+- **Context:** `AzkarLibraryScreen.tsx`'s "no saved azkar yet" block matched `StatePanel`'s anatomy closely (dashed-border card, centered icon, heading, body, action button) but `StatePanel`'s `AppStateKind` union had no kind for "nothing saved yet," and no `Bookmark` icon mapping.
+- **Options considered:** Leave `AzkarLibraryScreen`'s block as its own one-off; add a new `empty-saved` kind to `StatePanel` and adopt it.
+- **Decision:** Added `empty-saved` to `AppStateKind` (with a `Bookmark` icon and baseline English copy, both overridden in practice by `AzkarLibraryScreen`'s localized `title`/`description`/`actionLabel` props) and adopted `StatePanel` in place of the hand-rolled block.
+- **Consequences:** The circular icon badge background `AzkarLibraryScreen` previously had behind its bookmark icon is gone — `StatePanel` renders a bare icon. Accepted as a minor, low-risk simplification rather than adding a new icon-badge variant to `StatePanel` (which would have needed to stay opt-in to avoid silently changing the existing `SearchScreen.tsx` `StatePanel` usage's appearance too).
+- **Files/contracts to update:** `src/app/components/StatePanel.tsx`, `src/app/screens/AzkarLibraryScreen.tsx`.
+- **Tests/evidence required:** `pnpm check`, `pnpm test:e2e` (no test referenced the old markup/ids).
+- **Supersedes:** None
+
+---
+
+## DEC-019 — `SettingsSection` wrapper, adopted across all 7 sections in `SettingsRootPanel`
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 2)
+- **Related phase:** Phase 03
+- **Context:** `SettingsRootPanel.tsx` hand-rolled the same `SectionLabel` + card-wrapper pair 7 times, in two slight variants: a padded wrapper for arbitrary content (theme section) and an `overflow-hidden`, unpadded wrapper for a list of `SettingsRowItem` rows (6 sections). Card's `padding` prop didn't support a zero-padding option needed for the row-list variant.
+- **Decision:** Added `padding="none"` to `Card`. Added `SettingsSection` to `SettingsPrimitives.tsx` (optional `label` renders `SectionLabel` above; `variant: "rows" | "content"` selects unpadded+clipped vs. padded). Migrated all 7 sections in `SettingsRootPanel.tsx` onto it.
+- **Why:** Continues the DEC-008 shadow-token migration (all 7 now use `shadow-raised` instead of `shadow-lg`) and drops the same dead `backdrop-blur-xl` found in Batch 1, while removing the two-line label+wrapper boilerplate from every section.
+- **Consequences:** None visible — same `SectionLabel` component, same `SettingsRowItem` children, same shadow-token-driven visual as Batch 1's other migrations.
+- **Files/contracts to update:** `src/app/components/Card.tsx`, `src/app/screens/settings/SettingsPrimitives.tsx`, `src/app/screens/settings/SettingsRootPanel.tsx`.
+- **Tests/evidence required:** `SettingsSection.test.tsx` (new), extended `Card.test.tsx`, full `pnpm check` + `pnpm test:e2e`.
+- **Supersedes:** None

@@ -1,10 +1,11 @@
-import { AlertTriangle, CloudOff, Download, Search, VolumeX } from "./icons";
+import { AlertTriangle, Bookmark, CloudOff, Download, Search, VolumeX } from "./icons";
 
 export type AppStateKind =
-  "empty-search" | "network-error" | "offline" | "audio-error" | "download-error" | "interrupted";
+  "empty-search" | "empty-saved" | "network-error" | "offline" | "audio-error" | "download-error" | "interrupted";
 
 const COPY: Record<AppStateKind, { title: string; description: string }> = {
   "empty-search": { title: "No azkar found", description: "Try another word in Arabic, English, or transliteration." },
+  "empty-saved": { title: "No saved azkar yet", description: "Bookmark a zikr to find it here." },
   "network-error": {
     title: "Couldn’t connect",
     description: "Check your connection and try again. Your local progress is safe.",
@@ -17,6 +18,7 @@ const COPY: Record<AppStateKind, { title: string; description: string }> = {
 
 const ICONS = {
   "empty-search": Search,
+  "empty-saved": Bookmark,
   "network-error": AlertTriangle,
   offline: CloudOff,
   "audio-error": VolumeX,

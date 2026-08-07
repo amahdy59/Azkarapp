@@ -32,4 +32,10 @@ describe("Card", () => {
     render(<Card className="mt-4">Merged</Card>);
     expect(screen.getByText("Merged")).toHaveClass("mt-4", "rounded-3xl");
   });
+
+  it("applies no padding class when padding is none", () => {
+    render(<Card padding="none">No padding</Card>);
+    const el = screen.getByText("No padding");
+    expect(el).not.toHaveClass("p-3", "p-4.5", "p-6");
+  });
 });

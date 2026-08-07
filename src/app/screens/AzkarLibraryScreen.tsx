@@ -4,6 +4,7 @@ import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CategoryCard } from "../components/CategoryCard";
+import { StatePanel } from "../components/StatePanel";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -236,30 +237,15 @@ export function AzkarLibraryScreen({
               </div>
             </section>
           ) : (
-            <section
-              className="mt-8 rounded-2xl border border-dashed border-border bg-card p-6 text-center"
-              aria-labelledby="saved-empty-heading"
-            >
-              <span
-                className="mx-auto flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary"
-                aria-hidden="true"
-              >
-                <Bookmark size={22} />
-              </span>
-              <h2 id="saved-empty-heading" className="mt-4 text-[1.0625rem] font-bold text-foreground">
-                {t(language, "library.savedEmptyTitle")}
-              </h2>
-              <p className="mt-2 text-[0.875rem] leading-6 text-muted-foreground">
-                {t(language, "library.savedEmptyBody")}
-              </p>
-              <button
-                type="button"
-                onClick={() => setSection("collections")}
-                className="mt-5 min-h-11 rounded-xl bg-primary px-4 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                {t(language, "library.browseCollections")}
-              </button>
-            </section>
+            <div className="mt-8">
+              <StatePanel
+                kind="empty-saved"
+                title={t(language, "library.savedEmptyTitle")}
+                description={t(language, "library.savedEmptyBody")}
+                actionLabel={t(language, "library.browseCollections")}
+                onAction={() => setSection("collections")}
+              />
+            </div>
           )}
         </div>
       </div>

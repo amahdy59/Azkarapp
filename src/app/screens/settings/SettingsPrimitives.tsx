@@ -1,4 +1,5 @@
 import React from "react";
+import { Card } from "../../components/Card";
 import { IconButton } from "../../components/LayoutShells";
 import { ArrowPrevious } from "../../components/icons";
 import { t } from "../../i18n";
@@ -52,6 +53,35 @@ export function SectionLabel({ label }: { label: string }) {
         {label}
       </h2>
     </div>
+  );
+}
+
+/**
+ * Card wrapper for a settings section: optional SectionLabel above a Card.
+ * "rows" (default) = no padding, clips children's corners for a list of SettingsRowItem rows.
+ * "content" = padded, for sections wrapping arbitrary content (e.g. ThemeModeSelector).
+ */
+export function SettingsSection({
+  label,
+  variant = "rows",
+  className = "",
+  children,
+}: {
+  label?: string;
+  variant?: "rows" | "content";
+  className?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <>
+      {label && <SectionLabel label={label} />}
+      <Card
+        padding={variant === "content" ? "md" : "none"}
+        className={`mx-4 ${variant === "rows" ? "overflow-hidden" : ""} ${className}`.trim()}
+      >
+        {children}
+      </Card>
+    </>
   );
 }
 
