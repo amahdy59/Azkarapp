@@ -461,3 +461,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `package.json`; `src/app/components/ResponsiveSheet.tsx` (new); `QuranWordMeaningSheet.tsx`, `ReaderReferenceSheet.tsx`, `AuthenticZikrLibrarySheet.tsx`, `CounterTargetPicker.tsx`, `ShareableCardModal.tsx`, `CustomCounterScreen.tsx`.
 - **Tests/evidence required:** New `reader-microinteractions.spec.ts` test asserting focus containment across 12 Tab presses, Escape dismissal with the reader still mounted, and focus restore to the trigger. Full `pnpm check` (237 unit) + `pnpm test:e2e` (148 passing).
 - **Supersedes:** None
+
+---
+
+## DEC-026 — Decorative background imagery is Home-only
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (requested directly)
+- **Related phase:** Phase 03 (user-directed; anticipates Phase 05/06/07 screen work)
+- **Context:** `TimeOfDayBackground` (a full-bleed time-of-day photographic hero with a theme-aware gradient scrim) was rendered on nine screens: Home, Library, Category, Completion, Custom Counter, Friday Mode, Friday Salawat, Progress, and Settings.
+- **Options considered:** Keep decorative imagery everywhere; restrict it to Home.
+- **Decision:** `TimeOfDayBackground` is now rendered only by `HomeScreen`. Removed from the other eight screens.
+- **Why:** Consistent with `AGENTS.md`'s UX principles — "use decorative photography only where contrast is controlled" and "functional content should use stable surfaces" — and with DEC-003's direction for functional content. Home is the time-aware dashboard where the imagery carries meaning; on the functional screens it was decoration competing with content.
+- **Consequences:**
+  - Verified before removing that no affected screen relied on the image for text contrast. The only `text-white`/`bg-black/` usages on those screens (`CategoryScreen:313`, `FridayModeScreen:63,221`) are white text on solid coloured button fills, not text floating over the hero — so no contrast regression.
+  - The eight screens now render on the plain themed `--background`. Their existing `relative z-10` content wrappers were left in place; they are harmless without a sibling background layer.
+  - `AzkarHeroBackground` and the background asset set remain in use by Home across all five time-of-day variants, so PWA precaching of those assets is still warranted.
+  - This anticipates screen-level work formally scheduled for Phases 05–07. Recorded here because it was user-directed during Phase 03 rather than deferred.
+- **Files/contracts to update:** `AzkarLibraryScreen`, `CategoryScreen`, `CompletionScreen`, `CustomCounterScreen`, `FridayModeScreen`, `FridaySalawatScreen`, `ProgressScreen`, `settings/SettingsScreen`.
+- **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (148 passing). Visual confirmation across Light/Dark/Midnight still owed with the rest of the Phase 02–03 screenshot debt.
+- **Supersedes:** None

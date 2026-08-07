@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { Modal } from "../components/ResponsiveSheet";
 import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibrarySheet";
@@ -136,7 +135,6 @@ export function CustomCounterScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative flex flex-col page-content-center">
-      <TimeOfDayBackground categoryId="night" />
       <div className="relative z-10 flex flex-col min-h-screen flex-1">
         {/* Header */}
         <Header

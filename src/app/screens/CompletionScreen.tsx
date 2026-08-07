@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
-import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
@@ -138,7 +137,6 @@ export function CompletionScreen({
       className="completion-screen-enter relative h-full overflow-y-auto bg-background px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-6 text-center"
       dir={direction}
     >
-      <TimeOfDayBackground categoryId={catId} />
       <div className="relative z-10 mx-auto flex min-h-full w-full max-w-md flex-col">
         <p className="sr-only" role="status" aria-live="polite">
           {t(language, "completion.sessionComplete", { category: categoryName })}

@@ -16,7 +16,6 @@ import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
-import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import {
   getLocalizedPreferredTiming,
   getLocalizedZikrBenefit,
@@ -340,7 +339,6 @@ export function CategoryScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative">
-      <TimeOfDayBackground categoryId={catId} />
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 

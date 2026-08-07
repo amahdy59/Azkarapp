@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Search, Bookmark } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
 import { TabList, tabPanelProps } from "../components/Tabs";
@@ -57,7 +56,6 @@ export function AzkarLibraryScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative">
-      <TimeOfDayBackground categoryId="evening" />
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
           <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>

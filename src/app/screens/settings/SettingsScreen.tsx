@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
-import { TimeOfDayBackground } from "../../components/TimeOfDayBackground";
 import { t } from "../../i18n";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
 import type {
@@ -168,7 +167,6 @@ export function SettingsScreen({
 
   return (
     <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
-      <TimeOfDayBackground />
       {isTwoPaneLayout ? (
         /* ── Two-pane layout (Expanded 900px+) ── */
         <div className="settings-two-pane h-full">
