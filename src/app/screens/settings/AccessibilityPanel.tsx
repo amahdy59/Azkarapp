@@ -168,7 +168,7 @@ export function AccessibilityPanel({
           </RadioGroupPrimitive.Root>
         </section>
 
-        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Contrast size={20} className="text-primary" />}
@@ -208,7 +208,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.motion")} />
-        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Pause size={20} className="text-primary" />}
@@ -227,7 +227,7 @@ export function AccessibilityPanel({
         </div>
 
         <SectionLabel label={t(language, "settings.reading")} />
-        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+        <div className="mx-4 overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
           <SettingsToggleRow
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<TypeIcon size={20} className="text-primary" />}

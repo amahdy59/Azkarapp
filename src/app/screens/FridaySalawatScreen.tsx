@@ -43,7 +43,7 @@ const COPY = {
 
 function BenefitCard({ text, source, href }: { text: string; source: string; href: string }) {
   return (
-    <article className="rounded-3xl border border-border/40 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5">
+    <article className="rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised">
       <p className="text-[0.9375rem] font-semibold leading-7 text-foreground">{text}</p>
       <a
         href={href}
@@ -110,7 +110,7 @@ export function FridaySalawatScreen({
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
 
       <div className="relative z-10 flex flex-1 flex-col gap-5 overflow-y-auto px-5 pb-8 pt-3">
-        <section className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 text-center backdrop-blur-xl shadow-lg shadow-black/5">
+        <section className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 text-center shadow-raised">
           <Heart className="mx-auto fill-rose-500/15 text-rose-500" size={28} aria-hidden="true" />
           <p className="mt-3 text-[1.125rem] font-black leading-8 text-foreground" dir="rtl" lang="ar">
             {copy.phrase}
@@ -121,7 +121,7 @@ export function FridaySalawatScreen({
           <h2 id="salawat-target-title" className="mb-2 text-start text-[0.875rem] font-black text-foreground">
             {copy.target}
           </h2>
-          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-border/40 bg-card p-1.5 backdrop-blur-xl shadow-lg shadow-black/5">
+          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-border/40 bg-card p-1.5 shadow-raised">
             {TARGETS.map((target) => (
               <button
                 key={target}

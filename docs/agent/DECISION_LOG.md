@@ -351,3 +351,20 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/components/Card.tsx`, `src/app/screens/settings/InformationCard.tsx`, `HelpPanel.tsx`, `SourcesPanel.tsx`, `DownloadsPanel.tsx`, `AccountDataPanel.tsx`, `NotificationsPanel.tsx`.
 - **Tests/evidence required:** `InformationCard.test.tsx` (new), full `pnpm check` + `pnpm test:e2e`.
 - **Supersedes:** None
+
+---
+
+## DEC-021 — Complete the DEC-008 shadow-token rollout; remove dead `backdrop-blur-xl`
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 4)
+- **Related phase:** Phase 03
+- **Context:** DEC-008 deferred the bulk `shadow-lg`/`shadow-xl` → token migration to Phase 03 as "a wide, low-risk find/replace". At the start of this batch, 53 call sites across 16 files still used `shadow-lg shadow-black/5` or `shadow-xl shadow-black/5` for what the design system defines as a single "raised" elevation level, and 30 elements still carried `backdrop-blur-xl`.
+- **Options considered:** Convert every card call site to the `Card` component (large structural churn across 16 files); do the mechanical class-level migration only, leaving markup structure untouched.
+- **Decision:** Mechanical class-level migration only. All `backdrop-blur-xl shadow-lg shadow-black/5`, `shadow-lg shadow-black/5`, and `shadow-xl shadow-black/5` combinations collapsed to the single `shadow-raised` token (53 sites, 16 files). `backdrop-blur-xl` removed only from elements whose background is fully opaque (`bg-card` with no alpha), where it has no visible effect since DEC-007 made cards opaque — 26 sites.
+- **Why:** Matches DEC-008's own stated intent (find/replace, not restructure) and keeps the diff reviewable as pure 1:1 line swaps with zero logic changes. Wrapping every one of these in `Card` would have been a much larger, riskier diff for no additional token-consistency benefit.
+- **Consequences:** Card shadows across the app shift from Tailwind's `shadow-lg`/`shadow-xl` defaults to the single DEC-008 token value — an intentional, pre-approved consolidation, but a real visual change on ~53 surfaces. `backdrop-blur-xl` was deliberately **kept** on the 5 elements with genuinely translucent backgrounds (`bg-emerald-500/10`, `bg-muted/40`, `bg-card/65`, and `AccessibilityPanel`'s color-blind swatches), where the blur still does something. `shadow-2xl` (11 sites) was left untouched — it is consistently used for overlay-level surfaces (dialogs, sheets, modals, app shell), which is a different elevation level and will be handled with the dialog/`ResponsiveSheet` work.
+- **Files/contracts to update:** 16 files across `src/app/components` and `src/app/screens` (mechanical; no structural changes).
+- **Tests/evidence required:** Full `pnpm check` (222 unit tests) + `pnpm test:e2e` (142 tests) — both passed with no assertion changes needed.
+- **Supersedes:** None (completes the migration DEC-008 deferred)

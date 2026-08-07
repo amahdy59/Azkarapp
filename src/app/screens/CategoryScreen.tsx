@@ -191,7 +191,7 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/40 bg-card p-4.5 text-start transition-all shadow-lg shadow-black/5 backdrop-blur-xl hover:border-amber-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/40 bg-card p-4.5 text-start transition-all shadow-raised hover:border-amber-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
@@ -238,7 +238,7 @@ export function CategoryScreen({
       <div
         key={z.id}
         id={`zikr-card-${index}`}
-        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all backdrop-blur-xl shadow-lg shadow-black/5 ${
+        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-raised ${
           isCardCompleted
             ? "border-emerald-500/30 bg-emerald-500/15 dark:bg-emerald-950/30"
             : "border-border/40 bg-card hover:border-primary/40 hover:shadow-xl"
@@ -526,7 +526,7 @@ export function CategoryScreen({
 
           {catId === "before_sleep" && (
             <section
-              className="mb-5 rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+              className="mb-5 rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
               aria-labelledby="sleep-prepare-title"
             >
               <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">

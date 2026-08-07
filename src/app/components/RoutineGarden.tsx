@@ -398,7 +398,7 @@ export function TodayRoutineGarden({
             })}
           </div>
 
-          <div className="mb-4 flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-lg shadow-black/5 backdrop-blur-xl">
+          <div className="mb-4 flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-raised">
             <button
               type="button"
               onClick={() => setOffset((prev) => prev - 1)}

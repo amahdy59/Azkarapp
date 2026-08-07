@@ -497,7 +497,7 @@ export function HomeScreen({
 
           {/* Bottom Section: Special Friday Banner ("أذكار يوم الجمعة") */}
           <section className="home-grid-full my-1">
-            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-3xl border border-border/40 bg-card p-6 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+            <div className="relative flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden rounded-3xl border border-border/40 bg-card p-6 shadow-raised transition-all">
               {/* Left Side (RTL Start): Dome Artwork + Titles + Description + CTA */}
               <div className="flex flex-1 flex-col items-start gap-3 text-start z-10">
                 <div className="flex items-center gap-3">

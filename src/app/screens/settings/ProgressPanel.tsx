@@ -51,7 +51,7 @@ export function ProgressPanel({
       <div className="flex-1 space-y-4 overflow-y-auto p-5">
         {/* Garden toggle */}
         <section
-          className="overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5"
+          className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised"
           aria-label={t(language, "progressPanel.gardenToggle")}
         >
           <SettingsToggleRow
@@ -83,7 +83,7 @@ export function ProgressPanel({
 
             {/* Weekly goal */}
             <section
-              className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
               aria-labelledby="weekly-goal-title"
             >
               <div className="flex items-baseline justify-between gap-3">
@@ -138,7 +138,7 @@ export function ProgressPanel({
           </>
         ) : (
           <section
-            className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+            className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
             data-testid="garden-hidden-state"
           >
             <h2 className="text-[0.9375rem] font-bold text-foreground">
@@ -151,7 +151,7 @@ export function ProgressPanel({
         )}
 
         <section
-          className="rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
           aria-labelledby="progress-day-boundary-title"
         >
           <h2 id="progress-day-boundary-title" className="text-[0.9375rem] font-bold text-foreground">
@@ -191,7 +191,7 @@ export function ProgressPanel({
             {completedSessions.slice(0, 5).map((session) => (
               <article
                 key={session.id}
-                className="flex min-h-[70px] items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 backdrop-blur-xl shadow-lg shadow-black/5"
+                className="flex min-h-[70px] items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 shadow-raised"
               >
                 <div className="min-w-0 flex-1 text-start">
                   <p className="text-[0.875rem] font-semibold text-foreground">

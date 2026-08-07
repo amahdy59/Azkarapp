@@ -162,7 +162,7 @@ export function FridayModeScreen({
       />
 
       <div className="relative z-10 flex flex-1 flex-col gap-4 overflow-y-auto px-5 pb-8 pt-3">
-        <section className="shrink-0 overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 backdrop-blur-xl shadow-lg shadow-black/5">
+        <section className="shrink-0 overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 shadow-raised">
           <div className="flex items-start justify-between gap-4">
             <div className="text-start">
               <p className="text-[0.75rem] font-black uppercase tracking-wide text-amber-700 dark:text-amber-300">
@@ -190,7 +190,7 @@ export function FridayModeScreen({
 
         <section
           aria-labelledby="kahf-heading"
-          className="shrink-0 rounded-3xl border border-border/40 bg-card p-5 backdrop-blur-xl shadow-lg shadow-black/5"
+          className="shrink-0 rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
         >
           <div className="flex items-start gap-4">
             <div className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
@@ -229,7 +229,7 @@ export function FridayModeScreen({
           type="button"
           onClick={onOpenSalawat}
           aria-labelledby="salawat-heading"
-          className="flex min-h-24 shrink-0 items-center gap-4 rounded-3xl border border-border/40 bg-card p-5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex min-h-24 shrink-0 items-center gap-4 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
             <Heart size={24} className="fill-current/15" aria-hidden="true" />
@@ -254,7 +254,7 @@ export function FridayModeScreen({
             <h2 id={`friday-${section.items[0]?.id}`} className="mb-2 px-1 text-[0.9375rem] font-black text-foreground">
               {section.title}
             </h2>
-            <div className="overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+            <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
               {section.items.map((item) => (
                 <PracticeRow
                   key={item.id}
@@ -271,7 +271,7 @@ export function FridayModeScreen({
         <button
           type="button"
           onClick={onStartDuasSession}
-          className="flex min-h-24 shrink-0 items-center gap-3 rounded-3xl border border-border/40 bg-card p-5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex min-h-24 shrink-0 items-center gap-3 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
             <Clock size={23} />

@@ -29,7 +29,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
 
         <div>
           <SectionLabel label={t(language, "help.faq")} />
-          <div className="overflow-hidden rounded-3xl border border-border/40 bg-card backdrop-blur-xl shadow-lg shadow-black/5">
+          <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
             {FAQ_ITEMS.map(({ question, answer, icon: Icon }) => (
               <details className="group border-b border-border last:border-b-0" key={question}>
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">

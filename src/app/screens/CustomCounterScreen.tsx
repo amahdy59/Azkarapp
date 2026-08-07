@@ -161,7 +161,7 @@ export function CustomCounterScreen({
             <button
               type="button"
               onClick={() => setShowLibrarySheet(true)}
-              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <div className="min-w-0 flex-1 space-y-1">
                 <span className="block text-[0.75rem] font-bold text-muted-foreground">
@@ -213,7 +213,7 @@ export function CustomCounterScreen({
                 type="button"
                 onClick={handleUndo}
                 disabled={count === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground backdrop-blur-xl shadow-lg shadow-black/5 hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
               >
                 <RotateCcw size={16} />
                 <span>{isArabic ? "تراجع" : "Undo"}</span>
@@ -223,7 +223,7 @@ export function CustomCounterScreen({
                 type="button"
                 onClick={handleReset}
                 disabled={count === 0 && laps === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground backdrop-blur-xl shadow-lg shadow-black/5 hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
               >
                 <RotateCcw size={16} />
                 <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
@@ -264,7 +264,7 @@ export function CustomCounterScreen({
 
           {/* Virtue & Source Information Card */}
           {selectedAuthentic.virtueAr && (
-            <div className="rounded-3xl border border-border/40 bg-card p-4 backdrop-blur-xl shadow-lg shadow-black/5">
+            <div className="rounded-3xl border border-border/40 bg-card p-4 shadow-raised">
               <div className="flex items-start gap-3">
                 <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
                   <Sparkles size={18} />
@@ -301,7 +301,7 @@ export function CustomCounterScreen({
             className="absolute inset-0 h-full w-full cursor-default border-none bg-transparent p-0"
             onClick={() => setShowCompletionDialog(false)}
           />
-          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 text-center shadow-2xl backdrop-blur-xl">
+          <div className="relative z-10 w-full max-w-sm rounded-3xl border border-border/40 bg-card p-6 text-center shadow-2xl">
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400">
               <Check size={32} strokeWidth={3} />
             </div>
