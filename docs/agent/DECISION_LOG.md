@@ -506,3 +506,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `LayoutShells.tsx`, `App.tsx`, `hooks/useScreenFocus.ts`, `ScreenContainer.tsx`, `i18n/en.ts`, `i18n/ar.ts`, `styles/theme.css`, `docs/DESIGN_SYSTEM.md`, `docs/ARCHITECTURE.md`, four e2e specs.
 - **Tests/evidence required:** Seven new e2e tests (tier matrix, dead-zone regression, full-bleed band, onboarding nav suppression, `aria-current` + non-colour cue, single-`main` + focus-on-navigation). Dead-zone test verified to fail against the pre-fix CSS. Full `pnpm check` + `pnpm test:e2e` (166 passing).
 - **Supersedes:** None
+
+---
+
+## DEC-028 — Phase 05 Home redesign against the supplied Figma
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User (supplied the Figma node and delegated execution)
+- **Related phase:** Phase 05
+- **Context:** User supplied Figma node `940-26629` as the target Home design and asked for the screen to be updated to match, working autonomously.
+- **Changes made to match the design:**
+  - **Top utility bar.** Replaced the floating translucent header (badges on the start edge, date/prayer on the end edge, over the hero image) with an opaque bar on `bg-card`: quick actions on the start edge, next-prayer countdown and Hijri date as centred pills, lifetime palms and daily streak as end-edge badges. Moving off the image also removes the text-over-photo contrast risk the Phase 02 analysis flagged as unverifiable.
+  - **Three stat cards, not four.** Ordered This Week / Streak / Total Azkar per the design. The fourth "Resume Reading" `CompactActionCard` was dropped — it duplicated the hero's primary CTA, which already resumes the same collection, and the design does not show it. `CompactActionCard` remains exported for other callers.
+  - **Labelled section divider** (`SectionDivider`) introducing the Friday section, matching the centred rule-and-label treatment.
+- **Two deviations from the Figma, both deliberate:**
+  1. **No settings gear in the top bar.** The design shows a gear beside the bell, but Settings is already a top-level nav destination, and `PHASE_04_SHELL_NAVIGATION.md` explicitly prohibits duplicated top-level destinations. It also produced a real defect: two controls with the accessible name "Settings" broke nine e2e tests with strict-mode violations, and would be genuinely ambiguous for assistive tech. The bell is kept — notification settings is a sub-screen, not a nav destination.
+  2. **The "وردك اليوم" card is the existing `TodayRoutineGarden`, not a new component.** A bespoke `TodayWirdCard` was written first, and a screenshot showed the result rendered _two_ cards both headed "وردك اليوم" with overlapping routine navigation. `TodayRoutineGarden` with `hideTabs` already is this card, and carries existing test coverage, so the duplicate was removed and the garden restored to the hero-adjacent slot with its `quietProgressEnabled` gate intact.
+- **Consequences:** Home no longer shows the hero background image behind the header area in the same way, since the header is now opaque; `TimeOfDayBackground` still renders behind the scrollable content per DEC-026. The `hijri-date` and `next-prayer` test ids are preserved.
+- **Files/contracts to update:** `src/app/screens/HomeScreen.tsx`, `src/app/App.tsx`.
+- **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (166 passing). Visual verification captured at 1280×900 in Arabic during development; before/after screenshots across Light/Dark/Midnight remain outstanding with the rest of the Phase 02–05 screenshot debt.
+- **Supersedes:** None

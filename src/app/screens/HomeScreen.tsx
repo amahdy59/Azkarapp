@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Sun, Calendar, Zap, Clock, ArrowLeft, ArrowRight } from "../components/icons";
+import { Calendar, Zap, Clock, ArrowLeft, ArrowRight, Bell } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -12,7 +12,8 @@ import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
-import { StatCard, CompactActionCard } from "../components/StatCard";
+import { StatCard } from "../components/StatCard";
+import { IconButton } from "../components/LayoutShells";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
 import type {
@@ -64,6 +65,19 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
     title: t(language, "home.beforeSleepTitle"),
     desc: t(language, "home.beforeSleepDesc"),
   };
+}
+
+/** Centred section heading with rules on either side, per the Home design. */
+function SectionDivider({ label }: { label: string }) {
+  return (
+    <div className="home-grid-full flex items-center gap-4 py-1">
+      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+      <h2 className="text-[0.9375rem] font-bold text-primary" dir="auto">
+        {label}
+      </h2>
+      <span className="h-px flex-1 bg-border" aria-hidden="true" />
+    </div>
+  );
 }
 
 export function getHomeAction(
@@ -145,6 +159,7 @@ export function HomeScreen({
   routineModes,
   onSetRoutineMode,
   onOpenCustomCounter,
+  onOpenNotifications,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -161,6 +176,7 @@ export function HomeScreen({
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
   onOpenCustomCounter?: () => void;
+  onOpenNotifications?: () => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -240,65 +256,73 @@ export function HomeScreen({
       {/* Atmospheric Background Sky Image & Backdrop Overlay */}
       <TimeOfDayBackground categoryId={reminderInfo.categoryId} />
 
-      {/* Absolute Header floating above everything for scrolling translucency */}
-      <div className="absolute top-0 inset-x-0 z-30 px-page pt-2 pb-2 pointer-events-none">
-        <header className="flex w-full flex-col pointer-events-auto" dir={direction}>
+      {/* Top utility bar: quick actions (start) · date & next prayer (centre) · progress badges (end) */}
+      <div className="relative z-30 border-b border-border/40 bg-card/95 px-page py-2">
+        <header className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2" dir={direction}>
+          {/* Start: quick actions */}
+          <div className="flex items-center gap-1">
+            {/* Settings is a top-level nav destination, so no gear shortcut here —
+                the roadmap prohibits duplicated top-level destinations, and a
+                second control with the same accessible name is ambiguous for
+                assistive tech. Notifications is a sub-screen, so it stays. */}
+            {onOpenNotifications && (
+              <IconButton onClick={onOpenNotifications} label={t(language, "settings.notifications")}>
+                <Bell size={20} className="text-muted-foreground" />
+              </IconButton>
+            )}
+          </div>
+
+          {/* Centre: next prayer countdown and today's date */}
+          <div className="flex flex-wrap items-center justify-center gap-2" dir="auto">
+            <div
+              data-testid="next-prayer"
+              className="flex items-center gap-2 whitespace-nowrap rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[0.8125rem] font-semibold text-foreground"
+            >
+              <Clock className="h-[15px] w-[15px] shrink-0 text-primary" aria-hidden="true" />
+              <span className="flex items-center gap-1">
+                <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+                <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
+              </span>
+            </div>
+            <div
+              data-testid="hijri-date"
+              className="flex items-center gap-2 whitespace-nowrap rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-semibold text-foreground"
+            >
+              <Calendar className="h-[15px] w-[15px] shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span>{formatDisplayDate(now, language, calendarType)}</span>
+            </div>
+          </div>
+
+          {/* End: lifetime palms and daily streak */}
           <div
-            className="flex min-h-[48px] w-full shrink-0 flex-wrap items-center justify-between gap-x-4 gap-y-2 text-xs font-semibold"
-            dir="auto"
+            className="flex items-center gap-2"
             aria-label={
               isArabic
                 ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
                 : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length}, Daily streak: ${streakDays} days`
             }
           >
-            {/* Start side: Streak & Palms Gamification Badges */}
-            <div className="flex items-center gap-2.5">
-              {/* Streak */}
-              <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary backdrop-blur-md shadow-xs"
-                title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
-              >
-                <span>
-                  {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
-                </span>
-                <Zap className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} aria-hidden="true" />
-              </div>
-
-              {/* Palms */}
-              <div
-                className="flex items-center gap-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary backdrop-blur-md shadow-xs"
-                title={isArabic ? "أشجار النخيل" : "Palms"}
-              >
-                <PalmTreeMark
-                  size={16}
-                  filled={gardenSummary.lifetimePalms > 0}
-                  className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-white/40"}
-                />
-                <span>
-                  {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
-                </span>
-              </div>
+            <div
+              className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-bold text-foreground"
+              title={isArabic ? "أشجار النخيل" : "Palms"}
+            >
+              <PalmTreeMark
+                size={15}
+                filled={gardenSummary.lifetimePalms > 0}
+                className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
+              />
+              <span dir="auto">
+                {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
+              </span>
             </div>
-
-            {/* End side: Date & Next Prayer info */}
-            <div className="flex flex-wrap items-center gap-3 rounded-full border border-white/15 bg-black/25 px-3.5 py-1.5 backdrop-blur-md shadow-xs text-white">
-              {/* Date */}
-              <div data-testid="hijri-date" className="flex items-center gap-2 text-white whitespace-nowrap">
-                <Calendar className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" />
-                <span className="text-[0.8125rem] font-medium">{formatDisplayDate(now, language, calendarType)}</span>
-              </div>
-
-              <div className="hidden sm:block h-3.5 w-px bg-white/25 shrink-0" />
-
-              {/* Prayer timing */}
-              <div data-testid="next-prayer" className="flex items-center gap-2 text-white whitespace-nowrap">
-                <Sun className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" />
-                <span className="flex items-center gap-1 text-[0.8125rem] font-medium">
-                  <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-                  <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-                </span>
-              </div>
+            <div
+              className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-bold text-foreground"
+              title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+            >
+              <Zap className="h-[15px] w-[15px] text-primary" strokeWidth={2.5} aria-hidden="true" />
+              <span dir="auto">
+                {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
+              </span>
             </div>
           </div>
         </header>
@@ -427,7 +451,8 @@ export function HomeScreen({
             </section>
           )}
 
-          {/* Today's Wird Routine Card ("وردك اليوم") */}
+          {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
+              renders exactly this card; a second bespoke one would duplicate it. */}
           {quietProgressEnabled && (
             <div className="lg:col-span-2 flex w-full">
               <TodayRoutineGarden
@@ -441,42 +466,29 @@ export function HomeScreen({
             </div>
           )}
 
-          {/* Middle Row: 4 Compact Stat & Resume Cards (Side-by-side on Desktop & Tablet) */}
-          <div className="home-grid-full grid grid-cols-2 md:grid-cols-4 gap-3.5 my-1">
-            {/* Card 1: Streak / "سلسلة المتابعة" */}
-            <StatCard
-              title={isArabic ? "سلسلة المتابعة" : "Streak"}
-              icon={<Zap size={18} />}
-              value={formatNumerals(streakDays, language)}
-              subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
-            />
-
-            {/* Card 2: This Week / "هذا الأسبوع" */}
+          {/* Middle Row: three at-a-glance progress stats */}
+          <div className="home-grid-full grid grid-cols-1 sm:grid-cols-3 gap-3.5 my-1">
             <StatCard
               title={isArabic ? "هذا الأسبوع" : "This Week"}
               icon={<Calendar size={18} />}
               value={formatNumerals(activeDaysThisWeek, language)}
               subtitle={isArabic ? "من ٧ أيام" : "of 7 days"}
             />
-
-            {/* Card 3: Total Azkar / "إجمالي الأذكار" */}
             <StatCard
-              title={isArabic ? "إجمالي الأذكار" : "Total Days"}
+              title={isArabic ? "سلسلة المتابعة" : "Streak"}
+              icon={<Zap size={18} />}
+              value={formatNumerals(streakDays, language)}
+              subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
+            />
+            <StatCard
+              title={isArabic ? "إجمالي الأذكار" : "Total Azkar"}
               icon={<GoldenPalmMark size={18} />}
               value={formatNumerals(totalDays, language)}
-              subtitle={isArabic ? "يوماً" : "days active"}
-            />
-
-            {/* Card 4: Resume Reading / "تابع من حيث توقفت" */}
-            <CompactActionCard
-              title={isArabic ? "تابع من حيث توقفت" : "Resume Reading"}
-              icon="📖"
-              contentTitle={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
-              contentSubtitle={isArabic ? "آخر قراءة: اليوم" : "Last read: Today"}
-              actionLabel={isArabic ? "متابعة" : "Resume"}
-              onAction={() => onResume(reminderInfo.categoryId)}
+              subtitle={isArabic ? "ذكراً اليوم" : "azkar today"}
             />
           </div>
+
+          <SectionDivider label={isArabic ? "أذكار يوم الجمعة" : "Friday Azkar"} />
 
           {/* Bottom Section: Special Friday Banner ("أذكار يوم الجمعة") */}
           <section className="home-grid-full my-1">
