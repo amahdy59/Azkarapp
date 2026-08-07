@@ -115,7 +115,7 @@ DEC-013 resolved and implemented.
 
 ## Known limitations or remaining risks
 
-- **No before/after screenshots** for this phase or Phase 02. The most visually
+- **Before/after screenshots are now captured** in `docs/agent/evidence/screenshots/` — `before/` is the pre-Phase-02 commit `5290eeb`, `after/` is current `main`, both produced by the same `e2e/evidence-capture.spec.ts`.
   significant changes — `bg-card` losing backdrop blur, the app-wide shadow-token
   swap, `Button` typography — are unverified against the design intent. This is the
   largest outstanding gap and blocks a clean Definition-of-Done sign-off.

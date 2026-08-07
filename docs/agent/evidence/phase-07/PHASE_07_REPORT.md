@@ -34,5 +34,5 @@ Reporting these as "already correct" rather than manufacturing changes is the po
 
 ## Known limitations
 
-- No before/after screenshots — shared with Phases 02–06.
+- **Before/after screenshots are now captured** in `docs/agent/evidence/screenshots/` — `before/` is the pre-Phase-02 commit `5290eeb`, `after/` is current `main`, both produced by the same `e2e/evidence-capture.spec.ts`.
 - The manual keyboard and screen-reader reader walkthrough required by the phase's evidence section has **not** been performed; automated keyboard coverage is not a substitute and this remains outstanding.

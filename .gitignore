@@ -8,5 +8,8 @@ playwright-report/
 test-results/
 *.log
 *.png
+# ...but phase evidence is a deliberate, reviewed artifact. The blanket *.png
+# rule above is why the Phase 01 baseline was silently never committed.
+!docs/agent/evidence/screenshots/**/*.png
 .agents/
 skills-lock.json

@@ -48,6 +48,6 @@ Full `pnpm check` and `pnpm test:e2e` green: **249 unit, 172 e2e**. New e2e test
 
 ## Known limitations
 
-- **No before/after screenshots**, shared with Phases 02–04.
+- **Before/after screenshots are now captured** in `docs/agent/evidence/screenshots/` — `before/` is the pre-Phase-02 commit `5290eeb`, `after/` is current `main`, both produced by the same `e2e/evidence-capture.spec.ts`.
 - `HomeScreen` still does not adopt `.page-content-center`; deferred to a later phase as screen-internal redesign is out of Phase 04/05 scope.
 - `FloatingAudioPlayer`'s viewport-fixed positioning remains deferred for the same reason.

@@ -48,6 +48,6 @@ Recorded as **DEC-027**. Three points were the user's call:
 
 ## Known limitations
 
-- **No before/after screenshots.** This is the largest evidence gap and is shared with Phases 02, 03 and 05.
+- **Before/after screenshots are now captured** in `docs/agent/evidence/screenshots/` — `before/` is the pre-Phase-02 commit `5290eeb`, `after/` is current `main`, both produced by the same `e2e/evidence-capture.spec.ts`.
 - The onboarding navigation pattern (mixed `push`/`replaceState`/bare `setView`) remains inconsistent by explicit decision.
 - `ProgressViews.tsx` and `RoutineGarden.tsx` remain unsplit; still scheduled for Phase 08.

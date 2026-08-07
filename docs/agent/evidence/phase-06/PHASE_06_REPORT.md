@@ -41,4 +41,4 @@ Full `pnpm check` + `pnpm test:e2e`. Ten unit tests for the normalizer, a `Categ
 
 ## Known limitations
 
-No before/after screenshots — shared with Phases 02–05.
+Before/after screenshots are now captured in `docs/agent/evidence/screenshots/` (`before/` = pre-Phase-02 commit `5290eeb`, `after/` = current `main`, same capture spec on both sides).

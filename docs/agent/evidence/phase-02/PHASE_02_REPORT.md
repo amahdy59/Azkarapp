@@ -136,7 +136,7 @@ width/opacity normalization — Proposed, deferred, not implemented).
   was deliberately excluded from this phase's diff as the analysis's own
   highest-blast-radius item; color-token bypasses (the accessibility-breaking
   part) are fixed, but visual consistency is not yet complete.
-- **No before/after screenshots captured** for the `bg-card` opacity change
+- **Before/after screenshots have since been captured** (see `docs/agent/evidence/screenshots/`) covering the `bg-card` opacity change
   or the two narrowed dialogs — recommend capturing before Phase 03 begins,
   since Phase 03 will touch many of the same card surfaces.
 - The 131 raw Tailwind-palette color occurrences and 564 arbitrary-bracket
