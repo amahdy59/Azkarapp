@@ -146,7 +146,6 @@ const ar = {
     browseCollections: "تصفح المجموعات",
     complete: "مكتمل",
     progressOfTotal: "{done} من {total} مكتملة",
-    reviewNotice: "ستُضاف مجموعات موثقة جديدة بعد اكتمال مراجعة المحتوى.",
   },
   search: {
     placeholder: "ابحث في الأذكار والأدعية",

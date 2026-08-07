@@ -587,3 +587,25 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** The offline banner's e2e test could not drive real offline state — `lazyWithRetry` reloads the page when a chunk fails, destroying the execution context. The test asserts the `.app-status` wrapper's computed grid area and geometry instead, which is deterministic and still catches the regression.
 - **Tests/evidence required:** Both CSS fixes verified by reverting them and confirming the new tests fail; the `useLayoutMode` suite verified by introducing an off-by-one at 900 px. Full `pnpm check` + `pnpm test:e2e` (249 unit, 172 e2e).
 - **Supersedes:** None
+
+---
+
+## DEC-032 — Phase 06: Arabic search normalization, category card states, roadmap copy
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Claude (delegated — user asked to proceed through phases autonomously)
+- **Related phase:** Phase 06
+- **Context:** Phase 06 Step 1 analysis of the Library index, category cards and search.
+- **Primary finding — Arabic search was effectively broken.** `SearchScreen` matched Arabic with a raw `arabicText.includes(query)`. Verified against the corpus: **100% of sampled azkar carry diacritics** and 56% use hamza-alef variants. Confirmed live in a browser — searching `باسمك اللهم`, text that _is_ in the corpus as `بِاسْمِكَ اللَّهُمَّ`, returned "لم يتم العثور على أذكار". In an Arabic-first app, the primary search path returned nothing for ordinary typing.
+  - **Fix:** new `content/searchNormalization.ts` building a comparison key — strips tashkeel/tatweel, folds alef variants, taa marbuta, alef maqsura and hamza carriers, lowercases Latin, collapses whitespace.
+  - **Acceptance criterion "content text is not altered by normalization" is honoured structurally:** normalization produces a _match key only_ and is never applied to rendered strings. Verified in the browser — results still display `بِاسْمِكَ اللَّهُمَّ` with diacritics intact, and an e2e test asserts this.
+  - **Folding is deliberately conservative.** Only variants routinely dropped when typing are folded, and a unit test asserts distinct roots (`كتب`/`كسب`, `نور`/`نار`) do **not** collapse. Aggressive stemming would create false matches in devotional content, which is worse than a missed match.
+  - **Performance:** normalized keys are cached per zikr id rather than recomputed per keystroke; the corpus is static.
+- **Secondary findings fixed:**
+  - **Internal roadmap messaging in production UI** — the Library footer read "New collections will appear after their content review is complete." Removed with its i18n keys (Step 3 item 6). The separate `legal.reviewNotice` in Settings is left alone; it belongs to Phase 09.
+  - **Category cards marked completion by colour alone** — a finished collection differed from an in-progress one only by the chevron's hue. Added a check glyph beside the progress text. Same defect class as DEC-027's `BottomNav` finding.
+- **Already correct, no change needed:** `CategoryCard` already suppressed the progress bar for not-started collections (an explicit acceptance criterion), and the Library tabs already used the APG `TabList` from Phase 03 with proper `aria-label` and panel wiring.
+- **Tests/evidence required:** 10 unit tests for the normalizer, a `CategoryCard` test asserting the completion cue is non-colour, and four e2e tests (undiacritized matching, content-not-altered, live-region count, empty state). The search defect was proven in a real browser _before_ the fix and re-verified after. Full `pnpm check` + `pnpm test:e2e` (260 unit, 184 e2e).
+- **Not done / deferred:** taxonomy grouping (Step 1 item 4) is presentation-only per the phase's own prohibition on ID migration, and is left for a follow-up since it needs product input on group names. No search dependency was added, per the phase's prohibited list.
+- **Supersedes:** None

@@ -159,9 +159,6 @@ export function AzkarLibraryScreen({
                   <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
                 </div>
               )}
-              <p className="px-4 pt-5 text-center text-[0.75rem] leading-5 text-muted-foreground">
-                {t(language, "library.reviewNotice")}
-              </p>
             </>
           ) : savedAzkar.length > 0 ? (
             <section aria-labelledby="saved-zikr-heading">

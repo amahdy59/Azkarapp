@@ -144,7 +144,6 @@ const en = {
     browseCollections: "Browse collections",
     complete: "complete",
     progressOfTotal: "{done} of {total} complete",
-    reviewNotice: "New collections will appear after their content review is complete.",
   },
   search: {
     placeholder: "Search adhkar or duas",

@@ -67,6 +67,31 @@ describe("CategoryCard", () => {
     expect(screen.getByText("5 of 5")).toBeInTheDocument();
   });
 
+  it("marks a complete collection with a shape, not colour alone", () => {
+    function renderCard(completedCount: number) {
+      const { container, unmount } = render(
+        <CategoryCard
+          id="sleep"
+          title="Before Sleep"
+          icon="star"
+          direction="ltr"
+          totalCount={5}
+          completedCount={completedCount}
+          progressText={`${completedCount} of 5`}
+          ariaLabel="Before Sleep"
+          onClick={vi.fn()}
+        />,
+      );
+      const icons = container.querySelectorAll("[data-slot='category-copy'] svg").length;
+      unmount();
+      return icons;
+    }
+
+    // The completed card previously differed from an in-progress one only by
+    // the chevron's hue, which fails "use of colour" on its own.
+    expect(renderCard(5)).toBeGreaterThan(renderCard(2));
+  });
+
   it("renders occasional collections with a subtitle instead of progress", () => {
     render(
       <CategoryCard

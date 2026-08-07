@@ -8,6 +8,8 @@ import { StatePanel } from "../components/StatePanel";
 import { IconButton } from "../components/LayoutShells";
 import { t } from "../i18n";
 
+import { normalizeSearchText } from "../content/searchNormalization";
+
 // ─── Recent-search persistence ────────────────────────────────────────────────
 // Stored per-language so Arabic and English histories don't overwrite each other.
 const MAX_RECENTS = 5;
@@ -56,6 +58,23 @@ export function CategoryBadge({ catId, language }: { catId: CategoryId; language
 }
 
 // ─── SearchScreen ─────────────────────────────────────────────────────────────
+/**
+ * Normalized haystack per zikr, built once and reused across keystrokes.
+ * Normalizing the whole corpus on every render would be wasteful; the corpus is
+ * static so the key can be cached by zikr id.
+ */
+const searchKeyCache = new Map<string, string>();
+
+function searchKeyFor(zikr: (typeof ALL_AZKAR)[number]): string {
+  const cached = searchKeyCache.get(zikr.id);
+  if (cached !== undefined) return cached;
+  const key = normalizeSearchText(
+    [zikr.arabicText, zikr.translation, zikr.transliteration, ZIKR_LABELS[zikr.id] ?? ""].join(" | "),
+  );
+  searchKeyCache.set(zikr.id, key);
+  return key;
+}
+
 export function SearchScreen({
   onBack,
   onZikr,
@@ -76,15 +95,9 @@ export function SearchScreen({
 
   const results = useMemo(() => {
     if (deferredQuery.length < 2) return [];
-    const normalizedQuery = deferredQuery.toLowerCase();
-    return ALL_AZKAR.filter(
-      (zikr) =>
-        !zikr.isCollectionIntroduction &&
-        (zikr.arabicText.includes(deferredQuery) ||
-          zikr.translation.toLowerCase().includes(normalizedQuery) ||
-          zikr.transliteration.toLowerCase().includes(normalizedQuery) ||
-          (ZIKR_LABELS[zikr.id] ?? "").toLowerCase().includes(normalizedQuery)),
-    );
+    const normalizedQuery = normalizeSearchText(deferredQuery);
+    if (!normalizedQuery) return [];
+    return ALL_AZKAR.filter((zikr) => !zikr.isCollectionIntroduction && searchKeyFor(zikr).includes(normalizedQuery));
   }, [deferredQuery]);
 
   const handleSubmit = (term: string) => {

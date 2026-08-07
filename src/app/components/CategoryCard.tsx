@@ -1,5 +1,5 @@
 import { CatIcon } from "./CatIcon";
-import { ChevronNext } from "./icons";
+import { Check, ChevronNext } from "./icons";
 import { ProgressBar } from "./ProgressBar";
 
 export interface CategoryCardProps {
@@ -69,9 +69,14 @@ export function CategoryCard({
                 aria-label={progressText || ""}
               />
             )}
-            <span className="block text-[0.8125rem] text-muted-foreground">
-              {routineSummary ? `${routineSummary} · ` : ""}
-              {progressText}
+            <span className="flex items-center gap-1.5 text-[0.8125rem] text-muted-foreground">
+              {/* A shape, not just the chevron's hue, marks a finished
+                  collection — colour alone is not a sufficient cue. */}
+              {isComplete && <Check size={15} className="shrink-0 text-primary" aria-hidden="true" />}
+              <span>
+                {routineSummary ? `${routineSummary} · ` : ""}
+                {progressText}
+              </span>
             </span>
           </div>
         )}
