@@ -202,9 +202,7 @@ jobs:
                 // 4. Verify at least one JS asset referenced in the HTML is reachable
                 const jsAssetMatch = mainRes.data.match(/src=\"([^\"]*\/assets\/[^\"]+\.js[^\"]*)\"/);
                 if (jsAssetMatch) {
-                  const jsUrl = jsAssetMatch[1].startsWith('http')
-                    ? jsAssetMatch[1]
-                    : baseUrl.replace(/\/$/, '') + jsAssetMatch[1];
+                  const jsUrl = new URL(jsAssetMatch[1], baseUrl).href;
                   const jsRes = await fetchUrl(jsUrl);
                   if (jsRes.statusCode !== 200) {
                     console.log(\`JS asset status \${jsRes.statusCode} for \${jsUrl}, retrying...\`);
@@ -219,9 +217,7 @@ jobs:
                 // 5. Verify at least one CSS asset is reachable
                 const cssAssetMatch = mainRes.data.match(/href=\"([^\"]*\/assets\/[^\"]+\.css[^\"]*)\"/);
                 if (cssAssetMatch) {
-                  const cssUrl = cssAssetMatch[1].startsWith('http')
-                    ? cssAssetMatch[1]
-                    : baseUrl.replace(/\/$/, '') + cssAssetMatch[1];
+                  const cssUrl = new URL(cssAssetMatch[1], baseUrl).href;
                   const cssRes = await fetchUrl(cssUrl);
                   if (cssRes.statusCode !== 200) {
                     console.log(\`CSS asset status \${cssRes.statusCode} for \${cssUrl}, retrying...\`);
