@@ -527,3 +527,26 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `src/app/screens/HomeScreen.tsx`, `src/app/App.tsx`.
 - **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (166 passing). Visual verification captured at 1280×900 in Arabic during development; before/after screenshots across Light/Dark/Midnight remain outstanding with the rest of the Phase 02–05 screenshot debt.
 - **Supersedes:** None
+
+---
+
+## DEC-029 — Phase 05 Home rebuilt against the Figma node itself
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User
+- **Related phase:** Phase 05
+- **Context:** DEC-028's Home pass was inferred from a screenshot and got the page structure wrong. With direct Figma access to node `940:26629`, the design was read rather than guessed. Instruction was to follow it thoroughly while keeping the existing design-system foundation, and specifically to keep the scene image inside the main card.
+- **What the node actually specifies, and what changed:**
+  - **`hero-banner` is `1136×373`, inset 32px inside `hero-container`.** The image belongs to the hero card, not the page. `TimeOfDayBackground` gained a `variant="card"` that swaps the fade-to-page gradients (correct behind a full screen, wrong inside a rounded card, where a fade-to-page edge reads as a rendering bug) for a flat direction-agnostic scrim. Home no longer washes the scene across the whole screen.
+  - **The hero is one card containing both zones** — the zikr content at the start edge and the "وردك اليوم" card overlaid at the end edge. Previously these were sibling grid cells with the image floating behind everything.
+  - **`left-controls` (settings gear _and_ bell) is `hidden="true"` in the node.** Both are removed. This confirms DEC-028's gear call and extends it: the bell went too, so `onOpenNotifications` is gone from `HomeScreen` and `App.tsx`.
+  - **`friday-detail-card`** rebuilt to the node's three zones — artwork at the start, the Kahf message and its CTA in the middle, virtues list at the end — with the node's actual copy, replacing invented strings. The CTA now uses the `primary` token instead of hard-coded `#e2a84a`/`#ebd074` hexes.
+  - `home-grid-full` (`grid-column: 1 / -1`) usages were dropped: the container is a flex column now, so they described a grid that no longer exists.
+- **Two defects found while verifying, unrelated to layout:**
+  1. **`StatCard` mis-aligned its value in Arabic.** `dir="auto"` on a digits-only string resolves to **LTR**, so the number left-aligned against its own right-aligned subtitle. Removed so it inherits container direction.
+  2. **Two `<main>` landmarks survived Phase 04.** `HomeScreen` and `CustomCounterScreen` still nested one inside `App.tsx`'s `#main-content`. DEC-027's test passed _vacuously_: `toHaveCount(1)` polls and matched the shell's lone landmark before the lazy screen mounted. The test now waits for screen content first and checks a second screen; verified to report `Received: 2` against the unfixed code.
+- **Consequences:** DEC-028's claim that the design's "وردك اليوم" card could not be `TodayRoutineGarden` was wrong in emphasis — the card is the garden (its heading already matches), it simply belongs _inside_ the hero card. The garden keeps its `quietProgressEnabled` gate and its four e2e tests. The design draws three routine rows where the app has four (it includes أذكار ما بعد الصلاة); the fourth is kept, since dropping a routine is a product change, not a layout fix.
+- **Files/contracts to update:** `HomeScreen.tsx`, `CustomCounterScreen.tsx`, `TimeOfDayBackground.tsx`, `StatCard.tsx`, `App.tsx`, `e2e/responsive.spec.ts`.
+- **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (166 passing). Landmark regression verified by reverting the fix. Visual verification at 1440×900 in Arabic/Midnight.
+- **Supersedes:** Structural portions of DEC-028.

@@ -968,7 +968,6 @@ function AppContent() {
                     setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
                   }}
                   onOpenCustomCounter={() => push("custom_counter")}
-                  onOpenNotifications={() => handleNavTab("settings")}
                 />
               )}
               {view === "library" && (

@@ -16,9 +16,9 @@ export function StatCard({ title, icon, value, subtitle }: StatCardProps) {
         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
       </div>
       <div className="mt-3 text-start">
-        <p className="text-2xl md:text-3xl font-black text-foreground" dir="auto">
-          {value}
-        </p>
+        {/* No dir="auto" here: a digits-only string resolves to LTR, which would
+            left-align the value against its own right-aligned subtitle in Arabic. */}
+        <p className="text-2xl md:text-3xl font-black text-foreground">{value}</p>
         <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
           {subtitle}
         </p>
