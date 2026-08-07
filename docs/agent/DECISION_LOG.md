@@ -234,3 +234,54 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** TBD — depends on which mechanism is chosen.
 - **Tests/evidence required:** Full `pnpm test:e2e` re-run (interacts with keyboard-navigation and accessibility suites).
 - **Supersedes:** None
+
+---
+
+## DEC-014 — Interim focus-ring contract for new Phase 03 shared components
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 analysis)
+- **Related phase:** Phase 03
+- **Context:** DEC-013 (focus-ring mechanism normalization) is unresolved, but new shared components in Phase 03 (`Card`, and later `Button`/`RadioCard`/`SwitchRow`) need _some_ focus-visible answer now.
+- **Options considered:** Block new component work until DEC-013 resolves; adopt today's majority pattern (`focus-visible:ring-[3px] focus-visible:ring-ring`) as an explicit interim contract for anything new, revisited when DEC-013 lands.
+- **Decision:** Adopt `ring-[3px] ring-ring` as the interim contract for all new Phase 03 components.
+- **Why:** Already the majority pattern in the app (~40+ existing correct call sites); unblocks Phase 03 without prejudging DEC-013's outcome.
+- **Consequences:** If DEC-013 later picks the outline-based mechanism instead, every new Phase 03 component gets revisited alongside the rest of the app in that follow-up — not a special case.
+- **Files/contracts to update:** None beyond noting the contract here; enforced by convention until DEC-013 resolves.
+- **Tests/evidence required:** None beyond normal component tests.
+- **Supersedes:** None
+
+---
+
+## DEC-015 — Card primitive as the DEC-008 shadow-token migration vehicle
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 analysis)
+- **Related phase:** Phase 03
+- **Context:** The base card surface fragment (`rounded-3xl border border-border/40 bg-card ... shadow-lg/xl shadow-black/5 backdrop-blur-xl`) was duplicated 70 times across 22 files, with 3 different raw Tailwind shadow values standing in for the one documented "raised" elevation level. `backdrop-blur-xl` is additionally now dead weight on every one of these — Phase 02 made `bg-card` opaque, and blurring behind a fully opaque background has no visible effect.
+- **Options considered:** Migrate all 22 files in one large diff; build the `Card` primitive and migrate a small representative usage first (per the phase's own Step 3 guidance), deferring the full rollout.
+- **Decision:** Built `src/app/components/Card.tsx` (elevation: flat/raised/overlay, mapped to `--ds-shadow-raised`/`--ds-shadow-overlay`). Adopted it in `StatCard`/`CompactActionCard` (plain wrapper `<div>`s, a clean fit). `CategoryCard`'s root `<button>` was aligned to the same `shadow-raised`/`shadow-overlay` tokens and had `backdrop-blur-xl` dropped, without being wrapped in `Card` itself, since forcing an interactive element with many one-off props through a generic wrapper risked the "deeply configurable god component" the phase explicitly prohibits.
+- **Why:** Matches the phase's explicit instruction to migrate a small representative usage before broad adoption; the remaining ~20 files are a separate, mechanical follow-up batch.
+- **Consequences:** `StatCard`/`CompactActionCard`/`CategoryCard` shadows shift slightly from Tailwind's default `shadow-lg`/`shadow-xl` to the DEC-008 token value; `backdrop-blur-xl` removal has no visible effect (confirms it was already dead). While touching these files, also fixed raw Tailwind-palette colors (`amber-500`→`primary`) on `StatCard`'s icon badges and `CompactActionCard`'s action button, and added a missing focus-visible ring to that button.
+- **Files/contracts to update:** `src/app/components/Card.tsx` (new), `StatCard.tsx`, `CategoryCard.tsx`.
+- **Tests/evidence required:** `Card.test.tsx`, `StatCard.test.tsx`, `CategoryCard.test.tsx` (all new); full `pnpm check` + `pnpm test:e2e`.
+- **Supersedes:** None
+
+---
+
+## DEC-016 — Home/Friday/Progress plain-div progress bars are correctly decorative, not a gap
+
+- **Date:** 2026-08-07
+- **Status:** Approved (finding, not a code change)
+- **Owner:** Product owner (via Phase 03 analysis correction)
+- **Related phase:** Phase 03
+- **Context:** The Phase 03 analysis flagged `HomeScreen.tsx`, `FridayModeScreen.tsx`, and `ProgressViews.tsx`'s week view as having "non-accessible" plain-div progress bars needing `role="progressbar"` via the shared `ProgressBar` component. Direct inspection found all of these bars sit immediately next to visible text already stating the same value (e.g. "4 of 10", "6 of 7"), and `FridayModeScreen.tsx`'s bars are already explicitly `aria-hidden="true"` for exactly this reason.
+- **Options considered:** Adopt `ProgressBar` everywhere as originally proposed; leave these as-is since they're decorative reinforcement of already-announced text.
+- **Decision:** Leave these three locations unchanged. Adding `role="progressbar"` here would create a redundant second announcement of the same number for screen-reader users, which is worse, not better.
+- **Why:** The original analysis pattern-matched on "plain div with width%" without checking for adjacent equivalent text; verifying directly avoided introducing a real regression under the banner of an accessibility fix.
+- **Consequences:** None — no code changed at these three locations.
+- **Files/contracts to update:** None.
+- **Tests/evidence required:** None.
+- **Supersedes:** None

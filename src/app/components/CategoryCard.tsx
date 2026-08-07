@@ -40,7 +40,7 @@ export function CategoryCard({
       data-testid={`category-card-${id}`}
       dir={direction}
       onClick={onClick}
-      className="flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start backdrop-blur-xl shadow-lg shadow-black/5 hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       aria-label={ariaLabel}
     >
       <span

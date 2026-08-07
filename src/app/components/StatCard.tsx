@@ -1,4 +1,5 @@
 import React from "react";
+import { Card } from "./Card";
 
 export interface StatCardProps {
   title: string;
@@ -9,12 +10,10 @@ export interface StatCardProps {
 
 export function StatCard({ title, icon, value, subtitle }: StatCardProps) {
   return (
-    <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+    <Card className="flex flex-col justify-between transition-all">
       <div className="flex items-center justify-between">
         <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
-        <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-          {icon}
-        </span>
+        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
       </div>
       <div className="mt-3 text-start">
         <p className="text-2xl md:text-3xl font-black text-foreground" dir="auto">
@@ -24,7 +23,7 @@ export function StatCard({ title, icon, value, subtitle }: StatCardProps) {
           {subtitle}
         </p>
       </div>
-    </div>
+    </Card>
   );
 }
 
@@ -46,12 +45,10 @@ export function CompactActionCard({
   onAction,
 }: CompactActionCardProps) {
   return (
-    <div className="flex flex-col justify-between rounded-3xl border border-border/40 bg-card p-4.5 backdrop-blur-xl shadow-xl shadow-black/5 transition-all">
+    <Card className="flex flex-col justify-between transition-all">
       <div className="flex items-center justify-between">
         <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
-        <span className="flex size-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400">
-          {icon}
-        </span>
+        <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
       </div>
       <div className="mt-3 text-start flex items-end justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -65,11 +62,11 @@ export function CompactActionCard({
         <button
           type="button"
           onClick={onAction}
-          className="flex min-h-[36px] items-center justify-center rounded-xl bg-[#e2a84a] px-3.5 text-xs font-black text-slate-950 hover:bg-[#ebd074] transition-colors cursor-pointer shrink-0 shadow-xs"
+          className="flex min-h-[36px] items-center justify-center rounded-xl bg-primary px-3.5 text-xs font-black text-primary-foreground hover:bg-primary/90 transition-colors cursor-pointer shrink-0 shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {actionLabel}
         </button>
       </div>
-    </div>
+    </Card>
   );
 }
