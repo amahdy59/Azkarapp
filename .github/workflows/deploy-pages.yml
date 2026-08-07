@@ -22,6 +22,10 @@ concurrency:
 
 jobs:
   build:
+    # Without an explicit timeout this job inherits GitHub's 6-hour default.
+    # Because the "pages" concurrency group does not cancel in progress, one
+    # hung step would block every subsequent deployment for that whole window.
+    timeout-minutes: 45
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -97,6 +101,9 @@ jobs:
           GITHUB_RUN_ATTEMPT: ${{ github.run_attempt }}
 
       - name: Configure Pages
+        # Normally seconds. It has stalled for 45+ minutes before, holding the
+        # pages lock, so bound it and let a re-run recover instead.
+        timeout-minutes: 5
         uses: actions/configure-pages@v5
 
       - name: Upload artifact

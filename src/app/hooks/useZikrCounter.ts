@@ -28,7 +28,6 @@ export function useZikrCounter({
   onAdvance: (idx: number) => void;
 }) {
   const [count, setCount] = useState(0);
-  const [pulse, setPulse] = useState(0);
   const [complete, setComplete] = useState(false);
   const [justCompleted, setJustCompleted] = useState(false);
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
@@ -74,7 +73,6 @@ export function useZikrCounter({
 
     const next = count + 1;
     setCount(next);
-    setPulse((value) => value + 1);
     if (hapticFeedback) {
       vibrate(8);
     }
@@ -140,12 +138,10 @@ export function useZikrCounter({
     setComplete(false);
     setJustCompleted(false);
     setReaderAnnouncement(t(language, z?.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
-    setPulse((value) => value + 1);
   };
 
   return {
     count,
-    pulse,
     complete,
     justCompleted,
     readerAnnouncement,

@@ -583,7 +583,12 @@ export function ReaderScreen({
       <div className="sr-only" aria-live="polite">
         {shareMessage}
       </div>
-      <div className="sr-only" aria-live="assertive" aria-atomic="true">
+      {/* Polite, not assertive: this region carries counting progress (every
+          tenth repetition, the halfway mark) and the completion message. None
+          of that is urgent enough to cut off whatever the screen reader is
+          already saying — which, in a reader, is usually the zikr itself.
+          Matches ZikrShareButton, which reserves assertive for errors. */}
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
         {readerAnnouncement}
       </div>
 
