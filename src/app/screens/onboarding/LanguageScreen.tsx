@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Check } from "../../components/icons";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage } from "../../types";
@@ -34,20 +35,20 @@ export function LanguageScreen({
         </p>
       </div>
 
-      <div
+      <RadioGroupPrimitive.Root
+        dir={isArabic ? "rtl" : "ltr"}
+        value={selected}
+        onValueChange={(next) => setSelected(next as AppLanguage)}
         className="flex-1 overflow-y-auto px-6 flex flex-col gap-3 pb-4"
-        role="radiogroup"
         aria-label={isArabic ? "اللغات المتاحة" : "Available Languages"}
       >
         {LANGUAGES_LIST.map((lang) => {
           const active = selected === lang.code;
           return (
-            <button
+            <RadioGroupPrimitive.Item
               key={lang.code}
-              role="radio"
-              aria-checked={active}
+              value={lang.code}
               data-testid={`language-option-${lang.code}`}
-              onClick={() => setSelected(lang.code)}
               className={`relative flex items-center justify-center gap-3 rounded-2xl px-4 w-full transition-all active:scale-[0.98] h-[64px] bg-card border focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 active ? "border-primary shadow-sm" : "border-border-control"
               }`}
@@ -69,10 +70,10 @@ export function LanguageScreen({
                 </span>
                 <span className="text-[1.0625rem] font-semibold text-foreground">{lang.native}</span>
               </div>
-            </button>
+            </RadioGroupPrimitive.Item>
           );
         })}
-      </div>
+      </RadioGroupPrimitive.Root>
 
       <div className="px-6 pb-8 shrink-0">
         <button

@@ -15,6 +15,7 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { SegmentedControl } from "../components/SegmentedControl";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import {
   getLocalizedPreferredTiming,
@@ -346,32 +347,27 @@ export function CategoryScreen({
         {!isOccasional && (
           <div className="shrink-0 border-b border-border px-5 py-4">
             {isMainRoutine && (
-              <div
-                className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
-                role="group"
+              <SegmentedControl
+                value={routineMode}
+                onChange={(mode) => onRoutineModeChange?.(mode)}
+                direction={direction}
                 aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
-              >
-                {(["complete", "core"] as const).map((mode) => {
-                  const selected = routineMode === mode;
-                  const count =
-                    mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length;
-                  return (
-                    <button
-                      key={mode}
-                      type="button"
-                      aria-pressed={selected}
-                      onClick={() => onRoutineModeChange?.(mode)}
-                      className={`min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                        selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
-                      }`}
-                    >
-                      {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
-                        count: formatNumerals(count, language),
-                      })}
-                    </button>
-                  );
-                })}
-              </div>
+                className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
+                itemClassName={(selected) =>
+                  `min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
+                  }`
+                }
+                options={(["complete", "core"] as const).map((mode) => ({
+                  value: mode,
+                  label: t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
+                    count: formatNumerals(
+                      mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length,
+                      language,
+                    ),
+                  }),
+                }))}
+              />
             )}
 
             <div className="mb-2 flex items-center justify-between">

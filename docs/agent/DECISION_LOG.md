@@ -368,3 +368,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** 16 files across `src/app/components` and `src/app/screens` (mechanical; no structural changes).
 - **Tests/evidence required:** Full `pnpm check` (222 unit tests) + `pnpm test:e2e` (142 tests) — both passed with no assertion changes needed.
 - **Supersedes:** None (completes the migration DEC-008 deferred)
+
+---
+
+## DEC-022 — `SegmentedControl`: radio-group semantics for mutually exclusive mode choices
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** Product owner (via Phase 03 batch 5)
+- **Related phase:** Phase 03
+- **Context:** The app had six independent "choose one of N" implementations spanning three different ARIA patterns. Two of them — `HomeScreen.tsx`'s routine-mode toggle and `CategoryScreen.tsx`'s routine-mode toggle — used `role="group"` + `aria-pressed`, which directly violates `docs/agent/ACCESSIBILITY_REQUIREMENTS.md` §9 ("Mutually exclusive appearance/mode choices use radio-group semantics"). Two more (`SettingsRootPanel.tsx` language, `LanguageScreen.tsx` onboarding language) had correct roles but were hand-rolled, so they had no roving tabindex and no arrow-key focus movement.
+- **Options considered:** Merge all six onto a single richly-configurable component (matches the Phase 03 analysis literally, but risks the "deeply configurable god component" the phase prohibits); build a semantics-only primitive that callers style themselves, and migrate the cases that share a visual pattern.
+- **Decision:** Added `src/app/components/SegmentedControl.tsx` — a Radix `RadioGroup`-backed primitive that owns **semantics and keyboard behavior only** (`role="radiogroup"`/`"radio"`, roving tabindex, RTL-aware arrow keys), with callers supplying their own `className`/`itemClassName`. Migrated the two ARIA violations (`HomeScreen`, `CategoryScreen`) plus `SettingsRootPanel`'s hand-rolled language picker. Converted `LanguageScreen.tsx` to Radix primitives directly (keeping its distinct full-width row visual) so it gains roving tabindex without being forced into a shared visual shape.
+- **Why:** Fixes the actual conformance gap while respecting the phase's prohibition on god components — the shared thing is the accessibility contract, not the styling.
+- **Consequences:**
+  - **Real behavior change for assistive tech**: the two migrated toggles now announce as a radio group with checked state instead of a group of pressed buttons. Intentional, and the point of the fix.
+  - **Broke an existing e2e selector**, caught by the suite: `e2e/audio.spec.ts` queried the CategoryScreen mode toggle via `getByRole("button", …)`, which no longer matches now that it is `role="radio"`. Updated to `getByRole("radio", …)`; the accessible name is unchanged. This is the selector-drift risk the Phase 03 analysis flagged, and it failed loudly rather than silently.
+  - **Selection does not follow focus on arrow keys** in the pinned Radix version (1.2.3). Radix intends this (there is an `isArrowKeyPressedRef` + `onFocus` → `click()` path) but it is defeated by a listener-ordering race: the group's keydown handler moves focus before the `document`-level keydown listener sets the ref. Verified by probe that the **pre-existing, untouched** `ThemeModeSelector` behaves identically, so this is app-wide upstream behavior, not a regression introduced here. Arrow keys move focus; Space/Enter activates. Flagged for a separate decision (Radix upgrade or a local `onKeyDown` shim) rather than silently asserted as working.
+  - The card-style grid pickers (`ThemeModeSelector`, `AccessibilityPanel`'s text-size and calendar groups, `ProgressPanel`'s weekly goal) were **left as-is** — they are already correct Radix radio groups with distinct visual anatomies; merging them would have required icon/sample/check-indicator slots and grid configuration, i.e. exactly the god component the phase prohibits.
+- **Files/contracts to update:** `src/app/components/SegmentedControl.tsx` (new), `HomeScreen.tsx`, `CategoryScreen.tsx`, `SettingsRootPanel.tsx`, `onboarding/LanguageScreen.tsx`, `e2e/audio.spec.ts`, `e2e/settings-experience.spec.ts`.
+- **Tests/evidence required:** `SegmentedControl.test.tsx` (new, 6 tests) for roles/checked state/click/caller classes; real-browser keyboard assertions added to `e2e/settings-experience.spec.ts` (roving tabindex and arrow-key focus movement cannot be verified in jsdom — Radix leaves both items at `tabindex="-1"` without real layout, confirmed by probe). Full `pnpm check` + `pnpm test:e2e` (145 passing).
+- **Supersedes:** None

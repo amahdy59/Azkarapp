@@ -15,6 +15,7 @@ import {
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage, LocationSettings, ThemeMode } from "../../types";
+import { SegmentedControl } from "../../components/SegmentedControl";
 import { RowChevron, RowValue, SettingsRowItem, SettingsSection } from "./SettingsPrimitives";
 
 import { ThemeModeSelector } from "./ThemeModeSelector";
@@ -109,29 +110,23 @@ export function SettingsRootPanel({
             </span>
             <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.language")}</h3>
           </div>
-          <div
-            className="flex bg-muted/80 p-1 rounded-xl"
-            role="radiogroup"
+          <SegmentedControl
+            value={language}
+            onChange={onLanguageChange}
+            direction={direction}
             aria-label={t(language, "settings.language")}
-          >
-            {LANGUAGES_LIST.map((opt) => {
-              const selected = language === opt.code;
-              return (
-                <button
-                  key={opt.code}
-                  role="radio"
-                  aria-checked={selected}
-                  onClick={() => onLanguageChange(opt.code as AppLanguage)}
-                  className={`min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
-                  }`}
-                  data-testid={`settings-language-${opt.code}`}
-                >
-                  {opt.native}
-                </button>
-              );
-            })}
-          </div>
+            className="flex bg-muted/80 p-1 rounded-xl"
+            itemClassName={(selected) =>
+              `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
+              }`
+            }
+            options={LANGUAGES_LIST.map((opt) => ({
+              value: opt.code as AppLanguage,
+              label: opt.native,
+              testId: `settings-language-${opt.code}`,
+            }))}
+          />
         </div>
 
         <SettingsRowItem

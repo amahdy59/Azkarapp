@@ -11,6 +11,7 @@ import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculatio
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
+import { SegmentedControl } from "../components/SegmentedControl";
 import { StatCard, CompactActionCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
@@ -351,44 +352,26 @@ export function HomeScreen({
                 </div>
 
                 {/* Routine Mode Selector Pill (Abbreviated vs Complete) */}
-                <div
-                  className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/40 p-1 border border-white/15 dark:border-white/10"
-                  role="group"
+                <SegmentedControl
+                  value={reminderMode}
+                  onChange={(mode) => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, mode);
+                    }
+                  }}
+                  direction={direction}
                   aria-label={isArabic ? "وضع الورد" : "Routine mode"}
-                >
-                  <button
-                    type="button"
-                    aria-pressed={reminderMode === "complete"}
-                    onClick={() => {
-                      if (isRoutineCategory(reminderInfo.categoryId)) {
-                        onSetRoutineMode?.(reminderInfo.categoryId, "complete");
-                      }
-                    }}
-                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      reminderMode === "complete"
-                        ? "bg-[#d99f43] text-[#141a2a] shadow-md"
-                        : "text-white/80 hover:text-white"
-                    }`}
-                  >
-                    {isArabic ? "الكاملة" : "Complete"}
-                  </button>
-                  <button
-                    type="button"
-                    aria-pressed={reminderMode === "core"}
-                    onClick={() => {
-                      if (isRoutineCategory(reminderInfo.categoryId)) {
-                        onSetRoutineMode?.(reminderInfo.categoryId, "core");
-                      }
-                    }}
-                    className={`flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-                      reminderMode === "core"
-                        ? "bg-[#d99f43] text-[#141a2a] shadow-md"
-                        : "text-white/80 hover:text-white"
-                    }`}
-                  >
-                    {isArabic ? "المختصرة" : "Abbreviated"}
-                  </button>
-                </div>
+                  className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/40 p-1 border border-white/15 dark:border-white/10"
+                  itemClassName={(selected) =>
+                    `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                      selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/80 hover:text-white"
+                    }`
+                  }
+                  options={[
+                    { value: "complete", label: isArabic ? "الكاملة" : "Complete" },
+                    { value: "core", label: isArabic ? "المختصرة" : "Abbreviated" },
+                  ]}
+                />
 
                 {/* Progress Text & Progress Bar */}
                 {totalCount > 0 && (

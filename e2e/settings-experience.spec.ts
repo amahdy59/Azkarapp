@@ -116,6 +116,39 @@ test("language changes in place from the Settings selector", async ({ page }) =>
   expect(await page.evaluate(() => window.history.length)).toBe(historyLength);
 });
 
+test("segmented controls expose radio-group semantics and arrow-key focus movement", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await openSettings(page);
+
+  const group = page.getByRole("radiogroup", { name: "Language" });
+  const englishButton = page.getByTestId("settings-language-en");
+  const arabicButton = page.getByTestId("settings-language-ar");
+
+  // Radio-group semantics, not role="group" + aria-pressed toggle buttons.
+  await expect(group).toBeVisible();
+  await expect(englishButton).toHaveAttribute("role", "radio");
+  await expect(englishButton).toHaveAttribute("aria-checked", "true");
+  await expect(arabicButton).toHaveAttribute("aria-checked", "false");
+
+  // Roving tabindex: only the checked option is tabbable, so the whole group
+  // is a single tab stop rather than one stop per option.
+  await englishButton.focus();
+  await expect(englishButton).toHaveAttribute("tabindex", "0");
+  await expect(arabicButton).toHaveAttribute("tabindex", "-1");
+
+  // Arrow keys move focus within the group. Note: selection does not follow
+  // focus in the pinned Radix version (verified identical on the pre-existing
+  // theme radiogroup, so this is app-wide upstream behavior, not specific to
+  // this control) — see DEC-022. Activation still requires Space/Enter/click.
+  await page.keyboard.press("ArrowRight");
+  await expect(arabicButton).toHaveAttribute("tabindex", "0");
+  await expect(englishButton).toHaveAttribute("tabindex", "-1");
+
+  await page.keyboard.press("Space");
+  await expect(arabicButton).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator("html")).toHaveAttribute("lang", "ar");
+});
+
 test("forced RTL updates settings controls and their keyboard direction", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await openSettings(page);
