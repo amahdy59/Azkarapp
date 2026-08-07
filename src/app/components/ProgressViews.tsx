@@ -80,16 +80,24 @@ export function ProgressDayView({
   language,
   dynamicSubtitle,
   onSelectCategory,
+  visibleCategoryIds,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   dynamicSubtitle: string;
   onSelectCategory?: (categoryId: CategoryId) => void;
+  /**
+   * Restricts which routines are listed. Home shows only the three
+   * time-of-day routines; after-prayer azkar are getting their own card, and
+   * the Progress screen still lists all four. This is display-only — palm and
+   * leaf progress keep counting every main collection.
+   */
+  visibleCategoryIds?: readonly CategoryId[];
 }) {
   const isArabic = isAr(language);
   const completedToday = summary.today.completedCategories;
 
-  const categories = [
+  const allCategories = [
     {
       id: "morning" as const,
       name: isArabic ? "أذكار الصباح" : "Morning Azkar",
@@ -111,6 +119,10 @@ export function ProgressDayView({
       icon: <Sparkles size={20} className="text-emerald-500" />,
     },
   ];
+
+  const categories = visibleCategoryIds
+    ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
+    : allCategories;
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>

@@ -550,3 +550,21 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `HomeScreen.tsx`, `CustomCounterScreen.tsx`, `TimeOfDayBackground.tsx`, `StatCard.tsx`, `App.tsx`, `e2e/responsive.spec.ts`.
 - **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (166 passing). Landmark regression verified by reverting the fix. Visual verification at 1440×900 in Arabic/Midnight.
 - **Supersedes:** Structural portions of DEC-028.
+
+---
+
+## DEC-030 — Home's wird card lists three routines, not four
+
+- **Date:** 2026-08-07
+- **Status:** Approved
+- **Owner:** User
+- **Related phase:** Phase 05
+- **Context:** DEC-029 kept the fourth routine (أذكار ما بعد الصلاة) in Home's "وردك اليوم" card even though Figma node `940:26629` draws three rows, on the grounds that dropping a routine is a product change rather than a layout fix. User confirmed the design is intentional: after-prayer azkar are getting their own dedicated card later.
+- **Decision:** Home's wird card lists only the three time-of-day routines. Implemented as an opt-in `visibleCategoryIds` prop on `ProgressDayView`, threaded through `TodayRoutineGarden`, rather than by overloading the existing `hideTabs` flag — `hideTabs` means "this is the compact Home rendering", and conflating it with "show fewer routines" would silently couple two unrelated concerns for the next caller.
+- **Scope guard:** The change is display-only, and deliberately narrow:
+  - `ProgressScreen` passes no `visibleCategoryIds`, so it still lists all four and after-prayer azkar stay reachable.
+  - Leaf and palm arithmetic is untouched: a palm still requires all four main collections, and the header still announces "Today's leaves: N of 4". Filtering the rendered list must not quietly redefine what completing a day means.
+- **Consequences:** Until the dedicated after-prayer card ships, that routine is not reachable from Home directly — only via Progress or the Azkar library. This is a known, accepted interim gap, not an oversight.
+- **Files/contracts to update:** `ProgressViews.tsx`, `RoutineGarden.tsx`, `HomeScreen.tsx`, `e2e/quiet-garden.spec.ts`.
+- **Tests/evidence required:** Existing all-complete test updated from 4 to 3 rendered rows, with the all-complete message left as the real assertion that palm maths is unchanged. New test asserts Home omits after-prayer while Progress still shows it. Full `pnpm check` + `pnpm test:e2e` (169 passing).
+- **Supersedes:** The four-row decision recorded in DEC-029.

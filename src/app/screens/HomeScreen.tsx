@@ -24,6 +24,13 @@ import type {
   RoutineMode,
 } from "../types";
 
+/**
+ * The three time-of-day routines listed in Home's "وردك اليوم" card. After-prayer
+ * azkar are deliberately absent: they get their own card. Progress still counts
+ * all four main collections toward leaves and palms.
+ */
+const HOME_WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
+
 type HomeActionKind = "resume" | "start" | "again";
 
 export type HomeAction = {
@@ -449,6 +456,7 @@ export function HomeScreen({
                     calendarType={calendarType}
                     dailyCompletions={dailyCompletions}
                     onSelectCategory={onResume}
+                    visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
                   />
                 </div>
               )}

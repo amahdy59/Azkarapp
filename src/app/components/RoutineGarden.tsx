@@ -294,10 +294,13 @@ export function TodayRoutineGarden({
   calendarType = "hijri",
   dailyCompletions = [],
   onSelectCategory,
+  visibleCategoryIds,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   hideTabs?: boolean;
+  /** Passed through to the day view; see ProgressDayView for the contract. */
+  visibleCategoryIds?: readonly CategoryId[];
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
@@ -477,6 +480,7 @@ export function TodayRoutineGarden({
             language={language}
             dynamicSubtitle={dynamicSubtitle}
             onSelectCategory={onSelectCategory}
+            visibleCategoryIds={visibleCategoryIds}
           />
         )}
 

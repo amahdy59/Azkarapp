@@ -129,7 +129,10 @@ test("four completed main collections are announced as a palm without points or 
   const garden = page.getByTestId("today-garden-card");
 
   await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toBeVisible();
-  await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(4);
+  // Home lists only the three time-of-day routines; after-prayer azkar are
+  // getting their own card. A palm still requires all four main collections,
+  // which is why the all-complete message above is the real assertion here.
+  await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
 
@@ -178,4 +181,22 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await expect(page.getByText("Longest Streak", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Adherence", { exact: true })).toHaveCount(0);
   await expect(page.getByText("Full Palms", { exact: true })).toHaveCount(0);
+});
+
+test("Home lists the three time-of-day routines while Progress keeps all four", async ({ page }) => {
+  await seedReturningGardenUser(page, { completedToday: ["morning"] });
+  await openReturningHome(page);
+
+  // Home's wird card: after-prayer azkar are deliberately absent, since they
+  // are getting a dedicated card of their own.
+  const garden = page.getByTestId("today-garden-card");
+  await expect(garden.getByRole("button", { name: /Morning Azkar/ })).toBeVisible();
+  await expect(garden.getByRole("button", { name: /Evening Azkar/ })).toBeVisible();
+  await expect(garden.getByRole("button", { name: /Sleep Azkar/ })).toBeVisible();
+  await expect(garden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
+
+  // Progress still accounts for every main collection, so the routine stays
+  // reachable and leaf/palm maths is unchanged.
+  await page.getByRole("button", { name: "Progress", exact: true }).click();
+  await expect(page.getByRole("button", { name: /After Prayer Azkar/ }).first()).toBeVisible();
 });
