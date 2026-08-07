@@ -15,12 +15,7 @@ describe("InformationCard", () => {
 
   it("uses an h3 when headingLevel is 3", () => {
     render(
-      <InformationCard
-        icon={<span aria-hidden="true">*</span>}
-        title="Nested section"
-        body="Body"
-        headingLevel={3}
-      />,
+      <InformationCard icon={<span aria-hidden="true">*</span>} title="Nested section" body="Body" headingLevel={3} />,
     );
 
     expect(screen.getByRole("heading", { level: 3, name: "Nested section" })).toBeInTheDocument();
@@ -45,12 +40,7 @@ describe("InformationCard", () => {
 
   it("does not render an action button when only actionLabel is set without onAction", () => {
     render(
-      <InformationCard
-        icon={<span aria-hidden="true">*</span>}
-        title="Title"
-        body="Body"
-        actionLabel="Report issue"
-      />,
+      <InformationCard icon={<span aria-hidden="true">*</span>} title="Title" body="Body" actionLabel="Report issue" />,
     );
 
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
