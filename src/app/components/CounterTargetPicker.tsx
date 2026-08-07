@@ -50,7 +50,7 @@ export function CounterTargetPicker({
               key={preset.value}
               type="button"
               onClick={() => onTargetChange(preset.value)}
-              className={`interactive-elem h-9 shrink-0 rounded-full px-3.5 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`interactive-elem h-9 shrink-0 rounded-full px-3.5 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "border border-border/40 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
@@ -65,7 +65,7 @@ export function CounterTargetPicker({
         <button
           type="button"
           onClick={() => setShowCustomModal(true)}
-          className={`interactive-elem flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          className={`interactive-elem flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
             ![10, 33, 100, 1000, 0].includes(activeTarget)
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border/40 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
@@ -112,7 +112,7 @@ export function CounterTargetPicker({
                 max={100000}
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
-                className="h-12 w-full rounded-xl border border-border bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="h-12 w-full rounded-xl border border-border bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />

@@ -51,7 +51,10 @@ Rules:
 - Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
 - Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.
 - Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs and toggles. Meaningful control boundaries must reach 3:1 non-text contrast.
-- All focusable controls use the semantic ring color and a 3 px visible focus indicator.
+- Focus indicators have exactly two roles:
+  - **Controls** (buttons, links, inputs, tabs, radios, switches, cards acting as buttons) use `focus-visible:ring-[3px] focus-visible:ring-ring` — the semantic ring color at the full 3 px width. Add `focus-visible:ring-inset` only where an ancestor's `overflow: hidden` would clip an outward ring (e.g. rows inside a clipped settings card). Destructive actions may substitute `focus-visible:ring-destructive`.
+  - **Scroll regions** (non-control containers that are focusable only so keyboard users can scroll them) use `focus-visible:ring-1 focus-visible:ring-ring/40` — deliberately subtle, because a full 3 px ring around a page-sized region is visually overwhelming and the region is not an actionable control.
+- The global `:focus-visible` outline rule in `src/styles/theme.css` remains the automatic fallback, so an element that opts out of both treatments still gets a visible token-driven indicator rather than none.
 
 ## Color roles
 

@@ -220,19 +220,26 @@ Record user-approved product, design and architectural decisions here. Do not er
 
 ---
 
-## DEC-013 — Focus-ring width/opacity mechanism normalization (deferred)
+## DEC-013 — Focus-ring width/opacity mechanism normalization
 
-- **Date:** 2026-08-06
-- **Status:** Proposed
-- **Owner:** Unassigned
+- **Date:** 2026-08-06 (proposed) / 2026-08-07 (resolved)
+- **Status:** Approved — implemented in Phase 03 batch 7
+- **Owner:** Product owner
 - **Related phase:** Phase 02 (follow-up) / Phase 03
-- **Context:** Roughly 30 files apply `focus-visible:ring-*` overrides with at least 4 different widths (`ring-1`/`ring-2`/`ring-[2px]`/`ring-[3px]`) and inconsistent opacity (`ring-ring`, `ring-ring/40`, `ring-ring/50`), on top of the shared `Button` primitive's own distinct border+translucent-ring treatment. `--ds-focus-offset: 2px` was added in Phase 02 as a token to converge on.
-- **Options considered:** Standardize on the existing global `outline`-based `:focus-visible` rule (already token-driven, zero per-component classes needed); standardize on the Tailwind `ring-*` box-shadow approach app-wide instead.
-- **Decision:** Not yet made — flagged as the highest-blast-radius item from the Phase 02 analysis and deliberately excluded from this phase's diff.
-- **Why:** ~30-file mechanical change deserves its own reviewable, revertible commit rather than being bundled with unrelated token work.
-- **Consequences:** Focus-ring width/opacity remains visually inconsistent across the app until this is resolved.
-- **Files/contracts to update:** TBD — depends on which mechanism is chosen.
-- **Tests/evidence required:** Full `pnpm test:e2e` re-run (interacts with keyboard-navigation and accessibility suites).
+- **Context:** Roughly 30 files applied `focus-visible:ring-*` overrides with 4 different widths (`ring-1`/`ring-2`/`ring-[2px]`/`ring-[3px]`) and inconsistent opacity (`ring-ring`, `ring-ring/40`, `ring-ring/50`), on top of the shared `Button` primitive's own distinct border+translucent-ring treatment.
+- **Options considered:** (a) Standardize on the existing global `outline`-based `:focus-visible` rule and delete all per-component ring classes; (b) standardize on the Tailwind `ring-*` box-shadow approach app-wide.
+- **Decision:** Option (b), but with a correction to the premise. Auditing the call sites showed the variance was **not** uniform drift — it split cleanly along a real functional line:
+  - **Controls** (all 24 `ring-2` sites, both `ring-[2px]` sites, and the 57 already-correct sites — zero of which were scroll regions) → normalized to `focus-visible:ring-[3px] focus-visible:ring-ring`.
+  - **Scroll regions** (all 9 `ring-1` sites — every one a `tabIndex={0}` container with `overflow-y-auto`, focusable only so keyboard users can scroll) → kept deliberately subtle at `focus-visible:ring-1 focus-visible:ring-ring/40`.
+    The global `outline` rule in `theme.css` is retained as the automatic fallback so a component that opts out of both still cannot ship with no focus indicator.
+- **Why:** Option (a) would have required per-case negative `outline-offset` to replace the 5 `ring-inset` sites (rows inside `overflow: hidden` cards, where an outward outline is clipped) — no simpler than (b), with a much larger blast radius. And flattening scroll regions to the full 3 px control ring would have been a UX regression, not a consistency win: `docs/DESIGN_SYSTEM.md` scopes the 3 px rule to "focusable **controls**", and a page-sized region is not one.
+- **Consequences:**
+  - 26 control call sites got a slightly thicker ring (2px → 3px); `Button` and `Select` lost their translucent `ring-ring/50` in favor of the full-opacity token; `Button` also lost a stray `focus-visible:border-ring` that no other control had.
+  - `Button`'s destructive variant was simplified from `ring-destructive/20` + a `dark:` override to a single `ring-destructive`, matching the 3 other destructive-action rings already in the app.
+  - `ui/scroll-area.tsx` was reclassified from the control treatment to the scroll-region treatment, which is what it actually is.
+  - `focus-visible:ring-inset` (5 sites) and `focus-visible:ring-offset-2` (6 sites) are retained as documented, technically-required variants rather than drift.
+- **Files/contracts to update:** ~20 files across `src/app`; `ui/button.tsx`, `ui/select.tsx`, `ui/scroll-area.tsx`; contract documented in `docs/DESIGN_SYSTEM.md`.
+- **Tests/evidence required:** Full `pnpm check` + `pnpm test:e2e` (keyboard-navigation and accessibility suites).
 - **Supersedes:** None
 
 ---

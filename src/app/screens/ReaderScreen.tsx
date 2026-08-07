@@ -600,7 +600,7 @@ export function ReaderScreen({
                 setHasOpenedBenefit(true);
                 setBenefitOpen(true);
               }}
-              className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+              className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
               aria-label={t(language, "reader.referencesButton")}
               title={t(language, "reader.referencesButton")}
             >
@@ -613,7 +613,7 @@ export function ReaderScreen({
             <DropdownMenu dir={direction}>
               <DropdownMenuTrigger
                 aria-label={t(language, "reader.menu")}
-                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[2px] focus-visible:ring-ring"
+                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <MoreVertical size={20} />
               </DropdownMenuTrigger>

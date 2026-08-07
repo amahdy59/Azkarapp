@@ -363,7 +363,7 @@ export function HomeScreen({
                   aria-label={isArabic ? "وضع الورد" : "Routine mode"}
                   className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/40 p-1 border border-white/15 dark:border-white/10"
                   itemClassName={(selected) =>
-                    `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/80 hover:text-white"
                     }`
                   }
@@ -414,7 +414,7 @@ export function HomeScreen({
                   onClick={() => {
                     onResume(reminderInfo.categoryId);
                   }}
-                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer group"
+                  className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer group"
                 >
                   <span>{ctaLabel}</span>
                   {direction === "rtl" ? (

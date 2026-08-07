@@ -146,7 +146,7 @@ export function CustomCounterScreen({
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               aria-label={isArabic ? "الصوت والاهتزاز" : "Sound & Haptics"}
             >
               <Volume2 size={20} className={soundEnabled ? "text-primary" : "text-muted-foreground/40"} />
@@ -161,7 +161,7 @@ export function CustomCounterScreen({
             <button
               type="button"
               onClick={() => setShowLibrarySheet(true)}
-              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <div className="min-w-0 flex-1 space-y-1">
                 <span className="block text-[0.75rem] font-bold text-muted-foreground">
@@ -213,7 +213,7 @@ export function CustomCounterScreen({
                 type="button"
                 onClick={handleUndo}
                 disabled={count === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
               >
                 <RotateCcw size={16} />
                 <span>{isArabic ? "تراجع" : "Undo"}</span>
@@ -223,7 +223,7 @@ export function CustomCounterScreen({
                 type="button"
                 onClick={handleReset}
                 disabled={count === 0 && laps === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-all"
+                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
               >
                 <RotateCcw size={16} />
                 <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>

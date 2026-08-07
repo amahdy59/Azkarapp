@@ -65,7 +65,7 @@ function ReferenceContent({
       type="button"
       onClick={() => void copyReference(key, value)}
       aria-label={label}
-      className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+      className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] shrink-0 items-center justify-center rounded-full bg-muted/80 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
     >
       {copiedReference === key ? <Check size={16} className="favorite-pop text-primary" /> : <Copy size={16} />}
     </button>
@@ -99,7 +99,7 @@ function ReferenceContent({
           type="button"
           onClick={onClose}
           aria-label={t(language, "reader.closeReference")}
-          className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          className="flex h-[48px] w-[48px] min-h-[48px] min-w-[48px] items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
         >
           <X size={18} />
         </button>

@@ -117,7 +117,7 @@ export function AuthenticZikrLibrarySheet({
             type="button"
             onClick={onClose}
             aria-label={t(language, "common.back")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors cursor-pointer"
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -133,7 +133,7 @@ export function AuthenticZikrLibrarySheet({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={isArabic ? "بحث في الأذكار والمصادر..." : "Search dhikr or source..."}
-              className="w-full h-11 ps-9 pe-4 rounded-xl border border-border bg-background text-[0.875rem] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="w-full h-11 ps-9 pe-4 rounded-xl border border-border bg-background text-[0.875rem] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
 
@@ -182,7 +182,7 @@ export function AuthenticZikrLibrarySheet({
                 key={item.id}
                 type="button"
                 onClick={() => handleSelectAuthentic(item)}
-                className="group flex w-full flex-col gap-2 rounded-2xl border border-border/70 bg-card p-4 text-start shadow-xs transition-all hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+                className="group flex w-full flex-col gap-2 rounded-2xl border border-border/70 bg-card p-4 text-start shadow-xs transition-all hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
               >
                 <div className="flex items-start justify-between gap-3">
                   <p className="zikr-text text-[1.125rem] font-bold leading-relaxed text-foreground" dir="rtl">

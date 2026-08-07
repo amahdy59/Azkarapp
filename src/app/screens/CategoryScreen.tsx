@@ -249,7 +249,7 @@ export function CategoryScreen({
         <button
           type="button"
           onClick={() => onZikr(index)}
-          className="interactive-elem min-h-[44px] min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[2px] focus-visible:ring-ring"
+          className="interactive-elem min-h-[44px] min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {isMainRoutine && routineMode === "complete" && z.includedInCore && (
             <span className="mb-2 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[0.6875rem] font-extrabold text-primary">
