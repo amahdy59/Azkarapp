@@ -22,15 +22,14 @@ The item-by-item implementation ledger is `docs/agent/UI_FIX_BACKLOG.md`. Final 
 
 Implementation currently spans:
 
-- Application composition/state: `src/app/App.tsx`, `src/app/types.ts`, `src/app/fridayProgress.ts`
+- Application composition/state: `src/app/App.tsx`, `src/app/types.ts`, `src/app/state.ts`, `src/app/fridayProgress.ts`, and their updated tests
 - Shared UI/hooks: `src/app/components/ScreenContainer.tsx`, `src/app/components/TasbeehCounterButton.tsx`, `src/app/components/MushafPageReader.tsx`, `src/app/hooks/useCounterClickFeedback.ts`, `src/app/hooks/useZikrCounter.ts`
 - Content structure: `src/app/content/azkar.ts`, `src/app/content/fridayKahf.ts`, `src/app/content/mushafPages.ts`, `scripts/generate-friday-kahf.mjs`
 - Screens: `HomeScreen.tsx`, `AzkarLibraryScreen.tsx`, `SearchScreen.tsx`, `FridayModeScreen.tsx`, `ReaderScreen.tsx`, `CategoryScreen.tsx`, `CustomCounterScreen.tsx`, and new `BenefitsScreen.tsx`
 - Product copy/theme: `src/app/i18n/ar.ts`, `src/app/i18n/en.ts`, `src/app/formatting.ts`, `src/styles/theme.css`
-- Unit/browser coverage colocated with those modules plus `e2e/accessibility.spec.ts`, `e2e/navigation.spec.ts`, `e2e/search.spec.ts`, `e2e/reader-microinteractions.spec.ts`, and `e2e/counter-feedback.spec.ts`
+- Unit/browser coverage colocated with those modules plus `e2e/accessibility.spec.ts`, `e2e/navigation.spec.ts`, `e2e/search.spec.ts`, `e2e/reader-microinteractions.spec.ts`, `e2e/counter-feedback.spec.ts`, and `e2e/pre-phase-nine.spec.ts`
+- Evidence: the 10 tracked current browser-baseline PNGs under `docs/agent/evidence/screenshots/current/`, refreshed by the passing evidence-capture suite
 - Documentation: `docs/CONTENT_AUTHORING.md`, `docs/agent/DECISION_LOG.md`, `docs/agent/UI_FIX_BACKLOG.md`, and this report
-
-Reconcile this list against the final staged diff before release.
 
 ## Components added or modified
 
