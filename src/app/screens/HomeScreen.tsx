@@ -418,9 +418,13 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           {/* Hero card. The scene image is contained by this card rather than
               washed across the whole screen, so the page keeps its own surface. */}
-          <div className="relative overflow-hidden rounded-3xl shadow-raised">
+          {/* Capped and centred: unbounded, the hero stretched the full width of
+              an ultrawide display and the scene image lost all composition. */}
+          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden rounded-3xl shadow-raised">
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
-            <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-center lg:gap-5">
+            {/* items-stretch, not items-center: the wird card should match the
+                hero's height rather than float centred against it. */}
+            <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5">
               {isComplete ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
@@ -439,7 +443,7 @@ export function HomeScreen({
                       so its white text needs its own dark backing rather than
                       relying on the page scrim. Without this, "Time for"
                       measured 1.98:1 against a required 4.5:1. */}
-                  <div className="flex flex-col gap-3 rounded-3xl bg-black/45 p-3 text-start backdrop-blur-[2px] md:p-4">
+                  <div className="flex flex-1 flex-col gap-3 rounded-3xl bg-black/45 p-3 text-start backdrop-blur-[2px] md:p-4">
                     {/* Hero Text & Category Header */}
                     <div className="flex w-full flex-col items-start gap-1 px-1">
                       <p
@@ -543,7 +547,7 @@ export function HomeScreen({
               {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
               renders exactly this card; a second bespoke one would duplicate it. */}
               {quietProgressEnabled && (
-                <div className="lg:col-span-2 flex w-full">
+                <div className="lg:col-span-2 flex h-full w-full">
                   <TodayRoutineGarden
                     summary={gardenSummary}
                     language={language}

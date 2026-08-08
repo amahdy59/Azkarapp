@@ -128,9 +128,12 @@ export function ProgressDayView({
     : allCategories;
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
+    // h-full/flex-1 let Home stretch this card to the hero's height. On the
+    // Progress screen the parent has no definite height, so both resolve to
+    // auto and nothing changes there.
+    <div className="flex h-full flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
       {/* Main Today's Wird Container Card */}
-      <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
+      <div className="flex w-full flex-1 flex-col rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
         {/* Title and subtitle */}
         <div className="flex flex-col items-center text-center mb-5">
           <h3 className="text-[1.375rem] md:text-[1.5rem] font-black text-foreground tracking-tight mb-1">
@@ -177,7 +180,9 @@ export function ProgressDayView({
         </ul>
 
         {/* Motivational Quote Pill Banner */}
-        <div className="w-full rounded-2xl border border-border/40 bg-muted/40 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
+        {/* mt-auto so the banner sits at the card's foot when the card is
+            stretched to match the hero, rather than leaving a gap below it. */}
+        <div className="mt-auto w-full rounded-2xl border border-border/40 bg-muted/40 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
           <p className="text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground">
             {isArabic
               ? "« القليل الدائم، خير من الكثير المنقطع »"
