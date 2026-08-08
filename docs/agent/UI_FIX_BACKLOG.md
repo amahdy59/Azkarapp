@@ -11,6 +11,7 @@ so nothing already-done gets rebuilt. Items keep the user's original numbering.
 | **2.1** No background on non-Home screens   | **Done** (DEC-026)                 | Only `HomeScreen.tsx` imports `TimeOfDayBackground`                                                                          |
 | **1.1** Home text contrast                  | **Done** (DEC-035)                 | Light-theme hero failed at 1.98:1 and was fixed with `--on-media` tokens; all five modes now pass an automated contrast gate |
 | **4.3** Tap-anywhere disabled during surahs | **Partly done** — see defect below | `handleSurfaceTap` returns early when `z.isSurah`                                                                            |
+| **4.4** Friday CTA arrow direction          | **Verified correct** (DEC-043)     | Rendered arrow points right in LTR and left in RTL, matching the directional-icon contract                                   |
 
 ## Verified defect found while triaging
 
@@ -35,11 +36,14 @@ prefer deriving over editing `azkar.ts`.
 
 ## Remaining work, by the user's priority
 
-**P0 — bugs**
+## P0 bug pass — completed 2026-08-08
 
-- 5.3 Counter broken/undersized on desktop and older phones
-- 5.4 Bottom nav selected-state line overlapping the icon
-- 4.4 Friday CTA arrow points the wrong way
+| Item                                     | Result                                                                                                                                    |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| **5.3** Counter undersized               | Fixed the circular counter at the documented 184×184 CSS px; verified it fits a 320px viewport and remains 184px on desktop               |
+| **5.4** Bottom-nav selected line overlap | Gave each nav item the full available height; the top indicator now clears the icon while retaining the persistent non-color selected cue |
+| **4.4** Friday CTA arrow                 | No change required: browser inspection confirmed right in LTR and left in RTL                                                             |
+| Home image `fetchPriority` React warning | Switched to the standard lowercase DOM attribute; the `high` hint remains present and a fresh browser console has no warnings             |
 
 **P1 — core UX**
 
@@ -67,7 +71,7 @@ prefer deriving over editing `azkar.ts`.
 
 ## Sequencing note
 
-P0 items are small and independent — good first batch. The two counter themes
-(5.3, 2.2c, 2.2d) overlap heavily and should be one piece of work, not three.
+The P0 batch is complete. The remaining two counter themes (2.2c, 2.2d)
+overlap heavily and should be one piece of work, not separate changes.
 `useZikrCounter` is at 89% coverage and `CustomCounterScreen` at 43%, so the
 second counter needs characterization tests before restructuring.

@@ -205,9 +205,9 @@ export function ZikrCounterSurface({
       className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${className}`}
       initial={false}
       animate={{
-        width: compact ? "100%" : 164,
-        height: compact ? 76 : 164,
-        borderRadius: compact ? 24 : 82,
+        width: compact ? "100%" : 184,
+        height: compact ? 76 : 184,
+        borderRadius: compact ? 24 : 92,
       }}
       transition={{ duration: 0.26, ease: [0.2, 0, 0.2, 1] }}
       whileTap={complete ? undefined : { scale: 0.985 }}

@@ -32,7 +32,7 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
         width={1280}
         height={720}
         loading={priority ? "eager" : "lazy"}
-        fetchPriority={priority ? "high" : "auto"}
+        {...{ fetchpriority: priority ? "high" : "auto" }}
         decoding="async"
       />
     </picture>

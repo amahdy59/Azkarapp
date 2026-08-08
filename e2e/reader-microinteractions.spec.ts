@@ -78,6 +78,34 @@ async function openFridayKahf(page: Page) {
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
 
+test("the circular counter keeps its 184px contract on narrow phones and desktop", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 844 });
+  await openFirstMorningZikr(page);
+
+  const counter = page.getByTestId("counter-surface");
+  await expect(counter).toHaveAttribute("data-counter-shape", "circle");
+
+  for (const viewport of [
+    { width: 320, height: 844 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect
+      .poll(async () => {
+        const box = await counter.boundingBox();
+        return box ? { width: Math.round(box.width), height: Math.round(box.height) } : null;
+      })
+      .toEqual({ width: 184, height: 184 });
+
+    const box = await counter.boundingBox();
+    expect(box).not.toBeNull();
+    if (box) {
+      expect(box.x).toBeGreaterThanOrEqual(0);
+      expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+    }
+  }
+});
+
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 
@@ -190,7 +218,7 @@ test("the adaptive counter stays circular when content fits and only compacts wh
 
   const counterSurface = page.getByTestId("counter-surface");
   await expect(counterSurface).toHaveAttribute("data-counter-shape", "circle");
-  await expect(counterSurface).toHaveCSS("border-radius", "82px");
+  await expect(counterSurface).toHaveCSS("border-radius", "92px");
 
   const counterPanel = page.getByTestId("counter-panel");
   await expect(counterPanel.getByRole("button", { name: "Prev", exact: true })).toBeVisible();

@@ -266,6 +266,14 @@ test("the active nav item is marked with aria-current and a non-colour cue", asy
   const before = await weights();
   expect(Number(before.home)).toBeGreaterThan(Number(before.azkar));
 
+  const activeCueBox = await home.locator("span").first().boundingBox();
+  const activeIconBox = await home.locator("svg").boundingBox();
+  expect(activeCueBox).not.toBeNull();
+  expect(activeIconBox).not.toBeNull();
+  if (activeCueBox && activeIconBox) {
+    expect(activeCueBox.y + activeCueBox.height).toBeLessThanOrEqual(activeIconBox.y);
+  }
+
   await azkar.click();
   await expect(azkar).toHaveAttribute("aria-current", "page");
   await expect(home).not.toHaveAttribute("aria-current", "page");

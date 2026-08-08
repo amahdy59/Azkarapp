@@ -768,3 +768,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **No migration:** The completion ledger, persisted record shape, merge boundary, and remote sync contract are unchanged. This is a read-model and presentation correction only.
 - **Tests/evidence required:** Selector and component regression tests for empty periods, unrelated-category exclusion, after-prayer dominance, and current-year streaks; relevant Playwright coverage; mobile and desktop browser evidence; mandatory local release gate; green GitHub Quality and Pages workflows; production smoke verification.
 - **Supersedes:** DEC-037's incorrect verification claim that every displayed value already derived from stored data. DEC-040 remains authoritative for the completed `RoutineGarden` split.
+
+---
+
+## DEC-043 — P0 UI geometry fixes and evidence-based closure
+
+- **Date:** 2026-08-08
+- **Status:** Approved
+- **Owner:** User (approved the sequential stabilization and P0 release)
+- **Related scope:** `docs/agent/UI_FIX_BACKLOG.md` items 5.3, 5.4, and 4.4
+- **Counter:** `ZikrCounterSurface` animated the circular form to 164px even though the Reader contract specifies 184 CSS px and its collision footprint already reserved 206px. Restored 184×184 with a 92px radius. Browser tests assert the circle fits a 320px viewport and remains 184px on desktop.
+- **Bottom navigation:** The selected indicator and icon both began at the nav button's top edge. Making each button fill the nav row gives the centered icon 7px of clearance below the indicator while preserving `aria-current`, the bold label, and the persistent non-color cue.
+- **Friday CTA:** No code change. Rendered SVG inspection confirmed the arrow already points right in LTR and left in RTL, matching the directional-icon contract. Changing correct behavior to satisfy a stale report would create a regression.
+- **Browser warning:** React 18 warned about the camel-cased `fetchPriority` prop. The image now emits the standard lowercase `fetchpriority` attribute through a spread, preserving the `high` resource hint without the warning.
+- **Tests/evidence required:** Component test for the resource hint and warning-free render; real-browser counter and nav geometry tests across configured projects; fresh-console browser check; mandatory release gate; green GitHub Quality and Pages workflows; production smoke verification.
+- **Supersedes:** The open P0 entries for 5.3, 5.4, and 4.4 in the UI backlog.
