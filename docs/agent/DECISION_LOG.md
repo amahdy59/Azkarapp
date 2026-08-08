@@ -740,3 +740,16 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Coverage note that looks alarming but is not:** `RoutineGarden.tsx` now reads 29% rather than 61%. The well-tested marks and date helpers moved out, leaving the untested `TodayRoutineGarden` as a larger share of a smaller file. Nothing lost coverage; overall totals are unchanged.
 - **Tests/evidence required:** 291 unit, 256 e2e, bundle budget passed.
 - **Supersedes:** The "still open: the split itself" note in DEC-038.
+
+---
+
+## DEC-041 — Preserve user-controlled PWA updates
+
+- **Date:** 2026-08-08
+- **Status:** Approved
+- **Owner:** User (approved the stabilization sequence before Phase 09)
+- **Related phase:** Phase 13 / release hardening
+- **Context:** The app already implements an update-available notice through `registerSW({ onNeedRefresh })`, lets the user choose Refresh or Later, and documents understandable update behavior. Changing VitePWA to `registerType: "autoUpdate"` bypassed that product contract and could reload an active reading or settings flow without the user's choice.
+- **Decision:** Restore `registerType: "prompt"` and retain the existing `onNeedRefresh` event bridge and update notice. Add a regression test that keeps the build strategy aligned with the application UI.
+- **Tests/evidence required:** Targeted PWA configuration test, mandatory local release gate, successful GitHub Quality and Pages workflows, and production smoke verification.
+- **Supersedes:** Commit `1d2b8de`'s automatic-update policy; the deployment itself remains current through the normal prompt flow.
