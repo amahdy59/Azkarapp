@@ -3,9 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import {
   BookOpen,
   ChevronUp,
+  ArrowPrevious,
   Heart,
   Share2,
   MoreVertical,
@@ -35,6 +37,7 @@ import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { getQuranWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { formatNumerals } from "../formatting";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -177,6 +180,13 @@ export function ReaderScreen({
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingContentRef = useRef<HTMLDivElement | null>(null);
 
+  // A wide-desktop-only reader treatment (hero band + card chrome). Gated well
+  // above the 1200px "large" shell tier (where the nav sidebar already
+  // appears) so the default Playwright desktop viewport (1280px) and the
+  // shell's own breakpoint stay on the existing layout; only genuinely wide
+  // screens opt in.
+  const isDesktopReader = useMediaQuery("(min-width: 1366px)");
+
   const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
     useZikrCounter({
       z,
@@ -259,7 +269,7 @@ export function ReaderScreen({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [z?.id, textSize, showTranslation, showTransliteration, language, longSurah]);
+  }, [z?.id, textSize, showTranslation, showTransliteration, language, longSurah, isDesktopReader]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -348,6 +358,7 @@ export function ReaderScreen({
   const isSaved = savedZikrIds.has(z.id);
   const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
   const readingFontFamily = "var(--font-reading-arabic)";
+  const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
 
   const handleShare = async () => {
     setIsSharing(true);
@@ -619,6 +630,97 @@ export function ReaderScreen({
     );
   };
 
+  // Shared between the mobile header's overflow menu and the wide-desktop
+  // card header's overflow menu so the two never drift apart.
+  const renderReaderMenuItems = () => (
+    <>
+      <DropdownMenuItem
+        disabled={idx === 0}
+        onClick={onPrev}
+        className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+      >
+        <div className="flex items-center gap-2.5">
+          {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
+          <span>{t(language, "reader.prev")}</span>
+        </div>
+      </DropdownMenuItem>
+
+      <DropdownMenuItem
+        disabled={idx === azkar.length - 1}
+        onClick={onNext}
+        className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
+      >
+        <div className="flex items-center gap-2.5">
+          {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
+          <span>{t(language, "reader.next")}</span>
+        </div>
+      </DropdownMenuItem>
+
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+      <DropdownMenuItem
+        disabled={!audioAvailable}
+        onClick={onPlayAudio}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+      >
+        <Volume2 size={18} />
+        {audioAvailable
+          ? language === "ar"
+            ? "تشغيل مرة واحدة"
+            : "Play audio once"
+          : language === "ar"
+            ? "الصوت غير متاح"
+            : "Audio unavailable"}
+      </DropdownMenuItem>
+
+      {onRepeatAudio && (
+        <DropdownMenuItem
+          onClick={onRepeatAudio}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        >
+          <RotateCcw size={18} />
+          {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
+        </DropdownMenuItem>
+      )}
+
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+      <DropdownMenuItem
+        onClick={handleResetCounter}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <RotateCcw size={18} />
+        {t(language, "reader.resetCounter")}
+      </DropdownMenuItem>
+
+      <DropdownMenuItem
+        onClick={handleToggleSaved}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
+        {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
+      </DropdownMenuItem>
+
+      <DropdownMenuItem
+        onClick={() => void handleShare()}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <Share2 size={18} />
+        {t(language, "reader.share")}
+      </DropdownMenuItem>
+
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+      <DropdownMenuItem
+        onClick={onBack}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <List size={18} />
+        {t(language, "reader.viewAllAzkar")}
+      </DropdownMenuItem>
+    </>
+  );
+
   const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
 
   return (
@@ -649,182 +751,272 @@ export function ReaderScreen({
         {readerAnnouncement}
       </div>
 
-      <Header
-        title={isArabic ? category.nameArabic : category.name}
-        onBack={onBack}
-        language={language}
-        right={
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={(event) => {
-                event.stopPropagation();
-                setHasOpenedBenefit(true);
-                setBenefitOpen(true);
-              }}
-              className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-              aria-label={t(language, "reader.referencesButton")}
-              title={t(language, "reader.referencesButton")}
+      {isDesktopReader ? (
+        <>
+          {/* Wide-desktop hero band (>=1366px). Fixed navy brand surface,
+              independent of the active theme — mirrors the Home screen's
+              .azkar-hero background (src/app/components/azkar-hero-background.css)
+              rather than following light/dark/midnight tokens, since it plays
+              the same "always-dark brand band" role. */}
+          <div
+            className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-4 overflow-hidden rounded-3xl px-6 py-7 text-center"
+            style={{
+              background: "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), #0b1426",
+            }}
+          >
+            <IconButton
+              onClick={onBack}
+              label={t(language, "common.back")}
+              className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
             >
-              <BookOpen className="shrink-0 text-primary" size={16} />
-              <span className="truncate" dir="auto">
-                {t(language, "reader.referencesButton")}
-              </span>
-            </button>
+              <ArrowPrevious size={20} />
+            </IconButton>
 
-            <DropdownMenu dir={direction}>
-              <DropdownMenuTrigger
-                aria-label={t(language, "reader.menu")}
-                className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              >
-                <MoreVertical size={20} />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align="end"
-                className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
-                sideOffset={8}
-              >
-                {/* Navigation Items */}
-                <DropdownMenuItem
-                  disabled={idx === 0}
-                  onClick={onPrev}
-                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
-                >
-                  <div className="flex items-center gap-2.5">
-                    {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-                    <span>{t(language, "reader.prev")}</span>
-                  </div>
-                </DropdownMenuItem>
+            <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+              {isArabic ? category.nameArabic : category.name}
+            </h1>
 
-                <DropdownMenuItem
-                  disabled={idx === azkar.length - 1}
-                  onClick={onNext}
-                  className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
-                >
-                  <div className="flex items-center gap-2.5">
-                    {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-                    <span>{t(language, "reader.next")}</span>
-                  </div>
-                </DropdownMenuItem>
+            <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
+              <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
+                <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
+                  {t(language, "reader.collectionPercentComplete", { percent: readingPercent })}
+                </span>
+                <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
+                  {t(language, "reader.collectionCount", {
+                    done: formatNumerals(readingProgressValue, language),
+                    total: formatNumerals(azkar.length, language),
+                  })}
+                </span>
+              </div>
+              <ProgressBar
+                value={readingProgressValue}
+                max={azkar.length}
+                height={8}
+                trackColor="rgba(255,255,255,0.2)"
+                fillColor="var(--on-media-accent)"
+                direction={direction}
+                aria-label={t(language, "reader.groupProgress")}
+              />
+            </div>
+          </div>
 
-                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-                {/* Zikr Action Items */}
-                <DropdownMenuItem
-                  disabled={!audioAvailable}
-                  onClick={onPlayAudio}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
-                >
-                  <Volume2 size={18} />
-                  {audioAvailable
-                    ? language === "ar"
-                      ? "تشغيل مرة واحدة"
-                      : "Play audio once"
-                    : language === "ar"
-                      ? "الصوت غير متاح"
-                      : "Audio unavailable"}
-                </DropdownMenuItem>
-
-                {onRepeatAudio && (
-                  <DropdownMenuItem
-                    onClick={onRepeatAudio}
-                    className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+          {/* Wide-desktop card: header actions + counter badge, reading
+              content, and the existing counter panel/keyboard-shortcuts row. */}
+          <div className="mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised">
+            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
+              <div className="flex min-w-0 items-center gap-2">
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger
+                    aria-label={t(language, "reader.menu")}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-background text-foreground/80 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
-                    <RotateCcw size={18} />
-                    {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
-                  </DropdownMenuItem>
-                )}
+                    <MoreVertical size={18} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="start"
+                    className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                    sideOffset={8}
+                  >
+                    {renderReaderMenuItems()}
+                  </DropdownMenuContent>
+                </DropdownMenu>
 
-                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-                <DropdownMenuItem
-                  onClick={handleResetCounter}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setHasOpenedBenefit(true);
+                    setBenefitOpen(true);
+                  }}
+                  className="flex h-11 items-center gap-1.5 rounded-md border border-border bg-background px-3.5 text-[0.8125rem] font-bold text-primary transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                  aria-label={t(language, "reader.referencesButton")}
+                  title={t(language, "reader.referencesButton")}
                 >
-                  <RotateCcw size={18} />
-                  {t(language, "reader.resetCounter")}
-                </DropdownMenuItem>
+                  <BookOpen size={16} />
+                  <span dir="auto">{t(language, "reader.referencesButton")}</span>
+                </button>
 
-                <DropdownMenuItem
-                  onClick={handleToggleSaved}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    handleToggleSaved();
+                  }}
+                  label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
+                  aria-pressed={isSaved}
+                  className="rounded-md border border-border bg-background"
+                  style={{ color: isSaved ? "var(--primary)" : "var(--foreground)" }}
                 >
-                  <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
-                  {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
-                </DropdownMenuItem>
+                  <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
+                </IconButton>
 
-                <DropdownMenuItem
-                  onClick={() => void handleShare()}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void handleShare();
+                  }}
+                  label={t(language, "reader.share")}
+                  disabled={isSharing}
+                  aria-busy={isSharing || undefined}
+                  onPointerEnter={() => void prepareZikrShareCardFonts()}
+                  onFocus={() => void prepareZikrShareCardFonts()}
+                  className="rounded-md border border-border bg-background"
                 >
                   <Share2 size={18} />
-                  {t(language, "reader.share")}
-                </DropdownMenuItem>
+                </IconButton>
 
-                <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-                {/* View All */}
-                <DropdownMenuItem
-                  onClick={onBack}
-                  className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    toggleSound();
+                  }}
+                  label={t(language, "counter.sound")}
+                  title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+                  aria-pressed={soundEnabled}
+                  data-testid="reader-counter-sound-toggle"
+                  className="rounded-md border border-border bg-background"
                 >
-                  <List size={18} />
-                  {t(language, "reader.viewAllAzkar")}
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        }
-      />
-
-      <div className="shrink-0 px-5 pb-3 pt-2 reader-column">
-        <ProgressBar
-          value={readingProgressValue}
-          max={azkar.length}
-          height={6}
-          trackColor="var(--card)"
-          fillColor="var(--primary)"
-          direction={direction}
-          aria-label={t(language, "reader.groupProgress")}
-        />
-      </div>
-
-      {/* Main Layout Area */}
-      <div
-        ref={readerMainRef}
-        className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
-      >
-        {/* Long chapters keep their completion control after the final Mushaf page;
-            ordinary adhkar retain the fixed counter below this scroll region. */}
-        <div
-          role="region"
-          tabIndex={0}
-          aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-          className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
-            justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-          }`}
-        >
-          {/* Inner wrapper vertically centers short/medium Zikrs; long Surahs start at top to scroll naturally */}
-          <div
-            className={`flex min-h-full flex-col ${
-              isLongContent ? "justify-start pt-1" : "justify-center my-auto"
-            } pb-2 items-center`}
-          >
-            <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
-              {renderReadingContent()}
-            </div>
-            {longSurah && (
-              <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
-                {renderCounterPanel()}
+                  {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </IconButton>
               </div>
-            )}
+
+              {/* Visual-only: the position it names is already carried by the
+                  progress bar above (single accessible progress source per
+                  docs/DESIGN_SYSTEM.md's reader contract), so this pill stays
+                  out of the accessibility tree instead of announcing twice. */}
+              <span
+                aria-hidden="true"
+                className="shrink-0 rounded-full bg-muted px-4 py-1.5 text-[0.8125rem] font-bold text-primary"
+              >
+                {t(language, "reader.title", {
+                  index: formatNumerals(idx + 1, language),
+                  total: formatNumerals(azkar.length, language),
+                })}
+              </span>
+            </div>
+
+            <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+              <div
+                role="region"
+                tabIndex={0}
+                aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+                className={`flex-1 overflow-y-auto min-h-0 w-full px-6 pt-6 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
+                  justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                }`}
+              >
+                <div
+                  className={`mx-auto flex min-h-full max-w-[600px] flex-col ${
+                    isLongContent ? "justify-start pt-1" : "justify-center my-auto"
+                  } pb-2 items-center`}
+                >
+                  <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
+                    {renderReadingContent()}
+                  </div>
+                  {longSurah && (
+                    <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
+                      {renderCounterPanel()}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
+            </div>
           </div>
-        </div>
+        </>
+      ) : (
+        <>
+          <Header
+            title={isArabic ? category.nameArabic : category.name}
+            onBack={onBack}
+            language={language}
+            right={
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setHasOpenedBenefit(true);
+                    setBenefitOpen(true);
+                  }}
+                  className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                  aria-label={t(language, "reader.referencesButton")}
+                  title={t(language, "reader.referencesButton")}
+                >
+                  <BookOpen className="shrink-0 text-primary" size={16} />
+                  <span className="truncate" dir="auto">
+                    {t(language, "reader.referencesButton")}
+                  </span>
+                </button>
 
-        {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
-      </div>
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger
+                    aria-label={t(language, "reader.menu")}
+                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    <MoreVertical size={20} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                    sideOffset={8}
+                  >
+                    {renderReaderMenuItems()}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            }
+          />
 
-      <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
+          <div className="shrink-0 px-5 pb-3 pt-2 reader-column">
+            <ProgressBar
+              value={readingProgressValue}
+              max={azkar.length}
+              height={6}
+              trackColor="var(--card)"
+              fillColor="var(--primary)"
+              direction={direction}
+              aria-label={t(language, "reader.groupProgress")}
+            />
+          </div>
+
+          {/* Main Layout Area */}
+          <div
+            ref={readerMainRef}
+            className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
+          >
+            {/* Long chapters keep their completion control after the final Mushaf page;
+                ordinary adhkar retain the fixed counter below this scroll region. */}
+            <div
+              role="region"
+              tabIndex={0}
+              aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+              className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
+                justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+              }`}
+            >
+              {/* Inner wrapper vertically centers short/medium Zikrs; long Surahs start at top to scroll naturally */}
+              <div
+                className={`flex min-h-full flex-col ${
+                  isLongContent ? "justify-start pt-1" : "justify-center my-auto"
+                } pb-2 items-center`}
+              >
+                <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
+                  {renderReadingContent()}
+                </div>
+                {longSurah && (
+                  <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
+                    {renderCounterPanel()}
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
+          </div>
+
+          <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
+        </>
+      )}
 
       {hasOpenedBenefit && (
         <ReaderReferenceSheet

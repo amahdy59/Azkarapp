@@ -104,6 +104,7 @@ Every interactive component should define:
 - Share, Benefit, and save remain separate actions below the counter with targets of at least 44×44 CSS px. Their flexible toolbar must stay inside a 320 px app canvas.
 - Share generates a theme-aware 1080×2920 PNG locally. Mobile uses Web Share with an image file; unsupported browsers copy the PNG or download it. Arabic cards exclude English supporting content, while English cards include the Arabic zikr with meaning, pronunciation, benefit, and source.
 - The reader has one contained vertical scroll region. Short screens must preserve access to the zikr, counter, and actions without document-level horizontal overflow.
+- **Wide-desktop reader (≥1366px, `src/app/hooks/useMediaQuery.ts`):** the Reader swaps its plain header for a fixed dark-navy hero band (same `#0b1426` brand surface as Home's `.azkar-hero`, independent of the active theme) carrying the back control, category title, and the collection progress bar, and wraps the reading content in a bordered card. Share/Benefit/save/sound relocate into that card's header bar instead of below the counter — the 320px-canvas/below-counter rule above applies to `large` tier and narrower. The card header also shows a "Zikr {index} of {total}" position pill and the hero repeats the progress bar's percent/count as text; both are `aria-hidden` decorative captions bound to the same single progress bar (its `aria-label` remains the only accessible announcement), so this does not reintroduce the "second position text row" this contract otherwise forbids. The reading column itself stays capped at 600px and centered inside the wider card — width grows for chrome, not for line length, per the responsive-shell reading-measure rule below. The counter ring keeps its 184px contract unchanged.
 
 ## Home and azkar-group contract
 
@@ -187,7 +188,7 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 - There is no drawer/off-canvas navigation variant; exactly one nav component mounts per tier.
 - Navigation is hidden entirely on splash, onboarding and auth views at every tier.
 - Height is never part of tier selection. Short landscape viewports keep the navigation for their width.
-- Reader/focused flows: constrained reading measure (~430px–600px maximum), independent of tier.
+- Reader/focused flows: constrained reading measure (~430px–600px maximum), independent of tier. On the wide-desktop reader (≥1366px, see the Reader contract above) the card chrome around that column widens to fill the shell; the reading measure itself stays capped at 600px.
 - Dashboard-tier screens opt into `.page-content-center` (max `--content-dashboard`); Settings uses its own two-pane with `--content-form` on the detail pane.
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 

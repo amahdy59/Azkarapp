@@ -624,6 +624,8 @@ const en = {
   },
   reader: {
     title: "Zikr {index} of {total}",
+    collectionPercentComplete: "{percent}% complete",
+    collectionCount: "{done} of {total}",
     groupProgress: "Group progress",
     menu: "Reader options",
     progressSummary: "{done} of {total} zikr",

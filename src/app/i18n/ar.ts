@@ -611,6 +611,8 @@ const ar = {
   },
   reader: {
     title: "\u0630\u0643\u0631 {index} \u0645\u0646 {total}",
+    collectionPercentComplete: "{percent}% مكتمل",
+    collectionCount: "{done} من {total}",
     groupProgress: "\u062a\u0642\u062f\u0645 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629",
     menu: "\u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0642\u0627\u0631\u0626",
     progressSummary: "{done} \u0645\u0646 {total} \u0630\u0643\u0631",
