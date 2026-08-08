@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useDeferredValue, useMemo, useState } from "react";
+import { useDeferredValue, useId, useMemo, useState } from "react";
 import { ArrowPrevious, Search, X } from "../components/icons";
 import { ALL_AZKAR, getAzkarByCategory, ZIKR_LABELS } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
@@ -80,14 +80,17 @@ export function SearchScreen({
   onZikr,
   language,
   direction,
+  initialQuery = "",
 }: {
   onBack: () => void;
   onZikr: (catId: CategoryId, i: number) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  initialQuery?: string;
 }) {
   const isArabic = language === "ar";
-  const [q, setQ] = useState("");
+  const searchInputId = useId();
+  const [q, setQ] = useState(() => initialQuery.trim());
   const deferredQuery = useDeferredValue(q.trim());
 
   // Load per-language history from localStorage; no hardcoded defaults.
@@ -129,34 +132,40 @@ export function SearchScreen({
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
       {/* Search bar */}
-      <div className="flex items-center gap-3 px-5 py-3 shrink-0">
+      <div className="flex shrink-0 items-end gap-3 px-5 py-3">
         <IconButton onClick={onBack} label={t(language, "common.back")} className="shrink-0">
           <ArrowPrevious size={20} className="text-foreground" />
         </IconButton>
 
-        <div className="flex h-12 flex-1 items-center gap-3 rounded-full border border-border-control bg-card px-4">
-          <Search size={18} className="text-primary shrink-0" />
-          <input
-            type="text"
-            placeholder={t(language, "search.placeholder")}
-            aria-label={t(language, "search.inputAriaLabel")}
-            value={q}
-            dir="auto"
-            onChange={(e) => setQ(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && handleSubmit(q)}
-            className="flex-1 bg-transparent focus:outline-none text-[0.875rem] text-foreground font-sans leading-[22px]"
-          />
-          {!q && <div className="shrink-0 rounded-sm w-[2px] h-[18px] bg-primary animate-pulse" />}
-          {q && (
-            <button
-              type="button"
-              onClick={() => setQ("")}
-              className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground"
-              aria-label={t(language, "search.clearAriaLabel")}
-            >
-              <X size={16} />
-            </button>
-          )}
+        <div className="min-w-0 flex-1">
+          <label htmlFor={searchInputId} className="mb-1.5 block text-[0.75rem] font-semibold text-muted-foreground">
+            {t(language, "search.inputAriaLabel")}
+          </label>
+          <div className="flex h-12 items-center gap-3 rounded-full border border-border-control bg-card px-4 focus-within:ring-[3px] focus-within:ring-ring">
+            <Search size={18} className="shrink-0 text-primary" aria-hidden="true" />
+            <input
+              id={searchInputId}
+              type="text"
+              placeholder={t(language, "search.placeholder")}
+              value={q}
+              dir={q.trim() ? "auto" : direction}
+              lang={language}
+              autoComplete="off"
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSubmit(q)}
+              className="min-w-0 flex-1 bg-transparent text-start font-sans text-[0.875rem] leading-[22px] text-foreground focus:outline-none"
+            />
+            {q && (
+              <button
+                type="button"
+                onClick={() => setQ("")}
+                className="-me-3 flex h-11 w-11 shrink-0 items-center justify-center text-muted-foreground"
+                aria-label={t(language, "search.clearAriaLabel")}
+              >
+                <X size={16} aria-hidden="true" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -233,7 +242,7 @@ export function SearchScreen({
                       title: accessibleTitle,
                       category: isArabic ? category.nameArabic : category.name,
                     })}
-                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all"
+                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-amber-500/40 transition-all"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p

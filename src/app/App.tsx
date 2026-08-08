@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
-import { getAzkarForMode, isRoutineCategory } from "./content/azkar";
+import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "./content/azkar";
 import type {
   AppLanguage,
   AppStateSnapshot,
@@ -15,9 +15,16 @@ import type {
   ThemeMode,
   View,
 } from "./types";
+import type { LibrarySection } from "./screens/AzkarLibraryScreen";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
-import { FRIDAY_KAHF_WEEK_KEY, fridayKahfOpenedKey, getIsoWeekKey } from "./fridayProgress";
+import {
+  FRIDAY_KAHF_WEEK_KEY,
+  fridayKahfOpenedKey,
+  getIsoWeekKey,
+  readFridayDuaProgress,
+  writeFridayDuaProgress,
+} from "./fridayProgress";
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
@@ -47,6 +54,7 @@ import { useSessionHandlers } from "./hooks/useSessionHandlers";
 import {
   getPalmStreakSummary,
   getFirstIncompleteZikrIndex,
+  getNextIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
   resetStaleCompletedCollections,
   type GrowthEvent,
@@ -99,6 +107,9 @@ const SearchScreen = lazyWithRetry(() =>
 );
 const ProgressScreen = lazyWithRetry(() =>
   import("./screens/ProgressScreen").then((module) => ({ default: module.ProgressScreen })),
+);
+const BenefitsScreen = lazyWithRetry(() =>
+  import("./screens/BenefitsScreen").then((module) => ({ default: module.BenefitsScreen })),
 );
 const FridayModeScreen = lazyWithRetry(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
@@ -165,6 +176,8 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
   const [activeCat, setActiveCat] = useState<CategoryId>("morning");
   const [activeIdx, setActiveIdx] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
@@ -212,6 +225,9 @@ function AppContent() {
       initialState.settings.progressDayStartHour,
     ),
   );
+  const [fridayDuaCompletedIds, setFridayDuaCompletedIds] = useState<Set<string>>(() => new Set());
+  const [fridayDuaTotalCount, setFridayDuaTotalCount] = useState(0);
+  const [fridayDuaFlow, setFridayDuaFlow] = useState(false);
 
   const ensureCurrentFridayWeek = useCallback(() => {
     const currentWeek = getIsoWeekKey();
@@ -222,8 +238,24 @@ function AppContent() {
       // Keep the in-memory reset when persistent storage is unavailable.
     }
     setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+    setFridayDuaCompletedIds(new Set());
     return false;
   }, []);
+
+  const hydrateFridayDuaProgress = useCallback(async () => {
+    const week = getIsoWeekKey();
+    const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
+    registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+    const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
+    const stored = readFridayDuaProgress(duaIds, week);
+    writeFridayDuaProgress(stored, week);
+    setFridayDuaTotalCount(duaIds.length);
+    setFridayDuaCompletedIds(stored);
+  }, []);
+
+  useEffect(() => {
+    if (view === "friday") void hydrateFridayDuaProgress();
+  }, [hydrateFridayDuaProgress, view]);
 
   useEffect(() => {
     ensureCurrentFridayWeek();
@@ -415,6 +447,30 @@ function AppContent() {
     setActiveTab,
     showConfirm,
   });
+
+  const updateFridayDuaProgress = useCallback((index: number, shouldComplete: boolean) => {
+    const zikrId = getAzkarForMode("comprehensive_duas")[index]?.id;
+    if (!zikrId) return;
+    setFridayDuaCompletedIds((previous) => {
+      const next = new Set(previous);
+      if (shouldComplete) next.add(zikrId);
+      else next.delete(zikrId);
+      writeFridayDuaProgress(next);
+      return next;
+    });
+  }, []);
+
+  const resetFridayDuaProgress = useCallback(() => {
+    const next = new Set<string>();
+    setFridayDuaCompletedIds(next);
+    writeFridayDuaProgress(next);
+  }, []);
+
+  useEffect(() => {
+    if (fridayDuaFlow && (activeCat !== "comprehensive_duas" || (view !== "category" && view !== "reader"))) {
+      setFridayDuaFlow(false);
+    }
+  }, [activeCat, fridayDuaFlow, view]);
 
   useEffect(() => {
     const plan = audioController.state.plan;
@@ -740,6 +796,7 @@ function AppContent() {
     if (tab === "home") {
       push("home");
     } else if (tab === "azkar") {
+      setLibrarySection("collections");
       push("library");
     } else if (tab === "progress") {
       push("progress");
@@ -751,6 +808,7 @@ function AppContent() {
   const showBottomNav = [
     "home",
     "library",
+    "benefits",
     "category",
     "reader",
     "settings",
@@ -840,7 +898,12 @@ function AppContent() {
         )}
 
         <div className="app-main">
-          <main id="main-content" tabIndex={-1} className="flex-1 overflow-hidden flex flex-col">
+          <main
+            id="main-content"
+            data-view={view}
+            tabIndex={-1}
+            className="app-main-view flex-1 overflow-hidden flex flex-col"
+          >
             <Suspense fallback={<ScreenFallback language={selectedLang} />}>
               {/* Phase 2 — onboarding flow */}
               {view === "splash" && <SplashScreen language={selectedLang} onDone={handleSplashDone} />}
@@ -973,7 +1036,18 @@ function AppContent() {
                     setRoutineModes((prev) => ({ ...prev, [categoryId]: mode }));
                   }}
                   onOpenCustomCounter={() => push("custom_counter")}
+                  savedZikrIds={savedZikrIds}
+                  onOpenSavedZikr={(categoryId, index) => openReader(categoryId, index, "complete")}
+                  onOpenSavedLibrary={() => {
+                    setActiveTab("azkar");
+                    setLibrarySection("saved");
+                    push("library");
+                  }}
+                  onOpenBenefits={() => push("benefits")}
                 />
+              )}
+              {view === "benefits" && (
+                <BenefitsScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
               )}
               {view === "library" && (
                 <AzkarLibraryScreen
@@ -982,9 +1056,13 @@ function AppContent() {
                   direction={layoutDirection}
                   onCategory={openCategory}
                   onZikr={(catId, index) => openReader(catId, index, "complete")}
-                  onSearch={() => push("search")}
+                  onSearch={(query) => {
+                    setSearchQuery(query);
+                    push("search");
+                  }}
                   savedZikrIds={savedZikrIds}
                   routineModes={routineModes}
+                  initialSection={librarySection}
                 />
               )}
               {view === "progress" && (
@@ -1003,7 +1081,8 @@ function AppContent() {
                   isArabic={isArabic}
                   direction={layoutDirection}
                   kahfCompletedCount={completed.friday_kahf?.has("friday-kahf") ? 1 : 0}
-                  duasCompletedCount={completed.comprehensive_duas?.size ?? 0}
+                  duasCompletedCount={fridayDuaCompletedIds.size}
+                  duasTotalCount={fridayDuaTotalCount}
                   onBack={pop}
                   onStartKahf={() => {
                     try {
@@ -1022,7 +1101,14 @@ function AppContent() {
                     openReader("friday_kahf", nextIndex);
                   }}
                   onOpenSalawat={() => push("friday_salawat")}
-                  onStartDuasSession={() => void openCategory("comprehensive_duas")}
+                  onStartDuasSession={() => {
+                    void (async () => {
+                      ensureCurrentFridayWeek();
+                      await hydrateFridayDuaProgress();
+                      await openCategory("comprehensive_duas");
+                      setFridayDuaFlow(true);
+                    })();
+                  }}
                 />
               )}
               {view === "friday_salawat" && (
@@ -1038,13 +1124,48 @@ function AppContent() {
               {view === "category" && (
                 <CategoryScreen
                   catId={activeCat}
-                  completed={completed[activeCat] ?? new Set()}
+                  completed={
+                    fridayDuaFlow && activeCat === "comprehensive_duas"
+                      ? fridayDuaCompletedIds
+                      : (completed[activeCat] ?? new Set())
+                  }
                   isArabic={isArabic}
                   direction={layoutDirection}
                   onZikr={(i) => openReader(activeCat, i)}
-                  onToggleZikr={(i) => toggleZikrCompletion(activeCat, i)}
-                  onReset={() => handleResetCategory(activeCat)}
-                  onRepeat={() => repeatCategory(activeCat)}
+                  onToggleZikr={(i) => {
+                    const zikrId = getAzkarForMode(activeCat, activeRoutineMode)[i]?.id;
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas" && zikrId) {
+                      const shouldComplete = !fridayDuaCompletedIds.has(zikrId);
+                      updateFridayDuaProgress(i, shouldComplete);
+                      if (shouldComplete && !completed.comprehensive_duas.has(zikrId)) {
+                        toggleZikrCompletion(activeCat, i);
+                      }
+                      return;
+                    }
+                    toggleZikrCompletion(activeCat, i);
+                  }}
+                  onReset={() => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      showConfirm(
+                        t(selectedLang, "category.resetConfirmTitle"),
+                        t(selectedLang, "category.resetConfirm"),
+                        t(selectedLang, "common.reset"),
+                        t(selectedLang, "common.cancel"),
+                        resetFridayDuaProgress,
+                        true,
+                      );
+                      return;
+                    }
+                    handleResetCategory(activeCat);
+                  }}
+                  onRepeat={() => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      resetFridayDuaProgress();
+                      openReader(activeCat, 0);
+                      return;
+                    }
+                    repeatCategory(activeCat);
+                  }}
                   onBack={pop}
                   onPlayAllAudio={
                     activeCat === "comprehensive_duas" || audioCoverage.available === 0 ? undefined : startPlayAllAudio
@@ -1069,9 +1190,17 @@ function AppContent() {
                   isDone={
                     isRepeatSession
                       ? repeatCompleted.has(activeIdx)
-                      : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
+                      : fridayDuaFlow && activeCat === "comprehensive_duas"
+                        ? fridayDuaCompletedIds.has(azkar[activeIdx]?.id ?? "")
+                        : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
                   }
-                  collectionCompletedCount={isRepeatSession ? repeatCompleted.size : (completed[activeCat]?.size ?? 0)}
+                  collectionCompletedCount={
+                    isRepeatSession
+                      ? repeatCompleted.size
+                      : fridayDuaFlow && activeCat === "comprehensive_duas"
+                        ? fridayDuaCompletedIds.size
+                        : (completed[activeCat]?.size ?? 0)
+                  }
                   hapticFeedback={hapticFeedback}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
@@ -1085,15 +1214,43 @@ function AppContent() {
                         }
                       : leaveReader
                   }
-                  onComplete={markComplete}
-                  onUncomplete={(i) => toggleZikrCompletion(activeCat, i)}
+                  onComplete={(i) => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      updateFridayDuaProgress(i, true);
+                      const zikrId = azkar[i]?.id;
+                      if (zikrId && !completed.comprehensive_duas.has(zikrId)) markComplete(i);
+                      return;
+                    }
+                    markComplete(i);
+                  }}
+                  onUncomplete={(i) => {
+                    if (fridayDuaFlow && activeCat === "comprehensive_duas") {
+                      updateFridayDuaProgress(i, false);
+                      return;
+                    }
+                    toggleZikrCompletion(activeCat, i);
+                  }}
                   onAdvance={
                     activeCat === "friday_kahf"
                       ? () => {
                           window.history.replaceState({ view: "friday" }, "", "?view=friday");
                           setView("friday");
                         }
-                      : advanceAfterCompletion
+                      : fridayDuaFlow && activeCat === "comprehensive_duas"
+                        ? (i) => {
+                            const effectiveProgress = new Set(fridayDuaCompletedIds);
+                            const zikrId = azkar[i]?.id;
+                            if (zikrId) effectiveProgress.add(zikrId);
+                            const nextIndex = getNextIncompleteZikrIndex(azkar, effectiveProgress, i);
+                            if (nextIndex !== null) {
+                              setActiveIdx(nextIndex);
+                              return;
+                            }
+                            window.history.replaceState({ view: "friday" }, "", "?view=friday");
+                            setView("friday");
+                            setFridayDuaFlow(false);
+                          }
+                        : advanceAfterCompletion
                   }
                   onNext={() => {
                     if (activeIdx < azkar.length - 1) setActiveIdx((i) => i + 1);
@@ -1193,6 +1350,7 @@ function AppContent() {
                 <SearchScreen
                   language={selectedLang}
                   direction={layoutDirection}
+                  initialQuery={searchQuery}
                   onBack={pop}
                   onZikr={(catId, i) => {
                     openReader(catId, i, "complete");

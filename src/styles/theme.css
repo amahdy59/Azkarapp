@@ -1479,6 +1479,31 @@ a[href]:not(.no-press):active,
   flex-direction: column;
 }
 
+/* Non-Home screens get one quiet, page-level tonal texture. Cards remain
+   opaque, so the treatment never competes with devotional or functional text.
+   App.tsx owns the data-view value; Home deliberately keeps a clean surface. */
+#main-content[data-view]:not([data-view="home"]) .app-screen-surface,
+#main-content[data-view]:not([data-view="home"]) > .bg-background {
+  background-color: var(--background);
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='pageNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.72' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23pageNoise)' opacity='.035'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px 180px;
+}
+
+.reduce-transparency #main-content[data-view]:not([data-view="home"]) .app-screen-surface,
+.reduce-transparency #main-content[data-view]:not([data-view="home"]) > .bg-background,
+.high-contrast #main-content[data-view]:not([data-view="home"]) .app-screen-surface,
+.high-contrast #main-content[data-view]:not([data-view="home"]) > .bg-background {
+  background-image: none !important;
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  #main-content[data-view]:not([data-view="home"]) .app-screen-surface,
+  #main-content[data-view]:not([data-view="home"]) > .bg-background {
+    background-image: none !important;
+  }
+}
+
 /* App Shell Adaptive Grid */
 @media (min-width: 37.5rem) {
   .app-viewport {

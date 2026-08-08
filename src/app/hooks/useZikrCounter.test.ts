@@ -68,6 +68,16 @@ describe("useZikrCounter", () => {
     expect(result.current.count).toBe(1);
   });
 
+  it("emits optional count feedback exactly once per accepted tap", () => {
+    const onCount = vi.fn();
+    const { result } = setup({ z: makeZikr({ repetitionCount: 1 }), onCount });
+
+    act(() => result.current.handleTap());
+    act(() => result.current.handleTap());
+
+    expect(onCount).toHaveBeenCalledTimes(1);
+  });
+
   it("does not count surface taps that land on an interactive control", () => {
     const { result } = setup({});
     const button = document.createElement("button");
@@ -92,15 +102,35 @@ describe("useZikrCounter", () => {
     paragraph.remove();
   });
 
-  it("never counts surface taps for a full surah", () => {
-    // Long chapters are read and scrolled; only the explicit counter counts,
-    // so a stray tap cannot mark Al-Kahf complete.
-    const { result } = setup({ z: makeZikr({ isSurah: true, repetitionCount: 1 }) });
+  it("never counts surface taps for a reviewed multi-page surah", () => {
+    const { result } = setup({
+      z: makeZikr({
+        isSurah: true,
+        repetitionCount: 1,
+        mushafPages: [
+          { page: 293, startAyah: 1, endAyah: 4 },
+          { page: 294, startAyah: 5, endAyah: 15 },
+        ],
+      }),
+    });
     const paragraph = document.createElement("p");
     document.body.appendChild(paragraph);
 
     act(() => result.current.handleSurfaceTap(tapEventOn(paragraph)));
     expect(result.current.count).toBe(0);
+
+    paragraph.remove();
+  });
+
+  it("keeps canvas counting for a short surah", () => {
+    const { result } = setup({
+      z: makeZikr({ isSurah: true, repetitionCount: 3, verseCount: 4 }),
+    });
+    const paragraph = document.createElement("p");
+    document.body.appendChild(paragraph);
+
+    act(() => result.current.handleSurfaceTap(tapEventOn(paragraph)));
+    expect(result.current.count).toBe(1);
 
     paragraph.remove();
   });

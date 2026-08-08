@@ -1,0 +1,80 @@
+import { Fragment, type CSSProperties } from "react";
+import type { QuranWordMeaning } from "../content/quranWordMeanings";
+import { splitMushafPages } from "../content/mushafPages";
+import { formatNumerals } from "../formatting";
+import { t } from "../i18n";
+import type { AppLanguage, Zikr } from "../types";
+import { QuranWordText } from "./QuranWordText";
+
+export function MushafPageReader({
+  zikr,
+  arabicText,
+  meanings,
+  language,
+  textStyle,
+  onSelectMeanings,
+}: {
+  zikr: Zikr;
+  arabicText: string;
+  meanings: readonly QuranWordMeaning[];
+  language: AppLanguage;
+  textStyle: CSSProperties;
+  onSelectMeanings: (meanings: QuranWordMeaning[]) => void;
+}) {
+  const pages = splitMushafPages(arabicText, zikr.mushafPages ?? []);
+  if (pages.length === 0) return null;
+
+  return (
+    <div className="space-y-5" data-testid="mushaf-pages">
+      {pages.map((page, index) => {
+        const headingId = `mushaf-page-${zikr.id}-${page.page}`;
+        const pageNumber = formatNumerals(page.page, language);
+        const startAyah = formatNumerals(page.startAyah, language);
+        const endAyah = formatNumerals(page.endAyah, language);
+
+        return (
+          <Fragment key={page.page}>
+            <section
+              aria-labelledby={headingId}
+              className="rounded-3xl border border-border/60 bg-card px-4 py-5 shadow-raised sm:px-6 sm:py-6"
+              data-testid="mushaf-page"
+              data-mushaf-page={page.page}
+            >
+              <header className="mb-4 flex items-center justify-between gap-3 border-b border-border/50 pb-3">
+                <h2 id={headingId} className="text-[0.8125rem] font-extrabold text-foreground">
+                  {t(language, "reader.mushafPage", { page: pageNumber })}
+                </h2>
+                <span className="text-[0.75rem] font-bold text-muted-foreground">
+                  {t(language, "reader.mushafPageRange", { start: startAyah, end: endAyah })}
+                </span>
+              </header>
+
+              <QuranWordText
+                text={page.text}
+                meanings={meanings}
+                language={language}
+                style={{ ...textStyle, textAlign: "justify", textAlignLast: "center" }}
+                onSelectMeanings={onSelectMeanings}
+              />
+            </section>
+
+            {index < pages.length - 1 && (
+              <div
+                role="separator"
+                aria-label={t(language, "reader.mushafPageEnd", { page: pageNumber })}
+                className="flex items-center gap-3 px-2 text-muted-foreground"
+                data-testid="mushaf-page-separator"
+              >
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+                <span className="text-[0.6875rem] font-bold" aria-hidden="true">
+                  {pageNumber}
+                </span>
+                <span className="h-px flex-1 bg-border" aria-hidden="true" />
+              </div>
+            )}
+          </Fragment>
+        );
+      })}
+    </div>
+  );
+}

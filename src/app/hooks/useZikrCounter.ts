@@ -3,6 +3,7 @@ import { COUNTER_ADVANCE_DELAY_MS } from "../constants/reader";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { Zikr, AppLanguage } from "../types";
+import { isLongSurah } from "../content/mushafPages";
 
 export function useZikrCounter({
   z,
@@ -13,6 +14,7 @@ export function useZikrCounter({
   collectionCompletedCount,
   hapticFeedback,
   vibrate,
+  onCount,
   onComplete,
   onAdvance,
 }: {
@@ -24,6 +26,7 @@ export function useZikrCounter({
   collectionCompletedCount: number;
   hapticFeedback: boolean;
   vibrate: (pattern: number | number[]) => void;
+  onCount?: () => void;
   onComplete: (idx: number) => void;
   onAdvance: (idx: number) => void;
 }) {
@@ -54,7 +57,7 @@ export function useZikrCounter({
     setReaderAnnouncement(
       initialCount > 0
         ? t(language, "reader.counterReadyComplete")
-        : t(language, z.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"),
+        : t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"),
     );
   }, [idx, isDone, language, z]);
 
@@ -73,6 +76,7 @@ export function useZikrCounter({
 
     const next = count + 1;
     setCount(next);
+    onCount?.();
     if (hapticFeedback) {
       vibrate(8);
     }
@@ -115,9 +119,9 @@ export function useZikrCounter({
   };
 
   const handleSurfaceTap = (event: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-    // For full surahs (long chapters like Surah Al-Kahf, Al-Mulk), tapping the reading text/canvas
-    // should NOT count so users can scroll/read without accidentally completing. Only the counter button counts.
-    if (z?.isSurah) {
+    // Reviewed multi-page surahs are read and scrolled before their end control.
+    // Short surahs keep the ordinary canvas-counting interaction.
+    if (isLongSurah(z)) {
       return;
     }
 
@@ -137,7 +141,7 @@ export function useZikrCounter({
     setCount(0);
     setComplete(false);
     setJustCompleted(false);
-    setReaderAnnouncement(t(language, z?.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
+    setReaderAnnouncement(t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
   };
 
   return {

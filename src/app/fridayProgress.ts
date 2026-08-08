@@ -27,6 +27,30 @@ export function fridaySalawatKey(week = getIsoWeekKey()): string {
   return `azkarapp.friday-salawat.${week}`;
 }
 
+export function fridayDuasKey(week = getIsoWeekKey()): string {
+  return `azkarapp.friday-duas.${week}`;
+}
+
+export function readFridayDuaProgress(allowedIds: Iterable<string>, week = getIsoWeekKey()): Set<string> {
+  try {
+    const allowed = new Set(allowedIds);
+    const parsed: unknown = JSON.parse(localStorage.getItem(fridayDuasKey(week)) ?? "[]");
+    return new Set(
+      Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string" && allowed.has(id)) : [],
+    );
+  } catch {
+    return new Set();
+  }
+}
+
+export function writeFridayDuaProgress(ids: Iterable<string>, week = getIsoWeekKey()): void {
+  try {
+    localStorage.setItem(fridayDuasKey(week), JSON.stringify([...new Set(ids)].sort()));
+  } catch {
+    // Weekly progress remains usable in memory when storage is unavailable.
+  }
+}
+
 export function readFridaySalawatProgress(week = getIsoWeekKey()): FridaySalawatProgress {
   try {
     const parsed = JSON.parse(localStorage.getItem(fridaySalawatKey(week)) ?? "null") as Partial<FridaySalawatProgress>;

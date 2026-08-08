@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { getHomeAction, getTimeOfDayZikr } from "./HomeScreen";
+import { getHomeAction, getHomeBackgroundCategoryId, getTimeOfDayZikr } from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
 import { getAzkarByCategory } from "../content/azkar";
@@ -55,5 +55,10 @@ describe("getHomeAction", () => {
     expect(getTimeOfDayZikr(atTime(date, times.asr), "en", cairo).categoryId).toBe("evening");
     expect(getTimeOfDayZikr(atTime(date, times.isha, -1), "en", cairo).categoryId).toBe("evening");
     expect(getTimeOfDayZikr(atTime(date, times.isha), "en", cairo).categoryId).toBe("before_sleep");
+  });
+
+  it("uses the Friday scene on Home without changing the recommended routine", () => {
+    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 7, 9), "morning")).toBe("friday_kahf");
+    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 8, 9), "morning")).toBe("morning");
   });
 });

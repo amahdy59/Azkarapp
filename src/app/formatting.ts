@@ -56,6 +56,17 @@ export function formatHijriDateWithTime(date: Date = new Date(), language: AppLa
   }
 }
 
+export function formatDisplayTime(date: Date = new Date(), language: AppLanguage = "ar"): string {
+  try {
+    return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(date);
+  } catch {
+    return date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+  }
+}
+
 export function formatDisplayDate(
   date: Date = new Date(),
   language: AppLanguage = "ar",

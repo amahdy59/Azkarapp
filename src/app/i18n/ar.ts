@@ -85,6 +85,26 @@ const ar = {
     fajrSunnah: "سُنَّة خاصة بعد صلاة الفجر",
     afterPrayerTitle: "أذكار ما بعد الصلاة",
     progressOf: "{done} من {total} مكتملة",
+    yourLibrary: "مكتبتك",
+    savedEyebrow: "جاهزة لك",
+    savedTitle: "الأذكار المحفوظة",
+    savedEmpty: "احفظ ذكراً من شاشة القراءة ليظهر هنا للوصول السريع.",
+    openSaved: "فتح جميع الأذكار المحفوظة",
+  },
+  benefits: {
+    title: "فوائد الذكر",
+    subtitle: "فوائد مراجعة مع مصادرها",
+    homeDescription: "تصفح الفوائد التي روجعت داخل التطبيق مع إظهار مصدر كل فائدة.",
+    open: "استكشف الفوائد",
+    reviewedHeading: "محتوى مُراجع",
+    reviewedDescription:
+      "تعرض هذه الصفحة نصوص الفوائد والمصادر المراجعة الموجودة في التطبيق دون إنشاء أحكام دينية جديدة.",
+    shareHeading: "فائدة من الذكر",
+    source: "المصدر",
+    shareWhatsApp: "مشاركة عبر واتساب",
+    shareWhatsAppAria: "مشاركة فائدة {category} عبر واتساب",
+    showing: "عرض {visible} من {total}",
+    loadMore: "عرض {count} إضافية",
   },
   friday: {
     title: "رفيق الجمعة",
@@ -133,6 +153,9 @@ const ar = {
     benefitLabel: "الفائدة",
     evidenceLabel: "السياق والدليل",
     sourceLabel: "المصدر",
+    progressStart: "ابدأ أعمال الجمعة بهدوء وعلى قدر استطاعتك.",
+    progressContinue: "خطوة مباركة أُنجزت؛ واصل بهدوء.",
+    progressComplete: "اكتملت أعمال الجمعة — تقبل الله طاعتك.",
   },
   library: {
     groups: {
@@ -556,6 +579,9 @@ const ar = {
     prepareWudu: "الوضوء",
     prepareDustBed: "نفض الفراش",
     prepareRightSide: "الاضطجاع على الشق الأيمن",
+    prepareProgress: "تقدم الاستعداد للنوم",
+    prepareCompleteTitle: "اكتمل الاستعداد",
+    prepareCompleteBody: "يمكنك الآن بدء أذكار النوم عندما تكون مستعدًا.",
     ritualThreeQuls: "سور التحصين الثلاث",
     ritualThreeQulsInstruction: "تقرأ الإخلاص والفلق والناس كعمل واحد.",
     ritualSleepInstruction: "اجمع كفيك ← اقرأ ← انفث نفثًا خفيفًا ← امسح الجسد.",
@@ -647,6 +673,10 @@ const ar = {
     tapAnywhere: "\u0627\u0636\u063a\u0637 \u0623\u064a \u0645\u0643\u0627\u0646 \u0644\u0644\u0639\u062f",
     tapCounterWhenFinished:
       "\u0627\u0636\u063a\u0637 \u0627\u0644\u0639\u062f\u0627\u062f \u0639\u0646\u062f \u0627\u0644\u0625\u062a\u0645\u0627\u0645",
+    mushafPage: "\u0635\u0641\u062d\u0629 \u0627\u0644\u0645\u0635\u062d\u0641 {page}",
+    mushafPageRange: "\u0627\u0644\u0622\u064a\u0627\u062a {start}\u2013{end}",
+    mushafPageEnd:
+      "\u0646\u0647\u0627\u064a\u0629 \u0635\u0641\u062d\u0629 \u0627\u0644\u0645\u0635\u062d\u0641 {page}",
     wordMeaningAria: "\u0645\u0639\u0646\u0649 {word}\u060c \u0627\u0644\u0622\u064a\u0629 {ayah}",
     wordMeaningTitle: "\u0645\u0639\u0646\u0649 \u0627\u0644\u0643\u0644\u0645\u0629",
     closeWordMeaning: "\u0625\u063a\u0644\u0627\u0642 \u0645\u0639\u0646\u0649 \u0627\u0644\u0643\u0644\u0645\u0629",
@@ -683,6 +713,11 @@ const ar = {
     undo: "\u062a\u0631\u0627\u062c\u0639",
     tapWhenFinished: "اضغط عند الإتمام",
     completedSurah: "تمت القراءة بنجاح",
+  },
+  counter: {
+    sound: "صوت العداد",
+    muteSound: "كتم صوت العداد",
+    enableSound: "تشغيل صوت العداد",
   },
   auth: {
     welcome: "\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0623\u0630\u0643\u0627\u0631",

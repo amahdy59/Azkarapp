@@ -158,10 +158,17 @@ test("full surahs count only from the counter and expose sourced difficult-word 
 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
+  const endCounter = page.getByTestId("long-surah-end-counter");
   await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
   await expect(counter).toHaveAccessibleName(/0 \/ 1/);
+  await expect(page.getByTestId("mushaf-page")).toHaveCount(12);
+  await expect(page.getByTestId("mushaf-page-separator")).toHaveCount(11);
+  await expect(page.getByRole("heading", { name: "Mushaf page 293" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Mushaf page 304" })).not.toBeInViewport();
+  await expect(endCounter).not.toBeInViewport();
 
   await reader.click({ position: { x: 2, y: 320 } });
+  await page.keyboard.press("Space");
   await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
 
   const difficultWords = page.getByTestId("quran-word-help");
@@ -185,6 +192,9 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   await meaningSheet.getByRole("button", { name: "Close word meaning", exact: true }).click();
   await expect(meaningSheet).toBeHidden();
   await page.waitForTimeout(500);
+
+  await endCounter.scrollIntoViewIfNeeded();
+  await expect(endCounter).toBeInViewport();
   const completionCue = page.getByTestId("counter-completion-cue");
   await counter.click();
   await expect(completionCue.or(page.getByTestId("friday-mode-screen"))).toBeVisible();

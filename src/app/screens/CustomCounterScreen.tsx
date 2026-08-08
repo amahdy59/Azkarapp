@@ -6,8 +6,10 @@ import { Modal } from "../components/ResponsiveSheet";
 import { AuthenticZikrLibrarySheet } from "../components/AuthenticZikrLibrarySheet";
 import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/authenticAzkar";
 import { formatNumerals } from "../formatting";
+import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
+import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { Check, RotateCcw, Volume2, Sparkles, ChevronDown, Play } from "../components/icons";
+import { Check, RotateCcw, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
 import { PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
 
 function vibrate(pattern: number | number[]) {
@@ -36,7 +38,7 @@ export function CustomCounterScreen({
   const [target, setTarget] = useState<number>(0);
   const [count, setCount] = useState<number>(0);
   const [laps, setLaps] = useState<number>(0);
-  const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
+  const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
   const [showLibrarySheet, setShowLibrarySheet] = useState<boolean>(false);
   const [pulse, setPulse] = useState<number>(0);
   const [showCompletionDialog, setShowCompletionDialog] = useState<boolean>(false);
@@ -54,6 +56,7 @@ export function CustomCounterScreen({
     const nextCount = count + 1;
     setCount(nextCount);
     setPulse((v) => v + 1);
+    playClickFeedback();
 
     if (hapticFeedback) {
       vibrate(8);
@@ -65,7 +68,7 @@ export function CustomCounterScreen({
         vibrate([30, 50, 40, 50, 60]);
       }
     }
-  }, [isTargetComplete, count, hapticFeedback, isTargetMode, target]);
+  }, [isTargetComplete, count, hapticFeedback, isTargetMode, playClickFeedback, target]);
 
   const handleUndo = useCallback(() => {
     if (count > 0) {
@@ -97,13 +100,6 @@ export function CustomCounterScreen({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
-      if (
-        activeEl &&
-        (activeEl.tagName === "INPUT" || activeEl.tagName === "TEXTAREA" || activeEl.getAttribute("role") === "search")
-      ) {
-        return;
-      }
-
       if (e.key === "Escape") {
         e.preventDefault();
         if (showLibrarySheet) {
@@ -111,7 +107,17 @@ export function CustomCounterScreen({
         } else {
           onBack();
         }
-      } else if (e.key === " " || e.code === "Space") {
+        return;
+      }
+
+      const focusedControl =
+        activeEl instanceof Element &&
+        activeEl.closest(
+          'button, a[href], input, textarea, select, [contenteditable="true"], [role="button"], [role="checkbox"], [role="radio"], [role="search"], [role="switch"], [role="textbox"]',
+        );
+      if (focusedControl) return;
+
+      if (e.key === " " || e.code === "Space") {
         e.preventDefault();
         if (!showLibrarySheet) {
           handleTap();
@@ -136,10 +142,10 @@ export function CustomCounterScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="relative flex flex-col page-content-center"
+      className="relative flex flex-col overflow-y-auto page-content-center"
       screenName={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
     >
-      <div className="relative z-10 flex flex-col min-h-screen flex-1">
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <Header
           title={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
@@ -148,23 +154,33 @@ export function CustomCounterScreen({
           right={
             <button
               type="button"
-              onClick={() => setSoundEnabled(!soundEnabled)}
-              className="interactive-elem flex h-10 w-10 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={isArabic ? "الصوت والاهتزاز" : "Sound & Haptics"}
+              onClick={toggleSound}
+              className="interactive-elem flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={t(language, "counter.sound")}
+              aria-pressed={soundEnabled}
+              title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+              data-testid="counter-sound-toggle"
             >
-              <Volume2 size={20} className={soundEnabled ? "text-primary" : "text-muted-foreground/40"} />
+              {soundEnabled ? (
+                <Volume2 size={20} className="text-primary" aria-hidden="true" />
+              ) : (
+                <VolumeX size={20} className="text-muted-foreground" aria-hidden="true" />
+              )}
             </button>
           }
         />
 
-        <div className="flex min-h-0 flex-1 flex-col justify-between px-5 pb-6 pt-2">
+        <div
+          className="mx-auto flex min-h-0 w-full max-w-[40rem] flex-1 flex-col justify-between px-4 pb-6 pt-2 sm:px-5"
+          data-testid="custom-counter-content"
+        >
           {/* Top Controls: Zikr Card & Target Picker */}
           <div className="space-y-3">
             {/* Selected Authentic Zikr Card */}
             <button
               type="button"
               onClick={() => setShowLibrarySheet(true)}
-              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised transition-colors hover:border-amber-500/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <div className="min-w-0 flex-1 space-y-1">
                 <span className="block text-[0.75rem] font-bold text-muted-foreground">
@@ -194,7 +210,7 @@ export function CustomCounterScreen({
           </div>
 
           {/* Central Counter Display Surface */}
-          <div className="my-auto flex flex-col items-center justify-center py-6">
+          <div className="my-auto flex flex-col items-center justify-center py-4 sm:py-6">
             <div className="relative flex items-center justify-center">
               <PulseRings trigger={pulse} size={220} count={count} total={target} />
 

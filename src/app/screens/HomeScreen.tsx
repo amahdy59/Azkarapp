@@ -1,14 +1,22 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, Clock, ArrowLeft, ArrowRight } from "../components/icons";
+import { Calendar, Zap, Clock, ArrowLeft, ArrowRight, Bookmark, Sparkles } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { estimateCompletionMinutes, getAzkarForMode, getRoutineProgress, isRoutineCategory } from "../content/azkar";
+import {
+  ALL_AZKAR,
+  estimateCompletionMinutes,
+  getAzkarByCategory,
+  getAzkarForMode,
+  getRoutineProgress,
+  isRoutineCategory,
+  registerLazyCollection,
+} from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
-import { formatDisplayDate, formatNumerals } from "../formatting";
+import { formatDisplayDate, formatDisplayTime, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
@@ -30,7 +38,6 @@ import type {
  * all four main collections toward leaves and palms.
  */
 const HOME_WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
-
 type HomeActionKind = "resume" | "start" | "again";
 
 export type HomeAction = {
@@ -39,6 +46,14 @@ export type HomeAction = {
   completedCount: number;
   totalCount: number;
   kind: HomeActionKind;
+};
+
+type HomeSavedItem = {
+  id: string;
+  category: CategoryId;
+  arabicText: string;
+  translation: string;
+  source: "main" | "comprehensive" | "friday";
 };
 
 function suggestedCategoryId(date: Date, location?: LocationSettings): CategoryId {
@@ -71,6 +86,10 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
     title: t(language, "home.beforeSleepTitle"),
     desc: t(language, "home.beforeSleepDesc"),
   };
+}
+
+export function getHomeBackgroundCategoryId(now: Date, routineCategoryId: CategoryId): CategoryId {
+  return now.getDay() === 5 ? "friday_kahf" : routineCategoryId;
 }
 
 /** Centred section heading with rules on either side, per the Home design. */
@@ -165,6 +184,10 @@ export function HomeScreen({
   routineModes,
   onSetRoutineMode,
   onOpenCustomCounter,
+  savedZikrIds,
+  onOpenSavedZikr,
+  onOpenSavedLibrary,
+  onOpenBenefits,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -181,6 +204,10 @@ export function HomeScreen({
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
   onOpenCustomCounter?: () => void;
+  savedZikrIds: Set<string>;
+  onOpenSavedZikr?: (categoryId: CategoryId, index: number) => void;
+  onOpenSavedLibrary?: () => void;
+  onOpenBenefits?: () => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -248,6 +275,56 @@ export function HomeScreen({
   const streakDays = gardenSummary.currentUsageStreak ?? gardenSummary.activeDaysLast7 ?? 0;
   const activeDaysThisWeek = gardenSummary.activeDaysLast7 ?? 0;
   const totalDays = gardenSummary.lifetimePalms * 3 + gardenSummary.today.goldenLeafCount;
+  const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
+  const savedPreview = useMemo(() => {
+    const available: HomeSavedItem[] = ALL_AZKAR.filter(
+      (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
+    ).map((zikr) => ({
+      id: zikr.id,
+      category: zikr.category,
+      arabicText: zikr.arabicText,
+      translation: zikr.translation,
+      source: "main",
+    }));
+    const comprehensiveCategory = CATEGORIES.find((category) => category.id === "comprehensive_duas")!;
+    for (const id of savedZikrIds) {
+      if (!id.startsWith("friday-dua-") && !id.startsWith("comprehensive-dua-")) continue;
+      available.push({
+        id,
+        category: "comprehensive_duas",
+        arabicText: comprehensiveCategory.nameArabic,
+        translation: comprehensiveCategory.name,
+        source: "comprehensive",
+      });
+    }
+    if (savedZikrIds.has("friday-kahf")) {
+      const fridayCategory = CATEGORIES.find((category) => category.id === "friday_kahf")!;
+      available.unshift({
+        id: "friday-kahf",
+        category: "friday_kahf",
+        arabicText: fridayCategory.nameArabic,
+        translation: fridayCategory.name,
+        source: "friday",
+      });
+    }
+    return available.slice(0, 3);
+  }, [savedZikrIds]);
+
+  const openSavedZikr = async (zikr: HomeSavedItem) => {
+    if (zikr.source === "friday") {
+      const { FRIDAY_KAHF } = await import("../content/fridayKahf");
+      registerLazyCollection("friday_kahf", FRIDAY_KAHF);
+      onOpenSavedZikr?.("friday_kahf", 0);
+      return;
+    }
+    if (zikr.source === "comprehensive") {
+      const { COMPREHENSIVE_DUAS } = await import("../content/comprehensiveDuas");
+      registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+    }
+    const items = getAzkarByCategory(zikr.category);
+    const index = items.findIndex((item) => item.id === zikr.id);
+    if (index >= 0) onOpenSavedZikr?.(zikr.category, index);
+  };
 
   return (
     <ScreenContainer
@@ -257,33 +334,47 @@ export function HomeScreen({
     >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Top utility bar: quick actions (start) · date & next prayer (centre) · progress badges (end) */}
+      {/* Two-row utility bar: date first, current time/prayer second, with the
+          streak intentionally stacked above the palm status. */}
       <div className="relative z-30 border-b border-border/40 bg-card/95 px-page py-2">
-        <header className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-2" dir={direction}>
-          {/* Centre: next prayer countdown and today's date */}
-          <div className="flex flex-wrap items-center justify-center gap-2" dir="auto">
-            <div
-              data-testid="next-prayer"
-              className="flex items-center gap-2 whitespace-nowrap rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-[0.8125rem] font-semibold text-foreground"
-            >
-              <Clock className="h-[15px] w-[15px] shrink-0 text-primary" aria-hidden="true" />
-              <span className="flex items-center gap-1">
-                <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-                <span>{isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}</span>
-              </span>
-            </div>
-            <div
-              data-testid="hijri-date"
-              className="flex items-center gap-2 whitespace-nowrap rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-semibold text-foreground"
-            >
-              <Calendar className="h-[15px] w-[15px] shrink-0 text-muted-foreground" aria-hidden="true" />
-              <span>{formatDisplayDate(now, language, calendarType)}</span>
-            </div>
+        <header
+          data-testid="home-utility-header"
+          className="grid w-full grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-2 gap-y-1.5 sm:gap-x-3"
+          dir={direction}
+        >
+          <div
+            data-testid="hijri-date"
+            className="row-start-1 flex min-w-0 items-center gap-2 text-[0.75rem] font-bold text-foreground sm:text-[0.8125rem]"
+          >
+            <Calendar className="h-[15px] w-[15px] shrink-0 text-muted-foreground" aria-hidden="true" />
+            <time className="truncate" dateTime={now.toISOString()}>
+              {formatDisplayDate(now, language, calendarType)}
+            </time>
           </div>
 
-          {/* End: lifetime palms and daily streak */}
           <div
-            className="flex items-center gap-2"
+            data-testid="next-prayer"
+            className="row-start-2 flex min-w-0 items-center gap-2 text-[0.75rem] font-semibold text-muted-foreground sm:text-[0.8125rem]"
+          >
+            <Clock className="h-[15px] w-[15px] shrink-0 text-primary" aria-hidden="true" />
+            <time
+              data-testid="current-time"
+              className="shrink-0 font-extrabold text-foreground"
+              dateTime={now.toISOString()}
+            >
+              {formatDisplayTime(now, language)}
+            </time>
+            <span className="text-border" aria-hidden="true">
+              ·
+            </span>
+            <span className="min-w-0 truncate" dir="auto">
+              {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
+              <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+            </span>
+          </div>
+
+          <div
+            className="col-start-2 row-span-2 row-start-1 grid min-w-[4.25rem] grid-rows-2 gap-1"
             aria-label={
               isArabic
                 ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
@@ -291,26 +382,26 @@ export function HomeScreen({
             }
           >
             <div
-              className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-bold text-foreground"
+              data-testid="header-streak"
+              className="flex items-center justify-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-1 text-[0.6875rem] font-black text-foreground"
+              title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+            >
+              <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
+              <span>{formatNumerals(streakDays, language)}</span>
+              <span className="hidden sm:inline">{isArabic ? "أيام" : "days"}</span>
+            </div>
+            <div
+              data-testid="header-palms"
+              className="flex items-center justify-center gap-1 rounded-full border border-border/60 bg-muted/50 px-2 py-1 text-[0.6875rem] font-black text-foreground"
               title={isArabic ? "أشجار النخيل" : "Palms"}
             >
               <PalmTreeMark
-                size={15}
+                size={14}
                 filled={gardenSummary.lifetimePalms > 0}
                 className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
               />
-              <span dir="auto">
-                {formatNumerals(gardenSummary.lifetimePalms, language)} {isArabic ? "نخلة" : "palms"}
-              </span>
-            </div>
-            <div
-              className="flex items-center gap-1.5 rounded-full border border-border/60 bg-muted/50 px-3 py-1.5 text-[0.8125rem] font-bold text-foreground"
-              title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
-            >
-              <Zap className="h-[15px] w-[15px] text-primary" strokeWidth={2.5} aria-hidden="true" />
-              <span dir="auto">
-                {formatNumerals(streakDays, language)} {isArabic ? "أيام" : "days"}
-              </span>
+              <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
+              <span className="hidden sm:inline">{isArabic ? "نخلة" : "palms"}</span>
             </div>
           </div>
         </header>
@@ -328,7 +419,7 @@ export function HomeScreen({
           {/* Hero card. The scene image is contained by this card rather than
               washed across the whole screen, so the page keeps its own surface. */}
           <div className="relative overflow-hidden rounded-3xl shadow-raised">
-            <TimeOfDayBackground categoryId={reminderInfo.categoryId} variant="card" />
+            <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-center lg:gap-5">
               {isComplete ? (
                 <div className="lg:col-span-3">
@@ -487,6 +578,109 @@ export function HomeScreen({
               value={formatNumerals(totalDays, language)}
               subtitle={isArabic ? "ذكراً اليوم" : "azkar today"}
             />
+          </div>
+
+          <SectionDivider label={t(language, "home.yourLibrary")} />
+
+          <div className="grid items-stretch gap-3.5 lg:grid-cols-2">
+            <section
+              aria-labelledby="home-saved-heading"
+              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+              data-testid="home-saved-section"
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="text-start">
+                  <p className="text-[0.75rem] font-black uppercase tracking-wide text-primary">
+                    {t(language, "home.savedEyebrow")}
+                  </p>
+                  <h2 id="home-saved-heading" className="mt-1 text-[1.125rem] font-black text-foreground">
+                    {t(language, "home.savedTitle")}
+                  </h2>
+                </div>
+                <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary">
+                  {formatNumerals(savedZikrIds.size, language)}
+                </span>
+              </div>
+
+              {savedPreview.length > 0 ? (
+                <div className="mt-4 space-y-2.5">
+                  {savedPreview.map((zikr) => {
+                    const category = CATEGORIES.find((item) => item.id === zikr.category)!;
+                    return (
+                      <button
+                        key={zikr.id}
+                        type="button"
+                        onClick={() => void openSavedZikr(zikr)}
+                        className="interactive-elem flex min-h-14 w-full items-center gap-3 rounded-2xl border border-border/50 bg-background/80 px-3 py-2.5 text-start transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                          <Bookmark size={18} className="fill-current" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block text-[0.6875rem] font-bold text-primary">
+                            {isArabic ? category.nameArabic : category.name}
+                          </span>
+                          <span
+                            className={`mt-0.5 block truncate text-[0.875rem] font-bold text-foreground ${isArabic ? "font-arabic" : "font-sans"}`}
+                            dir={isArabic ? "rtl" : "ltr"}
+                          >
+                            {isArabic ? zikr.arabicText : zikr.translation}
+                          </span>
+                        </span>
+                        {direction === "rtl" ? (
+                          <ArrowLeft size={17} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+                        ) : (
+                          <ArrowRight size={17} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="mt-4 text-start text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
+                  {t(language, "home.savedEmpty")}
+                </p>
+              )}
+
+              {onOpenSavedLibrary && (
+                <button
+                  type="button"
+                  onClick={onOpenSavedLibrary}
+                  className="mt-4 flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 text-[0.875rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  {t(language, "home.openSaved")}
+                </button>
+              )}
+            </section>
+
+            {onOpenBenefits && (
+              <button
+                type="button"
+                onClick={onOpenBenefits}
+                className="interactive-elem group flex min-h-[12rem] w-full flex-col justify-between rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 via-card to-card p-5 text-start shadow-raised transition-colors hover:border-amber-500/55 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                data-testid="home-benefits-card"
+              >
+                <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
+                  <Sparkles size={24} aria-hidden="true" />
+                </span>
+                <span className="mt-5 block">
+                  <span className="block text-[1.25rem] font-black text-foreground">
+                    {t(language, "benefits.title")}
+                  </span>
+                  <span className="mt-1.5 block text-[0.875rem] font-semibold leading-6 text-muted-foreground">
+                    {t(language, "benefits.homeDescription")}
+                  </span>
+                  <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-800 dark:text-amber-300">
+                    {t(language, "benefits.open")}
+                    {direction === "rtl" ? (
+                      <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+                    ) : (
+                      <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                    )}
+                  </span>
+                </span>
+              </button>
+            )}
           </div>
 
           <SectionDivider label={isArabic ? "أذكار يوم الجمعة" : "Friday Azkar"} />

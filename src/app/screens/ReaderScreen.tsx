@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
+import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import {
   BookOpen,
@@ -14,10 +15,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Volume2,
+  VolumeX,
 } from "../components/icons";
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
+import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
@@ -29,6 +32,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahFooter } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
+import { MushafPageReader } from "../components/MushafPageReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { getQuranWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 import {
@@ -158,6 +162,7 @@ export function ReaderScreen({
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const longSurah = isLongSurah(z);
 
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
@@ -166,6 +171,7 @@ export function ReaderScreen({
   const [useCompactCounter, setUseCompactCounter] = useState(false);
   const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
+  const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
@@ -181,6 +187,7 @@ export function ReaderScreen({
       collectionCompletedCount,
       hapticFeedback,
       vibrate,
+      onCount: playClickFeedback,
       onComplete,
       onAdvance,
     });
@@ -226,6 +233,11 @@ export function ReaderScreen({
     const content = readingContentRef.current;
     if (!main || !content) return;
 
+    if (longSurah) {
+      setUseCompactCounter(false);
+      return;
+    }
+
     let frame = 0;
     const measure = () => {
       cancelAnimationFrame(frame);
@@ -247,7 +259,7 @@ export function ReaderScreen({
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [z?.id, textSize, showTranslation, showTransliteration, language]);
+  }, [z?.id, textSize, showTranslation, showTransliteration, language, longSurah]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -276,6 +288,7 @@ export function ReaderScreen({
       }
 
       if (e.key === " " || e.code === "Space") {
+        if (longSurah) return;
         e.preventDefault();
         handleTap();
       } else if (e.key === "ArrowRight") {
@@ -322,13 +335,14 @@ export function ReaderScreen({
     handleToggleSaved,
     benefitOpen,
     selectedWordMeanings,
+    longSurah,
   ]);
 
   if (!z || !category) {
     return null;
   }
 
-  const counterInstruction = t(language, z.isSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere");
+  const counterInstruction = t(language, longSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere");
   const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
@@ -373,6 +387,20 @@ export function ReaderScreen({
 
   const renderCounterActions = () => (
     <div className="flex min-w-0 items-center gap-2">
+      <IconButton
+        onClick={(event) => {
+          event.stopPropagation();
+          toggleSound();
+        }}
+        label={t(language, "counter.sound")}
+        title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+        aria-pressed={soundEnabled}
+        data-testid="reader-counter-sound-toggle"
+        className="shrink-0 border border-border-control bg-card text-card-foreground"
+      >
+        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+      </IconButton>
+
       <IconButton
         onClick={(event) => {
           event.stopPropagation();
@@ -439,11 +467,20 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      className={`mt-1 w-full rounded-2xl px-4 pb-2 pt-2 ${z.isSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
+      className={`mt-1 w-full rounded-3xl border border-border/40 bg-card px-4 pb-2 pt-2 shadow-raised ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
     >
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
-      {wordMeanings.length > 0 ? (
+      {longSurah ? (
+        <MushafPageReader
+          zikr={z}
+          arabicText={displayArabicText}
+          meanings={wordMeanings}
+          language={language}
+          textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+          onSelectMeanings={setSelectedWordMeanings}
+        />
+      ) : wordMeanings.length > 0 ? (
         <QuranWordText
           text={displayArabicText}
           meanings={wordMeanings}
@@ -591,7 +628,7 @@ export function ReaderScreen({
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
-      data-counting-mode={z.isSurah ? "counter-only" : "canvas"}
+      data-counting-mode={longSurah ? "counter-only" : "canvas"}
       dir={direction}
       style={categoryThemeStyles}
       screenName={isArabic ? category.nameArabic : category.name}
@@ -757,8 +794,8 @@ export function ReaderScreen({
         ref={readerMainRef}
         className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
       >
-        {/* Upper section: scrollable Zikr content — long chapters (Tabarak, Sajdah) scroll
-          within this region; the counter below is always visible and never covered. */}
+        {/* Long chapters keep their completion control after the final Mushaf page;
+            ordinary adhkar retain the fixed counter below this scroll region. */}
         <div
           role="region"
           tabIndex={0}
@@ -776,11 +813,15 @@ export function ReaderScreen({
             <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
               {renderReadingContent()}
             </div>
+            {longSurah && (
+              <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
+                {renderCounterPanel()}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Lower section: Counter panel — shrink-0 ensures it is always pinned and never covered */}
-        <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>
+        {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
       </div>
 
       <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>

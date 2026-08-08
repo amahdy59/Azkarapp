@@ -29,4 +29,29 @@ describe("CategoryScreen comprehensive-dua session", () => {
     fireEvent.click(screen.getByRole("button", { name: /Start Session/ }));
     expect(onZikr).toHaveBeenCalledWith(0);
   });
+
+  it("turns the sleep preparation checklist into visible, announced progress", () => {
+    render(
+      <CategoryScreen
+        catId="before_sleep"
+        completed={new Set()}
+        isArabic={false}
+        direction="ltr"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId("sleep-preparation-count")).toHaveTextContent("0 / 3");
+    const steps = ["Perform wudu", "Dust the bed", "Lie on the right side"];
+    for (const step of steps) fireEvent.click(screen.getByRole("checkbox", { name: step }));
+
+    expect(screen.getByTestId("sleep-preparation-count")).toHaveTextContent("3 / 3");
+    expect(screen.getByRole("status")).toHaveTextContent("Preparation complete");
+
+    fireEvent.click(screen.getByRole("checkbox", { name: steps[0] }));
+    expect(screen.queryByTestId("sleep-preparation-complete")).not.toBeInTheDocument();
+  });
 });

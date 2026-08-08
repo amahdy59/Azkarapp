@@ -191,7 +191,7 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-2xl border border-border/40 bg-card p-4.5 text-start transition-all shadow-raised hover:border-amber-500/40 hover:shadow-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-3xl border border-border/40 bg-card p-4.5 text-start transition-all shadow-raised hover:border-amber-500/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
@@ -238,10 +238,10 @@ export function CategoryScreen({
       <div
         key={z.id}
         id={`zikr-card-${index}`}
-        className={`flex w-full flex-col gap-3.5 rounded-2xl border p-4.5 transition-all shadow-raised ${
+        className={`flex w-full flex-col gap-3.5 rounded-3xl border p-4.5 transition-all shadow-raised ${
           isCardCompleted
             ? "border-emerald-500/30 bg-emerald-500/15 dark:bg-emerald-950/30"
-            : "border-border/40 bg-card hover:border-primary/40 hover:shadow-xl"
+            : "border-border/40 bg-card hover:border-primary/40"
         }`}
       >
         {/* Card Header & Text — Clicking text opens full Reader */}
@@ -523,9 +523,23 @@ export function CategoryScreen({
               className="mb-5 rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
               aria-labelledby="sleep-prepare-title"
             >
-              <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
-                {t(language, "category.prepareTitle")}
-              </h2>
+              <div className="flex items-center justify-between gap-3">
+                <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
+                  {t(language, "category.prepareTitle")}
+                </h2>
+                <span className="text-[0.75rem] font-black text-primary" data-testid="sleep-preparation-count">
+                  {formatNumerals(preparationSteps.size, language)} / {formatNumerals(3, language)}
+                </span>
+              </div>
+              <div className="mt-3">
+                <ProgressBar
+                  value={preparationSteps.size}
+                  max={3}
+                  height={6}
+                  direction={direction}
+                  aria-label={t(language, "category.prepareProgress")}
+                />
+              </div>
               <div className="mt-3 grid gap-2">
                 {(
                   [
@@ -536,7 +550,11 @@ export function CategoryScreen({
                 ).map(([id, labelKey]) => (
                   <label
                     key={id}
-                    className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl bg-muted/60 px-3"
+                    className={`flex min-h-12 cursor-pointer items-center gap-3 rounded-2xl border px-3 transition-colors ${
+                      preparationSteps.has(id)
+                        ? "border-primary/35 bg-primary/10"
+                        : "border-border/50 bg-muted/60 hover:border-primary/30"
+                    }`}
                   >
                     <input
                       type="checkbox"
@@ -549,12 +567,43 @@ export function CategoryScreen({
                           return next;
                         })
                       }
-                      className="size-5 accent-primary"
+                      className="peer sr-only"
                     />
-                    <span className="text-[0.8125rem] font-bold text-foreground">{t(language, labelKey)}</span>
+                    <span
+                      className={`flex size-7 shrink-0 items-center justify-center rounded-xl border transition-colors peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring ${
+                        preparationSteps.has(id)
+                          ? "border-primary bg-primary text-primary-foreground"
+                          : "border-border bg-background text-transparent"
+                      }`}
+                      aria-hidden="true"
+                    >
+                      <Check size={16} strokeWidth={3} />
+                    </span>
+                    <span className="min-w-0 flex-1 text-[0.8125rem] font-bold text-foreground">
+                      {t(language, labelKey)}
+                    </span>
                   </label>
                 ))}
               </div>
+              {preparationSteps.size === 3 && (
+                <div
+                  role="status"
+                  className="celebration-pop mt-3 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-start"
+                  data-testid="sleep-preparation-complete"
+                >
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950">
+                    <Check size={19} strokeWidth={3} aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block text-[0.8125rem] font-black text-foreground">
+                      {t(language, "category.prepareCompleteTitle")}
+                    </span>
+                    <span className="mt-0.5 block text-[0.75rem] font-semibold leading-5 text-muted-foreground">
+                      {t(language, "category.prepareCompleteBody")}
+                    </span>
+                  </span>
+                </div>
+              )}
             </section>
           )}
 

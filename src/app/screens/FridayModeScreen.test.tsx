@@ -15,6 +15,7 @@ describe("FridayModeScreen", () => {
         direction="ltr"
         kahfCompletedCount={1}
         duasCompletedCount={0}
+        duasTotalCount={47}
         onBack={() => undefined}
         onStartKahf={onStartKahf}
         onOpenSalawat={() => undefined}
@@ -36,6 +37,7 @@ describe("FridayModeScreen", () => {
         direction="ltr"
         kahfCompletedCount={0}
         duasCompletedCount={0}
+        duasTotalCount={47}
         onBack={() => undefined}
         onStartKahf={() => undefined}
         onOpenSalawat={onOpenSalawat}
@@ -56,6 +58,7 @@ describe("FridayModeScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: /Comprehensive Duas/ }));
     expect(onStartDuasSession).toHaveBeenCalledOnce();
     expect(screen.queryByRole("button", { name: "Show benefit and source" })).not.toBeInTheDocument();
+    expect(screen.queryByText("Set aside a quiet time for dua before sunset.")).not.toBeInTheDocument();
   });
 
   it("derives the three smart-card completions automatically", () => {
@@ -67,6 +70,7 @@ describe("FridayModeScreen", () => {
         direction="ltr"
         kahfCompletedCount={1}
         duasCompletedCount={47}
+        duasTotalCount={47}
         onBack={() => undefined}
         onStartKahf={() => undefined}
         onOpenSalawat={() => undefined}
@@ -75,6 +79,29 @@ describe("FridayModeScreen", () => {
     );
 
     expect(screen.getByText("3 / 10")).toBeInTheDocument();
+    expect(screen.getByText(/blessed step/i)).toBeInTheDocument();
     expect(screen.getAllByRole("checkbox")).toHaveLength(7);
+  });
+
+  it("announces the completed Friday routine after all weekly practices are done", () => {
+    writeFridaySalawatProgress({ count: 10, target: 10 });
+    render(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={1}
+        duasCompletedCount={47}
+        duasTotalCount={47}
+        onBack={() => undefined}
+        onStartKahf={() => undefined}
+        onOpenSalawat={() => undefined}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+
+    for (const practice of screen.getAllByRole("checkbox")) fireEvent.click(practice);
+
+    expect(screen.getAllByText("10 / 10").length).toBeGreaterThan(0);
+    expect(screen.getByRole("status")).toHaveTextContent("may Allah accept");
   });
 });

@@ -572,12 +572,22 @@ export function clearStoredAppData() {
     "azkarapp.foreground-reminders.v1",
     "azkarapp.install-dismissed",
     "azkarapp.onboarding-complete.v1",
+    "azkarapp.counter-sound.v1",
   ]) {
     try {
       window.localStorage.removeItem(key);
     } catch {
       // Continue clearing any remaining app-owned keys when storage is partially unavailable.
     }
+  }
+
+  try {
+    for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.localStorage.key(index);
+      if (key?.startsWith("azkarapp.friday-")) window.localStorage.removeItem(key);
+    }
+  } catch {
+    // Fixed keys above are still cleared when storage enumeration is unavailable.
   }
 }
 

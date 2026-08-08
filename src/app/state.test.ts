@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_APP_STATE,
   MAX_STORED_SESSIONS,
+  clearStoredAppData,
   clearPrivateAppData,
   fromCompletedSets,
   loadAppState,
@@ -54,6 +55,22 @@ describe("app state persistence", () => {
 
     expect(saveAppState(DEFAULT_APP_STATE)).toBe(false);
     write.mockRestore();
+  });
+
+  it("clears dynamic Friday and counter-sound data without touching unrelated origin storage", () => {
+    window.localStorage.setItem("azkarapp.state.v1", "{}");
+    window.localStorage.setItem("azkarapp.counter-sound.v1", "false");
+    window.localStorage.setItem("azkarapp.friday-duas.2026-W31", '["friday-dua-01"]');
+    window.localStorage.setItem("azkarapp.friday-checklist.2026-W31", "[]");
+    window.localStorage.setItem("unrelated.product.key", "keep");
+
+    clearStoredAppData();
+
+    expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.counter-sound.v1")).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.friday-duas.2026-W31")).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.friday-checklist.2026-W31")).toBeNull();
+    expect(window.localStorage.getItem("unrelated.product.key")).toBe("keep");
   });
 
   it("retains only the newest bounded session history", () => {

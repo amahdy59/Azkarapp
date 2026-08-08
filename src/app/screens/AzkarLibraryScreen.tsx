@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import { Search, Bookmark } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -17,9 +17,12 @@ import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/ca
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode } from "../types";
+import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
 
-type LibrarySection = "collections" | "saved";
+export type LibrarySection = "collections" | "saved";
+type SavedLibraryItem = Pick<Zikr, "id" | "category" | "arabicText" | "translation" | "transliteration"> & {
+  lazyCollection?: "friday_kahf";
+};
 
 const COMPREHENSIVE_DUA_ITEMS = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction);
 
@@ -33,26 +36,40 @@ export function AzkarLibraryScreen({
   savedZikrIds,
   routineModes,
   onOpenCustomCounter,
+  initialSection = "collections",
 }: {
   completed: Record<CategoryId, Set<string>>;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onCategory: (category: CategoryId) => void;
   onZikr: (category: CategoryId, index: number) => void;
-  onSearch: () => void;
+  onSearch: (query: string) => void;
   savedZikrIds: Set<string>;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onOpenCustomCounter?: () => void;
+  initialSection?: LibrarySection;
 }) {
-  const [section, setSection] = useState<LibrarySection>("collections");
+  const [section, setSection] = useState<LibrarySection>(initialSection);
+  const [searchQuery, setSearchQuery] = useState("");
+  const searchInputId = useId();
   const isArabic = language === "ar";
-  const savedAzkar = useMemo(
-    () =>
-      [...ALL_AZKAR, ...COMPREHENSIVE_DUA_ITEMS].filter(
-        (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
-      ),
-    [savedZikrIds],
-  );
+  const savedAzkar = useMemo(() => {
+    const available: SavedLibraryItem[] = [...ALL_AZKAR, ...COMPREHENSIVE_DUA_ITEMS].filter(
+      (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
+    );
+    if (savedZikrIds.has("friday-kahf")) {
+      const category = CATEGORIES.find((item) => item.id === "friday_kahf")!;
+      available.unshift({
+        id: "friday-kahf",
+        category: "friday_kahf",
+        arabicText: category.nameArabic,
+        translation: category.name,
+        transliteration: "Surah Al-Kahf",
+        lazyCollection: "friday_kahf",
+      });
+    }
+    return available;
+  }, [savedZikrIds]);
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
@@ -60,34 +77,61 @@ export function AzkarLibraryScreen({
         <header className="shrink-0 px-5 pb-4 pt-3">
           <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>
           <p className="mt-1 text-[0.8125rem] text-muted-foreground">{t(language, "library.subtitle")}</p>
-          <button
-            type="button"
-            onClick={onSearch}
-            className="interactive-elem mt-4 flex h-12 w-full items-center gap-3 rounded-2xl border border-border/40 bg-card px-4 text-start text-[0.875rem] text-muted-foreground shadow-raised focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-label={t(language, "library.search")}
-          >
-            <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
-            <span>{t(language, "library.search")}</span>
-          </button>
-          <TabList
-            value={section}
-            onChange={setSection}
-            direction={direction}
-            idPrefix="library"
-            aria-label={t(language, "library.title")}
-            className="mt-4 grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
-            itemClassName={(selected) =>
-              `min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
-              }`
-            }
-            tabs={(["collections", "saved"] as const).map((value) => ({
-              value,
-              label: `${t(language, `library.${value}`)}${
-                value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
-              }`,
-            }))}
-          />
+          <div className="mt-4 grid gap-4 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)] min-[900px]:items-end">
+            <form
+              className="min-w-0"
+              onSubmit={(event) => {
+                event.preventDefault();
+                const query = searchQuery.trim();
+                if (query) onSearch(query);
+              }}
+            >
+              <label
+                htmlFor={searchInputId}
+                className="mb-1.5 block text-[0.75rem] font-semibold text-muted-foreground"
+              >
+                {t(language, "library.search")}
+              </label>
+              <div className="flex h-12 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised focus-within:ring-[3px] focus-within:ring-ring">
+                <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                <input
+                  id={searchInputId}
+                  type="text"
+                  value={searchQuery}
+                  placeholder={t(language, "library.search")}
+                  dir={searchQuery.trim() ? "auto" : direction}
+                  lang={language}
+                  autoComplete="off"
+                  onChange={(event) => {
+                    const value = event.currentTarget.value;
+                    setSearchQuery(value);
+                    const query = value.trim();
+                    if (query) onSearch(query);
+                  }}
+                  className="h-11 min-w-0 flex-1 bg-transparent text-start text-[0.875rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
+                />
+              </div>
+            </form>
+            <TabList
+              value={section}
+              onChange={setSection}
+              direction={direction}
+              idPrefix="library"
+              aria-label={t(language, "library.title")}
+              className="grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
+              itemClassName={(selected) =>
+                `min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
+                }`
+              }
+              tabs={(["collections", "saved"] as const).map((value) => ({
+                value,
+                label: `${t(language, `library.${value}`)}${
+                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
+                }`,
+              }))}
+            />
+          </div>
         </header>
 
         <div
@@ -185,7 +229,13 @@ export function AzkarLibraryScreen({
                     <button
                       key={zikr.id}
                       type="button"
-                      onClick={() => {
+                      onClick={async () => {
+                        if (zikr.lazyCollection === "friday_kahf") {
+                          const { FRIDAY_KAHF } = await import("../content/fridayKahf");
+                          registerLazyCollection("friday_kahf", FRIDAY_KAHF);
+                          onZikr("friday_kahf", 0);
+                          return;
+                        }
                         const isComprehensiveDuas = zikr.category === "comprehensive_duas";
                         const index = (
                           isComprehensiveDuas ? COMPREHENSIVE_DUA_ITEMS : getAzkarByCategory(zikr.category)
@@ -195,7 +245,7 @@ export function AzkarLibraryScreen({
                         }
                         onZikr(zikr.category, index);
                       }}
-                      className="flex min-h-[100px] w-full items-start gap-3 rounded-2xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-amber-500/40 hover:shadow-xl transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="flex min-h-[100px] w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-amber-500/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

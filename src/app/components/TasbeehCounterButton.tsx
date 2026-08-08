@@ -59,11 +59,11 @@ export function TasbeehCounterButton({
       type="button"
       onClick={onClick}
       dir={direction}
-      className="interactive-elem group relative flex min-h-[4.5rem] w-full items-center justify-between rounded-3xl border border-white/40 dark:border-white/15 bg-card/65 dark:bg-black/55 p-4 md:p-5 text-foreground backdrop-blur-xl shadow-sm transition-all duration-300 hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md dark:hover:bg-black/65 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] cursor-pointer"
+      className="interactive-elem group relative mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl border border-white/40 bg-card/65 p-3 text-foreground shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] sm:min-h-[4.5rem] sm:rounded-3xl sm:p-4 md:p-5 lg:max-w-2xl dark:border-white/15 dark:bg-black/55 dark:hover:bg-black/65 cursor-pointer"
       aria-label={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
     >
       <div className="flex items-center gap-3.5 min-w-0">
-        <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-500 border border-amber-500/30 backdrop-blur-md transition-transform duration-200 group-hover:scale-105">
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/15 text-amber-500 backdrop-blur-md transition-transform duration-200 group-hover:scale-105 sm:size-11 sm:rounded-2xl">
           <TasbeehIcon size={24} className="shrink-0" />
         </div>
         <span className="text-[1rem] md:text-[1.0625rem] font-black tracking-tight text-foreground truncate">

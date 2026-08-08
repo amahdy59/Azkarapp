@@ -47,6 +47,7 @@ export type View =
   | "home"
   | "library"
   | "progress"
+  | "benefits"
   | "friday"
   | "friday_salawat"
   | "category"
@@ -95,6 +96,13 @@ export interface DailyCollectionCompletion {
   completionLevel?: RoutineMode;
 }
 
+/** A reviewed Madani Mushaf page boundary for one complete surah. */
+export interface MushafPageRange {
+  page: number;
+  startAyah: number;
+  endAyah: number;
+}
+
 export interface Zikr {
   id: string;
   /** Stable content identity shared by category-specific instances with identical wording. */
@@ -132,6 +140,8 @@ export interface Zikr {
   surahNameEnglish?: string;
   surahType?: "Meccan" | "Medinan" | "مكية" | "مدنية";
   verseCount?: number;
+  /** Optional structural metadata; Quran text remains in `arabicText` unchanged. */
+  mushafPages?: readonly MushafPageRange[];
   hasBasmalah?: boolean;
   hasSeekRefuge?: boolean;
 }

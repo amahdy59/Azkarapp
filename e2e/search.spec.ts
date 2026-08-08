@@ -8,13 +8,67 @@ async function openArabicSearch(page: Page) {
   await page.getByTestId("continue-as-guest").click();
   await expect(page.getByRole("navigation")).toBeVisible();
 
-  await page.getByRole("button", { name: "الأذكار", exact: true }).click();
-  await page
-    .getByRole("button", { name: /بحث|ابحث/ })
-    .first()
-    .click();
+  await page.getByTestId("nav-azkar").click();
   return page.getByRole("textbox").first();
 }
+
+test("search waits for input, preserves the query, and uses visible labels", async ({ page }) => {
+  const libraryInput = await openArabicSearch(page);
+
+  await expect(page).toHaveURL(/view=library/);
+  await libraryInput.click();
+  await expect(page).toHaveURL(/view=library/);
+
+  const emptyDirection = await libraryInput.evaluate((input) => getComputedStyle(input).direction);
+  expect(emptyDirection).toBe("rtl");
+  expect(
+    await libraryInput.evaluate((input) =>
+      Array.from(input.labels ?? []).some((label) => {
+        const box = label.getBoundingClientRect();
+        return box.width > 0 && box.height > 0 && getComputedStyle(label).visibility !== "hidden";
+      }),
+    ),
+  ).toBe(true);
+
+  await libraryInput.fill("sleep");
+  await expect(page).toHaveURL(/view=search/);
+
+  const searchInput = page.getByRole("textbox").first();
+  await expect(searchInput).toHaveValue("sleep");
+  expect(await searchInput.evaluate((input) => getComputedStyle(input).direction)).toBe("ltr");
+  expect(
+    await searchInput.evaluate((input) =>
+      Array.from(input.labels ?? []).some((label) => {
+        const box = label.getBoundingClientRect();
+        return box.width > 0 && box.height > 0 && getComputedStyle(label).visibility !== "hidden";
+      }),
+    ),
+  ).toBe(true);
+});
+
+test("Library search and tabs share a desktop row and stack on compact screens", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const input = await openArabicSearch(page);
+  const tabs = page.getByRole("tablist");
+
+  const desktopInput = await input.boundingBox();
+  const desktopTabs = await tabs.boundingBox();
+  expect(desktopInput).not.toBeNull();
+  expect(desktopTabs).not.toBeNull();
+  expect(
+    desktopInput!.x + desktopInput!.width <= desktopTabs!.x || desktopTabs!.x + desktopTabs!.width <= desktopInput!.x,
+  ).toBe(true);
+  expect(Math.min(desktopInput!.y + desktopInput!.height, desktopTabs!.y + desktopTabs!.height)).toBeGreaterThan(
+    Math.max(desktopInput!.y, desktopTabs!.y),
+  );
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const compactInput = await input.boundingBox();
+  const compactTabs = await tabs.boundingBox();
+  expect(compactInput).not.toBeNull();
+  expect(compactTabs).not.toBeNull();
+  expect(compactTabs!.y).toBeGreaterThanOrEqual(compactInput!.y + compactInput!.height);
+});
 
 test("Arabic search matches undiacritized typing against vocalized content", async ({ page }) => {
   const input = await openArabicSearch(page);

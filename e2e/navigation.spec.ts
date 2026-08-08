@@ -13,7 +13,7 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
 
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Search adhkar and duas", exact: true })).toBeVisible();
+  await expect(page.getByRole("textbox", { name: "Search adhkar and duas", exact: true })).toBeVisible();
 
   await page.getByTestId("category-card-morning").click();
   await expect(page.locator("h1", { hasText: "Morning Azkar" })).toBeVisible();

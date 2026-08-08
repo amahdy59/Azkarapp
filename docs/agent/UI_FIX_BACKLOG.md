@@ -1,77 +1,67 @@
 # UI fix backlog
 
-User-supplied list, 2026-08-08. Verified against the codebase before scheduling
-so nothing already-done gets rebuilt. Items keep the user's original numbering.
+User-supplied list, 2026-08-08. Items retain the user's original numbering. DEC-044 records the approved resolution of the earlier Home-header and non-Home-surface conflicts.
 
-## Already done — do not rebuild
+## Current release status
 
-| Item                                        | Status                             | Evidence                                                                                                                     |
-| ------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| **1.2** Dynamic background by zikr type     | **Done**                           | `TimeOfDayBackground` already maps morning / evening / before_sleep / after_prayer / friday                                  |
-| **2.1** No background on non-Home screens   | **Done** (DEC-026)                 | Only `HomeScreen.tsx` imports `TimeOfDayBackground`                                                                          |
-| **1.1** Home text contrast                  | **Done** (DEC-035)                 | Light-theme hero failed at 1.98:1 and was fixed with `--on-media` tokens; all five modes now pass an automated contrast gate |
-| **4.3** Tap-anywhere disabled during surahs | **Partly done** — see defect below | `handleSurfaceTap` returns early when `z.isSurah`                                                                            |
-| **4.4** Friday CTA arrow direction          | **Verified correct** (DEC-043)     | Rendered arrow points right in LTR and left in RTL, matching the directional-icon contract                                   |
+The complete numbered list has an implementation in the current pre-Phase-09 working tree. Previously released items are marked **Verified complete**. New items are marked **Implementation complete; release verification pending** until the mandatory local gate, GitHub workflows, deployment, and production smoke test succeed. A failed gate reopens the affected item; implementation presence alone is not release evidence.
 
-## Verified defect found while triaging
+Final command results and manual/visual evidence belong in `docs/agent/evidence/pre-phase-09/PRE_PHASE_09_REPORT.md`.
 
-**4.3 is inverted for short surahs.** Twelve azkar carry `isSurah: true`, including
-`s-hm-99-ikhlas` (قل هو الله أحد), `falaq` and `nas`. Those are three-line surahs
-repeated 3×, but tap-anywhere is currently **disabled** for them — the exact case
-the user says it should still apply to. Only genuinely long surahs (Al-Kahf,
-Al-Mulk) should require the counter button.
+## 1. Home page
 
-Fix needs a way to distinguish long from short. `isSurah` alone is the wrong
-signal; a `isLongSurah` flag or a length-derived predicate is needed. Content
-data changes are governed by the Phase 06 prohibition on content rewriting, so
-prefer deriving over editing `azkar.ts`.
+| Item                             | Status                                                    | Implementation evidence                                                                                                                                                                    |
+| -------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| **1.1** Home text accessibility  | **Verified complete**                                     | DEC-035 added semantic on-media tokens and automated contrast checks across all five appearance modes.                                                                                     |
+| **1.2** Dynamic Home background  | **Implementation complete; release verification pending** | Home selects Morning, Evening, Before Sleep, or Friday context; Friday overrides the ordinary time recommendation only on Home. Non-Home screens do not mount the photographic background. |
+| **1.3** Responsive Masbaha entry | **Implementation complete; release verification pending** | `TasbeehCounterButton` uses compact mobile geometry, grows through tablet spacing, fills its container, and caps its reading width on large screens.                                       |
 
-## Conflicts with existing decisions — need a call before implementing
+## 2. Global surfaces except Home
 
-| Item                                           | Conflict                                                                                                                                                                         |
-| ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **2.2** Background texture on non-home screens | DEC-002/Phase 02 deliberately made surfaces opaque and reserved decorative treatments. A texture is a foundations-level change and should be a token, not per-screen CSS         |
-| **5.5** Top nav declutter (2-line max)         | Phase 05 (DEC-028/029) just rebuilt this top bar to match the supplied Figma. This request supersedes that design — confirm the Figma is no longer authoritative for the top bar |
-| **3.1** Remove filters                         | Marked "needs a decision" by the user. Removing a control is a product call                                                                                                      |
+| Item                                                  | Status                                                    | Implementation evidence                                                                                                                                                                                                                                                                                                               |
+| ----------------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **2.1** Remove non-Home photography                   | **Verified complete**                                     | DEC-026 restricts `TimeOfDayBackground` to Home; the current diff preserves that rule.                                                                                                                                                                                                                                                |
+| **2.2a** Subtle non-Home texture                      | **Implementation complete; release verification pending** | `App.tsx` exposes the active view; `ScreenContainer` and direct top-level screen roots supply the page-surface hooks. Theme CSS applies low-opacity tonal noise only to non-Home surfaces and disables it for high contrast, reduced transparency, and `prefers-reduced-transparency`. Functional and devotional cards remain opaque. |
+| **2.2b** Card, button, and completion-cue consistency | **Implementation complete; release verification pending** | Affected Library, Category, Friday, counter, Benefits, Saved, and sleep-checklist surfaces use the established radius, elevation, focus, target-size, and semantic-state contracts; oversized one-off hover shadows were removed from these flows.                                                                                    |
+| **2.2c** Counter consistency and responsive geometry  | **Implementation complete; release verification pending** | Reader and custom counter retain their distinct purposes while sharing the 184px counter surface, responsive constrained layout, keyboard guard behavior, and optional click-feedback contract. DEC-043 already verified Reader desktop/mobile geometry.                                                                              |
+| **2.2d** Optional counter click sound                 | **Implementation complete; release verification pending** | Reader and custom counter use the same device-local `azkarapp.counter-sound.v1` preference, visible 44px mute/unmute controls, and a short platform Web Audio click that fails safely when unsupported.                                                                                                                               |
 
-## Remaining work, by the user's priority
+## 3. Azkar Library and search
 
-## P0 bug pass — completed 2026-08-08
+| Item                                               | Status                                                    | Implementation evidence                                                                                                                                                                |
+| -------------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **3.1** Search and filters side by side on desktop | **Implementation complete; release verification pending** | The existing first-class Collections/Saved tabs are retained and align beside search at 900px and wider; narrower layouts stack. DEC-044 records the keep-filters decision.            |
+| **3.2** No premature search navigation             | **Implementation complete; release verification pending** | Focusing the input or its visual search icon stays in Library. Navigation occurs only after non-whitespace text is entered or the form is submitted. The query is carried into Search. |
+| **3.3** Natural Arabic input direction             | **Implementation complete; release verification pending** | Empty Arabic search fields are explicitly RTL/right-start; typed content uses natural `dir="auto"`.                                                                                    |
+| **3.4** Visible input labels                       | **Implementation complete; release verification pending** | Library and Search expose visible, programmatically associated labels instead of relying on placeholders.                                                                              |
 
-| Item                                     | Result                                                                                                                                    |
-| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **5.3** Counter undersized               | Fixed the circular counter at the documented 184×184 CSS px; verified it fits a 320px viewport and remains 184px on desktop               |
-| **5.4** Bottom-nav selected line overlap | Gave each nav item the full available height; the top indicator now clears the icon while retaining the persistent non-color selected cue |
-| **4.4** Friday CTA arrow                 | No change required: browser inspection confirmed right in LTR and left in RTL                                                             |
-| Home image `fetchPriority` React warning | Switched to the standard lowercase DOM attribute; the `high` hint remains present and a fresh browser console has no warnings             |
+## 4. Friday Mode and long-surah reading
 
-**P1 — core UX**
+| Item                                     | Status                                                    | Implementation evidence                                                                                                                                                                                                                                                                                                                            |
+| ---------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **4.1** Responsive Friday layout         | **Implementation complete; release verification pending** | Friday Mode is a one-column compact/tablet flow and a bounded two-column desktop grid; the hero and final dua action span the desktop grid.                                                                                                                                                                                                        |
+| **4.2** Mushaf-style long-surah pages    | **Implementation complete; release verification pending** | Al-Kahf, As-Sajdah, and Al-Mulk carry reviewed Madani Mushaf page ranges. `MushafPageReader` renders semantic page sections and visible separators from existing ayah markers without changing Quran text.                                                                                                                                         |
+| **4.3** Counter only after long surahs   | **Implementation complete; release verification pending** | Multi-page metadata is the long-surah signal. Long-surah text/canvas taps cannot count and the counter appears after the final page; short surahs such as Al-Ikhlas retain ordinary tap-anywhere counting.                                                                                                                                         |
+| **4.4** Final Friday action and progress | **Implementation complete; release verification pending** | The supporting subtext is removed; DEC-043 verified the arrow already points outward in LTR and RTL. Friday Mode shows a simple progress bar, current completion ratio, and start/continue/completion blessing copy. Comprehensive duas completed through the Friday-origin session are tracked per ISO week, separately from lifetime completion. |
 
-- 3.1 Search + filter side by side (pending the removal decision)
-- 3.2 Search icon must not navigate away prematurely
-- 3.3 Arabic search input must be right-aligned with RTL cursor
-- 3.4 Visible labels on all inputs
-- 4.2 Mushaf-style long-surah reading with page separators
-- 4.3 Scope tap-disable to long surahs only (see defect above)
-- 5.5 Top nav 2-line layout (pending the Figma conflict)
+## 5. Cross-cutting improvements
 
-**P2 — visual system**
+| Item                                       | Status                                                    | Implementation evidence                                                                                                                                                                                         |
+| ------------------------------------------ | --------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **5.1** Zikr Benefits Home card and screen | **Implementation complete; release verification pending** | Home opens a lazy dedicated Benefits screen built only from existing reviewed benefit/source fields. Each item has an explicit WhatsApp share link.                                                             |
+| **5.2** Saved zikr on Home                 | **Implementation complete; release verification pending** | Home shows up to three saved items plus a route to the canonical Saved library. Regular, comprehensive-dua, and lazy Al-Kahf saved entries open the Reader without changing saved IDs or persistence semantics. |
+| **5.3** Desktop Reader counter             | **Verified complete**                                     | DEC-043 restored and browser-tested the documented 184×184 CSS-pixel counter on mobile and desktop.                                                                                                             |
+| **5.4** Mobile bottom-nav overlap          | **Verified complete**                                     | DEC-043 gave each nav item the full row height; the selected indicator clears the icon while preserving `aria-current` and a non-color cue.                                                                     |
+| **5.5** Two-row compact Home header        | **Implementation complete; release verification pending** | Date occupies row one; current time and prayer context occupy row two; streak is stacked above palms. DEC-044 supersedes only the conflicting prior Figma utility-header structure.                             |
+| **5.6** Before-sleep checklist feedback    | **Implementation complete; release verification pending** | The checklist now uses card-like 48px rows, explicit check states, a 0/3 progress indicator and progressbar, plus a restrained live completion confirmation that reverses if an item is unchecked.              |
 
-- 1.3 Masbaha button responsive sizing
-- 2.2 Background texture (pending the DEC-002 conflict)
-- 2.2b Consistent card radii, checkmarks, buttons
-- 2.2c Counter consistency across the two counter types
-- 2.2d Counter click sound with an on/off setting
+## Verification still required before Phase 09
 
-**P3 — new features**
+No known implementation item remains open. The release remains pending until all of the following are recorded as successful in the pre-Phase-09 report:
 
-- 5.1 Zikr Benefits card + screen + WhatsApp share
-- 5.2 Saved/liked zikr surfaced on Home
-- 5.6 Before-sleep checklist completion feedback and redesign
-
-## Sequencing note
-
-The P0 batch is complete. The remaining two counter themes (2.2c, 2.2d)
-overlap heavily and should be one piece of work, not separate changes.
-`useZikrCounter` is at 89% coverage and `CustomCounterScreen` at 43%, so the
-second counter needs characterization tests before restructuring.
+1. `pnpm install --frozen-lockfile`
+2. `pnpm check`
+3. `pnpm test:e2e`
+4. `pnpm build:pages`
+5. GitHub Quality and Pages build/deploy workflows
+6. Production response and expected-app smoke test

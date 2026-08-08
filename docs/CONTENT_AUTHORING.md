@@ -43,6 +43,20 @@ Use this minimal shape:
 - `orderIndex`: unique inside the category. Reordering must not change IDs.
 - `sourceUrl`, `preferredTiming`, `authenticityNote`, and `notes`: optional; add only when reviewed and useful to the reader.
 
+### Mushaf page metadata for complete surahs
+
+`mushafPages` is optional structural metadata for a reviewed, complete surah. It controls page separators and long-surah reader behavior; it is not devotional text and must never be used to rewrite, normalize, or reflow `arabicText`.
+
+- Use the page numbering and ayah ranges from one identified, authoritative Madani Mushaf pagination source. Record the source, edition/version, review date, and reviewer in the change report or decision evidence.
+- Add a range as `{ page, startAyah, endAyah }`. Page numbers must increase, ranges must be contiguous and non-overlapping, the first range must start at ayah 1, and the final range must end at the reviewed `verseCount`.
+- Do not infer page boundaries from character count, line wrapping, viewport height, screenshots, or generated visual layout. A visual wrap is not a Mushaf page boundary.
+- Every `endAyah` must match an existing ayah marker in the untouched `arabicText`. Do not add, remove, replace, normalize, or reposition Quran text or ayah markers to make metadata fit.
+- Splitting by `mushafPages` must be byte-preserving: concatenating every generated page string in order must reproduce the original `arabicText` byte-for-byte.
+- Multi-page metadata is the explicit signal for long-surah behavior. Short surahs continue to use the ordinary reader interaction unless separately reviewed multi-page metadata exists.
+- Generators that rewrite content modules must preserve this metadata. Add tests for contiguous coverage, expected page ranges, generator preservation, and byte-for-byte reconstruction.
+
+Changing a page range requires the same independent source review as adding it. It does not authorize any change to Quran wording, spelling, diacritics, verse markers, translation, attribution, or repetition count.
+
 ## Add a new collection
 
 1. Add its literal ID to `CategoryId` in `src/app/types.ts`.
