@@ -1,4 +1,22 @@
 #!/bin/sh
+
+# Verify the local Node major matches .nvmrc before trusting anything below.
+#
+# This hook runs the same commands as CI but on the *local* toolchain, so a
+# runtime-version gap is invisible to it by construction. That is not
+# hypothetical: fs.globSync (Node 22+) passed here on Node 24 and failed the
+# build on CI's Node 20, and two further pushes went red before it was noticed.
+if [ -f .nvmrc ]; then
+  expected_major=$(sed 's/^v//' .nvmrc | cut -d. -f1)
+  actual_major=$(node -v | sed 's/^v//' | cut -d. -f1)
+  if [ "$expected_major" != "$actual_major" ]; then
+    echo "❌ Node version mismatch: .nvmrc wants v${expected_major}.x but this shell has $(node -v)."
+    echo "   CI installs the .nvmrc version, so passing here would not mean passing there."
+    echo "   Run 'nvm use' (or install Node ${expected_major}) and push again."
+    exit 1
+  fi
+fi
+
 echo "Running pre-push quality checks (prettier, eslint, tsc, vitest, build, budget)..."
 npm run check
 if [ $? -ne 0 ]; then

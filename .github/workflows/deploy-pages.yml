@@ -39,7 +39,10 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          # Read from .nvmrc so CI and local can never drift. They did:
+          # .nvmrc said 24 while this said 20, so fs.globSync passed
+          # locally and failed the build here.
+          node-version-file: ".nvmrc"
           cache: "pnpm"
 
       - name: Install dependencies
