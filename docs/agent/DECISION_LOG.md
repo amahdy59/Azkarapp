@@ -720,3 +720,23 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** replaced the throwaway regex with `src/app/i18n/parity.test.ts`, which imports both bundles and compares real key paths. Result: **full parity, no empty strings**. The criterion is genuinely met. The test also guards against empty-string values, which parity alone would miss, and was verified by removing a key and confirming it names `library.saved`.
 - **Tests/evidence required:** 3 parity tests; CI run green; live `deployment-meta.json` matching `HEAD`. Full `pnpm check` (291 unit).
 - **Supersedes:** None
+
+---
+
+## DEC-040 — RoutineGarden split, behind the characterization tests
+
+- **Date:** 2026-08-08
+- **Status:** Approved
+- **Owner:** User (approved "characterization tests first", which this completes)
+- **Related phase:** Phase 08
+- **Context:** `RoutineGarden.tsx` was 672 lines and the largest remaining technical debt. DEC-038 raised its coverage from 2.45% to 61.47% specifically so this split could be verified rather than hoped.
+- **Decision:** cut the two seams with no data dependencies:
+  - `GardenMarks.tsx` (176 lines) — the eight pure SVG leaf/palm marks.
+  - `gardenDateLabel.ts` (110 lines) — Hijri/Gregorian parsing and `getGardenDateLabel`. Pure functions with no React import, so `.ts` rather than `.tsx` and testable without rendering.
+  - `RoutineGarden.tsx` drops **672 → 418 lines**.
+- **Every extracted symbol is re-exported from `RoutineGarden.tsx`**, so no call site changed. The split is invisible to consumers, which keeps the blast radius at zero and makes the diff reviewable as pure movement.
+- **Evidence it was behaviour-preserving, not just green:** the 13 characterization tests pass **unchanged**, and overall coverage is byte-identical before and after — **2478/3836 statements, 2314/3517 lines**. Identical totals are the strongest available signal that code moved without changing what executes. Full e2e also unchanged at 256.
+- **Deliberately not extracted:** `TodayRoutineGarden` itself, which is the remaining bulk of the file. It owns tab state, offset navigation and summary recomputation, so cutting it is a behavioural refactor rather than a move, and it deserves its own change with its own tests.
+- **Coverage note that looks alarming but is not:** `RoutineGarden.tsx` now reads 29% rather than 61%. The well-tested marks and date helpers moved out, leaving the untested `TodayRoutineGarden` as a larger share of a smaller file. Nothing lost coverage; overall totals are unchanged.
+- **Tests/evidence required:** 291 unit, 256 e2e, bundle budget passed.
+- **Supersedes:** The "still open: the split itself" note in DEC-038.
