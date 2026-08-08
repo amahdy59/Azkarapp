@@ -1,49 +1,101 @@
-# Phase 08 — Progress and Quiet Garden
+# Phase Report — Phase 08 Progress and Quiet Garden
 
-## Summary
+## Objective
 
-One serious accessibility defect, several criteria already met, and one substantial item deliberately left undone.
+Make Progress a useful, accessible, gentle reflection area whose period metrics are supported by recorded data.
 
-## Primary finding — the week grid was invisible to screen readers
+## Scope completed
 
-The week view rendered completion as **shape alone with no text**. A completed cell held an icon `<div>`; an incomplete cell held an empty bordered `<div>`. Neither carried a label or any text content.
+- Removed every hard-coded metric fallback and unsupported comparison from Week, Month, and Year views.
+- Corrected selectors to count exactly the four `MAIN_CATEGORY_IDS` and ignore unrelated collections.
+- Added after-prayer to weekly text equivalents, routine summaries, monthly fractions, selected-day details, best-routine calculations, and annual consistency calculations.
+- Made best routine, most missed routine, best month, and most consistent routine neutral when no activity is recorded.
+- Prevented future dates from resetting the current-year streak.
+- Replaced unsupported praise/comparison claims with factual, localized empty and activity summaries.
+- Completed the previously deferred `RoutineGarden` split under DEC-040; it is now 418 lines with extracted marks and date-label helpers.
 
-A screen reader therefore announced all 21 cells as blank. The week view — the phase's central visualization — conveyed **nothing**. That is a direct failure of "charts are understandable without color or vision."
+## Files changed
 
-**Fix:** `WeekStatusCell` renders an `sr-only` "Morning: Completed" / "Not completed" string and marks the visual shape `aria-hidden`. Column headers gained `scope="col"` so association is explicit during grid navigation.
+- `src/app/gardenViews.ts`
+- `src/app/gardenViews.test.ts`
+- `src/app/components/ProgressViews.tsx`
+- `src/app/components/ProgressViews.test.tsx`
+- `src/app/components/RoutineGarden.tsx`
+- `src/app/i18n/en.ts`
+- `src/app/i18n/ar.ts`
+- `e2e/quiet-garden.spec.ts`
+- `docs/agent/DECISION_LOG.md`
+- `docs/agent/evidence/phase-08/PHASE_08_REPORT.md`
+- `docs/agent/evidence/phase-08/*.png`
 
-## Verified already correct — deliberately unchanged
+## Components added or modified
 
-| Criterion                                    | Finding                                                                                                                  |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| No punitive streak language                  | Copy is already gentle — "You kept up with {category} today". Nothing to change                                          |
-| Charts understandable without vision (month) | The month calendar is well built: every day is a `<button>` with an `aria-label` covering complete / partial / unstarted |
-| Existing progress data intact                | No calculation, schema or ledger change was made                                                                         |
-| No fabricated metrics                        | All displayed values derive from stored `dailyCompletions`                                                               |
+- `ProgressWeekView`: four-routine matrix and summaries; recorded zero values; neutral empty state.
+- `ProgressMonthView`: four-routine calendar fractions/details; recorded statistics; factual monthly summary.
+- `ProgressYearView`: recorded chart values and totals; nullable best-period labels; neutral annual guidance.
+- `TodayRoutineGarden`: removed an obsolete summary prop from the Week view call.
+- Garden view selectors: main-routine filtering, nullable empty-state leaders, after-prayer coverage, and elapsed-date streak logic.
 
-Reporting these as verified rather than inventing changes is deliberate.
+## User-visible changes
 
-## A repeat mistake and its systemic fix
+- New users see zero rather than example numbers such as 74%, 214 active days, or 14,367 completions.
+- Progress no longer claims improvement without prior-period evidence.
+- Week and Month now visibly account for Post-Prayer Azkar and use a denominator of four.
+- Empty periods explain that no routine activity is recorded and how to begin.
 
-The Arabic strings in the new cell shipped as mojibake — the **same** defect as DEC-036, from the same `unicode_escape` script pattern.
+## Accessibility work
 
-The DEC-036 guard did not catch it, because that guard scanned only `ar.ts` and this Arabic was inline in a component. The guard now scans **every** `src/**/*.{ts,tsx}` file and reports `file:line`, verified by reintroducing the corruption.
+- Weekly chart/list equivalence now exposes 28 labelled status cells across four routine columns.
+- Every week header retains `scope="col"`; every status keeps readable completed/not-completed text.
+- Month calendar accessible names now announce partial completion out of four.
+- Selected-day details expose the fourth routine in text, not only through aggregate color or marks.
+- Automated evidence does not replace the outstanding manual screen-reader walkthrough.
 
-Two occurrences of one defect class in a single session is a process signal, not bad luck. The check now covers the whole surface rather than the one file that happened to fail first.
+## Tests added or updated
 
-## Not done — and why
+- Selector tests cover empty periods, non-main-category exclusion, after-prayer as the strongest routine, and current-year streak preservation.
+- Component tests reject fabricated zero-data values and unsupported comparison copy.
+- Playwright weekly-grid coverage now expects and checks all 28 labelled cells, including Post-Prayer.
 
-**`ProgressViews.tsx` (905 lines) and `RoutineGarden.tsx` (781 lines) remain unsplit.** `RoutineGarden.tsx` sits at **2.45% statement coverage** — the lowest in the codebase.
+## Commands run
 
-Refactoring a 781-line file with almost no coverage is how regressions land silently: nothing would fail, and the damage would surface later in a screen users rely on daily. Characterization tests must come first, and that is a larger piece of work than this phase's fix.
+| Command                                                                                      | Result                                                           |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `pnpm exec vitest run src/app/gardenViews.test.ts src/app/components/ProgressViews.test.tsx` | Passed — 14 tests                                                |
+| `pnpm typecheck`                                                                             | Passed                                                           |
+| `pnpm lint`                                                                                  | Passed                                                           |
+| `pnpm install --frozen-lockfile`                                                             | Passed — lockfile current                                        |
+| `pnpm check`                                                                                 | Passed — 56 files, 296 tests, coverage/build/bundle budget green |
+| `pnpm test:e2e`                                                                              | Passed — 256 tests                                               |
+| `pnpm build:pages`                                                                           | Passed — Pages artifact and bundle budget green                  |
 
-This is a deliberate deferral, not an oversight. It is the single largest piece of technical debt remaining in the roadmap.
+## Visual/manual evidence
 
-## Verification
+- `empty-week-mobile.png` — 390×844, recorded zeros and four-routine matrix.
+- `empty-month-mobile.png` — 390×844, four-routine legend/details and factual empty summary.
+- `empty-year-mobile.png` — 390×844, zero-height bars and neutral annual guidance.
+- `empty-week-desktop.png` — 1440×900, all five table headers visible with no viewport overflow.
+- Browser DOM review confirmed Week, Month, and Year semantics; mobile and desktop document widths matched their viewports.
 
-Full `pnpm check` + `pnpm test:e2e`: **275 unit, 256 e2e**. New e2e asserts 21 labelled cells, that the table text contains "Morning: Completed/Not completed", and that column headers are scoped. Verified in a browser before and after.
+## Documentation updated
 
-## Known limitations
+- DEC-042 records the supported-metric and four-routine read-model contract.
+- This report corrects the stale DEC-037-era claims about fabricated metrics and the since-completed `RoutineGarden` split.
 
-- The **screen-reader review of charts** required by this phase's evidence section has not been performed. The automated assertions prove the text exists; only a human can confirm it reads sensibly.
-- The two large files above remain unsplit.
+## Decisions recorded
+
+- DEC-042 — Phase 08 progress metrics must reflect only recorded main-routine data.
+
+## Known limitations or remaining risks
+
+- The required manual screen-reader walkthrough of the chart/summary reading order still needs a human VoiceOver, NVDA, or TalkBack session. Automated labels cannot prove that experience is coherent.
+- `ProgressViews.tsx` remains large; splitting it is separate technical debt and was intentionally not mixed into this integrity correction.
+- When the Hijri calendar preference is selected, the visible period label is Hijri while persisted progress buckets and month/year calculations remain Gregorian. Resolving that calendar-display contract needs a separate product decision; this release does not reinterpret or migrate stored dates.
+
+## Out-of-scope findings
+
+- Local browser review reproduced the existing React warning for `fetchPriority` in `AzkarHeroBackground`; it is unrelated to Progress and belongs in the next P0 defect release.
+
+## Recommended next step
+
+Deploy and verify this Phase 08 integrity release, then address the P0 UI defect backlog as the next isolated release.

@@ -22,6 +22,7 @@ export interface WeekDayRecord {
   morningStatus: RoutineStatus;
   eveningStatus: RoutineStatus;
   sleepStatus: RoutineStatus;
+  afterPrayerStatus: RoutineStatus;
   completedCount: number;
   isPalm: boolean;
 }
@@ -35,7 +36,7 @@ export interface WeekGardenStats {
   completedDaysCount: number;
   mostMissedRoutine: CategoryId | null;
   bestStreakDays: number;
-  bestRoutine: CategoryId;
+  bestRoutine: CategoryId | null;
 }
 
 export interface MonthDetailedStats {
@@ -44,7 +45,7 @@ export interface MonthDetailedStats {
   totalActiveDays: number;
   completionRate: number;
   longestStreak: number;
-  bestRoutine: CategoryId;
+  bestRoutine: CategoryId | null;
   daysInMonth: number;
 }
 
@@ -63,14 +64,18 @@ export interface YearDetailedStats {
   overallCompletionRate: number;
   longestStreak: number;
   currentStreak: number;
-  bestMonthIndex: number;
+  bestMonthIndex: number | null;
   bestMonthRate: number;
-  mostConsistentRoutine: CategoryId;
+  mostConsistentRoutine: CategoryId | null;
   months: YearMonthHeatmap[];
 }
 
 function pad(value: number) {
   return String(value).padStart(2, "0");
+}
+
+function countMainCompletions(categories: Set<CategoryId>) {
+  return MAIN_CATEGORY_IDS.filter((category) => categories.has(category)).length;
 }
 
 export function formatDayKey(date: Date): string {
@@ -147,7 +152,8 @@ export function getWeekGardenStats(
       morningStatus: hasMorning ? "complete" : "missed",
       eveningStatus: hasEvening ? "complete" : "missed",
       sleepStatus: hasSleep ? "complete" : "missed",
-      completedCount: categories.size,
+      afterPrayerStatus: hasAfterPrayer ? "complete" : "missed",
+      completedCount: countMainCompletions(categories),
       isPalm,
     });
   }
@@ -160,11 +166,11 @@ export function getWeekGardenStats(
     { id: "after_prayer" as CategoryId, count: afterPrayerCompletedCount },
   ];
 
-  routineCounts.sort((a, b) => a.count - b.count);
-  const lowest = routineCounts[0]!;
-  const highest = routineCounts[3]!;
-  const mostMissedRoutine = lowest.count < 7 ? lowest.id : null;
-  const bestRoutine = highest.id;
+  const totalRoutineCompletions = routineCounts.reduce((total, routine) => total + routine.count, 0);
+  const lowest = routineCounts.reduce((current, routine) => (routine.count < current.count ? routine : current));
+  const highest = routineCounts.reduce((current, routine) => (routine.count > current.count ? routine : current));
+  const mostMissedRoutine = totalRoutineCompletions > 0 && lowest.count < 7 ? lowest.id : null;
+  const bestRoutine = totalRoutineCompletions > 0 ? highest.id : null;
 
   return {
     days,
@@ -191,7 +197,7 @@ export function getMonthGardenDays(
     const dayNum = dayIndex + 1;
     const dayKey = `${year}-${pad(zeroBasedMonth + 1)}-${pad(dayNum)}`;
     const categories = index.get(dayKey) ?? new Set<CategoryId>();
-    const completedCount = categories.size;
+    const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
 
     let status: MonthGardenDay["status"] = "unstarted";
@@ -228,6 +234,7 @@ export function getMonthDetailedStats(
   let morningCount = 0;
   let eveningCount = 0;
   let sleepCount = 0;
+  let afterPrayerCount = 0;
   let currentStreak = 0;
   let longestStreak = 0;
 
@@ -249,17 +256,20 @@ export function getMonthDetailedStats(
       if (cat === "morning") morningCount++;
       if (cat === "evening") eveningCount++;
       if (cat === "before_sleep") sleepCount++;
+      if (cat === "after_prayer") afterPrayerCount++;
     }
   }
 
   const completionRate = Math.round((totalCompletions / (daysInMonth * 4)) * 100);
 
-  let bestRoutine: CategoryId = "morning";
-  if (eveningCount > morningCount && eveningCount >= sleepCount) {
-    bestRoutine = "evening";
-  } else if (sleepCount > morningCount && sleepCount > eveningCount) {
-    bestRoutine = "before_sleep";
-  }
+  const routineCounts = [
+    { id: "morning" as CategoryId, count: morningCount },
+    { id: "evening" as CategoryId, count: eveningCount },
+    { id: "before_sleep" as CategoryId, count: sleepCount },
+    { id: "after_prayer" as CategoryId, count: afterPrayerCount },
+  ];
+  const highest = routineCounts.reduce((current, routine) => (routine.count > current.count ? routine : current));
+  const bestRoutine = totalCompletions > 0 ? highest.id : null;
 
   return {
     days,
@@ -279,8 +289,10 @@ export function getYearGardenStats(index: DailyCompletionIndex, year: number) {
 
   for (const [dayKey, categories] of index) {
     if (!dayKey.startsWith(`${year}-`)) continue;
+    const completedCount = countMainCompletions(categories);
+    if (completedCount === 0) continue;
     activeDays += 1;
-    totalCollections += categories.size;
+    totalCollections += completedCount;
     if (MAIN_CATEGORY_IDS.every((category) => categories.has(category))) {
       totalPalms += 1;
     }
@@ -297,12 +309,14 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
   let morningTotal = 0;
   let eveningTotal = 0;
   let sleepTotal = 0;
-  let bestMonthIndex = 0;
+  let afterPrayerTotal = 0;
+  let bestMonthIndex: number | null = null;
   let bestMonthRate = 0;
   let totalPossibleAllYear = 0;
 
   let currentStreak = 0;
   let longestStreak = 0;
+  const todayKey = formatDayKey(new Date());
 
   for (let m = 0; m < 12; m++) {
     const daysInMonth = new Date(year, m + 1, 0).getDate();
@@ -315,16 +329,21 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     for (let d = 1; d <= daysInMonth; d++) {
       const dayKey = `${year}-${pad(m + 1)}-${pad(d)}`;
       const categories = index.get(dayKey) ?? new Set<CategoryId>();
-      const count = categories.size;
+      const count = countMainCompletions(categories);
       const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
+
+      if (dayKey <= todayKey) {
+        if (isPalm) {
+          currentStreak++;
+          if (currentStreak > longestStreak) longestStreak = currentStreak;
+        } else {
+          currentStreak = 0;
+        }
+      }
 
       if (isPalm) {
         fullDaysCount++;
         totalPalms++;
-        currentStreak++;
-        if (currentStreak > longestStreak) longestStreak = currentStreak;
-      } else {
-        currentStreak = 0;
       }
 
       if (count > 0) {
@@ -337,6 +356,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       if (categories.has("morning")) morningTotal++;
       if (categories.has("evening")) eveningTotal++;
       if (categories.has("before_sleep")) sleepTotal++;
+      if (categories.has("after_prayer")) afterPrayerTotal++;
 
       const level: 0 | 1 | 2 = isPalm ? 2 : count > 0 ? 1 : 0;
       dayCells.push({ dayNum: d, level, isPalm });
@@ -359,12 +379,14 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
 
   const overallCompletionRate = Math.round((totalCollections / totalPossibleAllYear) * 100);
 
-  let mostConsistentRoutine: CategoryId = "morning";
-  if (eveningTotal > morningTotal && eveningTotal >= sleepTotal) {
-    mostConsistentRoutine = "evening";
-  } else if (sleepTotal > morningTotal && sleepTotal > eveningTotal) {
-    mostConsistentRoutine = "before_sleep";
-  }
+  const routineCounts = [
+    { id: "morning" as CategoryId, count: morningTotal },
+    { id: "evening" as CategoryId, count: eveningTotal },
+    { id: "before_sleep" as CategoryId, count: sleepTotal },
+    { id: "after_prayer" as CategoryId, count: afterPrayerTotal },
+  ];
+  const highest = routineCounts.reduce((current, routine) => (routine.count > current.count ? routine : current));
+  const mostConsistentRoutine = totalCollections > 0 ? highest.id : null;
 
   return {
     totalPalms,

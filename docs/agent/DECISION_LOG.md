@@ -753,3 +753,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** Restore `registerType: "prompt"` and retain the existing `onNeedRefresh` event bridge and update notice. Add a regression test that keeps the build strategy aligned with the application UI.
 - **Tests/evidence required:** Targeted PWA configuration test, mandatory local release gate, successful GitHub Quality and Pages workflows, and production smoke verification.
 - **Supersedes:** Commit `1d2b8de`'s automatic-update policy; the deployment itself remains current through the normal prompt flow.
+
+---
+
+## DEC-042 — Phase 08 progress metrics must reflect only recorded main-routine data
+
+- **Date:** 2026-08-08
+- **Status:** Approved
+- **Owner:** User (approved the stabilization sequence and Phase 08 integrity pass)
+- **Related phase:** Phase 08
+- **Context:** The period views displayed hard-coded fallback values whenever a real metric was zero, including invented streaks, active days, completion rates, monthly comparisons, and totals. The selectors also counted unrelated collections in four-routine totals, omitted after-prayer from several summaries, and let future calendar dates reset the current-year streak. This contradicted the Phase 08 prohibition on fabricated metrics and the four-main-routine contract in DEC-030.
+- **Decision:** Every displayed metric now derives directly from `dailyCompletions`. Empty periods show recorded zeros and neutral guidance; best-routine/month selectors are nullable when no activity exists. Week, month, and year calculations count exactly `MAIN_CATEGORY_IDS`, include after-prayer consistently, ignore unrelated collection categories, and preserve a current-year streak through future calendar cells.
+- **Accessibility consequence:** The weekly text-equivalent matrix expands from 21 to 28 labelled cells so the fourth routine is represented. Month day labels and visible fractions now use a four-routine denominator, and selected-day details include after-prayer.
+- **No migration:** The completion ledger, persisted record shape, merge boundary, and remote sync contract are unchanged. This is a read-model and presentation correction only.
+- **Tests/evidence required:** Selector and component regression tests for empty periods, unrelated-category exclusion, after-prayer dominance, and current-year streaks; relevant Playwright coverage; mobile and desktop browser evidence; mandatory local release gate; green GitHub Quality and Pages workflows; production smoke verification.
+- **Supersedes:** DEC-037's incorrect verification claim that every displayed value already derived from stored data. DEC-040 remains authoritative for the completed `RoutineGarden` split.

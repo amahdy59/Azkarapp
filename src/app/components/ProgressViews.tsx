@@ -1,5 +1,6 @@
 import React, { useState, useMemo } from "react";
 import { formatNumerals } from "../formatting";
+import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 import {
   getWeekGardenStats,
@@ -37,6 +38,8 @@ function getCategoryName(category: CategoryId | null | undefined, language: AppL
       return isArabic ? "أذكار المساء" : "Evening Azkar";
     case "before_sleep":
       return isArabic ? "أذكار النوم" : "Sleep Azkar";
+    case "after_prayer":
+      return isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer Azkar";
     default:
       return isArabic ? "أذكار أخرى" : "Other Azkar";
   }
@@ -218,12 +221,10 @@ function WeekStatusCell({ done, label, isArabic }: { done: boolean; label: strin
 }
 
 export function ProgressWeekView({
-  summary,
   language,
   dailyCompletions = [],
   referenceDate = new Date(),
 }: {
-  summary: GardenSummary;
   language: AppLanguage;
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
   referenceDate?: Date;
@@ -258,8 +259,7 @@ export function ProgressWeekView({
             {isArabic ? "أفضل سلسلة" : "Best streak"}
           </span>
           <span className="text-[0.9375rem] font-black text-foreground">
-            {formatNumerals(weekStats.bestStreakDays || summary.currentPalmRhythm || 3, language)}{" "}
-            {isArabic ? "أيام" : "days"}
+            {formatNumerals(weekStats.bestStreakDays, language)} {isArabic ? "أيام" : "days"}
           </span>
         </div>
 
@@ -270,8 +270,7 @@ export function ProgressWeekView({
             {isArabic ? "أيام مكتملة" : "Completed days"}
           </span>
           <span className="text-[0.9375rem] font-black text-foreground">
-            {formatNumerals(weekStats.completedDaysCount || summary.palmDaysLast7 || 5, language)}{" "}
-            {isArabic ? "من 7" : "of 7"}
+            {formatNumerals(weekStats.completedDaysCount, language)} {isArabic ? "من 7" : "of 7"}
           </span>
         </div>
       </div>
@@ -311,6 +310,12 @@ export function ProgressWeekView({
                     <span>{isArabic ? "أذكار النوم" : "Sleep"}</span>
                   </div>
                 </th>
+                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                  <div className="flex items-center justify-center gap-1">
+                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <span>{isArabic ? "بعد الصلاة" : "Post-Prayer"}</span>
+                  </div>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/20 dark:divide-white/5">
@@ -341,6 +346,12 @@ export function ProgressWeekView({
                   <WeekStatusCell
                     done={day.sleepStatus === "complete"}
                     label={isArabic ? "أذكار النوم" : "Sleep"}
+                    isArabic={isArabic}
+                  />
+
+                  <WeekStatusCell
+                    done={day.afterPrayerStatus === "complete"}
+                    label={isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer"}
                     isArabic={isArabic}
                   />
                 </tr>
@@ -379,14 +390,16 @@ export function ProgressWeekView({
           </div>
           <div>
             <h4 className="text-[0.9375rem] font-black text-foreground leading-snug mb-1">
-              {isArabic
-                ? `أكملت جميع الأوراد في ${formatNumerals(weekStats.completedDaysCount || 3, language)} أيام`
-                : `Completed all routines in ${weekStats.completedDaysCount || 3} days`}
+              {t(language, "garden.weekCompletedDays", {
+                count: formatNumerals(weekStats.completedDaysCount, language),
+              })}
             </h4>
             <p className="text-[0.8125rem] font-semibold text-muted-foreground">
-              {isArabic
-                ? "أفضل انتظامك هذا الأسبوع كان في أذكار الصباح."
-                : "Your best consistency this week was in Morning Azkar."}
+              {weekStats.bestRoutine
+                ? t(language, "garden.weekBestRoutine", {
+                    routine: getCategoryName(weekStats.bestRoutine, language),
+                  })
+                : t(language, "garden.noRecordedActivity")}
             </p>
           </div>
         </div>
@@ -400,12 +413,12 @@ export function ProgressWeekView({
           {/* Morning Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.morningCompletedCount || 6, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.morningCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full bg-emerald-500 rounded-full"
-                style={{ width: `${Math.round(((weekStats.morningCompletedCount || 6) / 7) * 100)}%` }}
+                style={{ width: `${Math.round((weekStats.morningCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
@@ -417,12 +430,12 @@ export function ProgressWeekView({
           {/* Evening Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.eveningCompletedCount || 5, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.eveningCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full bg-amber-500 rounded-full"
-                style={{ width: `${Math.round(((weekStats.eveningCompletedCount || 5) / 7) * 100)}%` }}
+                style={{ width: `${Math.round((weekStats.eveningCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
@@ -434,17 +447,34 @@ export function ProgressWeekView({
           {/* Sleep Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.sleepCompletedCount || 3, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.sleepCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
                 className="h-full bg-indigo-500 rounded-full"
-                style={{ width: `${Math.round(((weekStats.sleepCompletedCount || 3) / 7) * 100)}%` }}
+                style={{ width: `${Math.round((weekStats.sleepCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{isArabic ? "أذكار النوم" : "Sleep"}</span>
               <Moon size={14} className="text-indigo-400" />
+            </div>
+          </div>
+
+          {/* Post-Prayer Bar */}
+          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
+            <span className="text-muted-foreground w-14 shrink-0">
+              {formatNumerals(weekStats.afterPrayerCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
+            </span>
+            <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full"
+                style={{ width: `${Math.round((weekStats.afterPrayerCompletedCount / 7) * 100)}%` }}
+              />
+            </div>
+            <div className="flex items-center gap-1 text-foreground shrink-0">
+              <span>{isArabic ? "بعد الصلاة" : "Post-Prayer"}</span>
+              <CheckCircle2 size={14} className="text-emerald-500" />
             </div>
           </div>
         </div>
@@ -512,7 +542,7 @@ export function ProgressMonthView({
             {isArabic ? "أطول سلسلة" : "Longest streak"}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(monthStats.longestStreak || 7, language)} {isArabic ? "أيام" : "days"}
+            {formatNumerals(monthStats.longestStreak, language)} {isArabic ? "أيام" : "days"}
           </span>
         </div>
 
@@ -523,7 +553,7 @@ export function ProgressMonthView({
             {isArabic ? "أيام كاملة" : "Full days"}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(monthStats.fullDaysCount || 18, language)}
+            {formatNumerals(monthStats.fullDaysCount, language)}
           </span>
         </div>
 
@@ -534,7 +564,7 @@ export function ProgressMonthView({
             {isArabic ? "معدل الاكتمال" : "Completion rate"}
           </span>
           <span className="text-[0.875rem] font-black text-amber-600 dark:text-amber-400">
-            %{formatNumerals(monthStats.completionRate || 74, language)}
+            %{formatNumerals(monthStats.completionRate, language)}
           </span>
         </div>
       </div>
@@ -573,8 +603,8 @@ export function ProgressMonthView({
                   onClick={() => setSelectedDayNum(day.dayNum)}
                   aria-label={
                     isArabic
-                      ? `اليوم ${formatNumerals(day.dayNum, language)}، ${isPalm ? "مكتمل" : count > 0 ? `جزئي ${formatNumerals(count, language)} من 3` : "لم يبدأ"}`
-                      : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 3` : "Unstarted"}`
+                      ? `اليوم ${formatNumerals(day.dayNum, language)}، ${isPalm ? "مكتمل" : count > 0 ? `جزئي ${formatNumerals(count, language)} من 4` : "لم يبدأ"}`
+                      : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 4` : "Unstarted"}`
                   }
                   aria-pressed={isSelected}
                   className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
@@ -595,7 +625,7 @@ export function ProgressMonthView({
                       <Check size={12} strokeWidth={3} className="text-emerald-600 dark:text-emerald-400" />
                     ) : count > 0 ? (
                       <span className="text-[0.5625rem] font-extrabold text-blue-500">
-                        {formatNumerals(count, language)}/3
+                        {formatNumerals(count, language)}/4
                       </span>
                     ) : (
                       <span className="text-[0.625rem] text-muted-foreground/40">-</span>
@@ -614,7 +644,7 @@ export function ProgressMonthView({
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
-              <span>{isArabic ? "جزئي (2/3 أو 1/3)" : "Partial (2/3 or 1/3)"}</span>
+              <span>{isArabic ? "جزئي (1–3 من 4)" : "Partial (1–3 of 4)"}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full border border-amber-500" />
@@ -688,6 +718,23 @@ export function ProgressMonthView({
                 <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
               )}
             </div>
+
+            {/* Post-Prayer Status */}
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={16} className="text-emerald-500" />
+                <span className="text-[0.8125rem] font-bold">
+                  {isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer Azkar"}
+                </span>
+              </div>
+              {selectedDayRecord?.categories.includes("after_prayer") ? (
+                <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
+                  {isArabic ? "مكتملة" : "Done"}
+                </span>
+              ) : (
+                <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
+              )}
+            </div>
           </div>
 
           {/* Month Improvement Insight */}
@@ -695,12 +742,12 @@ export function ProgressMonthView({
             <Sprout size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <h5 className="text-[0.875rem] font-black text-foreground mb-1">
-                {isArabic ? "انتظامك تحسن هذا الشهر" : "Your consistency improved"}
+                {t(language, "garden.monthRecordTitle")}
               </h5>
               <p className="text-[0.75rem] font-semibold text-muted-foreground">
-                {isArabic
-                  ? `أكملت ${formatNumerals(monthStats.fullDaysCount || 18, language)} يوماً كاملاً من أصل ${formatNumerals(monthStats.daysInMonth, language)} يوماً. استمر على هذا النحو!`
-                  : `Completed ${monthStats.fullDaysCount || 18} full days out of ${monthStats.daysInMonth} days. Keep it up!`}
+                {t(language, "garden.monthFullDays", {
+                  count: formatNumerals(monthStats.fullDaysCount, language),
+                })}
               </p>
             </div>
           </div>
@@ -728,7 +775,8 @@ export function ProgressYearView({
   const yearStats = useMemo(() => getYearDetailedStats(completionIndex, targetYear), [completionIndex, targetYear]);
 
   const monthNames = isArabic ? HIJRI_MONTH_NAMES_AR : GREGORIAN_MONTH_NAMES_EN;
-  const bestMonthName = monthNames[yearStats.bestMonthIndex] || monthNames[2];
+  const bestMonthName =
+    yearStats.bestMonthIndex === null ? getCategoryName(null, language) : monthNames[yearStats.bestMonthIndex];
 
   return (
     <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
@@ -741,7 +789,7 @@ export function ProgressYearView({
             {isArabic ? "معدل الاكتمال" : "Completion rate"}
           </span>
           <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
-            %{formatNumerals(yearStats.overallCompletionRate || 78, language)}
+            %{formatNumerals(yearStats.overallCompletionRate, language)}
           </span>
         </div>
 
@@ -752,7 +800,7 @@ export function ProgressYearView({
             {isArabic ? "أطول سلسلة" : "Longest streak"}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.longestStreak || 32, language)} {isArabic ? "يوماً" : "days"}
+            {formatNumerals(yearStats.longestStreak, language)} {isArabic ? "يوماً" : "days"}
           </span>
         </div>
 
@@ -763,7 +811,7 @@ export function ProgressYearView({
             {isArabic ? "السلسلة الحالية" : "Current streak"}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.currentStreak || 12, language)} {isArabic ? "يوماً" : "days"}
+            {formatNumerals(yearStats.currentStreak, language)} {isArabic ? "يوماً" : "days"}
           </span>
         </div>
 
@@ -774,7 +822,7 @@ export function ProgressYearView({
             {isArabic ? "أيام نشطة" : "Active days"}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.activeDays || 214, language)} {isArabic ? "يوماً نشطاً" : "active"}
+            {formatNumerals(yearStats.activeDays, language)} {isArabic ? "يوماً نشطاً" : "active"}
           </span>
         </div>
       </div>
@@ -789,14 +837,14 @@ export function ProgressYearView({
             </h4>
           </div>
           <p className="text-[0.75rem] font-semibold text-muted-foreground mb-4">
-            {isArabic ? "تحسن انتظامك بنسبة 12% مقارنة بالعام الماضي" : "Your consistency improved by 12% vs last year"}
+            {t(language, "garden.yearChartHint")}
           </p>
 
           {/* Bar Chart */}
           <div className="flex-1 flex items-end justify-between gap-1.5 pt-6 pb-2 min-h-[140px]">
             {yearStats.months.map((m, idx) => {
-              const rate = m.completionRate || (idx === 2 ? 92 : 50 + ((idx * 7) % 35));
-              const isBest = idx === (yearStats.bestMonthIndex || 2);
+              const rate = m.completionRate;
+              const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
 
               return (
                 <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
@@ -814,7 +862,7 @@ export function ProgressYearView({
                           ? "bg-amber-500 shadow-md shadow-amber-500/30"
                           : "bg-amber-500/40 dark:bg-amber-500/30 group-hover:bg-amber-500/70"
                       }`}
-                      style={{ height: `${Math.max(15, rate)}%` }}
+                      style={{ height: `${rate}%` }}
                     />
                   </div>
                   <span className="text-[0.5625rem] font-bold text-muted-foreground mt-1.5 truncate max-w-full text-center">
@@ -863,7 +911,7 @@ export function ProgressYearView({
                 {isArabic ? "إجمالي الأذكار المكتملة" : "Total completed"}
               </span>
               <span className="text-[0.875rem] font-black text-foreground">
-                {formatNumerals(yearStats.totalCollections || 14367, language)}
+                {formatNumerals(yearStats.totalCollections, language)}
               </span>
             </div>
             <CheckCircle2 size={18} className="text-emerald-500" />
@@ -874,8 +922,8 @@ export function ProgressYearView({
       {/* 12-Month Mini Heatmap Matrices */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2.5">
         {yearStats.months.map((m, idx) => {
-          const isBest = idx === (yearStats.bestMonthIndex || 2);
-          const rate = m.completionRate || (idx === 2 ? 92 : 65 + ((idx * 5) % 25));
+          const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
+          const rate = m.completionRate;
 
           return (
             <div
@@ -914,9 +962,11 @@ export function ProgressYearView({
       {/* Motivational Quote / Closing Prayer Card */}
       <div className="p-4 rounded-3xl bg-muted/40 border border-border/40 shadow-raised backdrop-blur-xl flex items-center justify-center text-center">
         <p className="text-[0.875rem] font-bold text-foreground">
-          {isArabic
-            ? "« ما شاء الله! انتظامك هذا العام رائع. استمر في الورد وادعُ أن يجعله الله في ميزان حسناتك »"
-            : "« Masha'Allah! Your consistency this year is wonderful. Keep up the good work and devotion »"}
+          {yearStats.totalCollections > 0
+            ? t(language, "garden.yearActivitySummary", {
+                count: formatNumerals(yearStats.totalCollections, language),
+              })
+            : t(language, "garden.yearNoActivity")}
         </p>
       </div>
     </div>

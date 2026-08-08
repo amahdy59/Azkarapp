@@ -231,12 +231,7 @@ export function TodayRoutineGarden({
         )}
 
         {activeTab === "week" && (
-          <ProgressWeekView
-            summary={summary}
-            language={language}
-            dailyCompletions={dailyCompletions}
-            referenceDate={displayDate}
-          />
+          <ProgressWeekView language={language} dailyCompletions={dailyCompletions} referenceDate={displayDate} />
         )}
 
         {activeTab === "month" && (

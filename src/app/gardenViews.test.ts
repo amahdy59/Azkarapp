@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createDailyCompletionIndex,
   getMonthGardenDays,
@@ -30,13 +30,13 @@ describe("garden view selectors", () => {
 
     expect(days).toHaveLength(29);
     expect(days[0]).toMatchObject({ completedCount: 4, isPalm: true, status: "complete" });
-    expect(days[1]).toMatchObject({ completedCount: 1, isPalm: false, status: "partial" });
+    expect(days[1]).toMatchObject({ completedCount: 0, isPalm: false, status: "unstarted" });
   });
 
   it("scopes year totals and active days to the requested year", () => {
     const stats = getYearGardenStats(createDailyCompletionIndex(records), 2024);
 
-    expect(stats).toEqual({ totalPalms: 2, totalCollections: 9, activeDays: 3 });
+    expect(stats).toEqual({ totalPalms: 2, totalCollections: 8, activeDays: 2 });
   });
 
   it("calculates weekly commitment matrix and routine totals accurately", () => {
@@ -78,6 +78,56 @@ describe("garden view selectors", () => {
     const sleepIndex = createDailyCompletionIndex(sleepDominant);
     expect(getMonthDetailedStats(sleepIndex, 2024, 2).bestRoutine).toBe("before_sleep");
     expect(getYearDetailedStats(sleepIndex, 2024).mostConsistentRoutine).toBe("before_sleep");
+  });
+
+  it("returns neutral empty-state selectors instead of inventing a best period", () => {
+    const index = createDailyCompletionIndex([]);
+
+    expect(getWeekGardenStats(index, new Date(2024, 1, 3), "en")).toMatchObject({
+      bestRoutine: null,
+      mostMissedRoutine: null,
+      completedDaysCount: 0,
+      bestStreakDays: 0,
+    });
+    expect(getMonthDetailedStats(index, 2024, 1)).toMatchObject({
+      bestRoutine: null,
+      fullDaysCount: 0,
+      completionRate: 0,
+      longestStreak: 0,
+    });
+    expect(getYearDetailedStats(index, 2024)).toMatchObject({
+      bestMonthIndex: null,
+      mostConsistentRoutine: null,
+      totalCollections: 0,
+      overallCompletionRate: 0,
+    });
+  });
+
+  it("counts all four main routines while excluding unrelated collections", () => {
+    const mixedRecords: DailyCollectionCompletion[] = [
+      { dayKey: "2024-03-01", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "travel", timeZone: "Africa/Cairo" },
+    ];
+    const index = createDailyCompletionIndex(mixedRecords);
+
+    expect(getWeekGardenStats(index, new Date(2024, 2, 1), "ar").bestRoutine).toBe("after_prayer");
+    expect(getMonthGardenDays(index, 2024, 2)[0]).toMatchObject({ completedCount: 1, status: "partial" });
+    expect(getMonthDetailedStats(index, 2024, 2).bestRoutine).toBe("after_prayer");
+    expect(getYearGardenStats(index, 2024)).toEqual({ totalPalms: 0, totalCollections: 1, activeDays: 1 });
+    expect(getYearDetailedStats(index, 2024).mostConsistentRoutine).toBe("after_prayer");
+  });
+
+  it("does not let future dates reset the current-year streak", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 3, 12));
+    const streakRecords: DailyCollectionCompletion[] = [];
+    for (const dayKey of ["2026-03-02", "2026-03-03"]) {
+      for (const category of ["morning", "evening", "before_sleep", "after_prayer"] as const) {
+        streakRecords.push({ dayKey, category, timeZone: "Africa/Cairo" });
+      }
+    }
+
+    expect(getYearDetailedStats(createDailyCompletionIndex(streakRecords), 2026).currentStreak).toBe(2);
   });
 
   it("handles English locale, perfect week, and streak tracking in weekly stats", () => {
@@ -122,4 +172,8 @@ describe("garden view selectors", () => {
     const brokenStats = getWeekGardenStats(brokenIndex, new Date(2024, 1, 3), "ar");
     expect(brokenStats.bestStreakDays).toBe(2);
   });
+});
+
+afterEach(() => {
+  vi.useRealTimers();
 });

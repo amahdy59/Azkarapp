@@ -52,14 +52,7 @@ describe("ProgressViews components", () => {
   });
 
   it("renders ProgressWeekView with commitment matrix in Arabic", () => {
-    render(
-      <ProgressWeekView
-        summary={mockSummary}
-        language="ar"
-        dailyCompletions={mockCompletions}
-        referenceDate={new Date(2026, 7, 5)}
-      />,
-    );
+    render(<ProgressWeekView language="ar" dailyCompletions={mockCompletions} referenceDate={new Date(2026, 7, 5)} />);
 
     expect(screen.getByText("التزامك هذا الأسبوع")).toBeInTheDocument();
     expect(screen.getByText("ملخص الأوراد هذا الأسبوع")).toBeInTheDocument();
@@ -69,7 +62,7 @@ describe("ProgressViews components", () => {
     render(<ProgressMonthView language="ar" targetYear={2026} targetMonth={7} dailyCompletions={mockCompletions} />);
 
     expect(screen.getByTestId("garden-month-calendar")).toBeInTheDocument();
-    expect(screen.getByText("انتظامك تحسن هذا الشهر")).toBeInTheDocument();
+    expect(screen.getByText("سجل هذا الشهر")).toBeInTheDocument();
   });
 
   it("renders ProgressYearView with monthly completion rate and heatmaps in Arabic", () => {
@@ -77,5 +70,28 @@ describe("ProgressViews components", () => {
 
     expect(screen.getByText("معدل الاكتمال الشهري")).toBeInTheDocument();
     expect(screen.getByText("نظرة سريعة")).toBeInTheDocument();
+  });
+
+  it("renders empty progress periods with recorded zero values and neutral guidance", () => {
+    const { rerender } = render(
+      <ProgressWeekView language="en" dailyCompletions={[]} referenceDate={new Date(2026, 7, 5)} />,
+    );
+
+    expect(screen.getByText("Completed all four routines on 0 days")).toBeInTheDocument();
+    expect(screen.getByText("No routine activity recorded for this period.")).toBeInTheDocument();
+    expect(screen.getAllByText("0 of 7")).toHaveLength(5);
+
+    rerender(<ProgressMonthView language="en" targetYear={2026} targetMonth={7} dailyCompletions={[]} />);
+
+    expect(screen.getByText("This month's record")).toBeInTheDocument();
+    expect(screen.getByText("0 full days recorded this month.")).toBeInTheDocument();
+    expect(screen.queryByText("Your consistency improved")).not.toBeInTheDocument();
+
+    rerender(<ProgressYearView language="en" targetYear={2026} dailyCompletions={[]} />);
+
+    expect(screen.getByText("Recorded completion rate by month.")).toBeInTheDocument();
+    expect(screen.getByText("Complete a routine to begin your yearly record.")).toBeInTheDocument();
+    expect(screen.queryByText(/improved by 12%/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/14367|214 active|32 days|78/)).not.toBeInTheDocument();
   });
 });

@@ -213,8 +213,9 @@ test("the week grid conveys completion as text, not shape alone", async ({ page 
 
   // Cells used to contain only an icon or an empty bordered circle, so a
   // screen reader announced the whole grid as blank.
-  await expect(table.locator("td .sr-only")).toHaveCount(21);
+  await expect(table.locator("td .sr-only")).toHaveCount(28);
   await expect(table).toContainText(/Morning: (Completed|Not completed)/);
+  await expect(table).toContainText(/Post-Prayer: (Completed|Not completed)/);
 
   // Headers must be associated with their column for grid navigation.
   const scoped = await table.locator("th[scope='col']").count();
