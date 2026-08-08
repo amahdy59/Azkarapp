@@ -807,3 +807,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `docs/CONTENT_AUTHORING.md`, `docs/agent/UI_FIX_BACKLOG.md`, pre-Phase-09 release evidence, Home/Library/Reader/Friday/Benefits/counter screens and tests, Friday progress utilities, Mushaf metadata/types, i18n, and semantic theme CSS.
 - **Tests/evidence required:** Content invariance and page-boundary tests; Home two-row and Friday-background tests; Library search/label/RTL tests; long-vs-short-surah interaction tests; Saved and Benefits navigation tests; weekly Friday progress tests; sound persistence/fallback tests; contrast, keyboard, touch-target, responsive, full `pnpm check`, full `pnpm test:e2e`, Pages build, CI/deployment, and production smoke evidence.
 - **Supersedes:** The utility-header structure in DEC-028/DEC-029 and DEC-026's consequence that non-Home screens render on a completely flat `--background`. DEC-026's Home-only photography rule remains authoritative. DEC-003/DEC-007 remain authoritative for opaque functional and devotional surfaces; this decision adds only the bounded page-background texture exception described above.
+
+---
+
+## DEC-045 — Benefits screen uses a dedicated evidence catalogue
+
+- **Date:** 2026-08-08
+- **Status:** Approved
+- **Owner:** User (provided the conservative source review and explicitly requested removal of non-Qur’an/non-hadith cards)
+- **Related scope:** Pre-Phase-09 Benefits content correction
+- **Context:** DEC-044 assembled the Benefits screen by scraping every reviewed `benefit` field in the app. Those fields include contextual editorial summaries, so generic statements appeared as if they were standalone religious benefits. The user supplied a source-led review prioritizing the Qur’an, Sahih al-Bukhari, Sahih Muslim, and explicitly authenticated reports.
+- **Decision:** The Benefits screen now uses a dedicated bilingual catalogue in this order: seven Qur’anic evidence entries, 21 authenticated hadith entries, and exactly 30 concise benefits directly mapped to their hadith evidence IDs. The UI groups the material with accessible tabs and subgroups, keeps sources visible and linked, and batches lists over 20 items. General collection `benefit` fields are no longer a Benefits-screen data source.
+- **Content boundary:** A derived card may restate or separate promises explicitly contained in its linked hadith, but may not create a reward, count, timing, protection claim, or interpretation. Qur’anic excerpts remain source-linked and are not represented as full verses when excerpted.
+- **Review evidence:** User-supplied research dated 2026-08-08; implementation cross-check against the linked Quran.com and Dorar al-Saniyyah records; invariant tests enforce group sizes, source domains, stable evidence links, and the removal of the reported generic cards.
+- **Tests/evidence required:** Catalogue invariant tests; bilingual component tests; WhatsApp source-preservation test; desktop/mobile browser test; mandatory local release gate; green GitHub Quality and Pages workflows; production smoke verification.
+- **Supersedes:** DEC-044’s Benefits data-source rule. DEC-044 remains authoritative for the route, Home entry, sharing action, and all unrelated pre-Phase-09 contracts.

@@ -43,6 +43,17 @@ Use this minimal shape:
 - `orderIndex`: unique inside the category. Reordering must not change IDs.
 - `sourceUrl`, `preferredTiming`, `authenticityNote`, and `notes`: optional; add only when reviewed and useful to the reader.
 
+### Benefits evidence catalogue
+
+The dedicated Benefits screen reads `src/app/content/zikrBenefits.ts`; it must not scrape general editorial `benefit` fields from every collection.
+
+- Keep the display order Qur’an, authenticated hadith, then concise hadith-derived benefits.
+- A Qur’an record must carry an exact surah/ayah reference and a direct Quran source URL. An excerpt must remain contiguous and must not be presented as the complete ayah.
+- A hadith record must identify the collection and number. Reports outside Sahih al-Bukhari and Sahih Muslim must also record the named authentication relied upon.
+- Every derived benefit must reference a stable hadith evidence ID. It may split multiple promises stated in one hadith, but must not infer a new promise or count.
+- The 30-item derived collection is a reviewed product set, not a target to fill with generic encouragement. Changing its wording, count, or evidence mapping requires content review and invariant tests.
+- Keep source links visible and include the same source in shared text so a benefit is never detached from its evidence.
+
 ### Mushaf page metadata for complete surahs
 
 `mushafPages` is optional structural metadata for a reviewed, complete surah. It controls page separators and long-surah reader behavior; it is not devotional text and must never be used to rewrite, normalize, or reflow `arabicText`.
