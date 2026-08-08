@@ -21,7 +21,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       VitePWA({
-        registerType: "prompt",
+        registerType: "autoUpdate",
         includeAssets: ["**/*.svg"],
         manifest: {
           name: "Azkar",
