@@ -16,9 +16,14 @@ test("onboarding offers a visible skip action for pointer and keyboard users", a
   await expect(page.locator('#main-content[data-view="home"]')).toBeVisible();
 });
 
-async function openReturningGuest(page: Page, savedZikrIds: string[] = [], completedComprehensiveDuas: string[] = []) {
+async function openReturningGuest(
+  page: Page,
+  savedZikrIds: string[] = [],
+  completedComprehensiveDuas: string[] = [],
+  language: "ar" | "en" = "en",
+) {
   await page.addInitScript(
-    ({ saved, comprehensiveDuas }) => {
+    ({ saved, comprehensiveDuas, locale }) => {
       const progressDate = new Date();
       progressDate.setHours(progressDate.getHours() - 4);
       const progressDayKey = [
@@ -30,7 +35,7 @@ async function openReturningGuest(page: Page, savedZikrIds: string[] = [], compl
       window.localStorage.setItem(
         "azkarapp.state.v1",
         JSON.stringify({
-          settings: { language: "en", themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
+          settings: { language: locale, themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
           profile: { displayName: "Guest", isGuest: true },
           completed: {
             morning: [],
@@ -54,7 +59,7 @@ async function openReturningGuest(page: Page, savedZikrIds: string[] = [], compl
         }),
       );
     },
-    { saved: savedZikrIds, comprehensiveDuas: completedComprehensiveDuas },
+    { saved: savedZikrIds, comprehensiveDuas: completedComprehensiveDuas, locale: language },
   );
 
   await page.goto("/");
@@ -129,6 +134,65 @@ test("Home Saved preview opens its item and the full Saved library state", async
 
   await expect(page.getByRole("tab", { name: /Saved/ })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
+});
+
+test("Home populated cards stay inside the content boundary at every responsive tier", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "desktop-chromium", "One Chromium context covers the full width matrix.");
+
+  await openReturningGuest(page, ["m-hm-77m", "m-hm-78m", "m-hm-75"], [], "ar");
+
+  for (const viewport of [
+    { width: 320, height: 700 },
+    { width: 390, height: 844 },
+    { width: 600, height: 800 },
+    { width: 768, height: 846 },
+    { width: 899, height: 800 },
+    { width: 900, height: 800 },
+    { width: 1199, height: 800 },
+    { width: 1200, height: 800 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.waitForTimeout(100);
+
+    const geometry = await page.evaluate(() => {
+      const saved = document.querySelector<HTMLElement>('[data-testid="home-saved-section"]')!;
+      const benefits = document.querySelector<HTMLElement>('[data-testid="home-benefits-card"]')!;
+      const region = saved.closest<HTMLElement>('[role="region"]')!;
+      const regionBounds = region.getBoundingClientRect();
+      const elements = [saved, benefits, ...saved.querySelectorAll<HTMLElement>("button")];
+
+      return {
+        regionOverflow: region.scrollWidth - region.clientWidth,
+        offenders: [...region.querySelectorAll<HTMLElement>("*")]
+          .map((element) => {
+            const bounds = element.getBoundingClientRect();
+            return {
+              tag: element.tagName,
+              testId: element.dataset.testid ?? "",
+              className: element.className.toString(),
+              leftGap: bounds.left - regionBounds.left,
+              rightGap: regionBounds.right - bounds.right,
+            };
+          })
+          .filter((element) => element.leftGap < -1 || element.rightGap < -1),
+        elements: elements.map((element) => {
+          const bounds = element.getBoundingClientRect();
+          return {
+            leftGap: bounds.left - regionBounds.left,
+            rightGap: regionBounds.right - bounds.right,
+          };
+        }),
+      };
+    });
+
+    expect(geometry.offenders, `Home overflow elements at ${viewport.width}px`).toEqual([]);
+    expect(geometry.regionOverflow, `Home content overflow at ${viewport.width}px`).toBeLessThanOrEqual(1);
+    for (const [index, element] of geometry.elements.entries()) {
+      expect(element.leftGap, `Home element ${index} left bound at ${viewport.width}px`).toBeGreaterThanOrEqual(-1);
+      expect(element.rightGap, `Home element ${index} right bound at ${viewport.width}px`).toBeGreaterThanOrEqual(-1);
+    }
+  }
 });
 
 test("Friday mode omits the removed supporting copy and remains overflow-free", async ({ page }) => {

@@ -593,7 +593,7 @@ export function HomeScreen({
 
           <SectionDivider label={t(language, "home.yourLibrary")} />
 
-          <div className="grid items-stretch gap-3.5 lg:grid-cols-2">
+          <div className="grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
             <section
               aria-labelledby="home-saved-heading"
               className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
@@ -699,7 +699,7 @@ export function HomeScreen({
           {/* Friday card: artwork at the start edge, the Kahf message and its
               call to action in the middle, and the virtues list at the end. */}
           <section aria-labelledby="friday-card-heading">
-            <div className="flex flex-col items-stretch gap-5 rounded-3xl border border-border/40 bg-card p-6 shadow-raised md:flex-row md:items-center">
+            <div className="flex flex-col items-stretch gap-5 rounded-3xl border border-border/40 bg-card p-6 shadow-raised xl:flex-row xl:items-center">
               <div
                 className="flex size-[120px] shrink-0 items-center justify-center self-center rounded-2xl border border-amber-500/30 bg-amber-500/15 text-5xl"
                 aria-hidden="true"
@@ -728,7 +728,7 @@ export function HomeScreen({
                 )}
               </div>
 
-              <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start md:w-[280px]">
+              <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start xl:w-[280px]">
                 <p className="mb-2 text-[0.8125rem] font-black text-amber-700 dark:text-amber-400" dir="auto">
                   {isArabic ? "من فضائل يوم الجمعة" : "Virtues of Friday"}
                 </p>

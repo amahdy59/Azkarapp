@@ -140,3 +140,13 @@ DEC-044 records:
 ## Recommended next step
 
 Publish the verified commit to `origin/main`, monitor Quality and Pages through successful deployment, and complete the production smoke test. Start Phase 09 only after the publication handoff is green.
+
+## 2026-08-09 Home responsive boundary follow-up
+
+- **Objective completed:** Populated Saved and Benefits cards now remain inside Home's scroll-region boundary instead of expanding an implicit grid column beyond the screen.
+- **Files changed:** `HomeScreen.tsx`, `e2e/pre-phase-nine.spec.ts`, and `public/release-notes.json`.
+- **User-visible behavior:** Home cards fit compact, medium, expanded, and large layouts, including the reported 768px view.
+- **Accessibility:** Long Arabic saved text still truncates visually while the complete button name remains available to assistive technology.
+- **Focused evidence:** The populated Arabic Home boundary test passed at 320, 390, 600, 768, 899, 900, 1199, 1200, and 1440px; live browser review covered phone, medium, and desktop layouts.
+- **Remaining risk:** Manual safe-area and real screen-reader checks remain pending as documented in `docs/QUALITY_CHECKLIST.md`.
+- **Recommended next phase:** Start Phase 09 only after this follow-up's release workflows and production smoke test are green.
