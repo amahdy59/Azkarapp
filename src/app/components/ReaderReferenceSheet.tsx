@@ -90,9 +90,7 @@ function ReferenceContent({
             <h2 className="text-[1.125rem] font-extrabold text-foreground leading-snug">
               {t(language, "reader.referencesButton")}
             </h2>
-            <p className="text-[0.75rem] font-medium text-muted-foreground">
-              {isArabic ? "الأدلة والفوائد والتخريج" : "Evidence, Benefits & Sources"}
-            </p>
+            <p className="text-[0.75rem] font-medium text-muted-foreground">{t(language, "reader.referenceTitle")}</p>
           </div>
         </div>
         <button
@@ -217,7 +215,7 @@ function ReferenceContent({
               <div className="flex items-center gap-2">
                 <span className="h-4 w-1 rounded-full bg-amber-500" aria-hidden="true" />
                 <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-amber-600 dark:text-amber-400">
-                  {isArabic ? "وقت الاستحباب والهدى النبوي" : "Recommended Timing & Guidance"}
+                  {t(language, "reader.timingGuidance")}
                 </h3>
               </div>
               <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">

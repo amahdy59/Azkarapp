@@ -180,6 +180,8 @@ const en = {
     progressComplete: "Friday practices complete — may Allah accept your worship.",
   },
   library: {
+    occasionalSupplications: "Occasional supplications",
+    supplications: "supplications",
     groups: {
       daily: "Daily Azkar",
       place: "Place & Travel",
@@ -525,6 +527,7 @@ const en = {
     shareMilestone: "Share Milestone",
   },
   completion: {
+    completedCategory: "Completed {category}",
     sessionComplete: "{category} session complete",
     mashaAllah: "Masha’Allah!",
     completed: "You completed {category}",
@@ -630,6 +633,11 @@ const en = {
     continueAdditional: "Continue with {count} additional adhkar",
   },
   reader: {
+    tapToCount: "Tap to count",
+    ayahs: "Ayahs",
+    wordMeaningsTitle: "Quranic Word Meanings & Exegesis",
+    referenceTitle: "Evidence, Benefits & Sources",
+    timingGuidance: "Recommended Timing & Guidance",
     title: "Zikr {index} of {total}",
     collectionPercentComplete: "{percent}% complete",
     collectionCount: "{done} of {total}",
@@ -731,6 +739,7 @@ const en = {
     completedSurah: "Completed",
   },
   counter: {
+    tasbeehTitle: "Tasbeeh Counter",
     sound: "Counter sound",
     muteSound: "Mute counter sound",
     enableSound: "Enable counter sound",

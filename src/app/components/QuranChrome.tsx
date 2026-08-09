@@ -1,5 +1,6 @@
 import type { AppLanguage, Zikr } from "../types";
 import { formatNumerals, numeralFontFamily } from "../formatting";
+import { t } from "../i18n";
 
 export const SEEK_REFUGE_ARABIC = "أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ";
 export const BASMALAH_ARABIC = "بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ";
@@ -60,7 +61,7 @@ export function QuranSurahFooter({ zikr, language }: { zikr: Zikr; language: App
             className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80"
             style={{ fontFamily: numeralFontFamily(language) }}
           >
-            {language === "ar" ? "آيَاتُهَا" : "Ayahs"} {formatNumerals(zikr.verseCount, language)}
+            {t(language, "reader.ayahs")} {formatNumerals(zikr.verseCount, language)}
           </span>
         )}
       </div>

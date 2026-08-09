@@ -180,6 +180,8 @@ const ar = {
     progressComplete: "اكتملت أعمال الجمعة — تقبل الله طاعتك.",
   },
   library: {
+    occasionalSupplications: "أذكار سياقية",
+    supplications: "أذكار",
     groups: {
       daily: "أذكار اليوم",
       place: "أذكار المكان والسفر",
@@ -512,6 +514,7 @@ const ar = {
     shareMilestone: "مشاركة الإنجاز",
   },
   completion: {
+    completedCategory: "أكملت {category}",
     sessionComplete: "اكتملت جلسة {category}",
     mashaAllah: "ما شاء الله!",
     completed: "أكملت {category}",
@@ -617,6 +620,11 @@ const ar = {
     continueAdditional: "تابع {count} ذكرًا إضافيًا",
   },
   reader: {
+    tapToCount: "اضغط للتسبيح",
+    ayahs: "آيَاتُهَا",
+    wordMeaningsTitle: "معاني كلمات القرآن الكريمة",
+    referenceTitle: "الأدلة والفوائد والتخريج",
+    timingGuidance: "وقت الاستحباب والهدى النبوي",
     title: "\u0630\u0643\u0631 {index} \u0645\u0646 {total}",
     collectionPercentComplete: "{percent}% مكتمل",
     collectionCount: "{done} من {total}",
@@ -749,6 +757,7 @@ const ar = {
     completedSurah: "تمت القراءة بنجاح",
   },
   counter: {
+    tasbeehTitle: "المسبحة الإلكترونية",
     sound: "صوت العداد",
     muteSound: "كتم صوت العداد",
     enableSound: "تشغيل صوت العداد",

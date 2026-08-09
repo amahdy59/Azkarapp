@@ -205,12 +205,13 @@ export function AzkarLibraryScreen({
                             done: formatNumerals(done, language),
                             total: formatNumerals(total, language),
                           })}
-                          occasionalSubtitle={`${formatNumerals(total, language)} ${isArabic ? "أذكار سياقية" : "Occasional supplications"}`}
+                          occasionalSubtitle={`${formatNumerals(total, language)} ${t(language, "library.occasionalSupplications")}`}
                           ariaLabel={
                             isOccasional
-                              ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${
-                                  isArabic ? "أذكار" : "supplications"
-                                }`
+                              ? `${isArabic ? category.nameArabic : category.name}, ${formatNumerals(total, language)} ${t(
+                                  language,
+                                  "library.supplications",
+                                )}`
                               : [isArabic ? category.nameArabic : category.name, routineSummary, progressLabel]
                                   .filter(Boolean)
                                   .join(", ")

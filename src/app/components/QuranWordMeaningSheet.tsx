@@ -44,7 +44,7 @@ function WordMeaningContent({
               {t(language, "reader.wordMeaningTitle")}
             </h2>
             <p className="text-[0.75rem] font-medium text-muted-foreground">
-              {language === "ar" ? "معاني كلمات القرآن الكريمة" : "Quranic Word Meanings & Exegesis"}
+              {t(language, "reader.wordMeaningsTitle")}
             </p>
           </div>
         </div>

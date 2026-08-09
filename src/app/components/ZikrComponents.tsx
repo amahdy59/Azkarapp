@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { motion } from "motion/react";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
+import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
@@ -121,7 +122,7 @@ export function ZikrCounterSurface({
 }: ZikrCounterSurfaceProps) {
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
-  const defaultInstruction = isArabic ? "اضغط للتسبيح" : "Tap to count";
+  const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
 
   const localizedCount = formatNumerals(count, language);

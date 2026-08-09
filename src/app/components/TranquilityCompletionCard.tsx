@@ -54,7 +54,7 @@ export function TranquilityCompletionCard({
     return quote ?? REFLECTION_QUOTES[0]!;
   }, []);
 
-  const completedTitle = isArabic ? `أكملت ${categoryName}` : `Completed ${categoryName}`;
+  const completedTitle = t(language, "completion.completedCategory", { category: categoryName });
   const completedSubtitle = t(language, "home.completedSubtitle");
   const reviewLabel = t(language, "home.reviewAction", { name: categoryName });
 
