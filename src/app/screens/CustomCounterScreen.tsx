@@ -8,15 +8,10 @@ import { AUTHENTIC_AZKAR_COLLECTION, type AuthenticZikrItem } from "../content/a
 import { formatNumerals } from "../formatting";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { t } from "../i18n";
+import { vibrateIfEnabled } from "../motionPreferences";
 import type { AppLanguage } from "../types";
-import { Check, RotateCcw, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
+import { Check, RotateCcw, Undo, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
 import { PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
-
-function vibrate(pattern: number | number[]) {
-  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    navigator.vibrate(pattern);
-  }
-}
 
 export function CustomCounterScreen({
   isArabic,
@@ -58,15 +53,11 @@ export function CustomCounterScreen({
     setPulse((v) => v + 1);
     playClickFeedback();
 
-    if (hapticFeedback) {
-      vibrate(8);
-    }
+    vibrateIfEnabled(hapticFeedback, 8);
 
     if (isTargetMode && nextCount >= target) {
       setShowCompletionDialog(true);
-      if (hapticFeedback) {
-        vibrate([30, 50, 40, 50, 60]);
-      }
+      vibrateIfEnabled(hapticFeedback, [30, 50, 40, 50, 60]);
     }
   }, [isTargetComplete, count, hapticFeedback, isTargetMode, playClickFeedback, target]);
 
@@ -234,8 +225,8 @@ export function CustomCounterScreen({
                 disabled={count === 0}
                 className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
               >
-                <RotateCcw size={16} />
-                <span>{isArabic ? "تراجع" : "Undo"}</span>
+                <Undo size={16} />
+                <span>{t(language, "reader.undo")}</span>
               </button>
 
               <button
@@ -245,7 +236,7 @@ export function CustomCounterScreen({
                 className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
               >
                 <RotateCcw size={16} />
-                <span>{isArabic ? "إعادة الفتح" : "Reset"}</span>
+                <span>{t(language, "reader.resetCounter")}</span>
               </button>
             </div>
 

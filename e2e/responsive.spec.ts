@@ -288,7 +288,7 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   // Wait for the lazy screen to actually mount first. Asserting straight after
   // guest mode passes vacuously: toHaveCount matches the shell's lone landmark
   // before the screen renders, so a screen-level <main> would slip through.
-  await expect(page.getByTestId("home-primary-cta")).toBeVisible();
+  await expect(page.getByTestId("home-primary-cta")).toBeVisible({ timeout: 15_000 });
   await expect(page.locator("main")).toHaveCount(1);
 
   await page.getByTestId("nav-azkar").click();

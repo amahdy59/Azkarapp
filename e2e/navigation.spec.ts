@@ -23,6 +23,22 @@ test("@cross-browser Azkar tab opens the library and exposes search", async ({ p
   await expect(page.getByRole("heading", { name: "Azkar Library", exact: true })).toBeVisible();
 });
 
+test("hash routes restore lazy collections, reject invalid positions, and preserve PWA shortcuts", async ({ page }) => {
+  await enterAsEnglishGuest(page);
+
+  await page.goto("/#/azkar/comprehensive-duas");
+  await expect(page.getByRole("heading", { name: "Comprehensive Duas", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/#\/azkar\/comprehensive-duas$/);
+
+  await page.goto("/#/azkar/morning/9999");
+  await expect(page).toHaveURL(/#\/azkar\/morning$/);
+  await expect(page.getByRole("heading", { name: "Morning Azkar", exact: true })).toBeVisible();
+
+  await page.goto("/?category=evening");
+  await expect(page.getByRole("heading", { name: "Evening Azkar", exact: true })).toBeVisible();
+  await expect(page).toHaveURL(/#\/azkar\/evening$/);
+});
+
 test("saved zikr is visible from the first-class Saved library tab", async ({ page }) => {
   await enterAsEnglishGuest(page);
 

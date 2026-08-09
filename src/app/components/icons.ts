@@ -67,6 +67,8 @@ export {
   Phone01 as Smartphone,
   Play,
   RefreshCcw01 as RotateCcw,
+  // Distinct from RotateCcw, which the design system reserves for reset/restart.
+  ReverseLeft as Undo,
   SearchMd as Search,
   SearchMd as SearchIcon,
   Settings01 as Settings,

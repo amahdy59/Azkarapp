@@ -16,6 +16,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
+import { scrollBehavior, vibrateIfEnabled } from "../motionPreferences";
 import {
   getLocalizedPreferredTiming,
   getLocalizedZikrBenefit,
@@ -36,6 +37,8 @@ export function CategoryScreen({
   audioCoverage,
   routineMode = "complete",
   onRoutineModeChange,
+  hapticFeedback = true,
+  reduceMotion = false,
 }: {
   catId: CategoryId;
   completed: Set<string>;
@@ -50,6 +53,8 @@ export function CategoryScreen({
   audioCoverage?: { available: number; unavailable: number; total: number };
   routineMode?: RoutineMode;
   onRoutineModeChange?: (mode: RoutineMode) => void;
+  hapticFeedback?: boolean;
+  reduceMotion?: boolean;
 }) {
   const isMainRoutine = isRoutineCategory(catId);
   const allAzkar = getAzkarByCategory(catId);
@@ -158,15 +163,13 @@ export function CategoryScreen({
         setTimeout(() => {
           const el = document.getElementById(`zikr-card-${targetIndex}`);
           if (el) {
-            el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            el.scrollIntoView({ behavior: scrollBehavior(reduceMotion), block: "nearest" });
           }
         }, 120);
       }
     } else {
       setCardCounts((prev) => ({ ...prev, [index]: nextCount }));
-      if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-        navigator.vibrate(15);
-      }
+      vibrateIfEnabled(hapticFeedback, 15);
     }
   };
 

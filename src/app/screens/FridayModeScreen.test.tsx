@@ -23,9 +23,45 @@ describe("FridayModeScreen", () => {
       />,
     );
 
-    expect(screen.getByText("Ayah 110 of 110")).toBeInTheDocument();
+    expect(screen.getByText("Completed")).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Start reading" }));
     expect(onStartKahf).toHaveBeenCalledOnce();
+  });
+
+  it("reports only the Al-Kahf status it can actually prove", () => {
+    const { rerender } = render(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={0}
+        duasCompletedCount={0}
+        duasTotalCount={47}
+        onBack={() => undefined}
+        onStartKahf={() => undefined}
+        onOpenSalawat={() => undefined}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+
+    // Nothing opened and nothing completed — no invented verse number.
+    expect(screen.getByText("Not started")).toBeInTheDocument();
+    expect(screen.queryByText(/Ayah/)).not.toBeInTheDocument();
+
+    rerender(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={1}
+        duasCompletedCount={0}
+        duasTotalCount={47}
+        onBack={() => undefined}
+        onStartKahf={() => undefined}
+        onOpenSalawat={() => undefined}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
   it("keeps the Sunnahs as a weekly checklist and the duas behind one action", () => {

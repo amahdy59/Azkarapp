@@ -100,6 +100,7 @@ Users who prefer reduced motion should have a comfortable experience. This is co
 - Opacity transitions and color changes may remain.
 - Maximum duration for any reduced animation is **100ms**.
 - Implement per-component alternatives instead of a global sledgehammer override where appropriate.
+- JavaScript-driven smooth scrolling and completion effects must use the shared `motionPreferences.ts` gate so both the OS preference and the in-app Reduce Motion setting are honored. Haptics use the same boundary and remain independently controlled by the Haptic Feedback setting.
 
 ## 8. Accessibility Requirements
 

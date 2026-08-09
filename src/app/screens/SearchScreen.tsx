@@ -52,7 +52,7 @@ export function CategoryBadge({ catId, language }: { catId: CategoryId; language
 
   return (
     <div className={`flex items-center justify-center rounded-full px-2 py-1 shrink-0 ${className}`}>
-      <p className="text-[0.625rem] font-medium font-sans leading-[14px] whitespace-nowrap">{label}</p>
+      <p className="text-[0.75rem] font-medium font-sans leading-[16px] whitespace-nowrap">{label}</p>
     </div>
   );
 }
@@ -253,7 +253,9 @@ export function SearchScreen({
                         {label}
                       </p>
                       <p
-                        className="w-full truncate text-start font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
+                        // Two lines rather than one: Arabic previews lose their
+                        // sense far earlier than Latin text when clipped mid-phrase.
+                        className="line-clamp-2 w-full text-start font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >

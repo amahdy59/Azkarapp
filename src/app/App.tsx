@@ -1,6 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
+import { parseLocation, routeToHash } from "./routing";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "./content/azkar";
 import type {
   AppLanguage,
@@ -31,6 +32,20 @@ const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 function categoryFromShortcutUrl(): CategoryId | null {
   const category = new URLSearchParams(window.location.search).get("category");
   return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
+}
+
+function isLazyRouteCategory(categoryId: CategoryId): boolean {
+  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf";
+}
+
+async function loadLazyRouteCategory(categoryId: CategoryId) {
+  if (categoryId === "comprehensive_duas") {
+    const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
+    registerLazyCollection(categoryId, COMPREHENSIVE_DUAS);
+  } else if (categoryId === "friday_kahf") {
+    const { FRIDAY_KAHF } = await import("./content/fridayKahf");
+    registerLazyCollection(categoryId, FRIDAY_KAHF);
+  }
 }
 
 import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
@@ -151,16 +166,24 @@ const AudioContentReviewScreen = lazy(() =>
   import("./screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
 );
 
+type NavTab = "home" | "azkar" | "progress" | "settings";
+
+/** Keeps the bottom/rail navigation highlight in step with a restored route. */
+function tabForView(view: View): NavTab {
+  if (view === "settings") return "settings";
+  if (view === "progress") return "progress";
+  if (view === "library" || view === "category" || view === "reader") return "azkar";
+  return "home";
+}
+
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent() {
   const initialState = useRef(loadAppState()).current;
-  const [view, setView] = useState<View>(() => {
-    const requestedView = new URLSearchParams(window.location.search).get("view");
-    if (requestedView === "auth-callback") return "auth-callback";
-    if (requestedView === "friday") return "friday";
-    if (requestedView === "custom_counter") return "custom_counter";
-    return "splash";
-  });
+  // Deep link wins over the splash screen, so a shared or bookmarked URL opens
+  // the screen it names instead of restarting the app at the beginning.
+  const initialRoute = useRef(parseLocation(window.location.search, window.location.hash)).current;
+  const initialShortcutCategory = useRef(categoryFromShortcutUrl()).current;
+  const [view, setView] = useState<View>(() => initialRoute?.view ?? "splash");
   const initialHistoryView = useRef(view).current;
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -173,15 +196,46 @@ function AppContent() {
   const [showAudioReview, setShowAudioReview] = useState(
     () => import.meta.env.DEV && new URLSearchParams(window.location.search).get("audio-review") === "1",
   );
-  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">("home");
-  const [activeCat, setActiveCat] = useState<CategoryId>("morning");
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">(() =>
+    tabForView(initialRoute?.view ?? "home"),
+  );
+  const [activeCat, setActiveCat] = useState<CategoryId>(initialRoute?.categoryId ?? "morning");
+  const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
+  const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
   const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
+  const [routeContentLoading, setRouteContentLoading] = useState(
+    () =>
+      initialRoute?.view === "reader" ||
+      Boolean(initialRoute?.categoryId && isLazyRouteCategory(initialRoute.categoryId)),
+  );
+  const routeLoadId = useRef(0);
+
+  const hydrateRouteCategory = useCallback(
+    async (categoryId: CategoryId, targetView: View, targetIndex = 0) => {
+      const loadId = ++routeLoadId.current;
+      setRouteContentLoading(true);
+      try {
+        await loadLazyRouteCategory(categoryId);
+        if (loadId !== routeLoadId.current) return;
+
+        const mode = isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete";
+        const items = getAzkarForMode(categoryId, mode);
+        if (targetView === "reader" && (targetIndex < 0 || targetIndex >= items.length)) {
+          setActiveIdx(0);
+          setView(items.length > 0 ? "category" : "library");
+        }
+      } catch {
+        if (loadId === routeLoadId.current) setView("library");
+      } finally {
+        if (loadId === routeLoadId.current) setRouteContentLoading(false);
+      }
+    },
+    [routineModes],
+  );
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
-  const activeAzkarList = useMemo(() => getAzkarForMode(activeCat, activeRoutineMode), [activeCat, activeRoutineMode]);
+  const activeAzkarList = getAzkarForMode(activeCat, activeRoutineMode);
   const layoutMode = useLayoutMode();
   useViewFocus(view);
 
@@ -260,6 +314,12 @@ function AppContent() {
   useEffect(() => {
     ensureCurrentFridayWeek();
   }, [ensureCurrentFridayWeek]);
+
+  useEffect(() => {
+    if (initialRoute?.categoryId && (initialRoute.view === "reader" || isLazyRouteCategory(initialRoute.categoryId))) {
+      void hydrateRouteCategory(initialRoute.categoryId, initialRoute.view, initialRoute.index);
+    }
+  }, [hydrateRouteCategory, initialRoute]);
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -393,8 +453,11 @@ function AppContent() {
   // and Back navigated out of the app instead of home.
   const inAppHistoryDepth = useRef(0);
 
+  // Creates the history entry only. The URL itself is written by the sync
+  // effect below, which also catches the places that call setView directly
+  // (keyboard shortcuts, app shortcuts) so the address bar never lies.
   const push = useCallback((to: View) => {
-    window.history.pushState({ view: to }, "", `?view=${to}`);
+    window.history.pushState({ view: to }, "", window.location.href);
     inAppHistoryDepth.current += 1;
     setView(to);
   }, []);
@@ -696,30 +759,73 @@ function AppContent() {
     }
   }, [initialHistoryView]);
 
+  // Single writer for the address bar: whatever the app is showing, the URL
+  // says so, and reloading that URL comes back to the same place.
+  useEffect(() => {
+    const hash = routeToHash({ view, categoryId: activeCat, index: activeIdx, query: searchQuery });
+    // Onboarding and auth steps have no linkable route — leave the URL alone.
+    if (!hash) return;
+    const target = `${window.location.pathname}${hash}`;
+    if (`${window.location.pathname}${window.location.hash}` !== target) {
+      window.history.replaceState({ view }, "", target);
+    }
+  }, [view, activeCat, activeIdx, searchQuery]);
+
+  // Adopts whatever the address bar currently says. Idempotent, so it is safe
+  // for popstate and hashchange to both fire for the same navigation.
+  const applyRouteFromLocation = useCallback((): boolean => {
+    const route = parseLocation(window.location.search, window.location.hash);
+    if (!route) return false;
+    setView(route.view);
+    if (route.categoryId) {
+      setActiveCat(route.categoryId);
+      if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
+        void hydrateRouteCategory(route.categoryId, route.view, route.index);
+      } else {
+        routeLoadId.current += 1;
+        setRouteContentLoading(false);
+      }
+    } else {
+      routeLoadId.current += 1;
+      setRouteContentLoading(false);
+    }
+    if (route.index !== undefined) setActiveIdx(route.index);
+    if (route.query !== undefined) setSearchQuery(route.query);
+    setActiveTab(tabForView(route.view));
+    return true;
+  }, [hydrateRouteCategory]);
+
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
       // Keep the in-app depth counter in step with the browser's own Back
       // button, not just our pop() helper, so the two never drift apart.
       inAppHistoryDepth.current = Math.max(0, inAppHistoryDepth.current - 1);
 
-      if (e.state && e.state.view) {
+      // The URL is the source of truth; history.state is only a fallback for
+      // entries pushed before the route was written.
+      if (applyRouteFromLocation()) return;
+      if (e.state?.view) {
         setView(e.state.view);
-        if (e.state.view === "settings") {
-          setActiveTab("settings");
-        } else if (e.state.view === "progress") {
-          setActiveTab("progress");
-        } else if (e.state.view === "library" || e.state.view === "category") {
-          setActiveTab("azkar");
-        } else if (e.state.view === "home") {
-          setActiveTab("home");
-        }
+        setActiveTab(tabForView(e.state.view));
       } else {
         setView(hasCompletedOnboarding ? "home" : "language");
       }
     };
+
+    // Typing a route into the address bar, or following an in-page link, fires
+    // hashchange but not popstate — without this the sync effect would simply
+    // overwrite the hash the user just asked for.
+    const handleHashChange = () => {
+      applyRouteFromLocation();
+    };
+
     window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, [hasCompletedOnboarding, setView, setActiveTab]);
+    window.addEventListener("hashchange", handleHashChange);
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+      window.removeEventListener("hashchange", handleHashChange);
+    };
+  }, [applyRouteFromLocation, hasCompletedOnboarding, setView, setActiveTab]);
 
   // Global Keyboard Shortcuts (Cmd+K / Ctrl+K / '/' for search; Alt+1..5 for tabs)
   useEffect(() => {
@@ -780,7 +886,7 @@ function AppContent() {
       return;
     }
 
-    const category = categoryFromShortcutUrl();
+    const category = initialShortcutCategory;
     if (!category) {
       return;
     }
@@ -789,7 +895,7 @@ function AppContent() {
     setActiveTab("azkar");
     setView("category");
     window.history.replaceState(null, "", window.location.pathname);
-  }, [view]);
+  }, [initialShortcutCategory, view]);
 
   const handleNavTab = (tab: "home" | "azkar" | "progress" | "settings") => {
     setActiveTab(tab);
@@ -1076,6 +1182,9 @@ function AppContent() {
                   onSelectCategory={openCategory}
                 />
               )}
+              {(view === "category" || view === "reader") && routeContentLoading && (
+                <ScreenFallback language={selectedLang} />
+              )}
               {view === "friday" && (
                 <FridayModeScreen
                   isArabic={isArabic}
@@ -1121,7 +1230,7 @@ function AppContent() {
                   }}
                 />
               )}
-              {view === "category" && (
+              {view === "category" && !routeContentLoading && (
                 <CategoryScreen
                   catId={activeCat}
                   completed={
@@ -1177,9 +1286,11 @@ function AppContent() {
                       setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
                     }
                   }}
+                  hapticFeedback={hapticFeedback}
+                  reduceMotion={reduceMotion}
                 />
               )}
-              {view === "reader" && (
+              {view === "reader" && !routeContentLoading && activeZikr && (
                 <ReaderScreen
                   catId={activeCat}
                   idx={activeIdx}
@@ -1202,6 +1313,7 @@ function AppContent() {
                         : (completed[activeCat]?.size ?? 0)
                   }
                   hapticFeedback={hapticFeedback}
+                  reduceMotion={reduceMotion}
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
                   textSize={textSize}
@@ -1291,6 +1403,8 @@ function AppContent() {
                         }
                       : undefined
                   }
+                  reduceMotion={reduceMotion}
+                  hapticFeedback={hapticFeedback}
                 />
               )}
               {view === "settings" && (

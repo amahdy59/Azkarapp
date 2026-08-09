@@ -412,7 +412,7 @@ export function HomeScreen({
       <div
         tabIndex={0}
         role="region"
-        aria-label={t(language, "app.name")}
+        aria-label={t(language, "home.title")}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-page pb-24 pt-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         <div className="flex w-full flex-col gap-4 lg:gap-5">

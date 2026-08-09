@@ -28,7 +28,7 @@ describe("AzkarLibraryScreen", () => {
     expect(onCategory).toHaveBeenCalledWith("comprehensive_duas");
   });
 
-  it("keeps search on the Library until a non-empty query is entered", () => {
+  it("filters collections in place while typing instead of navigating away", () => {
     const onSearch = vi.fn();
 
     render(
@@ -48,13 +48,39 @@ describe("AzkarLibraryScreen", () => {
     expect(input.labels?.[0]).toBeVisible();
     expect(input.labels?.[0]).toHaveTextContent("Search adhkar and duas");
 
-    fireEvent.click(input);
+    expect(screen.getByRole("button", { name: /^Morning Azkar/ })).toBeInTheDocument();
+
+    // Typing narrows the visible collections and must never leave the Library.
+    fireEvent.change(input, { target: { value: " sleep " } });
     expect(onSearch).not.toHaveBeenCalled();
+    expect(screen.queryByRole("button", { name: /^Morning Azkar/ })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
+  });
+
+  it("escalates to full search only when the query is submitted", () => {
+    const onSearch = vi.fn();
+
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={onSearch}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const input = screen.getByRole("textbox", { name: "Search adhkar and duas" }) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: " " } });
+    fireEvent.submit(input.closest("form")!);
     expect(onSearch).not.toHaveBeenCalled();
 
     fireEvent.change(input, { target: { value: " sleep " } });
+    fireEvent.submit(input.closest("form")!);
     expect(onSearch).toHaveBeenCalledOnce();
     expect(onSearch).toHaveBeenCalledWith("sleep");
   });

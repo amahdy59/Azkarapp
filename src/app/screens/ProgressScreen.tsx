@@ -27,7 +27,7 @@ export function ProgressScreen({
       dir={direction}
       tabIndex={0}
       className="relative px-page py-4 overflow-y-auto page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-      screenName={t(language, "nav.progress")}
+      screenName={t(language, "common.progress")}
     >
       <div className="relative z-10 w-full flex flex-col items-center">
         <Header title={t(language, "common.progress")} language={language} />

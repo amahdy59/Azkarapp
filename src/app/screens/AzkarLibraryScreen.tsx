@@ -1,4 +1,4 @@
-import { useId, useMemo, useState } from "react";
+import { useDeferredValue, useId, useMemo, useState } from "react";
 import { Search, Bookmark } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -16,6 +16,7 @@ import {
 import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/categories";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
+import { matchesSearch, normalizeSearchText } from "../content/searchNormalization";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
 
@@ -71,6 +72,23 @@ export function AzkarLibraryScreen({
     return available;
   }, [savedZikrIds]);
 
+  // Typing filters the collections in place. Submitting escalates to the full
+  // Search screen, which is the only thing that looks *inside* each zikr —
+  // typing used to navigate there on every keystroke, losing the user's place.
+  const deferredQuery = useDeferredValue(searchQuery.trim());
+  const visibleGroups = useMemo(() => {
+    const normalizedQuery = normalizeSearchText(deferredQuery);
+    if (!normalizedQuery) return CATEGORY_GROUPS.map((group) => ({ group, categories: group.categories }));
+    return CATEGORY_GROUPS.map((group) => ({
+      group,
+      categories: group.categories.filter((categoryId) => {
+        const category = CATEGORIES.find((item) => item.id === categoryId);
+        if (!category) return false;
+        return matchesSearch(category.name, normalizedQuery) || matchesSearch(category.nameArabic, normalizedQuery);
+      }),
+    })).filter((entry) => entry.categories.length > 0);
+  }, [deferredQuery]);
+
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 flex flex-col min-h-screen">
@@ -102,15 +120,13 @@ export function AzkarLibraryScreen({
                   dir={searchQuery.trim() ? "auto" : direction}
                   lang={language}
                   autoComplete="off"
-                  onChange={(event) => {
-                    const value = event.currentTarget.value;
-                    setSearchQuery(value);
-                    const query = value.trim();
-                    if (query) onSearch(query);
-                  }}
+                  onChange={(event) => setSearchQuery(event.currentTarget.value)}
                   className="h-11 min-w-0 flex-1 bg-transparent text-start text-[0.875rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
                 />
               </div>
+              {searchQuery.trim() && (
+                <p className="mt-1.5 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
+              )}
             </form>
             <TabList
               value={section}
@@ -140,7 +156,7 @@ export function AzkarLibraryScreen({
         >
           {section === "collections" ? (
             <>
-              {CATEGORY_GROUPS.map((group) => (
+              {visibleGroups.map(({ group, categories }) => (
                 <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
                   <h2
                     id={`library-group-${group.id}`}
@@ -150,7 +166,7 @@ export function AzkarLibraryScreen({
                     {t(language, `library.groups.${group.labelKey}`)}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {group.categories.map((categoryId) => {
+                    {categories.map((categoryId) => {
                       const category = CATEGORIES.find((item) => item.id === categoryId);
                       if (!category) return null;
                       const isComprehensiveDuas = category.id === "comprehensive_duas";
@@ -211,7 +227,18 @@ export function AzkarLibraryScreen({
                   </div>
                 </section>
               ))}
-              {onOpenCustomCounter && (
+              {visibleGroups.length === 0 && (
+                <div className="mt-8">
+                  <StatePanel
+                    kind="empty-search"
+                    title={t(language, "library.noCollectionMatch", { query: deferredQuery })}
+                    description={t(language, "library.searchHint")}
+                    actionLabel={t(language, "library.searchAllAzkar", { query: deferredQuery })}
+                    onAction={() => onSearch(deferredQuery)}
+                  />
+                </div>
+              )}
+              {onOpenCustomCounter && visibleGroups.length > 0 && (
                 <div className="mt-4">
                   <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
                 </div>

@@ -156,7 +156,9 @@ test("marketing landing page has no automatically detectable WCAG A/AA violation
 test("search results expose concise accessible names", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  await page.getByRole("textbox", { name: "Search adhkar and duas" }).fill("sleep");
+  const searchInput = page.getByRole("textbox", { name: "Search adhkar and duas" });
+  await searchInput.fill("sleep");
+  await searchInput.press("Enter");
 
   const results = page.getByTestId("search-result");
   await expect(results.first()).toBeVisible();

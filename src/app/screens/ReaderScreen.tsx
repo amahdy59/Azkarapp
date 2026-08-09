@@ -20,6 +20,7 @@ import {
   VolumeX,
 } from "../components/icons";
 import { t } from "../i18n";
+import { scrollBehavior } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
 import { isLongSurah, splitMushafPages } from "../content/mushafPages";
@@ -121,6 +122,7 @@ export function ReaderScreen({
   isDone,
   collectionCompletedCount,
   hapticFeedback,
+  reduceMotion = false,
   showTranslation,
   showTransliteration,
   textSize,
@@ -145,6 +147,7 @@ export function ReaderScreen({
   isDone: boolean;
   collectionCompletedCount: number;
   hapticFeedback: boolean;
+  reduceMotion?: boolean;
   showTranslation: boolean;
   showTransliteration: boolean;
   textSize: TextSizeOption;
@@ -532,7 +535,7 @@ export function ReaderScreen({
   const scrollToLongSurahCounter = () => {
     readingScrollRef.current
       ?.querySelector('[data-testid="long-surah-end-counter"]')
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      ?.scrollIntoView({ behavior: scrollBehavior(reduceMotion), block: "center" });
   };
 
   const renderReadingContent = () => (

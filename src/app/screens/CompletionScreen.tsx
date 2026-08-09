@@ -6,14 +6,9 @@ import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
 import { formatHijriDate, formatNumerals, numeralFontFamily } from "../formatting";
 import { t } from "../i18n";
+import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
-
-function vibrate(pattern: number | number[]) {
-  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
-    navigator.vibrate(pattern);
-  }
-}
 
 export function CompletionScreen({
   catId,
@@ -27,6 +22,8 @@ export function CompletionScreen({
   direction,
   completionLevel = "complete",
   onContinueComplete,
+  reduceMotion = false,
+  hapticFeedback = true,
 }: {
   catId: CategoryId;
   sessionStart: number;
@@ -39,6 +36,8 @@ export function CompletionScreen({
   direction: "ltr" | "rtl";
   completionLevel?: RoutineMode;
   onContinueComplete?: () => void;
+  reduceMotion?: boolean;
+  hapticFeedback?: boolean;
 }) {
   const cat = CATEGORIES.find((item) => item.id === catId)!;
   const azkarCount = getAzkarForMode(catId, completionLevel).length;
@@ -47,13 +46,13 @@ export function CompletionScreen({
   const [shareStatus, setShareStatus] = useState("");
 
   useEffect(() => {
-    const reduceMotion =
-      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if (reduceMotion) {
+    // Haptics and motion are separate preferences: someone who suppresses
+    // animation may still want the completion buzz, so gate them independently.
+    vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
+
+    if (shouldReduceMotion(reduceMotion)) {
       return;
     }
-
-    vibrate([30, 50, 30, 50, 50]);
 
     const isCore = MAIN_CATEGORY_IDS.includes(catId);
     let animationFrame = 0;
@@ -96,7 +95,7 @@ export function CompletionScreen({
     }
 
     return () => cancelAnimationFrame(animationFrame);
-  }, [catId]);
+  }, [catId, hapticFeedback, reduceMotion]);
 
   const categoryName = isArabic ? cat.nameArabic : cat.name;
   const categoryStreak = Math.max(1, getCategoryStreak(dailyCompletions, catId, new Date(), progressDayStartHour));

@@ -148,7 +148,6 @@ const en = {
     weeklyProgress: "This week’s progress",
     kahfNotStarted: "Not started",
     kahfInProgress: "In progress",
-    kahfVerseProgress: "Ayah {done} of {total}",
     kahfStart: "Start reading",
     kahfContinue: "Continue reading",
     preparationHeading: "Prepare for Friday",

@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function openArabicSearch(page: Page) {
+/** Runs the Arabic onboarding flow and stops on the Azkar Library. */
+async function openArabicLibrary(page: Page) {
   await page.goto("/");
   await page.getByTestId("language-option-ar").click();
   await page.getByTestId("confirm-language").click();
@@ -12,43 +13,60 @@ async function openArabicSearch(page: Page) {
   return page.getByRole("textbox").first();
 }
 
-test("search waits for input, preserves the query, and uses visible labels", async ({ page }) => {
-  const libraryInput = await openArabicSearch(page);
+/** Escalates from the Library to the full Search screen and returns its input. */
+async function openArabicSearch(page: Page) {
+  const libraryInput = await openArabicLibrary(page);
+  await libraryInput.fill("سفر");
+  await libraryInput.press("Enter");
+  await expect(page).toHaveURL(/#\/search/);
+  const searchInput = page.getByRole("textbox").first();
+  await searchInput.fill("");
+  return searchInput;
+}
 
-  await expect(page).toHaveURL(/view=library/);
+function hasVisibleLabel(input: HTMLInputElement) {
+  return Array.from(input.labels ?? []).some((label) => {
+    const box = label.getBoundingClientRect();
+    return box.width > 0 && box.height > 0 && getComputedStyle(label).visibility !== "hidden";
+  });
+}
+
+test("typing in the Library filters in place instead of navigating", async ({ page }) => {
+  const libraryInput = await openArabicLibrary(page);
+
+  await expect(page).toHaveURL(/#\/azkar/);
   await libraryInput.click();
-  await expect(page).toHaveURL(/view=library/);
+  await expect(page).toHaveURL(/#\/azkar/);
 
-  const emptyDirection = await libraryInput.evaluate((input) => getComputedStyle(input).direction);
-  expect(emptyDirection).toBe("rtl");
-  expect(
-    await libraryInput.evaluate((input) =>
-      Array.from(input.labels ?? []).some((label) => {
-        const box = label.getBoundingClientRect();
-        return box.width > 0 && box.height > 0 && getComputedStyle(label).visibility !== "hidden";
-      }),
-    ),
-  ).toBe(true);
+  expect(await libraryInput.evaluate((input) => getComputedStyle(input).direction)).toBe("rtl");
+  expect(await libraryInput.evaluate(hasVisibleLabel)).toBe(true);
+
+  // Typing narrows the collections and must leave the user on the Library.
+  await libraryInput.fill("النوم");
+  await expect(page).toHaveURL(/#\/azkar/);
+  await expect(page.getByRole("button", { name: /أذكار النوم/ })).toBeVisible();
+  await expect(page.getByRole("button", { name: /أذكار الصباح/ })).toHaveCount(0);
+});
+
+test("submitting the Library query opens Search and preserves it", async ({ page }) => {
+  const libraryInput = await openArabicLibrary(page);
 
   await libraryInput.fill("sleep");
-  await expect(page).toHaveURL(/view=search/);
+  await expect(page).toHaveURL(/#\/azkar/);
+
+  await libraryInput.press("Enter");
+  await expect(page).toHaveURL(/#\/search/);
 
   const searchInput = page.getByRole("textbox").first();
   await expect(searchInput).toHaveValue("sleep");
   expect(await searchInput.evaluate((input) => getComputedStyle(input).direction)).toBe("ltr");
-  expect(
-    await searchInput.evaluate((input) =>
-      Array.from(input.labels ?? []).some((label) => {
-        const box = label.getBoundingClientRect();
-        return box.width > 0 && box.height > 0 && getComputedStyle(label).visibility !== "hidden";
-      }),
-    ),
-  ).toBe(true);
+  expect(await searchInput.evaluate(hasVisibleLabel)).toBe(true);
 });
 
 test("Library search and tabs share a desktop row and stack on compact screens", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  const input = await openArabicSearch(page);
+  // The Collections/Saved tablist lives on the Library, not the Search screen.
+  const input = await openArabicLibrary(page);
   const tabs = page.getByRole("tablist");
 
   const desktopInput = await input.boundingBox();

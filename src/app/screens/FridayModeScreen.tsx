@@ -22,8 +22,6 @@ import { registerLazyCollection } from "../content/azkar";
 
 registerLazyCollection("friday_kahf", FRIDAY_KAHF);
 
-const KAHF_VERSE_COUNT = 110;
-
 type PracticeId = "ghusl" | "siwak" | "perfume" | "best_clothes" | "early" | "walking" | "listen";
 
 const PRACTICE_IDS: PracticeId[] = ["ghusl", "siwak", "perfume", "best_clothes", "early", "walking", "listen"];
@@ -104,8 +102,15 @@ export function FridayModeScreen({
     }
   });
 
-  const kahfProgress = kahfCompletedCount > 0 ? KAHF_VERSE_COUNT : 0;
-  const kahfComplete = kahfProgress === KAHF_VERSE_COUNT;
+  // Only two facts are actually persisted: whether the surah was opened this
+  // week, and whether it was marked complete. Reporting a verse number from
+  // that would be invented precision, so the UI states the status it can prove.
+  const kahfComplete = kahfCompletedCount > 0;
+  const kahfStatusKey = kahfComplete
+    ? "friday.kahfCompleted"
+    : kahfStarted
+      ? "friday.kahfInProgress"
+      : "friday.kahfNotStarted";
   const salawatComplete = salawatProgress.count >= salawatProgress.target;
   const duasComplete = duasTotalCount > 0 && duasCompletedCount >= duasTotalCount;
   const completedCount =
@@ -214,20 +219,9 @@ export function FridayModeScreen({
               <h2 id="kahf-heading" className="text-[1.125rem] font-black text-foreground">
                 {t(language, "friday.kahfHeading")}
               </h2>
-              <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground">
-                {t(language, "friday.kahfVerseProgress", {
-                  done: formatNumerals(kahfProgress, language),
-                  total: formatNumerals(KAHF_VERSE_COUNT, language),
-                })}
-              </p>
+              <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground">{t(language, kahfStatusKey)}</p>
             </div>
             {kahfComplete && <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />}
-          </div>
-          <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted" aria-hidden="true">
-            <div
-              className="h-full rounded-full bg-amber-500 transition-[width]"
-              style={{ width: `${(kahfProgress / KAHF_VERSE_COUNT) * 100}%` }}
-            />
           </div>
           <button
             type="button"
