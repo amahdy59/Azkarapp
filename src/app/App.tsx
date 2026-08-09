@@ -61,6 +61,7 @@ import { useAudioController } from "./audio/useAudioController";
 import { AudioProvider } from "./audio/AudioProvider";
 import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
 import { t } from "./i18n";
+import { loadReleaseNotes, type ReleaseNotes } from "./releaseNotes";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
 import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
@@ -330,6 +331,7 @@ function AppContent() {
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+  const [releaseNotes, setReleaseNotes] = useState<ReleaseNotes | null>(null);
   const [persistenceError, setPersistenceError] = useState(false);
   const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -720,7 +722,11 @@ function AppContent() {
   }, [progressDayStartHour, reconcileDailyProgress]);
 
   useEffect(() => {
-    const handleUpdate = () => setUpdateAvailable(true);
+    const handleUpdate = () => {
+      setUpdateAvailable(true);
+      setReleaseNotes(null);
+      void loadReleaseNotes().then(setReleaseNotes);
+    };
     const handleInstallPrompt = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as BeforeInstallPromptEvent);
@@ -1535,7 +1541,8 @@ function AppContent() {
             ) : updateAvailable ? (
               <PwaNotice
                 title={t(selectedLang, "pwa.updateTitle")}
-                body={t(selectedLang, "pwa.updateBody")}
+                body={releaseNotes ? undefined : t(selectedLang, "pwa.updateBody")}
+                items={releaseNotes?.[selectedLang]}
                 actionLabel={t(selectedLang, "pwa.refresh")}
                 dismissLabel={t(selectedLang, "pwa.later")}
                 isActionLoading={isUpdating}
@@ -1546,7 +1553,10 @@ function AppContent() {
                     window.location.reload();
                   }, 1500);
                 }}
-                onDismiss={() => setUpdateAvailable(false)}
+                onDismiss={() => {
+                  setUpdateAvailable(false);
+                  setReleaseNotes(null);
+                }}
               />
             ) : (
               <PwaNotice

@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 export function PwaNotice({
   title,
   body,
+  items,
   actionLabel,
   dismissLabel,
   onAction,
@@ -10,7 +11,8 @@ export function PwaNotice({
   isActionLoading,
 }: {
   title: string;
-  body: string;
+  body?: string;
+  items?: readonly string[];
   actionLabel: string;
   dismissLabel: string;
   onAction: () => void;
@@ -20,7 +22,14 @@ export function PwaNotice({
   return (
     <aside className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg" role="status" aria-live="polite">
       <p className="text-[0.9375rem] font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
+      {body && <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>}
+      {items && (
+        <ul className="mt-2 list-disc space-y-1 ps-5 text-[0.8125rem] leading-5 text-muted-foreground">
+          {items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      )}
       <div className="mt-3 flex justify-end gap-2">
         <Button type="button" variant="ghost" size="sm" onClick={onDismiss} className="text-[0.8125rem]">
           {dismissLabel}

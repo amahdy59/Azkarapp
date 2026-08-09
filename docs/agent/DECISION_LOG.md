@@ -822,3 +822,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Review evidence:** User-supplied research dated 2026-08-08; implementation cross-check against the linked Quran.com and Dorar al-Saniyyah records; invariant tests enforce group sizes, source domains, stable evidence links, and the removal of the reported generic cards.
 - **Tests/evidence required:** Catalogue invariant tests; bilingual component tests; WhatsApp source-preservation test; desktop/mobile browser test; mandatory local release gate; green GitHub Quality and Pages workflows; production smoke verification.
 - **Supersedes:** DEC-044’s Benefits data-source rule. DEC-044 remains authoritative for the route, Home entry, sharing action, and all unrelated pre-Phase-09 contracts.
+
+---
+
+## DEC-046 — Bilingual user-facing release highlights in the update notice
+
+- **Date:** 2026-08-09
+- **Status:** Approved
+- **Owner:** User
+- **Related scope:** Narrow update-notice improvement; Phase 10 system-state behavior without starting the full phase
+- **Context:** The PWA update notice only said that improvements were available. Users could not tell what mattered to them before choosing whether to refresh. The notice is rendered by the older client while a newer service worker waits, so notes compiled into the React bundle would describe the wrong release.
+- **Decision:** Every deployment maintains `public/release-notes.json` with the 3–5 most important user-facing changes in simple Arabic and English. The waiting-update flow fetches the deployed file without cache, validates both language lists, and renders the selected language as a semantic bullet list. Invalid or unavailable notes use the existing generic localized message. Refresh and Later remain explicit user choices.
+- **Why:** A small same-origin manifest keeps the old client informed about the new deployment without a dependency, persisted state, polling, or automatic reload.
+- **Consequences:** Release maintenance must update both language lists before each deployment. The first deployment of this mechanism cannot retrofit detailed notes into clients running code from before the mechanism existed; subsequent updates use the deployed manifest.
+- **Files/contracts to update:** `public/release-notes.json`, `src/app/releaseNotes.ts`, `PwaNotice.tsx`, `App.tsx`, README maintenance workflow, and PWA architecture documentation.
+- **Tests/evidence required:** Manifest validation tests, bilingual browser coverage, mandatory local release gate, green GitHub Quality and Pages workflows, and production smoke verification.
+- **Supersedes:** None

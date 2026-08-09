@@ -196,11 +196,12 @@ Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_S
 
 1. Fetch `origin/main` and confirm the working tree scope.
 2. Make the smallest domain-appropriate change.
-3. Add or update colocated unit tests and relevant Playwright coverage.
-4. Update documentation when behavior, state shape, environment variables, or operational procedures change.
-5. Run `pnpm check` and the relevant Playwright specs.
-6. Commit and push only after all required checks pass.
-7. Confirm the GitHub Quality and Pages workflows complete successfully.
+3. Update `public/release-notes.json` with the 3–5 most important user-facing changes in simple Arabic and English.
+4. Add or update colocated unit tests and relevant Playwright coverage.
+5. Update documentation when behavior, state shape, environment variables, or operational procedures change.
+6. Run `pnpm check` and the relevant Playwright specs.
+7. Commit and push only after all required checks pass.
+8. Confirm the GitHub Quality and Pages workflows complete successfully.
 
 Documentation sources of truth:
 

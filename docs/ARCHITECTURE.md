@@ -170,7 +170,7 @@ Database schema changes require an ordered migration and corresponding applicati
 
 ## Offline and PWA behavior
 
-The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections.
+The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections. When a waiting service worker is detected, the running client fetches `public/release-notes.json` without cache and shows its 3–5 validated highlights in the selected language. This deployed manifest is necessary because the update prompt runs in the older client bundle; invalid or unavailable notes fall back to the generic localized update message, and applying the update remains the user's choice.
 
 Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, OAuth, or fresh Aladhan values—must fail safely and retain local behavior.
 
