@@ -28,7 +28,16 @@ function loadRegistry(): DownloadRegistry {
 }
 
 function saveRegistry(registry: DownloadRegistry) {
-  window.localStorage.setItem(REGISTRY_KEY, JSON.stringify(registry));
+  try {
+    window.localStorage.setItem(REGISTRY_KEY, JSON.stringify(registry));
+  } catch {
+    // Every caller reaches here only after the Cache API work has already
+    // succeeded, so the audio itself is downloaded (or deleted) either way.
+    // Losing the bookkeeping degrades the Downloads screen's totals until the
+    // next successful write; throwing would instead report a completed
+    // download as a failure, and storage quota is exactly the pressure this
+    // feature creates.
+  }
 }
 
 function toHex(buffer: ArrayBuffer) {
