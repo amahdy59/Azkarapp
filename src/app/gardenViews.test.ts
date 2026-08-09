@@ -33,6 +33,21 @@ describe("garden view selectors", () => {
     expect(days[1]).toMatchObject({ completedCount: 0, isPalm: false, status: "unstarted" });
   });
 
+  it("marks days after today as empty rather than unstarted", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 2, 3, 12));
+    const days = getMonthGardenDays(createDailyCompletionIndex([]), 2026, 2);
+
+    expect(days).toHaveLength(31);
+    // A day that has already passed with nothing recorded is a real miss, so it
+    // stays "unstarted". A day that has not arrived yet cannot be missed, so it
+    // reads as "empty" and the calendar does not present it as a failure.
+    expect(days[1]).toMatchObject({ dayKey: "2026-03-02", status: "unstarted" });
+    expect(days[2]).toMatchObject({ dayKey: "2026-03-03", status: "unstarted" });
+    expect(days[3]).toMatchObject({ dayKey: "2026-03-04", status: "empty" });
+    expect(days[30]).toMatchObject({ dayKey: "2026-03-31", status: "empty" });
+  });
+
   it("scopes year totals and active days to the requested year", () => {
     const stats = getYearGardenStats(createDailyCompletionIndex(records), 2024);
 
@@ -115,6 +130,30 @@ describe("garden view selectors", () => {
     expect(getMonthDetailedStats(index, 2024, 2).bestRoutine).toBe("after_prayer");
     expect(getYearGardenStats(index, 2024)).toEqual({ totalPalms: 0, totalCollections: 1, activeDays: 1 });
     expect(getYearDetailedStats(index, 2024).mostConsistentRoutine).toBe("after_prayer");
+  });
+
+  it("names the weakest and strongest routine when the week is uneven", () => {
+    // Every other weekly fixture completes each routine the same number of
+    // times, so the "is this routine weaker than the current lowest" comparison
+    // never actually selects a new minimum. An uneven week is what proves
+    // mostMissedRoutine tracks the genuinely weakest routine.
+    const unevenRecords: DailyCollectionCompletion[] = [
+      { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-05", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "after_prayer", timeZone: "Africa/Cairo" },
+    ];
+    // "ar" starts the week on Saturday, so Feb 3 2024 (a Saturday) opens the
+    // window and all three fixture days fall inside it. Under "en" the same
+    // reference date closes a Sunday-start week and only Feb 3 would count.
+    const stats = getWeekGardenStats(createDailyCompletionIndex(unevenRecords), new Date(2024, 1, 3), "ar");
+
+    expect(stats.mostMissedRoutine).toBe("evening");
+    expect(stats.bestRoutine).toBe("morning");
   });
 
   it("does not let future dates reset the current-year streak", () => {
