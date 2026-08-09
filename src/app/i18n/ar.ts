@@ -25,6 +25,9 @@ const ar = {
     loading: "جارٍ التحميل",
     dismiss: "إخفاء",
     skipToMain: "تخطى إلى المحتوى الرئيسي",
+    appName: "تطبيق الأذكار",
+    appTagline: "حصنك اليومي",
+    theme: "المظهر",
   },
   onboarding: {
     title: "رفيقك اليومي للذكر",

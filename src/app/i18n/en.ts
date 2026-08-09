@@ -25,6 +25,9 @@ const en = {
     loading: "Loading",
     dismiss: "Dismiss",
     skipToMain: "Skip to main content",
+    appName: "Azkar App",
+    appTagline: "Daily Fortress",
+    theme: "Theme",
   },
   onboarding: {
     title: "Your Daily Companion for Dhikr",

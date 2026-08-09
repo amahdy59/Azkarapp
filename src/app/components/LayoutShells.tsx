@@ -2,6 +2,7 @@ import React from "react";
 import { ArrowPrevious, BarChart3, BookOpen, Home, Settings, Globe, Moon, Sun, Contrast } from "./icons";
 import { PalmTreeMark } from "./RoutineGarden";
 import { t } from "../i18n";
+import { LANGUAGE_LABELS } from "../languageOptions";
 import type { AppLanguage, ThemeMode } from "../types";
 
 // ─── Shared nav tab definition ────────────────────────────────────────────────
@@ -212,10 +213,10 @@ export function NavSidebar({
           <PalmTreeMark size={32} className="text-primary shrink-0" />
           <div className="flex flex-col leading-tight">
             <span className="text-[1.125rem] font-extrabold text-foreground font-sans">
-              {isArabic ? "تطبيق الأذكار" : "Azkar App"}
+              {t(language, "common.appName")}
             </span>
             <span className="text-[0.75rem] font-semibold text-muted-foreground font-sans">
-              {isArabic ? "حصنك اليومي" : "Daily Fortress"}
+              {t(language, "common.appTagline")}
             </span>
           </div>
         </div>
@@ -252,7 +253,10 @@ export function NavSidebar({
           >
             <div className="flex items-center gap-2.5">
               <Globe size={18} className="text-primary" />
-              <span>{isArabic ? "English" : "العربية"}</span>
+              {/* Deliberately the *target* language's own name, not the current
+                  one — this control switches languages. LANGUAGE_LABELS is the
+                  single source for those names. */}
+              <span>{LANGUAGE_LABELS[isArabic ? "en" : "ar"]}</span>
             </div>
             <span className="text-[0.6875rem] font-bold uppercase text-muted-foreground">{language.toUpperCase()}</span>
           </button>
@@ -262,12 +266,12 @@ export function NavSidebar({
           <button
             type="button"
             onClick={cycleTheme}
-            aria-label={`${isArabic ? "المظهر" : "Theme"}: ${t(language, themeLabelKeys[themeMode])}`}
+            aria-label={`${t(language, "common.theme")}: ${t(language, themeLabelKeys[themeMode])}`}
             className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="flex items-center gap-2.5">
               <ThemeIcon size={18} className="text-primary" />
-              <span>{isArabic ? "المظهر" : "Theme"}</span>
+              <span>{t(language, "common.theme")}</span>
             </div>
             <span className="text-[0.6875rem] font-bold text-muted-foreground">
               {t(language, themeLabelKeys[themeMode])}
