@@ -106,6 +106,42 @@ test("the circular counter keeps its 184px contract on narrow phones and desktop
   }
 });
 
+test("desktop and tablet keep keyboard guidance with session progress and tablet actions centered", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openFirstMorningZikr(page);
+
+  const shortcutGuide = page.getByTestId("reader-keyboard-shortcuts");
+  const desktopHero = page.getByTestId("reader-desktop-hero");
+  await expect(desktopHero.getByTestId("reader-keyboard-shortcuts")).toBeVisible();
+  await expect(page.locator("footer").getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
+
+  await page.setViewportSize({ width: 1024, height: 768 });
+  const sessionChrome = page.getByTestId("reader-session-chrome");
+  await expect(desktopHero).toHaveCount(0);
+  await expect(sessionChrome.getByTestId("reader-keyboard-shortcuts")).toBeVisible();
+  await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
+
+  const chromePrecedesReading = await sessionChrome.evaluate((chrome) => {
+    const reading = document.querySelector('[role="region"][aria-label="Zikr reading text"]');
+    return Boolean(reading && chrome.compareDocumentPosition(reading) & Node.DOCUMENT_POSITION_FOLLOWING);
+  });
+  expect(chromePrecedesReading).toBe(true);
+
+  const [readerBox, actionsBox] = await Promise.all([
+    page.getByTestId("reader-screen").boundingBox(),
+    page.getByTestId("reader-actions").boundingBox(),
+  ]);
+  expect(readerBox).not.toBeNull();
+  expect(actionsBox).not.toBeNull();
+  if (readerBox && actionsBox) {
+    const readerCenter = readerBox.x + readerBox.width / 2;
+    const actionsCenter = actionsBox.x + actionsBox.width / 2;
+    expect(Math.abs(readerCenter - actionsCenter)).toBeLessThanOrEqual(2);
+  }
+});
+
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 

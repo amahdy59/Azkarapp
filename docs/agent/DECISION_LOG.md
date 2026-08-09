@@ -838,3 +838,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `public/release-notes.json`, `src/app/releaseNotes.ts`, `PwaNotice.tsx`, `App.tsx`, README maintenance workflow, and PWA architecture documentation.
 - **Tests/evidence required:** Manifest validation tests, bilingual browser coverage, mandatory local release gate, green GitHub Quality and Pages workflows, and production smoke verification.
 - **Supersedes:** None
+
+---
+
+## DEC-047 — Evidence-led Reader refinement for desktop and tablet
+
+- **Date:** 2026-08-09
+- **Status:** Approved
+- **Owner:** User
+- **Related scope:** Narrow Phase 07 follow-up before Phase 09
+- **Context:** Two proposed Reader visuals showed useful ideas for reading focus, progress prominence, and control proximity, but also conflicted with established contracts through excessive empty canvas, detached edge navigation, duplicated progress, alternate icons, and a reduced counter treatment. The user explicitly requested selective adoption rather than literal implementation.
+- **Decision:** Preserve the existing Untitled icons, every Reader action, the 184px counter, the 600px reading measure, the ≥1200px hero/card boundary, and all content/session behavior. Reposition the persistent keyboard guide from the bottom action area to the session-progress area: beneath progress inside the desktop hero and beneath progress above the tablet reading region. Keep narrow-screen actions below the counter and center the tablet action row. Product labels for the guide move into bilingual i18n.
+- **Why:** Readers see the available keyboard controls before beginning, while the counter and primary actions retain a calmer, less crowded finish. The change takes the references' hierarchy benefit without importing their weaker spacing, duplicate status, or unapproved visual language.
+- **Consequences:** Desktop hero height increases slightly; the reading card gains that space back by removing the old shortcut footer row. Tablet actions retain the same controls and semantics but align around the reading axis. Compact layouts remain unchanged because the keyboard guide stays hidden below the medium breakpoint.
+- **Files/contracts to update:** `ReaderScreen.tsx`, Reader i18n, `docs/DESIGN_SYSTEM.md`, responsive Reader tests, and release highlights.
+- **Tests/evidence required:** Desktop/tablet browser screenshots; geometry assertions for guide placement, tablet action centering, fixed counter size, full local release gate, green Quality and Pages workflows, and production smoke verification.
+- **Supersedes:** Only the keyboard-guide position described by the earlier wide-desktop Reader implementation; all other Reader contracts remain authoritative.

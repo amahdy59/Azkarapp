@@ -442,7 +442,7 @@ export function ReaderScreen({
   };
 
   const renderCounterActions = () => (
-    <div className="flex min-w-0 items-center gap-2">
+    <div className="flex min-w-0 items-center justify-center gap-2" data-testid="reader-actions">
       <IconButton
         onClick={(event) => {
           event.stopPropagation();
@@ -671,8 +671,16 @@ export function ReaderScreen({
   // (outside the scrollable region) instead of being buried at the bottom of
   // a 12-page Mushaf scroll for long Surahs, where it previously only
   // appeared once the reader scrolled all the way down to the counter.
-  const renderKeyboardShortcutsHint = () => (
-    <div className="hidden md:flex items-center justify-center gap-3 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+  const renderKeyboardShortcutsHint = (onMedia = false) => (
+    <div
+      className={`hidden w-fit max-w-full items-center justify-center gap-3 rounded-full border px-4 py-1.5 text-[0.75rem] font-medium md:flex ${
+        onMedia
+          ? "border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media-muted)]"
+          : "border-border/40 bg-muted/60 text-muted-foreground"
+      }`}
+      data-testid="reader-keyboard-shortcuts"
+      aria-label={t(language, "reader.keyboardShortcuts")}
+    >
       {/* Space only counts once the counter itself is focused in
           long-Surah mode (the reader canvas deliberately never counts a
           full Surah — see the counter-only contract in
@@ -684,7 +692,7 @@ export function ReaderScreen({
             <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
               Space
             </kbd>
-            <span>{isArabic ? "التسبيح" : "Count"}</span>
+            <span>{t(language, "reader.shortcutCount")}</span>
           </span>
           <span className="h-3 w-px bg-border/60" aria-hidden="true" />
         </>
@@ -696,21 +704,21 @@ export function ReaderScreen({
         <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
           ←
         </kbd>
-        <span>{isArabic ? "الانتقال" : "Navigate"}</span>
+        <span>{t(language, "reader.shortcutNavigate")}</span>
       </span>
       <span className="h-3 w-px bg-border/60" aria-hidden="true" />
       <span className="flex items-center gap-1">
         <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
           R
         </kbd>
-        <span>{isArabic ? "إعادة" : "Reset"}</span>
+        <span>{t(language, "reader.shortcutReset")}</span>
       </span>
       <span className="h-3 w-px bg-border/60" aria-hidden="true" />
       <span className="flex items-center gap-1">
         <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
           Esc
         </kbd>
-        <span>{isArabic ? "رجوع" : "Back"}</span>
+        <span>{t(language, "reader.shortcutBack")}</span>
       </span>
     </div>
   );
@@ -879,12 +887,13 @@ export function ReaderScreen({
 
       {isDesktopReader ? (
         <>
-          {/* Wide-desktop hero band (>=1366px). Fixed navy brand surface,
+          {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
               independent of the active theme — mirrors the Home screen's
               .azkar-hero background (src/app/components/azkar-hero-background.css)
               rather than following light/dark/midnight tokens, since it plays
               the same "always-dark brand band" role. */}
           <div
+            data-testid="reader-desktop-hero"
             className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-4 overflow-hidden rounded-3xl px-6 py-7 text-center"
             style={{
               background: "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), #0b1426",
@@ -1016,6 +1025,8 @@ export function ReaderScreen({
                 aria-label={t(language, "reader.groupProgress")}
               />
             </div>
+
+            {renderKeyboardShortcutsHint(true)}
           </div>
 
           {/* Wide-desktop card: position badge, reading content, and the
@@ -1068,15 +1079,10 @@ export function ReaderScreen({
                 </div>
               </div>
 
-              {/* Unconditional: the nav-arrows/counter row stays inside the
-                  scroll region for long Surahs (the counter deliberately
-                  follows the reading), but the keyboard-shortcuts hint is
-                  now persistent chrome here for every zikr — long Surah or
-                  not — instead of only appearing once scrolled to the end. */}
-              <footer className="shrink-0 pb-2 pt-1">
-                {!longSurah && renderCounterPanel()}
-                {renderKeyboardShortcutsHint()}
-              </footer>
+              {/* The nav-arrows/counter row stays inside the scroll region for
+                  long Surahs because the counter deliberately follows the
+                  reading. The shortcut guide remains persistent in the hero. */}
+              <footer className="shrink-0 pb-2 pt-1">{!longSurah && renderCounterPanel()}</footer>
             </div>
 
             {renderLongSurahJumpFab()}
@@ -1126,7 +1132,7 @@ export function ReaderScreen({
             }
           />
 
-          <div className="shrink-0 px-5 pb-3 pt-2 reader-column">
+          <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
             <ProgressBar
               value={readingProgressValue}
               max={azkar.length}
@@ -1136,6 +1142,7 @@ export function ReaderScreen({
               direction={direction}
               aria-label={t(language, "reader.groupProgress")}
             />
+            <div className="mt-3">{renderKeyboardShortcutsHint()}</div>
           </div>
 
           {/* Main Layout Area */}
@@ -1176,15 +1183,11 @@ export function ReaderScreen({
             {renderLongSurahJumpFab()}
           </div>
 
-          {/* One footer (not two): the keyboard-shortcuts hint joins the
-              existing action row here instead of getting its own <footer>,
-              since this is already the one persistent chrome element mobile
-              keeps outside the scrollable region. Makes it available at all
-              times, long Surah or not, matching the desktop tree. */}
-          <footer className="shrink-0 px-4 pb-6 pt-4">
-            {renderCounterActions()}
-            <div className="mt-3">{renderKeyboardShortcutsHint()}</div>
-          </footer>
+          {/* The action row remains below the counter. Keyboard guidance now
+              sits with the session progress above the reading region, where
+              it is discoverable before reading without competing with the
+              counter or these primary actions. */}
+          <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
         </>
       )}
 

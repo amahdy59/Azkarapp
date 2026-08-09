@@ -619,6 +619,12 @@ const ar = {
     collectionCount: "{done} من {total}",
     groupProgress: "\u062a\u0642\u062f\u0645 \u0627\u0644\u0645\u062c\u0645\u0648\u0639\u0629",
     menu: "\u062e\u064a\u0627\u0631\u0627\u062a \u0627\u0644\u0642\u0627\u0631\u0626",
+    keyboardShortcuts:
+      "\u0627\u062e\u062a\u0635\u0627\u0631\u0627\u062a \u0644\u0648\u062d\u0629 \u0627\u0644\u0645\u0641\u0627\u062a\u064a\u062d",
+    shortcutCount: "\u0627\u0644\u0639\u062f",
+    shortcutNavigate: "\u0627\u0644\u0627\u0646\u062a\u0642\u0627\u0644",
+    shortcutReset: "\u0625\u0639\u0627\u062f\u0629",
+    shortcutBack: "\u0631\u062c\u0648\u0639",
     progressSummary: "{done} \u0645\u0646 {total} \u0630\u0643\u0631",
     viewAll: "\u0639\u0631\u0636 \u0627\u0644\u0643\u0644",
     listenModeToggle: "\u0627\u0633\u062a\u0645\u0627\u0639",
