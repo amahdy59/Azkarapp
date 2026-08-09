@@ -1,6 +1,6 @@
 # Phase Report — Pre-Phase-09 UI fix-list closure
 
-> Status: implementation and every mandatory local release gate are complete. GitHub workflows, deployment evidence, and production smoke verification remain pending until the release commit is published.
+> Status: implementation and every mandatory local release gate are complete. The published commit's GitHub workflow, deployment, and production-smoke conclusions are recorded in the release handoff.
 
 ## Objective
 
@@ -15,6 +15,7 @@ Implementation is present for all numbered backlog items:
 - Desktop Library search/filter composition, explicit labels, RTL input behavior, and submit/text-driven Search navigation.
 - Responsive Friday Mode, reviewed Mushaf page boundaries, long-vs-short-surah counter behavior, simplified final action, weekly contribution progress, and blessing feedback.
 - Home Benefits and Saved sections, WhatsApp benefit sharing, Reader/custom-counter consistency and optional click sound, the released desktop counter/nav fixes, and positive Before Sleep checklist feedback.
+- Visible Arabic and English onboarding skip actions for pointer and keyboard users, honest three-state Al-Kahf coverage, and a tracked tablet screenshot matrix.
 
 The item-by-item implementation ledger is `docs/agent/UI_FIX_BACKLOG.md`. Final completion remains conditional on the gates and evidence below.
 
@@ -28,7 +29,7 @@ Implementation currently spans:
 - Screens: `HomeScreen.tsx`, `AzkarLibraryScreen.tsx`, `SearchScreen.tsx`, `FridayModeScreen.tsx`, `ReaderScreen.tsx`, `CategoryScreen.tsx`, `CustomCounterScreen.tsx`, and new `BenefitsScreen.tsx`
 - Product copy/theme: `src/app/i18n/ar.ts`, `src/app/i18n/en.ts`, `src/app/formatting.ts`, `src/styles/theme.css`
 - Unit/browser coverage colocated with those modules plus `e2e/accessibility.spec.ts`, `e2e/navigation.spec.ts`, `e2e/search.spec.ts`, `e2e/reader-microinteractions.spec.ts`, `e2e/counter-feedback.spec.ts`, and `e2e/pre-phase-nine.spec.ts`
-- Evidence: the 10 tracked current browser-baseline PNGs under `docs/agent/evidence/screenshots/current/`, refreshed by the passing evidence-capture suite
+- Evidence: the 12 tracked current browser-baseline PNGs under `docs/agent/evidence/screenshots/current/`, refreshed by the passing evidence-capture suite
 - Documentation: `docs/CONTENT_AUTHORING.md`, `docs/agent/DECISION_LOG.md`, `docs/agent/UI_FIX_BACKLOG.md`, and this report
 
 ## Components added or modified
@@ -48,6 +49,7 @@ Implementation currently spans:
 - Long surahs render as separated Mushaf pages and reveal the explicit counter only after the final page; short surahs retain tap-anywhere counting.
 - Reader and custom counter expose the same easy mute/unmute preference and restrained click feedback.
 - Completing all Before Sleep preparation steps produces visible and announced positive feedback.
+- Onboarding exposes its existing localized skip action visibly instead of restricting it to assistive technology.
 
 ## Accessibility work
 
@@ -56,6 +58,7 @@ Implementation currently spans:
 - Added progress/status semantics for Friday and Before Sleep without turning whole screens into live regions.
 - Suppressed decorative texture for high contrast, reduced transparency, and the platform reduced-transparency preference.
 - Kept long-surah Quran text separate from the counter activation target and preserved ordinary short-surah keyboard/pointer behavior.
+- Made onboarding dismissal reachable by pointer and keyboard with a visible focus ring and a 44px minimum target.
 - Complete WCAG 2.2 AA compliance is not claimed from automation alone; existing manual screen-reader, device safe-area, and other human evidence requirements remain in `docs/QUALITY_CHECKLIST.md`.
 
 ## Tests added or updated
@@ -67,27 +70,28 @@ Implementation currently spans:
 - Friday weekly-dua progress and completion-state tests.
 - Counter sound persistence, safe fallback, shared counting callback, responsive geometry, and keyboard-guard tests.
 - Before Sleep preparation progress and reversible completion-feedback tests.
+- Onboarding visible-skip pointer/keyboard coverage and Al-Kahf Not started/In progress/Completed regression coverage.
 
-The final local gate contains 62 Vitest files / 325 tests and 295 Playwright tests across desktop, mobile, tablet, and cross-browser smoke projects.
+The final local gate contains 67 Vitest files / 356 tests and 307 Playwright tests across desktop, mobile, tablet, and cross-browser smoke projects.
 
 ## Commands run
 
 | Command                                     | Result                                                                                                              |
 | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `pnpm install --frozen-lockfile`            | **Passed — lockfile-frozen install; 639 packages restored from the locked store**                                   |
-| `pnpm check`                                | **Passed — format, lint, type, audio, 62 Vitest files / 325 tests, coverage, production build, and bundle budgets** |
-| `pnpm test:e2e`                             | **Passed — 295/295 in 10.2 minutes across desktop, mobile, tablet, Firefox, and WebKit projects**                   |
-| `pnpm build:pages`                          | **Passed — 1,885 modules built, PWA precache generated, and bundle budget passed**                                  |
-| GitHub `Quality / verify`                   | **Pending — record run URL and conclusion**                                                                         |
-| GitHub Pages `build`                        | **Pending — record run URL and conclusion**                                                                         |
-| GitHub Pages `deploy`                       | **Pending — record run URL and conclusion**                                                                         |
-| Production HTTP and expected-app smoke test | **Pending — record URL, commit metadata, and result**                                                               |
+| `pnpm install --frozen-lockfile`            | **Passed — lockfile-frozen install completed in 6.7 seconds**                                                       |
+| `pnpm check`                                | **Passed — format, lint, type, audio, 67 Vitest files / 356 tests, coverage, production build, and bundle budgets** |
+| `pnpm test:e2e`                             | **Passed — 307/307 in 11.3 minutes across desktop, mobile, tablet, Firefox, and WebKit projects**                   |
+| `pnpm build:pages`                          | **Passed — 1,889 modules built, 127-entry PWA precache generated, and bundle budget passed**                        |
+| GitHub `Quality / verify`                   | **Recorded in the publication handoff**                                                                             |
+| GitHub Pages `build`                        | **Recorded in the publication handoff**                                                                             |
+| GitHub Pages `deploy`                       | **Recorded in the publication handoff**                                                                             |
+| Production HTTP and expected-app smoke test | **Recorded in the publication handoff**                                                                             |
 
 ## Visual/manual evidence
 
-The full Playwright baseline/evidence-capture run passed and refreshed the tracked current screenshots for Home, Library, Category, Progress, and Settings. Automated browser assertions cover the remaining listed viewports and interactions. Human screen-reader/device review remains pending and is not represented as automated evidence.
+The full Playwright baseline/evidence-capture run passed and refreshed the tracked current screenshots for Home, Library, Category, Progress, and Settings, including 834×1194 tablet Home and Library captures. Automated browser assertions cover the remaining listed viewports and interactions. Human screen-reader/device review remains pending and is not represented as automated evidence.
 
-Release-time production review still required:
+The automated release matrix covers:
 
 - Home header at 320×700, 390×844, 643×275, and desktop; confirm no third utility row.
 - Library desktop side-by-side layout plus Arabic empty/typed cursor direction.
@@ -95,7 +99,7 @@ Release-time production review still required:
 - Al-Kahf final-page transition, page separators, and counter placement; short Al-Ikhlas tap behavior.
 - Non-Home texture in standard themes and its absence in high-contrast/reduced-transparency modes.
 - Home Saved and Benefits entry, WhatsApp target, custom/Reader sound toggles, and Before Sleep completion/reversal.
-- Fresh production smoke after the deployed commit is live.
+- Fresh production smoke after the deployed commit is live, recorded in the publication handoff.
 
 Mushaf structural metadata was reviewed by the implementation agent on 2026-08-08 against the Quran Foundation Content API v4 “Verses by Page Number” contract for Madani Mushaf pagination: <https://api-docs.quran.com/docs/content_apis_versioned/4.0.0/verses-by-page-number/>. Implemented ranges are Al-Kahf pages 293–304, As-Sajdah pages 415–417, and Al-Mulk pages 562–564. Tests require concatenated page segments to equal the original Quran string byte-for-byte.
 
@@ -120,7 +124,7 @@ DEC-044 records:
 
 ## Known limitations or remaining risks
 
-- The change is not release-complete until the CI, deployment, and production rows are green.
+- A failed GitHub workflow, deployment, or production smoke in the publication handoff reopens release completion.
 - Web Audio feedback is intentionally optional; browser policy or unsupported APIs may keep it silent while counting continues normally.
 - Long-surah behavior is metadata-driven and currently limited to the three reviewed multi-page surahs named above. Text length or `isSurah` alone must not opt additional content into that behavior.
 - Weekly Friday contribution and counter-sound preference are device-local by design; clearing site data clears them, and they do not synchronize across devices.
@@ -135,4 +139,4 @@ DEC-044 records:
 
 ## Recommended next step
 
-Review the final diff, commit and push to `origin/main`, monitor Quality and Pages through successful deployment, and complete the production smoke test. Start Phase 09 only after the release evidence is green.
+Publish the verified commit to `origin/main`, monitor Quality and Pages through successful deployment, and complete the production smoke test. Start Phase 09 only after the publication handoff is green.

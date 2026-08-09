@@ -1,5 +1,21 @@
 import { expect, test, type Page } from "@playwright/test";
 
+test("onboarding offers a visible skip action for pointer and keyboard users", async ({ page }) => {
+  await page.goto("/");
+  await page.getByTestId("language-option-en").click();
+  await page.getByTestId("confirm-language").click();
+
+  const skip = page.getByTestId("onboarding-skip");
+  await expect(skip).toBeVisible();
+  await expect(skip).toHaveText("Skip onboarding");
+  await skip.focus();
+  await expect(skip).toBeFocused();
+  await skip.click();
+
+  await expect(page.getByTestId("nav-home").first()).toBeVisible();
+  await expect(page.locator('#main-content[data-view="home"]')).toBeVisible();
+});
+
 async function openReturningGuest(page: Page, savedZikrIds: string[] = [], completedComprehensiveDuas: string[] = []) {
   await page.addInitScript(
     ({ saved, comprehensiveDuas }) => {

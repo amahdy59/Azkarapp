@@ -188,10 +188,7 @@ The authoritative release checklist is [docs/QUALITY_CHECKLIST.md](docs/QUALITY_
 
 ## Deployment
 
-Pushes to `main` trigger:
-
-1. `.github/workflows/quality.yml` — installs dependencies, runs `pnpm check`, and executes Playwright.
-2. `.github/workflows/deploy-pages.yml` — verifies the build, creates the GitHub Pages artifact, and deploys it.
+Pushes to `main` trigger `.github/workflows/deploy-pages.yml`, which runs the release gates, creates the GitHub Pages artifact, deploys it, and verifies production. `.github/workflows/quality.yml` runs on pull requests or manual dispatch and provides the standalone Quality check used for direct-main release evidence.
 
 Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_SUPABASE_URL` as an Actions variable and a publishable key as `VITE_SUPABASE_PUBLISHABLE_KEY` (a secret is acceptable despite the key being public). Provider flags are Actions variables and should remain false until the corresponding provider is configured.
 

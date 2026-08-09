@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { writeFridaySalawatProgress } from "../fridayProgress";
+import { fridayKahfOpenedKey, writeFridaySalawatProgress } from "../fridayProgress";
 import { FridayModeScreen } from "./FridayModeScreen";
 
 describe("FridayModeScreen", () => {
@@ -29,7 +29,7 @@ describe("FridayModeScreen", () => {
   });
 
   it("reports only the Al-Kahf status it can actually prove", () => {
-    const { rerender } = render(
+    const { unmount } = render(
       <FridayModeScreen
         isArabic={false}
         direction="ltr"
@@ -46,6 +46,23 @@ describe("FridayModeScreen", () => {
     // Nothing opened and nothing completed — no invented verse number.
     expect(screen.getByText("Not started")).toBeInTheDocument();
     expect(screen.queryByText(/Ayah/)).not.toBeInTheDocument();
+
+    unmount();
+    localStorage.setItem(fridayKahfOpenedKey(), "true");
+    const { rerender } = render(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={0}
+        duasCompletedCount={0}
+        duasTotalCount={47}
+        onBack={() => undefined}
+        onStartKahf={() => undefined}
+        onOpenSalawat={() => undefined}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+    expect(screen.getByText("In progress")).toBeInTheDocument();
 
     rerender(
       <FridayModeScreen

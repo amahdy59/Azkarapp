@@ -67,6 +67,9 @@ async function shoot(page: Page, name: string) {
   mkdirSync(OUT_DIR, { recursive: true });
   // Let fonts and any entrance transition settle so diffs reflect layout, not timing.
   await page.waitForTimeout(400);
+  await page.locator(".skip-link").evaluate((element) => {
+    (element as HTMLElement).style.display = "none";
+  });
   await page.screenshot({ path: join(OUT_DIR, `${name}.png`), fullPage: true });
 }
 
@@ -105,6 +108,16 @@ test("core screens in Arabic midnight at compact width", async ({ page }) => {
 
   if (await openTab(page, "azkar")) {
     await shoot(page, "compact-azkar-ar-midnight");
+  }
+});
+
+test("core screens in Arabic midnight at tablet width", async ({ page }) => {
+  await page.setViewportSize({ width: 834, height: 1194 });
+  await enterApp(page, "ar", "midnight");
+  await shoot(page, "tablet-home-ar-midnight");
+
+  if (await openTab(page, "azkar")) {
+    await shoot(page, "tablet-azkar-ar-midnight");
   }
 });
 

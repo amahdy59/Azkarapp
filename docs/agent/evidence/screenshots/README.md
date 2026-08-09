@@ -4,10 +4,11 @@ Closes the screenshot debt tracked as a Known Limitation in the Phase 02–07 re
 
 ## What these are
 
-| Directory | Commit                                | Meaning                                   |
-| --------- | ------------------------------------- | ----------------------------------------- |
-| `before/` | `5290eeb` (`style: format AGENTS.md`) | The last commit **before** Phase 02 began |
-| `after/`  | current `main`                        | After Phases 02–07                        |
+| Directory  | Commit                                | Meaning                                   |
+| ---------- | ------------------------------------- | ----------------------------------------- |
+| `before/`  | `5290eeb` (`style: format AGENTS.md`) | The last commit **before** Phase 02 began |
+| `after/`   | current `main`                        | After Phases 02–07                        |
+| `current/` | latest verified capture               | Current pre-Phase-09 application state    |
 
 Both sides were produced by running **the same file**, `e2e/evidence-capture.spec.ts`, against each commit — `before/` via a temporary detached `git worktree`, so the working tree was never checked out or stashed. Running the identical script on both sides is what makes this a genuine comparison rather than two unrelated snapshots.
 
@@ -21,7 +22,7 @@ EVIDENCE_DIR=docs/agent/evidence/screenshots/after pnpm exec playwright test e2e
 
 ## Coverage
 
-Home across all three themes (Midnight, Dark, Light) plus English Light; Library, Progress, Settings and a category screen at desktop width; Home and Library at compact width. Arabic unless the filename says otherwise.
+The before/after comparison covers Home across all three themes (Midnight, Dark, Light) plus English Light; Library, Progress, Settings and a category screen at desktop width; and Home and Library at compact width. The current capture adds Home and Library at tablet width. Arabic unless the filename says otherwise.
 
 ## A correction worth recording
 
