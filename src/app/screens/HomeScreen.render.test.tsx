@@ -49,6 +49,11 @@ describe("HomeScreen quick access", () => {
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
 
+    // The streak/palms cluster must be reachable by role. Before it carried
+    // role="img" its aria-label sat on a roleless div, so assistive technology
+    // announced the two chips as bare unlabelled numerals.
+    expect(screen.getByRole("img", { name: /Daily streak/i })).toBeInTheDocument();
+
     fireEvent.click(screen.getByTestId("home-saved-section").getElementsByTagName("button")[0]!);
     expect(onOpenSavedZikr).toHaveBeenCalledWith(saved.category, expect.any(Number));
 

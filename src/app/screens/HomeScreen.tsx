@@ -373,7 +373,14 @@ export function HomeScreen({
             </span>
           </div>
 
+          {/* role="img" (not a bare div): aria-label on a roleless generic
+              container is ignored by most screen readers, so this summary was
+              announced as nothing. It also suppresses the two chips' bare
+              numerals, which carry no meaning read on their own — the label
+              below is the complete text alternative for the pair. */}
           <div
+            role="img"
+            data-testid="home-header-stats"
             className="col-start-2 row-span-2 row-start-1 grid min-w-[4.25rem] grid-rows-2 gap-1"
             aria-label={
               isArabic
