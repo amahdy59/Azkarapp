@@ -6,9 +6,7 @@ import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import {
   BookOpen,
-  ChevronUp,
   ArrowPrevious,
-  Heart,
   Share2,
   MoreVertical,
   RotateCcw,
@@ -46,6 +44,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+
+/** Shared ghost icon-button treatment for every control in the phone header row. */
+const READER_HEADER_ACTION_CLASS =
+  "flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
 
 const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   generating: "reader.shareCardGenerating",
@@ -184,13 +186,11 @@ export function ReaderScreen({
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
   const [visibleMushafPage, setVisibleMushafPage] = useState<number | null>(null);
 
-  // A wide-desktop-only reader treatment (hero band + card chrome), gated at
-  // exactly the shell's own "large" tier (>=1200px, src/app/hooks/useLayoutMode.ts)
-  // where the labeled nav sidebar already appears — so the reader's chrome
-  // and the shell's own chrome change together instead of leaving a
-  // 1200-1365px gap where the sidebar shows but the reader still looks like
-  // the mobile layout.
-  const isDesktopReader = useMediaQuery("(min-width: 1200px)");
+  // The hero band + card treatment now starts at the tablet breakpoint
+  // (>=768px) rather than at the shell's "large" tier: tablets have the width
+  // for the desktop reader, and running the phone layout there left a wide,
+  // sparse column. Below 768px the phone layout takes over.
+  const isDesktopReader = useMediaQuery("(min-width: 768px)");
 
   const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
     useZikrCounter({
@@ -406,69 +406,6 @@ export function ReaderScreen({
       shareTimer.current = setTimeout(() => setShareMessage(""), 2600);
     }
   };
-
-  const renderCounterActions = () => (
-    <div className="flex min-w-0 items-center justify-center gap-2" data-testid="reader-actions">
-      <IconButton
-        onClick={(event) => {
-          event.stopPropagation();
-          toggleSound();
-        }}
-        label={t(language, "counter.sound")}
-        title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-        aria-pressed={soundEnabled}
-        data-testid="reader-counter-sound-toggle"
-        className="shrink-0 border border-border-control bg-card text-card-foreground"
-      >
-        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-      </IconButton>
-
-      <IconButton
-        onClick={(event) => {
-          event.stopPropagation();
-          void handleShare();
-        }}
-        label={t(language, "reader.share")}
-        disabled={isSharing}
-        aria-busy={isSharing || undefined}
-        onPointerEnter={() => void prepareZikrShareCardFonts()}
-        onFocus={() => void prepareZikrShareCardFonts()}
-        className="shrink-0 border border-border-control bg-card text-card-foreground"
-      >
-        <Share2 size={18} />
-      </IconButton>
-
-      <button
-        type="button"
-        onClick={(event) => {
-          event.stopPropagation();
-          setHasOpenedBenefit(true);
-          setBenefitOpen(true);
-        }}
-        aria-haspopup="dialog"
-        className="interactive-elem ui-control flex md:hidden min-h-[44px] min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-border-control bg-card px-3 text-[0.875rem] font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-      >
-        <BookOpen className="shrink-0" size={17} />
-        <span className="truncate" dir="auto">
-          {t(language, "reader.referencesButton")}
-        </span>
-        <ChevronUp className="shrink-0" size={17} />
-      </button>
-
-      <IconButton
-        onClick={(event) => {
-          event.stopPropagation();
-          handleToggleSaved();
-        }}
-        label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-        aria-pressed={isSaved}
-        className="shrink-0 border border-border-control bg-card"
-        style={{ color: isSaved ? "var(--primary)" : "var(--card-foreground)" }}
-      >
-        <Heart key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
-      </IconButton>
-    </div>
-  );
 
   let displayArabicText = z.arabicText;
   if (z.hasBasmalah || z.isSurah) {
@@ -801,6 +738,17 @@ export function ReaderScreen({
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
+      {/* The counter-sound toggle lives here on phones: the hero header owns
+          it on tablet/desktop, and the phone header row is capped at three
+          controls (Benefit, Share, More) to keep the title legible at 320px. */}
+      <DropdownMenuItem
+        onClick={toggleSound}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+        {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+      </DropdownMenuItem>
+
       <DropdownMenuItem
         onClick={handleResetCounter}
         className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
@@ -1021,7 +969,7 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 [scrollbar-gutter:stable] ${
+                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
               >
@@ -1055,7 +1003,12 @@ export function ReaderScreen({
             onBack={onBack}
             language={language}
             right={
-              <div className="flex items-center gap-2">
+              // Phone layout: Benefit and Share join the overflow control in
+              // this single top row (the old bottom action bar is gone, and
+              // with it the second row of chrome). All three share the
+              // header's ghost icon-button treatment, so the row reads as one
+              // set rather than a pill next to two icons.
+              <div className="flex items-center gap-1" data-testid="reader-actions">
                 <button
                   type="button"
                   onClick={(event) => {
@@ -1063,21 +1016,33 @@ export function ReaderScreen({
                     setHasOpenedBenefit(true);
                     setBenefitOpen(true);
                   }}
-                  className="hidden md:flex h-[44px] min-h-[44px] items-center justify-center gap-1.5 rounded-full border border-border/60 bg-card px-3.5 text-[0.8125rem] font-semibold text-foreground shadow-2xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                  aria-haspopup="dialog"
+                  className={READER_HEADER_ACTION_CLASS}
                   aria-label={t(language, "reader.referencesButton")}
                   title={t(language, "reader.referencesButton")}
                 >
-                  <BookOpen className="shrink-0 text-primary" size={16} />
-                  <span className="truncate" dir="auto">
-                    {t(language, "reader.referencesButton")}
-                  </span>
+                  <BookOpen size={20} />
+                </button>
+
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void handleShare();
+                  }}
+                  disabled={isSharing}
+                  aria-busy={isSharing || undefined}
+                  onPointerEnter={() => void prepareZikrShareCardFonts()}
+                  onFocus={() => void prepareZikrShareCardFonts()}
+                  className={READER_HEADER_ACTION_CLASS}
+                  aria-label={t(language, "reader.share")}
+                  title={t(language, "reader.share")}
+                >
+                  <Share2 size={20} />
                 </button>
 
                 <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger
-                    aria-label={t(language, "reader.menu")}
-                    className="flex h-11 w-11 min-h-[44px] min-w-[44px] shrink-0 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
+                  <DropdownMenuTrigger aria-label={t(language, "reader.menu")} className={READER_HEADER_ACTION_CLASS}>
                     <MoreVertical size={20} />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
@@ -1117,7 +1082,7 @@ export function ReaderScreen({
               role="region"
               tabIndex={0}
               aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-              className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
+              className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none ${
                 justCompleted ? "zikr-step-exit" : "zikr-step-enter"
               }`}
             >
@@ -1138,13 +1103,16 @@ export function ReaderScreen({
               </div>
             </div>
 
-            {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterStack()}</div>}
+            {/* The screen sets !pb-0 and the tab bar is hidden here, so the
+                counter itself owns the bottom inset — otherwise it would sit
+                flush against the home indicator. */}
+            {!longSurah && (
+              <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">{renderCounterStack()}</div>
+            )}
 
             {renderSideNavigation()}
             {renderLongSurahJumpFab()}
           </div>
-
-          <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
         </>
       )}
 

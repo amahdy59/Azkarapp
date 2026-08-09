@@ -111,6 +111,9 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   const desktopHero = page.getByTestId("reader-desktop-hero");
   await expect(desktopHero.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
   await expect(page.getByText("Zikr 1 of 25", { exact: true })).toHaveCount(0);
+  // The hero + card treatment now starts at the tablet breakpoint, so 1024px
+  // gets the same reader chrome as 1440px rather than the phone layout.
+  await expect(desktopHero).toBeVisible();
 
   for (const viewport of [
     { width: 1440, height: 900 },
@@ -145,20 +148,13 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
     if (counterBox && guideBox) expect(guideBox.y - (counterBox.y + counterBox.height)).toBeGreaterThanOrEqual(20);
   }
 
-  await expect(desktopHero).toHaveCount(0);
-  await expect(page.getByTestId("reader-session-chrome").getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
-
-  const [readerBox, actionsBox] = await Promise.all([
-    page.getByTestId("reader-screen").boundingBox(),
-    page.getByTestId("reader-actions").boundingBox(),
-  ]);
-  expect(readerBox).not.toBeNull();
-  expect(actionsBox).not.toBeNull();
-  if (readerBox && actionsBox) {
-    const readerCenter = readerBox.x + readerBox.width / 2;
-    const actionsCenter = actionsBox.x + actionsBox.width / 2;
-    expect(Math.abs(readerCenter - actionsCenter)).toBeLessThanOrEqual(2);
-  }
+  await expect(desktopHero).toBeVisible();
+  await expect(page.getByTestId("reader-session-chrome")).toHaveCount(0);
+  // Page-level actions live in the hero toolbar on this tier, not in a second
+  // row under the counter.
+  await expect(page.getByTestId("reader-actions")).toHaveCount(0);
+  await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toBeVisible();
+  await expect(desktopHero.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
 });
 
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
@@ -176,7 +172,8 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   const completionCue = page.getByTestId("counter-completion-cue");
   await expect(completionCue).toBeVisible();
   await expect(completionCue.locator("svg")).toBeVisible();
-  await expect(counterSurface).toHaveText("");
+  // The check now carries a short text label beside it for non-visual clarity.
+  await expect(counterSurface).toHaveText("Done");
   await expect(page.getByText("Complete!", { exact: true })).toHaveCount(0);
 
   const elapsed = Date.now() - startedAt;
@@ -195,7 +192,10 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   const counterSurface = page.getByTestId("counter-surface");
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  await page.getByRole("button", { name: "Save zikr", exact: true }).click();
+  // Tier-agnostic: saving lives in the hero toolbar on tablet/desktop and in
+  // the overflow menu on phones, so drive it through the menu on every tier.
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Add to Favorites", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
@@ -204,7 +204,8 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   await sheet.getByRole("button", { name: "Close benefit", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  await page.locator("footer").click({ position: { x: 2, y: 2 } });
+  // Chrome outside the reading text still counts: tap the screen's own margin.
+  await page.getByTestId("reader-screen").click({ position: { x: 2, y: 2 } });
   await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
 });
 
@@ -259,9 +260,16 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
+  // Phone chrome is one header row (Benefit, Share, More) with no bottom
+  // action bar and no tab bar, so the reading surface owns the viewport.
+  await expect(page.getByTestId("reader-actions")).toBeVisible();
+  await expect(page.getByTestId("nav-azkar")).toHaveCount(0);
+
   const readerBox = await page.getByTestId("reader-screen").boundingBox();
   const actionBoxes = await Promise.all(
-    ["Share zikr", "Benefit", "Save zikr"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
+    ["Share zikr", "Benefit", "Reader options"].map((name) =>
+      page.getByRole("button", { name, exact: true }).boundingBox(),
+    ),
   );
   expect(readerBox).not.toBeNull();
   if (!readerBox) return;

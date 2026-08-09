@@ -97,6 +97,8 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.click(screen.getByTestId("custom-counter-surface"));
 
     expect(oscillator.start).toHaveBeenCalledWith(1);
-    expect(oscillator.stop).toHaveBeenCalledWith(1.035);
+    // The bead cue layers two wooden partials with different decays.
+    expect(oscillator.stop).toHaveBeenCalledWith(1.07);
+    expect(oscillator.stop).toHaveBeenCalledWith(1.045);
   });
 });

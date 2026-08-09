@@ -53,7 +53,7 @@ describe("counter click feedback", () => {
     expect(() => writeCounterSoundEnabled(false, storage)).not.toThrow();
   });
 
-  it("creates one reusable Web Audio context and emits a 35ms restrained cue", () => {
+  it("creates one reusable Web Audio context and emits the layered bead cue", () => {
     const frequency = {
       setValueAtTime: vi.fn(),
       exponentialRampToValueAtTime: vi.fn(),
@@ -88,9 +88,14 @@ describe("counter click feedback", () => {
     expect(context.resume).toHaveBeenCalledTimes(2);
     expect(oscillator.connect).toHaveBeenCalledWith(gain);
     expect(gain.connect).toHaveBeenCalledWith(context.destination);
+    // Two wooden partials per tap, both starting on the same frame.
+    expect(context.createOscillator).toHaveBeenCalledTimes(4);
     expect(oscillator.start).toHaveBeenLastCalledWith(4);
-    expect(oscillator.stop).toHaveBeenLastCalledWith(4.035);
-    expect(frequency.setValueAtTime).toHaveBeenCalledWith(720, 4);
-    expect(frequency.exponentialRampToValueAtTime).toHaveBeenCalledWith(420, 4.035);
+    expect(frequency.setValueAtTime).toHaveBeenCalledWith(1180, 4);
+    expect(frequency.setValueAtTime).toHaveBeenCalledWith(1870, 4);
+    // Audibly louder than the old 0.035 sine so it carries on a phone speaker.
+    expect(gainParam.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.22, 4.002);
+    // A context without createBuffer simply skips the noise transient.
+    expect(() => play()).not.toThrow();
   });
 });

@@ -48,9 +48,12 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-75");
-    expect(screen.getByRole("button", { name: "Counter sound" })).toHaveAttribute("aria-pressed", "true");
-    fireEvent.click(screen.getByRole("button", { name: "Counter sound" }));
-    expect(screen.getByRole("button", { name: "Counter sound" })).toHaveAttribute("aria-pressed", "false");
+    // Phone chrome: Benefit, Share and the overflow control share one header
+    // row; the counter-sound toggle moved into that overflow menu.
+    expect(screen.getByRole("button", { name: "Benefit" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Share zikr" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reader options" })).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Counter sound" })).toBeNull();
   });
 
   it("renders reviewed Mushaf pages and keeps long-surah completion at the end", () => {

@@ -743,6 +743,7 @@ const en = {
     sound: "Counter sound",
     muteSound: "Mute counter sound",
     enableSound: "Enable counter sound",
+    done: "Done",
   },
   auth: {
     welcome: "Welcome to Azkar",

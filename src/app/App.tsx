@@ -974,7 +974,10 @@ function AppContent() {
 
   // All three nav variants share the same view whitelist, so splash, onboarding
   // and auth never render app navigation regardless of viewport.
-  const showBottomNavArea = showBottomNav && (layoutMode === "compact" || layoutMode === "medium");
+  // The reader is a full-screen reading surface on the bottom-nav tiers: its
+  // own header row carries every action it needs, so the tab bar is hidden
+  // there and the zikr text plus counter get the whole viewport back.
+  const showBottomNavArea = showBottomNav && view !== "reader" && (layoutMode === "compact" || layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 

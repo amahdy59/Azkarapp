@@ -756,23 +756,24 @@ textarea {
   cursor: default;
 }
 
-.adaptive-counter-track {
+/* Progress lives on the surface's own outline: a 2px stroke that is fully
+   hidden at zero and closes the whole rectangle on completion. */
+.counter-outline-progress {
+  pointer-events: none;
   position: absolute;
-  right: 12px;
-  bottom: 10px;
-  left: 12px;
-  height: 4px;
-  overflow: hidden;
-  border-radius: 9999px;
-  background: color-mix(in srgb, var(--muted-foreground) 20%, var(--card));
+  inset: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.adaptive-counter-progress {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: var(--primary);
-  transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);
+.counter-outline-progress rect {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 2;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .adaptive-counter-content {
@@ -784,7 +785,7 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 12px 16px 20px;
+  padding: 14px 18px;
 }
 
 .adaptive-counter-content .tap-anywhere-hint {
@@ -876,9 +877,10 @@ textarea {
 .counter-complete-cue,
 .counter-complete-static {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
+  gap: 10px;
 }
 
 .counter-complete-cue {
@@ -887,19 +889,42 @@ textarea {
 
 .counter-check-mark {
   display: flex;
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
+  flex: none;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
   color: var(--primary-foreground);
   background: var(--primary);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 12%, transparent);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.counter-face-swap {
+  animation: counter-face-swap 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes counter-face-swap {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.counter-complete-label {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--primary);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .adaptive-counter-track,
-  .adaptive-counter-progress,
+  .counter-outline-progress rect,
   .adaptive-counter-nav {
     transition-duration: 0.01ms;
   }
@@ -1303,9 +1328,11 @@ a[href]:not(.no-press):active,
     animation: none;
   }
 
-  .counter-complete-cue {
+  .counter-complete-cue,
+  .counter-face-swap {
     animation: none;
     opacity: 1;
+    transform: none;
   }
 
   .counter-complete-cue .counter-check-mark svg path {

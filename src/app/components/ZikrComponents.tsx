@@ -85,13 +85,37 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   );
 }
 
-export function AdaptiveCounterTrack({ count, total }: { count: number; total: number }) {
+/**
+ * Progress rendered as a 2px stroke inset along the counter's own rectangle
+ * instead of a separate bar inside it. `pathLength="1"` normalises the
+ * perimeter so the dash offset is simply `1 - progress`: hidden at zero,
+ * closing the full outline exactly on completion. `non-scaling-stroke` keeps
+ * the 2px weight constant when the surface shrinks below its 220px width.
+ */
+export function CounterOutlineProgress({ count, total }: { count: number; total: number }) {
   const progress = total > 0 ? Math.min(1, count / total) : 0;
 
   return (
-    <span className="adaptive-counter-track" aria-hidden="true">
-      <span className="adaptive-counter-progress" style={{ width: `${progress * 100}%` }} />
-    </span>
+    <svg
+      className="counter-outline-progress"
+      viewBox="0 0 220 76"
+      preserveAspectRatio="none"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <rect
+        x="1"
+        y="1"
+        width="218"
+        height="74"
+        rx="15"
+        ry="15"
+        pathLength={1}
+        strokeDasharray="1 1"
+        strokeDashoffset={1 - progress}
+        vectorEffect="non-scaling-stroke"
+      />
+    </svg>
   );
 }
 
@@ -183,14 +207,20 @@ export function ZikrCounterSurface({
       initial={false}
       whileTap={complete ? undefined : { scale: 0.985 }}
     >
-      <div className="adaptive-counter-content">
+      {/* Keyed on the face it shows so React swaps the node — the number face
+          and the completed face each play a 180ms fade/rise instead of
+          snapping, which is also what carries the eye to the next zikr. */}
+      <div className="adaptive-counter-content counter-face-swap" key={complete ? "complete" : "counting"}>
         {complete ? (
           <div
             className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
             data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
           >
             <span className="counter-check-mark">
-              <Check size={24} strokeWidth={2.5} />
+              <Check size={19} strokeWidth={3} />
+            </span>
+            <span className="counter-complete-label" dir="auto">
+              {t(language, "counter.done")}
             </span>
           </div>
         ) : (
@@ -209,7 +239,7 @@ export function ZikrCounterSurface({
           </p>
         )}
       </div>
-      <AdaptiveCounterTrack count={count} total={total} />
+      <CounterOutlineProgress count={count} total={total} />
     </motion.button>
   );
 }

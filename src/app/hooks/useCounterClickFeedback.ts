@@ -39,38 +39,81 @@ export function writeCounterSoundEnabled(
 }
 
 /**
- * Creates a short, restrained click without adding or downloading an audio
- * asset. The injected factory keeps the Web Audio boundary deterministic in
- * tests and lets unsupported browsers fail silently without affecting count.
+ * Creates the counter's bead click without adding or downloading an audio
+ * asset. Two detuned wooden partials (a low body resonance and a bright
+ * contact tone) plus a very short band-passed noise transient read as two
+ * tasbih beads knocking together rather than as a UI blip — and it is
+ * noticeably louder than a plain sine so it survives phone speakers.
+ *
+ * The injected factory keeps the Web Audio boundary deterministic in tests and
+ * lets unsupported browsers fail silently without affecting count.
  */
 export function createCounterClickPlayer(createAudioContext: () => AudioContext | null): () => void {
   let context: AudioContext | null = null;
+  let noiseBuffer: AudioBuffer | null = null;
 
   return () => {
     try {
       context ??= createAudioContext();
       if (!context) return;
+      const ctx = context;
 
-      if (context.state === "suspended") {
-        void context.resume().catch(() => undefined);
+      if (ctx.state === "suspended") {
+        void ctx.resume().catch(() => undefined);
       }
 
-      const startAt = context.currentTime;
-      const stopAt = startAt + 0.035;
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
+      const startAt = ctx.currentTime;
+      const master = ctx.createGain();
+      master.gain.setValueAtTime(1, startAt);
+      master.connect(ctx.destination);
 
-      oscillator.type = "sine";
-      oscillator.frequency.setValueAtTime(720, startAt);
-      oscillator.frequency.exponentialRampToValueAtTime(420, stopAt);
-      gain.gain.setValueAtTime(0.0001, startAt);
-      gain.gain.exponentialRampToValueAtTime(0.035, startAt + 0.003);
-      gain.gain.exponentialRampToValueAtTime(0.0001, stopAt);
+      // Wooden body: two partials at a slightly inharmonic ratio, each decaying
+      // fast. Frequencies sit where small hardwood beads actually resonate.
+      for (const [frequency, peak, decay] of [
+        [1180, 0.22, 0.07],
+        [1870, 0.12, 0.045],
+      ] as const) {
+        const oscillator = ctx.createOscillator();
+        const gain = ctx.createGain();
+        oscillator.type = "triangle";
+        oscillator.frequency.setValueAtTime(frequency, startAt);
+        oscillator.frequency.exponentialRampToValueAtTime(frequency * 0.72, startAt + decay);
+        gain.gain.setValueAtTime(0.0001, startAt);
+        gain.gain.exponentialRampToValueAtTime(peak, startAt + 0.002);
+        gain.gain.exponentialRampToValueAtTime(0.0001, startAt + decay);
+        oscillator.connect(gain);
+        gain.connect(master);
+        oscillator.start(startAt);
+        oscillator.stop(startAt + decay);
+      }
 
-      oscillator.connect(gain);
-      gain.connect(context.destination);
-      oscillator.start(startAt);
-      oscillator.stop(stopAt);
+      // Contact transient: 30ms of band-passed noise, generated once and reused
+      // so repeated taps cost nothing but a buffer-source node.
+      if (!noiseBuffer && typeof ctx.createBuffer === "function") {
+        const frames = Math.max(1, Math.floor(ctx.sampleRate * 0.03));
+        const buffer = ctx.createBuffer(1, frames, ctx.sampleRate);
+        const channel = buffer.getChannelData(0);
+        for (let i = 0; i < frames; i += 1) {
+          channel[i] = (Math.random() * 2 - 1) * (1 - i / frames) ** 3;
+        }
+        noiseBuffer = buffer;
+      }
+
+      if (noiseBuffer) {
+        const source = ctx.createBufferSource();
+        const bandpass = ctx.createBiquadFilter();
+        const noiseGain = ctx.createGain();
+        source.buffer = noiseBuffer;
+        bandpass.type = "bandpass";
+        bandpass.frequency.setValueAtTime(2400, startAt);
+        bandpass.Q.setValueAtTime(1.1, startAt);
+        noiseGain.gain.setValueAtTime(0.16, startAt);
+        noiseGain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.03);
+        source.connect(bandpass);
+        bandpass.connect(noiseGain);
+        noiseGain.connect(master);
+        source.start(startAt);
+      }
     } catch {
       // Sound feedback is optional; never let it interrupt devotional counting.
     }
