@@ -96,6 +96,31 @@ function getCachedPrayerTimes(date: Date, lat: number, lng: number, method: numb
   }
 }
 
+/** Days either side of the requested date whose cached times stay useful. */
+const CACHE_RETENTION_DAYS = 2;
+
+/**
+ * The cache is keyed per date (and per location and method), so it grew by a
+ * fresh key every day and nothing ever removed the old ones. Only dates near
+ * the one being read are ever useful, so pruning on write keeps the cache
+ * bounded without a separate cleanup pass.
+ */
+export function pruneExpiredPrayerTimes(reference: Date): void {
+  const oldest = dateKey(new Date(reference.getTime() - CACHE_RETENTION_DAYS * 86_400_000));
+  const newest = dateKey(new Date(reference.getTime() + CACHE_RETENTION_DAYS * 86_400_000));
+  try {
+    for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
+      const key = window.localStorage.key(index);
+      if (!key?.startsWith(CACHE_KEY_PREFIX)) continue;
+      // `YYYY-MM-DD` sorts lexicographically, so a string compare is the range check.
+      const cachedDate = key.slice(CACHE_KEY_PREFIX.length).split("_")[0];
+      if (cachedDate && (cachedDate < oldest || cachedDate > newest)) window.localStorage.removeItem(key);
+    }
+  } catch {
+    // An unpruned cache is only wasted space; prayer times are unaffected.
+  }
+}
+
 function setCachedPrayerTimes(date: Date, lat: number, lng: number, method: number, times: PrayerTimes): void {
   if (typeof window === "undefined") return;
   try {
@@ -103,6 +128,7 @@ function setCachedPrayerTimes(date: Date, lat: number, lng: number, method: numb
   } catch {
     // Prayer times still work through the in-memory offline calculation.
   }
+  pruneExpiredPrayerTimes(date);
 }
 
 function getCachedTimeZone(lat: number, lng: number): string | undefined {

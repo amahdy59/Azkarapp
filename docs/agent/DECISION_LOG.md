@@ -870,3 +870,21 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** Shared counter component/styles, Reader composition, Custom Counter, Reader tests, design-system contract, release notes, and phase evidence.
 - **Tests/evidence required:** Focused Reader/Custom Counter unit and browser coverage, desktop/tablet visual review, and the normal release gate once before publication.
 - **Supersedes:** DEC-043 counter geometry and DEC-047 keyboard-guide placement.
+
+---
+
+## DEC-049 — "Clear local data" sweeps every app-owned storage namespace
+
+- **Date:** 2026-08-09
+- **Status:** **Proposed — awaiting user approval.** Implemented in the working tree; revert if rejected.
+- **Owner:** Claude (delegated — user asked to continue through the recommendation list autonomously). Raised as Proposed rather than Approved because it changes what a destructive, privacy-facing action deletes, which is the user's call, not the agent's.
+- **Related scope:** Cross-cutting robustness pass before Phase 09
+- **Context:** `clearStoredAppData` cleared a hand-maintained list of six named keys plus an `azkarapp.friday-` prefix sweep. The list had fallen behind the code: **search history (`azkarapp_recent_searches_*`), cached prayer times (`azkarapp.prayer_times_cache.*`), the cached timezone (`azkarapp.prayer_time_zone.*`), the last sync stamp, and audio preferences all survived it.** Search history and location-derived caches outliving a "delete my local data" action is the part that matters — the app ships an account-deletion page and this same function runs after account deletion.
+- **Options considered:** Keep the named list and append the five missing keys; sweep by owned prefix so the function cannot fall behind again.
+- **Decision:** Sweep by prefix over the three namespaces the app actually writes under — `azkarapp.`, `azkarapp_`, and `azkar.audio-preferences`. Unrelated origin storage is still untouched, which an existing assertion continues to guard.
+- **One key is deliberately excluded, and this is the part worth review.** `azkar.audio-downloads.v1` is the **only** index of which URLs live in the `azkar-audio-v*` Cache API bucket. Deleting it without the cache entries would strand those bytes — potentially hundreds of MB — with nothing able to find or remove them. Clearing it properly means awaiting `removeDownloadedAudio()`, which would make this sync function async and change both call sites. That is a larger change than a robustness fix should make unreviewed, so the exclusion is documented in the code and recorded here as the open question.
+- **Consequences:** "Clear local data" and post-account-deletion cleanup now also remove search history, prayer-time and timezone caches, the sync stamp, and audio preferences. Downloaded offline audio is unaffected and is still cleared from the Downloads screen. No persisted state shape, merge boundary, or remote-sync contract changes — this only widens which local keys are removed.
+- **Files/contracts to update:** `src/app/state.ts`, `src/app/state.test.ts`.
+- **Tests/evidence required:** The existing clear-data test now asserts all 13 owned keys are removed, that unrelated origin storage survives, and that the audio-download registry is deliberately retained. Verified by narrowing the prefix list and confirming the test fails naming `azkarapp.state.v1`. Full `pnpm check` green.
+- **Open question for the user:** should offline audio also be cleared by this action (making it async), or is the Downloads screen the right and only place for that?
+- **Supersedes:** None

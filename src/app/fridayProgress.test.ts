@@ -4,7 +4,9 @@ import {
   fridayDuasKey,
   fridayKahfOpenedKey,
   fridaySalawatKey,
+  FRIDAY_KAHF_WEEK_KEY,
   getIsoWeekKey,
+  pruneStaleFridayProgress,
   readFridaySalawatProgress,
   readFridayDuaProgress,
   writeFridayDuaProgress,
@@ -22,6 +24,28 @@ describe("Friday weekly progress", () => {
     expect(fridayKahfOpenedKey("2026-W31")).toBe("azkarapp.friday-kahf-opened.2026-W31");
     expect(fridaySalawatKey("2026-W31")).toBe("azkarapp.friday-salawat.2026-W31");
     expect(fridayDuasKey("2026-W31")).toBe("azkarapp.friday-duas.2026-W31");
+  });
+
+  it("prunes past ISO weeks while keeping the current week and non-weekly keys", () => {
+    localStorage.clear();
+    localStorage.setItem(fridayDuasKey("2026-W29"), "[]");
+    localStorage.setItem(fridayChecklistKey("2026-W29"), "[]");
+    localStorage.setItem(fridaySalawatKey("2026-W30"), "{}");
+    localStorage.setItem(fridayKahfOpenedKey("2026-W31"), "true");
+    localStorage.setItem(fridayDuasKey("2026-W31"), "[]");
+    // Not week-scoped: it ends in `.v1`, so pruning must never touch it.
+    localStorage.setItem(FRIDAY_KAHF_WEEK_KEY, "2026-W31");
+    localStorage.setItem("unrelated.product.key", "keep");
+
+    pruneStaleFridayProgress("2026-W31");
+
+    expect(localStorage.getItem(fridayDuasKey("2026-W29"))).toBeNull();
+    expect(localStorage.getItem(fridayChecklistKey("2026-W29"))).toBeNull();
+    expect(localStorage.getItem(fridaySalawatKey("2026-W30"))).toBeNull();
+    expect(localStorage.getItem(fridayKahfOpenedKey("2026-W31"))).toBe("true");
+    expect(localStorage.getItem(fridayDuasKey("2026-W31"))).toBe("[]");
+    expect(localStorage.getItem(FRIDAY_KAHF_WEEK_KEY)).toBe("2026-W31");
+    expect(localStorage.getItem("unrelated.product.key")).toBe("keep");
   });
 
   it("stores a validated weekly Salawat target and count", () => {

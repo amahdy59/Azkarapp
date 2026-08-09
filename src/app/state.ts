@@ -560,34 +560,44 @@ export function resetStoredSettings() {
   }
 }
 
+/**
+ * Every localStorage namespace this app writes under. Sweeping by prefix is
+ * what keeps "clear local data" complete as keys are added — the previous
+ * hand-maintained list had fallen behind, leaving search history
+ * (`azkarapp_recent_searches_*`), cached prayer times and the cached timezone
+ * (`azkarapp.prayer_time*`) and the last sync stamp on the device.
+ *
+ * `azkar.audio-downloads.v1` is deliberately absent. It is the only index of
+ * which URLs live in the `azkar-audio-v*` Cache API bucket, so removing it
+ * without the cache entries would strand those bytes with nothing able to find
+ * or delete them. Offline audio is cleared from the Downloads screen, which
+ * removes registry and cache together through `removeDownloadedAudio`.
+ */
+const OWNED_STORAGE_PREFIXES = ["azkarapp.", "azkarapp_", "azkar.audio-preferences"];
+
 /** Removes only Azkar-owned local data, leaving unrelated origin storage untouched. */
 export function clearStoredAppData() {
   if (typeof window === "undefined") {
     return;
   }
 
-  for (const key of [
-    STORAGE_KEY,
-    LEGACY_SAVED_ZIKR_STORAGE_KEY,
-    "azkarapp.foreground-reminders.v1",
-    "azkarapp.install-dismissed",
-    "azkarapp.onboarding-complete.v1",
-    "azkarapp.counter-sound.v1",
-  ]) {
-    try {
-      window.localStorage.removeItem(key);
-    } catch {
-      // Continue clearing any remaining app-owned keys when storage is partially unavailable.
-    }
-  }
-
   try {
     for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
       const key = window.localStorage.key(index);
-      if (key?.startsWith("azkarapp.friday-")) window.localStorage.removeItem(key);
+      if (key && OWNED_STORAGE_PREFIXES.some((prefix) => key.startsWith(prefix))) {
+        window.localStorage.removeItem(key);
+      }
     }
   } catch {
-    // Fixed keys above are still cleared when storage enumeration is unavailable.
+    // Storage enumeration can fail where the whole API is restricted. Fall back
+    // to the two keys that hold the user's own reading and saved data.
+    for (const key of [STORAGE_KEY, LEGACY_SAVED_ZIKR_STORAGE_KEY]) {
+      try {
+        window.localStorage.removeItem(key);
+      } catch {
+        // The reload still restarts the app from in-memory defaults.
+      }
+    }
   }
 }
 

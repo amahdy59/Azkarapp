@@ -31,6 +31,33 @@ export function fridayDuasKey(week = getIsoWeekKey()): string {
   return `azkarapp.friday-duas.${week}`;
 }
 
+/**
+ * Matches only the week-scoped Friday keys. `FRIDAY_KAHF_WEEK_KEY` ends in
+ * `.v1` rather than an ISO week, so it can never match and is never pruned.
+ */
+const WEEK_SCOPED_FRIDAY_KEY = /^azkarapp\.friday-[a-z-]+\.(\d{4}-W\d{2})$/;
+
+/**
+ * Friday progress is written under a fresh ISO week every seven days and was
+ * never cleaned up, so a long-lived install accumulated four dead keys per week
+ * indefinitely. Only the current week is ever read, so anything else is waste.
+ *
+ * Called once at startup from `main.tsx`, deliberately not from the read
+ * functions: those take an explicit `week`, so pruning against *today* inside a
+ * read would delete the very data a non-current-week read asked for.
+ */
+export function pruneStaleFridayProgress(currentWeek = getIsoWeekKey()): void {
+  try {
+    for (let index = localStorage.length - 1; index >= 0; index -= 1) {
+      const key = localStorage.key(index);
+      const week = key?.match(WEEK_SCOPED_FRIDAY_KEY)?.[1];
+      if (key && week && week !== currentWeek) localStorage.removeItem(key);
+    }
+  } catch {
+    // Stale weeks only occupy storage; failing to prune them changes nothing.
+  }
+}
+
 export function readFridayDuaProgress(allowedIds: Iterable<string>, week = getIsoWeekKey()): Set<string> {
   try {
     const allowed = new Set(allowedIds);

@@ -57,20 +57,38 @@ describe("app state persistence", () => {
     write.mockRestore();
   });
 
-  it("clears dynamic Friday and counter-sound data without touching unrelated origin storage", () => {
-    window.localStorage.setItem("azkarapp.state.v1", "{}");
-    window.localStorage.setItem("azkarapp.counter-sound.v1", "false");
-    window.localStorage.setItem("azkarapp.friday-duas.2026-W31", '["friday-dua-01"]');
-    window.localStorage.setItem("azkarapp.friday-checklist.2026-W31", "[]");
+  it("clears every app-owned namespace without touching unrelated origin storage", () => {
+    const owned = [
+      "azkarapp.state.v1",
+      "azkarapp.saved-zikr.v1",
+      "azkarapp.counter-sound.v1",
+      "azkarapp.foreground-reminders.v1",
+      "azkarapp.install-dismissed",
+      "azkarapp.onboarding-complete.v1",
+      "azkarapp.friday-duas.2026-W31",
+      "azkarapp.friday-checklist.2026-W31",
+      // These four survived the previous hand-maintained key list. Search
+      // history and location-derived prayer caches outliving "clear local
+      // data" is the part that actually matters.
+      "azkarapp_recent_searches_ar",
+      "azkarapp.prayer_times_cache.2026-08-09.30.0.31.2.5",
+      "azkarapp.prayer_time_zone.30.0.31.2",
+      "azkarapp.last-successful-sync.v1",
+      "azkar.audio-preferences.v1",
+    ];
+    for (const key of owned) window.localStorage.setItem(key, "x");
     window.localStorage.setItem("unrelated.product.key", "keep");
+    // Not swept on purpose: it is the only index of the Cache API audio bucket,
+    // so dropping it alone would strand those bytes. See OWNED_STORAGE_PREFIXES.
+    window.localStorage.setItem("azkar.audio-downloads.v1", "{}");
 
     clearStoredAppData();
 
-    expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
-    expect(window.localStorage.getItem("azkarapp.counter-sound.v1")).toBeNull();
-    expect(window.localStorage.getItem("azkarapp.friday-duas.2026-W31")).toBeNull();
-    expect(window.localStorage.getItem("azkarapp.friday-checklist.2026-W31")).toBeNull();
+    for (const key of owned) {
+      expect(window.localStorage.getItem(key), `${key} should have been cleared`).toBeNull();
+    }
     expect(window.localStorage.getItem("unrelated.product.key")).toBe("keep");
+    expect(window.localStorage.getItem("azkar.audio-downloads.v1")).toBe("{}");
   });
 
   it("retains only the newest bounded session history", () => {

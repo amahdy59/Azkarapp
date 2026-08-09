@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { createRoot } from "react-dom/client";
 import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
+import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
 import { loadAppState } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
 import { startPerformanceMonitoring } from "./lib/observability.ts";
@@ -17,6 +18,8 @@ const Root = isMarketingLanding ? MarketingLanding : App;
 const initialAppearance = loadAppState().settings;
 applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
 startPerformanceMonitoring();
+// Best-effort startup cleanup, alongside cleanupStaleAudioDownloads below.
+if (!isMarketingLanding) pruneStaleFridayProgress();
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
   event.preventDefault();
