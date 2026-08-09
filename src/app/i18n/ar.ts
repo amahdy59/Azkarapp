@@ -148,6 +148,7 @@ const ar = {
     weeklyProgress: "تقدم هذا الأسبوع",
     kahfNotStarted: "لم تبدأ",
     kahfInProgress: "قيد القراءة",
+    kahfVerseProgress: "الآية {done} من {total}",
     kahfStart: "ابدأ القراءة",
     kahfContinue: "متابعة القراءة",
     preparationHeading: "الاستعداد للجمعة",
