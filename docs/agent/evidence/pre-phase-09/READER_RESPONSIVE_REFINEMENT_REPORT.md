@@ -6,17 +6,22 @@ Refine the Reader experience on desktop and tablet using the supplied references
 
 ## Scope completed
 
-- Repositioned the existing keyboard guidance beside session progress instead of leaving it detached at the bottom of the reading surface.
-- Kept the established desktop Reader hero, 184px repetition counter, 600px reading measure, action buttons, and icon system.
-- Centered the action group at tablet widths and retained the current responsive Reader structure.
+- Moved Previous and Next to the card's vertically centered side edges on tablet and desktop.
+- Removed the redundant desktop zikr-position strip.
+- Replaced the circular/compact variants with one shared rectangular Reader and custom counter.
+- Moved keyboard guidance below the counter with at least 20px clearance.
 - Added concise bilingual release notes for the major user-visible improvements.
 
 ## Files changed
 
 - `src/app/screens/ReaderScreen.tsx`
+- `src/app/screens/CustomCounterScreen.tsx`
+- `src/app/components/ZikrComponents.tsx`
+- `src/styles/theme.css`
 - `src/app/i18n/ar.ts`
 - `src/app/i18n/en.ts`
 - `e2e/reader-microinteractions.spec.ts`
+- `e2e/counter-feedback.spec.ts`
 - `public/release-notes.json`
 - `docs/DESIGN_SYSTEM.md`
 - `docs/agent/DECISION_LOG.md`
@@ -24,14 +29,16 @@ Refine the Reader experience on desktop and tablet using the supplied references
 
 ## Components added or modified
 
-- Modified `ReaderScreen` session chrome, action alignment, and keyboard-shortcut guide.
+- Modified `ReaderScreen` navigation placement, card chrome, counter placement, and keyboard-shortcut guide.
+- Modified the shared `ZikrCounterSurface` used by Reader and Custom Counter.
 - Added localized accessible shortcut labels without adding a component or runtime dependency.
 
 ## User-visible changes
 
-- Desktop keyboard guidance now sits in the session hero beneath progress.
-- Tablet keyboard guidance now sits immediately below session progress and before the reading content.
-- Tablet Reader actions are centered for a more balanced and predictable layout.
+- Tablet and desktop navigation arrows sit at the card sides instead of beside the counter.
+- The desktop card opens directly into the zikr without a duplicate position bar.
+- Keyboard guidance sits below the counter, separated by at least 20px.
+- Reader and custom counting use the same rectangular ratio-and-progress treatment.
 - Update notices describe the major changes in four concise Arabic or English bullets.
 
 ## Accessibility work
@@ -43,8 +50,7 @@ Refine the Reader experience on desktop and tablet using the supplied references
 
 ## Tests added or updated
 
-- Added desktop and tablet assertions for shortcut placement, accessible naming, reading order, and centered tablet actions.
-- Re-ran the complete configured Playwright inventory across all projects.
+- Added focused assertions for the shared rectangular counter, side-arrow placement, removed position strip, accessible shortcut naming, and counter-to-guide spacing.
 
 ## Commands run
 
@@ -63,19 +69,18 @@ Refine the Reader experience on desktop and tablet using the supplied references
 
 ## Visual/manual evidence
 
-- Direct browser review at 1440×900 and 1024×768 in both Arabic and English.
-- Confirmed that the desktop guide remains within the hero, the tablet guide precedes the reading content, actions remain visible, and the devotional text stays visually dominant.
-- Confirmed that the supplied references were used selectively: no alternate icon set, duplicated progress, detached edge navigation, oversized empty canvas, or reduced counter was introduced.
+- Direct Arabic browser review at 1440×900 and 1024×768.
+- Confirmed that arrows align to the card sides, the duplicate strip is absent, the counter is rectangular, and keyboard guidance clears the counter.
 
 ## Documentation updated
 
 - Updated the Reader contract in `docs/DESIGN_SYSTEM.md`.
-- Recorded the approved evidence-led refinement as DEC-047 in `docs/agent/DECISION_LOG.md`.
+- Recorded the final approved counter and Reader-card refinement as DEC-048 in `docs/agent/DECISION_LOG.md`.
 - Added this phase report.
 
 ## Decisions recorded
 
-- DEC-047 preserves the established Reader controls and proportions while relocating keyboard guidance by breakpoint.
+- DEC-048 supersedes DEC-043's circular-counter geometry and DEC-047's keyboard-guide placement.
 
 ## Known limitations or remaining risks
 

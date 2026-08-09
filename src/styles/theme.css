@@ -558,20 +558,6 @@ textarea {
     transform: translateY(4px);
   }
 }
-@keyframes counter-ready-breathe {
-  0% {
-    opacity: 0.55;
-    transform: scale(0.92);
-  }
-  62% {
-    opacity: 1;
-    transform: scale(1.035);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
 @keyframes counter-ready-glow {
   0% {
     opacity: 0;
@@ -737,6 +723,10 @@ textarea {
   box-shadow: 0 4px 20px color-mix(in srgb, var(--foreground) 6%, transparent);
   cursor: pointer;
   isolation: isolate;
+  width: 220px;
+  max-width: 100%;
+  height: 76px;
+  border-radius: 16px;
   transition:
     border-color 200ms ease,
     box-shadow 200ms ease,
@@ -766,20 +756,23 @@ textarea {
   cursor: default;
 }
 
-.adaptive-counter-track,
-.adaptive-counter-progress {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-}
-
 .adaptive-counter-track {
-  stroke: color-mix(in srgb, var(--muted-foreground) 20%, var(--card));
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  left: 12px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--muted-foreground) 20%, var(--card));
 }
 
 .adaptive-counter-progress {
-  stroke: var(--primary);
-  stroke-linecap: round;
-  transition: stroke-dashoffset 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+  transition: width 180ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .adaptive-counter-content {
@@ -791,7 +784,7 @@ textarea {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 12px 16px 20px;
 }
 
 .adaptive-counter-content .tap-anywhere-hint {
@@ -799,14 +792,6 @@ textarea {
   font-size: 0.75rem;
   line-height: 1.1rem;
   text-align: center;
-}
-
-.adaptive-counter-content.is-compact {
-  flex-direction: row;
-  gap: 14px;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 18px;
 }
 
 .adaptive-counter-pulse {
@@ -875,15 +860,11 @@ textarea {
   }
 }
 
-.counter-ring-ready {
-  animation: counter-ready-breathe 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
 .counter-ring-ready::after {
   position: absolute;
   inset: 4px;
   border: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
-  border-radius: 9999px;
+  border-radius: inherit;
   content: "";
   animation: counter-ready-glow 720ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
 }
@@ -906,19 +887,13 @@ textarea {
 
 .counter-check-mark {
   display: flex;
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
   color: var(--primary-foreground);
   background: var(--primary);
-  box-shadow: 0 0 0 10px color-mix(in srgb, var(--primary) 12%, transparent);
-}
-
-.adaptive-counter-content.is-compact .counter-check-mark {
-  width: 48px;
-  height: 48px;
   box-shadow: 0 0 0 6px color-mix(in srgb, var(--primary) 12%, transparent);
 }
 
@@ -1322,10 +1297,6 @@ a[href]:not(.no-press):active,
   .counter-number {
     animation: none;
     opacity: 1;
-  }
-
-  .counter-ring-ready {
-    animation: none;
   }
 
   .counter-ring-ready::after {

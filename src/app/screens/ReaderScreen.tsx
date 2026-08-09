@@ -174,7 +174,6 @@ export function ReaderScreen({
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
-  const [useCompactCounter, setUseCompactCounter] = useState(false);
   const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
@@ -243,39 +242,6 @@ export function ReaderScreen({
   useEffect(() => {
     setSelectedWordMeanings(null);
   }, [z?.id]);
-
-  useEffect(() => {
-    const main = readerMainRef.current;
-    const content = readingContentRef.current;
-    if (!main || !content) return;
-
-    if (longSurah) {
-      setUseCompactCounter(false);
-      return;
-    }
-
-    let frame = 0;
-    const measure = () => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        // Reserve the full circular counter footprint. The compact form is only
-        // selected when the reading would otherwise collide with or hide it.
-        const circularCounterFootprint = 206;
-        const readingFootprint = content.scrollHeight + 24;
-        setUseCompactCounter(readingFootprint + circularCounterFootprint > main.clientHeight);
-      });
-    };
-
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(main);
-    observer.observe(content);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      observer.disconnect();
-    };
-  }, [z?.id, textSize, showTranslation, showTransliteration, language, longSurah, isDesktopReader]);
 
   // Long-Surah reading-position tracking. Drives the floating "jump to
   // counter" affordance (task: sticky mini-counter) and lets it report which
@@ -617,67 +583,76 @@ export function ReaderScreen({
     </article>
   );
 
-  const renderCounterPanel = () => {
+  const renderNavigationButton = (kind: "prev" | "next") => {
+    const isPrevious = kind === "prev";
+    const disabled = isPrevious ? idx === 0 : idx === azkar.length - 1;
+    const label = t(language, isPrevious ? "reader.prev" : "reader.next");
+
     return (
-      <div className="px-3 pb-3" data-testid="counter-panel">
-        <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onPrev();
-            }}
-            disabled={idx === 0}
-            title={t(language, "reader.prev")}
-            aria-label={t(language, "reader.prev")}
-            className="adaptive-counter-nav"
-          >
-            {direction === "rtl" ? <ChevronRight size={22} /> : <ChevronLeft size={22} />}
-          </button>
-
-          <div className="flex min-w-0 flex-1 justify-center">
-            <ZikrCounterSurface
-              count={count}
-              total={z.repetitionCount}
-              compact={useCompactCounter}
-              complete={complete}
-              justCompleted={justCompleted}
-              onTap={handleTap}
-              language={language}
-              instructionText={counterInstruction}
-              testId="counter-surface"
-            />
-          </div>
-
-          <button
-            type="button"
-            onClick={(event) => {
-              event.stopPropagation();
-              onNext();
-            }}
-            disabled={idx === azkar.length - 1}
-            title={t(language, "reader.next")}
-            aria-label={t(language, "reader.next")}
-            className="adaptive-counter-nav"
-          >
-            {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
-          </button>
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={(event) => {
+          event.stopPropagation();
+          if (isPrevious) {
+            onPrev();
+          } else {
+            onNext();
+          }
+        }}
+        disabled={disabled}
+        title={label}
+        aria-label={label}
+        className="adaptive-counter-nav"
+      >
+        {isPrevious ? (
+          direction === "rtl" ? (
+            <ChevronRight size={22} />
+          ) : (
+            <ChevronLeft size={22} />
+          )
+        ) : direction === "rtl" ? (
+          <ChevronLeft size={22} />
+        ) : (
+          <ChevronRight size={22} />
+        )}
+      </button>
     );
   };
 
-  // Extracted from the counter panel so it can render as persistent chrome
-  // (outside the scrollable region) instead of being buried at the bottom of
-  // a 12-page Mushaf scroll for long Surahs, where it previously only
-  // appeared once the reader scrolled all the way down to the counter.
-  const renderKeyboardShortcutsHint = (onMedia = false) => (
+  const renderSideNavigation = () => (
     <div
-      className={`hidden w-fit max-w-full items-center justify-center gap-3 rounded-full border px-4 py-1.5 text-[0.75rem] font-medium md:flex ${
-        onMedia
-          ? "border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media-muted)]"
-          : "border-border/40 bg-muted/60 text-muted-foreground"
-      }`}
+      className="pointer-events-none absolute inset-x-4 top-1/2 z-10 hidden -translate-y-1/2 items-center justify-between md:flex"
+      data-testid="reader-side-navigation"
+    >
+      <div className="pointer-events-auto">{renderNavigationButton("prev")}</div>
+      <div className="pointer-events-auto">{renderNavigationButton("next")}</div>
+    </div>
+  );
+
+  const renderCounterPanel = () => (
+    <div className="px-3 pb-3" data-testid="counter-panel">
+      <div className="adaptive-counter-row flex w-full items-center justify-center gap-2.5">
+        <div className="md:hidden">{renderNavigationButton("prev")}</div>
+        <div className="flex min-w-0 flex-1 justify-center">
+          <ZikrCounterSurface
+            count={count}
+            total={z.repetitionCount}
+            complete={complete}
+            justCompleted={justCompleted}
+            onTap={handleTap}
+            language={language}
+            instructionText={counterInstruction}
+            testId="counter-surface"
+          />
+        </div>
+        <div className="md:hidden">{renderNavigationButton("next")}</div>
+      </div>
+    </div>
+  );
+
+  const renderKeyboardShortcutsHint = () => (
+    <div
+      className="mx-auto mt-5 hidden w-fit max-w-full items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex"
       data-testid="reader-keyboard-shortcuts"
       aria-label={t(language, "reader.keyboardShortcuts")}
     >
@@ -720,6 +695,13 @@ export function ReaderScreen({
         </kbd>
         <span>{t(language, "reader.shortcutBack")}</span>
       </span>
+    </div>
+  );
+
+  const renderCounterStack = () => (
+    <div data-testid="reader-counter-stack">
+      {renderCounterPanel()}
+      {renderKeyboardShortcutsHint()}
     </div>
   );
 
@@ -1025,34 +1007,14 @@ export function ReaderScreen({
                 aria-label={t(language, "reader.groupProgress")}
               />
             </div>
-
-            {renderKeyboardShortcutsHint(true)}
           </div>
 
-          {/* Wide-desktop card: position badge, reading content, and the
-              counter panel. Page-level actions live in the hero above. */}
-          <div className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised">
-            <div className="flex shrink-0 items-center justify-center border-b border-border px-4 py-3">
-              {/* Visual-only: the position it names is already carried by the
-                  progress bar above (single accessible progress source per
-                  docs/DESIGN_SYSTEM.md's reader contract), so this pill stays
-                  out of the accessibility tree instead of announcing twice.
-                  Carries its own icon (vs. the hero's plain text) so the two
-                  numbers — hero: collection completed, here: reading
-                  position — read as distinct stats rather than a possible
-                  duplicate at a glance. */}
-              <span
-                aria-hidden="true"
-                className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[0.8125rem] font-bold text-primary"
-              >
-                <List size={14} className="shrink-0" />
-                {t(language, "reader.title", {
-                  index: formatNumerals(idx + 1, language),
-                  total: formatNumerals(azkar.length, language),
-                })}
-              </span>
-            </div>
-
+          {/* Wide-desktop card: reading content, side navigation, counter,
+              and keyboard guidance. Page-level actions stay in the hero. */}
+          <div
+            className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised"
+            data-testid="reader-card"
+          >
             <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
               <div
                 ref={readingScrollRef}
@@ -1073,18 +1035,16 @@ export function ReaderScreen({
                   </div>
                   {longSurah && (
                     <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
-                      {renderCounterPanel()}
+                      {renderCounterStack()}
                     </div>
                   )}
                 </div>
               </div>
 
-              {/* The nav-arrows/counter row stays inside the scroll region for
-                  long Surahs because the counter deliberately follows the
-                  reading. The shortcut guide remains persistent in the hero. */}
-              <footer className="shrink-0 pb-2 pt-1">{!longSurah && renderCounterPanel()}</footer>
+              <footer className="shrink-0 pb-3 pt-1">{!longSurah && renderCounterStack()}</footer>
             </div>
 
+            {renderSideNavigation()}
             {renderLongSurahJumpFab()}
           </div>
         </>
@@ -1142,13 +1102,13 @@ export function ReaderScreen({
               direction={direction}
               aria-label={t(language, "reader.groupProgress")}
             />
-            <div className="mt-3">{renderKeyboardShortcutsHint()}</div>
           </div>
 
           {/* Main Layout Area */}
           <div
             ref={readerMainRef}
             className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
+            data-testid="reader-card"
           >
             {/* Long chapters keep their completion control after the final Mushaf page;
                 ordinary adhkar retain the fixed counter below this scroll region. */}
@@ -1172,21 +1132,18 @@ export function ReaderScreen({
                 </div>
                 {longSurah && (
                   <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
-                    {renderCounterPanel()}
+                    {renderCounterStack()}
                   </div>
                 )}
               </div>
             </div>
 
-            {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
+            {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterStack()}</div>}
 
+            {renderSideNavigation()}
             {renderLongSurahJumpFab()}
           </div>
 
-          {/* The action row remains below the counter. Keyboard guidance now
-              sits with the session progress above the reading region, where
-              it is discoverable before reading without competing with the
-              counter or these primary actions. */}
           <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
         </>
       )}

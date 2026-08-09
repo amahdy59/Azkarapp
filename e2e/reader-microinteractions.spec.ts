@@ -78,56 +78,75 @@ async function openFridayKahf(page: Page) {
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
 
-test("the circular counter keeps its 184px contract on narrow phones and desktop", async ({ page }) => {
+test("the Reader counter keeps one rectangular shape across phone, tablet, and desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 844 });
   await openFirstMorningZikr(page);
 
   const counter = page.getByTestId("counter-surface");
-  await expect(counter).toHaveAttribute("data-counter-shape", "circle");
+  await expect(counter).toHaveAttribute("data-counter-shape", "rectangle");
 
   for (const viewport of [
     { width: 320, height: 844 },
+    { width: 1024, height: 768 },
     { width: 1440, height: 900 },
   ]) {
     await page.setViewportSize(viewport);
-    await expect
-      .poll(async () => {
-        const box = await counter.boundingBox();
-        return box ? { width: Math.round(box.width), height: Math.round(box.height) } : null;
-      })
-      .toEqual({ width: 184, height: 184 });
-
     const box = await counter.boundingBox();
     expect(box).not.toBeNull();
     if (box) {
+      expect(Math.round(box.height)).toBe(76);
+      expect(box.width).toBeLessThanOrEqual(220);
+      expect(box.width).toBeGreaterThanOrEqual(160);
       expect(box.x).toBeGreaterThanOrEqual(0);
       expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
     }
   }
 });
 
-test("desktop and tablet keep keyboard guidance with session progress and tablet actions centered", async ({
-  page,
-}) => {
+test("desktop and tablet place navigation at the card sides and shortcuts below the counter", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openFirstMorningZikr(page);
 
   const shortcutGuide = page.getByTestId("reader-keyboard-shortcuts");
   const desktopHero = page.getByTestId("reader-desktop-hero");
-  await expect(desktopHero.getByTestId("reader-keyboard-shortcuts")).toBeVisible();
-  await expect(page.locator("footer").getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
+  await expect(desktopHero.getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
+  await expect(page.getByText("Zikr 1 of 25", { exact: true })).toHaveCount(0);
 
-  await page.setViewportSize({ width: 1024, height: 768 });
-  const sessionChrome = page.getByTestId("reader-session-chrome");
+  for (const viewport of [
+    { width: 1440, height: 900 },
+    { width: 1024, height: 768 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const card = page.getByTestId("reader-card");
+    const sideNavigation = card.getByTestId("reader-side-navigation");
+    const counter = card.getByTestId("counter-surface");
+
+    await expect(sideNavigation).toBeVisible();
+    await expect(sideNavigation.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
+    await expect(sideNavigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
+    await expect(card.getByTestId("reader-counter-stack").getByTestId("reader-keyboard-shortcuts")).toBeVisible();
+    await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
+
+    const [cardBox, navigationBox, counterBox, guideBox] = await Promise.all([
+      card.boundingBox(),
+      sideNavigation.boundingBox(),
+      counter.boundingBox(),
+      shortcutGuide.boundingBox(),
+    ]);
+    expect(cardBox).not.toBeNull();
+    expect(navigationBox).not.toBeNull();
+    expect(counterBox).not.toBeNull();
+    expect(guideBox).not.toBeNull();
+    if (cardBox && navigationBox) {
+      expect(
+        Math.abs(navigationBox.y + navigationBox.height / 2 - (cardBox.y + cardBox.height / 2)),
+      ).toBeLessThanOrEqual(2);
+    }
+    if (counterBox && guideBox) expect(guideBox.y - (counterBox.y + counterBox.height)).toBeGreaterThanOrEqual(20);
+  }
+
   await expect(desktopHero).toHaveCount(0);
-  await expect(sessionChrome.getByTestId("reader-keyboard-shortcuts")).toBeVisible();
-  await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
-
-  const chromePrecedesReading = await sessionChrome.evaluate((chrome) => {
-    const reading = document.querySelector('[role="region"][aria-label="Zikr reading text"]');
-    return Boolean(reading && chrome.compareDocumentPosition(reading) & Node.DOCUMENT_POSITION_FOLLOWING);
-  });
-  expect(chromePrecedesReading).toBe(true);
+  await expect(page.getByTestId("reader-session-chrome").getByTestId("reader-keyboard-shortcuts")).toHaveCount(0);
 
   const [readerBox, actionsBox] = await Promise.all([
     page.getByTestId("reader-screen").boundingBox(),
@@ -254,28 +273,6 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
     expect(actionBox.x + actionBox.width).toBeLessThanOrEqual(readerBox.x + readerBox.width);
     expect(actionBox.height).toBeGreaterThanOrEqual(44);
   }
-});
-
-test("the adaptive counter stays circular when content fits and only compacts when space is constrained", async ({
-  page,
-}) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await openFirstMorningZikr(page);
-
-  const counterSurface = page.getByTestId("counter-surface");
-  await expect(counterSurface).toHaveAttribute("data-counter-shape", "circle");
-  await expect(counterSurface).toHaveCSS("border-radius", "92px");
-
-  const counterPanel = page.getByTestId("counter-panel");
-  await expect(counterPanel.getByRole("button", { name: "Prev", exact: true })).toBeVisible();
-  await expect(counterPanel.getByRole("button", { name: "Next", exact: true })).toBeVisible();
-
-  await page.setViewportSize({ width: 390, height: 420 });
-  await expect(counterSurface).toHaveAttribute("data-counter-shape", "compact");
-  await expect.poll(async () => Math.round((await counterSurface.boundingBox())?.height ?? 0)).toBe(76);
-
-  await page.setViewportSize({ width: 390, height: 844 });
-  await expect(counterSurface).toHaveAttribute("data-counter-shape", "circle");
 });
 
 test("reference sheet matches the approved hierarchy and stays usable on short screens", async ({ page }) => {

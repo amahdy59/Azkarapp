@@ -203,12 +203,11 @@ export function CustomCounterScreen({
           {/* Central Counter Display Surface */}
           <div className="my-auto flex flex-col items-center justify-center py-4 sm:py-6">
             <div className="relative flex items-center justify-center">
-              <PulseRings trigger={pulse} size={220} count={count} total={target} />
+              <PulseRings trigger={pulse} size={220} height={76} count={count} total={target} />
 
               <ZikrCounterSurface
                 count={count}
                 total={target}
-                compact={false}
                 complete={isTargetComplete}
                 onTap={handleTap}
                 language={language}

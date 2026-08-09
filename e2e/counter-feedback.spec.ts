@@ -74,8 +74,8 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
   const counterBox = await counter.boundingBox();
   expect(counterBox).not.toBeNull();
   if (counterBox) {
-    expect(Math.round(counterBox.width)).toBe(184);
-    expect(Math.round(counterBox.height)).toBe(184);
+    expect(Math.round(counterBox.width)).toBe(220);
+    expect(Math.round(counterBox.height)).toBe(76);
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
     expect(counterBox.x + counterBox.width).toBeLessThanOrEqual(320);
   }

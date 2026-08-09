@@ -141,7 +141,6 @@ export function FridaySalawatScreen({
           <ZikrCounterSurface
             count={progress.count}
             total={progress.target}
-            compact={false}
             complete={complete}
             onTap={increment}
             language={language}

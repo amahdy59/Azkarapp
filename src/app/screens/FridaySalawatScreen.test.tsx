@@ -12,9 +12,10 @@ describe("FridaySalawatScreen", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "10" }));
     const counter = screen.getByTestId("salawat-counter");
+    expect(counter).toHaveAttribute("data-counter-shape", "rectangle");
     for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
 
-    expect(screen.getByText("Target completed")).toBeInTheDocument();
+    expect(counter).toHaveAccessibleName("Completed 10 / 10");
     expect(readFridaySalawatProgress()).toEqual({ count: 10, target: 10 });
 
     fireEvent.click(screen.getByRole("button", { name: "Reset counter" }));

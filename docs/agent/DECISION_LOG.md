@@ -854,3 +854,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** `ReaderScreen.tsx`, Reader i18n, `docs/DESIGN_SYSTEM.md`, responsive Reader tests, and release highlights.
 - **Tests/evidence required:** Desktop/tablet browser screenshots; geometry assertions for guide placement, tablet action centering, fixed counter size, full local release gate, green Quality and Pages workflows, and production smoke verification.
 - **Supersedes:** Only the keyboard-guide position described by the earlier wide-desktop Reader implementation; all other Reader contracts remain authoritative.
+
+---
+
+## DEC-048 — Shared rectangular counter and simplified Reader card
+
+- **Date:** 2026-08-09
+- **Status:** Approved
+- **Owner:** User
+- **Related scope:** Narrow Phase 07 follow-up before Phase 09
+- **Context:** The approved visual review found the circular counter, duplicate position strip, bottom navigation arrows, and hero-level shortcut guide unnecessarily consumed or fragmented the reading layout.
+- **Decision:** Use one shared 220×76px rectangular counter with a bottom progress track in Reader and Custom Counter. Remove the desktop "Zikr {index} of {total}" strip. On tablet and desktop, place Previous/Next at the card's logical side edges and vertical midpoint. Place keyboard guidance below the counter with at least 20px clearance; compact layouts keep navigation beside the counter and hide keyboard guidance.
+- **Why:** This keeps the zikr primary, uses less vertical space, and makes navigation spatially predictable without adding controls or changing content.
+- **Consequences:** The Reader no longer measures content to switch between circular and compact counter variants. DEC-043's fixed circular geometry and DEC-047's shortcut placement are superseded; counting, completion, keyboard, accessibility, and session behavior remain unchanged.
+- **Files/contracts to update:** Shared counter component/styles, Reader composition, Custom Counter, Reader tests, design-system contract, release notes, and phase evidence.
+- **Tests/evidence required:** Focused Reader/Custom Counter unit and browser coverage, desktop/tablet visual review, and the normal release gate once before publication.
+- **Supersedes:** DEC-043 counter geometry and DEC-047 keyboard-guide placement.

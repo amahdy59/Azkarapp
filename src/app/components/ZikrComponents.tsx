@@ -22,11 +22,13 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
 export function PulseRings({
   trigger,
   size = 200,
+  height = 76,
   count = 0,
   total = 1,
 }: {
   trigger: number;
   size?: number;
+  height?: number;
   count?: number;
   total?: number;
 }) {
@@ -37,10 +39,10 @@ export function PulseRings({
   return (
     <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div
-        className={`absolute rounded-full border ${ringColor} pulse-ring`}
+        className={`absolute rounded-2xl border ${ringColor} pulse-ring`}
         style={{
           width: `${size - 8}px`,
-          height: `${size - 8}px`,
+          height: `${height - 8}px`,
           animationDuration: "260ms",
           animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
           animationFillMode: "forwards",
@@ -82,41 +84,19 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   );
 }
 
-export function AdaptiveCounterTrack({ count, total, compact }: { count: number; total: number; compact?: boolean }) {
+export function AdaptiveCounterTrack({ count, total }: { count: number; total: number }) {
   const progress = total > 0 ? Math.min(1, count / total) : 0;
-  const strokeWidth = compact ? 8 : 7;
-  const r = 50 - strokeWidth / 2 - 2;
-  const circ = 2 * Math.PI * r;
 
   return (
-    <svg
-      className="absolute inset-0 h-full w-full overflow-visible pointer-events-none"
-      viewBox="0 0 100 100"
-      aria-hidden="true"
-    >
-      <circle className="adaptive-counter-track" cx="50" cy="50" r={r} strokeWidth={strokeWidth} fill="none" />
-      <circle
-        className="adaptive-counter-progress"
-        cx="50"
-        cy="50"
-        r={r}
-        strokeWidth={strokeWidth}
-        fill="none"
-        strokeLinecap={count === 0 ? "butt" : "round"}
-        strokeDasharray={circ}
-        strokeDashoffset={circ * (1 - progress)}
-        transform="rotate(-90 50 50)"
-        opacity={count === 0 ? 0 : 1}
-        style={{ transition: "stroke-dashoffset 180ms cubic-bezier(0.4,0,0.2,1), opacity 180ms" }}
-      />
-    </svg>
+    <span className="adaptive-counter-track" aria-hidden="true">
+      <span className="adaptive-counter-progress" style={{ width: `${progress * 100}%` }} />
+    </span>
   );
 }
 
 export interface ZikrCounterSurfaceProps {
   count: number;
   total: number;
-  compact?: boolean;
   complete?: boolean;
   justCompleted?: boolean;
   onTap: () => void;
@@ -130,7 +110,6 @@ export interface ZikrCounterSurfaceProps {
 export function ZikrCounterSurface({
   count,
   total,
-  compact = false,
   complete = false,
   justCompleted = false,
   onTap,
@@ -142,15 +121,12 @@ export function ZikrCounterSurface({
 }: ZikrCounterSurfaceProps) {
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
-  const remainingCount = total > 1 ? total - count : 0;
-
   const defaultInstruction = isArabic ? "اضغط للتسبيح" : "Tap to count";
   const activeInstruction = instructionText || defaultInstruction;
 
   const localizedCount = formatNumerals(count, language);
   const localizedTotal = formatNumerals(total, language);
   const localizedRatio = total > 0 ? `${localizedCount} / ${localizedTotal}` : localizedCount;
-  const remainingText = isArabic ? `${formatNumerals(remainingCount, language)} متبقٍ` : `${remainingCount} remaining`;
 
   const accessibleName = complete
     ? total > 0
@@ -187,7 +163,7 @@ export function ZikrCounterSurface({
     <motion.button
       type="button"
       data-testid={testId}
-      data-counter-shape={compact ? "compact" : "circle"}
+      data-counter-shape="rectangle"
       disabled={disabled || complete}
       onClick={handleClick}
       onPointerDown={handlePointerDown}
@@ -204,134 +180,35 @@ export function ZikrCounterSurface({
       aria-label={accessibleName}
       className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${className}`}
       initial={false}
-      animate={{
-        width: compact ? "100%" : 184,
-        height: compact ? 76 : 184,
-        borderRadius: compact ? 24 : 92,
-      }}
-      transition={{ duration: 0.26, ease: [0.2, 0, 0.2, 1] }}
       whileTap={complete ? undefined : { scale: 0.985 }}
     >
-      {!compact && <AdaptiveCounterTrack count={count} total={total} compact={false} />}
-
-      {/* Keyed on shape, not on count/complete: this only remounts (and
-          fades via .zikr-step-enter) when the compact/circle shape itself
-          changes, not on every tap. */}
-      <div
-        key={compact ? "compact" : "circle"}
-        className={`adaptive-counter-content zikr-step-enter ${compact ? "is-compact" : ""}`}
-      >
-        {compact ? (
-          <div className="flex w-full h-full items-center justify-between gap-3 px-1">
-            <div className="relative flex size-[52px] shrink-0 items-center justify-center rounded-full bg-primary/10">
-              <AdaptiveCounterTrack count={count} total={total} compact={true} />
-              {complete ? (
-                <Check size={24} strokeWidth={2.5} className="text-primary" />
-              ) : (
-                <div className="flex flex-col items-center justify-center text-center leading-none" dir="ltr">
-                  <span
-                    className="text-[0.9375rem] font-extrabold text-foreground"
-                    style={{
-                      fontFamily: counterNumeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums lining-nums",
-                    }}
-                  >
-                    {localizedCount}
-                  </span>
-                  {total > 1 && (
-                    <span
-                      className="text-[0.625rem] font-bold text-muted-foreground mt-0.5"
-                      style={{
-                        fontFamily: counterNumeralFontFamily(language),
-                        fontVariantNumeric: "tabular-nums lining-nums",
-                      }}
-                    >
-                      /{formatNumerals(total, language)}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="h-8 w-[1px] bg-border/60 shrink-0" aria-hidden="true" />
-
-            <div className="flex min-w-0 flex-1 flex-col justify-center text-start">
-              <p className="text-[0.9375rem] font-extrabold text-foreground truncate">
-                {complete ? (isArabic ? "أتممت الهدف" : "Target completed") : activeInstruction}
-              </p>
-              <p className="text-[0.8125rem] font-bold text-primary mt-0.5 truncate">
-                {complete
-                  ? isArabic
-                    ? "مكتمل ✓"
-                    : "Done ✓"
-                  : remainingCount > 0
-                    ? remainingText
-                    : isArabic
-                      ? "اضغط للتسبيح"
-                      : "Tap to count"}
-              </p>
-            </div>
+      <div className="adaptive-counter-content">
+        {complete ? (
+          <div
+            className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
+            data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
+          >
+            <span className="counter-check-mark">
+              <Check size={24} strokeWidth={2.5} />
+            </span>
           </div>
         ) : (
-          <>
-            {complete ? (
-              <div
-                className={justCompleted ? "counter-complete-cue" : "counter-complete-static"}
-                data-testid={justCompleted ? "counter-completion-cue" : "counter-complete-state"}
-              >
-                <span className="counter-check-mark">
-                  <Check size={36} strokeWidth={2.5} />
-                </span>
-                {!justCompleted && (
-                  <span className="mt-2 text-[0.75rem] font-black text-foreground">
-                    {isArabic ? "أتممت الهدف" : "Target completed"}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <>
-                <div className="adaptive-counter-numerals flex flex-col items-center" dir="ltr">
-                  <p
-                    className="counter-number text-[2rem] font-black leading-none text-foreground"
-                    key={count}
-                    style={{
-                      fontFamily: counterNumeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums lining-nums",
-                    }}
-                  >
-                    {localizedCount}
-                  </p>
-                  {total > 0 && (
-                    <p
-                      className="text-[0.75rem] font-bold text-muted-foreground mt-1"
-                      style={{
-                        fontFamily: counterNumeralFontFamily(language),
-                        fontVariantNumeric: "tabular-nums lining-nums",
-                      }}
-                    >
-                      {isArabic ? `من ${localizedTotal}` : `of ${localizedTotal}`}
-                    </p>
-                  )}
-                </div>
-
-                <div className="my-1.5 h-[1.5px] w-7 bg-transparent rounded-full" aria-hidden="true" />
-
-                {remainingCount > 0 && (
-                  <p
-                    className="text-[0.6875rem] font-extrabold text-primary mt-0.5"
-                    style={{
-                      fontFamily: counterNumeralFontFamily(language),
-                      fontVariantNumeric: "tabular-nums lining-nums",
-                    }}
-                  >
-                    {remainingText}
-                  </p>
-                )}
-              </>
-            )}
-          </>
+          <p
+            className="text-[1.75rem] font-black leading-none text-foreground"
+            dir="ltr"
+            style={{
+              fontFamily: counterNumeralFontFamily(language),
+              fontVariantNumeric: "tabular-nums lining-nums",
+            }}
+          >
+            <span className="counter-number" key={count}>
+              {localizedCount}
+            </span>
+            {total > 0 && <span> / {localizedTotal}</span>}
+          </p>
         )}
       </div>
+      <AdaptiveCounterTrack count={count} total={total} />
     </motion.button>
   );
 }
