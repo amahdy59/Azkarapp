@@ -22,7 +22,7 @@ import {
 import { t } from "../i18n";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
-import { isLongSurah } from "../content/mushafPages";
+import { isLongSurah, splitMushafPages } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
@@ -179,13 +179,16 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingContentRef = useRef<HTMLDivElement | null>(null);
+  const readingScrollRef = useRef<HTMLDivElement | null>(null);
+  const [visibleMushafPage, setVisibleMushafPage] = useState<number | null>(null);
 
-  // A wide-desktop-only reader treatment (hero band + card chrome). Gated well
-  // above the 1200px "large" shell tier (where the nav sidebar already
-  // appears) so the default Playwright desktop viewport (1280px) and the
-  // shell's own breakpoint stay on the existing layout; only genuinely wide
-  // screens opt in.
-  const isDesktopReader = useMediaQuery("(min-width: 1366px)");
+  // A wide-desktop-only reader treatment (hero band + card chrome), gated at
+  // exactly the shell's own "large" tier (>=1200px, src/app/hooks/useLayoutMode.ts)
+  // where the labeled nav sidebar already appears — so the reader's chrome
+  // and the shell's own chrome change together instead of leaving a
+  // 1200-1365px gap where the sidebar shows but the reader still looks like
+  // the mobile layout.
+  const isDesktopReader = useMediaQuery("(min-width: 1200px)");
 
   const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
     useZikrCounter({
@@ -270,6 +273,45 @@ export function ReaderScreen({
       observer.disconnect();
     };
   }, [z?.id, textSize, showTranslation, showTransliteration, language, longSurah, isDesktopReader]);
+
+  // Long-Surah reading-position tracking. Drives the floating "jump to
+  // counter" affordance (task: sticky mini-counter) and lets it report which
+  // Mushaf page is currently on screen (task: page-jump orientation) without
+  // a second observer. Included isDesktopReader in the deps for the same
+  // reason as the measurement effect above: swapping mobile/desktop trees
+  // remounts the scroll container, and a stale observer would otherwise keep
+  // watching a detached node.
+  useEffect(() => {
+    if (!longSurah) {
+      setVisibleMushafPage(null);
+      return;
+    }
+    const root = readingScrollRef.current;
+    const content = readingContentRef.current;
+    if (!root || !content) return;
+    // jsdom (unit tests) and some older embedded webviews don't implement
+    // IntersectionObserver; the jump pill simply stays hidden there rather
+    // than throwing during mount.
+    if (typeof IntersectionObserver === "undefined") return;
+
+    const sections = Array.from(content.querySelectorAll<HTMLElement>("[data-mushaf-page]"));
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+        const top = visible[0]?.target;
+        const page = top ? Number(top.getAttribute("data-mushaf-page")) : NaN;
+        if (!Number.isNaN(page)) setVisibleMushafPage(page);
+      },
+      { root, rootMargin: "0px 0px -70% 0px", threshold: 0 },
+    );
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, [longSurah, z?.id, isDesktopReader]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -474,11 +516,36 @@ export function ReaderScreen({
   }
 
   const isLongContent = Boolean(z.isSurah || z.surahNameArabic);
+  const mushafPages = longSurah ? splitMushafPages(displayArabicText, z.mushafPages ?? []) : [];
+  const firstMushafPage = mushafPages[0]?.page ?? null;
+  const lastMushafPage = mushafPages[mushafPages.length - 1]?.page ?? null;
+  // Hidden on the first page (nothing to jump to yet) and on the last page
+  // (the counter it points to is already close by, so the pill would just
+  // sit on top of it).
+  const showLongSurahJump =
+    longSurah &&
+    !complete &&
+    visibleMushafPage !== null &&
+    visibleMushafPage !== firstMushafPage &&
+    visibleMushafPage !== lastMushafPage;
+
+  const scrollToLongSurahCounter = () => {
+    readingScrollRef.current
+      ?.querySelector('[data-testid="long-surah-end-counter"]')
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
 
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      className={`mt-1 w-full rounded-3xl border border-border/40 bg-card px-4 pb-2 pt-2 shadow-raised ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
+      // On the wide-desktop reader the outer card already carries the
+      // surface (border/shadow/bg), so this drops its own to avoid nesting
+      // a card inside a card; mobile keeps its own surface since it has no
+      // outer card. Either way, the tap-anywhere-to-count hover/active tint
+      // stays for ordinary adhkar.
+      className={`mt-1 w-full px-4 pb-2 pt-2 ${
+        isDesktopReader ? "rounded-2xl" : "rounded-3xl border border-border/40 bg-card shadow-raised"
+      } ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
     >
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
@@ -490,6 +557,7 @@ export function ReaderScreen({
           language={language}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
           onSelectMeanings={setSelectedWordMeanings}
+          flat={isDesktopReader}
         />
       ) : wordMeanings.length > 0 ? (
         <QuranWordText
@@ -592,9 +660,23 @@ export function ReaderScreen({
             {direction === "rtl" ? <ChevronLeft size={22} /> : <ChevronRight size={22} />}
           </button>
         </div>
+      </div>
+    );
+  };
 
-        {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
-        <div className="hidden md:flex items-center justify-center gap-3 mt-3 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+  // Extracted from the counter panel so it can render as persistent chrome
+  // (outside the scrollable region) instead of being buried at the bottom of
+  // a 12-page Mushaf scroll for long Surahs, where it previously only
+  // appeared once the reader scrolled all the way down to the counter.
+  const renderKeyboardShortcutsHint = () => (
+    <div className="hidden md:flex items-center justify-center gap-3 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
+      {/* Space only counts once the counter itself is focused in
+          long-Surah mode (the reader canvas deliberately never counts a
+          full Surah — see the counter-only contract in
+          docs/DESIGN_SYSTEM.md), so the discoverable global shortcut
+          doesn't apply here and the hint would be misleading. */}
+      {!longSurah && (
+        <>
           <span className="flex items-center gap-1">
             <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
               Space
@@ -602,33 +684,74 @@ export function ReaderScreen({
             <span>{isArabic ? "التسبيح" : "Count"}</span>
           </span>
           <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-          <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-              →
-            </kbd>
-            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-              ←
-            </kbd>
-            <span>{isArabic ? "الانتقال" : "Navigate"}</span>
-          </span>
-          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-          <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-              R
-            </kbd>
-            <span>{isArabic ? "إعادة" : "Reset"}</span>
-          </span>
-          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-          <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-              Esc
-            </kbd>
-            <span>{isArabic ? "رجوع" : "Back"}</span>
-          </span>
-        </div>
+        </>
+      )}
+      <span className="flex items-center gap-1">
+        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+          →
+        </kbd>
+        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+          ←
+        </kbd>
+        <span>{isArabic ? "الانتقال" : "Navigate"}</span>
+      </span>
+      <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+      <span className="flex items-center gap-1">
+        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+          R
+        </kbd>
+        <span>{isArabic ? "إعادة" : "Reset"}</span>
+      </span>
+      <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+      <span className="flex items-center gap-1">
+        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
+          Esc
+        </kbd>
+        <span>{isArabic ? "رجوع" : "Back"}</span>
+      </span>
+    </div>
+  );
+
+  // Long Surahs can run a dozen Mushaf pages before the counter appears.
+  // This floating pill reports the current page and jumps straight to the
+  // counter, so the primary action is never more than one tap away.
+  //
+  // Positioned `absolute` against the reading pane (not `sticky` inside the
+  // scroll flow), so it stays anchored to a fixed corner of the pane
+  // regardless of scroll offset, never overlaps the centered word-help
+  // targets or the counter itself, and — always mounted, only opacity
+  // toggled — never causes a scroll-position jump when it appears. The
+  // nearest `relative` ancestor differs per tree (the outer card on desktop,
+  // the reader-column on mobile), so each call site supplies its own
+  // container's positioning context; this just renders the pill itself.
+  const renderLongSurahJumpFab = () =>
+    longSurah && (
+      <div
+        className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex justify-end"
+        aria-hidden={!showLongSurahJump}
+      >
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            scrollToLongSurahCounter();
+          }}
+          tabIndex={showLongSurahJump ? 0 : -1}
+          className={`pointer-events-auto flex items-center gap-2 rounded-full border border-border bg-card/95 px-4 py-2.5 text-[0.8125rem] font-bold text-foreground shadow-raised backdrop-blur transition-[opacity,transform] duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            showLongSurahJump ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
+          }`}
+        >
+          <BookOpen size={16} className="shrink-0 text-primary" />
+          {visibleMushafPage !== null && (
+            <span dir="auto">
+              {t(language, "reader.mushafPage", { page: formatNumerals(visibleMushafPage, language) })}
+            </span>
+          )}
+          <span className="h-3 w-px bg-border" aria-hidden="true" />
+          <span dir="auto">{t(language, "reader.jumpToCounter")}</span>
+        </button>
       </div>
     );
-  };
 
   // Shared between the mobile header's overflow menu and the wide-desktop
   // card header's overflow menu so the two never drift apart.
@@ -772,9 +895,101 @@ export function ReaderScreen({
               <ArrowPrevious size={20} />
             </IconButton>
 
+            {/* Page-level actions live with the back control in the hero —
+                a single toolbar row — rather than in a second row inside the
+                card below. Icon-only throughout (the "Benefit" pill lost its
+                text label; its tooltip now previews the actual benefit text
+                instead of repeating the button's own name). */}
+            <div className="absolute end-4 top-4 flex items-center gap-2">
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger
+                  aria-label={t(language, "reader.menu")}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <MoreVertical size={18} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align="end"
+                  className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                  sideOffset={8}
+                >
+                  {renderReaderMenuItems()}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setHasOpenedBenefit(true);
+                  setBenefitOpen(true);
+                }}
+                label={t(language, "reader.referencesButton")}
+                title={getLocalizedZikrBenefit(z, language)}
+                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+              >
+                <BookOpen size={18} />
+              </IconButton>
+
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleToggleSaved();
+                }}
+                label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
+                aria-pressed={isSaved}
+                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 hover:bg-[color:var(--on-media)]/20"
+                style={{ color: isSaved ? "var(--on-media-accent)" : "var(--on-media)" }}
+              >
+                <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
+              </IconButton>
+
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  void handleShare();
+                }}
+                label={t(language, "reader.share")}
+                disabled={isSharing}
+                aria-busy={isSharing || undefined}
+                onPointerEnter={() => void prepareZikrShareCardFonts()}
+                onFocus={() => void prepareZikrShareCardFonts()}
+                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+              >
+                <Share2 size={18} />
+              </IconButton>
+
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  toggleSound();
+                }}
+                label={t(language, "counter.sound")}
+                title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+                aria-pressed={soundEnabled}
+                data-testid="reader-counter-sound-toggle"
+                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+              >
+                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+              </IconButton>
+            </div>
+
             <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
               {isArabic ? category.nameArabic : category.name}
             </h1>
+
+            {/* Reviewed, sourced benefit — same content the "Benefit" sheet
+                shows, not new copy — surfaced here only for long Surahs,
+                which are a single stable zikr per category so the line
+                can't flicker as the reader advances the way it would for an
+                ordinary multi-zikr collection. */}
+            {longSurah && (
+              <p
+                className="line-clamp-2 max-w-[36rem] text-[0.875rem] font-medium text-[color:var(--on-media-muted)]"
+                dir="auto"
+              >
+                {getLocalizedZikrBenefit(z, language)}
+              </p>
+            )}
 
             <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
               <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
@@ -800,93 +1015,23 @@ export function ReaderScreen({
             </div>
           </div>
 
-          {/* Wide-desktop card: header actions + counter badge, reading
-              content, and the existing counter panel/keyboard-shortcuts row. */}
-          <div className="mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised">
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border px-4 py-3">
-              <div className="flex min-w-0 items-center gap-2">
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger
-                    aria-label={t(language, "reader.menu")}
-                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-md border border-border bg-background text-foreground/80 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    <MoreVertical size={18} />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="start"
-                    className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
-                    sideOffset={8}
-                  >
-                    {renderReaderMenuItems()}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setHasOpenedBenefit(true);
-                    setBenefitOpen(true);
-                  }}
-                  className="flex h-11 items-center gap-1.5 rounded-md border border-border bg-background px-3.5 text-[0.8125rem] font-bold text-primary transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
-                  aria-label={t(language, "reader.referencesButton")}
-                  title={t(language, "reader.referencesButton")}
-                >
-                  <BookOpen size={16} />
-                  <span dir="auto">{t(language, "reader.referencesButton")}</span>
-                </button>
-
-                <IconButton
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleToggleSaved();
-                  }}
-                  label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-                  aria-pressed={isSaved}
-                  className="rounded-md border border-border bg-background"
-                  style={{ color: isSaved ? "var(--primary)" : "var(--foreground)" }}
-                >
-                  <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
-                </IconButton>
-
-                <IconButton
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    void handleShare();
-                  }}
-                  label={t(language, "reader.share")}
-                  disabled={isSharing}
-                  aria-busy={isSharing || undefined}
-                  onPointerEnter={() => void prepareZikrShareCardFonts()}
-                  onFocus={() => void prepareZikrShareCardFonts()}
-                  className="rounded-md border border-border bg-background"
-                >
-                  <Share2 size={18} />
-                </IconButton>
-
-                <IconButton
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    toggleSound();
-                  }}
-                  label={t(language, "counter.sound")}
-                  title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-                  aria-pressed={soundEnabled}
-                  data-testid="reader-counter-sound-toggle"
-                  className="rounded-md border border-border bg-background"
-                >
-                  {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-                </IconButton>
-              </div>
-
+          {/* Wide-desktop card: position badge, reading content, and the
+              counter panel. Page-level actions live in the hero above. */}
+          <div className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised">
+            <div className="flex shrink-0 items-center justify-center border-b border-border px-4 py-3">
               {/* Visual-only: the position it names is already carried by the
                   progress bar above (single accessible progress source per
                   docs/DESIGN_SYSTEM.md's reader contract), so this pill stays
-                  out of the accessibility tree instead of announcing twice. */}
+                  out of the accessibility tree instead of announcing twice.
+                  Carries its own icon (vs. the hero's plain text) so the two
+                  numbers — hero: collection completed, here: reading
+                  position — read as distinct stats rather than a possible
+                  duplicate at a glance. */}
               <span
                 aria-hidden="true"
-                className="shrink-0 rounded-full bg-muted px-4 py-1.5 text-[0.8125rem] font-bold text-primary"
+                className="flex shrink-0 items-center gap-1.5 rounded-full border border-border bg-background px-3.5 py-1.5 text-[0.8125rem] font-bold text-primary"
               >
+                <List size={14} className="shrink-0" />
                 {t(language, "reader.title", {
                   index: formatNumerals(idx + 1, language),
                   total: formatNumerals(azkar.length, language),
@@ -896,10 +1041,11 @@ export function ReaderScreen({
 
             <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
               <div
+                ref={readingScrollRef}
                 role="region"
                 tabIndex={0}
                 aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-                className={`flex-1 overflow-y-auto min-h-0 w-full px-6 pt-6 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 ${
+                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none focus-visible:ring-1 focus-visible:ring-ring/40 [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
               >
@@ -919,8 +1065,18 @@ export function ReaderScreen({
                 </div>
               </div>
 
-              {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
+              {/* Unconditional: the nav-arrows/counter row stays inside the
+                  scroll region for long Surahs (the counter deliberately
+                  follows the reading), but the keyboard-shortcuts hint is
+                  now persistent chrome here for every zikr — long Surah or
+                  not — instead of only appearing once scrolled to the end. */}
+              <footer className="shrink-0 pb-2 pt-1">
+                {!longSurah && renderCounterPanel()}
+                {renderKeyboardShortcutsHint()}
+              </footer>
             </div>
+
+            {renderLongSurahJumpFab()}
           </div>
         </>
       ) : (
@@ -987,6 +1143,7 @@ export function ReaderScreen({
             {/* Long chapters keep their completion control after the final Mushaf page;
                 ordinary adhkar retain the fixed counter below this scroll region. */}
             <div
+              ref={readingScrollRef}
               role="region"
               tabIndex={0}
               aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
@@ -1012,9 +1169,19 @@ export function ReaderScreen({
             </div>
 
             {!longSurah && <div className="shrink-0 pb-2 pt-1">{renderCounterPanel()}</div>}
+
+            {renderLongSurahJumpFab()}
           </div>
 
-          <footer className="shrink-0 px-4 pb-6 pt-4">{renderCounterActions()}</footer>
+          {/* One footer (not two): the keyboard-shortcuts hint joins the
+              existing action row here instead of getting its own <footer>,
+              since this is already the one persistent chrome element mobile
+              keeps outside the scrollable region. Makes it available at all
+              times, long Surah or not, matching the desktop tree. */}
+          <footer className="shrink-0 px-4 pb-6 pt-4">
+            {renderCounterActions()}
+            <div className="mt-3">{renderKeyboardShortcutsHint()}</div>
+          </footer>
         </>
       )}
 

@@ -13,6 +13,7 @@ export function MushafPageReader({
   language,
   textStyle,
   onSelectMeanings,
+  flat = false,
 }: {
   zikr: Zikr;
   arabicText: string;
@@ -20,12 +21,20 @@ export function MushafPageReader({
   language: AppLanguage;
   textStyle: CSSProperties;
   onSelectMeanings: (meanings: QuranWordMeaning[]) => void;
+  /**
+   * When the reader already wraps the whole reading column in its own card
+   * (the wide-desktop reader), each page's own border/shadow/radius nests a
+   * card inside a card. `flat` drops that per-page surface in favor of a
+   * plain divider, letting the outer card carry all the elevation. Mobile
+   * has no outer card, so it keeps the default per-page surface.
+   */
+  flat?: boolean;
 }) {
   const pages = splitMushafPages(arabicText, zikr.mushafPages ?? []);
   if (pages.length === 0) return null;
 
   return (
-    <div className="space-y-5" data-testid="mushaf-pages">
+    <div className={flat ? "" : "space-y-5"} data-testid="mushaf-pages">
       {pages.map((page, index) => {
         const headingId = `mushaf-page-${zikr.id}-${page.page}`;
         const pageNumber = formatNumerals(page.page, language);
@@ -36,11 +45,17 @@ export function MushafPageReader({
           <Fragment key={page.page}>
             <section
               aria-labelledby={headingId}
-              className="rounded-3xl border border-border/60 bg-card px-4 py-5 shadow-raised sm:px-6 sm:py-6"
+              className={
+                flat
+                  ? "px-1 py-3"
+                  : "rounded-3xl border border-border/60 bg-card px-4 py-5 shadow-raised sm:px-6 sm:py-6"
+              }
               data-testid="mushaf-page"
               data-mushaf-page={page.page}
             >
-              <header className="mb-4 flex items-center justify-between gap-3 border-b border-border/50 pb-3">
+              <header
+                className={`flex items-center justify-between gap-3 pb-3 ${flat ? "mb-3" : "mb-4 border-b border-border/50"}`}
+              >
                 <h2 id={headingId} className="text-[0.8125rem] font-extrabold text-foreground">
                   {t(language, "reader.mushafPage", { page: pageNumber })}
                 </h2>

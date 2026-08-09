@@ -214,7 +214,13 @@ export function ZikrCounterSurface({
     >
       {!compact && <AdaptiveCounterTrack count={count} total={total} compact={false} />}
 
-      <div className={`adaptive-counter-content ${compact ? "is-compact" : ""}`}>
+      {/* Keyed on shape, not on count/complete: this only remounts (and
+          fades via .zikr-step-enter) when the compact/circle shape itself
+          changes, not on every tap. */}
+      <div
+        key={compact ? "compact" : "circle"}
+        className={`adaptive-counter-content zikr-step-enter ${compact ? "is-compact" : ""}`}
+      >
         {compact ? (
           <div className="flex w-full h-full items-center justify-between gap-3 px-1">
             <div className="relative flex size-[52px] shrink-0 items-center justify-center rounded-full bg-primary/10">
