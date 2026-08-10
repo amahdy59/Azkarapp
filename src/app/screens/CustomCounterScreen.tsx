@@ -136,12 +136,12 @@ export function CustomCounterScreen({
     <ScreenContainer
       dir={direction}
       className="relative flex flex-col overflow-y-auto page-content-center"
-      screenName={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
+      screenName={t(language, "counter.tasbeehTitle")}
     >
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         {/* Header */}
         <Header
-          title={isArabic ? "المسبحة الإلكترونية" : "Tasbeeh Counter"}
+          title={t(language, "counter.tasbeehTitle")}
           onBack={onBack}
           language={language}
           right={
@@ -208,7 +208,7 @@ export function CustomCounterScreen({
             >
               <div className="min-w-0 flex-1 space-y-1">
                 <span className="block text-[0.75rem] font-bold text-muted-foreground">
-                  {isArabic ? "الذكر المأثور" : "Selected Dhikr"}
+                  {t(language, "counter.selectedDhikr")}
                 </span>
                 <p className="truncate text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
                   {activeText}
@@ -278,28 +278,28 @@ export function CustomCounterScreen({
                 <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
                   Space
                 </kbd>
-                <span>{isArabic ? "التسبيح" : "Count"}</span>
+                <span>{t(language, "counter.count")}</span>
               </span>
               <span className="h-3 w-px bg-border/60" aria-hidden="true" />
               <span className="flex items-center gap-1">
                 <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
                   R
                 </kbd>
-                <span>{isArabic ? "إعادة" : "Reset"}</span>
+                <span>{t(language, "counter.reset")}</span>
               </span>
               <span className="h-3 w-px bg-border/60" aria-hidden="true" />
               <span className="flex items-center gap-1">
                 <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
                   Backspace
                 </kbd>
-                <span>{isArabic ? "تراجع" : "Undo"}</span>
+                <span>{t(language, "counter.undo")}</span>
               </span>
               <span className="h-3 w-px bg-border/60" aria-hidden="true" />
               <span className="flex items-center gap-1">
                 <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
                   Esc
                 </kbd>
-                <span>{isArabic ? "رجوع" : "Back"}</span>
+                <span>{t(language, "counter.back")}</span>
               </span>
             </div>
           </div>
@@ -314,7 +314,7 @@ export function CustomCounterScreen({
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-2">
                     <h4 className="text-[0.8125rem] font-extrabold text-foreground">
-                      {isArabic ? "الفضل والحديث:" : "Virtue & Reference:"}
+                      {t(language, "counter.virtueReference")}
                     </h4>
                     <span className="text-[0.6875rem] font-bold text-amber-600 dark:text-amber-400">
                       {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
@@ -335,7 +335,7 @@ export function CustomCounterScreen({
         <Modal
           open
           onClose={() => setShowCompletionDialog(false)}
-          title={isArabic ? "ما شاء الله! أتممت الهدف" : "Goal Reached!"}
+          title={t(language, "counter.goalReached")}
           direction={isArabic ? "rtl" : "ltr"}
           maxWidthClassName="max-w-sm"
           className="p-6 text-center"
@@ -345,9 +345,7 @@ export function CustomCounterScreen({
               <Check size={32} strokeWidth={3} />
             </div>
 
-            <h3 className="mb-1 text-[1.25rem] font-extrabold text-foreground">
-              {isArabic ? "ما شاء الله! أتممت الهدف" : "Goal Reached!"}
-            </h3>
+            <h3 className="mb-1 text-[1.25rem] font-extrabold text-foreground">{t(language, "counter.goalReached")}</h3>
             <p className="mb-5 text-[0.875rem] text-muted-foreground">
               {isArabic
                 ? `وصلت إلى ${formatNumerals(target, language)} من "${activeText}". تقبل الله طاعتك!`
@@ -374,7 +372,7 @@ export function CustomCounterScreen({
                 className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background text-[0.875rem] font-bold text-foreground transition-all hover:bg-muted"
               >
                 <RotateCcw size={18} />
-                <span>{isArabic ? "إعادة العداد لـ 0" : "Reset Counter to 0"}</span>
+                <span>{t(language, "counter.resetToZero")}</span>
               </button>
             </div>
           </div>

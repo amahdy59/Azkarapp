@@ -391,16 +391,16 @@ export function HomeScreen({
             <div
               data-testid="header-streak"
               className="flex items-center justify-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-1 text-[0.6875rem] font-black text-foreground"
-              title={isArabic ? "السلسلة اليومية" : "Daily Streak"}
+              title={t(language, "progress.dailyStreak")}
             >
               <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
               <span>{formatNumerals(streakDays, language)}</span>
-              <span className="hidden sm:inline">{isArabic ? "أيام" : "days"}</span>
+              <span className="hidden sm:inline">{t(language, "progress.days")}</span>
             </div>
             <div
               data-testid="header-palms"
               className="flex items-center justify-center gap-1 rounded-full border border-border/60 bg-muted/50 px-2 py-1 text-[0.6875rem] font-black text-foreground"
-              title={isArabic ? "أشجار النخيل" : "Palms"}
+              title={t(language, "progress.palmsTitle")}
             >
               <PalmTreeMark
                 size={14}
@@ -408,7 +408,7 @@ export function HomeScreen({
                 className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
               />
               <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-              <span className="hidden sm:inline">{isArabic ? "نخلة" : "palms"}</span>
+              <span className="hidden sm:inline">{t(language, "progress.palmsUnit")}</span>
             </div>
           </div>
         </header>
@@ -457,7 +457,7 @@ export function HomeScreen({
                         className="text-[1.125rem] font-black text-on-media drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
                         dir="auto"
                       >
-                        {isArabic ? "حان وقت" : "Time for"}
+                        {t(language, "home.timeFor")}
                       </p>
                       <h2
                         id="current-zikr-heading"
@@ -484,7 +484,7 @@ export function HomeScreen({
                         }
                       }}
                       direction={direction}
-                      aria-label={isArabic ? "وضع الورد" : "Routine mode"}
+                      aria-label={t(language, "home.routineMode")}
                       className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/55 p-1 border border-white/20 dark:border-white/10"
                       itemClassName={(selected) =>
                         `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
@@ -492,8 +492,8 @@ export function HomeScreen({
                         }`
                       }
                       options={[
-                        { value: "complete", label: isArabic ? "الكاملة" : "Complete" },
-                        { value: "core", label: isArabic ? "المختصرة" : "Abbreviated" },
+                        { value: "complete", label: t(language, "home.routineComplete") },
+                        { value: "core", label: t(language, "home.routineAbbreviated") },
                       ]}
                     />
 
@@ -505,7 +505,7 @@ export function HomeScreen({
                           dir="auto"
                         >
                           <span>
-                            {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
+                            {formatNumerals(doneCount, language)} {t(language, "home.ofSeparator")}{" "}
                             {formatNumerals(totalCount, language)}
                           </span>
                           <div className="flex items-center gap-1.5 text-on-media">
@@ -575,26 +575,26 @@ export function HomeScreen({
           >
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
-                title={isArabic ? "هذا الأسبوع" : "This Week"}
+                title={t(language, "home.thisWeek")}
                 icon={<Calendar size={18} />}
                 value={formatNumerals(activeDaysThisWeek, language)}
-                subtitle={isArabic ? "من ٧ أيام" : "of 7 days"}
+                subtitle={t(language, "home.ofSevenDays")}
               />
             </div>
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
-                title={isArabic ? "سلسلة المتابعة" : "Streak"}
+                title={t(language, "home.streakTitle")}
                 icon={<Zap size={18} />}
                 value={formatNumerals(streakDays, language)}
-                subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
+                subtitle={t(language, "home.consecutiveDays")}
               />
             </div>
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
-                title={isArabic ? "إجمالي الأذكار" : "Total Azkar"}
+                title={t(language, "home.totalAzkar")}
                 icon={<GoldenPalmMark size={18} />}
                 value={formatNumerals(totalDays, language)}
-                subtitle={isArabic ? "ذكراً اليوم" : "azkar today"}
+                subtitle={t(language, "home.azkarToday")}
               />
             </div>
           </div>
@@ -699,7 +699,7 @@ export function HomeScreen({
             )}
           </div>
 
-          <SectionDivider label={isArabic ? "أذكار يوم الجمعة" : "Friday Azkar"} />
+          <SectionDivider label={t(language, "home.fridayAzkar")} />
 
           {/* Friday card: artwork at the start edge, the Kahf message and its
               call to action in the middle, and the virtues list at the end. */}
@@ -714,7 +714,7 @@ export function HomeScreen({
 
               <div className="flex min-w-0 flex-1 flex-col gap-3 text-start">
                 <h3 id="friday-card-heading" className="text-xl font-black text-foreground md:text-2xl" dir="auto">
-                  {isArabic ? "فضل قراءة سورة الكهف والذكر" : "The merit of reciting Surat Al-Kahf"}
+                  {t(language, "home.kahfMerit")}
                 </h3>
                 <p className="text-[0.875rem] font-medium text-muted-foreground" dir="auto">
                   {isArabic
@@ -727,7 +727,7 @@ export function HomeScreen({
                     onClick={onOpenFridayMode}
                     className="mt-1 flex h-[48px] w-fit items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-[0.9375rem] font-black text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
-                    <span>{isArabic ? "عرض أذكار الجمعة" : "View Friday Azkar"}</span>
+                    <span>{t(language, "home.viewFridayAzkar")}</span>
                     {direction === "rtl" ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
                   </button>
                 )}
@@ -735,7 +735,7 @@ export function HomeScreen({
 
               <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start xl:w-[280px]">
                 <p className="mb-2 text-[0.8125rem] font-black text-amber-700 dark:text-amber-400" dir="auto">
-                  {isArabic ? "من فضائل يوم الجمعة" : "Virtues of Friday"}
+                  {t(language, "home.fridayVirtues")}
                 </p>
                 <ul className="flex list-disc flex-col gap-1.5 ps-4 text-xs font-semibold text-foreground">
                   {(isArabic

@@ -170,9 +170,7 @@ export function NotificationsPanel({
           timeZone: prayerData.timeZone ?? detectedLocation.timeZone,
         });
       }
-      setLocationStatus(
-        isArabic ? "تم تحديث الموقع والمنطقة الزمنية بنجاح." : "Location and time zone updated successfully.",
-      );
+      setLocationStatus(t(language, "notifications.locationUpdated"));
     } else {
       setLocationStatus(
         isArabic
@@ -237,7 +235,7 @@ export function NotificationsPanel({
       autoDetect: false,
       timeZone: timeZoneDraft.trim() || Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
-    setLocationStatus(isArabic ? "تم حفظ الموقع اليدوي." : "Manual location saved.");
+    setLocationStatus(t(language, "notifications.manualLocationSaved"));
   };
 
   const handleAdjustmentChange = (prayer: keyof NonNullable<LocationSettings["adjustments"]>, value: number) => {
@@ -315,7 +313,7 @@ export function NotificationsPanel({
             </span>
             <div className="min-w-0 flex-1">
               <h2 id="prayer-location-title" className="text-[1.0625rem] font-semibold text-foreground">
-                {isArabic ? "الموقع ومواقيت الصلاة" : "Location & Prayer Times"}
+                {t(language, "notifications.locationPrayerTimes")}
               </h2>
               <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
                 {isArabic
@@ -382,7 +380,7 @@ export function NotificationsPanel({
                 htmlFor="calculation-method-select"
                 className="block text-[0.875rem] font-bold text-foreground mb-1.5"
               >
-                {isArabic ? "طريقة حساب مواقيت الصلاة" : "Calculation Method"}
+                {t(language, "notifications.calculationMethod")}
               </label>
               <select
                 id="calculation-method-select"
@@ -400,22 +398,22 @@ export function NotificationsPanel({
 
             <fieldset className="space-y-2 border-t border-border pt-4">
               <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
-                {isArabic ? "تحديد الموقع يدويًا" : "Manual Location"}
+                {t(language, "notifications.manualLocation")}
               </legend>
               <input
                 type="text"
                 value={cityDraft}
                 onChange={(event) => setCityDraft(event.target.value)}
-                placeholder={isArabic ? "اسم المدينة" : "City name"}
-                aria-label={isArabic ? "اسم المدينة" : "City name"}
+                placeholder={t(language, "notifications.cityName")}
+                aria-label={t(language, "notifications.cityName")}
                 className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
               />
               <input
                 type="text"
                 value={timeZoneDraft}
                 onChange={(event) => setTimeZoneDraft(event.target.value)}
-                placeholder={isArabic ? "المنطقة الزمنية، مثال: Africa/Cairo" : "Time zone, e.g. Africa/Cairo"}
-                aria-label={isArabic ? "المنطقة الزمنية" : "IANA time zone"}
+                placeholder={t(language, "notifications.timeZonePlaceholder")}
+                aria-label={t(language, "notifications.timeZoneLabel")}
                 dir="ltr"
                 className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
               />
@@ -427,8 +425,8 @@ export function NotificationsPanel({
                   step="0.0001"
                   value={latitudeDraft}
                   onChange={(event) => setLatitudeDraft(event.target.value)}
-                  placeholder={isArabic ? "خط العرض" : "Latitude"}
-                  aria-label={isArabic ? "خط العرض" : "Latitude"}
+                  placeholder={t(language, "notifications.latitude")}
+                  aria-label={t(language, "notifications.latitude")}
                   dir="ltr"
                   className="h-11 min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
                 />
@@ -439,8 +437,8 @@ export function NotificationsPanel({
                   step="0.0001"
                   value={longitudeDraft}
                   onChange={(event) => setLongitudeDraft(event.target.value)}
-                  placeholder={isArabic ? "خط الطول" : "Longitude"}
-                  aria-label={isArabic ? "خط الطول" : "Longitude"}
+                  placeholder={t(language, "notifications.longitude")}
+                  aria-label={t(language, "notifications.longitude")}
                   dir="ltr"
                   className="h-11 min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
                 />
@@ -451,13 +449,13 @@ export function NotificationsPanel({
                 onClick={handleManualLocationSave}
                 className="w-full border-primary text-primary hover:bg-primary/5"
               >
-                {isArabic ? "حفظ الموقع" : "Save Location"}
+                {t(language, "notifications.saveLocation")}
               </Button>
             </fieldset>
 
             <fieldset className="border-t border-border pt-4">
               <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
-                {isArabic ? "تعديل الدقائق يدويًا" : "Manual Minute Adjustments"}
+                {t(language, "notifications.manualMinuteAdjustments")}
               </legend>
               <p className="mb-3 text-[0.75rem] leading-5 text-muted-foreground">
                 {isArabic
@@ -467,11 +465,11 @@ export function NotificationsPanel({
               <div className="grid grid-cols-2 gap-2">
                 {(
                   [
-                    ["fajr", isArabic ? "الفجر" : "Fajr"],
-                    ["dhuhr", isArabic ? "الظهر" : "Dhuhr"],
-                    ["asr", isArabic ? "العصر" : "Asr"],
-                    ["maghrib", isArabic ? "المغرب" : "Maghrib"],
-                    ["isha", isArabic ? "العشاء" : "Isha"],
+                    ["fajr", t(language, "notifications.fajr")],
+                    ["dhuhr", t(language, "notifications.dhuhr")],
+                    ["asr", t(language, "notifications.asr")],
+                    ["maghrib", t(language, "notifications.maghrib")],
+                    ["isha", t(language, "notifications.isha")],
                   ] as const
                 ).map(([prayer, label]) => (
                   <label key={prayer} className="text-[0.75rem] font-semibold text-muted-foreground">

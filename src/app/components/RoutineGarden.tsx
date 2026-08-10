@@ -188,7 +188,7 @@ export function TodayRoutineGarden({
 
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-3xl border border-amber-500/30 bg-amber-500/10 py-3 px-3 shadow-sm backdrop-blur-sm dark:bg-amber-500/15">
-          <div className="flex items-center gap-1.5" title={isArabic ? "السلسلة اليومية" : "Daily Streak"}>
+          <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>
             <Zap
               className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}
               strokeWidth={2.5}
@@ -197,11 +197,11 @@ export function TodayRoutineGarden({
             <span
               className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
             >
-              {formatNumerals(streak, language)} {isArabic ? "أيام" : "days"}
+              {formatNumerals(streak, language)} {t(language, "progress.days")}
             </span>
           </div>
           <span className="h-4 w-px bg-amber-500/30" />
-          <div className="flex items-center gap-1.5" title={isArabic ? "أشجار النخيل" : "Palms"}>
+          <div className="flex items-center gap-1.5" title={t(language, "progress.palmsTitle")}>
             <PalmTreeMark
               size={20}
               filled={totalPalms > 0}
@@ -210,7 +210,7 @@ export function TodayRoutineGarden({
             <span
               className={`text-[0.875rem] font-black leading-tight ${totalPalms > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
             >
-              {formatNumerals(totalPalms, language)} {isArabic ? "نخلة" : "palms"}
+              {formatNumerals(totalPalms, language)} {t(language, "progress.palmsUnit")}
             </span>
           </div>
         </div>
@@ -274,24 +274,24 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               {day.isPalm ? (
                 <div
                   className="flex size-9 items-center justify-center rounded-xl border border-amber-400/80 bg-amber-500/20 text-amber-500 shadow-2xs dark:bg-amber-500/25"
-                  title={isArabic ? "نخلة مكتملة" : "Palm Completed"}
-                  aria-label={isArabic ? "نخلة مكتملة" : "Palm Completed"}
+                  title={t(language, "progress.palmCompleted")}
+                  aria-label={t(language, "progress.palmCompleted")}
                 >
                   <PalmTreeMark size={22} filled />
                 </div>
               ) : azkarCount > 0 ? (
                 <div
                   className="flex size-9 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
-                  title={isArabic ? "نشط" : "In Progress"}
-                  aria-label={isArabic ? "نشط" : "In Progress"}
+                  title={t(language, "progress.inProgress")}
+                  aria-label={t(language, "progress.inProgress")}
                 >
                   <GoldenLeafMark size={20} filled />
                 </div>
               ) : (
                 <div
                   className="flex size-9 items-center justify-center rounded-xl border border-transparent bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/30"
-                  title={isArabic ? "غير نشط" : "Inactive"}
-                  aria-label={isArabic ? "غير نشط" : "Inactive"}
+                  title={t(language, "progress.inactive")}
+                  aria-label={t(language, "progress.inactive")}
                 >
                   <GoldenLeafMark size={20} filled={false} />
                 </div>
