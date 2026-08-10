@@ -494,9 +494,9 @@ export function HomeScreen({
                       }}
                       direction={direction}
                       aria-label={t(language, "home.routineMode")}
-                      className="flex min-h-[44px] w-full items-center rounded-2xl bg-black/55 p-1 border border-white/20 dark:border-white/10"
+                      className="flex min-h-[48px] w-full items-center rounded-2xl bg-black/55 p-1 border border-white/20 dark:border-white/10"
                       itemClassName={(selected) =>
-                        `flex min-h-[42px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                        `flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                           selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/95 hover:text-white"
                         }`
                       }
