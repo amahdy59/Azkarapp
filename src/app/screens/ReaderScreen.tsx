@@ -172,7 +172,6 @@ export function ReaderScreen({
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
   const longSurah = isLongSurah(z);
-
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
@@ -180,26 +179,6 @@ export function ReaderScreen({
   const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
-
-  const [isZenMode, setIsZenMode] = useState(false);
-  const zenModeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const activateZenMode = useCallback(() => {
-    setIsZenMode(true);
-    if (zenModeTimer.current) {
-      clearTimeout(zenModeTimer.current);
-    }
-    zenModeTimer.current = setTimeout(() => {
-      setIsZenMode(false);
-    }, 3000);
-  }, []);
-
-  const deactivateZenMode = useCallback(() => {
-    setIsZenMode(false);
-    if (zenModeTimer.current) {
-      clearTimeout(zenModeTimer.current);
-    }
-  }, []);
 
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
@@ -227,14 +206,6 @@ export function ReaderScreen({
       onComplete,
       onAdvance,
     });
-
-  const handleSurfaceTapWithZen = useCallback(
-    (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
-      activateZenMode();
-      handleSurfaceTap(e);
-    },
-    [activateZenMode, handleSurfaceTap],
-  );
 
   /**
    * "Reset counter" also clears a recorded completion, so an accidental tap on
@@ -459,7 +430,6 @@ export function ReaderScreen({
       .trim();
   }
 
-  const isLongContent = Boolean(z.isSurah || z.surahNameArabic);
   const mushafPages = longSurah ? splitMushafPages(displayArabicText, z.mushafPages ?? []) : [];
   const firstMushafPage = mushafPages[0]?.page ?? null;
   const lastMushafPage = mushafPages[mushafPages.length - 1]?.page ?? null;
@@ -482,7 +452,7 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
+      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-justify bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
       <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
       {!longSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
@@ -507,7 +477,7 @@ export function ReaderScreen({
         />
       ) : (
         <p
-          className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
+          className="zikr-text pointer-events-none text-justify font-medium leading-[2.1] text-foreground"
           data-testid="zikr-text"
           dir="rtl"
           lang="ar"
@@ -831,7 +801,7 @@ export function ReaderScreen({
       dir={direction}
       style={categoryThemeStyles}
       screenName={isArabic ? category.nameArabic : category.name}
-      onClick={handleSurfaceTapWithZen}
+      onClick={handleSurfaceTap}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -855,11 +825,9 @@ export function ReaderScreen({
               .azkar-hero background (src/app/components/azkar-hero-background.css)
               rather than following light/dark/midnight tokens, since it plays
               the same "always-dark brand band" role. */}
-          <motion.div
-            animate={{ opacity: isZenMode ? 0 : 1, y: isZenMode ? -10 : 0 }}
-            transition={{ duration: 0.3 }}
+          <div
             data-testid="reader-desktop-hero"
-            className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-4 overflow-hidden rounded-3xl px-6 py-7 text-center"
+            className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
             style={{
               background: "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), #0b1426",
             }}
@@ -954,20 +922,6 @@ export function ReaderScreen({
               {isArabic ? category.nameArabic : category.name}
             </h1>
 
-            {/* Reviewed, sourced benefit — same content the "Benefit" sheet
-                shows, not new copy — surfaced here only for long Surahs,
-                which are a single stable zikr per category so the line
-                can't flicker as the reader advances the way it would for an
-                ordinary multi-zikr collection. */}
-            {longSurah && (
-              <p
-                className="line-clamp-2 max-w-[36rem] text-[0.875rem] font-medium text-[color:var(--on-media-muted)]"
-                dir="auto"
-              >
-                {getLocalizedZikrBenefit(z, language)}
-              </p>
-            )}
-
             <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
               <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
                 <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
@@ -990,7 +944,7 @@ export function ReaderScreen({
                 aria-label={t(language, "reader.groupProgress")}
               />
             </div>
-          </motion.div>
+          </div>
 
           {/* Wide-desktop card: reading content, side navigation, counter,
               and keyboard guidance. Page-level actions stay in the hero. */}
@@ -1004,7 +958,6 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-                onScroll={deactivateZenMode}
                 className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
@@ -1016,12 +969,10 @@ export function ReaderScreen({
                     animate={{ opacity: 1, x: 0 }}
                     exit={{ opacity: 0, x: direction === "rtl" ? 20 : -20 }}
                     transition={{ duration: 0.3, ease: "easeOut" }}
-                    className={`mx-auto flex min-h-full max-w-[600px] w-full flex-col ${
-                      isLongContent ? "justify-start py-4" : "justify-center items-center"
-                    }`}
+                    className="mx-auto flex min-h-full max-w-[480px] w-full flex-col py-4"
                   >
                     <div
-                      className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                      className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                     >
                       {renderReadingContent()}
                     </div>
@@ -1038,7 +989,7 @@ export function ReaderScreen({
         </>
       ) : (
         <>
-          <motion.div animate={{ opacity: isZenMode ? 0 : 1, y: isZenMode ? -10 : 0 }} transition={{ duration: 0.3 }}>
+          <div>
             <Header
               title={isArabic ? category.nameArabic : category.name}
               onBack={onBack}
@@ -1097,7 +1048,7 @@ export function ReaderScreen({
                 </div>
               }
             />
-          </motion.div>
+          </div>
 
           <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
             <ProgressBar
@@ -1128,15 +1079,11 @@ export function ReaderScreen({
                 justCompleted ? "zikr-step-exit" : "zikr-step-enter"
               }`}
             >
-              {/* Inner wrapper vertically centers short/medium Zikrs; long Surahs start at top to scroll naturally */}
-              <div
-                className={`flex min-h-full w-full flex-col ${
-                  isLongContent ? "justify-start py-4" : "justify-center items-center"
-                }`}
-              >
+              {/* Inner wrapper vertically centers short/medium Zikrs safely via my-auto; long Surahs start at top to scroll naturally */}
+              <div className="flex min-h-full w-full flex-col py-4">
                 <div
                   key={z.id}
-                  className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                  className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                 >
                   {renderReadingContent()}
                 </div>

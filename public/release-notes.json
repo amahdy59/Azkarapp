@@ -1,14 +1,14 @@
 {
   "ar": [
-    "شاشة القراءة تخفي الآن أشرطة التنقل تلقائياً لتمنحك تركيزاً أفضل.",
-    "تكبير حجم الخط للأذكار أصبح أكثر سلاسة ووضوحاً.",
-    "تم تنظيم إحصائيات الشاشة الرئيسية في شريط تمرير أفقي مرتب وموفر للمساحة.",
+    "واجهة قراءة أكثر راحة للعين مع محاذاة النص مثل المصحف وتوسيطه بذكاء.",
+    "إلغاء وضع الإخفاء التلقائي للقوائم لتبقى أدوات التحكم في متناول يدك دائماً.",
+    "استغلال أفضل لمساحة الشاشة مع إزالة التوسيعات الزائدة في شاشات الجوال.",
     "تحسينات على شكل العداد ليظهر بشكل عائم وأكثر أناقة."
   ],
   "en": [
-    "The reading screen now hides navigation automatically to let you focus on Azkar.",
-    "Azkar text size scales up more gracefully and comfortably.",
-    "The home screen stats have been reorganized into a neat horizontal swipe area.",
+    "A more comfortable reading interface with Mushaf-style text alignment and smart vertical centering.",
+    "Disabled auto-hiding of the navigation bars so controls are always at your fingertips.",
+    "Better screen space utilization by allowing content to expand fully side-to-side on mobile.",
     "Refined the floating counter appearance for a more elegant look."
   ]
 }

@@ -68,7 +68,9 @@ export function Header({
         </IconButton>
       )}
       <div className="flex-1 min-w-0">
-        <h1 className="font-extrabold truncate text-[1.5rem] leading-tight text-foreground font-sans">{title}</h1>
+        <h1 className="font-extrabold text-xl min-[400px]:text-2xl leading-tight text-foreground font-sans line-clamp-2">
+          {title}
+        </h1>
         {subtitle && <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}

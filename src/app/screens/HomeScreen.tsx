@@ -431,7 +431,7 @@ export function HomeScreen({
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
-            <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 pt-8 sm:pt-4">
+            <div className="relative z-10 flex flex-col items-stretch gap-4 px-0 pb-4 pt-0 sm:p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5">
               {isComplete ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
@@ -444,13 +444,13 @@ export function HomeScreen({
               ) : (
                 <section
                   aria-labelledby="current-zikr-heading"
-                  className="lg:col-span-3 flex flex-col justify-between p-0 md:p-2 transition-all"
+                  className="lg:col-span-3 flex flex-col justify-between transition-all"
                 >
                   {/* The hero sits on a photo that fades to white in light mode,
                       so its white text needs its own dark backing rather than
                       relying on the page scrim. Without this, "Time for"
                       measured 1.98:1 against a required 4.5:1. */}
-                  <div className="flex flex-1 flex-col gap-4 rounded-[28px] bg-black/40 p-5 text-start backdrop-blur-md md:p-6 border border-white/10 shadow-2xl">
+                  <div className="flex flex-1 flex-col gap-4 rounded-b-[28px] sm:rounded-[28px] bg-black/40 px-5 pb-5 pt-6 sm:p-5 text-start backdrop-blur-md md:p-6 border-b sm:border border-white/10 shadow-2xl">
                     {/* Hero Text & Category Header */}
                     <div className="flex w-full flex-col items-start gap-1 px-1">
                       <p
