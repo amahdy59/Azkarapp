@@ -703,6 +703,7 @@ const en = {
     openCounter: "Open the full counter",
     counterReadyComplete: "Already completed",
     tapAnywhere: "Tap anywhere to count",
+    tapAnywhereDesktop: "Click anywhere or press Space to count",
     tapCounterWhenFinished: "Tap counter when finished",
     mushafPage: "Mushaf page {page}",
     mushafPageRange: "Ayahs {start}–{end}",

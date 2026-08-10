@@ -90,8 +90,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.getAllByTestId("mushaf-page")).toHaveLength(12);
     expect(screen.getAllByTestId("mushaf-page-separator")).toHaveLength(11);
     const finalPage = screen.getAllByTestId("mushaf-page").at(-1)!;
-    const endCounter = screen.getByTestId("long-surah-end-counter");
-    expect(endCounter).toContainElement(screen.getByTestId("counter-surface"));
+    const endCounter = screen.getByTestId("counter-surface");
     expect(finalPage.compareDocumentPosition(endCounter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     // Reading taps and the global Space shortcut cannot complete a long surah.

@@ -771,7 +771,7 @@ textarea {
 .counter-outline-progress rect {
   fill: none;
   stroke: var(--primary);
-  stroke-width: 2;
+  stroke-width: 10;
   stroke-linecap: round;
   transition: stroke-dashoffset 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }

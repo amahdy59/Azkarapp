@@ -31,7 +31,7 @@ import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
-import { QuranPrelude, QuranSurahFooter } from "../components/QuranChrome";
+import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
@@ -444,15 +444,9 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      // On the wide-desktop reader the outer card already carries the
-      // surface (border/shadow/bg), so this drops its own to avoid nesting
-      // a card inside a card; mobile keeps its own surface since it has no
-      // outer card. Either way, the tap-anywhere-to-count hover/active tint
-      // stays for ordinary adhkar.
-      className={`mt-1 w-full px-4 pb-2 pt-2 ${
-        isDesktopReader ? "rounded-2xl" : "rounded-3xl border border-border/40 bg-card shadow-raised"
-      } ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/50 active:bg-muted"}`}
+      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
     >
+      <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
       <QuranPrelude zikr={z} className="pointer-events-none" />
 
       {longSurah ? (
@@ -484,8 +478,6 @@ export function ReaderScreen({
           {displayArabicText}
         </p>
       )}
-
-      <QuranSurahFooter zikr={z} language={language} />
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
@@ -584,6 +576,9 @@ export function ReaderScreen({
         </div>
         <div className="md:hidden">{renderNavigationButton("next")}</div>
       </div>
+      <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
+        {isDesktopReader ? t(language, "reader.tapAnywhereDesktop") : t(language, "reader.tapAnywhere")}
+      </p>
     </div>
   );
 
@@ -960,7 +955,7 @@ export function ReaderScreen({
           {/* Wide-desktop card: reading content, side navigation, counter,
               and keyboard guidance. Page-level actions stay in the hero. */}
           <div
-            className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-raised"
+            className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden bg-transparent"
             data-testid="reader-card"
           >
             <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
@@ -981,15 +976,10 @@ export function ReaderScreen({
                   <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
                     {renderReadingContent()}
                   </div>
-                  {longSurah && (
-                    <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
-                      {renderCounterStack()}
-                    </div>
-                  )}
                 </div>
               </div>
 
-              <footer className="shrink-0 pb-3 pt-1">{!longSurah && renderCounterStack()}</footer>
+              <footer className="shrink-0 pb-3 pt-1">{renderCounterStack()}</footer>
             </div>
 
             {renderSideNavigation()}
@@ -1095,20 +1085,13 @@ export function ReaderScreen({
                 <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
                   {renderReadingContent()}
                 </div>
-                {longSurah && (
-                  <div className="w-full px-1 pb-4 pt-6" data-testid="long-surah-end-counter">
-                    {renderCounterStack()}
-                  </div>
-                )}
               </div>
             </div>
 
             {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-            {!longSurah && (
-              <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">{renderCounterStack()}</div>
-            )}
+            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">{renderCounterStack()}</div>
 
             {renderSideNavigation()}
             {renderLongSurahJumpFab()}

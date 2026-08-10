@@ -194,10 +194,10 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col gap-3.5 rounded-3xl border border-border/40 bg-card p-4.5 text-start transition-all shadow-raised hover:border-amber-500/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex w-full cursor-pointer flex-col items-center gap-3.5 bg-transparent p-4.5 text-center transition-all hover:bg-muted/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
-            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
             dir={isArabic ? "rtl" : "ltr"}
             lang={isArabic ? "ar" : "en"}
           >
@@ -241,17 +241,15 @@ export function CategoryScreen({
       <div
         key={z.id}
         id={`zikr-card-${index}`}
-        className={`flex w-full flex-col gap-3.5 rounded-3xl border p-4.5 transition-all shadow-raised ${
-          isCardCompleted
-            ? "border-emerald-500/30 bg-emerald-500/15 dark:bg-emerald-950/30"
-            : "border-border/40 bg-card hover:border-primary/40"
+        className={`flex w-full flex-col items-center gap-3.5 bg-transparent p-4.5 transition-all ${
+          isCardCompleted ? "opacity-60 grayscale" : ""
         }`}
       >
         {/* Card Header & Text — Clicking text opens full Reader */}
         <button
           type="button"
           onClick={() => onZikr(index)}
-          className="interactive-elem min-h-[44px] min-w-0 w-full text-start focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="interactive-elem min-h-[44px] min-w-0 w-full flex flex-col items-center text-center focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {isMainRoutine && routineMode === "complete" && z.includedInCore && (
             <span className="mb-2 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[0.6875rem] font-extrabold text-primary">
@@ -280,7 +278,7 @@ export function CategoryScreen({
           )}
 
           <p
-            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
             dir={isArabic ? "rtl" : "ltr"}
             lang={isArabic ? "ar" : "en"}
           >

@@ -30,7 +30,15 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
   );
 }
 
-export function QuranSurahFooter({ zikr, language }: { zikr: Zikr; language: AppLanguage }) {
+export function QuranSurahHeader({
+  zikr,
+  language,
+  sticky = false,
+}: {
+  zikr: Zikr;
+  language: AppLanguage;
+  sticky?: boolean;
+}) {
   if (!zikr.isSurah && !zikr.surahNameArabic) return null;
 
   const surahType = zikr.surahType
@@ -46,7 +54,9 @@ export function QuranSurahFooter({ zikr, language }: { zikr: Zikr; language: App
     : undefined;
 
   return (
-    <div className="mb-2 mt-4 text-center pointer-events-none">
+    <div
+      className={`mb-4 text-center ${sticky ? "sticky top-0 z-20 bg-background/80 backdrop-blur pb-2 pt-2" : "pointer-events-none"}`}
+    >
       <div className="inline-flex items-center gap-1.5 rounded-lg border border-amber-700/25 bg-amber-500/10 px-2.5 py-1 dark:border-amber-500/25 dark:bg-amber-950/30">
         {surahType && (
           <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">{surahType}</span>
