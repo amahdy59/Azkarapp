@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, Clock, ArrowLeft, ArrowRight, Bookmark, Sparkles } from "../components/icons";
+import { Calendar, Zap, Clock, ArrowLeft, ArrowRight, Bookmark, Sparkles, Check } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -14,7 +14,14 @@ import {
   registerLazyCollection,
 } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import { getEstimatedPrayerTimes, getNextPrayerCountdown, timeToMinutes } from "../content/prayerTimes";
+import {
+  formatPrayerTimeLabel,
+  getCurrentPrayerPeriod,
+  getEstimatedPrayerTimes,
+  getNextPrayerCountdown,
+  timeToMinutes,
+  type PrayerName,
+} from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { formatDisplayDate, formatDisplayTime, formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -38,6 +45,7 @@ import type {
  * all four main collections toward leaves and palms.
  */
 const HOME_WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
+const AFTER_PRAYER_TRACKER_ORDER = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
 type HomeActionKind = "resume" | "start" | "again";
 
 export type HomeAction = {
@@ -103,6 +111,14 @@ function SectionDivider({ label }: { label: string }) {
       <span className="h-px flex-1 bg-border" aria-hidden="true" />
     </div>
   );
+}
+
+function prayerLabel(language: AppLanguage, prayer: PrayerName) {
+  return t(language, `notifications.${prayer}` as never);
+}
+
+function prayerTrackerLabel(language: AppLanguage, prayer: PrayerName) {
+  return language === "ar" ? `بعد ${prayerLabel(language, prayer)}` : `After ${prayerLabel(language, prayer)}`;
 }
 
 export function getHomeAction(
@@ -240,6 +256,9 @@ export function HomeScreen({
     [dailyCompletions, now, progressDayStartHour],
   );
   const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
+  const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
+  const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
+  const afterPrayerCompletedToday = gardenSummary.today.completedCategories.includes("after_prayer");
 
   const reminderInfo = useMemo(
     () => getTimeOfDayZikr(now, language, locationSettings),
@@ -339,7 +358,7 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="px-0 relative overflow-hidden flex flex-col"
+      className="px-0 pt-0 relative overflow-hidden flex flex-col"
       screenName={t(language, "home.title")}
     >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
@@ -350,53 +369,32 @@ export function HomeScreen({
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
-        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-page pb-24 pt-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           {/* Hero card. The scene image is contained by this card rather than
               washed across the whole screen, so the page keeps its own surface. */}
           {/* Capped and centred: unbounded, the hero stretched the full width of
               an ultrawide display and the scene image lost all composition. */}
-          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden sm:rounded-[36px] sm:shadow-raised -mx-4 sm:mx-auto -mt-4 sm:mt-0">
+          <div className="relative w-full overflow-hidden sm:mx-auto sm:mt-4 sm:max-w-[80rem] sm:rounded-[36px] sm:shadow-raised">
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,11,18,0.14)_0%,rgba(7,11,18,0.34)_18%,rgba(7,11,18,0.62)_60%,rgba(7,11,18,0.9)_100%)]"
+              className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,11,18,0.04)_0%,rgba(7,11,18,0.16)_16%,rgba(7,11,18,0.34)_42%,rgba(7,11,18,0.64)_72%,rgba(7,11,18,0.82)_100%)]"
             />
-            <div className="absolute inset-x-0 top-0 z-20 px-5 pt-[max(0.9rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8">
+            <div className="absolute inset-x-0 top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8">
               <header
                 data-testid="home-utility-header"
-                className="grid w-full grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-2 gap-y-1.5 sm:gap-x-3"
-                dir={direction}
+                className="flex w-full items-start justify-between gap-3"
+                dir="ltr"
               >
                 <div
                   data-testid="hijri-date"
-                  className="row-start-1 min-w-0 text-[0.8125rem] font-bold text-[#e6be76] sm:text-[0.9375rem]"
+                  className="min-w-0 text-[0.8125rem] font-bold text-[#e6be76] sm:text-[0.9375rem]"
                 >
                   <time className="block truncate" dateTime={now.toISOString()}>
                     {formatDisplayDate(now, language, calendarType)}
                   </time>
-                </div>
-
-                <div
-                  data-testid="next-prayer"
-                  className="row-start-2 flex min-w-0 items-center gap-2 text-[0.75rem] font-semibold text-white/82 sm:text-[0.8125rem]"
-                >
-                  <Clock className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" aria-hidden="true" />
-                  <time
-                    data-testid="current-time"
-                    className="shrink-0 font-extrabold text-white"
-                    dateTime={now.toISOString()}
-                  >
-                    {formatDisplayTime(now, language)}
-                  </time>
-                  <span className="text-white/45" aria-hidden="true">
-                    ·
-                  </span>
-                  <span className="min-w-0 truncate" dir="auto">
-                    {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
-                    <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-                  </span>
                 </div>
 
                 {/* role="img" keeps the two-chip summary discoverable as one
@@ -404,7 +402,7 @@ export function HomeScreen({
                 <div
                   role="img"
                   data-testid="home-header-stats"
-                  className="col-start-2 row-span-2 row-start-1 grid min-w-[4.25rem] grid-rows-2 gap-1"
+                  className="flex shrink-0 flex-col items-end gap-1"
                   aria-label={
                     isArabic
                       ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
@@ -439,7 +437,7 @@ export function HomeScreen({
 
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
-            <div className="relative z-10 flex flex-col items-stretch gap-4 px-0 pb-4 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
+            <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
               {isComplete ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
@@ -459,18 +457,32 @@ export function HomeScreen({
                       so its white text needs its own dark backing rather than
                       relying on the page scrim. Without this, "Time for"
                       measured 1.98:1 against a required 4.5:1. */}
-                  <div className="flex flex-1 flex-col gap-4 rounded-b-[28px] sm:rounded-[28px] bg-black/40 px-5 pb-5 pt-6 sm:p-5 text-start backdrop-blur-md md:p-6 border-b sm:border border-white/10 shadow-2xl">
+                  <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/12 bg-black/14 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
                     {/* Hero Text & Category Header */}
-                    <div className="flex w-full flex-col items-start gap-1 px-1">
-                      <p
-                        className="text-[1.125rem] font-black text-on-media drop-shadow-[0_2px_4px_rgba(0,0,0,0.7)]"
-                        dir="auto"
+                    <div className="flex w-full flex-col items-start gap-2 px-1">
+                      <div
+                        data-testid="next-prayer"
+                        className="flex min-w-0 items-center gap-2 text-[0.8125rem] font-semibold text-white/82"
                       >
-                        {t(language, "home.timeFor")}
-                      </p>
+                        <Clock className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" aria-hidden="true" />
+                        <time
+                          data-testid="current-time"
+                          className="shrink-0 font-extrabold text-white"
+                          dateTime={now.toISOString()}
+                        >
+                          {formatDisplayTime(now, language)}
+                        </time>
+                        <span className="text-white/45" aria-hidden="true">
+                          •
+                        </span>
+                        <span className="min-w-0 truncate" dir="auto">
+                          {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
+                          <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+                        </span>
+                      </div>
                       <h2
                         id="current-zikr-heading"
-                        className="text-3xl md:text-4xl font-black text-on-media-accent tracking-wide drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                        className="text-4xl md:text-5xl font-black text-on-media-accent tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                         dir="auto"
                         style={{ lineHeight: "1.25" }}
                       >
@@ -577,10 +589,99 @@ export function HomeScreen({
             </div>
           </div>
 
-          {/* Middle Row: three at-a-glance progress stats */}
+          <div className="px-page">
+            <section
+              data-testid="after-prayer-trackers"
+              className="rounded-[30px] border border-border/40 bg-card/95 px-4 py-5 shadow-raised backdrop-blur-xl sm:px-5 sm:py-6"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0 text-start">
+                  <h2 className="text-[1.25rem] font-black text-foreground" dir="auto">
+                    {t(language, "progress.postPrayerAzkar")}
+                  </h2>
+                  <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground" dir="auto">
+                    {prayerTrackerLabel(language, currentPrayerPeriod.currentPrayer)}
+                  </p>
+                </div>
+                <div className="rounded-full bg-primary/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary">
+                  {afterPrayerCompletedToday
+                    ? t(language, "progress.completed")
+                    : formatPrayerTimeLabel(
+                        currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer],
+                        isArabic,
+                      )}
+                </div>
+              </div>
+
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted/70">
+                <div
+                  className={`h-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
+                    direction === "rtl" ? "origin-right" : "origin-left"
+                  }`}
+                  style={{
+                    transform: `scaleX(${(activePrayerIndex + 1) / AFTER_PRAYER_TRACKER_ORDER.length})`,
+                  }}
+                />
+              </div>
+
+              <div className="-mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex min-w-max gap-3 sm:grid sm:min-w-0 sm:grid-cols-5">
+                  {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
+                    const isActivePrayer = index === activePrayerIndex;
+                    const isPastPrayer = index < activePrayerIndex;
+                    const isCompletedPrayer = afterPrayerCompletedToday && (isActivePrayer || isPastPrayer);
+
+                    return (
+                      <button
+                        key={prayer}
+                        type="button"
+                        onClick={() => onResume("after_prayer")}
+                        className={`relative flex min-h-[11rem] w-[11rem] shrink-0 flex-col items-center justify-between rounded-[24px] border px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 sm:min-h-[12rem] sm:w-auto ${
+                          isActivePrayer
+                            ? "border-primary bg-primary/12 text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
+                            : "border-border/60 bg-background/85 text-foreground/90"
+                        }`}
+                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${
+                          isCompletedPrayer
+                            ? t(language, "progress.completed")
+                            : isActivePrayer
+                              ? t(language, "progress.inProgress")
+                              : t(language, "progress.notCompleted")
+                        }`}
+                      >
+                        <span
+                          className={`flex size-12 items-center justify-center rounded-full border ${
+                            isActivePrayer
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border/70 bg-card text-primary"
+                          }`}
+                        >
+                          {isCompletedPrayer ? (
+                            <Check size={18} strokeWidth={3} aria-hidden="true" />
+                          ) : (
+                            <span className="h-3 w-3 rounded-full bg-current" aria-hidden="true" />
+                          )}
+                        </span>
+
+                        <div className="flex flex-col gap-1">
+                          <span className="text-[1rem] font-black leading-tight" dir="auto">
+                            {prayerTrackerLabel(language, prayer)}
+                          </span>
+                          <span className="text-[0.75rem] font-bold text-muted-foreground">
+                            {formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}
+                          </span>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </section>
+          </div>
+
           <div
             tabIndex={0}
-            className="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0"
+            className="px-page flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
@@ -608,9 +709,11 @@ export function HomeScreen({
             </div>
           </div>
 
-          <SectionDivider label={t(language, "home.yourLibrary")} />
+          <div className="px-page">
+            <SectionDivider label={t(language, "home.yourLibrary")} />
+          </div>
 
-          <div className="grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
+          <div className="px-page grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
             <section
               aria-labelledby="home-saved-heading"
               className="rounded-3xl bg-transparent py-3"

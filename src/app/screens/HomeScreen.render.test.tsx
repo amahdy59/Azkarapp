@@ -71,4 +71,33 @@ describe("HomeScreen quick access", () => {
     fireEvent.click(screen.getByTestId("home-benefits-card"));
     expect(onOpenBenefits).toHaveBeenCalledOnce();
   });
+
+  it("renders the dedicated after-prayer tracker rail on Home while keeping the compact wird card", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled={true}
+        progressDayStartHour={4}
+        language="en"
+        direction="ltr"
+        onResume={() => undefined}
+        onRepeat={() => undefined}
+        routineModes={routineModes}
+        savedZikrIds={new Set()}
+        onOpenSavedZikr={() => undefined}
+        onOpenSavedLibrary={() => undefined}
+        onOpenBenefits={() => undefined}
+      />,
+    );
+
+    expect(screen.getByTestId("after-prayer-trackers")).toBeInTheDocument();
+    expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
+    expect(screen.getByText("After Asr")).toBeInTheDocument();
+    expect(screen.getByText("After Fajr")).toBeInTheDocument();
+    expect(screen.getByText(/today'?s wird/i)).toBeInTheDocument();
+  });
 });
