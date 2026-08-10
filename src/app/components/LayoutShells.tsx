@@ -255,12 +255,14 @@ export function NavSidebar({
           >
             <div className="flex items-center gap-2.5">
               <Globe size={18} className="text-primary" />
-              {/* Deliberately the *target* language's own name, not the current
-                  one — this control switches languages. LANGUAGE_LABELS is the
-                  single source for those names. */}
-              <span>{LANGUAGE_LABELS[isArabic ? "en" : "ar"]}</span>
+              <span>{t(language, "settings.language")}</span>
             </div>
-            <span className="text-[0.6875rem] font-bold uppercase text-muted-foreground">{language.toUpperCase()}</span>
+            {/* Label names the setting, value shows the CURRENT language —
+                matching the theme button directly below and every settings row.
+                It previously labelled itself with the *target* language
+                ("English") beside a badge showing the current one ("AR"), which
+                is two opposite mental models in one control. */}
+            <span className="text-[0.6875rem] font-bold text-muted-foreground">{LANGUAGE_LABELS[language]}</span>
           </button>
         )}
 

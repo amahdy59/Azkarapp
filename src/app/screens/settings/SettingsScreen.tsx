@@ -187,6 +187,8 @@ export function SettingsScreen({
               syncError={syncError}
               quietProgressEnabled={quietProgressEnabled}
               locationSettings={locationSettings}
+              calendarType={calendarType}
+              onCalendarTypeChange={onCalendarTypeChange}
               activeSub={effectiveSub}
             />
           </div>
@@ -222,6 +224,8 @@ export function SettingsScreen({
                 syncError={syncError}
                 quietProgressEnabled={quietProgressEnabled}
                 locationSettings={locationSettings}
+                calendarType={calendarType}
+                onCalendarTypeChange={onCalendarTypeChange}
               />
             </motion.div>
           )}
@@ -249,8 +253,6 @@ export function SettingsScreen({
           <AccessibilityPanel
             language={language}
             direction={direction}
-            calendarType={calendarType}
-            onCalendarTypeChange={onCalendarTypeChange}
             textSize={textSize}
             showTranslation={showTranslation}
             showTransliteration={showTransliteration}

@@ -819,6 +819,12 @@ const en = {
     showTransliteration: "Show pronunciation in Reader",
     resetPreferencesTitle: "Restore Defaults",
     resetPreferencesConfirm: "Restore default preferences? Your progress, sessions, and saved azkar will be kept.",
+    prayerTimesAndReminders: "Prayer Times & Reminders",
+    locationNotSet: "Not set",
+    calendarSystem: "Calendar System",
+    calendarHijri: "Hijri (Default)",
+    calendarGregorian: "Gregorian",
+    screenReaderNote: "Screen readers are supported throughout the app. No setup is needed.",
     deleteAccountTitle: "Permanently delete account",
     deleteAccountConfirm:
       "A copy of your data will download first, then your account and cloud data will be permanently deleted.",

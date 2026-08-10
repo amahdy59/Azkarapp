@@ -2,7 +2,7 @@ import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { AlignRight, Check, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage, ColorBlindSupport, TextSizeOption } from "../../types";
-import { RowValue, SectionLabel, SettingsRowItem, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
+import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
 
 function formatColorBlindSupport(value: ColorBlindSupport, language: AppLanguage) {
   switch (value) {
@@ -17,18 +17,23 @@ function formatColorBlindSupport(value: ColorBlindSupport, language: AppLanguage
   }
 }
 
-function PanelOptionButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+/**
+ * One option in a mutually exclusive group. Previously a plain button carrying
+ * `aria-pressed`, which models an independent toggle — four of them announced
+ * as four unrelated on/off controls rather than one single-choice group, and
+ * their container's `aria-label` sat on a roleless div where it is ignored.
+ * Now a Radix radio item, matching Text size in this same panel.
+ */
+function PanelRadioOption({ value, active, label }: { value: string; active: boolean; label: string }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={active}
-      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] ${
+    <RadioGroupPrimitive.Item
+      value={value}
+      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
         active ? "border-primary bg-primary text-primary-foreground" : "border-border/40 bg-card text-foreground"
       }`}
     >
       {label}
-    </button>
+    </RadioGroupPrimitive.Item>
   );
 }
 
@@ -44,8 +49,6 @@ export function AccessibilityPanel({
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
-  calendarType = "hijri",
-  onCalendarTypeChange,
   onTextSizeChange,
   onShowTranslationChange,
   onShowTransliterationChange,
@@ -59,7 +62,6 @@ export function AccessibilityPanel({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
-  calendarType?: "hijri" | "gregorian";
   textSize: TextSizeOption;
   showTranslation: boolean;
   showTransliteration: boolean;
@@ -69,7 +71,6 @@ export function AccessibilityPanel({
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
-  onCalendarTypeChange?: (val: "hijri" | "gregorian") => void;
   onTextSizeChange: (value: TextSizeOption) => void;
   onShowTranslationChange: (value: boolean) => void;
   onShowTransliterationChange: (value: boolean) => void;
@@ -89,41 +90,11 @@ export function AccessibilityPanel({
       <div className="flex-1 overflow-y-auto pb-8">
         <SectionLabel label={t(language, "settings.visual")} />
 
-        {/* Calendar System Preference */}
-        <section className="mx-4 mb-6 mt-2" aria-labelledby="calendar-type-title">
-          <h3 id="calendar-type-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
-            {language === "ar" ? "نظام التقويم" : "Calendar System"}
-          </h3>
-          <RadioGroupPrimitive.Root
-            dir={direction}
-            value={calendarType}
-            onValueChange={(val) => onCalendarTypeChange?.(val as "hijri" | "gregorian")}
-            className="grid grid-cols-2 gap-2"
-          >
-            <RadioGroupPrimitive.Item
-              value="hijri"
-              className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
-                calendarType === "hijri"
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/40 bg-card text-foreground"
-              }`}
-            >
-              {language === "ar" ? "التقويم الهجري (الافتراضي)" : "Hijri (Default)"}
-            </RadioGroupPrimitive.Item>
-            <RadioGroupPrimitive.Item
-              value="gregorian"
-              className={`min-h-11 rounded-2xl border px-3 text-[0.8125rem] font-bold ${
-                calendarType === "gregorian"
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border/40 bg-card text-foreground"
-              }`}
-            >
-              {language === "ar" ? "التقويم الميلادي" : "Gregorian"}
-            </RadioGroupPrimitive.Item>
-          </RadioGroupPrimitive.Root>
-        </section>
+        {/* Calendar system used to sit here, first in this panel and under the
+            "Visual" label. It is a locale preference, not an accessibility aid,
+            and now lives beside Language in Settings → Preferences. */}
 
-        <section className="mx-4 mb-6" aria-labelledby="text-size-title">
+        <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
           <h3 id="text-size-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
             {t(language, "settings.textSize")}
           </h3>
@@ -192,18 +163,26 @@ export function AccessibilityPanel({
               >
                 <Eye size={20} className="text-primary" />
               </span>
-              <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.colorBlindSupport")}</h3>
+              <h3 id="color-blind-title" className="text-[1rem] font-semibold text-foreground">
+                {t(language, "settings.colorBlindSupport")}
+              </h3>
             </div>
-            <div className="grid grid-cols-2 gap-2" aria-label={t(language, "settings.colorBlindSupport")}>
+            <RadioGroupPrimitive.Root
+              dir={direction}
+              value={colorBlindSupport}
+              onValueChange={(value) => onColorBlindSupportChange(value as ColorBlindSupport)}
+              className="grid grid-cols-2 gap-2"
+              aria-labelledby="color-blind-title"
+            >
               {colorBlindOptions.map((option) => (
-                <PanelOptionButton
+                <PanelRadioOption
                   key={option}
+                  value={option}
                   active={colorBlindSupport === option}
                   label={formatColorBlindSupport(option, language)}
-                  onClick={() => onColorBlindSupportChange(option)}
                 />
               ))}
-            </div>
+            </RadioGroupPrimitive.Root>
           </div>
         </div>
 
@@ -248,15 +227,18 @@ export function AccessibilityPanel({
             label={t(language, "settings.rtlLayout")}
             checked={forceRtl}
             onChange={() => onForceRtlChange(!forceRtl)}
-          />
-          <SettingsRowItem
-            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
-            icon={<Info size={20} className="text-primary" />}
-            label={t(language, "settings.screenReader")}
-            right={<RowValue value={t(language, "settings.alwaysOn")} withChevron={false} />}
             hasDivider={false}
           />
         </div>
+
+        {/* Not a row. Screen reader support is not something the user turns on,
+            so presenting it with the same anatomy as the working toggles above
+            gave it a control's affordance without a control's behaviour. It is
+            reassurance, so it reads as help text. */}
+        <p className="mx-4 mt-2 flex items-start gap-2 px-1 text-[0.75rem] leading-5 text-muted-foreground">
+          <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+          <span>{t(language, "settings.screenReaderNote")}</span>
+        </p>
       </div>
     </div>
   );

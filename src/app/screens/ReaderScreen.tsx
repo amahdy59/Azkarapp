@@ -452,7 +452,7 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-justify bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
+      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
       <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
       {!longSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
@@ -465,7 +465,7 @@ export function ReaderScreen({
           language={language}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
           onSelectMeanings={setSelectedWordMeanings}
-          flat={isDesktopReader}
+          flat={true}
         />
       ) : wordMeanings.length > 0 ? (
         <QuranWordText
@@ -477,7 +477,7 @@ export function ReaderScreen({
         />
       ) : (
         <p
-          className="zikr-text pointer-events-none text-justify font-medium leading-[2.1] text-foreground"
+          className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
           data-testid="zikr-text"
           dir="rtl"
           lang="ar"
@@ -1075,7 +1075,7 @@ export function ReaderScreen({
               role="region"
               tabIndex={0}
               aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-              className={`flex-1 overflow-y-auto min-h-0 w-full outline-none ${
+              className={`flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                 justCompleted ? "zikr-step-exit" : "zikr-step-enter"
               }`}
             >

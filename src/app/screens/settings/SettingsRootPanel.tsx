@@ -1,5 +1,5 @@
 import {
-  Bell,
+  Calendar,
   BarChart3,
   BookOpen,
   Database,
@@ -49,6 +49,8 @@ export function SettingsRootPanel({
   syncError,
   quietProgressEnabled,
   locationSettings,
+  calendarType = "hijri",
+  onCalendarTypeChange,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
@@ -63,6 +65,8 @@ export function SettingsRootPanel({
   syncError: string;
   quietProgressEnabled: boolean;
   locationSettings?: LocationSettings;
+  calendarType?: "hijri" | "gregorian";
+  onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
   /** When set, highlights the matching row (two-pane layout). */
   activeSub?: SettingsSubScreen;
 }) {
@@ -126,18 +130,59 @@ export function SettingsRootPanel({
           />
         </div>
 
+        {/* Calendar system sits beside Language, not under Accessibility where
+            it used to live. It is a locale preference, not an accessibility
+            aid, and Phase 09 calls for it in General. Same SegmentedControl as
+            Language above, which also gives it the radiogroup semantics the
+            hand-rolled radio items lacked. Presentation move only — the
+            persisted calendarType field and its normalization are unchanged. */}
+        {onCalendarTypeChange && (
+          <div className="border-b border-border/50 p-4">
+            <div className="mb-3 flex items-center gap-3">
+              <span
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                style={{ backgroundColor: iconBackground }}
+                aria-hidden="true"
+              >
+                <Calendar size={20} className="text-primary" />
+              </span>
+              <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.calendarSystem")}</h3>
+            </div>
+            <SegmentedControl
+              value={calendarType}
+              onChange={onCalendarTypeChange}
+              direction={direction}
+              aria-label={t(language, "settings.calendarSystem")}
+              className="flex bg-muted/80 p-1 rounded-xl"
+              itemClassName={(selected) =>
+                `min-h-11 flex-1 rounded-lg py-2.5 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected ? "bg-background text-foreground shadow-sm" : "text-foreground hover:bg-muted/40"
+                }`
+              }
+              options={[
+                { value: "hijri" as const, label: t(language, "settings.calendarHijri"), testId: "calendar-hijri" },
+                {
+                  value: "gregorian" as const,
+                  label: t(language, "settings.calendarGregorian"),
+                  testId: "calendar-gregorian",
+                },
+              ]}
+            />
+          </div>
+        )}
+
+        {/* One row, one destination. "Prayer Times & Location" and
+            "Notifications" were two labels with two different values that both
+            opened this same panel — the ambiguous-chevron problem in
+            AGENTS.md §7. The panel owns both concerns, so the row names both.
+            The value shows the configured city, or an explicit unset state:
+            defaulting the label to "Cairo" presented a fallback as though the
+            user had chosen it. */}
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<MapPin size={20} className="text-primary" />}
-          label={language === "ar" ? "مواقيت الصلاة والموقع" : "Prayer Times & Location"}
-          right={<RowValue value={locationSettings?.cityName || (language === "ar" ? "القاهرة" : "Cairo")} />}
-          onPress={() => onNav("notifications")}
-        />
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<Bell size={20} className="text-primary" />}
-          label={t(language, "settings.notifications")}
-          right={<RowValue value={t(language, "settings.notificationsSetup")} />}
+          label={t(language, "settings.prayerTimesAndReminders")}
+          right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
           onPress={() => onNav("notifications")}
           hasDivider={false}
         />
