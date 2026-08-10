@@ -508,7 +508,7 @@ export function HomeScreen({
                             {formatNumerals(doneCount, language)} {isArabic ? "من" : "of"}{" "}
                             {formatNumerals(totalCount, language)}
                           </span>
-                          <div className="flex items-center gap-1.5 text-on-media-muted">
+                          <div className="flex items-center gap-1.5 text-on-media">
                             <Clock className="h-[14px] w-[14px] text-[#e2a84a]" />
                             <span>
                               {isArabic

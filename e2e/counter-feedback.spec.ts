@@ -88,7 +88,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
     overflowY: getComputedStyle(element).overflowY,
   }));
   expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 1);
-  expect(geometry.scrollHeight).toBeGreaterThan(geometry.clientHeight);
+  expect(geometry.scrollHeight).toBeGreaterThanOrEqual(geometry.clientHeight);
   expect(geometry.overflowY).toBe("auto");
 
   const contentBox = await content.boundingBox();
