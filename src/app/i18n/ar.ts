@@ -64,7 +64,7 @@ const ar = {
     streakTitle: "سلسلة المتابعة",
     consecutiveDays: "أيام متتالية",
     totalAzkar: "إجمالي الأذكار",
-    azkarToday: "ذكراً اليوم",
+    collectionsCompleted: "أوراد مكتملة",
     fridayAzkar: "أذكار يوم الجمعة",
     kahfMerit: "فضل قراءة سورة الكهف والذكر",
     viewFridayAzkar: "عرض أذكار الجمعة",

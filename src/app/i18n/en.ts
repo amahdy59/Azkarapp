@@ -64,7 +64,7 @@ const en = {
     streakTitle: "Streak",
     consecutiveDays: "consecutive days",
     totalAzkar: "Total Azkar",
-    azkarToday: "azkar today",
+    collectionsCompleted: "collections completed",
     fridayAzkar: "Friday Azkar",
     kahfMerit: "The merit of reciting Surat Al-Kahf",
     viewFridayAzkar: "View Friday Azkar",

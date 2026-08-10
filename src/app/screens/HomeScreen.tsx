@@ -274,7 +274,14 @@ export function HomeScreen({
 
   const streakDays = gardenSummary.currentUsageStreak ?? gardenSummary.activeDaysLast7 ?? 0;
   const activeDaysThisWeek = gardenSummary.activeDaysLast7 ?? 0;
-  const totalDays = gardenSummary.lifetimePalms * 3 + gardenSummary.today.goldenLeafCount;
+  // Recorded main-routine completions, lifetime. This used to be
+  // `lifetimePalms * 3 + today.goldenLeafCount`, which was wrong twice over:
+  // the multiplier predates DEC-042 making a palm four routines rather than
+  // three, and counting only palm days meant someone who completed 3 of 4
+  // every day for a month was shown zero. `lifetimeGoldenLeaves` is the
+  // ledger's own count of MAIN_CATEGORY_IDS completions, so it needs no
+  // arithmetic here and cannot drift from the routine count again.
+  const completedCollections = gardenSummary.lifetimeGoldenLeaves;
   const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
   const savedPreview = useMemo(() => {
     const available: HomeSavedItem[] = ALL_AZKAR.filter(
@@ -395,7 +402,12 @@ export function HomeScreen({
             >
               <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
               <span>{formatNumerals(streakDays, language)}</span>
-              <span className="hidden sm:inline">{t(language, "progress.days")}</span>
+              {/* The unit stays visible below sm. Hiding it left the chip
+                  reading as a bare "3", which means nothing on its own — the
+                  icon is decorative and the title attribute never fires on
+                  touch. The 320px overflow assertion in pre-phase-nine.spec.ts
+                  is what keeps this honest if the row ever gets too wide. */}
+              <span>{t(language, "progress.days")}</span>
             </div>
             <div
               data-testid="header-palms"
@@ -408,7 +420,7 @@ export function HomeScreen({
                 className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
               />
               <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-              <span className="hidden sm:inline">{t(language, "progress.palmsUnit")}</span>
+              <span>{t(language, "progress.palmsUnit")}</span>
             </div>
           </div>
         </header>
@@ -593,8 +605,8 @@ export function HomeScreen({
               <StatCard
                 title={t(language, "home.totalAzkar")}
                 icon={<GoldenPalmMark size={18} />}
-                value={formatNumerals(totalDays, language)}
-                subtitle={t(language, "home.azkarToday")}
+                value={formatNumerals(completedCollections, language)}
+                subtitle={t(language, "home.collectionsCompleted")}
               />
             </div>
           </div>

@@ -49,6 +49,17 @@ describe("HomeScreen quick access", () => {
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
 
+    // Units stay visible at every width. Hidden below sm, these chips read as
+    // bare numerals with no indication of what they count.
+    expect(screen.getByTestId("header-streak")).toHaveTextContent(/days/i);
+    expect(screen.getByTestId("header-palms")).toHaveTextContent(/palms/i);
+
+    // "Total Azkar" counts recorded main-routine completions for all time. It
+    // was `lifetimePalms * 3 + today's leaves`, which both used the pre-DEC-042
+    // three-routine multiplier and showed zero to anyone who never completed a
+    // full day. The fixture below has palms but no complete day.
+    expect(screen.getByText("collections completed")).toBeInTheDocument();
+
     // The streak/palms cluster must be reachable by role. Before it carried
     // role="img" its aria-label sat on a roleless div, so assistive technology
     // announced the two chips as bare unlabelled numerals.
