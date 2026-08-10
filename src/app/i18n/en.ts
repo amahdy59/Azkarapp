@@ -797,7 +797,10 @@ const en = {
     morningAzkar: "Morning Azkar",
     eveningAzkar: "Evening Azkar",
     sleepAzkar: "Sleep Azkar",
-    postPrayerAzkar: "Post-Prayer Azkar",
+    // "After Prayer" is the canonical English name in content/categories.ts;
+    // the short column form below stays "Post-Prayer", which the week-grid
+    // text-equivalent test asserts on.
+    postPrayerAzkar: "After Prayer Azkar",
     otherAzkar: "Other Azkar",
     none: "None",
     morningShort: "Morning",
