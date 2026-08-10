@@ -519,11 +519,10 @@ export function HomeScreen({
                         </div>
                         <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
                           <div
-                            className="h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out origin-[--bar-origin]"
+                            className={`h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${direction === "rtl" ? "origin-right" : "origin-left"}`}
                             style={
                               {
                                 transform: `scaleX(${Math.min(1, Math.max(0, doneCount / totalCount))})`,
-                                "--bar-origin": direction === "rtl" ? "right" : "left",
                               } as React.CSSProperties
                             }
                           />
@@ -570,25 +569,31 @@ export function HomeScreen({
           </div>
 
           {/* Middle Row: three at-a-glance progress stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
-            <StatCard
-              title={isArabic ? "هذا الأسبوع" : "This Week"}
-              icon={<Calendar size={18} />}
-              value={formatNumerals(activeDaysThisWeek, language)}
-              subtitle={isArabic ? "من ٧ أيام" : "of 7 days"}
-            />
-            <StatCard
-              title={isArabic ? "سلسلة المتابعة" : "Streak"}
-              icon={<Zap size={18} />}
-              value={formatNumerals(streakDays, language)}
-              subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
-            />
-            <StatCard
-              title={isArabic ? "إجمالي الأذكار" : "Total Azkar"}
-              icon={<GoldenPalmMark size={18} />}
-              value={formatNumerals(totalDays, language)}
-              subtitle={isArabic ? "ذكراً اليوم" : "azkar today"}
-            />
+          <div className="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
+              <StatCard
+                title={isArabic ? "هذا الأسبوع" : "This Week"}
+                icon={<Calendar size={18} />}
+                value={formatNumerals(activeDaysThisWeek, language)}
+                subtitle={isArabic ? "من ٧ أيام" : "of 7 days"}
+              />
+            </div>
+            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
+              <StatCard
+                title={isArabic ? "سلسلة المتابعة" : "Streak"}
+                icon={<Zap size={18} />}
+                value={formatNumerals(streakDays, language)}
+                subtitle={isArabic ? "أيام متتالية" : "consecutive days"}
+              />
+            </div>
+            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
+              <StatCard
+                title={isArabic ? "إجمالي الأذكار" : "Total Azkar"}
+                icon={<GoldenPalmMark size={18} />}
+                value={formatNumerals(totalDays, language)}
+                subtitle={isArabic ? "ذكراً اليوم" : "azkar today"}
+              />
+            </div>
           </div>
 
           <SectionDivider label={t(language, "home.yourLibrary")} />
@@ -596,7 +601,7 @@ export function HomeScreen({
           <div className="grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
             <section
               aria-labelledby="home-saved-heading"
-              className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+              className="rounded-3xl bg-transparent py-3"
               data-testid="home-saved-section"
             >
               <div className="flex items-start justify-between gap-3">
@@ -622,7 +627,7 @@ export function HomeScreen({
                         key={zikr.id}
                         type="button"
                         onClick={() => void openSavedZikr(zikr)}
-                        className="interactive-elem flex min-h-14 w-full items-center gap-3 rounded-2xl border border-border/50 bg-background/80 px-3 py-2.5 text-start transition-colors hover:border-primary/40 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className="interactive-elem flex min-h-14 w-full items-center gap-3 rounded-2xl bg-muted/30 px-3 py-2.5 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                           <Bookmark size={18} className="fill-current" aria-hidden="true" />
@@ -668,7 +673,7 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group flex min-h-[12rem] w-full flex-col justify-between rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 via-card to-card p-5 text-start shadow-raised transition-colors hover:border-amber-500/55 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem group flex min-h-[10rem] w-full flex-col justify-between rounded-3xl bg-amber-500/10 p-5 text-start transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 data-testid="home-benefits-card"
               >
                 <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
@@ -677,9 +682,6 @@ export function HomeScreen({
                 <span className="mt-5 block">
                   <span className="block text-[1.25rem] font-black text-foreground">
                     {t(language, "benefits.title")}
-                  </span>
-                  <span className="mt-1.5 block text-[0.875rem] font-semibold leading-6 text-muted-foreground">
-                    {t(language, "benefits.homeDescription")}
                   </span>
                   <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-800 dark:text-amber-300">
                     {t(language, "benefits.open")}

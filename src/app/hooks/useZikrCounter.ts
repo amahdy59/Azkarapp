@@ -93,7 +93,7 @@ export function useZikrCounter({
         }),
       );
       if (hapticFeedback) {
-        vibrate([32, 45, 26, 45, 70]);
+        vibrate([30, 50, 30]);
       }
       onComplete(idx);
       advanceTimer.current = setTimeout(() => {

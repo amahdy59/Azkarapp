@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useRef, useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -180,6 +181,26 @@ export function ReaderScreen({
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
+  const [isZenMode, setIsZenMode] = useState(false);
+  const zenModeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const activateZenMode = useCallback(() => {
+    setIsZenMode(true);
+    if (zenModeTimer.current) {
+      clearTimeout(zenModeTimer.current);
+    }
+    zenModeTimer.current = setTimeout(() => {
+      setIsZenMode(false);
+    }, 3000);
+  }, []);
+
+  const deactivateZenMode = useCallback(() => {
+    setIsZenMode(false);
+    if (zenModeTimer.current) {
+      clearTimeout(zenModeTimer.current);
+    }
+  }, []);
+
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingContentRef = useRef<HTMLDivElement | null>(null);
@@ -206,6 +227,14 @@ export function ReaderScreen({
       onComplete,
       onAdvance,
     });
+
+  const handleSurfaceTapWithZen = useCallback(
+    (e: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+      activateZenMode();
+      handleSurfaceTap(e);
+    },
+    [activateZenMode, handleSurfaceTap],
+  );
 
   /**
    * "Reset counter" also clears a recorded completion, so an accidental tap on
@@ -367,7 +396,16 @@ export function ReaderScreen({
   const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
-  const readingFontSize = { small: "16px", medium: "18.5px", large: "21.5px" }[textSize];
+  // Dynamic typography scaling: slightly increase size for short text.
+  let scaleFactor = 1;
+  const arabicLength = z.arabicText.length;
+  if (!longSurah) {
+    if (arabicLength < 30) scaleFactor = 1.3;
+    else if (arabicLength < 60) scaleFactor = 1.15;
+    else if (arabicLength < 80) scaleFactor = 1.05;
+  }
+  const baseSize = { small: 16, medium: 18.5, large: 21.5 }[textSize];
+  const readingFontSize = `${baseSize * scaleFactor}px`;
   const readingFontFamily = "var(--font-reading-arabic)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
 
@@ -793,7 +831,7 @@ export function ReaderScreen({
       dir={direction}
       style={categoryThemeStyles}
       screenName={isArabic ? category.nameArabic : category.name}
-      onClick={handleSurfaceTap}
+      onClick={handleSurfaceTapWithZen}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -817,7 +855,9 @@ export function ReaderScreen({
               .azkar-hero background (src/app/components/azkar-hero-background.css)
               rather than following light/dark/midnight tokens, since it plays
               the same "always-dark brand band" role. */}
-          <div
+          <motion.div
+            animate={{ opacity: isZenMode ? 0 : 1, y: isZenMode ? -10 : 0 }}
+            transition={{ duration: 0.3 }}
             data-testid="reader-desktop-hero"
             className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-4 overflow-hidden rounded-3xl px-6 py-7 text-center"
             style={{
@@ -950,7 +990,7 @@ export function ReaderScreen({
                 aria-label={t(language, "reader.groupProgress")}
               />
             </div>
-          </div>
+          </motion.div>
 
           {/* Wide-desktop card: reading content, side navigation, counter,
               and keyboard guidance. Page-level actions stay in the hero. */}
@@ -964,22 +1004,29 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+                onScroll={deactivateZenMode}
                 className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
               >
-                <div
-                  className={`mx-auto flex min-h-full max-w-[600px] w-full flex-col ${
-                    isLongContent ? "justify-start py-4" : "justify-center items-center"
-                  }`}
-                >
-                  <div
+                <AnimatePresence mode="wait">
+                  <motion.div
                     key={z.id}
-                    className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                    initial={{ opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    className={`mx-auto flex min-h-full max-w-[600px] w-full flex-col ${
+                      isLongContent ? "justify-start py-4" : "justify-center items-center"
+                    }`}
                   >
-                    {renderReadingContent()}
-                  </div>
-                </div>
+                    <div
+                      className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                    >
+                      {renderReadingContent()}
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
               <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
@@ -991,64 +1038,66 @@ export function ReaderScreen({
         </>
       ) : (
         <>
-          <Header
-            title={isArabic ? category.nameArabic : category.name}
-            onBack={onBack}
-            language={language}
-            right={
-              // Phone layout: Benefit and Share join the overflow control in
-              // this single top row (the old bottom action bar is gone, and
-              // with it the second row of chrome). All three share the
-              // header's ghost icon-button treatment, so the row reads as one
-              // set rather than a pill next to two icons.
-              <div className="flex items-center gap-1" data-testid="reader-actions">
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    setHasOpenedBenefit(true);
-                    setBenefitOpen(true);
-                  }}
-                  aria-haspopup="dialog"
-                  className={READER_HEADER_ACTION_CLASS}
-                  aria-label={t(language, "reader.referencesButton")}
-                  title={t(language, "reader.referencesButton")}
-                >
-                  <BookOpen size={20} />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    void handleShare();
-                  }}
-                  disabled={isSharing}
-                  aria-busy={isSharing || undefined}
-                  onPointerEnter={() => void prepareZikrShareCardFonts()}
-                  onFocus={() => void prepareZikrShareCardFonts()}
-                  className={READER_HEADER_ACTION_CLASS}
-                  aria-label={t(language, "reader.share")}
-                  title={t(language, "reader.share")}
-                >
-                  <Share2 size={20} />
-                </button>
-
-                <DropdownMenu dir={direction}>
-                  <DropdownMenuTrigger aria-label={t(language, "reader.menu")} className={READER_HEADER_ACTION_CLASS}>
-                    <MoreVertical size={20} />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    align="end"
-                    className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
-                    sideOffset={8}
+          <motion.div animate={{ opacity: isZenMode ? 0 : 1, y: isZenMode ? -10 : 0 }} transition={{ duration: 0.3 }}>
+            <Header
+              title={isArabic ? category.nameArabic : category.name}
+              onBack={onBack}
+              language={language}
+              right={
+                // Phone layout: Benefit and Share join the overflow control in
+                // this single top row (the old bottom action bar is gone, and
+                // with it the second row of chrome). All three share the
+                // header's ghost icon-button treatment, so the row reads as one
+                // set rather than a pill next to two icons.
+                <div className="flex items-center gap-1" data-testid="reader-actions">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setHasOpenedBenefit(true);
+                      setBenefitOpen(true);
+                    }}
+                    aria-haspopup="dialog"
+                    className={READER_HEADER_ACTION_CLASS}
+                    aria-label={t(language, "reader.referencesButton")}
+                    title={t(language, "reader.referencesButton")}
                   >
-                    {renderReaderMenuItems()}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            }
-          />
+                    <BookOpen size={20} />
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      void handleShare();
+                    }}
+                    disabled={isSharing}
+                    aria-busy={isSharing || undefined}
+                    onPointerEnter={() => void prepareZikrShareCardFonts()}
+                    onFocus={() => void prepareZikrShareCardFonts()}
+                    className={READER_HEADER_ACTION_CLASS}
+                    aria-label={t(language, "reader.share")}
+                    title={t(language, "reader.share")}
+                  >
+                    <Share2 size={20} />
+                  </button>
+
+                  <DropdownMenu dir={direction}>
+                    <DropdownMenuTrigger aria-label={t(language, "reader.menu")} className={READER_HEADER_ACTION_CLASS}>
+                      <MoreVertical size={20} />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="end"
+                      className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                      sideOffset={8}
+                    >
+                      {renderReaderMenuItems()}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+              }
+            />
+          </motion.div>
 
           <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
             <ProgressBar

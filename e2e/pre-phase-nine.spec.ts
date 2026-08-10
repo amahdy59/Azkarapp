@@ -165,6 +165,7 @@ test("Home populated cards stay inside the content boundary at every responsive 
       return {
         regionOverflow: region.scrollWidth - region.clientWidth,
         offenders: [...region.querySelectorAll<HTMLElement>("*")]
+          .filter((element) => !element.closest(".overflow-x-auto"))
           .map((element) => {
             const bounds = element.getBoundingClientRect();
             return {

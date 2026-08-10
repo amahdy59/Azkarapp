@@ -108,8 +108,8 @@ export function CounterOutlineProgress({ count, total }: { count: number; total:
         y="5"
         width="210"
         height="66"
-        rx="15"
-        ry="15"
+        rx="33"
+        ry="33"
         pathLength="1"
         strokeDasharray="1 1"
         strokeDashoffset={1 - progress}
