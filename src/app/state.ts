@@ -567,11 +567,16 @@ export function resetStoredSettings() {
  * (`azkarapp_recent_searches_*`), cached prayer times and the cached timezone
  * (`azkarapp.prayer_time*`) and the last sync stamp on the device.
  *
- * `azkar.audio-downloads.v1` is deliberately absent. It is the only index of
- * which URLs live in the `azkar-audio-v*` Cache API bucket, so removing it
- * without the cache entries would strand those bytes with nothing able to find
- * or delete them. Offline audio is cleared from the Downloads screen, which
- * removes registry and cache together through `removeDownloadedAudio`.
+ * `azkar.audio-downloads.v1` is deliberately absent, and must stay absent. It
+ * is the only index of which URLs live in the `azkar-audio-v*` Cache API
+ * bucket, so removing it here — without the cache entries — would strand those
+ * bytes with nothing able to find or delete them.
+ *
+ * Downloaded audio is still cleared alongside this data: `clearAllLocalData()`
+ * in `hooks/useSettingsHandlers.ts` awaits `removeDownloadedAudio()` first,
+ * which removes the cached bytes and empties this registry together. Sweeping
+ * the key from here as well would break that ordering guarantee if the Cache
+ * API step ever failed.
  */
 const OWNED_STORAGE_PREFIXES = ["azkarapp.", "azkarapp_", "azkar.audio-preferences"];
 

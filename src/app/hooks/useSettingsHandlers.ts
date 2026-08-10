@@ -3,6 +3,29 @@ import { clearStoredAppData, resetStoredSettings } from "../state";
 import { t } from "../i18n";
 import { deleteCurrentAccount } from "../../lib/auth";
 
+/**
+ * Clears every local trace of the user's data.
+ *
+ * Downloaded audio lives in two places that have to go together: the Cache API
+ * bucket holding the bytes, and `azkar.audio-downloads.v1`, which is the only
+ * index of which URLs are in that bucket. `removeDownloadedAudio()` removes
+ * both, so it runs first — clearing storage on its own would strand the cached
+ * bytes with nothing able to find or delete them.
+ *
+ * The audio module is imported dynamically, as `main.tsx` already does, so the
+ * Cache API paths and the audio catalogue stay out of the settings bundle.
+ */
+export async function clearAllLocalData() {
+  try {
+    const { removeDownloadedAudio } = await import("../audio/audioOfflineCache");
+    await removeDownloadedAudio();
+  } catch {
+    // Offline audio is unsupported, blocked, or already gone. Local data still
+    // clears — a failure here must not leave the user unable to clear anything.
+  }
+  clearStoredAppData();
+}
+
 export function useSettingsHandlers({
   selectedLang,
   appStateSnapshot,
@@ -49,8 +72,8 @@ export function useSettingsHandlers({
       t(selectedLang, "settings.clearLocalDataConfirm"),
       t(selectedLang, "settings.clearLocalDataAction"),
       t(selectedLang, "common.cancel"),
-      () => {
-        clearStoredAppData();
+      async () => {
+        await clearAllLocalData();
         window.location.reload();
       },
       true,
@@ -59,25 +82,19 @@ export function useSettingsHandlers({
 
   const handleDeleteAccount = () => {
     showConfirm(
-      selectedLang === "ar" ? "حذف الحساب نهائياً" : "Permanently delete account",
-      selectedLang === "ar"
-        ? "سيتم تنزيل نسخة من بياناتك أولاً، ثم حذف الحساب وبياناته نهائياً."
-        : "A copy of your data will download first, then your account and cloud data will be permanently deleted.",
-      selectedLang === "ar" ? "تنزيل البيانات وحذف الحساب" : "Export data and delete account",
+      t(selectedLang, "settings.deleteAccountTitle"),
+      t(selectedLang, "settings.deleteAccountConfirm"),
+      t(selectedLang, "settings.deleteAccountAction"),
       t(selectedLang, "common.cancel"),
       async () => {
         try {
           handleExportData();
           await deleteCurrentAccount();
-          clearStoredAppData();
+          await clearAllLocalData();
           window.location.reload();
         } catch (error) {
           console.error("Account deletion failed", error instanceof Error ? error.message : "Unknown error");
-          window.alert(
-            selectedLang === "ar"
-              ? "تعذر حذف الحساب. لم تُحذف بياناتك المحلية، ويمكنك المحاولة مرة أخرى."
-              : "Account deletion failed. Your local data was kept, so you can try again.",
-          );
+          window.alert(t(selectedLang, "settings.deleteAccountFailed"));
         }
       },
       true,

@@ -819,6 +819,11 @@ const en = {
     showTransliteration: "Show pronunciation in Reader",
     resetPreferencesTitle: "Restore Defaults",
     resetPreferencesConfirm: "Restore default preferences? Your progress, sessions, and saved azkar will be kept.",
+    deleteAccountTitle: "Permanently delete account",
+    deleteAccountConfirm:
+      "A copy of your data will download first, then your account and cloud data will be permanently deleted.",
+    deleteAccountAction: "Export data and delete account",
+    deleteAccountFailed: "Account deletion failed. Your local data was kept, so you can try again.",
     clearLocalDataTitle: "Erase Local Data",
     clearLocalDataConfirm: "Erase all local Azkar data on this device? This cannot be undone.",
     clearLocalDataAction: "Erase Data",
