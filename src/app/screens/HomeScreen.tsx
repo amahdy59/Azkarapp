@@ -569,7 +569,10 @@ export function HomeScreen({
           </div>
 
           {/* Middle Row: three at-a-glance progress stats */}
-          <div className="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0">
+          <div
+            tabIndex={0}
+            className="flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden -mx-4 px-4 sm:mx-0 sm:px-0"
+          >
             <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
               <StatCard
                 title={isArabic ? "هذا الأسبوع" : "This Week"}
