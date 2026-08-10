@@ -1,20 +1,19 @@
 import { AlertTriangle, Bookmark, CloudOff, Download, Search, VolumeX } from "./icons";
 import { Button } from "./ui/button";
+import { t } from "../i18n";
+import type { AppLanguage } from "../types";
 
 export type AppStateKind =
   "empty-search" | "empty-saved" | "network-error" | "offline" | "audio-error" | "download-error" | "interrupted";
 
-const COPY: Record<AppStateKind, { title: string; description: string }> = {
-  "empty-search": { title: "No azkar found", description: "Try another word in Arabic, English, or transliteration." },
-  "empty-saved": { title: "No saved azkar yet", description: "Bookmark a zikr to find it here." },
-  "network-error": {
-    title: "Couldn’t connect",
-    description: "Check your connection and try again. Your local progress is safe.",
-  },
-  offline: { title: "You’re offline", description: "Downloaded content and counting remain available." },
-  "audio-error": { title: "Audio unavailable", description: "Continue reading now or retry the recitation." },
-  "download-error": { title: "Download interrupted", description: "Free some space or reconnect, then resume." },
-  interrupted: { title: "Session paused", description: "Continue where you stopped or restart this zikr." },
+const COPY_KEYS: Record<AppStateKind, { title: string; description: string }> = {
+  "empty-search": { title: "search.emptyTitle", description: "search.emptyDescription" },
+  "empty-saved": { title: "library.savedEmptyTitle", description: "library.savedEmptyBody" },
+  "network-error": { title: "common.networkError", description: "common.networkErrorDescription" },
+  offline: { title: "syncStatus.offlineTitle", description: "syncStatus.offlineNotice" },
+  "audio-error": { title: "reader.audioUnavailable", description: "reader.audioUnavailableDescription" },
+  "download-error": { title: "downloads.downloadError", description: "downloads.downloadErrorDescription" },
+  interrupted: { title: "reader.sessionPaused", description: "reader.sessionPausedDescription" },
 };
 
 const ICONS = {
@@ -33,24 +32,27 @@ export function StatePanel({
   onAction,
   title,
   description,
+  language = "en",
 }: {
   kind: AppStateKind;
   actionLabel?: string;
   onAction?: () => void;
   title?: string;
   description?: string;
+  language?: AppLanguage;
 }) {
-  const copy = COPY[kind];
+  const copy = COPY_KEYS[kind];
   const Icon = ICONS[kind];
+  const isAlert = kind === "network-error" || kind === "audio-error" || kind === "download-error";
   return (
     <section
       className="flex flex-col items-center rounded-2xl border border-dashed border-border bg-card px-5 py-10 text-center"
-      role="status"
+      role={isAlert ? "alert" : "status"}
     >
       <Icon size={32} className="text-primary" aria-hidden="true" />
-      <h2 className="mt-3 text-[1.0625rem] font-semibold text-foreground">{title ?? copy.title}</h2>
+      <h2 className="mt-3 text-[1.0625rem] font-semibold text-foreground">{title ?? t(language, copy.title)}</h2>
       <p className="mt-1 max-w-sm text-[0.875rem] leading-[22px] text-muted-foreground">
-        {description ?? copy.description}
+        {description ?? t(language, copy.description)}
       </p>
       {actionLabel && onAction && (
         <Button type="button" onClick={onAction} className="mt-4 px-5">

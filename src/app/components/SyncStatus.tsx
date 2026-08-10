@@ -15,7 +15,7 @@ export function SyncStatus({
   if (errorMessage) {
     return (
       <div className="sync-status sync-status-error" role="alert">
-        <span className="min-w-0 flex-1">{t(language, "syncStatus.paused", { error: errorMessage })}</span>
+        <span className="min-w-0 flex-1">{t(language, "syncStatus.paused")}</span>
         <button type="button" onClick={onRetry} className="min-h-11 shrink-0 rounded-lg border border-current px-3">
           {t(language, "syncStatus.retry")}
         </button>

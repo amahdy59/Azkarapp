@@ -43,8 +43,8 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    expect(screen.getByTestId("home-utility-header")).toHaveClass("grid-rows-2");
-    expect(screen.getByTestId("current-time")).toHaveTextContent(/9:05/);
+    expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
+    expect(screen.getByTestId("home-header-stats")).toBeInTheDocument();
     expect(screen.getByTestId("header-streak").compareDocumentPosition(screen.getByTestId("header-palms"))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );

@@ -28,6 +28,8 @@ const ar = {
     appName: "تطبيق الأذكار",
     appTagline: "حصنك اليومي",
     theme: "المظهر",
+    networkError: "مشكلة في الاتصال",
+    networkErrorDescription: "تحقق من الاتصال وحاول مرة أخرى. تقدمك المحلي محفوظ.",
   },
   onboarding: {
     chooseLanguage: "اختر لغتك",
@@ -41,7 +43,8 @@ const ar = {
     skip: "تخطي",
   },
   syncStatus: {
-    paused: "توقفت مزامنة الحساب مؤقتاً: {error}",
+    paused: "توقفت مزامنة الحساب. بياناتك المحلية ما زالت متاحة.",
+    offlineTitle: "أنت غير متصل بالإنترنت",
     retry: "إعادة المحاولة",
     syncing: "جارٍ مزامنة الحساب...",
     restoreError: "تعذرت استعادة بيانات حسابك.",
@@ -77,6 +80,7 @@ const ar = {
     startGroup: "ابدأ {name}",
     continueGroup: "تابع {name}",
     readGroupAgain: "اقرأ {name} مرة أخرى",
+    continueWird: "تابع وردك",
     collections: "كل المجموعات",
     complete: "مكتمل",
     goodMorning: "\u0635\u0628\u0627\u062d \u0627\u0644\u062e\u064a\u0631",
@@ -303,6 +307,8 @@ const ar = {
     quota: "المساحة المتاحة",
     refresh: "تحديث الحالة",
     unavailable: "غير متاح",
+    downloadError: "توقف التنزيل",
+    downloadErrorDescription: "أفرغ مساحة أو اتصل بالإنترنت ثم استأنف التنزيل.",
     statusError: "تعذر فحص التخزين دون اتصال. أعد تحميل الصفحة وحاول مرة أخرى.",
   },
   about: {
@@ -665,6 +671,10 @@ const ar = {
     continueAdditional: "تابع {count} ذكرًا إضافيًا",
   },
   reader: {
+    audioUnavailable: "الصوت غير متاح",
+    audioUnavailableDescription: "يمكنك متابعة القراءة أو تجربة الصوت مرة أخرى.",
+    sessionPaused: "توقفت الجلسة",
+    sessionPausedDescription: "تابع من حيث توقفت أو أعد قراءة هذا الذكر.",
     repeatPrescribed: "تكرار العدد المحدد",
     readingText: "نص الذكر",
     tapToCount: "اضغط للتسبيح",

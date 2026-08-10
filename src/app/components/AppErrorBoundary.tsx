@@ -24,6 +24,10 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
     window.location.reload();
   };
 
+  private retry = () => {
+    window.location.reload();
+  };
+
   render() {
     if (!this.state.hasError) {
       return this.props.children;
@@ -55,13 +59,22 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
               ? "يمكنك استعادة الإعدادات الافتراضية مع الاحتفاظ بالتقدم والجلسات والأذكار المحفوظة."
               : "Restore default preferences while keeping your progress, sessions, and saved azkar."}
           </p>
-          <button
-            type="button"
-            onClick={this.resetPreferences}
-            className="mt-6 min-h-11 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground"
-          >
-            {isArabic ? "استعادة الإعدادات" : "Restore preferences"}
-          </button>
+          <div className="mt-6 grid gap-3">
+            <button
+              type="button"
+              onClick={this.retry}
+              className="min-h-11 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground"
+            >
+              {isArabic ? "إعادة المحاولة" : "Try again"}
+            </button>
+            <button
+              type="button"
+              onClick={this.resetPreferences}
+              className="min-h-11 w-full rounded-xl border border-border px-4 font-semibold text-foreground"
+            >
+              {isArabic ? "استعادة الإعدادات الافتراضية" : "Restore default preferences"}
+            </button>
+          </div>
         </section>
       </main>
     );

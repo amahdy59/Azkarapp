@@ -9,20 +9,7 @@ import {
   createDailyCompletionIndex,
 } from "../gardenViews";
 import { type GardenSummary } from "../progress";
-import { GoldenLeafMark } from "./RoutineGarden";
-import {
-  Zap,
-  ChevronLeft,
-  ChevronRight,
-  Check,
-  CheckCircle2,
-  Calendar,
-  Sun,
-  Moon,
-  Star,
-  Sprout,
-  Sparkles,
-} from "./icons";
+import { Zap, Check, CheckCircle2, Calendar, Sun, Moon, Star, Sprout, Sparkles } from "./icons";
 
 function isAr(language: AppLanguage) {
   return language === "ar";
@@ -42,6 +29,67 @@ function getCategoryName(category: CategoryId | null | undefined, language: AppL
     default:
       return t(language, "progress.otherAzkar");
   }
+}
+
+type DayGroupCardStatus = "completed" | "pending";
+
+function MainDhikrGroupCard({
+  name,
+  icon,
+  status,
+  completedLabel,
+  pendingLabel,
+  onPress,
+}: {
+  name: string;
+  icon: React.ReactNode;
+  status: DayGroupCardStatus;
+  completedLabel: string;
+  pendingLabel: string;
+  onPress?: () => void;
+}) {
+  const isCompleted = status === "completed";
+  const statusLabel = isCompleted ? completedLabel : pendingLabel;
+
+  return (
+    <button
+      type="button"
+      onClick={onPress}
+      className={`group relative flex min-h-[9.5rem] flex-col items-center justify-between rounded-[24px] border px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+        isCompleted
+          ? "border-amber-300/70 bg-gradient-to-b from-amber-500/20 via-black/25 to-black/35 text-white shadow-[0_18px_36px_rgba(0,0,0,0.32)]"
+          : "border-white/10 bg-white/5 text-white shadow-[0_16px_30px_rgba(0,0,0,0.24)] backdrop-blur-xl hover:border-white/15 hover:bg-white/10"
+      }`}
+      aria-label={`${name} - ${statusLabel}`}
+    >
+      <div
+        className={`flex size-14 items-center justify-center rounded-full border transition-colors ${
+          isCompleted
+            ? "border-amber-300/55 bg-amber-500/20 text-amber-300"
+            : "border-white/10 bg-white/10 text-white/80"
+        }`}
+      >
+        {icon}
+      </div>
+
+      <div className="flex w-full flex-col items-center gap-1">
+        <span className="text-[1rem] font-black leading-tight text-inherit">{name}</span>
+        <span
+          className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
+            isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-white/10 text-white/70"
+          }`}
+        >
+          {statusLabel}
+        </span>
+      </div>
+
+      {isCompleted ? (
+        <span className="absolute -end-1.5 bottom-3 flex size-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-400 text-slate-950 shadow-md">
+          <Check size={13} strokeWidth={3} aria-hidden="true" />
+        </span>
+      ) : null}
+    </button>
+  );
 }
 
 const HIJRI_MONTH_NAMES_AR = [
@@ -125,68 +173,50 @@ export function ProgressDayView({
   const categories = visibleCategoryIds
     ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
     : allCategories;
+  const displayCategories = isArabic ? [...categories].reverse() : [...categories];
+  const completedCount = categories.filter((category) => completedToday.includes(category.id)).length;
 
   return (
     // h-full/flex-1 let Home stretch this card to the hero's height. On the
     // Progress screen the parent has no definite height, so both resolve to
     // auto and nothing changes there.
-    <div className="flex h-full flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
-      {/* Main Today's Wird Container Card */}
-      <div className="flex w-full flex-1 flex-col rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
-        {/* Title and subtitle */}
-        <div className="flex flex-col items-center text-center mb-5">
-          <h3 className="text-[1.375rem] md:text-[1.5rem] font-black text-foreground tracking-tight mb-1">
-            {t(language, "progress.todayWird")}
-          </h3>
-          <p className="text-[0.8125rem] sm:text-[0.875rem] font-semibold text-muted-foreground">{dynamicSubtitle}</p>
+    <div className="flex h-full w-full max-w-[44rem] flex-col gap-4 mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
+      <div className="flex w-full flex-1 flex-col rounded-[28px] border border-white/10 bg-black/35 p-4 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-5 md:p-6">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3
+              className="text-[1.25rem] font-black tracking-tight text-white sm:text-[1.375rem] md:text-[1.5rem]"
+              dir="auto"
+            >
+              {t(language, "progress.todayWird")}
+            </h3>
+            <p className="mt-1 text-[0.8125rem] font-semibold text-white/72 sm:text-[0.875rem]" dir="auto">
+              {dynamicSubtitle}
+            </p>
+          </div>
+
+          <div className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[0.8125rem] font-black text-white/85">
+            <span>{formatNumerals(completedCount, language)}</span>
+            <span aria-hidden="true">/</span>
+            <span>{formatNumerals(categories.length, language)}</span>
+          </div>
         </div>
 
-        {/* Categories / Routines List */}
-        <ul className="flex flex-col gap-2.5 w-full mb-4">
-          {categories.map((col) => {
+        <div className="mt-4 grid grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
+          {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
             return (
-              <li key={col.id}>
-                <button
-                  type="button"
-                  onClick={() => onSelectCategory?.(col.id)}
-                  className={`w-full min-h-[52px] flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] cursor-pointer ${
-                    isDone
-                      ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs hover:bg-amber-500/15"
-                      : "bg-muted/40 border-border/40 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
-                  }`}
-                  aria-label={`${col.name} - ${isDone ? t(language, "progress.completed") : t(language, "progress.notCompleted")}`}
-                >
-                  {/* Routine Icon + Name */}
-                  <div className="flex items-center gap-3 min-w-0">
-                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white/60 dark:bg-white/10 shadow-2xs shrink-0">
-                      {col.icon}
-                    </div>
-                    <span className="text-[1rem] font-bold text-foreground truncate">{col.name}</span>
-                  </div>
-
-                  {/* Leaf Indicator + Chevron */}
-                  <div className="flex items-center gap-3 shrink-0">
-                    <GoldenLeafMark size={22} filled={isDone} />
-                    <span className="text-muted-foreground/60">
-                      {isArabic ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}
-                    </span>
-                  </div>
-                </button>
-              </li>
+              <MainDhikrGroupCard
+                key={col.id}
+                name={col.name}
+                icon={<>{col.icon}</>}
+                status={isDone ? "completed" : "pending"}
+                completedLabel={t(language, "progress.completed")}
+                pendingLabel={t(language, "progress.notCompleted")}
+                onPress={() => onSelectCategory?.(col.id)}
+              />
             );
           })}
-        </ul>
-
-        {/* Motivational Quote Pill Banner */}
-        {/* mt-auto so the banner sits at the card's foot when the card is
-            stretched to match the hero, rather than leaving a gap below it. */}
-        <div className="mt-auto w-full rounded-2xl border border-border/40 bg-muted/40 px-4 py-3 flex items-center justify-center text-center shadow-2xs backdrop-blur-md">
-          <p className="text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground">
-            {isArabic
-              ? "« القليل الدائم، خير من الكثير المنقطع »"
-              : "« Consistent small deeds are better than intermittent large ones »"}
-          </p>
         </div>
       </div>
     </div>

@@ -1499,13 +1499,6 @@ a[href]:not(.no-press):active,
   background-image: none !important;
 }
 
-@media (prefers-reduced-transparency: reduce) {
-  #main-content[data-view]:not([data-view="home"]) .app-screen-surface,
-  #main-content[data-view]:not([data-view="home"]) > .bg-background {
-    background-image: none !important;
-  }
-}
-
 /* App Shell Adaptive Grid */
 @media (min-width: 37.5rem) {
   .app-viewport {

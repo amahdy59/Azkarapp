@@ -90,7 +90,9 @@ function ReferenceContent({
             <h2 className="text-[1.125rem] font-extrabold text-foreground leading-snug">
               {t(language, "reader.referencesButton")}
             </h2>
-            <p className="text-[0.75rem] font-medium text-muted-foreground">{t(language, "reader.referenceTitle")}</p>
+            <p id="reader-reference-description" className="text-[0.75rem] font-medium text-muted-foreground">
+              {t(language, "reader.referenceTitle")}
+            </p>
           </div>
         </div>
         <button
@@ -286,6 +288,7 @@ export function ReaderReferenceSheet({
       title={t(language, "reader.referencesButton")}
       direction={direction}
       testId="reference-sheet"
+      describedById="reader-reference-description"
       // `.reference-sheet` carries the sheet height rules in theme.css.
       drawerClassName="reference-sheet"
     >

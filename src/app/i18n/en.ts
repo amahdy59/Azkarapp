@@ -28,6 +28,8 @@ const en = {
     appName: "Azkar App",
     appTagline: "Daily Fortress",
     theme: "Theme",
+    networkError: "Connection problem",
+    networkErrorDescription: "Check your connection and try again. Your local progress is safe.",
   },
   onboarding: {
     chooseLanguage: "Choose Your Language",
@@ -41,7 +43,8 @@ const en = {
     skip: "Skip onboarding",
   },
   syncStatus: {
-    paused: "Account sync paused: {error}",
+    paused: "Account sync is paused. Your local data remains available.",
+    offlineTitle: "You’re offline",
     retry: "Retry",
     syncing: "Syncing account…",
     restoreError: "Could not restore your account data.",
@@ -77,6 +80,7 @@ const en = {
     startGroup: "Start {name}",
     continueGroup: "Continue {name}",
     readGroupAgain: "Read {name} again",
+    continueWird: "Continue your Wird",
     collections: "All collections",
     complete: "complete",
     goodMorning: "Good Morning",
@@ -303,6 +307,8 @@ const en = {
     quota: "Origin quota",
     refresh: "Refresh status",
     unavailable: "Unavailable",
+    downloadError: "Download interrupted",
+    downloadErrorDescription: "Free some space or reconnect, then resume.",
     statusError: "Could not inspect offline storage. Reload the page and try again.",
   },
   about: {
@@ -678,6 +684,10 @@ const en = {
     continueAdditional: "Continue with {count} additional adhkar",
   },
   reader: {
+    audioUnavailable: "Audio unavailable",
+    audioUnavailableDescription: "Continue reading now or try the audio again.",
+    sessionPaused: "Session paused",
+    sessionPausedDescription: "Continue where you stopped or restart this zikr.",
     repeatPrescribed: "Repeat prescribed count",
     readingText: "Zikr reading text",
     tapToCount: "Tap to count",

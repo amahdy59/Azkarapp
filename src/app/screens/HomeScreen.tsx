@@ -239,7 +239,6 @@ export function HomeScreen({
     () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
     [dailyCompletions, now, progressDayStartHour],
   );
-
   const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
 
   const reminderInfo = useMemo(
@@ -283,6 +282,10 @@ export function HomeScreen({
   // arithmetic here and cannot drift from the routine count again.
   const completedCollections = gardenSummary.lifetimeGoldenLeaves;
   const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
+  const nextHomeAction = useMemo(
+    () => getHomeAction(completed, now, locationSettings, routineModes),
+    [completed, now, locationSettings, routineModes],
+  );
   const savedPreview = useMemo(() => {
     const available: HomeSavedItem[] = ALL_AZKAR.filter(
       (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
@@ -341,91 +344,6 @@ export function HomeScreen({
     >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Two-row utility bar: date first, current time/prayer second, with the
-          streak intentionally stacked above the palm status. */}
-      <div className="relative z-30 border-b border-border/40 bg-card/95 px-page py-2">
-        <header
-          data-testid="home-utility-header"
-          className="grid w-full grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-2 gap-y-1.5 sm:gap-x-3"
-          dir={direction}
-        >
-          <div
-            data-testid="hijri-date"
-            className="row-start-1 flex min-w-0 items-center gap-2 text-[0.75rem] font-bold text-foreground sm:text-[0.8125rem]"
-          >
-            <Calendar className="h-[15px] w-[15px] shrink-0 text-muted-foreground" aria-hidden="true" />
-            <time className="truncate" dateTime={now.toISOString()}>
-              {formatDisplayDate(now, language, calendarType)}
-            </time>
-          </div>
-
-          <div
-            data-testid="next-prayer"
-            className="row-start-2 flex min-w-0 items-center gap-2 text-[0.75rem] font-semibold text-muted-foreground sm:text-[0.8125rem]"
-          >
-            <Clock className="h-[15px] w-[15px] shrink-0 text-primary" aria-hidden="true" />
-            <time
-              data-testid="current-time"
-              className="shrink-0 font-extrabold text-foreground"
-              dateTime={now.toISOString()}
-            >
-              {formatDisplayTime(now, language)}
-            </time>
-            <span className="text-border" aria-hidden="true">
-              ·
-            </span>
-            <span className="min-w-0 truncate" dir="auto">
-              {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
-              <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-            </span>
-          </div>
-
-          {/* role="img" (not a bare div): aria-label on a roleless generic
-              container is ignored by most screen readers, so this summary was
-              announced as nothing. It also suppresses the two chips' bare
-              numerals, which carry no meaning read on their own — the label
-              below is the complete text alternative for the pair. */}
-          <div
-            role="img"
-            data-testid="home-header-stats"
-            className="col-start-2 row-span-2 row-start-1 grid min-w-[4.25rem] grid-rows-2 gap-1"
-            aria-label={
-              isArabic
-                ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
-                : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length}, Daily streak: ${streakDays} days`
-            }
-          >
-            <div
-              data-testid="header-streak"
-              className="flex items-center justify-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2 py-1 text-[0.6875rem] font-black text-foreground"
-              title={t(language, "progress.dailyStreak")}
-            >
-              <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
-              <span>{formatNumerals(streakDays, language)}</span>
-              {/* The unit stays visible below sm. Hiding it left the chip
-                  reading as a bare "3", which means nothing on its own — the
-                  icon is decorative and the title attribute never fires on
-                  touch. The 320px overflow assertion in pre-phase-nine.spec.ts
-                  is what keeps this honest if the row ever gets too wide. */}
-              <span>{t(language, "progress.days")}</span>
-            </div>
-            <div
-              data-testid="header-palms"
-              className="flex items-center justify-center gap-1 rounded-full border border-border/60 bg-muted/50 px-2 py-1 text-[0.6875rem] font-black text-foreground"
-              title={t(language, "progress.palmsTitle")}
-            >
-              <PalmTreeMark
-                size={14}
-                filled={gardenSummary.lifetimePalms > 0}
-                className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
-              />
-              <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-              <span>{t(language, "progress.palmsUnit")}</span>
-            </div>
-          </div>
-        </header>
-      </div>
-
       {/* Scrollable Content Area */}
       {/* A scroll region, not a landmark: App.tsx owns the single #main-content. */}
       <div
@@ -439,17 +357,96 @@ export function HomeScreen({
               washed across the whole screen, so the page keeps its own surface. */}
           {/* Capped and centred: unbounded, the hero stretched the full width of
               an ultrawide display and the scene image lost all composition. */}
-          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden sm:rounded-3xl sm:shadow-raised -mx-4 sm:mx-auto -mt-4 sm:mt-0">
+          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden sm:rounded-[36px] sm:shadow-raised -mx-4 sm:mx-auto -mt-4 sm:mt-0">
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
+            <div
+              aria-hidden="true"
+              className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,11,18,0.14)_0%,rgba(7,11,18,0.34)_18%,rgba(7,11,18,0.62)_60%,rgba(7,11,18,0.9)_100%)]"
+            />
+            <div className="absolute inset-x-0 top-0 z-20 px-5 pt-[max(0.9rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8">
+              <header
+                data-testid="home-utility-header"
+                className="grid w-full grid-cols-[minmax(0,1fr)_auto] grid-rows-2 items-center gap-x-2 gap-y-1.5 sm:gap-x-3"
+                dir={direction}
+              >
+                <div
+                  data-testid="hijri-date"
+                  className="row-start-1 min-w-0 text-[0.8125rem] font-bold text-[#e6be76] sm:text-[0.9375rem]"
+                >
+                  <time className="block truncate" dateTime={now.toISOString()}>
+                    {formatDisplayDate(now, language, calendarType)}
+                  </time>
+                </div>
+
+                <div
+                  data-testid="next-prayer"
+                  className="row-start-2 flex min-w-0 items-center gap-2 text-[0.75rem] font-semibold text-white/82 sm:text-[0.8125rem]"
+                >
+                  <Clock className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" aria-hidden="true" />
+                  <time
+                    data-testid="current-time"
+                    className="shrink-0 font-extrabold text-white"
+                    dateTime={now.toISOString()}
+                  >
+                    {formatDisplayTime(now, language)}
+                  </time>
+                  <span className="text-white/45" aria-hidden="true">
+                    ·
+                  </span>
+                  <span className="min-w-0 truncate" dir="auto">
+                    {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
+                    <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
+                  </span>
+                </div>
+
+                {/* role="img" keeps the two-chip summary discoverable as one
+                    meaningful announcement instead of isolated numerals. */}
+                <div
+                  role="img"
+                  data-testid="home-header-stats"
+                  className="col-start-2 row-span-2 row-start-1 grid min-w-[4.25rem] grid-rows-2 gap-1"
+                  aria-label={
+                    isArabic
+                      ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
+                      : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length}, Daily streak: ${streakDays} days`
+                  }
+                >
+                  <div
+                    data-testid="header-streak"
+                    className="flex items-center justify-center gap-1 rounded-full border border-[#e6be76]/25 bg-black/18 px-2 py-1 text-[0.6875rem] font-black text-[#e6be76] backdrop-blur-md"
+                    title={t(language, "progress.dailyStreak")}
+                  >
+                    <Zap className="h-[13px] w-[13px] text-[#e6be76]" strokeWidth={2.5} aria-hidden="true" />
+                    <span>{formatNumerals(streakDays, language)}</span>
+                    <span>{t(language, "progress.days")}</span>
+                  </div>
+                  <div
+                    data-testid="header-palms"
+                    className="flex items-center justify-center gap-1 rounded-full border border-[#e6be76]/25 bg-black/18 px-2 py-1 text-[0.6875rem] font-black text-[#e6be76] backdrop-blur-md"
+                    title={t(language, "progress.palmsTitle")}
+                  >
+                    <PalmTreeMark
+                      size={14}
+                      filled={gardenSummary.lifetimePalms > 0}
+                      className={gardenSummary.lifetimePalms > 0 ? "text-[#e6be76]" : "text-[#e6be76]/70"}
+                    />
+                    <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
+                    <span>{t(language, "progress.palmsUnit")}</span>
+                  </div>
+                </div>
+              </header>
+            </div>
+
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
-            <div className="relative z-10 flex flex-col items-stretch gap-4 px-0 pb-4 pt-0 sm:p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5">
+            <div className="relative z-10 flex flex-col items-stretch gap-4 px-0 pb-4 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
               {isComplete ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
                     categoryId={reminderInfo.categoryId}
                     language={language}
                     direction={direction}
+                    onContinue={() => onResume(nextHomeAction.categoryId)}
                     onReview={onRepeat}
                   />
                 </div>

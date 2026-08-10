@@ -40,7 +40,7 @@ const mockCompletions: DailyCollectionCompletion[] = [
 ];
 
 describe("ProgressViews components", () => {
-  it("renders ProgressDayView with routine list and stats in Arabic", () => {
+  it("renders ProgressDayView with a responsive routine card grid in Arabic", () => {
     render(
       <ProgressDayView summary={mockSummary} language="ar" dynamicSubtitle="أكملت 1 من أصل 3 أوراد رئيسية اليوم" />,
     );
@@ -49,6 +49,7 @@ describe("ProgressViews components", () => {
     expect(screen.getByText("أذكار الصباح")).toBeInTheDocument();
     expect(screen.getByText("أذكار المساء")).toBeInTheDocument();
     expect(screen.getByText("أذكار النوم")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "أذكار الصباح - مكتملة" })).toBeInTheDocument();
   });
 
   it("renders ProgressWeekView with commitment matrix in Arabic", () => {

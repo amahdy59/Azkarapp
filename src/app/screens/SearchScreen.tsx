@@ -216,6 +216,7 @@ export function SearchScreen({
             {results.length === 0 ? (
               <StatePanel
                 kind="empty-search"
+                language={language}
                 title={t(language, "search.emptyTitle")}
                 description={t(language, "search.emptyDescription")}
                 actionLabel={t(language, "search.emptyAction")}

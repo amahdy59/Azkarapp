@@ -232,6 +232,7 @@ export function AzkarLibraryScreen({
                 <div className="mt-8">
                   <StatePanel
                     kind="empty-search"
+                    language={language}
                     title={t(language, "library.noCollectionMatch", { query: deferredQuery })}
                     description={t(language, "library.searchHint")}
                     actionLabel={t(language, "library.searchAllAzkar", { query: deferredQuery })}
@@ -324,6 +325,7 @@ export function AzkarLibraryScreen({
             <div className="mt-8">
               <StatePanel
                 kind="empty-saved"
+                language={language}
                 title={t(language, "library.savedEmptyTitle")}
                 description={t(language, "library.savedEmptyBody")}
                 actionLabel={t(language, "library.browseCollections")}

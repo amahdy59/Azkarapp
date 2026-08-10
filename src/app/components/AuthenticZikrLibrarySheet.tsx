@@ -61,6 +61,7 @@ export function AuthenticZikrLibrarySheet({
       onClose={onClose}
       title={t(language, "library.authenticTitle")}
       direction={direction}
+      describedById="authentic-sheet-description"
       maxWidthClassName="max-w-[var(--content-form)]"
     >
       <>
@@ -81,7 +82,7 @@ export function AuthenticZikrLibrarySheet({
               <h2 id="authentic-sheet-title" className="text-[1.0625rem] font-extrabold text-foreground leading-snug">
                 {t(language, "library.authenticTitle")}
               </h2>
-              <p className="text-[0.75rem] font-medium text-muted-foreground">
+              <p id="authentic-sheet-description" className="text-[0.75rem] font-medium text-muted-foreground">
                 {t(language, "library.authenticSubtitle")}
               </p>
             </div>
