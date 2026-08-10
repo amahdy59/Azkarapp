@@ -29,19 +29,18 @@ function isAr(language: AppLanguage) {
 }
 
 function getCategoryName(category: CategoryId | null | undefined, language: AppLanguage) {
-  const isArabic = isAr(language);
-  if (!category) return isArabic ? "لا يوجد" : "None";
+  if (!category) return t(language, "progress.none");
   switch (category) {
     case "morning":
-      return isArabic ? "أذكار الصباح" : "Morning Azkar";
+      return t(language, "progress.morningAzkar");
     case "evening":
-      return isArabic ? "أذكار المساء" : "Evening Azkar";
+      return t(language, "progress.eveningAzkar");
     case "before_sleep":
-      return isArabic ? "أذكار النوم" : "Sleep Azkar";
+      return t(language, "progress.sleepAzkar");
     case "after_prayer":
-      return isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer Azkar";
+      return t(language, "progress.postPrayerAzkar");
     default:
-      return isArabic ? "أذكار أخرى" : "Other Azkar";
+      return t(language, "progress.otherAzkar");
   }
 }
 
@@ -103,22 +102,22 @@ export function ProgressDayView({
   const allCategories = [
     {
       id: "morning" as const,
-      name: isArabic ? "أذكار الصباح" : "Morning Azkar",
+      name: t(language, "progress.morningAzkar"),
       icon: <Sun size={20} className="text-amber-500" />,
     },
     {
       id: "evening" as const,
-      name: isArabic ? "أذكار المساء" : "Evening Azkar",
+      name: t(language, "progress.eveningAzkar"),
       icon: <Sun size={20} className="text-orange-500" />,
     },
     {
       id: "before_sleep" as const,
-      name: isArabic ? "أذكار النوم" : "Sleep Azkar",
+      name: t(language, "progress.sleepAzkar"),
       icon: <Moon size={20} className="text-indigo-400" />,
     },
     {
       id: "after_prayer" as const,
-      name: isArabic ? "أذكار ما بعد الصلاة" : "After Prayer Azkar",
+      name: t(language, "progress.postPrayerAzkar"),
       icon: <Sparkles size={20} className="text-emerald-500" />,
     },
   ];
@@ -137,7 +136,7 @@ export function ProgressDayView({
         {/* Title and subtitle */}
         <div className="flex flex-col items-center text-center mb-5">
           <h3 className="text-[1.375rem] md:text-[1.5rem] font-black text-foreground tracking-tight mb-1">
-            {isArabic ? "وردك اليوم" : "Today's Wird"}
+            {t(language, "progress.todayWird")}
           </h3>
           <p className="text-[0.8125rem] sm:text-[0.875rem] font-semibold text-muted-foreground">{dynamicSubtitle}</p>
         </div>
@@ -156,7 +155,7 @@ export function ProgressDayView({
                       ? "bg-amber-500/10 border-amber-500/30 text-foreground shadow-2xs hover:bg-amber-500/15"
                       : "bg-muted/40 border-border/40 text-foreground hover:bg-white/60 dark:hover:bg-white/10"
                   }`}
-                  aria-label={`${col.name} - ${isDone ? (isArabic ? "مكتملة" : "Completed") : isArabic ? "غير مكتملة" : "Not completed"}`}
+                  aria-label={`${col.name} - ${isDone ? t(language, "progress.completed") : t(language, "progress.notCompleted")}`}
                 >
                   {/* Routine Icon + Name */}
                   <div className="flex items-center gap-3 min-w-0">
@@ -204,8 +203,8 @@ export function ProgressDayView({
  * with no text and no label, so every cell in the week grid was announced as
  * empty and the whole view conveyed nothing to a screen reader.
  */
-function WeekStatusCell({ done, label, isArabic }: { done: boolean; label: string; isArabic: boolean }) {
-  const status = done ? (isArabic ? "مكتملة" : "Completed") : isArabic ? "غير مكتملة" : "Not completed";
+function WeekStatusCell({ done, label, language }: { done: boolean; label: string; language: AppLanguage }) {
+  const status = done ? t(language, "progress.completed") : t(language, "progress.notCompleted");
   return (
     <td className="py-3 px-2">
       <div className="flex justify-center">
@@ -252,7 +251,7 @@ export function ProgressWeekView({
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Moon size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أكثر ورد فاتك" : "Most missed"}
+            {t(language, "progress.mostMissed")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground truncate max-w-full">{mostMissedName}</span>
         </div>
@@ -261,10 +260,10 @@ export function ProgressWeekView({
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أفضل سلسلة" : "Best streak"}
+            {t(language, "progress.bestStreak")}
           </span>
           <span className="text-[0.9375rem] font-black text-foreground">
-            {formatNumerals(weekStats.bestStreakDays, language)} {isArabic ? "أيام" : "days"}
+            {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}
           </span>
         </div>
 
@@ -272,10 +271,10 @@ export function ProgressWeekView({
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <CheckCircle2 size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أيام مكتملة" : "Completed days"}
+            {t(language, "progress.completedDays")}
           </span>
           <span className="text-[0.9375rem] font-black text-foreground">
-            {formatNumerals(weekStats.completedDaysCount, language)} {isArabic ? "من 7" : "of 7"}
+            {formatNumerals(weekStats.completedDaysCount, language)} {t(language, "progress.ofSeven")}
           </span>
         </div>
       </div>
@@ -283,7 +282,7 @@ export function ProgressWeekView({
       {/* Main Weekly Commitment Matrix Card */}
       <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
         <h3 className="text-[1.125rem] md:text-[1.25rem] font-black text-foreground mb-4 text-start">
-          {isArabic ? "التزامك هذا الأسبوع" : "Your commitment this week"}
+          {t(language, "progress.weekCommitment")}
         </h3>
 
         {/* Grid Table */}
@@ -294,31 +293,31 @@ export function ProgressWeekView({
                 <th scope="col" className="py-2.5 px-2 text-start text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar size={15} />
-                    <span>{isArabic ? "اليوم" : "Day"}</span>
+                    <span>{t(language, "progress.day")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sun size={15} className="text-emerald-500" />
-                    <span>{isArabic ? "أذكار الصباح" : "Morning"}</span>
+                    <span>{t(language, "progress.morningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sun size={15} className="text-amber-500" />
-                    <span>{isArabic ? "أذكار المساء" : "Evening"}</span>
+                    <span>{t(language, "progress.eveningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Moon size={15} className="text-indigo-400" />
-                    <span>{isArabic ? "أذكار النوم" : "Sleep"}</span>
+                    <span>{t(language, "progress.sleepShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <CheckCircle2 size={15} className="text-emerald-500" />
-                    <span>{isArabic ? "بعد الصلاة" : "Post-Prayer"}</span>
+                    <span>{t(language, "progress.postPrayerShort")}</span>
                   </div>
                 </th>
               </tr>
@@ -338,26 +337,26 @@ export function ProgressWeekView({
 
                   <WeekStatusCell
                     done={day.morningStatus === "complete"}
-                    label={isArabic ? "أذكار الصباح" : "Morning"}
-                    isArabic={isArabic}
+                    label={t(language, "progress.morningShort")}
+                    language={language}
                   />
 
                   <WeekStatusCell
                     done={day.eveningStatus === "complete"}
-                    label={isArabic ? "أذكار المساء" : "Evening"}
-                    isArabic={isArabic}
+                    label={t(language, "progress.eveningShort")}
+                    language={language}
                   />
 
                   <WeekStatusCell
                     done={day.sleepStatus === "complete"}
-                    label={isArabic ? "أذكار النوم" : "Sleep"}
-                    isArabic={isArabic}
+                    label={t(language, "progress.sleepShort")}
+                    language={language}
                   />
 
                   <WeekStatusCell
                     done={day.afterPrayerStatus === "complete"}
-                    label={isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer"}
-                    isArabic={isArabic}
+                    label={t(language, "progress.postPrayerShort")}
+                    language={language}
                   />
                 </tr>
               ))}
@@ -371,17 +370,17 @@ export function ProgressWeekView({
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500 text-emerald-600 dark:text-emerald-400">
               <Check size={12} strokeWidth={3} />
             </div>
-            <span>{isArabic ? "مكتمل" : "Complete"}</span>
+            <span>{t(language, "progress.complete")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/20 border border-blue-500 text-blue-500">
               <span className="text-[0.625rem] font-black">-</span>
             </div>
-            <span>{isArabic ? "جزئي" : "Partial"}</span>
+            <span>{t(language, "progress.partial")}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <div className="w-4 h-4 rounded-full border-2 border-amber-500" />
-            <span>{isArabic ? "فاتك" : "Missed"}</span>
+            <span>{t(language, "progress.missed")}</span>
           </div>
         </div>
       </div>
@@ -411,14 +410,12 @@ export function ProgressWeekView({
 
         {/* Routine Summary Progress Bars Card */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-center gap-3">
-          <h4 className="text-[0.875rem] font-black text-foreground mb-1">
-            {isArabic ? "ملخص الأوراد هذا الأسبوع" : "Weekly routines summary"}
-          </h4>
+          <h4 className="text-[0.875rem] font-black text-foreground mb-1">{t(language, "progress.weeklySummary")}</h4>
 
           {/* Morning Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.morningCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.morningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
@@ -427,7 +424,7 @@ export function ProgressWeekView({
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{isArabic ? "أذكار الصباح" : "Morning"}</span>
+              <span>{t(language, "progress.morningShort")}</span>
               <Sun size={14} className="text-emerald-500" />
             </div>
           </div>
@@ -435,7 +432,7 @@ export function ProgressWeekView({
           {/* Evening Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.eveningCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.eveningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
@@ -444,7 +441,7 @@ export function ProgressWeekView({
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{isArabic ? "أذكار المساء" : "Evening"}</span>
+              <span>{t(language, "progress.eveningShort")}</span>
               <Sun size={14} className="text-amber-500" />
             </div>
           </div>
@@ -452,7 +449,7 @@ export function ProgressWeekView({
           {/* Sleep Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.sleepCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.sleepCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
@@ -461,7 +458,7 @@ export function ProgressWeekView({
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{isArabic ? "أذكار النوم" : "Sleep"}</span>
+              <span>{t(language, "progress.sleepShort")}</span>
               <Moon size={14} className="text-indigo-400" />
             </div>
           </div>
@@ -469,7 +466,7 @@ export function ProgressWeekView({
           {/* Post-Prayer Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.afterPrayerCompletedCount, language)} {isArabic ? "من 7" : "of 7"}
+              {formatNumerals(weekStats.afterPrayerCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
@@ -478,7 +475,7 @@ export function ProgressWeekView({
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{isArabic ? "بعد الصلاة" : "Post-Prayer"}</span>
+              <span>{t(language, "progress.postPrayerShort")}</span>
               <CheckCircle2 size={14} className="text-emerald-500" />
             </div>
           </div>
@@ -533,7 +530,7 @@ export function ProgressMonthView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sun size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أفضل ورد" : "Best routine"}
+            {t(language, "progress.bestRoutine")}
           </span>
           <span className="text-[0.8125rem] font-black text-foreground truncate max-w-full">
             {getCategoryName(monthStats.bestRoutine, language)}
@@ -544,10 +541,10 @@ export function ProgressMonthView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أطول سلسلة" : "Longest streak"}
+            {t(language, "progress.longestStreak")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(monthStats.longestStreak, language)} {isArabic ? "أيام" : "days"}
+            {formatNumerals(monthStats.longestStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
 
@@ -555,7 +552,7 @@ export function ProgressMonthView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Calendar size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أيام كاملة" : "Full days"}
+            {t(language, "progress.fullDays")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
             {formatNumerals(monthStats.fullDaysCount, language)}
@@ -566,7 +563,7 @@ export function ProgressMonthView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sprout size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "معدل الاكتمال" : "Completion rate"}
+            {t(language, "progress.completionRate")}
           </span>
           <span className="text-[0.875rem] font-black text-amber-600 dark:text-amber-400">
             %{formatNumerals(monthStats.completionRate, language)}
@@ -645,18 +642,18 @@ export function ProgressMonthView({
           <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-[0.6875rem] font-bold text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1">
               <Check size={12} strokeWidth={3} className="text-emerald-500" />
-              <span>{isArabic ? "مكتمل" : "Complete"}</span>
+              <span>{t(language, "progress.complete")}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full bg-blue-500" />
-              <span>{isArabic ? "جزئي (1–3 من 4)" : "Partial (1–3 of 4)"}</span>
+              <span>{t(language, "progress.partialRange")}</span>
             </div>
             <div className="flex items-center gap-1">
               <div className="w-2 h-2 rounded-full border border-amber-500" />
-              <span>{isArabic ? "لم يبدأ" : "Unstarted"}</span>
+              <span>{t(language, "progress.unstarted")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <span>- {isArabic ? "لا يوجد" : "No data"}</span>
+              <span>- {t(language, "progress.noData")}</span>
             </div>
           </div>
         </div>
@@ -683,14 +680,14 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-amber-500" />
-                <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار الصباح" : "Morning Azkar"}</span>
+                <span className="text-[0.8125rem] font-bold">{t(language, "progress.morningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("morning") ? (
                 <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {isArabic ? "مكتملة" : "Done"}
+                  {t(language, "progress.done")}
                 </span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
+                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -698,14 +695,14 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-orange-500" />
-                <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار المساء" : "Evening Azkar"}</span>
+                <span className="text-[0.8125rem] font-bold">{t(language, "progress.eveningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("evening") ? (
                 <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {isArabic ? "مكتملة" : "Done"}
+                  {t(language, "progress.done")}
                 </span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
+                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -713,14 +710,14 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <Moon size={16} className="text-indigo-400" />
-                <span className="text-[0.8125rem] font-bold">{isArabic ? "أذكار النوم" : "Sleep Azkar"}</span>
+                <span className="text-[0.8125rem] font-bold">{t(language, "progress.sleepAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("before_sleep") ? (
                 <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {isArabic ? "مكتملة" : "Done"}
+                  {t(language, "progress.done")}
                 </span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
+                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -728,16 +725,14 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-emerald-500" />
-                <span className="text-[0.8125rem] font-bold">
-                  {isArabic ? "أذكار ما بعد الصلاة" : "Post-Prayer Azkar"}
-                </span>
+                <span className="text-[0.8125rem] font-bold">{t(language, "progress.postPrayerAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("after_prayer") ? (
                 <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {isArabic ? "مكتملة" : "Done"}
+                  {t(language, "progress.done")}
                 </span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{isArabic ? "لم تبدأ" : "Not done"}</span>
+                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
               )}
             </div>
           </div>
@@ -791,7 +786,7 @@ export function ProgressYearView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sprout size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "معدل الاكتمال" : "Completion rate"}
+            {t(language, "progress.completionRate")}
           </span>
           <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
             %{formatNumerals(yearStats.overallCompletionRate, language)}
@@ -802,10 +797,10 @@ export function ProgressYearView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Star size={20} className="text-amber-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أطول سلسلة" : "Longest streak"}
+            {t(language, "progress.longestStreak")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.longestStreak, language)} {isArabic ? "يوماً" : "days"}
+            {formatNumerals(yearStats.longestStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
 
@@ -813,10 +808,10 @@ export function ProgressYearView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "السلسلة الحالية" : "Current streak"}
+            {t(language, "progress.currentStreak")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.currentStreak, language)} {isArabic ? "يوماً" : "days"}
+            {formatNumerals(yearStats.currentStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
 
@@ -824,10 +819,10 @@ export function ProgressYearView({
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Calendar size={20} className="text-emerald-500 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {isArabic ? "أيام نشطة" : "Active days"}
+            {t(language, "progress.activeDays")}
           </span>
           <span className="text-[0.875rem] font-black text-foreground">
-            {formatNumerals(yearStats.activeDays, language)} {isArabic ? "يوماً نشطاً" : "active"}
+            {formatNumerals(yearStats.activeDays, language)} {t(language, "progress.activeSuffix")}
           </span>
         </div>
       </div>
@@ -838,7 +833,7 @@ export function ProgressYearView({
         <div className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col">
           <div className="flex items-center justify-between mb-1">
             <h4 className="text-[0.9375rem] font-black text-foreground">
-              {isArabic ? "معدل الاكتمال الشهري" : "Monthly completion rate"}
+              {t(language, "progress.monthlyCompletionRate")}
             </h4>
           </div>
           <p className="text-[0.75rem] font-semibold text-muted-foreground mb-4">
@@ -882,14 +877,14 @@ export function ProgressYearView({
         {/* Quick Glance Card (1 Column on desktop) */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-between gap-3">
           <h4 className="text-[0.9375rem] font-black text-foreground border-b border-white/20 dark:border-white/10 pb-2">
-            {isArabic ? "نظرة سريعة" : "Quick glance"}
+            {t(language, "progress.quickGlance")}
           </h4>
 
           {/* Best Month */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "أفضل شهر" : "Best month"}
+                {t(language, "progress.bestMonth")}
               </span>
               <span className="text-[0.875rem] font-black text-foreground">{bestMonthName}</span>
             </div>
@@ -900,7 +895,7 @@ export function ProgressYearView({
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "أكثر ورد منتظم" : "Most consistent"}
+                {t(language, "progress.mostConsistent")}
               </span>
               <span className="text-[0.875rem] font-black text-foreground">
                 {getCategoryName(yearStats.mostConsistentRoutine, language)}
@@ -913,7 +908,7 @@ export function ProgressYearView({
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
-                {isArabic ? "إجمالي الأذكار المكتملة" : "Total completed"}
+                {t(language, "progress.totalCompleted")}
               </span>
               <span className="text-[0.875rem] font-black text-foreground">
                 {formatNumerals(yearStats.totalCollections, language)}
