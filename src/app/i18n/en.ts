@@ -30,6 +30,9 @@ const en = {
     theme: "Theme",
   },
   onboarding: {
+    chooseLanguage: "Choose Your Language",
+    changeLater: "You can change this later in Settings",
+    availableLanguages: "Available Languages",
     title: "Your Daily Companion for Dhikr",
     feature1: "Morning, evening & sleep sessions",
     feature2: "Tap-to-count with haptic feedback",
@@ -195,6 +198,12 @@ const en = {
     progressComplete: "Friday practices complete — may Allah accept your worship.",
   },
   library: {
+    authenticTitle: "Authentic Verified Zikr Library",
+    authenticSubtitle: "Authentic Sunnah & Sahabah Supplications",
+    authenticSearch: "Search dhikr or source...",
+    all: "All",
+    noMatchingDhikr: "No matching dhikr found",
+    times: "times",
     occasionalSupplications: "Occasional supplications",
     supplications: "supplications",
     groups: {
@@ -276,6 +285,10 @@ const en = {
     activeNotice: "This browser will show reminders while Azkar is open.",
   },
   downloads: {
+    downloadedAudio: "Downloaded audio",
+    optionalAudioDownloads: "Optional audio downloads",
+    cancelDownload: "Cancel download",
+    removeDownloadedAudio: "Remove downloaded audio",
     title: "Offline access",
     bundledTitle: "Core content is included",
     bundledBody:
@@ -665,6 +678,8 @@ const en = {
     continueAdditional: "Continue with {count} additional adhkar",
   },
   reader: {
+    repeatPrescribed: "Repeat prescribed count",
+    readingText: "Zikr reading text",
     tapToCount: "Tap to count",
     ayahs: "Ayahs",
     wordMeaningsTitle: "Quranic Word Meanings & Exegesis",
@@ -821,6 +836,10 @@ const en = {
     totalCompleted: "Total completed",
   },
   counter: {
+    targetOpen: "Open",
+    targetLabel: "Target:",
+    setCustomTarget: "Set Custom Target",
+    applyTarget: "Apply Target",
     selectedDhikr: "Selected Dhikr",
     count: "Count",
     reset: "Reset",
@@ -836,6 +855,8 @@ const en = {
     done: "Done",
   },
   auth: {
+    completingSignIn: "Completing sign-in",
+    restoringAccount: "Restoring your account and data securely…",
     welcome: "Welcome to Azkar",
     syncSubtitle: "Sign in to securely sync your progress, favorites, and preferences across devices.",
     continueAsGuest: "Continue as Guest",
@@ -852,6 +873,9 @@ const en = {
     skip: "Skip",
   },
   settings: {
+    lastSuccessfulSync: "Last successful sync",
+    deleteAccountShort: "Delete account",
+    exportAndDelete: "Export and delete account",
     preferences: "Preferences",
     language: "Language",
     displayTheme: "Appearance",

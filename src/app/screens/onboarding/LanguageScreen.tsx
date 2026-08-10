@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Check } from "../../components/icons";
+import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage } from "../../types";
 
@@ -14,6 +15,9 @@ export function LanguageScreen({
   const [selected, setSelected] = useState<AppLanguage>(initialLanguage);
   // Keep the overall page direction based on the current selection
   const isArabic = selected === "ar";
+  // Onboarding copy follows the language being previewed, not a stored
+  // preference — there is no saved language yet at this point in the flow.
+  const language = selected;
 
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
@@ -28,10 +32,10 @@ export function LanguageScreen({
         </div>
         <p className="text-[0.9375rem] font-semibold text-foreground font-sans">Azkar</p>
         <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px] text-center">
-          {isArabic ? "اختر لغتك" : "Choose Your Language"}
+          {t(language, "onboarding.chooseLanguage")}
         </h1>
         <p className="text-[0.75rem] text-muted-foreground font-sans leading-[16px]">
-          {isArabic ? "يمكنك تغييرها لاحقًا من الإعدادات" : "You can change this later in Settings"}
+          {t(language, "onboarding.changeLater")}
         </p>
       </div>
 
@@ -40,7 +44,7 @@ export function LanguageScreen({
         value={selected}
         onValueChange={(next) => setSelected(next as AppLanguage)}
         className="flex-1 overflow-y-auto px-6 flex flex-col gap-3 pb-4"
-        aria-label={isArabic ? "اللغات المتاحة" : "Available Languages"}
+        aria-label={t(language, "onboarding.availableLanguages")}
       >
         {LANGUAGES_LIST.map((lang) => {
           const active = selected === lang.code;
@@ -81,7 +85,7 @@ export function LanguageScreen({
           onClick={() => onContinue(selected)}
           className="w-full flex items-center justify-center rounded-2xl transition-all active:scale-95 h-[56px] bg-primary text-[1.0625rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          {isArabic ? "متابعة" : "Continue"}
+          {t(language, "common.continue")}
         </button>
       </div>
     </div>

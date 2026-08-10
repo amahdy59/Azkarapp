@@ -310,12 +310,9 @@ export function AuthCallbackScreen({
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-6 text-center">
       <BrandLockup compact />
-      <h1 className="text-xl font-bold text-foreground">
-        {language === "ar" ? "جارٍ إكمال تسجيل الدخول" : "Completing sign-in"}
-      </h1>
+      <h1 className="text-xl font-bold text-foreground">{t(language, "auth.completingSignIn")}</h1>
       <p className={errorMessage ? "text-sm text-destructive" : "text-sm text-muted-foreground"} role="status">
-        {errorMessage ||
-          (language === "ar" ? "نستعيد حسابك وبياناتك بأمان…" : "Restoring your account and data securely…")}
+        {errorMessage || t(language, "auth.restoringAccount")}
       </p>
     </div>
   );

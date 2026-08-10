@@ -29,6 +29,14 @@ export class AppErrorBoundary extends React.Component<React.PropsWithChildren, E
       return this.props.children;
     }
 
+    // These strings stay inline on purpose — do not move them into the i18n
+    // bundle with the rest of the app's copy. This screen renders only after
+    // the app has already crashed, so importing `t` would pull ar.ts and en.ts
+    // into the crash-recovery path and a failure inside them would break the
+    // very screen meant to recover from failures. Same reasoning as DEC-024,
+    // which keeps this component off the shared Button primitive.
+    // The language is read from the document rather than app state for the same
+    // reason: app state is what may have failed to load.
     const isArabic = typeof document !== "undefined" && document.documentElement.lang === "ar";
     const direction = typeof document !== "undefined" && document.documentElement.dir === "rtl" ? "rtl" : "ltr";
     return (

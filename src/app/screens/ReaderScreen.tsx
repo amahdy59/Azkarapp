@@ -735,7 +735,7 @@ export function ReaderScreen({
           className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
         >
           <RotateCcw size={18} />
-          {language === "ar" ? "تكرار العدد المحدد" : "Repeat prescribed count"}
+          {t(language, "reader.repeatPrescribed")}
         </DropdownMenuItem>
       )}
 
@@ -957,7 +957,7 @@ export function ReaderScreen({
                 ref={readingScrollRef}
                 role="region"
                 tabIndex={0}
-                aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+                aria-label={t(language, "reader.readingText")}
                 className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
@@ -1074,7 +1074,7 @@ export function ReaderScreen({
               ref={readingScrollRef}
               role="region"
               tabIndex={0}
-              aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
+              aria-label={t(language, "reader.readingText")}
               className={`flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
                 justCompleted ? "zikr-step-exit" : "zikr-step-enter"
               }`}

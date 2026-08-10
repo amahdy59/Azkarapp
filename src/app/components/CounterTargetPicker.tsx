@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { formatNumerals } from "../formatting";
+import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { SlidersHorizontal } from "./icons";
 import { Modal } from "./ResponsiveSheet";
@@ -26,7 +27,7 @@ export function CounterTargetPicker({
     { value: 33, label: formatNumerals(33, language) },
     { value: 100, label: formatNumerals(100, language) },
     { value: 1000, label: formatNumerals(1000, language) },
-    { value: 0, label: isArabic ? "مفتوح" : "Open" },
+    { value: 0, label: t(language, "counter.targetOpen") },
   ];
 
   const handleCustomSubmit = (e: React.FormEvent) => {
@@ -42,7 +43,7 @@ export function CounterTargetPicker({
       {/* Preset Pill Buttons Row */}
       <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
         <span className="shrink-0 text-[0.75rem] font-bold text-muted-foreground">
-          {isArabic ? "الهدف:" : "Target:"}
+          {t(language, "counter.targetLabel")}
         </span>
         {presets.map((preset) => {
           const isSelected = activeTarget === preset.value;
@@ -88,15 +89,13 @@ export function CounterTargetPicker({
         <Modal
           open
           onClose={() => setShowCustomModal(false)}
-          title={isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
+          title={t(language, "counter.setCustomTarget")}
           direction={isArabic ? "rtl" : "ltr"}
           maxWidthClassName="max-w-sm"
           className="p-6"
         >
           <div>
-            <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">
-              {isArabic ? "تحديد هدف مخصص" : "Set Custom Target"}
-            </h3>
+            <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">{t(language, "counter.setCustomTarget")}</h3>
             <p className="mb-4 text-[0.8125rem] text-muted-foreground">
               {isArabic
                 ? "أدخل العدد المستهدف الذي تريد الوصول إليه (مثلاً 50، 500، 70):"
@@ -134,13 +133,13 @@ export function CounterTargetPicker({
                   onClick={() => setShowCustomModal(false)}
                   className="h-11 flex-1 rounded-xl border border-border bg-background text-[0.875rem] font-bold text-foreground hover:bg-muted"
                 >
-                  {isArabic ? "إلغاء" : "Cancel"}
+                  {t(language, "common.cancel")}
                 </button>
                 <button
                   type="submit"
                   className="h-11 flex-1 rounded-xl bg-primary text-[0.875rem] font-bold text-primary-foreground hover:bg-primary/90"
                 >
-                  {isArabic ? "تطبيق الهدف" : "Apply Target"}
+                  {t(language, "counter.applyTarget")}
                 </button>
               </div>
             </form>

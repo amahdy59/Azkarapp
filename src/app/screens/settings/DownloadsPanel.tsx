@@ -151,9 +151,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                     <dd className="font-medium text-foreground">{formatMegabytes(status.quotaBytes, language)}</dd>
                   </div>
                   <div className="flex justify-between gap-3">
-                    <dt className="text-muted-foreground">
-                      {language === "ar" ? "الصوت المحمّل" : "Downloaded audio"}
-                    </dt>
+                    <dt className="text-muted-foreground">{t(language, "downloads.downloadedAudio")}</dt>
                     <dd className="font-medium text-foreground">
                       {status.downloadedAudioAssets} · {formatMegabytes(status.downloadedAudioBytes, language)}
                     </dd>
@@ -183,7 +181,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
         <Card as="section" padding="lg" aria-labelledby="audio-downloads-title">
           <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">
-            {language === "ar" ? "تنزيلات الصوت الاختيارية" : "Optional audio downloads"}
+            {t(language, "downloads.optionalAudioDownloads")}
           </h2>
           <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
             {language === "ar"
@@ -243,7 +241,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 className="mt-2 w-full border-border"
               >
                 <X size={18} aria-hidden="true" />
-                {language === "ar" ? "إلغاء التنزيل" : "Cancel download"}
+                {t(language, "downloads.cancelDownload")}
               </Button>
             </div>
           )}
@@ -255,7 +253,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             onClick={() => void removeDownloadedAudio().then(refreshStatus)}
             className="mt-3 w-full border-destructive/40 text-destructive"
           >
-            {language === "ar" ? "حذف الصوت المحمّل" : "Remove downloaded audio"}
+            {t(language, "downloads.removeDownloadedAudio")}
           </Button>
         </Card>
       </div>

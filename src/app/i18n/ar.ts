@@ -30,6 +30,9 @@ const ar = {
     theme: "المظهر",
   },
   onboarding: {
+    chooseLanguage: "اختر لغتك",
+    changeLater: "يمكنك تغييرها لاحقًا من الإعدادات",
+    availableLanguages: "اللغات المتاحة",
     title: "رفيقك اليومي للذكر",
     feature1: "أذكار الصباح والمساء والنوم بتصميم مريح",
     feature2: "عدّاد تفاعلي بلمسة واحدة مع اهتزاز تفاعلي",
@@ -195,6 +198,12 @@ const ar = {
     progressComplete: "اكتملت أعمال الجمعة — تقبل الله طاعتك.",
   },
   library: {
+    authenticTitle: "مكتبة الأذكار المأثورة الموثقة",
+    authenticSubtitle: "أذكار ثابتة عن النبي ﷺ وأصحابه",
+    authenticSearch: "بحث في الأذكار والمصادر...",
+    all: "الكل",
+    noMatchingDhikr: "لم يتم العثور على أذكار مطابقة",
+    times: "مرة",
     occasionalSupplications: "أذكار سياقية",
     supplications: "أذكار",
     groups: {
@@ -276,6 +285,10 @@ const ar = {
     activeNotice: "سيعرض هذا المتصفح التذكيرات أثناء فتح تطبيق أذكار.",
   },
   downloads: {
+    downloadedAudio: "الصوت المحمّل",
+    optionalAudioDownloads: "تنزيلات الصوت الاختيارية",
+    cancelDownload: "إلغاء التنزيل",
+    removeDownloadedAudio: "حذف الصوت المحمّل",
     title: "الوصول دون اتصال",
     bundledTitle: "المحتوى الأساسي متاح",
     bundledBody:
@@ -652,6 +665,8 @@ const ar = {
     continueAdditional: "تابع {count} ذكرًا إضافيًا",
   },
   reader: {
+    repeatPrescribed: "تكرار العدد المحدد",
+    readingText: "نص الذكر",
     tapToCount: "اضغط للتسبيح",
     ayahs: "آيَاتُهَا",
     wordMeaningsTitle: "معاني كلمات القرآن الكريمة",
@@ -839,6 +854,10 @@ const ar = {
     totalCompleted: "إجمالي الأذكار المكتملة",
   },
   counter: {
+    targetOpen: "مفتوح",
+    targetLabel: "الهدف:",
+    setCustomTarget: "تحديد هدف مخصص",
+    applyTarget: "تطبيق الهدف",
     selectedDhikr: "الذكر المأثور",
     count: "التسبيح",
     reset: "إعادة",
@@ -854,6 +873,8 @@ const ar = {
     done: "تمّ",
   },
   auth: {
+    completingSignIn: "جارٍ إكمال تسجيل الدخول",
+    restoringAccount: "نستعيد حسابك وبياناتك بأمان…",
     welcome: "\u0645\u0631\u062d\u0628\u0627\u064b \u0628\u0643 \u0641\u064a \u0623\u0630\u0643\u0627\u0631",
     syncSubtitle:
       "\u0633\u062c\u0644 \u0627\u0644\u062f\u062e\u0648\u0644 \u0644\u0645\u0632\u0627\u0645\u0646\u0629 \u062a\u0642\u062f\u0645\u0643\u060c \u0648\u0645\u0641\u0636\u0644\u0627\u062a\u0643\u060c \u0648\u062a\u0641\u0636\u064a\u0644\u0627\u062a\u0643 \u0628\u0623\u0645\u0627\u0646 \u0639\u0628\u0631 \u0623\u062c\u0647\u0632\u062a\u0643.",
@@ -872,6 +893,9 @@ const ar = {
     skip: "\u062a\u062e\u0637\u064a",
   },
   settings: {
+    lastSuccessfulSync: "آخر مزامنة ناجحة",
+    deleteAccountShort: "حذف الحساب",
+    exportAndDelete: "تصدير وحذف الحساب",
     preferences: "\u0627\u0644\u062a\u0641\u0636\u064a\u0644\u0627\u062a",
     language: "\u0627\u0644\u0644\u063a\u0629",
     displayTheme: "\u0627\u0644\u0645\u0638\u0647\u0631",

@@ -79,7 +79,7 @@ export function AccountDataPanel({
               )}
               {!isGuest && lastSyncLabel && (
                 <p className="mt-1 text-[0.75rem] text-muted-foreground">
-                  {language === "ar" ? "آخر مزامنة ناجحة" : "Last successful sync"}: {lastSyncLabel}
+                  {t(language, "settings.lastSuccessfulSync")}: {lastSyncLabel}
                 </p>
               )}
             </div>
@@ -131,13 +131,13 @@ export function AccountDataPanel({
           {!isGuest && (
             <DataAction
               icon={<LogOut size={20} aria-hidden="true" />}
-              title={language === "ar" ? "حذف الحساب" : "Delete account"}
+              title={t(language, "settings.deleteAccountShort")}
               body={
                 language === "ar"
                   ? "نزّل بياناتك ثم احذف الحساب والنسخة السحابية نهائياً."
                   : "Export your data, then permanently remove your account and cloud copy."
               }
-              action={language === "ar" ? "تصدير وحذف الحساب" : "Export and delete account"}
+              action={t(language, "settings.exportAndDelete")}
               onPress={onDeleteAccount}
               destructive
             />

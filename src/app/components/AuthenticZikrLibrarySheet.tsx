@@ -59,7 +59,7 @@ export function AuthenticZikrLibrarySheet({
     <ResponsiveSheet
       open={isOpen}
       onClose={onClose}
-      title={isArabic ? "مكتبة الأذكار المأثورة الموثقة" : "Authentic Verified Zikr Library"}
+      title={t(language, "library.authenticTitle")}
       direction={direction}
       maxWidthClassName="max-w-[var(--content-form)]"
     >
@@ -79,10 +79,10 @@ export function AuthenticZikrLibrarySheet({
             </div>
             <div>
               <h2 id="authentic-sheet-title" className="text-[1.0625rem] font-extrabold text-foreground leading-snug">
-                {isArabic ? "مكتبة الأذكار المأثورة الموثقة" : "Authentic Verified Zikr Library"}
+                {t(language, "library.authenticTitle")}
               </h2>
               <p className="text-[0.75rem] font-medium text-muted-foreground">
-                {isArabic ? "أذكار ثابتة عن النبي ﷺ وأصحابه" : "Authentic Sunnah & Sahabah Supplications"}
+                {t(language, "library.authenticSubtitle")}
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function AuthenticZikrLibrarySheet({
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={isArabic ? "بحث في الأذكار والمصادر..." : "Search dhikr or source..."}
+              placeholder={t(language, "library.authenticSearch")}
               className="w-full h-11 ps-9 pe-4 rounded-xl border border-border bg-background text-[0.875rem] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
@@ -121,7 +121,7 @@ export function AuthenticZikrLibrarySheet({
                   : "bg-background border border-border text-muted-foreground hover:text-foreground"
               }`}
             >
-              {isArabic ? "الكل" : "All"} ({formatNumerals(AUTHENTIC_AZKAR_COLLECTION.length, language)})
+              {t(language, "library.all")} ({formatNumerals(AUTHENTIC_AZKAR_COLLECTION.length, language)})
             </button>
             {categories.map((cat) => (
               <button
@@ -145,9 +145,7 @@ export function AuthenticZikrLibrarySheet({
           {filteredItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-10 text-center text-muted-foreground">
               <Sparkles size={32} className="mb-2 text-muted-foreground/40" />
-              <p className="text-[0.9375rem] font-semibold">
-                {isArabic ? "لم يتم العثور على أذكار مطابقة" : "No matching dhikr found"}
-              </p>
+              <p className="text-[0.9375rem] font-semibold">{t(language, "library.noMatchingDhikr")}</p>
             </div>
           ) : (
             filteredItems.map((item) => (
@@ -171,7 +169,7 @@ export function AuthenticZikrLibrarySheet({
                   <span className="text-primary font-semibold">{isArabic ? item.sourceRefAr : item.sourceRefEn}</span>
                   {item.recommendedTarget && (
                     <span className="rounded-md bg-muted px-2 py-0.5 text-[0.6875rem] font-bold text-foreground">
-                      {formatNumerals(item.recommendedTarget, language)} {isArabic ? "مرة" : "times"}
+                      {formatNumerals(item.recommendedTarget, language)} {t(language, "library.times")}
                     </span>
                   )}
                 </div>
