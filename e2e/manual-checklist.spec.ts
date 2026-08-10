@@ -128,7 +128,7 @@ test("text resize: 200% zoom keeps primary navigation usable", async ({ page }) 
 test("prayer times: effective timezone and offset are surfaced and survive going offline", async ({ page }) => {
   await seedAndOpen(page);
   await page.getByTestId("nav-settings").click();
-  await page.getByRole("button", { name: /Prayer Times & Location/ }).click();
+  await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
 
   const status = page.getByTestId("daylight-saving-status");
   await expect(status).toBeVisible();

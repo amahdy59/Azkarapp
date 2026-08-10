@@ -1,6 +1,6 @@
 # Phase 09 — Step 1 analysis (settings and accessibility preferences)
 
-**Status:** Analysis only. No settings code has been changed. Phase 09 Step 2 is an approval gate — implementation waits on the user.
+**Status:** Superseded by implementation. The user approved all five questions on 2026-08-10 and the work landed under **DEC-050**; see the Decision Log for what was decided and why. This document is kept as the record of what the settings screens looked like _before_ Phase 09, and of how each finding was reached.
 
 **Produced:** 2026-08-09, against `0d1a7c9` plus the working-tree robustness pass.
 
@@ -87,13 +87,17 @@ None blocking. DEC-027 (sidebar controls) intersects the phase's prohibited list
 - Moving calendar system between panels must not change the persisted `calendarType` field or its normalization — presentation move only.
 - Panel coverage is thin, so changes here are under-protected. Worth adding panel tests alongside, not after.
 
-## 7. Decisions that require user approval
+## 7. Decisions that required user approval — all resolved 2026-08-10
 
-1. **Merge or separate** the two rows that both open the Notifications panel.
-2. **Sidebar theme/language controls** — re-affirm DEC-027 (keep) or remove per the phase's prohibited list. If kept, fix the target-vs-current label contradiction.
-3. **Where calendar system lands** — a new "General" group at root, or inside an existing group.
-4. **Whether "Screen reader — Always on"** becomes plain help text, moves to About, or is removed.
-5. **Whether the prayer-times row should show an unset state** instead of the "Cairo" default.
+| #   | Question                        | Resolution (DEC-050)                                                                     |
+| --- | ------------------------------- | ---------------------------------------------------------------------------------------- |
+| 1   | Merge or separate the two rows  | **Merged** into "Prayer Times & Reminders" — one row, one destination                    |
+| 2   | Sidebar theme/language controls | **Kept** (re-affirms DEC-027); the target-vs-current label contradiction fixed instead   |
+| 3   | Where calendar system lands     | **Preferences**, beside Language — no new group needed, and locale settings sit together |
+| 4   | "Screen reader — Always on"     | **Help text.** It was already a non-interactive div, so the defect was affordance only   |
+| 5   | Prayer-times unset state        | **Shows "Not set"** rather than presenting the "Cairo" fallback as a user choice         |
+
+One correction to §4.3 and §4.6, found when implementing: the colour-blind buttons do carry `aria-pressed` (wrong pattern for an exclusive choice, but not unlabelled), and the screen-reader row was never a fake button — `SettingsRowItem` renders a plain `<div>` without `onPress`. Both findings stand; both were less severe than written here.
 
 ## 8. Acceptance-criteria mapping
 

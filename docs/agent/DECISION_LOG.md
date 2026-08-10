@@ -892,3 +892,36 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **`azkar.audio-downloads.v1` stays out of `OWNED_STORAGE_PREFIXES`,** now for a stronger reason than before: the ordering guarantee. If the Cache API step ever fails, the registry must survive so the bytes remain findable. Sweeping it from `state.ts` as well would silently break that. The comment there says so.
 - **The audio step cannot block the local clear.** It is wrapped so an unsupported or blocked Cache API still leaves the user able to erase everything else — asserted by a test, alongside one proving the audio removal is awaited _before_ storage is cleared.
 - **Supersedes:** None
+
+---
+
+## DEC-050 — Phase 09 settings IA and control semantics
+
+- **Date:** 2026-08-10
+- **Status:** Approved
+- **Owner:** User (approved each open question, delegating the specifics: "merge or separate depending on best UX practices you decide", "you can keep and do whatever necessary", "follow best practices on screen reader", "follow best practices").
+- **Related phase:** Phase 09 (clears its Step 2 approval gate)
+- **Context:** The Step 1 analysis in `docs/agent/evidence/phase-09/PHASE_09_STEP_1_ANALYSIS.md` found five open questions and three defects against the phase's own acceptance criteria.
+
+### Decisions
+
+- **(a) Merged the two rows that opened the same panel.** "Prayer Times & Location" and "Notifications" were two labels with two different values both calling `onNav("notifications")`. One row, one destination is the principle; two labels pointing at one screen is precisely the ambiguous-chevron problem AGENTS.md §7 names. The single row is "Prayer Times & Reminders", naming both concerns so either intent finds it by text, with the location pin as its icon since the value is a place.
+- **(b) Kept the sidebar theme and language controls,** re-affirming DEC-027 rather than applying the phase's blanket prohibition. Fixed the contradiction inside the language control instead: it labelled itself with the **target** language ("English") beside a badge showing the **current** one ("AR") — two opposite mental models in one control. It is now label + current value, matching the theme button directly beneath it and every settings row in the app.
+- **(c) Screen-reader support is help text, not a row.** It was already a non-interactive `<div>` (`SettingsRowItem` renders a plain div without `onPress`), so this was never a semantics bug — it was an affordance bug: identical anatomy to the working toggles above it. It now reads as a short note. Screen reader support is not something a user switches on, so it should not look switchable.
+- **(d) Calendar system moved from Accessibility to Preferences, beside Language.** It is a locale preference, not an accessibility aid, and it sat under a "Visual" label inside the Accessibility panel. It now uses the same `SegmentedControl` as Language, which also gives it the radiogroup semantics and the DEC-013 focus ring its hand-rolled radio items lacked. **Presentation move only** — the persisted `calendarType` field, its normalization and its default are untouched.
+- **(d, cont.) The prayer-times row shows a real unset state.** It rendered `locationSettings?.cityName || "Cairo"`, presenting a fallback as though the user had configured it. It now shows the configured city or an explicit "Not set".
+
+### Also fixed, no approval needed
+
+- **Colour-blind support had the wrong control semantics.** Four plain buttons carrying `aria-pressed` inside a bare `<div aria-label=…>`. `aria-pressed` models an independent toggle, so a screen reader announced four unrelated on/off controls rather than one single-choice group, and a label on a roleless div is ignored outright. Now a Radix `RadioGroup`, matching Text size in the same panel. Same defect class as the Home header fix earlier in this series.
+
+### Consequences
+
+- Two e2e specs referenced the old row label and were updated — the DEC-022/DEC-027 selector-drift class, which has now failed loudly rather than silently three times running. That is the pattern working.
+- `AccessibilityPanel` loses its `calendarType`/`onCalendarTypeChange` props; `SettingsRootPanel` gains them.
+- Inline bilingual strings in every touched file moved into the i18n bundle, so `parity.test.ts` now covers them.
+
+- **Files/contracts to update:** `SettingsRootPanel.tsx`, `AccessibilityPanel.tsx`, `SettingsScreen.tsx`, `LayoutShells.tsx`, i18n bundles, `e2e/settings-experience.spec.ts`, `e2e/manual-checklist.spec.ts`.
+- **Tests/evidence required:** New `AccessibilityPanel.test.tsx` (4 tests) covering the radio-group semantics, the calendar's absence, and the screen-reader note not being a control. Full `pnpm check` and `pnpm test:e2e`.
+- **Not done:** language and RTL remain on separate screens (analysis §4.5). `forceRtl` is a reading-direction override rather than a locale choice, and moving it was not approved.
+- **Supersedes:** Re-affirms DEC-027 on the sidebar controls; supersedes the calendar's placement in the Accessibility panel.
