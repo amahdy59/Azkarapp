@@ -12,6 +12,7 @@ import { vibrateIfEnabled } from "../motionPreferences";
 import type { AppLanguage } from "../types";
 import { Check, RotateCcw, Undo, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
 import { PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
+import { motion } from "motion/react";
 
 export function CustomCounterScreen({
   isArabic,
@@ -37,6 +38,7 @@ export function CustomCounterScreen({
   const [showLibrarySheet, setShowLibrarySheet] = useState<boolean>(false);
   const [pulse, setPulse] = useState<number>(0);
   const [showCompletionDialog, setShowCompletionDialog] = useState<boolean>(false);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
   const activeText = selectedAuthentic.textAr;
   const isTargetMode = target > 0;
@@ -162,11 +164,42 @@ export function CustomCounterScreen({
         />
 
         <div
-          className="mx-auto flex min-h-0 w-full max-w-[40rem] flex-1 flex-col justify-between px-4 pb-6 pt-2 sm:px-5"
+          className="relative mx-auto flex min-h-0 w-full max-w-[40rem] flex-1 flex-col justify-between px-4 pb-6 pt-2 sm:px-5 overflow-hidden rounded-3xl"
           data-testid="custom-counter-content"
+          onPointerDown={(e) => {
+            const el = e.target as HTMLElement;
+            // Ignore if tapping other specific buttons
+            if (el.closest("button") && !el.closest('[data-testid="custom-counter-surface"]')) return;
+
+            // Generate ripple
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            setRipples((prev) => [...prev.slice(-4), { id: Date.now() + Math.random(), x, y }]);
+
+            // Prevent default to avoid double firing on touch? Actually just let it bubble
+            // but we need to trigger the tap
+            // Wait, if they tapped the ZikrCounterSurface itself, the surface's onClick will ALSO fire handleTap.
+            // We should only fire handleTap if they DIDN'T click the surface, OR we can disable the surface's own tap.
+            if (!el.closest('[data-testid="custom-counter-surface"]')) {
+              handleTap();
+            }
+          }}
         >
+          {ripples.map((r) => (
+            <motion.div
+              key={r.id}
+              initial={{ scale: 0, opacity: 0.5 }}
+              animate={{ scale: 40, opacity: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="pointer-events-none absolute rounded-full bg-primary/20"
+              style={{ left: r.x, top: r.y, width: 20, height: 20, marginLeft: -10, marginTop: -10 }}
+              onAnimationComplete={() => setRipples((prev) => prev.filter((p) => p.id !== r.id))}
+            />
+          ))}
+
           {/* Top Controls: Zikr Card & Target Picker */}
-          <div className="space-y-3">
+          <div className="space-y-3 relative z-10">
             {/* Selected Authentic Zikr Card */}
             <button
               type="button"
@@ -201,7 +234,7 @@ export function CustomCounterScreen({
           </div>
 
           {/* Central Counter Display Surface */}
-          <div className="my-auto flex flex-col items-center justify-center py-4 sm:py-6">
+          <div className="my-auto flex flex-col items-center justify-center py-4 sm:py-6 relative z-10">
             <div className="relative flex items-center justify-center">
               <PulseRings trigger={pulse} size={220} height={76} count={count} total={target} />
 

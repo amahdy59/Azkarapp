@@ -444,10 +444,10 @@ export function ReaderScreen({
   const renderReadingContent = () => (
     <article
       ref={readingContentRef}
-      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20"}`}
+      className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
       <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
-      <QuranPrelude zikr={z} className="pointer-events-none" />
+      {!longSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
 
       {longSurah ? (
         <MushafPageReader
@@ -969,17 +969,20 @@ export function ReaderScreen({
                 }`}
               >
                 <div
-                  className={`mx-auto flex min-h-full max-w-[600px] flex-col ${
-                    isLongContent ? "justify-start pt-1" : "justify-center my-auto"
-                  } pb-2 items-center`}
+                  className={`mx-auto flex min-h-full max-w-[600px] w-full flex-col ${
+                    isLongContent ? "justify-start py-4" : "justify-center items-center"
+                  }`}
                 >
-                  <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
+                  <div
+                    key={z.id}
+                    className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                  >
                     {renderReadingContent()}
                   </div>
                 </div>
               </div>
 
-              <footer className="shrink-0 pb-3 pt-1">{renderCounterStack()}</footer>
+              <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
             </div>
 
             {renderSideNavigation()}
@@ -1072,17 +1075,20 @@ export function ReaderScreen({
               role="region"
               tabIndex={0}
               aria-label={isArabic ? "نص الذكر" : "Zikr reading text"}
-              className={`flex-1 overflow-y-auto min-h-0 w-full pt-1 pb-2 outline-none ${
+              className={`flex-1 overflow-y-auto min-h-0 w-full outline-none ${
                 justCompleted ? "zikr-step-exit" : "zikr-step-enter"
               }`}
             >
               {/* Inner wrapper vertically centers short/medium Zikrs; long Surahs start at top to scroll naturally */}
               <div
-                className={`flex min-h-full flex-col ${
-                  isLongContent ? "justify-start pt-1" : "justify-center my-auto"
-                } pb-2 items-center`}
+                className={`flex min-h-full w-full flex-col ${
+                  isLongContent ? "justify-start py-4" : "justify-center items-center"
+                }`}
               >
-                <div key={z.id} className={justCompleted ? "zikr-step-exit" : "zikr-step-enter"}>
+                <div
+                  key={z.id}
+                  className={`w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                >
                   {renderReadingContent()}
                 </div>
               </div>
@@ -1091,7 +1097,7 @@ export function ReaderScreen({
             {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-1">{renderCounterStack()}</div>
+            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
 
             {renderSideNavigation()}
             {renderLongSurahJumpFab()}

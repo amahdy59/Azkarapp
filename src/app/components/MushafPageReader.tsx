@@ -5,6 +5,7 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { QuranWordText } from "./QuranWordText";
+import { QuranPrelude } from "./QuranChrome";
 
 export function MushafPageReader({
   zikr,
@@ -63,6 +64,8 @@ export function MushafPageReader({
                   {t(language, "reader.mushafPageRange", { start: startAyah, end: endAyah })}
                 </span>
               </header>
+
+              {index === 0 && <QuranPrelude zikr={zikr} className="pointer-events-none mb-6" />}
 
               <QuranWordText
                 text={page.text}

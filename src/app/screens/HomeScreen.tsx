@@ -427,11 +427,11 @@ export function HomeScreen({
               washed across the whole screen, so the page keeps its own surface. */}
           {/* Capped and centred: unbounded, the hero stretched the full width of
               an ultrawide display and the scene image lost all composition. */}
-          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden rounded-3xl shadow-raised">
+          <div className="relative mx-auto w-full max-w-[80rem] overflow-hidden sm:rounded-3xl sm:shadow-raised -mx-4 sm:mx-auto -mt-4 sm:mt-0">
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
-            <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5">
+            <div className="relative z-10 flex flex-col items-stretch gap-4 p-4 md:p-6 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 pt-8 sm:pt-4">
               {isComplete ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
@@ -444,13 +444,13 @@ export function HomeScreen({
               ) : (
                 <section
                   aria-labelledby="current-zikr-heading"
-                  className="lg:col-span-3 flex flex-col justify-between p-1 md:p-2 transition-all"
+                  className="lg:col-span-3 flex flex-col justify-between p-0 md:p-2 transition-all"
                 >
                   {/* The hero sits on a photo that fades to white in light mode,
                       so its white text needs its own dark backing rather than
                       relying on the page scrim. Without this, "Time for"
                       measured 1.98:1 against a required 4.5:1. */}
-                  <div className="flex flex-1 flex-col gap-3 rounded-3xl bg-black/45 p-3 text-start backdrop-blur-[2px] md:p-4">
+                  <div className="flex flex-1 flex-col gap-4 rounded-[28px] bg-black/40 p-5 text-start backdrop-blur-md md:p-6 border border-white/10 shadow-2xl">
                     {/* Hero Text & Category Header */}
                     <div className="flex w-full flex-col items-start gap-1 px-1">
                       <p
