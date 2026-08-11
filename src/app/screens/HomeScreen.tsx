@@ -592,30 +592,25 @@ export function HomeScreen({
           <div className="px-page">
             <section
               data-testid="after-prayer-trackers"
-              className="rounded-[30px] border border-border/40 bg-card/95 px-4 py-5 shadow-raised backdrop-blur-xl sm:px-5 sm:py-6"
+              dir={direction}
+              className="rounded-[30px] border border-[#2b3749] bg-[#121821] px-4 py-6 text-[#f8fafc] shadow-raised sm:px-8 sm:py-7"
             >
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center justify-between gap-4">
                 <div className="min-w-0 text-start">
-                  <h2 className="text-[1.25rem] font-black text-foreground" dir="auto">
+                  <h2 className="text-[1.5rem] font-black leading-none text-[#f8fafc]" dir="auto">
                     {t(language, "progress.postPrayerAzkar")}
                   </h2>
-                  <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground" dir="auto">
-                    {prayerTrackerLabel(language, currentPrayerPeriod.currentPrayer)}
-                  </p>
                 </div>
-                <div className="rounded-full bg-primary/10 px-3 py-1.5 text-[0.8125rem] font-black text-primary">
-                  {afterPrayerCompletedToday
-                    ? t(language, "progress.completed")
-                    : formatPrayerTimeLabel(
-                        currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer],
-                        isArabic,
-                      )}
+                <div className="text-[1.125rem] font-black text-[#e9bb64]" dir="auto">
+                  {isArabic
+                    ? `${prayerLabel(language, currentPrayerPeriod.currentPrayer)} بعد ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`
+                    : `After ${prayerLabel(language, currentPrayerPeriod.currentPrayer)} ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`}
                 </div>
               </div>
 
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted/70">
+              <div className="mt-7 h-3 overflow-hidden rounded-full bg-[#202a3a]">
                 <div
-                  className={`h-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
+                  className={`h-full rounded-full bg-[#e9bb64] transition-[transform] duration-500 ease-out ${
                     direction === "rtl" ? "origin-right" : "origin-left"
                   }`}
                   style={{
@@ -624,8 +619,8 @@ export function HomeScreen({
                 />
               </div>
 
-              <div className="-mx-4 mt-4 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex min-w-max gap-3 sm:grid sm:min-w-0 sm:grid-cols-5">
+              <div className="-mx-4 mt-12 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex min-w-max gap-4 sm:grid sm:min-w-0 sm:grid-cols-5">
                   {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
                     const isActivePrayer = index === activePrayerIndex;
                     const isPastPrayer = index < activePrayerIndex;
@@ -636,10 +631,10 @@ export function HomeScreen({
                         key={prayer}
                         type="button"
                         onClick={() => onResume("after_prayer")}
-                        className={`relative flex min-h-[11rem] w-[11rem] shrink-0 flex-col items-center justify-between rounded-[24px] border px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 sm:min-h-[12rem] sm:w-auto ${
+                        className={`relative flex min-h-[13.75rem] w-[11.5rem] shrink-0 flex-col items-center justify-center gap-5 rounded-[24px] border-2 px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-auto ${
                           isActivePrayer
-                            ? "border-primary bg-primary/12 text-foreground shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
-                            : "border-border/60 bg-background/85 text-foreground/90"
+                            ? "border-[#e9bb64] bg-[#202938] text-[#f8fafc] shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
+                            : "border-[#2b3749] bg-[#18202d] text-[#e9bb64]"
                         }`}
                         aria-label={`${prayerTrackerLabel(language, prayer)} - ${
                           isCompletedPrayer
@@ -650,10 +645,8 @@ export function HomeScreen({
                         }`}
                       >
                         <span
-                          className={`flex size-12 items-center justify-center rounded-full border ${
-                            isActivePrayer
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border/70 bg-card text-primary"
+                          className={`flex size-12 items-center justify-center rounded-full border-0 ${
+                            isActivePrayer ? "bg-[#e9bb64] text-[#121821]" : "bg-transparent text-[#e9bb64]"
                           }`}
                         >
                           {isCompletedPrayer ? (
@@ -664,10 +657,13 @@ export function HomeScreen({
                         </span>
 
                         <div className="flex flex-col gap-1">
-                          <span className="text-[1rem] font-black leading-tight" dir="auto">
+                          <span
+                            className={`text-[1.125rem] font-black leading-tight ${isActivePrayer ? "text-[#f8fafc]" : "text-[#e9bb64]"}`}
+                            dir="auto"
+                          >
                             {prayerTrackerLabel(language, prayer)}
                           </span>
-                          <span className="text-[0.75rem] font-bold text-muted-foreground">
+                          <span className="text-[0.75rem] font-bold text-[#b8c0cc]">
                             {formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}
                           </span>
                         </div>
