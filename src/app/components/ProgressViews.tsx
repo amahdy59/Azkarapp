@@ -180,8 +180,11 @@ export function ProgressDayView({
     // h-full/flex-1 let Home stretch this card to the hero's height. On the
     // Progress screen the parent has no definite height, so both resolve to
     // auto and nothing changes there.
-    <div className="flex h-full w-full max-w-[44rem] flex-col gap-4 mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
-      <div className="flex w-full flex-1 flex-col rounded-[28px] border border-white/10 bg-black/35 p-4 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-5 md:p-6">
+    <div
+      className="mx-auto flex h-full min-h-[19rem] w-full max-w-[44rem] flex-col gap-4 fade-in sm:min-h-[21rem] md:min-h-[22rem]"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
+      <div className="flex w-full flex-1 flex-col rounded-[28px] border border-white/10 bg-black/35 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-6 md:p-7">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3
@@ -202,7 +205,7 @@ export function ProgressDayView({
           </div>
         </div>
 
-        <div className="mt-4 grid grid-cols-3 gap-2.5 sm:gap-3 md:gap-4">
+        <div className="mt-5 grid grid-cols-3 gap-3 sm:gap-4 md:gap-5">
           {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
             return (

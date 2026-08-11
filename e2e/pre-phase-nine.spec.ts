@@ -66,7 +66,7 @@ async function openReturningGuest(
   await expect(page.getByTestId("home-utility-header")).toBeVisible({ timeout: 10_000 });
 }
 
-test("Home utility status keeps its two-row hierarchy without horizontal overflow", async ({ page }) => {
+test("Home utility status stays on one line without horizontal overflow", async ({ page }) => {
   await openReturningGuest(page);
 
   for (const viewport of [
@@ -91,7 +91,7 @@ test("Home utility status keeps its two-row hierarchy without horizontal overflo
     });
 
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
-    expect(geometry.streak.y, `streak row at ${viewport.width}px`).toBeLessThan(geometry.palms.y);
+    expect(Math.abs(geometry.streak.y - geometry.palms.y), `streak/palms row at ${viewport.width}px`).toBeLessThan(1);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
   }
 });

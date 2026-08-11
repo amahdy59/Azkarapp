@@ -194,7 +194,6 @@ export function HomeScreen({
   calendarType = "hijri",
   locationSettings,
   onResume,
-  onRepeat,
   onOpenFridayMode,
   onOpenProgress: _onOpenProgress,
   routineModes,
@@ -214,7 +213,6 @@ export function HomeScreen({
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
-  onRepeat: (category: CategoryId) => void;
   onOpenFridayMode?: () => void;
   onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
@@ -278,6 +276,22 @@ export function HomeScreen({
   const totalCount = reminderProgress.total;
   const doneCount = reminderProgress.done;
   const isComplete = doneCount >= totalCount && totalCount > 0;
+  const [completionCardState, setCompletionCardState] = useState<"hidden" | "visible" | "exiting">("hidden");
+
+  useEffect(() => {
+    if (!isComplete) {
+      setCompletionCardState("hidden");
+      return;
+    }
+
+    setCompletionCardState("visible");
+    const exitTimer = window.setTimeout(() => setCompletionCardState("exiting"), 3_600);
+    const hideTimer = window.setTimeout(() => setCompletionCardState("hidden"), 4_100);
+    return () => {
+      window.clearTimeout(exitTimer);
+      window.clearTimeout(hideTimer);
+    };
+  }, [isComplete, reminderInfo.categoryId]);
 
   const estimatedMinutes = useMemo(() => estimateCompletionMinutes(visibleReminderAzkar), [visibleReminderAzkar]);
 
@@ -301,10 +315,6 @@ export function HomeScreen({
   // arithmetic here and cannot drift from the routine count again.
   const completedCollections = gardenSummary.lifetimeGoldenLeaves;
   const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
-  const nextHomeAction = useMemo(
-    () => getHomeAction(completed, now, locationSettings, routineModes),
-    [completed, now, locationSettings, routineModes],
-  );
   const savedPreview = useMemo(() => {
     const available: HomeSavedItem[] = ALL_AZKAR.filter(
       (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
@@ -385,7 +395,7 @@ export function HomeScreen({
             <div className="absolute inset-x-0 top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8">
               <header
                 data-testid="home-utility-header"
-                className="flex w-full items-start justify-between gap-3"
+                className="flex w-full items-center justify-between gap-3"
                 dir="ltr"
               >
                 <div
@@ -402,7 +412,7 @@ export function HomeScreen({
                 <div
                   role="img"
                   data-testid="home-header-stats"
-                  className="flex shrink-0 flex-col items-end gap-1"
+                  className="flex shrink-0 items-center gap-3"
                   aria-label={
                     isArabic
                       ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
@@ -411,16 +421,15 @@ export function HomeScreen({
                 >
                   <div
                     data-testid="header-streak"
-                    className="flex items-center justify-center gap-1 rounded-full border border-[#e6be76]/25 bg-black/18 px-2 py-1 text-[0.6875rem] font-black text-[#e6be76] backdrop-blur-md"
+                    className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-[#e6be76]"
                     title={t(language, "progress.dailyStreak")}
                   >
                     <Zap className="h-[13px] w-[13px] text-[#e6be76]" strokeWidth={2.5} aria-hidden="true" />
                     <span>{formatNumerals(streakDays, language)}</span>
-                    <span>{t(language, "progress.days")}</span>
                   </div>
                   <div
                     data-testid="header-palms"
-                    className="flex items-center justify-center gap-1 rounded-full border border-[#e6be76]/25 bg-black/18 px-2 py-1 text-[0.6875rem] font-black text-[#e6be76] backdrop-blur-md"
+                    className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-[#e6be76]"
                     title={t(language, "progress.palmsTitle")}
                   >
                     <PalmTreeMark
@@ -429,7 +438,6 @@ export function HomeScreen({
                       className={gardenSummary.lifetimePalms > 0 ? "text-[#e6be76]" : "text-[#e6be76]/70"}
                     />
                     <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-                    <span>{t(language, "progress.palmsUnit")}</span>
                   </div>
                 </div>
               </header>
@@ -438,14 +446,12 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
-              {isComplete ? (
+              {isComplete && completionCardState !== "hidden" ? (
                 <div className="lg:col-span-3">
                   <TranquilityCompletionCard
                     categoryId={reminderInfo.categoryId}
                     language={language}
-                    direction={direction}
-                    onContinue={() => onResume(nextHomeAction.categoryId)}
-                    onReview={onRepeat}
+                    isExiting={completionCardState === "exiting"}
                   />
                 </div>
               ) : (
@@ -784,9 +790,13 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group flex min-h-[10rem] w-full flex-col justify-between rounded-3xl bg-amber-500/10 p-5 text-start transition-colors hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem group relative flex min-h-[12rem] w-full flex-col justify-between overflow-hidden rounded-3xl border border-amber-500/20 bg-[linear-gradient(145deg,rgba(245,158,11,0.18),rgba(245,158,11,0.06)_58%,rgba(255,255,255,0.04))] p-5 text-start shadow-sm transition-[background-color,transform,box-shadow] hover:-translate-y-0.5 hover:bg-amber-500/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:p-6"
                 data-testid="home-benefits-card"
               >
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute end-3 top-3 size-24 rounded-full bg-amber-300/15 blur-2xl"
+                />
                 <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
                   <Sparkles size={24} aria-hidden="true" />
                 </span>
@@ -794,7 +804,7 @@ export function HomeScreen({
                   <span className="block text-[1.25rem] font-black text-foreground">
                     {t(language, "benefits.title")}
                   </span>
-                  <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-800 dark:text-amber-300">
+                  <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-900 dark:text-amber-200">
                     {t(language, "benefits.open")}
                     {direction === "rtl" ? (
                       <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
@@ -812,9 +822,9 @@ export function HomeScreen({
           {/* Friday card: artwork at the start edge, the Kahf message and its
               call to action in the middle, and the virtues list at the end. */}
           <section aria-labelledby="friday-card-heading">
-            <div className="flex flex-col items-stretch gap-5 rounded-3xl border border-border/40 bg-card p-6 shadow-raised xl:flex-row xl:items-center">
+            <div className="grid gap-5 overflow-hidden rounded-3xl border border-amber-500/20 bg-card p-5 shadow-raised sm:p-6 xl:grid-cols-[7.5rem_minmax(0,1fr)_17.5rem] xl:items-center">
               <div
-                className="flex size-[120px] shrink-0 items-center justify-center self-center rounded-2xl border border-amber-500/30 bg-amber-500/15 text-5xl"
+                className="flex size-[96px] shrink-0 items-center justify-center self-center rounded-2xl border border-amber-500/30 bg-amber-500/15 text-4xl shadow-sm sm:size-[112px] sm:text-5xl"
                 aria-hidden="true"
               >
                 🕌
@@ -841,7 +851,7 @@ export function HomeScreen({
                 )}
               </div>
 
-              <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start xl:w-[280px]">
+              <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start xl:w-auto">
                 <p className="mb-2 text-[0.8125rem] font-black text-amber-700 dark:text-amber-400" dir="auto">
                   {t(language, "home.fridayVirtues")}
                 </p>

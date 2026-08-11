@@ -217,7 +217,7 @@ export function TodayRoutineGarden({
       )}
 
       <div
-        {...tabPanelProps("garden", activeTab)}
+        {...(hideTabs ? {} : tabPanelProps("garden", activeTab))}
         className="outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {activeTab === "day" && (

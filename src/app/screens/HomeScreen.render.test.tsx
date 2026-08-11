@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { ALL_AZKAR } from "../content/azkar";
+import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
 import { CATEGORY_IDS, type CategoryId } from "../types";
 import { HomeScreen } from "./HomeScreen";
 
@@ -34,7 +34,6 @@ describe("HomeScreen quick access", () => {
         language="en"
         direction="ltr"
         onResume={() => undefined}
-        onRepeat={() => undefined}
         routineModes={routineModes}
         savedZikrIds={new Set([saved.id])}
         onOpenSavedZikr={onOpenSavedZikr}
@@ -49,10 +48,10 @@ describe("HomeScreen quick access", () => {
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
 
-    // Units stay visible at every width. Hidden below sm, these chips read as
-    // bare numerals with no indication of what they count.
-    expect(screen.getByTestId("header-streak")).toHaveTextContent(/days/i);
-    expect(screen.getByTestId("header-palms")).toHaveTextContent(/palms/i);
+    // The compact visual treatment is icon + number only; the parent keeps
+    // the full accessible announcement for screen readers.
+    expect(screen.getByTestId("header-streak")).not.toHaveTextContent(/days/i);
+    expect(screen.getByTestId("header-palms")).not.toHaveTextContent(/palms/i);
 
     // "Total Azkar" counts recorded main-routine completions for all time. It
     // was `lifetimePalms * 3 + today's leaves`, which both used the pre-DEC-042
@@ -85,7 +84,6 @@ describe("HomeScreen quick access", () => {
         language="en"
         direction="ltr"
         onResume={() => undefined}
-        onRepeat={() => undefined}
         routineModes={routineModes}
         savedZikrIds={new Set()}
         onOpenSavedZikr={() => undefined}
@@ -99,5 +97,35 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByText("After Asr")).toBeInTheDocument();
     expect(screen.getByText("After Fajr")).toBeInTheDocument();
     expect(screen.getByText(/today'?s wird/i)).toBeInTheDocument();
+  });
+
+  it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+    const completed = emptyProgress();
+    completed.morning = new Set(getAzkarForMode("morning", "complete").map((zikr) => zikr.id));
+
+    render(
+      <HomeScreen
+        completed={completed}
+        dailyCompletions={[]}
+        quietProgressEnabled={false}
+        progressDayStartHour={4}
+        language="en"
+        direction="ltr"
+        onResume={() => undefined}
+        routineModes={routineModes}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const completion = screen.getByRole("status", { name: /completed/i });
+    expect(completion).toBeInTheDocument();
+    expect(completion).not.toHaveTextContent(/continue|read again/i);
+    expect(completion.querySelector("button")).toBeNull();
+
+    act(() => vi.advanceTimersByTime(4_200));
+    expect(screen.queryByRole("status", { name: /completed/i })).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-time")).toBeInTheDocument();
   });
 });

@@ -1133,7 +1133,6 @@ function AppContent() {
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   onResume={resumeCategory}
-                  onRepeat={repeatCategory}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");
