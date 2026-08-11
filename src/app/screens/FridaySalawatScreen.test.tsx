@@ -10,6 +10,7 @@ describe("FridaySalawatScreen", () => {
   it("counts only through the counter, supports targets, and resets", () => {
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 
+    expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 100 });
     fireEvent.click(screen.getByRole("button", { name: "10" }));
     const counter = screen.getByTestId("salawat-counter");
     expect(counter).toHaveAttribute("data-counter-shape", "rectangle");
@@ -20,6 +21,19 @@ describe("FridaySalawatScreen", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Reset counter" }));
     expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 10 });
+  });
+
+  it("supports an arbitrary target without offering an open-ended Friday goal", () => {
+    render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
+
+    expect(screen.queryByRole("button", { name: "Open" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Custom" }));
+    const input = screen.getByRole("spinbutton", { name: /^Target:?$/ });
+    fireEvent.change(input, { target: { value: "250" } });
+    fireEvent.click(screen.getByRole("button", { name: /Apply Target/i }));
+
+    expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 250 });
+    expect(screen.getByTestId("salawat-counter")).toHaveAccessibleName(/0 \/ 250/);
   });
 
   it("links both authentic hadith references", () => {

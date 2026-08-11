@@ -4,6 +4,7 @@ import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { SlidersHorizontal } from "./icons";
 import { Modal } from "./ResponsiveSheet";
+import { Button } from "./ui/button";
 
 export type TargetPreset = 10 | 33 | 100 | 1000 | 0 | "custom";
 
@@ -12,11 +13,13 @@ export function CounterTargetPicker({
   onTargetChange,
   language,
   direction,
+  allowOpen = true,
 }: {
   activeTarget: number; // 0 means open/unlimited
   onTargetChange: (newTarget: number) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  allowOpen?: boolean;
 }) {
   const isArabic = language === "ar";
   const [showCustomModal, setShowCustomModal] = useState(false);
@@ -27,8 +30,9 @@ export function CounterTargetPicker({
     { value: 33, label: formatNumerals(33, language) },
     { value: 100, label: formatNumerals(100, language) },
     { value: 1000, label: formatNumerals(1000, language) },
-    { value: 0, label: t(language, "counter.targetOpen") },
+    ...(allowOpen ? [{ value: 0, label: t(language, "counter.targetOpen") }] : []),
   ];
+  const isCustomTarget = !presets.some((preset) => preset.value === activeTarget);
 
   const handleCustomSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +43,10 @@ export function CounterTargetPicker({
   };
 
   return (
-    <div className="w-full" dir={direction}>
+    <fieldset className="w-full" dir={direction}>
+      <legend className="mb-2 text-[0.8125rem] font-bold text-foreground">{t(language, "counter.targetLabel")}</legend>
       {/* Preset Pill Buttons Row */}
-      <div className="no-scrollbar flex items-center gap-2 overflow-x-auto py-1">
-        <span className="shrink-0 text-[0.75rem] font-bold text-muted-foreground">
-          {t(language, "counter.targetLabel")}
-        </span>
+      <div className="grid grid-cols-3 gap-2 py-1 sm:flex sm:items-center sm:overflow-x-auto">
         {presets.map((preset) => {
           const isSelected = activeTarget === preset.value;
           return (
@@ -52,7 +54,7 @@ export function CounterTargetPicker({
               key={preset.value}
               type="button"
               onClick={() => onTargetChange(preset.value)}
-              className={`interactive-elem h-9 shrink-0 rounded-full px-3.5 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              className={`interactive-elem min-h-11 w-full rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-auto sm:shrink-0 sm:px-4 ${
                 isSelected
                   ? "bg-primary text-primary-foreground shadow-sm"
                   : "border border-border/40 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
@@ -67,20 +69,14 @@ export function CounterTargetPicker({
         <button
           type="button"
           onClick={() => setShowCustomModal(true)}
-          className={`interactive-elem flex h-9 shrink-0 items-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            ![10, 33, 100, 1000, 0].includes(activeTarget)
+          className={`interactive-elem flex min-h-11 w-full items-center justify-center gap-1.5 rounded-full px-3 text-[0.8125rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-auto sm:shrink-0 sm:px-4 ${
+            isCustomTarget
               ? "bg-primary text-primary-foreground shadow-sm"
               : "border border-border/40 bg-card/80 backdrop-blur-md text-muted-foreground hover:bg-muted"
           }`}
         >
           <SlidersHorizontal size={14} />
-          <span>
-            {![10, 33, 100, 1000, 0].includes(activeTarget)
-              ? formatNumerals(activeTarget, language)
-              : isArabic
-                ? "مخصص"
-                : "Custom"}
-          </span>
+          <span>{isCustomTarget ? formatNumerals(activeTarget, language) : isArabic ? "مخصص" : "Custom"}</span>
         </button>
       </div>
 
@@ -103,49 +99,49 @@ export function CounterTargetPicker({
             </p>
 
             <form onSubmit={handleCustomSubmit} className="space-y-4">
+              <label htmlFor="custom-counter-target" className="block text-[0.8125rem] font-bold text-foreground">
+                {t(language, "counter.targetLabel")}
+              </label>
               <input
                 type="number"
+                id="custom-counter-target"
+                name="custom-counter-target"
                 min={1}
                 max={100000}
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
-                className="h-12 w-full rounded-xl border border-border bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                inputMode="numeric"
+                className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />
 
               <div className="grid grid-cols-4 gap-2">
                 {[50, 70, 300, 500].map((quickVal) => (
-                  <button
+                  <Button
                     key={quickVal}
                     type="button"
+                    variant={customInputValue === quickVal ? "secondary" : "outline"}
                     onClick={() => setCustomInputValue(quickVal)}
-                    className="h-9 rounded-lg border border-border bg-muted/40 text-[0.8125rem] font-bold text-foreground hover:bg-muted"
+                    className="min-w-0 px-2"
                   >
                     {formatNumerals(quickVal, language)}
-                  </button>
+                  </Button>
                 ))}
               </div>
 
               <div className="flex gap-2 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowCustomModal(false)}
-                  className="h-11 flex-1 rounded-xl border border-border bg-background text-[0.875rem] font-bold text-foreground hover:bg-muted"
-                >
+                <Button type="button" variant="outline" onClick={() => setShowCustomModal(false)} className="flex-1">
                   {t(language, "common.cancel")}
-                </button>
-                <button
-                  type="submit"
-                  className="h-11 flex-1 rounded-xl bg-primary text-[0.875rem] font-bold text-primary-foreground hover:bg-primary/90"
-                >
+                </Button>
+                <Button type="submit" className="flex-1">
                   {t(language, "counter.applyTarget")}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </Modal>
       )}
-    </div>
+    </fieldset>
   );
 }

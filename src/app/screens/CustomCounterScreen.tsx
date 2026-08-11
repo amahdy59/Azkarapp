@@ -10,9 +10,9 @@ import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
 import type { AppLanguage } from "../types";
-import { Check, RotateCcw, Undo, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
+import { Check, RotateCcw, Volume2, VolumeX, Sparkles, ChevronDown, Play } from "../components/icons";
 import { PulseRings, ZikrCounterSurface } from "../components/ZikrComponents";
-import { motion } from "motion/react";
+import { Button } from "../components/ui/button";
 
 export function CustomCounterScreen({
   isArabic,
@@ -38,7 +38,6 @@ export function CustomCounterScreen({
   const [showLibrarySheet, setShowLibrarySheet] = useState<boolean>(false);
   const [pulse, setPulse] = useState<number>(0);
   const [showCompletionDialog, setShowCompletionDialog] = useState<boolean>(false);
-  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
   const activeText = selectedAuthentic.textAr;
   const isTargetMode = target > 0;
@@ -62,12 +61,6 @@ export function CustomCounterScreen({
       vibrateIfEnabled(hapticFeedback, [30, 50, 40, 50, 60]);
     }
   }, [isTargetComplete, count, hapticFeedback, isTargetMode, playClickFeedback, target]);
-
-  const handleUndo = useCallback(() => {
-    if (count > 0) {
-      setCount((prev) => prev - 1);
-    }
-  }, [count]);
 
   const handleReset = () => {
     setCount(0);
@@ -120,17 +113,12 @@ export function CustomCounterScreen({
         if (!showLibrarySheet) {
           handleReset();
         }
-      } else if (e.key === "Backspace") {
-        e.preventDefault();
-        if (!showLibrarySheet) {
-          handleUndo();
-        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [onBack, showLibrarySheet, isTargetComplete, count, target, handleTap, handleUndo]);
+  }, [onBack, showLibrarySheet, isTargetComplete, count, target, handleTap]);
 
   return (
     <ScreenContainer
@@ -166,58 +154,33 @@ export function CustomCounterScreen({
         <div
           className="relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between overflow-hidden rounded-3xl px-4 pb-6 pt-2 sm:px-5"
           data-testid="custom-counter-content"
-          onPointerDown={(e) => {
-            const el = e.target as HTMLElement;
-            // Ignore if tapping other specific buttons
-            if (el.closest("button") && !el.closest('[data-testid="custom-counter-surface"]')) return;
-
-            // Generate ripple
-            const rect = e.currentTarget.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            setRipples((prev) => [...prev.slice(-4), { id: Date.now() + Math.random(), x, y }]);
-
-            // Prevent default to avoid double firing on touch? Actually just let it bubble
-            // but we need to trigger the tap
-            // Wait, if they tapped the ZikrCounterSurface itself, the surface's onClick will ALSO fire handleTap.
-            // We should only fire handleTap if they DIDN'T click the surface, OR we can disable the surface's own tap.
-            if (!el.closest('[data-testid="custom-counter-surface"]')) {
-              handleTap();
-            }
-          }}
         >
-          {ripples.map((r) => (
-            <motion.div
-              key={r.id}
-              initial={{ scale: 0, opacity: 0.5 }}
-              animate={{ scale: 40, opacity: 0 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="pointer-events-none absolute rounded-full bg-primary/20"
-              style={{ left: r.x, top: r.y, width: 20, height: 20, marginLeft: -10, marginTop: -10 }}
-              onAnimationComplete={() => setRipples((prev) => prev.filter((p) => p.id !== r.id))}
-            />
-          ))}
-
           {/* Top Controls: Zikr Card & Target Picker */}
           <div className="space-y-3 relative z-10">
             {/* Selected Authentic Zikr Card */}
-            <button
-              type="button"
-              onClick={() => setShowLibrarySheet(true)}
-              className="interactive-elem flex w-full items-center justify-between gap-3 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised transition-colors hover:border-amber-500/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              <div className="min-w-0 flex-1 space-y-1">
-                <span className="block text-[0.75rem] font-bold text-muted-foreground">
-                  {t(language, "counter.selectedDhikr")}
-                </span>
-                <p className="line-clamp-2 text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
-                  {activeText}
-                </p>
-              </div>
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground">
-                <ChevronDown size={18} />
-              </div>
-            </button>
+            <div className="space-y-2">
+              <span id="selected-dhikr-label" className="block text-[0.8125rem] font-bold text-foreground">
+                {t(language, "counter.selectedDhikr")}
+              </span>
+              <button
+                type="button"
+                onClick={() => setShowLibrarySheet(true)}
+                aria-labelledby="selected-dhikr-label selected-dhikr-value"
+                aria-haspopup="dialog"
+                aria-expanded={showLibrarySheet}
+                className="interactive-elem flex min-h-20 w-full items-center justify-between gap-3 rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 py-3 text-start transition-[border-color,background-color,box-shadow] hover:border-primary/45 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <p className="line-clamp-2 text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
+                    <span id="selected-dhikr-value">{activeText}</span>
+                  </p>
+                  <p className="line-clamp-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground" dir="auto">
+                    {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                  </p>
+                </div>
+                <ChevronDown className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
+              </button>
+            </div>
 
             {/* Target Presets */}
             <CounterTargetPicker
@@ -250,27 +213,11 @@ export function CustomCounterScreen({
               />
             </div>
 
-            {/* Quick Counter Action Buttons (Undo & Reset) */}
-            <div className="mt-6 flex items-center justify-center gap-3">
-              <button
-                type="button"
-                onClick={handleUndo}
-                disabled={count === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
-              >
-                <Undo size={16} />
-                <span>{t(language, "reader.undo")}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={count === 0 && laps === 0}
-                className="interactive-elem flex h-11 items-center justify-center gap-2 rounded-2xl border border-border/40 bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-raised hover:bg-muted disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-all"
-              >
+            <div className="mt-6 flex items-center justify-center">
+              <Button variant="outline" onClick={handleReset} disabled={count === 0 && laps === 0}>
                 <RotateCcw size={16} />
                 <span>{t(language, "reader.resetCounter")}</span>
-              </button>
+              </Button>
             </div>
 
             {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
@@ -287,13 +234,6 @@ export function CustomCounterScreen({
                   R
                 </kbd>
                 <span>{t(language, "counter.reset")}</span>
-              </span>
-              <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-              <span className="flex items-center gap-1">
-                <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-                  Backspace
-                </kbd>
-                <span>{t(language, "counter.undo")}</span>
               </span>
               <span className="h-3 w-px bg-border/60" aria-hidden="true" />
               <span className="flex items-center gap-1">
@@ -354,27 +294,19 @@ export function CustomCounterScreen({
             </p>
 
             <div className="space-y-2.5">
-              <button
-                type="button"
-                onClick={handleContinueCounting}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-md transition-all hover:bg-primary/90"
-              >
+              <Button onClick={handleContinueCounting} size="lg" className="w-full">
                 <Play size={18} />
                 <span>
                   {isArabic
                     ? `متابعة التسبيح (الجولة ${formatNumerals(laps + 2, language)})`
                     : `Continue Counting (Lap ${laps + 2})`}
                 </span>
-              </button>
+              </Button>
 
-              <button
-                type="button"
-                onClick={handleReset}
-                className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-background text-[0.875rem] font-bold text-foreground transition-all hover:bg-muted"
-              >
+              <Button variant="outline" onClick={handleReset} size="lg" className="w-full">
                 <RotateCcw size={18} />
                 <span>{t(language, "counter.resetToZero")}</span>
-              </button>
+              </Button>
             </div>
           </div>
         </Modal>
@@ -387,6 +319,7 @@ export function CustomCounterScreen({
         onSelectZikr={handleSelectAuthenticZikr}
         language={language}
         direction={direction}
+        selectedZikrId={selectedAuthentic.id}
       />
     </ScreenContainer>
   );

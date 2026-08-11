@@ -5,6 +5,15 @@ import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
+export const tapRippleStyle: React.CSSProperties = {
+  position: "absolute",
+  width: "1rem",
+  height: "1rem",
+  margin: "-0.5rem",
+  borderRadius: 999,
+  background: "color-mix(in srgb, var(--primary) 28%, transparent)",
+};
+
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
     <span
@@ -146,6 +155,7 @@ export function ZikrCounterSurface({
 }: ZikrCounterSurfaceProps) {
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
+  const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
 
@@ -165,9 +175,14 @@ export function ZikrCounterSurface({
       ? `${activeInstruction} ${localizedRatio}`
       : activeInstruction;
 
-  const handlePointerDown = () => {
+  const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (disabled || complete) return;
     setIsPressed(true);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setRipples((current) => [
+      ...current.slice(-3),
+      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
+    ]);
   };
 
   const handlePointerUp = () => {
@@ -210,6 +225,19 @@ export function ZikrCounterSurface({
       {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of
           snapping, which is also what carries the eye to the next zikr. */}
+      {ripples.map((ripple) => (
+        <span
+          key={ripple.id}
+          className="tap-ripple"
+          style={{
+            ...tapRippleStyle,
+            left: ripple.x,
+            top: ripple.y,
+          }}
+          aria-hidden="true"
+          onAnimationEnd={() => setRipples((current) => current.filter((item) => item.id !== ripple.id))}
+        />
+      ))}
       <div className="adaptive-counter-content counter-face-swap" key={complete ? "complete" : "counting"}>
         {complete ? (
           <div

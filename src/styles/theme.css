@@ -737,6 +737,21 @@ textarea {
     background-color 200ms ease;
 }
 
+.tap-ripple {
+  animation: tap-ripple-expand 560ms ease-out both;
+}
+
+@keyframes tap-ripple-expand {
+  from {
+    opacity: 0.48;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(32);
+  }
+}
+
 .adaptive-counter-surface:hover:not(:disabled) {
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
   box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
@@ -762,7 +777,31 @@ textarea {
 
 /* The dedicated masbaha screen can use additional wide-screen space; Reader
    keeps the documented compact 220 Ã— 76 control. */
+.custom-counter-stage .adaptive-counter-surface {
+  width: min(18rem, 78vw);
+  height: 5.5rem;
+  border-radius: 2.75rem;
+}
+
+.custom-counter-stage .pulse-ring {
+  width: min(17.5rem, 75vw) !important;
+  height: 5rem !important;
+  border-radius: 2.5rem;
+}
+
+.salawat-counter-surface {
+  width: min(18rem, 78vw);
+  height: 5.5rem;
+  border-radius: 2.75rem;
+}
+
 @media (min-width: 48rem) {
+  .salawat-counter-surface {
+    width: 20rem;
+    height: 6.5rem;
+    border-radius: 3.25rem;
+  }
+
   .custom-counter-stage .adaptive-counter-surface {
     width: 18rem;
     height: 6rem;
@@ -782,15 +821,15 @@ textarea {
 
 @media (min-width: 64rem) {
   .custom-counter-stage .adaptive-counter-surface {
-    width: 24rem;
-    height: 8rem;
-    border-radius: 4rem;
+    width: 28rem;
+    height: 9rem;
+    border-radius: 4.5rem;
   }
 
   .custom-counter-stage .pulse-ring {
-    width: 23.5rem !important;
-    height: 7.5rem !important;
-    border-radius: 4rem;
+    width: 27.5rem !important;
+    height: 8.5rem !important;
+    border-radius: 4.5rem;
   }
 
   .custom-counter-stage .counter-number {
@@ -1365,6 +1404,10 @@ a[href]:not(.no-press):active,
 
 /* ─── Per-component Reduced Motion Alternatives ─────────────────────── */
 @media (prefers-reduced-motion: reduce) {
+  .tap-ripple {
+    display: none;
+  }
+
   .counter-number {
     animation: none;
     opacity: 1;
@@ -1480,6 +1523,10 @@ a[href]:not(.no-press):active,
     animation: none;
     opacity: 0;
   }
+}
+
+.reduce-motion .tap-ripple {
+  display: none;
 }
 
 @media (prefers-reduced-motion: reduce) {

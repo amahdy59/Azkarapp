@@ -54,6 +54,15 @@ describe("Friday weekly progress", () => {
     expect(readFridaySalawatProgress("2026-W31")).toEqual({ count: 10, target: 100 });
   });
 
+  it("accepts custom Salawat targets and clamps injected values", () => {
+    localStorage.clear();
+    writeFridaySalawatProgress({ count: 12, target: 250 }, "2026-W31");
+    expect(readFridaySalawatProgress("2026-W31")).toEqual({ count: 12, target: 250 });
+
+    localStorage.setItem(fridaySalawatKey("2026-W31"), JSON.stringify({ count: -4, target: 999999 }));
+    expect(readFridaySalawatProgress("2026-W31")).toEqual({ count: 0, target: 100000 });
+  });
+
   it("stores comprehensive-dua progress independently for each week", () => {
     localStorage.clear();
     writeFridayDuaProgress(["friday-dua-02", "friday-dua-01"], "2026-W31");

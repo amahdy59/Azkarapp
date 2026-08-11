@@ -59,7 +59,7 @@ function MainDhikrGroupCard({
       onClick={onPress}
       className={`group relative flex w-full rounded-[24px] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
-          ? "min-h-[5.5rem] items-center gap-3 px-4 py-3 text-start sm:min-h-[9.5rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-3 sm:py-4 sm:text-center"
+          ? "min-h-[6.25rem] items-center gap-4 px-4 py-4 text-start sm:min-h-[10rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-3 sm:py-4 sm:text-center"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
@@ -81,9 +81,9 @@ function MainDhikrGroupCard({
       </div>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col gap-1 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+        className={`flex min-w-0 flex-1 flex-col gap-2 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
-        <span className="text-[1rem] font-black leading-tight text-inherit">{name}</span>
+        <span className="text-[1rem] font-black leading-snug text-inherit">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
             isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-white/10 text-white/70"

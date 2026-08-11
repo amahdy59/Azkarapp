@@ -3,11 +3,10 @@ import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { counterNumeralFontFamily, formatNumerals } from "../formatting";
+import { CounterTargetPicker } from "../components/CounterTargetPicker";
+import { Button } from "../components/ui/button";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import type { AppLanguage } from "../types";
-
-const TARGETS: FridaySalawatTarget[] = [10, 100, 1000];
 
 const COPY = {
   en: {
@@ -107,67 +106,76 @@ export function FridaySalawatScreen({
     <ScreenContainer dir={direction} className="px-0 relative" screenName={copy.title}>
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
 
-      <div className="relative z-10 flex flex-1 flex-col gap-5 overflow-y-auto px-5 pb-8 pt-3">
-        <section className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 text-center shadow-raised">
-          <Heart className="mx-auto fill-rose-500/15 text-rose-500" size={28} aria-hidden="true" />
-          <p className="mt-3 text-[1.125rem] font-black leading-8 text-foreground" dir="rtl" lang="ar">
-            {copy.phrase}
-          </p>
-        </section>
-
-        <section aria-labelledby="salawat-target-title">
-          <h2 id="salawat-target-title" className="mb-2 text-start text-[0.875rem] font-black text-foreground">
-            {copy.target}
-          </h2>
-          <div className="grid grid-cols-3 gap-2 rounded-3xl border border-border/40 bg-card p-1.5 shadow-raised">
-            {TARGETS.map((target) => (
-              <button
-                key={target}
-                type="button"
-                aria-pressed={progress.target === target}
-                onClick={() => persist(progress.count, target)}
-                className={`min-h-11 rounded-xl text-[0.9375rem] font-black focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  progress.target === target ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-muted"
-                }`}
-                style={{ fontFamily: counterNumeralFontFamily(language) }}
+      <div className="relative z-10 flex flex-1 overflow-y-auto px-5 pb-8 pt-3">
+        <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-5">
+          <div className="grid items-stretch gap-5 md:grid-cols-[minmax(0,1fr)_minmax(20rem,0.9fr)]">
+            <section className="flex min-h-48 flex-col items-center justify-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 via-card to-card p-6 text-center shadow-raised md:min-h-[22rem]">
+              <span className="flex size-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
+                <Heart className="fill-rose-500/15" size={28} aria-hidden="true" />
+              </span>
+              <p
+                className="mt-4 max-w-[32rem] zikr-text text-[1.25rem] font-black leading-9 text-foreground sm:text-[1.375rem]"
+                dir="rtl"
+                lang="ar"
               >
-                {formatNumerals(target, language)}
-              </button>
-            ))}
+                {copy.phrase}
+              </p>
+            </section>
+
+            <section
+              aria-labelledby="salawat-counter-title"
+              className="flex flex-col justify-between rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-5"
+            >
+              <h2 id="salawat-counter-title" className="sr-only">
+                {copy.target}
+              </h2>
+              <CounterTargetPicker
+                activeTarget={progress.target}
+                onTargetChange={(target) => persist(progress.count, target)}
+                language={language}
+                direction={direction}
+                allowOpen={false}
+              />
+
+              <div className="my-6 flex flex-col items-center justify-center">
+                <ZikrCounterSurface
+                  count={progress.count}
+                  total={progress.target}
+                  complete={complete}
+                  onTap={increment}
+                  language={language}
+                  instructionText={copy.tap}
+                  testId="salawat-counter"
+                  className="salawat-counter-surface"
+                />
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => persist(0, progress.target)}
+                  disabled={progress.count === 0}
+                  className="mt-4"
+                >
+                  <RotateCcw size={18} aria-hidden="true" />
+                  {copy.reset}
+                </Button>
+              </div>
+            </section>
           </div>
-        </section>
 
-        <section className="flex flex-col items-center" aria-live="polite">
-          <ZikrCounterSurface
-            count={progress.count}
-            total={progress.target}
-            complete={complete}
-            onTap={increment}
-            language={language}
-            instructionText={copy.tap}
-            testId="salawat-counter"
-          />
-
-          <button
-            type="button"
-            onClick={() => persist(0, progress.target)}
-            className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl px-4 text-[0.875rem] font-black text-muted-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <RotateCcw size={18} aria-hidden="true" />
-            {copy.reset}
-          </button>
-        </section>
-
-        <section aria-labelledby="salawat-benefits" className="space-y-3">
-          <div className="flex items-center gap-2 text-start">
-            <CheckCircle2 size={20} className="text-emerald-500" aria-hidden="true" />
-            <h2 id="salawat-benefits" className="text-[0.9375rem] font-black text-foreground">
-              {copy.benefits}
-            </h2>
-          </div>
-          <BenefitCard text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
-          <BenefitCard text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
-        </section>
+          <section aria-labelledby="salawat-benefits" className="space-y-3">
+            <div className="flex items-center gap-2 text-start">
+              <CheckCircle2 size={20} className="text-emerald-500" aria-hidden="true" />
+              <h2 id="salawat-benefits" className="text-[0.9375rem] font-black text-foreground">
+                {copy.benefits}
+              </h2>
+            </div>
+            <div className="grid gap-3 md:grid-cols-2">
+              <BenefitCard text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
+              <BenefitCard text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
+            </div>
+          </section>
+        </div>
       </div>
     </ScreenContainer>
   );

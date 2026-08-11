@@ -1,12 +1,11 @@
 import { useMemo, useState } from "react";
-import { Search, BookOpen, Sparkles, X } from "./icons";
+import { Search, BookOpen, Sparkles, X, Check } from "./icons";
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import {
   AUTHENTIC_AZKAR_COLLECTION,
   getAuthenticZikrCategories,
   type AuthenticZikrItem,
 } from "../content/authenticAzkar";
-import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { useLayoutMode } from "../hooks/useLayoutMode";
@@ -17,12 +16,14 @@ export function AuthenticZikrLibrarySheet({
   onSelectZikr,
   language,
   direction,
+  selectedZikrId,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSelectZikr: (item: AuthenticZikrItem) => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  selectedZikrId?: string;
 }) {
   const isArabic = language === "ar";
   const layoutMode = useLayoutMode();
@@ -43,7 +44,8 @@ export function AuthenticZikrLibrarySheet({
         item.textEn.toLowerCase().includes(q) ||
         item.sourceRefAr.includes(q) ||
         item.sourceRefEn.toLowerCase().includes(q) ||
-        item.virtueAr.includes(q);
+        item.virtueAr.includes(q) ||
+        item.virtueEn.toLowerCase().includes(q);
       return matchesCat && matchesSearch;
     });
   }, [selectedCat, searchQuery]);
@@ -91,7 +93,7 @@ export function AuthenticZikrLibrarySheet({
             type="button"
             onClick={onClose}
             aria-label={t(language, "common.back")}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
+            className="flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring transition-colors cursor-pointer"
           >
             <X size={18} />
           </button>
@@ -100,36 +102,32 @@ export function AuthenticZikrLibrarySheet({
         {/* Search Bar & Category Filter Pills */}
         <div className="flex flex-col gap-3 p-4 bg-muted/30 border-b border-border/40 shrink-0">
           {/* Search input */}
+          <label htmlFor="authentic-zikr-search" className="sr-only">
+            {t(language, "library.authenticSearch")}
+          </label>
           <div className="relative flex items-center">
             <Search size={18} className="absolute start-3 text-muted-foreground pointer-events-none" />
             <input
               type="text"
+              id="authentic-zikr-search"
+              name="authentic-zikr-search"
+              autoComplete="off"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t(language, "library.authenticSearch")}
-              className="w-full h-11 ps-9 pe-4 rounded-xl border border-border bg-background text-[0.875rem] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background ps-10 pe-4 text-[0.875rem] placeholder:text-muted-foreground/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             />
           </div>
 
           {/* Category Filter Pills */}
           <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
-            <button
-              type="button"
-              onClick={() => setSelectedCat("all")}
-              className={`shrink-0 h-9 px-3.5 rounded-xl text-[0.8125rem] font-bold transition-colors cursor-pointer ${
-                selectedCat === "all"
-                  ? "bg-primary text-primary-foreground shadow-xs"
-                  : "bg-background border border-border text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              {t(language, "library.all")} ({formatNumerals(AUTHENTIC_AZKAR_COLLECTION.length, language)})
-            </button>
             {categories.map((cat) => (
               <button
                 key={cat.id}
                 type="button"
                 onClick={() => setSelectedCat(cat.id)}
-                className={`shrink-0 h-9 px-3.5 rounded-xl text-[0.8125rem] font-bold transition-colors cursor-pointer ${
+                aria-pressed={selectedCat === cat.id}
+                className={`min-h-11 shrink-0 rounded-xl px-3.5 text-[0.8125rem] font-bold transition-colors cursor-pointer ${
                   selectedCat === cat.id
                     ? "bg-primary text-primary-foreground shadow-xs"
                     : "bg-background border border-border text-muted-foreground hover:text-foreground"
@@ -154,26 +152,28 @@ export function AuthenticZikrLibrarySheet({
                 key={item.id}
                 type="button"
                 onClick={() => handleSelectAuthentic(item)}
-                className="group flex w-full flex-col gap-2 rounded-2xl border border-border/70 bg-card p-4 text-start shadow-xs transition-all hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+                aria-pressed={selectedZikrId === item.id}
+                className={`group flex min-h-24 w-full flex-col gap-2 rounded-[var(--ds-radius-control)] border p-4 text-start transition-[border-color,background-color,box-shadow] hover:border-primary/50 hover:bg-muted/40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer ${
+                  selectedZikrId === item.id ? "border-primary bg-primary/8" : "border-border-control bg-card"
+                }`}
               >
                 <div className="flex items-start justify-between gap-3">
-                  <p className="zikr-text text-[1.125rem] font-bold leading-relaxed text-foreground" dir="rtl">
+                  <p className="zikr-text line-clamp-2 text-[1.0625rem] font-bold leading-7 text-foreground" dir="rtl">
                     {item.textAr}
                   </p>
-                </div>
-
-                {!isArabic && (
-                  <p className="latin-ui text-[0.875rem] text-muted-foreground leading-relaxed">{item.textEn}</p>
-                )}
-
-                <div className="flex items-center justify-between pt-1 border-t border-border/40 text-[0.75rem] font-medium text-muted-foreground">
-                  <span className="text-primary font-semibold">{isArabic ? item.sourceRefAr : item.sourceRefEn}</span>
-                  {item.recommendedTarget && (
-                    <span className="rounded-md bg-muted px-2 py-0.5 text-[0.6875rem] font-bold text-foreground">
-                      {formatNumerals(item.recommendedTarget, language)} {t(language, "library.times")}
+                  {selectedZikrId === item.id ? (
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
+                      <Check size={14} strokeWidth={3} aria-hidden="true" />
                     </span>
-                  )}
+                  ) : null}
                 </div>
+
+                <p
+                  className="line-clamp-2 border-t border-border/40 pt-2 text-[0.8125rem] font-semibold leading-5 text-muted-foreground"
+                  dir="auto"
+                >
+                  {isArabic ? item.virtueAr : item.virtueEn}
+                </p>
               </button>
             ))
           )}

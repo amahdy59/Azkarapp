@@ -3,7 +3,8 @@ export type AzkarBackgroundKey = "morning" | "evening" | "sleep" | "friday" | "p
 export interface ResponsiveBackgroundAsset {
   alt: "";
   decorative: true;
-  objectPosition: string;
+  objectPositionCompact: string;
+  objectPositionWide: string;
   sizes: string;
   placeholder: string;
   avif: readonly { src: string; width: number }[];
@@ -14,7 +15,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   morning: {
     alt: "",
     decorative: true,
-    objectPosition: "43% 57%",
+    objectPositionCompact: "28% 72%",
+    objectPositionWide: "40% 70%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -49,7 +51,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   evening: {
     alt: "",
     decorative: true,
-    objectPosition: "52% 55%",
+    objectPositionCompact: "72% 74%",
+    objectPositionWide: "58% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -84,7 +87,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   sleep: {
     alt: "",
     decorative: true,
-    objectPosition: "46% 50%",
+    objectPositionCompact: "25% 74%",
+    objectPositionWide: "42% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -119,7 +123,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
   friday: {
     alt: "",
     decorative: true,
-    objectPosition: "55% 55%",
+    objectPositionCompact: "22% 60%",
+    objectPositionWide: "42% 60%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {
@@ -155,7 +160,8 @@ export const azkarBackgrounds: Record<AzkarBackgroundKey, ResponsiveBackgroundAs
     alt: "",
     decorative: true,
     // Slightly higher crop than evening to show more sky — peaceful post-prayer feel
-    objectPosition: "52% 40%",
+    objectPositionCompact: "72% 74%",
+    objectPositionWide: "58% 72%",
     sizes: "(max-width: 767px) 100vw, (max-width: 1199px) 66vw, 760px",
     avif: [
       {

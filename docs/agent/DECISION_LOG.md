@@ -969,3 +969,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** Home, Progress, Friday, Counter, semantic theme styles, responsive tests, and the design-system contract.
 - **Tests/evidence required:** Focused Home, Friday, Counter, and Wird tests; narrow/tablet/desktop browser geometry; full local release gate; green GitHub Pages workflow and production SHA smoke verification.
 - **Supersedes:** The shared wide-screen Custom Counter geometry in DEC-048 and the next-prayer placement decision in DEC-051. Reader geometry, prayer calculation, and reviewed content contracts remain unchanged.
+
+---
+
+## DEC-053 - Focal Home imagery, prayer-state anatomy, and shared counting feedback
+
+- **Date:** 2026-08-11
+- **Status:** Approved
+- **Owner:** User
+- **Related scope:** Focused Phase 05/07 Home, Reader, Custom Counter, and Friday Salawat follow-up
+- **Context:** The user identified a responsive gap above the Home hero, subject loss under image cropping, crowded Wird labels, a detached prayer-time strip, inconsistent Masbaha inputs, a missing arbitrary Salawat target, and a useful ripple that was isolated to one counter flow.
+- **Decision:** Home begins flush at the screen edge and uses category-specific compact/wide focal points. A finite decorative particle drift may appear over Home imagery, but never loops and is removed for reduced motion, reduced transparency, and high contrast. The post-prayer rail keeps each calculated time inside its prayer card and differentiates completed, current, next, earlier, and upcoming states through localized text plus repository icons. Counter targets use labelled form semantics and 44px controls; compact targets wrap instead of clipping. The authentic-zikr selector remains a dialog, adds a labelled benefit-aware search, and shows concise zikr-plus-reviewed-benefit choices. Remove Custom Counter Undo and keep Reset as its single secondary action. Friday Salawat defaults to 100, accepts any validated target from 1 to 100,000, and reuses the target picker. The one-shot counter ripple becomes shared across Reader, Custom Counter, and Salawat and is disabled by reduced motion.
+- **Why:** These changes preserve devotional focus while improving subject visibility, state recognition, touch ergonomics, form predictability, and responsive use without a dependency or religious-content change.
+- **Consequences:** Custom Counter is intentionally larger than Reader at wide breakpoints. Friday target persistence now accepts validated integers rather than three literal values. Existing out-of-range persisted values are clamped safely. Hero particles are decorative and never announced. Prayer calculations, reviewed benefits, zikr text, repetition data, and offline behavior are unchanged.
+- **Files/contracts to update:** Home/background components, post-prayer cards, shared counter styles, Reader, Custom Counter and zikr library sheet, Friday Salawat and persistence, shared Select geometry, i18n, motion/design documentation, tests, and release highlights.
+- **Tests/evidence required:** Focused component/persistence tests; 320px large-text, phone, tablet, and desktop live-browser checks; reduced-motion verification; full local release gate; green Quality and Pages workflows; production metadata and smoke verification.
+- **Supersedes:** DEC-052's detached next-prayer presentation and its earlier Custom Counter desktop size. All prayer calculation, reviewed-content, Reader full-surah, and persistence-merge contracts remain authoritative.

@@ -72,23 +72,25 @@ The following animation patterns are strictly prohibited:
 
 ## 6. Component Motion Matrix
 
-| Component              | Animation                | Duration    | Easing     | Reduced Motion Behavior         |
-| :--------------------- | :----------------------- | :---------- | :--------- | :------------------------------ |
-| **Universal Press**    | Scale to 0.98            | 90ms        | Standard   | Opacity change only, max 100ms  |
-| **Counter Number Pop** | Scale/Opacity up         | 160ms       | Enter      | Opacity transition              |
-| **Counter Ring Pulse** | Subtle scale outward     | 280ms       | Enter      | Removed                         |
-| **Counter Readiness**  | Ready state indication   | 600ms       | Enter      | Removed                         |
-| **Counter Completion** | Final state animation    | 440ms       | Enter      | Fade to completion state        |
-| **Check Draw**         | SVG `stroke-dashoffset`  | 300ms       | Enter      | Instant or fast opacity (100ms) |
-| **Navigation Active**  | Highlight state change   | 220ms       | Enter      | Opacity fade                    |
-| **Favorite Pop**       | Scale and color shift    | 260ms       | Enter      | Opacity/Color transition only   |
-| **Zikr Step**          | Enter / Exit translation | 300ms/220ms | Enter/Exit | Crossfade only                  |
-| **Completion Screen**  | Enter transition         | 240ms       | Ease-out   | Crossfade only                  |
-| **Celebration Pop**    | Pop / Glow               | 520ms/900ms | Enter      | Opacity fade (max 100ms)        |
-| **Menu Pop**           | Context menu opening     | 160ms       | Standard   | Opacity fade                    |
-| **Scrim In**           | Background dimming       | 180ms       | Standard   | Instant or fast opacity         |
-| **Leaf Appear**        | Spring scale in          | 380ms       | Spring     | Opacity fade                    |
-| **Progress Ring**      | `stroke-dashoffset`      | 150ms       | Standard   | Removed or fast opacity         |
+| Component               | Animation                | Duration    | Easing     | Reduced Motion Behavior         |
+| :---------------------- | :----------------------- | :---------- | :--------- | :------------------------------ |
+| **Universal Press**     | Scale to 0.98            | 90ms        | Standard   | Opacity change only, max 100ms  |
+| **Counter Number Pop**  | Scale/Opacity up         | 160ms       | Enter      | Opacity transition              |
+| **Counter Ring Pulse**  | Subtle scale outward     | 280ms       | Enter      | Removed                         |
+| **Counter Readiness**   | Ready state indication   | 600ms       | Enter      | Removed                         |
+| **Counter Completion**  | Final state animation    | 440ms       | Enter      | Fade to completion state        |
+| **Counter Tap Ripple**  | Scale/opacity from input | 560ms       | Ease-out   | Removed                         |
+| **Home Hero Particles** | Finite upward drift      | 3.9-4.8s    | Ease-out   | Removed                         |
+| **Check Draw**          | SVG `stroke-dashoffset`  | 300ms       | Enter      | Instant or fast opacity (100ms) |
+| **Navigation Active**   | Highlight state change   | 220ms       | Enter      | Opacity fade                    |
+| **Favorite Pop**        | Scale and color shift    | 260ms       | Enter      | Opacity/Color transition only   |
+| **Zikr Step**           | Enter / Exit translation | 300ms/220ms | Enter/Exit | Crossfade only                  |
+| **Completion Screen**   | Enter transition         | 240ms       | Ease-out   | Crossfade only                  |
+| **Celebration Pop**     | Pop / Glow               | 520ms/900ms | Enter      | Opacity fade (max 100ms)        |
+| **Menu Pop**            | Context menu opening     | 160ms       | Standard   | Opacity fade                    |
+| **Scrim In**            | Background dimming       | 180ms       | Standard   | Instant or fast opacity         |
+| **Leaf Appear**         | Spring scale in          | 380ms       | Spring     | Opacity fade                    |
+| **Progress Ring**       | `stroke-dashoffset`      | 150ms       | Standard   | Removed or fast opacity         |
 
 ## 7. Reduced Motion Behavior
 
@@ -115,6 +117,7 @@ All animations must comply with WCAG standards:
 Animations must not degrade the user experience:
 
 - **Compositor-friendly:** Only animate opacity and transform whenever possible.
+- **Finite ambience:** Home particles run once after entry; they never loop, flash, capture input, or continue as an endless distraction.
 - **No Layout Reflow:** Avoid animating properties that trigger reflow (e.g., width, height, margin, padding) per frame.
 - **No Permanent `will-change`:** Use `will-change` sparingly and remove it when the animation completes.
 - **No Extra Libraries:** Do not add new animation libraries. Use CSS transitions/animations or existing libraries carefully.

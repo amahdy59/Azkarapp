@@ -59,6 +59,11 @@ const ar = {
   home: {
     timeFor: "حان وقت",
     nextPrayer: "الصلاة القادمة",
+    prayerTrackerHint: "مواقيت الصلاة وحالة أذكار ما بعد الصلاة اليوم",
+    prayerNow: "حان وقتها",
+    prayerNext: "الصلاة القادمة",
+    prayerEarlier: "مضت",
+    prayerUpcoming: "لاحقًا",
     routineCompleteHint: "المجموعة المراجعة كاملة.",
     routineAbbreviatedHint: "اختيار أقصر عندما يكون الوقت محدوداً.",
     remainingCount: "متبقي {count}",
@@ -230,7 +235,7 @@ const ar = {
   library: {
     authenticTitle: "مكتبة الأذكار المأثورة الموثقة",
     authenticSubtitle: "أذكار ثابتة عن النبي ﷺ وأصحابه",
-    authenticSearch: "بحث في الأذكار والمصادر...",
+    authenticSearch: "ابحث في الذكر أو فضله...",
     all: "الكل",
     noMatchingDhikr: "لم يتم العثور على أذكار مطابقة",
     times: "مرة",

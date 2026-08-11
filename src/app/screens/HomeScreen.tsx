@@ -1,6 +1,19 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, ArrowLeft, ArrowRight, Sparkles, Check, Clock } from "../components/icons";
+import {
+  Calendar,
+  Zap,
+  ArrowLeft,
+  ArrowRight,
+  Sparkles,
+  Check,
+  Clock,
+  Sunrise,
+  Sun,
+  CloudSun,
+  Sunset,
+  MoonStar,
+} from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -137,6 +150,15 @@ function prayerLabel(language: AppLanguage, prayer: PrayerName) {
 
 function prayerTrackerLabel(language: AppLanguage, prayer: PrayerName) {
   return language === "ar" ? `بعد ${prayerLabel(language, prayer)}` : `After ${prayerLabel(language, prayer)}`;
+}
+
+function PrayerIcon({ prayer }: { prayer: PrayerName }) {
+  const props = { size: 21, strokeWidth: 2.2, "aria-hidden": true } as const;
+  if (prayer === "fajr") return <Sunrise {...props} />;
+  if (prayer === "dhuhr") return <Sun {...props} />;
+  if (prayer === "asr") return <CloudSun {...props} />;
+  if (prayer === "maghrib") return <Sunset {...props} />;
+  return <MoonStar {...props} />;
 }
 
 export function getHomeAction(
@@ -410,6 +432,7 @@ export function HomeScreen({
     <ScreenContainer
       dir={direction}
       className="px-0 pt-0 relative overflow-hidden flex flex-col"
+      style={{ paddingTop: 0 }}
       screenName={t(language, "home.title")}
     >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
@@ -427,7 +450,10 @@ export function HomeScreen({
               washed across the whole screen, so the page keeps its own surface. */}
           {/* Capped and centred: unbounded, the hero stretched the full width of
               an ultrawide display and the scene image lost all composition. */}
-          <div className="relative w-full overflow-hidden sm:mx-auto sm:mt-4 sm:max-w-[80rem] sm:rounded-[36px] sm:shadow-raised">
+          <div
+            data-testid="home-hero"
+            className="relative w-full overflow-hidden sm:mx-auto sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised"
+          >
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             <div
               aria-hidden="true"
@@ -544,38 +570,13 @@ export function HomeScreen({
               dir={direction}
               className="overflow-hidden rounded-[30px] border border-border bg-card text-foreground shadow-raised"
             >
-              <div className="grid gap-4 border-b border-border/70 bg-muted/35 px-4 py-5 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
-                <div className="min-w-0 text-start">
-                  <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
-                    {t(language, "progress.postPrayerAzkar")}
-                  </h2>
-                </div>
-                <div className="text-[0.8125rem] font-bold text-muted-foreground" dir="auto">
-                  {isArabic
-                    ? `${prayerLabel(language, currentPrayerPeriod.currentPrayer)} بعد ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`
-                    : `After ${prayerLabel(language, currentPrayerPeriod.currentPrayer)} ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`}
-                </div>
-              </div>
-
-              <div
-                data-testid="next-prayer"
-                className="mx-4 mb-5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-border/70 bg-background/65 px-3 py-2 text-[0.8125rem] font-bold text-muted-foreground sm:mx-6 md:mx-0 md:mb-0 md:me-6"
-              >
-                <Clock className="size-4 shrink-0 text-primary" aria-hidden="true" />
-                <span>{t(language, "home.nextPrayer")}</span>
-                <strong className="font-black text-foreground" dir="auto">
-                  {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
-                </strong>
-                <time
-                  data-testid="next-prayer-time"
-                  className="font-black text-foreground"
-                  dateTime={nextPrayerInfo.time24}
-                >
-                  {formatPrayerTimeLabel(nextPrayerInfo.time24, isArabic)}
-                </time>
-                <span className="rounded-full bg-primary/12 px-2 py-0.5 text-primary" dir="ltr">
-                  {nextPrayerInfo.formattedCountdown}
-                </span>
+              <div className="border-b border-border/70 bg-muted/35 px-4 py-5 text-start sm:px-6">
+                <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
+                  {t(language, "progress.postPrayerAzkar")}
+                </h2>
+                <p className="mt-2 text-[0.8125rem] font-semibold leading-5 text-muted-foreground" dir="auto">
+                  {t(language, "home.prayerTrackerHint")}
+                </p>
               </div>
 
               <div className="mx-4 mt-5 h-2 overflow-hidden rounded-full bg-muted sm:mx-6" aria-hidden="true">
@@ -595,38 +596,69 @@ export function HomeScreen({
                     const isActivePrayer = index === activePrayerIndex;
                     const isPastPrayer = index < activePrayerIndex;
                     const isCompletedPrayer = afterPrayerCompletedToday && (isActivePrayer || isPastPrayer);
+                    const isNextPrayer = prayer === nextPrayerInfo.name;
+                    const stateLabel = isCompletedPrayer
+                      ? t(language, "progress.completed")
+                      : isActivePrayer
+                        ? t(language, "home.prayerNow")
+                        : isNextPrayer
+                          ? t(language, "home.prayerNext")
+                          : isPastPrayer
+                            ? t(language, "home.prayerEarlier")
+                            : t(language, "home.prayerUpcoming");
 
                     return (
                       <button
                         key={prayer}
                         type="button"
                         onClick={() => onResume("after_prayer")}
-                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
-                          isActivePrayer
-                            ? "border-primary/60 bg-primary/10 text-foreground shadow-[0_14px_30px_color-mix(in_srgb,var(--primary)_16%,transparent)]"
-                            : "border-border bg-background/50 text-foreground hover:border-primary/35 hover:bg-muted/65"
-                        }`}
-                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${
+                        data-testid={isNextPrayer ? "next-prayer" : undefined}
+                        data-prayer-state={
                           isCompletedPrayer
-                            ? t(language, "progress.completed")
+                            ? "completed"
                             : isActivePrayer
-                              ? t(language, "progress.inProgress")
-                              : t(language, "progress.notCompleted")
+                              ? "current"
+                              : isNextPrayer
+                                ? "next"
+                                : isPastPrayer
+                                  ? "earlier"
+                                  : "upcoming"
+                        }
+                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
+                          isCompletedPrayer
+                            ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
+                            : isActivePrayer
+                              ? "border-primary/60 bg-primary/12 text-foreground shadow-[0_14px_30px_color-mix(in_srgb,var(--primary)_16%,transparent)]"
+                              : isNextPrayer
+                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-primary/45 hover:bg-primary/10"
+                                : isPastPrayer
+                                  ? "border-border/70 bg-muted/35 text-foreground hover:bg-muted/60"
+                                  : "border-border/60 bg-background/35 text-foreground hover:border-primary/25 hover:bg-muted/50"
                         }`}
+                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${stateLabel}`}
                         aria-current={isActivePrayer ? "step" : undefined}
                       >
                         <span
-                          className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${
-                            isActivePrayer ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                          className={`relative flex size-12 shrink-0 items-center justify-center rounded-2xl ${
+                            isCompletedPrayer
+                              ? "bg-success text-success-foreground"
+                              : isActivePrayer
+                                ? "bg-primary text-primary-foreground"
+                                : isNextPrayer
+                                  ? "bg-primary/12 text-primary"
+                                  : "bg-muted text-muted-foreground"
                           }`}
                         >
+                          <PrayerIcon prayer={prayer} />
                           {isCompletedPrayer ? (
-                            <Check size={18} strokeWidth={3} aria-hidden="true" />
-                          ) : isActivePrayer ? (
-                            <Clock size={18} strokeWidth={2.5} aria-hidden="true" />
-                          ) : (
-                            <span className="h-2.5 w-2.5 rounded-full bg-current" aria-hidden="true" />
-                          )}
+                            <span className="absolute -end-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-success text-success-foreground">
+                              <Check size={11} strokeWidth={3} aria-hidden="true" />
+                            </span>
+                          ) : isActivePrayer || isNextPrayer ? (
+                            <span className="absolute -end-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-card text-primary">
+                              <Clock size={11} strokeWidth={3} aria-hidden="true" />
+                            </span>
+                          ) : null}
                         </span>
 
                         <div className="min-w-0 flex-1 lg:flex-none">
@@ -636,9 +668,29 @@ export function HomeScreen({
                           >
                             {prayerTrackerLabel(language, prayer)}
                           </span>
-                          <span className="mt-1 block text-[0.75rem] font-bold text-muted-foreground">
+                          <time
+                            data-testid={isNextPrayer ? "next-prayer-time" : undefined}
+                            className="mt-1.5 block text-[0.8125rem] font-black text-foreground"
+                            dateTime={currentPrayerPeriod.prayerTimes[prayer]}
+                          >
                             {formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}
+                          </time>
+                          <span
+                            className={`mt-2 inline-flex min-h-6 items-center rounded-full px-2.5 py-0.5 text-[0.6875rem] font-black ${
+                              isCompletedPrayer
+                                ? "bg-success/15 text-success"
+                                : isActivePrayer || isNextPrayer
+                                  ? "bg-primary/12 text-primary"
+                                  : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {stateLabel}
                           </span>
+                          {isNextPrayer ? (
+                            <span className="mt-1.5 block text-[0.6875rem] font-bold text-primary" dir="ltr">
+                              {nextPrayerInfo.formattedCountdown}
+                            </span>
+                          ) : null}
                         </div>
                       </button>
                     );

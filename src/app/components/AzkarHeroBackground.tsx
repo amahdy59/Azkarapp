@@ -18,7 +18,8 @@ export function AzkarHeroBackground({ kind, priority = false, className = "" }: 
   const asset = azkarBackgrounds[kind];
   const style = {
     "--azkar-bg-placeholder": `url(${getAssetUrl(asset.placeholder)})`,
-    "--azkar-bg-position": asset.objectPosition,
+    "--azkar-bg-position": asset.objectPositionCompact,
+    "--azkar-bg-position-wide": asset.objectPositionWide,
   } as CSSProperties;
 
   return (

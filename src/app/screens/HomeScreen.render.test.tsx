@@ -43,6 +43,8 @@ describe("HomeScreen quick access", () => {
     );
 
     expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
+    expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
+    expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
     expect(screen.getByTestId("home-header-stats")).toBeInTheDocument();
     expect(screen.getByTestId("header-streak").compareDocumentPosition(screen.getByTestId("header-palms"))).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
@@ -94,7 +96,12 @@ describe("HomeScreen quick access", () => {
 
     expect(screen.getByTestId("after-prayer-trackers")).toBeInTheDocument();
     expect(screen.getByTestId("next-prayer")).toHaveTextContent("Next prayer");
+    expect(screen.getByTestId("next-prayer")).toHaveAttribute("data-prayer-state", "next");
     expect(screen.getByTestId("next-prayer-time")).toBeInTheDocument();
+    expect(screen.getByTestId("after-prayer-trackers").querySelectorAll("button[data-prayer-state]")).toHaveLength(5);
+    expect(screen.getByTestId("after-prayer-trackers").querySelectorAll("button[data-prayer-state] svg")).toHaveLength(
+      7,
+    );
     expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
     expect(screen.getByText("After Asr")).toBeInTheDocument();
     expect(screen.getByText("After Fajr")).toBeInTheDocument();

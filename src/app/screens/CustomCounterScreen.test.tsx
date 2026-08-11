@@ -17,7 +17,7 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("custom-counter-surface");
   });
 
-  it("increments counter on tap and supports undo/reset", () => {
+  it("increments on tap, removes undo, and keeps reset as the single secondary action", () => {
     const onBack = vi.fn();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
@@ -25,10 +25,8 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.click(tapButton);
 
     expect(screen.getByText("١")).toBeInTheDocument();
-    const undoButton = screen.getAllByText("تراجع")[0]?.closest("button");
-    expect(undoButton).not.toBeDisabled();
-
-    fireEvent.click(undoButton!);
+    expect(screen.queryByRole("button", { name: "تراجع" })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "إعادة تعيين العداد" }));
     expect(screen.getAllByText("٠")[0]).toBeInTheDocument();
   });
 
@@ -60,10 +58,22 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.keyDown(counter, { key: " ", code: "Space" });
     expect(counter).toHaveTextContent("1");
 
-    const undo = screen.getByRole("button", { name: "Undo" });
-    undo.focus();
-    fireEvent.keyDown(undo, { key: " ", code: "Space" });
+    const reset = screen.getByRole("button", { name: /reset counter/i });
+    reset.focus();
+    fireEvent.keyDown(reset, { key: " ", code: "Space" });
     expect(counter).toHaveTextContent("1");
+  });
+
+  it("exposes the zikr picker as a labelled dialog control with a concise benefit", () => {
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    const picker = screen.getByRole("button", { name: /Selected Dhikr/i });
+    expect(picker).toHaveAttribute("aria-haspopup", "dialog");
+    expect(picker).toHaveAttribute("aria-expanded", "false");
+
+    fireEvent.click(picker);
+    expect(screen.getByRole("textbox")).toHaveAccessibleName(/.+/);
+    expect(picker).toHaveAttribute("aria-expanded", "true");
   });
 
   it("plays the Web Audio click when an enabled counter is tapped", () => {

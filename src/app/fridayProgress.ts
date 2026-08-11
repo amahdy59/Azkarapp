@@ -1,5 +1,5 @@
 export const FRIDAY_KAHF_WEEK_KEY = "azkarapp.friday-kahf-week.v1";
-export type FridaySalawatTarget = 10 | 100 | 1000;
+export type FridaySalawatTarget = number;
 
 export interface FridaySalawatProgress {
   count: number;
@@ -81,7 +81,7 @@ export function writeFridayDuaProgress(ids: Iterable<string>, week = getIsoWeekK
 export function readFridaySalawatProgress(week = getIsoWeekKey()): FridaySalawatProgress {
   try {
     const parsed = JSON.parse(localStorage.getItem(fridaySalawatKey(week)) ?? "null") as Partial<FridaySalawatProgress>;
-    const target = parsed?.target === 10 || parsed?.target === 1000 ? parsed.target : 100;
+    const target = Number.isFinite(parsed?.target) ? Math.min(100_000, Math.max(1, Math.floor(parsed.target!))) : 100;
     const count = Number.isFinite(parsed?.count) ? Math.max(0, Math.floor(parsed.count!)) : 0;
     return { count, target };
   } catch {
@@ -91,7 +91,9 @@ export function readFridaySalawatProgress(week = getIsoWeekKey()): FridaySalawat
 
 export function writeFridaySalawatProgress(progress: FridaySalawatProgress, week = getIsoWeekKey()): void {
   try {
-    localStorage.setItem(fridaySalawatKey(week), JSON.stringify(progress));
+    const target = Math.min(100_000, Math.max(1, Math.floor(progress.target)));
+    const count = Math.max(0, Math.floor(progress.count));
+    localStorage.setItem(fridaySalawatKey(week), JSON.stringify({ count, target }));
   } catch {
     // Counting remains usable in memory when storage is unavailable.
   }

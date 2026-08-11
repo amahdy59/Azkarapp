@@ -30,6 +30,42 @@
   object-position: var(--azkar-bg-position, center);
 }
 
+@media (min-width: 37.5rem) {
+  .azkar-hero__media img {
+    object-position: var(--azkar-bg-position-wide, var(--azkar-bg-position, center));
+  }
+}
+
+.azkar-hero-particle {
+  position: absolute;
+  left: var(--particle-x);
+  top: var(--particle-y);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 999px;
+  background: rgb(255 226 158 / 58%);
+  box-shadow: 0 0 0.65rem rgb(255 205 105 / 32%);
+  opacity: 0;
+  animation: azkar-particle-drift var(--particle-duration) var(--particle-delay) ease-out 1 both;
+}
+
+@keyframes azkar-particle-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0.45rem, 0) scale(0.75);
+  }
+  20% {
+    opacity: 0.48;
+  }
+  70% {
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--particle-drift), -1.5rem, 0) scale(1.1);
+  }
+}
+
 /* RTL-friendly text-safe overlay: stronger on the logical end/right where Arabic text sits. */
 .azkar-hero__overlay {
   z-index: -1;
@@ -60,4 +96,14 @@
   .azkar-hero__media img {
     transition: none;
   }
+
+  .azkar-hero-particles {
+    display: none;
+  }
+}
+
+.reduce-motion .azkar-hero-particles,
+.reduce-transparency .azkar-hero-particles,
+.high-contrast .azkar-hero-particles {
+  display: none;
 }

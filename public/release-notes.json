@@ -1,14 +1,14 @@
 {
   "ar": [
-    "واجهة قراءة أكثر راحة للعين مع محاذاة النص مثل المصحف وتوسيطه بذكاء.",
-    "إلغاء وضع الإخفاء التلقائي للقوائم لتبقى أدوات التحكم في متناول يدك دائماً.",
-    "استغلال أفضل لمساحة الشاشة مع إزالة التوسيعات الزائدة في شاشات الجوال.",
-    "تحسينات على شكل العداد ليظهر بشكل عائم وأكثر أناقة."
+    "تبدأ واجهة الرئيسية من أعلى الشاشة مع محاذاة أفضل لصور الأذكار وحركة ضوئية هادئة تحترم إعدادات سهولة الوصول.",
+    "تعرض بطاقة أذكار ما بعد الصلاة رمزًا وحالة ووقتًا واضحًا لكل صلاة داخل بطاقتها.",
+    "أصبحت بطاقات وردك اليوم أكثر اتساعًا ووضوحًا على الجوال واللوحي وسطح المكتب.",
+    "تحسنت المسبحة وعداد الصلاة على النبي ﷺ بحقوق إدخال موحدة، واختيار ذكر قابل للبحث، وأهداف مخصصة، واستجابة لمس متسقة."
   ],
   "en": [
-    "A more comfortable reading interface with Mushaf-style text alignment and smart vertical centering.",
-    "Disabled auto-hiding of the navigation bars so controls are always at your fingertips.",
-    "Better screen space utilization by allowing content to expand fully side-to-side on mobile.",
-    "Refined the floating counter appearance for a more elegant look."
+    "Home now starts flush at the top with better image focal points and calm decorative motion that respects accessibility preferences.",
+    "Post-prayer cards now show a clear icon, state, and prayer time inside every prayer card.",
+    "Today's Wird cards are roomier and easier to read across phone, tablet, and desktop layouts.",
+    "Masbaha and Salawat counting now use consistent inputs, searchable zikr selection, custom targets, and shared tap feedback."
   ]
 }

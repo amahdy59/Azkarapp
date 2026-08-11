@@ -59,6 +59,11 @@ const en = {
   home: {
     timeFor: "Time for",
     nextPrayer: "Next prayer",
+    prayerTrackerHint: "Prayer times and post-prayer remembrance status for today",
+    prayerNow: "Time now",
+    prayerNext: "Next prayer",
+    prayerEarlier: "Earlier",
+    prayerUpcoming: "Upcoming",
     routineCompleteHint: "The full reviewed collection.",
     routineAbbreviatedHint: "A shorter selection for limited time.",
     remainingCount: "{count} remaining",
@@ -230,7 +235,7 @@ const en = {
   library: {
     authenticTitle: "Authentic Verified Zikr Library",
     authenticSubtitle: "Authentic Sunnah & Sahabah Supplications",
-    authenticSearch: "Search dhikr or source...",
+    authenticSearch: "Search dhikr or benefit...",
     all: "All",
     noMatchingDhikr: "No matching dhikr found",
     times: "times",

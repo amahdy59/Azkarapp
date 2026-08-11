@@ -25,7 +25,7 @@ import { getAzkarForMode } from "../content/azkar";
 import { isLongSurah, splitMushafPages } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
 import { ProgressBar } from "../components/ProgressBar";
-import { ZikrCounterSurface } from "../components/ZikrComponents";
+import { tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
@@ -185,6 +185,7 @@ export function ReaderScreen({
   const readingContentRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
   const [visibleMushafPage, setVisibleMushafPage] = useState<number | null>(null);
+  const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -790,6 +791,24 @@ export function ReaderScreen({
 
   const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
 
+  const handleReaderPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduceMotion || longSurah || complete) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-prevent-count='true']",
+      )
+    ) {
+      return;
+    }
+    const rect = event.currentTarget.getBoundingClientRect();
+    setCanvasRipples((current) => [
+      ...current.slice(-3),
+      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
+    ]);
+  };
+
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
@@ -802,12 +821,27 @@ export function ReaderScreen({
       style={categoryThemeStyles}
       screenName={isArabic ? category.nameArabic : category.name}
       onClick={handleSurfaceTap}
+      onPointerDown={handleReaderPointerDown}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
     >
       <div className="sr-only" aria-live="polite">
         {shareMessage}
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
+        {canvasRipples.map((ripple) => (
+          <span
+            key={ripple.id}
+            className="tap-ripple"
+            style={{
+              ...tapRippleStyle,
+              left: ripple.x,
+              top: ripple.y,
+            }}
+            onAnimationEnd={() => setCanvasRipples((current) => current.filter((item) => item.id !== ripple.id))}
+          />
+        ))}
       </div>
       {/* Polite, not assertive: this region carries counting progress (every
           tenth repetition, the halfway mark) and the completion message. None
