@@ -5,6 +5,7 @@ import { getCurrentSession, loadRemoteState, subscribeToAuthChanges, syncRemoteS
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { t } from "../i18n";
 import { prepareAuthenticatedState, type GuestMigrationDecision } from "./useAuthHandlers";
+import { reportError } from "../../lib/observability";
 
 const LAST_SYNC_STORAGE_KEY = "azkarapp.last-successful-sync.v1";
 
@@ -115,9 +116,8 @@ export function useRemoteAccountSync({
         }
       } catch (error) {
         if (active) {
-          setSyncError(
-            error instanceof Error ? error.message : t(initialState.settings.language, "syncStatus.restoreError"),
-          );
+          reportError(error, "account-sync-restore");
+          setSyncError(t(initialState.settings.language, "syncStatus.restoreError"));
         }
       } finally {
         if (active) {
@@ -147,9 +147,8 @@ export function useRemoteAccountSync({
       })
       .catch((error) => {
         if (active) {
-          setSyncError(
-            error instanceof Error ? error.message : t(initialState.settings.language, "syncStatus.restoreError"),
-          );
+          reportError(error, "account-sync-subscribe");
+          setSyncError(t(initialState.settings.language, "syncStatus.restoreError"));
         }
       });
 
@@ -170,7 +169,6 @@ export function useRemoteAccountSync({
         .enqueue(async () => {
           if (!mounted.current) return;
           if (!navigator.onLine) {
-            setSyncError(t(snapshot.settings.language, "syncStatus.offlineNotice"));
             return;
           }
           setIsSyncing(true);
@@ -198,9 +196,8 @@ export function useRemoteAccountSync({
             }
           }
           if (mounted.current) {
-            setSyncError(
-              lastError instanceof Error ? lastError.message : t(snapshot.settings.language, "syncStatus.pushError"),
-            );
+            reportError(lastError, "account-sync-push");
+            setSyncError(t(snapshot.settings.language, "syncStatus.pushError"));
           }
         })
         .finally(() => {

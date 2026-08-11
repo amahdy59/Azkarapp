@@ -116,6 +116,10 @@ Coordinates are rounded to three decimal places in cache keys. A date, method, o
 
 ## Failure and privacy behavior
 
+Geolocation failure is classified as unsupported, permission denied, unavailable, timeout, or unknown. Settings gives reason-specific recovery guidance and keeps the previously saved location and prayer settings unchanged. Permission denial points to the browser's site settings; unsupported detection keeps manual latitude, longitude, city, and IANA timezone entry available.
+
+Changing the calculation method remains local-first. If Aladhan verification is unavailable, the selected method is saved and the astronomical local calculation stays active; Settings reports that fallback without interrupting Home.
+
 | Condition                         | Behavior                                                      |
 | --------------------------------- | ------------------------------------------------------------- |
 | Geolocation denied/unavailable    | Keep existing/default location and show an actionable message |

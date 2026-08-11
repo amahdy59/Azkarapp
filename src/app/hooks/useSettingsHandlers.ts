@@ -2,6 +2,7 @@ import type { AppLanguage, AppStateSnapshot } from "../types";
 import { clearStoredAppData, resetStoredSettings } from "../state";
 import { t } from "../i18n";
 import { deleteCurrentAccount } from "../../lib/auth";
+import { reportError } from "../../lib/observability";
 
 /**
  * Clears every local trace of the user's data.
@@ -38,7 +39,7 @@ export function useSettingsHandlers({
     description: string,
     confirmLabel: string,
     cancelLabel: string,
-    onConfirm: () => void,
+    onConfirm: () => void | Promise<void>,
     destructive?: boolean,
   ) => void;
 }) {
@@ -93,8 +94,8 @@ export function useSettingsHandlers({
           await clearAllLocalData();
           window.location.reload();
         } catch (error) {
-          console.error("Account deletion failed", error instanceof Error ? error.message : "Unknown error");
-          window.alert(t(selectedLang, "settings.deleteAccountFailed"));
+          reportError(error, "account-delete");
+          throw new Error(t(selectedLang, "settings.deleteAccountFailed"), { cause: error });
         }
       },
       true,

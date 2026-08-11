@@ -90,6 +90,17 @@ Every interactive component should define:
 - Loading
 - Error where applicable
 
+### System feedback contract
+
+- Empty content is ordinary page content, not a live region. It may offer one clear next action.
+- A newly occurring recoverable error uses `role="alert"`, explains what remains safe, and provides the smallest useful recovery. Move focus to the recovery heading only when the failure blocks the current screen.
+- Loading states include visible text, `aria-busy`, and a restrained indicator that yields to reduced motion. Do not rely on an unlabeled spinner.
+- Success, cancellation, reconnect, and other non-urgent outcomes use a narrowly scoped polite status. Never make an entire interactive card, sheet, or notice a live region.
+- Disable the initiating action while an asynchronous operation is pending. Retry must be idempotent and must not duplicate writes.
+- Offline feedback may briefly occupy the full status row, then collapses to a 44 px user-expandable indicator. Account-sync errors remain independently retryable/dismissible, while reading and counting stay available.
+- Raw provider, network, cache, clipboard, and database messages are diagnostic data, not product copy. Map them to localized user-safe outcomes and send only privacy-safe metadata to observability.
+- Recoverable code-split failures offer **Try again** and **Go to Azkar** first. **Refresh app** appears only after retry fails; no automatic reload is permitted.
+
 ## Reader contract
 
 - The header follows reading direction: back is at logical start, the screen title stays centered, and the menu is at logical end. DOM and tab order remain stable.

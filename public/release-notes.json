@@ -1,14 +1,14 @@
 {
   "ar": [
-    "تبدأ واجهة الرئيسية من أعلى الشاشة مع محاذاة أفضل لصور الأذكار وحركة ضوئية هادئة تحترم إعدادات سهولة الوصول.",
-    "تعرض بطاقة أذكار ما بعد الصلاة رمزًا وحالة ووقتًا واضحًا لكل صلاة داخل بطاقتها.",
-    "أصبحت بطاقات وردك اليوم أكثر اتساعًا ووضوحًا على الجوال واللوحي وسطح المكتب.",
-    "تحسنت المسبحة وعداد الصلاة على النبي ﷺ بحقوق إدخال موحدة، واختيار ذكر قابل للبحث، وأهداف مخصصة، واستجابة لمس متسقة."
+    "أصبحت حالات التحميل والخطأ وعدم الاتصال أوضح مع إجراءات آمنة لإعادة المحاولة دون فقدان التقدم المحلي.",
+    "تتقلص رسالة عدم الاتصال تلقائيًا إلى مؤشر صغير، ويظهر تأكيد هادئ عند عودة الاتصال.",
+    "تحسنت إرشادات أذونات الموقع والإشعارات مع الحفاظ على إعدادات الصلاة المحفوظة عند التعذر.",
+    "أصبحت تحديثات التطبيق والتنزيل والمشاركة وتسجيل الدخول تعرض حالة الانتظار والنجاح والإلغاء والخطأ بوضوح."
   ],
   "en": [
-    "Home now starts flush at the top with better image focal points and calm decorative motion that respects accessibility preferences.",
-    "Post-prayer cards now show a clear icon, state, and prayer time inside every prayer card.",
-    "Today's Wird cards are roomier and easier to read across phone, tablet, and desktop layouts.",
-    "Masbaha and Salawat counting now use consistent inputs, searchable zikr selection, custom targets, and shared tap feedback."
+    "Loading, error, and offline states now provide clear recovery without risking local progress.",
+    "The offline notice collapses to a compact indicator and quietly confirms when connection returns.",
+    "Location and notification permission guidance is clearer while saved prayer settings remain protected.",
+    "App updates, downloads, sharing, and sign-in now communicate pending, success, cancellation, and failure states."
   ]
 }

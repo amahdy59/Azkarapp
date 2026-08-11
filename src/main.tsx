@@ -4,7 +4,7 @@ import { AppErrorBoundary } from "./app/components/AppErrorBoundary.tsx";
 import { pruneStaleFridayProgress } from "./app/fridayProgress.ts";
 import { loadAppState } from "./app/state.ts";
 import { applyAppAppearance } from "./app/theme.ts";
-import { startPerformanceMonitoring } from "./lib/observability.ts";
+import { reportError, startPerformanceMonitoring } from "./lib/observability.ts";
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
@@ -59,5 +59,14 @@ if (!isMarketingLanding && "caches" in window) {
 }
 
 window.addEventListener("azkar-apply-update", () => {
-  void updateServiceWorker(true);
+  let timeoutId = 0;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = window.setTimeout(() => reject(new Error("Service worker update timed out")), 15_000);
+  });
+  void Promise.race([updateServiceWorker(true), timeout])
+    .catch((error) => {
+      reportError(error, "pwa-update");
+      window.dispatchEvent(new Event("azkar-update-failed"));
+    })
+    .finally(() => window.clearTimeout(timeoutId));
 });

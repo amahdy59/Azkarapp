@@ -4,6 +4,8 @@ import { Button } from "../../components/ui/button";
 import { CheckCircle2, CloudOff, Database, Download, RotateCcw, X } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
+import { formatNumerals } from "../../formatting";
+import { reportError } from "../../../lib/observability";
 import { InformationCard } from "./InformationCard";
 import { SubHeader } from "./SettingsPrimitives";
 import { getAzkarForMode } from "../../content/azkar";
@@ -36,6 +38,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [status, setStatus] = useState<OfflineStatus | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
   const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const audioPreferences = useMemo(loadAudioPreferences, []);
@@ -51,6 +54,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const refreshStatus = useCallback(async () => {
     try {
       setErrorMessage("");
+      setSuccessMessage("");
       setIsLoading(true);
 
       const [registration, cacheNames, storage] = await Promise.all([
@@ -69,11 +73,12 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         downloadedAudioBytes: audioSummary.byteSize,
       });
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "Could not inspect offline storage.");
+      reportError(error, "offline-storage-status");
+      setErrorMessage(t(language, "downloads.statusError"));
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     void refreshStatus();
@@ -84,6 +89,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     const controller = new AbortController();
     abortRef.current = controller;
     setErrorMessage("");
+    setSuccessMessage("");
     setDownloadProgress({ completed: 0, total: collection.byteSize });
     try {
       await downloadAudioForZikrs(collection.zikrs, audioPreferences, {
@@ -91,12 +97,30 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         onProgress: (completed, total) => setDownloadProgress({ completed, total }),
       });
       await refreshStatus();
+      setSuccessMessage(t(language, "downloads.downloadComplete"));
     } catch (error) {
-      if (!controller.signal.aborted)
-        setErrorMessage(error instanceof Error ? error.message : "Audio download failed.");
+      if (controller.signal.aborted) {
+        setSuccessMessage(t(language, "downloads.downloadCancelled"));
+      } else {
+        reportError(error, "audio-download");
+        setErrorMessage(t(language, "downloads.downloadErrorDescription"));
+      }
     } finally {
       abortRef.current = null;
       setDownloadProgress(null);
+    }
+  };
+
+  const removeDownloads = async () => {
+    try {
+      setErrorMessage("");
+      setSuccessMessage("");
+      await removeDownloadedAudio();
+      await refreshStatus();
+      setSuccessMessage(t(language, "downloads.removeComplete"));
+    } catch (error) {
+      reportError(error, "audio-download-remove");
+      setErrorMessage(t(language, "downloads.removeError"));
     }
   };
 
@@ -174,7 +198,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
 
           {errorMessage && (
             <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
-              {errorMessage || t(language, "downloads.statusError")}
+              {errorMessage}
             </p>
           )}
         </Card>
@@ -184,25 +208,19 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             {t(language, "downloads.optionalAudioDownloads")}
           </h2>
           <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-            {language === "ar"
-              ? "تُنزّل الملفات المعتمدة كاملة فقط، ويمكن حذفها في أي وقت."
-              : "Only complete, approved recordings are downloaded. You can remove them at any time."}
+            {t(language, "downloads.approvedOnly")}
           </p>
 
           <div className="mt-4 grid gap-2">
             {audioCollections.map((collection) => {
-              const label =
+              const label = t(
+                language,
                 collection.category === "morning"
-                  ? language === "ar"
-                    ? "أذكار الصباح المختصرة"
-                    : "Morning Core"
+                  ? "downloads.morningCore"
                   : collection.category === "evening"
-                    ? language === "ar"
-                      ? "أذكار المساء المختصرة"
-                      : "Evening Core"
-                    : language === "ar"
-                      ? "أذكار النوم المختصرة"
-                      : "Before-Sleep Core";
+                    ? "downloads.eveningCore"
+                    : "downloads.beforeSleepCore",
+              );
               return (
                 <button
                   key={collection.category}
@@ -218,9 +236,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                   <span className="text-[0.75rem] text-muted-foreground">
                     {collection.byteSize > 0
                       ? formatMegabytes(collection.byteSize, language)
-                      : language === "ar"
-                        ? "غير متاح"
-                        : "Unavailable"}
+                      : t(language, "downloads.unavailable")}
                   </span>
                 </button>
               );
@@ -228,12 +244,27 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           </div>
 
           {downloadProgress && (
-            <div className="mt-3" role="status">
+            <div className="mt-3">
               <progress
                 className="w-full"
                 max={Math.max(1, downloadProgress.total)}
                 value={downloadProgress.completed}
+                aria-label={t(language, "downloads.progressLabel")}
+                aria-describedby="audio-download-progress-value"
               />
+              <p
+                id="audio-download-progress-value"
+                className="mt-1 text-center text-[0.75rem] font-semibold text-muted-foreground"
+                role="status"
+                aria-live="polite"
+              >
+                {t(language, "downloads.progressValue", {
+                  percent: formatNumerals(
+                    Math.round((downloadProgress.completed / Math.max(1, downloadProgress.total)) * 100),
+                    language,
+                  ),
+                })}
+              </p>
               <Button
                 type="button"
                 variant="outline"
@@ -250,11 +281,20 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             type="button"
             variant="outline"
             disabled={!status?.downloadedAudioAssets || downloadProgress !== null}
-            onClick={() => void removeDownloadedAudio().then(refreshStatus)}
+            onClick={() => void removeDownloads()}
             className="mt-3 w-full border-destructive/40 text-destructive"
           >
             {t(language, "downloads.removeDownloadedAudio")}
           </Button>
+          {successMessage && (
+            <p
+              className="mt-3 text-center text-[0.8125rem] font-semibold text-primary"
+              role="status"
+              aria-live="polite"
+            >
+              {successMessage}
+            </p>
+          )}
         </Card>
       </div>
     </div>

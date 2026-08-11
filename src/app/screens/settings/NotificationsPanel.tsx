@@ -126,6 +126,8 @@ export function NotificationsPanel({
   const [hasRequestError, setHasRequestError] = useState(false);
   const [isDetectingLocation, setIsDetectingLocation] = useState(false);
   const [locationStatus, setLocationStatus] = useState<string | null>(null);
+  const [locationStatusIsError, setLocationStatusIsError] = useState(false);
+  const [permissionAttemptBlocked, setPermissionAttemptBlocked] = useState(false);
   const [latitudeDraft, setLatitudeDraft] = useState(String(locationSettings?.latitude ?? ""));
   const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
@@ -144,24 +146,25 @@ export function NotificationsPanel({
     const requestId = ++locationRequestId.current;
     setIsDetectingLocation(true);
     setLocationStatus(null);
-    const coords = await detectUserCoordinates();
+    setLocationStatusIsError(false);
+    const result = await detectUserCoordinates();
     if (requestId !== locationRequestId.current) return;
 
-    if (coords && onLocationChange) {
+    if (result.ok && onLocationChange) {
       const detectedLocation: LocationSettings = {
         ...(locationSettings ?? DEFAULT_LOCATION),
-        latitude: coords.latitude,
-        longitude: coords.longitude,
-        cityName: `${coords.latitude.toFixed(2)}°, ${coords.longitude.toFixed(2)}°`,
+        latitude: result.latitude,
+        longitude: result.longitude,
+        cityName: `${result.latitude.toFixed(2)}°, ${result.longitude.toFixed(2)}°`,
         autoDetect: true,
-        timeZone: coords.timeZone ?? DEFAULT_LOCATION.timeZone,
+        timeZone: result.timeZone ?? DEFAULT_LOCATION.timeZone,
       };
       onLocationChange(detectedLocation);
 
       const prayerData = await fetchAladhanPrayerData(
         new Date(),
-        coords.latitude,
-        coords.longitude,
+        result.latitude,
+        result.longitude,
         detectedLocation.calculationMethod,
       );
       if (prayerData && requestId === locationRequestId.current) {
@@ -170,13 +173,17 @@ export function NotificationsPanel({
           timeZone: prayerData.timeZone ?? detectedLocation.timeZone,
         });
       }
-      setLocationStatus(t(language, "notifications.locationUpdated"));
-    } else {
       setLocationStatus(
-        isArabic
-          ? "تعذر تحديد الموقع. يرجى التأكد من السماح بإذن الموقع في المتصفح."
-          : "Could not detect location. Please check browser location permissions.",
+        t(language, prayerData ? "notifications.locationUpdated" : "notifications.prayerRefreshDeferred"),
       );
+    } else {
+      const reasonKey =
+        result.ok || result.reason === "unknown"
+          ? "Error"
+          : `${result.reason[0]!.toUpperCase()}${result.reason.slice(1)}`;
+      const key = `notifications.location${reasonKey}`;
+      setLocationStatus(t(language, key));
+      setLocationStatusIsError(true);
     }
     if (requestId === locationRequestId.current) {
       setIsDetectingLocation(false);
@@ -205,6 +212,11 @@ export function NotificationsPanel({
         ...updatedLocation,
         timeZone: prayerData.timeZone ?? updatedLocation.timeZone,
       });
+      setLocationStatus(t(language, "notifications.locationUpdated"));
+      setLocationStatusIsError(false);
+    } else if (requestId === locationRequestId.current) {
+      setLocationStatus(t(language, "notifications.prayerRefreshDeferred"));
+      setLocationStatusIsError(false);
     }
   };
 
@@ -224,6 +236,7 @@ export function NotificationsPanel({
           ? "أدخل خط عرض بين ‎-90 و90 وخط طول بين ‎-180 و180."
           : "Enter a latitude from -90 to 90 and longitude from -180 to 180.",
       );
+      setLocationStatusIsError(true);
       return;
     }
     locationRequestId.current += 1;
@@ -236,6 +249,7 @@ export function NotificationsPanel({
       timeZone: timeZoneDraft.trim() || Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     setLocationStatus(t(language, "notifications.manualLocationSaved"));
+    setLocationStatusIsError(false);
   };
 
   const handleAdjustmentChange = (prayer: keyof NonNullable<LocationSettings["adjustments"]>, value: number) => {
@@ -256,9 +270,11 @@ export function NotificationsPanel({
 
     try {
       setHasRequestError(false);
+      setPermissionAttemptBlocked(false);
       setIsRequesting(true);
       const next = await Notification.requestPermission();
       setPermission(next);
+      setPermissionAttemptBlocked(next !== "granted");
       return next;
     } catch {
       setHasRequestError(true);
@@ -284,6 +300,7 @@ export function NotificationsPanel({
       }
     }
     if (enabling && permission !== "granted") {
+      setPermissionAttemptBlocked(true);
       return;
     }
     updateSchedule(kind, { enabled: enabling });
@@ -352,8 +369,8 @@ export function NotificationsPanel({
             <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
               {locationSettings?.autoDetect
                 ? isArabic
-                  ? "يتم التحقق من المنطقة الزمنية من الإحداثيات عند الاتصال، مع الرجوع إلى إعداد الجهاز دون اتصال."
-                  : "The time zone is verified from coordinates online, with the device setting as the offline fallback."
+                  ? "يتحقق التطبيق من المنطقة الزمنية عبر الإحداثيات عند توفر الاتصال، ويستخدم الإعداد المحفوظ دون اتصال."
+                  : "When online, the app checks the time zone from your coordinates; offline, it uses the saved setting."
                 : isArabic
                   ? "تُستخدم هذه المنطقة الزمنية لحساب المواقيت دون اتصال."
                   : "This time zone is used for offline prayer calculations."}
@@ -372,7 +389,12 @@ export function NotificationsPanel({
             </Button>
 
             {locationStatus && (
-              <p className="text-[0.8125rem] font-medium text-foreground bg-muted p-2.5 rounded-lg">{locationStatus}</p>
+              <p
+                className={`rounded-lg p-2.5 text-[0.8125rem] font-medium ${locationStatusIsError ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"}`}
+                role={locationStatusIsError ? "alert" : "status"}
+              >
+                {locationStatus}
+              </p>
             )}
 
             <div className="pt-2">
@@ -537,6 +559,16 @@ export function NotificationsPanel({
           {hasRequestError && (
             <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
               {t(language, "notifications.permissionError")}
+            </p>
+          )}
+          {(permission === "denied" || permission === "unsupported") && (
+            <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-[0.8125rem] leading-5 text-foreground">
+              {t(language, "notifications.permissionBlockedAction")}
+            </p>
+          )}
+          {permissionAttemptBlocked && (
+            <p className="mt-3 text-[0.875rem] font-semibold text-destructive" role="alert">
+              {t(language, "notifications.permissionRequired")}
             </p>
           )}
         </section>

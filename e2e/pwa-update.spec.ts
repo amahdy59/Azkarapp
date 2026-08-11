@@ -27,7 +27,7 @@ for (const language of ["en", "ar"] as const) {
     await page.evaluate(() => window.dispatchEvent(new Event("azkar-update-available")));
 
     const title = language === "ar" ? "يتوفر تحديث جديد" : "An update is ready";
-    const notice = page.getByRole("status").filter({ hasText: title });
+    const notice = page.getByRole("complementary", { name: title });
     await expect(notice.getByRole("listitem")).toHaveText(notes[language]);
     await expect(notice).not.toContainText(
       language === "ar" ? "حدّث التطبيق لاستخدام أحدث التحسينات." : "Refresh to use the latest improvements.",

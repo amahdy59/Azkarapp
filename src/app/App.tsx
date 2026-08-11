@@ -56,11 +56,14 @@ import { NetworkStatus } from "./components/NetworkStatus";
 import { SyncStatus } from "./components/SyncStatus";
 import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ScreenFallback } from "./components/ScreenFallback";
+import { StatePanel } from "./components/StatePanel";
+import { retryableScreen } from "./components/RetryableScreen";
 import { PwaNotice } from "./components/PwaNotice";
 import { useAudioController } from "./audio/useAudioController";
 import { AudioProvider } from "./audio/AudioProvider";
 import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
 import { t } from "./i18n";
+import { reportError } from "../lib/observability";
 import { loadReleaseNotes, type ReleaseNotes } from "./releaseNotes";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
@@ -76,61 +79,43 @@ import {
   type GrowthEvent,
 } from "./progress";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function lazyWithRetry<T extends React.ComponentType<any>>(
-  factory: () => Promise<{ default: T }>,
-): React.LazyExoticComponent<T> {
-  return lazy(async () => {
-    try {
-      return await factory();
-    } catch (error) {
-      const hasRefreshed = sessionStorage.getItem("azkar-lazy-refreshed");
-      if (!hasRefreshed) {
-        sessionStorage.setItem("azkar-lazy-refreshed", "true");
-        window.location.reload();
-      }
-      throw error;
-    }
-  });
-}
-
-const HomeScreen = lazyWithRetry(() =>
+const HomeScreen = retryableScreen(() =>
   import("./screens/HomeScreen").then((module) => ({ default: module.HomeScreen })),
 );
-const AzkarLibraryScreen = lazyWithRetry(() =>
+const AzkarLibraryScreen = retryableScreen(() =>
   import("./screens/AzkarLibraryScreen").then((module) => ({ default: module.AzkarLibraryScreen })),
 );
-const CategoryScreen = lazyWithRetry(() =>
+const CategoryScreen = retryableScreen(() =>
   import("./screens/CategoryScreen").then((module) => ({ default: module.CategoryScreen })),
 );
-const ReaderScreen = lazyWithRetry(() =>
+const ReaderScreen = retryableScreen(() =>
   import("./screens/ReaderScreen").then((module) => ({ default: module.ReaderScreen })),
 );
-const FloatingAudioPlayer = lazyWithRetry(() =>
+const FloatingAudioPlayer = lazy(() =>
   import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
 );
-const CompletionScreen = lazyWithRetry(() =>
+const CompletionScreen = retryableScreen(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
-const CustomCounterScreen = lazyWithRetry(() =>
+const CustomCounterScreen = retryableScreen(() =>
   import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
 );
-const SettingsScreen = lazyWithRetry(() =>
+const SettingsScreen = retryableScreen(() =>
   import("./screens/settings/SettingsScreen").then((module) => ({ default: module.SettingsScreen })),
 );
-const SearchScreen = lazyWithRetry(() =>
+const SearchScreen = retryableScreen(() =>
   import("./screens/SearchScreen").then((module) => ({ default: module.SearchScreen })),
 );
-const ProgressScreen = lazyWithRetry(() =>
+const ProgressScreen = retryableScreen(() =>
   import("./screens/ProgressScreen").then((module) => ({ default: module.ProgressScreen })),
 );
-const BenefitsScreen = lazyWithRetry(() =>
+const BenefitsScreen = retryableScreen(() =>
   import("./screens/BenefitsScreen").then((module) => ({ default: module.BenefitsScreen })),
 );
-const FridayModeScreen = lazyWithRetry(() =>
+const FridayModeScreen = retryableScreen(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
-const FridaySalawatScreen = lazyWithRetry(() =>
+const FridaySalawatScreen = retryableScreen(() =>
   import("./screens/FridaySalawatScreen").then((module) => ({ default: module.FridaySalawatScreen })),
 );
 const ProgressShareModal = lazy(() =>
@@ -210,12 +195,18 @@ function AppContent() {
       initialRoute?.view === "reader" ||
       Boolean(initialRoute?.categoryId && isLazyRouteCategory(initialRoute.categoryId)),
   );
+  const [routeContentError, setRouteContentError] = useState<{
+    categoryId: CategoryId;
+    targetView: View;
+    targetIndex: number;
+  } | null>(null);
   const routeLoadId = useRef(0);
 
   const hydrateRouteCategory = useCallback(
     async (categoryId: CategoryId, targetView: View, targetIndex = 0) => {
       const loadId = ++routeLoadId.current;
       setRouteContentLoading(true);
+      setRouteContentError(null);
       try {
         await loadLazyRouteCategory(categoryId);
         if (loadId !== routeLoadId.current) return;
@@ -226,8 +217,13 @@ function AppContent() {
           setActiveIdx(0);
           setView(items.length > 0 ? "category" : "library");
         }
-      } catch {
-        if (loadId === routeLoadId.current) setView("library");
+        return true;
+      } catch (error) {
+        reportError(error, "route-content-load");
+        if (loadId === routeLoadId.current) {
+          setRouteContentError({ categoryId, targetView, targetIndex });
+        }
+        return false;
       } finally {
         if (loadId === routeLoadId.current) setRouteContentLoading(false);
       }
@@ -283,6 +279,8 @@ function AppContent() {
   const [fridayDuaCompletedIds, setFridayDuaCompletedIds] = useState<Set<string>>(() => new Set());
   const [fridayDuaTotalCount, setFridayDuaTotalCount] = useState(0);
   const [fridayDuaFlow, setFridayDuaFlow] = useState(false);
+  const [isFridayDuasLoading, setIsFridayDuasLoading] = useState(false);
+  const [fridayDuasError, setFridayDuasError] = useState(false);
 
   const ensureCurrentFridayWeek = useCallback(() => {
     const currentWeek = getIsoWeekKey();
@@ -298,14 +296,25 @@ function AppContent() {
   }, []);
 
   const hydrateFridayDuaProgress = useCallback(async () => {
-    const week = getIsoWeekKey();
-    const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
-    registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
-    const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
-    const stored = readFridayDuaProgress(duaIds, week);
-    writeFridayDuaProgress(stored, week);
-    setFridayDuaTotalCount(duaIds.length);
-    setFridayDuaCompletedIds(stored);
+    try {
+      setIsFridayDuasLoading(true);
+      setFridayDuasError(false);
+      const week = getIsoWeekKey();
+      const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
+      registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+      const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
+      const stored = readFridayDuaProgress(duaIds, week);
+      writeFridayDuaProgress(stored, week);
+      setFridayDuaTotalCount(duaIds.length);
+      setFridayDuaCompletedIds(stored);
+      return true;
+    } catch (error) {
+      reportError(error, "friday-duas-load");
+      setFridayDuasError(true);
+      return false;
+    } finally {
+      setIsFridayDuasLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -335,6 +344,9 @@ function AppContent() {
   const [persistenceError, setPersistenceError] = useState(false);
   const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isInstalling, setIsInstalling] = useState(false);
+  const [pwaError, setPwaError] = useState("");
+  const [pwaStatus, setPwaStatus] = useState("");
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [installDismissed, setInstallDismissed] = useState(() => {
     try {
@@ -372,7 +384,7 @@ function AppContent() {
       description: string,
       confirmLabel: string,
       cancelLabel: string,
-      onConfirm: () => void,
+      onConfirm: () => void | Promise<void>,
       destructive = false,
     ) => {
       setPendingConfirm({ title, description, confirmLabel, cancelLabel, onConfirm, destructive });
@@ -480,7 +492,7 @@ function AppContent() {
     isRepeatSession,
     repeatCompleted,
     handleResetCategory,
-    openCategory,
+    openCategory: openCategoryWithoutHydration,
     openReader,
     resumeCategory,
     repeatCategory,
@@ -513,6 +525,19 @@ function AppContent() {
     showConfirm,
   });
 
+  const openCategory = useCallback(
+    async (categoryId: CategoryId) => {
+      if (isLazyRouteCategory(categoryId) && !(await hydrateRouteCategory(categoryId, "category"))) {
+        setActiveCat(categoryId);
+        setActiveTab("azkar");
+        push("category");
+        return;
+      }
+      openCategoryWithoutHydration(categoryId);
+    },
+    [hydrateRouteCategory, openCategoryWithoutHydration, push],
+  );
+
   const updateFridayDuaProgress = useCallback((index: number, shouldComplete: boolean) => {
     const zikrId = getAzkarForMode("comprehensive_duas")[index]?.id;
     if (!zikrId) return;
@@ -538,6 +563,10 @@ function AppContent() {
   }, [activeCat, fridayDuaFlow, view]);
 
   useEffect(() => {
+    if (view !== "category" && view !== "reader") setRouteContentError(null);
+  }, [view]);
+
+  useEffect(() => {
     const plan = audioController.state.plan;
     const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
     if (view !== "reader" || !plan || plan.context.category !== activeCat || !playingZikrId) return;
@@ -559,6 +588,7 @@ function AppContent() {
     isVerifyingOtp,
     isResendingOtp,
     isCompletingProfile,
+    isAuthenticatingOAuth,
     authError,
     setAuthError,
     handleOpenAccountAuth,
@@ -724,6 +754,7 @@ function AppContent() {
   useEffect(() => {
     const handleUpdate = () => {
       setUpdateAvailable(true);
+      setPwaError("");
       setReleaseNotes(null);
       void loadReleaseNotes().then(setReleaseNotes);
     };
@@ -731,14 +762,20 @@ function AppContent() {
       event.preventDefault();
       setInstallPrompt(event as BeforeInstallPromptEvent);
     };
+    const handleUpdateFailure = () => {
+      setIsUpdating(false);
+      setPwaError(t(selectedLang, "pwa.updateError"));
+    };
 
     window.addEventListener("azkar-update-available", handleUpdate);
+    window.addEventListener("azkar-update-failed", handleUpdateFailure);
     window.addEventListener("beforeinstallprompt", handleInstallPrompt);
     return () => {
       window.removeEventListener("azkar-update-available", handleUpdate);
+      window.removeEventListener("azkar-update-failed", handleUpdateFailure);
       window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
     };
-  }, []);
+  }, [selectedLang]);
 
   useEffect(() => {
     applyAppAppearance({
@@ -988,6 +1025,11 @@ function AppContent() {
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}
         <div className="app-status">
+          {pwaStatus && (
+            <p className="sync-status" role="status" aria-live="polite">
+              {pwaStatus}
+            </p>
+          )}
           <NetworkStatus language={selectedLang} />
           {isSupabaseConfigured && !isGuest && (
             <SyncStatus
@@ -1069,6 +1111,8 @@ function AppContent() {
                     setView("home");
                     setActiveTab("home");
                   }}
+                  errorMessage={authError}
+                  isAuthenticating={isAuthenticatingOAuth}
                 />
               )}
               {view === "email" && (
@@ -1193,6 +1237,30 @@ function AppContent() {
               {(view === "category" || view === "reader") && routeContentLoading && (
                 <ScreenFallback language={selectedLang} />
               )}
+              {(view === "category" || view === "reader") && routeContentError && !routeContentLoading && (
+                <div className="flex h-full items-center justify-center p-4">
+                  <StatePanel
+                    kind="route-error"
+                    language={selectedLang}
+                    focusOnMount
+                    actionLabel={t(selectedLang, "common.tryAgain")}
+                    onAction={() => {
+                      void hydrateRouteCategory(
+                        routeContentError.categoryId,
+                        routeContentError.targetView,
+                        routeContentError.targetIndex,
+                      );
+                    }}
+                    secondaryActionLabel={t(selectedLang, "common.goToLibrary")}
+                    onSecondaryAction={() => {
+                      setRouteContentError(null);
+                      setLibrarySection("collections");
+                      setActiveTab("azkar");
+                      push("library");
+                    }}
+                  />
+                </div>
+              )}
               {view === "friday" && (
                 <FridayModeScreen
                   isArabic={isArabic}
@@ -1200,28 +1268,39 @@ function AppContent() {
                   kahfCompletedCount={completed.friday_kahf?.has("friday-kahf") ? 1 : 0}
                   duasCompletedCount={fridayDuaCompletedIds.size}
                   duasTotalCount={fridayDuaTotalCount}
+                  isDuasLoading={isFridayDuasLoading}
+                  duasLoadError={fridayDuasError}
+                  onRetryDuas={() => void hydrateFridayDuaProgress()}
                   onBack={pop}
                   onStartKahf={() => {
-                    try {
-                      window.localStorage.setItem(fridayKahfOpenedKey(), "true");
-                    } catch {
-                      // Opening the reader does not depend on storage.
-                    }
-                    const sameWeek = ensureCurrentFridayWeek();
-                    const kahf = getAzkarForMode("friday_kahf");
-                    const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
-                    if (nextIndex === null) {
-                      setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
-                      openReader("friday_kahf", 0);
-                      return;
-                    }
-                    openReader("friday_kahf", nextIndex);
+                    void (async () => {
+                      try {
+                        window.localStorage.setItem(fridayKahfOpenedKey(), "true");
+                      } catch {
+                        // Opening the reader does not depend on storage.
+                      }
+                      const sameWeek = ensureCurrentFridayWeek();
+                      if (!(await hydrateRouteCategory("friday_kahf", "reader", 0))) {
+                        setActiveCat("friday_kahf");
+                        setActiveIdx(0);
+                        setView("reader");
+                        return;
+                      }
+                      const kahf = getAzkarForMode("friday_kahf");
+                      const nextIndex = sameWeek ? getFirstIncompleteZikrIndex(kahf, completed.friday_kahf) : 0;
+                      if (nextIndex === null) {
+                        setCompleted((previous) => ({ ...previous, friday_kahf: new Set() }));
+                        openReader("friday_kahf", 0);
+                        return;
+                      }
+                      openReader("friday_kahf", nextIndex);
+                    })();
                   }}
                   onOpenSalawat={() => push("friday_salawat")}
                   onStartDuasSession={() => {
                     void (async () => {
                       ensureCurrentFridayWeek();
-                      await hydrateFridayDuaProgress();
+                      if (!(await hydrateFridayDuaProgress())) return;
                       await openCategory("comprehensive_duas");
                       setFridayDuaFlow(true);
                     })();
@@ -1238,7 +1317,7 @@ function AppContent() {
                   }}
                 />
               )}
-              {view === "category" && !routeContentLoading && (
+              {view === "category" && !routeContentLoading && !routeContentError && (
                 <CategoryScreen
                   catId={activeCat}
                   completed={
@@ -1298,7 +1377,7 @@ function AppContent() {
                   reduceMotion={reduceMotion}
                 />
               )}
-              {view === "reader" && !routeContentLoading && activeZikr && (
+              {view === "reader" && !routeContentLoading && !routeContentError && activeZikr && (
                 <ReaderScreen
                   catId={activeCat}
                   idx={activeIdx}
@@ -1548,12 +1627,12 @@ function AppContent() {
                 actionLabel={t(selectedLang, "pwa.refresh")}
                 dismissLabel={t(selectedLang, "pwa.later")}
                 isActionLoading={isUpdating}
+                statusMessage={isUpdating ? t(selectedLang, "pwa.updating") : undefined}
+                errorMessage={pwaError}
                 onAction={() => {
+                  setPwaError("");
                   setIsUpdating(true);
                   window.dispatchEvent(new Event("azkar-apply-update"));
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 1500);
                 }}
                 onDismiss={() => {
                   setUpdateAvailable(false);
@@ -1566,9 +1645,31 @@ function AppContent() {
                 body={t(selectedLang, "pwa.installBody")}
                 actionLabel={t(selectedLang, "pwa.install")}
                 dismissLabel={t(selectedLang, "pwa.later")}
+                isActionLoading={isInstalling}
+                statusMessage={isInstalling ? t(selectedLang, "pwa.installing") : undefined}
                 onAction={() => {
-                  void installPrompt?.prompt();
-                  setInstallPrompt(null);
+                  const prompt = installPrompt;
+                  if (!prompt) return;
+                  void (async () => {
+                    try {
+                      setIsInstalling(true);
+                      await prompt.prompt();
+                      const choice = await prompt.userChoice;
+                      setPwaStatus(
+                        t(
+                          selectedLang,
+                          choice?.outcome === "accepted" ? "pwa.installAccepted" : "pwa.installDismissed",
+                        ),
+                      );
+                    } catch (error) {
+                      reportError(error, "pwa-install");
+                      setPwaStatus(t(selectedLang, "pwa.installDismissed"));
+                    } finally {
+                      setIsInstalling(false);
+                      setInstallPrompt(null);
+                      window.setTimeout(() => setPwaStatus(""), 3000);
+                    }
+                  })();
                 }}
                 onDismiss={() => {
                   try {
@@ -1617,8 +1718,8 @@ function AppContent() {
           confirmLabel={pendingConfirm.confirmLabel}
           cancelLabel={pendingConfirm.cancelLabel}
           destructive={pendingConfirm.destructive}
-          onConfirm={() => {
-            pendingConfirm.onConfirm();
+          onConfirm={async () => {
+            await pendingConfirm.onConfirm();
             setPendingConfirm(null);
           }}
           onCancel={() => setPendingConfirm(null)}

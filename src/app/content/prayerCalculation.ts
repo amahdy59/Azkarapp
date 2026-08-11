@@ -441,12 +441,14 @@ export function triggerBackgroundPrayerTimesRefresh(
   });
 }
 
-export async function detectUserCoordinates(): Promise<{
-  latitude: number;
-  longitude: number;
-  timeZone?: string;
-} | null> {
-  if (typeof navigator === "undefined" || !("geolocation" in navigator)) return null;
+export type CoordinateDetectionResult =
+  | { ok: true; latitude: number; longitude: number; timeZone?: string }
+  | { ok: false; reason: "unsupported" | "denied" | "unavailable" | "timeout" | "unknown" };
+
+export async function detectUserCoordinates(): Promise<CoordinateDetectionResult> {
+  if (typeof navigator === "undefined" || !("geolocation" in navigator)) {
+    return { ok: false, reason: "unsupported" };
+  }
 
   return new Promise((resolve) => {
     navigator.geolocation.getCurrentPosition(
@@ -458,12 +460,17 @@ export async function detectUserCoordinates(): Promise<{
           timeZone = undefined;
         }
         resolve({
+          ok: true,
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           timeZone,
         });
       },
-      () => resolve(null),
+      (error) => {
+        const reason =
+          error.code === 1 ? "denied" : error.code === 2 ? "unavailable" : error.code === 3 ? "timeout" : "unknown";
+        resolve({ ok: false, reason });
+      },
       { timeout: 8000, enableHighAccuracy: true, maximumAge: 300_000 },
     );
   });

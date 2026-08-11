@@ -1183,7 +1183,7 @@ textarea {
   z-index: 20;
   background: var(--destructive);
   color: var(--destructive-foreground);
-  padding: 0.5rem 1rem;
+  padding: 0 1rem;
   text-align: center;
   font-size: 0.75rem;
   font-weight: 600;

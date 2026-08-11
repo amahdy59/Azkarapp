@@ -34,12 +34,13 @@ function LegalConsent({ language, compact = false }: { language: AppLanguage; co
   );
 }
 
-function ProviderButton({ label, onClick }: { label: string; onClick: () => void }) {
+function ProviderButton({ label, onClick, disabled }: { label: string; onClick: () => void; disabled?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="min-h-12 w-full rounded-xl border border-border-control bg-card px-4 text-[0.9375rem] font-semibold text-foreground hover:bg-muted"
+      disabled={disabled}
+      className="min-h-12 w-full rounded-xl border border-border-control bg-card px-4 text-[0.9375rem] font-semibold text-foreground hover:bg-muted disabled:cursor-wait disabled:opacity-55"
     >
       {label}
     </button>
@@ -53,6 +54,8 @@ export function LoginScreen({
   onEmail,
   onApple,
   onGuest,
+  errorMessage = "",
+  isAuthenticating = false,
 }: {
   language: AppLanguage;
   providerFlags: { google: boolean; email: boolean; apple: boolean };
@@ -60,6 +63,8 @@ export function LoginScreen({
   onEmail: () => void;
   onApple: () => void;
   onGuest: () => void;
+  errorMessage?: string;
+  isAuthenticating?: boolean;
 }) {
   const ar = language === "ar";
   const legalReady = Boolean(termsUrl) && Boolean(privacyUrl);
@@ -76,19 +81,39 @@ export function LoginScreen({
         </div>
         <div className="flex w-full flex-col gap-2">
           {providerFlags.google && legalReady && (
-            <ProviderButton label={ar ? "المتابعة باستخدام Google" : "Continue with Google"} onClick={onGoogle} />
+            <ProviderButton
+              label={ar ? "المتابعة باستخدام Google" : "Continue with Google"}
+              onClick={onGoogle}
+              disabled={isAuthenticating}
+            />
           )}
           {providerFlags.email && legalReady && (
-            <ProviderButton label={ar ? "المتابعة بالبريد الإلكتروني" : "Continue with Email"} onClick={onEmail} />
+            <ProviderButton
+              label={ar ? "المتابعة بالبريد الإلكتروني" : "Continue with Email"}
+              onClick={onEmail}
+              disabled={isAuthenticating}
+            />
           )}
           {providerFlags.apple && legalReady && (
-            <ProviderButton label={ar ? "المتابعة باستخدام Apple" : "Continue with Apple"} onClick={onApple} />
+            <ProviderButton
+              label={ar ? "المتابعة باستخدام Apple" : "Continue with Apple"}
+              onClick={onApple}
+              disabled={isAuthenticating}
+            />
           )}
           {!accountAuthEnabled && (
             <p className="text-center text-[0.6875rem] leading-4 text-muted-foreground">
               {ar
                 ? "تسجيل الدخول غير متاح حالياً؛ يمكنك المتابعة كزائر."
                 : "Sign-in is not available yet. You can continue as a guest."}
+            </p>
+          )}
+          {errorMessage && (
+            <p
+              className="rounded-xl bg-destructive/10 px-3 py-2 text-center text-[0.8125rem] font-semibold text-destructive"
+              role="alert"
+            >
+              {errorMessage}
             </p>
           )}
         </div>
@@ -311,7 +336,10 @@ export function AuthCallbackScreen({
     <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-6 text-center">
       <BrandLockup compact />
       <h1 className="text-xl font-bold text-foreground">{t(language, "auth.completingSignIn")}</h1>
-      <p className={errorMessage ? "text-sm text-destructive" : "text-sm text-muted-foreground"} role="status">
+      <p
+        className={errorMessage ? "text-sm text-destructive" : "text-sm text-muted-foreground"}
+        role={errorMessage ? "alert" : "status"}
+      >
         {errorMessage || t(language, "auth.restoringAccount")}
       </p>
     </div>
@@ -348,12 +376,19 @@ export function ProfileCompletionScreen({
         onChange={(event) => setDisplayName(event.target.value)}
         autoComplete="name"
         aria-label={ar ? "الاسم المعروض" : "Display name"}
+        aria-describedby={errorMessage ? "profile-error" : undefined}
+        aria-invalid={errorMessage ? "true" : undefined}
       />
-      {errorMessage && <p className="mt-2 text-sm text-destructive">{errorMessage}</p>}
+      {errorMessage && (
+        <p id="profile-error" className="mt-2 text-sm text-destructive" role="alert">
+          {errorMessage}
+        </p>
+      )}
       <div className="flex-1" />
       <button
         type="button"
         disabled={!displayName.trim() || isSaving}
+        aria-busy={isSaving || undefined}
         onClick={() => onSave(displayName)}
         className="h-12 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-50"
       >

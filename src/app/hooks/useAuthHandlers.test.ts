@@ -11,7 +11,7 @@ vi.mock("../../lib/auth", async (importOriginal) => {
   return { ...original, signOutSupabase: authMocks.signOutSupabase };
 });
 
-import { prepareAuthenticatedState } from "./useAuthHandlers";
+import { getSafeAuthErrorMessage, prepareAuthenticatedState } from "./useAuthHandlers";
 
 function session(userId = "account-a") {
   return {
@@ -93,5 +93,20 @@ describe("prepareAuthenticatedState", () => {
     expect(result?.completed.morning).toEqual([]);
     expect(result?.sessions).toEqual([]);
     expect(result?.profile.accountUserId).toBe("account-b");
+  });
+});
+
+describe("getSafeAuthErrorMessage", () => {
+  it("maps stable Supabase codes without exposing backend messages", () => {
+    const error = { code: "over_request_rate_limit", message: "internal provider detail", status: 429 };
+    expect(getSafeAuthErrorMessage(error, "en", "auth.verifyCodeError")).toBe(
+      "Too many attempts. Wait a few minutes, then try again.",
+    );
+  });
+
+  it("uses a localized fallback for unknown failures", () => {
+    expect(getSafeAuthErrorMessage(new Error("private backend text"), "ar", "auth.signOutError")).toBe(
+      "تعذر تسجيل الخروج.",
+    );
   });
 });

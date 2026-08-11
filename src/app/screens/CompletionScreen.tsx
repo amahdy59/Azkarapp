@@ -9,6 +9,7 @@ import { t } from "../i18n";
 import { shouldReduceMotion, vibrateIfEnabled } from "../motionPreferences";
 import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
+import { reportError } from "../../lib/observability";
 
 export function CompletionScreen({
   catId,
@@ -44,6 +45,8 @@ export function CompletionScreen({
   const elapsedMin = Math.max(1, Math.round((Date.now() - sessionStart) / 60_000));
   const isArabic = language === "ar";
   const [shareStatus, setShareStatus] = useState("");
+  const [shareError, setShareError] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
 
   useEffect(() => {
     // Haptics and motion are separate preferences: someone who suppresses
@@ -114,8 +117,12 @@ export function CompletionScreen({
   ];
 
   const share = async () => {
+    if (isSharing) return;
     const text = t(language, "completion.shareText", { category: categoryName });
     try {
+      setIsSharing(true);
+      setShareError(false);
+      setShareStatus("");
       if (navigator.share) {
         await navigator.share({ title: "Azkar", text });
         setShareStatus(t(language, "completion.shareSuccess"));
@@ -125,9 +132,14 @@ export function CompletionScreen({
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") {
+        setShareStatus(t(language, "completion.shareCancelled"));
         return;
       }
+      reportError(error, "completion-share");
+      setShareError(true);
       setShareStatus(t(language, "completion.shareError"));
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -212,12 +224,18 @@ export function CompletionScreen({
             <button
               type="button"
               onClick={() => void share()}
-              className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              disabled={isSharing}
+              aria-busy={isSharing || undefined}
+              className="flex min-h-[48px] items-center justify-center gap-2 rounded-xl border border-border-control bg-card px-4 font-bold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-60"
             >
               <Share2 size={18} /> {t(language, "completion.share")}
             </button>
             {shareStatus && (
-              <p className="text-[0.75rem] font-semibold text-muted-foreground" role="status" aria-live="polite">
+              <p
+                className={`text-[0.75rem] font-semibold ${shareError ? "text-destructive" : "text-muted-foreground"}`}
+                role={shareError ? "alert" : "status"}
+                aria-live={shareError ? undefined : "polite"}
+              >
                 {shareStatus}
               </p>
             )}

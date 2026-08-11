@@ -1,4 +1,4 @@
-import { type ReactNode } from "react";
+import { type ReactNode, useState } from "react";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ interface ConfirmDialogProps {
   description: string;
   confirmLabel: string;
   cancelLabel: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   onCancel: () => void;
   secondaryLabel?: string;
   onSecondary?: () => void;
@@ -49,12 +49,33 @@ export function ConfirmDialog({
   children,
 }: ConfirmDialogProps) {
   const appShell = typeof document === "undefined" ? undefined : document.querySelector<HTMLElement>(".app-shell");
+  const [isConfirming, setIsConfirming] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const handleConfirm = async () => {
+    try {
+      setErrorMessage("");
+      setIsConfirming(true);
+      await onConfirm();
+    } catch (error) {
+      const isArabic = typeof document !== "undefined" && document.documentElement.lang === "ar";
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : isArabic
+            ? "تعذر إكمال الإجراء. حاول مرة أخرى."
+            : "The action could not be completed. Try again.",
+      );
+    } finally {
+      setIsConfirming(false);
+    }
+  };
 
   return (
     <AlertDialog
       open={open}
       onOpenChange={(isOpen) => {
-        if (!isOpen) onCancel();
+        if (!isOpen && !isConfirming) onCancel();
       }}
     >
       <AlertDialogContent
@@ -68,9 +89,18 @@ export function ConfirmDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         {children}
+        {errorMessage && (
+          <p
+            className="mt-3 rounded-xl bg-destructive/10 px-3 py-2 text-sm font-semibold text-destructive"
+            role="alert"
+          >
+            {errorMessage}
+          </p>
+        )}
         <AlertDialogFooter className="mt-6 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
           <AlertDialogCancel
             onClick={onCancel}
+            disabled={isConfirming}
             className="h-11 rounded-xl border border-border-control bg-background px-5 text-[0.9375rem] font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {cancelLabel}
@@ -79,13 +109,19 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={onSecondary}
+              disabled={isConfirming}
               className="h-11 rounded-xl border border-border-control bg-muted px-5 text-[0.9375rem] font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {secondaryLabel}
             </button>
           )}
           <AlertDialogAction
-            onClick={onConfirm}
+            onClick={(event) => {
+              event.preventDefault();
+              void handleConfirm();
+            }}
+            disabled={isConfirming}
+            aria-busy={isConfirming || undefined}
             className={`h-11 rounded-xl px-5 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               destructive
                 ? "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive"

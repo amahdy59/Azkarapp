@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   applyPrayerAdjustments,
   calculateOfflinePrayerTimes,
   CALCULATION_METHODS,
   DEFAULT_LOCATION,
+  detectUserCoordinates,
   formatUtcOffset,
   getPrayerTimes,
   getTimeZoneOffsetHours,
@@ -14,6 +15,8 @@ import {
 } from "./prayerCalculation";
 
 describe("prayerCalculation", () => {
+  const originalGeolocation = navigator.geolocation;
+
   it("keeps Arabic calculation-method labels as valid readable Unicode", () => {
     expect(Object.values(CALCULATION_METHODS).map((method) => method.nameArabic)).toEqual([
       "جامعة العلوم الإسلامية بكراتشي",
@@ -25,6 +28,9 @@ describe("prayerCalculation", () => {
     expect(Object.values(CALCULATION_METHODS).every((method) => !/[ØÙ]/.test(method.nameArabic))).toBe(true);
   });
   beforeEach(() => window.localStorage.clear());
+  afterEach(() => {
+    Object.defineProperty(navigator, "geolocation", { configurable: true, value: originalGeolocation });
+  });
 
   it("has Egyptian General Authority of Survey as method 5", () => {
     const egyptianMethod = CALCULATION_METHODS[5];
@@ -153,6 +159,36 @@ describe("prayerCalculation", () => {
       asr: "15:00",
       maghrib: "18:00",
       isha: "00:05",
+    });
+  });
+
+  it("distinguishes denied location permission for actionable recovery", async () => {
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition: vi.fn((_success: PositionCallback, failure: PositionErrorCallback) =>
+          failure({ code: 1 } as GeolocationPositionError),
+        ),
+      },
+    });
+
+    await expect(detectUserCoordinates()).resolves.toEqual({ ok: false, reason: "denied" });
+  });
+
+  it("returns detected coordinates and the device time zone", async () => {
+    Object.defineProperty(navigator, "geolocation", {
+      configurable: true,
+      value: {
+        getCurrentPosition: vi.fn((success: PositionCallback) =>
+          success({ coords: { latitude: 30.04, longitude: 31.24 } } as GeolocationPosition),
+        ),
+      },
+    });
+
+    await expect(detectUserCoordinates()).resolves.toMatchObject({
+      ok: true,
+      latitude: 30.04,
+      longitude: 31.24,
     });
   });
 });

@@ -80,6 +80,9 @@ export function FridayModeScreen({
   onStartKahf,
   onOpenSalawat,
   onStartDuasSession,
+  isDuasLoading = false,
+  duasLoadError = false,
+  onRetryDuas,
 }: {
   isArabic: boolean;
   direction: "ltr" | "rtl";
@@ -90,6 +93,9 @@ export function FridayModeScreen({
   onStartKahf: () => void;
   onOpenSalawat: () => void;
   onStartDuasSession: () => void;
+  isDuasLoading?: boolean;
+  duasLoadError?: boolean;
+  onRetryDuas?: () => void;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
   const [checkedPractices, setCheckedPractices] = useState(loadChecklist);
@@ -297,6 +303,8 @@ export function FridayModeScreen({
         <button
           type="button"
           onClick={onStartDuasSession}
+          disabled={isDuasLoading || duasLoadError}
+          aria-busy={isDuasLoading || undefined}
           className="flex min-h-24 shrink-0 items-center gap-3 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-amber-500/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring lg:col-span-2"
         >
           <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
@@ -314,6 +322,22 @@ export function FridayModeScreen({
             <ChevronNext size={20} className="shrink-0 text-muted-foreground rtl:scale-x-[-1]" aria-hidden="true" />
           )}
         </button>
+        {duasLoadError && (
+          <div className="rounded-2xl bg-destructive/10 p-4 text-start lg:col-span-2" role="alert">
+            <p className="text-[0.8125rem] font-semibold text-destructive">
+              {t(language, "common.contentLoadErrorDescription")}
+            </p>
+            {onRetryDuas && (
+              <button
+                type="button"
+                onClick={onRetryDuas}
+                className="mt-2 min-h-11 rounded-xl border border-destructive/40 px-4 text-[0.8125rem] font-bold text-destructive"
+              >
+                {t(language, "common.tryAgain")}
+              </button>
+            )}
+          </div>
+        )}
       </div>
     </ScreenContainer>
   );

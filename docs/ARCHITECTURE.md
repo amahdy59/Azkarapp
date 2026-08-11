@@ -170,9 +170,18 @@ Database schema changes require an ordered migration and corresponding applicati
 
 ## Offline and PWA behavior
 
-The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections. When a waiting service worker is detected, the running client fetches `public/release-notes.json` without cache and shows its 3–5 validated highlights in the selected language. This deployed manifest is necessary because the update prompt runs in the older client bundle; invalid or unavailable notes fall back to the generic localized update message, and applying the update remains the user's choice.
+The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections. When a waiting service worker is detected, the running client fetches `public/release-notes.json` without cache and shows its 3–5 validated highlights in the selected language. This deployed manifest is necessary because the update prompt runs in the older client bundle; invalid or unavailable notes fall back to the generic localized update message, and applying the update remains the user's choice. Applying an update is awaited with a bounded timeout and an actionable failure state; the app does not reload on a blind timer.
 
 Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, OAuth, or fresh Aladhan values—must fail safely and retain local behavior.
+
+## System-state and recovery boundaries
+
+- `StatePanel` owns stable full-surface empty and recovery anatomy. Static empty states have no live-region role; newly occurring failures use an alert, and blocking recovery may focus its heading.
+- `retryableScreen` owns screen-chunk loading. A rejected chunk offers an in-place retry and a route back to Azkar while preserving local state. Refresh appears only after the explicit retry also fails.
+- Lazy collection hydration uses the same recovery policy and never silently redirects or automatically reloads. Friday supplemental-dua loading fails locally inside Friday rather than removing the rest of that screen.
+- `NetworkStatus` announces an offline transition, collapses to an expandable indicator after five seconds, and briefly confirms reconnection. `SyncStatus` remains a separate account concern and never exposes backend messages.
+- Authentication and synchronization branch on stable service error codes where available. User copy is localized and safe; privacy-limited observability receives only error class/name and source.
+- Async actions disable duplicate submission while pending. Success and cancellation use narrow polite status regions; failures use narrow alerts. The crash boundary remains reserved for unrecoverable application errors.
 
 ## Testing strategy
 

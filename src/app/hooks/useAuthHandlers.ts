@@ -15,6 +15,7 @@ import {
 import { isSupabaseConfigured } from "../../lib/supabase";
 import { clearPrivateAppData } from "../state";
 import { t } from "../i18n";
+import { reportError } from "../../lib/observability";
 
 export type GuestMigrationDecision = "merge" | "discard" | "cancel";
 
@@ -23,8 +24,31 @@ export interface ConfirmDialogOptions {
   description: string;
   confirmLabel: string;
   cancelLabel: string;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
   destructive?: boolean;
+}
+
+type AuthErrorShape = { code?: unknown; status?: unknown; name?: unknown };
+
+export function getSafeAuthErrorMessage(error: unknown, language: AppLanguage, fallbackKey: string) {
+  const value = error as AuthErrorShape | null;
+  const code = typeof value?.code === "string" ? value.code : "";
+  const status = typeof value?.status === "number" ? value.status : 0;
+
+  if (code === "over_email_send_rate_limit" || code === "over_request_rate_limit" || status === 429) {
+    return t(language, "auth.rateLimitedError");
+  }
+  if (["otp_expired", "flow_state_expired", "flow_state_not_found", "bad_code_verifier"].includes(code)) {
+    return t(language, "auth.sessionExpiredError");
+  }
+  if (["provider_disabled", "oauth_provider_not_supported", "email_provider_disabled", "otp_disabled"].includes(code)) {
+    return t(language, "auth.providerUnavailableError");
+  }
+  if (code === "email_not_confirmed") return t(language, "auth.emailNotConfirmedError");
+  if (status >= 500 || value?.name === "AuthRetryableFetchError" || error instanceof TypeError) {
+    return t(language, "auth.serviceUnavailableError");
+  }
+  return t(language, fallbackKey);
 }
 
 export function hasPrivateProgress(state: AppStateSnapshot) {
@@ -87,7 +111,7 @@ export function useAuthHandlers({
     description: string,
     confirmLabel: string,
     cancelLabel: string,
-    onConfirm: () => void,
+    onConfirm: () => void | Promise<void>,
     destructive?: boolean,
   ) => void;
   setView: (view: View) => void;
@@ -97,6 +121,7 @@ export function useAuthHandlers({
   const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const [isResendingOtp, setIsResendingOtp] = useState(false);
   const [isCompletingProfile, setIsCompletingProfile] = useState(false);
+  const [isAuthenticatingOAuth, setIsAuthenticatingOAuth] = useState(false);
   const [authError, setAuthError] = useState("");
 
   const finishSession = async (session: Session) => {
@@ -132,7 +157,8 @@ export function useAuthHandlers({
       setEmail(normalizedEmail);
       setView("otp");
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.sendCodeError"));
+      reportError(error, "auth-send-otp");
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.sendCodeError"));
     } finally {
       setIsSendingOtp(false);
     }
@@ -146,7 +172,8 @@ export function useAuthHandlers({
       if (!session) throw new Error(t(selectedLang, "auth.verifyCodeError"));
       await finishSession(session);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
+      reportError(error, "auth-verify-otp");
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.verifyCodeError"));
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -158,7 +185,8 @@ export function useAuthHandlers({
       setIsResendingOtp(true);
       await resendEmailOtp(email);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.resendCodeError"));
+      reportError(error, "auth-resend-otp");
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.resendCodeError"));
     } finally {
       setIsResendingOtp(false);
     }
@@ -167,9 +195,13 @@ export function useAuthHandlers({
   const handleOAuth = async (provider: "google" | "apple") => {
     try {
       setAuthError("");
+      setIsAuthenticatingOAuth(true);
       await signInWithOAuthProvider(provider);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
+      reportError(error, `auth-oauth-${provider}`);
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.verifyCodeError"));
+    } finally {
+      setIsAuthenticatingOAuth(false);
     }
   };
 
@@ -183,7 +215,8 @@ export function useAuthHandlers({
       if (!session) throw new Error(t(selectedLang, "auth.verifyCodeError"));
       await finishSession(session);
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.verifyCodeError"));
+      reportError(error, "auth-callback");
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.verifyCodeError"));
       setView("login");
     } finally {
       const cleanUrl = new URL(window.location.href);
@@ -204,7 +237,8 @@ export function useAuthHandlers({
       });
       setView("home");
     } catch (error) {
-      setAuthError(error instanceof Error ? error.message : "Could not save your display name.");
+      reportError(error, "auth-profile-save");
+      setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.profileSaveError"));
     } finally {
       setIsCompletingProfile(false);
     }
@@ -225,7 +259,9 @@ export function useAuthHandlers({
           setView("login");
           setActiveTab("home");
         } catch (error) {
-          setAuthError(error instanceof Error ? error.message : t(selectedLang, "auth.signOutError"));
+          reportError(error, "auth-sign-out");
+          setAuthError(getSafeAuthErrorMessage(error, selectedLang, "auth.signOutError"));
+          throw new Error(t(selectedLang, "auth.signOutError"), { cause: error });
         }
       },
       true,
@@ -237,6 +273,7 @@ export function useAuthHandlers({
     isVerifyingOtp,
     isResendingOtp,
     isCompletingProfile,
+    isAuthenticatingOAuth,
     authError,
     setAuthError,
     handleOpenAccountAuth,

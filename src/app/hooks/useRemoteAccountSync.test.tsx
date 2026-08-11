@@ -202,7 +202,7 @@ describe("useRemoteAccountSync account boundaries", () => {
       }
     });
 
-    await waitFor(() => expect(result.current.syncError).toBe("restore failed"));
+    await waitFor(() => expect(result.current.syncError).toBe("Could not restore your account data."));
     expect(result.current.remoteSyncReady).toBe(false);
     expect(onRemoteHydrationChange).not.toHaveBeenCalledWith(true);
     expect(onRemoteState).toHaveBeenCalledOnce();

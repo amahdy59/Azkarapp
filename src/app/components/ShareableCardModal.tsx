@@ -1,10 +1,11 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { X, Share2 } from "../components/icons";
 import type { AppLanguage } from "../types";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { PalmTreeMark } from "./RoutineGarden";
 import { Modal } from "./ResponsiveSheet";
+import { reportError } from "../../lib/observability";
 
 interface ShareableCardModalProps {
   palms: number;
@@ -19,10 +20,15 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
   const isArabic = language === "ar";
   const direction = isArabic ? "rtl" : "ltr";
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const [isSharing, setIsSharing] = useState(false);
+  const [shareStatus, setShareStatus] = useState<{ message: string; error: boolean } | null>(null);
 
   const handleShare = async () => {
-    if (navigator.share) {
-      try {
+    if (isSharing) return;
+    try {
+      setIsSharing(true);
+      setShareStatus({ message: t(language, "shareModal.sharing"), error: false });
+      if (navigator.share) {
         await navigator.share({
           title: t(language, "shareModal.title"),
           text: t(language, "shareModal.text", {
@@ -31,13 +37,21 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           }),
           url: window.location.origin,
         });
-      } catch {
-        // User cancelled or share failed
+        setShareStatus({ message: t(language, "shareModal.shared"), error: false });
+      } else {
+        const text = t(language, "shareModal.copyText");
+        await navigator.clipboard.writeText(text);
+        setShareStatus({ message: t(language, "shareModal.copied"), error: false });
       }
-    } else {
-      const text = t(language, "shareModal.copyText");
-      await navigator.clipboard.writeText(text);
-      alert(t(language, "shareModal.copyAlert"));
+    } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") {
+        setShareStatus({ message: t(language, "shareModal.cancelled"), error: false });
+      } else {
+        reportError(error, "progress-share");
+        setShareStatus({ message: t(language, "shareModal.error"), error: true });
+      }
+    } finally {
+      setIsSharing(false);
     }
   };
 
@@ -133,13 +147,24 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         <div className="mt-5 flex gap-3">
           <button
             type="button"
-            onClick={handleShare}
-            className="flex flex-1 items-center justify-center gap-2 rounded-2xl bg-amber-500 py-3 text-[0.9375rem] font-black text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all"
+            onClick={() => void handleShare()}
+            disabled={isSharing}
+            aria-busy={isSharing || undefined}
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-amber-500 py-3 text-[0.9375rem] font-black text-slate-950 shadow-md transition-all hover:bg-amber-400 active:scale-95 disabled:cursor-wait disabled:opacity-60"
           >
             <Share2 size={18} />
             <span>{t(language, "shareModal.shareMilestone")}</span>
           </button>
         </div>
+        {shareStatus && (
+          <p
+            className={`mt-3 text-center text-[0.8125rem] font-semibold ${shareStatus.error ? "text-destructive" : "text-primary"}`}
+            role={shareStatus.error ? "alert" : "status"}
+            aria-live={shareStatus.error ? undefined : "polite"}
+          >
+            {shareStatus.message}
+          </p>
+        )}
       </div>
     </Modal>
   );

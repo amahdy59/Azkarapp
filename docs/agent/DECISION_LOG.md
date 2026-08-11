@@ -985,3 +985,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** Home/background components, post-prayer cards, shared counter styles, Reader, Custom Counter and zikr library sheet, Friday Salawat and persistence, shared Select geometry, i18n, motion/design documentation, tests, and release highlights.
 - **Tests/evidence required:** Focused component/persistence tests; 320px large-text, phone, tablet, and desktop live-browser checks; reduced-motion verification; full local release gate; green Quality and Pages workflows; production metadata and smoke verification.
 - **Supersedes:** DEC-052's detached next-prayer presentation and its earlier Custom Counter desktop size. All prayer calculation, reviewed-content, Reader full-surah, and persistence-merge contracts remain authoritative.
+
+---
+
+## DEC-054 — Phase 10 system-state recovery and transient connectivity feedback
+
+- **Date:** 2026-08-12
+- **Status:** Approved
+- **Owner:** User (approved both open decisions: “A and A”).
+- **Related phase:** Phase 10
+- **Context:** The Phase 10 inventory found silent lazy-content failures, automatic reload recovery, persistent offline clutter, raw remote errors, incomplete permission guidance, and async actions without consistent busy, success, cancellation, or failure feedback.
+- **Decision A — connectivity:** Announce and show the complete offline explanation when connectivity changes, then collapse it after five seconds to a compact, user-expandable indicator. Briefly confirm reconnection. Core reading and progress remain available, and account-sync failures can be retried or dismissed without clearing their underlying Settings state.
+- **Decision A — content loading:** Never reload automatically after a screen or collection chunk fails. Show a focused recovery state with **Try again** and **Go to Azkar** while preserving local progress. Offer **Refresh app** only after the explicit retry also fails.
+- **Supporting decisions:** Static empty states are not live regions. Blocking failures move focus to their recovery heading; non-blocking action outcomes use narrowly scoped polite status or assertive alert messages. Backend error text is never presented directly. PWA updates remain user-controlled, permission denial includes browser-settings guidance, and duplicate async actions are disabled while pending.
+- **Consequences:** No persistence schema, sync merge rule, religious content, router, or runtime dependency changes. The hand-written `AppErrorBoundary` remains the last resort for true application crashes; recoverable chunk failures no longer depend on it.
+- **Tests/evidence required:** Focused state/retry/permission tests, `pnpm check`, full Playwright, offline/reconnect and denied-permission manual checks, Pages workflow success, and production SHA smoke verification.
+- **Supersedes:** The automatic one-time lazy-route reload behavior only. Existing offline-first, update-consent, and local-state ownership contracts remain authoritative.

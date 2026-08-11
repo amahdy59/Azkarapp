@@ -57,6 +57,7 @@ function ReferenceContent({
       }, 1600);
     } catch {
       setCopiedReference(null);
+      onAnnouncement(t(language, "reader.copyError"));
     }
   };
 
