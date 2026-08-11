@@ -1321,6 +1321,10 @@ a[href]:not(.no-press):active,
   transform: none !important;
 }
 
+.reduce-motion .skip-link {
+  transition: none !important;
+}
+
 /* ─── Per-component Reduced Motion Alternatives ─────────────────────── */
 @media (prefers-reduced-motion: reduce) {
   .counter-number {

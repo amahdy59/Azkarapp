@@ -154,7 +154,7 @@ test("reduced motion keeps the skip link hidden until keyboard focus", async ({ 
   expect((hiddenBounds?.y ?? 1) + (hiddenBounds?.height ?? 0)).toBeLessThanOrEqual(0);
   await page.keyboard.press("Tab");
   await expect(skipLink).toBeFocused();
-  expect((await skipLink.boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(0);
+  await expect.poll(async () => (await skipLink.boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(0);
 });
 
 test("marketing landing page has no automatically detectable WCAG A/AA violations", async ({ page }) => {
