@@ -126,6 +126,7 @@ describe("HomeScreen quick access", () => {
 
     act(() => vi.advanceTimersByTime(4_200));
     expect(screen.queryByRole("status", { name: /completed/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId("current-time")).toBeInTheDocument();
+    expect(screen.getByTestId("next-prayer-time")).toBeInTheDocument();
+    expect(screen.queryByTestId("current-time")).not.toBeInTheDocument();
   });
 });

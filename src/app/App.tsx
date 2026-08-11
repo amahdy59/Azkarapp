@@ -1154,7 +1154,7 @@ function AppContent() {
                   onOpenSavedZikr={(categoryId, index) => openReader(categoryId, index, "complete")}
                   onOpenSavedLibrary={() => {
                     setActiveTab("azkar");
-                    setLibrarySection("saved");
+                    setLibrarySection(savedZikrIds.size > 0 ? "saved" : "collections");
                     push("library");
                   }}
                   onOpenBenefits={() => push("benefits")}

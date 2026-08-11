@@ -1,9 +1,10 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, Clock, ArrowLeft, ArrowRight, Bookmark, Sparkles, Check } from "../components/icons";
+import { Calendar, Zap, ArrowLeft, ArrowRight, Sparkles, Check } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
+import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import {
   ALL_AZKAR,
   estimateCompletionMinutes,
@@ -23,13 +24,13 @@ import {
   type PrayerName,
 } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
-import { formatDisplayDate, formatDisplayTime, formatNumerals } from "../formatting";
+import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { SegmentedControl } from "../components/SegmentedControl";
 import { StatCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
 import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
+import { fridayKahfOpenedKey } from "../fridayProgress";
 import type {
   AppLanguage,
   CategoryId,
@@ -98,6 +99,23 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
 
 export function getHomeBackgroundCategoryId(now: Date, routineCategoryId: CategoryId): CategoryId {
   return now.getDay() === 5 ? "friday_kahf" : routineCategoryId;
+}
+
+export function isFridayFeatureWindow(now: Date, location?: LocationSettings): boolean {
+  const day = now.getDay();
+  if (day !== 4 && day !== 5) return false;
+
+  const maghrib = timeToMinutes(getEstimatedPrayerTimes(now, location).maghrib);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  return (day === 4 && currentMinutes >= maghrib) || (day === 5 && currentMinutes < maghrib);
+}
+
+function hasStartedFridayKahf(): boolean {
+  try {
+    return window.localStorage.getItem(fridayKahfOpenedKey()) === "true";
+  } catch {
+    return false;
+  }
 }
 
 /** Centred section heading with rules on either side, per the Home design. */
@@ -226,6 +244,12 @@ export function HomeScreen({
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
   const [, setPrayerTimesRevision] = useState(0);
+  const [previewFriday, setPreviewFriday] = useState(false);
+  const [savedOpenState, setSavedOpenState] = useState<{
+    loadingId: string | null;
+    errorId: string | null;
+  }>({ loadingId: null, errorId: null });
+  const [fridayKahfStarted] = useState(hasStartedFridayKahf);
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout>;
@@ -302,7 +326,10 @@ export function HomeScreen({
       ? t(language, "home.startGroup", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
       : actionKind === "again"
         ? t(language, "home.readGroupAgain", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
-        : t(language, "home.continueGroup", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name });
+        : t(language, "home.continueGroupRemaining", {
+            name: isArabic ? reminderCategory.nameArabic : reminderCategory.name,
+            count: formatNumerals(Math.max(0, totalCount - doneCount), language),
+          });
 
   const streakDays = gardenSummary.currentUsageStreak ?? gardenSummary.activeDaysLast7 ?? 0;
   const activeDaysThisWeek = gardenSummary.activeDaysLast7 ?? 0;
@@ -315,6 +342,9 @@ export function HomeScreen({
   // arithmetic here and cannot drift from the routine count again.
   const completedCollections = gardenSummary.lifetimeGoldenLeaves;
   const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
+  const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
+  const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
+  const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";
   const savedPreview = useMemo(() => {
     const available: HomeSavedItem[] = ALL_AZKAR.filter(
       (zikr) => !zikr.isCollectionIntroduction && savedZikrIds.has(zikr.id),
@@ -326,7 +356,7 @@ export function HomeScreen({
       source: "main",
     }));
     const comprehensiveCategory = CATEGORIES.find((category) => category.id === "comprehensive_duas")!;
-    for (const id of savedZikrIds) {
+    for (const id of [...savedZikrIds].sort()) {
       if (!id.startsWith("friday-dua-") && !id.startsWith("comprehensive-dua-")) continue;
       available.push({
         id,
@@ -350,19 +380,27 @@ export function HomeScreen({
   }, [savedZikrIds]);
 
   const openSavedZikr = async (zikr: HomeSavedItem) => {
-    if (zikr.source === "friday") {
-      const { FRIDAY_KAHF } = await import("../content/fridayKahf");
-      registerLazyCollection("friday_kahf", FRIDAY_KAHF);
-      onOpenSavedZikr?.("friday_kahf", 0);
-      return;
+    setSavedOpenState({ loadingId: zikr.id, errorId: null });
+    try {
+      if (zikr.source === "friday") {
+        const { FRIDAY_KAHF } = await import("../content/fridayKahf");
+        registerLazyCollection("friday_kahf", FRIDAY_KAHF);
+        onOpenSavedZikr?.("friday_kahf", 0);
+        setSavedOpenState({ loadingId: null, errorId: null });
+        return;
+      }
+      if (zikr.source === "comprehensive") {
+        const { COMPREHENSIVE_DUAS } = await import("../content/comprehensiveDuas");
+        registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
+      }
+      const items = getAzkarByCategory(zikr.category);
+      const index = items.findIndex((item) => item.id === zikr.id);
+      if (index < 0) throw new Error(`Saved zikr ${zikr.id} was not found`);
+      onOpenSavedZikr?.(zikr.category, index);
+      setSavedOpenState({ loadingId: null, errorId: null });
+    } catch {
+      setSavedOpenState({ loadingId: null, errorId: zikr.id });
     }
-    if (zikr.source === "comprehensive") {
-      const { COMPREHENSIVE_DUAS } = await import("../content/comprehensiveDuas");
-      registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
-    }
-    const items = getAzkarByCategory(zikr.category);
-    const index = items.findIndex((item) => item.id === zikr.id);
-    if (index >= 0) onOpenSavedZikr?.(zikr.category, index);
   };
 
   return (
@@ -455,126 +493,27 @@ export function HomeScreen({
                   />
                 </div>
               ) : (
-                <section
-                  aria-labelledby="current-zikr-heading"
-                  className="lg:col-span-3 flex flex-col justify-between transition-all"
-                >
-                  {/* The hero sits on a photo that fades to white in light mode,
-                      so its white text needs its own dark backing rather than
-                      relying on the page scrim. Without this, "Time for"
-                      measured 1.98:1 against a required 4.5:1. */}
-                  <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/12 bg-black/14 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
-                    {/* Hero Text & Category Header */}
-                    <div className="flex w-full flex-col items-start gap-2 px-1">
-                      <div
-                        data-testid="next-prayer"
-                        className="flex min-w-0 items-center gap-2 text-[0.8125rem] font-semibold text-white/82"
-                      >
-                        <Clock className="h-[15px] w-[15px] shrink-0 text-[#e2a84a]" aria-hidden="true" />
-                        <time
-                          data-testid="current-time"
-                          className="shrink-0 font-extrabold text-white"
-                          dateTime={now.toISOString()}
-                        >
-                          {formatDisplayTime(now, language)}
-                        </time>
-                        <span className="text-white/45" aria-hidden="true">
-                          •
-                        </span>
-                        <span className="min-w-0 truncate" dir="auto">
-                          {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}{" "}
-                          <span dir="ltr">{nextPrayerInfo.formattedCountdown}</span>
-                        </span>
-                      </div>
-                      <h2
-                        id="current-zikr-heading"
-                        className="text-4xl md:text-5xl font-black text-on-media-accent tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                        dir="auto"
-                        style={{ lineHeight: "1.25" }}
-                      >
-                        {isArabic ? reminderCategory.nameArabic : reminderCategory.name}
-                      </h2>
-                      <p
-                        className="text-[0.875rem] font-bold text-white bg-black/40 backdrop-blur-md px-3.5 py-1.5 rounded-full w-fit mt-1 shadow-sm border border-white/10"
-                        dir="auto"
-                      >
-                        {reminderInfo.desc}
-                      </p>
-                    </div>
-
-                    {/* Routine Mode Selector Pill (Abbreviated vs Complete) */}
-                    <SegmentedControl
-                      value={reminderMode}
-                      onChange={(mode) => {
-                        if (isRoutineCategory(reminderInfo.categoryId)) {
-                          onSetRoutineMode?.(reminderInfo.categoryId, mode);
-                        }
-                      }}
-                      direction={direction}
-                      aria-label={t(language, "home.routineMode")}
-                      className="flex min-h-[48px] w-full items-center rounded-2xl bg-black/55 p-1 border border-white/20 dark:border-white/10"
-                      itemClassName={(selected) =>
-                        `flex min-h-[44px] flex-1 items-center justify-center rounded-2xl transition-all duration-200 text-[0.875rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                          selected ? "bg-primary text-primary-foreground shadow-md" : "text-white/95 hover:text-white"
-                        }`
-                      }
-                      options={[
-                        { value: "complete", label: t(language, "home.routineComplete") },
-                        { value: "core", label: t(language, "home.routineAbbreviated") },
-                      ]}
-                    />
-
-                    {/* Progress Text & Progress Bar */}
-                    {totalCount > 0 && (
-                      <div className="flex flex-col gap-2 w-full mt-1">
-                        <div
-                          className="flex w-full items-center justify-between text-[0.8125rem] font-bold text-on-media"
-                          dir="auto"
-                        >
-                          <span>
-                            {formatNumerals(doneCount, language)} {t(language, "home.ofSeparator")}{" "}
-                            {formatNumerals(totalCount, language)}
-                          </span>
-                          <div className="flex items-center gap-1.5 text-on-media">
-                            <Clock className="h-[14px] w-[14px] text-[#e2a84a]" />
-                            <span>
-                              {isArabic
-                                ? `${formatNumerals(estimatedMinutes, language)} دقائق تقريباً`
-                                : `~${estimatedMinutes} mins`}
-                            </span>
-                          </div>
-                        </div>
-                        <div className="h-2 w-full overflow-hidden rounded-full bg-black/20 dark:bg-white/20">
-                          <div
-                            className={`h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${direction === "rtl" ? "origin-right" : "origin-left"}`}
-                            style={
-                              {
-                                transform: `scaleX(${Math.min(1, Math.max(0, doneCount / totalCount))})`,
-                              } as React.CSSProperties
-                            }
-                          />
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Primary Action Button (Gold Gradient CTA) */}
-                    <button
-                      type="button"
-                      data-testid="home-primary-cta"
-                      onClick={() => {
-                        onResume(reminderInfo.categoryId);
-                      }}
-                      className="mt-2 flex h-[54px] min-h-[48px] w-full items-center justify-center gap-2.5 rounded-2xl bg-[#e2a84a] text-[1.0625rem] font-black text-slate-950 shadow-lg hover:bg-[#ebd074] transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 cursor-pointer group"
-                    >
-                      <span>{ctaLabel}</span>
-                      {direction === "rtl" ? (
-                        <ArrowLeft size={20} className="shrink-0 transition-transform group-hover:-translate-x-1" />
-                      ) : (
-                        <ArrowRight size={20} className="shrink-0 transition-transform group-hover:translate-x-1" />
-                      )}
-                    </button>
-                  </div>
-                </section>
+                <PrayerRoutineCard
+                  language={language}
+                  direction={direction}
+                  nextPrayerName={isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
+                  nextPrayerTime24={nextPrayerInfo.time24}
+                  nextPrayerTimeLabel={formatPrayerTimeLabel(nextPrayerInfo.time24, isArabic)}
+                  nextPrayerCountdown={nextPrayerInfo.formattedCountdown}
+                  categoryName={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
+                  description={reminderInfo.desc}
+                  mode={reminderMode}
+                  onModeChange={(mode) => {
+                    if (isRoutineCategory(reminderInfo.categoryId)) {
+                      onSetRoutineMode?.(reminderInfo.categoryId, mode);
+                    }
+                  }}
+                  completedCount={doneCount}
+                  totalCount={totalCount}
+                  estimatedMinutes={estimatedMinutes}
+                  ctaLabel={ctaLabel}
+                  onOpen={() => onResume(reminderInfo.categoryId)}
+                />
               )}
 
               {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
@@ -716,75 +655,27 @@ export function HomeScreen({
           </div>
 
           <div className="px-page grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
-            <section
-              aria-labelledby="home-saved-heading"
-              className="rounded-3xl bg-transparent py-3"
-              data-testid="home-saved-section"
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="text-start">
-                  <p className="text-[0.75rem] font-black uppercase tracking-wide text-primary">
-                    {t(language, "home.savedEyebrow")}
-                  </p>
-                  <h2 id="home-saved-heading" className="mt-1 text-[1.125rem] font-black text-foreground">
-                    {t(language, "home.savedTitle")}
-                  </h2>
-                </div>
-                <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary">
-                  {formatNumerals(savedZikrIds.size, language)}
-                </span>
-              </div>
-
-              {savedPreview.length > 0 ? (
-                <div className="mt-4 space-y-2.5">
-                  {savedPreview.map((zikr) => {
-                    const category = CATEGORIES.find((item) => item.id === zikr.category)!;
-                    return (
-                      <button
-                        key={zikr.id}
-                        type="button"
-                        onClick={() => void openSavedZikr(zikr)}
-                        className="interactive-elem flex min-h-14 w-full items-center gap-3 rounded-2xl bg-muted/30 px-3 py-2.5 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      >
-                        <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                          <Bookmark size={18} className="fill-current" aria-hidden="true" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block text-[0.6875rem] font-bold text-primary">
-                            {isArabic ? category.nameArabic : category.name}
-                          </span>
-                          <span
-                            className={`mt-0.5 block truncate text-[0.875rem] font-bold text-foreground ${isArabic ? "font-arabic" : "font-sans"}`}
-                            dir={isArabic ? "rtl" : "ltr"}
-                          >
-                            {isArabic ? zikr.arabicText : zikr.translation}
-                          </span>
-                        </span>
-                        {direction === "rtl" ? (
-                          <ArrowLeft size={17} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-                        ) : (
-                          <ArrowRight size={17} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <p className="mt-4 text-start text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
-                  {t(language, "home.savedEmpty")}
-                </p>
-              )}
-
-              {onOpenSavedLibrary && (
-                <button
-                  type="button"
-                  onClick={onOpenSavedLibrary}
-                  className="mt-4 flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 text-[0.875rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  {t(language, "home.openSaved")}
-                </button>
-              )}
-            </section>
+            <SavedZikrCard
+              language={language}
+              direction={direction}
+              count={savedZikrIds.size}
+              items={savedPreview.map((zikr) => {
+                const category = CATEGORIES.find((item) => item.id === zikr.category)!;
+                return {
+                  id: zikr.id,
+                  categoryLabel: isArabic ? category.nameArabic : category.name,
+                  displayText: isArabic ? zikr.arabicText : zikr.translation,
+                  source: zikr.source,
+                };
+              })}
+              loadingId={savedOpenState.loadingId}
+              errorId={savedOpenState.errorId}
+              onOpenItem={(id) => {
+                const item = savedPreview.find((zikr) => zikr.id === id);
+                if (item) void openSavedZikr(item);
+              }}
+              onOpenLibrary={onOpenSavedLibrary}
+            />
 
             {onOpenBenefits && (
               <button
@@ -819,65 +710,15 @@ export function HomeScreen({
 
           <SectionDivider label={t(language, "home.fridayAzkar")} />
 
-          {/* Friday card: artwork at the start edge, the Kahf message and its
-              call to action in the middle, and the virtues list at the end. */}
-          <section aria-labelledby="friday-card-heading">
-            <div className="grid gap-5 overflow-hidden rounded-3xl border border-amber-500/20 bg-card p-5 shadow-raised sm:p-6 xl:grid-cols-[7.5rem_minmax(0,1fr)_17.5rem] xl:items-center">
-              <div
-                className="flex size-[96px] shrink-0 items-center justify-center self-center rounded-2xl border border-amber-500/30 bg-amber-500/15 text-4xl shadow-sm sm:size-[112px] sm:text-5xl"
-                aria-hidden="true"
-              >
-                🕌
-              </div>
-
-              <div className="flex min-w-0 flex-1 flex-col gap-3 text-start">
-                <h3 id="friday-card-heading" className="text-xl font-black text-foreground md:text-2xl" dir="auto">
-                  {t(language, "home.kahfMerit")}
-                </h3>
-                <p className="text-[0.875rem] font-medium text-muted-foreground" dir="auto">
-                  {isArabic
-                    ? "من قرأ سورة الكهف في يوم الجمعة أضاء له من النور ما بين الجمعتين."
-                    : "Whoever recites Surat Al-Kahf on Friday will have light between the two Fridays."}
-                </p>
-                {onOpenFridayMode && (
-                  <button
-                    type="button"
-                    onClick={onOpenFridayMode}
-                    className="mt-1 flex h-[48px] w-fit items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-[0.9375rem] font-black text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    <span>{t(language, "home.viewFridayAzkar")}</span>
-                    {direction === "rtl" ? <ArrowLeft size={18} /> : <ArrowRight size={18} />}
-                  </button>
-                )}
-              </div>
-
-              <div className="w-full shrink-0 rounded-2xl border border-amber-500/25 bg-amber-500/10 p-4 text-start xl:w-auto">
-                <p className="mb-2 text-[0.8125rem] font-black text-amber-700 dark:text-amber-400" dir="auto">
-                  {t(language, "home.fridayVirtues")}
-                </p>
-                <ul className="flex list-disc flex-col gap-1.5 ps-4 text-xs font-semibold text-foreground">
-                  {(isArabic
-                    ? [
-                        "فيه أفضل صلاة (صلاة فجر يوم الجمعة)",
-                        "قراءة سورة الكهف نور بين الجمعتين",
-                        "أجر عظيم عند الذهاب للمسجد مبكراً والإنصات للخطيب",
-                        "فيه وقت استجابة الدعاء",
-                      ]
-                    : [
-                        "It contains the best prayer (Friday's Fajr)",
-                        "Reciting Al-Kahf is light between the two Fridays",
-                        "Great reward for arriving early and listening to the sermon",
-                        "It holds an hour when supplication is answered",
-                      ]
-                  ).map((virtue) => (
-                    <li key={virtue} dir="auto">
-                      {virtue}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          </section>
+          <FridayHomeCard
+            language={language}
+            direction={direction}
+            expanded={fridayInWindow || previewFriday}
+            status={fridayStatus}
+            onOpen={onOpenFridayMode}
+            canPreview={import.meta.env.DEV && !fridayInWindow}
+            onTogglePreview={() => setPreviewFriday((current) => !current)}
+          />
 
           {/* Tasbeeh Counter Button (Full width matching design system tokens) */}
           {onOpenCustomCounter && (

@@ -83,7 +83,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
 
       return {
         date: bounds("hijri-date"),
-        time: bounds("current-time"),
+        time: bounds("next-prayer-time"),
         streak: bounds("header-streak"),
         palms: bounds("header-palms"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
@@ -130,7 +130,7 @@ test("Home Saved preview opens its item and the full Saved library state", async
 
   await page.goBack();
   await expect(page.getByTestId("home-saved-section")).toBeVisible();
-  await page.getByTestId("home-saved-section").getByRole("button", { name: "Open all saved zikr" }).click();
+  await page.getByTestId("home-saved-section").getByRole("button", { name: "Open all 1 saved zikr" }).click();
 
   await expect(page.getByRole("tab", { name: /Saved/ })).toHaveAttribute("aria-selected", "true");
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();

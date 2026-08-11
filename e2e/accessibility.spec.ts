@@ -145,6 +145,18 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
+test("reduced motion keeps the skip link hidden until keyboard focus", async ({ page }) => {
+  await page.goto("/");
+  await page.locator("html").evaluate((element) => element.classList.add("reduce-motion"));
+
+  const skipLink = page.locator(".skip-link");
+  const hiddenBounds = await skipLink.boundingBox();
+  expect((hiddenBounds?.y ?? 1) + (hiddenBounds?.height ?? 0)).toBeLessThanOrEqual(0);
+  await page.keyboard.press("Tab");
+  await expect(skipLink).toBeFocused();
+  expect((await skipLink.boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(0);
+});
+
 test("marketing landing page has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await page.goto("/?view=landing");
   await expect(page.getByRole("heading", { name: "Build a lasting azkar habit." })).toBeVisible();

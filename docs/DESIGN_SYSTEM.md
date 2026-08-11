@@ -115,9 +115,12 @@ Every interactive component should define:
 - Arabic group cards use an explicit physical LTR grid so visual placement is deterministic: Arabic text occupies the right column with its own `dir="rtl"`, the category icon sits to its left, and the back/entry chevron is the far-left element. English mirrors that physical grid.
 - Group progress fills from the reading start edge: right-to-left for Arabic and left-to-right for English. DOM and tab order remain stable in both languages.
 - The featured “start your zikr” card uses the selected location's calculated prayer boundaries: Morning from Fajr until Asr, Evening from Asr until Isha, and Before Sleep from Isha until the following Fajr. Copy identifies after Asr until Maghrib as the preferred Evening window without hiding the collection afterward.
+- The featured card's prayer line contains the actionable schedule only: next-prayer name, calculated local prayer time, and countdown. It must wrap at narrow widths and must not duplicate the device clock. Routine mode is a labelled radio group with a short mode-specific explanation; visible progress text remains the text alternative for its decorative bar, and a resume action states the remaining count.
 - Each featured state uses a lightweight semantic CSS gradient for Morning, Evening, or Before Sleep; contrast must remain legible in Light, Midnight, and Dark/OLED modes without downloading decorative imagery.
 - Featured-card Arabic copy is right aligned and uses RTL semantics. Zikr excerpts retain the `zikr-text` typography contract; decorative artwork has empty alternative text.
 - The daily palm trackers use two balanced columns with Before Sleep spanning the second row. Labels wrap without ellipsis, and each tracker contains exactly one status icon: a check when complete or a circle when pending.
+- The Friday Home feature is expanded only from the selected location's Thursday Maghrib through (but not including) Friday Maghrib. It is compact at other times. One reviewed virtue leads; secondary virtues and the reading source use native progressive disclosure. A test preview may exist only in development builds.
+- Saved quick access preserves deterministic catalogue order and does not add a separate persisted sort preference. Its count has a complete accessible name, each row names its source and category, lazy content announces loading or failure locally, and an empty state routes to Collections rather than an empty Saved view.
 
 ## Benefit sheet contract
 

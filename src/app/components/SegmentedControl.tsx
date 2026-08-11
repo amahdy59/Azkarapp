@@ -27,6 +27,7 @@ export function SegmentedControl<T extends string>({
   className = "",
   itemClassName,
   "aria-label": ariaLabel,
+  "aria-describedby": ariaDescribedBy,
 }: {
   value: T;
   onChange: (value: T) => void;
@@ -36,6 +37,7 @@ export function SegmentedControl<T extends string>({
   /** Per-item classes; receives the selected state so callers can style their own tone. */
   itemClassName: (selected: boolean) => string;
   "aria-label": string;
+  "aria-describedby"?: string;
 }) {
   return (
     <RadioGroupPrimitive.Root
@@ -44,6 +46,7 @@ export function SegmentedControl<T extends string>({
       onValueChange={(next) => onChange(next as T)}
       className={className}
       aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
     >
       {options.map((option) => (
         <RadioGroupPrimitive.Item

@@ -925,3 +925,31 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** New `AccessibilityPanel.test.tsx` (4 tests) covering the radio-group semantics, the calendar's absence, and the screen-reader note not being a control. Full `pnpm check` and `pnpm test:e2e`.
 - **Not done:** language and RTL remain on separate screens (analysis §4.5). `forceRtl` is a reading-direction override rather than a locale choice, and moving it was not approved.
 - **Supersedes:** Re-affirms DEC-027 on the sidebar controls; supersedes the calendar's placement in the Accessibility panel.
+
+---
+
+## DEC-051 — Home prayer, Friday, and Saved-card refinement
+
+- **Date:** 2026-08-11
+- **Status:** Approved
+- **Owner:** User (approved all four open decisions and said “go ahead”).
+- **Related phase:** Phase 05 Home follow-up
+- **Context:** The Home audit found that the prayer line prioritised the device clock over the actionable prayer schedule, the Friday feature had the same visual weight all week, and Saved quick access lacked robust loading/error feedback and clear empty-state routing. The cards also used inconsistent surface anatomy and several nested decorative treatments.
+
+### Decisions
+
+- **Prayer card:** Show the actual next prayer, its scheduled local time, and the live countdown inside the primary routine card. Remove the unrelated device clock. Keep the existing prayer calculation and location contracts unchanged.
+- **Friday card:** Show the expanded Friday experience from Thursday Maghrib until Friday Maghrib, using the existing calculated Maghrib time and user location. Outside that window, show a compact entry. A development-only preview control may expose the expanded state for QA; no test switch ships in production.
+- **Saved order:** Preserve the existing stable catalogue order. Do not add reordering, a new persisted field, or a synchronization migration.
+- **Friday content:** Surface one already-reviewed benefit first and place the remaining existing virtues behind progressive disclosure. Do not invent or reinterpret devotional claims or sources.
+
+### Consequences
+
+- The primary routine card receives clearer prayer hierarchy, wrapping at narrow widths, a concise mode explanation, and a CTA that communicates remaining work when resuming.
+- Saved quick access uses the shared card surface, announces its count and asynchronous state, distinguishes item sources visually and in accessible names, and sends an empty library to Collections rather than an empty Saved tab.
+- The Friday feature uses one responsive component with compact and expanded variants, semantic disclosure, a non-emoji repository icon, and state-aware entry copy without fabricating precise reading progress.
+- Presentation is extracted into focused Home card components. No runtime dependency, prayer-domain change, reviewed-content edit, or persisted-state change is introduced.
+
+- **Files/contracts to update:** Home composition/components, bilingual i18n, Home tests, responsive browser coverage, design-system documentation, and Phase 05 evidence.
+- **Tests/evidence required:** Focused unit/render tests for prayer presentation, Friday boundary logic and variants, Saved accessibility/loading/error states; `pnpm check`; Home browser coverage including narrow layout and axe; screenshots at phone, tablet, and desktop sizes.
+- **Supersedes:** Only the earlier always-expanded Friday-card presentation and the device-clock treatment within the Home prayer line.

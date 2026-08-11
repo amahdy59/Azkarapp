@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { getHomeAction, getHomeBackgroundCategoryId, getTimeOfDayZikr } from "./HomeScreen";
+import { getHomeAction, getHomeBackgroundCategoryId, getTimeOfDayZikr, isFridayFeatureWindow } from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
 import { getEstimatedPrayerTimes } from "../content/prayerTimes";
 import { getAzkarByCategory } from "../content/azkar";
@@ -60,5 +60,18 @@ describe("getHomeAction", () => {
   it("uses the Friday scene on Home without changing the recommended routine", () => {
     expect(getHomeBackgroundCategoryId(new Date(2026, 7, 7, 9), "morning")).toBe("friday_kahf");
     expect(getHomeBackgroundCategoryId(new Date(2026, 7, 8, 9), "morning")).toBe("morning");
+  });
+
+  it("expands the Friday feature from Thursday Maghrib until Friday Maghrib", () => {
+    const thursday = new Date(2026, 7, 6, 12);
+    const friday = new Date(2026, 7, 7, 12);
+    const thursdayMaghrib = getEstimatedPrayerTimes(thursday, cairo).maghrib;
+    const fridayMaghrib = getEstimatedPrayerTimes(friday, cairo).maghrib;
+
+    expect(isFridayFeatureWindow(atTime(thursday, thursdayMaghrib, -1), cairo)).toBe(false);
+    expect(isFridayFeatureWindow(atTime(thursday, thursdayMaghrib), cairo)).toBe(true);
+    expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib, -1), cairo)).toBe(true);
+    expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib), cairo)).toBe(false);
+    expect(isFridayFeatureWindow(new Date(2026, 7, 8, 12), cairo)).toBe(false);
   });
 });

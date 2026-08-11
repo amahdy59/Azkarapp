@@ -1315,7 +1315,7 @@ a[href]:not(.no-press):active,
 
 .reduce-motion button,
 .reduce-motion [role="button"],
-.reduce-motion a,
+.reduce-motion a:not(.skip-link),
 .reduce-motion .interactive-elem {
   transition: opacity var(--motion-duration-press) var(--motion-ease-standard) !important;
   transform: none !important;
