@@ -14,6 +14,7 @@ import {
   GoldenLeafMark,
   GreenLeafMark,
   PalmTreeMark,
+  TodayRoutineGarden,
   GardenMilestones,
   GrowthEventStatus,
   SevenDayGarden,
@@ -98,6 +99,25 @@ describe("leaf and palm marks", () => {
     expect(() => render(<GoldenLeafMark />)).not.toThrow();
     expect(() => render(<GreenLeafMark />)).not.toThrow();
     expect(() => render(<PalmTreeMark />)).not.toThrow();
+  });
+});
+
+describe("Home wird card", () => {
+  it("keeps Morning, Evening, and Sleep in one stable semantic order", () => {
+    render(
+      <TodayRoutineGarden
+        summary={makeSummary()}
+        language="en"
+        hideTabs
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+      />,
+    );
+
+    expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
+      "Morning Azkar - Completed",
+      "Evening Azkar - Completed",
+      "Sleep Azkar - Not completed",
+    ]);
   });
 });
 

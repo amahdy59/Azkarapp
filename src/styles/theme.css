@@ -760,6 +760,44 @@ textarea {
   cursor: default;
 }
 
+/* The dedicated masbaha screen can use additional wide-screen space; Reader
+   keeps the documented compact 220 Ã— 76 control. */
+@media (min-width: 48rem) {
+  .custom-counter-stage .adaptive-counter-surface {
+    width: 18rem;
+    height: 6rem;
+    border-radius: 3rem;
+  }
+
+  .custom-counter-stage .pulse-ring {
+    width: 17.5rem !important;
+    height: 5.5rem !important;
+    border-radius: 3rem;
+  }
+
+  .custom-counter-stage .counter-number {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .custom-counter-stage .adaptive-counter-surface {
+    width: 24rem;
+    height: 8rem;
+    border-radius: 4rem;
+  }
+
+  .custom-counter-stage .pulse-ring {
+    width: 23.5rem !important;
+    height: 7.5rem !important;
+    border-radius: 4rem;
+  }
+
+  .custom-counter-stage .counter-number {
+    font-size: 3rem;
+  }
+}
+
 /* Progress lives on the surface's own outline: a 2px stroke that is fully
    hidden at zero and closes the whole rectangle on completion. */
 .counter-outline-progress {

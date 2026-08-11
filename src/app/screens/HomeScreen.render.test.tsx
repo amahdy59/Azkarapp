@@ -71,7 +71,7 @@ describe("HomeScreen quick access", () => {
     expect(onOpenBenefits).toHaveBeenCalledOnce();
   });
 
-  it("renders the dedicated after-prayer tracker rail on Home while keeping the compact wird card", () => {
+  it("renders the theme-aware after-prayer tracker rail with the next prayer while keeping the compact wird card", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
 
@@ -93,6 +93,8 @@ describe("HomeScreen quick access", () => {
     );
 
     expect(screen.getByTestId("after-prayer-trackers")).toBeInTheDocument();
+    expect(screen.getByTestId("next-prayer")).toHaveTextContent("Next prayer");
+    expect(screen.getByTestId("next-prayer-time")).toBeInTheDocument();
     expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
     expect(screen.getByText("After Asr")).toBeInTheDocument();
     expect(screen.getByText("After Fajr")).toBeInTheDocument();
@@ -127,6 +129,6 @@ describe("HomeScreen quick access", () => {
     act(() => vi.advanceTimersByTime(4_200));
     expect(screen.queryByRole("status", { name: /completed/i })).not.toBeInTheDocument();
     expect(screen.getByTestId("next-prayer-time")).toBeInTheDocument();
-    expect(screen.queryByTestId("current-time")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("home-primary-cta")).not.toBeInTheDocument();
   });
 });

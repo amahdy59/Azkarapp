@@ -133,6 +133,7 @@ describe("FridayModeScreen", () => {
 
     expect(screen.getByText("3 / 10")).toBeInTheDocument();
     expect(screen.getByText(/blessed step/i)).toBeInTheDocument();
+    expect(screen.getByText("Virtues of Friday")).toBeInTheDocument();
     expect(screen.getAllByRole("checkbox")).toHaveLength(7);
   });
 

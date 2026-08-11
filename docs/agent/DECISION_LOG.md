@@ -953,3 +953,19 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Files/contracts to update:** Home composition/components, bilingual i18n, Home tests, responsive browser coverage, design-system documentation, and Phase 05 evidence.
 - **Tests/evidence required:** Focused unit/render tests for prayer presentation, Friday boundary logic and variants, Saved accessibility/loading/error states; `pnpm check`; Home browser coverage including narrow layout and axe; screenshots at phone, tablet, and desktop sizes.
 - **Supersedes:** Only the earlier always-expanded Friday-card presentation and the device-clock treatment within the Home prayer line.
+
+---
+
+## DEC-052 - Responsive Wird, post-prayer context, and companion depth
+
+- **Date:** 2026-08-11
+- **Status:** Approved
+- **Owner:** User
+- **Related scope:** Focused Phase 05 Home, Friday, and Custom Counter follow-up
+- **Context:** The user identified a reversed Arabic Wird arrangement, mobile cards too narrow for reliable reading, a routine card returning after completion, a fixed dark after-prayer surface, and a narrow masbaha entry and screen on wide devices. The Friday Home and companion screens also concealed too much of their already-reviewed contextual information.
+- **Decision:** Keep Morning, Evening, and Before Sleep in a stable source and DOM order; use direction-aware CSS placement rather than reversing arrays. Use full-width Wird rows on compact screens and three columns from tablet width. The post-prayer tracker owns next-prayer name, calculated time, and countdown, and uses semantic theme tokens with explicit active/completed icons. A completed featured collection shows the existing short completion acknowledgement and then keeps its routine card hidden. The Home masbaha entry fills the available content width; the dedicated Custom Counter expands only at tablet and desktop widths, leaving Reader geometry unchanged. Friday uses existing reviewed virtue and source copy only: brief disclosure on mobile and direct tablet/desktop presentation.
+- **Why:** This improves recognition, reading space, visual continuity across themes, and wide-screen ergonomics without new state, new content claims, prayer-domain changes, or a new dependency.
+- **Consequences:** Home and Counter responsive assertions change. The existing Custom Counter is no longer visually identical to the Reader at wide breakpoints, but both retain the same accessible button semantics, progress outline, keyboard support, and compact-screen geometry.
+- **Files/contracts to update:** Home, Progress, Friday, Counter, semantic theme styles, responsive tests, and the design-system contract.
+- **Tests/evidence required:** Focused Home, Friday, Counter, and Wird tests; narrow/tablet/desktop browser geometry; full local release gate; green GitHub Pages workflow and production SHA smoke verification.
+- **Supersedes:** The shared wide-screen Custom Counter geometry in DEC-048 and the next-prayer placement decision in DEC-051. Reader geometry, prayer calculation, and reviewed content contracts remain unchanged.

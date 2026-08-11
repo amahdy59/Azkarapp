@@ -14,7 +14,7 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.getByText("المسبحة الإلكترونية")).toBeInTheDocument();
     expect(screen.getByText("الذكر المأثور")).toBeInTheDocument();
     expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
-    expect(screen.getAllByTestId("custom-counter-surface")[0]).toBeInTheDocument();
+    expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("custom-counter-surface");
   });
 
   it("increments counter on tap and supports undo/reset", () => {

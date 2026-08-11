@@ -205,6 +205,24 @@ export function FridayModeScreen({
                   : "friday.progressStart",
             )}
           </p>
+          <div className="mt-5 grid gap-3 border-t border-amber-500/20 pt-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-background/55 p-3 text-start">
+              <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
+              <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
+                {t(language, "friday.kahfHadith")}
+              </p>
+              <p className="mt-2 text-[0.6875rem] font-bold text-amber-700 dark:text-amber-300">
+                {t(language, "home.fridayReadingSource")}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-background/55 p-3 text-start">
+              <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "home.fridayVirtues")}</h3>
+              <ul className="mt-1 list-disc space-y-1 ps-4 text-xs font-semibold leading-5 text-muted-foreground">
+                <li>{t(language, "home.fridayVirtueFajr")}</li>
+                <li>{t(language, "home.fridayVirtueDua")}</li>
+              </ul>
+            </div>
+          </div>
         </section>
 
         <section

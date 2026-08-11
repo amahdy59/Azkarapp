@@ -10,15 +10,11 @@ const savedItem: HomeSavedCardItem = {
 };
 
 describe("HomeCards", () => {
-  it("presents the scheduled prayer and mode explanation without a device clock", () => {
+  it("keeps the routine card focused on the zikr and mode explanation", () => {
     render(
       <PrayerRoutineCard
         language="en"
         direction="ltr"
-        nextPrayerName="Dhuhr"
-        nextPrayerTime24="12:03"
-        nextPrayerTimeLabel="12:03 PM"
-        nextPrayerCountdown="01:10 left"
         categoryName="Morning Azkar"
         description="Read after Fajr."
         mode="core"
@@ -31,13 +27,8 @@ describe("HomeCards", () => {
       />,
     );
 
-    expect(screen.getByTestId("next-prayer")).toHaveTextContent("Next prayer");
-    expect(screen.getByTestId("next-prayer")).toHaveTextContent("Dhuhr");
-    expect(screen.getByTestId("next-prayer")).toHaveTextContent("12:03 PM");
-    expect(screen.getByTestId("next-prayer")).toHaveTextContent("01:10 left");
-    expect(screen.getByTestId("next-prayer-time")).toHaveAttribute("datetime", "12:03");
     expect(screen.getByText("A shorter selection for limited time.")).toBeInTheDocument();
-    expect(screen.queryByTestId("current-time")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("next-prayer")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /3 remaining/i })).toHaveAttribute(
       "aria-describedby",
       "home-routine-progress",

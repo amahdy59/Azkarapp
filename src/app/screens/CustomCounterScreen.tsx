@@ -164,7 +164,7 @@ export function CustomCounterScreen({
         />
 
         <div
-          className="relative mx-auto flex min-h-0 w-full max-w-[40rem] flex-1 flex-col justify-between px-4 pb-6 pt-2 sm:px-5 overflow-hidden rounded-3xl"
+          className="relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between overflow-hidden rounded-3xl px-4 pb-6 pt-2 sm:px-5"
           data-testid="custom-counter-content"
           onPointerDown={(e) => {
             const el = e.target as HTMLElement;
@@ -210,7 +210,7 @@ export function CustomCounterScreen({
                 <span className="block text-[0.75rem] font-bold text-muted-foreground">
                   {t(language, "counter.selectedDhikr")}
                 </span>
-                <p className="truncate text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
+                <p className="line-clamp-2 text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
                   {activeText}
                 </p>
               </div>
@@ -234,8 +234,8 @@ export function CustomCounterScreen({
           </div>
 
           {/* Central Counter Display Surface */}
-          <div className="my-auto flex flex-col items-center justify-center py-4 sm:py-6 relative z-10">
-            <div className="relative flex items-center justify-center">
+          <div className="relative z-10 my-auto flex flex-col items-center justify-center py-4 sm:py-6 lg:py-8">
+            <div className="custom-counter-stage relative flex items-center justify-center">
               <PulseRings trigger={pulse} size={220} height={76} count={count} total={target} />
 
               <ZikrCounterSurface
@@ -246,6 +246,7 @@ export function CustomCounterScreen({
                 language={language}
                 instructionText=""
                 testId="custom-counter-surface"
+                className="custom-counter-surface"
               />
             </div>
 

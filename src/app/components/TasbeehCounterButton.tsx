@@ -58,7 +58,7 @@ export function TasbeehCounterButton({
       type="button"
       onClick={onClick}
       dir={direction}
-      className="interactive-elem group relative mx-auto flex min-h-16 w-full items-center justify-between rounded-2xl border border-white/40 bg-card/65 p-3 text-foreground shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] sm:min-h-[4.5rem] sm:rounded-3xl sm:p-4 md:p-5 lg:max-w-2xl dark:border-white/15 dark:bg-black/55 dark:hover:bg-black/65 cursor-pointer"
+      className="interactive-elem group relative mx-auto flex min-h-16 w-full max-w-[80rem] items-center justify-between rounded-2xl border border-white/40 bg-card/65 p-3 text-foreground shadow-sm backdrop-blur-xl transition-all duration-300 hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] sm:min-h-[4.5rem] sm:rounded-3xl sm:p-4 md:p-5 dark:border-white/15 dark:bg-black/55 dark:hover:bg-black/65 cursor-pointer"
       aria-label={t(language, "counter.tasbeehTitle")}
     >
       <div className="flex items-center gap-3.5 min-w-0">

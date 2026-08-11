@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, ArrowLeft, ArrowRight, Sparkles, Check } from "../components/icons";
+import { Calendar, Zap, ArrowLeft, ArrowRight, Sparkles, Check, Clock } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
@@ -317,6 +317,9 @@ export function HomeScreen({
     };
   }, [isComplete, reminderInfo.categoryId]);
 
+  const showCompletionCard = isComplete && completionCardState !== "hidden";
+  const showRoutineCard = !isComplete;
+  const showHeroContent = showCompletionCard || showRoutineCard || quietProgressEnabled;
   const estimatedMinutes = useMemo(() => estimateCompletionMinutes(visibleReminderAzkar), [visibleReminderAzkar]);
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
@@ -483,79 +486,101 @@ export function HomeScreen({
 
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
-            <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
-              {isComplete && completionCardState !== "hidden" ? (
-                <div className="lg:col-span-3">
-                  <TranquilityCompletionCard
-                    categoryId={reminderInfo.categoryId}
+            {showHeroContent && (
+              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
+                {showCompletionCard && (
+                  <div className={quietProgressEnabled ? "lg:col-span-3" : "lg:col-span-5"}>
+                    <TranquilityCompletionCard
+                      categoryId={reminderInfo.categoryId}
+                      language={language}
+                      isExiting={completionCardState === "exiting"}
+                    />
+                  </div>
+                )}
+                {showRoutineCard && (
+                  <PrayerRoutineCard
                     language={language}
-                    isExiting={completionCardState === "exiting"}
+                    direction={direction}
+                    categoryName={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
+                    description={reminderInfo.desc}
+                    mode={reminderMode}
+                    onModeChange={(mode) => {
+                      if (isRoutineCategory(reminderInfo.categoryId)) {
+                        onSetRoutineMode?.(reminderInfo.categoryId, mode);
+                      }
+                    }}
+                    completedCount={doneCount}
+                    totalCount={totalCount}
+                    estimatedMinutes={estimatedMinutes}
+                    ctaLabel={ctaLabel}
+                    onOpen={() => onResume(reminderInfo.categoryId)}
                   />
-                </div>
-              ) : (
-                <PrayerRoutineCard
-                  language={language}
-                  direction={direction}
-                  nextPrayerName={isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
-                  nextPrayerTime24={nextPrayerInfo.time24}
-                  nextPrayerTimeLabel={formatPrayerTimeLabel(nextPrayerInfo.time24, isArabic)}
-                  nextPrayerCountdown={nextPrayerInfo.formattedCountdown}
-                  categoryName={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
-                  description={reminderInfo.desc}
-                  mode={reminderMode}
-                  onModeChange={(mode) => {
-                    if (isRoutineCategory(reminderInfo.categoryId)) {
-                      onSetRoutineMode?.(reminderInfo.categoryId, mode);
-                    }
-                  }}
-                  completedCount={doneCount}
-                  totalCount={totalCount}
-                  estimatedMinutes={estimatedMinutes}
-                  ctaLabel={ctaLabel}
-                  onOpen={() => onResume(reminderInfo.categoryId)}
-                />
-              )}
+                )}
 
-              {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
+                {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
               renders exactly this card; a second bespoke one would duplicate it. */}
-              {quietProgressEnabled && (
-                <div className="lg:col-span-2 flex h-full w-full">
-                  <TodayRoutineGarden
-                    summary={gardenSummary}
-                    language={language}
-                    hideTabs={true}
-                    calendarType={calendarType}
-                    dailyCompletions={dailyCompletions}
-                    onSelectCategory={onResume}
-                    visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
-                  />
-                </div>
-              )}
-            </div>
+                {quietProgressEnabled && (
+                  <div
+                    className={`flex h-full w-full ${isComplete && !showCompletionCard ? "lg:col-span-5" : "lg:col-span-2"}`}
+                  >
+                    <TodayRoutineGarden
+                      summary={gardenSummary}
+                      language={language}
+                      hideTabs={true}
+                      calendarType={calendarType}
+                      dailyCompletions={dailyCompletions}
+                      onSelectCategory={onResume}
+                      visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
+                    />
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="px-page">
             <section
               data-testid="after-prayer-trackers"
               dir={direction}
-              className="rounded-[30px] border border-[#2b3749] bg-[#121821] px-4 py-6 text-[#f8fafc] shadow-raised sm:px-8 sm:py-7"
+              className="overflow-hidden rounded-[30px] border border-border bg-card text-foreground shadow-raised"
             >
-              <div className="flex items-center justify-between gap-4">
+              <div className="grid gap-4 border-b border-border/70 bg-muted/35 px-4 py-5 sm:px-6 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                 <div className="min-w-0 text-start">
-                  <h2 className="text-[1.5rem] font-black leading-none text-[#f8fafc]" dir="auto">
+                  <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
                     {t(language, "progress.postPrayerAzkar")}
                   </h2>
                 </div>
-                <div className="text-[1.125rem] font-black text-[#e9bb64]" dir="auto">
+                <div className="text-[0.8125rem] font-bold text-muted-foreground" dir="auto">
                   {isArabic
                     ? `${prayerLabel(language, currentPrayerPeriod.currentPrayer)} بعد ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`
                     : `After ${prayerLabel(language, currentPrayerPeriod.currentPrayer)} ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[currentPrayerPeriod.currentPrayer], isArabic)}`}
                 </div>
               </div>
 
-              <div className="mt-7 h-3 overflow-hidden rounded-full bg-[#202a3a]">
+              <div
+                data-testid="next-prayer"
+                className="mx-4 mb-5 flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 rounded-2xl border border-border/70 bg-background/65 px-3 py-2 text-[0.8125rem] font-bold text-muted-foreground sm:mx-6 md:mx-0 md:mb-0 md:me-6"
+              >
+                <Clock className="size-4 shrink-0 text-primary" aria-hidden="true" />
+                <span>{t(language, "home.nextPrayer")}</span>
+                <strong className="font-black text-foreground" dir="auto">
+                  {isArabic ? nextPrayerInfo.nameArabic : nextPrayerInfo.nameEnglish}
+                </strong>
+                <time
+                  data-testid="next-prayer-time"
+                  className="font-black text-foreground"
+                  dateTime={nextPrayerInfo.time24}
+                >
+                  {formatPrayerTimeLabel(nextPrayerInfo.time24, isArabic)}
+                </time>
+                <span className="rounded-full bg-primary/12 px-2 py-0.5 text-primary" dir="ltr">
+                  {nextPrayerInfo.formattedCountdown}
+                </span>
+              </div>
+
+              <div className="mx-4 mt-5 h-2 overflow-hidden rounded-full bg-muted sm:mx-6" aria-hidden="true">
                 <div
-                  className={`h-full rounded-full bg-[#e9bb64] transition-[transform] duration-500 ease-out ${
+                  className={`h-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
                     direction === "rtl" ? "origin-right" : "origin-left"
                   }`}
                   style={{
@@ -564,8 +589,8 @@ export function HomeScreen({
                 />
               </div>
 
-              <div className="-mx-4 mt-12 overflow-x-auto px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div className="flex min-w-max gap-4 sm:grid sm:min-w-0 sm:grid-cols-5">
+              <div className="mx-4 mb-4 mt-5 sm:mx-6 sm:mb-6">
+                <div className="grid grid-cols-1 gap-2.5 min-[30rem]:grid-cols-2 lg:grid-cols-5">
                   {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
                     const isActivePrayer = index === activePrayerIndex;
                     const isPastPrayer = index < activePrayerIndex;
@@ -576,10 +601,10 @@ export function HomeScreen({
                         key={prayer}
                         type="button"
                         onClick={() => onResume("after_prayer")}
-                        className={`relative flex min-h-[13.75rem] w-[11.5rem] shrink-0 flex-col items-center justify-center gap-5 rounded-[24px] border-2 px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 sm:w-auto ${
+                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
                           isActivePrayer
-                            ? "border-[#e9bb64] bg-[#202938] text-[#f8fafc] shadow-[0_18px_40px_rgba(0,0,0,0.18)]"
-                            : "border-[#2b3749] bg-[#18202d] text-[#e9bb64]"
+                            ? "border-primary/60 bg-primary/10 text-foreground shadow-[0_14px_30px_color-mix(in_srgb,var(--primary)_16%,transparent)]"
+                            : "border-border bg-background/50 text-foreground hover:border-primary/35 hover:bg-muted/65"
                         }`}
                         aria-label={`${prayerTrackerLabel(language, prayer)} - ${
                           isCompletedPrayer
@@ -588,27 +613,30 @@ export function HomeScreen({
                               ? t(language, "progress.inProgress")
                               : t(language, "progress.notCompleted")
                         }`}
+                        aria-current={isActivePrayer ? "step" : undefined}
                       >
                         <span
-                          className={`flex size-12 items-center justify-center rounded-full border-0 ${
-                            isActivePrayer ? "bg-[#e9bb64] text-[#121821]" : "bg-transparent text-[#e9bb64]"
+                          className={`flex size-11 shrink-0 items-center justify-center rounded-2xl ${
+                            isActivePrayer ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
                           }`}
                         >
                           {isCompletedPrayer ? (
                             <Check size={18} strokeWidth={3} aria-hidden="true" />
+                          ) : isActivePrayer ? (
+                            <Clock size={18} strokeWidth={2.5} aria-hidden="true" />
                           ) : (
-                            <span className="h-3 w-3 rounded-full bg-current" aria-hidden="true" />
+                            <span className="h-2.5 w-2.5 rounded-full bg-current" aria-hidden="true" />
                           )}
                         </span>
 
-                        <div className="flex flex-col gap-1">
+                        <div className="min-w-0 flex-1 lg:flex-none">
                           <span
-                            className={`text-[1.125rem] font-black leading-tight ${isActivePrayer ? "text-[#f8fafc]" : "text-[#e9bb64]"}`}
+                            className="block text-[1rem] font-black leading-tight text-foreground lg:text-[1.0625rem]"
                             dir="auto"
                           >
                             {prayerTrackerLabel(language, prayer)}
                           </span>
-                          <span className="text-[0.75rem] font-bold text-[#b8c0cc]">
+                          <span className="mt-1 block text-[0.75rem] font-bold text-muted-foreground">
                             {formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}
                           </span>
                         </div>
@@ -722,7 +750,7 @@ export function HomeScreen({
 
           {/* Tasbeeh Counter Button (Full width matching design system tokens) */}
           {onOpenCustomCounter && (
-            <div className="">
+            <div className="px-page">
               <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
             </div>
           )}

@@ -9,7 +9,7 @@ describe("TasbeehCounterButton", () => {
 
     const button = screen.getByRole("button", { name: "Tasbeeh Counter" });
     expect(button).toBeInTheDocument();
-    expect(button).toHaveClass("w-full", "min-h-16", "sm:min-h-[4.5rem]", "lg:max-w-2xl", "mx-auto");
+    expect(button).toHaveClass("w-full", "min-h-16", "sm:min-h-[4.5rem]", "max-w-[80rem]", "mx-auto");
 
     fireEvent.click(button);
     expect(handleClick).toHaveBeenCalledTimes(1);

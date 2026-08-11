@@ -1,22 +1,55 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function openReturningGuest(page: Page) {
-  await page.addInitScript(() => {
+async function openReturningGuest(page: Page, language: "ar" | "en" = "en") {
+  await page.addInitScript((selectedLanguage) => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
-        settings: { language: "en", themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
+        settings: { language: selectedLanguage, themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: { morning: [], evening: [], before_sleep: [] },
         sessions: [],
       }),
     );
-  });
+  }, language);
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
-  await expect(page.getByRole("button", { name: "Tasbeeh Counter" }).first()).toBeAttached();
 }
+
+test("the Home Wird keeps semantic order while mirroring Arabic placement and expanding on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 834, height: 900 });
+  await openReturningGuest(page, "en");
+
+  const ltrCards = page.getByTestId("today-garden-card").getByRole("button");
+  const ltrBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
+  expect(ltrBoxes.every(Boolean)).toBe(true);
+  if (ltrBoxes[0] && ltrBoxes[1] && ltrBoxes[2]) {
+    expect(ltrBoxes[0].x).toBeLessThan(ltrBoxes[1].x);
+    expect(ltrBoxes[1].x).toBeLessThan(ltrBoxes[2].x);
+  }
+
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.waitForFunction(() => window.innerWidth === 320);
+  const mobileBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
+  expect(mobileBoxes.every(Boolean)).toBe(true);
+  if (mobileBoxes[0] && mobileBoxes[1] && mobileBoxes[2]) {
+    expect(mobileBoxes[0].width).toBeGreaterThanOrEqual(180);
+  }
+
+  await openReturningGuest(page, "ar");
+  await page.setViewportSize({ width: 834, height: 900 });
+  await page.waitForFunction(() => window.innerWidth === 834);
+  const rtlCards = page.getByTestId("today-garden-card").getByRole("button");
+  const rtlBoxes = await Promise.all([0, 1, 2].map((index) => rtlCards.nth(index).boundingBox()));
+  expect(rtlBoxes.every(Boolean)).toBe(true);
+  if (rtlBoxes[0] && rtlBoxes[1] && rtlBoxes[2]) {
+    expect(rtlBoxes[0].x).toBeGreaterThan(rtlBoxes[1].x);
+    expect(rtlBoxes[1].x).toBeGreaterThan(rtlBoxes[2].x);
+  }
+});
 
 test("the Home masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
@@ -26,7 +59,7 @@ test("the Home masbaha entry fills compact/tablet layouts and is bounded on desk
   for (const viewport of [
     { width: 320, height: 568, minimumWidth: 260, maximumWidth: 320 },
     { width: 834, height: 900, minimumWidth: 700, maximumWidth: 834 },
-    { width: 1440, height: 900, minimumWidth: 500, maximumWidth: 673 },
+    { width: 1440, height: 900, minimumWidth: 900, maximumWidth: 1440 },
   ]) {
     await page.setViewportSize(viewport);
     const box = await entry.boundingBox();
@@ -103,7 +136,14 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();
   expect(contentBox).not.toBeNull();
-  if (contentBox) expect(contentBox.width).toBeLessThanOrEqual(640);
+  if (contentBox) expect(contentBox.width).toBeLessThanOrEqual(704);
+
+  const counterBox = await page.getByTestId("custom-counter-surface").boundingBox();
+  expect(counterBox).not.toBeNull();
+  if (counterBox) {
+    expect(counterBox.width).toBeGreaterThanOrEqual(384);
+    expect(counterBox.height).toBeGreaterThanOrEqual(128);
+  }
 });
 
 test("the tonal texture is non-Home only and yields to reduced transparency", async ({ page }) => {

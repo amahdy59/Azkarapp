@@ -40,6 +40,7 @@ function MainDhikrGroupCard({
   completedLabel,
   pendingLabel,
   onPress,
+  compact = false,
 }: {
   name: string;
   icon: React.ReactNode;
@@ -47,6 +48,7 @@ function MainDhikrGroupCard({
   completedLabel: string;
   pendingLabel: string;
   onPress?: () => void;
+  compact?: boolean;
 }) {
   const isCompleted = status === "completed";
   const statusLabel = isCompleted ? completedLabel : pendingLabel;
@@ -55,7 +57,11 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`group relative flex min-h-[9.5rem] flex-col items-center justify-between rounded-[24px] border px-3 py-4 text-center transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+      className={`group relative flex w-full rounded-[24px] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+        compact
+          ? "min-h-[5.5rem] items-center gap-3 px-4 py-3 text-start sm:min-h-[9.5rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-3 sm:py-4 sm:text-center"
+          : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
+      } ${
         isCompleted
           ? "border-amber-300/70 bg-gradient-to-b from-amber-500/20 via-black/25 to-black/35 text-white shadow-[0_18px_36px_rgba(0,0,0,0.32)]"
           : "border-white/10 bg-white/5 text-white shadow-[0_16px_30px_rgba(0,0,0,0.24)] backdrop-blur-xl hover:border-white/15 hover:bg-white/10"
@@ -63,7 +69,9 @@ function MainDhikrGroupCard({
       aria-label={`${name} - ${statusLabel}`}
     >
       <div
-        className={`flex size-14 items-center justify-center rounded-full border transition-colors ${
+        className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
+          compact ? "size-11 sm:size-14" : "size-14"
+        } ${
           isCompleted
             ? "border-amber-300/55 bg-amber-500/20 text-amber-300"
             : "border-white/10 bg-white/10 text-white/80"
@@ -72,7 +80,9 @@ function MainDhikrGroupCard({
         {icon}
       </div>
 
-      <div className="flex w-full flex-col items-center gap-1">
+      <div
+        className={`flex min-w-0 flex-1 flex-col gap-1 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+      >
         <span className="text-[1rem] font-black leading-tight text-inherit">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
@@ -84,7 +94,7 @@ function MainDhikrGroupCard({
       </div>
 
       {isCompleted ? (
-        <span className="absolute -end-1.5 bottom-3 flex size-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-400 text-slate-950 shadow-md">
+        <span className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-400 text-slate-950 shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3">
           <Check size={13} strokeWidth={3} aria-hidden="true" />
         </span>
       ) : null}
@@ -173,7 +183,9 @@ export function ProgressDayView({
   const categories = visibleCategoryIds
     ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
     : allCategories;
-  const displayCategories = isArabic ? [...categories].reverse() : [...categories];
+  // Keep the semantic order stable. The RTL grid places Morning at the right
+  // edge while preserving the same keyboard and assistive-technology order.
+  const displayCategories = categories;
   const completedCount = categories.filter((category) => completedToday.includes(category.id)).length;
 
   return (
@@ -205,7 +217,7 @@ export function ProgressDayView({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-3 gap-3 sm:gap-4 md:gap-5">
+        <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4 md:gap-5">
           {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
             return (
@@ -217,6 +229,7 @@ export function ProgressDayView({
                 completedLabel={t(language, "progress.completed")}
                 pendingLabel={t(language, "progress.notCompleted")}
                 onPress={() => onSelectCategory?.(col.id)}
+                compact={Boolean(visibleCategoryIds)}
               />
             );
           })}

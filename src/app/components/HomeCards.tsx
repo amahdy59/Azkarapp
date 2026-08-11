@@ -26,10 +26,6 @@ function DirectionArrow({ direction, size = 18 }: { direction: "ltr" | "rtl"; si
 export function PrayerRoutineCard({
   language,
   direction,
-  nextPrayerName,
-  nextPrayerTime24,
-  nextPrayerTimeLabel,
-  nextPrayerCountdown,
   categoryName,
   description,
   mode,
@@ -42,10 +38,6 @@ export function PrayerRoutineCard({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
-  nextPrayerName: string;
-  nextPrayerTime24: string;
-  nextPrayerTimeLabel: string;
-  nextPrayerCountdown: string;
   categoryName: string;
   description: string;
   mode: RoutineMode;
@@ -68,23 +60,18 @@ export function PrayerRoutineCard({
     >
       <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/12 bg-black/24 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
         <div className="flex w-full flex-col items-start gap-2 px-1">
-          <div
-            data-testid="next-prayer"
-            className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 text-[0.8125rem] font-semibold leading-5 text-white/82"
-          >
+          <div className="hidden" aria-hidden="true">
             <Clock className="size-[15px] shrink-0 text-on-media-accent" aria-hidden="true" />
             <span>{t(language, "home.nextPrayer")}</span>
             <strong className="font-extrabold text-white" dir="auto">
-              {nextPrayerName}
+              {""}
             </strong>
             <span className="text-white/45" aria-hidden="true">
               •
             </span>
-            <time data-testid="next-prayer-time" className="font-extrabold text-white" dateTime={nextPrayerTime24}>
-              {nextPrayerTimeLabel}
-            </time>
+            <time className="font-extrabold text-white">{""}</time>
             <span className="rounded-full bg-white/10 px-2 py-0.5 font-bold text-on-media-accent" dir="ltr">
-              {nextPrayerCountdown}
+              {""}
             </span>
           </div>
 
@@ -390,23 +377,38 @@ export function FridayHomeCard({
           )}
         </div>
 
-        <details className="group w-full rounded-2xl bg-muted/45 p-4 text-start">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl font-black text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-            <span>{t(language, "home.fridayMoreVirtues")}</span>
-            <ChevronDown
-              className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180"
-              aria-hidden="true"
-            />
-          </summary>
-          <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
-            <li>{t(language, "home.fridayVirtueFajr")}</li>
-            <li>{t(language, "home.fridayVirtueEarly")}</li>
-            <li>{t(language, "home.fridayVirtueDua")}</li>
-          </ul>
-          <p className="mt-3 border-t border-border/60 pt-3 text-xs font-semibold leading-5 text-muted-foreground">
-            {t(language, "home.fridayReadingSource")}
-          </p>
-        </details>
+        <div className="w-full rounded-2xl bg-muted/45 p-4 text-start">
+          <div className="md:hidden">
+            <p className="text-xs font-semibold leading-5 text-foreground">{t(language, "home.fridayVirtueFajr")}</p>
+            <details className="group mt-2">
+              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl font-black text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                <span>{t(language, "home.fridayMoreVirtues")}</span>
+                <ChevronDown
+                  className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180"
+                  aria-hidden="true"
+                />
+              </summary>
+              <ul className="mt-2 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
+                <li>{t(language, "home.fridayVirtueEarly")}</li>
+                <li>{t(language, "home.fridayVirtueDua")}</li>
+              </ul>
+              <p className="mt-3 border-t border-border/60 pt-3 text-xs font-semibold leading-5 text-muted-foreground">
+                {t(language, "home.fridayReadingSource")}
+              </p>
+            </details>
+          </div>
+          <div className="hidden md:block">
+            <h4 className="text-sm font-black text-foreground">{t(language, "home.fridayVirtues")}</h4>
+            <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
+              <li>{t(language, "home.fridayVirtueFajr")}</li>
+              <li>{t(language, "home.fridayVirtueEarly")}</li>
+              <li>{t(language, "home.fridayVirtueDua")}</li>
+            </ul>
+            <p className="mt-3 border-t border-border/60 pt-3 text-xs font-semibold leading-5 text-muted-foreground">
+              {t(language, "home.fridayReadingSource")}
+            </p>
+          </div>
+        </div>
       </div>
       {canPreview && (
         <button
