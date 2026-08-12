@@ -1,4 +1,4 @@
-import { createElement, type ComponentProps, type ComponentType, useEffect, useState } from "react";
+import { createElement, type ComponentProps, type ComponentType, useEffect, useRef, useState } from "react";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 import { reportError } from "../../lib/observability";
@@ -19,6 +19,15 @@ export function retryableScreen<Loaded extends ComponentType<any>>(loader: () =>
     const [attempt, setAttempt] = useState(0);
     const [Screen, setScreen] = useState<Loaded | null>(null);
     const [failed, setFailed] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
+    const fallbackReloadTimer = useRef<number | null>(null);
+
+    useEffect(
+      () => () => {
+        if (fallbackReloadTimer.current !== null) window.clearTimeout(fallbackReloadTimer.current);
+      },
+      [],
+    );
 
     useEffect(() => {
       let active = true;
@@ -38,14 +47,20 @@ export function retryableScreen<Loaded extends ComponentType<any>>(loader: () =>
 
     if (failed) {
       const retried = attempt > 0;
+      const refreshApp = () => {
+        setRefreshing(true);
+        window.dispatchEvent(new Event("azkar-apply-update"));
+        fallbackReloadTimer.current = window.setTimeout(() => window.location.reload(), 3_000);
+      };
       return (
         <div className="flex h-full items-center justify-center bg-background p-4">
           <StatePanel
             kind="route-error"
             language={language}
             focusOnMount
-            actionLabel={t(language, retried ? "common.refreshApp" : "common.tryAgain")}
-            onAction={retried ? () => window.location.reload() : () => setAttempt((value) => value + 1)}
+            actionLabel={t(language, refreshing ? "pwa.updating" : retried ? "common.refreshApp" : "common.tryAgain")}
+            onAction={retried ? refreshApp : () => setAttempt((value) => value + 1)}
+            isBusy={refreshing}
             secondaryActionLabel={t(language, "common.goToLibrary")}
             onSecondaryAction={() => {
               window.location.hash = "#/library";

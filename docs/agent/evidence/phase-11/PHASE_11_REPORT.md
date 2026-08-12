@@ -15,6 +15,7 @@ Validate and remediate Azkarapp across viewport, direction, language, zoom, text
 - Removed four unreferenced original PNG masters from first-install precache while retaining optimized offline hero assets.
 - Moved Reader- and Settings-only CSS into their lazy route chunks so the global stylesheet keeps bundle-budget headroom.
 - Updated GitHub workflow actions to their current supported Node-runtime majors without changing release logic.
+- Hardened stale-client route recovery so “Refresh app” activates a waiting service worker before a bounded fallback reload.
 
 ## Files changed
 
