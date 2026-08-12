@@ -1,3 +1,4 @@
+import React from "react";
 import { render, screen, act, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
@@ -6,12 +7,12 @@ import App from "./App";
 // Mock matchMedia because jsdom does not implement it
 Object.defineProperty(window, "matchMedia", {
   writable: true,
-  value: vi.fn().mockImplementation((query) => ({
+  value: vi.fn().mockImplementation((query: string) => ({
     matches: false,
     media: query,
     onchange: null,
-    addListener: vi.fn(), // Deprecated
-    removeListener: vi.fn(), // Deprecated
+    addListener: vi.fn(),
+    removeListener: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     dispatchEvent: vi.fn(),
@@ -41,24 +42,17 @@ vi.mock("./screens/onboarding/SplashScreen", () => ({
     React.useEffect(() => {
       onDone();
     }, [onDone]);
-    return <div data-testid="mock-splash">Splash</div>;
+    return React.createElement("div", { "data-testid": "mock-splash" }, "Splash");
   },
 }));
 
 vi.mock("./screens/settings/SettingsScreen", () => ({
-  SettingsScreen: () => <h1>Settings</h1>,
-}));
-
-vi.mock("./screens/progress/ProgressScreen", () => ({
-  ProgressScreen: () => <h1>Progress</h1>,
+  SettingsScreen: () => React.createElement("h1", null, "Settings"),
 }));
 
 vi.mock("./screens/ProgressScreen", () => ({
-  ProgressScreen: () => <h1>Progress</h1>,
+  ProgressScreen: () => React.createElement("h1", null, "Progress"),
 }));
-
-// Also import React at the top since we use it in the mock
-import React from "react";
 
 describe("App Composition and Routing", () => {
   beforeEach(() => {
@@ -74,10 +68,8 @@ describe("App Composition and Routing", () => {
   it("boots to Home screen when onboarding is complete", async () => {
     render(<App />);
 
-    // We expect the home screen elements to appear. The greeting "السلام عليكم" is typically on home
     expect(await screen.findByRole("main")).toBeInTheDocument();
 
-    // Bottom nav should highlight Home
     const homeTab = await screen.findByRole("button", { name: /home/i });
     expect(homeTab).toHaveAttribute("aria-current", "page");
   });
@@ -87,10 +79,11 @@ describe("App Composition and Routing", () => {
 
     render(<App />);
 
-    // Wait for the settings screen to load (it's lazy loaded)
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
 
-    const settingsTab = await screen.findByRole("button", { name: /settings/i });
+    const settingsTab = await screen.findByRole("button", {
+      name: /settings/i,
+    });
     expect(settingsTab).toHaveAttribute("aria-current", "page");
   });
 
@@ -98,7 +91,6 @@ describe("App Composition and Routing", () => {
     const user = userEvent.setup();
     render(<App />);
 
-    // Wait for home to settle
     await screen.findByRole("main");
 
     // Press Alt+4 for settings
@@ -121,7 +113,9 @@ describe("App Composition and Routing", () => {
     await screen.findByRole("main");
 
     // Click Settings tab
-    const settingsTab = await screen.findByRole("button", { name: /settings/i });
+    const settingsTab = await screen.findByRole("button", {
+      name: /settings/i,
+    });
     await user.click(settingsTab);
 
     expect(await screen.findByRole("heading", { name: /settings/i, level: 1 }, { timeout: 5000 })).toBeInTheDocument();
@@ -137,7 +131,6 @@ describe("App Composition and Routing", () => {
       expect(screen.queryByRole("heading", { name: /settings/i, level: 1 })).not.toBeInTheDocument();
     });
 
-    // Check if the bottom nav home tab is selected again
     const homeTab = await screen.findByRole("button", { name: /home/i });
     expect(homeTab).toHaveAttribute("aria-current", "page");
   });
