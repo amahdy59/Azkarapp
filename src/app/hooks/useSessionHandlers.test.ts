@@ -30,6 +30,7 @@ function renderSessionHarness({
 
   const hook = renderHook(() => {
     const [category, setCategory] = useState<CategoryId>(activeCat);
+    const [subCategory, setSubCategory] = useState<string | undefined>();
     const [index, setIndex] = useState(0);
     const [completionState, setCompletionState] = useState(completed);
     const [completionRecords, setCompletionRecords] = useState(dailyCompletions);
@@ -42,6 +43,8 @@ function renderSessionHarness({
     const handlers = useSessionHandlers({
       activeCat: category,
       setActiveCat: setCategory,
+      activeSubCategory: subCategory,
+      setActiveSubCategory: setSubCategory,
       activeIdx: index,
       setActiveIdx: setIndex,
       completed: completionState,

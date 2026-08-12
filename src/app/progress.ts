@@ -132,11 +132,13 @@ export function normalizeDailyCompletions(value: unknown): DailyCollectionComple
     ) {
       continue;
     }
-    unique.set(`${record.dayKey}:${record.category}`, {
+    const subCatKey = record.subCategory ? `:${record.subCategory}` : "";
+    unique.set(`${record.dayKey}:${record.category}${subCatKey}`, {
       dayKey: record.dayKey,
       category: record.category,
       timeZone: record.timeZone.trim(),
       completionLevel: record.completionLevel === "core" ? "core" : "complete",
+      subCategory: record.subCategory,
     });
   }
 
@@ -172,19 +174,23 @@ export function recordDailyCollectionCompletion(
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
   completionLevel: "core" | "complete" = "complete",
+  subCategory?: string,
 ) {
   const dayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records);
   const dayRecords = normalized.filter((record) => record.dayKey === dayKey);
-  const existing = dayRecords.find((record) => record.category === category);
+  const existing = dayRecords.find((record) => record.category === category && record.subCategory === subCategory);
   const isMainCategory = MAIN_CATEGORY_IDS.includes(category);
 
   if (existing) {
-    const leafCount = dayRecords.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+    const uniqueMainCategories = new Set(
+      dayRecords.map((r) => r.category).filter((c) => MAIN_CATEGORY_IDS.includes(c)),
+    );
+    const leafCount = uniqueMainCategories.size;
     const upgraded =
       existing.completionLevel === "core" && completionLevel === "complete"
         ? normalized.map((record) =>
-            record.dayKey === dayKey && record.category === category
+            record.dayKey === dayKey && record.category === category && record.subCategory === subCategory
               ? { ...record, completionLevel: "complete" as const }
               : record,
           )
@@ -195,10 +201,14 @@ export function recordDailyCollectionCompletion(
     };
   }
 
-  const next = mergeDailyCompletions(normalized, [{ dayKey, category, timeZone: currentTimeZone(), completionLevel }]);
-  const leafCount = next
-    .filter((record) => record.dayKey === dayKey)
-    .filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
+  const next = mergeDailyCompletions(normalized, [
+    { dayKey, category, timeZone: currentTimeZone(), completionLevel, subCategory },
+  ]);
+  const nextDayRecords = next.filter((record) => record.dayKey === dayKey);
+  const nextUniqueMainCategories = new Set(
+    nextDayRecords.map((r) => r.category).filter((c) => MAIN_CATEGORY_IDS.includes(c)),
+  );
+  const leafCount = nextUniqueMainCategories.size;
 
   if (!isMainCategory) {
     return {
@@ -210,7 +220,13 @@ export function recordDailyCollectionCompletion(
   return {
     records: next,
     event: {
-      kind: leafCount === MAIN_CATEGORY_IDS.length ? "palm" : "leaf",
+      // It's only a new leaf/palm if we just added the first subcategory for this main category today
+      kind:
+        leafCount === MAIN_CATEGORY_IDS.length && nextDayRecords.filter((r) => r.category === category).length === 1
+          ? "palm"
+          : nextDayRecords.filter((r) => r.category === category).length === 1
+            ? "leaf"
+            : "repeat",
       category,
       dayKey,
       leafCount,

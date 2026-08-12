@@ -82,7 +82,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
         document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)!.getBoundingClientRect().toJSON();
 
       return {
-        hero: bounds("home-hero"),
+        header: bounds("home-utility-header"),
         date: bounds("hijri-date"),
         time: bounds("next-prayer-time"),
         streak: bounds("header-streak"),
@@ -91,7 +91,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
       };
     });
 
-    expect(geometry.hero.y, `Home hero top at ${viewport.width}px`).toBeLessThanOrEqual(1);
+    expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(1);
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
     expect(Math.abs(geometry.streak.y - geometry.palms.y), `streak/palms row at ${viewport.width}px`).toBeLessThan(1);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);

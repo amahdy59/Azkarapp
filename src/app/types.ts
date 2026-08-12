@@ -95,6 +95,7 @@ export interface DailyCollectionCompletion {
   timeZone: string;
   /** Core earns the category leaf; Complete upgrades that same leaf. */
   completionLevel?: RoutineMode;
+  subCategory?: string;
 }
 
 /** A reviewed Madani Mushaf page boundary for one complete surah. */

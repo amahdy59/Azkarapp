@@ -154,6 +154,8 @@ function AppContent() {
     setActiveTab,
     activeCat,
     setActiveCat,
+    activeSubCategory,
+    setActiveSubCategory,
     activeIdx,
     setActiveIdx,
     searchQuery,
@@ -414,6 +416,8 @@ function AppContent() {
   } = useSessionHandlers({
     activeCat,
     setActiveCat,
+    activeSubCategory,
+    setActiveSubCategory,
     activeIdx,
     setActiveIdx,
     completed,
@@ -877,6 +881,7 @@ function AppContent() {
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   onResume={resumeCategory}
+                  onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");

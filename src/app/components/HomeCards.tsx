@@ -4,7 +4,7 @@ import type { AppLanguage, RoutineMode } from "../types";
 import { formatNumerals } from "../formatting";
 import { Card } from "./Card";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Building, ChevronDown, Clock, Sparkles } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, BookOpen, ChevronDown, Clock, Sparkles } from "./icons";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 
@@ -307,8 +307,12 @@ export function FridayHomeCard({
         elevation="flat"
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-          <Building size={24} aria-hidden="true" />
+        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary overflow-hidden">
+          <img
+            src="/images/mosque_prophet.jpg"
+            alt=""
+            className="h-full w-full object-cover opacity-80 mix-blend-luminosity"
+          />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
@@ -337,8 +341,9 @@ export function FridayHomeCard({
   return (
     <Card as="section" aria-labelledby="friday-card-heading" className="overflow-hidden p-0">
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[6rem_minmax(0,1fr)_19rem] xl:items-center">
-        <div className="flex size-20 items-center justify-center self-center rounded-2xl bg-primary/12 text-primary sm:size-24">
-          <Building size={40} aria-hidden="true" />
+        <div className="flex size-20 items-center justify-center self-center rounded-2xl bg-primary/12 text-primary sm:size-24 overflow-hidden relative border border-primary/20">
+          <img src="/images/mosque_prophet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <div className="absolute inset-0 bg-primary/10 mix-blend-color" />
         </div>
 
         <div className="min-w-0 text-start">

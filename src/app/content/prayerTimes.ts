@@ -1,5 +1,6 @@
 import type { LocationSettings } from "../types";
 import { getPrayerTimes } from "./prayerCalculation";
+import { formatNumerals } from "../formatting";
 
 export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
@@ -69,7 +70,9 @@ export function formatPrayerTimeLabel(time24: string, isArabic: boolean): string
   const m = mStr || "00";
   const period = h >= 12 ? (isArabic ? "م" : "PM") : isArabic ? "ص" : "AM";
   h = h % 12 || 12;
-  return `${h}:${m} ${period}`;
+  const timeString = `${h}:${m}`;
+  const formattedTime = isArabic ? formatNumerals(timeString, "ar") : timeString;
+  return `${formattedTime} ${period}`;
 }
 
 export interface NextPrayerInfo {
@@ -126,7 +129,9 @@ export function getNextPrayerCountdown(
 
   const hh = hours.toString().padStart(2, "0");
   const mm = mins.toString().padStart(2, "0");
-  const formattedCountdown = isArabic ? `باقي ${hh}:${mm}` : `${hh}:${mm} left`;
+  const timeStr = `${hh}:${mm}`;
+  const formattedTimeStr = isArabic ? formatNumerals(timeStr, "ar") : timeStr;
+  const formattedCountdown = isArabic ? `باقي ${formattedTimeStr}` : `${formattedTimeStr} left`;
 
   return {
     name: targetName,

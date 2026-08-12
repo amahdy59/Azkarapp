@@ -195,7 +195,7 @@ export function CategoryScreen({
           id={`zikr-card-${index}`}
           type="button"
           onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col items-center gap-3.5 bg-transparent p-4.5 text-center transition-all hover:bg-muted/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex w-full cursor-pointer flex-col items-center gap-3 bg-transparent p-3 text-center transition-all hover:bg-muted/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <p
             className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
@@ -242,7 +242,7 @@ export function CategoryScreen({
       <div
         key={z.id}
         id={`zikr-card-${index}`}
-        className={`flex w-full flex-col items-center gap-3.5 bg-transparent p-4.5 transition-all ${
+        className={`flex w-full flex-col items-center gap-3 bg-transparent p-3 transition-all ${
           isCardCompleted ? "opacity-60 grayscale" : ""
         }`}
       >
@@ -498,7 +498,7 @@ export function CategoryScreen({
           role="region"
           aria-label={isArabic ? cat.nameArabic : cat.name}
           tabIndex={0}
-          className="flex flex-1 flex-col overflow-y-auto px-5 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          className="flex flex-1 flex-col overflow-y-auto px-4 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         >
           {introduction && (
             <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
@@ -610,7 +610,7 @@ export function CategoryScreen({
           )}
 
           {isOccasional ? (
-            <div className="flex flex-col gap-3.5">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
+            <div className="flex flex-col gap-2">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
           ) : isMainRoutine ? (
             <div className="mb-6 flex flex-col gap-6">
               {groupedAzkar.map((group) => {
@@ -632,7 +632,7 @@ export function CategoryScreen({
                       </span>
                     </div>
 
-                    <div className="flex flex-col gap-3.5">
+                    <div className="flex flex-col gap-2">
                       {ritualChunks(group.items).map((chunk, chunkIndex) =>
                         chunk.ritualGroupId ? (
                           <div
@@ -665,7 +665,7 @@ export function CategoryScreen({
                             </div>
                           </div>
                         ) : (
-                          <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-3.5">
+                          <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-2">
                             {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
                           </div>
                         ),
@@ -676,7 +676,7 @@ export function CategoryScreen({
               })}
             </div>
           ) : (
-            <div className="mb-6 flex flex-col gap-3.5">
+            <div className="mb-6 flex flex-col gap-2">
               {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
             </div>
           )}

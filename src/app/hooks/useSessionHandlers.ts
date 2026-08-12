@@ -21,6 +21,8 @@ import { t } from "../i18n";
 export function useSessionHandlers({
   activeCat,
   setActiveCat,
+  activeSubCategory,
+  setActiveSubCategory,
   activeIdx: _activeIdx,
   setActiveIdx,
   completed,
@@ -42,6 +44,8 @@ export function useSessionHandlers({
 }: {
   activeCat: CategoryId;
   setActiveCat: (cat: CategoryId) => void;
+  activeSubCategory?: string;
+  setActiveSubCategory: (subCat?: string) => void;
   activeIdx: number;
   setActiveIdx: React.Dispatch<React.SetStateAction<number>>;
   completed: Record<CategoryId, Set<string>>;
@@ -99,25 +103,26 @@ export function useSessionHandlers({
     push("category");
   };
 
-  const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode) => {
+  const openReader = (catId: CategoryId, i: number, modeOverride?: RoutineMode, subCat?: string) => {
     if (modeOverride && isRoutineCategory(catId)) {
       setRoutineModes((previous) => ({ ...previous, [catId]: modeOverride }));
     }
     setActiveCat(catId);
+    setActiveSubCategory(subCat);
     setActiveIdx(i);
     setSessionStart(Date.now());
     push("reader");
   };
 
-  const resumeCategory = (catId: CategoryId) => {
+  const resumeCategory = (catId: CategoryId, subCat?: string) => {
     const nextIndex = getFirstIncompleteZikrIndex(sessionAzkar(catId), completed[catId] ?? []);
-    openReader(catId, nextIndex ?? 0);
+    openReader(catId, nextIndex ?? 0, undefined, subCat);
   };
 
-  const repeatCategory = (catId: CategoryId) => {
+  const repeatCategory = (catId: CategoryId, subCat?: string) => {
     setIsRepeatSession(true);
     setRepeatCompleted(new Set());
-    openReader(catId, 0);
+    openReader(catId, 0, undefined, subCat);
   };
 
   const leaveReader = () => {
@@ -180,6 +185,7 @@ export function useSessionHandlers({
       completedAt,
       progressDayStartHour,
       completionLevel,
+      activeSubCategory,
     );
     setDailyCompletions(growth.records);
     setLastGrowthEvent(growth.event);
@@ -232,6 +238,7 @@ export function useSessionHandlers({
         completedAt,
         progressDayStartHour,
         modeFor(catId),
+        activeSubCategory,
       );
       setDailyCompletions(growth.records);
       setLastGrowthEvent(growth.event);

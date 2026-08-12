@@ -234,6 +234,7 @@ export function HomeScreen({
   calendarType = "hijri",
   locationSettings,
   onResume,
+  onPrayerResume,
   onOpenFridayMode,
   onOpenProgress: _onOpenProgress,
   routineModes,
@@ -253,7 +254,8 @@ export function HomeScreen({
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
-  onOpenFridayMode?: () => void;
+  onPrayerResume?: (prayer: string) => void;
+  onOpenFridayMode: () => void;
   onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
   onSetRoutineMode?: (categoryId: RoutineCategoryId, mode: RoutineMode) => void;
@@ -437,18 +439,72 @@ export function HomeScreen({
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Scrollable Content Area */}
-      {/* A scroll region, not a landmark: App.tsx owns the single #main-content. */}
       <div
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
+        <div className="sticky top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 bg-background/60 backdrop-blur-xl border-b border-border/20 shadow-sm">
+          <header
+            data-testid="home-utility-header"
+            className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
+            dir="ltr"
+          >
+            <div
+              data-testid="hijri-date"
+              className="min-w-0 text-[0.8125rem] font-bold text-amber-700 dark:text-[#e6be76] sm:text-[0.9375rem]"
+            >
+              <time className="block truncate" dateTime={now.toISOString()}>
+                {formatDisplayDate(now, language, calendarType)}
+              </time>
+            </div>
+
+            <div
+              role="img"
+              data-testid="home-header-stats"
+              className="flex shrink-0 items-center gap-3"
+              aria-label={t(language, "home.headerStatsAria", {
+                palms: formatNumerals(gardenSummary.lifetimePalms, language),
+                leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
+                total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
+                streak: formatNumerals(streakDays, language),
+              })}
+            >
+              <div
+                data-testid="header-streak"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-amber-700 dark:text-[#e6be76]"
+                title={t(language, "progress.dailyStreak")}
+              >
+                <Zap
+                  className="h-[13px] w-[13px] text-amber-700 dark:text-[#e6be76]"
+                  strokeWidth={2.5}
+                  aria-hidden="true"
+                />
+                <span>{formatNumerals(streakDays, language)}</span>
+              </div>
+              <div
+                data-testid="header-palms"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-amber-700 dark:text-[#e6be76]"
+                title={t(language, "progress.palmsTitle")}
+              >
+                <PalmTreeMark
+                  size={14}
+                  strokeWidth={2.5}
+                  filled={gardenSummary.lifetimePalms > 0}
+                  className={
+                    gardenSummary.lifetimePalms > 0
+                      ? "text-amber-700 dark:text-[#e6be76]"
+                      : "text-amber-700/70 dark:text-[#e6be76]/70"
+                  }
+                />
+                <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
+              </div>
+            </div>
+          </header>
+        </div>
+
         <div className="flex w-full flex-col gap-4 lg:gap-5">
-          {/* Hero card. The scene image is contained by this card rather than
-              washed across the whole screen, so the page keeps its own surface. */}
-          {/* Capped and centred: unbounded, the hero stretched the full width of
-              an ultrawide display and the scene image lost all composition. */}
           <div
             data-testid="home-hero"
             className="relative w-full overflow-hidden sm:mx-auto sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised"
@@ -456,64 +512,17 @@ export function HomeScreen({
             <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
             <div
               aria-hidden="true"
-              className="absolute inset-0 bg-[linear-gradient(180deg,rgba(7,11,18,0.04)_0%,rgba(7,11,18,0.16)_16%,rgba(7,11,18,0.34)_42%,rgba(7,11,18,0.64)_72%,rgba(7,11,18,0.82)_100%)]"
+              className={`absolute inset-0 ${
+                homeBackgroundCategoryId === "morning"
+                  ? "bg-[linear-gradient(180deg,rgba(7,11,18,0.0)_0%,rgba(7,11,18,0.02)_16%,rgba(7,11,18,0.08)_42%,rgba(7,11,18,0.20)_72%,rgba(7,11,18,0.32)_100%)]"
+                  : "bg-[linear-gradient(180deg,rgba(7,11,18,0.04)_0%,rgba(7,11,18,0.16)_16%,rgba(7,11,18,0.34)_42%,rgba(7,11,18,0.64)_72%,rgba(7,11,18,0.82)_100%)]"
+              }`}
             />
-            <div className="absolute inset-x-0 top-0 z-20 px-5 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8">
-              <header
-                data-testid="home-utility-header"
-                className="flex w-full items-center justify-between gap-3"
-                dir="ltr"
-              >
-                <div
-                  data-testid="hijri-date"
-                  className="min-w-0 text-[0.8125rem] font-bold text-[#e6be76] sm:text-[0.9375rem]"
-                >
-                  <time className="block truncate" dateTime={now.toISOString()}>
-                    {formatDisplayDate(now, language, calendarType)}
-                  </time>
-                </div>
-
-                {/* role="img" keeps the two-chip summary discoverable as one
-                    meaningful announcement instead of isolated numerals. */}
-                <div
-                  role="img"
-                  data-testid="home-header-stats"
-                  className="flex shrink-0 items-center gap-3"
-                  aria-label={t(language, "home.headerStatsAria", {
-                    palms: formatNumerals(gardenSummary.lifetimePalms, language),
-                    leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
-                    total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
-                    streak: formatNumerals(streakDays, language),
-                  })}
-                >
-                  <div
-                    data-testid="header-streak"
-                    className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-[#e6be76]"
-                    title={t(language, "progress.dailyStreak")}
-                  >
-                    <Zap className="h-[13px] w-[13px] text-[#e6be76]" strokeWidth={2.5} aria-hidden="true" />
-                    <span>{formatNumerals(streakDays, language)}</span>
-                  </div>
-                  <div
-                    data-testid="header-palms"
-                    className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-[#e6be76]"
-                    title={t(language, "progress.palmsTitle")}
-                  >
-                    <PalmTreeMark
-                      size={14}
-                      filled={gardenSummary.lifetimePalms > 0}
-                      className={gardenSummary.lifetimePalms > 0 ? "text-[#e6be76]" : "text-[#e6be76]/70"}
-                    />
-                    <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-                  </div>
-                </div>
-              </header>
-            </div>
 
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-20 sm:p-6 sm:pt-24 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-28">
+              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-6 sm:p-6 sm:pt-6 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-8">
                 {showCompletionCard && (
                   <div className={quietProgressEnabled ? "lg:col-span-3" : "lg:col-span-5"}>
                     <TranquilityCompletionCard
@@ -611,7 +620,7 @@ export function HomeScreen({
                       <button
                         key={prayer}
                         type="button"
-                        onClick={() => onResume("after_prayer")}
+                        onClick={() => (onPrayerResume ? onPrayerResume(prayer) : onResume("after_prayer"))}
                         data-testid={isNextPrayer ? "next-prayer" : undefined}
                         data-prayer-state={
                           isCompletedPrayer
@@ -624,13 +633,13 @@ export function HomeScreen({
                                   ? "earlier"
                                   : "upcoming"
                         }
-                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
+                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer
-                              ? "border-primary/60 bg-primary/12 text-foreground shadow-[0_14px_30px_color-mix(in_srgb,var(--primary)_16%,transparent)]"
+                              ? "border-primary/60 bg-primary/12 text-foreground shadow-md hover:border-amber-500/50 hover:bg-card/75"
                               : isNextPrayer
-                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-primary/45 hover:bg-primary/10"
+                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md"
                                 : isPastPrayer
                                   ? "border-border/70 bg-muted/35 text-foreground hover:bg-muted/60"
                                   : "border-border/60 bg-background/35 text-foreground hover:border-primary/25 hover:bg-muted/50"
@@ -687,8 +696,8 @@ export function HomeScreen({
                             {stateLabel}
                           </span>
                           {isNextPrayer ? (
-                            <span className="mt-1.5 block text-[0.6875rem] font-bold text-primary" dir="ltr">
-                              {nextPrayerInfo.formattedCountdown}
+                            <span className="mt-1.5 block text-[0.6875rem] font-bold text-primary" dir="auto">
+                              {formatNumerals(nextPrayerInfo.formattedCountdown, language)}
                             </span>
                           ) : null}
                         </div>
@@ -763,32 +772,34 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group relative flex min-h-[12rem] w-full flex-col justify-between overflow-hidden rounded-3xl border border-amber-500/20 bg-[linear-gradient(145deg,rgba(245,158,11,0.18),rgba(245,158,11,0.06)_58%,rgba(255,255,255,0.04))] p-5 text-start shadow-sm transition-[background-color,transform,box-shadow] hover:-translate-y-0.5 hover:bg-amber-500/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:p-6"
+                className="interactive-elem group relative flex min-h-[12rem] w-full flex-col justify-between overflow-hidden rounded-3xl border border-amber-500/20 bg-[linear-gradient(145deg,rgba(245,158,11,0.18),rgba(245,158,11,0.06)_58%,rgba(255,255,255,0.04))] text-start shadow-sm transition-[background-color,transform,box-shadow] hover:-translate-y-0.5 hover:bg-amber-500/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 data-testid="home-benefits-card"
               >
-                <span
-                  aria-hidden="true"
-                  className="pointer-events-none absolute end-3 top-3 size-24 rounded-full bg-amber-300/15 blur-2xl"
-                />
-                <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
-                  <Sparkles size={24} aria-hidden="true" />
-                </span>
-                <span className="mt-5 block">
-                  <span className="block text-[1.25rem] font-black text-foreground">
-                    {t(language, "benefits.title")}
+                <div className="absolute inset-0 z-0">
+                  <img src="/images/benefits_zikr.jpg" alt="" className="h-full w-full object-cover opacity-35" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                </div>
+                <div className="relative z-10 flex h-full flex-col justify-between p-5 sm:p-6">
+                  <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-500 backdrop-blur-sm">
+                    <Sparkles size={24} aria-hidden="true" />
                   </span>
-                  <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-muted-foreground sm:text-[0.875rem]">
-                    {t(language, "benefits.homeDescription")}
+                  <span className="mt-5 block">
+                    <span className="block text-[1.25rem] font-black text-white drop-shadow-md">
+                      {t(language, "benefits.title")}
+                    </span>
+                    <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-white/90 sm:text-[0.875rem]">
+                      {t(language, "benefits.homeDescription")}
+                    </span>
+                    <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-400 drop-shadow-sm">
+                      {t(language, "benefits.open")}
+                      {direction === "rtl" ? (
+                        <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
+                      ) : (
+                        <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+                      )}
+                    </span>
                   </span>
-                  <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-900 dark:text-amber-200">
-                    {t(language, "benefits.open")}
-                    {direction === "rtl" ? (
-                      <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />
-                    ) : (
-                      <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-                    )}
-                  </span>
-                </span>
+                </div>
               </button>
             )}
           </div>

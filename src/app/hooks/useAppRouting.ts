@@ -47,6 +47,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
 
   const [activeTab, setActiveTab] = useState<NavTab>(() => tabForView(initialRoute?.view ?? "home"));
   const [activeCat, setActiveCat] = useState<CategoryId>(initialRoute?.categoryId ?? "morning");
+  const [activeSubCategory, setActiveSubCategory] = useState<string | undefined>(undefined);
   const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
   const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
   const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
@@ -262,6 +263,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     setActiveTab,
     activeCat,
     setActiveCat,
+    activeSubCategory,
+    setActiveSubCategory,
     activeIdx,
     setActiveIdx,
     searchQuery,
