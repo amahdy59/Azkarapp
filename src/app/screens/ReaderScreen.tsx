@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useRef, useState } from "react";
+import "../../styles/animations/ZikrAnimations.css";
 import { motion, AnimatePresence } from "motion/react";
 import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
@@ -20,7 +21,7 @@ import {
   VolumeX,
 } from "../components/icons";
 import { t } from "../i18n";
-import { scrollBehavior } from "../motionPreferences";
+import { scrollBehavior, shouldReduceMotion } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
 import { isLongSurah, splitMushafPages } from "../content/mushafPages";
@@ -172,6 +173,7 @@ export function ReaderScreen({
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
@@ -292,6 +294,11 @@ export function ReaderScreen({
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
+      const focusedControl =
+        activeEl instanceof Element &&
+        activeEl.closest(
+          'button, a[href], input, textarea, select, [contenteditable="true"], [role="button"], [role="checkbox"], [role="combobox"], [role="menuitem"], [role="option"], [role="radio"], [role="search"], [role="switch"], [role="tab"], [role="textbox"]',
+        );
       if (
         activeEl &&
         (activeEl.tagName === "INPUT" ||
@@ -301,6 +308,11 @@ export function ReaderScreen({
       ) {
         return;
       }
+
+      // Native controls own their keyboard semantics. Reader-wide shortcuts are
+      // intentionally limited to the document surface, so Space still saves,
+      // opens menus, and activates the focused action as expected.
+      if (focusedControl) return;
 
       if (benefitOpen || selectedWordMeanings) {
         if (e.key === "Escape") {
@@ -582,6 +594,7 @@ export function ReaderScreen({
             language={language}
             instructionText={counterInstruction}
             testId="counter-surface"
+            reduceMotion={reduceMotion}
           />
         </div>
         <div className="md:hidden">{renderNavigationButton("next")}</div>
@@ -738,6 +751,16 @@ export function ReaderScreen({
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
+      <DropdownMenuItem
+        onClick={handleToggleSaved}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <Bookmark size={18} className={savedZikrIds.has(z.id) ? "favorite-pop fill-current" : ""} />
+        {savedZikrIds.has(z.id) ? t(language, "reader.unsave") : t(language, "reader.save")}
+      </DropdownMenuItem>
+
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
       {/* The counter-sound toggle lives here on phones: the hero header owns
           it on tablet/desktop, and the phone header row is capped at three
           controls (Benefit, Share, More) to keep the title legible at 320px. */}
@@ -755,14 +778,6 @@ export function ReaderScreen({
       >
         <RotateCcw size={18} />
         {t(language, "reader.resetCounter")}
-      </DropdownMenuItem>
-
-      <DropdownMenuItem
-        onClick={handleToggleSaved}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-      >
-        <Bookmark size={18} className={isSaved ? "fill-current text-primary" : ""} />
-        {isSaved ? t(language, "reader.removeFromFavorites") : t(language, "reader.addToFavorites")}
       </DropdownMenuItem>
 
       <DropdownMenuItem
@@ -788,7 +803,7 @@ export function ReaderScreen({
   const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
 
   const handleReaderPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reduceMotion || longSurah || complete) return;
+    if (reducedMotion || longSurah || complete) return;
     const target = event.target;
     if (
       target instanceof Element &&
@@ -995,10 +1010,10 @@ export function ReaderScreen({
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={z.id}
-                    initial={{ opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: direction === "rtl" ? 20 : -20 }}
-                    transition={{ duration: 0.3, ease: "easeOut" }}
+                    initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                    animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                    exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                    transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
                     className="mx-auto flex min-h-full max-w-[480px] w-full flex-col py-4"
                   >
                     <div

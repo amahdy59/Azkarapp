@@ -81,6 +81,7 @@ test("Library search and tabs share a desktop row and stack on compact screens",
   );
 
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(500); // Wait for the media query layout shift to settle
   const compactInput = await input.boundingBox();
   const compactTabs = await tabs.boundingBox();
   expect(compactInput).not.toBeNull();
@@ -131,5 +132,5 @@ test("an unmatched query shows the empty state rather than a blank panel", async
   const input = await openArabicSearch(page);
   await input.fill("زقزقةغير");
 
-  await expect(page.getByText(/لم يتم العثور/)).toBeVisible();
+  await expect(page.getByRole("heading", { name: /لم يتم العثور/ })).toBeVisible();
 });
