@@ -77,6 +77,12 @@ test("Home utility status stays on one line without horizontal overflow", async 
   ]) {
     await page.setViewportSize(viewport);
 
+    // Scroll the inner home region to top so the sticky header is at y ≈ 0
+    await page.evaluate(() => {
+      const scroller = document.querySelector<HTMLElement>('[role="region"][aria-label]');
+      if (scroller) scroller.scrollTop = 0;
+    });
+
     const geometry = await page.evaluate(() => {
       const bounds = (testId: string) =>
         document.querySelector<HTMLElement>(`[data-testid="${testId}"]`)!.getBoundingClientRect().toJSON();

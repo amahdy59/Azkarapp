@@ -209,7 +209,7 @@ const en = {
     kahfHadith: "Whoever reads Surah Al-Kahf on Friday, a light will shine for him between the two Fridays.",
     blessedFriday: "Blessed Friday",
     todayPractices: "Today’s practices",
-    weeklyProgress: "This week’s progress",
+    weeklyProgress: "Your progress on Friday",
     kahfNotStarted: "Not started",
     kahfInProgress: "In progress",
     kahfStart: "Start reading",

@@ -114,8 +114,27 @@ export function useSessionHandlers({
     push("reader");
   };
 
+  const getEffectiveCompletedForSubcategory = (catId: CategoryId, subCat?: string) => {
+    const rawSet = completed[catId] ?? new Set<string>();
+    if (catId !== "after_prayer" || !subCat) return rawSet;
+    const effective = new Set<string>();
+    for (const id of rawSet) {
+      if (id.startsWith(`${subCat}:`)) {
+        effective.add(id.slice(subCat.length + 1));
+      }
+    }
+    return effective;
+  };
+
+  const prefixZikrId = (catId: CategoryId, zikrId: string, subCat?: string) => {
+    return catId === "after_prayer" && subCat ? `${subCat}:${zikrId}` : zikrId;
+  };
+
   const resumeCategory = (catId: CategoryId, subCat?: string) => {
-    const nextIndex = getFirstIncompleteZikrIndex(sessionAzkar(catId), completed[catId] ?? []);
+    const nextIndex = getFirstIncompleteZikrIndex(
+      sessionAzkar(catId),
+      getEffectiveCompletedForSubcategory(catId, subCat),
+    );
     openReader(catId, nextIndex ?? 0, undefined, subCat);
   };
 
@@ -152,7 +171,8 @@ export function useSessionHandlers({
     if (!zikrId) {
       return;
     }
-    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => completed[activeCat].has(zikr.id));
+    const effectiveCompleted = getEffectiveCompletedForSubcategory(activeCat, activeSubCategory);
+    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
 
     if (isRepeatSession) {
       const effectiveProgress = new Set(repeatCompleted);
@@ -165,14 +185,18 @@ export function useSessionHandlers({
         return;
       }
     } else {
-      const effectiveProgress = new Set(completed[activeCat]);
-      effectiveProgress.add(zikrId);
+      const prefixedId = prefixZikrId(activeCat, zikrId, activeSubCategory);
+      effectiveCompleted.add(zikrId); // Optimistically add for getNextIncompleteZikrIndex
+
       setCompleted((prev) => {
         const updated = new Set(prev[activeCat]);
-        updated.add(zikrId);
+        updated.add(prefixedId);
         return { ...prev, [activeCat]: updated };
       });
-      if (canonicalCollectionWasAlreadyComplete || getNextIncompleteZikrIndex(azkar, effectiveProgress, idx) !== null) {
+      if (
+        canonicalCollectionWasAlreadyComplete ||
+        getNextIncompleteZikrIndex(azkar, effectiveCompleted, idx) !== null
+      ) {
         return;
       }
     }
@@ -206,7 +230,8 @@ export function useSessionHandlers({
     );
 
     if (activeCat === "after_prayer") {
-      setCompleted((prev) => ({ ...prev, after_prayer: new Set() }));
+      // With independent tracking per prayer, we no longer wipe the entire after_prayer completions!
+      // The progress logic will know it's complete via `dailyCompletions`
     }
   };
 
@@ -216,13 +241,14 @@ export function useSessionHandlers({
     if (!zikrId) {
       return;
     }
+    const prefixedId = prefixZikrId(catId, zikrId, activeSubCategory);
     const setForCat = new Set(completed[catId] ?? new Set());
-    const wasCompleted = setForCat.has(zikrId);
+    const wasCompleted = setForCat.has(prefixedId);
 
     if (wasCompleted) {
-      setForCat.delete(zikrId);
+      setForCat.delete(prefixedId);
     } else {
-      setForCat.add(zikrId);
+      setForCat.add(prefixedId);
     }
 
     setCompleted((prev) => ({
@@ -230,7 +256,12 @@ export function useSessionHandlers({
       [catId]: setForCat,
     }));
 
-    if (!wasCompleted && azkar.every((zikr) => setForCat.has(zikr.id))) {
+    // Re-check completion using getEffectiveCompletedForSubcategory to see if the whole thing is done
+    const effectiveNow = getEffectiveCompletedForSubcategory(catId, activeSubCategory);
+    if (!wasCompleted) effectiveNow.add(zikrId);
+    else effectiveNow.delete(zikrId);
+
+    if (!wasCompleted && azkar.every((zikr) => effectiveNow.has(zikr.id))) {
       const completedAt = new Date();
       const growth = recordDailyCollectionCompletion(
         dailyCompletions,
@@ -252,7 +283,8 @@ export function useSessionHandlers({
       pop();
       return;
     }
-    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => completed[activeCat].has(zikr.id));
+    const effectiveCompleted = getEffectiveCompletedForSubcategory(activeCat, activeSubCategory);
+    const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
     if (!isRepeatSession && canonicalCollectionWasAlreadyComplete) {
       pop();
       return;
@@ -260,7 +292,7 @@ export function useSessionHandlers({
 
     const nextIncomplete = isRepeatSession
       ? getNextIncompleteIndex(azkar.length, new Set(repeatCompleted).add(idx), idx)
-      : getNextIncompleteZikrIndex(azkar, new Set(completed[activeCat]).add(zikrId), idx);
+      : getNextIncompleteZikrIndex(azkar, effectiveCompleted.add(zikrId), idx);
 
     if (nextIncomplete !== null) {
       setActiveIdx(nextIncomplete);

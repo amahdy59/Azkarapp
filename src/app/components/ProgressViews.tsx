@@ -41,6 +41,7 @@ function MainDhikrGroupCard({
   pendingLabel,
   onPress,
   compact = false,
+  subItems,
 }: {
   name: string;
   icon: React.ReactNode;
@@ -49,6 +50,7 @@ function MainDhikrGroupCard({
   pendingLabel: string;
   onPress?: () => void;
   compact?: boolean;
+  subItems?: { id: string; name: string; isCompleted: boolean }[];
 }) {
   const isCompleted = status === "completed";
   const statusLabel = isCompleted ? completedLabel : pendingLabel;
@@ -91,6 +93,19 @@ function MainDhikrGroupCard({
         >
           {statusLabel}
         </span>
+
+        {subItems && subItems.length > 0 && (
+          <div className="mt-1 flex flex-wrap items-center justify-center gap-1">
+            {subItems.map((item) => (
+              <span
+                key={item.id}
+                role="img"
+                aria-label={item.name}
+                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-emerald-400" : "bg-white/10"}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {isCompleted ? (
@@ -227,6 +242,38 @@ export function ProgressDayView({
         <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4 md:gap-5 xl:grid-cols-4">
           {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
+            const completedPrayers = summary.today.completedAfterPrayers ?? [];
+            const subItems =
+              col.id === "after_prayer"
+                ? [
+                    {
+                      id: "fajr",
+                      name: t(language, "notifications.fajr"),
+                      isCompleted: completedPrayers.includes("fajr"),
+                    },
+                    {
+                      id: "dhuhr",
+                      name: t(language, "notifications.dhuhr"),
+                      isCompleted: completedPrayers.includes("dhuhr"),
+                    },
+                    {
+                      id: "asr",
+                      name: t(language, "notifications.asr"),
+                      isCompleted: completedPrayers.includes("asr"),
+                    },
+                    {
+                      id: "maghrib",
+                      name: t(language, "notifications.maghrib"),
+                      isCompleted: completedPrayers.includes("maghrib"),
+                    },
+                    {
+                      id: "isha",
+                      name: t(language, "notifications.isha"),
+                      isCompleted: completedPrayers.includes("isha"),
+                    },
+                  ]
+                : undefined;
+
             return (
               <MainDhikrGroupCard
                 key={col.id}
@@ -237,6 +284,7 @@ export function ProgressDayView({
                 pendingLabel={t(language, "progress.notCompleted")}
                 onPress={() => onSelectCategory?.(col.id)}
                 compact={Boolean(visibleCategoryIds)}
+                subItems={subItems}
               />
             );
           })}

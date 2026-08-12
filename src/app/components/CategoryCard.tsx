@@ -1,5 +1,5 @@
 import { CatIcon } from "./CatIcon";
-import { Check, ChevronNext } from "./icons";
+import { Check } from "./icons";
 import { ProgressBar } from "./ProgressBar";
 
 export interface CategoryCardProps {
@@ -40,7 +40,7 @@ export function CategoryCard({
       data-testid={`category-card-${id}`}
       dir={direction}
       onClick={onClick}
-      className="flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       aria-label={ariaLabel}
     >
       <span
@@ -81,12 +81,6 @@ export function CategoryCard({
           </div>
         )}
       </span>
-      <ChevronNext
-        data-slot="category-chevron"
-        size={22}
-        className={isComplete ? "text-primary" : "text-muted-foreground"}
-        aria-hidden="true"
-      />
     </button>
   );
 }

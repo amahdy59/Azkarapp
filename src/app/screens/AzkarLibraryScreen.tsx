@@ -94,7 +94,6 @@ export function AzkarLibraryScreen({
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
           <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>
-          <p className="mt-1 text-[0.8125rem] text-muted-foreground">{t(language, "library.subtitle")}</p>
           <div className="mt-4 flex flex-col gap-4 min-[900px]:grid min-[900px]:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)] min-[900px]:items-end">
             <form
               className="min-w-0"
@@ -110,7 +109,7 @@ export function AzkarLibraryScreen({
               >
                 {t(language, "library.search")}
               </label>
-              <div className="flex h-12 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised focus-within:ring-[3px] focus-within:ring-ring">
+              <div className="flex h-12 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised focus-within:border-primary transition-colors">
                 <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
                 <input
                   id={searchInputId}
@@ -125,28 +124,32 @@ export function AzkarLibraryScreen({
                 />
               </div>
               {searchQuery.trim() && (
-                <p className="mt-1.5 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
+                <p className="mt-1.5 px-1 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
               )}
             </form>
-            <TabList
-              value={section}
-              onChange={setSection}
-              direction={direction}
-              idPrefix="library"
-              aria-label={t(language, "library.title")}
-              className="mt-1 grid grid-cols-2 gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised min-[900px]:mt-0"
-              itemClassName={(selected) =>
-                `min-h-11 rounded-xl px-3 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
-                }`
-              }
-              tabs={(["collections", "saved"] as const).map((value) => ({
-                value,
-                label: `${t(language, `library.${value}`)}${
-                  value === "saved" && savedZikrIds.size > 0 ? ` (${formatNumerals(savedZikrIds.size, language)})` : ""
-                }`,
-              }))}
-            />
+            <div className="overflow-x-auto no-scrollbar scroll-smooth min-[900px]:mt-0">
+              <TabList
+                value={section}
+                onChange={setSection}
+                direction={direction}
+                idPrefix="library"
+                aria-label={t(language, "library.title")}
+                className="mt-3 inline-flex min-w-max gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
+                itemClassName={(selected) =>
+                  `interactive-elem min-h-11 rounded-xl px-5 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] transition-transform ${
+                    selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
+                  }`
+                }
+                tabs={(["collections", "saved"] as const).map((value) => ({
+                  value,
+                  label: `${t(language, `library.${value}`)}${
+                    value === "saved" && savedZikrIds.size > 0
+                      ? ` (${formatNumerals(savedZikrIds.size, language)})`
+                      : ""
+                  }`,
+                }))}
+              />
+            </div>
           </div>
         </header>
 

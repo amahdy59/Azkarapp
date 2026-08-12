@@ -137,7 +137,7 @@ describe("useSessionHandlers", () => {
     expect(duplicate.result.current.dailyCompletions).toHaveLength(1);
   });
 
-  it("clears the transient after-prayer set after logging completion", () => {
+  it("keeps the transient after-prayer set intact for independent tracking", () => {
     const items = getAzkarForMode("after_prayer", "complete");
     const { result } = renderSessionHarness({
       activeCat: "after_prayer",
@@ -146,7 +146,7 @@ describe("useSessionHandlers", () => {
 
     act(() => result.current.handlers.markComplete(items.length - 1));
 
-    expect(result.current.completed.after_prayer.size).toBe(0);
+    expect(result.current.completed.after_prayer.size).toBe(items.length);
     expect(result.current.dailyCompletions[0]?.category).toBe("after_prayer");
     expect(result.current.sessions[0]?.category).toBe("after_prayer");
   });

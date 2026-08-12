@@ -42,7 +42,7 @@ import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { StatCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
-import { getFirstIncompleteZikrIndex, getGardenSummary, MAIN_CATEGORY_IDS } from "../progress";
+import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey, MAIN_CATEGORY_IDS } from "../progress";
 import { fridayKahfOpenedKey } from "../fridayProgress";
 import type {
   AppLanguage,
@@ -303,7 +303,13 @@ export function HomeScreen({
   const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
   const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
-  const afterPrayerCompletedToday = gardenSummary.today.completedCategories.includes("after_prayer");
+
+  const todayKey = getProgressDayKey(now, progressDayStartHour);
+  const completedAfterPrayersToday = new Set(
+    dailyCompletions
+      .filter((record) => record.dayKey === todayKey && record.category === "after_prayer" && record.subCategory)
+      .map((record) => record.subCategory),
+  );
 
   const reminderInfo = useMemo(
     () => getTimeOfDayZikr(now, language, locationSettings),
@@ -445,7 +451,7 @@ export function HomeScreen({
         aria-label={t(language, "home.title")}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
-        <div className="sticky top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 bg-background/60 backdrop-blur-xl border-b border-border/20 shadow-sm">
+        <div className="sticky top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-1 sm:px-6 sm:pt-5 lg:px-8 bg-background/60 backdrop-blur-xl border-b border-border/20 shadow-sm">
           <header
             data-testid="home-utility-header"
             className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
@@ -486,7 +492,7 @@ export function HomeScreen({
               >
                 <PalmTreeMark
                   size={14}
-                  strokeWidth={2.5}
+                  strokeWidth={3}
                   filled={gardenSummary.lifetimePalms > 0}
                   className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
                 />
@@ -514,7 +520,7 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-6 sm:p-6 sm:pt-6 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-8">
+              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-4 sm:p-6 sm:pt-5 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-6">
                 {showCompletionCard && (
                   <div className={quietProgressEnabled ? "lg:col-span-3" : "lg:col-span-5"}>
                     <TranquilityCompletionCard
@@ -592,11 +598,11 @@ export function HomeScreen({
               </div>
 
               <div className="mx-4 mb-4 mt-5 sm:mx-6 sm:mb-6">
-                <div className="grid grid-cols-1 gap-2.5 min-[30rem]:grid-cols-2 lg:grid-cols-5">
+                <div className="grid grid-cols-1 gap-2 min-[30rem]:grid-cols-2 lg:grid-cols-5">
                   {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
                     const isActivePrayer = index === activePrayerIndex;
                     const isPastPrayer = index < activePrayerIndex;
-                    const isCompletedPrayer = afterPrayerCompletedToday && (isActivePrayer || isPastPrayer);
+                    const isCompletedPrayer = completedAfterPrayersToday.has(prayer);
                     const isNextPrayer = prayer === nextPrayerInfo.name;
                     const stateLabel = isCompletedPrayer
                       ? t(language, "progress.completed")
@@ -625,7 +631,7 @@ export function HomeScreen({
                                   ? "earlier"
                                   : "upcoming"
                         }
-                        className={`relative flex min-h-24 w-full items-center gap-3 rounded-[22px] border px-4 py-3 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-4 lg:px-3 lg:py-4 lg:text-center ${
+                        className={`relative flex min-h-24 w-full items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer

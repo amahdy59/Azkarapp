@@ -11,7 +11,7 @@ import {
   ChevronNext,
   Clock,
   Droplets,
-  Heart,
+  MoonStar,
   Sparkles,
   User,
 } from "../components/icons";
@@ -169,20 +169,12 @@ export function FridayModeScreen({
       data-testid="friday-mode-screen"
       screenName={t(language, "friday.title")}
     >
-      <Header
-        onBack={onBack}
-        title={t(language, "friday.title")}
-        subtitle={t(language, "friday.subtitle")}
-        language={language}
-      />
+      <Header onBack={onBack} title={t(language, "friday.title")} language={language} />
 
       <div className="page-content-center relative z-10 grid min-h-0 flex-1 auto-rows-max grid-cols-1 gap-4 overflow-y-auto px-5 pb-8 pt-3 lg:grid-cols-2 lg:items-start">
         <section className="shrink-0 overflow-hidden rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 to-card p-5 shadow-raised lg:col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div className="text-start">
-              <p className="text-[0.75rem] font-black uppercase tracking-wide text-amber-700 dark:text-amber-300">
-                {t(language, "friday.todayPractices")}
-              </p>
               <h2 className="mt-1 text-[1.5rem] font-black text-foreground">{t(language, "friday.blessedFriday")}</h2>
             </div>
             <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500 text-slate-950 shadow-sm">
@@ -201,16 +193,15 @@ export function FridayModeScreen({
               style={{ width: `${(completedCount / totalPractices) * 100}%` }}
             />
           </div>
-          <p className="mt-3 text-start text-[0.8125rem] font-bold leading-5 text-muted-foreground" role="status">
-            {t(
-              language,
-              completedCount === totalPractices
-                ? "friday.progressComplete"
-                : completedCount > 0
-                  ? "friday.progressContinue"
-                  : "friday.progressStart",
-            )}
-          </p>
+          {completedCount >= totalPractices ? (
+            <p role="status" className="mt-3 text-[0.75rem] font-semibold text-emerald-600 dark:text-emerald-400">
+              {t(language, "friday.progressComplete")}
+            </p>
+          ) : completedCount > 0 ? (
+            <p className="mt-3 text-[0.75rem] font-semibold text-muted-foreground">
+              {t(language, "friday.progressContinue")}
+            </p>
+          ) : null}
           <div className="mt-5 grid gap-3 border-t border-amber-500/20 pt-4 sm:grid-cols-2">
             <div className="rounded-2xl bg-background/55 p-3 text-start">
               <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
@@ -230,6 +221,25 @@ export function FridayModeScreen({
             </div>
           </div>
         </section>
+
+        {sections.map((section) => (
+          <section key={section.title} aria-labelledby={`friday-${section.items[0]?.id}`} className="shrink-0">
+            <h2 id={`friday-${section.items[0]?.id}`} className="mb-2 px-1 text-[0.9375rem] font-black text-foreground">
+              {section.title}
+            </h2>
+            <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
+              {section.items.map((item) => (
+                <PracticeRow
+                  key={item.id}
+                  label={item.label}
+                  icon={item.icon}
+                  checked={checkedPractices.has(item.id)}
+                  onClick={() => togglePractice(item.id)}
+                />
+              ))}
+            </div>
+          </section>
+        ))}
 
         <section
           aria-labelledby="kahf-heading"
@@ -263,8 +273,8 @@ export function FridayModeScreen({
           aria-labelledby="salawat-heading"
           className="flex min-h-24 shrink-0 items-center gap-4 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-amber-500/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
-          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
-            <Heart size={24} className="fill-current/15" aria-hidden="true" />
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-amber-500/15 text-amber-700 dark:text-amber-300">
+            <MoonStar size={24} className="fill-current/15" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
             <span id="salawat-heading" className="block text-[1rem] font-black text-foreground">
@@ -277,28 +287,13 @@ export function FridayModeScreen({
           {salawatComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
           ) : (
-            <ChevronNext size={20} className="shrink-0 text-muted-foreground rtl:scale-x-[-1]" aria-hidden="true" />
+            <ChevronNext
+              size={20}
+              className={`shrink-0 text-muted-foreground ${direction === "rtl" ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
           )}
         </button>
-
-        {sections.map((section) => (
-          <section key={section.title} aria-labelledby={`friday-${section.items[0]?.id}`} className="shrink-0">
-            <h2 id={`friday-${section.items[0]?.id}`} className="mb-2 px-1 text-[0.9375rem] font-black text-foreground">
-              {section.title}
-            </h2>
-            <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
-              {section.items.map((item) => (
-                <PracticeRow
-                  key={item.id}
-                  label={item.label}
-                  icon={item.icon}
-                  checked={checkedPractices.has(item.id)}
-                  onClick={() => togglePractice(item.id)}
-                />
-              ))}
-            </div>
-          </section>
-        ))}
 
         <button
           type="button"
@@ -319,7 +314,11 @@ export function FridayModeScreen({
           {duasComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
           ) : (
-            <ChevronNext size={20} className="shrink-0 text-muted-foreground rtl:scale-x-[-1]" aria-hidden="true" />
+            <ChevronNext
+              size={20}
+              className={`shrink-0 text-muted-foreground ${direction === "rtl" ? "rotate-180" : ""}`}
+              aria-hidden="true"
+            />
           )}
         </button>
         {duasLoadError && (

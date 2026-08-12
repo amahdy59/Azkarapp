@@ -153,18 +153,15 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute("dir", "rtl");
 
-  const arrowBox = await card.locator('[data-slot="category-chevron"]').boundingBox();
   const iconBox = await card.locator('[data-slot="category-icon"]').boundingBox();
   const copyBox = await card.locator('[data-slot="category-copy"]').boundingBox();
-  expect(arrowBox).not.toBeNull();
   expect(iconBox).not.toBeNull();
   expect(copyBox).not.toBeNull();
-  if (!arrowBox || !iconBox || !copyBox) return;
+  if (!iconBox || !copyBox) return;
 
   // In the new layout with dir="rtl" and flex layout:
-  // Chevron is on the left, Copy spans most of the middle, Icon is on the right.
-  expect(arrowBox.x).toBeLessThan(iconBox.x);
-  expect(copyBox.x).toBeLessThan(iconBox.x);
+  // Copy spans most of the middle, Icon is on the right.
+  expect(iconBox.x).toBeGreaterThan(copyBox.x);
 
   const trackBox = await card.locator('[data-slot="progress-track"]').boundingBox();
   const fillBox = await card.locator('[data-slot="progress-fill"]').boundingBox();

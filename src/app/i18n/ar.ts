@@ -209,7 +209,7 @@ const ar = {
       "«مَنْ قَرَأَ سُورَةَ الْكَهْفِ فِي يَوْمِ الْجُمُعَةِ أَضَاءَ لَهُ مِنَ النُّورِ مَا بَيْنَ الْجُمُعَتَيْنِ»",
     blessedFriday: "جمعة مباركة",
     todayPractices: "أعمال اليوم",
-    weeklyProgress: "تقدم هذا الأسبوع",
+    weeklyProgress: "تقدمك يوم الجمعة",
     kahfNotStarted: "لم تبدأ",
     kahfInProgress: "قيد القراءة",
     kahfStart: "ابدأ القراءة",

@@ -20,6 +20,7 @@ export interface GardenDay {
   dayKey: string;
   date: Date;
   completedCategories: CategoryId[];
+  completedAfterPrayers: string[];
   goldenLeafCount: number;
   greenLeafCount: number;
   leafCount: number;
@@ -235,18 +236,26 @@ export function recordDailyCollectionCompletion(
 }
 
 function categoryMap(records: DailyCollectionCompletion[]) {
-  const byDay = new Map<string, Set<CategoryId>>();
+  const byDay = new Map<string, { categories: Set<CategoryId>; afterPrayers: Set<string> }>();
   for (const record of normalizeDailyCompletions(records)) {
-    const categories = byDay.get(record.dayKey) ?? new Set<CategoryId>();
-    categories.add(record.category);
-    byDay.set(record.dayKey, categories);
+    const entry = byDay.get(record.dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    entry.categories.add(record.category);
+    if (record.category === "after_prayer" && record.subCategory) {
+      entry.afterPrayers.add(record.subCategory);
+    }
+    byDay.set(record.dayKey, entry);
   }
   return byDay;
 }
 
-function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<CategoryId>>): GardenDay {
-  const categories = byDay.get(dayKey) ?? new Set<CategoryId>();
+function gardenDay(
+  dayKey: string,
+  todayKey: string,
+  entry: { categories: Set<CategoryId>; afterPrayers: Set<string> } | undefined,
+): GardenDay {
+  const categories = entry?.categories ?? new Set<CategoryId>();
   const completedCategories = CATEGORY_IDS.filter((category) => categories.has(category));
+  const completedAfterPrayers = entry ? Array.from(entry.afterPrayers) : [];
   const goldenCategories = MAIN_CATEGORY_IDS.filter((category) => categories.has(category));
   const greenCategories = CATEGORY_IDS.filter((id) => !MAIN_CATEGORY_IDS.includes(id) && categories.has(id));
 
@@ -257,6 +266,7 @@ function gardenDay(dayKey: string, todayKey: string, byDay: Map<string, Set<Cate
     dayKey,
     date: dateFromProgressDayKey(dayKey),
     completedCategories,
+    completedAfterPrayers,
     goldenLeafCount,
     greenLeafCount,
     leafCount: goldenLeafCount,
@@ -273,7 +283,7 @@ export function getUsageStreakSummary(
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const activeKeys = [...categoryMap(records).entries()]
-    .filter(([dayKey, categories]) => dayKey <= todayKey && categories.size > 0)
+    .filter(([dayKey, entry]) => dayKey <= todayKey && entry.categories.size > 0)
     .map(([dayKey]) => dayKey)
     .sort();
 
@@ -340,7 +350,7 @@ export function getPalmStreakSummary(
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const palmKeys = [...categoryMap(records).entries()]
-    .filter(([dayKey, categories]) => dayKey <= todayKey && MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)))
+    .filter(([dayKey, entry]) => dayKey <= todayKey && MAIN_CATEGORY_IDS.every((cat) => entry.categories.has(cat)))
     .map(([dayKey]) => dayKey)
     .sort();
 
@@ -378,18 +388,19 @@ export function getGardenSummary(
   const todayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records).filter((record) => record.dayKey <= todayKey);
   const byDay = categoryMap(normalized);
-  const days = Array.from({ length: 7 }, (_, index) =>
-    gardenDay(shiftProgressDayKey(todayKey, index - 6), todayKey, byDay),
-  );
-  const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay);
+  const days = Array.from({ length: 7 }, (_, index) => {
+    const key = shiftProgressDayKey(todayKey, index - 6);
+    return gardenDay(key, todayKey, byDay.get(key));
+  });
+  const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay.get(todayKey));
   const yesterday = days.at(-2);
   const activeKeys = [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort();
 
   const lifetimeGoldenLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
   const lifetimeGreenLeaves = normalized.filter((record) => !MAIN_CATEGORY_IDS.includes(record.category)).length;
   const lifetimeLeaves = normalized.length;
-  const lifetimePalms = [...byDay.values()].filter((categories) =>
-    MAIN_CATEGORY_IDS.every((cat) => categories.has(cat)),
+  const lifetimePalms = [...byDay.values()].filter((entry) =>
+    MAIN_CATEGORY_IDS.every((cat) => entry.categories.has(cat)),
   ).length;
   const { currentPalmRhythm, longestPalmRhythm } = getPalmStreakSummary(normalized, now, boundaryHour);
   const { currentUsageStreak, longestUsageStreak } = getUsageStreakSummary(normalized, now, boundaryHour);
