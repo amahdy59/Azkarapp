@@ -453,7 +453,7 @@ export function HomeScreen({
           >
             <div
               data-testid="hijri-date"
-              className="min-w-0 text-[0.8125rem] font-bold text-amber-700 dark:text-[#e6be76] sm:text-[0.9375rem]"
+              className="min-w-0 text-[0.8125rem] font-bold text-primary sm:text-[0.9375rem]"
             >
               <time className="block truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
@@ -473,30 +473,22 @@ export function HomeScreen({
             >
               <div
                 data-testid="header-streak"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-amber-700 dark:text-[#e6be76]"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
                 title={t(language, "progress.dailyStreak")}
               >
-                <Zap
-                  className="h-[13px] w-[13px] text-amber-700 dark:text-[#e6be76]"
-                  strokeWidth={2.5}
-                  aria-hidden="true"
-                />
+                <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
                 <span>{formatNumerals(streakDays, language)}</span>
               </div>
               <div
                 data-testid="header-palms"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-amber-700 dark:text-[#e6be76]"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
                 title={t(language, "progress.palmsTitle")}
               >
                 <PalmTreeMark
                   size={14}
                   strokeWidth={2.5}
                   filled={gardenSummary.lifetimePalms > 0}
-                  className={
-                    gardenSummary.lifetimePalms > 0
-                      ? "text-amber-700 dark:text-[#e6be76]"
-                      : "text-amber-700/70 dark:text-[#e6be76]/70"
-                  }
+                  className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
                 />
                 <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
               </div>

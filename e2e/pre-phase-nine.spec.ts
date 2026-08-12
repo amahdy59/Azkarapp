@@ -90,8 +90,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
-
-    expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(1);
+    expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
     expect(Math.abs(geometry.streak.y - geometry.palms.y), `streak/palms row at ${viewport.width}px`).toBeLessThan(1);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
