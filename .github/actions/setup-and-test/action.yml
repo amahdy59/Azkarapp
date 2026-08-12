@@ -1,0 +1,52 @@
+name: "Setup and Test"
+description: "Sets up Node, pnpm, and Playwright, and runs quality gates and tests."
+
+inputs:
+  vite-audio-base-url:
+    description: "VITE_AUDIO_BASE_URL environment variable"
+    required: false
+
+runs:
+  using: "composite"
+  steps:
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v6
+      with:
+        version: "9.15.0"
+
+    - name: Setup Node
+      uses: actions/setup-node@v7
+      with:
+        node-version-file: ".nvmrc"
+        cache: "pnpm"
+
+    - name: Install dependencies
+      run: pnpm install --frozen-lockfile
+      shell: bash
+
+    - name: Verify quality gates
+      run: pnpm check
+      shell: bash
+      env:
+        VITE_AUDIO_BASE_URL: ${{ inputs.vite-audio-base-url }}
+
+    - name: Cache Playwright browsers
+      uses: actions/cache@v6
+      id: playwright-cache
+      with:
+        path: ~/.cache/ms-playwright
+        key: playwright-browsers-v2-${{ runner.os }}-${{ env.ImageOS }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+    - name: Install Playwright browsers
+      if: steps.playwright-cache.outputs.cache-hit != 'true'
+      run: pnpm exec playwright install --with-deps chromium firefox webkit
+      shell: bash
+
+    - name: Install Playwright system deps only (cached)
+      if: steps.playwright-cache.outputs.cache-hit == 'true'
+      run: pnpm exec playwright install-deps chromium firefox webkit
+      shell: bash
+
+    - name: Run E2E tests
+      run: pnpm test:e2e
+      shell: bash

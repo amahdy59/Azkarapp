@@ -16,30 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
-      - uses: pnpm/action-setup@v6
+      - name: Setup and Test
+        uses: ./.github/actions/setup-and-test
         with:
-          version: "9.15.0"
-      - uses: actions/setup-node@v7
-        with:
-          # Read from .nvmrc so CI and local can never drift. They did:
-          # .nvmrc said 24 while this said 20, so fs.globSync passed
-          # locally and failed the build here.
-          node-version-file: ".nvmrc"
-          cache: "pnpm"
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm check
-        env:
-          VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
-      - name: Cache Playwright browsers
-        uses: actions/cache@v6
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-browsers-v2-${{ runner.os }}-${{ env.ImageOS }}-${{ hashFiles('pnpm-lock.yaml') }}
-      - name: Install Playwright browsers
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium firefox webkit
-      - name: Install Playwright system deps only (cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium firefox webkit
-      - run: pnpm test:e2e
+          vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
