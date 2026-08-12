@@ -92,15 +92,17 @@ test("the Reader counter keeps one rectangular shape across phone, tablet, and d
   ]) {
     await page.setViewportSize(viewport);
     await expect(counter).toBeVisible();
-    const box = await counter.boundingBox();
-    expect(box).not.toBeNull();
-    if (box) {
-      expect(Math.round(box.height)).toBe(76);
-      expect(box.width).toBeLessThanOrEqual(220);
-      expect(box.width).toBeGreaterThanOrEqual(160);
-      expect(box.x).toBeGreaterThanOrEqual(0);
-      expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
-    }
+    await expect(async () => {
+      const box = await counter.boundingBox();
+      expect(box).not.toBeNull();
+      if (box) {
+        expect(Math.round(box.height)).toBe(76);
+        expect(box.width).toBeLessThanOrEqual(220);
+        expect(box.width).toBeGreaterThanOrEqual(160);
+        expect(box.x).toBeGreaterThanOrEqual(0);
+        expect(box.x + box.width).toBeLessThanOrEqual(viewport.width);
+      }
+    }).toPass();
   }
 });
 
