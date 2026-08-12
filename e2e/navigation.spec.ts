@@ -46,7 +46,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   // Tier-agnostic: saving is a hero-toolbar button on tablet/desktop and an
   // overflow-menu item on phones, so drive it through the menu on every tier.
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Add to Favorites", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
   await page.getByRole("tab", { name: /Saved/ }).click();

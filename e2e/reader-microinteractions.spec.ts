@@ -196,7 +196,7 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   // Tier-agnostic: saving lives in the hero toolbar on tablet/desktop and in
   // the overflow menu on phones, so drive it through the menu on every tier.
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Add to Favorites", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
