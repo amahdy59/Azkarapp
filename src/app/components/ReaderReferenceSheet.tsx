@@ -290,7 +290,7 @@ export function ReaderReferenceSheet({
       direction={direction}
       testId="reference-sheet"
       describedById="reader-reference-description"
-      // `.reference-sheet` carries the sheet height rules in theme.css.
+      // `.reference-sheet` carries the sheet height rules in ReaderScreen.css.
       drawerClassName="reference-sheet"
     >
       <ReferenceContent

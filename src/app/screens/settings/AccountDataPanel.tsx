@@ -41,9 +41,7 @@ export function AccountDataPanel({
 }) {
   const syncStatusLabel =
     syncStatus === "offline"
-      ? language === "ar"
-        ? "محفوظ محلياً دون اتصال"
-        : "Saved locally while offline"
+      ? t(language, "accountData.savedOffline")
       : syncError
         ? t(language, "accountData.needsAttention")
         : isSyncing
@@ -132,11 +130,7 @@ export function AccountDataPanel({
             <DataAction
               icon={<LogOut size={20} aria-hidden="true" />}
               title={t(language, "settings.deleteAccountShort")}
-              body={
-                language === "ar"
-                  ? "نزّل بياناتك ثم احذف الحساب والنسخة السحابية نهائياً."
-                  : "Export your data, then permanently remove your account and cloud copy."
-              }
+              body={t(language, "accountData.deleteAccountBody")}
               action={t(language, "settings.exportAndDelete")}
               onPress={onDeleteAccount}
               destructive

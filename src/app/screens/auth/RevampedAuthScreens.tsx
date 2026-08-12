@@ -10,25 +10,22 @@ const termsUrl = (import.meta.env.VITE_TERMS_URL as string | undefined)?.trim() 
 const privacyUrl = (import.meta.env.VITE_PRIVACY_URL as string | undefined)?.trim() || "";
 
 function LegalConsent({ language, compact = false }: { language: AppLanguage; compact?: boolean }) {
-  const ar = language === "ar";
   if (!termsUrl || !privacyUrl) {
     return (
       <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
-        {ar
-          ? "سيُتاح تسجيل الدخول بعد نشر شروط الخدمة وسياسة الخصوصية."
-          : "Account sign-in will open after the Terms and Privacy Policy are published."}
+        {t(language, "auth.legalUnavailable")}
       </p>
     );
   }
   return (
     <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
-      {ar ? "بالمتابعة، أنت توافق على " : "By continuing you agree to our "}
+      {t(language, "auth.legalPrefix")}
       <a className="font-semibold text-primary underline" href={termsUrl} target="_blank" rel="noreferrer">
-        {ar ? "شروط الخدمة" : "Terms"}
+        {t(language, "auth.terms")}
       </a>
-      {ar ? " و" : " & "}
+      {t(language, "auth.legalJoin")}
       <a className="font-semibold text-primary underline" href={privacyUrl} target="_blank" rel="noreferrer">
-        {ar ? "سياسة الخصوصية" : "Privacy Policy"}
+        {t(language, "auth.privacyPolicy")}
       </a>
     </p>
   );
@@ -81,31 +78,17 @@ export function LoginScreen({
         </div>
         <div className="flex w-full flex-col gap-2">
           {providerFlags.google && legalReady && (
-            <ProviderButton
-              label={ar ? "المتابعة باستخدام Google" : "Continue with Google"}
-              onClick={onGoogle}
-              disabled={isAuthenticating}
-            />
+            <ProviderButton label={t(language, "auth.continueGoogle")} onClick={onGoogle} disabled={isAuthenticating} />
           )}
           {providerFlags.email && legalReady && (
-            <ProviderButton
-              label={ar ? "المتابعة بالبريد الإلكتروني" : "Continue with Email"}
-              onClick={onEmail}
-              disabled={isAuthenticating}
-            />
+            <ProviderButton label={t(language, "auth.continueEmail")} onClick={onEmail} disabled={isAuthenticating} />
           )}
           {providerFlags.apple && legalReady && (
-            <ProviderButton
-              label={ar ? "المتابعة باستخدام Apple" : "Continue with Apple"}
-              onClick={onApple}
-              disabled={isAuthenticating}
-            />
+            <ProviderButton label={t(language, "auth.continueApple")} onClick={onApple} disabled={isAuthenticating} />
           )}
           {!accountAuthEnabled && (
             <p className="text-center text-[0.6875rem] leading-4 text-muted-foreground">
-              {ar
-                ? "تسجيل الدخول غير متاح حالياً؛ يمكنك المتابعة كزائر."
-                : "Sign-in is not available yet. You can continue as a guest."}
+              {t(language, "auth.signInUnavailable")}
             </p>
           )}
           {errorMessage && (
@@ -168,11 +151,9 @@ export function EmailInputScreen({
       <div className="flex flex-col gap-8 px-6 pt-6">
         <div>
           <h1 className="text-[1.5rem] font-extrabold leading-8 text-foreground">
-            {ar ? "أدخل بريدك الإلكتروني" : "Enter your email"}
+            {t(language, "auth.enterEmailTitle")}
           </h1>
-          <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">
-            {ar ? "سنرسل رمز تحقق مكوّناً من 6 أرقام." : "We’ll send a six-digit verification code."}
-          </p>
+          <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">{t(language, "auth.enterEmailHint")}</p>
         </div>
         <input
           id="email-input"
@@ -184,7 +165,7 @@ export function EmailInputScreen({
           inputMode="email"
           autoComplete="email"
           dir="ltr"
-          aria-label={ar ? "البريد الإلكتروني" : "Email address"}
+          aria-label={t(language, "auth.emailLabel")}
           aria-describedby={errorMessage ? "email-error" : undefined}
           aria-invalid={errorMessage ? "true" : undefined}
         />
@@ -244,13 +225,13 @@ export function OTPScreen({
         <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
         </IconButton>
-        <p className="text-[1.0625rem] font-semibold text-foreground">{ar ? "تحقق من بريدك" : "Verify your email"}</p>
+        <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.verifyEmailTitle")}</p>
         <span />
       </header>
       <div className="flex flex-col gap-8 px-6 pt-5">
         <div className="flex flex-col gap-3">
           <p className="text-[0.875rem] text-muted-foreground">
-            {ar ? "أرسلنا رمزاً إلى" : "We sent a code to"}{" "}
+            {t(language, "auth.sentCodeTo")}{" "}
             <strong className="text-foreground" dir="ltr">
               {maskedEmail}
             </strong>
@@ -269,7 +250,7 @@ export function OTPScreen({
           containerClassName="w-full justify-center"
           inputMode="numeric"
           autoComplete="one-time-code"
-          aria-label={ar ? "رمز التحقق" : "Verification code"}
+          aria-label={t(language, "auth.verificationCodeLabel")}
         >
           <InputOTPGroup className="w-full justify-between" dir="ltr">
             {Array.from({ length: 6 }).map((_, index) => (
@@ -311,7 +292,7 @@ export function OTPScreen({
           {isVerifying ? t(language, "common.verifying") : t(language, "common.verify")}
         </button>
         <button type="button" onClick={onDifferent} className="min-h-11 font-semibold text-primary">
-          {ar ? "استخدام بريد آخر" : "Use a different email"}
+          {t(language, "auth.differentEmail")}
         </button>
       </div>
     </div>
@@ -362,20 +343,14 @@ export function ProfileCompletionScreen({
   return (
     <div className="flex h-full flex-col bg-background px-6 pb-6 pt-12" dir={ar ? "rtl" : "ltr"}>
       <BrandLockup compact />
-      <h1 className="mt-8 text-2xl font-extrabold text-foreground">
-        {ar ? "كيف تحب أن نناديك؟" : "What should we call you?"}
-      </h1>
-      <p className="mt-2 text-sm text-muted-foreground">
-        {ar
-          ? "لم يرسل مزود الحساب اسماً. يمكنك تغييره لاحقاً."
-          : "Your provider did not share a name. You can change it later."}
-      </p>
+      <h1 className="mt-8 text-2xl font-extrabold text-foreground">{t(language, "auth.profileTitle")}</h1>
+      <p className="mt-2 text-sm text-muted-foreground">{t(language, "auth.profileHint")}</p>
       <input
         className="mt-8 h-12 rounded-xl border border-border-control bg-card px-4 text-foreground"
         value={displayName}
         onChange={(event) => setDisplayName(event.target.value)}
         autoComplete="name"
-        aria-label={ar ? "الاسم المعروض" : "Display name"}
+        aria-label={t(language, "auth.displayNameLabel")}
         aria-describedby={errorMessage ? "profile-error" : undefined}
         aria-invalid={errorMessage ? "true" : undefined}
       />
@@ -392,7 +367,7 @@ export function ProfileCompletionScreen({
         onClick={() => onSave(displayName)}
         className="h-12 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-50"
       >
-        {isSaving ? (ar ? "جارٍ الحفظ…" : "Saving…") : ar ? "متابعة" : "Continue"}
+        {isSaving ? t(language, "auth.saving") : t(language, "auth.continue")}
       </button>
     </div>
   );

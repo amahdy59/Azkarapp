@@ -3,6 +3,7 @@ import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
+import "./SettingsScreen.css";
 import type {
   AppLanguage,
   ColorBlindSupport,

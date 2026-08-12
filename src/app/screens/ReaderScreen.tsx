@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
+import "./ReaderScreen.css";
 import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -593,6 +594,7 @@ export function ReaderScreen({
 
   const renderKeyboardShortcutsHint = () => (
     <div
+      role="group"
       className="mx-auto mt-5 hidden w-fit max-w-full items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex"
       data-testid="reader-keyboard-shortcuts"
       aria-label={t(language, "reader.keyboardShortcuts")}
@@ -721,13 +723,7 @@ export function ReaderScreen({
         className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
       >
         <Volume2 size={18} />
-        {audioAvailable
-          ? language === "ar"
-            ? "تشغيل مرة واحدة"
-            : "Play audio once"
-          : language === "ar"
-            ? "الصوت غير متاح"
-            : "Audio unavailable"}
+        {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
       </DropdownMenuItem>
 
       {onRepeatAudio && (

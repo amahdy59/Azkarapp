@@ -266,7 +266,6 @@ export function HomeScreen({
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
   const [, setPrayerTimesRevision] = useState(0);
-  const [previewFriday, setPreviewFriday] = useState(false);
   const [savedOpenState, setSavedOpenState] = useState<{
     loadingId: string | null;
     errorId: string | null;
@@ -480,11 +479,12 @@ export function HomeScreen({
                   role="img"
                   data-testid="home-header-stats"
                   className="flex shrink-0 items-center gap-3"
-                  aria-label={
-                    isArabic
-                      ? `أشجار النخيل: ${formatNumerals(gardenSummary.lifetimePalms, language)}، أوراق اليوم: ${formatNumerals(gardenSummary.today.goldenLeafCount, language)} من ${formatNumerals(MAIN_CATEGORY_IDS.length, language)}، السلسلة اليومية: ${formatNumerals(streakDays, language)} أيام`
-                      : `Palms: ${gardenSummary.lifetimePalms}, Today's leaves: ${gardenSummary.today.goldenLeafCount} of ${MAIN_CATEGORY_IDS.length}, Daily streak: ${streakDays} days`
-                  }
+                  aria-label={t(language, "home.headerStatsAria", {
+                    palms: formatNumerals(gardenSummary.lifetimePalms, language),
+                    leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
+                    total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
+                    streak: formatNumerals(streakDays, language),
+                  })}
                 >
                   <div
                     data-testid="header-streak"
@@ -775,6 +775,9 @@ export function HomeScreen({
                   <span className="block text-[1.25rem] font-black text-foreground">
                     {t(language, "benefits.title")}
                   </span>
+                  <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-muted-foreground sm:text-[0.875rem]">
+                    {t(language, "benefits.homeDescription")}
+                  </span>
                   <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-900 dark:text-amber-200">
                     {t(language, "benefits.open")}
                     {direction === "rtl" ? (
@@ -793,11 +796,9 @@ export function HomeScreen({
           <FridayHomeCard
             language={language}
             direction={direction}
-            expanded={fridayInWindow || previewFriday}
+            expanded={fridayInWindow}
             status={fridayStatus}
             onOpen={onOpenFridayMode}
-            canPreview={import.meta.env.DEV && !fridayInWindow}
-            onTogglePreview={() => setPreviewFriday((current) => !current)}
           />
 
           {/* Tasbeeh Counter Button (Full width matching design system tokens) */}

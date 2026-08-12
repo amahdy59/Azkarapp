@@ -48,7 +48,6 @@ export function PrayerRoutineCard({
   ctaLabel: string;
   onOpen: () => void;
 }) {
-  const isArabic = language === "ar";
   const progressId = "home-routine-progress";
   const modeHintId = "home-routine-mode-hint";
   const progress = totalCount > 0 ? Math.min(1, Math.max(0, completedCount / totalCount)) : 0;
@@ -124,7 +123,9 @@ export function PrayerRoutineCard({
               </span>
               <span className="flex items-center gap-1.5">
                 <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
-                {isArabic ? `${formatNumerals(estimatedMinutes, language)} دقائق تقريباً` : `~${estimatedMinutes} mins`}
+                {t(language, "home.estimatedMinutes", {
+                  count: formatNumerals(estimatedMinutes, language),
+                })}
               </span>
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-black/30" aria-hidden="true">
@@ -201,11 +202,9 @@ export function SavedZikrCard({
             {t(language, "home.savedTitle")}
           </h2>
         </div>
-        <span
-          className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary"
-          aria-label={t(language, "home.savedCount", { count: formatNumerals(count, language) })}
-        >
-          {formatNumerals(count, language)}
+        <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary">
+          <span aria-hidden="true">{formatNumerals(count, language)}</span>
+          <span className="sr-only">{t(language, "home.savedCount", { count: formatNumerals(count, language) })}</span>
         </span>
       </div>
 
@@ -291,16 +290,12 @@ export function FridayHomeCard({
   expanded,
   status,
   onOpen,
-  canPreview,
-  onTogglePreview,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   expanded: boolean;
   status: "start" | "continue" | "review";
   onOpen?: () => void;
-  canPreview: boolean;
-  onTogglePreview: () => void;
 }) {
   const actionLabel = t(language, `home.friday${status[0]!.toUpperCase()}${status.slice(1)}`);
 
@@ -332,15 +327,6 @@ export function FridayHomeCard({
             >
               {actionLabel}
               <DirectionArrow direction={direction} />
-            </button>
-          )}
-          {canPreview && (
-            <button
-              type="button"
-              onClick={onTogglePreview}
-              className="min-h-11 rounded-2xl border border-border px-4 text-xs font-bold text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {t(language, "home.previewFriday")}
             </button>
           )}
         </div>
@@ -410,15 +396,6 @@ export function FridayHomeCard({
           </div>
         </div>
       </div>
-      {canPreview && (
-        <button
-          type="button"
-          onClick={onTogglePreview}
-          className="mx-5 mb-5 min-h-11 rounded-2xl border border-border px-4 text-xs font-bold text-muted-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:mx-6 sm:mb-6"
-        >
-          {t(language, "home.hideFridayPreview")}
-        </button>
-      )}
     </Card>
   );
 }

@@ -1001,3 +1001,18 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** No persistence schema, sync merge rule, religious content, router, or runtime dependency changes. The hand-written `AppErrorBoundary` remains the last resort for true application crashes; recoverable chunk failures no longer depend on it.
 - **Tests/evidence required:** Focused state/retry/permission tests, `pnpm check`, full Playwright, offline/reconnect and denied-permission manual checks, Pages workflow success, and production SHA smoke verification.
 - **Supersedes:** The automatic one-time lazy-route reload behavior only. Existing offline-first, update-consent, and local-state ownership contracts remain authoritative.
+
+---
+
+## DEC-055 — Phase 11 responsive/i18n matrix and deterministic browser gate
+
+- **Date:** 2026-08-12
+- **Status:** Approved
+- **Owner:** User (approved the recommended next decision and instructed the agent to complete Phase 11).
+- **Related phase:** Phase 11
+- **Context:** The pre-change responsive run passed all 13 desktop assertions, then the Vite HMR server exited and 26 mobile/tablet checks failed with `ERR_CONNECTION_REFUSED`. Static review also found desktop Progress capped at 44rem, new inline Arabic/English JSX copy, repeated `aria-label` use on roleless containers, and routine evidence capture rewriting tracked screenshots during ordinary test runs.
+- **Decision:** Run Playwright against one built Vite preview on an isolated strict port, with no hidden CI retries and failure traces retained. Ordinary evidence tests write under Playwright output; committed screenshots change only when `EVIDENCE_DIR` is explicit. Enforce local ESLint rules against inline bilingual conditional copy and roleless `aria-label`, while preserving the documented crash-boundary exception. Complete the current i18n cleanup and widen Progress views at desktop widths without reducing compact text size, reversing semantic order, or changing reviewed content.
+- **Responsive contract:** Validate Arabic and English across 320px, 390px, tablet, desktop, 200% zoom equivalence, large app text, short landscape, and both directions. Preserve logical navigation order, mixed-direction isolation, safe-area shell padding, and one reachable navigation variant.
+- **Consequences:** E2E startup includes one production build but removes HMR/on-demand-transform contention. A real application failure is no longer silently retried in CI. Progress uses available desktop space while compact and Home-specific reading measures remain bounded. No persistence, prayer calculation, reviewed content, runtime dependency, or route contract changes.
+- **Tests/evidence required:** Unit tests for both lint rules; targeted responsive and i18n tests; full `pnpm check`; full retry-free Playwright matrix; Pages build; deliberate compact/tablet/desktop evidence refresh; green Pages workflow and production SHA smoke verification.
+- **Supersedes:** The dev-server and implicit-current-screenshot defaults in the test harness only.

@@ -79,6 +79,7 @@ export default defineConfig(({ mode }) => {
             "colored palm tree.png",
             "dimmed palm tree.png",
             "azkar-responsive-assets/**",
+            "assets/backgrounds/Originals/**",
             "webp/**",
             "evening_sky.webp",
             "morning_sky.webp",

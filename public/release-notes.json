@@ -1,14 +1,14 @@
 {
   "ar": [
-    "أصبحت حالات التحميل والخطأ وعدم الاتصال أوضح مع إجراءات آمنة لإعادة المحاولة دون فقدان التقدم المحلي.",
-    "تتقلص رسالة عدم الاتصال تلقائيًا إلى مؤشر صغير، ويظهر تأكيد هادئ عند عودة الاتصال.",
-    "تحسنت إرشادات أذونات الموقع والإشعارات مع الحفاظ على إعدادات الصلاة المحفوظة عند التعذر.",
-    "أصبحت تحديثات التطبيق والتنزيل والمشاركة وتسجيل الدخول تعرض حالة الانتظار والنجاح والإلغاء والخطأ بوضوح."
+    "أصبح عرض التقدم أوسع وأكثر استفادة من مساحة سطح المكتب، مع بقاء التخطيط مريحًا على الهاتف والجهاز اللوحي.",
+    "تحسّن ثبات التخطيط بالعربية والإنجليزية عند تكبير المتصفح واستخدام أكبر حجم للنص.",
+    "أصبحت التسميات وحالات الأيام والإرشادات مكتملة باللغة المختارة وأكثر وضوحًا لقارئات الشاشة.",
+    "أزيل زر معاينة الجمعة المؤقت، وأضيف وصف موجز لبطاقة فوائد الذكر."
   ],
   "en": [
-    "Loading, error, and offline states now provide clear recovery without risking local progress.",
-    "The offline notice collapses to a compact indicator and quietly confirms when connection returns.",
-    "Location and notification permission guidance is clearer while saved prayer settings remain protected.",
-    "App updates, downloads, sharing, and sign-in now communicate pending, success, cancellation, and failure states."
+    "Progress now uses desktop space more effectively while staying comfortable on phones and tablets.",
+    "Arabic and English layouts are more resilient at browser zoom and the largest app text setting.",
+    "Labels, day states, and guidance now stay in the selected language with clearer screen-reader semantics.",
+    "The temporary Friday preview control is gone, and the Benefits card now includes a concise description."
   ]
 }

@@ -20,14 +20,16 @@ async function seedReturningGardenUser(
     language = "en",
     completedToday,
     quietProgressEnabled = true,
+    textSize = "medium",
   }: {
     language?: AppLanguage;
     completedToday: CategoryId[];
     quietProgressEnabled?: boolean;
+    textSize?: "medium" | "large";
   },
 ) {
   await page.addInitScript(
-    ({ language: selectedLanguage, completedToday: categories, quietProgressEnabled: gardenEnabled }) => {
+    ({ language: selectedLanguage, completedToday: categories, quietProgressEnabled: gardenEnabled, textSize }) => {
       const seedMarker = "azkarapp.e2e.quiet-garden-seeded";
       if (window.sessionStorage.getItem(seedMarker) === "true") {
         return;
@@ -54,7 +56,7 @@ async function seedReturningGardenUser(
             themeMode: "midnight",
             showTransliteration: false,
             showTranslation: false,
-            textSize: "medium",
+            textSize,
             highContrast: false,
             boldText: false,
             reduceMotion: true,
@@ -90,9 +92,57 @@ async function seedReturningGardenUser(
         }),
       );
     },
-    { language, completedToday, quietProgressEnabled },
+    { language, completedToday, quietProgressEnabled, textSize },
   );
 }
+
+for (const language of ["en", "ar"] as const) {
+  test(`Progress uses the expanded desktop canvas in ${language}`, async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 900 });
+    await seedReturningGardenUser(page, { language, completedToday: [] });
+    await openReturningHome(page);
+    await page.getByTestId("nav-progress").click();
+
+    const garden = page.getByTestId("today-garden-card");
+    await expect(garden).toBeVisible();
+    const dayView = garden.locator('[role="tabpanel"]');
+    const box = await dayView.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.width).toBeGreaterThan(800);
+    const routineCards = dayView.getByRole("button");
+    await expect(routineCards).toHaveCount(4);
+    const routineCardTops = await routineCards.evaluateAll((cards) =>
+      cards.map((card) => Math.round(card.getBoundingClientRect().top)),
+    );
+    expect(new Set(routineCardTops).size).toBe(1);
+    await expect(page.locator("html")).toHaveAttribute("dir", language === "ar" ? "rtl" : "ltr");
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(1280);
+  });
+}
+
+test("Arabic large text keeps Progress controls and month details usable at compact widths", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await seedReturningGardenUser(page, { language: "ar", completedToday: [], textSize: "large" });
+  await openReturningHome(page);
+  await page.getByTestId("nav-progress").click();
+
+  const tabs = page.getByRole("tab");
+  await expect(tabs).toHaveCount(4);
+  for (const tab of await tabs.all()) {
+    const box = await tab.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height).toBeGreaterThanOrEqual(44);
+  }
+
+  await tabs.nth(2).click();
+  await expect(page.getByTestId("garden-month-calendar")).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  const date = page.getByTestId("garden-view-date");
+  expect(await date.evaluate((element) => element.scrollWidth <= element.clientWidth + 1)).toBe(true);
+});
 
 async function openReturningHome(page: Page) {
   await page.goto("/");

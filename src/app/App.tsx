@@ -996,11 +996,13 @@ function AppContent() {
 
     if (audioCoverage.unavailable > 0) {
       showConfirm(
-        selectedLang === "ar" ? "تغطية الصوت" : "Audio coverage",
-        selectedLang === "ar"
-          ? `الصوت متاح لـ ${audioCoverage.available} من ${audioCoverage.total}. غير متاح لـ ${audioCoverage.unavailable}.`
-          : `Audio is available for ${audioCoverage.available} of ${audioCoverage.total} items. ${audioCoverage.unavailable} are unavailable.`,
-        selectedLang === "ar" ? "تشغيل المتاح" : "Play available",
+        t(selectedLang, "auth.audioCoverageTitle"),
+        t(selectedLang, "auth.audioCoverageBody", {
+          available: audioCoverage.available,
+          total: audioCoverage.total,
+          unavailable: audioCoverage.unavailable,
+        }),
+        t(selectedLang, "auth.playAvailableAudio"),
         t(selectedLang, "common.cancel"),
         playAvailable,
       );
@@ -1696,15 +1698,11 @@ function AppContent() {
       {guestMigrationOpen && (
         <ConfirmDialog
           open
-          title={selectedLang === "ar" ? "بيانات الزائر" : "Guest progress found"}
-          description={
-            selectedLang === "ar"
-              ? "اختر ما تريد فعله ببيانات هذا الجهاز قبل فتح الحساب."
-              : "Choose what to do with this device’s guest progress before opening the account."
-          }
-          confirmLabel={selectedLang === "ar" ? "دمج التقدم مع الحساب" : "Merge guest progress"}
-          secondaryLabel={selectedLang === "ar" ? "حذف تقدم الزائر" : "Discard guest progress"}
-          cancelLabel={selectedLang === "ar" ? "إلغاء والبقاء كزائر" : "Cancel and remain a guest"}
+          title={t(selectedLang, "auth.guestProgressTitle")}
+          description={t(selectedLang, "auth.guestProgressBody")}
+          confirmLabel={t(selectedLang, "auth.mergeGuestProgress")}
+          secondaryLabel={t(selectedLang, "auth.discardGuestProgress")}
+          cancelLabel={t(selectedLang, "auth.cancelGuestMigration")}
           onConfirm={() => resolveGuestMigration("merge")}
           onSecondary={() => resolveGuestMigration("discard")}
           onCancel={() => resolveGuestMigration("cancel")}

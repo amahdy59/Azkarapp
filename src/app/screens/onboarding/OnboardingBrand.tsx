@@ -11,7 +11,7 @@ export function BrandCrescent({ size = 96 }: { size?: number }) {
 
 export function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex flex-col items-center text-primary" aria-label="Azkar">
+    <div className="flex flex-col items-center text-primary" role="img" aria-label="Azkar">
       <BrandCrescent size={compact ? 44 : 96} />
       <p
         className={`arabic-ui ${

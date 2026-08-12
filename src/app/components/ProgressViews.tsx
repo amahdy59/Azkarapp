@@ -183,6 +183,7 @@ export function ProgressDayView({
   const categories = visibleCategoryIds
     ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
     : allCategories;
+  const isHomeSubset = visibleCategoryIds !== undefined;
   // Keep the semantic order stable. The RTL grid places Morning at the right
   // edge while preserving the same keyboard and assistive-technology order.
   const displayCategories = categories;
@@ -193,10 +194,16 @@ export function ProgressDayView({
     // Progress screen the parent has no definite height, so both resolve to
     // auto and nothing changes there.
     <div
-      className="mx-auto flex h-full min-h-[19rem] w-full max-w-[44rem] flex-col gap-4 fade-in sm:min-h-[21rem] md:min-h-[22rem]"
+      className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem] ${
+        isHomeSubset ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
+      }`}
       dir={isArabic ? "rtl" : "ltr"}
     >
-      <div className="flex w-full flex-1 flex-col rounded-[28px] border border-white/10 bg-black/35 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-6 md:p-7">
+      <div
+        className={`flex w-full flex-col rounded-[28px] border border-white/10 bg-black/35 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-6 md:p-7 ${
+          isHomeSubset ? "flex-1" : ""
+        }`}
+      >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <h3
@@ -217,7 +224,7 @@ export function ProgressDayView({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4 md:gap-5">
+        <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4 md:gap-5 xl:grid-cols-4">
           {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
             return (
@@ -290,7 +297,10 @@ export function ProgressWeekView({
   const mostMissedName = getCategoryName(weekStats.mostMissedRoutine, language);
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
+    <div
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       {/* Top 3 Stat Cards */}
       <div className="grid grid-cols-3 gap-3">
         {/* Most Missed Routine Card */}
@@ -565,11 +575,30 @@ export function ProgressMonthView({
   const offset = isArabic ? (firstDayOffset + 1) % 7 : firstDayOffset;
 
   const weekdays = isArabic
-    ? ["السبت", "الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة"]
-    : ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    ? [
+        t(language, "progress.weekdaySaturday"),
+        t(language, "progress.weekdaySunday"),
+        t(language, "progress.weekdayMonday"),
+        t(language, "progress.weekdayTuesday"),
+        t(language, "progress.weekdayWednesday"),
+        t(language, "progress.weekdayThursday"),
+        t(language, "progress.weekdayFriday"),
+      ]
+    : [
+        t(language, "progress.weekdaySunday"),
+        t(language, "progress.weekdayMonday"),
+        t(language, "progress.weekdayTuesday"),
+        t(language, "progress.weekdayWednesday"),
+        t(language, "progress.weekdayThursday"),
+        t(language, "progress.weekdayFriday"),
+        t(language, "progress.weekdaySaturday"),
+      ];
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
+    <div
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       {/* Top 4 Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Best Routine */}
@@ -649,11 +678,14 @@ export function ProgressMonthView({
                   type="button"
                   key={day.dayKey}
                   onClick={() => setSelectedDayNum(day.dayNum)}
-                  aria-label={
-                    isArabic
-                      ? `اليوم ${formatNumerals(day.dayNum, language)}، ${isPalm ? "مكتمل" : count > 0 ? `جزئي ${formatNumerals(count, language)} من 4` : "لم يبدأ"}`
-                      : `Day ${day.dayNum}, ${isPalm ? "Complete" : count > 0 ? `Partial ${count} of 4` : "Unstarted"}`
-                  }
+                  aria-label={t(language, "progress.monthDayAria", {
+                    day: formatNumerals(day.dayNum, language),
+                    status: isPalm
+                      ? t(language, "progress.monthDayComplete")
+                      : count > 0
+                        ? t(language, "progress.monthDayPartial", { count: formatNumerals(count, language) })
+                        : t(language, "progress.monthDayUnstarted"),
+                  })}
                   aria-pressed={isSelected}
                   className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     isSelected
@@ -711,9 +743,9 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
               <div>
                 <h4 className="text-[0.9375rem] font-black text-foreground">
-                  {isArabic
-                    ? `تفاصيل اليوم (${formatNumerals(selectedDayNum, language)})`
-                    : `Day ${selectedDayNum} Details`}
+                  {t(language, "progress.selectedDayDetails", {
+                    day: formatNumerals(selectedDayNum, language),
+                  })}
                 </h4>
                 <span className="text-[0.6875rem] font-semibold text-muted-foreground">
                   {selectedDayRecord?.dayKey}
@@ -825,7 +857,10 @@ export function ProgressYearView({
     yearStats.bestMonthIndex === null ? getCategoryName(null, language) : monthNames[yearStats.bestMonthIndex];
 
   return (
-    <div className="flex flex-col gap-4 w-full max-w-[44rem] mx-auto fade-in" dir={isArabic ? "rtl" : "ltr"}>
+    <div
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       {/* Top 4 Stat Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Completion Rate */}

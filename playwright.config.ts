@@ -5,11 +5,11 @@ export default defineConfig({
   testIgnore: ["**/.*", "**/*-temp.spec.ts"],
   fullyParallel: true,
   workers: 3,
-  retries: process.env.CI ? 2 : 0,
+  retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://127.0.0.1:5173",
-    trace: "on-first-retry",
+    baseURL: "http://127.0.0.1:4173",
+    trace: "retain-on-failure",
     reducedMotion: "reduce",
   },
   projects: [
@@ -31,8 +31,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "npm run dev -- --host 127.0.0.1",
-    url: "http://127.0.0.1:5173",
-    reuseExistingServer: !process.env.CI,
+    command: "pnpm test:e2e:serve",
+    url: "http://127.0.0.1:4173",
+    reuseExistingServer: false,
+    timeout: 120_000,
   },
 });

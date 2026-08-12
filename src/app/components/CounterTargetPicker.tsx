@@ -76,7 +76,7 @@ export function CounterTargetPicker({
           }`}
         >
           <SlidersHorizontal size={14} />
-          <span>{isCustomTarget ? formatNumerals(activeTarget, language) : isArabic ? "مخصص" : "Custom"}</span>
+          <span>{isCustomTarget ? formatNumerals(activeTarget, language) : t(language, "counter.custom")}</span>
         </button>
       </div>
 
@@ -92,11 +92,7 @@ export function CounterTargetPicker({
         >
           <div>
             <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">{t(language, "counter.setCustomTarget")}</h3>
-            <p className="mb-4 text-[0.8125rem] text-muted-foreground">
-              {isArabic
-                ? "أدخل العدد المستهدف الذي تريد الوصول إليه (مثلاً 50، 500، 70):"
-                : "Enter your preferred target count (e.g., 50, 500, 70):"}
-            </p>
+            <p className="mb-4 text-[0.8125rem] text-muted-foreground">{t(language, "counter.customTargetHint")}</p>
 
             <form onSubmit={handleCustomSubmit} className="space-y-4">
               <label htmlFor="custom-counter-target" className="block text-[0.8125rem] font-bold text-foreground">

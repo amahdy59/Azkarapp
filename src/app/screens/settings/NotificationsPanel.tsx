@@ -231,11 +231,7 @@ export function NotificationsPanel({
       longitude < -180 ||
       longitude > 180
     ) {
-      setLocationStatus(
-        isArabic
-          ? "أدخل خط عرض بين ‎-90 و90 وخط طول بين ‎-180 و180."
-          : "Enter a latitude from -90 to 90 and longitude from -180 to 180.",
-      );
+      setLocationStatus(t(language, "notifications.invalidCoordinates"));
       setLocationStatusIsError(true);
       return;
     }
@@ -333,9 +329,7 @@ export function NotificationsPanel({
                 {t(language, "notifications.locationPrayerTimes")}
               </h2>
               <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-                {isArabic
-                  ? "يتم حساب مواقيت الصلاة بدقة بناءً على موقعك الجغرافي والتوقيت الصيفي."
-                  : "Prayer times are calculated accurately based on your location and local DST."}
+                {t(language, "notifications.prayerCalculationDescription")}
               </p>
             </div>
           </div>
@@ -354,38 +348,30 @@ export function NotificationsPanel({
               </span>
             </div>
             <p className="mt-2 text-[0.8125rem] font-semibold text-foreground">
-              {timeZoneStatus.daylightSavingActive
-                ? isArabic
-                  ? "التوقيت الصيفي مُفعّل تلقائيًا لهذا التاريخ."
-                  : "Daylight saving time is active automatically for this date."
-                : timeZoneStatus.observesDaylightSaving
-                  ? isArabic
-                    ? "التوقيت القياسي مُفعّل حاليًا، وسيُطبّق التوقيت الصيفي تلقائيًا عند بدايته."
-                    : "Standard time is active; daylight saving will apply automatically when it begins."
-                  : isArabic
-                    ? "هذه المنطقة الزمنية لا تستخدم تغييرًا موسميًا للتوقيت."
-                    : "This time zone does not use a seasonal daylight-saving change."}
+              {t(
+                language,
+                timeZoneStatus.daylightSavingActive
+                  ? "notifications.daylightSavingActive"
+                  : timeZoneStatus.observesDaylightSaving
+                    ? "notifications.standardTimeActive"
+                    : "notifications.noSeasonalTimeChange",
+              )}
             </p>
             <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
-              {locationSettings?.autoDetect
-                ? isArabic
-                  ? "يتحقق التطبيق من المنطقة الزمنية عبر الإحداثيات عند توفر الاتصال، ويستخدم الإعداد المحفوظ دون اتصال."
-                  : "When online, the app checks the time zone from your coordinates; offline, it uses the saved setting."
-                : isArabic
-                  ? "تُستخدم هذه المنطقة الزمنية لحساب المواقيت دون اتصال."
-                  : "This time zone is used for offline prayer calculations."}
+              {t(
+                language,
+                locationSettings?.autoDetect
+                  ? "notifications.automaticTimeZoneHint"
+                  : "notifications.manualTimeZoneHint",
+              )}
             </p>
           </div>
 
           <div className="mt-4 space-y-3">
             <Button type="button" onClick={handleDetectLocation} disabled={isDetectingLocation} className="w-full">
               {isDetectingLocation
-                ? isArabic
-                  ? "جارٍ تحديد الموقع..."
-                  : "Detecting location..."
-                : isArabic
-                  ? "تحديد موقعي تلقائيًا"
-                  : "Detect My Location"}
+                ? t(language, "notifications.detectingLocation")
+                : t(language, "notifications.detectLocation")}
             </Button>
 
             {locationStatus && (
@@ -480,9 +466,7 @@ export function NotificationsPanel({
                 {t(language, "notifications.manualMinuteAdjustments")}
               </legend>
               <p className="mb-3 text-[0.75rem] leading-5 text-muted-foreground">
-                {isArabic
-                  ? "استخدم قيمة موجبة أو سالبة لضبط كل صلاة (من ‎-120 إلى 120 دقيقة)."
-                  : "Use positive or negative values per prayer (-120 to 120 minutes)."}
+                {t(language, "notifications.minuteAdjustmentHint")}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {(

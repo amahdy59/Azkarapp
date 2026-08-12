@@ -20,6 +20,7 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "playwright test",
+    "test:e2e:serve": "vite build && vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
     "budget": "node scripts/check-bundle-budget.mjs",

@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { motion, useReducedMotion } from "motion/react";
+import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
 import { BrandLockup } from "./OnboardingBrand";
 
@@ -33,7 +34,7 @@ export function SplashScreen({ onDone, language }: { onDone: () => void; languag
           lang={arabic ? "ar" : "en"}
           dir={arabic ? "rtl" : "ltr"}
         >
-          {arabic ? "الذكر اليومي للمسلم" : "Daily Remembrance"}
+          {t(language, "onboarding.tagline")}
         </p>
       </motion.div>
 

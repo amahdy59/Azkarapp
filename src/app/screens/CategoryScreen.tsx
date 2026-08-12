@@ -214,9 +214,9 @@ export function CategoryScreen({
                 🔁
               </span>
               <span>
-                {isArabic
-                  ? `تُقال ${formatNumerals(targetCount, language)} مرات`
-                  : `Recite ${formatNumerals(targetCount, language)} times`}
+                {t(language, "category.repetitionInstruction", {
+                  count: formatNumerals(targetCount, language),
+                })}
               </span>
             </div>
           )}

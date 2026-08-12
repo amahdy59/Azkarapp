@@ -288,18 +288,19 @@ export function CustomCounterScreen({
 
             <h3 className="mb-1 text-[1.25rem] font-extrabold text-foreground">{t(language, "counter.goalReached")}</h3>
             <p className="mb-5 text-[0.875rem] text-muted-foreground">
-              {isArabic
-                ? `وصلت إلى ${formatNumerals(target, language)} من "${activeText}". تقبل الله طاعتك!`
-                : `You reached ${formatNumerals(target, language)} repetitions.`}
+              {t(language, "counter.goalReachedDetail", {
+                target: formatNumerals(target, language),
+                zikr: activeText,
+              })}
             </p>
 
             <div className="space-y-2.5">
               <Button onClick={handleContinueCounting} size="lg" className="w-full">
                 <Play size={18} />
                 <span>
-                  {isArabic
-                    ? `متابعة التسبيح (الجولة ${formatNumerals(laps + 2, language)})`
-                    : `Continue Counting (Lap ${laps + 2})`}
+                  {t(language, "counter.continueLap", {
+                    lap: formatNumerals(laps + 2, language),
+                  })}
                 </span>
               </Button>
 

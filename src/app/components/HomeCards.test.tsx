@@ -49,7 +49,7 @@ describe("HomeCards", () => {
       />,
     );
 
-    expect(screen.getByLabelText("1 saved zikr")).toHaveTextContent("1");
+    expect(screen.getByText("1 saved zikr")).toHaveClass("sr-only");
     expect(screen.getByRole("button", { name: /Open Collection: Morning Azkar/i })).toBeDisabled();
     expect(screen.getByRole("status")).toHaveTextContent("Opening saved zikr");
 
@@ -90,31 +90,13 @@ describe("HomeCards", () => {
 
   it("keeps Friday compact by default and exposes virtues only in the expanded variant", () => {
     const { rerender } = render(
-      <FridayHomeCard
-        language="en"
-        direction="ltr"
-        expanded={false}
-        status="start"
-        onOpen={() => undefined}
-        canPreview={false}
-        onTogglePreview={() => undefined}
-      />,
+      <FridayHomeCard language="en" direction="ltr" expanded={false} status="start" onOpen={() => undefined} />,
     );
 
     expect(screen.getByText(/Thursday Maghrib until Friday Maghrib/i)).toBeInTheDocument();
     expect(screen.queryByText("More Friday virtues and reading source")).not.toBeInTheDocument();
 
-    rerender(
-      <FridayHomeCard
-        language="en"
-        direction="ltr"
-        expanded
-        status="continue"
-        onOpen={() => undefined}
-        canPreview={false}
-        onTogglePreview={() => undefined}
-      />,
-    );
+    rerender(<FridayHomeCard language="en" direction="ltr" expanded status="continue" onOpen={() => undefined} />);
     expect(screen.getByRole("button", { name: "Continue Friday companion" })).toBeInTheDocument();
     expect(screen.getByText("More Friday virtues and reading source")).toBeInTheDocument();
   });

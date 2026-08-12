@@ -92,22 +92,16 @@ export function TodayRoutineGarden({
   const targetMonth = displayDate.getMonth();
 
   const completedCount = summary.today.completedCategories.length;
-  const dynamicSubtitle =
+  const dynamicSubtitle = t(
+    language,
     completedCount === 0
-      ? isArabic
-        ? "أكمل أوراد اليوم لتنمو نخلتك"
-        : "Complete today's routines to grow your palm"
+      ? "garden.todayPromptEmpty"
       : completedCount === 1
-        ? isArabic
-          ? "بداية ممتازة! أكمل وردين آخرين لنخلة كاملة 🌴"
-          : "Great start! Complete 2 more routines for a full palm 🌴"
+        ? "garden.todayPromptOne"
         : completedCount === 2
-          ? isArabic
-            ? "أوشكت على الانتهاء! متبقي ورد واحد فقط 🌴"
-            : "Almost there! 1 more routine for a full palm 🌴"
-          : isArabic
-            ? "ماشاء الله! اكتملت جميع أوراد اليوم 🌴"
-            : "Masha'Allah! All today's routines completed! 🌴";
+          ? "garden.todayPromptTwo"
+          : "garden.todayPromptComplete",
+  );
 
   return (
     <section
@@ -258,13 +252,14 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
   const locale = isArabic ? "ar-EG" : "en-US";
 
   return (
-    <div className="space-y-2" aria-label={t(language, "garden.weeklyRecord")}>
+    <div className="space-y-2" role="list" aria-label={t(language, "garden.weeklyRecord")}>
       {summary.days.map((day) => {
         const weekday = new Intl.DateTimeFormat(locale, { weekday: "long" }).format(day.date);
         const azkarCount = day.completedCategories.length;
 
         return (
           <div
+            role="listitem"
             key={day.dayKey}
             data-testid={`garden-day-${day.dayKey}`}
             className="flex items-center justify-between rounded-xl border border-border/70 bg-background/80 px-4 py-2.5"
@@ -273,6 +268,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
             <div className="flex items-center gap-2">
               {day.isPalm ? (
                 <div
+                  role="img"
                   className="flex size-9 items-center justify-center rounded-xl border border-amber-400/80 bg-amber-500/20 text-amber-500 shadow-2xs dark:bg-amber-500/25"
                   title={t(language, "progress.palmCompleted")}
                   aria-label={t(language, "progress.palmCompleted")}
@@ -281,6 +277,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
                 </div>
               ) : azkarCount > 0 ? (
                 <div
+                  role="img"
                   className="flex size-9 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
                   title={t(language, "progress.inProgress")}
                   aria-label={t(language, "progress.inProgress")}
@@ -289,6 +286,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
                 </div>
               ) : (
                 <div
+                  role="img"
                   className="flex size-9 items-center justify-center rounded-xl border border-transparent bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/30"
                   title={t(language, "progress.inactive")}
                   aria-label={t(language, "progress.inactive")}
