@@ -122,6 +122,69 @@ test("text resize: 200% zoom keeps primary navigation usable", async ({ page }) 
   await expectNoHorizontalOverflow(page, "200% zoom Settings");
 });
 
+test("text reflow: 400% zoom equivalent keeps core actions reachable", async ({ page }) => {
+  // WCAG's 1280px-at-400% reflow condition presents as a 320 CSS px viewport.
+  await page.setViewportSize({ width: 320, height: 700 });
+  await seedAndOpen(page);
+
+  await page.getByTestId("nav-azkar").click();
+  const morning = page.getByTestId("category-card-morning");
+  await expect(morning).toBeVisible();
+  await expectNoHorizontalOverflow(page, "400% zoom Library");
+  await morning.click();
+  await expect(page.getByRole("button", { name: /Start Session|Continue/ }).first()).toBeVisible();
+
+  await page.getByTestId("nav-settings").click();
+  await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
+  await expectNoHorizontalOverflow(page, "400% zoom Settings");
+});
+
+test("text spacing overrides do not clip core content or actions", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await seedAndOpen(page);
+  await page.addStyleTag({
+    content: `
+      #main-content * {
+        line-height: 1.5 !important;
+        letter-spacing: 0.12em !important;
+        word-spacing: 0.16em !important;
+      }
+      #main-content p { margin-bottom: 2em !important; }
+    `,
+  });
+
+  await expectNoHorizontalOverflow(page, "text spacing Home");
+  await page.getByTestId("nav-azkar").click();
+  await expect(page.getByTestId("category-card-morning")).toBeVisible();
+  await expectNoHorizontalOverflow(page, "text spacing Library");
+  await page.getByTestId("nav-settings").click();
+  await expect(page.getByRole("button", { name: "Accessibility", exact: true })).toBeVisible();
+  await expectNoHorizontalOverflow(page, "text spacing Settings");
+});
+
+test("reduced motion removes decorative Home particles", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await seedAndOpen(page, { reduceMotion: false });
+
+  const particles = page.locator(".azkar-hero-particles").first();
+  await expect(particles).toBeAttached();
+  await expect(particles).toBeHidden();
+});
+
+test("forced colors preserves focus and selected-state cues", async ({ page }) => {
+  await page.emulateMedia({ forcedColors: "active" });
+  await seedAndOpen(page);
+
+  const home = page.getByTestId("nav-home");
+  await expect(home).toHaveAttribute("aria-current", "page");
+  const selectedOutline = await home.evaluate((element) => getComputedStyle(element).outlineWidth);
+  expect(parseFloat(selectedOutline)).toBeGreaterThanOrEqual(2);
+
+  await page.keyboard.press("Tab");
+  const focusedOutline = await page.evaluate(() => getComputedStyle(document.activeElement as Element).outlineWidth);
+  expect(parseFloat(focusedOutline)).toBeGreaterThanOrEqual(2);
+});
+
 // ─── Prayer time and DST ─────────────────────────────────────────────────────
 // Checklist row: "Effective timezone/offset match the detected location; online
 // and offline results use the selected method."
@@ -158,16 +221,29 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
       const el = document.activeElement as HTMLElement | null;
       if (!el || el === document.body) return null;
       const style = getComputedStyle(el);
+      const rect = el.getBoundingClientRect();
       const hasOutline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth || "0") > 0;
       const hasShadowRing = style.boxShadow !== "none";
       return {
         key: `${el.tagName}:${el.getAttribute("data-testid") ?? el.textContent?.trim().slice(0, 24) ?? ""}`,
         visible: hasOutline || hasShadowRing,
+        unobscured:
+          rect.top >= 0 &&
+          rect.bottom <= window.innerHeight &&
+          rect.left >= 0 &&
+          rect.right <= window.innerWidth &&
+          Boolean(
+            (() => {
+              const topElement = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+              return topElement && (el.contains(topElement) || topElement.contains(el));
+            })(),
+          ),
       };
     });
     if (!info) continue;
     seen.add(info.key);
     expect(info.visible, `no visible focus indicator on ${info.key}`).toBe(true);
+    expect(info.unobscured, `focused control is clipped or obscured: ${info.key}`).toBe(true);
   }
   expect(seen.size, "Tab did not move across distinct controls").toBeGreaterThan(3);
 

@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { Check, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
+import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import {
   getAzkarByCategory,

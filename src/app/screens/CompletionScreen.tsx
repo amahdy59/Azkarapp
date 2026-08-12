@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import confetti from "canvas-confetti";
+import "./CompletionScreen.css";
 import { Check, Home, Share2 } from "../components/icons";
 import { GrowthEventStatus } from "../components/RoutineGarden";
 import { CATEGORIES } from "../content/categories";

@@ -131,6 +131,7 @@ export function SearchScreen({
 
   return (
     <div className="flex flex-col h-full bg-background slide-in-from-right" dir={direction}>
+      <h1 className="sr-only">{t(language, "search.inputAriaLabel")}</h1>
       {/* Search bar */}
       <div className="flex shrink-0 items-end gap-3 px-5 py-3">
         <IconButton onClick={onBack} label={t(language, "common.back")} className="shrink-0">
@@ -207,12 +208,15 @@ export function SearchScreen({
 
         {/* Results */}
         {q.trim().length >= 2 && (
-          <div className="flex flex-col gap-2" aria-live="polite">
-            {results.length > 0 && (
-              <p className="mb-1 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]">
-                {resultCountLabel}
-              </p>
-            )}
+          <div className="flex flex-col gap-2">
+            <p
+              role="status"
+              aria-live="polite"
+              aria-atomic="true"
+              className="mb-1 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]"
+            >
+              {results.length > 0 ? resultCountLabel : t(language, "search.emptyTitle")}
+            </p>
             {results.length === 0 ? (
               <StatePanel
                 kind="empty-search"

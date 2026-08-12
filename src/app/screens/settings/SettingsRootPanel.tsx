@@ -51,6 +51,7 @@ export function SettingsRootPanel({
   locationSettings,
   calendarType = "hijri",
   onCalendarTypeChange,
+  activeSub,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
   language: AppLanguage;
@@ -70,6 +71,11 @@ export function SettingsRootPanel({
   /** When set, highlights the matching row (two-pane layout). */
   activeSub?: SettingsSubScreen;
 }) {
+  const itemProps = (screen: SettingsSubScreen) => ({
+    current: activeSub === screen,
+    testId: `settings-sub-${screen}`,
+  });
+
   return (
     <div className="flex-1 overflow-y-auto pb-8">
       <SettingsSection label={t(language, "settings.preferences")} variant="content">
@@ -185,6 +191,7 @@ export function SettingsRootPanel({
           right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
           onPress={() => onNav("notifications")}
           hasDivider={false}
+          {...itemProps("notifications")}
         />
       </SettingsSection>
 
@@ -195,6 +202,7 @@ export function SettingsRootPanel({
           label={t(language, "settings.offlineAccess")}
           right={<RowValue value={t(language, "settings.included")} />}
           onPress={() => onNav("downloads")}
+          {...itemProps("downloads")}
         />
         <SettingsRowItem
           iconBg={iconBackground}
@@ -203,6 +211,7 @@ export function SettingsRootPanel({
           right={<RowChevron />}
           onPress={() => onNav("sources")}
           hasDivider={false}
+          {...itemProps("sources")}
         />
       </SettingsSection>
 
@@ -214,6 +223,7 @@ export function SettingsRootPanel({
           right={<RowChevron />}
           onPress={() => onNav("accessibility")}
           hasDivider={false}
+          {...itemProps("accessibility")}
         />
       </SettingsSection>
 
@@ -225,6 +235,7 @@ export function SettingsRootPanel({
           right={<RowValue value={t(language, quietProgressEnabled ? "garden.shown" : "garden.hidden")} />}
           onPress={() => onNav("progress")}
           hasDivider={false}
+          {...itemProps("progress")}
         />
       </SettingsSection>
 
@@ -248,6 +259,7 @@ export function SettingsRootPanel({
           }
           onPress={() => onNav("account-data")}
           hasDivider={false}
+          {...itemProps("account-data")}
         />
       </SettingsSection>
 
@@ -258,6 +270,7 @@ export function SettingsRootPanel({
           label={t(language, "settings.helpFaq")}
           right={<RowChevron />}
           onPress={() => onNav("help")}
+          {...itemProps("help")}
         />
         <SettingsRowItem
           iconBg={iconBackground}
@@ -265,6 +278,7 @@ export function SettingsRootPanel({
           label={t(language, "settings.privacyTerms")}
           right={<RowChevron />}
           onPress={() => onNav("legal")}
+          {...itemProps("legal")}
         />
         <SettingsRowItem
           iconBg={iconBackground}
@@ -273,6 +287,7 @@ export function SettingsRootPanel({
           right={<RowChevron />}
           onPress={() => onNav("about")}
           hasDivider={false}
+          {...itemProps("about")}
         />
       </SettingsSection>
     </div>

@@ -233,6 +233,10 @@ test("full surahs count only from the counter and expose sourced difficult-word 
 
   const meaningSheet = page.getByTestId("quran-word-meaning-sheet");
   await expect(meaningSheet).toBeVisible();
+  const closeMeaning = meaningSheet.getByRole("button", { name: "Close word meaning", exact: true });
+  const closeBounds = await closeMeaning.boundingBox();
+  expect(closeBounds?.width ?? 0).toBeGreaterThanOrEqual(44);
+  expect(closeBounds?.height ?? 0).toBeGreaterThanOrEqual(44);
   await expect(meaningSheet.getByRole("link", { name: /Muyassar of Ghareeb Al-Qur'an/ })).toHaveAttribute(
     "href",
     "https://qurancomplex.gov.sa/en/techquran/dev/",
@@ -245,7 +249,7 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   expect(accessibility.violations).toEqual([]);
   await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
 
-  await meaningSheet.getByRole("button", { name: "Close word meaning", exact: true }).click();
+  await closeMeaning.click();
   await expect(meaningSheet).toBeHidden();
   await page.waitForTimeout(500);
 

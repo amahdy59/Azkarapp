@@ -635,7 +635,7 @@ export function HomeScreen({
                                   ? "border-border/70 bg-muted/35 text-foreground hover:bg-muted/60"
                                   : "border-border/60 bg-background/35 text-foreground hover:border-primary/25 hover:bg-muted/50"
                         }`}
-                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${stateLabel}`}
+                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${stateLabel} - ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}${isNextPrayer ? ` - ${nextPrayerInfo.formattedCountdown}` : ""}`}
                         aria-current={isActivePrayer ? "step" : undefined}
                       >
                         <span
@@ -701,6 +701,8 @@ export function HomeScreen({
           </div>
 
           <div
+            role="region"
+            aria-label={t(language, "home.thisWeek")}
             tabIndex={0}
             className="px-page flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
           >

@@ -10,6 +10,8 @@ export interface SettingsRowProps {
   right?: React.ReactNode;
   onPress?: () => void;
   hasDivider?: boolean;
+  current?: boolean;
+  testId?: string;
 }
 
 export function SettingsRowItem({
@@ -20,6 +22,8 @@ export function SettingsRowItem({
   right,
   onPress,
   hasDivider = true,
+  current = false,
+  testId,
 }: SettingsRowProps) {
   const content = (
     <>
@@ -42,7 +46,9 @@ export function SettingsRowItem({
         <button
           type="button"
           onClick={onPress}
-          className="flex min-h-16 w-full items-center gap-3 px-4 py-3 transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          data-testid={testId}
+          aria-current={current ? "page" : undefined}
+          className={`flex min-h-16 w-full items-center gap-3 px-4 py-3 text-start transition-all active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring ${current ? "border-s-4 border-primary" : "border-s-4 border-transparent"}`}
           style={{ background: "var(--card)" }}
         >
           {content}

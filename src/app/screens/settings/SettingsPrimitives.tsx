@@ -24,7 +24,7 @@ export function SubHeader({
   if (isTwoPane) {
     return (
       <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-        <h1 className="text-2xl font-extrabold text-foreground font-sans leading-tight">{title}</h1>
+        <h2 className="text-2xl font-extrabold text-foreground font-sans leading-tight">{title}</h2>
         <div className="flex justify-end items-center">{right}</div>
       </div>
     );
@@ -35,7 +35,13 @@ export function SubHeader({
       <IconButton onClick={onBack} label={t(language, "common.back")}>
         <ArrowPrevious size={20} className="text-foreground" />
       </IconButton>
-      <h1 className="text-[1.5rem] font-extrabold text-foreground font-sans leading-tight">{title}</h1>
+      <h1
+        data-settings-subheading
+        tabIndex={-1}
+        className="text-[1.5rem] font-extrabold text-foreground font-sans leading-tight outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      >
+        {title}
+      </h1>
       <div style={{ width: 44 }} className="flex justify-end items-center">
         {right}
       </div>

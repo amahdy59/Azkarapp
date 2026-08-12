@@ -19,11 +19,13 @@ export function CustomCounterScreen({
   direction,
   onBack,
   hapticFeedback = true,
+  reduceMotion = false,
 }: {
   isArabic: boolean;
   direction: "ltr" | "rtl";
   onBack: () => void;
   hapticFeedback?: boolean;
+  reduceMotion?: boolean;
 }) {
   const language: AppLanguage = isArabic ? "ar" : "en";
 
@@ -210,6 +212,7 @@ export function CustomCounterScreen({
                 instructionText=""
                 testId="custom-counter-surface"
                 className="custom-counter-surface"
+                reduceMotion={reduceMotion}
               />
             </div>
 

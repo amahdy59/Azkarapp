@@ -102,6 +102,19 @@
   }
 }
 
+@media (prefers-reduced-transparency: reduce) {
+  .azkar-hero-particles {
+    display: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .azkar-hero__media,
+  .azkar-hero-particles {
+    display: none;
+  }
+}
+
 .reduce-motion .azkar-hero-particles,
 .reduce-transparency .azkar-hero-particles,
 .high-contrast .azkar-hero-particles {

@@ -1,12 +1,10 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
-import { parseLocation, routeToHash } from "./routing";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "./content/azkar";
 import type {
   AppLanguage,
   AppStateSnapshot,
-  BeforeInstallPromptEvent,
   CategoryId,
   ColorBlindSupport,
   LocationSettings,
@@ -14,9 +12,7 @@ import type {
   RoutineMode,
   TextSizeOption,
   ThemeMode,
-  View,
 } from "./types";
-import type { LibrarySection } from "./screens/AzkarLibraryScreen";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
 import {
@@ -29,24 +25,7 @@ import {
 
 const ONBOARDING_COMPLETE_KEY = "azkarapp.onboarding-complete.v1";
 
-function categoryFromShortcutUrl(): CategoryId | null {
-  const category = new URLSearchParams(window.location.search).get("category");
-  return category === "morning" || category === "evening" || category === "before_sleep" ? category : null;
-}
-
-function isLazyRouteCategory(categoryId: CategoryId): boolean {
-  return categoryId === "comprehensive_duas" || categoryId === "friday_kahf";
-}
-
-async function loadLazyRouteCategory(categoryId: CategoryId) {
-  if (categoryId === "comprehensive_duas") {
-    const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
-    registerLazyCollection(categoryId, COMPREHENSIVE_DUAS);
-  } else if (categoryId === "friday_kahf") {
-    const { FRIDAY_KAHF } = await import("./content/fridayKahf");
-    registerLazyCollection(categoryId, FRIDAY_KAHF);
-  }
-}
+import { useAppRouting, isLazyRouteCategory } from "./hooks/useAppRouting";
 
 import { BottomNav, NavRail, NavSidebar } from "./components/LayoutShells";
 import { useLayoutMode } from "./hooks/useLayoutMode";
@@ -64,12 +43,12 @@ import { AudioProvider } from "./audio/AudioProvider";
 import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
 import { t } from "./i18n";
 import { reportError } from "../lib/observability";
-import { loadReleaseNotes, type ReleaseNotes } from "./releaseNotes";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
 import { getLocationBasedReminders, useForegroundReminders } from "./hooks/useForegroundReminders";
 import { useAuthHandlers, type ConfirmDialogOptions, type GuestMigrationDecision } from "./hooks/useAuthHandlers";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { useSessionHandlers } from "./hooks/useSessionHandlers";
+import { usePwaLifecycle } from "./hooks/usePwaLifecycle";
 import {
   getPalmStreakSummary,
   getFirstIncompleteZikrIndex,
@@ -152,25 +131,9 @@ const AudioContentReviewScreen = lazy(() =>
   import("./screens/AudioContentReviewScreen").then((module) => ({ default: module.AudioContentReviewScreen })),
 );
 
-type NavTab = "home" | "azkar" | "progress" | "settings";
-
-/** Keeps the bottom/rail navigation highlight in step with a restored route. */
-function tabForView(view: View): NavTab {
-  if (view === "settings") return "settings";
-  if (view === "progress") return "progress";
-  if (view === "library" || view === "category" || view === "reader") return "azkar";
-  return "home";
-}
-
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent() {
   const initialState = useRef(loadAppState()).current;
-  // Deep link wins over the splash screen, so a shared or bookmarked URL opens
-  // the screen it names instead of restarting the app at the beginning.
-  const initialRoute = useRef(parseLocation(window.location.search, window.location.hash)).current;
-  const initialShortcutCategory = useRef(categoryFromShortcutUrl()).current;
-  const [view, setView] = useState<View>(() => initialRoute?.view ?? "splash");
-  const initialHistoryView = useRef(view).current;
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
       return window.localStorage.getItem(ONBOARDING_COMPLETE_KEY) === "true";
@@ -182,54 +145,29 @@ function AppContent() {
   const [showAudioReview, setShowAudioReview] = useState(
     () => import.meta.env.DEV && new URLSearchParams(window.location.search).get("audio-review") === "1",
   );
-  const [activeTab, setActiveTab] = useState<"home" | "azkar" | "progress" | "settings">(() =>
-    tabForView(initialRoute?.view ?? "home"),
-  );
-  const [activeCat, setActiveCat] = useState<CategoryId>(initialRoute?.categoryId ?? "morning");
-  const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
-  const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
-  const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
   const [routineModes, setRoutineModes] = useState(initialState.settings.routineModes);
-  const [routeContentLoading, setRouteContentLoading] = useState(
-    () =>
-      initialRoute?.view === "reader" ||
-      Boolean(initialRoute?.categoryId && isLazyRouteCategory(initialRoute.categoryId)),
-  );
-  const [routeContentError, setRouteContentError] = useState<{
-    categoryId: CategoryId;
-    targetView: View;
-    targetIndex: number;
-  } | null>(null);
-  const routeLoadId = useRef(0);
 
-  const hydrateRouteCategory = useCallback(
-    async (categoryId: CategoryId, targetView: View, targetIndex = 0) => {
-      const loadId = ++routeLoadId.current;
-      setRouteContentLoading(true);
-      setRouteContentError(null);
-      try {
-        await loadLazyRouteCategory(categoryId);
-        if (loadId !== routeLoadId.current) return;
-
-        const mode = isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete";
-        const items = getAzkarForMode(categoryId, mode);
-        if (targetView === "reader" && (targetIndex < 0 || targetIndex >= items.length)) {
-          setActiveIdx(0);
-          setView(items.length > 0 ? "category" : "library");
-        }
-        return true;
-      } catch (error) {
-        reportError(error, "route-content-load");
-        if (loadId === routeLoadId.current) {
-          setRouteContentError({ categoryId, targetView, targetIndex });
-        }
-        return false;
-      } finally {
-        if (loadId === routeLoadId.current) setRouteContentLoading(false);
-      }
-    },
-    [routineModes],
-  );
+  const {
+    view,
+    setView,
+    activeTab,
+    setActiveTab,
+    activeCat,
+    setActiveCat,
+    activeIdx,
+    setActiveIdx,
+    searchQuery,
+    setSearchQuery,
+    librarySection,
+    setLibrarySection,
+    routeContentLoading,
+    routeContentError,
+    setRouteContentError,
+    push,
+    pop,
+    handleNavTab,
+    hydrateRouteCategory,
+  } = useAppRouting({ routineModes, hasCompletedOnboarding });
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
   const activeAzkarList = getAzkarForMode(activeCat, activeRoutineMode);
@@ -241,6 +179,20 @@ function AppContent() {
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
+  const {
+    applyUpdate,
+    dismissInstall,
+    dismissUpdate,
+    installApp,
+    installDismissed,
+    installPrompt,
+    isInstalling,
+    isUpdating,
+    pwaError,
+    pwaStatus,
+    releaseNotes,
+    updateAvailable,
+  } = usePwaLifecycle(selectedLang);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
@@ -325,11 +277,6 @@ function AppContent() {
     ensureCurrentFridayWeek();
   }, [ensureCurrentFridayWeek]);
 
-  useEffect(() => {
-    if (initialRoute?.categoryId && (initialRoute.view === "reader" || isLazyRouteCategory(initialRoute.categoryId))) {
-      void hydrateRouteCategory(initialRoute.categoryId, initialRoute.view, initialRoute.index);
-    }
-  }, [hydrateRouteCategory, initialRoute]);
   const [sessions, setSessions] = useState<StoredSession[]>(initialState.sessions);
   const [savedZikrIds, setSavedZikrIds] = useState<Set<string>>(() => new Set(initialState.savedZikrIds));
   const [displayName, setDisplayName] = useState(initialState.profile.displayName);
@@ -339,22 +286,8 @@ function AppContent() {
   const [isGuest, setIsGuest] = useState(initialState.profile.isGuest);
   const [accountUserId, setAccountUserId] = useState(initialState.profile.accountUserId);
   const [remoteSyncReady, setRemoteSyncReady] = useState(false);
-  const [updateAvailable, setUpdateAvailable] = useState(false);
-  const [releaseNotes, setReleaseNotes] = useState<ReleaseNotes | null>(null);
   const [persistenceError, setPersistenceError] = useState(false);
   const [persistenceNoticeDismissed, setPersistenceNoticeDismissed] = useState(false);
-  const [isUpdating, setIsUpdating] = useState(false);
-  const [isInstalling, setIsInstalling] = useState(false);
-  const [pwaError, setPwaError] = useState("");
-  const [pwaStatus, setPwaStatus] = useState("");
-  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
-  const [installDismissed, setInstallDismissed] = useState(() => {
-    try {
-      return window.localStorage.getItem("azkarapp.install-dismissed") === "true";
-    } catch {
-      return false;
-    }
-  });
 
   // ── Confirmation dialog state ──────────────────────────────────────────────
   const [pendingConfirm, setPendingConfirm] = useState<ConfirmDialogOptions | null>(null);
@@ -462,30 +395,6 @@ function AppContent() {
     ],
   );
 
-  // Tracks how many entries *this app* has pushed. window.history.length counts
-  // the whole tab's session, so arriving from another site made it >1 already
-  // and Back navigated out of the app instead of home.
-  const inAppHistoryDepth = useRef(0);
-
-  // Creates the history entry only. The URL itself is written by the sync
-  // effect below, which also catches the places that call setView directly
-  // (keyboard shortcuts, app shortcuts) so the address bar never lies.
-  const push = useCallback((to: View) => {
-    window.history.pushState({ view: to }, "", window.location.href);
-    inAppHistoryDepth.current += 1;
-    setView(to);
-  }, []);
-
-  const pop = useCallback(() => {
-    if (inAppHistoryDepth.current > 0) {
-      // Do not decrement here — history.back() fires popstate, and the popstate
-      // handler owns the decrement so browser-Back and in-app back agree.
-      window.history.back();
-    } else {
-      push("home");
-    }
-  }, [push]);
-
   // Hook modules
   const {
     sessionStart,
@@ -535,7 +444,7 @@ function AppContent() {
       }
       openCategoryWithoutHydration(categoryId);
     },
-    [hydrateRouteCategory, openCategoryWithoutHydration, push],
+    [hydrateRouteCategory, openCategoryWithoutHydration, push, setActiveCat, setActiveTab],
   );
 
   const updateFridayDuaProgress = useCallback((index: number, shouldComplete: boolean) => {
@@ -564,7 +473,7 @@ function AppContent() {
 
   useEffect(() => {
     if (view !== "category" && view !== "reader") setRouteContentError(null);
-  }, [view]);
+  }, [view, setRouteContentError]);
 
   useEffect(() => {
     const plan = audioController.state.plan;
@@ -572,7 +481,15 @@ function AppContent() {
     if (view !== "reader" || !plan || plan.context.category !== activeCat || !playingZikrId) return;
     const matchingIndex = activeAzkarList.findIndex((zikr) => zikr.id === playingZikrId);
     if (matchingIndex >= 0 && matchingIndex !== activeIdx) setActiveIdx(matchingIndex);
-  }, [activeAzkarList, activeCat, activeIdx, audioController.state.entryIndex, audioController.state.plan, view]);
+  }, [
+    activeAzkarList,
+    activeCat,
+    activeIdx,
+    audioController.state.entryIndex,
+    audioController.state.plan,
+    view,
+    setActiveIdx,
+  ]);
 
   const markOnboardingComplete = useCallback(() => {
     setHasCompletedOnboarding(true);
@@ -582,81 +499,6 @@ function AppContent() {
       // Storage failure non-fatal
     }
   }, []);
-
-  const {
-    isSendingOtp,
-    isVerifyingOtp,
-    isResendingOtp,
-    isCompletingProfile,
-    isAuthenticatingOAuth,
-    authError,
-    setAuthError,
-    handleOpenAccountAuth,
-    handleSendOtp,
-    handleVerifyOtp,
-    handleResendOtp,
-    handleOAuth,
-    handleAuthCallback,
-    handleCompleteProfile,
-    handleSignOut,
-  } = useAuthHandlers({
-    selectedLang,
-    email,
-    setEmail,
-    setRemoteSyncReady,
-    appStateSnapshot,
-    applyStateSnapshot: useCallback((state: AppStateSnapshot) => {
-      setSelectedLang(state.settings.language);
-      setThemeMode(state.settings.themeMode);
-      setShowTransliteration(state.settings.showTransliteration);
-      setShowTranslation(state.settings.showTranslation);
-      setTextSize(state.settings.textSize);
-      setHighContrast(state.settings.highContrast);
-      setBoldText(state.settings.boldText);
-      setReduceMotion(state.settings.reduceMotion);
-      setHapticFeedback(state.settings.hapticFeedback);
-      setForceRtl(state.settings.forceRtl);
-      setColorBlindSupport(state.settings.colorBlindSupport);
-      setReminders(state.settings.reminders);
-      setLocationSettings(state.settings.location ?? DEFAULT_LOCATION);
-      setWeeklyGoalDays(state.settings.weeklyGoalDays);
-      setQuietProgressEnabled(state.settings.quietProgressEnabled);
-      setProgressDayStartHour(state.settings.progressDayStartHour);
-      setRoutineModes(state.settings.routineModes);
-      setDisplayName(state.profile.displayName);
-      setEmail(state.profile.email);
-      setPhone(state.profile.phone);
-      setAvatarUrl(state.profile.avatarUrl);
-      setIsGuest(state.profile.isGuest);
-      setAccountUserId(state.profile.accountUserId);
-      setDailyCompletions(state.dailyCompletions);
-      setCompleted(
-        resetStaleCompletedCollections(
-          toCompletedSets(state.completed),
-          state.dailyCompletions,
-          new Date(),
-          state.settings.progressDayStartHour,
-        ),
-      );
-      setSessions(state.sessions);
-      setSavedZikrIds(new Set(state.savedZikrIds));
-    }, []),
-    markOnboardingComplete,
-    requestGuestMigrationDecision,
-    showConfirm,
-    setView,
-    setActiveTab,
-  });
-
-  const { handleExportData, handleResetPreferences, handleClearLocalData, handleDeleteAccount } = useSettingsHandlers({
-    selectedLang,
-    appStateSnapshot,
-    showConfirm,
-  });
-
-  const handleSplashDone = useCallback(() => {
-    setView(hasCompletedOnboarding ? "home" : "language");
-  }, [hasCompletedOnboarding]);
 
   const applyStateSnapshot = useCallback((state: AppStateSnapshot) => {
     setSelectedLang(state.settings.language);
@@ -694,6 +536,46 @@ function AppContent() {
     setSessions(state.sessions);
     setSavedZikrIds(new Set(state.savedZikrIds));
   }, []);
+
+  const {
+    isSendingOtp,
+    isVerifyingOtp,
+    isResendingOtp,
+    isCompletingProfile,
+    isAuthenticatingOAuth,
+    authError,
+    setAuthError,
+    handleOpenAccountAuth,
+    handleSendOtp,
+    handleVerifyOtp,
+    handleResendOtp,
+    handleOAuth,
+    handleAuthCallback,
+    handleCompleteProfile,
+    handleSignOut,
+  } = useAuthHandlers({
+    selectedLang,
+    email,
+    setEmail,
+    setRemoteSyncReady,
+    appStateSnapshot,
+    applyStateSnapshot,
+    markOnboardingComplete,
+    requestGuestMigrationDecision,
+    showConfirm,
+    setView,
+    setActiveTab,
+  });
+
+  const { handleExportData, handleResetPreferences, handleClearLocalData, handleDeleteAccount } = useSettingsHandlers({
+    selectedLang,
+    appStateSnapshot,
+    showConfirm,
+  });
+
+  const handleSplashDone = useCallback(() => {
+    setView(hasCompletedOnboarding ? "home" : "language");
+  }, [hasCompletedOnboarding, setView]);
 
   const {
     isSyncing: isSyncingRemote,
@@ -752,32 +634,6 @@ function AppContent() {
   }, [progressDayStartHour, reconcileDailyProgress]);
 
   useEffect(() => {
-    const handleUpdate = () => {
-      setUpdateAvailable(true);
-      setPwaError("");
-      setReleaseNotes(null);
-      void loadReleaseNotes().then(setReleaseNotes);
-    };
-    const handleInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setInstallPrompt(event as BeforeInstallPromptEvent);
-    };
-    const handleUpdateFailure = () => {
-      setIsUpdating(false);
-      setPwaError(t(selectedLang, "pwa.updateError"));
-    };
-
-    window.addEventListener("azkar-update-available", handleUpdate);
-    window.addEventListener("azkar-update-failed", handleUpdateFailure);
-    window.addEventListener("beforeinstallprompt", handleInstallPrompt);
-    return () => {
-      window.removeEventListener("azkar-update-available", handleUpdate);
-      window.removeEventListener("azkar-update-failed", handleUpdateFailure);
-      window.removeEventListener("beforeinstallprompt", handleInstallPrompt);
-    };
-  }, [selectedLang]);
-
-  useEffect(() => {
     applyAppAppearance({
       themeMode,
       language: selectedLang,
@@ -795,164 +651,6 @@ function AppContent() {
     setPersistenceError(!saved);
     if (saved) setPersistenceNoticeDismissed(false);
   }, [appStateSnapshot]);
-
-  useEffect(() => {
-    if (!window.history.state?.view) {
-      window.history.replaceState({ view: initialHistoryView }, "", window.location.href);
-    }
-  }, [initialHistoryView]);
-
-  // Single writer for the address bar: whatever the app is showing, the URL
-  // says so, and reloading that URL comes back to the same place.
-  useEffect(() => {
-    const hash = routeToHash({ view, categoryId: activeCat, index: activeIdx, query: searchQuery });
-    // Onboarding and auth steps have no linkable route — leave the URL alone.
-    if (!hash) return;
-    const target = `${window.location.pathname}${hash}`;
-    if (`${window.location.pathname}${window.location.hash}` !== target) {
-      window.history.replaceState({ view }, "", target);
-    }
-  }, [view, activeCat, activeIdx, searchQuery]);
-
-  // Adopts whatever the address bar currently says. Idempotent, so it is safe
-  // for popstate and hashchange to both fire for the same navigation.
-  const applyRouteFromLocation = useCallback((): boolean => {
-    const route = parseLocation(window.location.search, window.location.hash);
-    if (!route) return false;
-    setView(route.view);
-    if (route.categoryId) {
-      setActiveCat(route.categoryId);
-      if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
-        void hydrateRouteCategory(route.categoryId, route.view, route.index);
-      } else {
-        routeLoadId.current += 1;
-        setRouteContentLoading(false);
-      }
-    } else {
-      routeLoadId.current += 1;
-      setRouteContentLoading(false);
-    }
-    if (route.index !== undefined) setActiveIdx(route.index);
-    if (route.query !== undefined) setSearchQuery(route.query);
-    setActiveTab(tabForView(route.view));
-    return true;
-  }, [hydrateRouteCategory]);
-
-  useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
-      // Keep the in-app depth counter in step with the browser's own Back
-      // button, not just our pop() helper, so the two never drift apart.
-      inAppHistoryDepth.current = Math.max(0, inAppHistoryDepth.current - 1);
-
-      // The URL is the source of truth; history.state is only a fallback for
-      // entries pushed before the route was written.
-      if (applyRouteFromLocation()) return;
-      if (e.state?.view) {
-        setView(e.state.view);
-        setActiveTab(tabForView(e.state.view));
-      } else {
-        setView(hasCompletedOnboarding ? "home" : "language");
-      }
-    };
-
-    // Typing a route into the address bar, or following an in-page link, fires
-    // hashchange but not popstate — without this the sync effect would simply
-    // overwrite the hash the user just asked for.
-    const handleHashChange = () => {
-      applyRouteFromLocation();
-    };
-
-    window.addEventListener("popstate", handlePopState);
-    window.addEventListener("hashchange", handleHashChange);
-    return () => {
-      window.removeEventListener("popstate", handlePopState);
-      window.removeEventListener("hashchange", handleHashChange);
-    };
-  }, [applyRouteFromLocation, hasCompletedOnboarding, setView, setActiveTab]);
-
-  // Global Keyboard Shortcuts (Cmd+K / Ctrl+K / '/' for search; Alt+1..5 for tabs)
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const activeEl = document.activeElement;
-      if (
-        activeEl &&
-        (activeEl.tagName === "INPUT" ||
-          activeEl.tagName === "TEXTAREA" ||
-          (activeEl as HTMLElement).isContentEditable ||
-          activeEl.getAttribute("role") === "textbox")
-      ) {
-        return;
-      }
-
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setView("search");
-        return;
-      }
-
-      if (e.key === "/" && view !== "reader" && view !== "custom_counter") {
-        e.preventDefault();
-        setView("search");
-        return;
-      }
-
-      if (e.altKey) {
-        if (e.key === "1") {
-          e.preventDefault();
-          setActiveTab("home");
-          setView("home");
-        } else if (e.key === "2") {
-          e.preventDefault();
-          setActiveTab("azkar");
-          setView("library");
-        } else if (e.key === "3") {
-          e.preventDefault();
-          setActiveTab("progress");
-          setView("progress");
-        } else if (e.key === "4") {
-          e.preventDefault();
-          setActiveTab("settings");
-          setView("settings");
-        } else if (e.key === "5") {
-          e.preventDefault();
-          setView("custom_counter");
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [view, setView, setActiveTab]);
-
-  useEffect(() => {
-    if (view !== "home") {
-      return;
-    }
-
-    const category = initialShortcutCategory;
-    if (!category) {
-      return;
-    }
-
-    setActiveCat(category);
-    setActiveTab("azkar");
-    setView("category");
-    window.history.replaceState(null, "", window.location.pathname);
-  }, [initialShortcutCategory, view]);
-
-  const handleNavTab = (tab: "home" | "azkar" | "progress" | "settings") => {
-    setActiveTab(tab);
-    if (tab === "home") {
-      push("home");
-    } else if (tab === "azkar") {
-      setLibrarySection("collections");
-      push("library");
-    } else if (tab === "progress") {
-      push("progress");
-    } else if (tab === "settings") {
-      push("settings");
-    }
-  };
 
   const showBottomNav = [
     "home",
@@ -1313,6 +1011,7 @@ function AppContent() {
                 <FridaySalawatScreen
                   language={selectedLang}
                   direction={layoutDirection}
+                  reduceMotion={reduceMotion}
                   onBack={() => {
                     window.history.replaceState({ view: "friday" }, "", "?view=friday");
                     setView("friday");
@@ -1566,6 +1265,7 @@ function AppContent() {
                   direction={layoutDirection}
                   onBack={pop}
                   hapticFeedback={hapticFeedback}
+                  reduceMotion={reduceMotion}
                 />
               )}
             </Suspense>
@@ -1631,15 +1331,8 @@ function AppContent() {
                 isActionLoading={isUpdating}
                 statusMessage={isUpdating ? t(selectedLang, "pwa.updating") : undefined}
                 errorMessage={pwaError}
-                onAction={() => {
-                  setPwaError("");
-                  setIsUpdating(true);
-                  window.dispatchEvent(new Event("azkar-apply-update"));
-                }}
-                onDismiss={() => {
-                  setUpdateAvailable(false);
-                  setReleaseNotes(null);
-                }}
+                onAction={applyUpdate}
+                onDismiss={dismissUpdate}
               />
             ) : (
               <PwaNotice
@@ -1649,38 +1342,8 @@ function AppContent() {
                 dismissLabel={t(selectedLang, "pwa.later")}
                 isActionLoading={isInstalling}
                 statusMessage={isInstalling ? t(selectedLang, "pwa.installing") : undefined}
-                onAction={() => {
-                  const prompt = installPrompt;
-                  if (!prompt) return;
-                  void (async () => {
-                    try {
-                      setIsInstalling(true);
-                      await prompt.prompt();
-                      const choice = await prompt.userChoice;
-                      setPwaStatus(
-                        t(
-                          selectedLang,
-                          choice?.outcome === "accepted" ? "pwa.installAccepted" : "pwa.installDismissed",
-                        ),
-                      );
-                    } catch (error) {
-                      reportError(error, "pwa-install");
-                      setPwaStatus(t(selectedLang, "pwa.installDismissed"));
-                    } finally {
-                      setIsInstalling(false);
-                      setInstallPrompt(null);
-                      window.setTimeout(() => setPwaStatus(""), 3000);
-                    }
-                  })();
-                }}
-                onDismiss={() => {
-                  try {
-                    window.localStorage.setItem("azkarapp.install-dismissed", "true");
-                  } catch {
-                    // Non-fatal storage failure
-                  }
-                  setInstallDismissed(true);
-                }}
+                onAction={() => void installApp()}
+                onDismiss={dismissInstall}
               />
             )}
           </div>

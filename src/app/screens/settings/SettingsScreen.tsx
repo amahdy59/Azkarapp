@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "motion/react";
 import { Header } from "../../components/LayoutShells";
 import { t } from "../../i18n";
+import { shouldReduceMotion } from "../../motionPreferences";
 import { useLayoutMode } from "../../hooks/useLayoutMode";
 import "./SettingsScreen.css";
 import type {
@@ -132,18 +133,39 @@ export function SettingsScreen({
   onDeleteAccount,
 }: SettingsScreenProps) {
   const [sub, setSub] = useState<SettingsSubScreen>("root");
-  const goBack = () => setSub("root");
+  const focusReturnSub = useRef<SettingsSubScreen>("root");
+  const goBack = () => {
+    const returnSub = focusReturnSub.current;
+    setSub("root");
+    requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>(`[data-testid="settings-sub-${returnSub}"]`)?.focus();
+    });
+  };
   const layoutMode = useLayoutMode();
   const isTwoPaneLayout = layoutMode === "expanded" || layoutMode === "large";
+  const motionReduced = shouldReduceMotion(reduceMotion);
   // On two-pane layout, auto-select accessibility panel if user hasn't chosen one
   const effectiveSub = isTwoPaneLayout && sub === "root" ? "accessibility" : sub;
 
-  const panelVariants = reduceMotion
+  const openSubPanel = (next: SettingsSubScreen) => {
+    focusReturnSub.current = next;
+    setSub(next);
+  };
+
+  useEffect(() => {
+    if (isTwoPaneLayout || sub === "root") return;
+    const frame = requestAnimationFrame(() => {
+      document.querySelector<HTMLElement>("[data-settings-subheading]")?.focus();
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [isTwoPaneLayout, sub]);
+
+  const panelVariants = motionReduced
     ? {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 },
-        transition: { duration: 0.15 },
+        transition: { duration: 0.1 },
       }
     : {
         initial: { x: direction === "rtl" ? "-100%" : "100%", opacity: 0 },
@@ -152,12 +174,12 @@ export function SettingsScreen({
         transition: { type: "tween", duration: 0.22, ease: [0.16, 1, 0.3, 1] },
       };
 
-  const rootVariants = reduceMotion
+  const rootVariants = motionReduced
     ? {
         initial: { opacity: 0 },
         animate: { opacity: 1 },
         exit: { opacity: 0 },
-        transition: { duration: 0.15 },
+        transition: { duration: 0.1 },
       }
     : {
         initial: { x: 0, opacity: 1 },
@@ -175,7 +197,7 @@ export function SettingsScreen({
           <div className="settings-nav-pane">
             <Header title={t(language, "common.settings")} language={language} />
             <SettingsRootPanel
-              onNav={setSub}
+              onNav={openSubPanel}
               language={language}
               direction={direction}
               themeMode={themeMode}
@@ -212,7 +234,7 @@ export function SettingsScreen({
             >
               <Header title={t(language, "common.settings")} language={language} />
               <SettingsRootPanel
-                onNav={setSub}
+                onNav={openSubPanel}
                 language={language}
                 direction={direction}
                 themeMode={themeMode}

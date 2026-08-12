@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import { motion } from "motion/react";
+import "./ZikrComponents.css";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
 import { t } from "../i18n";
+import { shouldReduceMotion } from "../motionPreferences";
 import type { AppLanguage } from "../types";
 
 export const tapRippleStyle: React.CSSProperties = {
@@ -139,6 +141,7 @@ export interface ZikrCounterSurfaceProps {
   className?: string;
   disabled?: boolean;
   testId?: string;
+  reduceMotion?: boolean;
 }
 
 export function ZikrCounterSurface({
@@ -152,12 +155,14 @@ export function ZikrCounterSurface({
   className = "",
   disabled = false,
   testId = "counter-surface",
+  reduceMotion = false,
 }: ZikrCounterSurfaceProps) {
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
   const defaultInstruction = t(language, "reader.tapToCount");
   const activeInstruction = instructionText || defaultInstruction;
+  const reducedMotion = shouldReduceMotion(reduceMotion);
 
   const localizedCount = formatNumerals(count, language);
   const localizedTotal = formatNumerals(total, language);
@@ -177,7 +182,8 @@ export function ZikrCounterSurface({
 
   const handlePointerDown = (event: React.PointerEvent<HTMLButtonElement>) => {
     if (disabled || complete) return;
-    setIsPressed(true);
+    if (!reducedMotion) setIsPressed(true);
+    if (reducedMotion) return;
     const rect = event.currentTarget.getBoundingClientRect();
     setRipples((current) => [
       ...current.slice(-3),
@@ -220,7 +226,7 @@ export function ZikrCounterSurface({
       aria-label={accessibleName}
       className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${className}`}
       initial={false}
-      whileTap={complete ? undefined : { scale: 0.985 }}
+      whileTap={complete || reducedMotion ? undefined : { scale: 0.985 }}
     >
       {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of

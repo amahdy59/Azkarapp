@@ -1,0 +1,360 @@
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.18;
+  }
+  100% {
+    transform: scale(1.08);
+    opacity: 0;
+  }
+}
+
+@keyframes counter-ready-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  50% {
+    opacity: 0.22;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
+}
+
+@keyframes counter-number-pop {
+  0% {
+    opacity: 0.55;
+    transform: translateY(2px) scale(0.86);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes counter-complete-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.68);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 48;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes tap-ripple-expand {
+  from {
+    opacity: 0.48;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 0;
+    transform: scale(32);
+  }
+}
+
+@keyframes adaptive-counter-pulse {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes counter-face-swap {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 4px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.pulse-ring {
+  animation-name: pulse-ring;
+}
+
+.adaptive-counter-surface {
+  position: relative;
+  display: flex;
+  flex: none;
+  width: 220px;
+  max-width: 100%;
+  height: 76px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  isolation: isolate;
+  cursor: pointer;
+  color: var(--foreground);
+  background: color-mix(in srgb, var(--background) 70%, transparent);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
+  border-radius: 38px;
+  box-shadow:
+    0 10px 40px -10px color-mix(in srgb, var(--foreground) 15%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
+  transition:
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
+}
+
+.tap-ripple {
+  animation: tap-ripple-expand 560ms ease-out both;
+}
+
+.adaptive-counter-surface:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.adaptive-counter-surface.is-pressed,
+.adaptive-counter-surface:active:not(:disabled) {
+  transform: scale(0.985);
+  background: color-mix(in srgb, var(--primary) 6%, var(--card));
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+
+.adaptive-counter-surface:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px var(--ring),
+    0 6px 24px color-mix(in srgb, var(--primary) 15%, transparent);
+}
+
+.adaptive-counter-surface:disabled {
+  cursor: default;
+}
+
+.custom-counter-stage .adaptive-counter-surface,
+.salawat-counter-surface {
+  width: min(18rem, 78vw);
+  height: 5.5rem;
+  border-radius: 2.75rem;
+}
+
+.custom-counter-stage .pulse-ring {
+  width: min(17.5rem, 75vw) !important;
+  height: 5rem !important;
+  border-radius: 2.5rem;
+}
+
+@media (min-width: 48rem) {
+  .salawat-counter-surface {
+    width: 20rem;
+    height: 6.5rem;
+    border-radius: 3.25rem;
+  }
+  .custom-counter-stage .adaptive-counter-surface {
+    width: 18rem;
+    height: 6rem;
+    border-radius: 3rem;
+  }
+  .custom-counter-stage .pulse-ring {
+    width: 17.5rem !important;
+    height: 5.5rem !important;
+    border-radius: 3rem;
+  }
+  .custom-counter-stage .counter-number {
+    font-size: 2.25rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .custom-counter-stage .adaptive-counter-surface {
+    width: 28rem;
+    height: 9rem;
+    border-radius: 4.5rem;
+  }
+  .custom-counter-stage .pulse-ring {
+    width: 27.5rem !important;
+    height: 8.5rem !important;
+    border-radius: 4.5rem;
+  }
+  .custom-counter-stage .counter-number {
+    font-size: 3rem;
+  }
+}
+
+.counter-outline-progress {
+  position: absolute;
+  inset: -8px;
+  z-index: 2;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.counter-outline-progress rect {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.adaptive-counter-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 18px;
+}
+
+.adaptive-counter-pulse {
+  position: absolute;
+  inset: 6px;
+  border: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  animation: adaptive-counter-pulse 280ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.adaptive-counter-nav {
+  display: flex;
+  width: 46px;
+  height: 46px;
+  min-width: 46px;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-control);
+  border-radius: 9999px;
+  color: var(--foreground);
+  background: var(--card);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
+  transition:
+    height 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 420ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 160ms ease,
+    border-color 160ms ease,
+    transform 160ms ease,
+    opacity 160ms ease;
+}
+
+.adaptive-counter-nav.is-compact {
+  height: 76px;
+  border-radius: 20px;
+}
+.adaptive-counter-nav:hover:not(:disabled) {
+  background: var(--muted);
+  border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));
+  transform: translateY(-1px);
+}
+.adaptive-counter-nav:active:not(:disabled) {
+  transform: scale(0.94);
+}
+.adaptive-counter-nav:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+.adaptive-counter-nav:disabled {
+  opacity: 0.25;
+}
+
+.counter-ring-ready::after {
+  position: absolute;
+  inset: 4px;
+  border: 2px solid color-mix(in srgb, var(--primary) 50%, transparent);
+  border-radius: inherit;
+  content: "";
+  animation: counter-ready-glow 720ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+.counter-number {
+  animation: counter-number-pop 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.counter-complete-cue,
+.counter-complete-static {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+.counter-complete-cue {
+  animation: counter-complete-pop 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.counter-check-mark {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  color: var(--primary-foreground);
+  background: var(--primary);
+  box-shadow: 0 0 0 5px color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.counter-face-swap {
+  animation: counter-face-swap 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+.counter-complete-label {
+  font-size: 0.9375rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  color: var(--primary);
+}
+.counter-complete-cue .counter-check-mark svg path {
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: check-draw 300ms cubic-bezier(0.22, 1, 0.36, 1) 90ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tap-ripple {
+    display: none;
+  }
+  .counter-outline-progress rect,
+  .adaptive-counter-nav {
+    transition-duration: 0.01ms;
+  }
+  .adaptive-counter-pulse,
+  .counter-number,
+  .counter-ring-ready::after,
+  .counter-complete-cue,
+  .counter-face-swap,
+  .counter-complete-cue .counter-check-mark svg path {
+    animation: none;
+  }
+  .counter-number,
+  .counter-complete-cue,
+  .counter-face-swap {
+    opacity: 1;
+    transform: none;
+  }
+}

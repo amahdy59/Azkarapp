@@ -60,10 +60,12 @@ export function FridaySalawatScreen({
   language,
   direction,
   onBack,
+  reduceMotion = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onBack: () => void;
+  reduceMotion?: boolean;
 }) {
   const copy = COPY[language];
   const [progress, setProgress] = useState(readFridaySalawatProgress);
@@ -90,6 +92,12 @@ export function FridaySalawatScreen({
       ) {
         return;
       }
+      const focusedControl =
+        activeEl instanceof Element &&
+        activeEl.closest(
+          'button, a[href], input, textarea, select, [contenteditable="true"], [role="button"], [role="checkbox"], [role="combobox"], [role="menuitem"], [role="option"], [role="radio"], [role="search"], [role="switch"], [role="tab"], [role="textbox"]',
+        );
+      if (focusedControl) return;
       if (e.key === " " || e.code === "Space") {
         e.preventDefault();
         increment();
@@ -105,6 +113,9 @@ export function FridaySalawatScreen({
   return (
     <ScreenContainer dir={direction} className="px-0 relative" screenName={copy.title}>
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
+      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {complete ? copy.completed : ""}
+      </p>
 
       <div className="relative z-10 flex flex-1 overflow-y-auto px-5 pb-8 pt-3">
         <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-5">
@@ -147,6 +158,7 @@ export function FridaySalawatScreen({
                   instructionText={copy.tap}
                   testId="salawat-counter"
                   className="salawat-counter-surface"
+                  reduceMotion={reduceMotion}
                 />
 
                 <Button

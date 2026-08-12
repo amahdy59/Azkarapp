@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import "./RoutineGarden.css";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";

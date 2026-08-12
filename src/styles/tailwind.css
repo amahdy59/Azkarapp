@@ -1,5 +1,6 @@
 @import "tailwindcss" source(none);
 @source '../app/**/*.{js,ts,jsx,tsx}';
+@source not '../app/**/*.{test,spec}.{js,ts,jsx,tsx}';
 @source not '../app/components/ui/**/*.{js,ts,jsx,tsx}';
 @source '../app/components/ui/{alert-dialog,button,drawer,dropdown-menu,input-otp,scroll-area,select}.tsx';
 

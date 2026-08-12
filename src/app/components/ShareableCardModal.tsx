@@ -70,7 +70,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           type="button"
           onClick={onClose}
           aria-label={t(language, "common.cancel")}
-          className={`absolute top-4 ${isArabic ? "right-4" : "left-4"} z-10 flex size-9 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all`}
+          className={`absolute top-4 ${isArabic ? "right-4" : "left-4"} z-10 flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all`}
         >
           <X size={18} />
         </button>

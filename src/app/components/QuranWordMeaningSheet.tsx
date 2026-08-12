@@ -52,7 +52,7 @@ function WordMeaningContent({
           type="button"
           onClick={onClose}
           aria-label={t(language, "reader.closeWordMeaning")}
-          className="flex h-10 w-10 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
+          className="flex h-11 w-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring cursor-pointer"
         >
           <X size={18} />
         </button>
