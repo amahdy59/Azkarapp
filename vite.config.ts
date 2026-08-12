@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => {
           theme_color: "#0a1228",
           background_color: "#0a1228",
           display: "standalone",
+          id: appBase,
+          start_url: appBase,
+          scope: appBase,
           shortcuts: [
             {
               name: "Morning Azkar",
@@ -69,10 +72,7 @@ export default defineConfig(({ mode }) => {
         workbox: {
           globPatterns: ["**/*.{js,css,html,svg,png,webp,avif,woff2}"],
           globIgnores: [
-            "**/ReaderScreen-*.js",
-            "**/SettingsScreen-*.js",
             "**/FridayModeScreen-*.js",
-            "**/comprehensiveDuas-*.js",
             "Before Sleep.png",
             "Evening.png",
             "Morning.png",

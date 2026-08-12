@@ -28,9 +28,18 @@ async function expectNoWcagViolations(page: import("@playwright/test").Page) {
   const contrastViolations = await page.evaluate(() => {
     const MIN_NORMAL = 4.5;
     const MIN_LARGE = 3.0;
+    const _canvas = document.createElement("canvas");
+    _canvas.width = 1;
+    _canvas.height = 1;
+    const _ctx = _canvas.getContext("2d", { willReadFrequently: true });
+
     function parseRgba(s: string): [number, number, number, number] {
-      const m = s.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
-      return m ? [+m[1], +m[2], +m[3], m[4] !== undefined ? +m[4] : 1] : [0, 0, 0, 1];
+      if (!_ctx) return [0, 0, 0, 1];
+      _ctx.clearRect(0, 0, 1, 1);
+      _ctx.fillStyle = s;
+      _ctx.fillRect(0, 0, 1, 1);
+      const data = _ctx.getImageData(0, 0, 1, 1).data;
+      return [data[0], data[1], data[2], data[3] / 255];
     }
     function blend(fg: [number, number, number, number], bg: [number, number, number]): [number, number, number] {
       const a = fg[3];
@@ -237,4 +246,46 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
   await expect(page.getByTestId("reference-sheet")).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Benefit sheet");
+});
+
+test("dialogs have no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+
+  // Settings dialog
+  await page.getByTestId("nav-settings").click();
+  await page.getByRole("button", { name: "Privacy & terms" }).click();
+  await expect(page.getByRole("heading", { name: "Privacy & terms" })).toBeVisible();
+
+  // Privacy sheet opens a dialog conceptually in some viewports, but here we test the panel
+  await expectNoWcagViolations(page);
+});
+
+test("theme emulation (forced colors/high contrast) has no automatically detectable WCAG A/AA violations", async ({
+  page,
+}) => {
+  await page.emulateMedia({ colorScheme: "dark", forcedColors: "active" });
+  await enterEnglishGuestMode(page);
+  await expectNoWcagViolations(page);
+});
+
+test("custom counter has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.goto("/#/counter");
+  await expect(page.getByRole("heading", { name: "Tasbeeh Counter" })).toBeVisible();
+  await expectNoWcagViolations(page);
+});
+
+test("Friday mode has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.goto("/#/friday");
+  await expect(page.getByRole("heading", { name: /Friday Companion/i })).toBeVisible();
+  await expectNoWcagViolations(page);
+});
+
+test("Saved zikr has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-azkar").click();
+  await page.getByRole("tab", { name: /Saved/ }).click();
+  await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
+  await expectNoWcagViolations(page);
 });

@@ -45,6 +45,18 @@ vi.mock("./screens/onboarding/SplashScreen", () => ({
   },
 }));
 
+vi.mock("./screens/settings/SettingsScreen", () => ({
+  SettingsScreen: () => <h1>Settings</h1>,
+}));
+
+vi.mock("./screens/progress/ProgressScreen", () => ({
+  ProgressScreen: () => <h1>Progress</h1>,
+}));
+
+vi.mock("./screens/ProgressScreen", () => ({
+  ProgressScreen: () => <h1>Progress</h1>,
+}));
+
 // Also import React at the top since we use it in the mock
 import React from "react";
 
