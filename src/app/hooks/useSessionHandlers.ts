@@ -14,6 +14,8 @@ import {
   getNextIncompleteIndex,
   getNextIncompleteZikrIndex,
   recordDailyCollectionCompletion,
+  getEffectiveCompletedForSubcategory,
+  prefixZikrId,
   type GrowthEvent,
 } from "../progress";
 import { t } from "../i18n";
@@ -114,26 +116,10 @@ export function useSessionHandlers({
     push("reader");
   };
 
-  const getEffectiveCompletedForSubcategory = (catId: CategoryId, subCat?: string) => {
-    const rawSet = completed[catId] ?? new Set<string>();
-    if (catId !== "after_prayer" || !subCat) return rawSet;
-    const effective = new Set<string>();
-    for (const id of rawSet) {
-      if (id.startsWith(`${subCat}:`)) {
-        effective.add(id.slice(subCat.length + 1));
-      }
-    }
-    return effective;
-  };
-
-  const prefixZikrId = (catId: CategoryId, zikrId: string, subCat?: string) => {
-    return catId === "after_prayer" && subCat ? `${subCat}:${zikrId}` : zikrId;
-  };
-
   const resumeCategory = (catId: CategoryId, subCat?: string) => {
     const nextIndex = getFirstIncompleteZikrIndex(
       sessionAzkar(catId),
-      getEffectiveCompletedForSubcategory(catId, subCat),
+      getEffectiveCompletedForSubcategory(completed, catId, subCat),
     );
     openReader(catId, nextIndex ?? 0, undefined, subCat);
   };
@@ -171,7 +157,7 @@ export function useSessionHandlers({
     if (!zikrId) {
       return;
     }
-    const effectiveCompleted = getEffectiveCompletedForSubcategory(activeCat, activeSubCategory);
+    const effectiveCompleted = getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory);
     const canonicalCollectionWasAlreadyComplete = azkar.every((zikr) => effectiveCompleted.has(zikr.id));
 
     if (isRepeatSession) {

@@ -55,6 +55,7 @@ import {
   getNextIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
   resetStaleCompletedCollections,
+  getEffectiveCompletedForSubcategory,
   type GrowthEvent,
 } from "./progress";
 
@@ -718,7 +719,11 @@ function AppContent() {
   // The reader is a full-screen reading surface on the bottom-nav tiers: its
   // own header row carries every action it needs, so the tab bar is hidden
   // there and the zikr text plus counter get the whole viewport back.
-  const showBottomNavArea = showBottomNav && view !== "reader" && (layoutMode === "compact" || layoutMode === "medium");
+  const showBottomNavArea =
+    showBottomNav &&
+    view !== "reader" &&
+    view !== "custom_counter" &&
+    (layoutMode === "compact" || layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 
@@ -1029,7 +1034,7 @@ function AppContent() {
                   completed={
                     fridayDuaFlow && activeCat === "comprehensive_duas"
                       ? fridayDuaCompletedIds
-                      : (completed[activeCat] ?? new Set())
+                      : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory)
                   }
                   isArabic={isArabic}
                   direction={layoutDirection}
@@ -1094,14 +1099,16 @@ function AppContent() {
                       ? repeatCompleted.has(activeIdx)
                       : fridayDuaFlow && activeCat === "comprehensive_duas"
                         ? fridayDuaCompletedIds.has(azkar[activeIdx]?.id ?? "")
-                        : (completed[activeCat]?.has(azkar[activeIdx]?.id ?? "") ?? false)
+                        : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory).has(
+                            azkar[activeIdx]?.id ?? "",
+                          )
                   }
                   collectionCompletedCount={
                     isRepeatSession
                       ? repeatCompleted.size
                       : fridayDuaFlow && activeCat === "comprehensive_duas"
                         ? fridayDuaCompletedIds.size
-                        : (completed[activeCat]?.size ?? 0)
+                        : getEffectiveCompletedForSubcategory(completed, activeCat, activeSubCategory).size
                   }
                   hapticFeedback={hapticFeedback}
                   reduceMotion={reduceMotion}

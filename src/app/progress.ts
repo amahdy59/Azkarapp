@@ -534,3 +534,23 @@ export function getNextIncompleteZikrIndex(
   }
   return null;
 }
+
+export function getEffectiveCompletedForSubcategory(
+  completed: Record<CategoryId, Set<string>>,
+  catId: CategoryId,
+  subCat?: string,
+): Set<string> {
+  const rawSet = completed[catId] ?? new Set<string>();
+  if (catId !== "after_prayer" || !subCat) return rawSet;
+  const effective = new Set<string>();
+  for (const id of rawSet) {
+    if (id.startsWith(`${subCat}:`)) {
+      effective.add(id.slice(subCat.length + 1));
+    }
+  }
+  return effective;
+}
+
+export function prefixZikrId(catId: CategoryId, zikrId: string, subCat?: string): string {
+  return catId === "after_prayer" && subCat ? `${subCat}:${zikrId}` : zikrId;
+}
