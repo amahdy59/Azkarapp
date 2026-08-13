@@ -716,14 +716,13 @@ function AppContent() {
 
   // All three nav variants share the same view whitelist, so splash, onboarding
   // and auth never render app navigation regardless of viewport.
-  // The reader is a full-screen reading surface on the bottom-nav tiers: its
+  // The reader is a full-screen reading surface on mobile: its
   // own header row carries every action it needs, so the tab bar is hidden
   // there and the zikr text plus counter get the whole viewport back.
+  // On tablet (medium) and larger, we preserve navigation even during active reading.
   const showBottomNavArea =
     showBottomNav &&
-    view !== "reader" &&
-    view !== "custom_counter" &&
-    (layoutMode === "compact" || layoutMode === "medium");
+    ((layoutMode === "compact" && view !== "reader" && view !== "custom_counter") || layoutMode === "medium");
   const showRail = showBottomNav && layoutMode === "expanded";
   const showSidebar = showBottomNav && layoutMode === "large";
 
