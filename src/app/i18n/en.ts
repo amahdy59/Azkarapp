@@ -1058,6 +1058,8 @@ const en = {
     contentSection: "Content",
     accessibilitySection: "Accessibility",
     progressSection: "Progress",
+    gardenActive: "Garden active",
+    gardenHidden: "Garden hidden",
     accountSection: "Account",
     supportSection: "Support",
     accountNeedsAttention: "Needs attention",

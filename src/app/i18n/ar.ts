@@ -1077,6 +1077,8 @@ const ar = {
     contentSection: "المحتوى",
     accessibilitySection: "إمكانية الوصول",
     progressSection: "التقدم",
+    gardenActive: "الحديقة نشطة",
+    gardenHidden: "الحديقة مخفية",
     accountSection: "الحساب",
     supportSection: "المساعدة",
     accountNeedsAttention: "يتطلب انتباهاً",
