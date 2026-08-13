@@ -10,7 +10,6 @@ import {
   MapPin,
   Moon,
   User,
-  BarChart3,
 } from "../../components/icons";
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
@@ -47,7 +46,6 @@ export function SettingsRootPanel({
   isGuest,
   isSyncing,
   syncError,
-  quietProgressEnabled,
   locationSettings,
   calendarType = "hijri",
   onCalendarTypeChange,
@@ -184,14 +182,7 @@ export function SettingsRootPanel({
             The value shows the configured city, or an explicit unset state:
             defaulting the label to "Cairo" presented a fallback as though the
             user had chosen it. */}
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<BarChart3 size={20} className="text-primary" />}
-          label={t(language, "settings.myProgress")}
-          right={<RowValue value={t(language, quietProgressEnabled ? "garden.shown" : "garden.hidden")} />}
-          onPress={() => onNav("progress")}
-          {...itemProps("progress")}
-        />
+
         <SettingsRowItem
           iconBg={iconBackground}
           icon={<MapPin size={20} className="text-primary" />}

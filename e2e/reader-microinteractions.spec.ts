@@ -356,7 +356,7 @@ for (const locale of [
   }) => {
     await openReturningGuestHome(page, locale.language);
     await page.getByTestId("category-card-morning").click();
-    await page.locator(`button:has([lang='${locale.language}'])`).first().click();
+    await page.getByTestId("start-session-button").click();
     await page.getByRole("button", { name: locale.benefit, exact: true }).click();
 
     const sheet = page.getByTestId("reference-sheet");
@@ -399,7 +399,7 @@ for (const locale of [
     const categoryProgress = page.getByRole("progressbar");
     await expectFillToStartAt(categoryProgress, locale.direction);
 
-    await page.locator(`button:has([lang='${locale.language}'])`).first().click();
+    await page.getByTestId("start-session-button").click();
     await expect(page.getByTestId("zikr-text")).toBeVisible();
 
     const readerProgress = page.getByRole("progressbar");

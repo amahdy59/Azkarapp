@@ -234,7 +234,7 @@ test("Friday dua progress starts weekly even when the canonical collection was c
   await expect(page.getByRole("heading", { name: "Comprehensive Duas", exact: true })).toBeVisible();
   await expect(page.getByText("0 of 47", { exact: true })).toBeVisible();
 
-  await page.getByRole("button", { name: "Not completed — tap to check" }).first().click();
+  await page.getByRole("button", { name: "Not completed — tap to check", exact: true }).first().click();
   await expect(page.getByText("1 of 47", { exact: true })).toBeVisible();
 
   const persisted = await page.evaluate(() => {

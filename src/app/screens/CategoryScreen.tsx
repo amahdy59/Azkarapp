@@ -209,6 +209,7 @@ export function CategoryScreen({
               <>
                 <button
                   type="button"
+                  data-testid="start-session-button"
                   onClick={() => onZikr(Math.max(0, resumeIdx))}
                   className="interactive-elem flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
@@ -403,7 +404,9 @@ export function CategoryScreen({
           )}
 
           {isOccasional ? (
-            <div className="flex flex-col gap-2">{azkar.map((z, index) => renderZikrCard({ z, index }, false))}</div>
+            <div className="flex flex-col gap-2">
+              {azkar.map((z, index) => renderZikrCard({ z, index }, completed.has(z.id)))}
+            </div>
           ) : isMainRoutine ? (
             <div className="mb-6 flex flex-col gap-6">
               {groupedAzkar.map((group) => {
@@ -560,6 +563,11 @@ function ZikrAccordion({
                 onToggleZikr(index);
               }}
               className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={
+                isCardCompleted
+                  ? t(language, "category.completedToggle", { defaultValue: "Completed — tap to uncheck" })
+                  : t(language, "category.remainingToggle", { defaultValue: "Not completed — tap to check" })
+              }
             >
               {isCardCompleted ? (
                 <Check size={24} className="text-emerald-500" strokeWidth={3} />

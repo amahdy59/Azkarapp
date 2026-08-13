@@ -444,55 +444,6 @@ export function HomeScreen({
     >
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
-      {/* Fixed Header Overlay */}
-      <div className="absolute inset-x-0 top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 bg-background/60 backdrop-blur-xl border-b border-border/20 shadow-sm pointer-events-auto">
-        <header
-          data-testid="home-utility-header"
-          className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
-          dir="ltr"
-        >
-          <div data-testid="hijri-date" className="min-w-0 text-[0.8125rem] font-bold text-primary sm:text-[0.9375rem]">
-            <time className="block truncate" dateTime={now.toISOString()}>
-              {formatDisplayDate(now, language, calendarType)}
-            </time>
-          </div>
-
-          <div
-            role="img"
-            data-testid="home-header-stats"
-            className="flex shrink-0 items-center gap-3"
-            aria-label={t(language, "home.headerStatsAria", {
-              palms: formatNumerals(gardenSummary.lifetimePalms, language),
-              leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
-              total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
-              streak: formatNumerals(streakDays, language),
-            })}
-          >
-            <div
-              data-testid="header-streak"
-              className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
-              title={t(language, "progress.dailyStreak")}
-            >
-              <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
-              <span>{formatNumerals(streakDays, language)}</span>
-            </div>
-            <div
-              data-testid="header-palms"
-              className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
-              title={t(language, "progress.palmsTitle")}
-            >
-              <PalmTreeMark
-                size={14}
-                strokeWidth={3}
-                filled={gardenSummary.lifetimePalms > 0}
-                className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
-              />
-              <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-            </div>
-          </div>
-        </header>
-      </div>
-
       {/* Scrollable Content Area */}
       <div
         tabIndex={0}
@@ -500,6 +451,57 @@ export function HomeScreen({
         aria-label={t(language, "home.title")}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
+        {/* Sticky Header Overlay */}
+        <div className="sticky inset-x-0 top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 bg-background/70 backdrop-blur-xl border-b border-border/20 shadow-sm pointer-events-auto">
+          <header
+            data-testid="home-utility-header"
+            className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
+            dir="ltr"
+          >
+            <div
+              data-testid="hijri-date"
+              className="min-w-0 text-[0.8125rem] font-bold text-primary sm:text-[0.9375rem]"
+            >
+              <time className="block truncate" dateTime={now.toISOString()}>
+                {formatDisplayDate(now, language, calendarType)}
+              </time>
+            </div>
+
+            <div
+              role="img"
+              data-testid="home-header-stats"
+              className="flex shrink-0 items-center gap-3"
+              aria-label={t(language, "home.headerStatsAria", {
+                palms: formatNumerals(gardenSummary.lifetimePalms, language),
+                leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
+                total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
+                streak: formatNumerals(streakDays, language),
+              })}
+            >
+              <div
+                data-testid="header-streak"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
+                title={t(language, "progress.dailyStreak")}
+              >
+                <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
+                <span>{formatNumerals(streakDays, language)}</span>
+              </div>
+              <div
+                data-testid="header-palms"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
+                title={t(language, "progress.palmsTitle")}
+              >
+                <PalmTreeMark
+                  size={14}
+                  strokeWidth={3}
+                  filled={gardenSummary.lifetimePalms > 0}
+                  className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
+                />
+                <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
+              </div>
+            </div>
+          </header>
+        </div>
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"

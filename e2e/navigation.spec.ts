@@ -130,7 +130,7 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   await expect(page.getByRole("heading", { name: "Begin", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Qur’anic protection", exact: true })).toBeVisible();
   await expect(page.locator('[data-ritual-group="three_quls"]')).toHaveCount(1);
-  await expect(page.getByText("Core", { exact: true })).not.toHaveCount(0);
+  await expect(page.getByRole("radio", { name: /Core/ })).toBeVisible();
 
   await page.getByRole("button", { name: "Reset Progress", exact: true }).click();
 

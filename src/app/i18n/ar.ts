@@ -944,7 +944,7 @@ const ar = {
     noData: "لا يوجد",
     day: "اليوم",
     days: "أيام",
-    ofSeven: "من 7",
+    ofSeven: "من ٧",
     mostMissed: "أكثر ورد فاتك",
     bestStreak: "أفضل سلسلة",
     completedDays: "أيام مكتملة",

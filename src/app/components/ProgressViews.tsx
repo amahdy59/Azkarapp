@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from "react";
-import { formatNumerals } from "../formatting";
+import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 import {
@@ -779,7 +779,7 @@ export function ProgressMonthView({
                       <Check size={12} strokeWidth={3} className="text-emerald-600 dark:text-emerald-400" />
                     ) : count > 0 ? (
                       <span className="text-[0.5625rem] font-extrabold text-blue-500">
-                        {formatNumerals(count, language)}/4
+                        {formatRatio(count, 4, language)}
                       </span>
                     ) : (
                       <span className="text-[0.625rem] text-muted-foreground/40">-</span>
