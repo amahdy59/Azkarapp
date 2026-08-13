@@ -17,11 +17,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
-import {
-  getLocalizedPreferredTiming,
-  getLocalizedZikrBenefit,
-  hasSpecificRecommendedTiming,
-} from "../content/localizedZikr";
+import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
 
 export function CategoryScreen({
   catId,
@@ -126,167 +122,17 @@ export function CategoryScreen({
       : { done: completedItemCount, total: azkar.length };
 
   const renderZikrCard = ({ z, index }: { z: Zikr; index: number }, isCardCompleted: boolean) => {
-    const targetCount = z.repetitionCount;
-    const showTiming = hasSpecificRecommendedTiming(z);
-    const timingText = getLocalizedPreferredTiming(z, language);
-    const contextTip = getLocalizedZikrBenefit(z, language) || timingText;
-
-    if (isOccasional) {
-      return (
-        <button
-          key={z.id}
-          id={`zikr-card-${index}`}
-          type="button"
-          onClick={() => onZikr(index)}
-          className="flex w-full cursor-pointer flex-col items-center gap-3 bg-transparent p-3 text-center transition-all hover:bg-muted/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          <p
-            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
-            dir={isArabic ? "rtl" : "ltr"}
-            lang={isArabic ? "ar" : "en"}
-          >
-            {isArabic ? z.arabicText : z.translation}
-          </p>
-
-          {/* Repetition Badge for Occasional Cards (if count > 1) */}
-          {targetCount > 1 && (
-            <div
-              className="inline-flex items-center gap-1.5 self-start rounded-xl border border-primary/20 bg-primary/5 px-3 py-1.5 text-[0.8125rem] font-extrabold text-primary"
-              dir={isArabic ? "rtl" : "ltr"}
-            >
-              <span aria-hidden="true" className="shrink-0">
-                🔁
-              </span>
-              <span>
-                {t(language, "category.repetitionInstruction", {
-                  count: formatNumerals(targetCount, language),
-                })}
-              </span>
-            </div>
-          )}
-
-          {/* Suggested Timing / Context Tip Pill for Occasional Cards */}
-          {contextTip && (
-            <div
-              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
-              dir={isArabic ? "rtl" : "ltr"}
-            >
-              <span aria-hidden="true" className="shrink-0">
-                💡
-              </span>
-              <span className="leading-snug">{contextTip}</span>
-            </div>
-          )}
-        </button>
-      );
-    }
-
-    if (isMainRoutine && routineMode === "core") {
-      return (
-        <CoreZikrAccordion
-          key={z.id}
-          z={z}
-          index={index}
-          isCardCompleted={isCardCompleted}
-          language={language}
-          isArabic={isArabic}
-          direction={direction}
-          onZikr={onZikr}
-          onToggleZikr={onToggleZikr}
-        />
-      );
-    }
-
     return (
-      <div
+      <ZikrAccordion
         key={z.id}
-        id={`zikr-card-${index}`}
-        className={`flex w-full flex-col items-center gap-3 bg-transparent p-3 transition-all ${
-          isCardCompleted ? "opacity-60 grayscale" : ""
-        }`}
-      >
-        {/* Card Header & Text — Clicking text opens full Reader */}
-        <button
-          type="button"
-          onClick={() => onZikr(index)}
-          className="interactive-elem min-h-[44px] min-w-0 w-full flex flex-col items-center text-center focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          {isMainRoutine && routineMode === "complete" && z.includedInCore && (
-            <span className="mb-2 inline-flex rounded-full bg-primary/10 px-2.5 py-1 text-[0.6875rem] font-extrabold text-primary">
-              {t(language, "category.coreBadge")}
-            </span>
-          )}
-          {catId === "before_sleep" && z.groupId === "final" && (
-            <span className="mb-2 inline-flex rounded-full bg-amber-500/15 px-2.5 py-1 text-[0.6875rem] font-extrabold text-amber-800 dark:text-amber-200">
-              {t(language, "category.finalWords")}
-            </span>
-          )}
-          {isArabic && z.hasSeekRefuge && (
-            <div className="mb-2 text-center pointer-events-none">
-              <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-                أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
-              </p>
-            </div>
-          )}
-
-          {isArabic && (z.hasBasmalah || z.isSurah) && (
-            <div className="mb-2 text-center pointer-events-none">
-              <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-              </p>
-            </div>
-          )}
-
-          <p
-            className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
-            dir={isArabic ? "rtl" : "ltr"}
-            lang={isArabic ? "ar" : "en"}
-          >
-            {isArabic ? z.arabicText : z.translation}
-          </p>
-        </button>
-
-        {/* Specific Recommended Timing Pill — shown ONLY for specific zikrs */}
-        {showTiming && timingText && (
-          <div
-            className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
-            dir={isArabic ? "rtl" : "ltr"}
-          >
-            <span aria-hidden="true" className="shrink-0">
-              💡
-            </span>
-            <span className="leading-snug">{timingText}</span>
-          </div>
-        )}
-
-        {onToggleZikr ? (
-          <button
-            type="button"
-            onClick={() => onToggleZikr(index)}
-            className={`mt-2 flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              isCardCompleted
-                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/20"
-                : "bg-muted/80 text-muted-foreground border border-border hover:bg-muted"
-            }`}
-          >
-            <span className="text-[0.875rem] font-bold">
-              {t(language, isCardCompleted ? "category.completedButton" : "category.remainingToggle")}
-            </span>
-            {isCardCompleted ? (
-              <Check size={18} strokeWidth={3} />
-            ) : (
-              <div className="size-[18px] rounded-full border-[2.5px] border-current opacity-60" />
-            )}
-          </button>
-        ) : (
-          isCardCompleted && (
-            <div className="mt-2 text-emerald-600 dark:text-emerald-500 flex items-center justify-center gap-1.5">
-              <span className="text-[0.875rem] font-bold">{t(language, "category.completedButton")}</span>
-              <Check size={18} strokeWidth={3} />
-            </div>
-          )
-        )}
-      </div>
+        z={z}
+        index={index}
+        isCardCompleted={isCardCompleted}
+        language={language}
+        isArabic={isArabic}
+        direction={direction}
+        onToggleZikr={onToggleZikr}
+      />
     );
   };
 
@@ -640,14 +486,13 @@ export function CategoryScreen({
   );
 }
 
-function CoreZikrAccordion({
+function ZikrAccordion({
   z,
   index,
   isCardCompleted,
   language,
   isArabic,
   direction,
-  onZikr,
   onToggleZikr,
 }: {
   z: Zikr;
@@ -656,7 +501,6 @@ function CoreZikrAccordion({
   language: "ar" | "en";
   isArabic: boolean;
   direction: "ltr" | "rtl";
-  onZikr: (i: number) => void;
   onToggleZikr?: (i: number) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -669,7 +513,19 @@ function CoreZikrAccordion({
       id={`zikr-card-${index}`}
       className={`flex w-full flex-col bg-transparent transition-all ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
     >
-      <div className="flex w-full items-center p-3 gap-3" dir={direction}>
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => setExpanded(!expanded)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            setExpanded(!expanded);
+          }
+        }}
+        className="flex w-full items-center p-3 gap-3 cursor-pointer outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-t-2xl"
+        dir={direction}
+      >
         {/* Index */}
         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-[0.875rem] font-bold text-muted-foreground">
           {formatNumerals(index + 1, language)}
@@ -690,21 +546,19 @@ function CoreZikrAccordion({
 
         {/* Actions */}
         <div className="flex items-center gap-1 shrink-0">
-          <button
-            type="button"
-            onClick={() => setExpanded(!expanded)}
-            className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-expanded={expanded}
-          >
+          <div className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full">
             <ChevronDown
               size={20}
               className={`text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
             />
-          </button>
+          </div>
           {onToggleZikr && (
             <button
               type="button"
-              onClick={() => onToggleZikr(index)}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleZikr(index);
+              }}
               className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {isCardCompleted ? (
@@ -719,11 +573,7 @@ function CoreZikrAccordion({
 
       {expanded && (
         <div className="flex flex-col items-center gap-3 p-4 pt-1 border-t border-border/20 bg-muted/10">
-          <button
-            type="button"
-            onClick={() => onZikr(index)}
-            className="interactive-elem min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3 focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
+          <div className="min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3">
             {isArabic && z.hasSeekRefuge && (
               <div className="mb-2 text-center pointer-events-none">
                 <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
@@ -745,7 +595,7 @@ function CoreZikrAccordion({
             >
               {isArabic ? z.arabicText : z.translation}
             </p>
-          </button>
+          </div>
 
           {showTiming && timingText && (
             <div
