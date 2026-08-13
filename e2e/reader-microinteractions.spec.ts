@@ -218,13 +218,31 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
   await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
-  await expect(counter).toHaveAccessibleName(/0 \/ 1/);
+
+  // For long multi-page surahs the counter is hidden until the reader reaches
+  // the end of the pages — users must read through before they can count.
+  await expect(counter).toHaveCount(0);
+
   await expect(page.getByTestId("mushaf-page")).toHaveCount(12);
   await expect(page.getByTestId("mushaf-page-separator")).toHaveCount(11);
   await expect(page.getByRole("heading", { name: "Mushaf page 293" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Mushaf page 304" })).not.toBeInViewport();
+
+  // Clicking the text or pressing Space while the counter is hidden must NOT
+  // advance the count (longSurah guard).
+  await reader.click({ position: { x: 2, y: 320 } });
+  await page.keyboard.press("Space");
+
+  // Scroll to the bottom of the reading region to reveal the counter.
+  const scrollRegion = page.getByRole("region", { name: "Zikr reading text" });
+  await scrollRegion.evaluate((el) => {
+    el.scrollTop = el.scrollHeight;
+  });
+  await expect(counter).toBeVisible();
+  await expect(counter).toHaveAccessibleName(/0 \/ 1/);
   await expect(counter).toBeInViewport();
 
+  // Non-counter interactions must still not count after the counter is revealed.
   await reader.click({ position: { x: 2, y: 320 } });
   await page.keyboard.press("Space");
   await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
