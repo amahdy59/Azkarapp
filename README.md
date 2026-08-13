@@ -45,22 +45,29 @@ See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST dete
 
 ## Prerequisites
 
-- Node.js 20 or newer
-- pnpm 9 or newer (`packageManager` is pinned to `pnpm@9.15.0`)
+- Node.js 24.x (`.nvmrc` pins the exact CI patch release)
+- pnpm 11.19.0 (`packageManager` and CI use this exact release)
 - Chromium for Playwright browser tests
 
 ## Local setup
 
 ```bash
-pnpm install
+pnpm run verify:toolchain
+pnpm install --frozen-lockfile
 pnpm dev
 ```
 
-Vite prints the local development URL. To exercise browser tests on a new machine, install Chromium once:
+Use `nvm use` before setup when Node does not match `.nvmrc`. Install pnpm 11.19.0 through your normal package-manager or version-manager bootstrap if `pnpm run verify:toolchain` reports a mismatch. Do not regenerate the lockfile with another pnpm release.
+
+The frozen install activates the repository's tracked pre-push hook through `core.hooksPath`. That hook verifies the toolchain and dependency graph, then runs the quality, browser, and Pages gates before Git can push.
+
+Vite prints the local development URL. To exercise browser tests on a new machine, install the repository-pinned browser engines once:
 
 ```bash
-pnpm exec playwright install --with-deps chromium
+pnpm setup:browsers
 ```
+
+Local and CI tests both use Playwright's pinned Chromium, Firefox, and WebKit revisions; they do not depend on a separately installed system Chrome.
 
 ### Environment variables
 
@@ -94,6 +101,7 @@ Never commit `.env` or service-role credentials. The app remains usable as a loc
 | `pnpm build`                   | Create the production build in `dist/`                                                    |
 | `pnpm build:pages`             | Build with the GitHub Pages base path and enforce the bundle budget                       |
 | `pnpm preview`                 | Preview the production build locally                                                      |
+| `pnpm setup:browsers`          | Install the pinned Chromium, Firefox, and WebKit test engines                             |
 | `pnpm check`                   | Run formatting check, ESLint, TypeScript, unit tests, production build, and bundle budget |
 | `pnpm test:run`                | Run all unit tests once                                                                   |
 | `pnpm test:e2e`                | Run Playwright tests across desktop Chromium, Firefox, WebKit, mobile, and tablet         |
@@ -104,7 +112,7 @@ Never commit `.env` or service-role credentials. The app remains usable as a loc
 | `pnpm validate:audio`          | Validate manifest, mappings, metadata, Qur'an ranges, and hosted audio                    |
 | `pnpm report:audio -- --write` | Regenerate the approved/unmatched audio mapping report                                    |
 
-Run `pnpm check` and `pnpm test:e2e` before merging or releasing.
+Run `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test:e2e`, and `pnpm build:pages` before pushing. The repository pre-push hook enforces this sequence.
 
 ## Architecture
 
@@ -199,9 +207,17 @@ Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_S
 3. Update `public/release-notes.json` with the 3–5 most important user-facing changes in simple Arabic and English.
 4. Add or update colocated unit tests and relevant Playwright coverage.
 5. Update documentation when behavior, state shape, environment variables, or operational procedures change.
-6. Run `pnpm check` and the relevant Playwright specs.
+6. Run `pnpm run verify:toolchain`, `pnpm install --frozen-lockfile`, `pnpm check`, the relevant Playwright specs, and `pnpm build:pages`.
 7. Commit and push only after all required checks pass.
 8. Confirm the GitHub Quality and Pages workflows complete successfully.
+
+### Dependency updates
+
+- Keep the seven-day `minimumReleaseAge` quarantine in `pnpm-workspace.yaml`; do not bypass it to make an install green.
+- Add dependencies with the pinned pnpm release and commit `package.json` and `pnpm-lock.yaml` together.
+- If the newest release is quarantined, select an eligible reviewed release or wait for the quarantine to expire.
+- Treat any quarantine exception as a separate, documented security decision rather than an ordinary dependency update.
+- Pull requests and direct `main` pushes run the frozen install, quality suite, full browser suite, Pages build, and production dependency audit.
 
 Documentation sources of truth:
 

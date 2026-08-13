@@ -6,6 +6,7 @@ dist/
 coverage/
 playwright-report/
 test-results/
+.playwright-dist/
 *.log
 *.png
 # ...but phase evidence is a deliberate, reviewed artifact. The blanket *.png

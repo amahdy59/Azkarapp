@@ -4,7 +4,7 @@ This document makes the project checklist auditable. A recommendation is **met**
 
 ## Automated gates
 
-Every pull request must pass `pnpm check` and `pnpm test:e2e`.
+Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test:e2e`, `pnpm build:pages`, and `pnpm audit:prod`.
 
 | Concern               | Evidence                                                                                                     |
 | --------------------- | ------------------------------------------------------------------------------------------------------------ |
@@ -14,9 +14,11 @@ Every pull request must pass `pnpm check` and `pnpm test:e2e`.
 | Accessibility         | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks                  |
 | Browser compatibility | Full Chromium viewport matrix plus Firefox desktop and WebKit mobile core-flow smoke tests                   |
 | Performance           | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                                         |
-| Supply chain          | `pnpm audit:prod` during dependency updates and release review                                               |
+| Supply chain          | Exact pnpm pin, frozen lockfile, seven-day quarantine, and `pnpm audit:prod` on PRs and `main` pushes        |
 | Secrets               | Runtime environment variables; `.env*` excluded except `.env.example`                                        |
 | Deployment            | The Pages workflow runs all non-browser quality gates before building                                        |
+
+Dependency updates must be resolved with the pnpm release declared by `packageManager`. A package that is younger than `minimumReleaseAge` must not enter the lockfile through a local-policy bypass. Select an eligible reviewed release, wait for the quarantine to expire, or record an explicit security exception before changing `minimumReleaseAgeExclude`.
 
 Current per-file production budgets are 450 KiB JavaScript, 120 KiB CSS, and 1 MiB for another asset, with compressed ceilings of 130 KiB per JavaScript file and 20 KiB per CSS file. The complete initial route graph, derived from Vite's build manifest, must remain below 200 KiB gzip including HTML, static JavaScript imports, and CSS. Reducing a budget is encouraged; any increase requires a fresh production measurement and justification in the pull request.
 

@@ -19,23 +19,30 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
   // Test navigating into a sub-panel to verify full focus trap / keyboard flow
   const accessibilityRow = page.getByRole("button", { name: /Accessibility/i });
   await accessibilityRow.focus();
-  await page.keyboard.press("Enter");
+  await expect(accessibilityRow).toBeFocused();
+  await accessibilityRow.press("Enter");
 
   // Now in Accessibility panel
   await expect(page.getByRole("heading", { name: "Accessibility", exact: true }).last()).toBeVisible();
+  const compactSubheading = page.locator("[data-settings-subheading]");
+  if (await compactSubheading.isVisible()) {
+    await expect(compactSubheading).toBeFocused();
+  }
 
   // Now test a switch here
   const highContrastSwitch = page.getByRole("switch", { name: /High contrast/i });
   await highContrastSwitch.focus();
+  await expect(highContrastSwitch).toBeFocused();
   const initialState = await highContrastSwitch.getAttribute("aria-checked");
-  await page.keyboard.press("Space");
+  await highContrastSwitch.press("Space");
   await expect(highContrastSwitch).toHaveAttribute("aria-checked", initialState === "true" ? "false" : "true");
 
   // Press back if visible (mobile)
   const backBtn = page.getByRole("button", { name: /Back/i });
   if (await backBtn.isVisible()) {
     await backBtn.focus();
-    await page.keyboard.press("Enter");
+    await expect(backBtn).toBeFocused();
+    await backBtn.press("Enter");
   }
 
   await expect(page.getByRole("heading", { name: /Preferences/i }).first()).toBeVisible();

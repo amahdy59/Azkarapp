@@ -48,3 +48,13 @@ The following dependencies are outdated:
 - **CI Workflows**: GitHub Actions uses Secrets management for deployments.
 
 No critical secret exposure exists.
+
+## 5. Toolchain and package-age enforcement
+
+- **Node:** CI uses the exact `.nvmrc` release; local verification requires the same Node major supported by `package.json`.
+- **pnpm:** `packageManager`, `engines.pnpm`, GitHub Actions, and the pre-push check converge on pnpm 11.19.0.
+- **Package quarantine:** `minimumReleaseAge: 10080` rejects packages published within the last seven days.
+- **Frozen graph:** local pushes and CI begin with `pnpm install --frozen-lockfile`.
+- **Hook activation:** the install `prepare` script configures `core.hooksPath=.githooks`, so fresh clones enforce the tracked pre-push release gate.
+- **Dependency gate:** Quality runs the normal checks, full Playwright suite, GitHub Pages build, and production audit on pull requests and direct `main` pushes.
+- **2026-08-13 remediation:** `@testing-library/user-event` is pinned to eligible 14.6.3 because 14.6.4 was published on 2026-08-11 and correctly failed the quarantine.

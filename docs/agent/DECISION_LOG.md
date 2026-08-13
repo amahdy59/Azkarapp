@@ -1016,3 +1016,16 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** E2E startup includes one production build but removes HMR/on-demand-transform contention. A real application failure is no longer silently retried in CI. Progress uses available desktop space while compact and Home-specific reading measures remain bounded. No persistence, prayer calculation, reviewed content, runtime dependency, or route contract changes.
 - **Tests/evidence required:** Unit tests for both lint rules; targeted responsive and i18n tests; full `pnpm check`; full retry-free Playwright matrix; Pages build; deliberate compact/tablet/desktop evidence refresh; green Pages workflow and production SHA smoke verification.
 - **Supersedes:** The dev-server and implicit-current-screenshot defaults in the test harness only.
+
+---
+
+## DEC-056 — Pre-Phase-12 reproducible toolchain and dependency quarantine
+
+- **Date:** 2026-08-13
+- **Status:** Approved
+- **Owner:** User (approved all recommended tooling-hardening actions before Phase 12).
+- **Related scope:** Pre-Phase-12 release and supply-chain reliability
+- **Context:** A fresh local gate was blocked before tests because `@testing-library/user-event@14.6.4` entered the lockfile one day after publication while the repository requires a seven-day package quarantine. The repository also declared pnpm 9.15.0, the Codex runtime used pnpm 11.19.0, and the existing pre-push hook did not run the frozen install, browser suite, or Pages build required by `AGENTS.md`.
+- **Decision:** Pin pnpm 11.19.0 in one package metadata source and make local verification and GitHub Actions enforce it. Preserve Node 24 as the supported local major and `.nvmrc` as CI's exact patch source. Pin `@testing-library/user-event` to eligible 14.6.3, preserve the seven-day quarantine with no exception, and require frozen install, quality, full browser, and Pages gates before push. The frozen install activates the tracked hook through `core.hooksPath`. Quality runs on pull requests and direct `main` pushes and additionally runs the production dependency audit. Local and CI Playwright projects use the same pinned browser revisions instead of requiring a separate local Chrome channel. Local runs use two workers to avoid page crashes under sustained Windows desktop load; CI retains three workers. Retries remain disabled everywhere.
+- **Consequences:** Dependency adoption can intentionally lag a newly published release by seven days. Local pushes take longer but now match the documented release gate. No runtime dependency, application behavior, persistence, religious content, or deployment topology changes.
+- **Tests/evidence required:** Toolchain-verifier unit tests; pinned-toolchain check; frozen install; `pnpm check`; `pnpm test:e2e`; `pnpm build:pages`; `pnpm audit:prod`; green Quality and Pages workflows; production SHA smoke verification.

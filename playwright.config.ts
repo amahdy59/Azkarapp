@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./e2e",
   testIgnore: ["**/.*", "**/*-temp.spec.ts"],
   fullyParallel: true,
-  workers: 3,
+  workers: process.env.CI ? 3 : 2,
   retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {
@@ -14,11 +14,11 @@ export default defineConfig({
   },
   timeout: 60_000,
   projects: [
-    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"], channel: process.env.CI ? undefined : "chrome" } },
-    { name: "mobile-chromium", use: { ...devices["Pixel 7"], channel: process.env.CI ? undefined : "chrome" } },
+    { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
+    { name: "mobile-chromium", use: { ...devices["Pixel 7"] } },
     {
       name: "tablet-chromium",
-      use: { ...devices["iPad Pro 11"], browserName: "chromium", channel: process.env.CI ? undefined : "chrome" },
+      use: { ...devices["iPad Pro 11"], browserName: "chromium" },
     },
     {
       name: "desktop-firefox-smoke",

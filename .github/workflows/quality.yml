@@ -1,6 +1,9 @@
 name: Quality
 
 on:
+  push:
+    branches:
+      - "main"
   pull_request:
   workflow_dispatch:
 
@@ -20,3 +23,11 @@ jobs:
         uses: ./.github/actions/setup-and-test
         with:
           vite-audio-base-url: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Verify GitHub Pages build
+        run: pnpm build:pages
+        env:
+          VITE_AUDIO_BASE_URL: ${{ vars.VITE_AUDIO_BASE_URL }}
+
+      - name: Audit production dependencies
+        run: pnpm audit:prod

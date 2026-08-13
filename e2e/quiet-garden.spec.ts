@@ -104,8 +104,8 @@ for (const language of ["en", "ar"] as const) {
     await page.getByTestId("nav-progress").click();
 
     const garden = page.getByTestId("today-garden-card");
-    await expect(garden).toBeVisible();
     const dayView = garden.locator('[role="tabpanel"]');
+    await expect(dayView).toBeVisible();
     const box = await dayView.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThan(800);

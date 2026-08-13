@@ -1,26 +1,59 @@
 #!/bin/sh
 
-# Verify the local Node major matches .nvmrc before trusting anything below.
-#
-# This hook runs the same commands as CI but on the *local* toolchain, so a
-# runtime-version gap is invisible to it by construction. That is not
-# hypothetical: fs.globSync (Node 22+) passed here on Node 24 and failed the
-# build on CI's Node 20, and two further pushes went red before it was noticed.
-if [ -f .nvmrc ]; then
-  expected_major=$(sed 's/^v//' .nvmrc | cut -d. -f1)
-  actual_major=$(node -v | sed 's/^v//' | cut -d. -f1)
-  if [ "$expected_major" != "$actual_major" ]; then
-    echo "❌ Node version mismatch: .nvmrc wants v${expected_major}.x but this shell has $(node -v)."
-    echo "   CI installs the .nvmrc version, so passing here would not mean passing there."
-    echo "   Run 'nvm use' (or install Node ${expected_major}) and push again."
-    exit 1
+set -e
+
+resolve_pnpm() {
+  if command -v pnpm >/dev/null 2>&1; then
+    PNPM="pnpm"
+    return
+  fi
+
+  # Git for Windows hooks run under sh, which does not resolve .cmd shims
+  # when they are invoked without their extension. where.exe still resolves
+  # the shim through Windows' PATHEXT rules.
+  if command -v where.exe >/dev/null 2>&1; then
+    pnpm_candidates=$(where.exe pnpm 2>/dev/null || true)
+    if [ -n "$pnpm_candidates" ]; then
+      old_ifs=$IFS
+      IFS='
+'
+      set -- $pnpm_candidates
+      IFS=$old_ifs
+      PNPM=$1
+      return
+    fi
+  fi
+
+  echo "pnpm was not found. Install the repository-pinned pnpm version before pushing." >&2
+  exit 1
+}
+
+resolve_pnpm
+
+if ! command -v node >/dev/null 2>&1 && [ "$PNPM" != "pnpm" ]; then
+  pnpm_posix=$(printf '%s' "$PNPM" | sed 's#\\#/#g; s#^\([A-Za-z]\):#/\1#')
+  pnpm_runtime_root=$(dirname "$(dirname "$(dirname "$pnpm_posix")")")
+  bundled_node_dir="$pnpm_runtime_root/node/bin"
+  if [ -x "$bundled_node_dir/node.exe" ]; then
+    PATH="$bundled_node_dir:$PATH"
+    export PATH
   fi
 fi
 
-echo "Running pre-push quality checks (prettier, eslint, tsc, vitest, build, budget)..."
-npm run check
-if [ $? -ne 0 ]; then
-  echo "❌ Pre-push check failed! Please fix the errors above before pushing."
+if ! command -v node >/dev/null 2>&1; then
+  echo "node was not found. Install the Node version pinned by .nvmrc before pushing." >&2
   exit 1
 fi
-echo "✅ All quality checks passed!"
+
+echo "Verifying the pinned Node and pnpm toolchain..."
+"$PNPM" run verify:toolchain
+
+echo "Verifying the frozen dependency graph and seven-day package quarantine..."
+"$PNPM" install --frozen-lockfile
+
+echo "Running repository quality gates..."
+"$PNPM" check
+"$PNPM" test:e2e
+"$PNPM" build:pages
+
+echo "All pre-push release gates passed."

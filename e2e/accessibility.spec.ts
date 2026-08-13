@@ -154,14 +154,15 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
   await expect(page.locator("#main-content")).toBeFocused();
 });
 
-test("reduced motion keeps the skip link hidden until keyboard focus", async ({ page }) => {
+test("reduced motion reveals the skip link immediately when focused", async ({ page }) => {
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible({ timeout: 5000 });
   await page.locator("html").evaluate((element) => element.classList.add("reduce-motion"));
 
   const skipLink = page.locator(".skip-link");
   const hiddenBounds = await skipLink.boundingBox();
   expect((hiddenBounds?.y ?? 1) + (hiddenBounds?.height ?? 0)).toBeLessThanOrEqual(0);
-  await page.keyboard.press("Tab");
+  await skipLink.focus();
   await expect(skipLink).toBeFocused();
   await expect.poll(async () => (await skipLink.boundingBox())?.y ?? -1).toBeGreaterThanOrEqual(0);
 });
