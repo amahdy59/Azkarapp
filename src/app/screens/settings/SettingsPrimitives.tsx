@@ -24,7 +24,16 @@ export function SubHeader({
   if (isTwoPane) {
     return (
       <div className="flex items-center justify-between px-4 pt-4 pb-2 shrink-0">
-        <h2 className="text-2xl font-extrabold text-foreground font-sans leading-tight">{title}</h2>
+        <h2
+          aria-label={
+            title === t(language, "settings.accessibility")
+              ? t(language, "settings.accessibilityDetailHeading")
+              : undefined
+          }
+          className="block min-w-0 flex-1 truncate whitespace-nowrap font-sans text-2xl font-extrabold leading-tight text-foreground"
+        >
+          {title}
+        </h2>
         <div className="flex justify-end items-center">{right}</div>
       </div>
     );
@@ -38,7 +47,7 @@ export function SubHeader({
       <h1
         data-settings-subheading
         tabIndex={-1}
-        className="text-[1.5rem] font-extrabold text-foreground font-sans leading-tight outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-sans text-[1.25rem] font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-[1.5rem]"
       >
         {title}
       </h1>

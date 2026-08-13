@@ -395,7 +395,10 @@ export function ReaderScreen({
     return null;
   }
 
-  const counterInstruction = t(language, longSurah ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere");
+  const counterInstruction = t(
+    language,
+    longSurah ? "reader.tapCounterWhenFinished" : isDesktopReader ? "reader.tapAnywhereDesktop" : "reader.tapAnywhere",
+  );
   const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);

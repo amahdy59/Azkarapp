@@ -1029,3 +1029,17 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** Pin pnpm 11.19.0 in one package metadata source and make local verification and GitHub Actions enforce it. Preserve Node 24 as the supported local major and `.nvmrc` as CI's exact patch source. Pin `@testing-library/user-event` to eligible 14.6.3, preserve the seven-day quarantine with no exception, and require frozen install, quality, full browser, and Pages gates before push. The frozen install activates the tracked hook through `core.hooksPath`. Quality runs on pull requests and direct `main` pushes and additionally runs the production dependency audit. Local and CI Playwright projects use the same pinned browser revisions instead of requiring a separate local Chrome channel. Local runs use two workers to avoid page crashes under sustained Windows desktop load; CI retains three workers. Retries remain disabled everywhere.
 - **Consequences:** Dependency adoption can intentionally lag a newly published release by seven days. Local pushes take longer but now match the documented release gate. No runtime dependency, application behavior, persistence, religious content, or deployment topology changes.
 - **Tests/evidence required:** Toolchain-verifier unit tests; pinned-toolchain check; frozen install; `pnpm check`; `pnpm test:e2e`; `pnpm build:pages`; `pnpm audit:prod`; green Quality and Pages workflows; production SHA smoke verification.
+
+---
+
+## DEC-057 — Phase 12 semantic remediation and one-line mobile headings
+
+- **Date:** 2026-08-13
+- **Status:** Approved
+- **Owner:** User (approved the Phase 12 plan and explicitly required phone headings to remain visible, contained, and on one line).
+- **Related phase:** Phase 12
+- **Context:** The audit found skipped Progress heading levels, an unannounced in-place Library filter, duplicate same-name Benefit headings, mismatched Reader counter instructions, and ambiguous two-pane Settings headings. The user identified the OnePlus Nord 4 as the representative physical Android device and required that semantic remediation must not produce oversized or two-line phone headings.
+- **Decision:** Correct semantic heading levels without increasing visual typography. Keep primary phone headings on one line, at or below 20 CSS px in the asserted phone profiles, with truncation only as a last-resort overflow safeguard. Validate 320px, 390px, and a 412×924 representative OnePlus Nord 4 CSS viewport; include Arabic at the OnePlus size. Add polite localized collection-filter announcements, one authoritative Benefit dialog heading, consistent Reader instructions, and a uniquely named Accessibility detail heading. Preserve all other Settings accessible names.
+- **Manual evidence:** Automated emulation does not certify TalkBack speech or physical cutout behavior. Those rows remain pending until tested on the real OnePlus Nord 4.
+- **Consequences:** Progress visual styling stays materially unchanged except the Week view uses 16 CSS px at the narrowest phone width to keep the complete English label visible. No content, persistence, prayer, route, dependency, or synchronization contract changes.
+- **Tests/evidence required:** Focused unit tests, heading/live-region/dialog/Reader browser regressions, one-line English and Arabic viewport checks, `pnpm check`, retry-free full Playwright, Pages build, green workflows, production SHA verification, and dated real TalkBack/cutout evidence before Phase 12 is declared complete.

@@ -1,14 +1,14 @@
 {
   "ar": [
-    "أصبح عرض التقدم أوسع وأكثر استفادة من مساحة سطح المكتب، مع بقاء التخطيط مريحًا على الهاتف والجهاز اللوحي.",
-    "تحسّن ثبات التخطيط بالعربية والإنجليزية عند تكبير المتصفح واستخدام أكبر حجم للنص.",
-    "أصبحت التسميات وحالات الأيام والإرشادات مكتملة باللغة المختارة وأكثر وضوحًا لقارئات الشاشة.",
-    "أزيل زر معاينة الجمعة المؤقت، وأضيف وصف موجز لبطاقة فوائد الذكر."
+    "أصبحت عناوين التقدم أوضح لقارئات الشاشة مع بقائها في سطر واحد وبحجم مناسب على الهواتف.",
+    "يعلن البحث داخل مكتبة الأذكار الآن عدد المجموعات المطابقة بطريقة موجزة.",
+    "تحسّن وصف نافذة الفائدة وإعدادات إمكانية الوصول دون تغيير المحتوى الديني.",
+    "أصبحت إرشادات عدّاد القراءة متسقة بين النص الظاهر وقارئات الشاشة."
   ],
   "en": [
-    "Progress now uses desktop space more effectively while staying comfortable on phones and tablets.",
-    "Arabic and English layouts are more resilient at browser zoom and the largest app text setting.",
-    "Labels, day states, and guidance now stay in the selected language with clearer screen-reader semantics.",
-    "The temporary Friday preview control is gone, and the Benefits card now includes a concise description."
+    "Progress headings are clearer to screen readers while staying compact and single-line on phones.",
+    "Filtering the Azkar Library now announces the matching collection count concisely.",
+    "Benefit dialog and Accessibility settings headings are less ambiguous without changing religious content.",
+    "Reader counter guidance is now consistent between visible text and assistive technology."
   ]
 }

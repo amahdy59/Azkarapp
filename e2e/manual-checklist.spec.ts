@@ -7,7 +7,7 @@
  * media alternatives stay manual and stay Pending until someone does them.
  */
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 type Settings = Record<string, unknown>;
 
@@ -49,6 +49,28 @@ async function expectNoHorizontalOverflow(page: Page, context: string) {
   expect(overflow.scrollWidth, `${context}: page scrolls horizontally`).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
+async function expectSingleLineHeading(heading: Locator, context: string) {
+  await expect(heading).toBeVisible();
+  const metrics = await heading.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      height: element.getBoundingClientRect().height,
+      lineHeight: Number.parseFloat(style.lineHeight),
+      fontSize: Number.parseFloat(style.fontSize),
+      whiteSpace: style.whiteSpace,
+    };
+  });
+
+  expect(metrics.whiteSpace, `${context}: heading can wrap`).toBe("nowrap");
+  expect(metrics.height, `${context}: heading wrapped to more than one line`).toBeLessThanOrEqual(
+    metrics.lineHeight + 1,
+  );
+  expect(metrics.scrollWidth, `${context}: heading text was clipped`).toBeLessThanOrEqual(metrics.clientWidth + 1);
+  expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
+}
+
 // ─── Contrast ────────────────────────────────────────────────────────────────
 // Checklist row: "Light, dark, high-contrast, and color-blind modes pass a
 // contrast analyzer."
@@ -74,6 +96,10 @@ for (const mode of CONTRAST_MODES) {
 const VIEWPORTS = [
   { name: "320px mobile", width: 320, height: 720 },
   { name: "390px mobile", width: 390, height: 844 },
+  // OnePlus Nord 4 is 1240×2772 physical pixels. 412×924 is the representative
+  // CSS viewport at common Android display scaling; the physical device check
+  // remains part of the manual release record.
+  { name: "OnePlus Nord 4", width: 412, height: 924 },
   { name: "tablet", width: 834, height: 1194 },
   { name: "desktop", width: 1280, height: 900 },
 ] as const;
@@ -91,6 +117,43 @@ for (const viewport of VIEWPORTS) {
     await expectNoHorizontalOverflow(page, `${viewport.name} Library`);
   });
 }
+
+for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
+  test(`mobile headings: ${viewport.name} keeps Progress titles readable on one line`, async ({ page }) => {
+    await page.setViewportSize({ width: viewport.width, height: viewport.height });
+    await seedAndOpen(page);
+    await page.getByTestId("nav-progress").click();
+
+    await expectSingleLineHeading(
+      page.getByRole("heading", { name: "Progress", exact: true, level: 1 }),
+      `${viewport.name} page title`,
+    );
+
+    const tabs = page.getByRole("tab");
+    for (let index = 0; index < 4; index += 1) {
+      await tabs.nth(index).click();
+      await expectSingleLineHeading(
+        page.getByTestId("progress-primary-heading"),
+        `${viewport.name} Progress tab ${index + 1}`,
+      );
+    }
+  });
+}
+
+test("mobile headings: OnePlus Nord 4 keeps Arabic Progress titles readable on one line", async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 924 });
+  await seedAndOpen(page, { language: "ar" });
+  await page.getByTestId("nav-progress").click();
+
+  const tabs = page.getByRole("tab");
+  for (let index = 0; index < 4; index += 1) {
+    await tabs.nth(index).click();
+    await expectSingleLineHeading(
+      page.getByTestId("progress-primary-heading"),
+      `OnePlus Nord 4 Arabic Progress tab ${index + 1}`,
+    );
+  }
+});
 
 // ─── Text resize ─────────────────────────────────────────────────────────────
 // Checklist row: "200% browser zoom and largest app text setting do not hide

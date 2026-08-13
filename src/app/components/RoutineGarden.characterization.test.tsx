@@ -103,6 +103,25 @@ describe("leaf and palm marks", () => {
 });
 
 describe("Home wird card", () => {
+  it("keeps the Home card nested at heading level three", () => {
+    render(
+      <TodayRoutineGarden
+        summary={makeSummary()}
+        language="en"
+        hideTabs
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "Today's Wird", level: 3 })).toBeInTheDocument();
+  });
+
+  it("promotes the same card to heading level two on Progress", () => {
+    render(<TodayRoutineGarden summary={makeSummary()} language="en" hideTabs={false} />);
+
+    expect(screen.getByRole("heading", { name: "Today's Wird", level: 2 })).toBeInTheDocument();
+  });
+
   it("keeps Morning, Evening, and Sleep in one stable semantic order", () => {
     render(
       <TodayRoutineGarden

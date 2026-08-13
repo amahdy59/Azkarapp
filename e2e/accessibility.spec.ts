@@ -190,6 +190,25 @@ test("search results expose concise accessible names", async ({ page }) => {
   expect(names.every((name) => name.length > 0 && name.length < 120)).toBe(true);
 });
 
+test("library filtering announces the collection result count", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-azkar").click();
+  await page.getByRole("textbox", { name: "Search adhkar and duas" }).fill("sleep");
+
+  await expect(page.getByTestId("library-filter-status")).toHaveText("1 collection matches “sleep”");
+  await expect(page.getByTestId("library-filter-status")).toHaveAttribute("aria-live", "polite");
+});
+
+test("Progress tabs expose a logical level-two heading in every view", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-progress").click();
+
+  for (const tabName of ["Day", "Week", "Month", "Year"] as const) {
+    await page.getByRole("tab", { name: tabName, exact: true }).click();
+    await expect(page.getByTestId("progress-primary-heading")).toHaveRole("heading", { level: 2 });
+  }
+});
+
 test("home and settings flows have no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await expectNoWcagViolations(page);
@@ -245,7 +264,9 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Reader");
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
-  await expect(page.getByTestId("reference-sheet")).toBeVisible();
+  const benefitSheet = page.getByTestId("reference-sheet");
+  await expect(benefitSheet).toBeVisible();
+  await expect(benefitSheet.getByRole("heading", { name: "Benefit", exact: true })).toHaveCount(1);
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Benefit sheet");
 });
 

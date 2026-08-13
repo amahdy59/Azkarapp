@@ -270,6 +270,8 @@ const ar = {
     searchHint: "اضغط Enter للبحث داخل كل ذكر",
     noCollectionMatch: "لا توجد مجموعة تطابق «{query}»",
     searchAllAzkar: "ابحث في كل الأذكار عن «{query}»",
+    filterResultsSingular: "مجموعة واحدة تطابق «{query}»",
+    filterResultsPlural: "{count} مجموعة تطابق «{query}»",
   },
   search: {
     placeholder: "ابحث في الأذكار والأدعية",
@@ -819,6 +821,7 @@ const ar = {
       "\u0646\u0633\u062e \u0627\u0644\u0646\u0637\u0642 \u0628\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629",
     copyHadith: "\u0646\u0633\u062e \u0646\u0635 \u0627\u0644\u062d\u062f\u064a\u062b",
     benefitLabel: "\u0627\u0644\u0641\u0627\u0626\u062f\u0629",
+    benefitDetails: "\u062a\u0641\u0627\u0635\u064a\u0644 \u0627\u0644\u0641\u0627\u0626\u062f\u0629",
     sourceLabel: "\u0627\u0644\u0645\u0635\u062f\u0631",
     copyBenefit: "\u0646\u0633\u062e \u0627\u0644\u0641\u0627\u0626\u062f\u0629",
     copySource: "\u0646\u0633\u062e \u0627\u0644\u0645\u0635\u062f\u0631",
@@ -1056,6 +1059,8 @@ const ar = {
     offlineDownloads:
       "\u0627\u0644\u062a\u0646\u0632\u064a\u0644\u0627\u062a \u062f\u0648\u0646 \u0627\u062a\u0635\u0627\u0644",
     accessibility: "\u0625\u0645\u0643\u0627\u0646\u064a\u0629 \u0627\u0644\u0648\u0635\u0648\u0644",
+    accessibilityDetailHeading:
+      "\u0625\u0639\u062f\u0627\u062f\u0627\u062a \u0625\u0645\u0643\u0627\u0646\u064a\u0629 \u0627\u0644\u0648\u0635\u0648\u0644",
     account: "\u0627\u0644\u062d\u0633\u0627\u0628",
     notifications: "\u0627\u0644\u0625\u0634\u0639\u0627\u0631\u0627\u062a",
     myProgress: "\u062a\u0642\u062f\u0645\u064a",

@@ -132,6 +132,7 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
     await expect(sideNavigation.getByRole("button", { name: "Next", exact: true })).toBeVisible();
     await expect(card.getByTestId("reader-counter-stack").getByTestId("reader-keyboard-shortcuts")).toBeVisible();
     await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
+    await expect(counter).toHaveAccessibleName(/Click anywhere or press Space to count/);
 
     const [cardBox, navigationBox, counterBox, guideBox] = await Promise.all([
       card.boundingBox(),

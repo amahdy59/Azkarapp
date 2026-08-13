@@ -222,6 +222,7 @@ export function TodayRoutineGarden({
             dynamicSubtitle={dynamicSubtitle}
             onSelectCategory={onSelectCategory}
             visibleCategoryIds={visibleCategoryIds}
+            headingLevel={hideTabs ? 3 : 2}
           />
         )}
 

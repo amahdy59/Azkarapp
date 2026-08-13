@@ -88,9 +88,12 @@ function ReferenceContent({
             <BookOpen size={20} aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-[1.125rem] font-extrabold text-foreground leading-snug">
+            <div
+              aria-hidden="true"
+              className="block max-w-full truncate whitespace-nowrap text-[1.125rem] font-extrabold leading-snug text-foreground"
+            >
               {t(language, "reader.referencesButton")}
-            </h2>
+            </div>
             <p id="reader-reference-description" className="text-[0.75rem] font-medium text-muted-foreground">
               {t(language, "reader.referenceTitle")}
             </p>
@@ -178,7 +181,10 @@ function ReferenceContent({
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                   <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                  <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
+                  <h3
+                    aria-label={t(language, "reader.benefitDetails")}
+                    className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground"
+                  >
                     {t(language, "reader.benefitLabel")}
                   </h3>
                 </div>

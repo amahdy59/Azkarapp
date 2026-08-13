@@ -156,6 +156,7 @@ export function ProgressDayView({
   dynamicSubtitle,
   onSelectCategory,
   visibleCategoryIds,
+  headingLevel = 2,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -168,6 +169,8 @@ export function ProgressDayView({
    * leaf progress keep counting every main collection.
    */
   visibleCategoryIds?: readonly CategoryId[];
+  /** Home nests this card below its own section heading; Progress owns an h2. */
+  headingLevel?: 2 | 3;
 }) {
   const isArabic = isAr(language);
   const completedToday = summary.today.completedCategories;
@@ -199,6 +202,7 @@ export function ProgressDayView({
     ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
     : allCategories;
   const isHomeSubset = visibleCategoryIds !== undefined;
+  const Heading = headingLevel === 3 ? "h3" : "h2";
   // Keep the semantic order stable. The RTL grid places Morning at the right
   // edge while preserving the same keyboard and assistive-technology order.
   const displayCategories = categories;
@@ -221,12 +225,13 @@ export function ProgressDayView({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3
-              className="text-[1.25rem] font-black tracking-tight text-white sm:text-[1.375rem] md:text-[1.5rem]"
+            <Heading
+              data-testid="progress-primary-heading"
+              className="block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight text-white sm:text-[1.375rem] md:text-[1.5rem]"
               dir="auto"
             >
               {t(language, "progress.todayWird")}
-            </h3>
+            </Heading>
             <p className="mt-1 text-[0.8125rem] font-semibold text-white/72 sm:text-[0.875rem]" dir="auto">
               {dynamicSubtitle}
             </p>
@@ -404,9 +409,12 @@ export function ProgressWeekView({
 
       {/* Main Weekly Commitment Matrix Card */}
       <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
-        <h3 className="text-[1.125rem] md:text-[1.25rem] font-black text-foreground mb-4 text-start">
+        <h2
+          data-testid="progress-primary-heading"
+          className="mb-4 block max-w-full truncate whitespace-nowrap text-start text-[1rem] font-black text-foreground sm:text-[1.125rem] md:text-[1.25rem]"
+        >
           {t(language, "progress.weekCommitment")}
-        </h3>
+        </h2>
 
         {/* Grid Table */}
         <div className="overflow-x-auto">
@@ -523,11 +531,11 @@ export function ProgressWeekView({
             <Sparkles size={24} />
           </div>
           <div>
-            <h4 className="text-[0.9375rem] font-black text-foreground leading-snug mb-1">
+            <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black leading-snug text-foreground">
               {t(language, "garden.weekCompletedDays", {
                 count: formatNumerals(weekStats.completedDaysCount, language),
               })}
-            </h4>
+            </h3>
             <p className="text-[0.8125rem] font-semibold text-muted-foreground">
               {weekStats.bestRoutine
                 ? t(language, "garden.weekBestRoutine", {
@@ -540,7 +548,9 @@ export function ProgressWeekView({
 
         {/* Routine Summary Progress Bars Card */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-center gap-3">
-          <h4 className="text-[0.875rem] font-black text-foreground mb-1">{t(language, "progress.weeklySummary")}</h4>
+          <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
+            {t(language, "progress.weeklySummary")}
+          </h3>
 
           {/* Morning Bar */}
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
@@ -815,12 +825,15 @@ export function ProgressMonthView({
           {/* Day Details Card */}
           <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col gap-3">
             <div className="flex items-center justify-between border-b border-white/20 dark:border-white/10 pb-2">
-              <div>
-                <h4 className="text-[0.9375rem] font-black text-foreground">
+              <div className="min-w-0 flex-1">
+                <h2
+                  data-testid="progress-primary-heading"
+                  className="block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black text-foreground"
+                >
                   {t(language, "progress.selectedDayDetails", {
                     day: formatNumerals(selectedDayNum, language),
                   })}
-                </h4>
+                </h2>
                 <span className="text-[0.6875rem] font-semibold text-muted-foreground">
                   {selectedDayRecord?.dayKey}
                 </span>
@@ -893,9 +906,9 @@ export function ProgressMonthView({
           <div className="p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 shadow-raised backdrop-blur-xl flex items-start gap-3">
             <Sprout size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
-              <h5 className="text-[0.875rem] font-black text-foreground mb-1">
+              <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
                 {t(language, "garden.monthRecordTitle")}
-              </h5>
+              </h3>
               <p className="text-[0.75rem] font-semibold text-muted-foreground">
                 {t(language, "garden.monthFullDays", {
                   count: formatNumerals(monthStats.fullDaysCount, language),
@@ -987,9 +1000,12 @@ export function ProgressYearView({
         {/* Monthly Completion Bar Chart (2 Columns on desktop) */}
         <div className="md:col-span-2 p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col">
           <div className="flex items-center justify-between mb-1">
-            <h4 className="text-[0.9375rem] font-black text-foreground">
+            <h2
+              data-testid="progress-primary-heading"
+              className="block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black text-foreground"
+            >
               {t(language, "progress.monthlyCompletionRate")}
-            </h4>
+            </h2>
           </div>
           <p className="text-[0.75rem] font-semibold text-muted-foreground mb-4">
             {t(language, "garden.yearChartHint")}
@@ -1031,9 +1047,9 @@ export function ProgressYearView({
 
         {/* Quick Glance Card (1 Column on desktop) */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-between gap-3">
-          <h4 className="text-[0.9375rem] font-black text-foreground border-b border-white/20 dark:border-white/10 pb-2">
+          <h2 className="block max-w-full truncate whitespace-nowrap border-b border-white/20 pb-2 text-[0.9375rem] font-black text-foreground dark:border-white/10">
             {t(language, "progress.quickGlance")}
-          </h4>
+          </h2>
 
           {/* Best Month */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">

@@ -55,6 +55,8 @@ describe("AzkarLibraryScreen", () => {
     expect(onSearch).not.toHaveBeenCalled();
     expect(screen.queryByRole("button", { name: /^Morning Azkar/ })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^Before Sleep Azkar/ })).toBeInTheDocument();
+    expect(screen.getByTestId("library-filter-status")).toHaveTextContent("1 collection matches “sleep”");
+    expect(screen.getByTestId("library-filter-status")).toHaveAttribute("aria-live", "polite");
   });
 
   it("escalates to full search only when the query is submitted", () => {

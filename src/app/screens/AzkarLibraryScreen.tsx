@@ -88,12 +88,21 @@ export function AzkarLibraryScreen({
       }),
     })).filter((entry) => entry.categories.length > 0);
   }, [deferredQuery]);
+  const visibleCollectionCount = visibleGroups.reduce((count, entry) => count + entry.categories.length, 0);
+  const filterStatusMessage = deferredQuery
+    ? t(language, visibleCollectionCount === 1 ? "library.filterResultsSingular" : "library.filterResultsPlural", {
+        count: formatNumerals(visibleCollectionCount, language),
+        query: deferredQuery,
+      })
+    : "";
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
-          <h1 className="text-[1.5rem] font-extrabold text-foreground">{t(language, "library.title")}</h1>
+          <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-[1.5rem]">
+            {t(language, "library.title")}
+          </h1>
           <div className="mt-4 flex flex-col gap-4 min-[900px]:grid min-[900px]:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)] min-[900px]:items-end">
             <form
               className="min-w-0"
@@ -126,6 +135,15 @@ export function AzkarLibraryScreen({
               {searchQuery.trim() && (
                 <p className="mt-1.5 px-1 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
               )}
+              <p
+                data-testid="library-filter-status"
+                className="sr-only"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {filterStatusMessage}
+              </p>
             </form>
             <div className="overflow-x-auto no-scrollbar scroll-smooth min-[900px]:mt-0">
               <TabList
