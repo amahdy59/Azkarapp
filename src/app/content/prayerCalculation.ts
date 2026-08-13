@@ -382,7 +382,7 @@ export async function fetchAladhanPrayerData(
     method: String(methodId),
   });
   const controller = new AbortController();
-  const timeoutId = window.setTimeout(() => controller.abort(), 5000);
+  const timeoutId = setTimeout(() => controller.abort(), 5000);
 
   try {
     const response = await fetch(`https://api.aladhan.com/v1/timings/${apiDate}?${query}`, {
@@ -398,7 +398,7 @@ export async function fetchAladhanPrayerData(
   } catch {
     return null;
   } finally {
-    window.clearTimeout(timeoutId);
+    clearTimeout(timeoutId);
   }
 }
 
