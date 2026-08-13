@@ -54,6 +54,15 @@
   --info-foreground: #04213f;
 }
 
+/* Pre-app flows share the form measure. Center compact flows only when the
+   viewport is tall enough; short desktop/landscape windows stay top-aligned
+   and scroll instead of clipping their first or primary action. */
+@media (min-width: 56.25rem) and (min-height: 36rem) {
+  .pre-app-flow-centered {
+    justify-content: center;
+  }
+}
+
 .dark,
 .theme-dark {
   color-scheme: dark;
@@ -1039,6 +1048,14 @@ a[href]:not(.no-press):active,
     background: var(--card);
     overflow-y: auto;
     overflow-x: hidden;
+  }
+}
+
+/* Pre-app and authentication views do not render navigation, so their grid
+   must not reserve an empty desktop rail or sidebar column. */
+@media (min-width: 56.25rem) {
+  .app-shell.app-shell--navigation-hidden {
+    grid-template: "status" auto "main" minmax(0, 1fr) / minmax(0, 1fr);
   }
 }
 

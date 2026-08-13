@@ -3,6 +3,7 @@ import { ArrowPrevious, Clock } from "../../components/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
 import { t } from "../../i18n";
 import { IconButton } from "../../components/LayoutShells";
+import { PreAppLayout } from "../../components/PreAppLayout";
 import type { AppLanguage } from "../../types";
 import { BrandLockup } from "../onboarding/OnboardingBrand";
 
@@ -67,8 +68,12 @@ export function LoginScreen({
   const legalReady = Boolean(termsUrl) && Boolean(privacyUrl);
   const accountAuthEnabled = legalReady && Object.values(providerFlags).some(Boolean);
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background px-6 pb-7 pt-8" dir={ar ? "rtl" : "ltr"}>
-      <div className="flex flex-col items-center gap-7">
+    <PreAppLayout
+      className="slide-in-from-right"
+      contentClassName="pre-app-flow-centered px-6 pb-7 pt-8"
+      dir={ar ? "rtl" : "ltr"}
+    >
+      <div className="flex flex-col items-center gap-7" data-testid="auth-intro">
         <BrandLockup compact />
         <div className="text-center">
           <h1 className="text-[1.75rem] font-extrabold leading-9 text-foreground">{t(language, "auth.welcome")}</h1>
@@ -101,8 +106,8 @@ export function LoginScreen({
           )}
         </div>
       </div>
-      <div className="flex-1" />
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex-1 min-[900px]:hidden" />
+      <div className="flex flex-col items-center gap-4 min-[900px]:mt-8" data-testid="auth-actions">
         <button
           data-testid="continue-as-guest"
           type="button"
@@ -113,7 +118,7 @@ export function LoginScreen({
         </button>
         <LegalConsent language={language} />
       </div>
-    </div>
+    </PreAppLayout>
   );
 }
 
@@ -138,7 +143,7 @@ export function EmailInputScreen({
   const ar = language === "ar";
   const canSend = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={ar ? "rtl" : "ltr"}>
+    <PreAppLayout className="slide-in-from-right" dir={ar ? "rtl" : "ltr"}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
         <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
@@ -175,8 +180,8 @@ export function EmailInputScreen({
           </p>
         )}
       </div>
-      <div className="flex-1" />
-      <div className="flex flex-col items-center gap-4 px-6 pb-6">
+      <div className="flex-1 min-[900px]:hidden" />
+      <div className="flex flex-col items-center gap-4 px-6 pb-6 min-[900px]:mt-8">
         <button
           type="button"
           onClick={canSend && !isSending ? () => onSend(email.trim()) : undefined}
@@ -187,7 +192,7 @@ export function EmailInputScreen({
         </button>
         <LegalConsent language={language} compact />
       </div>
-    </div>
+    </PreAppLayout>
   );
 }
 
@@ -220,7 +225,7 @@ export function OTPScreen({
   }, []);
   const ar = language === "ar";
   return (
-    <div className="slide-in-from-right flex h-full flex-col bg-background" dir={ar ? "rtl" : "ltr"}>
+    <PreAppLayout className="slide-in-from-right" dir={ar ? "rtl" : "ltr"}>
       <header className="grid h-14 grid-cols-[1fr_auto_1fr] items-center px-5">
         <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
@@ -281,8 +286,8 @@ export function OTPScreen({
           </button>
         )}
       </div>
-      <div className="flex-1" />
-      <div className="flex flex-col gap-3 px-6 pb-6">
+      <div className="flex-1 min-[900px]:hidden" />
+      <div className="flex flex-col gap-3 px-6 pb-6 min-[900px]:mt-8">
         <button
           type="button"
           onClick={token.length === 6 && !isVerifying ? () => onVerify(token) : undefined}
@@ -295,7 +300,7 @@ export function OTPScreen({
           {t(language, "auth.differentEmail")}
         </button>
       </div>
-    </div>
+    </PreAppLayout>
   );
 }
 
@@ -314,7 +319,7 @@ export function AuthCallbackScreen({
     onReadyRef.current();
   }, []);
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 bg-background px-6 text-center">
+    <PreAppLayout contentClassName="items-center justify-center gap-4 px-6 text-center">
       <BrandLockup compact />
       <h1 className="text-xl font-bold text-foreground">{t(language, "auth.completingSignIn")}</h1>
       <p
@@ -323,7 +328,7 @@ export function AuthCallbackScreen({
       >
         {errorMessage || t(language, "auth.restoringAccount")}
       </p>
-    </div>
+    </PreAppLayout>
   );
 }
 
@@ -341,7 +346,7 @@ export function ProfileCompletionScreen({
   const [displayName, setDisplayName] = useState("");
   const ar = language === "ar";
   return (
-    <div className="flex h-full flex-col bg-background px-6 pb-6 pt-12" dir={ar ? "rtl" : "ltr"}>
+    <PreAppLayout contentClassName="pre-app-flow-centered px-6 pb-6 pt-12" dir={ar ? "rtl" : "ltr"}>
       <BrandLockup compact />
       <h1 className="mt-8 text-2xl font-extrabold text-foreground">{t(language, "auth.profileTitle")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{t(language, "auth.profileHint")}</p>
@@ -359,16 +364,16 @@ export function ProfileCompletionScreen({
           {errorMessage}
         </p>
       )}
-      <div className="flex-1" />
+      <div className="flex-1 min-[900px]:hidden" />
       <button
         type="button"
         disabled={!displayName.trim() || isSaving}
         aria-busy={isSaving || undefined}
         onClick={() => onSave(displayName)}
-        className="h-12 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-50"
+        className="h-12 rounded-xl bg-primary font-bold text-primary-foreground disabled:opacity-50 min-[900px]:mt-8"
       >
         {isSaving ? t(language, "auth.saving") : t(language, "auth.continue")}
       </button>
-    </div>
+    </PreAppLayout>
   );
 }

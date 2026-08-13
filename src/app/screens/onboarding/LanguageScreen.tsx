@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
 import { Check } from "../../components/icons";
+import { PreAppLayout } from "../../components/PreAppLayout";
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
 import type { AppLanguage } from "../../types";
@@ -20,7 +21,11 @@ export function LanguageScreen({
   const language = selected;
 
   return (
-    <div className="flex flex-col h-full bg-background slide-in-from-right" dir={isArabic ? "rtl" : "ltr"}>
+    <PreAppLayout
+      className="slide-in-from-right"
+      contentClassName="pre-app-flow-centered"
+      dir={isArabic ? "rtl" : "ltr"}
+    >
       <div className="flex flex-col items-center gap-2 px-6 pt-5 pb-4 shrink-0">
         <div className="relative w-[32px] h-[32px]" aria-hidden="true">
           <div className="absolute" style={{ inset: "-18.75% 0 0 -18.75%" }}>
@@ -43,7 +48,7 @@ export function LanguageScreen({
         dir={isArabic ? "rtl" : "ltr"}
         value={selected}
         onValueChange={(next) => setSelected(next as AppLanguage)}
-        className="flex-1 overflow-y-auto px-6 flex flex-col gap-3 pb-4"
+        className="flex flex-1 flex-col gap-3 overflow-y-auto px-6 pb-4 min-[900px]:flex-none min-[900px]:overflow-visible"
         aria-label={t(language, "onboarding.availableLanguages")}
       >
         {LANGUAGES_LIST.map((lang) => {
@@ -79,7 +84,7 @@ export function LanguageScreen({
         })}
       </RadioGroupPrimitive.Root>
 
-      <div className="px-6 pb-8 shrink-0">
+      <div className="shrink-0 px-6 pb-8 min-[900px]:pt-3">
         <button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
@@ -88,6 +93,6 @@ export function LanguageScreen({
           {t(language, "common.continue")}
         </button>
       </div>
-    </div>
+    </PreAppLayout>
   );
 }

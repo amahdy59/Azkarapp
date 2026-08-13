@@ -97,3 +97,13 @@ DEC-055 records the deterministic preview gate, retry policy, opt-in screenshot 
 ## Recommended next step
 
 Begin Phase 12 with a real screen-reader session and physical safe-area/device checks, then remediate only evidence-backed findings.
+
+## Responsive follow-up — 2026-08-13
+
+- Capped onboarding, authentication, and zikr collection overview content at the existing 40rem form measure on desktop.
+- Removed viewport-filling desktop gaps between related choices and primary actions while preserving compact-phone reachability.
+- Collapsed the unused desktop rail/sidebar column on splash, onboarding, and authentication views so pre-app content centers in the actual viewport.
+- Made welcome artwork responsive to viewport height and kept short desktop/landscape flows top-aligned and scrollable.
+- Added browser geometry coverage for 1440×900, the reported 1440×451 short desktop shape, and 390×844 mobile fluidity.
+- Focused responsive validation passed 44/44 across Chromium desktop, mobile, tablet, Firefox, and mobile WebKit projects. Final release validation passed 433/433 unit tests and 402 browser tests with 4 intentional skips and retries disabled; production audit, PWA build, and bundle budgets also passed.
+- Recorded the approved contract in DEC-058. Phase 12's physical TalkBack/cutout evidence remains pending and is not affected by this layout follow-up.

@@ -207,6 +207,8 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 - Navigation is hidden entirely on splash, onboarding and auth views at every tier.
 - Height is never part of tier selection. Short landscape viewports keep the navigation for their width.
 - Reader/focused flows: constrained reading measure (~430px–600px maximum), independent of tier. On the wide-desktop reader (≥1200px, see the Reader contract above) the card chrome around that column widens to fill the shell; the reading measure itself stays capped at 600px.
+- Splash, onboarding, and authentication do not reserve an empty desktop navigation column. Their interactive content uses `--content-form` (40rem) and related controls stay grouped instead of being separated by viewport-filling spacers. Compact-height desktop and landscape views scroll from the top rather than centering into clipped content.
+- Zikr collection overviews use `--content-form` (40rem) for the header, progress controls, introduction, and item list while remaining fluid and full-width below that measure.
 - Dashboard-tier screens opt into `.page-content-center` (max `--content-dashboard`); Settings uses its own two-pane with `--content-form` on the detail pane.
 - Progress Day, Week, Month, and Year keep the compact 44rem measure through the expanded tier, then may use up to 72rem at the large desktop tier for calendars, summaries, and charts. Their semantic order and compact text size do not change.
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.

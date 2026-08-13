@@ -728,7 +728,9 @@ function AppContent() {
 
   return (
     <div className="app-viewport flex items-center justify-center">
-      <div className="app-shell relative overflow-hidden bg-background shadow-2xl">
+      <div
+        className={`app-shell relative overflow-hidden bg-background shadow-2xl ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
+      >
         {/* Both banners share one grid area, so they stack across the full shell
             width instead of being auto-placed into an implicit row — which put
             them underneath the rail on the expanded and large tiers. */}

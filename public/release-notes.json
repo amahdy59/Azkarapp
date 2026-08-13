@@ -1,14 +1,14 @@
 {
   "ar": [
-    "أصبحت عناوين التقدم أوضح لقارئات الشاشة مع بقائها في سطر واحد وبحجم مناسب على الهواتف.",
-    "يعلن البحث داخل مكتبة الأذكار الآن عدد المجموعات المطابقة بطريقة موجزة.",
-    "تحسّن وصف نافذة الفائدة وإعدادات إمكانية الوصول دون تغيير المحتوى الديني.",
-    "أصبحت إرشادات عدّاد القراءة متسقة بين النص الظاهر وقارئات الشاشة."
+    "أصبحت صفحات البداية وتسجيل الدخول بعرض مريح ومتمركزة بصورة صحيحة على شاشات سطح المكتب.",
+    "أصبحت المسافات بين اختيارات اللغة وزر المتابعة أقصر وأكثر اتساقًا.",
+    "تتكيّف رسومات الترحيب مع ارتفاع الشاشة دون دفع الأزرار بعيدًا.",
+    "أصبحت صفحة نظرة عامة على مجموعة الأذكار محددة العرض على سطح المكتب وتظل مرنة على الهاتف."
   ],
   "en": [
-    "Progress headings are clearer to screen readers while staying compact and single-line on phones.",
-    "Filtering the Azkar Library now announces the matching collection count concisely.",
-    "Benefit dialog and Accessibility settings headings are less ambiguous without changing religious content.",
-    "Reader counter guidance is now consistent between visible text and assistive technology."
+    "Intro and sign-in pages now use a comfortable, correctly centered desktop width.",
+    "Language choices and Continue now stay closely and consistently spaced.",
+    "Welcome artwork adapts to screen height without pushing actions away.",
+    "Zikr collection overviews are bounded on desktop while remaining fluid on phones."
   ]
 }

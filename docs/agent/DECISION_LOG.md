@@ -1043,3 +1043,16 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Manual evidence:** Automated emulation does not certify TalkBack speech or physical cutout behavior. Those rows remain pending until tested on the real OnePlus Nord 4.
 - **Consequences:** Progress visual styling stays materially unchanged except the Week view uses 16 CSS px at the narrowest phone width to keep the complete English label visible. No content, persistence, prayer, route, dependency, or synchronization contract changes.
 - **Tests/evidence required:** Focused unit tests, heading/live-region/dialog/Reader browser regressions, one-line English and Arabic viewport checks, `pnpm check`, retry-free full Playwright, Pages build, green workflows, production SHA verification, and dated real TalkBack/cutout evidence before Phase 12 is declared complete.
+
+---
+
+## DEC-058 — Bounded desktop pre-app and zikr-overview measures
+
+- **Date:** 2026-08-13
+- **Status:** Approved
+- **Owner:** User (explicitly requested implementation and release)
+- **Related scope:** Focused Phase 11 responsive follow-up before Phase 13
+- **Context:** Desktop onboarding and authentication rendered controls across the entire main area and used flexible spacers to pin primary actions to the viewport bottom. Because the navigation element was hidden without collapsing its grid column, pre-app content was also offset from the viewport center. Zikr collection overviews had no desktop content measure.
+- **Decision:** Collapse the rail/sidebar grid column whenever app navigation is absent. Use the existing `--content-form` 40rem measure for all pre-app interactive flows and the complete zikr overview. Preserve compact-phone bottom action placement where it supports reachability, but from the expanded desktop tier group actions with their related controls. Center short pre-app compositions only when viewport height is sufficient; otherwise top-align and scroll. Keep welcome artwork height-responsive rather than fixed.
+- **Consequences:** Language, welcome, sign-in, email verification, profile completion, and category overview screens no longer stretch across wide desktops. Mobile remains fluid. No route, persistence, authentication, religious content, dependency, or reader-measure contract changes.
+- **Tests/evidence required:** Desktop 40rem cap and centering assertions, short-height Continue visibility and spacing assertions, mobile category-fluidity and overflow checks, full responsive browser matrix, required local release gates, green GitHub workflows, and production SHA verification.

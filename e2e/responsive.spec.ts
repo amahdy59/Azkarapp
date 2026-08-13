@@ -239,6 +239,117 @@ test("app navigation is hidden during onboarding at desktop width", async ({ pag
   await expect(page.getByRole("navigation")).toHaveCount(0);
 });
 
+test("desktop onboarding keeps related controls within the form measure and close together", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/");
+  await expect(page.getByTestId("language-option-en")).toBeVisible({ timeout: 5000 });
+
+  const expectFormMeasure = async () => {
+    const content = page.getByTestId("pre-app-content");
+    const bounds = await content.boundingBox();
+    expect(bounds).not.toBeNull();
+    if (!bounds) return;
+    expect(bounds.width).toBeLessThanOrEqual(640);
+    expect(Math.abs(bounds.x + bounds.width / 2 - 720)).toBeLessThanOrEqual(1);
+  };
+
+  await expectFormMeasure();
+  const lastLanguage = page.getByTestId("language-option-ar");
+  const continueButton = page.getByTestId("confirm-language");
+  const [languageBounds, continueBounds] = await Promise.all([
+    lastLanguage.boundingBox(),
+    continueButton.boundingBox(),
+  ]);
+  expect(languageBounds).not.toBeNull();
+  expect(continueBounds).not.toBeNull();
+  if (languageBounds && continueBounds) {
+    const gap = continueBounds.y - (languageBounds.y + languageBounds.height);
+    expect(gap).toBeGreaterThanOrEqual(12);
+    expect(gap).toBeLessThanOrEqual(48);
+  }
+
+  await page.getByTestId("language-option-en").click();
+  await continueButton.click();
+  await expect(page.getByTestId("onboarding-get-started")).toBeVisible();
+  await expectFormMeasure();
+
+  const [featuresBounds, startBounds] = await Promise.all([
+    page.getByTestId("onboarding-feature-list").boundingBox(),
+    page.getByTestId("onboarding-get-started").boundingBox(),
+  ]);
+  expect(featuresBounds).not.toBeNull();
+  expect(startBounds).not.toBeNull();
+  if (featuresBounds && startBounds) {
+    const gap = startBounds.y - (featuresBounds.y + featuresBounds.height);
+    expect(gap).toBeGreaterThanOrEqual(16);
+    expect(gap).toBeLessThanOrEqual(32);
+  }
+
+  await page.getByTestId("onboarding-get-started").click();
+  await expect(page.getByTestId("continue-as-guest")).toBeVisible();
+  await expectFormMeasure();
+
+  const [introBounds, actionBounds] = await Promise.all([
+    page.getByTestId("auth-intro").boundingBox(),
+    page.getByTestId("auth-actions").boundingBox(),
+  ]);
+  expect(introBounds).not.toBeNull();
+  expect(actionBounds).not.toBeNull();
+  if (introBounds && actionBounds) {
+    const gap = actionBounds.y - (introBounds.y + introBounds.height);
+    expect(gap).toBeGreaterThanOrEqual(24);
+    expect(gap).toBeLessThanOrEqual(48);
+  }
+});
+
+test("short desktop onboarding keeps Continue visible without a flexible-space gap", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 451 });
+  await page.goto("/");
+  await expect(page.getByTestId("language-option-en")).toBeVisible({ timeout: 5000 });
+
+  const lastLanguage = page.getByTestId("language-option-ar");
+  const continueButton = page.getByTestId("confirm-language");
+  await expect(continueButton).toBeInViewport();
+  const [languageBounds, continueBounds] = await Promise.all([
+    lastLanguage.boundingBox(),
+    continueButton.boundingBox(),
+  ]);
+  expect(languageBounds).not.toBeNull();
+  expect(continueBounds).not.toBeNull();
+  if (languageBounds && continueBounds) {
+    expect(continueBounds.y - (languageBounds.y + languageBounds.height)).toBeLessThanOrEqual(48);
+  }
+});
+
+test("zikr overview uses the form measure on desktop and remains fluid on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await enterEnglishGuestMode(page);
+  await page.getByTestId("nav-azkar").click();
+  await page.getByTestId("category-card-morning").click();
+
+  const overview = page.getByTestId("category-overview");
+  await expect(overview).toBeVisible();
+  const [desktopBounds, mainBounds] = await Promise.all([
+    overview.boundingBox(),
+    page.locator("#main-content").boundingBox(),
+  ]);
+  expect(desktopBounds).not.toBeNull();
+  expect(mainBounds).not.toBeNull();
+  if (desktopBounds && mainBounds) {
+    expect(desktopBounds.width).toBeLessThanOrEqual(640);
+    expect(
+      Math.abs(desktopBounds.x + desktopBounds.width / 2 - (mainBounds.x + mainBounds.width / 2)),
+    ).toBeLessThanOrEqual(1);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  const mobileBounds = await overview.boundingBox();
+  expect(mobileBounds).not.toBeNull();
+  if (mobileBounds) expect(mobileBounds.width).toBeCloseTo(390, 0);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBe(
+    0,
+  );
+});
+
 test("the active nav item is marked with aria-current and a non-colour cue", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await enterEnglishGuestMode(page);

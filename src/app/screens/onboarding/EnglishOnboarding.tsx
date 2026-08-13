@@ -1,9 +1,10 @@
 import { FeatureCheck, WelcomeArtwork } from "./OnboardingBrand";
 import { t } from "../../i18n";
+import { PreAppLayout } from "../../components/PreAppLayout";
 
 export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => void; onSkip: () => void }) {
   return (
-    <div className="slide-in-from-right relative flex h-full flex-col bg-background">
+    <PreAppLayout className="slide-in-from-right" contentClassName="pre-app-flow-centered relative">
       <button
         data-testid="onboarding-skip"
         onClick={onSkip}
@@ -11,19 +12,18 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
       >
         {t("en", "onboarding.skip")}
       </button>
-      <div className="h-[360px] shrink-0">
+      <div className="h-[clamp(13rem,42dvh,22.5rem)] shrink-0">
         <WelcomeArtwork />
       </div>
-      <div className="flex flex-1 flex-col items-center gap-7 px-6 pb-7 pt-5">
+      <div className="flex flex-col items-center gap-5 px-6 pb-7 pt-4">
         <h1 className="text-center text-[1.75rem] font-extrabold leading-9 tracking-[-0.28px] text-foreground">
           {t("en", "onboarding.title")}
         </h1>
-        <div className="flex w-full flex-col gap-4">
+        <div className="flex w-full flex-col gap-3" data-testid="onboarding-feature-list">
           <FeatureCheck>{t("en", "onboarding.feature1")}</FeatureCheck>
           <FeatureCheck>{t("en", "onboarding.feature2")}</FeatureCheck>
           <FeatureCheck>{t("en", "onboarding.feature3")}</FeatureCheck>
         </div>
-        <div className="flex-1" />
         <button
           data-testid="onboarding-get-started"
           onClick={onNext}
@@ -32,6 +32,6 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
           {t("en", "onboarding.getStarted")}
         </button>
       </div>
-    </div>
+    </PreAppLayout>
   );
 }
