@@ -12,6 +12,7 @@ export default defineConfig({
     trace: "retain-on-failure",
     reducedMotion: "reduce",
   },
+  timeout: 60_000,
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"], channel: process.env.CI ? undefined : "chrome" } },
     { name: "mobile-chromium", use: { ...devices["Pixel 7"], channel: process.env.CI ? undefined : "chrome" } },

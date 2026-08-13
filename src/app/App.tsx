@@ -1079,8 +1079,6 @@ function AppContent() {
                       setRoutineModes((previous) => ({ ...previous, [activeCat]: mode }));
                     }
                   }}
-                  hapticFeedback={hapticFeedback}
-                  reduceMotion={reduceMotion}
                 />
               )}
               {view === "reader" && !routeContentLoading && !routeContentError && activeZikr && (

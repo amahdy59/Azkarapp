@@ -14,12 +14,13 @@ const records: DailyCollectionCompletion[] = [
   { dayKey: "2024-02-01", category: "morning", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-01", category: "evening", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-01", category: "before_sleep", timeZone: "Africa/Cairo" },
-  { dayKey: "2024-02-01", category: "after_prayer", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-01", category: "after_prayer", subCategory: "fajr", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-01", category: "after_prayer", subCategory: "dhuhr", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-02", category: "travel", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
-  { dayKey: "2024-02-03", category: "after_prayer", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-03", category: "after_prayer", subCategory: "maghrib", timeZone: "Africa/Cairo" },
   { dayKey: "2025-02-01", category: "morning", timeZone: "Africa/Cairo" },
 ];
 
@@ -137,6 +138,7 @@ describe("garden view selectors", () => {
     // times, so the "is this routine weaker than the current lowest" comparison
     // never actually selects a new minimum. An uneven week is what proves
     // mostMissedRoutine tracks the genuinely weakest routine.
+    // mostMissedRoutine tracks the genuinely weakest routine.
     const unevenRecords: DailyCollectionCompletion[] = [
       { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-04", category: "morning", timeZone: "Africa/Cairo" },
@@ -210,6 +212,17 @@ describe("garden view selectors", () => {
     const brokenIndex = createDailyCompletionIndex(brokenStreakRecords);
     const brokenStats = getWeekGardenStats(brokenIndex, new Date(2024, 1, 3), "ar");
     expect(brokenStats.bestStreakDays).toBe(2);
+  });
+
+  it("reports partial status for incomplete routines on the current day", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 2, 2, 12));
+    const emptyIndex = createDailyCompletionIndex([]);
+    const stats = getWeekGardenStats(emptyIndex, new Date(2024, 2, 2), "en");
+    const today = stats.days.find((d) => d.isToday);
+    expect(today?.eveningStatus).toBe("partial");
+    expect(today?.sleepStatus).toBe("partial");
+    expect(today?.afterPrayerStatus).toBe("partial");
   });
 });
 

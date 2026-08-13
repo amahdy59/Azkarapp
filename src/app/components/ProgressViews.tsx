@@ -304,13 +304,32 @@ export function ProgressDayView({
  * with no text and no label, so every cell in the week grid was announced as
  * empty and the whole view conveyed nothing to a screen reader.
  */
-function WeekStatusCell({ done, label, language }: { done: boolean; label: string; language: AppLanguage }) {
+function WeekStatusCell({
+  done,
+  label,
+  language,
+  subItems,
+}: {
+  done: boolean;
+  label: string;
+  language: AppLanguage;
+  subItems?: boolean[];
+}) {
   const status = done ? t(language, "progress.completed") : t(language, "progress.notCompleted");
   return (
     <td className="py-3 px-2">
       <div className="flex justify-center">
         <span className="sr-only">{`${label}: ${status}`}</span>
-        {done ? (
+        {subItems ? (
+          <div aria-hidden="true" className="flex items-center gap-0.5">
+            {subItems.map((isCompleted, i) => (
+              <span
+                key={i}
+                className={`inline-block h-1.5 w-1.5 rounded-full ${isCompleted ? "bg-emerald-500" : "bg-white/10 dark:bg-white/10 bg-black/10"}`}
+              />
+            ))}
+          </div>
+        ) : done ? (
           <div
             aria-hidden="true"
             className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400"
@@ -461,6 +480,13 @@ export function ProgressWeekView({
                     done={day.afterPrayerStatus === "complete"}
                     label={t(language, "progress.postPrayerShort")}
                     language={language}
+                    subItems={[
+                      day.completedAfterPrayers.includes("fajr"),
+                      day.completedAfterPrayers.includes("dhuhr"),
+                      day.completedAfterPrayers.includes("asr"),
+                      day.completedAfterPrayers.includes("maghrib"),
+                      day.completedAfterPrayers.includes("isha"),
+                    ]}
                   />
                 </tr>
               ))}

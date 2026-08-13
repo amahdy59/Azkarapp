@@ -76,6 +76,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
     { width: 1440, height: 900 },
   ]) {
     await page.setViewportSize(viewport);
+    await page.waitForTimeout(500);
 
     // Scroll the inner home region to top so the sticky header is at y ≈ 0
     await page.evaluate(() => {
@@ -160,7 +161,7 @@ test("Home populated cards stay inside the content boundary at every responsive 
     { width: 1440, height: 900 },
   ]) {
     await page.setViewportSize(viewport);
-    await page.waitForTimeout(100);
+    await page.waitForTimeout(500);
 
     const geometry = await page.evaluate(() => {
       const saved = document.querySelector<HTMLElement>('[data-testid="home-saved-section"]')!;

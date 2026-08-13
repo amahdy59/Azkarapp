@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { Check, RotateCcw, Volume2 } from "../components/icons";
+import { Check, ChevronDown, RotateCcw, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
@@ -17,7 +17,6 @@ import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { SegmentedControl } from "../components/SegmentedControl";
-import { scrollBehavior, vibrateIfEnabled } from "../motionPreferences";
 import {
   getLocalizedPreferredTiming,
   getLocalizedZikrBenefit,
@@ -38,8 +37,6 @@ export function CategoryScreen({
   audioCoverage,
   routineMode = "complete",
   onRoutineModeChange,
-  hapticFeedback = true,
-  reduceMotion = false,
 }: {
   catId: CategoryId;
   completed: Set<string>;
@@ -54,8 +51,6 @@ export function CategoryScreen({
   audioCoverage?: { available: number; unavailable: number; total: number };
   routineMode?: RoutineMode;
   onRoutineModeChange?: (mode: RoutineMode) => void;
-  hapticFeedback?: boolean;
-  reduceMotion?: boolean;
 }) {
   const isMainRoutine = isRoutineCategory(catId);
   const allAzkar = getAzkarByCategory(catId);
@@ -66,8 +61,6 @@ export function CategoryScreen({
   const resumeIdx = azkar.findIndex((zikr) => !completed.has(zikr.id));
   const language = isArabic ? "ar" : "en";
   const isOccasional = isOccasionalCategory(catId);
-
-  const [cardCounts, setCardCounts] = useState<Record<number, number>>({});
   const [preparationSteps, setPreparationSteps] = useState<Set<string>>(() => new Set());
   const orderedAzkar = azkar.map((z, i) => ({ z, index: i }));
   const groupedAzkar = orderedAzkar.reduce<Array<{ groupId: ZikrGroupId; items: typeof orderedAzkar }>>(
@@ -132,61 +125,11 @@ export function CategoryScreen({
       ? stepProgress(orderedAzkar)
       : { done: completedItemCount, total: azkar.length };
 
-  const handleToggle = (index: number) => {
-    if (onToggleZikr) {
-      onToggleZikr(index);
-    } else {
-      onZikr(index);
-    }
-  };
-
-  const handleCardTap = (index: number, repetitionCount: number) => {
-    const isAlreadyDone = azkar[index] ? completed.has(azkar[index].id) : false;
-    if (isAlreadyDone) {
-      setCardCounts((prev) => ({ ...prev, [index]: 0 }));
-      handleToggle(index);
-      return;
-    }
-
-    const currentCount = cardCounts[index] ?? 0;
-    const nextCount = currentCount + 1;
-
-    if (nextCount >= repetitionCount) {
-      setCardCounts((prev) => ({ ...prev, [index]: repetitionCount }));
-      handleToggle(index);
-
-      // Smooth auto-scroll to next incomplete card
-      const nextIncomplete = azkar.findIndex((zikr, i) => i > index && !completed.has(zikr.id));
-      const targetIndex =
-        nextIncomplete !== -1 ? nextIncomplete : azkar.findIndex((zikr, i) => i !== index && !completed.has(zikr.id));
-
-      if (targetIndex !== -1) {
-        setTimeout(() => {
-          const el = document.getElementById(`zikr-card-${targetIndex}`);
-          if (el) {
-            el.scrollIntoView({ behavior: scrollBehavior(reduceMotion), block: "nearest" });
-          }
-        }, 120);
-      }
-    } else {
-      setCardCounts((prev) => ({ ...prev, [index]: nextCount }));
-      vibrateIfEnabled(hapticFeedback, 15);
-    }
-  };
-
   const renderZikrCard = ({ z, index }: { z: Zikr; index: number }, isCardCompleted: boolean) => {
     const targetCount = z.repetitionCount;
-    const currentCount = isCardCompleted ? targetCount : (cardCounts[index] ?? 0);
-    const localizedCurrent = formatNumerals(currentCount, language);
-    const localizedTarget = formatNumerals(targetCount, language);
     const showTiming = hasSpecificRecommendedTiming(z);
     const timingText = getLocalizedPreferredTiming(z, language);
     const contextTip = getLocalizedZikrBenefit(z, language) || timingText;
-
-    const counterLabelText = t(language, "category.counterProgress", {
-      current: localizedCurrent,
-      total: localizedTarget,
-    });
 
     if (isOccasional) {
       return (
@@ -235,6 +178,22 @@ export function CategoryScreen({
             </div>
           )}
         </button>
+      );
+    }
+
+    if (isMainRoutine && routineMode === "core") {
+      return (
+        <CoreZikrAccordion
+          key={z.id}
+          z={z}
+          index={index}
+          isCardCompleted={isCardCompleted}
+          language={language}
+          isArabic={isArabic}
+          direction={direction}
+          onZikr={onZikr}
+          onToggleZikr={onToggleZikr}
+        />
       );
     }
 
@@ -300,41 +259,33 @@ export function CategoryScreen({
           </div>
         )}
 
-        {/* Bottom Action Footer for Routine Cards */}
-        <button
-          type="button"
-          onClick={() => handleCardTap(index, targetCount)}
-          aria-label={
-            isCardCompleted
-              ? `${t(language, "category.completedButton")}. ${t(language, "category.completedToggle")}`
-              : t(language, "category.remainingToggle")
-          }
-          className={`interactive-elem flex min-h-[46px] w-full items-center justify-center gap-2 rounded-xl px-4 text-[0.9375rem] font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            isCardCompleted
-              ? "bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950 shadow-xs hover:bg-emerald-700"
-              : currentCount > 0
-                ? "border border-amber-500/40 bg-amber-500/15 text-amber-900 dark:text-amber-200 shadow-xs"
-                : "border border-primary/40 bg-primary/10 text-primary hover:bg-primary/20 shadow-xs"
-          }`}
-        >
-          {isCardCompleted ? (
-            <>
-              <Check size={18} strokeWidth={3} className="shrink-0" />
-              <span>{t(language, "category.completedButton")}</span>
-            </>
-          ) : (
-            <>
-              <span
-                className="text-[1.0625rem] font-extrabold"
-                dir="auto"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-              >
-                {counterLabelText}
-              </span>
-              <span className="text-[0.8125rem] opacity-80">({t(language, "category.tapToCount")})</span>
-            </>
-          )}
-        </button>
+        {onToggleZikr ? (
+          <button
+            type="button"
+            onClick={() => onToggleZikr(index)}
+            className={`mt-2 flex min-h-[44px] min-w-[44px] items-center justify-center gap-2 rounded-full px-5 py-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              isCardCompleted
+                ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40 hover:bg-emerald-500/20"
+                : "bg-muted/80 text-muted-foreground border border-border hover:bg-muted"
+            }`}
+          >
+            <span className="text-[0.875rem] font-bold">
+              {t(language, isCardCompleted ? "category.completedButton" : "category.remainingToggle")}
+            </span>
+            {isCardCompleted ? (
+              <Check size={18} strokeWidth={3} />
+            ) : (
+              <div className="size-[18px] rounded-full border-[2.5px] border-current opacity-60" />
+            )}
+          </button>
+        ) : (
+          isCardCompleted && (
+            <div className="mt-2 text-emerald-600 dark:text-emerald-500 flex items-center justify-center gap-1.5">
+              <span className="text-[0.875rem] font-bold">{t(language, "category.completedButton")}</span>
+              <Check size={18} strokeWidth={3} />
+            </div>
+          )
+        )}
       </div>
     );
   };
@@ -344,17 +295,55 @@ export function CategoryScreen({
       <div className="relative z-10 flex flex-col min-h-screen">
         <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
 
-        {!isOccasional && (
-          <div className="shrink-0 border-b border-border px-5 py-4">
+        <div className="shrink-0 border-b border-border px-5 py-4">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+            <p
+              className="text-[0.8125rem] font-bold text-muted-foreground"
+              dir="auto"
+              style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
+            >
+              {t(language, "category.counterProgress", {
+                current: formatNumerals(headerProgress.done, language),
+                total: formatNumerals(headerProgress.total, language),
+              })}
+            </p>
+          </div>
+          <ProgressBar
+            value={headerProgress.done}
+            max={headerProgress.total}
+            height={8}
+            trackColor="var(--card)"
+            fillColor="var(--primary)"
+            direction={direction}
+            aria-label={t(language, "category.dailyProgress")}
+          />
+
+          {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
+            <button
+              type="button"
+              onClick={() => onRoutineModeChange?.("complete")}
+              className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
+            >
+              <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
+              <span className="text-[0.75rem] font-bold">
+                {t(language, "category.continueAdditional", {
+                  count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
+                })}
+              </span>
+            </button>
+          )}
+
+          <div className="mt-4 flex w-full flex-wrap items-center gap-3">
             {isMainRoutine && (
               <SegmentedControl
+                className="flex h-14 w-full rounded-2xl border border-border bg-muted/60 p-1"
                 value={routineMode}
                 onChange={(mode) => onRoutineModeChange?.(mode)}
                 direction={direction}
                 aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
-                className="mb-4 grid grid-cols-2 rounded-2xl border border-border bg-muted/60 p-1"
                 itemClassName={(selected) =>
-                  `min-h-11 rounded-xl px-2 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  `flex-1 rounded-xl px-1 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
                   }`
                 }
@@ -370,116 +359,42 @@ export function CategoryScreen({
               />
             )}
 
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[0.8125rem] font-bold text-muted-foreground">
-                {t(language, "category.dailyProgress")}
-              </p>
-              <p
-                className="text-[0.8125rem] font-bold text-muted-foreground"
-                dir="auto"
-                style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
-              >
-                {t(language, "category.counterProgress", {
-                  current: formatNumerals(headerProgress.done, language),
-                  total: formatNumerals(headerProgress.total, language),
-                })}
-              </p>
-            </div>
-            <ProgressBar
-              value={headerProgress.done}
-              max={headerProgress.total}
-              height={8}
-              trackColor="var(--card)"
-              fillColor="var(--primary)"
-              direction={direction}
-              aria-label={t(language, "category.dailyProgress")}
-            />
-
-            {isMainRoutine && routineMode === "core" && completedItemCount === azkar.length && (
-              <button
-                type="button"
-                onClick={() => onRoutineModeChange?.("complete")}
-                className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
-              >
-                <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
-                <span className="text-[0.75rem] font-bold">
-                  {t(language, "category.continueAdditional", {
-                    count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
-                  })}
-                </span>
-              </button>
-            )}
-
-            <div className="mt-4 flex w-full gap-3">
-              {completedItemCount < azkar.length ? (
-                <>
+            {completedItemCount < azkar.length ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => onZikr(Math.max(0, resumeIdx))}
+                  className="interactive-elem flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <span className="leading-none">
+                    {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
+                  </span>
+                  <span className="text-[1.125rem] leading-none" aria-hidden="true">
+                    {direction === "rtl" ? "←" : "→"}
+                  </span>
+                </button>
+                {onPlayAllAudio && (
                   <button
                     type="button"
-                    onClick={() => onZikr(Math.max(0, resumeIdx))}
-                    className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    onClick={onPlayAllAudio}
+                    className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
+                    aria-label={t(language, "category.playAllAudio")}
+                    title={
+                      audioCoverage
+                        ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
+                        : t(language, "category.playAllAudio")
+                    }
                   >
-                    <span className="leading-none">
-                      {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
-                    </span>
-                    <span className="text-[1.125rem] leading-none" aria-hidden="true">
-                      {direction === "rtl" ? "←" : "→"}
+                    <Volume2 size={16} />
+                    <span>
+                      {t(language, "category.playAll")}
+                      {audioCoverage
+                        ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
+                        : ""}
                     </span>
                   </button>
-                  {onPlayAllAudio && (
-                    <button
-                      type="button"
-                      onClick={onPlayAllAudio}
-                      className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
-                      aria-label={t(language, "category.playAllAudio")}
-                      title={
-                        audioCoverage
-                          ? `${t(language, "category.playAllAudio")}: ${audioCoverage.available}/${audioCoverage.total}`
-                          : t(language, "category.playAllAudio")
-                      }
-                    >
-                      <Volume2 size={16} />
-                      <span>
-                        {t(language, "category.playAll")}
-                        {audioCoverage
-                          ? ` · ${formatNumerals(audioCoverage.available, language)}/${formatNumerals(audioCoverage.total, language)}`
-                          : ""}
-                      </span>
-                    </button>
-                  )}
-                  {completedItemCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={onReset}
-                      className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
-                      aria-label={t(language, "category.resetProgress")}
-                    >
-                      <RotateCcw size={18} />
-                    </button>
-                  )}
-                </>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    onClick={onRepeat}
-                    className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    {isArabic ? (
-                      <>
-                        <span className="text-[0.9375rem] font-bold leading-none">
-                          {t(language, "category.readAgain")}
-                        </span>
-                        <RotateCcw size={18} className="shrink-0" />
-                      </>
-                    ) : (
-                      <>
-                        <RotateCcw size={18} className="shrink-0" />
-                        <span className="text-[0.9375rem] font-bold leading-none">
-                          {t(language, "category.readAgain")}
-                        </span>
-                      </>
-                    )}
-                  </button>
+                )}
+                {completedItemCount > 0 && (
                   <button
                     type="button"
                     onClick={onReset}
@@ -488,11 +403,43 @@ export function CategoryScreen({
                   >
                     <RotateCcw size={18} />
                   </button>
-                </>
-              )}
-            </div>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onRepeat}
+                  className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  {isArabic ? (
+                    <>
+                      <span className="text-[0.9375rem] font-bold leading-none">
+                        {t(language, "category.readAgain")}
+                      </span>
+                      <RotateCcw size={18} className="shrink-0" />
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw size={18} className="shrink-0" />
+                      <span className="text-[0.9375rem] font-bold leading-none">
+                        {t(language, "category.readAgain")}
+                      </span>
+                    </>
+                  )}
+                </button>
+                <button
+                  type="button"
+                  onClick={onReset}
+                  className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                  aria-label={t(language, "category.resetProgress")}
+                >
+                  <RotateCcw size={18} />
+                </button>
+              </>
+            )}
           </div>
-        )}
+        </div>
 
         <div
           role="region"
@@ -617,7 +564,7 @@ export function CategoryScreen({
                 const groupProgress = stepProgress(group.items);
                 return (
                   <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
-                    <div className="mb-3 flex items-center justify-between gap-3">
+                    <div className="mb-3 flex items-center justify-between gap-3 px-1">
                       <h2 id={`group-${group.groupId}`} className="text-[0.875rem] font-extrabold text-foreground">
                         {groupLabel(group.groupId)}
                       </h2>
@@ -637,10 +584,10 @@ export function CategoryScreen({
                         chunk.ritualGroupId ? (
                           <div
                             key={chunk.ritualGroupId}
-                            className="rounded-3xl border border-primary/25 bg-primary/5 p-3"
+                            className={`rounded-3xl border ${routineMode === "core" ? "border-border/30 bg-card overflow-hidden" : "border-primary/25 bg-primary/5 p-3"}`}
                             data-ritual-group={chunk.ritualGroupId}
                           >
-                            <div className="mb-3 px-1">
+                            <div className={`mb-3 px-1 ${routineMode === "core" ? "p-3 pb-0" : ""}`}>
                               <h3 className="text-[0.8125rem] font-extrabold text-primary">
                                 {t(
                                   language,
@@ -660,12 +607,17 @@ export function CategoryScreen({
                                 )}
                               </p>
                             </div>
-                            <div className="flex flex-col gap-3">
+                            <div
+                              className={`flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20" : "gap-3"}`}
+                            >
                               {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
                             </div>
                           </div>
                         ) : (
-                          <div key={`${group.groupId}-${chunkIndex}`} className="flex flex-col gap-2">
+                          <div
+                            key={`${group.groupId}-${chunkIndex}`}
+                            className={`flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20 rounded-2xl border border-border/30 bg-card overflow-hidden" : "gap-2"}`}
+                          >
                             {chunk.items.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
                           </div>
                         ),
@@ -676,12 +628,138 @@ export function CategoryScreen({
               })}
             </div>
           ) : (
-            <div className="mb-6 flex flex-col gap-2">
+            <div
+              className={`mb-6 flex flex-col ${routineMode === "core" ? "gap-0 divide-y divide-border/20 rounded-2xl border border-border/30 bg-card overflow-hidden" : "gap-2"}`}
+            >
               {orderedAzkar.map(({ z, index }) => renderZikrCard({ z, index }, completed.has(z.id)))}
             </div>
           )}
         </div>
       </div>
     </ScreenContainer>
+  );
+}
+
+function CoreZikrAccordion({
+  z,
+  index,
+  isCardCompleted,
+  language,
+  isArabic,
+  direction,
+  onZikr,
+  onToggleZikr,
+}: {
+  z: Zikr;
+  index: number;
+  isCardCompleted: boolean;
+  language: "ar" | "en";
+  isArabic: boolean;
+  direction: "ltr" | "rtl";
+  onZikr: (i: number) => void;
+  onToggleZikr?: (i: number) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const targetCount = z.repetitionCount;
+  const showTiming = hasSpecificRecommendedTiming(z);
+  const timingText = getLocalizedPreferredTiming(z, language);
+
+  return (
+    <div
+      id={`zikr-card-${index}`}
+      className={`flex w-full flex-col bg-transparent transition-all ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
+    >
+      <div className="flex w-full items-center p-3 gap-3" dir={direction}>
+        {/* Index */}
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-[0.875rem] font-bold text-muted-foreground">
+          {formatNumerals(index + 1, language)}
+        </div>
+
+        {/* Text */}
+        <div className="flex-1 text-start min-w-0" dir={direction}>
+          <p
+            className={`${isArabic ? "font-arabic" : "font-sans"} text-[1.0625rem] font-bold text-foreground line-clamp-1`}
+            lang={isArabic ? "ar" : "en"}
+          >
+            {isArabic ? z.arabicText : z.translation}
+          </p>
+          <p className="mt-1 text-[0.75rem] font-semibold text-muted-foreground">
+            {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
+          </p>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center gap-1 shrink-0">
+          <button
+            type="button"
+            onClick={() => setExpanded(!expanded)}
+            className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-expanded={expanded}
+          >
+            <ChevronDown
+              size={20}
+              className={`text-muted-foreground transition-transform ${expanded ? "rotate-180" : ""}`}
+            />
+          </button>
+          {onToggleZikr && (
+            <button
+              type="button"
+              onClick={() => onToggleZikr(index)}
+              className="flex items-center justify-center min-h-[44px] min-w-[44px] rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {isCardCompleted ? (
+                <Check size={24} className="text-emerald-500" strokeWidth={3} />
+              ) : (
+                <div className="size-[20px] rounded-full border-[2.5px] border-muted-foreground opacity-50" />
+              )}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {expanded && (
+        <div className="flex flex-col items-center gap-3 p-4 pt-1 border-t border-border/20 bg-muted/10">
+          <button
+            type="button"
+            onClick={() => onZikr(index)}
+            className="interactive-elem min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3 focus-visible:outline-none focus-visible:rounded-lg focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            {isArabic && z.hasSeekRefuge && (
+              <div className="mb-2 text-center pointer-events-none">
+                <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                  أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
+                </p>
+              </div>
+            )}
+            {isArabic && (z.hasBasmalah || z.isSurah) && (
+              <div className="mb-2 text-center pointer-events-none">
+                <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
+                </p>
+              </div>
+            )}
+            <p
+              className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+              dir={isArabic ? "rtl" : "ltr"}
+              lang={isArabic ? "ar" : "en"}
+            >
+              {isArabic ? z.arabicText : z.translation}
+            </p>
+          </button>
+
+          {showTiming && timingText && (
+            <div
+              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
+              dir={isArabic ? "rtl" : "ltr"}
+            >
+              <span aria-hidden="true" className="shrink-0">
+                💡
+              </span>
+              <span className="leading-snug">{timingText}</span>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   );
 }

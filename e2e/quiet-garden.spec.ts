@@ -192,7 +192,7 @@ test("garden visibility preference persists and keeps Home quiet when disabled",
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
 
   await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await page.getByRole("button", { name: /My progress.*Garden shown/i }).click();
+  await page.getByTestId("settings-sub-progress").click();
   await expect(page.getByRole("heading", { name: "My progress", exact: true })).toBeVisible();
 
   const gardenSwitch = page.getByRole("switch", { name: /^Garden progress/ });
@@ -216,7 +216,7 @@ test("garden visibility preference persists and keeps Home quiet when disabled",
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
   await expect(page.getByTestId("today-garden-card")).toHaveCount(0);
   await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await expect(page.getByRole("button", { name: /My progress.*Garden hidden/i })).toBeVisible();
+  await expect(page.getByTestId("settings-sub-progress")).toContainText(/Garden hidden/i);
 });
 
 test("month view shows the calendar without the removed summary card", async ({ page }) => {
@@ -224,7 +224,7 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await openReturningHome(page);
 
   await page.getByRole("button", { name: "Settings", exact: true }).click();
-  await page.getByRole("button", { name: /My progress.*Garden shown/i }).click();
+  await page.getByTestId("settings-sub-progress").click();
   await page.getByRole("tab", { name: "Month", exact: true }).click();
 
   await expect(page.getByTestId("garden-month-calendar")).toBeVisible();

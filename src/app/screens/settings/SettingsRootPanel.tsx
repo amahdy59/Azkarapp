@@ -1,6 +1,5 @@
 import {
   Calendar,
-  BarChart3,
   BookOpen,
   Database,
   Download,
@@ -11,6 +10,7 @@ import {
   MapPin,
   Moon,
   User,
+  BarChart3,
 } from "../../components/icons";
 import { t } from "../../i18n";
 import { LANGUAGES_LIST } from "../../languageOptions";
@@ -186,6 +186,14 @@ export function SettingsRootPanel({
             user had chosen it. */}
         <SettingsRowItem
           iconBg={iconBackground}
+          icon={<BarChart3 size={20} className="text-primary" />}
+          label={t(language, "settings.myProgress")}
+          right={<RowValue value={t(language, quietProgressEnabled ? "garden.shown" : "garden.hidden")} />}
+          onPress={() => onNav("progress")}
+          {...itemProps("progress")}
+        />
+        <SettingsRowItem
+          iconBg={iconBackground}
           icon={<MapPin size={20} className="text-primary" />}
           label={t(language, "settings.prayerTimesAndReminders")}
           right={<RowValue value={locationSettings?.cityName || t(language, "settings.locationNotSet")} />}
@@ -224,18 +232,6 @@ export function SettingsRootPanel({
           onPress={() => onNav("accessibility")}
           hasDivider={false}
           {...itemProps("accessibility")}
-        />
-      </SettingsSection>
-
-      <SettingsSection label={t(language, "settings.progressSection")}>
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<BarChart3 size={20} className="text-primary" />}
-          label={t(language, "settings.myProgress")}
-          right={<RowValue value={t(language, quietProgressEnabled ? "garden.shown" : "garden.hidden")} />}
-          onPress={() => onNav("progress")}
-          hasDivider={false}
-          {...itemProps("progress")}
         />
       </SettingsSection>
 

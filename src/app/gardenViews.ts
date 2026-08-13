@@ -1,7 +1,7 @@
 import { MAIN_CATEGORY_IDS } from "./progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "./types";
 
-export type DailyCompletionIndex = Map<string, Set<CategoryId>>;
+export type DailyCompletionIndex = Map<string, { categories: Set<CategoryId>; afterPrayers: Set<string> }>;
 
 export type MonthGardenDay = {
   dayKey: string;
@@ -23,6 +23,7 @@ export interface WeekDayRecord {
   eveningStatus: RoutineStatus;
   sleepStatus: RoutineStatus;
   afterPrayerStatus: RoutineStatus;
+  completedAfterPrayers: string[];
   completedCount: number;
   isPalm: boolean;
 }
@@ -85,9 +86,12 @@ export function formatDayKey(date: Date): string {
 export function createDailyCompletionIndex(records: DailyCollectionCompletion[]): DailyCompletionIndex {
   const index: DailyCompletionIndex = new Map();
   for (const record of records) {
-    const categories = index.get(record.dayKey) ?? new Set<CategoryId>();
-    categories.add(record.category);
-    index.set(record.dayKey, categories);
+    const entry = index.get(record.dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    entry.categories.add(record.category);
+    if (record.category === "after_prayer" && record.subCategory) {
+      entry.afterPrayers.add(record.subCategory);
+    }
+    index.set(record.dayKey, entry);
   }
   return index;
 }
@@ -122,7 +126,8 @@ export function getWeekGardenStats(
     const d = new Date(startOfWeek);
     d.setDate(startOfWeek.getDate() + i);
     const dayKey = formatDayKey(d);
-    const categories = index.get(dayKey) ?? new Set<CategoryId>();
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const categories = entry.categories;
     const isToday = dayKey === todayKey;
 
     const hasMorning = categories.has("morning");
@@ -150,10 +155,11 @@ export function getWeekGardenStats(
       weekdayName: weekdayFormatter.format(d),
       isToday,
       morningStatus: hasMorning ? "complete" : "missed",
-      eveningStatus: hasEvening ? "complete" : "missed",
-      sleepStatus: hasSleep ? "complete" : "missed",
-      afterPrayerStatus: hasAfterPrayer ? "complete" : "missed",
-      completedCount: countMainCompletions(categories),
+      eveningStatus: hasEvening ? "complete" : isToday ? "partial" : "missed",
+      sleepStatus: hasSleep ? "complete" : isToday ? "partial" : "missed",
+      afterPrayerStatus: hasAfterPrayer ? "complete" : isToday ? "partial" : "missed",
+      completedAfterPrayers: Array.from(entry.afterPrayers),
+      completedCount: [hasMorning, hasEvening, hasSleep, hasAfterPrayer].filter(Boolean).length,
       isPalm,
     });
   }
@@ -196,7 +202,8 @@ export function getMonthGardenDays(
   return Array.from({ length: daysInMonth }, (_, dayIndex): MonthGardenDay => {
     const dayNum = dayIndex + 1;
     const dayKey = `${year}-${pad(zeroBasedMonth + 1)}-${pad(dayNum)}`;
-    const categories = index.get(dayKey) ?? new Set<CategoryId>();
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
 
@@ -287,8 +294,9 @@ export function getYearGardenStats(index: DailyCompletionIndex, year: number) {
   let totalCollections = 0;
   let activeDays = 0;
 
-  for (const [dayKey, categories] of index) {
+  for (const [dayKey, entry] of index) {
     if (!dayKey.startsWith(`${year}-`)) continue;
+    const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     if (completedCount === 0) continue;
     activeDays += 1;
@@ -326,9 +334,12 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     let activeDaysCount = 0;
     const dayCells: YearMonthHeatmap["dayCells"] = [];
 
-    for (let d = 1; d <= daysInMonth; d++) {
-      const dayKey = `${year}-${pad(m + 1)}-${pad(d)}`;
-      const categories = index.get(dayKey) ?? new Set<CategoryId>();
+    for (let i = 0; i < daysInMonth; i++) {
+      const d = new Date(year, m, i + 1);
+      const dayKey = formatDayKey(d);
+      const entry = index.get(dayKey);
+      const categories = entry ? entry.categories : new Set<CategoryId>();
+
       const count = countMainCompletions(categories);
       const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
 
@@ -359,7 +370,7 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       if (categories.has("after_prayer")) afterPrayerTotal++;
 
       const level: 0 | 1 | 2 = isPalm ? 2 : count > 0 ? 1 : 0;
-      dayCells.push({ dayNum: d, level, isPalm });
+      dayCells.push({ dayNum: i + 1, level, isPalm });
     }
 
     const completionRate = Math.round((monthCompletions / (daysInMonth * 4)) * 100);
