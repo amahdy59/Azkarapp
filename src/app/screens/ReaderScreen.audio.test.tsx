@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
@@ -86,6 +86,20 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
+
+    // Counter is hidden until the user scrolls to the bottom of a long surah.
+    expect(screen.queryByTestId("counter-surface")).toBeNull();
+
+    // Simulate scrolling to the bottom using getter-based defineProperty so
+    // jsdom's internal DOM machinery (scrollTop setter, etc.) is not disturbed.
+    const scrollRegion = screen.getByRole("region", { name: "نص الذكر" });
+    Object.defineProperty(scrollRegion, "scrollHeight", { configurable: true, get: () => 1000 });
+    Object.defineProperty(scrollRegion, "clientHeight", { configurable: true, get: () => 500 });
+    Object.defineProperty(scrollRegion, "scrollTop", { configurable: true, get: () => 500 });
+    act(() => {
+      fireEvent.scroll(scrollRegion);
+    });
+
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
     expect(screen.getAllByTestId("mushaf-page")).toHaveLength(12);
     expect(screen.getAllByTestId("mushaf-page-separator")).toHaveLength(11);

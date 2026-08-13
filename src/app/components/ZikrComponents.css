@@ -303,7 +303,7 @@
   gap: 10px;
 }
 .counter-complete-cue {
-  animation: counter-complete-pop 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: counter-complete-pop 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 .counter-check-mark {
@@ -320,7 +320,7 @@
 }
 
 .counter-face-swap {
-  animation: counter-face-swap 180ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: counter-face-swap 220ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .counter-complete-label {
   font-size: 0.9375rem;
@@ -332,7 +332,7 @@
 .counter-complete-cue .counter-check-mark svg path {
   stroke-dasharray: 48;
   stroke-dashoffset: 48;
-  animation: check-draw 300ms cubic-bezier(0.22, 1, 0.36, 1) 90ms forwards;
+  animation: check-draw 340ms cubic-bezier(0.22, 1, 0.36, 1) 90ms forwards;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { COUNTER_ADVANCE_DELAY_MS } from "../constants/reader";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -69,7 +69,7 @@ export function useZikrCounter({
     };
   }, []);
 
-  const handleTap = () => {
+  const handleTap = useCallback(() => {
     if (complete || !z) {
       return;
     }
@@ -78,7 +78,7 @@ export function useZikrCounter({
     setCount(next);
     onCount?.();
     if (hapticFeedback) {
-      vibrate(22);
+      vibrate(30);
     }
 
     if (next >= z.repetitionCount) {
@@ -93,7 +93,7 @@ export function useZikrCounter({
         }),
       );
       if (hapticFeedback) {
-        vibrate([30, 50, 30]);
+        vibrate([40, 50, 40]);
       }
       onComplete(idx);
       advanceTimer.current = setTimeout(() => {
@@ -105,7 +105,21 @@ export function useZikrCounter({
         setReaderAnnouncement(`${formatNumerals(next, language)}`);
       }
     }
-  };
+  }, [
+    complete,
+    z,
+    count,
+    onCount,
+    hapticFeedback,
+    vibrate,
+    collectionCompletedCount,
+    isDone,
+    azkarLength,
+    language,
+    onComplete,
+    idx,
+    onAdvance,
+  ]);
 
   const shouldIgnoreCountTap = (target: EventTarget | null) => {
     if (!(target instanceof Element)) {
@@ -143,6 +157,34 @@ export function useZikrCounter({
     setJustCompleted(false);
     setReaderAnnouncement(t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"));
   };
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e: KeyboardEvent) => {
+      if (e.key === " " || e.code === "Space") {
+        // e.target may be window/document in some environments, guard before
+        // calling DOM methods that only exist on Element/HTMLElement.
+        const target = e.target instanceof HTMLElement ? e.target : null;
+        if (
+          target?.tagName === "INPUT" ||
+          target?.tagName === "TEXTAREA" ||
+          target?.hasAttribute("contenteditable") ||
+          target?.closest("button, [role='button']") // Let focused buttons handle their own spacebar
+        ) {
+          return;
+        }
+
+        if (isLongSurah(z)) {
+          return;
+        }
+
+        e.preventDefault();
+        handleTap();
+      }
+    };
+
+    window.addEventListener("keydown", handleGlobalKeyDown);
+    return () => window.removeEventListener("keydown", handleGlobalKeyDown);
+  }, [z, handleTap]);
 
   return {
     count,

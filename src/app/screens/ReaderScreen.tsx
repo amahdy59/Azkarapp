@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import "../../styles/animations/ZikrAnimations.css";
 import { motion, AnimatePresence } from "motion/react";
 import "./ReaderScreen.css";
@@ -189,6 +189,7 @@ export function ReaderScreen({
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
   const [visibleMushafPage, setVisibleMushafPage] = useState<number | null>(null);
   const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -246,6 +247,23 @@ export function ReaderScreen({
   useEffect(() => {
     setSelectedWordMeanings(null);
   }, [z?.id]);
+
+  useLayoutEffect(() => {
+    setIsScrolledToBottom(false);
+    if (readingScrollRef.current) {
+      readingScrollRef.current.scrollTop = 0;
+    }
+  }, [idx]);
+
+  const handleScroll = useCallback(() => {
+    if (!longSurah || isScrolledToBottom) return;
+    const el = readingScrollRef.current;
+    if (!el) return;
+    // Show counter when within 150px of the bottom
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 150) {
+      setIsScrolledToBottom(true);
+    }
+  }, [longSurah, isScrolledToBottom]);
 
   // Long-Surah reading-position tracking. Drives the floating "jump to
   // counter" affordance (task: sticky mini-counter) and lets it report which
@@ -1000,6 +1018,7 @@ export function ReaderScreen({
             <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
               <div
                 ref={readingScrollRef}
+                onScroll={handleScroll}
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}
@@ -1025,7 +1044,9 @@ export function ReaderScreen({
                 </AnimatePresence>
               </div>
 
-              <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+              <footer className="shrink-0 pb-3 pt-2">
+                {(!longSurah || isScrolledToBottom) && renderCounterStack()}
+              </footer>
             </div>
 
             {renderSideNavigation()}
@@ -1117,6 +1138,7 @@ export function ReaderScreen({
                 ordinary adhkar retain the fixed counter below this scroll region. */}
             <div
               ref={readingScrollRef}
+              onScroll={handleScroll}
               role="region"
               tabIndex={0}
               aria-label={t(language, "reader.readingText")}
@@ -1138,7 +1160,9 @@ export function ReaderScreen({
             {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
+            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
+              {(!longSurah || isScrolledToBottom) && renderCounterStack()}
+            </div>
 
             {renderSideNavigation()}
             {renderLongSurahJumpFab()}

@@ -70,8 +70,8 @@ export function createCounterClickPlayer(createAudioContext: () => AudioContext 
       // Wooden body: two partials at a slightly inharmonic ratio, each decaying
       // fast. Frequencies sit where small hardwood beads actually resonate.
       for (const [frequency, peak, decay] of [
-        [1180, 0.22, 0.07],
-        [1870, 0.12, 0.045],
+        [1180, 0.35, 0.07],
+        [1870, 0.2, 0.045],
       ] as const) {
         const oscillator = ctx.createOscillator();
         const gain = ctx.createGain();
@@ -107,7 +107,7 @@ export function createCounterClickPlayer(createAudioContext: () => AudioContext 
         bandpass.type = "bandpass";
         bandpass.frequency.setValueAtTime(2400, startAt);
         bandpass.Q.setValueAtTime(1.1, startAt);
-        noiseGain.gain.setValueAtTime(0.16, startAt);
+        noiseGain.gain.setValueAtTime(0.25, startAt);
         noiseGain.gain.exponentialRampToValueAtTime(0.0001, startAt + 0.03);
         source.connect(bandpass);
         bandpass.connect(noiseGain);

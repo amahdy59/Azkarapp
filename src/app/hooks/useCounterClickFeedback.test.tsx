@@ -93,8 +93,7 @@ describe("counter click feedback", () => {
     expect(oscillator.start).toHaveBeenLastCalledWith(4);
     expect(frequency.setValueAtTime).toHaveBeenCalledWith(1180, 4);
     expect(frequency.setValueAtTime).toHaveBeenCalledWith(1870, 4);
-    // Audibly louder than the old 0.035 sine so it carries on a phone speaker.
-    expect(gainParam.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.22, 4.002);
+    expect(gainParam.exponentialRampToValueAtTime).toHaveBeenCalledWith(0.35, 4.002);
     // A context without createBuffer simply skips the noise transient.
     expect(() => play()).not.toThrow();
   });
