@@ -639,7 +639,7 @@ export function HomeScreen({
                                   ? "earlier"
                                   : "upcoming"
                         }
-                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
+                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer
@@ -796,10 +796,10 @@ export function HomeScreen({
                 </div>
                 <div className="relative z-10 m-3 rounded-2xl bg-slate-950/90 p-4 shadow-lg sm:m-4 sm:p-5">
                   <span className="block">
-                    <span className="block text-[1.25rem] font-black text-white drop-shadow-md">
+                    <span className="block text-[1.25rem] font-black text-on-media drop-shadow-md">
                       {t(language, "benefits.title")}
                     </span>
-                    <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-white/90 sm:text-[0.875rem]">
+                    <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-on-media-muted sm:text-[0.875rem]">
                       {t(language, "benefits.homeDescription")}
                     </span>
                     <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-400 drop-shadow-sm">

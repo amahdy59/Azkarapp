@@ -15,11 +15,19 @@ export interface HomeSavedCardItem {
   source: HomeSavedSource;
 }
 
-function DirectionArrow({ direction, size = 18 }: { direction: "ltr" | "rtl"; size?: number }) {
+function DirectionArrow({
+  direction,
+  size = 18,
+  className,
+}: {
+  direction: "ltr" | "rtl";
+  size?: number;
+  className?: string;
+}) {
   return direction === "rtl" ? (
-    <ArrowLeft size={size} className="shrink-0" aria-hidden="true" />
+    <ArrowLeft size={size} className={`shrink-0${className ? ` ${className}` : ""}`} aria-hidden="true" />
   ) : (
-    <ArrowRight size={size} className="shrink-0" aria-hidden="true" />
+    <ArrowRight size={size} className={`shrink-0${className ? ` ${className}` : ""}`} aria-hidden="true" />
   );
 }
 
@@ -59,20 +67,7 @@ export function PrayerRoutineCard({
     >
       <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-slate-950/82 px-5 py-6 text-start shadow-2xl backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
         <div className="flex w-full flex-col items-start gap-3 px-1">
-          <div className="hidden" aria-hidden="true">
-            <Clock className="size-[15px] shrink-0 text-on-media-accent" aria-hidden="true" />
-            <span>{t(language, "home.nextPrayer")}</span>
-            <strong className="font-extrabold text-white" dir="auto">
-              {""}
-            </strong>
-            <span className="text-white/45" aria-hidden="true">
-              •
-            </span>
-            <time className="font-extrabold text-white">{""}</time>
-            <span className="rounded-full bg-white/10 px-2 py-0.5 font-bold text-on-media-accent" dir="ltr">
-              {""}
-            </span>
-          </div>
+
 
           <h2
             id="current-zikr-heading"
@@ -82,7 +77,7 @@ export function PrayerRoutineCard({
           >
             {categoryName}
           </h2>
-          <p className="max-w-[52ch] text-[0.875rem] font-semibold leading-6 text-white/88" dir="auto">
+          <p className="max-w-[52ch] text-[0.875rem] font-semibold leading-6 text-on-media-muted" dir="auto">
             {description}
           </p>
         </div>
@@ -93,10 +88,10 @@ export function PrayerRoutineCard({
             onChange={onModeChange}
             direction={direction}
             aria-label={t(language, "home.routineMode")}
-            className="flex min-h-[48px] w-full items-center rounded-2xl border border-white/16 bg-black/45 p-1"
+            className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
             itemClassName={(selected) =>
               `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                selected ? "bg-primary text-primary-foreground shadow-xs" : "text-white/95 hover:bg-white/8"
+                selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
               }`
             }
             options={[
@@ -124,7 +119,7 @@ export function PrayerRoutineCard({
                 })}
               </span>
             </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-black/30" aria-hidden="true">
+            <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
               <div
                 className={`h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
                   direction === "rtl" ? "origin-right" : "origin-left"
@@ -143,7 +138,11 @@ export function PrayerRoutineCard({
           className="group mt-1 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-lg transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
-          <DirectionArrow direction={direction} size={20} />
+          <DirectionArrow
+            direction={direction}
+            size={20}
+            className="transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
+          />
         </button>
       </div>
     </section>
@@ -269,7 +268,7 @@ export function SavedZikrCard({
         <button
           type="button"
           onClick={onOpenLibrary}
-          className="mt-auto flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 py-3 text-[0.875rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="mt-auto flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 py-3 text-[0.875rem] font-black text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {count > 0
             ? t(language, "home.openSavedCount", { count: formatNumerals(count, language) })
@@ -311,9 +310,9 @@ export function FridayHomeCard({
           />
         </span>
         <div className="min-w-0 flex-1 text-start">
-          <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
+          <h2 id="friday-card-heading" className="text-lg font-black text-foreground">
             {t(language, "friday.title")}
-          </h3>
+          </h2>
           <p className="mt-1 max-w-[65ch] text-sm font-medium leading-6 text-muted-foreground">
             {t(language, "home.fridayCompactBody")}
           </p>
@@ -349,9 +348,9 @@ export function FridayHomeCard({
           <p className="text-xs font-black uppercase tracking-wide text-primary">
             {t(language, "home.fridayWindowLabel")}
           </p>
-          <h3 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
+          <h2 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
             {t(language, "home.kahfMerit")}
-          </h3>
+          </h2>
           <p className="mt-3 max-w-[62ch] text-[0.875rem] font-medium leading-7 text-muted-foreground" dir="auto">
             {t(language, "friday.kahfHadith")}
           </p>
