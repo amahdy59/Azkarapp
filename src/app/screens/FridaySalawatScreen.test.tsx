@@ -8,7 +8,7 @@ describe("FridaySalawatScreen", () => {
   beforeEach(() => localStorage.clear());
   afterEach(cleanup);
 
-  it("counts across the devotional canvas, supports targets, and resets", async () => {
+  it("counts across the devotional canvas, supports targets, and resets via the More Options menu", async () => {
     const user = userEvent.setup();
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 
@@ -22,7 +22,9 @@ describe("FridaySalawatScreen", () => {
     expect(counter).toHaveAccessibleName("Completed 10 / 10");
     expect(readFridaySalawatProgress()).toEqual({ count: 10, target: 10 });
 
-    fireEvent.click(screen.getByRole("button", { name: "Reset counter" }));
+    // Open More Options Menu
+    await user.click(screen.getByRole("button", { name: "More options" }));
+    fireEvent.click(screen.getByRole("menuitem", { name: "Reset counter" }));
     expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 10 });
   });
 

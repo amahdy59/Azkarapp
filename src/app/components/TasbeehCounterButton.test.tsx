@@ -7,7 +7,8 @@ describe("TasbeehCounterButton", () => {
     const handleClick = vi.fn();
     render(<TasbeehCounterButton onClick={handleClick} language="en" direction="ltr" />);
 
-    const button = screen.getByRole("button", { name: "Tasbeeh Counter" });
+    // EN label is now "Masbaha" (counter.tasbeehTitle)
+    const button = screen.getByRole("button", { name: "Masbaha" });
     expect(button).toBeInTheDocument();
     expect(button).toHaveClass("w-full", "min-h-16", "sm:min-h-[4.5rem]", "max-w-[80rem]", "mx-auto");
 
@@ -19,7 +20,8 @@ describe("TasbeehCounterButton", () => {
     const handleClick = vi.fn();
     render(<TasbeehCounterButton onClick={handleClick} language="ar" direction="rtl" />);
 
-    const button = screen.getByRole("button", { name: "المسبحة الإلكترونية" });
+    // AR label is now "المسبحة" (counter.tasbeehTitle in ar.ts)
+    const button = screen.getByRole("button", { name: "المسبحة" });
     expect(button).toBeInTheDocument();
     expect(button).toHaveAttribute("dir", "rtl");
 

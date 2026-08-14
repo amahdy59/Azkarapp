@@ -76,9 +76,7 @@ function MainDhikrGroupCard({
       <div
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
           compact ? "size-11 sm:size-14" : "size-14"
-        } ${
-          isCompleted ? "border-primary/45 bg-primary text-primary-foreground" : "border-border bg-muted text-primary"
-        }`}
+        } ${isCompleted ? "border-primary/50 bg-primary/15 text-primary" : "border-border bg-muted text-primary"}`}
       >
         {icon}
       </div>
@@ -165,22 +163,22 @@ export function ProgressDayView({
     {
       id: "morning" as const,
       name: t(language, "progress.morningAzkar"),
-      icon: <Sun size={20} className="text-primary" />,
+      icon: <Sun size={20} />,
     },
     {
       id: "evening" as const,
       name: t(language, "progress.eveningAzkar"),
-      icon: <Sun size={20} className="text-primary" />,
+      icon: <Sun size={20} />,
     },
     {
       id: "before_sleep" as const,
       name: t(language, "progress.sleepAzkar"),
-      icon: <Moon size={20} className="text-primary" />,
+      icon: <Moon size={20} />,
     },
     {
       id: "after_prayer" as const,
       name: t(language, "progress.postPrayerAzkar"),
-      icon: <Sparkles size={20} className="text-primary" />,
+      icon: <Sparkles size={20} />,
     },
   ];
 
@@ -205,8 +203,8 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border border-border bg-card p-5 text-foreground shadow-raised sm:p-7 md:p-8 ${
-          isHomeSubset ? "flex-1" : ""
+        className={`flex w-full flex-col rounded-[28px] border p-5 text-foreground shadow-raised sm:p-7 md:p-8 ${
+          isHomeSubset ? "flex-1 border-border/50 bg-card/85 backdrop-blur-xl" : "border-border bg-card"
         }`}
       >
         <div className="flex items-start justify-between gap-3">

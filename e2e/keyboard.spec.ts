@@ -51,7 +51,7 @@ test("Settings navigation via keyboard is fully operable", async ({ page }) => {
 test("Counters keyboard navigation and reset", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.goto("/#/counter");
-  await expect(page.getByRole("heading", { name: "Tasbeeh Counter" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Masbaha" })).toBeVisible();
 
   // Find the large tap area
   const counterArea = page.getByTestId("custom-counter-surface");
@@ -62,17 +62,18 @@ test("Counters keyboard navigation and reset", async ({ page }) => {
   // Ensure the count increased
   await expect(page.getByText("2").first()).toBeVisible();
 
-  // Reset via keyboard
-  const resetBtn = page.getByRole("button", { name: /Reset/i }).first();
-  await resetBtn.focus();
+  // Reset via keyboard: open more options menu first
+  const moreOptions = page.getByRole("button", { name: /options/i }).first();
+  await moreOptions.focus();
   await page.keyboard.press("Enter");
 
-  // Handle reset dialog
-  const confirmBtn = page.getByRole("button", { name: /Reset/i }).last();
-  await expect(confirmBtn).toBeVisible();
-  await confirmBtn.focus();
+  // The Reset menu item directly resets the counter without a confirmation dialog
+  const resetMenuItem = page.getByRole("menuitem", { name: /Reset/i }).first();
+  await expect(resetMenuItem).toBeVisible();
+  await resetMenuItem.focus();
   await page.keyboard.press("Enter");
 
+  // Counter should be back to 0 after reset
   await expect(page.getByText("0").first()).toBeVisible();
 });
 

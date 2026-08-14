@@ -123,7 +123,7 @@ describe("HomeScreen quick access", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /^After Fajr/ }));
     expect(onPrayerResume).toHaveBeenCalledWith("fajr");
-    fireEvent.click(screen.getByRole("button", { name: "Tasbeeh Counter" }));
+    fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
     expect(onOpenCustomCounter).toHaveBeenCalledOnce();
   });
 

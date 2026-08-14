@@ -1,11 +1,16 @@
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { BookOpen, ExternalLink, RotateCcw, Sparkles, X } from "../components/icons";
+import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, X } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { Modal } from "../components/ResponsiveSheet";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { Button } from "../components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
@@ -139,15 +144,31 @@ export function FridaySalawatScreen({
         onBack={onBack}
         language={language}
         right={
-          <button
-            type="button"
-            onClick={() => setShowBenefits(true)}
-            className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            aria-label={copy.benefits}
-            aria-haspopup="dialog"
-          >
-            <BookOpen size={20} aria-hidden="true" />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => setShowBenefits(true)}
+              className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              aria-label={copy.benefits}
+              aria-haspopup="dialog"
+            >
+              <BookOpen size={20} aria-hidden="true" />
+            </button>
+            <DropdownMenu dir={direction}>
+              <DropdownMenuTrigger
+                className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                aria-label={t(language, "common.moreOptions")}
+              >
+                <MoreVertical size={20} aria-hidden="true" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
+                  <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                  <span>{copy.reset}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         }
       />
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
@@ -171,7 +192,20 @@ export function FridaySalawatScreen({
             </span>
           </div>
           <ProgressBar value={progress.count} max={progress.target} direction={direction} aria-label={copy.target} />
-          <p className="truncate text-start text-[0.875rem] font-black text-foreground">{copy.subtitle}</p>
+          <div className="flex items-center gap-2 pt-1" data-prevent-count="true">
+            <div className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl border border-border-control bg-background px-3 py-2 text-[0.875rem] font-bold text-foreground">
+              <span className="truncate">{copy.subtitle}</span>
+            </div>
+            <div className="shrink-0 w-[100px]">
+              <CounterTargetPicker
+                activeTarget={progress.target}
+                onTargetChange={(target) => persist(0, target)}
+                language={language}
+                direction={direction}
+                allowOpen={false}
+              />
+            </div>
+          </div>
         </section>
 
         <div className="my-auto flex flex-col items-center justify-center py-8 sm:py-10">
@@ -182,42 +216,35 @@ export function FridaySalawatScreen({
           >
             {copy.phrase}
           </p>
-          <ZikrCounterSurface
-            count={progress.count}
-            total={progress.target}
-            complete={complete}
-            onTap={increment}
-            language={language}
-            instructionText=""
-            testId="salawat-counter"
-            className="salawat-counter-surface"
-            reduceMotion={reduceMotion}
-          />
-
-          <div className="mt-6 flex w-full max-w-sm items-center justify-center gap-2" data-prevent-count="true">
-            <div className="min-w-0 flex-1">
-              <CounterTargetPicker
-                activeTarget={progress.target}
-                onTargetChange={(target) => persist(0, target)}
+          <div className="flex w-full items-center justify-center gap-2.5">
+            <div className="flex min-w-0 flex-1 justify-center">
+              <ZikrCounterSurface
+                count={progress.count}
+                total={progress.target}
+                complete={complete}
+                onTap={increment}
                 language={language}
-                direction={direction}
-                allowOpen={false}
+                instructionText={t(language, "reader.tapAnywhere")}
+                testId="salawat-counter"
+                reduceMotion={reduceMotion}
               />
             </div>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={reset}
-              disabled={progress.count === 0}
-              aria-label={copy.reset}
-            >
-              <RotateCcw size={18} aria-hidden="true" />
-              <span className="sr-only sm:not-sr-only">{copy.reset}</span>
-            </Button>
           </div>
-          <p className="mt-3 text-center text-[0.8125rem] font-semibold text-muted-foreground">
-            {t(language, "reader.tapAnywhere")}
-          </p>
+        </div>
+        <div className="mx-auto mt-4 hidden w-fit items-center justify-center gap-3 rounded-full border border-border bg-card px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex">
+          <span>
+            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground">
+              Space
+            </kbd>{" "}
+            {t(language, "counter.count")}
+          </span>
+          <span aria-hidden="true">·</span>
+          <span>
+            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground">
+              R
+            </kbd>{" "}
+            {t(language, "counter.reset")}
+          </span>
         </div>
       </div>
 

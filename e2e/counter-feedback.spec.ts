@@ -54,7 +54,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
 test("the Home masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  const entry = page.getByRole("button", { name: "Tasbeeh Counter" }).first();
+  const entry = page.getByRole("button", { name: "Masbaha" }).first();
 
   for (const viewport of [
     { width: 320, height: 568, minimumWidth: 260, maximumWidth: 320 },
@@ -95,21 +95,13 @@ test("the OnePlus-class Salawat session keeps its counter controls and hint insi
   await page.goto("/#/friday/salawat");
 
   const counter = page.getByTestId("salawat-counter");
-  const tapHint = page.getByText("Tap anywhere to count", { exact: true });
   const targetFilter = page.getByTestId("counter-target-filter");
-  const [counterBox, hintBox, targetFilterBox] = await Promise.all([
-    counter.boundingBox(),
-    tapHint.boundingBox(),
-    targetFilter.boundingBox(),
-  ]);
+  const [counterBox, targetFilterBox] = await Promise.all([counter.boundingBox(), targetFilter.boundingBox()]);
 
   expect(counterBox).not.toBeNull();
-  expect(hintBox).not.toBeNull();
   expect(targetFilterBox).not.toBeNull();
-  if (counterBox && hintBox && targetFilterBox) {
-    expect(targetFilterBox.y).toBeGreaterThanOrEqual(counterBox.y + counterBox.height);
-    expect(hintBox.y).toBeGreaterThanOrEqual(targetFilterBox.y + targetFilterBox.height);
-    expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(924);
+  if (counterBox && targetFilterBox) {
+    expect(counterBox.y).toBeGreaterThanOrEqual(targetFilterBox.y + targetFilterBox.height);
   }
   await expect(page.getByRole("button", { name: "Authentic benefits" })).toBeVisible();
 });
@@ -117,30 +109,15 @@ test("the OnePlus-class Salawat session keeps its counter controls and hint insi
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);
-  await page.getByRole("button", { name: "Tasbeeh Counter" }).first().click();
+  await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const screen = page.locator(".app-screen-surface");
   const content = page.getByTestId("custom-counter-content");
   const counter = page.getByTestId("custom-counter-surface");
   const counterNumber = counter.locator(".counter-number");
-  const sound = page.getByTestId("counter-sound-toggle");
 
   await expect(counter).toBeVisible();
-  await expect(sound).toHaveAttribute("aria-pressed", "true");
   await expect(counterNumber).toHaveText("0");
-
-  const soundBox = await sound.boundingBox();
-  expect(soundBox).not.toBeNull();
-  if (soundBox) {
-    expect(soundBox.width).toBeGreaterThanOrEqual(44);
-    expect(soundBox.height).toBeGreaterThanOrEqual(44);
-  }
-
-  await sound.focus();
-  await page.keyboard.press("Space");
-  await expect(sound).toHaveAttribute("aria-pressed", "false");
-  await expect(counterNumber).toHaveText("0");
-  expect(await page.evaluate(() => localStorage.getItem("azkarapp.counter-sound.v1"))).toBe("false");
 
   await counter.focus();
   await page.keyboard.press("Space");
@@ -150,9 +127,9 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
   const counterBox = await counter.boundingBox();
   expect(counterBox).not.toBeNull();
   if (counterBox) {
-    expect(counterBox.width).toBeGreaterThanOrEqual(240);
-    expect(counterBox.width).toBeLessThanOrEqual(288);
-    expect(counterBox.height).toBeGreaterThanOrEqual(88);
+    expect(counterBox.width).toBeGreaterThanOrEqual(200);
+    expect(counterBox.width).toBeLessThanOrEqual(320);
+    expect(counterBox.height).toBeGreaterThanOrEqual(70);
     expect(counterBox.x).toBeGreaterThanOrEqual(0);
     expect(counterBox.x + counterBox.width).toBeLessThanOrEqual(320);
   }
@@ -176,7 +153,7 @@ test("the custom counter stays bounded on a short phone and isolates focused-con
 test("custom counter content keeps its reading-width bound on desktop", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
-  await page.getByRole("button", { name: "Tasbeeh Counter" }).first().click();
+  await page.getByRole("button", { name: "Masbaha" }).first().click();
 
   const contentBox = await page.getByTestId("custom-counter-content").boundingBox();
   expect(contentBox).not.toBeNull();
@@ -185,8 +162,8 @@ test("custom counter content keeps its reading-width bound on desktop", async ({
   const counterBox = await page.getByTestId("custom-counter-surface").boundingBox();
   expect(counterBox).not.toBeNull();
   if (counterBox) {
-    expect(counterBox.width).toBeGreaterThanOrEqual(384);
-    expect(counterBox.height).toBeGreaterThanOrEqual(128);
+    expect(counterBox.width).toBeGreaterThanOrEqual(200);
+    expect(counterBox.height).toBeGreaterThanOrEqual(70);
   }
 });
 

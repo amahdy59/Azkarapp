@@ -293,7 +293,7 @@ test("theme emulation (forced colors/high contrast) has no automatically detecta
 test("custom counter has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.goto("/#/counter");
-  await expect(page.getByRole("heading", { name: "Tasbeeh Counter" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Masbaha" })).toBeVisible();
   await expectNoWcagViolations(page);
 });
 

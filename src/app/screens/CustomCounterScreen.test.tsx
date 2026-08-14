@@ -1,5 +1,6 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { COUNTER_SOUND_STORAGE_KEY } from "../hooks/useCounterClickFeedback";
 import { CustomCounterScreen } from "./CustomCounterScreen";
 
@@ -11,13 +12,14 @@ describe("CustomCounterScreen Component", () => {
     const onBack = vi.fn();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
-    expect(screen.getByText("المسبحة الإلكترونية")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /الذكر المأثور/ })).toBeInTheDocument();
+    expect(screen.getByText("المسبحة")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "التسبيح والتحميد" })).toBeInTheDocument();
     expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
-    expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("custom-counter-surface");
+    expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("adaptive-counter-surface");
   });
 
-  it("increments on tap, removes undo, and keeps reset as the single secondary action", () => {
+  it("increments on tap, removes undo, and keeps reset as the single secondary action in the menu", async () => {
+    const user = userEvent.setup();
     const onBack = vi.fn();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
@@ -26,11 +28,16 @@ describe("CustomCounterScreen Component", () => {
 
     expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("١");
     expect(screen.queryByRole("button", { name: "تراجع" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "إعادة تعيين العداد" }));
+
+    // Open More Options and click Reset
+    await user.click(screen.getByRole("button", { name: "المزيد من الخيارات" }));
+    await user.click(screen.getByRole("menuitem", { name: "إعادة تعيين العداد" }));
+
     expect(screen.getAllByText("٠")[0]).toBeInTheDocument();
   });
 
-  it("counts from non-interactive canvas space while protecting controls", () => {
+  it("counts from non-interactive canvas space while protecting controls", async () => {
+    const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
     const canvas = screen.getByTestId("custom-counter-content");
@@ -38,54 +45,58 @@ describe("CustomCounterScreen Component", () => {
     fireEvent.click(canvas);
     expect(counter).toHaveTextContent("1");
 
-    fireEvent.click(screen.getByTestId("counter-target-filter"));
+    // Click the target filter instead of opening the zikr dropdown
+    await user.click(screen.getByTestId("counter-target-filter"));
     expect(counter).toHaveTextContent("1");
   });
 
-  it("persists a localized sound toggle with pressed-state semantics", () => {
+  it("persists a localized sound toggle with pressed-state semantics inside More Options menu", async () => {
+    const user = userEvent.setup();
     const firstRender = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
-    const mute = screen.getByRole("button", { name: "Counter sound" });
 
-    expect(mute).toHaveAttribute("aria-pressed", "true");
-    expect(mute).toHaveClass("size-11");
-    fireEvent.click(mute);
-    expect(screen.getByRole("button", { name: "Counter sound" })).toHaveAttribute("aria-pressed", "false");
+    // Open More Options
+    await user.click(screen.getByRole("button", { name: "More options" }));
+    const mute = screen.getByRole("menuitem", { name: "Mute counter sound" });
+
+    // Toggle sound
+    await user.click(mute);
+
+    // Verify local storage and menu item change
+    await user.click(screen.getByRole("button", { name: "More options" }));
+    expect(screen.getByRole("menuitem", { name: "Enable counter sound" })).toBeInTheDocument();
     expect(window.localStorage.getItem(COUNTER_SOUND_STORAGE_KEY)).toBe("false");
 
     firstRender.unmount();
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={vi.fn()} />);
-    expect(screen.getByRole("button", { name: "صوت العداد" })).toHaveAttribute("aria-pressed", "false");
+
+    await user.click(screen.getByRole("button", { name: "المزيد من الخيارات" }));
+    expect(screen.getByRole("menuitem", { name: "تشغيل صوت العداد" })).toBeInTheDocument();
   });
 
   it("counts once from the focused counter but never from Space on another control", () => {
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
     const counter = screen.getByTestId("custom-counter-surface");
-    const soundToggle = screen.getByTestId("counter-sound-toggle");
+    const moreOptions = screen.getByRole("button", { name: "More options" });
 
-    soundToggle.focus();
-    fireEvent.keyDown(soundToggle, { key: " ", code: "Space" });
+    moreOptions.focus();
+    fireEvent.keyDown(moreOptions, { key: " ", code: "Space" });
     expect(counter).toHaveTextContent("0");
 
     counter.focus();
     fireEvent.keyDown(counter, { key: " ", code: "Space" });
     expect(counter).toHaveTextContent("1");
-
-    const reset = screen.getByRole("button", { name: /reset counter/i });
-    reset.focus();
-    fireEvent.keyDown(reset, { key: " ", code: "Space" });
-    expect(counter).toHaveTextContent("1");
   });
 
-  it("exposes the zikr picker as a labelled dialog control with a concise benefit", () => {
+  it("exposes the zikr picker as a labelled dropdown menu", async () => {
+    const user = userEvent.setup();
     render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
 
-    const picker = screen.getByRole("button", { name: /Selected Dhikr/i });
-    expect(picker).toHaveAttribute("aria-haspopup", "dialog");
-    expect(picker).toHaveAttribute("aria-expanded", "false");
+    const picker = screen.getByRole("button", { name: /Tasbeeh & Tahmeed/i });
 
-    fireEvent.click(picker);
-    expect(screen.getByRole("textbox")).toHaveAccessibleName(/.+/);
-    expect(picker).toHaveAttribute("aria-expanded", "true");
+    await user.click(picker);
+
+    // Verify that the dropdown menu options are visible (checking another category)
+    expect(screen.getByRole("menuitemradio", { name: /Tahliel & Tawheed/i })).toBeInTheDocument();
   });
 
   it("plays the Web Audio click when an enabled counter is tapped", () => {
