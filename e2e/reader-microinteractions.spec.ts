@@ -134,19 +134,20 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
     await expect(shortcutGuide).toHaveAccessibleName("Keyboard shortcuts");
     await expect(counter).toHaveAccessibleName(/Click anywhere or press Space to count/);
 
-    const [cardBox, navigationBox, counterBox, guideBox] = await Promise.all([
-      card.boundingBox(),
+    const zikrText = card.getByTestId("zikr-text").first();
+    const [textBox, navigationBox, counterBox, guideBox] = await Promise.all([
+      zikrText.boundingBox(),
       sideNavigation.boundingBox(),
       counter.boundingBox(),
       shortcutGuide.boundingBox(),
     ]);
-    expect(cardBox).not.toBeNull();
+    expect(textBox).not.toBeNull();
     expect(navigationBox).not.toBeNull();
     expect(counterBox).not.toBeNull();
     expect(guideBox).not.toBeNull();
-    if (cardBox && navigationBox) {
+    if (textBox && navigationBox) {
       expect(
-        Math.abs(navigationBox.y + navigationBox.height / 2 - (cardBox.y + cardBox.height / 2)),
+        Math.abs(navigationBox.y + navigationBox.height / 2 - (textBox.y + textBox.height / 2)),
       ).toBeLessThanOrEqual(2);
     }
     if (counterBox && guideBox) expect(guideBox.y - (counterBox.y + counterBox.height)).toBeGreaterThanOrEqual(20);
@@ -196,10 +197,14 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   const counterSurface = page.getByTestId("counter-surface");
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  // Tier-agnostic: saving lives in the hero toolbar on tablet/desktop and in
-  // the overflow menu on phones, so drive it through the menu on every tier.
-  await page.getByRole("button", { name: "Reader options", exact: true }).click();
-  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
+  const saveButton = page.getByRole("button", { name: "Save zikr", exact: true });
+  if ((page.viewportSize()?.width ?? 0) >= 768) {
+    await expect(saveButton).toBeVisible();
+    await saveButton.click();
+  } else {
+    await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
+  }
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();

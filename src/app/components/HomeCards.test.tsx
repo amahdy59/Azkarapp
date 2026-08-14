@@ -88,7 +88,7 @@ describe("HomeCards", () => {
     expect(onOpenLibrary).toHaveBeenCalledOnce();
   });
 
-  it("keeps Friday compact by default and exposes virtues only in the expanded variant", () => {
+  it("keeps Friday compact by default and removes the mobile virtues disclosure", () => {
     const { rerender } = render(
       <FridayHomeCard language="en" direction="ltr" expanded={false} status="start" onOpen={() => undefined} />,
     );
@@ -98,6 +98,7 @@ describe("HomeCards", () => {
 
     rerender(<FridayHomeCard language="en" direction="ltr" expanded status="continue" onOpen={() => undefined} />);
     expect(screen.getByRole("button", { name: "Continue Friday companion" })).toBeInTheDocument();
-    expect(screen.getByText("More Friday virtues and reading source")).toBeInTheDocument();
+    expect(screen.queryByText("More Friday virtues and reading source")).not.toBeInTheDocument();
+    expect(screen.getByText("Virtues of Friday")).toBeInTheDocument();
   });
 });

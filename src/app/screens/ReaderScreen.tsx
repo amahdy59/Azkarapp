@@ -65,6 +65,18 @@ const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   error: "reader.shareCardError",
 };
 
+function getReaderZikrTitle(zikr: Zikr, language: AppLanguage, fallback: string) {
+  const surahName = language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish;
+  if (surahName?.trim()) return surahName.trim();
+
+  const primaryText = (language === "ar" ? zikr.arabicText : zikr.translation).replace(/\s+/g, " ").trim();
+  const firstClause = primaryText.split(/[,،;؛.!?؟]/)[0]?.trim() ?? "";
+  if (firstClause.length >= 4) {
+    return firstClause.length > 58 ? `${firstClause.slice(0, 57).trimEnd()}…` : firstClause;
+  }
+  return fallback;
+}
+
 function vibrate(pattern: number | number[]) {
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     navigator.vibrate(pattern);
@@ -422,6 +434,8 @@ export function ReaderScreen({
   const readingFontSize = `${baseSize * scaleFactor}px`;
   const readingFontFamily = "var(--font-reading-arabic)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
+  const readerZikrTitle = getReaderZikrTitle(z, language, displayCategoryName);
+  const localizedReadingPercent = formatNumerals(readingPercent, language);
 
   const handleShare = async () => {
     setIsSharing(true);
@@ -731,34 +745,8 @@ export function ReaderScreen({
       </div>
     );
 
-  // Shared between the mobile header's overflow menu and the wide-desktop
-  // card header's overflow menu so the two never drift apart.
-  const renderReaderMenuItems = () => (
+  const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
-      <DropdownMenuItem
-        disabled={idx === 0}
-        onClick={onPrev}
-        className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
-      >
-        <div className="flex items-center gap-2.5">
-          {direction === "rtl" ? <ChevronRight size={18} /> : <ChevronLeft size={18} />}
-          <span>{t(language, "reader.prev")}</span>
-        </div>
-      </DropdownMenuItem>
-
-      <DropdownMenuItem
-        disabled={idx === azkar.length - 1}
-        onClick={onNext}
-        className="flex cursor-pointer items-center justify-between rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:opacity-40 data-[disabled]:cursor-not-allowed"
-      >
-        <div className="flex items-center gap-2.5">
-          {direction === "rtl" ? <ChevronLeft size={18} /> : <ChevronRight size={18} />}
-          <span>{t(language, "reader.next")}</span>
-        </div>
-      </DropdownMenuItem>
-
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
       <DropdownMenuItem
         disabled={!audioAvailable}
         onClick={onPlayAudio}
@@ -780,26 +768,24 @@ export function ReaderScreen({
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
-      <DropdownMenuItem
-        onClick={handleToggleSaved}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-      >
-        <Bookmark size={18} className={savedZikrIds.has(z.id) ? "favorite-pop fill-current" : ""} />
-        {savedZikrIds.has(z.id) ? t(language, "reader.unsave") : t(language, "reader.save")}
-      </DropdownMenuItem>
-
-      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
-
-      {/* The counter-sound toggle lives here on phones: the hero header owns
-          it on tablet/desktop, and the phone header row is capped at three
-          controls (Benefit, Share, More) to keep the title legible at 320px. */}
-      <DropdownMenuItem
-        onClick={toggleSound}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-      >
-        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-        {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-      </DropdownMenuItem>
+      {layout === "mobile" && (
+        <>
+          <DropdownMenuItem
+            onClick={handleToggleSaved}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+          >
+            <Bookmark size={18} className={savedZikrIds.has(z.id) ? "favorite-pop fill-current" : ""} />
+            {savedZikrIds.has(z.id) ? t(language, "reader.unsave") : t(language, "reader.save")}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={toggleSound}
+            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+          >
+            {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+            {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+          </DropdownMenuItem>
+        </>
+      )}
 
       <DropdownMenuItem
         onClick={handleResetCounter}
@@ -807,14 +793,6 @@ export function ReaderScreen({
       >
         <RotateCcw size={18} />
         {t(language, "reader.resetCounter")}
-      </DropdownMenuItem>
-
-      <DropdownMenuItem
-        onClick={() => void handleShare()}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-      >
-        <Share2 size={18} />
-        {t(language, "reader.share")}
       </DropdownMenuItem>
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
@@ -932,7 +910,7 @@ export function ReaderScreen({
                   className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
                   sideOffset={8}
                 >
-                  {renderReaderMenuItems()}
+                  {renderReaderMenuItems("desktop")}
                 </DropdownMenuContent>
               </DropdownMenu>
 
@@ -999,7 +977,7 @@ export function ReaderScreen({
             <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
               <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
                 <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
-                  {t(language, "reader.collectionPercentComplete", { percent: readingPercent })}
+                  {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
                 </span>
                 <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
                   {t(language, "reader.collectionCount", {
@@ -1017,6 +995,13 @@ export function ReaderScreen({
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
               />
+              <h2
+                className="w-full truncate text-start text-[0.875rem] font-extrabold text-[color:var(--on-media)]"
+                dir="auto"
+                title={readerZikrTitle}
+              >
+                {readerZikrTitle}
+              </h2>
             </div>
           </div>
 
@@ -1033,7 +1018,7 @@ export function ReaderScreen({
                 role="region"
                 tabIndex={0}
                 aria-label={t(language, "reader.readingText")}
-                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 pt-6 pb-2 outline-none [scrollbar-gutter:stable] ${
+                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 py-4 outline-none [scrollbar-gutter:stable] ${
                   justCompleted ? "zikr-step-exit" : "zikr-step-enter"
                 }`}
               >
@@ -1053,6 +1038,7 @@ export function ReaderScreen({
                     </div>
                   </motion.div>
                 </AnimatePresence>
+                {renderSideNavigation()}
               </div>
 
               <footer className="shrink-0 pb-3 pt-2">
@@ -1060,7 +1046,6 @@ export function ReaderScreen({
               </footer>
             </div>
 
-            {renderSideNavigation()}
             {renderLongSurahJumpFab()}
           </div>
         </>
@@ -1119,7 +1104,7 @@ export function ReaderScreen({
                       className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
                       sideOffset={8}
                     >
-                      {renderReaderMenuItems()}
+                      {renderReaderMenuItems("mobile")}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -1128,6 +1113,15 @@ export function ReaderScreen({
           </div>
 
           <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
+            <div className="mb-2 flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
+              <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
+              <span>
+                {t(language, "reader.collectionCount", {
+                  done: formatNumerals(readingProgressValue, language),
+                  total: formatNumerals(azkar.length, language),
+                })}
+              </span>
+            </div>
             <ProgressBar
               value={readingProgressValue}
               max={azkar.length}
@@ -1137,6 +1131,13 @@ export function ReaderScreen({
               direction={direction}
               aria-label={t(language, "reader.groupProgress")}
             />
+            <h2
+              className="mt-2 block max-w-full truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold text-foreground"
+              dir="auto"
+              title={readerZikrTitle}
+            >
+              {readerZikrTitle}
+            </h2>
           </div>
 
           {/* Main Layout Area */}
@@ -1175,7 +1176,6 @@ export function ReaderScreen({
               {(!longSurah || isScrolledToBottom) && renderCounterStack()}
             </div>
 
-            {renderSideNavigation()}
             {renderLongSurahJumpFab()}
           </div>
         </>

@@ -4,7 +4,7 @@ import type { AppLanguage, RoutineMode } from "../types";
 import { formatNumerals } from "../formatting";
 import { Card } from "./Card";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowLeft, ArrowRight, Bookmark, BookOpen, ChevronDown, Clock, Sparkles } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles } from "./icons";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 
@@ -371,27 +371,8 @@ export function FridayHomeCard({
           )}
         </div>
 
-        <div className="w-full rounded-2xl bg-muted/45 p-4 text-start">
-          <div className="md:hidden">
-            <p className="text-xs font-semibold leading-5 text-foreground">{t(language, "home.fridayVirtueFajr")}</p>
-            <details className="group mt-2">
-              <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl font-black text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                <span>{t(language, "home.fridayMoreVirtues")}</span>
-                <ChevronDown
-                  className="size-5 shrink-0 text-primary transition-transform group-open:rotate-180"
-                  aria-hidden="true"
-                />
-              </summary>
-              <ul className="mt-2 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
-                <li>{t(language, "home.fridayVirtueEarly")}</li>
-                <li>{t(language, "home.fridayVirtueDua")}</li>
-              </ul>
-              <p className="mt-3 border-t border-border/60 pt-3 text-xs font-semibold leading-5 text-muted-foreground">
-                {t(language, "home.fridayReadingSource")}
-              </p>
-            </details>
-          </div>
-          <div className="hidden md:block">
+        <div className="hidden w-full rounded-2xl bg-muted p-4 text-start md:block">
+          <div>
             <h4 className="text-sm font-black text-foreground">{t(language, "home.fridayVirtues")}</h4>
             <ul className="mt-3 flex list-disc flex-col gap-2 ps-5 text-xs font-semibold leading-5 text-foreground">
               <li>{t(language, "home.fridayVirtueFajr")}</li>

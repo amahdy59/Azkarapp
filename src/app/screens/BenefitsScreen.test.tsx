@@ -1,42 +1,38 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { DERIVED_ZIKR_BENEFITS } from "../content/zikrBenefits";
 import { BenefitsScreen, buildWhatsAppBenefitUrl } from "./BenefitsScreen";
 
 describe("BenefitsScreen", () => {
-  it("orders the evidence as Qur'an, hadith, then 30 derived benefits", () => {
+  it("presents Qur'an and hadith as two side-by-side evidence filters", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Qur’an (7)", "Hadith (21)", "30 hadith benefits"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Qur’an (7)", "Hadith (51)"]);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.getByRole("heading", { name: "Qur’anic foundations" })).toBeVisible();
     expect(screen.getAllByRole("article")).toHaveLength(7);
   });
 
-  it("shows only authenticated hadith entries in a keyboard-scrollable batch", () => {
+  it("shows authenticated hadith entries in a keyboard-scrollable batch", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
     expect(screen.getByTestId("benefits-scroll-region")).toHaveAttribute("tabindex", "0");
-    fireEvent.click(screen.getByRole("tab", { name: "Hadith (21)" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Hadith (51)" }));
     expect(screen.getAllByRole("article")).toHaveLength(15);
     expect(screen.getAllByText("Authentic hadith").length).toBeGreaterThan(0);
     fireEvent.click(screen.getByTestId("benefits-load-more"));
     expect(screen.getAllByRole("article")).toHaveLength(21);
   });
 
-  it("groups exactly 30 concise benefits and ties each one to hadith evidence", () => {
+  it("nests all 30 concise benefits with their supporting hadith", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
-    fireEvent.click(screen.getByRole("tab", { name: "30 hadith benefits" }));
-    expect(screen.getByRole("heading", { name: "Forgiveness" })).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Weight and reward" })).toBeVisible();
-    expect(screen.getAllByRole("article")).toHaveLength(15);
+    fireEvent.click(screen.getByRole("tab", { name: "Hadith (51)" }));
     fireEvent.click(screen.getByTestId("benefits-load-more"));
-    expect(screen.getAllByRole("article")).toHaveLength(30);
-    expect(screen.getByRole("heading", { name: "Protection" })).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Promises connected to Paradise" })).toBeVisible();
-    expect(screen.getByRole("heading", { name: "Heart and remembrance gatherings" })).toBeVisible();
-    expect(screen.getAllByText("Hadith evidence:")).toHaveLength(30);
+    for (const item of DERIVED_ZIKR_BENEFITS) {
+      expect(screen.getAllByText(item.benefit.en).length).toBeGreaterThan(0);
+    }
   });
 
   it("supports Arabic direction, source sharing, and Back", () => {

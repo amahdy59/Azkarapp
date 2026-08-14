@@ -1,5 +1,4 @@
 import {
-  BarChart3,
   Calendar,
   BookOpen,
   Database,
@@ -50,7 +49,6 @@ export function SettingsRootPanel({
   locationSettings,
   calendarType = "hijri",
   onCalendarTypeChange,
-  quietProgressEnabled,
   activeSub,
 }: {
   onNav: (screen: SettingsSubScreen) => void;
@@ -213,22 +211,6 @@ export function SettingsRootPanel({
           onPress={() => onNav("sources")}
           hasDivider={false}
           {...itemProps("sources")}
-        />
-      </SettingsSection>
-
-      <SettingsSection label={t(language, "settings.progressSection")}>
-        <SettingsRowItem
-          iconBg={iconBackground}
-          icon={<BarChart3 size={20} className="text-primary" />}
-          label={t(language, "settings.myProgress")}
-          right={
-            <RowValue
-              value={quietProgressEnabled ? t(language, "settings.gardenActive") : t(language, "settings.gardenHidden")}
-            />
-          }
-          onPress={() => onNav("progress")}
-          hasDivider={false}
-          {...itemProps("progress")}
         />
       </SettingsSection>
 

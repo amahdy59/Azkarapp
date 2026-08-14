@@ -96,37 +96,16 @@ export function CounterRing({ count, total, size = 160 }: { count: number; total
   );
 }
 
-/**
- * Progress rendered as a 2px stroke inset along the counter's own rectangle
- * instead of a separate bar inside it. `pathLength="1"` normalises the
- * perimeter so the dash offset is simply `1 - progress`: hidden at zero,
- * closing the full outline exactly on completion. `non-scaling-stroke` keeps
- * the 2px weight constant when the surface shrinks below its 220px width.
- */
 export function CounterOutlineProgress({ count, total }: { count: number; total: number }) {
   const progress = total > 0 ? Math.min(1, count / total) : 0;
 
   return (
-    <svg
-      className="counter-outline-progress"
-      viewBox="0 0 220 76"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-      focusable="false"
-    >
-      <rect
-        x="5"
-        y="5"
-        width="210"
-        height="66"
-        rx="33"
-        ry="33"
-        pathLength="1"
-        strokeDasharray="1 1"
-        strokeDashoffset={1 - progress}
-        strokeLinecap="round"
+    <span className="counter-outline-progress" aria-hidden="true">
+      <span
+        className="counter-progress-fill"
+        style={{ inlineSize: `${progress * 100}%`, borderInlineEndWidth: progress > 0 ? 2 : 0 }}
       />
-    </svg>
+    </span>
   );
 }
 

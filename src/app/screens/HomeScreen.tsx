@@ -504,11 +504,11 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative w-full overflow-hidden sm:mx-auto sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised"
+            className="relative isolate min-h-[42rem] w-full overflow-hidden bg-slate-950 sm:mx-auto sm:min-h-[44rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[35rem]"
           >
             <div
               data-testid="time-of-day-scene-window"
-              className="relative h-48 w-full overflow-hidden sm:h-56 lg:h-64"
+              className="absolute inset-0 -z-10 overflow-hidden"
               aria-hidden="true"
             >
               <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
@@ -517,7 +517,7 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 flex flex-col items-stretch gap-4 px-4 pb-6 pt-4 sm:p-6 sm:pt-5 md:p-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:pt-6">
+              <div className="relative z-10 flex min-h-[inherit] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-40 sm:px-6 sm:pb-6 sm:pt-48 md:px-8 lg:grid lg:grid-cols-5 lg:items-end lg:gap-5 lg:px-8 lg:pb-8 lg:pt-24">
                 {showCompletionCard && (
                   <div className={quietProgressEnabled ? "lg:col-span-3" : "lg:col-span-5"}>
                     <TranquilityCompletionCard
@@ -559,6 +559,7 @@ export function HomeScreen({
                       hideTabs={true}
                       calendarType={calendarType}
                       dailyCompletions={dailyCompletions}
+                      progressDayStartHour={progressDayStartHour}
                       onSelectCategory={onResume}
                       visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
                     />

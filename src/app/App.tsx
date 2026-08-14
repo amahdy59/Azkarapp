@@ -943,10 +943,12 @@ function AppContent() {
                   dailyCompletions={dailyCompletions}
                   progressDayStartHour={progressDayStartHour}
                   calendarType={calendarType}
+                  quietProgressEnabled={quietProgressEnabled}
                   language={selectedLang}
                   direction={layoutDirection}
                   onOpenShareModal={() => setShowShareModal(true)}
                   onSelectCategory={openCategory}
+                  onQuietProgressEnabledChange={setQuietProgressEnabled}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

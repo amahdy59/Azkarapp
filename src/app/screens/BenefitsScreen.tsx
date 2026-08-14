@@ -10,11 +10,8 @@ import {
   DERIVED_ZIKR_BENEFITS,
   HADITH_DHIKR_EVIDENCE,
   QURAN_DHIKR_EVIDENCE,
-  getBenefitEvidence,
   localizeBenefitText,
   type BenefitEvidence,
-  type BenefitSection,
-  type DerivedBenefitGroup,
   type DerivedZikrBenefit,
 } from "../content/zikrBenefits";
 import { formatNumerals } from "../formatting";
@@ -22,14 +19,8 @@ import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
 const BENEFITS_BATCH_SIZE = 15;
-const SECTION_ORDER: readonly BenefitSection[] = ["quran", "hadith", "derived"];
-const DERIVED_GROUP_ORDER: readonly DerivedBenefitGroup[] = [
-  "forgiveness",
-  "reward",
-  "protection",
-  "paradise",
-  "heart",
-];
+type BenefitsView = "quran" | "hadith";
+const SECTION_ORDER: readonly BenefitsView[] = ["quran", "hadith"];
 
 export function buildWhatsAppBenefitUrl(message: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
@@ -50,7 +41,15 @@ function ShareLink({ language, label, message }: { language: AppLanguage; label:
   );
 }
 
-function EvidenceCard({ item, language }: { item: BenefitEvidence; language: AppLanguage }) {
+function EvidenceCard({
+  item,
+  language,
+  derivedBenefits = [],
+}: {
+  item: BenefitEvidence;
+  language: AppLanguage;
+  derivedBenefits?: readonly DerivedZikrBenefit[];
+}) {
   const title = localizeBenefitText(item.title, language);
   const text = item.kind === "quran" ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
@@ -83,40 +82,19 @@ function EvidenceCard({ item, language }: { item: BenefitEvidence; language: App
           {source}
         </a>
       </p>
+      {derivedBenefits.length > 0 && (
+        <section className="mt-4 border-t border-border pt-4" aria-label={t(language, "benefits.derivedHeading")}>
+          <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "benefits.derivedHeading")}</h3>
+          <ul className="mt-2 space-y-2 ps-5 text-[0.875rem] font-semibold leading-6 text-foreground">
+            {derivedBenefits.map((derived) => (
+              <li key={derived.id} className="list-disc marker:text-primary" dir="auto">
+                {localizeBenefitText(derived.benefit, language)}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
       <ShareLink language={language} label={title} message={shareMessage} />
-    </article>
-  );
-}
-
-function DerivedCard({ item, language }: { item: DerivedZikrBenefit; language: AppLanguage }) {
-  const evidence = getBenefitEvidence(item.evidenceId);
-  if (!evidence) return null;
-
-  const zikr = localizeBenefitText(item.zikr, language);
-  const benefit = localizeBenefitText(item.benefit, language);
-  const source = localizeBenefitText(evidence.source, language);
-  const shareMessage = [t(language, "benefits.shareHeading"), zikr, benefit, source].join("\n\n");
-
-  return (
-    <article className="flex flex-col rounded-3xl border border-border/50 bg-card p-5 text-start shadow-raised">
-      <p className="text-[0.75rem] font-black text-primary" dir="auto">
-        {zikr}
-      </p>
-      <h3 className="mt-2 text-[1rem] font-black leading-7 text-foreground" dir="auto">
-        {benefit}
-      </h3>
-      <p className="mt-3 text-[0.75rem] font-semibold leading-5 text-muted-foreground" dir="auto">
-        <span className="font-black text-foreground">{t(language, "benefits.derivedFrom")}: </span>
-        <a
-          href={evidence.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded underline decoration-primary/45 underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          {source}
-        </a>
-      </p>
-      <ShareLink language={language} label={zikr} message={shareMessage} />
     </article>
   );
 }
@@ -130,12 +108,11 @@ export function BenefitsScreen({
   direction: "ltr" | "rtl";
   onBack: () => void;
 }) {
-  const [activeSection, setActiveSection] = useState<BenefitSection>("quran");
+  const [activeSection, setActiveSection] = useState<BenefitsView>("quran");
   const [visibleCount, setVisibleCount] = useState(BENEFITS_BATCH_SIZE);
   const evidenceItems = activeSection === "quran" ? QURAN_DHIKR_EVIDENCE : HADITH_DHIKR_EVIDENCE;
-  const total = activeSection === "derived" ? DERIVED_ZIKR_BENEFITS.length : evidenceItems.length;
+  const total = evidenceItems.length;
   const visibleEvidence = evidenceItems.slice(0, visibleCount);
-  const visibleDerived = DERIVED_ZIKR_BENEFITS.slice(0, visibleCount);
   const tabs = useMemo(
     () =>
       SECTION_ORDER.map((section) => ({
@@ -144,9 +121,7 @@ export function BenefitsScreen({
           count: formatNumerals(
             section === "quran"
               ? QURAN_DHIKR_EVIDENCE.length
-              : section === "hadith"
-                ? HADITH_DHIKR_EVIDENCE.length
-                : DERIVED_ZIKR_BENEFITS.length,
+              : HADITH_DHIKR_EVIDENCE.length + DERIVED_ZIKR_BENEFITS.length,
             language,
           ),
         }),
@@ -192,7 +167,7 @@ export function BenefitsScreen({
           direction={direction}
           idPrefix="benefits"
           aria-label={t(language, "benefits.sectionsLabel")}
-          className="mb-5 grid grid-cols-1 gap-2 rounded-3xl border border-border/50 bg-card/95 p-2 sm:grid-cols-3"
+          className="mb-5 grid grid-cols-2 gap-2 rounded-3xl border border-border bg-card p-2"
           itemClassName={(selected) =>
             `min-h-11 rounded-2xl px-3 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
@@ -214,32 +189,20 @@ export function BenefitsScreen({
             </p>
           </div>
 
-          {activeSection !== "derived" ? (
-            <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
-              {visibleEvidence.map((item) => (
-                <EvidenceCard key={item.id} item={item} language={language} />
-              ))}
-            </div>
-          ) : (
-            <div data-testid="benefits-list" className="space-y-6">
-              {DERIVED_GROUP_ORDER.map((group) => {
-                const items = visibleDerived.filter((item) => item.group === group);
-                if (items.length === 0) return null;
-                return (
-                  <section key={group} aria-labelledby={`benefits-group-${group}`}>
-                    <h3 id={`benefits-group-${group}`} className="mb-3 text-[0.9375rem] font-black text-primary">
-                      {t(language, `benefits.group${group[0]!.toUpperCase()}${group.slice(1)}`)}
-                    </h3>
-                    <div className="grid gap-3.5 lg:grid-cols-2">
-                      {items.map((item) => (
-                        <DerivedCard key={item.id} item={item} language={language} />
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-            </div>
-          )}
+          <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
+            {visibleEvidence.map((item) => (
+              <EvidenceCard
+                key={item.id}
+                item={item}
+                language={language}
+                derivedBenefits={
+                  item.kind === "hadith"
+                    ? DERIVED_ZIKR_BENEFITS.filter((benefit) => benefit.evidenceId === item.id)
+                    : undefined
+                }
+              />
+            ))}
+          </div>
 
           <p className="mt-4 text-center text-[0.75rem] font-semibold text-muted-foreground" aria-live="polite">
             {t(language, "benefits.showing", {

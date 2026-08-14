@@ -110,11 +110,9 @@
   isolation: isolate;
   cursor: pointer;
   color: var(--foreground);
-  background: color-mix(in srgb, var(--background) 70%, transparent);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  border-radius: 38px;
+  background: var(--card);
+  border: 1px solid var(--border-control);
+  border-radius: 24px;
   box-shadow:
     0 10px 40px -10px color-mix(in srgb, var(--foreground) 15%, transparent),
     0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
@@ -203,20 +201,21 @@
 
 .counter-outline-progress {
   position: absolute;
-  inset: -8px;
-  z-index: 2;
-  width: calc(100% + 16px);
-  height: calc(100% + 16px);
-  overflow: visible;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  border-radius: inherit;
   pointer-events: none;
 }
 
-.counter-outline-progress rect {
-  fill: none;
-  stroke: var(--primary);
-  stroke-width: 10;
-  stroke-linecap: round;
-  transition: stroke-dashoffset 260ms cubic-bezier(0.22, 1, 0.36, 1);
+.counter-progress-fill {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  max-inline-size: 100%;
+  background: color-mix(in srgb, var(--primary) 24%, var(--card));
+  border-inline-end: 2px solid var(--primary);
+  transition: inline-size 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .adaptive-counter-content {
@@ -243,13 +242,13 @@
 
 .adaptive-counter-nav {
   display: flex;
-  width: 46px;
-  height: 46px;
-  min-width: 46px;
+  width: 52px;
+  height: 64px;
+  min-width: 52px;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-control);
-  border-radius: 9999px;
+  border-radius: 20px;
   color: var(--foreground);
   background: var(--card);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
@@ -339,7 +338,7 @@
   .tap-ripple {
     display: none;
   }
-  .counter-outline-progress rect,
+  .counter-progress-fill,
   .adaptive-counter-nav {
     transition-duration: 0.01ms;
   }

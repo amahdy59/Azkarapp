@@ -1,13 +1,16 @@
-import React, { useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { formatNumerals, formatRatio } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId } from "../types";
 import {
   getWeekGardenStats,
   getMonthDetailedStats,
+  getMonthDetailedStatsForDates,
   getYearDetailedStats,
+  getYearDetailedStatsForPeriods,
   createDailyCompletionIndex,
 } from "../gardenViews";
+import { getCalendarMonthPeriod, getCalendarYearPeriods, type CalendarType } from "../calendarPeriods";
 import { type GardenSummary } from "../progress";
 import { Zap, Check, CheckCircle2, Calendar, Sun, Moon, Star, Sprout, Sparkles } from "./icons";
 
@@ -65,8 +68,8 @@ function MainDhikrGroupCard({
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? "border-amber-300/70 bg-amber-950/82 text-white shadow-[0_18px_36px_rgba(0,0,0,0.32)] backdrop-blur-md"
-          : "border-white/15 bg-slate-950/78 text-white shadow-[0_16px_30px_rgba(0,0,0,0.24)] backdrop-blur-md hover:border-white/25 hover:bg-slate-950/88"
+          ? "border-amber-400 bg-amber-950 text-white shadow-raised"
+          : "border-slate-700 bg-slate-950 text-white shadow-raised hover:border-slate-500 hover:bg-slate-900"
       }`}
       aria-label={`${name} - ${statusLabel}`}
     >
@@ -74,9 +77,7 @@ function MainDhikrGroupCard({
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
           compact ? "size-11 sm:size-14" : "size-14"
         } ${
-          isCompleted
-            ? "border-amber-300/55 bg-amber-500/20 text-amber-300"
-            : "border-white/10 bg-white/10 text-white/80"
+          isCompleted ? "border-amber-300 bg-amber-900 text-amber-200" : "border-slate-600 bg-slate-800 text-slate-100"
         }`}
       >
         {icon}
@@ -88,7 +89,7 @@ function MainDhikrGroupCard({
         <span className="text-[1rem] font-black leading-snug text-inherit">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
-            isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-white/10 text-white/70"
+            isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-slate-800 text-slate-200"
           }`}
         >
           {statusLabel}
@@ -101,7 +102,7 @@ function MainDhikrGroupCard({
                 key={item.id}
                 role="img"
                 aria-label={item.name}
-                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-emerald-400" : "bg-white/10"}`}
+                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-emerald-400" : "bg-slate-600"}`}
               />
             ))}
           </div>
@@ -116,21 +117,6 @@ function MainDhikrGroupCard({
     </button>
   );
 }
-
-const HIJRI_MONTH_NAMES_AR = [
-  "محرم",
-  "صفر",
-  "ربيع الأول",
-  "ربيع الآخر",
-  "جمادى الأولى",
-  "جمادى الآخر",
-  "رجب",
-  "شعبان",
-  "رمضان",
-  "شوال",
-  "ذو القعدة",
-  "ذو الحجة",
-];
 
 const GREGORIAN_MONTH_NAMES_EN = [
   "January",
@@ -219,7 +205,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border border-white/15 bg-slate-950/78 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:p-6 md:p-7 ${
+        className={`flex w-full flex-col rounded-[28px] border border-slate-700 bg-slate-950 p-5 shadow-raised sm:p-6 md:p-7 ${
           isHomeSubset ? "flex-1" : ""
         }`}
       >
@@ -237,7 +223,7 @@ export function ProgressDayView({
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1.5 text-[0.8125rem] font-black text-white/85">
+          <div className="flex shrink-0 items-center gap-2 rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-[0.8125rem] font-black text-white">
             <span>{formatNumerals(completedCount, language)}</span>
             <span aria-hidden="true">/</span>
             <span>{formatNumerals(categories.length, language)}</span>
@@ -530,7 +516,7 @@ export function ProgressWeekView({
       {/* Bottom Row: Insight Card & Routine Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insight Card */}
-        <div className="p-5 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 shadow-raised backdrop-blur-xl flex items-center gap-4">
+        <div className="p-5 rounded-3xl bg-card border border-emerald-600 shadow-raised flex items-center gap-4">
           <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shrink-0">
             <Sparkles size={24} />
           </div>
@@ -636,30 +622,55 @@ export function ProgressMonthView({
   language,
   targetYear,
   targetMonth,
+  referenceDate,
+  calendarType = "gregorian",
   dailyCompletions = [],
 }: {
   language: AppLanguage;
-  targetYear: number;
-  targetMonth: number;
+  targetYear?: number;
+  targetMonth?: number;
+  referenceDate?: Date;
+  calendarType?: CalendarType;
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
 }) {
   const isArabic = isAr(language);
   const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
 
-  const monthStats = useMemo(
-    () => getMonthDetailedStats(completionIndex, targetYear, targetMonth),
-    [completionIndex, targetYear, targetMonth],
+  const resolvedReferenceDate = useMemo(
+    () =>
+      referenceDate ?? new Date(targetYear ?? new Date().getFullYear(), targetMonth ?? new Date().getMonth(), 15, 12),
+    [referenceDate, targetMonth, targetYear],
+  );
+  const period = useMemo(
+    () => getCalendarMonthPeriod(resolvedReferenceDate, calendarType, language),
+    [calendarType, language, resolvedReferenceDate],
   );
 
-  const [selectedDayNum, setSelectedDayNum] = useState<number>(11);
+  const monthStats = useMemo(
+    () =>
+      calendarType === "gregorian" && targetYear !== undefined && targetMonth !== undefined && !referenceDate
+        ? getMonthDetailedStats(completionIndex, targetYear, targetMonth)
+        : getMonthDetailedStatsForDates(completionIndex, period.dates, period.dayNumbers),
+    [calendarType, completionIndex, period, referenceDate, targetMonth, targetYear],
+  );
+
+  const todayKey = `${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, "0")}-${String(
+    new Date().getDate(),
+  ).padStart(2, "0")}`;
+  const defaultSelectedDay =
+    monthStats.days.find((day) => day.dayKey === todayKey)?.dayNum ?? monthStats.days[0]?.dayNum ?? 1;
+  const [selectedDayNum, setSelectedDayNum] = useState<number>(defaultSelectedDay);
+
+  useEffect(() => {
+    setSelectedDayNum(defaultSelectedDay);
+  }, [defaultSelectedDay, period.startDate]);
 
   const selectedDayRecord = useMemo(
     () => monthStats.days.find((d) => d.dayNum === selectedDayNum) || monthStats.days[0],
     [monthStats.days, selectedDayNum],
   );
 
-  const monthDate = new Date(targetYear, targetMonth, 1);
-  const firstDayOffset = monthDate.getDay();
+  const firstDayOffset = period.startDate.getDay();
   const offset = isArabic ? (firstDayOffset + 1) % 7 : firstDayOffset;
 
   const weekdays = isArabic
@@ -846,7 +857,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Morning Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-amber-500" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.morningAzkar")}</span>
@@ -861,7 +872,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Evening Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <Sun size={16} className="text-orange-500" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.eveningAzkar")}</span>
@@ -876,7 +887,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Sleep Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <Moon size={16} className="text-indigo-400" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.sleepAzkar")}</span>
@@ -891,7 +902,7 @@ export function ProgressMonthView({
             </div>
 
             {/* Post-Prayer Status */}
-            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+            <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-emerald-500" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.postPrayerAzkar")}</span>
@@ -907,7 +918,7 @@ export function ProgressMonthView({
           </div>
 
           {/* Month Improvement Insight */}
-          <div className="p-4 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 shadow-raised backdrop-blur-xl flex items-start gap-3">
+          <div className="p-4 rounded-3xl bg-card border border-emerald-600 shadow-raised flex items-start gap-3">
             <Sprout size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
             <div>
               <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
@@ -932,18 +943,41 @@ export function ProgressMonthView({
 export function ProgressYearView({
   language,
   targetYear = new Date().getFullYear(),
+  referenceDate,
+  calendarType = "gregorian",
   dailyCompletions = [],
 }: {
   language: AppLanguage;
   targetYear?: number;
+  referenceDate?: Date;
+  calendarType?: CalendarType;
   dailyCompletions?: import("../types").DailyCollectionCompletion[];
 }) {
   const isArabic = isAr(language);
   const completionIndex = useMemo(() => createDailyCompletionIndex(dailyCompletions), [dailyCompletions]);
+  const resolvedReferenceDate = useMemo(
+    () => referenceDate ?? new Date(targetYear, 6, 1, 12),
+    [referenceDate, targetYear],
+  );
+  const yearPeriods = useMemo(
+    () => getCalendarYearPeriods(resolvedReferenceDate, calendarType, language),
+    [calendarType, language, resolvedReferenceDate],
+  );
 
-  const yearStats = useMemo(() => getYearDetailedStats(completionIndex, targetYear), [completionIndex, targetYear]);
+  const yearStats = useMemo(
+    () =>
+      calendarType === "gregorian" && !referenceDate
+        ? getYearDetailedStats(completionIndex, targetYear)
+        : getYearDetailedStatsForPeriods(completionIndex, yearPeriods),
+    [calendarType, completionIndex, referenceDate, targetYear, yearPeriods],
+  );
 
-  const monthNames = isArabic ? HIJRI_MONTH_NAMES_AR : GREGORIAN_MONTH_NAMES_EN;
+  const monthNames =
+    calendarType === "gregorian" && !referenceDate
+      ? isArabic
+        ? yearPeriods.map((period) => period.monthLabel)
+        : GREGORIAN_MONTH_NAMES_EN
+      : yearPeriods.map((period) => period.monthLabel);
   const bestMonthName =
     yearStats.bestMonthIndex === null ? getCategoryName(null, language) : monthNames[yearStats.bestMonthIndex];
 
@@ -1056,7 +1090,7 @@ export function ProgressYearView({
           </h2>
 
           {/* Best Month */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "progress.bestMonth")}
@@ -1067,7 +1101,7 @@ export function ProgressYearView({
           </div>
 
           {/* Most Consistent Routine */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "progress.mostConsistent")}
@@ -1080,7 +1114,7 @@ export function ProgressYearView({
           </div>
 
           {/* Total Azkar Completed */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted/40 border border-white/20">
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
               <span className="block text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "progress.totalCompleted")}
@@ -1135,7 +1169,7 @@ export function ProgressYearView({
       </div>
 
       {/* Motivational Quote / Closing Prayer Card */}
-      <div className="p-4 rounded-3xl bg-muted/40 border border-border/40 shadow-raised backdrop-blur-xl flex items-center justify-center text-center">
+      <div className="p-4 rounded-3xl bg-muted border border-border shadow-raised flex items-center justify-center text-center">
         <p className="text-[0.875rem] font-bold text-foreground">
           {yearStats.totalCollections > 0
             ? t(language, "garden.yearActivitySummary", {

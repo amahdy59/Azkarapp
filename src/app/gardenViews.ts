@@ -227,66 +227,91 @@ export function getMonthGardenDays(
   });
 }
 
+export function getMonthGardenDaysForDates(
+  index: DailyCompletionIndex,
+  dates: Date[],
+  dayNumbers: number[] = dates.map((date) => date.getDate()),
+): MonthGardenDay[] {
+  const todayKey = formatDayKey(new Date());
+  return dates.map((date, dayIndex) => {
+    const dayKey = formatDayKey(date);
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const categories = entry.categories;
+    const completedCount = countMainCompletions(categories);
+    const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
+    const status: MonthGardenDay["status"] = isPalm
+      ? "complete"
+      : completedCount > 0
+        ? "partial"
+        : dayKey > todayKey
+          ? "empty"
+          : "unstarted";
+    return {
+      dayKey,
+      dayNum: dayNumbers[dayIndex] ?? dayIndex + 1,
+      completedCount,
+      isPalm,
+      status,
+      categories: Array.from(categories),
+    };
+  });
+}
+
+function summarizeMonthDays(days: MonthGardenDay[]): MonthDetailedStats {
+  const daysInMonth = days.length;
+  let fullDaysCount = 0;
+  let totalActiveDays = 0;
+  let totalCompletions = 0;
+  let currentStreak = 0;
+  let longestStreak = 0;
+  const routineCounts = new Map<CategoryId, number>(MAIN_CATEGORY_IDS.map((category) => [category, 0]));
+
+  for (const day of days) {
+    if (day.isPalm) {
+      fullDaysCount += 1;
+      currentStreak += 1;
+      longestStreak = Math.max(longestStreak, currentStreak);
+    } else {
+      currentStreak = 0;
+    }
+    if (day.completedCount > 0) {
+      totalActiveDays += 1;
+      totalCompletions += Math.min(4, day.completedCount);
+    }
+    day.categories.forEach((category) => {
+      if (routineCounts.has(category)) routineCounts.set(category, routineCounts.get(category)! + 1);
+    });
+  }
+
+  const best = [...routineCounts.entries()].reduce(
+    (current, candidate) => (candidate[1] > current[1] ? candidate : current),
+    ["morning" as CategoryId, 0] as [CategoryId, number],
+  );
+  return {
+    days,
+    fullDaysCount,
+    totalActiveDays,
+    completionRate: daysInMonth > 0 ? Math.round((totalCompletions / (daysInMonth * 4)) * 100) : 0,
+    longestStreak,
+    bestRoutine: totalCompletions > 0 ? best[0] : null,
+    daysInMonth,
+  };
+}
+
+export function getMonthDetailedStatsForDates(
+  index: DailyCompletionIndex,
+  dates: Date[],
+  dayNumbers?: number[],
+): MonthDetailedStats {
+  return summarizeMonthDays(getMonthGardenDaysForDates(index, dates, dayNumbers));
+}
+
 export function getMonthDetailedStats(
   index: DailyCompletionIndex,
   year: number,
   zeroBasedMonth: number,
 ): MonthDetailedStats {
-  const days = getMonthGardenDays(index, year, zeroBasedMonth);
-  const daysInMonth = days.length;
-
-  let fullDaysCount = 0;
-  let totalActiveDays = 0;
-  let totalCompletions = 0;
-  let morningCount = 0;
-  let eveningCount = 0;
-  let sleepCount = 0;
-  let afterPrayerCount = 0;
-  let currentStreak = 0;
-  let longestStreak = 0;
-
-  for (const day of days) {
-    if (day.isPalm) {
-      fullDaysCount++;
-      currentStreak++;
-      if (currentStreak > longestStreak) longestStreak = currentStreak;
-    } else {
-      currentStreak = 0;
-    }
-
-    if (day.completedCount > 0) {
-      totalActiveDays++;
-      totalCompletions += Math.min(4, day.completedCount);
-    }
-
-    for (const cat of day.categories) {
-      if (cat === "morning") morningCount++;
-      if (cat === "evening") eveningCount++;
-      if (cat === "before_sleep") sleepCount++;
-      if (cat === "after_prayer") afterPrayerCount++;
-    }
-  }
-
-  const completionRate = Math.round((totalCompletions / (daysInMonth * 4)) * 100);
-
-  const routineCounts = [
-    { id: "morning" as CategoryId, count: morningCount },
-    { id: "evening" as CategoryId, count: eveningCount },
-    { id: "before_sleep" as CategoryId, count: sleepCount },
-    { id: "after_prayer" as CategoryId, count: afterPrayerCount },
-  ];
-  const highest = routineCounts.reduce((current, routine) => (routine.count > current.count ? routine : current));
-  const bestRoutine = totalCompletions > 0 ? highest.id : null;
-
-  return {
-    days,
-    fullDaysCount,
-    totalActiveDays,
-    completionRate,
-    longestStreak,
-    bestRoutine,
-    daysInMonth,
-  };
+  return summarizeMonthDays(getMonthGardenDays(index, year, zeroBasedMonth));
 }
 
 export function getYearGardenStats(index: DailyCompletionIndex, year: number) {
@@ -409,6 +434,90 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     bestMonthIndex,
     bestMonthRate,
     mostConsistentRoutine,
+    months,
+  };
+}
+
+export function getYearDetailedStatsForPeriods(
+  index: DailyCompletionIndex,
+  periods: { dates: Date[]; dayNumbers?: number[] }[],
+): YearDetailedStats {
+  const months: YearMonthHeatmap[] = [];
+  let totalPalms = 0;
+  let totalCollections = 0;
+  let activeDays = 0;
+  let longestStreak = 0;
+  let currentStreak = 0;
+  let bestMonthIndex: number | null = null;
+  let bestMonthRate = 0;
+  let totalPossibleAllYear = 0;
+  const todayKey = formatDayKey(new Date());
+  const routineCounts = new Map<CategoryId, number>(MAIN_CATEGORY_IDS.map((category) => [category, 0]));
+
+  periods.forEach((period, monthIndex) => {
+    const days = getMonthGardenDaysForDates(index, period.dates, period.dayNumbers);
+    totalPossibleAllYear += days.length * 4;
+    let monthCompletions = 0;
+    let fullDaysCount = 0;
+    let activeDaysCount = 0;
+
+    days.forEach((day) => {
+      if (day.dayKey <= todayKey) {
+        if (day.isPalm) {
+          currentStreak += 1;
+          longestStreak = Math.max(longestStreak, currentStreak);
+        } else {
+          currentStreak = 0;
+        }
+      }
+      if (day.isPalm) {
+        fullDaysCount += 1;
+        totalPalms += 1;
+      }
+      if (day.completedCount > 0) {
+        activeDaysCount += 1;
+        activeDays += 1;
+        monthCompletions += Math.min(4, day.completedCount);
+        totalCollections += day.completedCount;
+      }
+      day.categories.forEach((category) => {
+        if (routineCounts.has(category)) routineCounts.set(category, routineCounts.get(category)! + 1);
+      });
+    });
+
+    const completionRate = days.length > 0 ? Math.round((monthCompletions / (days.length * 4)) * 100) : 0;
+    if (completionRate > bestMonthRate) {
+      bestMonthRate = completionRate;
+      bestMonthIndex = monthIndex;
+    }
+    months.push({
+      monthIndex,
+      completionRate,
+      fullDaysCount,
+      activeDaysCount,
+      dayCells: days.map((day) => ({
+        dayNum: day.dayNum,
+        level: day.isPalm ? 2 : day.completedCount > 0 ? 1 : 0,
+        isPalm: day.isPalm,
+      })),
+    });
+  });
+
+  const bestRoutine = [...routineCounts.entries()].reduce(
+    (current, candidate) => (candidate[1] > current[1] ? candidate : current),
+    ["morning" as CategoryId, 0] as [CategoryId, number],
+  );
+
+  return {
+    totalPalms,
+    totalCollections,
+    activeDays,
+    overallCompletionRate: totalPossibleAllYear > 0 ? Math.round((totalCollections / totalPossibleAllYear) * 100) : 0,
+    longestStreak,
+    currentStreak,
+    bestMonthIndex,
+    bestMonthRate,
+    mostConsistentRoutine: totalCollections > 0 ? bestRoutine[0] : null,
     months,
   };
 }

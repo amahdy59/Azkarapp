@@ -111,14 +111,16 @@ test("Home Benefits entry opens the dedicated collection with encoded WhatsApp s
   await expect(page.locator('#main-content[data-view="benefits"]')).toBeVisible();
   await expect(page.getByTestId("benefits-list")).toBeVisible();
   const tabs = page.getByRole("tab");
-  await expect(tabs).toHaveText(["Qur’an (7)", "Hadith (21)", "30 hadith benefits"]);
+  await expect(tabs).toHaveText(["Qur’an (7)", "Hadith (51)"]);
   await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Evening testimony of faith.", { exact: true })).toHaveCount(0);
 
-  await page.getByRole("tab", { name: "Hadith (21)" }).click();
+  await page.getByRole("tab", { name: "Hadith (51)" }).click();
   await expect(page.getByText("Authentic hadith").first()).toBeVisible();
-  await page.getByRole("tab", { name: "30 hadith benefits" }).click();
-  await expect(page.getByRole("heading", { name: "Forgiveness" })).toBeVisible();
+  await page.getByTestId("benefits-load-more").click();
+  await expect(
+    page.getByText("Forgiveness of sins even if they are like the foam of the sea.", { exact: true }),
+  ).toBeVisible();
 
   const shareLink = page.getByRole("link", { name: /WhatsApp/ }).first();
   const href = await shareLink.getAttribute("href");

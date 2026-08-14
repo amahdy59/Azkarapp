@@ -821,6 +821,8 @@ const en = {
     closeReference: "Close benefit",
     copyError: "Could not copy this text. Check clipboard permission and try again.",
     translationLabel: "Translation",
+    showFullText: "Show full text",
+    hideFullText: "Hide full text",
     transliterationLabel: "Pronunciation in English",
     hadithLabel: "Hadith text",
     copyTranslation: "Copy translation",

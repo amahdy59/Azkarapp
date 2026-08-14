@@ -30,10 +30,18 @@ function ReferenceContent({
   variant: "sheet" | "dialog";
 }) {
   const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
+  const [showFullZikr, setShowFullZikr] = useState(false);
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
   const benefit = getLocalizedZikrBenefit(zikr, language);
+  const primaryText = isArabic ? zikr.arabicText : zikr.translation;
+  const collapseLimit = zikr.isSurah ? 180 : 280;
+  const shouldCollapseZikr = primaryText.length > collapseLimit;
+  const displayedPrimaryText =
+    shouldCollapseZikr && !showFullZikr ? `${primaryText.slice(0, collapseLimit).trimEnd()}…` : primaryText;
+
+  useEffect(() => setShowFullZikr(false), [zikr.id]);
 
   useEffect(() => {
     return () => {
@@ -122,8 +130,18 @@ function ReferenceContent({
           {isArabic ? (
             <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
               <p className="zikr-text text-[1.25rem] font-bold leading-relaxed text-primary" dir="rtl" lang="ar">
-                {zikr.arabicText}
+                {displayedPrimaryText}
               </p>
+              {shouldCollapseZikr && (
+                <button
+                  type="button"
+                  className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  onClick={() => setShowFullZikr((current) => !current)}
+                  aria-expanded={showFullZikr}
+                >
+                  {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
+                </button>
+              )}
             </div>
           ) : (
             <>
@@ -140,8 +158,18 @@ function ReferenceContent({
                 </div>
                 <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
                   <p className="latin-ui text-left text-[1rem] leading-relaxed text-foreground" lang="en" dir="ltr">
-                    {zikr.translation}
+                    {displayedPrimaryText}
                   </p>
+                  {shouldCollapseZikr && (
+                    <button
+                      type="button"
+                      className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      onClick={() => setShowFullZikr((current) => !current)}
+                      aria-expanded={showFullZikr}
+                    >
+                      {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
+                    </button>
+                  )}
                 </div>
               </div>
 

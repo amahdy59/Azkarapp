@@ -23,6 +23,7 @@ export {
 export { getGardenDateLabel } from "./gardenDateLabel";
 import { GoldenLeafMark, GreenLeafMark, PalmTreeMark } from "./GardenMarks";
 import { getGardenDateLabel } from "./gardenDateLabel";
+import { shiftCalendarDate } from "../calendarPeriods";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -40,6 +41,7 @@ export function TodayRoutineGarden({
   onOpenShareModal: _onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
+  progressDayStartHour = 4,
   onSelectCategory,
   visibleCategoryIds,
 }: {
@@ -51,6 +53,7 @@ export function TodayRoutineGarden({
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
+  progressDayStartHour?: number;
   onSelectCategory?: (categoryId: CategoryId) => void;
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
@@ -59,24 +62,15 @@ export function TodayRoutineGarden({
   const isArabic = language === "ar";
 
   const displayDate = useMemo(() => {
-    const d = new Date();
-    if (offset !== 0) {
-      if (activeTab === "day") {
-        d.setDate(d.getDate() + offset);
-      } else if (activeTab === "week") {
-        d.setDate(d.getDate() + offset * 7);
-      } else if (activeTab === "month") {
-        d.setMonth(d.getMonth() + offset);
-      } else if (activeTab === "year") {
-        d.setFullYear(d.getFullYear() + offset);
-      }
-    }
-    return d;
-  }, [activeTab, offset]);
+    return shiftCalendarDate(new Date(), activeTab, offset, calendarType);
+  }, [activeTab, calendarType, offset]);
 
   const summary = useMemo(
-    () => (offset === 0 && activeTab === "day" ? initialSummary : getGardenSummary(dailyCompletions, displayDate)),
-    [initialSummary, dailyCompletions, displayDate, offset, activeTab],
+    () =>
+      offset === 0 && activeTab === "day"
+        ? initialSummary
+        : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour),
+    [initialSummary, dailyCompletions, displayDate, offset, activeTab, progressDayStartHour],
   );
 
   const totalPalms = summary.lifetimePalms;
@@ -88,9 +82,6 @@ export function TodayRoutineGarden({
     setActiveTab(tab);
     setOffset(0);
   };
-
-  const targetYear = displayDate.getFullYear();
-  const targetMonth = displayDate.getMonth();
 
   const completedCount = summary.today.completedCategories.length;
   const dynamicSubtitle = t(
@@ -118,7 +109,7 @@ export function TodayRoutineGarden({
             direction={isArabic ? "rtl" : "ltr"}
             idPrefix="garden"
             aria-label={t(language, "garden.viewMode")}
-            className="mb-4 flex rounded-full bg-muted/60 p-1 dark:bg-muted/30"
+            className="mb-4 flex rounded-full border border-border bg-muted p-1"
             itemClassName={(selected) =>
               `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 selected
@@ -182,7 +173,7 @@ export function TodayRoutineGarden({
       )}
 
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-around rounded-3xl border border-amber-500/30 bg-amber-500/10 py-3 px-3 shadow-sm backdrop-blur-sm dark:bg-amber-500/15">
+        <div className="mb-4 flex items-center justify-around rounded-3xl border border-amber-500/40 bg-card py-3 px-3 shadow-sm">
           <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>
             <Zap
               className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}
@@ -233,14 +224,19 @@ export function TodayRoutineGarden({
         {activeTab === "month" && (
           <ProgressMonthView
             language={language}
-            targetYear={targetYear}
-            targetMonth={targetMonth}
+            referenceDate={displayDate}
+            calendarType={calendarType}
             dailyCompletions={dailyCompletions}
           />
         )}
 
         {activeTab === "year" && (
-          <ProgressYearView language={language} targetYear={targetYear} dailyCompletions={dailyCompletions} />
+          <ProgressYearView
+            language={language}
+            referenceDate={displayDate}
+            calendarType={calendarType}
+            dailyCompletions={dailyCompletions}
+          />
         )}
       </div>
     </section>

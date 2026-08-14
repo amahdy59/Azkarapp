@@ -2,10 +2,13 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   createDailyCompletionIndex,
   getMonthGardenDays,
+  getMonthGardenDaysForDates,
   getYearGardenStats,
   getWeekGardenStats,
   getMonthDetailedStats,
+  getMonthDetailedStatsForDates,
   getYearDetailedStats,
+  getYearDetailedStatsForPeriods,
 } from "./gardenViews";
 import type { DailyCollectionCompletion } from "./types";
 
@@ -76,6 +79,77 @@ describe("garden view selectors", () => {
     expect(yearStats.months).toHaveLength(12);
     expect(yearStats.totalPalms).toBe(2);
     expect(yearStats.bestMonthIndex).toBe(1); // Feb
+  });
+
+  it("summarizes arbitrary calendar periods without leaking records across their date ranges", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 2, 5, 12));
+    const periodRecords: DailyCollectionCompletion[] = [
+      { dayKey: "2024-03-01", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "travel", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-02", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-03", category: "morning", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-03", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-03", category: "before_sleep", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-03", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-04-01", category: "morning", timeZone: "Africa/Cairo" },
+    ];
+    const index = createDailyCompletionIndex(periodRecords);
+    const dates = [new Date(2024, 2, 1), new Date(2024, 2, 2), new Date(2024, 2, 4), new Date(2024, 2, 6)];
+
+    const defaultNumberedDays = getMonthGardenDaysForDates(index, dates);
+    expect(defaultNumberedDays.map((day) => day.dayNum)).toEqual([1, 2, 4, 6]);
+    expect(defaultNumberedDays.map((day) => day.status)).toEqual(["complete", "partial", "unstarted", "empty"]);
+
+    const customNumberedDays = getMonthGardenDaysForDates(index, dates, [21, 22, 23]);
+    expect(customNumberedDays.map((day) => day.dayNum)).toEqual([21, 22, 23, 4]);
+
+    expect(getMonthDetailedStatsForDates(index, dates, [21, 22, 23, 24])).toMatchObject({
+      daysInMonth: 4,
+      fullDaysCount: 1,
+      totalActiveDays: 2,
+      bestRoutine: "evening",
+    });
+    expect(getMonthDetailedStatsForDates(index, [])).toMatchObject({
+      daysInMonth: 0,
+      completionRate: 0,
+      bestRoutine: null,
+    });
+
+    const yearStats = getYearDetailedStatsForPeriods(index, [
+      {
+        dates: [new Date(2024, 2, 1), new Date(2024, 2, 2), new Date(2024, 2, 3), new Date(2024, 2, 6)],
+        dayNumbers: [11, 12, 13, 14],
+      },
+      { dates: [] },
+    ]);
+    expect(yearStats).toMatchObject({
+      totalPalms: 2,
+      totalCollections: 9,
+      activeDays: 3,
+      longestStreak: 1,
+      currentStreak: 1,
+      bestMonthIndex: 0,
+      mostConsistentRoutine: "evening",
+    });
+    expect(yearStats.months[0]?.dayCells).toEqual([
+      { dayNum: 11, level: 2, isPalm: true },
+      { dayNum: 12, level: 1, isPalm: false },
+      { dayNum: 13, level: 2, isPalm: true },
+      { dayNum: 14, level: 0, isPalm: false },
+    ]);
+    expect(yearStats.months[1]).toMatchObject({ completionRate: 0, dayCells: [] });
+
+    expect(getYearDetailedStatsForPeriods(index, [])).toMatchObject({
+      totalCollections: 0,
+      overallCompletionRate: 0,
+      bestMonthIndex: null,
+      mostConsistentRoutine: null,
+      months: [],
+    });
   });
 
   it("correctly identifies evening or sleep as the best routine when dominant", () => {
