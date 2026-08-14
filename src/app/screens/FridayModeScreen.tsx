@@ -8,7 +8,8 @@ import {
   Building,
   Check,
   CheckCircle2,
-  ChevronNext,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   Droplets,
   MoonStar,
@@ -286,12 +287,10 @@ export function FridayModeScreen({
           </span>
           {salawatComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
+          ) : direction === "rtl" ? (
+            <ChevronLeft size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           ) : (
-            <ChevronNext
-              size={20}
-              className={`shrink-0 text-muted-foreground ${direction === "rtl" ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
+            <ChevronRight size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           )}
         </button>
 
@@ -313,12 +312,10 @@ export function FridayModeScreen({
           </div>
           {duasComplete ? (
             <CheckCircle2 size={22} className="shrink-0 text-emerald-500" aria-hidden="true" />
+          ) : direction === "rtl" ? (
+            <ChevronLeft size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           ) : (
-            <ChevronNext
-              size={20}
-              className={`shrink-0 text-muted-foreground ${direction === "rtl" ? "rotate-180" : ""}`}
-              aria-hidden="true"
-            />
+            <ChevronRight size={20} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           )}
         </button>
         {duasLoadError && (

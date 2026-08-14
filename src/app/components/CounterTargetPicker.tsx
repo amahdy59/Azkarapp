@@ -61,7 +61,7 @@ export function CounterTargetPicker({
           <button
             type="button"
             data-testid="counter-target-filter"
-            className="interactive-elem inline-flex min-h-11 max-w-full items-center justify-center gap-2 rounded-btn border border-border-control bg-card px-3.5 text-[0.8125rem] font-extrabold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="interactive-elem inline-flex min-h-[46px] max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-muted/60 px-4 text-[0.8125rem] font-extrabold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={`${t(language, "counter.targetLabel")} ${activeLabel}`}
           >
             <SlidersHorizontal size={16} aria-hidden="true" />
