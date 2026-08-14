@@ -172,6 +172,7 @@ const en = {
     hadithHeading: "Authentic hadith",
     hadithDescription: "Specific adhkar and promises reported in authentic or explicitly authenticated narrations.",
     derivedHeading: "30 hadith-derived benefits",
+    derivedCount: "{count} related benefits",
     derivedDescription:
       "Each concise benefit remains linked to the hadith for its zikr; no additional reward is inferred.",
     quranBadge: "Qur’an",

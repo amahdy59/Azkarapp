@@ -451,15 +451,15 @@ export function HomeScreen({
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         {/* Sticky Header Overlay */}
-        <div className="sticky inset-x-0 top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 pointer-events-auto">
+        <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
           <header
             data-testid="home-utility-header"
-            className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
+            className="mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 px-5 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8"
             dir="ltr"
           >
             <div
               data-testid="hijri-date"
-              className="min-w-0 text-[0.8125rem] font-bold text-primary sm:text-[0.9375rem]"
+              className="min-w-0 text-[0.8125rem] font-bold text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-[0.9375rem]"
             >
               <time className="block truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
@@ -479,22 +479,22 @@ export function HomeScreen({
             >
               <div
                 data-testid="header-streak"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
                 title={t(language, "progress.dailyStreak")}
               >
-                <Zap className="h-[13px] w-[13px] text-primary" strokeWidth={2.5} aria-hidden="true" />
+                <Zap className="h-[13px] w-[13px] text-on-media-accent" strokeWidth={2.5} aria-hidden="true" />
                 <span>{formatNumerals(streakDays, language)}</span>
               </div>
               <div
                 data-testid="header-palms"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-primary"
+                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
                 title={t(language, "progress.palmsTitle")}
               >
                 <PalmTreeMark
                   size={14}
                   strokeWidth={4}
                   filled={gardenSummary.lifetimePalms > 0}
-                  className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
+                  className="text-on-media-accent"
                 />
                 <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
               </div>
@@ -504,7 +504,7 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative isolate min-h-[42rem] w-full overflow-hidden bg-slate-950 sm:mx-auto sm:min-h-[44rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[35rem]"
+            className="relative isolate min-h-[42rem] w-full overflow-hidden rounded-b-[28px] bg-slate-950 sm:mx-auto sm:min-h-[44rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[35rem]"
           >
             <div
               data-testid="time-of-day-scene-window"
@@ -517,9 +517,9 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 flex min-h-[inherit] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-40 sm:px-6 sm:pb-6 sm:pt-48 md:px-8 lg:grid lg:grid-cols-5 lg:items-end lg:gap-5 lg:px-8 lg:pb-8 lg:pt-24">
+              <div className="relative z-10 flex min-h-[inherit] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-40 sm:px-6 sm:pb-6 sm:pt-48 md:px-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:px-8 lg:pb-8 lg:pt-24">
                 {showCompletionCard && (
-                  <div className={quietProgressEnabled ? "lg:col-span-3" : "lg:col-span-5"}>
+                  <div className={quietProgressEnabled ? "h-full lg:col-span-3" : "h-full lg:col-span-5"}>
                     <TranquilityCompletionCard
                       categoryId={reminderInfo.categoryId}
                       language={language}

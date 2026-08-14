@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TabList, tabPanelProps } from "../components/Tabs";
-import { Share2, Sparkles } from "../components/icons";
+import { ChevronDown, Share2 } from "../components/icons";
 import {
   DERIVED_ZIKR_BENEFITS,
   HADITH_DHIKR_EVIDENCE,
@@ -26,17 +26,36 @@ export function buildWhatsAppBenefitUrl(message: string) {
   return `https://wa.me/?text=${encodeURIComponent(message)}`;
 }
 
+const QURAN_SURAH_NAMES: Readonly<Record<number, { ar: string; en: string }>> = {
+  2: { ar: "البقرة", en: "Al-Baqarah" },
+  3: { ar: "آل عمران", en: "Ali 'Imran" },
+  8: { ar: "الأنفال", en: "Al-Anfal" },
+  13: { ar: "الرعد", en: "Ar-Ra'd" },
+  33: { ar: "الأحزاب", en: "Al-Ahzab" },
+  62: { ar: "الجمعة", en: "Al-Jumu'ah" },
+};
+
+function quranCitation(item: BenefitEvidence, language: AppLanguage) {
+  const [, surahValue, ayahValue] = item.id.split("-");
+  const surah = Number(surahValue);
+  const ayah = Number(ayahValue);
+  const name = QURAN_SURAH_NAMES[surah]?.[language];
+  if (!name || !Number.isFinite(ayah)) return localizeBenefitText(item.source, language);
+  const reference = `${formatNumerals(surah, language)}:${formatNumerals(ayah, language)}`;
+  return language === "ar" ? `سورة ${name} · ${reference}` : `Surah ${name} · ${reference}`;
+}
+
 function ShareLink({ language, label, message }: { language: AppLanguage; label: string; message: string }) {
   return (
     <a
       href={buildWhatsAppBenefitUrl(message)}
       target="_blank"
       rel="noreferrer"
-      className="mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#0b6b5d] px-4 text-[0.875rem] font-black text-white transition-colors hover:bg-[#09594f] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-border bg-background text-muted-foreground transition-colors hover:border-primary/40 hover:text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       aria-label={t(language, "benefits.shareWhatsAppAria", { category: label })}
+      title={t(language, "benefits.shareWhatsApp")}
     >
-      <Share2 size={17} aria-hidden="true" />
-      {t(language, "benefits.shareWhatsApp")}
+      <Share2 size={18} aria-hidden="true" />
     </a>
   );
 }
@@ -53,48 +72,55 @@ function EvidenceCard({
   const title = localizeBenefitText(item.title, language);
   const text = item.kind === "quran" ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
-  const source = localizeBenefitText(item.source, language);
+  const source = item.kind === "quran" ? quranCitation(item, language) : localizeBenefitText(item.source, language);
   const shareMessage = [t(language, "benefits.shareHeading"), title, text, meaning, source]
     .filter(Boolean)
     .join("\n\n");
 
   return (
-    <article className="flex flex-col rounded-3xl border border-border/50 bg-card p-5 text-start shadow-raised">
-      <p className="text-[0.75rem] font-black text-primary">{t(language, `benefits.${item.kind}Badge`)}</p>
-      <h2 className="mt-2 text-[1rem] font-black leading-7 text-foreground" dir="auto">
-        {title}
-      </h2>
+    <article className="flex flex-col rounded-[24px] border border-border bg-card p-5 text-start shadow-raised sm:p-6">
+      {item.kind === "hadith" && (
+        <h2 className="text-[1rem] font-black leading-7 text-foreground" dir="auto">
+          {title}
+        </h2>
+      )}
       <p
-        className={`mt-3 font-semibold text-foreground ${item.kind === "quran" ? "font-arabic text-[1.125rem] leading-9" : "text-[0.9375rem] leading-7"}`}
+        className={`font-semibold text-foreground ${item.kind === "quran" ? "zikr-text text-[1.125rem] leading-[2.05]" : "mt-3 text-[0.9375rem] leading-7"}`}
         dir={item.kind === "quran" ? "rtl" : "auto"}
+        lang={item.kind === "quran" ? "ar" : undefined}
       >
         {text}
       </p>
-      {meaning && <p className="mt-2 text-[0.875rem] font-semibold leading-6 text-muted-foreground">{meaning}</p>}
-      <p className="mt-3 text-[0.75rem] font-semibold leading-5 text-muted-foreground" dir="auto">
-        <span className="font-black text-foreground">{t(language, "benefits.source")}: </span>
-        <a
-          href={item.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="rounded underline decoration-primary/45 underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          {source}
-        </a>
-      </p>
+      {meaning && <p className="mt-3 text-[0.875rem] font-semibold leading-7 text-muted-foreground">{meaning}</p>}
       {derivedBenefits.length > 0 && (
-        <section className="mt-4 border-t border-border pt-4" aria-label={t(language, "benefits.derivedHeading")}>
-          <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "benefits.derivedHeading")}</h3>
-          <ul className="mt-2 space-y-2 ps-5 text-[0.875rem] font-semibold leading-6 text-foreground">
+        <details className="group mt-4 rounded-2xl border border-border bg-muted/35">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-[0.8125rem] font-black text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
+            <span>
+              {t(language, "benefits.derivedCount", { count: formatNumerals(derivedBenefits.length, language) })}
+            </span>
+            <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
+          </summary>
+          <ul className="space-y-2 border-t border-border px-4 py-3 ps-9 text-[0.875rem] font-semibold leading-6 text-foreground">
             {derivedBenefits.map((derived) => (
               <li key={derived.id} className="list-disc marker:text-primary" dir="auto">
                 {localizeBenefitText(derived.benefit, language)}
               </li>
             ))}
           </ul>
-        </section>
+        </details>
       )}
-      <ShareLink language={language} label={title} message={shareMessage} />
+      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
+        <a
+          href={item.sourceUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="min-w-0 rounded text-[0.75rem] font-bold leading-5 text-muted-foreground underline decoration-primary/45 underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          dir="auto"
+        >
+          {source}
+        </a>
+        <ShareLink language={language} label={title} message={shareMessage} />
+      </footer>
     </article>
   );
 }
@@ -148,18 +174,6 @@ export function BenefitsScreen({
         className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-3 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="benefits-scroll-region"
       >
-        <div className="mb-4 flex items-start gap-3 rounded-3xl border border-amber-500/30 bg-amber-500/10 p-4 text-start">
-          <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-700 dark:text-amber-300">
-            <Sparkles size={22} aria-hidden="true" />
-          </span>
-          <div>
-            <h2 className="text-[0.9375rem] font-black text-foreground">{t(language, "benefits.reviewedHeading")}</h2>
-            <p className="mt-1 text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
-              {t(language, "benefits.reviewedDescription")}
-            </p>
-          </div>
-        </div>
-
         <TabList
           value={activeSection}
           onChange={setActiveSection}
@@ -180,15 +194,6 @@ export function BenefitsScreen({
           className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           data-testid={`benefits-panel-${activeSection}`}
         >
-          <div className="mb-4 text-start">
-            <h2 className="text-[1.125rem] font-black text-foreground">
-              {t(language, `benefits.${activeSection}Heading`)}
-            </h2>
-            <p className="mt-1 text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
-              {t(language, `benefits.${activeSection}Description`)}
-            </p>
-          </div>
-
           <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
             {visibleEvidence.map((item) => (
               <EvidenceCard

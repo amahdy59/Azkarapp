@@ -21,10 +21,10 @@ import {
   VolumeX,
 } from "../components/icons";
 import { t } from "../i18n";
-import { scrollBehavior, shouldReduceMotion } from "../motionPreferences";
+import { shouldReduceMotion } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
-import { isLongSurah, splitMushafPages } from "../content/mushafPages";
+import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
@@ -205,11 +205,8 @@ export function ReaderScreen({
 
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
-  const readingContentRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
-  const [visibleMushafPage, setVisibleMushafPage] = useState<number | null>(null);
   const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
-  const [isScrolledToBottom, setIsScrolledToBottom] = useState(false);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -269,60 +266,10 @@ export function ReaderScreen({
   }, [z?.id]);
 
   useLayoutEffect(() => {
-    setIsScrolledToBottom(false);
     if (readingScrollRef.current) {
       readingScrollRef.current.scrollTop = 0;
     }
   }, [idx]);
-
-  const handleScroll = useCallback(() => {
-    if (!longSurah || isScrolledToBottom) return;
-    const el = readingScrollRef.current;
-    if (!el) return;
-    // Show counter when within 150px of the bottom
-    if (el.scrollHeight - el.scrollTop - el.clientHeight < 150) {
-      setIsScrolledToBottom(true);
-    }
-  }, [longSurah, isScrolledToBottom]);
-
-  // Long-Surah reading-position tracking. Drives the floating "jump to
-  // counter" affordance (task: sticky mini-counter) and lets it report which
-  // Mushaf page is currently on screen (task: page-jump orientation) without
-  // a second observer. Included isDesktopReader in the deps for the same
-  // reason as the measurement effect above: swapping mobile/desktop trees
-  // remounts the scroll container, and a stale observer would otherwise keep
-  // watching a detached node.
-  useEffect(() => {
-    if (!longSurah) {
-      setVisibleMushafPage(null);
-      return;
-    }
-    const root = readingScrollRef.current;
-    const content = readingContentRef.current;
-    if (!root || !content) return;
-    // jsdom (unit tests) and some older embedded webviews don't implement
-    // IntersectionObserver; the jump pill simply stays hidden there rather
-    // than throwing during mount.
-    if (typeof IntersectionObserver === "undefined") return;
-
-    const sections = Array.from(content.querySelectorAll<HTMLElement>("[data-mushaf-page]"));
-    if (sections.length === 0) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        const top = visible[0]?.target;
-        const page = top ? Number(top.getAttribute("data-mushaf-page")) : NaN;
-        if (!Number.isNaN(page)) setVisibleMushafPage(page);
-      },
-      { root, rootMargin: "0px 0px -70% 0px", threshold: 0 },
-    );
-    sections.forEach((section) => observer.observe(section));
-
-    return () => observer.disconnect();
-  }, [longSurah, z?.id, isDesktopReader]);
 
   const handleToggleSaved = useCallback(() => {
     if (z) onToggleSaved(z.id);
@@ -487,28 +434,8 @@ export function ReaderScreen({
       .trim();
   }
 
-  const mushafPages = longSurah ? splitMushafPages(displayArabicText, z.mushafPages ?? []) : [];
-  const firstMushafPage = mushafPages[0]?.page ?? null;
-  const lastMushafPage = mushafPages[mushafPages.length - 1]?.page ?? null;
-  // Hidden on the first page (nothing to jump to yet) and on the last page
-  // (the counter it points to is already close by, so the pill would just
-  // sit on top of it).
-  const showLongSurahJump =
-    longSurah &&
-    !complete &&
-    visibleMushafPage !== null &&
-    visibleMushafPage !== firstMushafPage &&
-    visibleMushafPage !== lastMushafPage;
-
-  const scrollToLongSurahCounter = () => {
-    readingScrollRef.current
-      ?.querySelector('[data-testid="long-surah-end-counter"]')
-      ?.scrollIntoView({ behavior: scrollBehavior(reduceMotion), block: "center" });
-  };
-
   const renderReadingContent = () => (
     <article
-      ref={readingContentRef}
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
       <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
@@ -642,9 +569,7 @@ export function ReaderScreen({
         </div>
         <div className="md:hidden">{renderNavigationButton("next")}</div>
       </div>
-      <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
-        {isDesktopReader ? t(language, "reader.tapAnywhereDesktop") : t(language, "reader.tapAnywhere")}
-      </p>
+      <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{counterInstruction}</p>
     </div>
   );
 
@@ -703,47 +628,6 @@ export function ReaderScreen({
       {renderKeyboardShortcutsHint()}
     </div>
   );
-
-  // Long Surahs can run a dozen Mushaf pages before the counter appears.
-  // This floating pill reports the current page and jumps straight to the
-  // counter, so the primary action is never more than one tap away.
-  //
-  // Positioned `absolute` against the reading pane (not `sticky` inside the
-  // scroll flow), so it stays anchored to a fixed corner of the pane
-  // regardless of scroll offset, never overlaps the centered word-help
-  // targets or the counter itself, and — always mounted, only opacity
-  // toggled — never causes a scroll-position jump when it appears. The
-  // nearest `relative` ancestor differs per tree (the outer card on desktop,
-  // the reader-column on mobile), so each call site supplies its own
-  // container's positioning context; this just renders the pill itself.
-  const renderLongSurahJumpFab = () =>
-    longSurah && (
-      <div
-        className="pointer-events-none absolute inset-x-3 bottom-3 z-20 flex justify-end"
-        aria-hidden={!showLongSurahJump}
-      >
-        <button
-          type="button"
-          onClick={(event) => {
-            event.stopPropagation();
-            scrollToLongSurahCounter();
-          }}
-          tabIndex={showLongSurahJump ? 0 : -1}
-          className={`pointer-events-auto flex items-center gap-2 rounded-full border border-border bg-card/95 px-4 py-2.5 text-[0.8125rem] font-bold text-foreground shadow-raised backdrop-blur transition-[opacity,transform] duration-200 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            showLongSurahJump ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
-          }`}
-        >
-          <BookOpen size={16} className="shrink-0 text-primary" />
-          {visibleMushafPage !== null && (
-            <span dir="auto">
-              {t(language, "reader.mushafPage", { page: formatNumerals(visibleMushafPage, language) })}
-            </span>
-          )}
-          <span className="h-3 w-px bg-border" aria-hidden="true" />
-          <span dir="auto">{t(language, "reader.jumpToCounter")}</span>
-        </button>
-      </div>
-    );
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
@@ -1012,41 +896,38 @@ export function ReaderScreen({
             data-testid="reader-card"
           >
             <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
-              <div
-                ref={readingScrollRef}
-                onScroll={handleScroll}
-                role="region"
-                tabIndex={0}
-                aria-label={t(language, "reader.readingText")}
-                className={`relative flex-1 overflow-y-auto min-h-0 w-full ps-6 pe-7 py-4 outline-none [scrollbar-gutter:stable] ${
-                  justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                }`}
-              >
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={z.id}
-                    initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                    animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                    exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
-                    transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                    className="mx-auto flex min-h-full max-w-[480px] w-full flex-col py-4"
-                  >
-                    <div
-                      className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+              <div className="relative flex min-h-0 flex-1">
+                <div
+                  ref={readingScrollRef}
+                  role="region"
+                  tabIndex={0}
+                  aria-label={t(language, "reader.readingText")}
+                  className={`h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                    justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                  }`}
+                >
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={z.id}
+                      initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                      exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                      transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
+                      className="mx-auto flex min-h-full max-w-[480px] w-full flex-col py-4"
                     >
-                      {renderReadingContent()}
-                    </div>
-                  </motion.div>
-                </AnimatePresence>
+                      <div
+                        className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                      >
+                        {renderReadingContent()}
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
                 {renderSideNavigation()}
               </div>
 
-              <footer className="shrink-0 pb-3 pt-2">
-                {(!longSurah || isScrolledToBottom) && renderCounterStack()}
-              </footer>
+              <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
             </div>
-
-            {renderLongSurahJumpFab()}
           </div>
         </>
       ) : (
@@ -1146,11 +1027,8 @@ export function ReaderScreen({
             className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
             data-testid="reader-card"
           >
-            {/* Long chapters keep their completion control after the final Mushaf page;
-                ordinary adhkar retain the fixed counter below this scroll region. */}
             <div
               ref={readingScrollRef}
-              onScroll={handleScroll}
               role="region"
               tabIndex={0}
               aria-label={t(language, "reader.readingText")}
@@ -1172,11 +1050,7 @@ export function ReaderScreen({
             {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">
-              {(!longSurah || isScrolledToBottom) && renderCounterStack()}
-            </div>
-
-            {renderLongSurahJumpFab()}
+            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
           </div>
         </>
       )}

@@ -71,6 +71,45 @@ test("the Home masbaha entry fills compact/tablet layouts and is bounded on desk
   }
 });
 
+test("desktop Home hero cards settle to one aligned height", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReturningGuest(page);
+
+  const routine = page.getByRole("region", { name: "Morning Azkar" });
+  const wird = page.getByTestId("today-garden-card");
+  const [routineBox, wirdBox] = await Promise.all([routine.boundingBox(), wird.boundingBox()]);
+
+  expect(routineBox).not.toBeNull();
+  expect(wirdBox).not.toBeNull();
+  if (routineBox && wirdBox) {
+    expect(Math.abs(routineBox.y - wirdBox.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(routineBox.height - wirdBox.height)).toBeLessThanOrEqual(1);
+  }
+});
+
+test("the OnePlus-class Salawat layout keeps its counting hint inside the card", async ({ page }) => {
+  await page.setViewportSize({ width: 412, height: 924 });
+  await openReturningGuest(page);
+  await page.goto("/#/friday/salawat");
+
+  const targetCard = page.getByRole("region", { name: "Target" });
+  const tapHint = targetCard.getByText("Tap to count", { exact: true });
+  const nextEvidence = page.locator("main article").last();
+  const [cardBox, hintBox, nextBox] = await Promise.all([
+    targetCard.boundingBox(),
+    tapHint.boundingBox(),
+    nextEvidence.boundingBox(),
+  ]);
+
+  expect(cardBox).not.toBeNull();
+  expect(hintBox).not.toBeNull();
+  expect(nextBox).not.toBeNull();
+  if (cardBox && hintBox && nextBox) {
+    expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height);
+    expect(nextBox.y - (hintBox.y + hintBox.height)).toBeGreaterThanOrEqual(16);
+  }
+});
+
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await openReturningGuest(page);

@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
@@ -56,7 +56,7 @@ describe("ReaderScreen audio identity", () => {
     expect(screen.queryByRole("button", { name: "Counter sound" })).toBeNull();
   });
 
-  it("renders reviewed Mushaf pages and keeps long-surah completion at the end", () => {
+  it("renders reviewed Mushaf pages with a stable long-surah counter", () => {
     registerLazyCollection("friday_kahf", FRIDAY_KAHF);
     const onComplete = vi.fn();
 
@@ -87,25 +87,14 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
 
-    // Counter is hidden until the user scrolls to the bottom of a long surah.
-    expect(screen.queryByTestId("counter-surface")).toBeNull();
-
-    // Simulate scrolling to the bottom using getter-based defineProperty so
-    // jsdom's internal DOM machinery (scrollTop setter, etc.) is not disturbed.
     const scrollRegion = screen.getByRole("region", { name: "نص الذكر" });
-    Object.defineProperty(scrollRegion, "scrollHeight", { configurable: true, get: () => 1000 });
-    Object.defineProperty(scrollRegion, "clientHeight", { configurable: true, get: () => 500 });
-    Object.defineProperty(scrollRegion, "scrollTop", { configurable: true, get: () => 500 });
-    act(() => {
-      fireEvent.scroll(scrollRegion);
-    });
-
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
     expect(screen.getAllByTestId("mushaf-page")).toHaveLength(12);
     expect(screen.getAllByTestId("mushaf-page-separator")).toHaveLength(11);
     const finalPage = screen.getAllByTestId("mushaf-page").at(-1)!;
     const endCounter = screen.getByTestId("counter-surface");
     expect(finalPage.compareDocumentPosition(endCounter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(scrollRegion).not.toContainElement(endCounter);
 
     // Reading taps and the global Space shortcut cannot complete a long surah.
     fireEvent.click(screen.getAllByTestId("zikr-text")[0]!);

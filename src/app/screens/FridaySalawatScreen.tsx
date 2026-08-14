@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { ZikrCounterSurface } from "../components/ZikrComponents";
-import { CheckCircle2, ExternalLink, Heart, RotateCcw } from "../components/icons";
+import { ExternalLink, RotateCcw } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
@@ -110,6 +110,19 @@ export function FridaySalawatScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [increment, onBack]);
 
+  const handleCanvasClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const targetElement = event.target;
+    if (
+      targetElement instanceof Element &&
+      targetElement.closest(
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [data-prevent-count='true']",
+      )
+    ) {
+      return;
+    }
+    increment();
+  };
+
   return (
     <ScreenContainer dir={direction} className="px-0 relative" screenName={copy.title}>
       <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
@@ -117,27 +130,27 @@ export function FridaySalawatScreen({
         {complete ? copy.completed : ""}
       </p>
 
-      <div className="relative z-10 flex flex-1 overflow-y-auto px-5 pb-8 pt-3">
-        <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-5">
-          <div className="grid items-stretch gap-5 md:grid-cols-[minmax(0,1fr)_minmax(20rem,0.9fr)]">
-            <section className="flex min-h-48 flex-col items-center justify-center rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-500/15 via-card to-card p-6 text-center shadow-raised md:min-h-[22rem]">
-              <span className="flex size-14 items-center justify-center rounded-2xl bg-rose-500/10 text-rose-500">
-                <Heart className="fill-rose-500/15" size={28} aria-hidden="true" />
-              </span>
-              <p
-                className="mt-4 max-w-[32rem] zikr-text text-[1.25rem] font-black leading-9 text-foreground sm:text-[1.375rem]"
-                dir="rtl"
-                lang="ar"
-              >
-                {copy.phrase}
-              </p>
-            </section>
+      {/* Pointer-only canvas shortcut; the explicit counter remains the named keyboard target. */}
+      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+      <div
+        className="relative z-10 flex flex-1 overflow-y-auto px-5 pb-8 pt-3"
+        data-counting-mode="canvas"
+        onClick={handleCanvasClick}
+      >
+        <div className="mx-auto flex w-full max-w-[44rem] flex-col gap-4">
+          <section aria-labelledby="salawat-reference-title">
+            <h2 id="salawat-reference-title" className="mb-2 text-start text-[0.8125rem] font-black text-foreground">
+              {copy.benefits}
+            </h2>
+            <BenefitCard text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
+          </section>
 
-            <section
-              aria-labelledby="salawat-counter-title"
-              className="flex flex-col justify-between rounded-3xl border border-border/50 bg-card p-4 shadow-raised sm:p-5"
-            >
-              <h2 id="salawat-counter-title" className="sr-only">
+          <section
+            aria-labelledby="salawat-counter-title"
+            className="flex shrink-0 flex-col rounded-[24px] border border-border bg-card p-5 shadow-raised sm:p-6"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 id="salawat-counter-title" className="text-[0.8125rem] font-black text-foreground">
                 {copy.target}
               </h2>
               <CounterTargetPicker
@@ -147,46 +160,43 @@ export function FridaySalawatScreen({
                 direction={direction}
                 allowOpen={false}
               />
-
-              <div className="my-6 flex flex-col items-center justify-center">
-                <ZikrCounterSurface
-                  count={progress.count}
-                  total={progress.target}
-                  complete={complete}
-                  onTap={increment}
-                  language={language}
-                  instructionText={copy.tap}
-                  testId="salawat-counter"
-                  className="salawat-counter-surface"
-                  reduceMotion={reduceMotion}
-                />
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => persist(0, progress.target)}
-                  disabled={progress.count === 0}
-                  className="mt-4"
-                >
-                  <RotateCcw size={18} aria-hidden="true" />
-                  {copy.reset}
-                </Button>
-              </div>
-            </section>
-          </div>
-
-          <section aria-labelledby="salawat-benefits" className="space-y-3">
-            <div className="flex items-center gap-2 text-start">
-              <CheckCircle2 size={20} className="text-emerald-500" aria-hidden="true" />
-              <h2 id="salawat-benefits" className="text-[0.9375rem] font-black text-foreground">
-                {copy.benefits}
-              </h2>
             </div>
-            <div className="grid gap-3 md:grid-cols-2">
-              <BenefitCard text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
-              <BenefitCard text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
+
+            <div className="mt-6 flex flex-col items-center justify-center pb-1">
+              <p
+                className="zikr-text mb-7 max-w-[34rem] text-center text-[1.25rem] font-black leading-[2] text-foreground sm:text-[1.5rem]"
+                dir="rtl"
+                lang="ar"
+              >
+                {copy.phrase}
+              </p>
+              <ZikrCounterSurface
+                count={progress.count}
+                total={progress.target}
+                complete={complete}
+                onTap={increment}
+                language={language}
+                instructionText={copy.tap}
+                testId="salawat-counter"
+                className="salawat-counter-surface"
+                reduceMotion={reduceMotion}
+              />
+
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => persist(0, progress.target)}
+                disabled={progress.count === 0}
+                className="mt-5"
+              >
+                <RotateCcw size={18} aria-hidden="true" />
+                {copy.reset}
+              </Button>
+              <p className="mt-3 text-center text-[0.8125rem] font-semibold text-muted-foreground">{copy.tap}</p>
             </div>
           </section>
+
+          <BenefitCard text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
         </div>
       </div>
     </ScreenContainer>

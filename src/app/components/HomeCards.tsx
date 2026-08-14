@@ -49,16 +49,15 @@ export function PrayerRoutineCard({
   onOpen: () => void;
 }) {
   const progressId = "home-routine-progress";
-  const modeHintId = "home-routine-mode-hint";
   const progress = totalCount > 0 ? Math.min(1, Math.max(0, completedCount / totalCount)) : 0;
 
   return (
     <section
       aria-labelledby="current-zikr-heading"
-      className="flex flex-col justify-between transition-all lg:col-span-3"
+      className="flex h-full flex-col justify-between transition-all lg:col-span-3"
     >
-      <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/15 bg-slate-950/76 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
-        <div className="flex w-full flex-col items-start gap-2 px-1">
+      <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-slate-950/82 px-5 py-6 text-start shadow-2xl backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
+        <div className="flex w-full flex-col items-start gap-3 px-1">
           <div className="hidden" aria-hidden="true">
             <Clock className="size-[15px] shrink-0 text-on-media-accent" aria-hidden="true" />
             <span>{t(language, "home.nextPrayer")}</span>
@@ -93,7 +92,6 @@ export function PrayerRoutineCard({
             onChange={onModeChange}
             direction={direction}
             aria-label={t(language, "home.routineMode")}
-            aria-describedby={modeHintId}
             className="flex min-h-[48px] w-full items-center rounded-2xl border border-white/16 bg-black/45 p-1"
             itemClassName={(selected) =>
               `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
@@ -105,9 +103,6 @@ export function PrayerRoutineCard({
               { value: "core", label: t(language, "home.routineAbbreviated") },
             ]}
           />
-          <p id={modeHintId} className="mt-2 px-1 text-xs font-medium leading-5 text-white/72" dir="auto">
-            {t(language, mode === "complete" ? "home.routineCompleteHint" : "home.routineAbbreviatedHint")}
-          </p>
         </div>
 
         {totalCount > 0 && (
@@ -144,7 +139,7 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-2 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-lg transition-[background-color,transform] hover:bg-primary/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-1 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-lg transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
           <DirectionArrow direction={direction} size={20} />

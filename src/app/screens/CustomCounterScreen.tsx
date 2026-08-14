@@ -85,6 +85,19 @@ export function CustomCounterScreen({
     setShowCompletionDialog(false);
   };
 
+  const handleCanvasClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const targetElement = event.target;
+    if (
+      targetElement instanceof Element &&
+      targetElement.closest(
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [data-prevent-count='true']",
+      )
+    ) {
+      return;
+    }
+    handleTap();
+  };
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
@@ -153,9 +166,13 @@ export function CustomCounterScreen({
           }
         />
 
+        {/* Pointer-only canvas shortcut; the explicit counter remains the named keyboard target. */}
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-          className="relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between overflow-hidden rounded-3xl px-4 pb-6 pt-2 sm:px-5"
+          className="relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col justify-between overflow-y-auto rounded-[24px] px-4 pb-6 pt-2 sm:px-5"
           data-testid="custom-counter-content"
+          data-counting-mode="canvas"
+          onClick={handleCanvasClick}
         >
           {/* Top Controls: Zikr Card & Target Picker */}
           <div className="space-y-3 relative z-10">
@@ -170,19 +187,41 @@ export function CustomCounterScreen({
                 aria-labelledby="selected-dhikr-label selected-dhikr-value"
                 aria-haspopup="dialog"
                 aria-expanded={showLibrarySheet}
-                className="interactive-elem flex min-h-20 w-full items-center justify-between gap-3 rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 py-3 text-start transition-[border-color,background-color,box-shadow] hover:border-primary/45 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem flex min-h-20 w-full items-center justify-between gap-3 rounded-[20px] border border-border-control bg-card px-4 py-3 text-start shadow-raised transition-[border-color,background-color,box-shadow] hover:border-primary/45 hover:bg-muted/35 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <div className="min-w-0 flex-1 space-y-1.5">
-                  <p className="line-clamp-2 text-[1.125rem] font-extrabold leading-tight text-foreground" dir="rtl">
-                    <span id="selected-dhikr-value">{activeText}</span>
+                  <p className="text-[0.9375rem] font-extrabold leading-6 text-foreground" dir="auto">
+                    <span id="selected-dhikr-value">
+                      {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
+                    </span>
                   </p>
-                  <p className="line-clamp-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground" dir="auto">
-                    {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                  <p className="line-clamp-2 text-[0.75rem] font-semibold leading-5 text-muted-foreground" dir="auto">
+                    {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
+                    {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
                   </p>
                 </div>
                 <ChevronDown className="size-5 shrink-0 text-muted-foreground" aria-hidden="true" />
               </button>
             </div>
+
+            <section
+              className="rounded-[20px] border border-border bg-card p-4 text-start shadow-raised"
+              aria-labelledby="counter-reference-title"
+            >
+              <div className="flex items-start gap-3">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <Sparkles size={18} aria-hidden="true" />
+                </span>
+                <div className="min-w-0 flex-1">
+                  <h2 id="counter-reference-title" className="text-[0.8125rem] font-black text-foreground">
+                    {t(language, "counter.virtueReference")}
+                  </h2>
+                  <p className="mt-1 text-[0.8125rem] font-semibold leading-6 text-muted-foreground" dir="auto">
+                    {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
+                  </p>
+                </div>
+              </div>
+            </section>
 
             {/* Target Presets */}
             <CounterTargetPicker
@@ -200,6 +239,13 @@ export function CustomCounterScreen({
 
           {/* Central Counter Display Surface */}
           <div className="relative z-10 my-auto flex flex-col items-center justify-center py-4 sm:py-6 lg:py-8">
+            <p
+              className="zikr-text mb-6 max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
+              dir="rtl"
+              lang="ar"
+            >
+              {activeText}
+            </p>
             <div className="custom-counter-stage relative flex items-center justify-center">
               <PulseRings trigger={pulse} size={220} height={76} count={count} total={target} />
 
@@ -222,6 +268,10 @@ export function CustomCounterScreen({
                 <span>{t(language, "reader.resetCounter")}</span>
               </Button>
             </div>
+
+            <p className="mt-3 text-center text-[0.8125rem] font-semibold text-muted-foreground">
+              {t(language, "reader.tapAnywhere")}
+            </p>
 
             {/* Keyboard Shortcuts Helper on Desktop & Tablet */}
             <div className="hidden md:flex items-center justify-center gap-3 mt-4 py-1.5 px-4 rounded-full bg-muted/60 border border-border/40 text-[0.75rem] font-medium text-muted-foreground mx-auto w-fit">
@@ -247,30 +297,6 @@ export function CustomCounterScreen({
               </span>
             </div>
           </div>
-
-          {/* Virtue & Source Information Card */}
-          {selectedAuthentic.virtueAr && (
-            <div className="rounded-3xl border border-border/40 bg-card p-4 shadow-raised">
-              <div className="flex items-start gap-3">
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                  <Sparkles size={18} />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <h4 className="text-[0.8125rem] font-extrabold text-foreground">
-                      {t(language, "counter.virtueReference")}
-                    </h4>
-                    <span className="text-[0.6875rem] font-bold text-amber-600 dark:text-amber-400">
-                      {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
-                    </span>
-                  </div>
-                  <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground" dir={isArabic ? "rtl" : "ltr"}>
-                    {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
 

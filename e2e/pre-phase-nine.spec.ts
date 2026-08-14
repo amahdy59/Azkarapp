@@ -90,6 +90,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
 
       return {
         header: bounds("home-utility-header"),
+        hero: bounds("home-hero"),
         date: bounds("hijri-date"),
         time: bounds("next-prayer-time"),
         streak: bounds("header-streak"),
@@ -98,6 +99,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
       };
     });
     expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
+    expect(geometry.hero.y, `Home hero starts flush at ${viewport.width}px`).toBeLessThanOrEqual(1);
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
     expect(Math.abs(geometry.streak.y - geometry.palms.y), `streak/palms row at ${viewport.width}px`).toBeLessThan(1);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
@@ -116,8 +118,12 @@ test("Home Benefits entry opens the dedicated collection with encoded WhatsApp s
   await expect(page.getByText("Evening testimony of faith.", { exact: true })).toHaveCount(0);
 
   await page.getByRole("tab", { name: "Hadith (51)" }).click();
-  await expect(page.getByText("Authentic hadith").first()).toBeVisible();
+  await expect(page.getByText("Authentic hadith", { exact: true })).toHaveCount(0);
   await page.getByTestId("benefits-load-more").click();
+  const derivedBenefit = page.getByText("Forgiveness of sins even if they are like the foam of the sea.", {
+    exact: true,
+  });
+  await page.locator("details").filter({ has: derivedBenefit }).locator("summary").click();
   await expect(
     page.getByText("Forgiveness of sins even if they are like the foam of the sea.", { exact: true }),
   ).toBeVisible();

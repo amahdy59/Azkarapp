@@ -10,7 +10,7 @@ const savedItem: HomeSavedCardItem = {
 };
 
 describe("HomeCards", () => {
-  it("keeps the routine card focused on the zikr and mode explanation", () => {
+  it("keeps the routine card focused on the zikr without redundant mode explanation", () => {
     render(
       <PrayerRoutineCard
         language="en"
@@ -27,7 +27,7 @@ describe("HomeCards", () => {
       />,
     );
 
-    expect(screen.getByText("A shorter selection for limited time.")).toBeInTheDocument();
+    expect(screen.queryByText("A shorter selection for limited time.")).not.toBeInTheDocument();
     expect(screen.queryByTestId("next-prayer")).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: /3 remaining/i })).toHaveAttribute(
       "aria-describedby",

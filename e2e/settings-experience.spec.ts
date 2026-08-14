@@ -222,7 +222,8 @@ test("malformed legacy preferences recover without a blank screen", async ({ pag
   });
 
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 10_000 });
+  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
   await expect(page.locator("html")).toHaveClass(/theme-midnight/);
   await expect(page.locator("body")).not.toBeEmpty();
 });

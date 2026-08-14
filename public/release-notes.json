@@ -1,14 +1,16 @@
 {
   "ar": [
-    "أصبحت صفحات البداية وتسجيل الدخول بعرض مريح ومتمركزة بصورة صحيحة على شاشات سطح المكتب.",
-    "أصبحت المسافات بين اختيارات اللغة وزر المتابعة أقصر وأكثر اتساقًا.",
-    "تتكيّف رسومات الترحيب مع ارتفاع الشاشة دون دفع الأزرار بعيدًا.",
-    "أصبحت صفحة نظرة عامة على مجموعة الأذكار محددة العرض على سطح المكتب وتظل مرنة على الهاتف."
+    "أصبح رأس الصفحة الرئيسية شفافًا وثابتًا فوق الصورة، مع بطاقات متساوية الارتفاع وحواف أكثر نعومة على الهاتف.",
+    "تبقى أسهم التنقل والعداد في موضع ثابت أثناء قراءة السور الطويلة، دون خط تركيز زائد فوق العداد.",
+    "أصبحت صفحة فوائد الذكر أهدأ، بمراجع مختصرة وفوائد الحديث الإضافية داخل قسم قابل للفتح.",
+    "أصبح اختيار هدف المسبحة والصلاة على النبي قائمة واحدة، ويمكن العد بالنقر في المساحة غير التفاعلية.",
+    "انتقل فلتر المجموعة بين زري المتابعة وإعادة التعيين لسهولة الوصول."
   ],
   "en": [
-    "Intro and sign-in pages now use a comfortable, correctly centered desktop width.",
-    "Language choices and Continue now stay closely and consistently spaced.",
-    "Welcome artwork adapts to screen height without pushing actions away.",
-    "Zikr collection overviews are bounded on desktop while remaining fluid on phones."
+    "Home now has a transparent sticky header, equal-height hero cards, and softer mobile corners.",
+    "Long-surah navigation and the counter stay fixed while the Quran text scrolls, without an extra focus line.",
+    "Benefits are calmer to scan, with concise citations and secondary hadith benefits inside a disclosure.",
+    "Masbaha and Friday Salawat now use one target menu and support counting from non-interactive canvas space.",
+    "The collection filter now sits between Continue and Reset for easier reach."
   ]
 }

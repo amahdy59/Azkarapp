@@ -227,7 +227,9 @@ test("full surahs count only from the counter and expose sourced difficult-word 
 
   // For long multi-page surahs the counter is hidden until the reader reaches
   // the end of the pages — users must read through before they can count.
-  await expect(counter).toHaveCount(0);
+  await expect(counter).toBeVisible();
+  await expect(counter).toHaveAccessibleName(/0 \/ 1/);
+  await expect(counter).toBeInViewport();
 
   await expect(page.getByTestId("mushaf-page")).toHaveCount(12);
   await expect(page.getByTestId("mushaf-page-separator")).toHaveCount(11);
@@ -239,14 +241,19 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   await reader.click({ position: { x: 2, y: 320 } });
   await page.keyboard.press("Space");
 
-  // Scroll to the bottom of the reading region to reveal the counter.
   const scrollRegion = page.getByRole("region", { name: "Zikr reading text" });
+  const counterBeforeScroll = await counter.boundingBox();
   await scrollRegion.evaluate((el) => {
-    el.scrollTop = el.scrollHeight;
+    el.scrollTop = Math.min(800, el.scrollHeight - el.clientHeight);
   });
   await expect(counter).toBeVisible();
-  await expect(counter).toHaveAccessibleName(/0 \/ 1/);
   await expect(counter).toBeInViewport();
+  const counterAfterScroll = await counter.boundingBox();
+  expect(counterBeforeScroll).not.toBeNull();
+  expect(counterAfterScroll).not.toBeNull();
+  if (counterBeforeScroll && counterAfterScroll) {
+    expect(Math.abs(counterAfterScroll.y - counterBeforeScroll.y)).toBeLessThanOrEqual(1);
+  }
 
   // Non-counter interactions must still not count after the counter is revealed.
   await reader.click({ position: { x: 2, y: 320 } });

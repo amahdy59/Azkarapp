@@ -208,7 +208,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     data-testid="routine-mode-filter"
-                    className="interactive-elem flex h-11 shrink-0 items-center justify-center gap-2 rounded-btn border border-border bg-card px-3 text-[0.8125rem] font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="interactive-elem order-2 flex h-11 shrink-0 items-center justify-center gap-2 rounded-btn border border-border bg-card px-3 text-[0.8125rem] font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${t(language, "category.routineLength")}: ${t(language, routineMode === "core" ? "category.core" : "category.complete")}`}
                   >
                     <SlidersHorizontal size={17} aria-hidden="true" />
@@ -245,7 +245,7 @@ export function CategoryScreen({
                   type="button"
                   data-testid="start-session-button"
                   onClick={() => onZikr(Math.max(0, resumeIdx))}
-                  className="interactive-elem flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="interactive-elem order-1 flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <span className="leading-none">
                     {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
@@ -258,7 +258,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onPlayAllAudio}
-                    className="flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
+                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
                     aria-label={t(language, "category.playAllAudio")}
                     title={
                       audioCoverage
@@ -279,7 +279,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onReset}
-                    className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                    className="interactive-elem order-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
                     aria-label={t(language, "category.resetProgress")}
                   >
                     <RotateCcw size={18} />
@@ -291,7 +291,7 @@ export function CategoryScreen({
                 <button
                   type="button"
                   onClick={onRepeat}
-                  className="interactive-elem flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="interactive-elem order-1 flex h-11 flex-1 items-center justify-center gap-2 rounded-btn border border-primary/40 bg-primary/10 text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   {isArabic ? (
                     <>
@@ -312,7 +312,7 @@ export function CategoryScreen({
                 <button
                   type="button"
                   onClick={onReset}
-                  className="interactive-elem flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
+                  className="interactive-elem order-3 flex h-11 w-11 shrink-0 items-center justify-center rounded-btn border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/15 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-destructive"
                   aria-label={t(language, "category.resetProgress")}
                 >
                   <RotateCcw size={18} />

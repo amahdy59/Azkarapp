@@ -64,7 +64,7 @@ function MainDhikrGroupCard({
       onClick={onPress}
       className={`group relative flex w-full rounded-[24px] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
-          ? "min-h-[6.25rem] items-center gap-4 px-4 py-4 text-start sm:min-h-[10rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-3 sm:py-4 sm:text-center"
+          ? "min-h-[6.5rem] items-center gap-5 px-5 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-5 sm:px-4 sm:py-5 sm:text-center"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
@@ -86,7 +86,7 @@ function MainDhikrGroupCard({
       <div
         className={`flex min-w-0 flex-1 flex-col gap-2 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
-        <span className="text-[1rem] font-black leading-snug text-inherit">{name}</span>
+        <span className="text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem]">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
             isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-slate-800 text-slate-200"
@@ -205,7 +205,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border border-slate-700 bg-slate-950 p-5 shadow-raised sm:p-6 md:p-7 ${
+        className={`flex w-full flex-col rounded-[28px] border border-slate-700 bg-slate-950 p-5 shadow-raised sm:p-7 md:p-8 ${
           isHomeSubset ? "flex-1" : ""
         }`}
       >
@@ -231,7 +231,7 @@ export function ProgressDayView({
         </div>
 
         <div
-          className={`mt-5 grid grid-cols-1 gap-2.5 sm:gap-4 md:gap-5 ${
+          className={`mt-6 grid flex-1 grid-cols-1 gap-3 sm:gap-5 md:gap-6 ${
             isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >

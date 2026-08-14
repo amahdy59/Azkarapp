@@ -30,6 +30,18 @@ describe("CustomCounterScreen Component", () => {
     expect(screen.getAllByText("٠")[0]).toBeInTheDocument();
   });
 
+  it("counts from non-interactive canvas space while protecting controls", () => {
+    render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
+
+    const canvas = screen.getByTestId("custom-counter-content");
+    const counter = screen.getByTestId("custom-counter-surface");
+    fireEvent.click(canvas);
+    expect(counter).toHaveTextContent("1");
+
+    fireEvent.click(screen.getByTestId("counter-target-filter"));
+    expect(counter).toHaveTextContent("1");
+  });
+
   it("persists a localized sound toggle with pressed-state semantics", () => {
     const firstRender = render(<CustomCounterScreen isArabic={false} direction="ltr" onBack={vi.fn()} />);
     const mute = screen.getByRole("button", { name: "Counter sound" });

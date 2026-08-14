@@ -76,6 +76,8 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     const filter = screen.getByTestId("routine-mode-filter");
     expect(filter).toHaveAccessibleName("Routine length: Complete");
+    expect(filter).toHaveClass("order-2");
+    expect(screen.getByTestId("start-session-button")).toHaveClass("order-1");
     await user.click(filter);
     await user.click(screen.getByRole("menuitemradio", { name: /Core ·/ }));
     expect(onRoutineModeChange).toHaveBeenCalledWith("core");

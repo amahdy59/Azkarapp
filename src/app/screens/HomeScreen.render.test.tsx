@@ -18,7 +18,7 @@ const routineModes = {
 describe("HomeScreen quick access", () => {
   afterEach(() => vi.useRealTimers());
 
-  it("keeps the mobile utility header to two semantic rows and exposes saved and benefit actions", () => {
+  it("overlays the transparent utility header on the hero and exposes saved and benefit actions", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
     const saved = ALL_AZKAR.find((zikr) => !zikr.isCollectionIntroduction)!;
@@ -44,6 +44,7 @@ describe("HomeScreen quick access", () => {
 
     expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
     expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
+    expect(screen.getByTestId("home-hero")).toHaveClass("rounded-b-[28px]");
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
     expect(screen.getByTestId("home-header-stats")).toBeInTheDocument();
     expect(screen.getByTestId("header-streak").compareDocumentPosition(screen.getByTestId("header-palms"))).toBe(
@@ -65,6 +66,7 @@ describe("HomeScreen quick access", () => {
     // role="img" its aria-label sat on a roleless div, so assistive technology
     // announced the two chips as bare unlabelled numerals.
     expect(screen.getByRole("img", { name: /Daily streak/i })).toBeInTheDocument();
+    expect(screen.queryByText("The full reviewed collection.")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("home-saved-section").getElementsByTagName("button")[0]!);
     expect(onOpenSavedZikr).toHaveBeenCalledWith(saved.category, expect.any(Number));

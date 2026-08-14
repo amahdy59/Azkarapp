@@ -1,4 +1,5 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { readFridaySalawatProgress } from "../fridayProgress";
 import { FridaySalawatScreen } from "./FridaySalawatScreen";
@@ -7,11 +8,13 @@ describe("FridaySalawatScreen", () => {
   beforeEach(() => localStorage.clear());
   afterEach(cleanup);
 
-  it("counts only through the counter, supports targets, and resets", () => {
+  it("counts across the devotional canvas, supports targets, and resets", async () => {
+    const user = userEvent.setup();
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 
     expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 100 });
-    fireEvent.click(screen.getByRole("button", { name: "10" }));
+    await user.click(screen.getByTestId("counter-target-filter"));
+    await user.click(screen.getByRole("menuitemradio", { name: "10" }));
     const counter = screen.getByTestId("salawat-counter");
     expect(counter).toHaveAttribute("data-counter-shape", "rectangle");
     for (let count = 0; count < 10; count += 1) fireEvent.click(counter);
@@ -23,11 +26,13 @@ describe("FridaySalawatScreen", () => {
     expect(readFridaySalawatProgress()).toEqual({ count: 0, target: 10 });
   });
 
-  it("supports an arbitrary target without offering an open-ended Friday goal", () => {
+  it("supports an arbitrary target without offering an open-ended Friday goal", async () => {
+    const user = userEvent.setup();
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 
-    expect(screen.queryByRole("button", { name: "Open" })).not.toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Custom" }));
+    await user.click(screen.getByTestId("counter-target-filter"));
+    expect(screen.queryByRole("menuitemradio", { name: "Open" })).not.toBeInTheDocument();
+    await user.click(screen.getByRole("menuitem", { name: "Custom" }));
     const input = screen.getByRole("spinbutton", { name: /^Target:?$/ });
     fireEvent.change(input, { target: { value: "250" } });
     fireEvent.click(screen.getByRole("button", { name: /Apply Target/i }));

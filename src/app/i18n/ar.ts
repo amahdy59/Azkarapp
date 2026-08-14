@@ -172,6 +172,7 @@ const ar = {
     hadithHeading: "الأحاديث الصحيحة",
     hadithDescription: "أذكار وفضائل وردت في أحاديث صحيحة أو نُصّ على تصحيحها.",
     derivedHeading: "٣٠ فائدة مستنبطة من نصوص الأحاديث",
+    derivedCount: "{count} فوائد مرتبطة",
     derivedDescription: "كل فائدة موجزة مرتبطة بحديث الذكر الخاص بها، دون إضافة ثواب لم يرد في النص.",
     quranBadge: "القرآن الكريم",
     hadithBadge: "حديث صحيح",
