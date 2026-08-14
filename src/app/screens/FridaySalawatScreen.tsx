@@ -181,8 +181,23 @@ export function FridaySalawatScreen({
         data-counting-mode="canvas"
         onClick={handleCanvasClick}
       >
+        <div className="relative z-20 mb-4 flex flex-col gap-3 sm:flex-row" data-prevent-count="true">
+          <div className="interactive-elem flex min-h-[48px] w-full sm:min-w-0 sm:flex-1 items-center justify-between gap-3 rounded-[16px] border border-border-control bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-xs">
+            <span className="truncate">{copy.subtitle}</span>
+          </div>
+          <div className="w-full sm:w-auto sm:min-w-[140px] shrink-0">
+            <CounterTargetPicker
+              activeTarget={progress.target}
+              onTargetChange={(target) => persist(0, target)}
+              language={language}
+              direction={direction}
+              allowOpen={false}
+            />
+          </div>
+        </div>
+
         <section
-          className="space-y-2 rounded-[24px] border border-border bg-card p-4 shadow-raised"
+          className="space-y-3 rounded-[24px] border border-border bg-card p-4 sm:p-5 shadow-raised"
           aria-label={copy.target}
         >
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
@@ -192,20 +207,6 @@ export function FridaySalawatScreen({
             </span>
           </div>
           <ProgressBar value={progress.count} max={progress.target} direction={direction} aria-label={copy.target} />
-          <div className="flex items-center gap-2 pt-1" data-prevent-count="true">
-            <div className="flex min-w-0 flex-1 items-center justify-between gap-2 rounded-xl border border-border-control bg-background px-3 py-2 text-[0.875rem] font-bold text-foreground">
-              <span className="truncate">{copy.subtitle}</span>
-            </div>
-            <div className="shrink-0 w-[100px]">
-              <CounterTargetPicker
-                activeTarget={progress.target}
-                onTargetChange={(target) => persist(0, target)}
-                language={language}
-                direction={direction}
-                allowOpen={false}
-              />
-            </div>
-          </div>
         </section>
 
         <div className="my-auto flex flex-col items-center justify-center py-8 sm:py-10">

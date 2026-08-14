@@ -61,14 +61,16 @@ export function CounterTargetPicker({
           <button
             type="button"
             data-testid="counter-target-filter"
-            className="interactive-elem inline-flex min-h-[46px] max-w-full items-center justify-center gap-2 rounded-xl border border-border-control bg-muted/60 px-4 text-[0.8125rem] font-extrabold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-3 rounded-[16px] border border-border-control bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={`${t(language, "counter.targetLabel")} ${activeLabel}`}
           >
-            <SlidersHorizontal size={16} aria-hidden="true" />
-            <span className="truncate">
-              {t(language, "counter.targetLabel")} {activeLabel}
-            </span>
-            <ChevronDown size={15} className="shrink-0" aria-hidden="true" />
+            <div className="flex items-center gap-2 truncate">
+              <SlidersHorizontal size={18} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+              <span className="truncate">
+                {t(language, "counter.targetLabel")} {activeLabel}
+              </span>
+            </div>
+            <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="min-w-[13rem] rounded-2xl p-1.5">
