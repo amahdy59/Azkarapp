@@ -307,7 +307,8 @@ test("Friday mode has no automatically detectable WCAG A/AA violations", async (
 test("Saved zikr has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await enterEnglishGuestMode(page);
   await page.getByTestId("nav-azkar").click();
-  await page.getByRole("tab", { name: /Saved/ }).click();
+  await page.getByTestId("library-section-filter").click();
+  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
   await expectNoWcagViolations(page);
 });

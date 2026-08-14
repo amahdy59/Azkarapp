@@ -5,14 +5,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { TabList, tabPanelProps } from "../components/Tabs";
-import { ChevronDown, Share2 } from "../components/icons";
+import { Share2 } from "../components/icons";
 import {
-  DERIVED_ZIKR_BENEFITS,
   HADITH_DHIKR_EVIDENCE,
   QURAN_DHIKR_EVIDENCE,
   localizeBenefitText,
   type BenefitEvidence,
-  type DerivedZikrBenefit,
 } from "../content/zikrBenefits";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -60,15 +58,7 @@ function ShareLink({ language, label, message }: { language: AppLanguage; label:
   );
 }
 
-function EvidenceCard({
-  item,
-  language,
-  derivedBenefits = [],
-}: {
-  item: BenefitEvidence;
-  language: AppLanguage;
-  derivedBenefits?: readonly DerivedZikrBenefit[];
-}) {
+function EvidenceCard({ item, language }: { item: BenefitEvidence; language: AppLanguage }) {
   const title = localizeBenefitText(item.title, language);
   const text = item.kind === "quran" ? item.text.ar : localizeBenefitText(item.text, language);
   const meaning = item.kind === "quran" && language === "en" ? item.text.en : "";
@@ -92,24 +82,7 @@ function EvidenceCard({
         {text}
       </p>
       {meaning && <p className="mt-3 text-[0.875rem] font-semibold leading-7 text-muted-foreground">{meaning}</p>}
-      {derivedBenefits.length > 0 && (
-        <details className="group mt-4 rounded-2xl border border-border bg-muted/35">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2.5 text-[0.8125rem] font-black text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring [&::-webkit-details-marker]:hidden">
-            <span>
-              {t(language, "benefits.derivedCount", { count: formatNumerals(derivedBenefits.length, language) })}
-            </span>
-            <ChevronDown className="size-4 shrink-0 transition-transform group-open:rotate-180" aria-hidden="true" />
-          </summary>
-          <ul className="space-y-2 border-t border-border px-4 py-3 ps-9 text-[0.875rem] font-semibold leading-6 text-foreground">
-            {derivedBenefits.map((derived) => (
-              <li key={derived.id} className="list-disc marker:text-primary" dir="auto">
-                {localizeBenefitText(derived.benefit, language)}
-              </li>
-            ))}
-          </ul>
-        </details>
-      )}
-      <footer className="mt-auto flex items-center justify-between gap-3 border-t border-border pt-4">
+      <footer className="mt-auto flex items-center justify-between gap-3 pt-4">
         <a
           href={item.sourceUrl}
           target="_blank"
@@ -145,9 +118,7 @@ export function BenefitsScreen({
         value: section,
         label: t(language, `benefits.${section}Tab`, {
           count: formatNumerals(
-            section === "quran"
-              ? QURAN_DHIKR_EVIDENCE.length
-              : HADITH_DHIKR_EVIDENCE.length + DERIVED_ZIKR_BENEFITS.length,
+            section === "quran" ? QURAN_DHIKR_EVIDENCE.length : HADITH_DHIKR_EVIDENCE.length,
             language,
           ),
         }),
@@ -196,16 +167,7 @@ export function BenefitsScreen({
         >
           <div className="grid gap-3.5 lg:grid-cols-2" data-testid="benefits-list">
             {visibleEvidence.map((item) => (
-              <EvidenceCard
-                key={item.id}
-                item={item}
-                language={language}
-                derivedBenefits={
-                  item.kind === "hadith"
-                    ? DERIVED_ZIKR_BENEFITS.filter((benefit) => benefit.evidenceId === item.id)
-                    : undefined
-                }
-              />
+              <EvidenceCard key={item.id} item={item} language={language} />
             ))}
           </div>
 

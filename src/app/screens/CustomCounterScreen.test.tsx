@@ -12,7 +12,7 @@ describe("CustomCounterScreen Component", () => {
     render(<CustomCounterScreen isArabic={true} direction="rtl" onBack={onBack} />);
 
     expect(screen.getByText("المسبحة الإلكترونية")).toBeInTheDocument();
-    expect(screen.getByText("الذكر المأثور")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /الذكر المأثور/ })).toBeInTheDocument();
     expect(screen.getByText("سُبْحَانَ اللَّهِ وَبِحَمْدِهِ")).toBeInTheDocument();
     expect(screen.getAllByTestId("custom-counter-surface")[0]).toHaveClass("custom-counter-surface");
   });
@@ -24,7 +24,7 @@ describe("CustomCounterScreen Component", () => {
     const tapButton = screen.getAllByTestId("custom-counter-surface")[0]!;
     fireEvent.click(tapButton);
 
-    expect(screen.getByText("١")).toBeInTheDocument();
+    expect(screen.getByTestId("custom-counter-surface")).toHaveTextContent("١");
     expect(screen.queryByRole("button", { name: "تراجع" })).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "إعادة تعيين العداد" }));
     expect(screen.getAllByText("٠")[0]).toBeInTheDocument();

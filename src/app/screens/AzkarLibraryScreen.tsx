@@ -1,10 +1,17 @@
 import { useDeferredValue, useId, useMemo, useState } from "react";
-import { Search, Bookmark } from "../components/icons";
+import { Search, Bookmark, ChevronDown, SlidersHorizontal } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { CategoryCard } from "../components/CategoryCard";
 import { StatePanel } from "../components/StatePanel";
-import { TabList, tabPanelProps } from "../components/Tabs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import {
   ALL_AZKAR,
   getAzkarByCategory,
@@ -103,7 +110,7 @@ export function AzkarLibraryScreen({
           <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-[1.5rem]">
             {t(language, "library.title")}
           </h1>
-          <div className="mt-4 flex flex-col gap-4 min-[900px]:grid min-[900px]:grid-cols-[minmax(0,1fr)_minmax(18rem,0.6fr)] min-[900px]:items-end">
+          <div className="mt-4">
             <form
               className="min-w-0"
               onSubmit={(event) => {
@@ -118,19 +125,54 @@ export function AzkarLibraryScreen({
               >
                 {t(language, "library.search")}
               </label>
-              <div className="flex h-12 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised focus-within:border-primary transition-colors">
-                <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                <input
-                  id={searchInputId}
-                  type="text"
-                  value={searchQuery}
-                  placeholder={t(language, "library.search")}
-                  dir={searchQuery.trim() ? "auto" : direction}
-                  lang={language}
-                  autoComplete="off"
-                  onChange={(event) => setSearchQuery(event.currentTarget.value)}
-                  className="h-11 min-w-0 flex-1 bg-transparent text-start text-[0.875rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
-                />
+              <div className="flex items-center gap-2">
+                <div className="flex h-12 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
+                  <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
+                  <input
+                    id={searchInputId}
+                    type="text"
+                    value={searchQuery}
+                    placeholder={t(language, "library.search")}
+                    dir={searchQuery.trim() ? "auto" : direction}
+                    lang={language}
+                    autoComplete="off"
+                    onChange={(event) => setSearchQuery(event.currentTarget.value)}
+                    className="h-11 min-w-0 flex-1 bg-transparent text-start text-[0.875rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
+                  />
+                </div>
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      type="button"
+                      className="interactive-elem flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border border-border-control bg-card px-3.5 text-[0.8125rem] font-extrabold text-foreground shadow-raised transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      aria-label={`${t(language, "library.title")}: ${t(language, `library.${section}`)}`}
+                      data-testid="library-section-filter"
+                    >
+                      <SlidersHorizontal size={18} aria-hidden="true" />
+                      <span className="hidden sm:inline">{t(language, `library.${section}`)}</span>
+                      <ChevronDown size={15} aria-hidden="true" />
+                    </button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[13rem] rounded-2xl p-1.5">
+                    <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
+                      {t(language, "library.title")}
+                    </DropdownMenuLabel>
+                    <DropdownMenuRadioGroup
+                      value={section}
+                      onValueChange={(value) => setSection(value as LibrarySection)}
+                    >
+                      {(["collections", "saved"] as const).map((value) => (
+                        <DropdownMenuRadioItem key={value} value={value} className="min-h-11 rounded-xl font-bold">
+                          {`${t(language, `library.${value}`)}${
+                            value === "saved" && savedZikrIds.size > 0
+                              ? ` (${formatNumerals(savedZikrIds.size, language)})`
+                              : ""
+                          }`}
+                        </DropdownMenuRadioItem>
+                      ))}
+                    </DropdownMenuRadioGroup>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
               {searchQuery.trim() && (
                 <p className="mt-1.5 px-1 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
@@ -145,36 +187,10 @@ export function AzkarLibraryScreen({
                 {filterStatusMessage}
               </p>
             </form>
-            <div className="overflow-x-auto no-scrollbar scroll-smooth min-[900px]:mt-0">
-              <TabList
-                value={section}
-                onChange={setSection}
-                direction={direction}
-                idPrefix="library"
-                aria-label={t(language, "library.title")}
-                className="mt-3 inline-flex min-w-max gap-2 rounded-2xl border border-border/40 bg-card p-1 shadow-raised"
-                itemClassName={(selected) =>
-                  `interactive-elem min-h-11 rounded-xl px-5 text-[0.8125rem] font-bold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.98] transition-transform ${
-                    selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground"
-                  }`
-                }
-                tabs={(["collections", "saved"] as const).map((value) => ({
-                  value,
-                  label: `${t(language, `library.${value}`)}${
-                    value === "saved" && savedZikrIds.size > 0
-                      ? ` (${formatNumerals(savedZikrIds.size, language)})`
-                      : ""
-                  }`,
-                }))}
-              />
-            </div>
           </div>
         </header>
 
-        <div
-          {...tabPanelProps("library", section)}
-          className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
-        >
+        <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40">
           {section === "collections" ? (
             <>
               {visibleGroups.map(({ group, categories }) => (

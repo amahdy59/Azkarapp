@@ -85,7 +85,7 @@ export function CounterTargetPicker({
               <DropdownMenuRadioItem
                 key={preset.value}
                 value={String(preset.value)}
-                className="min-h-11 rounded-xl px-8 font-bold"
+                className="min-h-11 rounded-xl font-bold"
               >
                 {preset.label}
               </DropdownMenuRadioItem>

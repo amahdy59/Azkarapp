@@ -186,36 +186,17 @@ test("four completed main collections are announced as a palm without points or 
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
 });
 
-test("garden visibility preference persists and keeps Home quiet when disabled", async ({ page }) => {
-  await seedReturningGardenUser(page, { completedToday: ["morning"] });
+test("legacy garden visibility preferences no longer hide the current Wird or add a Progress toggle", async ({
+  page,
+}) => {
+  await seedReturningGardenUser(page, { completedToday: ["morning"], quietProgressEnabled: false });
   await openReturningHome(page);
   await expect(page.getByTestId("today-garden-card")).toBeVisible();
 
   await page.getByRole("button", { name: "Progress", exact: true }).click();
-
-  const gardenSwitch = page.getByRole("switch", { name: /^Garden progress/ });
-  await expect(gardenSwitch).toBeChecked();
-  await gardenSwitch.click();
-  await expect(gardenSwitch).not.toBeChecked();
-  await expect(page.getByTestId("garden-hidden-state")).toBeVisible();
-  await expect
-    .poll(() =>
-      page.evaluate(() => {
-        const stored = JSON.parse(window.localStorage.getItem("azkarapp.state.v1") || "{}");
-        return stored.settings?.quietProgressEnabled;
-      }),
-    )
-    .toBe(false);
-
-  await page.getByRole("button", { name: "Home", exact: true }).click();
-  await expect(page.getByTestId("today-garden-card")).toHaveCount(0);
-
-  await page.reload();
-  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await expect(page.getByTestId("today-garden-card")).toHaveCount(0);
-  await page.getByRole("button", { name: "Progress", exact: true }).click();
-  await expect(page.getByRole("switch", { name: /^Garden progress/ })).not.toBeChecked();
-  await expect(page.getByTestId("garden-hidden-state")).toBeVisible();
+  await expect(page.getByRole("switch", { name: /^Garden progress/ })).toHaveCount(0);
+  await expect(page.getByTestId("garden-hidden-state")).toHaveCount(0);
+  await expect(page.getByTestId("today-garden-card")).toBeVisible();
 });
 
 test("month view shows the calendar without the removed summary card", async ({ page }) => {

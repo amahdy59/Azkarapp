@@ -19,6 +19,7 @@ const ar = {
     bottomNavigation: "التنقل السفلي",
     primaryNavigation: "التنقل الرئيسي",
     cancel: "إلغاء",
+    close: "إغلاق",
     reset: "إعادة تعيين",
     skip: "تخطي",
     comingSoon: "قريباً",

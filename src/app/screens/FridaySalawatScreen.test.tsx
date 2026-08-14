@@ -41,9 +41,11 @@ describe("FridaySalawatScreen", () => {
     expect(screen.getByTestId("salawat-counter")).toHaveAccessibleName(/0 \/ 250/);
   });
 
-  it("links both authentic hadith references", () => {
+  it("opens both authentic hadith references from the header benefits action", async () => {
+    const user = userEvent.setup();
     render(<FridaySalawatScreen language="en" direction="ltr" onBack={() => undefined} />);
 
+    await user.click(screen.getByRole("button", { name: "Authentic benefits" }));
     expect(screen.getByRole("link", { name: /Sahih Muslim 408/ })).toHaveAttribute(
       "href",
       "https://sunnah.com/muslim:408",

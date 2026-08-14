@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { DERIVED_ZIKR_BENEFITS } from "../content/zikrBenefits";
 import { BenefitsScreen, buildWhatsAppBenefitUrl } from "./BenefitsScreen";
 
 describe("BenefitsScreen", () => {
@@ -8,7 +7,7 @@ describe("BenefitsScreen", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
     const tabs = screen.getAllByRole("tab");
-    expect(tabs.map((tab) => tab.textContent)).toEqual(["Qur’an (7)", "Hadith (51)"]);
+    expect(tabs.map((tab) => tab.textContent)).toEqual(["Qur’an (7)", "Hadith (21)"]);
     expect(tabs[0]).toHaveAttribute("aria-selected", "true");
     expect(screen.queryByText("Qur’an", { exact: true })).not.toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Surah Ar-Ra'd · 13:28" })).toBeVisible();
@@ -19,22 +18,20 @@ describe("BenefitsScreen", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
     expect(screen.getByTestId("benefits-scroll-region")).toHaveAttribute("tabindex", "0");
-    fireEvent.click(screen.getByRole("tab", { name: "Hadith (51)" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Hadith (21)" }));
     expect(screen.getAllByRole("article")).toHaveLength(15);
     expect(screen.queryByText("Authentic hadith", { exact: true })).not.toBeInTheDocument();
     fireEvent.click(screen.getByTestId("benefits-load-more"));
     expect(screen.getAllByRole("article")).toHaveLength(21);
   });
 
-  it("nests all 30 concise benefits with their supporting hadith", () => {
+  it("keeps cards focused on primary evidence without redundant related-benefit disclosures", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 
-    fireEvent.click(screen.getByRole("tab", { name: "Hadith (51)" }));
+    fireEvent.click(screen.getByRole("tab", { name: "Hadith (21)" }));
     fireEvent.click(screen.getByTestId("benefits-load-more"));
-    expect(screen.getAllByText(/related benefits/).length).toBeGreaterThan(0);
-    for (const item of DERIVED_ZIKR_BENEFITS) {
-      expect(screen.getAllByText(item.benefit.en).length).toBeGreaterThan(0);
-    }
+    expect(screen.queryByText(/related benefits/i)).not.toBeInTheDocument();
+    expect(screen.getAllByRole("article")).toHaveLength(21);
   });
 
   it("supports Arabic direction, source sharing, and Back", () => {

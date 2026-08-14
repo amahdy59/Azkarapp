@@ -75,7 +75,7 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
   await page.setViewportSize({ width: 1440, height: 900 });
   await openReturningGuest(page);
 
-  const routine = page.getByRole("region", { name: "Morning Azkar" });
+  const routine = page.getByTestId("home-routine-card");
   const wird = page.getByTestId("today-garden-card");
   const [routineBox, wirdBox] = await Promise.all([routine.boundingBox(), wird.boundingBox()]);
 
@@ -87,27 +87,31 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
   }
 });
 
-test("the OnePlus-class Salawat layout keeps its counting hint inside the card", async ({ page }) => {
+test("the OnePlus-class Salawat session keeps its counter controls and hint inside the app canvas", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 412, height: 924 });
   await openReturningGuest(page);
   await page.goto("/#/friday/salawat");
 
-  const targetCard = page.getByRole("region", { name: "Target" });
-  const tapHint = targetCard.getByText("Tap to count", { exact: true });
-  const nextEvidence = page.locator("main article").last();
-  const [cardBox, hintBox, nextBox] = await Promise.all([
-    targetCard.boundingBox(),
+  const counter = page.getByTestId("salawat-counter");
+  const tapHint = page.getByText("Tap anywhere to count", { exact: true });
+  const targetFilter = page.getByTestId("counter-target-filter");
+  const [counterBox, hintBox, targetFilterBox] = await Promise.all([
+    counter.boundingBox(),
     tapHint.boundingBox(),
-    nextEvidence.boundingBox(),
+    targetFilter.boundingBox(),
   ]);
 
-  expect(cardBox).not.toBeNull();
+  expect(counterBox).not.toBeNull();
   expect(hintBox).not.toBeNull();
-  expect(nextBox).not.toBeNull();
-  if (cardBox && hintBox && nextBox) {
-    expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(cardBox.y + cardBox.height);
-    expect(nextBox.y - (hintBox.y + hintBox.height)).toBeGreaterThanOrEqual(16);
+  expect(targetFilterBox).not.toBeNull();
+  if (counterBox && hintBox && targetFilterBox) {
+    expect(targetFilterBox.y).toBeGreaterThanOrEqual(counterBox.y + counterBox.height);
+    expect(hintBox.y).toBeGreaterThanOrEqual(targetFilterBox.y + targetFilterBox.height);
+    expect(hintBox.y + hintBox.height).toBeLessThanOrEqual(924);
   }
+  await expect(page.getByRole("button", { name: "Authentic benefits" })).toBeVisible();
 });
 
 test("the custom counter stays bounded on a short phone and isolates focused-control shortcuts", async ({ page }) => {

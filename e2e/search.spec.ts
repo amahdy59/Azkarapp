@@ -63,30 +63,40 @@ test("submitting the Library query opens Search and preserves it", async ({ page
   expect(await searchInput.evaluate(hasVisibleLabel)).toBe(true);
 });
 
-test("Library search and tabs share a desktop row and stack on compact screens", async ({ page }) => {
+test("Library search and its section filter share one bounded row at every responsive tier", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  // The Collections/Saved tablist lives on the Library, not the Search screen.
   const input = await openArabicLibrary(page);
-  const tabs = page.getByRole("tablist");
+  const filter = page.getByTestId("library-section-filter");
 
   const desktopInput = await input.boundingBox();
-  const desktopTabs = await tabs.boundingBox();
+  const desktopFilter = await filter.boundingBox();
   expect(desktopInput).not.toBeNull();
-  expect(desktopTabs).not.toBeNull();
+  expect(desktopFilter).not.toBeNull();
   expect(
-    desktopInput!.x + desktopInput!.width <= desktopTabs!.x || desktopTabs!.x + desktopTabs!.width <= desktopInput!.x,
+    desktopInput!.x + desktopInput!.width <= desktopFilter!.x ||
+      desktopFilter!.x + desktopFilter!.width <= desktopInput!.x,
   ).toBe(true);
-  expect(Math.min(desktopInput!.y + desktopInput!.height, desktopTabs!.y + desktopTabs!.height)).toBeGreaterThan(
-    Math.max(desktopInput!.y, desktopTabs!.y),
+  expect(Math.min(desktopInput!.y + desktopInput!.height, desktopFilter!.y + desktopFilter!.height)).toBeGreaterThan(
+    Math.max(desktopInput!.y, desktopFilter!.y),
   );
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(500); // Wait for the media query layout shift to settle
   const compactInput = await input.boundingBox();
-  const compactTabs = await tabs.boundingBox();
+  const compactFilter = await filter.boundingBox();
   expect(compactInput).not.toBeNull();
-  expect(compactTabs).not.toBeNull();
-  expect(compactTabs!.y).toBeGreaterThanOrEqual(compactInput!.y + compactInput!.height);
+  expect(compactFilter).not.toBeNull();
+  expect(Math.min(compactInput!.y + compactInput!.height, compactFilter!.y + compactFilter!.height)).toBeGreaterThan(
+    Math.max(compactInput!.y, compactFilter!.y),
+  );
+  expect(
+    compactInput!.x + compactInput!.width <= compactFilter!.x ||
+      compactFilter!.x + compactFilter!.width <= compactInput!.x,
+  ).toBe(true);
+  expect(Math.min(compactInput!.x, compactFilter!.x)).toBeGreaterThanOrEqual(0);
+  expect(Math.max(compactInput!.x + compactInput!.width, compactFilter!.x + compactFilter!.width)).toBeLessThanOrEqual(
+    390,
+  );
 });
 
 test("Arabic search matches undiacritized typing against vocalized content", async ({ page }) => {

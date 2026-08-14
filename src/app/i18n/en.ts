@@ -19,6 +19,7 @@ const en = {
     bottomNavigation: "Bottom Navigation",
     primaryNavigation: "Main Navigation",
     cancel: "Cancel",
+    close: "Close",
     reset: "Reset",
     skip: "Skip",
     comingSoon: "Coming Soon",

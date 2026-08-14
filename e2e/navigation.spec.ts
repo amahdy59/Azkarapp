@@ -55,7 +55,8 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
   }
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
-  await page.getByRole("tab", { name: /Saved/ }).click();
+  await page.getByTestId("library-section-filter").click();
+  await page.getByRole("menuitemradio", { name: /Saved/ }).click();
 
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
   await expect(page.getByRole("button", { name: /Azkar:/ }).first()).toBeVisible();

@@ -1,9 +1,35 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import type { CategoryId } from "../types";
 import { AzkarLibraryScreen } from "./AzkarLibraryScreen";
 
 describe("AzkarLibraryScreen", () => {
+  it("combines Collections and Saved into one accessible filter beside search", async () => {
+    const user = userEvent.setup();
+    render(
+      <AzkarLibraryScreen
+        completed={{} as Record<CategoryId, Set<string>>}
+        language="en"
+        direction="ltr"
+        routineModes={{ morning: "core", evening: "core", before_sleep: "core", after_prayer: "core" }}
+        onCategory={() => undefined}
+        onZikr={() => undefined}
+        onSearch={() => undefined}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const filter = screen.getByTestId("library-section-filter");
+    expect(filter).toHaveAccessibleName(/Collections/);
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+    await user.click(filter);
+    const saved = screen.getByRole("menuitemradio", { name: "Saved" });
+    await user.click(saved);
+    expect(filter).toHaveAccessibleName(/Saved/);
+    expect(screen.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
+  });
+
   it("keeps the collection available from the Azkar Library every day", () => {
     const onCategory = vi.fn();
 

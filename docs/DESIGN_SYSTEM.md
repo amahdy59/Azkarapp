@@ -156,7 +156,7 @@ Every interactive component should define:
 
 - The index has exactly two peer filters: Qur'an and Hadith. Cards do not repeat the active filter name or add a second category banner.
 - A Qur'an card presents the verse, then one concise citation in the form “Surah name · surah:ayah.” A Hadith card presents the reviewed text, then its available reviewed book/reference and authenticity grade. Narrator metadata is shown only after it has been independently sourced and approved; it must never be inferred or invented.
-- Derived benefits remain traceable to their authenticated hadith but begin collapsed behind one native disclosure with a visible item count. This preserves the reviewed content without making the initial scan compete with the primary sources.
+- Derived benefits remain traceable in reviewed content data but are not repeated in the Benefits index. The index presents only the primary Qur'an or hadith evidence and its concise reviewed citation; this avoids a redundant disclosure and separator inside every card.
 - Card surfaces are opaque and use the shared radius, border, text, and action tokens. Sharing is a named 44px icon action rather than a full-width competing call to action.
 
 ## Scrollbar contract
@@ -220,6 +220,11 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 - Splash, onboarding, and authentication do not reserve an empty desktop navigation column. Their interactive content uses `--content-form` (40rem) and related controls stay grouped instead of being separated by viewport-filling spacers. Compact-height desktop and landscape views scroll from the top rather than centering into clipped content.
 - Zikr collection overviews use `--content-form` (40rem) for the header, progress controls, introduction, and item list while remaining fluid and full-width below that measure.
 - Routine length on a collection overview is a compact radio menu in the primary action row beside Continue/Start and Reset, rather than a full-width segmented control.
+- Library scope is a compact radio menu beside Search. A selected menu item uses a logical-start checkmark plus the semantic primary highlight; it never uses an unlabelled dot or an overlapping physical-left indicator in RTL.
+- Home's paired hero cards use equal columns and equal stretch height from the expanded tier onward. The pair stays inside the 80rem dashboard measure, while each card remains fluid inside its column instead of expanding without a layout guide.
+- The integrated Home hero reserves only compact utility-header clearance before its first card; viewport-filling blank spacers are prohibited.
+- Masbaha and Friday Salawat use the Reader session hierarchy: icon actions in the header, compact progress metadata and track, centered devotional text, the shared counter surface, and target/reset controls below. Evidence opens from the header's book action instead of occupying the counting canvas.
+- Progress always presents the current Wird views directly. The obsolete garden-visibility banner and hidden-state card are not part of the canonical Progress screen, and legacy stored visibility values cannot hide the Home current Wird.
 - Dashboard-tier screens opt into `.page-content-center` (max `--content-dashboard`); Settings uses its own two-pane with `--content-form` on the detail pane.
 - Progress Day, Week, Month, and Year keep the compact 44rem measure through the expanded tier, then may use up to 72rem at the large desktop tier for calendars, summaries, and charts. Their semantic order and compact text size do not change.
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.

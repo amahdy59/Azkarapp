@@ -113,20 +113,15 @@ test("Home Benefits entry opens the dedicated collection with encoded WhatsApp s
   await expect(page.locator('#main-content[data-view="benefits"]')).toBeVisible();
   await expect(page.getByTestId("benefits-list")).toBeVisible();
   const tabs = page.getByRole("tab");
-  await expect(tabs).toHaveText(["Qur’an (7)", "Hadith (51)"]);
+  await expect(tabs).toHaveText(["Qur’an (7)", "Hadith (21)"]);
   await expect(tabs.first()).toHaveAttribute("aria-selected", "true");
   await expect(page.getByText("Evening testimony of faith.", { exact: true })).toHaveCount(0);
 
-  await page.getByRole("tab", { name: "Hadith (51)" }).click();
+  await page.getByRole("tab", { name: "Hadith (21)" }).click();
   await expect(page.getByText("Authentic hadith", { exact: true })).toHaveCount(0);
   await page.getByTestId("benefits-load-more").click();
-  const derivedBenefit = page.getByText("Forgiveness of sins even if they are like the foam of the sea.", {
-    exact: true,
-  });
-  await page.locator("details").filter({ has: derivedBenefit }).locator("summary").click();
-  await expect(
-    page.getByText("Forgiveness of sins even if they are like the foam of the sea.", { exact: true }),
-  ).toBeVisible();
+  await expect(page.getByTestId("benefits-list").locator("article")).toHaveCount(21);
+  await expect(page.locator("details")).toHaveCount(0);
 
   const shareLink = page.getByRole("link", { name: /WhatsApp/ }).first();
   const href = await shareLink.getAttribute("href");
@@ -148,7 +143,7 @@ test("Home Saved preview opens its item and the full Saved library state", async
   await expect(page.getByTestId("home-saved-section")).toBeVisible();
   await page.getByTestId("home-saved-section").getByRole("button", { name: "Open all 1 saved zikr" }).click();
 
-  await expect(page.getByRole("tab", { name: /Saved/ })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByTestId("library-section-filter")).toHaveAccessibleName(/Saved/);
   await expect(page.getByRole("heading", { name: "Saved remembrance", exact: true })).toBeVisible();
 });
 

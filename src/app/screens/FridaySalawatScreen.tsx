@@ -1,11 +1,15 @@
-import { useState, useEffect, useCallback } from "react";
-import { ZikrCounterSurface } from "../components/ZikrComponents";
-import { ExternalLink, RotateCcw } from "../components/icons";
-import { Header } from "../components/LayoutShells";
-import { ScreenContainer } from "../components/ScreenContainer";
+import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
+import { BookOpen, ExternalLink, RotateCcw, Sparkles, X } from "../components/icons";
+import { Header } from "../components/LayoutShells";
+import { ProgressBar } from "../components/ProgressBar";
+import { Modal } from "../components/ResponsiveSheet";
+import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
+import { ZikrCounterSurface } from "../components/ZikrComponents";
+import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
+import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
 const COPY = {
@@ -14,7 +18,6 @@ const COPY = {
     subtitle: "Choose a target and count with intention",
     phrase: "Allahumma salli wa sallim ‘ala Nabiyyina Muhammad",
     target: "Target",
-    tap: "Tap to count",
     completed: "Target completed",
     reset: "Reset counter",
     benefits: "Authentic benefits",
@@ -26,23 +29,24 @@ const COPY = {
   ar: {
     title: "عداد الصلاة على النبي ﷺ",
     subtitle: "اختر هدفًا واحتسب الأجر",
-    phrase: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
+    phrase: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
     target: "الهدف",
-    tap: "اضغط للعد",
     completed: "اكتمل الهدف",
     reset: "تصفير العداد",
     benefits: "فضائل ثابتة بأحاديث صحيحة",
-    muslim: "«مَنْ صَلَّى عَلَيَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا».",
+    muslim: "«مَنْ صَلَّى عَلَيَّ وَاحِدَةً صَلَّى اللَّهُ عَلَيْهِ عَشْرًا».",
     muslimSource: "صحيح مسلم ٤٠٨",
-    friday: "«إِنَّ مِنْ أَفْضَلِ أَيَّامِكُمْ يَوْمَ الْجُمُعَةِ، فَأَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ».",
+    friday: "«إِنَّ مِنْ أَفْضَلِ أَيَّامِكُمْ يَوْمَ الْجُمُعَةِ، فَأَكْثِرُوا عَلَيَّ مِنَ الصَّلَاةِ فِيهِ».",
     fridaySource: "سنن أبي داود ١٠٤٧ — صحيح",
   },
 } as const;
 
-function BenefitCard({ text, source, href }: { text: string; source: string; href: string }) {
+function ReferenceLink({ text, source, href }: { text: string; source: string; href: string }) {
   return (
-    <article className="rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised">
-      <p className="text-[0.9375rem] font-semibold leading-7 text-foreground">{text}</p>
+    <article className="rounded-[22px] border border-border bg-card p-4 text-start">
+      <p className="text-[0.9375rem] font-semibold leading-7 text-foreground" dir="auto">
+        {text}
+      </p>
       <a
         href={href}
         target="_blank"
@@ -69,7 +73,9 @@ export function FridaySalawatScreen({
 }) {
   const copy = COPY[language];
   const [progress, setProgress] = useState(readFridaySalawatProgress);
+  const [showBenefits, setShowBenefits] = useState(false);
   const complete = progress.count >= progress.target;
+  const progressPercent = Math.min(100, Math.round((progress.count / progress.target) * 100));
 
   const persist = useCallback((count: number, target: FridaySalawatTarget) => {
     const next = { count, target };
@@ -78,127 +84,172 @@ export function FridaySalawatScreen({
   }, []);
 
   const increment = useCallback(() => {
-    if (complete) return;
-    persist(progress.count + 1, progress.target);
+    if (!complete) persist(progress.count + 1, progress.target);
   }, [complete, persist, progress.count, progress.target]);
 
+  const reset = useCallback(() => persist(0, progress.target), [persist, progress.target]);
+
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const activeEl = document.activeElement;
-      if (
-        activeEl?.tagName === "INPUT" ||
-        activeEl?.tagName === "TEXTAREA" ||
-        (activeEl as HTMLElement)?.isContentEditable
-      ) {
-        return;
-      }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const activeElement = document.activeElement;
       const focusedControl =
-        activeEl instanceof Element &&
-        activeEl.closest(
+        activeElement instanceof Element &&
+        activeElement.closest(
           'button, a[href], input, textarea, select, [contenteditable="true"], [role="button"], [role="checkbox"], [role="combobox"], [role="menuitem"], [role="option"], [role="radio"], [role="search"], [role="switch"], [role="tab"], [role="textbox"]',
         );
-      if (focusedControl) return;
-      if (e.key === " " || e.code === "Space") {
-        e.preventDefault();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        if (showBenefits) setShowBenefits(false);
+        else onBack();
+        return;
+      }
+      if (focusedControl || showBenefits) return;
+      if (event.key === " " || event.code === "Space") {
+        event.preventDefault();
         increment();
-      } else if (e.key === "Escape") {
-        e.preventDefault();
-        onBack();
+      } else if (event.key === "r" || event.key === "R" || event.key === "ق") {
+        event.preventDefault();
+        reset();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [increment, onBack]);
+  }, [increment, onBack, reset, showBenefits]);
 
-  const handleCanvasClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const targetElement = event.target;
+  const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
+    const element = event.target;
     if (
-      targetElement instanceof Element &&
-      targetElement.closest(
+      element instanceof Element &&
+      element.closest(
         "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [data-prevent-count='true']",
       )
-    ) {
+    )
       return;
-    }
     increment();
   };
 
   return (
-    <ScreenContainer dir={direction} className="px-0 relative" screenName={copy.title}>
-      <Header title={copy.title} subtitle={copy.subtitle} onBack={onBack} language={language} />
+    <ScreenContainer
+      dir={direction}
+      className="relative flex flex-col overflow-y-auto page-content-center"
+      screenName={copy.title}
+    >
+      <Header
+        title={copy.title}
+        onBack={onBack}
+        language={language}
+        right={
+          <button
+            type="button"
+            onClick={() => setShowBenefits(true)}
+            className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            aria-label={copy.benefits}
+            aria-haspopup="dialog"
+          >
+            <BookOpen size={20} aria-hidden="true" />
+          </button>
+        }
+      />
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {complete ? copy.completed : ""}
       </p>
 
-      {/* Pointer-only canvas shortcut; the explicit counter remains the named keyboard target. */}
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
-        className="relative z-10 flex flex-1 overflow-y-auto px-5 pb-8 pt-3"
+        className="relative z-10 mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
         data-counting-mode="canvas"
         onClick={handleCanvasClick}
       >
-        <div className="mx-auto flex w-full max-w-[44rem] flex-col gap-4">
-          <section aria-labelledby="salawat-reference-title">
-            <h2 id="salawat-reference-title" className="mb-2 text-start text-[0.8125rem] font-black text-foreground">
-              {copy.benefits}
-            </h2>
-            <BenefitCard text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
-          </section>
+        <section
+          className="space-y-2 rounded-[24px] border border-border bg-card p-4 shadow-raised"
+          aria-label={copy.target}
+        >
+          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
+            <span>{formatNumerals(progressPercent, language)}%</span>
+            <span>
+              {formatNumerals(progress.count, language)} / {formatNumerals(progress.target, language)}
+            </span>
+          </div>
+          <ProgressBar value={progress.count} max={progress.target} direction={direction} aria-label={copy.target} />
+          <p className="truncate text-start text-[0.875rem] font-black text-foreground">{copy.subtitle}</p>
+        </section>
 
-          <section
-            aria-labelledby="salawat-counter-title"
-            className="flex shrink-0 flex-col rounded-[24px] border border-border bg-card p-5 shadow-raised sm:p-6"
+        <div className="my-auto flex flex-col items-center justify-center py-8 sm:py-10">
+          <p
+            className="zikr-text mb-7 max-w-[34rem] text-center text-[1.25rem] font-black leading-[2] text-foreground sm:text-[1.5rem]"
+            dir="rtl"
+            lang="ar"
           >
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h2 id="salawat-counter-title" className="text-[0.8125rem] font-black text-foreground">
-                {copy.target}
-              </h2>
+            {copy.phrase}
+          </p>
+          <ZikrCounterSurface
+            count={progress.count}
+            total={progress.target}
+            complete={complete}
+            onTap={increment}
+            language={language}
+            instructionText=""
+            testId="salawat-counter"
+            className="salawat-counter-surface"
+            reduceMotion={reduceMotion}
+          />
+
+          <div className="mt-6 flex w-full max-w-sm items-center justify-center gap-2" data-prevent-count="true">
+            <div className="min-w-0 flex-1">
               <CounterTargetPicker
                 activeTarget={progress.target}
-                onTargetChange={(target) => persist(progress.count, target)}
+                onTargetChange={(target) => persist(0, target)}
                 language={language}
                 direction={direction}
                 allowOpen={false}
               />
             </div>
-
-            <div className="mt-6 flex flex-col items-center justify-center pb-1">
-              <p
-                className="zikr-text mb-7 max-w-[34rem] text-center text-[1.25rem] font-black leading-[2] text-foreground sm:text-[1.5rem]"
-                dir="rtl"
-                lang="ar"
-              >
-                {copy.phrase}
-              </p>
-              <ZikrCounterSurface
-                count={progress.count}
-                total={progress.target}
-                complete={complete}
-                onTap={increment}
-                language={language}
-                instructionText={copy.tap}
-                testId="salawat-counter"
-                className="salawat-counter-surface"
-                reduceMotion={reduceMotion}
-              />
-
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => persist(0, progress.target)}
-                disabled={progress.count === 0}
-                className="mt-5"
-              >
-                <RotateCcw size={18} aria-hidden="true" />
-                {copy.reset}
-              </Button>
-              <p className="mt-3 text-center text-[0.8125rem] font-semibold text-muted-foreground">{copy.tap}</p>
-            </div>
-          </section>
-
-          <BenefitCard text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={reset}
+              disabled={progress.count === 0}
+              aria-label={copy.reset}
+            >
+              <RotateCcw size={18} aria-hidden="true" />
+              <span className="sr-only sm:not-sr-only">{copy.reset}</span>
+            </Button>
+          </div>
+          <p className="mt-3 text-center text-[0.8125rem] font-semibold text-muted-foreground">
+            {t(language, "reader.tapAnywhere")}
+          </p>
         </div>
       </div>
+
+      {showBenefits && (
+        <Modal
+          open
+          onClose={() => setShowBenefits(false)}
+          title={copy.benefits}
+          direction={direction}
+          maxWidthClassName="max-w-lg"
+          className="p-5 sm:p-6"
+        >
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-[1.125rem] font-black text-foreground">{copy.benefits}</h2>
+              <button
+                type="button"
+                onClick={() => setShowBenefits(false)}
+                className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border-control bg-background text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                aria-label={t(language, "common.close")}
+              >
+                <X size={20} aria-hidden="true" />
+              </button>
+            </div>
+            <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Sparkles size={20} aria-hidden="true" />
+            </span>
+            <ReferenceLink text={copy.muslim} source={copy.muslimSource} href="https://sunnah.com/muslim:408" />
+            <ReferenceLink text={copy.friday} source={copy.fridaySource} href="https://sunnah.com/abudawud:1047" />
+          </div>
+        </Modal>
+      )}
     </ScreenContainer>
   );
 }

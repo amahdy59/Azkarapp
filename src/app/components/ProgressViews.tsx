@@ -68,8 +68,8 @@ function MainDhikrGroupCard({
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? "border-amber-400 bg-amber-950 text-white shadow-raised"
-          : "border-slate-700 bg-slate-950 text-white shadow-raised hover:border-slate-500 hover:bg-slate-900"
+          ? "border-primary/55 bg-primary/10 text-foreground shadow-raised"
+          : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       aria-label={`${name} - ${statusLabel}`}
     >
@@ -77,7 +77,7 @@ function MainDhikrGroupCard({
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
           compact ? "size-11 sm:size-14" : "size-14"
         } ${
-          isCompleted ? "border-amber-300 bg-amber-900 text-amber-200" : "border-slate-600 bg-slate-800 text-slate-100"
+          isCompleted ? "border-primary/45 bg-primary text-primary-foreground" : "border-border bg-muted text-primary"
         }`}
       >
         {icon}
@@ -89,7 +89,7 @@ function MainDhikrGroupCard({
         <span className="text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem]">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
-            isCompleted ? "bg-emerald-300 text-slate-950 shadow-sm" : "bg-slate-800 text-slate-200"
+            isCompleted ? "bg-success text-success-foreground shadow-sm" : "bg-muted text-muted-foreground"
           }`}
         >
           {statusLabel}
@@ -102,7 +102,7 @@ function MainDhikrGroupCard({
                 key={item.id}
                 role="img"
                 aria-label={item.name}
-                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-emerald-400" : "bg-slate-600"}`}
+                className={`inline-flex h-1.5 w-4 rounded-full ${item.isCompleted ? "bg-success" : "bg-muted-foreground/45"}`}
               />
             ))}
           </div>
@@ -110,7 +110,7 @@ function MainDhikrGroupCard({
       </div>
 
       {isCompleted ? (
-        <span className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-emerald-200 bg-emerald-400 text-slate-950 shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3">
+        <span className="absolute end-3 top-3 flex size-6 items-center justify-center rounded-full border border-success bg-success text-success-foreground shadow-md sm:-end-1.5 sm:top-auto sm:bottom-3">
           <Check size={13} strokeWidth={3} aria-hidden="true" />
         </span>
       ) : null}
@@ -165,22 +165,22 @@ export function ProgressDayView({
     {
       id: "morning" as const,
       name: t(language, "progress.morningAzkar"),
-      icon: <Sun size={20} className="text-amber-500" />,
+      icon: <Sun size={20} className="text-primary" />,
     },
     {
       id: "evening" as const,
       name: t(language, "progress.eveningAzkar"),
-      icon: <Sun size={20} className="text-orange-500" />,
+      icon: <Sun size={20} className="text-primary" />,
     },
     {
       id: "before_sleep" as const,
       name: t(language, "progress.sleepAzkar"),
-      icon: <Moon size={20} className="text-indigo-400" />,
+      icon: <Moon size={20} className="text-primary" />,
     },
     {
       id: "after_prayer" as const,
       name: t(language, "progress.postPrayerAzkar"),
-      icon: <Sparkles size={20} className="text-emerald-500" />,
+      icon: <Sparkles size={20} className="text-primary" />,
     },
   ];
 
@@ -205,7 +205,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border border-slate-700 bg-slate-950 p-5 shadow-raised sm:p-7 md:p-8 ${
+        className={`flex w-full flex-col rounded-[28px] border border-border bg-card p-5 text-foreground shadow-raised sm:p-7 md:p-8 ${
           isHomeSubset ? "flex-1" : ""
         }`}
       >
@@ -213,17 +213,17 @@ export function ProgressDayView({
           <div className="min-w-0">
             <Heading
               data-testid="progress-primary-heading"
-              className="block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight text-white sm:text-[1.375rem] md:text-[1.5rem]"
+              className="block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight text-foreground sm:text-[1.375rem] md:text-[1.5rem]"
               dir="auto"
             >
               {t(language, "progress.todayWird")}
             </Heading>
-            <p className="mt-1 text-[0.8125rem] font-semibold text-white/72 sm:text-[0.875rem]" dir="auto">
+            <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground sm:text-[0.875rem]" dir="auto">
               {dynamicSubtitle}
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-[0.8125rem] font-black text-white">
+          <div className="flex shrink-0 items-center gap-2 rounded-full border border-border-control bg-muted px-3 py-1.5 text-[0.8125rem] font-black text-foreground">
             <span>{formatNumerals(completedCount, language)}</span>
             <span aria-hidden="true">/</span>
             <span>{formatNumerals(categories.length, language)}</span>

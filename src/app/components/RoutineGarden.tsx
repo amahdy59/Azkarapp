@@ -173,28 +173,28 @@ export function TodayRoutineGarden({
       )}
 
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-around rounded-3xl border border-amber-500/40 bg-card py-3 px-3 shadow-sm">
+        <div className="mb-4 flex items-center justify-around rounded-3xl border border-border bg-card px-3 py-3 shadow-sm">
           <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>
             <Zap
-              className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-amber-500" : "text-muted-foreground/40"}`}
+              className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-primary" : "text-muted-foreground/40"}`}
               strokeWidth={2.5}
               aria-hidden="true"
             />
             <span
-              className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
+              className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-primary" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(streak, language)} {t(language, "progress.days")}
             </span>
           </div>
-          <span className="h-4 w-px bg-amber-500/30" />
+          <span className="h-4 w-px bg-border" />
           <div className="flex items-center gap-1.5" title={t(language, "progress.palmsTitle")}>
             <PalmTreeMark
               size={20}
               filled={totalPalms > 0}
-              className={totalPalms > 0 ? "text-amber-500" : "text-muted-foreground/40"}
+              className={totalPalms > 0 ? "text-primary" : "text-muted-foreground/40"}
             />
             <span
-              className={`text-[0.875rem] font-black leading-tight ${totalPalms > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
+              className={`text-[0.875rem] font-black leading-tight ${totalPalms > 0 ? "text-primary" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(totalPalms, language)} {t(language, "progress.palmsUnit")}
             </span>

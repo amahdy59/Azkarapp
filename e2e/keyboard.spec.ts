@@ -122,7 +122,8 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   await page.getByRole("button", { name: /Back/i }).click();
   await page.getByRole("button", { name: /Back/i }).click();
 
-  await page.getByRole("tab", { name: /^Saved/i }).click();
+  await page.getByTestId("library-section-filter").click();
+  await page.getByRole("menuitemradio", { name: /^Saved/i }).click();
   await expect(page.getByRole("heading", { name: /Saved/i }).first()).toBeVisible();
 
   // Tab to the first saved zikr and open it
@@ -145,8 +146,10 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   // Go back
   await page.getByRole("button", { name: /Back/i }).click();
 
-  // Expect empty state
-  await page.getByRole("tab", { name: /^Saved/i }).click();
+  // Route restoration defaults to Collections, so reopen the Saved filter and
+  // verify that removing the item persisted.
+  await page.getByTestId("library-section-filter").click();
+  await page.getByRole("menuitemradio", { name: /^Saved/i }).click();
   await expect(page.getByRole("heading", { name: "Nothing saved yet" })).toBeVisible();
 });
 

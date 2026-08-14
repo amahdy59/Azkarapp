@@ -504,7 +504,7 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative isolate min-h-[42rem] w-full overflow-hidden rounded-b-[28px] bg-slate-950 sm:mx-auto sm:min-h-[44rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[35rem]"
+            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-[28px] bg-slate-950 sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[34rem]"
           >
             <div
               data-testid="time-of-day-scene-window"
@@ -517,9 +517,9 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 flex min-h-[inherit] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-40 sm:px-6 sm:pb-6 sm:pt-48 md:px-8 lg:grid lg:grid-cols-5 lg:items-stretch lg:gap-5 lg:px-8 lg:pb-8 lg:pt-24">
+              <div className="relative z-10 mx-auto flex min-h-[inherit] w-full max-w-[80rem] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
                 {showCompletionCard && (
-                  <div className={quietProgressEnabled ? "h-full lg:col-span-3" : "h-full lg:col-span-5"}>
+                  <div className={quietProgressEnabled ? "h-full" : "h-full lg:col-span-2"}>
                     <TranquilityCompletionCard
                       categoryId={reminderInfo.categoryId}
                       language={language}
@@ -550,9 +550,7 @@ export function HomeScreen({
                 {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
               renders exactly this card; a second bespoke one would duplicate it. */}
                 {quietProgressEnabled && (
-                  <div
-                    className={`flex h-full w-full ${isComplete && !showCompletionCard ? "lg:col-span-5" : "lg:col-span-2"}`}
-                  >
+                  <div className={`flex h-full w-full ${isComplete && !showCompletionCard ? "lg:col-span-2" : ""}`}>
                     <TodayRoutineGarden
                       summary={gardenSummary}
                       language={language}

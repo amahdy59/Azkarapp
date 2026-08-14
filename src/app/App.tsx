@@ -887,7 +887,7 @@ function AppContent() {
                 <HomeScreen
                   completed={completed}
                   dailyCompletions={dailyCompletions}
-                  quietProgressEnabled={quietProgressEnabled}
+                  quietProgressEnabled={true}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   onResume={resumeCategory}
@@ -943,12 +943,10 @@ function AppContent() {
                   dailyCompletions={dailyCompletions}
                   progressDayStartHour={progressDayStartHour}
                   calendarType={calendarType}
-                  quietProgressEnabled={quietProgressEnabled}
                   language={selectedLang}
                   direction={layoutDirection}
                   onOpenShareModal={() => setShowShareModal(true)}
                   onSelectCategory={openCategory}
-                  onQuietProgressEnabledChange={setQuietProgressEnabled}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

@@ -35,7 +35,7 @@ import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
-import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
+import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
@@ -438,7 +438,6 @@ export function ReaderScreen({
     <article
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
-      <QuranSurahHeader zikr={z} language={language} sticky={longSurah} />
       {!longSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
 
       {longSurah ? (

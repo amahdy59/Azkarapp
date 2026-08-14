@@ -225,7 +225,7 @@ export function CategoryScreen({
                     onValueChange={(mode) => onRoutineModeChange?.(mode as RoutineMode)}
                   >
                     {(["complete", "core"] as const).map((mode) => (
-                      <DropdownMenuRadioItem key={mode} value={mode} className="min-h-11 rounded-xl px-8 font-bold">
+                      <DropdownMenuRadioItem key={mode} value={mode} className="min-h-11 rounded-xl font-bold">
                         {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
                           count: formatNumerals(
                             mode === "core" ? getRoutineStepCount(catId, "core", prayer) : allAzkar.length,
