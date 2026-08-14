@@ -1,12 +1,13 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState } from "react";
-import { Check, ChevronDown, RotateCcw, Volume2 } from "../components/icons";
+import { Check, ChevronDown, RotateCcw, SlidersHorizontal, Volume2 } from "../components/icons";
 import { t } from "../i18n";
 import "../../styles/animations/ZikrAnimations.css";
 import { CATEGORIES, isOccasionalCategory } from "../content/categories";
 import {
   getAzkarByCategory,
   getAzkarForMode,
+  getAzkarForPrayer,
   getCollectionIntroduction,
   getRoutineStepCount,
   isRoutineCategory,
@@ -16,11 +17,20 @@ import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { formatNumerals, numeralFontFamily } from "../formatting";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { SegmentedControl } from "../components/SegmentedControl";
 import { getLocalizedPreferredTiming, hasSpecificRecommendedTiming } from "../content/localizedZikr";
+import { isPrayerName } from "../content/prayerTimes";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 
 export function CategoryScreen({
   catId,
+  subCategory,
   completed,
   isArabic,
   direction,
@@ -35,6 +45,7 @@ export function CategoryScreen({
   onRoutineModeChange,
 }: {
   catId: CategoryId;
+  subCategory?: string;
   completed: Set<string>;
   isArabic: boolean;
   direction: "ltr" | "rtl";
@@ -49,8 +60,11 @@ export function CategoryScreen({
   onRoutineModeChange?: (mode: RoutineMode) => void;
 }) {
   const isMainRoutine = isRoutineCategory(catId);
-  const allAzkar = getAzkarByCategory(catId);
-  const azkar = getAzkarForMode(catId, isMainRoutine ? routineMode : "complete");
+  const prayer = catId === "after_prayer" && isPrayerName(subCategory) ? subCategory : undefined;
+  const allAzkar = prayer ? getAzkarForPrayer(prayer, "complete") : getAzkarByCategory(catId);
+  const azkar = prayer
+    ? getAzkarForPrayer(prayer, isMainRoutine ? routineMode : "complete")
+    : getAzkarForMode(catId, isMainRoutine ? routineMode : "complete");
   const introduction = getCollectionIntroduction(catId);
   const cat = CATEGORIES.find((c) => c.id === catId)!;
   const completedItemCount = azkar.filter((zikr) => completed.has(zikr.id)).length;
@@ -142,7 +156,11 @@ export function CategoryScreen({
         className="relative z-10 mx-auto flex min-h-0 w-full max-w-[var(--content-form)] flex-1 flex-col"
         data-testid="category-overview"
       >
-        <Header title={isArabic ? cat.nameArabic : cat.name} onBack={onBack} language={language} />
+        <Header
+          title={`${isArabic ? cat.nameArabic : cat.name}${prayer ? ` · ${t(language, `notifications.${prayer}`)}` : ""}`}
+          onBack={onBack}
+          language={language}
+        />
 
         <div className="shrink-0 border-b border-border px-5 py-4">
           <div className="mb-2 flex items-center justify-between">
@@ -185,27 +203,40 @@ export function CategoryScreen({
 
           <div className="mt-4 flex w-full flex-wrap items-center gap-3">
             {isMainRoutine && (
-              <SegmentedControl
-                className="flex h-14 w-full rounded-2xl border border-border bg-muted/60 p-1"
-                value={routineMode}
-                onChange={(mode) => onRoutineModeChange?.(mode)}
-                direction={direction}
-                aria-label={`${t(language, "category.complete")} / ${t(language, "category.core")}`}
-                itemClassName={(selected) =>
-                  `flex-1 rounded-xl px-1 text-[0.75rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-card text-primary shadow-sm" : "text-muted-foreground"
-                  }`
-                }
-                options={(["complete", "core"] as const).map((mode) => ({
-                  value: mode,
-                  label: t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
-                    count: formatNumerals(
-                      mode === "core" ? getRoutineStepCount(catId, "core") : getAzkarForMode(catId, "complete").length,
-                      language,
-                    ),
-                  }),
-                }))}
-              />
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger asChild>
+                  <button
+                    type="button"
+                    data-testid="routine-mode-filter"
+                    className="interactive-elem flex h-11 shrink-0 items-center justify-center gap-2 rounded-btn border border-border bg-card px-3 text-[0.8125rem] font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    aria-label={`${t(language, "category.routineLength")}: ${t(language, routineMode === "core" ? "category.core" : "category.complete")}`}
+                  >
+                    <SlidersHorizontal size={17} aria-hidden="true" />
+                    <span>{t(language, routineMode === "core" ? "category.core" : "category.complete")}</span>
+                    <ChevronDown size={15} aria-hidden="true" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="min-w-[14rem] rounded-2xl p-1.5">
+                  <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
+                    {t(language, "category.routineLength")}
+                  </DropdownMenuLabel>
+                  <DropdownMenuRadioGroup
+                    value={routineMode}
+                    onValueChange={(mode) => onRoutineModeChange?.(mode as RoutineMode)}
+                  >
+                    {(["complete", "core"] as const).map((mode) => (
+                      <DropdownMenuRadioItem key={mode} value={mode} className="min-h-11 rounded-xl px-8 font-bold">
+                        {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
+                          count: formatNumerals(
+                            mode === "core" ? getRoutineStepCount(catId, "core", prayer) : allAzkar.length,
+                            language,
+                          ),
+                        })}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
 
             {completedItemCount < azkar.length ? (

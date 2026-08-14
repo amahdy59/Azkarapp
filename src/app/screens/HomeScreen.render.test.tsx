@@ -76,6 +76,7 @@ describe("HomeScreen quick access", () => {
   it("renders the theme-aware after-prayer tracker rail with the next prayer while keeping the compact wird card", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
+    const onPrayerResume = vi.fn();
 
     render(
       <HomeScreen
@@ -86,6 +87,7 @@ describe("HomeScreen quick access", () => {
         language="en"
         direction="ltr"
         onResume={() => undefined}
+        onPrayerResume={onPrayerResume}
         routineModes={routineModes}
         savedZikrIds={new Set()}
         onOpenSavedZikr={() => undefined}
@@ -106,6 +108,9 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByText("After Asr")).toBeInTheDocument();
     expect(screen.getByText("After Fajr")).toBeInTheDocument();
     expect(screen.getByText(/today'?s wird/i)).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /^After Fajr/ }));
+    expect(onPrayerResume).toHaveBeenCalledWith("fajr");
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {

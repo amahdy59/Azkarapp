@@ -1,7 +1,8 @@
 import { lazy, Suspense, useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { fromCompletedSets, loadAppState, saveAppState, toCompletedSets, type StoredSession } from "./state";
 import { applyAppAppearance } from "./theme";
-import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "./content/azkar";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory, registerLazyCollection } from "./content/azkar";
+import { isPrayerName } from "./content/prayerTimes";
 import type {
   AppLanguage,
   AppStateSnapshot,
@@ -173,7 +174,10 @@ function AppContent() {
   } = useAppRouting({ routineModes, hasCompletedOnboarding });
 
   const activeRoutineMode: RoutineMode = isRoutineCategory(activeCat) ? routineModes[activeCat] : "complete";
-  const activeAzkarList = getAzkarForMode(activeCat, activeRoutineMode);
+  const activeAzkarList =
+    activeCat === "after_prayer" && isPrayerName(activeSubCategory)
+      ? getAzkarForPrayer(activeSubCategory, activeRoutineMode)
+      : getAzkarForMode(activeCat, activeRoutineMode);
   const layoutMode = useLayoutMode();
   useViewFocus(view);
 
@@ -1032,6 +1036,7 @@ function AppContent() {
               {view === "category" && !routeContentLoading && !routeContentError && (
                 <CategoryScreen
                   catId={activeCat}
+                  subCategory={activeSubCategory}
                   completed={
                     fridayDuaFlow && activeCat === "comprehensive_duas"
                       ? fridayDuaCompletedIds
@@ -1041,7 +1046,7 @@ function AppContent() {
                   direction={layoutDirection}
                   onZikr={(i) => openReader(activeCat, i)}
                   onToggleZikr={(i) => {
-                    const zikrId = getAzkarForMode(activeCat, activeRoutineMode)[i]?.id;
+                    const zikrId = activeAzkarList[i]?.id;
                     if (fridayDuaFlow && activeCat === "comprehensive_duas" && zikrId) {
                       const shouldComplete = !fridayDuaCompletedIds.has(zikrId);
                       updateFridayDuaProgress(i, shouldComplete);
@@ -1064,7 +1069,7 @@ function AppContent() {
                       );
                       return;
                     }
-                    handleResetCategory(activeCat);
+                    handleResetCategory(activeCat, activeSubCategory);
                   }}
                   onRepeat={() => {
                     if (fridayDuaFlow && activeCat === "comprehensive_duas") {
@@ -1090,8 +1095,10 @@ function AppContent() {
               {view === "reader" && !routeContentLoading && !routeContentError && activeZikr && (
                 <ReaderScreen
                   catId={activeCat}
+                  subCategory={activeSubCategory}
                   idx={activeIdx}
                   routineMode={activeRoutineMode}
+                  azkarList={activeAzkarList}
                   isArabic={isArabic}
                   direction={layoutDirection}
                   themeMode={themeMode}

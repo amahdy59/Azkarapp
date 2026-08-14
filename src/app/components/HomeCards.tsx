@@ -57,7 +57,7 @@ export function PrayerRoutineCard({
       aria-labelledby="current-zikr-heading"
       className="flex flex-col justify-between transition-all lg:col-span-3"
     >
-      <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/12 bg-black/24 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
+      <div className="flex flex-1 flex-col gap-4 rounded-[30px] border border-white/15 bg-slate-950/76 px-5 pb-5 pt-6 text-start shadow-2xl backdrop-blur-lg md:p-6">
         <div className="flex w-full flex-col items-start gap-2 px-1">
           <div className="hidden" aria-hidden="true">
             <Clock className="size-[15px] shrink-0 text-on-media-accent" aria-hidden="true" />
@@ -76,7 +76,7 @@ export function PrayerRoutineCard({
 
           <h2
             id="current-zikr-heading"
-            className="text-4xl font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-5xl"
+            className="block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,7vw,2.25rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-5xl"
             dir="auto"
             style={{ lineHeight: "1.25" }}
           >
@@ -307,12 +307,8 @@ export function FridayHomeCard({
         elevation="flat"
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
-        <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/10 text-primary overflow-hidden">
-          <img
-            src="/images/mosque_prophet.jpg"
-            alt=""
-            className="h-full w-full object-cover opacity-80 mix-blend-luminosity"
-          />
+        <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
+          <img src="/images/mosque_prophet.jpg" alt="" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
@@ -340,10 +336,9 @@ export function FridayHomeCard({
 
   return (
     <Card as="section" aria-labelledby="friday-card-heading" className="overflow-hidden p-0">
-      <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[6rem_minmax(0,1fr)_19rem] xl:items-center">
-        <div className="flex size-20 items-center justify-center self-center rounded-2xl bg-primary/12 text-primary sm:size-24 overflow-hidden relative border border-primary/20">
+      <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
+        <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
           <img src="/images/mosque_prophet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
-          <div className="absolute inset-0 bg-primary/10 mix-blend-color" />
         </div>
 
         <div className="min-w-0 text-start">

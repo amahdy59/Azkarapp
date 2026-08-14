@@ -730,6 +730,7 @@ const ar = {
     complete: "كاملة",
     coreSummary: "مختصرة · {count} خطوات",
     completeSummary: "كاملة · {count} ذكرًا",
+    routineLength: "طول الورد",
     introductionLabel: "مقدمة المجموعة",
     optional: "اختيارية",
     coreBadge: "مختصر",

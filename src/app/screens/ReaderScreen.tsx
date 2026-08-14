@@ -25,7 +25,8 @@ import { scrollBehavior, shouldReduceMotion } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
 import { isLongSurah, splitMushafPages } from "../content/mushafPages";
-import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode } from "../types";
+import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Zikr } from "../types";
+import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
 import { tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
@@ -119,8 +120,10 @@ const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
 
 export function ReaderScreen({
   catId,
+  subCategory,
   idx,
   routineMode,
+  azkarList,
   isArabic,
   direction,
   themeMode,
@@ -144,8 +147,10 @@ export function ReaderScreen({
   onRepeatAudio,
 }: {
   catId: CategoryId;
+  subCategory?: string;
   idx: number;
   routineMode: RoutineMode;
+  azkarList?: Zikr[];
   isArabic: boolean;
   direction: "ltr" | "rtl";
   themeMode: ThemeMode;
@@ -169,10 +174,13 @@ export function ReaderScreen({
   onPlayAudio?: () => void;
   onRepeatAudio?: () => void;
 }) {
-  const azkar = getAzkarForMode(catId, routineMode);
+  const azkar = azkarList ?? getAzkarForMode(catId, routineMode);
   const z = azkar[idx];
   const category = CATEGORIES.find((item) => item.id === catId);
   const language: AppLanguage = isArabic ? "ar" : "en";
+  const displayCategoryName = `${category ? (isArabic ? category.nameArabic : category.name) : ""}${
+    catId === "after_prayer" && isPrayerName(subCategory) ? ` · ${t(language, `notifications.${subCategory}`)}` : ""
+  }`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
   const [benefitOpen, setBenefitOpen] = useState(false);
@@ -428,7 +436,7 @@ export function ReaderScreen({
           transliteration: language === "en" ? z.transliteration : undefined,
           benefit: getLocalizedZikrBenefit(z, language),
           sourceReference: getLocalizedSourceReference(z, language),
-          categoryLabel: isArabic ? category.nameArabic : category.name,
+          categoryLabel: displayCategoryName,
           repetitionCount: z.repetitionCount,
           appUrl:
             typeof window === "undefined"
@@ -851,7 +859,7 @@ export function ReaderScreen({
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
       dir={direction}
       style={categoryThemeStyles}
-      screenName={isArabic ? category.nameArabic : category.name}
+      screenName={displayCategoryName}
       onClick={handleSurfaceTap}
       onPointerDown={handleReaderPointerDown}
       onTouchStart={onTouchStart}
@@ -985,7 +993,7 @@ export function ReaderScreen({
             </div>
 
             <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
-              {isArabic ? category.nameArabic : category.name}
+              {displayCategoryName}
             </h1>
 
             <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
@@ -1060,7 +1068,7 @@ export function ReaderScreen({
         <>
           <div>
             <Header
-              title={isArabic ? category.nameArabic : category.name}
+              title={displayCategoryName}
               onBack={onBack}
               language={language}
               right={

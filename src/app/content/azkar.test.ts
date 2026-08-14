@@ -4,6 +4,7 @@ import {
   ALL_AZKAR,
   getAzkarByCategory,
   getAzkarForMode,
+  getAzkarForPrayer,
   getCategoryTotal,
   getCollectionIntroduction,
   getRoutineStepCount,
@@ -232,5 +233,32 @@ describe("azkar content totals", () => {
     expect(subhanallah?.repetitionCount).toBe(33);
     expect(alhamdulillah?.repetitionCount).toBe(33);
     expect(allahuakbar?.repetitionCount).toBe(33);
+  });
+
+  it("builds five source-aware after-prayer flows without leaking timed additions", () => {
+    const fajr = getAzkarForPrayer("fajr", "complete");
+    const dhuhr = getAzkarForPrayer("dhuhr", "complete");
+    const asr = getAzkarForPrayer("asr", "complete");
+    const maghrib = getAzkarForPrayer("maghrib", "complete");
+    const isha = getAzkarForPrayer("isha", "complete");
+
+    expect(fajr.map((zikr) => zikr.id)).toEqual(expect.arrayContaining(["ap-ref-7", "ap-ref-10"]));
+    expect(maghrib.map((zikr) => zikr.id)).toContain("ap-ref-7");
+    expect(maghrib.map((zikr) => zikr.id)).not.toContain("ap-ref-10");
+    for (const flow of [dhuhr, asr, isha]) {
+      expect(flow.map((zikr) => zikr.id)).not.toEqual(expect.arrayContaining(["ap-ref-7", "ap-ref-10"]));
+    }
+
+    for (const flow of [fajr, dhuhr, asr, maghrib, isha]) {
+      expect(flow.map((zikr) => zikr.id)).toEqual(expect.arrayContaining(["ap-ref-12a", "ap-ref-12b", "ap-ref-12c"]));
+      expect(flow.map((zikr) => zikr.id)).not.toContain("ap-ref-11");
+    }
+    expect(getAzkarForPrayer("fajr", "core").map((zikr) => zikr.id)).not.toContain("ap-ref-10");
+  });
+
+  it("uses the sourced Allahumma wording in Muadh's post-prayer supplication", () => {
+    const dua = getAzkarForPrayer("dhuhr").find((zikr) => zikr.id === "ap-ref-6");
+    expect(dua?.arabicText).toMatch(/^اللَّهُمَّ/);
+    expect(dua?.sourceUrl).toBe("https://sunnah.com/abudawud%3A1522");
   });
 });

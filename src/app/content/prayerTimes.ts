@@ -4,6 +4,12 @@ import { formatNumerals } from "../formatting";
 
 export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 
+export const PRAYER_NAMES = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
+
+export function isPrayerName(value: string | undefined): value is PrayerName {
+  return PRAYER_NAMES.some((prayer) => prayer === value);
+}
+
 export interface PrayerTimes {
   fajr: string; // e.g. "04:45"
   dhuhr: string; // e.g. "12:15"

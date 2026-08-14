@@ -5,7 +5,6 @@ import {
   Zap,
   ArrowLeft,
   ArrowRight,
-  Sparkles,
   Check,
   Clock,
   Sunrise,
@@ -452,7 +451,7 @@ export function HomeScreen({
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       >
         {/* Sticky Header Overlay */}
-        <div className="sticky inset-x-0 top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 bg-background/70 backdrop-blur-xl border-b border-border/20 shadow-sm pointer-events-auto">
+        <div className="sticky inset-x-0 top-0 z-50 px-5 pt-[max(1rem,env(safe-area-inset-top))] pb-3 sm:px-6 sm:pt-5 lg:px-8 pointer-events-auto">
           <header
             data-testid="home-utility-header"
             className="flex w-full items-center justify-between gap-3 mx-auto max-w-[80rem]"
@@ -493,7 +492,7 @@ export function HomeScreen({
               >
                 <PalmTreeMark
                   size={14}
-                  strokeWidth={3}
+                  strokeWidth={4}
                   filled={gardenSummary.lifetimePalms > 0}
                   className={gardenSummary.lifetimePalms > 0 ? "text-primary" : "text-muted-foreground"}
                 />
@@ -507,15 +506,7 @@ export function HomeScreen({
             data-testid="home-hero"
             className="relative w-full overflow-hidden sm:mx-auto sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised"
           >
-            <TimeOfDayBackground categoryId={homeBackgroundCategoryId} variant="card" />
-            <div
-              aria-hidden="true"
-              className={`absolute inset-0 ${
-                homeBackgroundCategoryId === "morning"
-                  ? "bg-[linear-gradient(180deg,rgba(7,11,18,0.0)_0%,rgba(7,11,18,0.02)_16%,rgba(7,11,18,0.08)_42%,rgba(7,11,18,0.20)_72%,rgba(7,11,18,0.32)_100%)]"
-                  : "bg-[linear-gradient(180deg,rgba(7,11,18,0.04)_0%,rgba(7,11,18,0.16)_16%,rgba(7,11,18,0.34)_42%,rgba(7,11,18,0.64)_72%,rgba(7,11,18,0.82)_100%)]"
-              }`}
-            />
+            <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
 
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
@@ -770,18 +761,18 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group relative flex min-h-[12rem] w-full flex-col justify-between overflow-hidden rounded-3xl border border-amber-500/20 bg-[linear-gradient(145deg,rgba(245,158,11,0.18),rgba(245,158,11,0.06)_58%,rgba(255,255,255,0.04))] text-start shadow-sm transition-[background-color,transform,box-shadow] hover:-translate-y-0.5 hover:bg-amber-500/20 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl border border-amber-500/20 bg-card text-start shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 data-testid="home-benefits-card"
               >
                 <div className="absolute inset-0 z-0">
-                  <img src="/images/benefits_zikr.jpg" alt="" className="h-full w-full object-cover opacity-35" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                  <img
+                    src="/images/benefits_zikr.jpg"
+                    alt=""
+                    className="h-full w-full object-cover object-[center_42%]"
+                  />
                 </div>
-                <div className="relative z-10 flex h-full flex-col justify-between p-5 sm:p-6">
-                  <span className="flex size-12 items-center justify-center rounded-2xl bg-amber-500/20 text-amber-500 backdrop-blur-sm">
-                    <Sparkles size={24} aria-hidden="true" />
-                  </span>
-                  <span className="mt-5 block">
+                <div className="relative z-10 m-3 rounded-2xl bg-slate-950/90 p-4 shadow-lg sm:m-4 sm:p-5">
+                  <span className="block">
                     <span className="block text-[1.25rem] font-black text-white drop-shadow-md">
                       {t(language, "benefits.title")}
                     </span>

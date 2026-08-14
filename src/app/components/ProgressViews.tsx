@@ -65,8 +65,8 @@ function MainDhikrGroupCard({
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? "border-amber-300/70 bg-gradient-to-b from-amber-500/20 via-black/25 to-black/35 text-white shadow-[0_18px_36px_rgba(0,0,0,0.32)]"
-          : "border-white/10 bg-white/5 text-white shadow-[0_16px_30px_rgba(0,0,0,0.24)] backdrop-blur-xl hover:border-white/15 hover:bg-white/10"
+          ? "border-amber-300/70 bg-amber-950/82 text-white shadow-[0_18px_36px_rgba(0,0,0,0.32)] backdrop-blur-md"
+          : "border-white/15 bg-slate-950/78 text-white shadow-[0_16px_30px_rgba(0,0,0,0.24)] backdrop-blur-md hover:border-white/25 hover:bg-slate-950/88"
       }`}
       aria-label={`${name} - ${statusLabel}`}
     >
@@ -219,7 +219,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border border-white/10 bg-black/35 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-6 md:p-7 ${
+        className={`flex w-full flex-col rounded-[28px] border border-white/15 bg-slate-950/78 p-5 shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-xl sm:p-6 md:p-7 ${
           isHomeSubset ? "flex-1" : ""
         }`}
       >
@@ -244,7 +244,11 @@ export function ProgressDayView({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-1 gap-2.5 sm:grid-cols-3 sm:gap-4 md:gap-5 xl:grid-cols-4">
+        <div
+          className={`mt-5 grid grid-cols-1 gap-2.5 sm:gap-4 md:gap-5 ${
+            isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
+          }`}
+        >
           {displayCategories.map((col) => {
             const isDone = completedToday.includes(col.id);
             const completedPrayers = summary.today.completedAfterPrayers ?? [];

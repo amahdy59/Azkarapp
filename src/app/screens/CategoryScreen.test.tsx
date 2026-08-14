@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { registerLazyCollection } from "../content/azkar";
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
@@ -53,5 +54,30 @@ describe("CategoryScreen comprehensive-dua session", () => {
 
     fireEvent.click(screen.getByRole("checkbox", { name: steps[0] }));
     expect(screen.queryByTestId("sleep-preparation-complete")).not.toBeInTheDocument();
+  });
+
+  it("uses a compact routine-length menu beside the session actions", async () => {
+    const onRoutineModeChange = vi.fn();
+    const user = userEvent.setup();
+    render(
+      <CategoryScreen
+        catId="morning"
+        completed={new Set()}
+        isArabic={false}
+        direction="ltr"
+        onZikr={() => undefined}
+        onReset={() => undefined}
+        onRepeat={() => undefined}
+        onBack={() => undefined}
+        routineMode="complete"
+        onRoutineModeChange={onRoutineModeChange}
+      />,
+    );
+
+    const filter = screen.getByTestId("routine-mode-filter");
+    expect(filter).toHaveAccessibleName("Routine length: Complete");
+    await user.click(filter);
+    await user.click(screen.getByRole("menuitemradio", { name: /Core ·/ }));
+    expect(onRoutineModeChange).toHaveBeenCalledWith("core");
   });
 });

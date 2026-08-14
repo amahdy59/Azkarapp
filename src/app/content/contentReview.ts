@@ -7,6 +7,9 @@ const QURAN_CONTENT_BY_ID = {
   "e-hm-75": QURAN_PASSAGES.ayatAlKursi,
   "s-hm-100": QURAN_PASSAGES.ayatAlKursi,
   "ap-ref-9": QURAN_PASSAGES.ayatAlKursi,
+  "ap-ref-12a": QURAN_PASSAGES.alIkhlas,
+  "ap-ref-12b": QURAN_PASSAGES.alFalaq,
+  "ap-ref-12c": QURAN_PASSAGES.anNas,
   "s-hm-101": QURAN_PASSAGES.lastTwoAlBaqarah,
   "m-hm-76a": QURAN_PASSAGES.alIkhlas,
   "e-hm-76a": QURAN_PASSAGES.alIkhlas,
@@ -52,6 +55,9 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "e-hm-75": "quran-002-255",
   "s-hm-100": "quran-002-255",
   "ap-ref-9": "quran-002-255",
+  "ap-ref-12a": "quran-112",
+  "ap-ref-12b": "quran-113",
+  "ap-ref-12c": "quran-114",
   "m-hm-76a": "quran-112",
   "e-hm-76a": "quran-112",
   "s-hm-99-ikhlas": "quran-112",
@@ -122,6 +128,8 @@ const CANONICAL_KEY_BY_ID: Readonly<Record<string, string>> = {
   "m-hm-95": "zikr:beneficial-knowledge-provision-accepted-deeds",
   "ap-ref-10": "zikr:beneficial-knowledge-provision-accepted-deeds",
   "comprehensive-dua-44": "zikr:beneficial-knowledge-provision-accepted-deeds",
+  "ap-ref-6": "zikr:help-with-remembrance-gratitude-and-worship",
+  "friday-dua-06": "zikr:help-with-remembrance-gratitude-and-worship",
 };
 
 function getAudioBehavior(item: ZikrDraft): ZikrAudioBehavior {
@@ -181,6 +189,20 @@ const QURAN_RELIANCE_CORRECTION: Partial<Zikr> = {
 };
 
 const TEXT_OVERRIDES: Readonly<Record<string, Partial<Zikr>>> = {
+  "ap-ref-6": {
+    arabicText: "اللَّهُمَّ أَعِنِّي عَلَى ذِكْرِكَ وَشُكْرِكَ وَحُسْنِ عِبَادَتِكَ",
+    transliteration: "Allahumma a'inni 'ala dhikrika wa shukrika wa husni 'ibadatik",
+    translation: "O Allah, help me remember You, thank You, and worship You well.",
+    sourceReference: "Sunan Abi Dawud 1522 (Sahih); Hisn al-Muslim 28.",
+    sourceReferenceArabic: "سنن أبي داود ١٥٢٢ (صحيح)؛ حصن المسلم ٢٨.",
+    authenticityNote: "Sahih (al-Albani).",
+    sourceUrl: "https://sunnah.com/abudawud%3A1522",
+  },
+  "ap-ref-8": {
+    sourceReference: "Jami' at-Tirmidhi 3233 (Hasan).",
+    authenticityNote: "Hasan (Darussalam).",
+    sourceUrl: "https://sunnah.com/tirmidhi%3A3233",
+  },
   "m-hm-83": QURAN_RELIANCE_CORRECTION,
   "e-hm-83": QURAN_RELIANCE_CORRECTION,
   "s-hm-107": {

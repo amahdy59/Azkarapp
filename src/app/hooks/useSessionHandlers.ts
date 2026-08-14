@@ -8,7 +8,8 @@ import type {
   View,
 } from "../types";
 import { MAX_STORED_SESSIONS, type StoredSession } from "../state";
-import { getAzkarForMode, isRoutineCategory } from "../content/azkar";
+import { getAzkarForMode, getAzkarForPrayer, isRoutineCategory } from "../content/azkar";
+import { isPrayerName } from "../content/prayerTimes";
 import {
   getFirstIncompleteZikrIndex,
   getNextIncompleteIndex,
@@ -78,9 +79,14 @@ export function useSessionHandlers({
   const [isRepeatSession, setIsRepeatSession] = useState(false);
   const [repeatCompleted, setRepeatCompleted] = useState<Set<number>>(() => new Set());
   const modeFor = (catId: CategoryId): RoutineMode => (isRoutineCategory(catId) ? routineModes[catId] : "complete");
-  const sessionAzkar = (catId: CategoryId, mode = modeFor(catId)) => getAzkarForMode(catId, mode);
+  const sessionAzkar = (
+    catId: CategoryId,
+    mode = modeFor(catId),
+    subCat = catId === activeCat ? activeSubCategory : undefined,
+  ) =>
+    catId === "after_prayer" && isPrayerName(subCat) ? getAzkarForPrayer(subCat, mode) : getAzkarForMode(catId, mode);
 
-  const handleResetCategory = (catId: CategoryId) => {
+  const handleResetCategory = (catId: CategoryId, subCat?: string) => {
     showConfirm(
       t(selectedLang, "category.resetConfirmTitle"),
       t(selectedLang, "category.resetConfirm"),
@@ -89,7 +95,11 @@ export function useSessionHandlers({
       () => {
         setCompleted((prev) => {
           const next = { ...prev };
-          next[catId] = new Set();
+          if (catId === "after_prayer" && subCat) {
+            next[catId] = new Set([...next[catId]].filter((id) => !id.startsWith(`${subCat}:`)));
+          } else {
+            next[catId] = new Set();
+          }
           return next;
         });
       },
@@ -101,6 +111,7 @@ export function useSessionHandlers({
     setIsRepeatSession(false);
     setRepeatCompleted(new Set());
     setActiveCat(catId);
+    setActiveSubCategory(undefined);
     setActiveTab("azkar");
     push("category");
   };
@@ -118,7 +129,7 @@ export function useSessionHandlers({
 
   const resumeCategory = (catId: CategoryId, subCat?: string) => {
     const nextIndex = getFirstIncompleteZikrIndex(
-      sessionAzkar(catId),
+      sessionAzkar(catId, modeFor(catId), subCat),
       getEffectiveCompletedForSubcategory(completed, catId, subCat),
     );
     openReader(catId, nextIndex ?? 0, undefined, subCat);

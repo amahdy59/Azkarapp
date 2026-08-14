@@ -1,4 +1,5 @@
 import type { CategoryId, RitualGroupId, RoutineCategoryId, RoutineMode, Zikr, ZikrDraft, ZikrGroupId } from "../types";
+import type { PrayerName } from "./prayerTimes";
 import { applyContentReview } from "./contentReview";
 
 const MORNING_AZKAR: ZikrDraft[] = [
@@ -1560,6 +1561,36 @@ const MOSQUE_AZKAR: ZikrDraft[] = [
   },
 ];
 
+function createAfterPrayerSurah(sourceId: string, id: string, orderIndex: number): ZikrDraft {
+  const source = MORNING_AZKAR.find((zikr) => zikr.id === sourceId);
+  if (!source) throw new Error(`Missing source surah for after-prayer collection: ${sourceId}`);
+
+  return {
+    ...source,
+    id,
+    category: "after_prayer",
+    orderIndex,
+    repetitionCount: 1,
+    countLabel: "1",
+    benefit: "Recited after every prescribed prayer.",
+    benefitArabic: "تُقرأ دبر كل صلاة مكتوبة.",
+    preferredTiming: "After every obligatory prayer.",
+    sourceReference: "Sunan Abi Dawud 1523 (Sahih).",
+    sourceReferenceArabic: "سنن أبي داود ١٥٢٣ (صحيح).",
+    hadithText:
+      "عَنْ عُقْبَةَ بْنِ عَامِرٍ قَالَ: أَمَرَنِي رَسُولُ اللَّهِ ﷺ أَنْ أَقْرَأَ بِالْمُعَوِّذَاتِ دُبُرَ كُلِّ صَلَاةٍ.",
+    authenticityNote: "Sahih (al-Albani).",
+    sourceUrl: "https://sunnah.com/abudawud%3A1523",
+    notes: "Recited once here; the morning and evening collections retain their own prescribed counts.",
+  };
+}
+
+const AFTER_PRAYER_SURAH_AZKAR: ZikrDraft[] = [
+  createAfterPrayerSurah("m-hm-76a", "ap-ref-12a", 3),
+  createAfterPrayerSurah("m-hm-76b", "ap-ref-12b", 4),
+  createAfterPrayerSurah("m-hm-76c", "ap-ref-12c", 5),
+];
+
 const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
   {
     id: "ap-ref-1",
@@ -1790,6 +1821,7 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
       "عن أم سلمة رضي الله عنها أن النبي ﷺ كان يقول إذا صلى الصبح حين يسلم: «اللَّهُمَّ إِنِّي أَسأَلُكَ عِلمًا نَافِعًا وَرِزقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا».",
     authenticityNote: "Authenticated by al-Albani.",
   },
+  ...AFTER_PRAYER_SURAH_AZKAR,
 ];
 
 const RESTROOM_AZKAR: ZikrDraft[] = [
@@ -2898,6 +2930,9 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
       groupId: "quran_protection",
       items: [
         { id: "ap-ref-9", core: true }, // Ayat al-Kursi
+        { id: "ap-ref-12a", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-12b", core: true, ritualGroupId: "three_quls" },
+        { id: "ap-ref-12c", core: true, ritualGroupId: "three_quls" },
       ],
     },
     {
@@ -2921,7 +2956,7 @@ const ROUTINE_ARRANGEMENTS: Record<RoutineCategoryId, ArrangementGroup[]> = {
       items: [
         { id: "ap-ref-6", core: true },
         { id: "ap-ref-8", core: false }, // comprehensive dua — complete mode only
-        // Fajr & Maghrib specific — complete mode only (no per-prayer detection yet)
+        // Prayer-specific additions — complete mode only; filtered per prayer below.
         { id: "ap-ref-7", core: false }, // 10× Tawhid after Fajr/Maghrib
         { id: "ap-ref-11", core: false }, // 7× protection after Fajr/Maghrib
         { id: "ap-ref-10", core: false }, // Fajr dua for knowledge/provision
@@ -3011,12 +3046,31 @@ const getAzkarForMode = (cat: CategoryId, mode: RoutineMode = "complete") => {
   return isRoutineCategory(cat) && mode === "core" ? azkar.filter((zikr) => zikr.includedInCore) : azkar;
 };
 
+const AFTER_PRAYER_SPECIFIC_IDS: Readonly<Record<PrayerName, readonly string[]>> = {
+  fajr: ["ap-ref-7", "ap-ref-10"],
+  dhuhr: [],
+  asr: [],
+  maghrib: ["ap-ref-7"],
+  isha: [],
+};
+
+const ALL_AFTER_PRAYER_SPECIFIC_IDS = new Set(Object.values(AFTER_PRAYER_SPECIFIC_IDS).flat());
+
+/** Shared adhkar stay in every flow; timing-specific additions appear only where established. */
+const getAzkarForPrayer = (prayer: PrayerName, mode: RoutineMode = "complete") => {
+  const prayerSpecificIds = new Set(AFTER_PRAYER_SPECIFIC_IDS[prayer]);
+  return getAzkarForMode("after_prayer", mode).filter(
+    (zikr) => !ALL_AFTER_PRAYER_SPECIFIC_IDS.has(zikr.id) || prayerSpecificIds.has(zikr.id),
+  );
+};
+
 const getCollectionIntroduction = (cat: CategoryId) =>
   (LAZY_AZKAR[cat] ?? ALL_AZKAR).find((zikr) => zikr.category === cat && zikr.isCollectionIntroduction);
 
-const getRoutineStepCount = (cat: RoutineCategoryId, mode: RoutineMode) => {
+const getRoutineStepCount = (cat: RoutineCategoryId, mode: RoutineMode, prayer?: PrayerName) => {
   const seenRituals = new Set<RitualGroupId>();
-  return getAzkarForMode(cat, mode).reduce((count, zikr) => {
+  const azkar = cat === "after_prayer" && prayer ? getAzkarForPrayer(prayer, mode) : getAzkarForMode(cat, mode);
+  return azkar.reduce((count, zikr) => {
     if (!zikr.ritualGroupId) {
       return count + 1;
     }
@@ -3104,6 +3158,7 @@ export {
   ZIKR_LABELS,
   ROUTINE_ARRANGEMENTS,
   getAzkarForMode,
+  getAzkarForPrayer,
   getAzkarByCategory,
   getCollectionIntroduction,
   getCategoryTotal,

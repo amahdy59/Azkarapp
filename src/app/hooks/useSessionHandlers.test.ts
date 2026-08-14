@@ -1,7 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 import { useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { getAzkarForMode } from "../content/azkar";
+import { getAzkarForMode, getAzkarForPrayer } from "../content/azkar";
 import type { GrowthEvent } from "../progress";
 import { DEFAULT_APP_STATE, MAX_STORED_SESSIONS, toCompletedSets, type StoredSession } from "../state";
 import type { CategoryId, DailyCollectionCompletion, RoutineMode, View } from "../types";
@@ -15,11 +15,13 @@ function createCompleted(overrides: Partial<Record<CategoryId, Set<string>>> = {
 
 function renderSessionHarness({
   activeCat = "morning",
+  activeSubCategory,
   completed = createCompleted(),
   dailyCompletions = [],
   sessions = [],
 }: {
   activeCat?: CategoryId;
+  activeSubCategory?: string;
   completed?: Record<CategoryId, Set<string>>;
   dailyCompletions?: DailyCollectionCompletion[];
   sessions?: StoredSession[];
@@ -30,7 +32,7 @@ function renderSessionHarness({
 
   const hook = renderHook(() => {
     const [category, setCategory] = useState<CategoryId>(activeCat);
-    const [subCategory, setSubCategory] = useState<string | undefined>();
+    const [subCategory, setSubCategory] = useState<string | undefined>(activeSubCategory);
     const [index, setIndex] = useState(0);
     const [completionState, setCompletionState] = useState(completed);
     const [completionRecords, setCompletionRecords] = useState(dailyCompletions);
@@ -149,6 +151,22 @@ describe("useSessionHandlers", () => {
     expect(result.current.completed.after_prayer.size).toBe(items.length);
     expect(result.current.dailyCompletions[0]?.category).toBe("after_prayer");
     expect(result.current.sessions[0]?.category).toBe("after_prayer");
+  });
+
+  it("records a completed prayer flow under only that prayer's tracker key", () => {
+    const items = getAzkarForPrayer("fajr", "complete");
+    const prefixedCompleted = new Set(items.slice(0, -1).map((item) => `fajr:${item.id}`));
+    const { result } = renderSessionHarness({
+      activeCat: "after_prayer",
+      activeSubCategory: "fajr",
+      completed: createCompleted({ after_prayer: prefixedCompleted }),
+    });
+
+    act(() => result.current.handlers.markComplete(items.length - 1));
+
+    expect(result.current.completed.after_prayer).toContain(`fajr:${items.at(-1)?.id}`);
+    expect(result.current.completed.after_prayer).not.toContain(`dhuhr:${items.at(-1)?.id}`);
+    expect(result.current.dailyCompletions[0]).toMatchObject({ category: "after_prayer", subCategory: "fajr" });
   });
 
   it("keeps canonical progress intact during repeat sessions and advances to completion", () => {

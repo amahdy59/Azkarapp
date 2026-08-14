@@ -391,6 +391,7 @@ const ARABIC_PREFERRED_TIMING: Readonly<Record<string, string>> = {
   "Before sleeping; perform wudu, lie on the right side, and make this the final words.":
     "تُقال قبل النوم؛ بعد الوضوء والاضطجاع على الشق الأيمن، وتُجعل آخر ما يُقال.",
   "Recited after Fajr prayer.": "تُقال عقب صلاة الفجر.",
+  "After every obligatory prayer.": "تُقرأ دبر كل صلاة مكتوبة.",
 };
 
 const GENERIC_PREFERRED_TIMINGS = new Set<string>([

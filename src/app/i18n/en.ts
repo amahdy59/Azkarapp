@@ -744,6 +744,7 @@ const en = {
     complete: "Complete",
     coreSummary: "Core · {count} steps",
     completeSummary: "Complete · {count} items",
+    routineLength: "Routine length",
     introductionLabel: "Collection introduction",
     optional: "Optional",
     coreBadge: "Core",

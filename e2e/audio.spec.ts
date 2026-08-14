@@ -26,9 +26,8 @@ test("unreviewed audio is unavailable and never autoplays", async ({ page }) => 
 
 test("Core Reader keeps the same stable zikr identity as its filtered routine", async ({ page }) => {
   await enterEnglishGuestMode(page);
-  // Routine mode is a radio group (was role="group" + aria-pressed buttons
-  // before the DEC-022 semantics fix); the accessible name is unchanged.
-  await page.getByRole("radio", { name: /^Core ·/ }).click();
+  await page.getByTestId("routine-mode-filter").click();
+  await page.getByRole("menuitemradio", { name: /^Core ·/ }).click();
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
   const reader = page.getByTestId("reader-screen");
   await expect(reader).toHaveAttribute("data-zikr-id", "m-hm-77m");

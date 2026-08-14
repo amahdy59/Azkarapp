@@ -23,7 +23,7 @@ describe("AzkarHeroBackground", () => {
   });
 
   it("adds a small decorative, non-interactive particle layer", () => {
-    const { container } = render(<TimeOfDayBackground categoryId="evening" variant="card" />);
+    const { container } = render(<TimeOfDayBackground categoryId="evening" />);
 
     expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
     expect(container.querySelectorAll(".azkar-hero-particle")).toHaveLength(9);
