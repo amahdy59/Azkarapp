@@ -35,7 +35,10 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
           <h2 className="text-[1.75rem] font-black tracking-tight text-on-media sm:text-[1.95rem]" dir="auto">
             {completedTitle}
           </h2>
-          <p className="max-w-[34ch] text-[0.9375rem] font-medium leading-7 text-on-media-muted sm:text-[1rem]" dir="auto">
+          <p
+            className="max-w-[34ch] text-[0.9375rem] font-medium leading-7 text-on-media-muted sm:text-[1rem]"
+            dir="auto"
+          >
             {completedSubtitle}
           </p>
         </div>
