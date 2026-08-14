@@ -506,7 +506,13 @@ export function HomeScreen({
             data-testid="home-hero"
             className="relative w-full overflow-hidden sm:mx-auto sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised"
           >
-            <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
+            <div
+              data-testid="time-of-day-scene-window"
+              className="relative h-48 w-full overflow-hidden sm:h-56 lg:h-64"
+              aria-hidden="true"
+            >
+              <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
+            </div>
 
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
@@ -589,7 +595,10 @@ export function HomeScreen({
               </div>
 
               <div className="mx-4 mb-4 mt-5 sm:mx-6 sm:mb-6">
-                <div className="grid grid-cols-1 gap-2 min-[30rem]:grid-cols-2 lg:grid-cols-5">
+                <div
+                  data-testid="after-prayer-carousel"
+                  className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-5"
+                >
                   {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
                     const isActivePrayer = index === activePrayerIndex;
                     const isPastPrayer = index < activePrayerIndex;
@@ -610,6 +619,15 @@ export function HomeScreen({
                         key={prayer}
                         type="button"
                         onClick={() => (onPrayerResume ? onPrayerResume(prayer) : onResume("after_prayer"))}
+                        onFocus={(event) => {
+                          if (window.matchMedia("(max-width: 639px)").matches) {
+                            event.currentTarget.scrollIntoView({
+                              behavior: "auto",
+                              block: "nearest",
+                              inline: "center",
+                            });
+                          }
+                        }}
                         data-testid={isNextPrayer ? "next-prayer" : undefined}
                         data-prayer-state={
                           isCompletedPrayer
@@ -622,7 +640,7 @@ export function HomeScreen({
                                   ? "earlier"
                                   : "upcoming"
                         }
-                        className={`relative flex min-h-24 w-full items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
+                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer
@@ -698,6 +716,12 @@ export function HomeScreen({
             </section>
           </div>
 
+          {onOpenCustomCounter && (
+            <div className="px-page" data-testid="home-masbaha-entry">
+              <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
+            </div>
+          )}
+
           <div
             role="region"
             aria-label={t(language, "home.thisWeek")}
@@ -766,7 +790,7 @@ export function HomeScreen({
               >
                 <div className="absolute inset-0 z-0">
                   <img
-                    src="/images/benefits_zikr.jpg"
+                    src={`${import.meta.env.BASE_URL}images/benefits_zikr.png`}
                     alt=""
                     className="h-full w-full object-cover object-[center_42%]"
                   />
@@ -802,13 +826,6 @@ export function HomeScreen({
             status={fridayStatus}
             onOpen={onOpenFridayMode}
           />
-
-          {/* Tasbeeh Counter Button (Full width matching design system tokens) */}
-          {onOpenCustomCounter && (
-            <div className="px-page">
-              <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
-            </div>
-          )}
         </div>
       </div>
     </ScreenContainer>

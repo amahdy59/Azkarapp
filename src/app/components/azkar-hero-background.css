@@ -10,8 +10,7 @@
 
 .azkar-hero__media,
 .azkar-hero__media::before,
-.azkar-hero__media img,
-.azkar-hero__overlay {
+.azkar-hero__media img {
   position: absolute;
   inset: 0;
 }
@@ -36,51 +35,6 @@
   }
 }
 
-.azkar-hero-particle {
-  position: absolute;
-  left: var(--particle-x);
-  top: var(--particle-y);
-  width: var(--particle-size);
-  height: var(--particle-size);
-  border-radius: 999px;
-  background: rgb(255 226 158 / 58%);
-  box-shadow: 0 0 0.65rem rgb(255 205 105 / 32%);
-  opacity: 0;
-  animation: azkar-particle-drift var(--particle-duration) var(--particle-delay) ease-out 1 both;
-}
-
-@keyframes azkar-particle-drift {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 0.45rem, 0) scale(0.75);
-  }
-  20% {
-    opacity: 0.48;
-  }
-  70% {
-    opacity: 0.3;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(var(--particle-drift), -1.5rem, 0) scale(1.1);
-  }
-}
-
-/* RTL-friendly text-safe overlay: stronger on the logical end/right where Arabic text sits. */
-.azkar-hero__overlay {
-  z-index: -1;
-  pointer-events: none;
-  background:
-    linear-gradient(180deg, rgb(5 12 27 / 18%) 0%, rgb(5 12 27 / 44%) 54%, rgb(5 12 27 / 78%) 100%),
-    linear-gradient(270deg, rgb(5 12 27 / 76%) 0%, rgb(5 12 27 / 44%) 42%, rgb(5 12 27 / 12%) 76%);
-}
-
-[dir="ltr"] .azkar-hero__overlay {
-  background:
-    linear-gradient(180deg, rgb(5 12 27 / 18%) 0%, rgb(5 12 27 / 44%) 54%, rgb(5 12 27 / 78%) 100%),
-    linear-gradient(90deg, rgb(5 12 27 / 76%) 0%, rgb(5 12 27 / 44%) 42%, rgb(5 12 27 / 12%) 76%);
-}
-
 .azkar-hero__content {
   position: relative;
   z-index: 1;
@@ -96,27 +50,10 @@
   .azkar-hero__media img {
     transition: none;
   }
-
-  .azkar-hero-particles {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-transparency: reduce) {
-  .azkar-hero-particles {
-    display: none;
-  }
 }
 
 @media (forced-colors: active) {
-  .azkar-hero__media,
-  .azkar-hero-particles {
+  .azkar-hero__media {
     display: none;
   }
-}
-
-.reduce-motion .azkar-hero-particles,
-.reduce-transparency .azkar-hero-particles,
-.high-contrast .azkar-hero-particles {
-  display: none;
 }

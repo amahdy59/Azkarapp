@@ -225,13 +225,56 @@ test("text spacing overrides do not clip core content or actions", async ({ page
   await expectNoHorizontalOverflow(page, "text spacing Settings");
 });
 
-test("reduced motion removes decorative Home particles", async ({ page }) => {
+test("time-of-day imagery has no decorative overlay layer", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await seedAndOpen(page, { reduceMotion: false });
 
-  const particles = page.locator(".azkar-hero-particles").first();
-  await expect(particles).toBeAttached();
-  await expect(particles).toBeHidden();
+  const hero = page.getByTestId("home-hero");
+  const scene = page.getByTestId("time-of-day-scene-window");
+  const image = hero.locator("picture img");
+  await expect(image).toBeVisible();
+  await expect(hero.locator(".azkar-hero-particles, .azkar-hero__overlay")).toHaveCount(0);
+  await expect(scene).toBeVisible();
+
+  const [sceneBox, imageOpacity, imageWidth] = await Promise.all([
+    scene.boundingBox(),
+    image.evaluate((element) => getComputedStyle(element).opacity),
+    image.evaluate((element: HTMLImageElement) => element.naturalWidth),
+  ]);
+  expect(sceneBox?.height).toBeGreaterThanOrEqual(192);
+  expect(imageOpacity).toBe("1");
+  expect(imageWidth).toBeGreaterThan(0);
+});
+
+test("post-prayer cards become a compact carousel followed by Masbaha", async ({ page }) => {
+  await seedAndOpen(page);
+
+  const tracker = page.getByTestId("after-prayer-trackers");
+  const carousel = page.getByTestId("after-prayer-carousel");
+  const masbaha = page.getByTestId("home-masbaha-entry");
+  const [trackerBox, masbahaBox, metrics] = await Promise.all([
+    tracker.boundingBox(),
+    masbaha.boundingBox(),
+    carousel.evaluate((element) => {
+      const firstCard = element.querySelector("button");
+      return {
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        firstCardWidth: firstCard?.getBoundingClientRect().width ?? 0,
+        cardCount: element.querySelectorAll("button").length,
+      };
+    }),
+  ]);
+
+  expect(metrics.cardCount).toBe(5);
+  expect(masbahaBox?.y).toBeGreaterThanOrEqual((trackerBox?.y ?? 0) + (trackerBox?.height ?? 0));
+  if ((page.viewportSize()?.width ?? 0) < 640) {
+    expect(metrics.scrollWidth).toBeGreaterThan(metrics.clientWidth);
+    expect(metrics.firstCardWidth).toBeLessThan(metrics.clientWidth);
+    expect(metrics.firstCardWidth).toBeGreaterThan(metrics.clientWidth * 0.75);
+  } else {
+    expect(metrics.scrollWidth).toBe(metrics.clientWidth);
+  }
 });
 
 test("forced colors preserves focus and selected-state cues", async ({ page }) => {

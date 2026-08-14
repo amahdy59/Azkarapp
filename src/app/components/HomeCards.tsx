@@ -308,7 +308,11 @@ export function FridayHomeCard({
         className="flex flex-col gap-4 sm:flex-row sm:items-center"
       >
         <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
-          <img src="/images/mosque_prophet.jpg" alt="" className="h-full w-full object-cover" />
+          <img
+            src={`${import.meta.env.BASE_URL}images/mosque_prophet.png`}
+            alt=""
+            className="h-full w-full object-cover"
+          />
         </span>
         <div className="min-w-0 flex-1 text-start">
           <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
@@ -338,7 +342,11 @@ export function FridayHomeCard({
     <Card as="section" aria-labelledby="friday-card-heading" className="overflow-hidden p-0">
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
-          <img src="/images/mosque_prophet.jpg" alt="" className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            src={`${import.meta.env.BASE_URL}images/mosque_prophet.png`}
+            alt=""
+            className="absolute inset-0 h-full w-full object-cover"
+          />
         </div>
 
         <div className="min-w-0 text-start">

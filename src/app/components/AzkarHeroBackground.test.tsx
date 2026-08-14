@@ -22,10 +22,11 @@ describe("AzkarHeroBackground", () => {
     expect(picture?.style.getPropertyValue("--azkar-bg-position-wide")).toBe("42% 72%");
   });
 
-  it("adds a small decorative, non-interactive particle layer", () => {
+  it("keeps the time-of-day image unobstructed by overlay layers", () => {
     const { container } = render(<TimeOfDayBackground categoryId="evening" />);
 
     expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
-    expect(container.querySelectorAll(".azkar-hero-particle")).toHaveLength(9);
+    expect(container.querySelector("picture")).toBeInTheDocument();
+    expect(container.querySelectorAll(".azkar-hero-particles, .azkar-hero__overlay")).toHaveLength(0);
   });
 });

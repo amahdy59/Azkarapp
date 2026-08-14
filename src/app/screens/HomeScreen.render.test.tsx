@@ -77,6 +77,7 @@ describe("HomeScreen quick access", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     const onPrayerResume = vi.fn();
+    const onOpenCustomCounter = vi.fn();
 
     render(
       <HomeScreen
@@ -93,6 +94,7 @@ describe("HomeScreen quick access", () => {
         onOpenSavedZikr={() => undefined}
         onOpenSavedLibrary={() => undefined}
         onOpenBenefits={() => undefined}
+        onOpenCustomCounter={onOpenCustomCounter}
       />,
     );
 
@@ -104,6 +106,14 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByTestId("after-prayer-trackers").querySelectorAll("button[data-prayer-state] svg")).toHaveLength(
       7,
     );
+    expect(screen.getByTestId("after-prayer-carousel")).toHaveClass("overflow-x-auto", "snap-mandatory", "sm:grid");
+    expect(screen.getByTestId("after-prayer-carousel").querySelector("button[data-prayer-state]")).toHaveClass(
+      "min-w-[84%]",
+      "sm:min-w-0",
+    );
+    expect(
+      screen.getByTestId("after-prayer-trackers").compareDocumentPosition(screen.getByTestId("home-masbaha-entry")),
+    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
     expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
     expect(screen.getByText("After Asr")).toBeInTheDocument();
     expect(screen.getByText("After Fajr")).toBeInTheDocument();
@@ -111,6 +121,8 @@ describe("HomeScreen quick access", () => {
 
     fireEvent.click(screen.getByRole("button", { name: /^After Fajr/ }));
     expect(onPrayerResume).toHaveBeenCalledWith("fajr");
+    fireEvent.click(screen.getByRole("button", { name: "Tasbeeh Counter" }));
+    expect(onOpenCustomCounter).toHaveBeenCalledOnce();
   });
 
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {

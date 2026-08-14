@@ -1070,3 +1070,16 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Content corrections:** Use the exact `Allahumma a'inni...` wording in Abu Dawud 1522; record Tirmidhi 3233 as Hasan (Darussalam); preserve exact reviewed Qur'an text through canonical `QURAN_PASSAGES` records.
 - **Consequences:** Fajr has 16 complete-mode items, Maghrib 15, and Dhuhr/Asr/Isha 14. The generic Library collection remains a complete reference view; prayer cards are the prescribed timing-aware entry points. No persistence migration or runtime dependency is introduced.
 - **Tests/evidence required:** Content invariants for all five flows, isolated prayer-ledger completion, compact dropdown interaction, Home prayer routing, English OnePlus-class mobile and 1440px desktop visual checks, full local release gates, green Quality and Pages workflows, and production smoke verification.
+
+---
+
+## DEC-060 — Text-free Home artwork, unobstructed time scenes, and compact prayer carousel
+
+- **Date:** 2026-08-14
+- **Status:** Approved
+- **Owner:** User (explicit implementation and release request)
+- **Related scope:** Home imagery and compact-screen content order
+- **Context:** Removing the hero scrim was insufficient because the time-of-day photograph still spanned the complete tall hero; its horizon and mosque remained behind opaque routine cards while compact users saw mostly empty sky. The Benefits and Friday raster assets also contained baked-in text, and five vertically stacked post-prayer cards delayed access to the Masbaha.
+- **Decision:** Give the time-of-day photograph a dedicated responsive scene band before the routine cards. Render it at full opacity with no gradient, tint, particle, or decorative layer above it. Replace the two text-bearing feature images with text-free artwork and keep all visible copy in semantic HTML. Present the five post-prayer cards as a horizontal snap carousel below 640px, retain the grid from 640px upward, and place the Masbaha immediately after the post-prayer group in DOM and visual order.
+- **Consequences:** Compact users see the image subject directly, can scan prayer states without a long vertical stack, and reach the Masbaha sooner. The carousel preserves button semantics and prayer-specific routing. The source JPGs containing embedded text are removed; the new PNG artwork remains recoverable from repository history after release. No reviewed content, persistence, prayer calculation, route, dependency, or synchronization contract changes.
+- **Tests/evidence required:** Component assertions for the absence of overlay layers and the carousel/order contract; OnePlus-class visual checks for the visible image band, next-card cue, no horizontal page overflow, and Masbaha order; asset-load checks; complete local release gates; green Quality and Pages workflows; and production SHA verification.
