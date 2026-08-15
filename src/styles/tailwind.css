@@ -1,8 +1,13 @@
 @import "tailwindcss" source(none);
 @source '../app/**/*.{js,ts,jsx,tsx}';
 @source not '../app/**/*.{test,spec}.{js,ts,jsx,tsx}';
-@source not '../app/components/ui/**/*.{js,ts,jsx,tsx}';
-@source '../app/components/ui/{alert-dialog,button,drawer,dropdown-menu,input-otp,scroll-area,select}.tsx';
+/* Do not add a `@source not` for components/ui. Tailwind v4 gives negative
+   patterns precedence over later positive ones, so an exclusion plus an
+   allow-list silently wins and every utility used ONLY inside the primitives
+   stops compiling — rounded-sm, ps-8, size-4, min-w-[8rem], bg-black/50 and
+   the Radix custom-property bindings among them. That left the confirm dialog
+   unpositioned and every modal scrim transparent. See DEC-064 / F01.
+   `scripts/check-css-utilities.mjs` fails the build if it regresses. */
 
 @import "tw-animate-css";
 

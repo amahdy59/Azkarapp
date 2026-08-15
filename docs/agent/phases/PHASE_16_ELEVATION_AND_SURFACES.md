@@ -14,21 +14,17 @@ definition.
 
 F11, F12, F15, F22 — see `docs/audits/DESIGN_CONSISTENCY_AUDIT.md`.
 
-## Blocking decision — F15
+## F15 decision — resolved
 
-**Do not start Step 3 until this is recorded in `DECISION_LOG.md`.**
+Recorded as **DEC-065**: the document is authoritative. The counter becomes a 24px rounded
+rectangle at every breakpoint, restoring DEC-003's stable-surface intent.
 
-`DESIGN_SYSTEM.md` states the counter fill is clipped to a 24px radius. The app ships 38px
-in Reader and 44 / 52 / 72px on Masbaha across breakpoints. Options:
-
-- **A — Honour the document.** Counter becomes a 24px rounded rectangle everywhere.
-  Restores DEC-003's stable-surface intent; changes the look of the app's most-used control.
-- **B — Honour the implementation.** The pill is the intended design; update
-  `DESIGN_SYSTEM.md`, the responsive size table and the Reader contract to match, and define
-  a named radius token for it rather than four literals.
-
-Either is defensible. The change-control rule requires the document and its regression
-coverage to be updated in the same change as the code.
+This changes the shape of the app's most-used control in Reader, Masbaha and Friday
+Salawat. Implement it by keeping the `ZikrComponents.css` definition and replacing the
+38 / 44 / 52 / 72px literals so radius follows the geometry scale. The documented
+_dimensions_ do not change — only the corner radius. `DESIGN_SYSTEM.md` needs no
+counter-radius edit because the implementation is moving to match it; re-verify its
+responsive size table and the Reader contract against the result in the same change.
 
 ## Required reading
 

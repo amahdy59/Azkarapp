@@ -10,9 +10,9 @@
   },
   "scripts": {
     "audit:prod": "pnpm audit --prod",
-    "build:pages": "vite build --mode github-pages && node scripts/check-bundle-budget.mjs",
+    "build:pages": "vite build --mode github-pages && node scripts/check-bundle-budget.mjs && node scripts/check-css-utilities.mjs",
     "build": "vite build",
-    "check": "pnpm run verify:toolchain && prettier --check . && eslint . --max-warnings 0 && tsc --noEmit && pnpm run validate:audio && pnpm run test:coverage && vite build && node scripts/check-bundle-budget.mjs",
+    "check": "pnpm run verify:toolchain && prettier --check . && eslint . --max-warnings 0 && tsc --noEmit && pnpm run validate:audio && pnpm run test:coverage && vite build && node scripts/check-bundle-budget.mjs && node scripts/check-css-utilities.mjs",
     "dev": "vite",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

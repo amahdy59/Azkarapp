@@ -26,44 +26,44 @@ will change shape or close outright once the design-system primitives actually c
 
 ## Findings register
 
-| ID  | Severity | Area            | Finding                                                                    | Phase |
-| --- | -------- | --------------- | -------------------------------------------------------------------------- | ----- |
-| F01 | Critical | Build           | Tailwind never compiles utilities used only in `components/ui/`            | 15    |
-| F02 | Critical | Overlays        | Destructive-confirmation dialog is unpositioned and unscrimmed             | 15    |
-| F03 | Critical | Overlays        | Every modal and drawer scrim is transparent                                | 15    |
-| F04 | Critical | Menus           | Menu items lose padding, indicator sizing and height clamp                 | 15    |
-| F05 | Critical | Auth            | OTP field in the auth flow is unstyled                                     | 15    |
-| F06 | High     | Menus           | Three incompatible dropdown recipes ship side by side                      | 17    |
-| F07 | High     | Menus           | Select and DropdownMenu are two different design languages                 | 17    |
-| F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                     | 17    |
-| F09 | Medium   | Menus / RTL     | RTL menu alignment handled two contradictory ways                          | 17    |
-| F10 | Medium   | Menus           | No collision padding on any menu                                           | 17    |
-| F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                         | 16    |
-| F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values          | 16    |
-| F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                  | 19    |
-| F14 | Medium   | Spacing         | Padding drifts off the documented 4px grid                                 | 19    |
-| F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — **needs decision** | 16    |
-| F16 | Passing  | Color           | Contrast passes AA with headroom in all three themes                       | —     |
-| F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files             | 19    |
-| F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op       | 20    |
-| F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them              | 20    |
-| F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                   | 20    |
-| F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                   | 20    |
-| F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                      | 16    |
-| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                    | 20    |
-| F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                     | 18    |
-| F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                           | 18    |
-| F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size              | 18    |
-| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                   | 18    |
-| F28 | Medium   | Performance     | No memoisation, on top of several very large components                    | 20    |
-| F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree           | —     |
-| F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract              | 20    |
-| F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling             | 17    |
-| F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                            | 15    |
-| F33 | Medium   | Hygiene         | Working files committed to the repository                                  | 18    |
-| F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                     | 18    |
-| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                       | 20    |
-| F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                              | 20    |
+| ID  | Severity | Area            | Finding                                                                     | Phase |
+| --- | -------- | --------------- | --------------------------------------------------------------------------- | ----- |
+| F01 | Critical | Build           | Tailwind never compiles utilities used only in `components/ui/`             | 15    |
+| F02 | Critical | Overlays        | Destructive-confirmation dialog is unpositioned and unscrimmed              | 15    |
+| F03 | Critical | Overlays        | Every modal and drawer scrim is transparent                                 | 15    |
+| F04 | Critical | Menus           | Menu items lose padding, indicator sizing and height clamp                  | 15    |
+| F05 | Critical | Auth            | OTP field in the auth flow is unstyled                                      | 15    |
+| F06 | High     | Menus           | Three incompatible dropdown recipes ship side by side                       | 17    |
+| F07 | High     | Menus           | Select and DropdownMenu are two different design languages                  | 17    |
+| F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                      | 17    |
+| F09 | Medium   | Menus / RTL     | RTL menu alignment handled two contradictory ways                           | 17    |
+| F10 | Medium   | Menus           | No collision padding on any menu                                            | 17    |
+| F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                          | 16    |
+| F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values           | 16    |
+| F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                   | 19    |
+| F14 | Medium   | Spacing         | Padding drifts off the documented 4px grid                                  | 19    |
+| F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — resolved by DEC-065 | 16    |
+| F16 | Passing  | Color           | Contrast passes AA with headroom in all three themes                        | —     |
+| F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files              | 19    |
+| F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op        | 20    |
+| F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them               | 20    |
+| F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20    |
+| F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20    |
+| F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16    |
+| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20    |
+| F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18    |
+| F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18    |
+| F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size               | 18    |
+| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 18    |
+| F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | 20    |
+| F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree            | —     |
+| F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20    |
+| F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17    |
+| F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15    |
+| F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18    |
+| F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18    |
+| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | 20    |
+| F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20    |
 
 ---
 
@@ -240,12 +240,15 @@ Contract: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64. In use: `p-4.5` (18px), `p-3.5` 
 `18px`, `2px 10px`, `6px 12px`, `4px 12px`. The half-steps cluster in chips and badges,
 suggesting one missing compact-chip spacing role rather than many independent mistakes.
 
-### F15 — Counter geometry contradicts its own contract · Medium · **Needs decision**
+### F15 — Counter geometry contradicts its own contract · Medium · Resolved by DEC-065
 
 `DESIGN_SYSTEM.md` specifies the counter fill is "clipped to the same 24px radius as the
-control." Shipped: Reader 38px; Masbaha 44 / 52 / 72px across breakpoints. Either is
-defensible; the documentation, the two stylesheets and the screen currently disagree.
-Per the change-control rule, whichever is chosen, the doc updates in the same change.
+control." Shipped: Reader 38px; Masbaha 44 / 52 / 72px across breakpoints.
+
+**Decision (DEC-065): the document is authoritative.** The counter becomes a 24px rounded
+rectangle at every breakpoint, restoring DEC-003's stable-surface intent. Phase 16
+implements it by keeping the `ZikrComponents.css` definition and replacing the four radius
+literals; the documented dimensions do not change.
 
 ### F16 — Contrast passes AA with headroom · Passing · Verified live
 

@@ -700,21 +700,11 @@ textarea {
   background: color-mix(in srgb, var(--muted-foreground) 72%, transparent);
 }
 
-/* Radix radio/checkbox menu items use logical CSS here rather than relying on
-   physical padding utilities. This keeps the selected check clear of Arabic
-   copy and gives the current choice an opaque, theme-owned highlight. */
-[data-slot="dropdown-menu-radio-item"],
-[data-slot="dropdown-menu-checkbox-item"] {
-  padding-inline-start: 2rem;
-  padding-inline-end: 0.5rem;
-}
-
-[data-slot="dropdown-menu-radio-item"] > span:first-child,
-[data-slot="dropdown-menu-checkbox-item"] > span:first-child {
-  inset-inline-start: 0.5rem;
-  inset-inline-end: auto;
-}
-
+/* The indicator gutter and its inset used to be duplicated here because
+   `ps-8`/`pe-2`/`start-2` never compiled (DEC-064 / F01) — Tailwind's logical
+   utilities now supply them, so only the theme-owned selected highlight
+   remains. It gives the current choice an opaque highlight rather than the
+   translucent accent, so Arabic copy stays legible over it. */
 [data-slot="dropdown-menu-radio-item"][data-state="checked"],
 [data-slot="dropdown-menu-checkbox-item"][data-state="checked"] {
   color: var(--primary);
