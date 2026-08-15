@@ -64,19 +64,31 @@ function MainDhikrGroupCard({
       onClick={onPress}
       className={`group relative flex w-full rounded-[24px] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
-          ? "min-h-[6.5rem] items-center gap-5 px-5 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-5 sm:px-4 sm:py-5 sm:text-center"
+          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? "border-primary/55 bg-primary/10 text-foreground shadow-raised"
-          : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
+          ? compact
+            ? "border-primary/55 bg-primary/15 text-white shadow-raised"
+            : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
+          : compact
+            ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40"
+            : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
       aria-label={`${name} - ${statusLabel}`}
     >
       <div
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
           compact ? "size-11 sm:size-14" : "size-14"
-        } ${isCompleted ? "border-primary/50 bg-primary/15 text-primary" : "border-border bg-muted text-primary"}`}
+        } ${
+          isCompleted
+            ? compact
+              ? "border-primary/50 bg-primary/20 text-primary"
+              : "border-primary/50 bg-primary/15 text-primary"
+            : compact
+              ? "border-white/10 bg-black/40 text-on-media-muted"
+              : "border-border bg-muted text-primary"
+        }`}
       >
         {icon}
       </div>
@@ -87,7 +99,11 @@ function MainDhikrGroupCard({
         <span className="text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem]">{name}</span>
         <span
           className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
-            isCompleted ? "bg-success text-success-foreground shadow-sm" : "bg-muted text-muted-foreground"
+            isCompleted
+              ? "bg-success text-success-foreground shadow-sm"
+              : compact
+                ? "border border-white/5 bg-black/45 text-white/60"
+                : "bg-muted text-muted-foreground"
           }`}
         >
           {statusLabel}
@@ -203,25 +219,40 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border p-5 text-foreground shadow-raised sm:p-7 md:p-8 ${
-          isHomeSubset ? "flex-1 border-border/50 bg-card/85 backdrop-blur-xl" : "border-border bg-card"
+        className={`flex w-full flex-col rounded-[28px] border p-5 shadow-2xl sm:p-7 md:p-8 ${
+          isHomeSubset
+            ? "flex-1 border-white/15 bg-slate-950/82 backdrop-blur-lg"
+            : "border-border bg-card text-foreground"
         }`}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <Heading
               data-testid="progress-primary-heading"
-              className="block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight text-foreground sm:text-[1.375rem] md:text-[1.5rem]"
+              className={`block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight sm:text-[1.375rem] md:text-[1.5rem] ${
+                isHomeSubset ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-foreground"
+              }`}
               dir="auto"
             >
               {t(language, "progress.todayWird")}
             </Heading>
-            <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground sm:text-[0.875rem]" dir="auto">
+            <p
+              className={`mt-1 text-[0.8125rem] font-semibold sm:text-[0.875rem] ${
+                isHomeSubset ? "text-on-media-muted" : "text-muted-foreground"
+              }`}
+              dir="auto"
+            >
               {dynamicSubtitle}
             </p>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 rounded-full border border-border-control bg-muted px-3 py-1.5 text-[0.8125rem] font-black text-foreground">
+          <div
+            className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[0.8125rem] font-black ${
+              isHomeSubset
+                ? "border-on-media/16 bg-black/45 text-on-media"
+                : "border-border-control bg-muted text-foreground"
+            }`}
+          >
             <span>{formatNumerals(completedCount, language)}</span>
             <span aria-hidden="true">/</span>
             <span>{formatNumerals(categories.length, language)}</span>
@@ -229,7 +260,7 @@ export function ProgressDayView({
         </div>
 
         <div
-          className={`mt-6 grid flex-1 grid-cols-1 gap-3 sm:gap-5 md:gap-6 ${
+          className={`mt-5 grid flex-1 grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
             isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >
