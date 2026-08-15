@@ -267,7 +267,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               {day.isPalm ? (
                 <div
                   role="img"
-                  className="flex size-9 items-center justify-center rounded-xl border border-amber-400/80 bg-amber-500/20 text-amber-500 shadow-2xs dark:bg-amber-500/25"
+                  className="flex size-9 items-center justify-center rounded-xl border border-primary/80 bg-primary/20 text-primary shadow-2xs dark:bg-primary/25"
                   title={t(language, "progress.palmCompleted")}
                   aria-label={t(language, "progress.palmCompleted")}
                 >
@@ -276,7 +276,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               ) : azkarCount > 0 ? (
                 <div
                   role="img"
-                  className="flex size-9 items-center justify-center rounded-xl border border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400"
+                  className="flex size-9 items-center justify-center rounded-xl border border-primary/30 bg-primary/10 text-primary"
                   title={t(language, "progress.inProgress")}
                   aria-label={t(language, "progress.inProgress")}
                 >
@@ -285,7 +285,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
               ) : (
                 <div
                   role="img"
-                  className="flex size-9 items-center justify-center rounded-xl border border-transparent bg-muted/30 dark:bg-zinc-800/40 text-muted-foreground/30"
+                  className="flex size-9 items-center justify-center rounded-xl border border-transparent bg-muted/30 dark:bg-muted/40 text-muted-foreground/30"
                   title={t(language, "progress.inactive")}
                   aria-label={t(language, "progress.inactive")}
                 >

@@ -46,7 +46,7 @@ export function PulseRings({
 }) {
   const isComplete = total > 0 && count >= total;
   const isHighProgress = total > 0 && count / total >= 0.8;
-  const ringColor = isComplete ? "border-green-500" : isHighProgress ? "border-yellow-500" : "border-primary/60";
+  const ringColor = isComplete ? "border-success" : isHighProgress ? "border-warning" : "border-primary/60";
 
   return (
     <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">

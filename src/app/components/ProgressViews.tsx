@@ -221,7 +221,7 @@ export function ProgressDayView({
       <div
         className={`flex w-full flex-col rounded-[28px] border p-5 shadow-raised sm:p-7 md:p-8 ${
           isHomeSubset
-            ? "flex-1 border-white/15 bg-slate-950/82 backdrop-blur-lg"
+            ? "flex-1 border-white/15 bg-on-media-surface/82 backdrop-blur-lg"
             : "border-border bg-card text-foreground"
         }`}
       >
@@ -349,19 +349,19 @@ function WeekStatusCell({
             {subItems.map((isCompleted, i) => (
               <span
                 key={i}
-                className={`inline-block h-1.5 w-1.5 rounded-full ${isCompleted ? "bg-emerald-500" : "bg-white/10 dark:bg-white/10 bg-black/10"}`}
+                className={`inline-block h-1.5 w-1.5 rounded-full ${isCompleted ? "bg-success" : "bg-white/10 dark:bg-white/10 bg-black/10"}`}
               />
             ))}
           </div>
         ) : done ? (
           <div
             aria-hidden="true"
-            className="flex items-center justify-center w-7 h-7 rounded-full bg-emerald-500/20 border border-emerald-500/50 text-emerald-600 dark:text-emerald-400"
+            className="flex items-center justify-center w-7 h-7 rounded-full bg-success/20 border border-success/50 text-success"
           >
             <Check size={15} strokeWidth={3} />
           </div>
         ) : (
-          <div aria-hidden="true" className="w-6 h-6 rounded-full border-2 border-amber-500/50" />
+          <div aria-hidden="true" className="w-6 h-6 rounded-full border-2 border-primary/50" />
         )}
       </div>
     </td>
@@ -396,7 +396,7 @@ export function ProgressWeekView({
       <div className="grid grid-cols-3 gap-3">
         {/* Most Missed Routine Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Moon size={20} className="text-amber-500 mb-1" />
+          <Moon size={20} className="text-primary mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.mostMissed")}
           </span>
@@ -405,7 +405,7 @@ export function ProgressWeekView({
 
         {/* Best Streak Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
+          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.bestStreak")}
           </span>
@@ -416,7 +416,7 @@ export function ProgressWeekView({
 
         {/* Completed Days Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <CheckCircle2 size={20} className="text-emerald-500 mb-1" />
+          <CheckCircle2 size={20} className="text-success mb-1" />
           <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completedDays")}
           </span>
@@ -448,25 +448,25 @@ export function ProgressWeekView({
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Sun size={15} className="text-emerald-500" />
+                    <Sun size={15} className="text-success" />
                     <span>{t(language, "progress.morningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Sun size={15} className="text-amber-500" />
+                    <Sun size={15} className="text-primary" />
                     <span>{t(language, "progress.eveningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Moon size={15} className="text-indigo-400" />
+                    <Moon size={15} className="text-sleep" />
                     <span>{t(language, "progress.sleepShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <CheckCircle2 size={15} className="text-emerald-500" />
+                    <CheckCircle2 size={15} className="text-success" />
                     <span>{t(language, "progress.postPrayerShort")}</span>
                   </div>
                 </th>
@@ -478,7 +478,7 @@ export function ProgressWeekView({
                   <td className="py-3 px-2 text-start">
                     <span
                       className={`text-[0.875rem] ${
-                        day.isToday ? "font-black text-amber-500" : "font-bold text-foreground"
+                        day.isToday ? "font-black text-primary" : "font-bold text-foreground"
                       }`}
                     >
                       {day.weekdayName}
@@ -524,19 +524,19 @@ export function ProgressWeekView({
         {/* Legend */}
         <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-6 text-[0.75rem] font-bold text-muted-foreground">
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-emerald-500/20 border border-emerald-500 text-emerald-600 dark:text-emerald-400">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-success/20 border border-success text-success">
               <Check size={12} strokeWidth={3} />
             </div>
             <span>{t(language, "progress.complete")}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-blue-500/20 border border-blue-500 text-blue-500">
+            <div className="flex items-center justify-center w-5 h-5 rounded-full bg-info/20 border border-info text-info">
               <span className="text-[0.625rem] font-black">-</span>
             </div>
             <span>{t(language, "progress.partial")}</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <div className="w-4 h-4 rounded-full border-2 border-amber-500" />
+            <div className="w-4 h-4 rounded-full border-2 border-primary" />
             <span>{t(language, "progress.missed")}</span>
           </div>
         </div>
@@ -545,8 +545,8 @@ export function ProgressWeekView({
       {/* Bottom Row: Insight Card & Routine Summary Card */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Insight Card */}
-        <div className="p-5 rounded-3xl bg-card border border-emerald-600 shadow-raised flex items-center gap-4">
-          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 shrink-0">
+        <div className="p-5 rounded-3xl bg-card border border-success shadow-raised flex items-center gap-4">
+          <div className="flex items-center justify-center w-12 h-12 rounded-full bg-success/20 border border-success/40 text-success shrink-0">
             <Sparkles size={24} />
           </div>
           <div>
@@ -578,13 +578,13 @@ export function ProgressWeekView({
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full"
+                className="h-full bg-success rounded-full"
                 style={{ width: `${Math.round((weekStats.morningCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.morningShort")}</span>
-              <Sun size={14} className="text-emerald-500" />
+              <Sun size={14} className="text-success" />
             </div>
           </div>
 
@@ -595,13 +595,13 @@ export function ProgressWeekView({
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
-                className="h-full bg-amber-500 rounded-full"
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${Math.round((weekStats.eveningCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.eveningShort")}</span>
-              <Sun size={14} className="text-amber-500" />
+              <Sun size={14} className="text-primary" />
             </div>
           </div>
 
@@ -612,13 +612,13 @@ export function ProgressWeekView({
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
-                className="h-full bg-indigo-500 rounded-full"
+                className="h-full bg-sleep rounded-full"
                 style={{ width: `${Math.round((weekStats.sleepCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.sleepShort")}</span>
-              <Moon size={14} className="text-indigo-400" />
+              <Moon size={14} className="text-sleep" />
             </div>
           </div>
 
@@ -629,13 +629,13 @@ export function ProgressWeekView({
             </span>
             <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full"
+                className="h-full bg-success rounded-full"
                 style={{ width: `${Math.round((weekStats.afterPrayerCompletedCount / 7) * 100)}%` }}
               />
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.postPrayerShort")}</span>
-              <CheckCircle2 size={14} className="text-emerald-500" />
+              <CheckCircle2 size={14} className="text-success" />
             </div>
           </div>
         </div>
@@ -731,7 +731,7 @@ export function ProgressMonthView({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Best Routine */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Sun size={20} className="text-amber-500 mb-1" />
+          <Sun size={20} className="text-primary mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.bestRoutine")}
           </span>
@@ -742,7 +742,7 @@ export function ProgressMonthView({
 
         {/* Longest Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
+          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.longestStreak")}
           </span>
@@ -753,7 +753,7 @@ export function ProgressMonthView({
 
         {/* Full Days */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Calendar size={20} className="text-emerald-500 mb-1" />
+          <Calendar size={20} className="text-success mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.fullDays")}
           </span>
@@ -764,11 +764,11 @@ export function ProgressMonthView({
 
         {/* Completion Rate */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Sprout size={20} className="text-emerald-500 mb-1" />
+          <Sprout size={20} className="text-success mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completionRate")}
           </span>
-          <span className="text-[0.875rem] font-black text-amber-600 dark:text-amber-400">
+          <span className="text-[0.875rem] font-black text-primary">
             %{formatNumerals(monthStats.completionRate, language)}
           </span>
         </div>
@@ -817,11 +817,11 @@ export function ProgressMonthView({
                   aria-pressed={isSelected}
                   className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     isSelected
-                      ? "border-amber-500 ring-2 ring-amber-500/50 bg-amber-500/20 scale-105 z-10"
+                      ? "border-primary ring-2 ring-primary/50 bg-primary/20 scale-105 z-10"
                       : isPalm
-                        ? "bg-emerald-500/15 border-emerald-500/30 text-emerald-600 dark:text-emerald-400"
+                        ? "bg-success/15 border-success/30 text-success"
                         : count > 0
-                          ? "bg-blue-500/10 border-blue-500/30 text-blue-500"
+                          ? "bg-info/10 border-info/30 text-info"
                           : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
                   }`}
                 >
@@ -830,9 +830,9 @@ export function ProgressMonthView({
                   </span>
                   <div className="flex h-4 items-center justify-center mt-0.5">
                     {isPalm ? (
-                      <Check size={12} strokeWidth={3} className="text-emerald-600 dark:text-emerald-400" />
+                      <Check size={12} strokeWidth={3} className="text-success" />
                     ) : count > 0 ? (
-                      <span className="text-[0.5625rem] font-extrabold text-blue-500">
+                      <span className="text-[0.5625rem] font-extrabold text-info">
                         {formatRatio(count, 4, language)}
                       </span>
                     ) : (
@@ -847,15 +847,15 @@ export function ProgressMonthView({
           {/* Bottom Grid Legend */}
           <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-[0.6875rem] font-bold text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1">
-              <Check size={12} strokeWidth={3} className="text-emerald-500" />
+              <Check size={12} strokeWidth={3} className="text-success" />
               <span>{t(language, "progress.complete")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full bg-blue-500" />
+              <div className="w-2 h-2 rounded-full bg-info" />
               <span>{t(language, "progress.partialRange")}</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-2 h-2 rounded-full border border-amber-500" />
+              <div className="w-2 h-2 rounded-full border border-primary" />
               <span>{t(language, "progress.unstarted")}</span>
             </div>
             <div className="flex items-center gap-1">
@@ -882,73 +882,65 @@ export function ProgressMonthView({
                   {selectedDayRecord?.dayKey}
                 </span>
               </div>
-              <Calendar size={18} className="text-amber-500" />
+              <Calendar size={18} className="text-primary" />
             </div>
 
             {/* Morning Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Sun size={16} className="text-amber-500" />
+                <Sun size={16} className="text-primary" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.morningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("morning") ? (
-                <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {t(language, "progress.done")}
-                </span>
+                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
+                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
             {/* Evening Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Sun size={16} className="text-orange-500" />
+                <Sun size={16} className="text-evening" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.eveningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("evening") ? (
-                <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {t(language, "progress.done")}
-                </span>
+                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
+                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
             {/* Sleep Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Moon size={16} className="text-indigo-400" />
+                <Moon size={16} className="text-sleep" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.sleepAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("before_sleep") ? (
-                <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {t(language, "progress.done")}
-                </span>
+                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
+                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
             {/* Post-Prayer Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <CheckCircle2 size={16} className="text-emerald-500" />
+                <CheckCircle2 size={16} className="text-success" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.postPrayerAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("after_prayer") ? (
-                <span className="text-[0.75rem] font-bold text-emerald-600 dark:text-emerald-400">
-                  {t(language, "progress.done")}
-                </span>
+                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-amber-600">{t(language, "progress.notDone")}</span>
+                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
           </div>
 
           {/* Month Improvement Insight */}
-          <div className="p-4 rounded-3xl bg-card border border-emerald-600 shadow-raised flex items-start gap-3">
-            <Sprout size={20} className="text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
+          <div className="p-4 rounded-3xl bg-card border border-success shadow-raised flex items-start gap-3">
+            <Sprout size={20} className="text-success shrink-0 mt-0.5" />
             <div>
               <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
                 {t(language, "garden.monthRecordTitle")}
@@ -1019,18 +1011,18 @@ export function ProgressYearView({
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {/* Completion Rate */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Sprout size={20} className="text-emerald-500 mb-1" />
+          <Sprout size={20} className="text-success mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completionRate")}
           </span>
-          <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
+          <span className="text-[0.9375rem] font-black text-primary">
             %{formatNumerals(yearStats.overallCompletionRate, language)}
           </span>
         </div>
 
         {/* Longest Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Star size={20} className="text-amber-500 mb-1" />
+          <Star size={20} className="text-primary mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.longestStreak")}
           </span>
@@ -1041,7 +1033,7 @@ export function ProgressYearView({
 
         {/* Current Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Zap className="h-5 w-5 text-amber-500 fill-amber-500/20 mb-1" />
+          <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.currentStreak")}
           </span>
@@ -1052,7 +1044,7 @@ export function ProgressYearView({
 
         {/* Active Days */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
-          <Calendar size={20} className="text-emerald-500 mb-1" />
+          <Calendar size={20} className="text-success mb-1" />
           <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.activeDays")}
           </span>
@@ -1088,7 +1080,7 @@ export function ProgressYearView({
                 <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
                   <span
                     className={`text-[0.625rem] font-black mb-1 opacity-0 group-hover:opacity-100 transition-opacity ${
-                      isBest ? "opacity-100 text-amber-500" : "text-muted-foreground"
+                      isBest ? "opacity-100 text-primary" : "text-muted-foreground"
                     }`}
                   >
                     %{formatNumerals(rate, language)}
@@ -1097,8 +1089,8 @@ export function ProgressYearView({
                     <div
                       className={`w-full rounded-t-lg transition-all duration-700 ${
                         isBest
-                          ? "bg-amber-500 shadow-md shadow-amber-500/30"
-                          : "bg-amber-500/40 dark:bg-amber-500/30 group-hover:bg-amber-500/70"
+                          ? "bg-primary shadow-md shadow-primary/30"
+                          : "bg-primary/40 dark:bg-primary/30 group-hover:bg-primary/70"
                       }`}
                       style={{ height: `${rate}%` }}
                     />
@@ -1126,7 +1118,7 @@ export function ProgressYearView({
               </span>
               <span className="text-[0.875rem] font-black text-foreground">{bestMonthName}</span>
             </div>
-            <Star size={18} className="text-amber-500" />
+            <Star size={18} className="text-primary" />
           </div>
 
           {/* Most Consistent Routine */}
@@ -1139,7 +1131,7 @@ export function ProgressYearView({
                 {getCategoryName(yearStats.mostConsistentRoutine, language)}
               </span>
             </div>
-            <Sun size={18} className="text-amber-500" />
+            <Sun size={18} className="text-primary" />
           </div>
 
           {/* Total Azkar Completed */}
@@ -1152,7 +1144,7 @@ export function ProgressYearView({
                 {formatNumerals(yearStats.totalCollections, language)}
               </span>
             </div>
-            <CheckCircle2 size={18} className="text-emerald-500" />
+            <CheckCircle2 size={18} className="text-success" />
           </div>
         </div>
       </div>
@@ -1167,9 +1159,7 @@ export function ProgressYearView({
             <div
               key={idx}
               className={`p-3 rounded-2xl bg-card border transition-all ${
-                isBest
-                  ? "border-emerald-500/60 ring-1 ring-emerald-500/40 bg-emerald-500/5 shadow-md"
-                  : "border-border/40"
+                isBest ? "border-success/60 ring-1 ring-success/40 bg-success/5 shadow-md" : "border-border/40"
               }`}
             >
               <div className="flex items-center justify-between mb-1.5 text-[0.75rem] font-extrabold">
@@ -1184,9 +1174,9 @@ export function ProgressYearView({
                     key={cell.dayNum}
                     className={`aspect-square rounded-[2px] ${
                       cell.isPalm || cell.level === 2
-                        ? "bg-amber-500"
+                        ? "bg-primary"
                         : cell.level === 1
-                          ? "bg-amber-500/40"
+                          ? "bg-primary/40"
                           : "bg-black/10 dark:bg-white/10"
                     }`}
                   />

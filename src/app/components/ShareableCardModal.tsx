@@ -78,14 +78,14 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         {/* Shareable Card Content */}
         <div
           ref={cardRef}
-          className="flex flex-col items-center rounded-2xl border border-amber-500/30 bg-gradient-to-b from-amber-500/15 via-amber-500/5 to-transparent p-6 text-center shadow-inner dark:from-amber-500/20"
+          className="flex flex-col items-center rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent p-6 text-center shadow-inner dark:from-primary/20"
         >
           {/* Logo Badge */}
-          <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-amber-600 dark:text-amber-400">
+          <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-primary">
             <PalmTreeMark
               size={20}
               filled={palms > 0}
-              className={palms > 0 ? "text-amber-600 dark:text-amber-400" : "text-slate-400 opacity-40"}
+              className={palms > 0 ? "text-primary" : "text-muted-foreground opacity-40"}
             />
             <span>{t(language, "common.azkar")}</span>
           </div>
@@ -99,15 +99,15 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           </p>
 
           {/* Stats Badge Pill Row */}
-          <div className="my-5 flex w-full items-center justify-around rounded-2xl border border-amber-500/30 bg-card/90 py-3 px-4 shadow-sm">
+          <div className="my-5 flex w-full items-center justify-around rounded-2xl border border-primary/30 bg-card/90 py-3 px-4 shadow-sm">
             <div className="flex flex-col items-center gap-1">
               <PalmTreeMark
                 size={24}
                 filled={palms > 0}
-                className={palms > 0 ? "text-amber-500" : "text-muted-foreground/40"}
+                className={palms > 0 ? "text-primary" : "text-muted-foreground/40"}
               />
               <span
-                className={`text-[0.9375rem] font-black ${palms > 0 ? "text-amber-500" : "text-muted-foreground/60"}`}
+                className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}
               >
                 {formatNumerals(palms, language)}
               </span>
@@ -115,22 +115,18 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
                 {t(language, "shareModal.palms")}
               </span>
             </div>
-            <span className="h-8 w-px bg-amber-500/30" />
+            <span className="h-8 w-px bg-primary/30" />
             <div className="flex flex-col items-center gap-1">
               <span className="text-[1.25rem]">🍂</span>
-              <span className="text-[0.9375rem] font-black text-amber-600 dark:text-amber-400">
-                {formatNumerals(golden, language)}
-              </span>
+              <span className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</span>
               <span className="text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "shareModal.golden")}
               </span>
             </div>
-            <span className="h-8 w-px bg-amber-500/30" />
+            <span className="h-8 w-px bg-primary/30" />
             <div className="flex flex-col items-center gap-1">
               <span className="text-[1.25rem]">🍃</span>
-              <span className="text-[0.9375rem] font-black text-emerald-600 dark:text-emerald-400">
-                {formatNumerals(green, language)}
-              </span>
+              <span className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</span>
               <span className="text-[0.6875rem] font-bold text-muted-foreground">
                 {t(language, "shareModal.green")}
               </span>
@@ -150,7 +146,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
             onClick={() => void handleShare()}
             disabled={isSharing}
             aria-busy={isSharing || undefined}
-            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-amber-500 py-3 text-[0.9375rem] font-black text-slate-950 shadow-md transition-all hover:bg-amber-400 active:scale-95 disabled:cursor-wait disabled:opacity-60"
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[0.9375rem] font-black text-primary-foreground shadow-md transition-all hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
           >
             <Share2 size={18} />
             <span>{t(language, "shareModal.shareMilestone")}</span>

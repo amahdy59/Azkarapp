@@ -65,7 +65,7 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-all"
     >
-      <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-slate-950/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
+      <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-on-media-surface/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
         <div className="flex w-full flex-col items-start gap-3 px-1">
           <h2
             id="current-zikr-heading"

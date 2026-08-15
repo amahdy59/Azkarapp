@@ -96,16 +96,16 @@ export function FormattedBenefit({ text, isArabic = true, direction = "rtl", cla
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/10 p-4 text-start ${className}`}
+      className={`flex flex-col gap-3 rounded-2xl border border-primary/20 bg-primary/10 p-4 text-start ${className}`}
       lang={isArabic ? "ar" : "en"}
       dir={direction}
     >
       {title && (
-        <div className="flex items-center gap-2 border-b border-amber-500/20 pb-2.5">
-          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500/20 text-xs font-bold text-amber-900 dark:text-amber-200">
+        <div className="flex items-center gap-2 border-b border-primary/20 pb-2.5">
+          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
             ✨
           </span>
-          <h4 className="text-[0.9375rem] font-bold leading-6 text-amber-950 dark:text-amber-100">{title}</h4>
+          <h4 className="text-[0.9375rem] font-bold leading-6 text-primary">{title}</h4>
         </div>
       )}
 
@@ -113,14 +113,11 @@ export function FormattedBenefit({ text, isArabic = true, direction = "rtl", cla
         <ul className="flex flex-col gap-2.5">
           {bullets.map((item) => (
             <li key={item.id} className="flex items-start gap-2.5 text-[0.9375rem] leading-7">
-              <span
-                className="mt-2.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-amber-600 dark:bg-amber-400"
-                aria-hidden="true"
-              />
+              <span className="mt-2.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
               <div className="flex-1 text-foreground">
                 {item.term ? (
                   <p className="inline">
-                    <span className="font-bold text-amber-950 dark:text-amber-200">{item.term}: </span>
+                    <span className="font-bold text-primary">{item.term}: </span>
                     <span className="font-medium text-foreground/90">{item.definition}</span>
                   </p>
                 ) : (

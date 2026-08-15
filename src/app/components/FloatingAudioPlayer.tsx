@@ -103,7 +103,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
     <section
       aria-label={copy.region}
       dir={direction}
-      className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-1rem)] max-w-lg -translate-x-1/2 rounded-2xl border border-amber-500/30 bg-card/95 p-3 shadow-overlay backdrop-blur-md dark:border-white/10 dark:bg-card/95"
+      className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-1rem)] max-w-lg -translate-x-1/2 rounded-2xl border border-primary/30 bg-card/95 p-3 shadow-overlay backdrop-blur-md dark:border-white/10 dark:bg-card/95"
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
@@ -115,17 +115,14 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             <p className="truncate text-[0.875rem] font-black text-foreground">{title}</p>
             {isPlaying && (
               <div className="flex items-end gap-0.5 h-3.5 shrink-0" aria-hidden="true">
-                <span className="w-0.5 bg-amber-500 rounded-full waveform-bar h-3" style={{ animationDelay: "0ms" }} />
+                <span className="w-0.5 bg-primary rounded-full waveform-bar h-3" style={{ animationDelay: "0ms" }} />
+                <span className="w-0.5 bg-primary rounded-full waveform-bar h-2" style={{ animationDelay: "150ms" }} />
                 <span
-                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-2"
-                  style={{ animationDelay: "150ms" }}
-                />
-                <span
-                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-3.5"
+                  className="w-0.5 bg-primary rounded-full waveform-bar h-3.5"
                   style={{ animationDelay: "300ms" }}
                 />
                 <span
-                  className="w-0.5 bg-amber-500 rounded-full waveform-bar h-1.5"
+                  className="w-0.5 bg-primary rounded-full waveform-bar h-1.5"
                   style={{ animationDelay: "450ms" }}
                 />
               </div>
@@ -136,7 +133,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             {repetitionPosition ? ` · ${repetitionPosition}` : ""}
           </p>
           {isBusy && (
-            <p className="mt-1 text-[0.75rem] font-semibold text-amber-700 dark:text-amber-300" role="status">
+            <p className="mt-1 text-[0.75rem] font-semibold text-primary" role="status">
               {state.status === "buffering" ? copy.buffering : copy.loading}
             </p>
           )}
@@ -156,7 +153,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             type="button"
             onClick={isPlaying ? controller.pause : controller.play}
             aria-label={isPlaying ? copy.pause : copy.play}
-            className="flex size-11 items-center justify-center rounded-xl bg-amber-500 text-slate-950 shadow-md transition-all duration-150 active:scale-95 hover:bg-amber-400 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-all duration-150 active:scale-95 hover:bg-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {isPlaying ? <Pause size={19} aria-hidden="true" /> : <Play size={19} aria-hidden="true" />}
           </button>

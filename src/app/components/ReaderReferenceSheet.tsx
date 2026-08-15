@@ -250,14 +250,14 @@ function ReferenceContent({
           {getLocalizedPreferredTiming(zikr, language) && (
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
-                <span className="h-4 w-1 rounded-full bg-amber-500" aria-hidden="true" />
-                <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-amber-600 dark:text-amber-400">
+                <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
+                <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-primary">
                   {t(language, "reader.timingGuidance")}
                 </h3>
               </div>
-              <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
                 <p
-                  className="text-start text-[0.875rem] font-semibold leading-relaxed text-amber-950 dark:text-amber-200"
+                  className="text-start text-[0.875rem] font-semibold leading-relaxed text-primary"
                   lang={isArabic ? "ar" : "en"}
                   dir={direction}
                 >

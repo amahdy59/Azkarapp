@@ -10,7 +10,7 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
     <>
       {zikr.hasSeekRefuge && (
         <p
-          className={`mb-3 text-center font-arabic text-[1.05rem] font-bold tracking-wide text-amber-900/90 dark:text-amber-200/90 ${className}`}
+          className={`mb-3 text-center font-arabic text-[1.05rem] font-bold tracking-wide text-primary/90 ${className}`}
           dir="rtl"
           lang="ar"
         >
@@ -19,7 +19,7 @@ export function QuranPrelude({ zikr, className = "" }: { zikr: Zikr; className?:
       )}
       {(zikr.hasBasmalah || zikr.isSurah) && (
         <p
-          className={`mb-4 text-center font-arabic text-[1.125rem] font-bold tracking-wide text-amber-900/90 dark:text-amber-200/90 ${className}`}
+          className={`mb-4 text-center font-arabic text-[1.125rem] font-bold tracking-wide text-primary/90 ${className}`}
           dir="rtl"
           lang="ar"
         >
@@ -56,17 +56,15 @@ export function QuranSurahHeader({
   return (
     <div className={`mb-4 text-center ${sticky ? "sticky top-3 z-20 pointer-events-none" : "pointer-events-none"}`}>
       <div className="inline-flex items-center gap-1.5 rounded-2xl border border-border/40 bg-card/60 backdrop-blur-md px-3 py-1.5 shadow-sm">
-        {surahType && (
-          <span className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80">{surahType}</span>
-        )}
-        <span className="font-arabic text-[0.875rem] font-bold text-amber-950 dark:text-amber-100" dir="rtl" lang="ar">
+        {surahType && <span className="text-[0.6875rem] font-semibold text-primary/80">{surahType}</span>}
+        <span className="font-arabic text-[0.875rem] font-bold text-primary" dir="rtl" lang="ar">
           {zikr.isSurah && zikr.surahNameArabic
             ? `سُورَةُ ${zikr.surahNameArabic}`
             : (zikr.surahNameArabic ?? "الْقُرْآنُ الْكَرِيمُ")}
         </span>
         {zikr.verseCount && (
           <span
-            className="text-[0.6875rem] font-semibold text-amber-900/80 dark:text-amber-200/80"
+            className="text-[0.6875rem] font-semibold text-primary/80"
             style={{ fontFamily: numeralFontFamily(language) }}
           >
             {t(language, "reader.ayahs")} {formatNumerals(zikr.verseCount, language)}

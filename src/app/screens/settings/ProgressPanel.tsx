@@ -59,7 +59,7 @@ export function ProgressPanel({
               <PalmTreeMark
                 size={22}
                 filled={quietProgressEnabled}
-                className={quietProgressEnabled ? "text-amber-500" : "text-muted-foreground/40"}
+                className={quietProgressEnabled ? "text-primary" : "text-muted-foreground/40"}
               />
             }
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"

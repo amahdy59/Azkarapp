@@ -190,7 +190,7 @@ export function CategoryScreen({
             <button
               type="button"
               onClick={() => onRoutineModeChange?.("complete")}
-              className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-emerald-500/30 bg-emerald-500/10 px-4 text-start text-emerald-800 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-emerald-200"
+              className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-success/30 bg-success/10 px-4 text-start text-success focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-success"
             >
               <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
               <span className="text-[0.75rem] font-bold">
@@ -258,7 +258,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onPlayAllAudio}
-                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-amber-500/30 bg-amber-500/10 px-3.5 text-[0.8125rem] font-bold text-amber-700 shadow-xs transition-all hover:bg-amber-500/20 active:scale-95 dark:text-amber-300"
+                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-[0.8125rem] font-bold text-primary shadow-xs transition-all hover:bg-primary/20 active:scale-95 dark:text-primary"
                     aria-label={t(language, "category.playAllAudio")}
                     title={
                       audioCoverage
@@ -329,9 +329,9 @@ export function CategoryScreen({
           className="flex flex-1 flex-col overflow-y-auto px-4 py-4 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         >
           {introduction && (
-            <aside className="mb-4 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4">
+            <aside className="mb-4 rounded-2xl border border-primary/30 bg-primary/10 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
-                <h2 className="text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200">
+                <h2 className="text-[0.8125rem] font-extrabold text-primary">
                   {t(language, "category.introductionLabel")}
                 </h2>
                 <span className="rounded-full bg-card/80 px-2.5 py-1 text-[0.6875rem] font-bold text-muted-foreground">
@@ -418,10 +418,10 @@ export function CategoryScreen({
               {preparationSteps.size === 3 && (
                 <div
                   role="status"
-                  className="celebration-pop mt-3 flex items-center gap-3 rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3 text-start"
+                  className="celebration-pop mt-3 flex items-center gap-3 rounded-2xl border border-success/30 bg-success/10 p-3 text-start"
                   data-testid="sleep-preparation-complete"
                 >
-                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white dark:bg-emerald-500 dark:text-slate-950">
+                  <span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-success text-white dark:bg-success dark:text-primary-foreground">
                     <Check size={19} strokeWidth={3} aria-hidden="true" />
                   </span>
                   <span>
@@ -604,7 +604,7 @@ function ZikrAccordion({
               }
             >
               {isCardCompleted ? (
-                <Check size={24} className="text-emerald-500" strokeWidth={3} />
+                <Check size={24} className="text-success" strokeWidth={3} />
               ) : (
                 <div className="size-[20px] rounded-full border-[2.5px] border-muted-foreground opacity-50" />
               )}
@@ -618,14 +618,14 @@ function ZikrAccordion({
           <div className="min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3">
             {isArabic && z.hasSeekRefuge && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="font-arabic text-[1rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                <p className="font-arabic text-[1rem] font-bold text-primary/90 tracking-wide">
                   أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
                 </p>
               </div>
             )}
             {isArabic && (z.hasBasmalah || z.isSurah) && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="font-arabic text-[1.05rem] font-bold text-amber-900/90 dark:text-amber-200/90 tracking-wide">
+                <p className="font-arabic text-[1.05rem] font-bold text-primary/90 tracking-wide">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </p>
               </div>
@@ -641,7 +641,7 @@ function ZikrAccordion({
 
           {showTiming && timingText && (
             <div
-              className="flex items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-amber-900 dark:text-amber-200"
+              className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-primary"
               dir={isArabic ? "rtl" : "ltr"}
             >
               <span aria-hidden="true" className="shrink-0">

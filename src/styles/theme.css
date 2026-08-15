@@ -174,7 +174,17 @@
 }
 
 :root {
+  /* Decorative collection colours. Progress marks the three time-of-day
+     routines by hue: morning uses --primary, evening and sleep need their own.
+     --sleep already existed but was never wired to Tailwind, so the code used
+     raw indigo instead (DEC-069 / F17). These are decorative, not semantic --
+     they never carry meaning alone; a text label always accompanies them. */
   --sleep: #9f7aea;
+  --evening: #fb923c;
+  /* Panels that sit ON the hero photography. Dark in every theme for the same
+     reason --on-media is light in every theme: the ground is the photograph,
+     not the app surface. */
+  --on-media-surface: #020617;
   --ds-control-height-compact: 2.75rem;
   --ds-control-height: 3rem;
   --ds-control-height-prominent: 3.25rem;
@@ -211,6 +221,8 @@
    separates from #f8f5f0 without a border doing all the work. */
 .light-mode,
 .theme-light {
+  --sleep: #6d28d9;
+  --evening: #c2410c;
   --ds-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -8px rgba(0, 0, 0, 0.12);
   --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.22);
 }
@@ -377,6 +389,9 @@ textarea {
   --color-success-foreground: var(--success-foreground);
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
+  --color-sleep: var(--sleep);
+  --color-evening: var(--evening);
+  --color-on-media-surface: var(--on-media-surface);
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
   --radius-sm: var(--ds-radius-small);

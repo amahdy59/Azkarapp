@@ -504,7 +504,7 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-[28px] bg-slate-950 sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[34rem]"
+            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-[28px] bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[34rem]"
           >
             <div
               data-testid="time-of-day-scene-window"
@@ -643,9 +643,9 @@ export function HomeScreen({
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer
-                              ? "border-primary/60 bg-primary/12 text-foreground shadow-md hover:border-amber-500/50 hover:bg-card/75"
+                              ? "border-primary/60 bg-primary/12 text-foreground shadow-md hover:border-primary/50 hover:bg-card/75"
                               : isNextPrayer
-                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-amber-500/50 hover:bg-card/75 hover:shadow-md"
+                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-primary/50 hover:bg-card/75 hover:shadow-md"
                                 : isPastPrayer
                                   ? "border-border/70 bg-muted/35 text-foreground hover:bg-muted/60"
                                   : "border-border/60 bg-background/35 text-foreground hover:border-primary/25 hover:bg-muted/50"
@@ -784,7 +784,7 @@ export function HomeScreen({
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl border border-amber-500/20 bg-card text-start shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl border border-primary/20 bg-card text-start shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 data-testid="home-benefits-card"
               >
                 <div className="absolute inset-0 z-0">
@@ -798,7 +798,7 @@ export function HomeScreen({
                     className="h-full w-full object-cover object-[center_42%]"
                   />
                 </div>
-                <div className="relative z-10 m-3 rounded-2xl bg-slate-950/90 p-4 shadow-raised sm:m-4 sm:p-5">
+                <div className="relative z-10 m-3 rounded-2xl bg-on-media-surface/90 p-4 shadow-raised sm:m-4 sm:p-5">
                   <span className="block">
                     <span className="block text-[1.25rem] font-black text-on-media drop-shadow-md">
                       {t(language, "benefits.title")}
@@ -806,7 +806,7 @@ export function HomeScreen({
                     <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-on-media-muted sm:text-[0.875rem]">
                       {t(language, "benefits.homeDescription")}
                     </span>
-                    <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-amber-400 drop-shadow-sm">
+                    <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-primary drop-shadow-sm">
                       {t(language, "benefits.open")}
                       {direction === "rtl" ? (
                         <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />

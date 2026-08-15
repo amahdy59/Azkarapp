@@ -27,7 +27,7 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
       }`}
     >
       <div className="flex flex-col items-center gap-5 rounded-[28px] border border-white/10 bg-black/30 px-5 py-6 text-center shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:px-6 sm:py-7">
-        <div className="flex size-24 items-center justify-center rounded-full bg-[#e2a84a] text-slate-950 shadow-[0_20px_35px_rgba(226,168,74,0.32)] sm:size-28">
+        <div className="flex size-24 items-center justify-center rounded-full bg-[#e2a84a] text-primary-foreground shadow-[0_20px_35px_rgba(226,168,74,0.32)] sm:size-28">
           <Check size={34} strokeWidth={2.8} aria-hidden="true" />
         </div>
 

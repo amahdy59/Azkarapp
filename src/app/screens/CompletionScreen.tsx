@@ -205,7 +205,7 @@ export function CompletionScreen({
               <button
                 type="button"
                 onClick={onContinueComplete}
-                className="flex min-h-[48px] items-center justify-center rounded-lg border border-amber-500/40 bg-amber-500/10 px-4 font-bold text-amber-900 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-amber-200"
+                className="flex min-h-[48px] items-center justify-center rounded-lg border border-primary/40 bg-primary/10 px-4 font-bold text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-primary"
               >
                 {t(language, "category.continueAdditional", {
                   count: formatNumerals(
