@@ -184,7 +184,7 @@ export function CustomCounterScreen({
 
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-          className="relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
+          className="custom-counter-stage relative mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
           data-testid="custom-counter-content"
           data-counting-mode="canvas"
           onClick={handleCanvasClick}
@@ -201,7 +201,7 @@ export function CustomCounterScreen({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align={direction === "rtl" ? "end" : "start"}
-                  className="max-h-[250px] w-[calc(100vw-3rem)] max-w-[24rem] overflow-y-auto"
+                  className="max-h-[250px] w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
                 >
                   <DropdownMenuRadioGroup
                     value={selectedAuthentic.id}
