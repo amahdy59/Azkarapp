@@ -406,8 +406,7 @@ test("there is exactly one main landmark and focus moves to it on navigation", a
   await page.getByTestId("nav-progress").click();
   await expect(page.getByRole("navigation", { name: "Bottom Navigation" })).toBeVisible();
 
-  const focusedId = await page.evaluate(() => document.activeElement?.id ?? "");
-  expect(focusedId).toBe("main-content");
+  await expect(page.locator("#main-content")).toBeFocused();
 });
 
 test("status banners get a full-width area above the nav, not an implicit row", async ({ page }) => {
