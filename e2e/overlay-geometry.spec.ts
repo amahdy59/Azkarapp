@@ -173,8 +173,13 @@ async function openLibraryScopeMenu(page: Page, language: "ar" | "en") {
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
   await page.getByTestId("nav-azkar").click();
+  await expect(page.getByTestId("library-section-filter")).toBeVisible();
 
-  const trigger = page.locator('[aria-haspopup="menu"]').first();
+  // Pin the specific control. `[aria-haspopup="menu"]`.first() resolved to a
+  // different trigger on the mobile device profile, where the menu legitimately
+  // aligns elsewhere — which failed in CI with a 1052px delta while passing
+  // locally on the desktop profile.
+  const trigger = page.getByTestId("library-section-filter");
   await expect(trigger).toBeVisible();
   await trigger.click();
   const menu = page.locator('[data-slot="dropdown-menu-content"]');

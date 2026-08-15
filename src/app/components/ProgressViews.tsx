@@ -62,7 +62,7 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`group relative flex w-full rounded-3xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+      className={`group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
           ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
@@ -1087,7 +1087,7 @@ export function ProgressYearView({
                   </span>
                   <div className="w-full bg-black/10 dark:bg-white/10 rounded-t-lg h-[90px] flex items-end">
                     <div
-                      className={`w-full rounded-t-lg transition-all duration-700 ${
+                      className={`w-full rounded-t-lg transition-[height,background-color] duration-700 ${
                         isBest
                           ? "bg-primary shadow-md shadow-primary/30"
                           : "bg-primary/40 dark:bg-primary/30 group-hover:bg-primary/70"

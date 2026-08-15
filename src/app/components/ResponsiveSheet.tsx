@@ -65,7 +65,7 @@ export function Modal({
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-200" />
+        <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-standard" />
         <DialogPrimitive.Content
           data-testid={testId}
           data-prevent-count="true"
@@ -76,7 +76,7 @@ export function Modal({
           // treats Escape as "leave the reader", so dismissing a dialog would
           // exit the reading session underneath it.
           onEscapeKeyDown={(event) => event.stopPropagation()}
-          className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl border border-border/60 bg-card shadow-overlay outline-none animate-in fade-in-0 zoom-in-95 duration-200 ${className}`.trim()}
+          className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl border border-border/60 bg-card shadow-overlay outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${className}`.trim()}
         >
           <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
           {children}

@@ -53,30 +53,50 @@ will change shape or close outright once the design-system primitives actually c
 | F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — resolved by DEC-065 | 16 ✅ |
 | F16 | Passing  | Color           | Contrast passes AA with headroom in all three themes                        | —     |
 | F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files              | 19 ✅ |
-| F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op        | 20    |
-| F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them               | 20    |
-| F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20    |
-| F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20    |
+| F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op        | 20 ✅ |
+| F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them               | 20 ✅ |
+| F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20 ✅ |
+| F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20 ✅ |
 | F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16 ✅ |
-| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20    |
+| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20 ⚠  |
 | F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18 ✅ |
 | F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18 ✅ |
 | F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size               | 18 ✅ |
 | F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 20 ⏸  |
-| F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | 20    |
+| F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | ⏸     |
 | F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree            | —     |
-| F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20    |
+| F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20 ✅ |
 | F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17 ✅ |
 | F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15 ✅ |
 | F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18 ✅ |
 | F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18 ✅ |
-| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | 20    |
-| F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20    |
+| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | ⏸     |
+| F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20 ✅ |
 | F37 | High     | Test coverage   | Touch-target test measures the Category screen before it is laid out        | ✅    |
 
 ---
 
 ## Detail
+
+### Phase 20 — what was left undone, and why
+
+Recorded so the register does not imply more completeness than exists.
+
+- **F23 is partial.** 7 of 33 `transition-all` sites were narrowed to explicit property
+  lists. The remaining 26 each need their animated properties verified individually; a blind
+  rewrite risks breaking hover and press behaviour for no measurable gain.
+- **F27 and F28 are deferred, twice over.** Both require measurement this environment cannot
+  produce: `requestAnimationFrame` delivers zero frames because the browser pane does not
+  composite. The phase briefs explicitly require a measurement rather than an assumption for
+  the noise overlay, and a profile before any memoisation. Both need real hardware.
+- **F35 is not attempted.** Splitting `theme.css` is a pure file move whose only risk is
+  cascade order. Mixing a 1,400-line reorganisation into the same commit as behavioural
+  motion changes would make both unreviewable. It deserves its own change, verified by
+  diffing the built CSS before and after.
+- **A token/contract mismatch was found rather than fixed.** `--motion-duration-emphasis`
+  is 360ms while the motion contract documents an emphasis band of 440–600ms. The
+  `duration-500`/`700` sites that belong in that band were left alone rather than sped up to
+  satisfy a token that disagrees with the contract.
 
 ### F09 correction — the audit named the wrong culprit
 

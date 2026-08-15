@@ -16,8 +16,10 @@ export default defineConfig(({ mode }) => {
   return {
     base: appBase,
     plugins: [
-      // The React and Tailwind plugins are both required for Make, even if
-      // Tailwind is not being actively used - do not remove them.
+      // Both plugins are load-bearing: the app is React, and Tailwind compiles
+      // the entire design system. (This previously claimed Tailwind "is not
+      // being actively used" — a leftover from the Figma Make scaffold that was
+      // actively misleading. DEC-070 / F36.)
       react(),
       tailwindcss(),
       VitePWA({

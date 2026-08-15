@@ -145,7 +145,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             onClick={controller.previous}
             disabled={state.entryIndex === 0}
             aria-label={copy.previous}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
           >
             <SkipBack size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
@@ -153,7 +153,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             type="button"
             onClick={isPlaying ? controller.pause : controller.play}
             aria-label={isPlaying ? copy.pause : copy.play}
-            className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-all duration-150 active:scale-95 hover:bg-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-md transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {isPlaying ? <Pause size={19} aria-hidden="true" /> : <Play size={19} aria-hidden="true" />}
           </button>
@@ -162,7 +162,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             onClick={controller.next}
             disabled={state.entryIndex === state.plan.entries.length - 1}
             aria-label={copy.next}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40 disabled:active:scale-100"
           >
             <SkipForward size={18} className="rtl:rotate-180" aria-hidden="true" />
           </button>
@@ -170,7 +170,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
             type="button"
             onClick={controller.stop}
             aria-label={copy.stop}
-            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-all duration-150 active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex size-11 items-center justify-center rounded-xl text-muted-foreground transition-[transform,background-color,color] duration-fast active:scale-95 hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <X size={18} aria-hidden="true" />
           </button>

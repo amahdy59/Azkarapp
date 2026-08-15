@@ -182,7 +182,7 @@ function ToggleTrack({ checked }: { checked: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors duration-200"
+      className="relative block h-[26px] w-11 rounded-full border-2 transition-colors duration-standard"
       style={{
         background: checked ? "var(--primary)" : "var(--card)",
         borderColor: checked ? "var(--primary)" : "var(--border-control)",

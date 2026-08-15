@@ -215,6 +215,7 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 | `large`    | ≥1200px      | Fluid grid, sidebar + main areas    | Labeled nav sidebar |
 
 - There is no drawer/off-canvas navigation variant; exactly one nav component mounts per tier.
+- **Component sub-steps at 768px and 1024px.** The four tiers govern the shell: which navigation mounts and how the page grid is laid out. Individual components may additionally step at 768px and 1024px — the counter's size steps, the Home card grid, the desktop scrollbar treatment and the app-shell border all do. These are deliberate and separate from the tier boundaries: a control can outgrow its size before the whole shell changes shape. Anything that changes _navigation or shell structure_ must use 600/900/1200; anything sizing a component within the page may use the sub-steps. `useLayoutMode` and the shell media queries continue to agree on the four tiers.
 - Navigation is hidden entirely on splash, onboarding and auth views at every tier.
 - Height is never part of tier selection. Short landscape viewports keep the navigation for their width.
 - Reader/focused flows: constrained reading measure (~430px–600px maximum), independent of tier. On the wide-desktop reader (≥1200px, see the Reader contract above) the card chrome around that column widens to fill the shell; the reading measure itself stays capped at 600px.

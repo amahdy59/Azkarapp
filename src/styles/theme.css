@@ -4,6 +4,8 @@
   --motion-duration-press: 90ms;
   --motion-duration-fast: 150ms;
   --motion-duration-standard: 220ms;
+  /* Screen/content entrance, per the motion contract's 240-300ms band. */
+  --motion-duration-entrance: 260ms;
   --motion-duration-emphasis: 360ms;
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
@@ -529,6 +531,18 @@ textarea {
   --radius-xl: var(--ds-radius-control);
   --radius-2xl: var(--ds-radius-card);
   --radius-3xl: var(--ds-radius-overlay);
+  /* Motion tokens existed but were never exposed to Tailwind, so components
+     reached for raw duration-150/200/300/500 utilities instead and the scale
+     went unused (DEC-070 / F19). These make `duration-standard`, `ease-enter`
+     and friends real utilities. */
+  --transition-duration-press: var(--motion-duration-press);
+  --transition-duration-fast: var(--motion-duration-fast);
+  --transition-duration-standard: var(--motion-duration-standard);
+  --transition-duration-entrance: var(--motion-duration-entrance);
+  --transition-duration-emphasis: var(--motion-duration-emphasis);
+  --ease-standard: var(--motion-ease-standard);
+  --ease-enter: var(--motion-ease-enter);
+  --ease-exit: var(--motion-ease-exit);
   --shadow-raised: var(--ds-shadow-raised);
   --shadow-overlay: var(--ds-shadow-overlay);
 }
@@ -661,12 +675,33 @@ textarea {
     opacity: 1;
   }
 }
+/* This animated opacity only, so it was a duplicate of fade-in wearing a
+   misleading name (DEC-070 / F21). It now does what it says. */
 @keyframes slide-up {
   from {
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The motion contract requires the save control to "pop once". Three components
+   apply .favorite-pop and .element-pop referenced these keyframes, but they
+   were never defined anywhere, so the microinteraction did nothing at all
+   (DEC-070 / F18). Restrained scale only, at the timing table's small
+   state-change band. */
+@keyframes favorite-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
   }
 }
 @keyframes waveform {
@@ -707,12 +742,23 @@ textarea {
   }
 }
 
+/* Both ran at 500ms and 400ms on the wrong easing, outside the 240-300ms
+   screen/content entrance band in the motion contract (DEC-070 / F20).
+   .fade-in is on all four Progress views, so this was the slowest entrance in
+   the app on the screen users open most repeatedly. */
 .fade-in {
-  animation: fade-in 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
 }
 
 .slide-up {
-  animation: slide-up 400ms cubic-bezier(0.4, 0, 0.2, 1) both;
+  animation: slide-up var(--motion-duration-entrance) var(--motion-ease-enter) both;
+}
+
+/* Both class names are in use for the same intent; they resolve to one
+   animation so the behaviour cannot diverge. */
+.favorite-pop,
+.element-pop {
+  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) both;
 }
 
 .waveform-bar {
@@ -785,32 +831,6 @@ textarea {
   }
 }
 
-/* Radix ScrollArea auto-hide overlay scrollbar (type="hover") */
-[data-slot="scroll-area-scrollbar"] {
-  padding: 2px;
-  opacity: 0;
-  transition: opacity 220ms ease;
-}
-
-[data-slot="scroll-area-scrollbar"][data-state="visible"] {
-  opacity: 0.64;
-}
-
-[data-slot="scroll-area-thumb"] {
-  background: color-mix(in srgb, var(--muted-foreground) 48%, transparent);
-  border-radius: 9999px;
-  transition: background-color 160ms ease;
-}
-
-[data-slot="scroll-area-scrollbar"]:hover [data-slot="scroll-area-thumb"] {
-  background: color-mix(in srgb, var(--muted-foreground) 72%, transparent);
-}
-
-/* The indicator gutter and its inset used to be duplicated here because
-   `ps-8`/`pe-2`/`start-2` never compiled (DEC-064 / F01) — Tailwind's logical
-   utilities now supply them, so only the theme-owned selected highlight
-   remains. It gives the current choice an opaque highlight rather than the
-   translucent accent, so Arabic copy stays legible over it. */
 [data-slot="dropdown-menu-radio-item"][data-state="checked"],
 [data-slot="dropdown-menu-checkbox-item"][data-state="checked"] {
   color: var(--primary);
@@ -967,9 +987,7 @@ textarea {
 [dir="rtl"] .animate-pulse-horizontal {
   animation: pulse-horizontal-rtl 1.2s ease-in-out 3;
 }
-.element-pop {
-  animation: favorite-pop 250ms cubic-bezier(0.4, 0, 0.2, 1) both;
-}
+/* .element-pop is declared with .favorite-pop above, on the motion tokens. */
 
 .font-arabic,
 .zikr-text {

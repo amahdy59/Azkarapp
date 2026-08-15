@@ -96,7 +96,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
               onClick={() => onChange(id)}
               aria-label={label}
               aria-current={on ? "page" : undefined}
-              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-150 active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="relative flex h-full min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-lg transition-[opacity,transform] duration-fast active:scale-95 active:opacity-70 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {/* Persistent non-color active cue. The selected state must not be
                   conveyed by colour alone, and .nav-active-cue below is only a
