@@ -143,8 +143,46 @@ JavaScript budgets and the 200 kB initial-route gzip budget were unaffected and 
 to pass throughout. Removing the unused `scroll-area` component was measured as a possible
 offset and recovered only 0.47 kB, so it was left for Phase 20.
 
+## Gate results
+
+| Command                                | Result                                |
+| -------------------------------------- | ------------------------------------- |
+| `pnpm check`                           | Pass (exit 0), bundle budget passed   |
+| `pnpm test:e2e`                        | 420 passed, 0 failed, 4 skipped       |
+| `pnpm exec vitest run`                 | 450 passed, 91 files                  |
+| `node scripts/check-css-utilities.mjs` | Pass; fails on reintroduced exclusion |
+
+The 420 figure is the base commit's 411 plus the 9 new overlay-geometry tests (3 tests
+across the three Chromium projects), so the new spec passes in compact, tablet and desktop
+profiles.
+
+### Two discarded failure reports
+
+Two intermediate runs reported three failures each and were investigated rather than
+retried away:
+
+| Run                         | Duration | Result                                 |
+| --------------------------- | -------- | -------------------------------------- |
+| Branch, concurrent build    | —        | 3 failed in `reader-microinteractions` |
+| Branch, stale dev server    | 14.4m    | 3 failed in `responsive`               |
+| Base commit `54b2b14`, idle | 9.1m     | 411 passed, 0 failed                   |
+| Branch, idle                | 9.5m     | 420 passed, 0 failed                   |
+
+The two failing runs named different specs, and every failure was `element(s) not found`
+immediately after `page.goto("/")` plus `browserContext.close: Target page, context or
+browser has been closed` and teardown timeouts — the application never mounting, not an
+assertion returning a wrong value. Both affected specs passed in isolation on the branch
+(`reader-microinteractions` 16/16 in 38.4s, `responsive` 14/14 in 25.8s).
+
+The cause was local resource contention: the first run had a `vite build` running
+alongside it, and the second had a leftover Vite dev server from browser-based inspection.
+With both removed, the branch matches the base commit's timing and passes clean. The base
+commit was run under the same idle conditions specifically to rule out a pre-existing
+failure, per the stop condition in `AGENTS.md` §12.
+
 ## Environment note
 
 The local `node_modules` had been installed by pnpm 9.15.0 while `package.json` pins
-11.19.0, so `pnpm test:e2e` could not start its web server until
-`pnpm install --frozen-lockfile` was run. Unrelated to this phase's changes.
+11.19.0, so `pnpm test:e2e` could not start its web server at all until
+`pnpm install --frozen-lockfile` was run. Unrelated to this phase's changes, but it means
+the e2e gate was not runnable in this working copy beforehand.
