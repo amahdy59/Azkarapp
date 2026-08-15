@@ -55,6 +55,19 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 11    | `phases/PHASE_11_RESPONSIVE_I18N.md`           | Full viewport, language and direction validation                      |
 | 12    | `phases/PHASE_12_ACCESSIBILITY_REMEDIATION.md` | WCAG-focused remediation and manual evidence                          |
 | 13    | `phases/PHASE_13_RELEASE_HARDENING.md`         | Performance, security, PWA and release readiness                      |
+| 14    | `phases/PHASE_14_CI_CD_FIX.md`                 | Stable CI/CD and green deployment pipeline                            |
+| 15    | `phases/PHASE_15_CSS_DELIVERY_REPAIR.md`       | Design-system primitives reach the compiled stylesheet                |
+| 16    | `phases/PHASE_16_ELEVATION_AND_SURFACES.md`    | Elevation works in every theme; one definition per surface            |
+| 17    | `phases/PHASE_17_MENU_UNIFICATION.md`          | One menu appearance, anatomy and direction rule                       |
+| 18    | `phases/PHASE_18_BUILD_WEIGHT.md`              | Only referenced assets ship; the budget gate can see them             |
+| 19    | `phases/PHASE_19_TOKEN_DISCIPLINE.md`          | Colour, radius and spacing back on scale, with lint enforcement       |
+| 20    | `phases/PHASE_20_MOTION_AND_STRUCTURE.md`      | Real motion system and navigable stylesheets                          |
+
+Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
+recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root
+cause (F01) produces several of the findings those phases address, so re-measure after it
+lands rather than working from the audit's pre-repair numbers. Phase 18 is independent and
+may run in parallel.
 
 ## Core rule
 
