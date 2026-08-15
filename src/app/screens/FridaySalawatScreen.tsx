@@ -33,7 +33,7 @@ const COPY = {
     fridaySource: "Sunan Abi Dawud 1047 — Sahih",
   },
   ar: {
-    title: "عداد الصلاة على النبي ﷺ",
+    title: "الصلاة على النبي ﷺ",
     subtitle: "اختر هدفًا واحتسب الأجر",
     phrase: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
     target: "الهدف",
@@ -184,21 +184,6 @@ export function FridaySalawatScreen({
         data-counting-mode="canvas"
         onClick={handleCanvasClick}
       >
-        <div className="relative z-20 mb-4 flex flex-col gap-3 sm:flex-row" data-prevent-count="true">
-          <div className="interactive-elem flex min-h-[48px] w-full sm:min-w-0 sm:flex-1 items-center justify-between gap-3 rounded-[16px] border border-border-control bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-xs">
-            <span className="truncate">{copy.subtitle}</span>
-          </div>
-          <div className="w-full sm:w-auto sm:min-w-[140px] shrink-0">
-            <CounterTargetPicker
-              activeTarget={progress.target}
-              onTargetChange={(target) => persist(0, target)}
-              language={language}
-              direction={direction}
-              allowOpen={false}
-            />
-          </div>
-        </div>
-
         <section
           className="space-y-3 rounded-[24px] border border-border bg-card p-4 sm:p-5 shadow-raised"
           aria-label={copy.target}
@@ -212,14 +197,27 @@ export function FridaySalawatScreen({
           <ProgressBar value={progress.count} max={progress.target} direction={direction} aria-label={copy.target} />
         </section>
 
-        <div className="my-auto flex flex-col items-center justify-center py-8 sm:py-10">
+        <div className="relative z-20 mt-4 flex w-full" data-prevent-count="true">
+          <CounterTargetPicker
+            activeTarget={progress.target}
+            onTargetChange={(target) => persist(0, target)}
+            language={language}
+            direction={direction}
+            allowOpen={false}
+          />
+        </div>
+
+        <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
           <p
-            className="zikr-text mb-7 max-w-[34rem] text-center text-[1.25rem] font-black leading-[2] text-foreground sm:text-[1.5rem]"
+            className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
             dir="rtl"
             lang="ar"
           >
             {copy.phrase}
           </p>
+        </div>
+
+        <footer className="shrink-0 flex flex-col items-center justify-center pb-3 pt-2">
           <div className="flex w-full items-center justify-center gap-2.5">
             <div className="flex min-w-0 flex-1 justify-center">
               <ZikrCounterSurface
@@ -234,22 +232,26 @@ export function FridaySalawatScreen({
               />
             </div>
           </div>
-        </div>
-        <div className="mx-auto mt-4 hidden w-fit items-center justify-center gap-3 rounded-full border border-border bg-card px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex">
-          <span>
-            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground">
-              Space
-            </kbd>{" "}
-            {t(language, "counter.count")}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span>
-            <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground">
-              R
-            </kbd>{" "}
-            {t(language, "counter.reset")}
-          </span>
-        </div>
+
+          <div
+            dir="ltr"
+            className="mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-5 py-2 text-[0.75rem] font-medium text-muted-foreground md:flex"
+          >
+            <span className="flex items-center gap-1.5" dir={direction}>
+              <kbd className="rounded bg-card border border-border px-1.5 py-0.5 font-mono text-[0.6875rem] shadow-2xs font-bold text-foreground">
+                Space
+              </kbd>
+              <span>{t(language, "counter.count")}</span>
+            </span>
+            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
+            <span className="flex items-center gap-1.5" dir={direction}>
+              <kbd className="rounded bg-card border border-border px-1.5 py-0.5 font-mono text-[0.6875rem] shadow-2xs font-bold text-foreground">
+                R
+              </kbd>
+              <span>{t(language, "counter.reset")}</span>
+            </span>
+          </div>
+        </footer>
       </div>
 
       {showBenefits && (

@@ -190,35 +190,37 @@ export function CustomCounterScreen({
           onClick={handleCanvasClick}
         >
           {/* Controls Bar */}
-          <div className="relative z-20 mb-4 flex flex-col gap-3 sm:flex-row" data-prevent-count="true">
-            <DropdownMenu dir={direction}>
-              <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full sm:min-w-0 sm:flex-1 items-center justify-between gap-3 rounded-[16px] border border-border-control bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                <span className="truncate">
-                  {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
-                </span>
-                <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                align={direction === "rtl" ? "end" : "start"}
-                className="max-h-[250px] w-[calc(100vw-3rem)] max-w-[24rem] overflow-y-auto"
-              >
-                <DropdownMenuRadioGroup
-                  value={selectedAuthentic.id}
-                  onValueChange={(id) => {
-                    const item = AUTHENTIC_AZKAR_COLLECTION.find((x) => x.id === id);
-                    if (item) handleSelectAuthenticZikr(item);
-                  }}
+          <div className="relative z-20 mb-4 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
+            <div className="min-w-0">
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-2 rounded-[16px] border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                  <span className="truncate text-start flex-1">
+                    {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
+                  </span>
+                  <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  align={direction === "rtl" ? "end" : "start"}
+                  className="max-h-[250px] w-[calc(100vw-3rem)] max-w-[24rem] overflow-y-auto"
                 >
-                  {AUTHENTIC_AZKAR_COLLECTION.map((item) => (
-                    <DropdownMenuRadioItem key={item.id} value={item.id} className="text-[0.875rem] font-bold">
-                      {isArabic ? item.categoryNameAr : item.categoryNameEn}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                  <DropdownMenuRadioGroup
+                    value={selectedAuthentic.id}
+                    onValueChange={(id) => {
+                      const item = AUTHENTIC_AZKAR_COLLECTION.find((x) => x.id === id);
+                      if (item) handleSelectAuthenticZikr(item);
+                    }}
+                  >
+                    {AUTHENTIC_AZKAR_COLLECTION.map((item) => (
+                      <DropdownMenuRadioItem key={item.id} value={item.id} className="text-[0.875rem] font-bold">
+                        {isArabic ? item.categoryNameAr : item.categoryNameEn}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
 
-            <div className="w-full sm:w-auto sm:min-w-[140px] shrink-0">
+            <div className="min-w-0">
               <CounterTargetPicker
                 activeTarget={target}
                 onTargetChange={changeTarget}
