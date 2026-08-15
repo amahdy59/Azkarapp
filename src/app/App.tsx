@@ -474,11 +474,8 @@ function AppContent() {
     writeFridayDuaProgress(next);
   }, []);
 
-  useEffect(() => {
-    if (fridayDuaFlow && (activeCat !== "comprehensive_duas" || (view !== "category" && view !== "reader"))) {
-      setFridayDuaFlow(false);
-    }
-  }, [activeCat, fridayDuaFlow, view]);
+  // The fridayDuaFlow state is cleared manually when navigating away (e.g. via nav tabs or back button)
+  // to avoid race conditions with asynchronous View Transitions.
 
   useEffect(() => {
     if (view !== "category" && view !== "reader") setRouteContentError(null);
@@ -756,11 +753,23 @@ function AppContent() {
         </div>
 
         {/* Adaptive navigation — only one renders at a time */}
-        {showRail && <NavRail active={activeTab} onChange={handleNavTab} isArabic={isArabic} />}
+        {showRail && (
+          <NavRail
+            active={activeTab}
+            onChange={(tab) => {
+              setFridayDuaFlow(false);
+              handleNavTab(tab);
+            }}
+            isArabic={isArabic}
+          />
+        )}
         {showSidebar && (
           <NavSidebar
             active={activeTab}
-            onChange={handleNavTab}
+            onChange={(tab) => {
+              setFridayDuaFlow(false);
+              handleNavTab(tab);
+            }}
             isArabic={isArabic}
             themeMode={themeMode}
             onThemeModeChange={setThemeMode}
@@ -1370,7 +1379,14 @@ function AppContent() {
         {/* Bottom nav — compact and medium only, shown in its own grid area */}
         {showBottomNavArea && (
           <div className="app-bottom-nav">
-            <BottomNav active={activeTab} onChange={handleNavTab} isArabic={isArabic} />
+            <BottomNav
+              active={activeTab}
+              onChange={(tab) => {
+                setFridayDuaFlow(false);
+                handleNavTab(tab);
+              }}
+              isArabic={isArabic}
+            />
           </div>
         )}
       </div>

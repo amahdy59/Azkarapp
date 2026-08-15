@@ -1,7 +1,9 @@
 import { useState, useRef, useCallback, useEffect } from "react";
+import { flushSync } from "react-dom";
 import { parseLocation, routeToHash } from "../routing";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import { reportError } from "../../lib/observability";
+import { startSafeViewTransition } from "../utils/viewTransitions";
 import type { CategoryId, RoutineMode, View, RoutineCategoryId } from "../types";
 import type { LibrarySection } from "../screens/AzkarLibraryScreen";
 
@@ -98,7 +100,11 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   const push = useCallback((to: View) => {
     window.history.pushState({ view: to }, "", window.location.href);
     inAppHistoryDepth.current += 1;
-    setView(to);
+    startSafeViewTransition(() => {
+      flushSync(() => {
+        setView(to);
+      });
+    });
   }, []);
 
   const pop = useCallback(() => {
@@ -133,22 +139,27 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   const applyRouteFromLocation = useCallback((): boolean => {
     const route = parseLocation(window.location.search, window.location.hash);
     if (!route) return false;
-    setView(route.view);
-    if (route.categoryId) {
-      setActiveCat(route.categoryId);
-      if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
-        void hydrateRouteCategory(route.categoryId, route.view, route.index);
-      } else {
-        routeLoadId.current += 1;
-        setRouteContentLoading(false);
-      }
-    } else {
-      routeLoadId.current += 1;
-      setRouteContentLoading(false);
-    }
-    if (route.index !== undefined) setActiveIdx(route.index);
-    if (route.query !== undefined) setSearchQuery(route.query);
-    setActiveTab(tabForView(route.view));
+
+    startSafeViewTransition(() => {
+      flushSync(() => {
+        setView(route.view);
+        if (route.categoryId) {
+          setActiveCat(route.categoryId);
+          if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
+            void hydrateRouteCategory(route.categoryId, route.view, route.index);
+          } else {
+            routeLoadId.current += 1;
+            setRouteContentLoading(false);
+          }
+        } else {
+          routeLoadId.current += 1;
+          setRouteContentLoading(false);
+        }
+        if (route.index !== undefined) setActiveIdx(route.index);
+        if (route.query !== undefined) setSearchQuery(route.query);
+        setActiveTab(tabForView(route.view));
+      });
+    });
     return true;
   }, [hydrateRouteCategory]);
 
@@ -157,10 +168,18 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       inAppHistoryDepth.current = Math.max(0, inAppHistoryDepth.current - 1);
       if (applyRouteFromLocation()) return;
       if (e.state?.view) {
-        setView(e.state.view);
-        setActiveTab(tabForView(e.state.view));
+        startSafeViewTransition(() => {
+          flushSync(() => {
+            setView(e.state.view);
+            setActiveTab(tabForView(e.state.view));
+          });
+        });
       } else {
-        setView(hasCompletedOnboarding ? "home" : "language");
+        startSafeViewTransition(() => {
+          flushSync(() => {
+            setView(hasCompletedOnboarding ? "home" : "language");
+          });
+        });
       }
     };
 

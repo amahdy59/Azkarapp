@@ -31,6 +31,7 @@ import { formatNumerals } from "../formatting";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { t } from "../i18n";
 import { vibrateIfEnabled } from "../motionPreferences";
+import { useWakeLock } from "../hooks/useWakeLock";
 import type { AppLanguage } from "../types";
 
 const HEADER_ACTION_CLASS =
@@ -58,6 +59,8 @@ export function CustomCounterScreen({
   const [showCompletionDialog, setShowCompletionDialog] = useState(false);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
+  useWakeLock(true);
+
   const activeText = selectedAuthentic.textAr;
   const isTargetMode = target > 0;
   const isTargetComplete = isTargetMode && count >= target;
@@ -71,10 +74,10 @@ export function CustomCounterScreen({
     const nextCount = count + 1;
     setCount(nextCount);
     playClickFeedback();
-    vibrateIfEnabled(hapticFeedback, 8);
+    vibrateIfEnabled(hapticFeedback, 15);
     if (isTargetMode && nextCount >= target) {
       setShowCompletionDialog(true);
-      vibrateIfEnabled(hapticFeedback, [30, 50, 40, 50, 60]);
+      vibrateIfEnabled(hapticFeedback, [30, 50, 30, 50, 50]);
     }
   }, [count, hapticFeedback, isTargetComplete, isTargetMode, playClickFeedback, target]);
 

@@ -7,6 +7,7 @@ import { useZikrCounter } from "../hooks/useZikrCounter";
 import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useWakeLock } from "../hooks/useWakeLock";
 import {
   BookOpen,
   ArrowPrevious,
@@ -213,6 +214,8 @@ export function ReaderScreen({
   // for the desktop reader, and running the phone layout there left a wide,
   // sparse column. Below 768px the phone layout takes over.
   const isDesktopReader = useMediaQuery("(min-width: 768px)");
+
+  useWakeLock(true);
 
   const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
     useZikrCounter({

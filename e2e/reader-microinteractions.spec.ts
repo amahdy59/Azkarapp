@@ -428,6 +428,7 @@ for (const locale of [
     await page.getByTestId("category-card-morning").click();
 
     const categoryProgress = page.getByRole("progressbar");
+    await expect(page.getByTestId("category-overview")).toBeVisible();
     await expectFillToStartAt(categoryProgress, locale.direction);
 
     await page.getByTestId("start-session-button").click();

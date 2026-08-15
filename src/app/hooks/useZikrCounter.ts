@@ -78,7 +78,7 @@ export function useZikrCounter({
     setCount(next);
     onCount?.();
     if (hapticFeedback) {
-      vibrate(30);
+      vibrate(15);
     }
 
     if (next >= z.repetitionCount) {
@@ -93,7 +93,7 @@ export function useZikrCounter({
         }),
       );
       if (hapticFeedback) {
-        vibrate([40, 50, 40]);
+        vibrate([30, 50, 30, 50, 50]);
       }
       onComplete(idx);
       advanceTimer.current = setTimeout(() => {

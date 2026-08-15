@@ -15,6 +15,7 @@ export interface CategoryCardProps {
   occasionalSubtitle?: string;
   ariaLabel: string;
   onClick: () => void;
+  index?: number;
 }
 
 export function CategoryCard({
@@ -30,6 +31,7 @@ export function CategoryCard({
   occasionalSubtitle,
   ariaLabel,
   onClick,
+  index,
 }: CategoryCardProps) {
   const isComplete = completedCount >= totalCount && totalCount > 0;
   const isStarted = completedCount > 0;
@@ -40,7 +42,8 @@ export function CategoryCard({
       data-testid={`category-card-${id}`}
       dir={direction}
       onClick={onClick}
-      className="interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      style={index !== undefined ? { animationDelay: `${index * 45}ms` } : undefined}
+      className={`interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`}
       aria-label={ariaLabel}
     >
       <span

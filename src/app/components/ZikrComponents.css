@@ -58,6 +58,21 @@
   }
 }
 
+@keyframes surface-complete-glow {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  30% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+
 @keyframes tap-ripple-expand {
   from {
     opacity: 0.48;
@@ -290,6 +305,16 @@
   animation: counter-ready-glow 720ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
 }
 
+.adaptive-counter-surface.just-completed::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--primary);
+  border-radius: inherit;
+  content: "";
+  pointer-events: none;
+  animation: surface-complete-glow 600ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 .counter-number {
   animation: counter-number-pop 160ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
@@ -345,6 +370,7 @@
   .adaptive-counter-pulse,
   .counter-number,
   .counter-ring-ready::after,
+  .adaptive-counter-surface.just-completed::after,
   .counter-complete-cue,
   .counter-face-swap,
   .counter-complete-cue .counter-check-mark svg path {

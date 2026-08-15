@@ -203,7 +203,7 @@ export function AzkarLibraryScreen({
                     {t(language, `library.groups.${group.labelKey}`)}
                   </h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                    {categories.map((categoryId) => {
+                    {categories.map((categoryId, index) => {
                       const category = CATEGORIES.find((item) => item.id === categoryId);
                       if (!category) return null;
                       const isComprehensiveDuas = category.id === "comprehensive_duas";
@@ -234,6 +234,7 @@ export function AzkarLibraryScreen({
                           title={isArabic ? category.nameArabic : category.name}
                           icon={category.icon}
                           direction={direction}
+                          index={index}
                           isOccasional={isOccasional}
                           totalCount={total}
                           completedCount={done}
@@ -289,7 +290,7 @@ export function AzkarLibraryScreen({
                 {t(language, "library.savedTitle")}
               </h2>
               <div className="space-y-3">
-                {savedAzkar.map((zikr) => {
+                {savedAzkar.map((zikr, index) => {
                   const category = CATEGORIES.find((item) => item.id === zikr.category)!;
                   return (
                     <button
@@ -303,15 +304,16 @@ export function AzkarLibraryScreen({
                           return;
                         }
                         const isComprehensiveDuas = zikr.category === "comprehensive_duas";
-                        const index = (
+                        const itemIndex = (
                           isComprehensiveDuas ? COMPREHENSIVE_DUA_ITEMS : getAzkarByCategory(zikr.category)
                         ).findIndex((item) => item.id === zikr.id);
                         if (isComprehensiveDuas) {
                           registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
                         }
-                        onZikr(zikr.category, index);
+                        onZikr(zikr.category, itemIndex);
                       }}
-                      className="flex min-h-[100px] w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-amber-500/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      style={{ animationDelay: `${index * 45}ms` }}
+                      className="stagger-enter flex min-h-[100px] w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-amber-500/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

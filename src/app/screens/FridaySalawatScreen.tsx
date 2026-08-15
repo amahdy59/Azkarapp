@@ -14,6 +14,7 @@ import {
 import { ZikrCounterSurface } from "../components/ZikrComponents";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
+import { useWakeLock } from "../hooks/useWakeLock";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -81,6 +82,8 @@ export function FridaySalawatScreen({
   const [showBenefits, setShowBenefits] = useState(false);
   const complete = progress.count >= progress.target;
   const progressPercent = Math.min(100, Math.round((progress.count / progress.target) * 100));
+
+  useWakeLock(true);
 
   const persist = useCallback((count: number, target: FridaySalawatTarget) => {
     const next = { count, target };

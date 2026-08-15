@@ -203,7 +203,7 @@ export function ZikrCounterSurface({
       }}
       aria-disabled={disabled || complete}
       aria-label={accessibleName}
-      className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${className}`}
+      className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
       initial={false}
       whileTap={complete || reducedMotion ? undefined : { scale: 0.985 }}
     >
