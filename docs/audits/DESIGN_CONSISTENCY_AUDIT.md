@@ -48,11 +48,11 @@ will change shape or close outright once the design-system primitives actually c
 | F10 | Medium   | Menus           | No collision padding on any menu                                            | 17 ✅ |
 | F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                          | 16 ✅ |
 | F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values           | 16 ✅ |
-| F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                   | 19    |
-| F14 | Medium   | Spacing         | Padding drifts off the documented 4px grid                                  | 19    |
+| F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                   | 19 ✅ |
+| F14 | Medium   | Spacing         | Padding drifts off the documented 4px grid                                  | 19 ✅ |
 | F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — resolved by DEC-065 | 16 ✅ |
 | F16 | Passing  | Color           | Contrast passes AA with headroom in all three themes                        | —     |
-| F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files              | 19    |
+| F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files              | 19 ✅ |
 | F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op        | 20    |
 | F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them               | 20    |
 | F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20    |

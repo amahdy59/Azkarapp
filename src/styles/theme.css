@@ -174,17 +174,40 @@
 }
 
 :root {
+  --sleep: #9f7aea;
+  /* --sleep must stay the FIRST declaration in this block, with nothing between
+     it and the selector: theme.tokens.test.ts anchors the geometry block on the
+     literal `:root {\n  --sleep` to guard against a theme-independent
+     --success/--warning pair reappearing here. Add new comments below it. */
   /* Decorative collection colours. Progress marks the three time-of-day
      routines by hue: morning uses --primary, evening and sleep need their own.
      --sleep already existed but was never wired to Tailwind, so the code used
      raw indigo instead (DEC-069 / F17). These are decorative, not semantic --
      they never carry meaning alone; a text label always accompanies them. */
-  --sleep: #9f7aea;
   --evening: #fb923c;
   /* Panels that sit ON the hero photography. Dark in every theme for the same
      reason --on-media is light in every theme: the ground is the photograph,
      not the app surface. */
   --on-media-surface: #020617;
+  /* The dark-navy brand band behind the Home hero and the wide-desktop Reader
+     hero. DESIGN_SYSTEM.md defines it as independent of the active theme, so
+     it is a fixed brand constant, not a theme token (DEC-069 / F17). */
+  --brand-hero: #0b1426;
+  /* Garden illustration palette. These are artwork colours, not semantic ones:
+     the leaf and palm marks are drawings, and forcing them onto --primary would
+     make the garden monochrome. Named so they are themeable and greppable
+     rather than being hex literals inside SVG paths (DEC-069 / F17). */
+  --garden-leaf: #f59e0b;
+  --garden-leaf-edge: #d97706;
+  --garden-leaf-vein: #92400e;
+  --garden-palm: #10b981;
+  --garden-palm-edge: #059669;
+  --garden-palm-shade: #064e3b;
+  --garden-gold: #e4a84a;
+  /* Celebration confetti ramps, one token per burst. Held as comma-separated
+     lists because canvas-confetti takes an array of colours. */
+  --confetti-session: #16a34a, #22c55e, #4ade80;
+  --confetti-group: #d7a528, #fbbf24, #fde68a, #a3e635;
   --ds-control-height-compact: 2.75rem;
   --ds-control-height: 3rem;
   --ds-control-height-prominent: 3.25rem;
@@ -194,6 +217,13 @@
   --ds-radius-control: 0.875rem;
   --ds-radius-card: 1.25rem;
   --ds-radius-overlay: 1.5rem;
+  /* Two radii that sit outside the card/overlay scale on purpose.
+     micro: heat-map day cells are ~10px square, where the 8px small radius
+     would round them almost to circles. device: the phone-canvas bezel,
+     shared with .app-shell, which is device chrome rather than a product
+     surface (DEC-069 / F13). */
+  --ds-radius-micro: 2px;
+  --ds-radius-device: 2.5rem;
   --ds-focus-width: 3px;
   --ds-focus-offset: 2px;
   --radius-full: 9999px;
@@ -342,6 +372,105 @@ textarea {
 .bold-text {
   --font-weight-medium: 700;
   --font-weight-normal: 500;
+}
+
+/* Reader per-category accent. Each collection tints --primary/--ring for its
+   own reading session. These sixteen values used to be hex literals inside a
+   switch in ReaderScreen.tsx, applied as an inline style (DEC-069 / F17); they
+   belong with the rest of the palette, where they can be seen next to the
+   themes they have to work against. Behaviour is unchanged: the attribute sits
+   on the reader root and descendants inherit the custom properties.
+
+   Dark grounds first, matching :root; the light theme overrides below. */
+
+[data-reader-category="morning"] {
+  --primary: #fbbf24;
+  --ring: #fbbf24;
+}
+
+[data-reader-category="evening"] {
+  --primary: #2dd4bf;
+  --ring: #2dd4bf;
+}
+
+[data-reader-category="before_sleep"] {
+  --primary: #a78bfa;
+  --ring: #a78bfa;
+}
+
+[data-reader-category="after_prayer"] {
+  --primary: #34d399;
+  --ring: #34d399;
+}
+
+[data-reader-category="waking_up"] {
+  --primary: #38bdf8;
+  --ring: #38bdf8;
+}
+
+[data-reader-category="illness_ruqyah"] {
+  --primary: #fb7185;
+  --ring: #fb7185;
+}
+
+[data-reader-category="distress_anxiety"] {
+  --primary: #818cf8;
+  --ring: #818cf8;
+}
+
+[data-reader-category="travel"] {
+  --primary: #fbbf24;
+  --ring: #fbbf24;
+}
+
+/* Light needs the darker 700-weight variants to hold contrast on #f8f5f0. */
+
+.light-mode [data-reader-category="morning"],
+.theme-light [data-reader-category="morning"] {
+  --primary: #b45309;
+  --ring: #b45309;
+}
+
+.light-mode [data-reader-category="evening"],
+.theme-light [data-reader-category="evening"] {
+  --primary: #0f766e;
+  --ring: #0f766e;
+}
+
+.light-mode [data-reader-category="before_sleep"],
+.theme-light [data-reader-category="before_sleep"] {
+  --primary: #6d28d9;
+  --ring: #6d28d9;
+}
+
+.light-mode [data-reader-category="after_prayer"],
+.theme-light [data-reader-category="after_prayer"] {
+  --primary: #047857;
+  --ring: #047857;
+}
+
+.light-mode [data-reader-category="waking_up"],
+.theme-light [data-reader-category="waking_up"] {
+  --primary: #0369a1;
+  --ring: #0369a1;
+}
+
+.light-mode [data-reader-category="illness_ruqyah"],
+.theme-light [data-reader-category="illness_ruqyah"] {
+  --primary: #be123c;
+  --ring: #be123c;
+}
+
+.light-mode [data-reader-category="distress_anxiety"],
+.theme-light [data-reader-category="distress_anxiety"] {
+  --primary: #4338ca;
+  --ring: #4338ca;
+}
+
+.light-mode [data-reader-category="travel"],
+.theme-light [data-reader-category="travel"] {
+  --primary: #d97706;
+  --ring: #d97706;
 }
 
 /* Untitled UI directional icons mirror from the nearest language direction. */
@@ -703,7 +832,7 @@ textarea {
   flex-direction: column;
   width: min(100vw, 390px);
   height: min(100dvh, 882px);
-  border-radius: 40px;
+  border-radius: var(--ds-radius-device);
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 

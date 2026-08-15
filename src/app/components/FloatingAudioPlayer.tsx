@@ -191,7 +191,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
           onChange={(event) => controller.seek(Number(event.currentTarget.value))}
           aria-label={copy.seek}
           aria-valuetext={accessibleTime(state.currentTime, state.duration, language)}
-          className="h-11 min-w-0 flex-1 accent-amber-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="h-11 min-w-0 flex-1 accent-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         />
         <span className="w-10 text-center text-[0.6875rem] font-semibold text-muted-foreground">
           {formatTime(state.duration, language)}

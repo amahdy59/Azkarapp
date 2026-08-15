@@ -47,6 +47,7 @@ Rules:
 ## Geometry and control contract
 
 - Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets. Documented set: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
+- **Compact sub-scale.** Chips, badges, icon-and-label rows and other compact internal elements may use the 2 px half-steps between those values — 2, 6, 10, 14, 18 px (`gap-1.5`, `py-2.5`, `p-3.5`, and so on). This is a deliberate part of the contract, not drift: at the scale of a 20 px badge the next full step is a 100% jump, and the app already relies on these in roughly 175 places. The half-steps are for spacing _inside_ a component. Page gutters, section rhythm and the gaps between cards stay on the full 4 px set above.
 - Radius roles are 8 px for compact internal elements, 12-14 px for controls, 16-20 px for standard cards, and 24 px for major containers and sheets. Full-radius for chips and compact segmented controls only.
 - Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
 - Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.

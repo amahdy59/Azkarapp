@@ -32,6 +32,11 @@ export default tseslint.config(
     rules: {
       "azkar/no-inline-bilingual-copy": "error",
       "azkar/no-roleless-aria-label": "error",
+      // Token discipline (DEC-069). The Phase 19 migration moved 252 raw
+      // palette usages and 17 arbitrary radii onto semantic tokens; without
+      // these the cleanup would regress one commit at a time.
+      "azkar/no-raw-palette-color": "error",
+      "azkar/no-arbitrary-radius": "error",
     },
   },
   {

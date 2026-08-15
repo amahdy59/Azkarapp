@@ -62,7 +62,7 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`group relative flex w-full rounded-[24px] border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+      className={`group relative flex w-full rounded-3xl border transition-all duration-200 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
           ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
@@ -219,7 +219,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border p-5 shadow-raised sm:p-7 md:p-8 ${
+        className={`flex w-full flex-col rounded-3xl border p-5 shadow-raised sm:p-7 md:p-8 ${
           isHomeSubset
             ? "flex-1 border-white/15 bg-on-media-surface/82 backdrop-blur-lg"
             : "border-border bg-card text-foreground"
@@ -1172,7 +1172,7 @@ export function ProgressYearView({
                 {m.dayCells.slice(0, 28).map((cell) => (
                   <div
                     key={cell.dayNum}
-                    className={`aspect-square rounded-[2px] ${
+                    className={`aspect-square rounded-[var(--ds-radius-micro)] ${
                       cell.isPalm || cell.level === 2
                         ? "bg-primary"
                         : cell.level === 1

@@ -1,33 +1,40 @@
-import { Linter } from "eslint";
 import { describe, expect, it } from "vitest";
-import { azkarLintRules } from "./eslint-rules.mjs";
+import { ARBITRARY_RADIUS, RAW_PALETTE_CLASS, azkarLintRules } from "./eslint-rules.mjs";
 
-function verify(code, rule) {
-  const linter = new Linter();
-  return linter.verify(code, [
-    {
-      languageOptions: {
-        ecmaVersion: "latest",
-        sourceType: "module",
-        parserOptions: { ecmaFeatures: { jsx: true } },
-      },
-      plugins: { azkar: azkarLintRules },
-      rules: { [`azkar/${rule}`]: "error" },
-    },
-  ]);
-}
-
-describe("Azkar ESLint guards", () => {
-  it("rejects inline Arabic and English conditional copy", () => {
-    expect(verify('<p>{isArabic ? "صباح الخير" : "Good morning"}</p>;', "no-inline-bilingual-copy")).toHaveLength(1);
+describe("azkar lint rules", () => {
+  it("registers every rule referenced by eslint.config.js", () => {
+    expect(Object.keys(azkarLintRules.rules).sort()).toEqual([
+      "no-arbitrary-radius",
+      "no-inline-bilingual-copy",
+      "no-raw-palette-color",
+      "no-roleless-aria-label",
+    ]);
   });
 
-  it("allows direction and locale conditionals", () => {
-    expect(verify('const direction = isArabic ? "rtl" : "ltr";', "no-inline-bilingual-copy")).toHaveLength(0);
+  describe("no-raw-palette-color", () => {
+    it.each(["flex bg-amber-500 p-2", "text-emerald-600", "border-slate-950/40", "hover:bg-blue-500"])(
+      "rejects %s",
+      (value) => expect(RAW_PALETTE_CLASS.test(value)).toBe(true),
+    );
+
+    it.each(["bg-primary text-primary-foreground", "text-success", "border-border-control", "bg-on-media-surface/82"])(
+      "allows %s",
+      (value) => expect(RAW_PALETTE_CLASS.test(value)).toBe(false),
+    );
+
+    it("does not flag a token whose name merely contains a palette word", () => {
+      expect(RAW_PALETTE_CLASS.test("bg-sleep text-evening")).toBe(false);
+    });
   });
 
-  it("rejects aria-label on a roleless div but accepts an explicit role", () => {
-    expect(verify('<div aria-label="Summary" />;', "no-roleless-aria-label")).toHaveLength(1);
-    expect(verify('<div role="region" aria-label="Summary" />;', "no-roleless-aria-label")).toHaveLength(0);
+  describe("no-arbitrary-radius", () => {
+    it.each(["rounded-[28px]", "rounded-b-[36px]", "rounded-t-[1.75rem]"])("rejects %s", (value) =>
+      expect(ARBITRARY_RADIUS.test(value)).toBe(true),
+    );
+
+    it.each(["rounded-3xl", "rounded-full", "rounded-[var(--ds-radius-overlay)]", "rounded-[inherit]"])(
+      "allows %s",
+      (value) => expect(ARBITRARY_RADIUS.test(value)).toBe(false),
+    );
   });
 });

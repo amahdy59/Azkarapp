@@ -144,7 +144,7 @@ export function ResponsiveSheet({
         data-prevent-count="true"
         aria-describedby={describedById}
         dir={direction}
-        className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-[1.75rem] border-t border-border/40 bg-background shadow-overlay outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${drawerClassName}`.trim()}
+        className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl border-t border-border/40 bg-background shadow-overlay outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${drawerClassName}`.trim()}
       >
         <DrawerTitle className="sr-only">{title}</DrawerTitle>
         {children}

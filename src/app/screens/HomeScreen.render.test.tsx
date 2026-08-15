@@ -44,7 +44,7 @@ describe("HomeScreen quick access", () => {
 
     expect(screen.getByTestId("hijri-date")).toBeInTheDocument();
     expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
-    expect(screen.getByTestId("home-hero")).toHaveClass("rounded-b-[28px]");
+    expect(screen.getByTestId("home-hero")).toHaveClass("rounded-b-3xl");
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
     expect(screen.getByTestId("home-header-stats")).toBeInTheDocument();
     expect(screen.getByTestId("header-streak").compareDocumentPosition(screen.getByTestId("header-palms"))).toBe(

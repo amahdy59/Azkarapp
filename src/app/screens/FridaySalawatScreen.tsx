@@ -49,7 +49,7 @@ const COPY = {
 
 function ReferenceLink({ text, source, href }: { text: string; source: string; href: string }) {
   return (
-    <article className="rounded-[22px] border border-border bg-card p-4 text-start">
+    <article className="rounded-3xl border border-border bg-card p-4 text-start">
       <p className="text-[0.9375rem] font-semibold leading-7 text-foreground" dir="auto">
         {text}
       </p>
@@ -185,7 +185,7 @@ export function FridaySalawatScreen({
         onClick={handleCanvasClick}
       >
         <section
-          className="space-y-3 rounded-[24px] border border-border bg-card p-4 sm:p-5 shadow-raised"
+          className="space-y-3 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-raised"
           aria-label={copy.target}
         >
           <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">

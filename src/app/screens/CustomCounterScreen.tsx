@@ -193,7 +193,7 @@ export function CustomCounterScreen({
           <div className="relative z-20 mb-4 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
             <div className="min-w-0">
               <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-2 rounded-[16px] border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
                   <span className="truncate text-start flex-1">
                     {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
                   </span>
@@ -231,7 +231,7 @@ export function CustomCounterScreen({
           </div>
 
           <section
-            className="relative z-10 space-y-3 rounded-[24px] border border-border bg-card p-4 sm:p-5 shadow-raised"
+            className="relative z-10 space-y-3 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-raised"
             aria-label={t(language, "counter.targetLabel")}
           >
             <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">

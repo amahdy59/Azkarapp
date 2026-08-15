@@ -504,7 +504,7 @@ export function HomeScreen({
         <div className="flex w-full flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-[28px] bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-[36px] sm:shadow-raised lg:min-h-[34rem]"
+            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-3xl bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-3xl sm:shadow-raised lg:min-h-[34rem]"
           >
             <div
               data-testid="time-of-day-scene-window"
@@ -571,7 +571,7 @@ export function HomeScreen({
             <section
               data-testid="after-prayer-trackers"
               dir={direction}
-              className="overflow-hidden rounded-[30px] border border-border bg-card text-foreground shadow-raised"
+              className="overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
             >
               <div className="border-b border-border/70 bg-muted/35 px-4 py-5 text-start sm:px-6">
                 <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
@@ -639,7 +639,7 @@ export function HomeScreen({
                                   ? "earlier"
                                   : "upcoming"
                         }
-                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-[22px] border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
+                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-3xl border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-300 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
                           isCompletedPrayer
                             ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
                             : isActivePrayer

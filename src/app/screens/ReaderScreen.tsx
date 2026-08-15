@@ -84,53 +84,6 @@ function vibrate(pattern: number | number[]) {
   }
 }
 
-const getCategoryThemeStyles = (catId: CategoryId, themeMode: ThemeMode) => {
-  const isLight = themeMode === "light";
-  if (isLight) {
-    switch (catId) {
-      case "morning":
-        return { "--primary": "#b45309", "--ring": "#b45309" } as React.CSSProperties; // Amber 700
-      case "evening":
-        return { "--primary": "#0f766e", "--ring": "#0f766e" } as React.CSSProperties; // Teal 700
-      case "before_sleep":
-        return { "--primary": "#6d28d9", "--ring": "#6d28d9" } as React.CSSProperties; // Violet 700
-      case "after_prayer":
-        return { "--primary": "#047857", "--ring": "#047857" } as React.CSSProperties; // Emerald 700
-      case "waking_up":
-        return { "--primary": "#0369a1", "--ring": "#0369a1" } as React.CSSProperties; // Sky 700
-      case "illness_ruqyah":
-        return { "--primary": "#be123c", "--ring": "#be123c" } as React.CSSProperties; // Rose 700
-      case "distress_anxiety":
-        return { "--primary": "#4338ca", "--ring": "#4338ca" } as React.CSSProperties; // Indigo 700
-      case "travel":
-        return { "--primary": "#d97706", "--ring": "#d97706" } as React.CSSProperties; // Amber 600
-      default:
-        return {};
-    }
-  } else {
-    switch (catId) {
-      case "morning":
-        return { "--primary": "#fbbf24", "--ring": "#fbbf24" } as React.CSSProperties; // Amber 400
-      case "evening":
-        return { "--primary": "#2dd4bf", "--ring": "#2dd4bf" } as React.CSSProperties; // Teal 400
-      case "before_sleep":
-        return { "--primary": "#a78bfa", "--ring": "#a78bfa" } as React.CSSProperties; // Violet 400
-      case "after_prayer":
-        return { "--primary": "#34d399", "--ring": "#34d399" } as React.CSSProperties; // Emerald 400
-      case "waking_up":
-        return { "--primary": "#38bdf8", "--ring": "#38bdf8" } as React.CSSProperties; // Sky 400
-      case "illness_ruqyah":
-        return { "--primary": "#fb7185", "--ring": "#fb7185" } as React.CSSProperties; // Rose 400
-      case "distress_anxiety":
-        return { "--primary": "#818cf8", "--ring": "#818cf8" } as React.CSSProperties; // Indigo 400
-      case "travel":
-        return { "--primary": "#fbbf24", "--ring": "#fbbf24" } as React.CSSProperties; // Amber 400
-      default:
-        return {};
-    }
-  }
-};
-
 export function ReaderScreen({
   catId,
   subCategory,
@@ -693,8 +646,6 @@ export function ReaderScreen({
     </>
   );
 
-  const categoryThemeStyles = getCategoryThemeStyles(catId, themeMode);
-
   const handleReaderPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (reducedMotion || longSurah || complete) return;
     const target = event.target;
@@ -722,7 +673,7 @@ export function ReaderScreen({
       data-zikr-id={z.id}
       data-counting-mode={longSurah ? "counter-only" : "canvas"}
       dir={direction}
-      style={categoryThemeStyles}
+      data-reader-category={catId}
       screenName={displayCategoryName}
       onClick={handleSurfaceTap}
       onPointerDown={handleReaderPointerDown}
@@ -767,7 +718,8 @@ export function ReaderScreen({
             data-testid="reader-desktop-hero"
             className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
             style={{
-              background: "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), #0b1426",
+              background:
+                "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
             }}
           >
             <IconButton

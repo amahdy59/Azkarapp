@@ -12,6 +12,21 @@ import { getCategoryStreak, MAIN_CATEGORY_IDS, type GrowthEvent } from "../progr
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, RoutineMode } from "../types";
 import { reportError } from "../../lib/observability";
 
+/**
+ * Confetti takes an array of colour strings, so these cannot be utility classes.
+ * They read the named decorative ramps from the stylesheet instead of hardcoding
+ * hex here (DEC-069 / F17), which keeps the celebration in step with the theme.
+ */
+function confettiColors(token: "--confetti-session" | "--confetti-group", fallback: string[]): string[] {
+  if (typeof document === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement).getPropertyValue(token);
+  const parsed = value
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean);
+  return parsed.length > 0 ? parsed : fallback;
+}
+
 export function CompletionScreen({
   catId,
   sessionStart,
@@ -59,6 +74,8 @@ export function CompletionScreen({
     }
 
     const isCore = MAIN_CATEGORY_IDS.includes(catId);
+    const sessionColors = confettiColors("--confetti-session", ["#16a34a", "#22c55e", "#4ade80"]);
+    const groupColors = confettiColors("--confetti-group", ["#d7a528", "#fbbf24", "#fde68a", "#a3e635"]);
     let animationFrame = 0;
 
     if (isCore) {
@@ -71,14 +88,14 @@ export function CompletionScreen({
           angle: 60,
           spread: 55,
           origin: { x: 0 },
-          colors: ["#16a34a", "#22c55e", "#4ade80"],
+          colors: sessionColors,
         });
         confetti({
           particleCount: 3,
           angle: 120,
           spread: 55,
           origin: { x: 1 },
-          colors: ["#16a34a", "#22c55e", "#4ade80"],
+          colors: sessionColors,
         });
         if (Date.now() < end) {
           animationFrame = requestAnimationFrame(frame);
@@ -92,7 +109,7 @@ export function CompletionScreen({
         angle: 90,
         spread: 45,
         origin: { x: 0.5, y: 0.35 },
-        colors: ["#d7a528", "#fbbf24", "#fde68a", "#a3e635"],
+        colors: groupColors,
         scalar: 0.7,
         gravity: 0.9,
       });

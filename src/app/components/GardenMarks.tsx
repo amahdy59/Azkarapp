@@ -27,16 +27,16 @@ export function GoldenLeafMark({
     >
       <path
         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-        fill="#F59E0B"
+        fill="var(--garden-leaf)"
         fillOpacity={filled ? 0.95 : 0.22}
-        stroke="#D97706"
+        stroke="var(--garden-leaf-edge)"
         strokeOpacity={filled ? 1 : 0.45}
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
       <path
         d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-        stroke="#92400E"
+        stroke="var(--garden-leaf-vein)"
         strokeOpacity={filled ? 1 : 0.35}
         strokeWidth="1.8"
         strokeLinecap="round"
@@ -67,16 +67,16 @@ export function GreenLeafMark({
     >
       <path
         d="M20.5 3.5C12.8 3.7 6.4 6.5 4.1 11.3c-1.5 3.1-.5 6.3 2.3 7.4 2.8 1.2 5.9-.2 7.8-2.4 2.7-3.6 4.7-8 6.3-12.8Z"
-        fill="#10B981"
+        fill="var(--garden-palm)"
         fillOpacity={filled ? 0.95 : 0.22}
-        stroke="#059669"
+        stroke="var(--garden-palm-edge)"
         strokeOpacity={filled ? 1 : 0.45}
         strokeWidth="1.8"
         strokeLinejoin="round"
       />
       <path
         d="M4 20c2.7-4.3 6.5-7.7 11.7-10.1"
-        stroke="#064E3B"
+        stroke="var(--garden-palm-shade)"
         strokeOpacity={filled ? 1 : 0.35}
         strokeWidth="1.8"
         strokeLinecap="round"
@@ -158,11 +158,11 @@ export function PalmTreeMark({
   );
 }
 
-/** Golden Palm Tree Mark — matching golden amber (#E4A84A). */
+/** Golden Palm Tree Mark — matching golden amber (--garden-gold). */
 export function GoldenPalmMark({
   className = "",
   size = 28,
-  color = "#E4A84A",
+  color = "var(--garden-gold)",
 }: {
   className?: string;
   size?: number;

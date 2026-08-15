@@ -68,7 +68,7 @@ function EvidenceCard({ item, language }: { item: BenefitEvidence; language: App
     .join("\n\n");
 
   return (
-    <article className="flex flex-col rounded-[24px] border border-border bg-card p-5 text-start shadow-raised sm:p-6">
+    <article className="flex flex-col rounded-3xl border border-border bg-card p-5 text-start shadow-raised sm:p-6">
       {item.kind === "hadith" && (
         <h2 className="text-[1rem] font-black leading-7 text-foreground" dir="auto">
           {title}

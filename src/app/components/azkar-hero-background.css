@@ -4,7 +4,7 @@
   overflow: hidden;
   border-radius: var(--radius-3xl, 24px);
   min-height: clamp(20rem, 42vw, 28rem);
-  background: #0b1426;
+  background: var(--brand-hero);
   color: #fff;
 }
 
