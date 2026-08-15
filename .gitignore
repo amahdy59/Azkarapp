@@ -8,9 +8,21 @@ playwright-report/
 test-results/
 .playwright-dist/
 *.log
-*.png
-# ...but phase evidence is a deliberate, reviewed artifact. The blanket *.png
-# rule above is why the Phase 01 baseline was silently never committed.
-!docs/agent/evidence/screenshots/**/*.png
+
+# Throwaway PNGs only. This used to be a blanket `*.png`, which silently
+# dropped every product image: the Phase 01 baseline was never committed, and
+# each image under public/ is in the repository only because someone forced it
+# past the rule. Scope the ignore to the directories that actually generate
+# disposable screenshots (DEC-066 / F34).
+playwright-report/**/*.png
+test-results/**/*.png
+coverage/**/*.png
+
+# Uncompressed masters and design references. Kept out of public/ so they are
+# never deployed (DEC-066 / F24). They are also the only copies in existence —
+# see the preservation note in docs/agent/phases/PHASE_18_BUILD_WEIGHT.md
+# before deleting this directory or moving it to another machine.
+design-sources/
+
 .agents/
 skills-lock.json

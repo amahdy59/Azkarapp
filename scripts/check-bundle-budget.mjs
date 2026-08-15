@@ -11,6 +11,15 @@ import { gzipSync } from "node:zlib";
  * corrected build as the old ones did over the broken one. Do not raise them
  * again to make a build pass; reduce the CSS instead.
  */
+/**
+ * `totalOutput` and `largestFile` walk the whole of dist/, not just dist/assets.
+ * Everything copied verbatim from public/ lands outside dist/assets, so until
+ * DEC-066 this gate could not see it at all — roughly 24 MB of unreferenced
+ * masters, design sources and superseded imagery shipped on every release
+ * without the budget noticing (F24/F25). Measured output after that cleanup is
+ * ~6.2 MB, so these ceilings hold real headroom while still failing loudly if
+ * a source tree is dropped back into public/.
+ */
 const limits = {
   javascript: 450 * 1024,
   css: 150 * 1024,
@@ -18,10 +27,34 @@ const limits = {
   javascriptGzip: 130 * 1024,
   cssGzip: 26 * 1024,
   initialGzip: 200 * 1024,
+  totalOutput: 8 * 1024 * 1024,
+  largestFile: 2 * 1024 * 1024,
 };
+const distDirectory = path.resolve("dist");
 const assetsDirectory = path.resolve("dist/assets");
 const entries = await readdir(assetsDirectory);
 const failures = [];
+
+async function* walkFiles(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const entryPath = path.join(directory, entry.name);
+    if (entry.isDirectory()) yield* walkFiles(entryPath);
+    else yield entryPath;
+  }
+}
+
+let totalOutputSize = 0;
+for await (const filePath of walkFiles(distDirectory)) {
+  const size = (await stat(filePath)).size;
+  totalOutputSize += size;
+  if (size > limits.largestFile) {
+    const relativePath = path.relative(distDirectory, filePath).split(path.sep).join("/");
+    failures.push(`${relativePath}: ${size} bytes exceeds the ${limits.largestFile} byte single-file limit`);
+  }
+}
+if (totalOutputSize > limits.totalOutput) {
+  failures.push(`dist total: ${totalOutputSize} bytes exceeds ${limits.totalOutput} bytes`);
+}
 
 for (const entry of entries) {
   const filePath = path.join(assetsDirectory, entry);

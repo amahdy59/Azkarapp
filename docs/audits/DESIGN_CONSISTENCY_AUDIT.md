@@ -19,6 +19,14 @@ responsiveness and performance.
 | **Medium**   | Localized drift, dead code, or a gap in enforcement                                  |
 | **Passing**  | Checked and found correct; recorded so it is not "fixed" by mistake                  |
 
+## Status
+
+✅ resolved · ⏸ deferred (with recorded reason)
+
+Phase 15 (DEC-064/065) closed F01–F05 and F32. Phase 18 (DEC-066) closed F24–F26, F33 and
+F34, and deferred F27 to Phase 20 because this environment cannot composite frames and the
+brief requires a measurement rather than an assumption.
+
 ## Root cause
 
 F01 is upstream of F02–F05 and contributes to F06 and F08. Fix it first; several findings
@@ -28,11 +36,11 @@ will change shape or close outright once the design-system primitives actually c
 
 | ID  | Severity | Area            | Finding                                                                     | Phase |
 | --- | -------- | --------------- | --------------------------------------------------------------------------- | ----- |
-| F01 | Critical | Build           | Tailwind never compiles utilities used only in `components/ui/`             | 15    |
-| F02 | Critical | Overlays        | Destructive-confirmation dialog is unpositioned and unscrimmed              | 15    |
-| F03 | Critical | Overlays        | Every modal and drawer scrim is transparent                                 | 15    |
-| F04 | Critical | Menus           | Menu items lose padding, indicator sizing and height clamp                  | 15    |
-| F05 | Critical | Auth            | OTP field in the auth flow is unstyled                                      | 15    |
+| F01 | Critical | Build           | Tailwind never compiles utilities used only in `components/ui/`             | 15 ✅ |
+| F02 | Critical | Overlays        | Destructive-confirmation dialog is unpositioned and unscrimmed              | 15 ✅ |
+| F03 | Critical | Overlays        | Every modal and drawer scrim is transparent                                 | 15 ✅ |
+| F04 | Critical | Menus           | Menu items lose padding, indicator sizing and height clamp                  | 15 ✅ |
+| F05 | Critical | Auth            | OTP field in the auth flow is unstyled                                      | 15 ✅ |
 | F06 | High     | Menus           | Three incompatible dropdown recipes ship side by side                       | 17    |
 | F07 | High     | Menus           | Select and DropdownMenu are two different design languages                  | 17    |
 | F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                      | 17    |
@@ -51,17 +59,17 @@ will change shape or close outright once the design-system primitives actually c
 | F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20    |
 | F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16    |
 | F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20    |
-| F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18    |
-| F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18    |
-| F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size               | 18    |
-| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 18    |
+| F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18 ✅ |
+| F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18 ✅ |
+| F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size               | 18 ✅ |
+| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 20 ⏸  |
 | F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | 20    |
 | F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree            | —     |
 | F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20    |
 | F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17    |
-| F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15    |
-| F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18    |
-| F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18    |
+| F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15 ✅ |
+| F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18 ✅ |
+| F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18 ✅ |
 | F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | 20    |
 | F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20    |
 

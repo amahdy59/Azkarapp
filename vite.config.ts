@@ -71,20 +71,14 @@ export default defineConfig(({ mode }) => {
         },
         workbox: {
           globPatterns: ["**/*.{js,css,html,svg,png,webp,avif,woff2}"],
-          globIgnores: [
-            "**/FridayModeScreen-*.js",
-            "Before Sleep.png",
-            "Evening.png",
-            "Morning.png",
-            "colored palm tree.png",
-            "dimmed palm tree.png",
-            "azkar-responsive-assets/**",
-            "assets/backgrounds/Originals/**",
-            "webp/**",
-            "evening_sky.webp",
-            "morning_sky.webp",
-            "sleep_sky.webp",
-          ],
+          // Only real exclusions belong here. The rest of this list used to name
+          // uncompressed masters, design sources and superseded imagery that no
+          // code path referenced — keeping them out of the precache while still
+          // deploying ~24 MB of them. Those files now live in design-sources/ or
+          // are gone entirely (DEC-066 / F24), so naming them here would be dead
+          // configuration. Do not re-add an asset here to hide its weight; take
+          // it out of public/ instead.
+          globIgnores: ["**/FridayModeScreen-*.js"],
           runtimeCaching: [
             {
               urlPattern: /\/assets\/.*\.(?:js|css)$/,

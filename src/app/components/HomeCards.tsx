@@ -304,6 +304,10 @@ export function FridayHomeCard({
           <img
             src={`${import.meta.env.BASE_URL}images/mosque_prophet.png`}
             alt=""
+            width={1254}
+            height={1254}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover"
           />
         </span>
@@ -338,6 +342,10 @@ export function FridayHomeCard({
           <img
             src={`${import.meta.env.BASE_URL}images/mosque_prophet.png`}
             alt=""
+            width={1254}
+            height={1254}
+            loading="lazy"
+            decoding="async"
             className="absolute inset-0 h-full w-full object-cover"
           />
         </div>

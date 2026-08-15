@@ -791,6 +791,10 @@ export function HomeScreen({
                   <img
                     src={`${import.meta.env.BASE_URL}images/benefits_zikr.png`}
                     alt=""
+                    width={1254}
+                    height={1254}
+                    loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover object-[center_42%]"
                   />
                 </div>
