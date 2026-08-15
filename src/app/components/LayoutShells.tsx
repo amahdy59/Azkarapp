@@ -251,7 +251,13 @@ export function NavSidebar({
           <button
             type="button"
             onClick={toggleLang}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors"
+            // Named like its theme sibling below (DEC-068 / F31). Without this
+            // the accessible name was the concatenated text content,
+            // "LanguageEnglish", so two adjacent controls of the same type
+            // announced in two different formats. The explicit focus ring
+            // matches the theme button too, which had one while this did not.
+            aria-label={`${t(language, "settings.language")}: ${LANGUAGE_LABELS[language]}`}
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="flex items-center gap-2.5">
               <Globe size={18} className="text-primary" />

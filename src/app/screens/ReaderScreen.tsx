@@ -791,11 +791,7 @@ export function ReaderScreen({
                 >
                   <MoreVertical size={18} />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="end"
-                  className="min-w-[210px] rounded-2xl p-1.5 shadow-overlay border border-border bg-popover text-popover-foreground"
-                  sideOffset={8}
-                >
+                <DropdownMenuContent align="end" className="min-w-[210px]">
                   {renderReaderMenuItems("desktop")}
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -982,11 +978,7 @@ export function ReaderScreen({
                     <DropdownMenuTrigger aria-label={t(language, "reader.menu")} className={READER_HEADER_ACTION_CLASS}>
                       <MoreVertical size={20} />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="min-w-[210px] rounded-2xl p-1.5 shadow-overlay border border-border bg-popover text-popover-foreground"
-                      sideOffset={8}
-                    >
+                    <DropdownMenuContent align="end" className="min-w-[210px]">
                       {renderReaderMenuItems("mobile")}
                     </DropdownMenuContent>
                   </DropdownMenu>

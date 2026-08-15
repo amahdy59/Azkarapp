@@ -153,7 +153,7 @@ export function AzkarLibraryScreen({
                       <ChevronDown size={15} aria-hidden="true" />
                     </button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="min-w-[13rem] rounded-2xl p-1.5">
+                  <DropdownMenuContent align="end" className="min-w-[13rem]">
                     <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
                       {t(language, "library.title")}
                     </DropdownMenuLabel>
@@ -162,7 +162,7 @@ export function AzkarLibraryScreen({
                       onValueChange={(value) => setSection(value as LibrarySection)}
                     >
                       {(["collections", "saved"] as const).map((value) => (
-                        <DropdownMenuRadioItem key={value} value={value} className="min-h-11 rounded-xl font-bold">
+                        <DropdownMenuRadioItem key={value} value={value} className="font-bold">
                           {`${t(language, `library.${value}`)}${
                             value === "saved" && savedZikrIds.size > 0
                               ? ` (${formatNumerals(savedZikrIds.size, language)})`

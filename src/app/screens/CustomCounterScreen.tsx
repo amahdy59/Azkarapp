@@ -200,7 +200,7 @@ export function CustomCounterScreen({
                   <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                  align={direction === "rtl" ? "end" : "start"}
+                  align="start"
                   className="max-h-[250px] w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
                 >
                   <DropdownMenuRadioGroup

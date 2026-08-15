@@ -216,7 +216,7 @@ export function CategoryScreen({
                     <ChevronDown size={15} aria-hidden="true" />
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="start" className="min-w-[14rem] rounded-2xl p-1.5">
+                <DropdownMenuContent align="start" className="min-w-[14rem]">
                   <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
                     {t(language, "category.routineLength")}
                   </DropdownMenuLabel>
@@ -225,7 +225,7 @@ export function CategoryScreen({
                     onValueChange={(mode) => onRoutineModeChange?.(mode as RoutineMode)}
                   >
                     {(["complete", "core"] as const).map((mode) => (
-                      <DropdownMenuRadioItem key={mode} value={mode} className="min-h-11 rounded-xl font-bold">
+                      <DropdownMenuRadioItem key={mode} value={mode} className="font-bold">
                         {t(language, mode === "core" ? "category.coreSummary" : "category.completeSummary", {
                           count: formatNumerals(
                             mode === "core" ? getRoutineStepCount(catId, "core", prayer) : allAzkar.length,

@@ -154,3 +154,87 @@ test("radio menu items keep their logical-start indicator gutter in Arabic", asy
   expect(geometry.indicatorInsetFromLogicalStart ?? -1).toBeGreaterThanOrEqual(0);
   expect(geometry.indicatorInsetFromLogicalStart ?? 999).toBeLessThanOrEqual(16);
 });
+
+/* ── Phase 17 / DEC-068: one menu surface, one item anatomy, logical alignment ── */
+
+async function openLibraryScopeMenu(page: Page, language: "ar" | "en") {
+  await page.addInitScript((selected) => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: selected, themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [] },
+        sessions: [],
+      }),
+    );
+  }, language);
+  await page.goto("/");
+  await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
+  await page.getByTestId("nav-azkar").click();
+
+  const trigger = page.locator('[aria-haspopup="menu"]').first();
+  await expect(trigger).toBeVisible();
+  await trigger.click();
+  const menu = page.locator('[data-slot="dropdown-menu-content"]');
+  await expect(menu).toBeVisible();
+  return { trigger, menu };
+}
+
+/**
+ * The library scope menu uses align="end". Radix resolves that against the
+ * direction on the menu root, so the edge it pins to must MIRROR between
+ * languages: the trigger's logical-end edge is its right in LTR and its left in
+ * RTL. Measured at desktop width so collision shifting, which is legitimate and
+ * viewport-dependent, cannot confound the result.
+ */
+test("menus align to the same logical edge in both reading directions", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+
+  const ltr = await openLibraryScopeMenu(page, "en");
+  const ltrMenu = await ltr.menu.boundingBox();
+  const ltrTrigger = await ltr.trigger.boundingBox();
+  expect(ltrMenu && ltrTrigger).toBeTruthy();
+  if (!ltrMenu || !ltrTrigger) return;
+  // LTR: logical end === physical right.
+  expect(Math.abs(ltrMenu.x + ltrMenu.width - (ltrTrigger.x + ltrTrigger.width))).toBeLessThanOrEqual(2);
+
+  const rtl = await openLibraryScopeMenu(page, "ar");
+  await expect(page.locator("html")).toHaveAttribute("dir", "rtl");
+  const rtlMenu = await rtl.menu.boundingBox();
+  const rtlTrigger = await rtl.trigger.boundingBox();
+  expect(rtlMenu && rtlTrigger).toBeTruthy();
+  if (!rtlMenu || !rtlTrigger) return;
+  // RTL: logical end === physical left. If this fails the menu is not
+  // mirroring, which is exactly the F09 defect.
+  expect(Math.abs(rtlMenu.x - rtlTrigger.x)).toBeLessThanOrEqual(2);
+});
+
+test("every menu presents the same surface and 44px items", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 800 });
+  const { menu } = await openLibraryScopeMenu(page, "en");
+
+  const surface = await menu.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      radius: style.borderTopLeftRadius,
+      padding: style.padding,
+      hasShadow: style.boxShadow !== "none",
+      borderColor: style.borderTopColor,
+    };
+  });
+  // --ds-radius-overlay is 1.5rem; menus are overlays, not cards.
+  expect(surface.radius).toBe("24px");
+  expect(surface.padding).toBe("6px");
+  expect(surface.hasShadow).toBe(true);
+
+  const items = menu.getByRole("menuitemradio");
+  const count = await items.count();
+  expect(count).toBeGreaterThan(0);
+  for (let index = 0; index < count; index += 1) {
+    const box = await items.nth(index).boundingBox();
+    expect(box).not.toBeNull();
+    if (box) expect(box.height).toBeGreaterThanOrEqual(44);
+  }
+});

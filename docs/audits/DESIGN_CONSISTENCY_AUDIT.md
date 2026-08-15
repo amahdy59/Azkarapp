@@ -41,11 +41,11 @@ will change shape or close outright once the design-system primitives actually c
 | F03 | Critical | Overlays        | Every modal and drawer scrim is transparent                                 | 15 ✅ |
 | F04 | Critical | Menus           | Menu items lose padding, indicator sizing and height clamp                  | 15 ✅ |
 | F05 | Critical | Auth            | OTP field in the auth flow is unstyled                                      | 15 ✅ |
-| F06 | High     | Menus           | Three incompatible dropdown recipes ship side by side                       | 17    |
-| F07 | High     | Menus           | Select and DropdownMenu are two different design languages                  | 17    |
-| F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                      | 17    |
-| F09 | Medium   | Menus / RTL     | RTL menu alignment handled two contradictory ways                           | 17    |
-| F10 | Medium   | Menus           | No collision padding on any menu                                            | 17    |
+| F06 | High     | Menus           | Three incompatible dropdown recipes ship side by side                       | 17 ✅ |
+| F07 | High     | Menus           | Select and DropdownMenu are two different design languages                  | 17 ✅ |
+| F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                      | 17 ✅ |
+| F09 | Medium   | Menus / RTL     | RTL menu alignment handled two contradictory ways                           | 17 ✅ |
+| F10 | Medium   | Menus           | No collision padding on any menu                                            | 17 ✅ |
 | F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                          | 16 ✅ |
 | F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values           | 16 ✅ |
 | F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                   | 19    |
@@ -66,7 +66,7 @@ will change shape or close outright once the design-system primitives actually c
 | F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | 20    |
 | F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree            | —     |
 | F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20    |
-| F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17    |
+| F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17 ✅ |
 | F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15 ✅ |
 | F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18 ✅ |
 | F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18 ✅ |
@@ -77,6 +77,16 @@ will change shape or close outright once the design-system primitives actually c
 ---
 
 ## Detail
+
+### F09 correction — the audit named the wrong culprit
+
+The audit inferred that because no `DirectionProvider` was mounted, Radix defaulted to LTR,
+making `CustomCounterScreen`'s manual flip the correct site and the other six wrong. That
+inference was wrong. Every `DropdownMenu` root already passes `dir={direction}`, so logical
+alignment resolved correctly everywhere and the manual flip was a **double flip** — the only
+incorrect site. The finding itself stands: two contradictory patterns existed and one was
+wrong. Only the identification was inverted. Corrected under DEC-068 and now covered by an
+LTR/RTL mirroring test rather than inspection.
 
 ### F37 — Touch-target test measures before layout · High · Reproduced and fixed
 

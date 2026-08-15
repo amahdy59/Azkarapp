@@ -73,7 +73,7 @@ export function CounterTargetPicker({
             <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-[13rem] rounded-2xl p-1.5">
+        <DropdownMenuContent align="start" className="min-w-[13rem]">
           <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
             {t(language, "counter.targetLabel")}
           </DropdownMenuLabel>
@@ -84,11 +84,7 @@ export function CounterTargetPicker({
             }}
           >
             {presets.map((preset) => (
-              <DropdownMenuRadioItem
-                key={preset.value}
-                value={String(preset.value)}
-                className="min-h-11 rounded-xl font-bold"
-              >
+              <DropdownMenuRadioItem key={preset.value} value={String(preset.value)} className="font-bold">
                 {preset.label}
               </DropdownMenuRadioItem>
             ))}
