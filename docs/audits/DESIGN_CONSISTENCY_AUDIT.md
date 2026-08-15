@@ -72,10 +72,56 @@ will change shape or close outright once the design-system primitives actually c
 | F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18 ✅ |
 | F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | 20    |
 | F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20    |
+| F37 | High     | Test coverage   | Touch-target test measures the Category screen before it is laid out        | ✅    |
 
 ---
 
 ## Detail
+
+### F37 — Touch-target test measures before layout · High · Reproduced and fixed
+
+Found during the Phase 15–18 programme rather than in the original review, and recorded
+here so the register stays the single source of truth.
+
+`e2e/accessibility.spec.ts` failed intermittently with 116 controls reported at 0x0 on the
+Category screen. That is not a touch-target regression — it is the whole screen measured
+before it was laid out. Two causes, both in the test:
+
+1. Every step in that test waits for a landmark before measuring, **except** the Category
+   step, which measured immediately after `category-card-morning.click()`.
+2. `expectVisibleInteractiveTargetsAtLeast44px` queries and measures in a single pass with
+   no polling, so a screen mid-mount is indistinguishable from a real violation.
+
+Reproduced deterministically with `--repeat-each=12` across the three Chromium projects:
+
+```
+before fix:  3 failed / 36  — all three on "Category"
+after fix:  36 passed / 36  — zero Category failures
+```
+
+The fix adds the missing landmark wait and wraps the measurement in `expect.toPass()`,
+matching the Phase 14 precedent in `reader-microinteractions.spec.ts`. Polling does not
+mask a real regression: a genuinely undersized control keeps failing until the timeout.
+
+**Not a product defect.** No application code changed.
+
+### Two other flaky runs, and what they actually were
+
+`responsive.spec.ts` and `reader-microinteractions.spec.ts` also failed during this
+programme. Neither reproduced: `--repeat-each=8` over the affected responsive tests passed
+96/96, and `reader-microinteractions` passed 16/16 standalone. Their failures correlated
+with a self-inflicted condition rather than a repository defect — `CI=true` was being set
+locally to work around a pnpm TTY prompt, and `playwright.config.ts` couples worker count
+to that same variable (`workers: process.env.CI ? 3 : 2`), silently raising local
+parallelism to 3 during the heavy pre-push gate. The pnpm workaround stopped being
+necessary once `node_modules` was reinstalled under the pinned pnpm 11. With it removed,
+the full suite runs 420/420 on two workers.
+
+**Latent risk, not fixed:** the suite has 68 geometry measurements and only 2 are guarded
+by `expect.toPass()`. The other 66 are the same shape as F37 and could fail the same way
+under load. They are not rewritten here because none of them has been observed failing, and
+speculatively rewriting working tests carries its own risk. Worth a dedicated pass if the
+flakiness recurs.
 
 ### F01 — Tailwind never compiles utilities used only in `components/ui/` · Critical
 

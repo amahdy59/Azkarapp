@@ -100,42 +100,53 @@ async function expectNoWcagViolations(page: import("@playwright/test").Page) {
   expect(contrastViolations, `Color contrast violations:\n${contrastViolations.join("\n")}`).toEqual([]);
 }
 
+/**
+ * A screen that is still mounting reports every control at 0x0, which by size
+ * alone is indistinguishable from a real violation — one run of this suite
+ * failed with 116 controls at 0x0 on a screen that was simply not laid out yet.
+ * Polling separates the two: a genuinely undersized control keeps failing until
+ * the timeout, so nothing real is masked, while the mount race resolves on the
+ * next attempt. Same approach as the Phase 14 bounding-box fix in
+ * reader-microinteractions.spec.ts.
+ */
 async function expectVisibleInteractiveTargetsAtLeast44px(page: import("@playwright/test").Page, screenName: string) {
-  const undersized = await page
-    .locator(
-      'button:visible, a[href]:visible, input:visible, select:visible, [role="button"]:visible, [role="tab"]:visible, [role="radio"]:visible, [role="switch"]:visible',
-    )
-    .evaluateAll((nodes) => {
-      const uniqueNodes = [...new Set(nodes)] as HTMLElement[];
-      return uniqueNodes.flatMap((node) => {
-        const ownBounds = node.getBoundingClientRect();
-        const associatedLabel =
-          node instanceof HTMLInputElement || node instanceof HTMLSelectElement
-            ? node.labels?.item(0)?.getBoundingClientRect()
-            : null;
-        const targetBounds =
-          associatedLabel && associatedLabel.width >= ownBounds.width && associatedLabel.height >= ownBounds.height
-            ? associatedLabel
-            : ownBounds;
+  await expect(async () => {
+    const undersized = await page
+      .locator(
+        'button:visible, a[href]:visible, input:visible, select:visible, [role="button"]:visible, [role="tab"]:visible, [role="radio"]:visible, [role="switch"]:visible',
+      )
+      .evaluateAll((nodes) => {
+        const uniqueNodes = [...new Set(nodes)] as HTMLElement[];
+        return uniqueNodes.flatMap((node) => {
+          const ownBounds = node.getBoundingClientRect();
+          const associatedLabel =
+            node instanceof HTMLInputElement || node instanceof HTMLSelectElement
+              ? node.labels?.item(0)?.getBoundingClientRect()
+              : null;
+          const targetBounds =
+            associatedLabel && associatedLabel.width >= ownBounds.width && associatedLabel.height >= ownBounds.height
+              ? associatedLabel
+              : ownBounds;
 
-        if (targetBounds.width >= 44 && targetBounds.height >= 44) return [];
+          if (targetBounds.width >= 44 && targetBounds.height >= 44) return [];
 
-        return [
-          {
-            label:
-              node.getAttribute("aria-label") ||
-              node.getAttribute("title") ||
-              node.textContent?.replace(/\s+/g, " ").trim() ||
-              node.tagName,
-            tag: node.tagName,
-            width: Math.round(targetBounds.width),
-            height: Math.round(targetBounds.height),
-          },
-        ];
+          return [
+            {
+              label:
+                node.getAttribute("aria-label") ||
+                node.getAttribute("title") ||
+                node.textContent?.replace(/\s+/g, " ").trim() ||
+                node.tagName,
+              tag: node.tagName,
+              width: Math.round(targetBounds.width),
+              height: Math.round(targetBounds.height),
+            },
+          ];
+        });
       });
-    });
 
-  expect(undersized, `${screenName} has interactive targets below the 44px product standard`).toEqual([]);
+    expect(undersized, `${screenName} has interactive targets below the 44px product standard`).toEqual([]);
+  }).toPass({ timeout: 15_000 });
 }
 
 test("initial flow has no automatically detectable WCAG A/AA violations", async ({ page }) => {
@@ -257,6 +268,10 @@ test("visible core-flow controls meet the 44px product touch-target standard", a
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Azkar Library");
 
   await page.getByTestId("category-card-morning").click();
+  // Every other step here waits for a landmark before measuring; this one did
+  // not, so it measured the Category screen mid-mount. That was the only step
+  // that ever failed: 3 of 36 repeats, always Category, always 0x0.
+  await expect(page.getByRole("button", { name: "Start Session", exact: true })).toBeVisible();
   await expectVisibleInteractiveTargetsAtLeast44px(page, "Category");
 
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
