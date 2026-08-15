@@ -793,7 +793,7 @@ export function ReaderScreen({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="end"
-                  className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                  className="min-w-[210px] rounded-2xl p-1.5 shadow-overlay border border-border bg-popover text-popover-foreground"
                   sideOffset={8}
                 >
                   {renderReaderMenuItems("desktop")}
@@ -984,7 +984,7 @@ export function ReaderScreen({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="end"
-                      className="min-w-[210px] rounded-2xl p-1.5 shadow-xl border border-border bg-popover text-popover-foreground"
+                      className="min-w-[210px] rounded-2xl p-1.5 shadow-overlay border border-border bg-popover text-popover-foreground"
                       sideOffset={8}
                     >
                       {renderReaderMenuItems("mobile")}

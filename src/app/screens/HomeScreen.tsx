@@ -798,7 +798,7 @@ export function HomeScreen({
                     className="h-full w-full object-cover object-[center_42%]"
                   />
                 </div>
-                <div className="relative z-10 m-3 rounded-2xl bg-slate-950/90 p-4 shadow-lg sm:m-4 sm:p-5">
+                <div className="relative z-10 m-3 rounded-2xl bg-slate-950/90 p-4 shadow-raised sm:m-4 sm:p-5">
                   <span className="block">
                     <span className="block text-[1.25rem] font-black text-on-media drop-shadow-md">
                       {t(language, "benefits.title")}

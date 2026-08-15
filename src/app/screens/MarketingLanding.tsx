@@ -53,7 +53,7 @@ export default function MarketingLanding() {
               ))}
             </ul>
           </div>
-          <div className="mx-auto w-full max-w-[430px] rounded-[40px] border border-border bg-card p-5 shadow-2xl">
+          <div className="mx-auto w-full max-w-[430px] rounded-[40px] border border-border bg-card p-5 shadow-overlay">
             <div className="rounded-[28px] bg-background p-6">
               <p className="text-sm text-muted-foreground">Good morning</p>
               <h2 className="mt-1 text-2xl font-bold">Begin with remembrance</h2>

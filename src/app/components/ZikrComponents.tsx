@@ -52,12 +52,11 @@ export function PulseRings({
     <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">
       <div
         className={`absolute rounded-2xl border ${ringColor} pulse-ring`}
+        // Only the measured geometry is inline; timing belongs to the
+        // .pulse-ring class so the animation is defined in one place.
         style={{
           width: `${size - 8}px`,
           height: `${height - 8}px`,
-          animationDuration: "260ms",
-          animationTimingFunction: "cubic-bezier(0.22, 1, 0.36, 1)",
-          animationFillMode: "forwards",
           opacity: 0,
         }}
       />

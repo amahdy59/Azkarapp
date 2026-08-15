@@ -106,8 +106,17 @@
   }
 }
 
+/* Timing lives here rather than in an inline style on the element, so the class
+   is self-contained (DEC-067 / F22). The values are carried over unchanged —
+   Phase 20 owns motion timings, not this phase. The width/height overrides in
+   the breakpoint blocks below still need `!important` because ZikrComponents.tsx
+   sets those two properties inline from the measured counter size, and inline
+   styles outrank a class; that is why the `!important` there is not removable. */
 .pulse-ring {
   animation-name: pulse-ring;
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: forwards;
 }
 
 .adaptive-counter-surface {
@@ -168,30 +177,30 @@
 .salawat-counter-surface {
   width: min(18rem, 78vw);
   height: 5.5rem;
-  border-radius: 2.75rem;
+  border-radius: 24px;
 }
 
 .custom-counter-stage .pulse-ring {
   width: min(17.5rem, 75vw) !important;
   height: 5rem !important;
-  border-radius: 2.5rem;
+  border-radius: 24px;
 }
 
 @media (min-width: 48rem) {
   .salawat-counter-surface {
     width: 20rem;
     height: 6.5rem;
-    border-radius: 3.25rem;
+    border-radius: 24px;
   }
   .custom-counter-stage .adaptive-counter-surface {
     width: 18rem;
     height: 6rem;
-    border-radius: 3rem;
+    border-radius: 24px;
   }
   .custom-counter-stage .pulse-ring {
     width: 17.5rem !important;
     height: 5.5rem !important;
-    border-radius: 3rem;
+    border-radius: 24px;
   }
   .custom-counter-stage .counter-number {
     font-size: 2.25rem;
@@ -202,12 +211,12 @@
   .custom-counter-stage .adaptive-counter-surface {
     width: 28rem;
     height: 9rem;
-    border-radius: 4.5rem;
+    border-radius: 24px;
   }
   .custom-counter-stage .pulse-ring {
     width: 27.5rem !important;
     height: 8.5rem !important;
-    border-radius: 4.5rem;
+    border-radius: 24px;
   }
   .custom-counter-stage .counter-number {
     font-size: 3rem;
@@ -263,7 +272,7 @@
   align-items: center;
   justify-content: center;
   border: 1px solid var(--border-control);
-  border-radius: 20px;
+  border-radius: 24px;
   color: var(--foreground);
   background: var(--card);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
@@ -278,7 +287,7 @@
 
 .adaptive-counter-nav.is-compact {
   height: 76px;
-  border-radius: 20px;
+  border-radius: 24px;
 }
 .adaptive-counter-nav:hover:not(:disabled) {
   background: var(--muted);

@@ -46,18 +46,18 @@ will change shape or close outright once the design-system primitives actually c
 | F08 | High     | Menus           | Checkbox/radio/sub-trigger items below the 44px target                      | 17    |
 | F09 | Medium   | Menus / RTL     | RTL menu alignment handled two contradictory ways                           | 17    |
 | F10 | Medium   | Menus           | No collision padding on any menu                                            | 17    |
-| F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                          | 16    |
-| F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values           | 16    |
+| F11 | High     | Elevation       | Raised elevation is invisible in Midnight and Dark                          | 16 ✅ |
+| F12 | High     | Surfaces        | `.adaptive-counter-surface` defined twice with conflicting values           | 16 ✅ |
 | F13 | Medium   | Radius          | Seven distinct corner radii on Home alone                                   | 19    |
 | F14 | Medium   | Spacing         | Padding drifts off the documented 4px grid                                  | 19    |
-| F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — resolved by DEC-065 | 16    |
+| F15 | Medium   | Counter         | Shipped counter geometry contradicts its own contract — resolved by DEC-065 | 16 ✅ |
 | F16 | Passing  | Color           | Contrast passes AA with headroom in all three themes                        | —     |
 | F17 | High     | Color           | 251 raw palette classes bypass the token layer across 17 files              | 19    |
 | F18 | High     | Motion          | `favorite-pop` keyframes undefined; save microinteraction is a no-op        | 20    |
 | F19 | Medium   | Motion          | Motion duration/easing tokens exist but nothing consumes them               | 20    |
 | F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20    |
 | F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20    |
-| F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16    |
+| F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16 ✅ |
 | F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20    |
 | F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18 ✅ |
 | F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18 ✅ |

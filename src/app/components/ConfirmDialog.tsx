@@ -80,7 +80,7 @@ export function ConfirmDialog({
     >
       <AlertDialogContent
         portalContainer={appShell}
-        className="rounded-2xl border border-border bg-background p-6 shadow-xl"
+        className="rounded-2xl border border-border bg-background p-6 shadow-overlay"
       >
         <AlertDialogHeader>
           <AlertDialogTitle className="text-[1.0625rem] font-bold text-foreground">{title}</AlertDialogTitle>

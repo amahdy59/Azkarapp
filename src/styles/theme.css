@@ -187,11 +187,40 @@
   --ds-focus-width: 3px;
   --ds-focus-offset: 2px;
   --radius-full: 9999px;
-  /* Two elevation levels only, per docs/DESIGN_SYSTEM.md. Raised = cards/rows;
-     overlay = sheets/dialogs/menus. Values reused from the pre-existing
-     glass-card and reference-dialog shadows so no surface visibly jumps. */
-  --ds-shadow-raised: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
-  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.4);
+  /* Three elevation roles per docs/DESIGN_SYSTEM.md — flat/bordered carries no
+     shadow, so only two shadow tokens exist. Raised = cards/rows; overlay =
+     sheets/dialogs/menus.
+
+     These are defined PER THEME (DEC-067 / F11). They used to be one value
+     shared by every theme, carried over from the light-mode glass card: 5% and
+     3% black. On the Midnight ground (#0a1228) that is imperceptible, so every
+     one of the 66 shadow-raised surfaces rendered flat and leaned entirely on a
+     border measuring 1.88-2.40:1. That is why ad-hoc shadow-xl/2xl kept being
+     added by hand. A shadow has to be read against its own ground, so the dark
+     themes need several times the alpha the light theme does.
+
+     This block is the dark default (:root is the dark palette); .theme-light
+     and .high-contrast override it below, after this rule so they win on equal
+     specificity. */
+  --ds-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -8px rgba(0, 0, 0, 0.55);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.7);
+}
+
+/* Light sits on a near-white ground, where the same alpha would read as soot.
+   Kept deliberately soft, but stronger than the old 5%/3% so a card still
+   separates from #f8f5f0 without a border doing all the work. */
+.light-mode,
+.theme-light {
+  --ds-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+/* High contrast draws every boundary with a full-strength border, so elevation
+   is structural rather than decorative here; the shadow only needs to separate
+   an overlay from the content behind it. */
+.high-contrast {
+  --ds-shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.75);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.9);
 }
 
 /* --border/--border-subtle and --input/--border-control are intentionally
@@ -534,10 +563,6 @@ textarea {
   }
 }
 
-.pulse-ring {
-  animation-name: pulse-ring;
-}
-
 .fade-in {
   animation: fade-in 500ms cubic-bezier(0.4, 0, 0.2, 1) both;
 }
@@ -566,79 +591,16 @@ textarea {
   pointer-events: none;
 }
 
-.counter-ring-stage {
-  transform-origin: center;
-}
-
-.adaptive-counter-surface {
-  position: relative;
-  display: flex;
-  flex: none;
-  touch-action: manipulation;
-  user-select: none;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  color: var(--foreground);
-  background: color-mix(in srgb, var(--background) 70%, transparent);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid color-mix(in srgb, var(--border) 40%, transparent);
-  box-shadow:
-    0 10px 40px -10px color-mix(in srgb, var(--foreground) 15%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
-  cursor: pointer;
-  isolation: isolate;
-  width: 220px;
-  max-width: 100%;
-  height: 76px;
-  border-radius: 38px;
-  transition:
-    border-color 200ms ease,
-    box-shadow 200ms ease,
-    background-color 200ms ease;
-}
-
-.tap-ripple {
-  animation: tap-ripple-expand 560ms ease-out both;
-}
-
-@keyframes tap-ripple-expand {
-  from {
-    opacity: 0.48;
-    transform: scale(0.5);
-  }
-  to {
-    opacity: 0;
-    transform: scale(32);
-  }
-}
-
-.adaptive-counter-surface:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
-  box-shadow: 0 6px 24px color-mix(in srgb, var(--primary) 12%, transparent);
-}
-
-.adaptive-counter-surface.is-pressed,
-.adaptive-counter-surface:active:not(:disabled) {
-  transform: scale(0.985);
-  background: color-mix(in srgb, var(--primary) 6%, var(--card));
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
-}
-
-.adaptive-counter-surface:focus-visible {
-  outline: none;
-  box-shadow:
-    0 0 0 3px var(--ring),
-    0 6px 24px color-mix(in srgb, var(--primary) 15%, transparent);
-}
-
-.adaptive-counter-surface:disabled {
-  cursor: default;
-}
-
-/* The dedicated masbaha screen can use additional wide-screen space; Reader
-   keeps the documented compact 220 Ã— 76 control. */
+/* The counter surface, its states, the tap ripple and its keyframes used to be
+   declared here AND in ZikrComponents.css with conflicting values — 38px
+   translucent glass here, 24px opaque there. Which one won depended on bundler
+   CSS ordering, and the shipped result was a hybrid: the opaque background from
+   ZikrComponents with this file's backdrop-filter leaking through, i.e. a 24px
+   GPU blur behind a fully opaque surface, costing paint time for no visual
+   effect and creating an unexpected stacking context. ZikrComponents.css owns
+   all of it now (DEC-067 / F12, F22); it is the copy matching DEC-003's
+   opaque-surface rule and DEC-065's 24px radius. Do not re-add counter rules
+   here. */
 
 /* Hide native scrollbar on compact touch screens; show elegant thin scrollbars on tablet & desktop */
 @media (max-width: 767px) {
@@ -920,13 +882,8 @@ a[href]:not(.no-press):active,
   transition: none !important;
 }
 
-/* ─── Per-component Reduced Motion Alternatives ─────────────────────── */
-@media (prefers-reduced-motion: reduce) {
-  .tap-ripple {
-    display: none;
-  }
-}
-
+/* The per-component `.tap-ripple` reduced-motion rule that used to sit here is
+   owned by ZikrComponents.css alongside the ripple itself (DEC-067 / F22). */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -1248,13 +1205,14 @@ a[href]:not(.no-press):active,
   -webkit-backdrop-filter: blur(16px);
 }
 
+/* The shadow here used to be a per-theme literal duplicating the raised token.
+   It now uses the token itself, which is already theme-aware (DEC-067 / F11),
+   so these surfaces cannot drift away from every other card again. */
 .glass-card,
 .wird-card {
   background-color: var(--card);
   border: 1px solid rgba(255, 255, 255, 0.4);
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.05),
-    0 8px 10px -6px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--ds-shadow-raised);
 }
 
 .dark .glass-card,
@@ -1264,9 +1222,6 @@ a[href]:not(.no-press):active,
 .theme-midnight .glass-card,
 .theme-midnight .wird-card {
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow:
-    0 10px 25px -5px rgba(0, 0, 0, 0.3),
-    0 8px 10px -6px rgba(0, 0, 0, 0.2);
 }
 
 @keyframes stagger-enter {

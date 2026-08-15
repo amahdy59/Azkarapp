@@ -28,7 +28,7 @@ export function PwaNotice({
 
   return (
     <aside
-      className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-lg"
+      className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-raised"
       aria-busy={isActionLoading || undefined}
       aria-labelledby={titleId}
     >

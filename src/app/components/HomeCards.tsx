@@ -65,7 +65,7 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-all"
     >
-      <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-slate-950/82 px-5 py-6 text-start shadow-2xl backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
+      <div className="flex flex-1 flex-col justify-between gap-5 rounded-[28px] border border-white/15 bg-slate-950/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
         <div className="flex w-full flex-col items-start gap-3 px-1">
           <h2
             id="current-zikr-heading"
@@ -133,7 +133,7 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-1 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-lg transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-1 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
           <DirectionArrow

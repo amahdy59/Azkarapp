@@ -219,7 +219,7 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-[28px] border p-5 shadow-2xl sm:p-7 md:p-8 ${
+        className={`flex w-full flex-col rounded-[28px] border p-5 shadow-raised sm:p-7 md:p-8 ${
           isHomeSubset
             ? "flex-1 border-white/15 bg-slate-950/82 backdrop-blur-lg"
             : "border-border bg-card text-foreground"

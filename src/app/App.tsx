@@ -730,7 +730,10 @@ function AppContent() {
   return (
     <div className="app-viewport flex items-center justify-center">
       <div
-        className={`app-shell relative overflow-hidden bg-background shadow-2xl ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
+        // No elevation utility here: theme.css sets `box-shadow: none` on
+        // .app-shell both at <=599px and at >=600px, so the shadow-2xl that used
+        // to sit here never rendered at any viewport width (DEC-067 / F11).
+        className={`app-shell relative overflow-hidden bg-background ${showBottomNav ? "" : "app-shell--navigation-hidden"}`}
       >
         {/* Both banners share one grid area, so they stack across the full shell
             width instead of being auto-placed into an implicit row — which put
