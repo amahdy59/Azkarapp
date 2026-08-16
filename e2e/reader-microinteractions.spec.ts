@@ -459,9 +459,19 @@ test("reference sheet matches the approved hierarchy and stays usable on short s
   const sheet = page.getByTestId("reference-sheet");
 
   await expect(sheet).toBeVisible();
-  await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
-  await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toBeVisible();
-  await expect(sheet.getByRole("button", { name: "Copy translation", exact: true })).toBeVisible();
+  // Three sections and no more: the benefit (with its timing folded in), the
+  // evidence, then the citation. The sheet used to reprint the zikr, its
+  // translation and its transliteration above all of that.
+  await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Benefit", "Evidence", "Source"]);
+  await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toHaveCount(0);
+  await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toHaveCount(0);
+  // The zikr is named, not reprinted, and the name stays on one line.
+  const zikrLabel = sheet.getByTestId("reference-zikr-label");
+  await expect(zikrLabel).toBeVisible();
+  expect(await zikrLabel.evaluate((el) => el.getClientRects().length)).toBe(1);
+  // Exactly one copy affordance, on the hadith, plus the close control.
+  await expect(sheet.getByRole("button", { name: "Copy hadith text", exact: true })).toBeVisible();
+  await expect(sheet.getByRole("button")).toHaveCount(2);
   await expect(sheet.getByText("Recommended timing", { exact: true })).toHaveCount(0);
   await expect(sheet.getByText("Authenticity", { exact: true })).toHaveCount(0);
   await expect
@@ -528,9 +538,13 @@ for (const locale of [
         expect(text).not.toMatch(/[A-Za-z]/);
       }
     } else {
-      await expect(sheet.locator("[lang='ar']")).toHaveCount(0);
-      await expect(sheet.getByRole("heading", { name: "Translation", exact: true })).toBeVisible();
-      await expect(sheet.getByRole("heading", { name: "Pronunciation in English", exact: true })).toBeVisible();
+      // The hadith is the one legitimately Arabic element in English mode — it
+      // is the narration itself, so it keeps lang="ar" for screen readers.
+      // Everything else must stay English.
+      const arabic = sheet.locator("[lang='ar']");
+      await expect(arabic).toHaveCount(1);
+      await expect(arabic).toHaveAttribute("data-testid", "reference-hadith");
+      await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Benefit", "Evidence", "Source"]);
     }
   });
 }

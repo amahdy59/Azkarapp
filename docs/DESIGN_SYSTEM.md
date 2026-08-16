@@ -165,10 +165,15 @@ Every interactive component should define:
 - Normal height is the smaller of 82 dynamic-viewport-height units and 720 px, capped at `100dvh - 12px`.
 - At heights of 560 px or less, height becomes `100dvh - 12px`.
 - Content scrolls inside the sheet with overscroll containment. The 64 px handle/close header remains outside the scroll viewport so dismissal is always reachable.
-- English hierarchy is translation, pronunciation, reviewed benefit, and English source. Arabic hierarchy is Arabic zikr, Arabic benefit, optional Arabic evidence, and Arabic source. Content from the other UI language must not appear.
+- **The sheet has exactly three sections in both languages: benefit, evidence, source — in that order.** It names the zikr rather than reprinting it: a single-line pill carrying the surah name and verse range, or the opening words elided with an ellipsis on a word boundary. The zikr's full text, its translation and its transliteration do not appear; the reader already shows them, and reprinting them pushed the evidence the sheet exists to serve below the fold.
+- The recommended time belongs to the benefit, not to a section of its own. It sits inside the benefit section behind a clock icon, with a screen-reader-only label. A separate heading naming both timing _and_ guidance made the benefit the subject of two sections.
+- Sections are separated by rules, not stacked cards, and no label is repeated inside the block it introduces.
+- Apart from the close control, **the hadith carries the sheet's only copy button.** Names, one-line summaries and citations are read at a glance; a copy affordance beside each of them was five buttons competing with the text they belonged to.
+- The hadith is Arabic in both interface languages — it is the narration itself, not supporting copy — so it always carries `lang="ar"` and RTL. Everything else follows the UI language, and content from the other UI language must not appear.
+- The benefit is a brief statement of what the zikr yields. Authoring notes ("use the evening wording in the evening row", "recited together with …") are not benefits and must never reach this field; where a benefit is written from a narration, it may only restate what that record's own reviewed hadith says.
 - Sheet content uses 24 px horizontal padding and 16 px vertical section gaps. Bottom padding includes the device safe-area inset.
 - The close control stays at logical end and has a 44×44 px target.
-- Copy actions use Untitled UI `Copy04`, expose localized accessible labels, and replace the icon briefly with a check after a successful copy.
+- The copy action uses Untitled UI `Copy04`, exposes a localized accessible label, and replaces the icon briefly with a check after a successful copy.
 
 ## Benefits index contract
 

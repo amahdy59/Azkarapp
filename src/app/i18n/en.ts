@@ -832,6 +832,7 @@ const en = {
     copyTransliteration: "Copy pronunciation",
     copyHadith: "Copy hadith text",
     benefitLabel: "Benefit",
+    recommendedTime: "Recommended time",
     benefitDetails: "Benefit details",
     sourceLabel: "Source",
     copyBenefit: "Copy benefit",

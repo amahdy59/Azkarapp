@@ -1,7 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useEffect, useRef, useState } from "react";
-import { BookOpen, Check, Copy, X } from "./icons";
+import { BookOpen, Check, Clock, Copy, X } from "./icons";
 import { t } from "../i18n";
+import { formatNumerals } from "../formatting";
 import type { AppLanguage, Zikr } from "../types";
 import {
   getLocalizedPreferredTiming,
@@ -12,7 +13,48 @@ import { ResponsiveSheet } from "./ResponsiveSheet";
 import { FormattedBenefit } from "./FormattedBenefit";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 
-type ReferenceCopyKey = "translation" | "transliteration" | "benefit" | "hadith" | "source";
+/**
+ * The hadith is the only copyable value here. Everything else in this sheet is
+ * either a name, a one-line summary, or a citation the reader can read at a
+ * glance — a copy affordance beside each of those was five buttons competing
+ * for attention with the text they belonged to.
+ */
+type ReferenceCopyKey = "hadith";
+
+/** Longest zikr opening shown in the identity pill before it is elided. */
+const ZIKR_LABEL_MAX_CHARS = 42;
+
+/**
+ * Names the zikr instead of reprinting it.
+ *
+ * The sheet used to open with the zikr's full text — the same words the reader
+ * had just been looking at, pushing the evidence it exists to serve below the
+ * fold and needing its own show-more control. A surah keeps its name and verse
+ * range; anything else is identified by its opening words, elided to a single
+ * line.
+ */
+function getZikrLabel(zikr: Zikr, language: AppLanguage): string {
+  const isArabic = language === "ar";
+  const surahName = isArabic ? zikr.surahNameArabic : zikr.surahNameEnglish;
+  if (surahName?.trim()) {
+    // Ayat al-Kursi and friends carry a parenthetical in the name itself, so
+    // "سورة" would double up; only prefix a bare surah name.
+    const hasQualifier = surahName.includes("(");
+    const name = hasQualifier ? surahName.trim() : isArabic ? `سورة ${surahName.trim()}` : `Surah ${surahName.trim()}`;
+    // A range only says something when there is more than one verse — Ayat
+    // al-Kursi carries verseCount 1 and would otherwise read "verses 1-1".
+    if (!zikr.verseCount || zikr.verseCount < 2) return name;
+    const verses = isArabic ? `الآيات ١-${formatNumerals(zikr.verseCount, language)}` : `verses 1-${zikr.verseCount}`;
+    return `${name} • ${verses}`;
+  }
+
+  const source = (isArabic ? zikr.arabicText : zikr.translation).replace(/\s+/g, " ").trim();
+  if (source.length <= ZIKR_LABEL_MAX_CHARS) return source;
+  // Cut on a word boundary so the ellipsis never lands mid-word.
+  const clipped = source.slice(0, ZIKR_LABEL_MAX_CHARS);
+  const lastSpace = clipped.lastIndexOf(" ");
+  return `${(lastSpace > 16 ? clipped.slice(0, lastSpace) : clipped).trimEnd()}…`;
+}
 
 function ReferenceContent({
   zikr,
@@ -30,18 +72,12 @@ function ReferenceContent({
   variant: "sheet" | "dialog";
 }) {
   const [copiedReference, setCopiedReference] = useState<ReferenceCopyKey | null>(null);
-  const [showFullZikr, setShowFullZikr] = useState(false);
   const copyFeedbackTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
   const benefit = getLocalizedZikrBenefit(zikr, language);
-  const primaryText = isArabic ? zikr.arabicText : zikr.translation;
-  const collapseLimit = zikr.isSurah ? 180 : 280;
-  const shouldCollapseZikr = primaryText.length > collapseLimit;
-  const displayedPrimaryText =
-    shouldCollapseZikr && !showFullZikr ? `${primaryText.slice(0, collapseLimit).trimEnd()}…` : primaryText;
-
-  useEffect(() => setShowFullZikr(false), [zikr.id]);
+  const preferredTiming = getLocalizedPreferredTiming(zikr, language);
+  const zikrLabel = getZikrLabel(zikr, language);
 
   useEffect(() => {
     return () => {
@@ -125,172 +161,99 @@ function ReferenceContent({
         tabIndex={0}
         dir={direction}
       >
-        <div className="reference-sheet-content flex flex-col gap-4 pb-4">
-          {/* Arabic Zikr Card Header */}
-          {isArabic ? (
-            <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
-              <p className="zikr-text text-[1.25rem] font-bold leading-relaxed text-primary" dir="rtl" lang="ar">
-                {displayedPrimaryText}
-              </p>
-              {shouldCollapseZikr && (
-                <button
-                  type="button"
-                  className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  onClick={() => setShowFullZikr((current) => !current)}
-                  aria-expanded={showFullZikr}
+        <div className="reference-sheet-content flex flex-col pb-4">
+          {/* Identity, not a reprint. A surah keeps its name and verse range;
+              anything else is named by its opening words on a single line. The
+              sheet used to open with the zikr in full, which pushed the
+              evidence it exists to serve below the fold. */}
+          <div className="flex justify-center pb-1">
+            <span
+              data-testid="reference-zikr-label"
+              className="inline-flex max-w-full items-center gap-2 rounded-full border border-primary/40 px-4 py-2 text-[0.875rem] font-bold text-primary"
+              dir={direction}
+              lang={isArabic ? "ar" : "en"}
+              title={zikrLabel}
+            >
+              <BookOpen size={15} aria-hidden="true" className="shrink-0" />
+              <span className="truncate">{zikrLabel}</span>
+            </span>
+          </div>
+
+          {/* One benefit category, timing included.
+              The timing used to be its own section headed "recommended time and
+              prophetic guidance" — which named the benefit a second time. It is
+              the same thought as the benefit and now sits inside it, marked by
+              a clock rather than a second heading. */}
+          {(benefit || preferredTiming) && (
+            <section className="border-t border-border/50 pt-4" aria-labelledby="reference-benefit-heading">
+              {/* The sheet's own accessible title is already "Benefit" (it is
+                  named after the button that opens it), so this heading takes
+                  the longer name to stay distinguishable in a heading list. */}
+              <h3
+                id="reference-benefit-heading"
+                aria-label={t(language, "reader.benefitDetails")}
+                className="mb-2 text-[0.9375rem] font-extrabold text-primary"
+              >
+                {t(language, "reader.benefitLabel")}
+              </h3>
+              {benefit && <FormattedBenefit text={benefit} isArabic={isArabic} direction={direction} />}
+              {preferredTiming && (
+                <p
+                  data-testid="reference-timing"
+                  className="mt-2.5 flex items-start gap-2 text-[0.875rem] font-medium leading-relaxed text-muted-foreground"
+                  lang={isArabic ? "ar" : "en"}
+                  dir={direction}
                 >
-                  {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
-                </button>
+                  <Clock size={15} aria-hidden="true" className="mt-1 shrink-0" />
+                  <span>
+                    <span className="sr-only">{t(language, "reader.recommendedTime")}: </span>
+                    {preferredTiming}
+                  </span>
+                </p>
               )}
-            </div>
-          ) : (
-            <>
-              {/* English Translation Section */}
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                    <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                      {t(language, "reader.translationLabel")}
-                    </h3>
-                  </div>
-                  {renderCopyButton("translation", zikr.translation, t(language, "reader.copyTranslation"))}
-                </div>
-                <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
-                  <p className="latin-ui text-left text-[1rem] leading-relaxed text-foreground" lang="en" dir="ltr">
-                    {displayedPrimaryText}
-                  </p>
-                  {shouldCollapseZikr && (
-                    <button
-                      type="button"
-                      className="mt-3 min-h-12 rounded-xl px-3 text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      onClick={() => setShowFullZikr((current) => !current)}
-                      aria-expanded={showFullZikr}
-                    >
-                      {t(language, showFullZikr ? "reader.hideFullText" : "reader.showFullText")}
-                    </button>
-                  )}
-                </div>
-              </div>
-
-              {/* Transliteration Section */}
-              {zikr.transliteration && (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                      <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                        {t(language, "reader.transliterationLabel")}
-                      </h3>
-                    </div>
-                    {renderCopyButton(
-                      "transliteration",
-                      zikr.transliteration,
-                      t(language, "reader.copyTransliteration"),
-                    )}
-                  </div>
-                  <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
-                    <p
-                      className="latin-ui text-left text-[0.9375rem] leading-relaxed text-muted-foreground"
-                      lang="en"
-                      dir="ltr"
-                    >
-                      {zikr.transliteration}
-                    </p>
-                  </div>
-                </div>
-              )}
-            </>
+            </section>
           )}
 
-          {/* Benefit Section */}
-          {benefit && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                  <h3
-                    aria-label={t(language, "reader.benefitDetails")}
-                    className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground"
-                  >
-                    {t(language, "reader.benefitLabel")}
-                  </h3>
-                </div>
-                {renderCopyButton("benefit", benefit, t(language, "reader.copyBenefit"))}
-              </div>
-              <FormattedBenefit text={benefit} isArabic={isArabic} direction={direction} />
-            </div>
-          )}
-
-          {/* Evidence / Hadith Section */}
+          {/* The evidence, in full, and the sheet's only copy target. */}
           {zikr.hadithText && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                  <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                    {t(language, "reader.evidence")}
-                  </h3>
-                </div>
+            <section className="mt-4 border-t border-border/50 pt-4" aria-labelledby="reference-evidence-heading">
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <h3 id="reference-evidence-heading" className="text-[0.9375rem] font-extrabold text-primary">
+                  {t(language, "reader.evidence")}
+                </h3>
                 {renderCopyButton("hadith", zikr.hadithText, t(language, "reader.copyHadith"))}
               </div>
-              <div className="rounded-2xl border border-border/50 bg-card p-4 shadow-xs">
-                <p
-                  className="zikr-text text-right text-[1rem] font-medium leading-8 text-foreground"
-                  lang={isArabic ? "ar" : undefined}
-                  dir={isArabic ? "rtl" : undefined}
-                >
-                  {zikr.hadithText}
-                </p>
-              </div>
-            </div>
+              {/* The hadith is Arabic in both interface languages — it is the
+                  narration itself, not supporting copy — so it is always marked
+                  `lang="ar"` and laid out right-to-left. Leaving it unmarked in
+                  English had screen readers pronouncing Arabic with an English
+                  voice. */}
+              <p
+                data-testid="reference-hadith"
+                className="zikr-text text-start text-[1rem] font-medium leading-8 text-foreground"
+                lang="ar"
+                dir="rtl"
+              >
+                {zikr.hadithText}
+              </p>
+            </section>
           )}
 
-          {/* Recommended Timing & Guidance */}
-          {getLocalizedPreferredTiming(zikr, language) && (
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-primary">
-                  {t(language, "reader.timingGuidance")}
-                </h3>
-              </div>
-              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4">
-                <p
-                  className="text-start text-[0.875rem] font-semibold leading-relaxed text-primary"
-                  lang={isArabic ? "ar" : "en"}
-                  dir={direction}
-                >
-                  {getLocalizedPreferredTiming(zikr, language)}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Source Reference Footer Card */}
-          <div className="flex flex-col gap-2 mt-1">
-            <div className="flex items-center gap-2">
-              <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-              <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                {t(language, "reader.sourceLabel")}
-              </h3>
-            </div>
-            <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-xs">
-              <div className="min-w-0 flex-1 text-start">
-                <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-muted-foreground/80">
-                  {t(language, "reader.sourceLabel")}
-                </span>
-                <span
-                  className="mt-0.5 block text-[0.8125rem] font-semibold text-foreground leading-snug"
-                  lang={isArabic ? "ar" : "en"}
-                  dir={direction}
-                >
-                  {sourceReference}
-                </span>
-              </div>
-              {renderCopyButton("source", sourceReference, t(language, "reader.copySource"))}
-            </div>
-          </div>
+          {/* Citation last, and named once. The old card repeated "source" as
+              its own heading and again inside itself. */}
+          <section className="mt-4 border-t border-border/50 pt-4" aria-labelledby="reference-source-heading">
+            <h3 id="reference-source-heading" className="mb-2 text-[0.9375rem] font-extrabold text-primary">
+              {t(language, "reader.sourceLabel")}
+            </h3>
+            <p
+              data-testid="reference-source"
+              className="text-start text-[0.875rem] font-semibold leading-relaxed text-muted-foreground"
+              lang={isArabic ? "ar" : "en"}
+              dir={direction}
+            >
+              {sourceReference}
+            </p>
+          </section>
         </div>
       </div>
     </div>

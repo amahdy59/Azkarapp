@@ -13,7 +13,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "Al\u1e25amdulill\u0101hi wa\u1e25dah, wa\u1e63-\u1e63al\u0101tu was-sal\u0101mu \u02bfal\u0101 man l\u0101 nabiyya ba\u02bfdah.",
     translation:
       "All praise is due to Allah alone, and prayers and peace be upon the one after whom there is no Prophet.",
-    benefit: "Included as the opening item of the morning/evening chapter.",
+    benefit: "The merit of sitting in remembrance from Fajr until sunrise, and from 'Asr until sunset.",
+    benefitArabic: "فضل مجالسة الذاكرين من صلاة الفجر حتى تطلع الشمس، ومن العصر حتى تغرب.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Abu Dawud no. 3667; Hisn al-Muslim 75a.",
@@ -66,7 +67,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul huwall\u0101hu a\u1e25ad. All\u0101hu\u1e63-\u1e63amad. Lam yalid wa lam y\u016blad. Wa lam yakun lahu kufuwan a\u1e25ad.",
     translation:
       "Say: He is Allah, One. Allah, the Self-Sufficient. He neither begets nor is begotten, and none is comparable to Him.",
-    benefit: "Recited together with al-Falaq and an-Nas three times each.",
+    benefit: "With the two refuge surahs, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع المعوذتين ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -93,7 +95,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul a\u02bf\u016bdhu birabbil-falaq. Min sharri m\u0101 khalaq. Wa min sharri gh\u0101siqin idh\u0101 waqab. Wa min sharrin-naff\u0101th\u0101ti fil-\u02bfuqad. Wa min sharri \u1e25\u0101sidin idh\u0101 \u1e25asad.",
     translation:
       "Say: I seek refuge in the Lord of daybreak, from the evil of what He created, from the evil of darkness when it settles, from the evil of those who blow on knots, and from the evil of the envier when he envies.",
-    benefit: "Recited together with al-Ikhlas and an-Nas three times each.",
+    benefit: "With al-Ikhlas and an-Nas, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع الإخلاص والناس ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -120,7 +123,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul a\u02bf\u016bdhu birabbin-n\u0101s. Malikin-n\u0101s. Il\u0101hin-n\u0101s. Min sharril-wasw\u0101sil-khann\u0101s. Alladh\u012b yuwaswisu f\u012b \u1e63ud\u016brin-n\u0101s. Minal-jinnati wan-n\u0101s.",
     translation:
       "Say: I seek refuge in the Lord of mankind, the King of mankind, the God of mankind, from the evil of the retreating whisperer who whispers in people\u2019s hearts, from jinn and mankind.",
-    benefit: "Recited together with al-Ikhlas and al-Falaq three times each.",
+    benefit: "With al-Ikhlas and al-Falaq, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع الإخلاص والفلق ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -141,7 +145,9 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "A\u1e63ba\u1e25n\u0101 wa a\u1e63ba\u1e25al-mulku lill\u0101h, wal\u1e25amdu lill\u0101h, l\u0101 il\u0101ha illall\u0101hu wa\u1e25dahu l\u0101 shar\u012bka lah, lahul-mulku wa lahul-\u1e25amd, wa huwa \u02bfal\u0101 kulli shay\u2019in qad\u012br. Rabbi as\u2019aluka khayra m\u0101 f\u012b h\u0101dh\u0101 \u2019l-yawmi wa khayra m\u0101 ba\u02bfdah, wa a\u02bf\u016bdhu bika min sharri m\u0101 f\u012b h\u0101dh\u0101 \u2019l-yawmi wa sharri m\u0101 ba\u02bfdah. Rabbi a\u02bf\u016bdhu bika minal-kasali wa s\u016b\u2019il-kibar. Rabbi a\u02bf\u016bdhu bika min \u02bfadh\u0101bin fin-n\u0101ri wa \u02bfadh\u0101bin fil-qabr.",
     translation:
       "We have entered the morning and dominion belongs to Allah. Praise is for Allah. None is worthy of worship but Allah alone, without partner; His is the dominion and praise, and He is able to do all things. My Lord, I ask You for the good of this day and what follows it, and I seek refuge in You from the evil of this day and what follows it. My Lord, I seek refuge in You from laziness and the hardships of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.",
-    benefit: "Use the evening wording in the evening row.",
+    benefit:
+      "The Prophet's ﷺ own morning and evening remembrance: affirming Allah's dominion and asking for the good of the day.",
+    benefitArabic: "من هدي النبي ﷺ في صباحه ومسائه: إقرار بأن المُلك لله وسؤال خير هذا اليوم.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Muslim 4/2088; Hisn al-Muslim 77.",
@@ -162,7 +168,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "All\u0101humma bika a\u1e63ba\u1e25n\u0101, wa bika amsayn\u0101, wa bika na\u1e25y\u0101, wa bika nam\u016bt, wa ilaykan-nush\u016br.",
     translation:
       "O Allah, by You we enter the morning, by You we enter the evening, by You we live, by You we die, and to You is the resurrection.",
-    benefit: "Use the evening wording in the evening row.",
+    benefit: "Taught by the Prophet ﷺ to his companions: that living, dying and the resurrection are by Allah alone.",
+    benefitArabic: "مما علّمه النبي ﷺ أصحابه: أن الحياة والموت والنشور بالله وحده.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "At-Tirmidhi 5/466; Abu Dawud 4/317; Ibn Majah; Hisn al-Muslim 78.",
@@ -204,7 +211,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "All\u0101humma inn\u012b a\u1e63ba\u1e25tu ush-hiduka, wa ush-hidu \u1e25amalata \u02bfarshik, wa mal\u0101\u2019ikataka, wa jam\u012b\u02bfa khalqik, annaka antall\u0101hu l\u0101 il\u0101ha ill\u0101 ant, wa\u1e25daka l\u0101 shar\u012bka lak, wa anna Mu\u1e25ammadan \u02bfabduka wa ras\u016bluk.",
     translation:
       "O Allah, this morning I call You, the bearers of Your Throne, Your angels, and all Your creation to witness that You are Allah; none is worthy of worship but You alone, without partner, and that Muhammad is Your servant and Messenger.",
-    benefit: "Use evening wording in the evening row.",
+    benefit: "Said four times morning or evening, Allah frees the one who says it from the Fire.",
+    benefitArabic: "من قالها أربعًا حين يصبح أو يمسي أعتقه الله من النار.",
     repetitionCount: 4,
     countLabel: "4",
     sourceReference:
@@ -226,7 +234,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "All\u0101humma m\u0101 a\u1e63ba\u1e25a b\u012b min ni\u02bfmatin, aw bi-a\u1e25adin min khalqik, fa minka wa\u1e25daka l\u0101 shar\u012bka lak, falakal-\u1e25amdu wa lakash-shukr.",
     translation:
       "O Allah, whatever blessing has reached me or any of Your creation this morning is from You alone, without partner; all praise and thanks belong to You.",
-    benefit: "Use evening wording in the evening row.",
+    benefit: "Saying it in the morning fulfils the gratitude owed for that day, and in the evening for that night.",
+    benefitArabic: "من قالها حين يصبح فقد أدّى شكر يومه، ومن قالها حين يمسي فقد أدّى شكر ليلته.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference:
@@ -311,7 +320,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "All\u0101humma \u02bf\u0101limal-ghaybi wash-shah\u0101dah, f\u0101\u1e6diras-sam\u0101w\u0101ti wal-ar\u1e0d, Rabba kulli shay\u2019in wa mal\u012bkah, ash-hadu an l\u0101 il\u0101ha ill\u0101 ant, a\u02bf\u016bdhu bika min sharri nafs\u012b, wa min sharrish-shay\u1e6d\u0101ni wa shirkih, wa an aqtarifa \u02bfal\u0101 nafs\u012b s\u016b\u2019an, aw ajurrahu il\u0101 Muslim.",
     translation:
       "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and the earth, Lord and Sovereign of everything. I bear witness that none is worthy of worship but You. I seek refuge in You from the evil of myself, from the evil of Satan and his shirk, and from committing evil against myself or bringing it upon a Muslim.",
-    benefit: "Also appears in before-sleep adhkar.",
+    benefit: "The Prophet ﷺ instructed Abu Bakr to say it morning, evening, and on going to bed.",
+    benefitArabic: "أمر النبي ﷺ أبا بكر أن يقولها إذا أصبح وإذا أمسى وإذا أخذ مضجعه.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
@@ -395,7 +405,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "A\u1e63ba\u1e25n\u0101 wa a\u1e63ba\u1e25al-mulku lill\u0101hi Rabbil-\u02bf\u0101lam\u012bn. All\u0101humma inn\u012b as\u2019aluka khayra h\u0101dh\u0101 \u2019l-yawm: fat\u1e25ahu, wa na\u1e63rahu, wa n\u016brahu, wa barakatahu, wa hud\u0101h, wa a\u02bf\u016bdhu bika min sharri m\u0101 f\u012bhi wa sharri m\u0101 ba\u02bfdah.",
     translation:
       "We have entered the morning, and dominion belongs to Allah, Lord of the worlds. O Allah, I ask You for the good of this day: its opening, victory, light, blessing, and guidance; and I seek refuge in You from the evil within it and the evil after it.",
-    benefit: "Use evening wording in the evening row.",
+    benefit: "Asking for the good of the day or night and seeking refuge from its evil.",
+    benefitArabic: "سؤال خير هذا اليوم أو هذه الليلة والاستعاذة من شرها.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "Abu Dawud 4/322; Hisn al-Muslim 89.",
@@ -416,7 +427,9 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "A\u1e63ba\u1e25n\u0101 \u02bfal\u0101 fi\u1e6dratil-Isl\u0101m, wa \u02bfal\u0101 kalimatil-ikhl\u0101\u1e63, wa \u02bfal\u0101 d\u012bni nabiyyin\u0101 Mu\u1e25ammadin \ufdfa, wa \u02bfal\u0101 millati ab\u012bn\u0101 Ibr\u0101h\u012bm, \u1e25an\u012bfan Musliman, wa m\u0101 k\u0101na minal-mushrik\u012bn.",
     translation:
       "We have entered the morning upon the natural religion of Islam, the word of sincerity, the religion of our Prophet Muhammad \ufdfa, and the way of our father Ibrahim, upright and Muslim, and he was not of the polytheists.",
-    benefit: "Use evening wording in the evening row.",
+    benefit:
+      "Renewing one's entry upon the natural religion of Islam, the word of sincerity, the religion of the Prophet ﷺ and the way of Ibrahim.",
+    benefitArabic: "تجديد الدخول على فطرة الإسلام وكلمة الإخلاص ودين النبي ﷺ وملّة إبراهيم.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference:
@@ -457,7 +470,10 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "L\u0101 il\u0101ha illall\u0101hu wa\u1e25dahu l\u0101 shar\u012bka lah, lahul-mulku wa lahul-\u1e25amd, wa huwa \u02bfal\u0101 kulli shay\u2019in qad\u012br.",
     translation:
       "None is worthy of worship but Allah alone, without partner. His is the dominion and praise, and He is able to do all things.",
-    benefit: "Same wording as HM-92 but with 100 count.",
+    benefit:
+      "Said 100 times in a day: the reward of freeing ten slaves, 100 good deeds recorded, 100 sins erased, and a shield from Satan until evening.",
+    benefitArabic:
+      "من قالها مائة مرة في يومه: عدل عشر رقاب، وكُتبت له مائة حسنة، ومُحيت عنه مائة سيئة، وكانت له حِرزًا من الشيطان حتى يمسي.",
     repetitionCount: 100,
     countLabel: "100",
     sourceReference: "Al-Bukhari 4/95; Muslim 4/2071; Hisn al-Muslim 93.",
@@ -613,7 +629,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul huwall\u0101hu a\u1e25ad. All\u0101hu\u1e63-\u1e63amad. Lam yalid wa lam y\u016blad. Wa lam yakun lahu kufuwan a\u1e25ad.",
     translation:
       "Say: He is Allah, One. Allah, the Self-Sufficient. He neither begets nor is begotten, and none is comparable to Him.",
-    benefit: "Recited together with al-Falaq and an-Nas three times each.",
+    benefit: "With the two refuge surahs, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع المعوذتين ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -640,7 +657,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul a\u02bf\u016bdhu birabbil-falaq. Min sharri m\u0101 khalaq. Wa min sharri gh\u0101siqin idh\u0101 waqab. Wa min sharrin-naff\u0101th\u0101ti fil-\u02bfuqad. Wa min sharri \u1e25\u0101sidin idh\u0101 \u1e25asad.",
     translation:
       "Say: I seek refuge in the Lord of daybreak, from the evil of what He created, from the evil of darkness when it settles, from the evil of those who blow on knots, and from the evil of the envier when he envies.",
-    benefit: "Recited together with al-Ikhlas and an-Nas three times each.",
+    benefit: "With al-Ikhlas and an-Nas, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع الإخلاص والناس ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -667,7 +685,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "Bismill\u0101hir-Ra\u1e25m\u0101nir-Ra\u1e25\u012bm. Qul a\u02bf\u016bdhu birabbin-n\u0101s. Malikin-n\u0101s. Il\u0101hin-n\u0101s. Min sharril-wasw\u0101sil-khann\u0101s. Alladh\u012b yuwaswisu f\u012b \u1e63ud\u016brin-n\u0101s. Minal-jinnati wan-n\u0101s.",
     translation:
       "Say: I seek refuge in the Lord of mankind, the King of mankind, the God of mankind, from the evil of the retreating whisperer who whispers in people\u2019s hearts, from jinn and mankind.",
-    benefit: "Recited together with al-Ikhlas and al-Falaq three times each.",
+    benefit: "With al-Ikhlas and al-Falaq, three times morning and evening: they suffice you against everything.",
+    benefitArabic: "مع الإخلاص والفلق ثلاثًا صباحًا ومساءً؛ تكفيك من كل شيء.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Abu Dawud 4/322; At-Tirmidhi 5/567; Hisn al-Muslim 76.",
@@ -858,7 +877,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "All\u0101humma \u02bf\u0101limal-ghaybi wash-shah\u0101dah, f\u0101\u1e6diras-sam\u0101w\u0101ti wal-ar\u1e0d, Rabba kulli shay\u2019in wa mal\u012bkah, ash-hadu an l\u0101 il\u0101ha ill\u0101 ant, a\u02bf\u016bdhu bika min sharri nafs\u012b, wa min sharrish-shay\u1e6d\u0101ni wa shirkih, wa an aqtarifa \u02bfal\u0101 nafs\u012b s\u016b\u2019an, aw ajurrahu il\u0101 Muslim.",
     translation:
       "O Allah, Knower of the unseen and the witnessed, Creator of the heavens and the earth, Lord and Sovereign of everything. I bear witness that none is worthy of worship but You. I seek refuge in You from the evil of myself, from the evil of Satan and his shirk, and from committing evil against myself or bringing it upon a Muslim.",
-    benefit: "Also appears in before-sleep adhkar.",
+    benefit: "The Prophet ﷺ instructed Abu Bakr to say it morning, evening, and on going to bed.",
+    benefitArabic: "أمر النبي ﷺ أبا بكر أن يقولها إذا أصبح وإذا أمسى وإذا أخذ مضجعه.",
     repetitionCount: 1,
     countLabel: "1",
     sourceReference: "At-Tirmidhi; Abu Dawud 4/317; Hisn al-Muslim 85/109.",
@@ -1004,7 +1024,10 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "L\u0101 il\u0101ha illall\u0101hu wa\u1e25dahu l\u0101 shar\u012bka lah, lahul-mulku wa lahul-\u1e25amd, wa huwa \u02bfal\u0101 kulli shay\u2019in qad\u012br.",
     translation:
       "None is worthy of worship but Allah alone, without partner. His is the dominion and praise, and He is able to do all things.",
-    benefit: "Same wording as HM-93 but different count and virtue.",
+    benefit:
+      "Said 100 times in a day: the reward of freeing ten slaves, 100 good deeds recorded, 100 sins erased, and a shield from Satan until evening.",
+    benefitArabic:
+      "من قالها مائة مرة في يومه: عدل عشر رقاب، وكُتبت له مائة حسنة، ومُحيت عنه مائة سيئة، وكانت له حِرزًا من الشيطان حتى يمسي.",
     repetitionCount: 100,
     countLabel: "100",
     sourceReference: "Al-Bukhari 3293; Muslim 2691; Hisn al-Muslim 92–93.",
@@ -1116,7 +1139,9 @@ const SLEEP_AZKAR: ZikrDraft[] = [
       "Qul a'udhu birabbil-falaq. Min sharri ma khalaq. Wa min sharri ghasiqin idha waqab. Wa min sharrin-naffathati fil-'uqad. Wa min sharri hasidin idha hasad.",
     translation:
       "Say: I seek refuge in the Lord of daybreak from the evil of that which He created, and from the evil of darkness when it settles, and from the evil of the blowers in knots, and from the evil of an envier when he envies.",
-    benefit: "Recited along with Al-Ikhlas and An-Nas before sleeping for complete protection. Repeated 3 times.",
+    benefit:
+      "Protection at bedtime: recited with al-Ikhlas and an-Nas, blowing into the palms and wiping over the body, three times.",
+    benefitArabic: "تحصين عند النوم: تُقرأ مع الإخلاص والناس، ويَنفث في كفيه ويمسح بهما جسده ثلاث مرات.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
@@ -1141,7 +1166,9 @@ const SLEEP_AZKAR: ZikrDraft[] = [
       "Qul a'udhu birabbin-nas. Malikin-nas. Ilahin-nas. Min sharril-waswasil-khannas. Alladhi yuwaswisu fi sudurin-nas. Minal-jinnati wan-nas.",
     translation:
       "Say: I seek refuge in the Lord of mankind, the Sovereign of mankind, the God of mankind, from the evil of the retreating whisperer who whispers into the breasts of mankind, from among the jinn and mankind.",
-    benefit: "Recited along with Al-Ikhlas and Al-Falaq before sleeping for complete protection. Repeated 3 times.",
+    benefit:
+      "Protection at bedtime: recited with al-Ikhlas and al-Falaq, blowing into the palms and wiping over the body, three times.",
+    benefitArabic: "تحصين عند النوم: تُقرأ مع الإخلاص والفلق، ويَنفث في كفيه ويمسح بهما جسده ثلاث مرات.",
     repetitionCount: 3,
     countLabel: "3",
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 99.",
