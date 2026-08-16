@@ -15,6 +15,7 @@ import {
 } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
+import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import {
@@ -788,15 +789,7 @@ export function HomeScreen({
                 data-testid="home-benefits-card"
               >
                 <div className="absolute inset-0 z-0">
-                  <img
-                    src={`${import.meta.env.BASE_URL}images/benefits_zikr.png`}
-                    alt=""
-                    width={1254}
-                    height={1254}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover object-[center_42%]"
-                  />
+                  <ProductImage name="benefits_zikr" className="h-full w-full object-cover object-[center_42%]" />
                 </div>
                 <div className="relative z-10 m-3 rounded-2xl bg-on-media-surface/90 p-4 shadow-raised sm:m-4 sm:p-5">
                   <span className="block">
