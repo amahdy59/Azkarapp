@@ -157,6 +157,16 @@ const ar = {
     fridayContinue: "تابع رفيق الجمعة",
     fridayReview: "راجع رفيق الجمعة",
   },
+  prayerTracking: {
+    mosque: "صليت في المسجد",
+    adhkar: "أتممت أذكار الصلاة",
+    legend: "متابعة صلاة {prayer}",
+    now: "حان وقتها",
+    next: "الصلاة القادمة",
+    past: "مضت",
+    openAdhkar: "فتح أذكار صلاة {prayer}",
+    upcoming: "لم يحن وقتها",
+  },
   wirdBenefits: {
     title: "أهمية الوِرد",
     subtitle: "لماذا تحافظ على وردك اليومي — بالدليل",

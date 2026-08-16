@@ -245,6 +245,9 @@
   --ds-radius-control: 0.875rem;
   --ds-radius-card: 1.25rem;
   --ds-radius-overlay: 1.5rem;
+  /* Between overlay and device: the after-prayer cards are large enough that
+     24px reads tight against their 24px padding. */
+  --ds-radius-card-large: 1.75rem;
   /* Two radii that sit outside the card/overlay scale on purpose.
      micro: heat-map day cells are ~10px square, where the 8px small radius
      would round them almost to circles. device: the phone-canvas bezel,

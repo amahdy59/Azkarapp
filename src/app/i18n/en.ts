@@ -156,6 +156,16 @@ const en = {
     fridayContinue: "Continue Friday companion",
     fridayReview: "Review Friday companion",
   },
+  prayerTracking: {
+    mosque: "Prayed at the mosque",
+    adhkar: "Completed the adhkar",
+    legend: "{prayer} prayer tracking",
+    now: "Now",
+    next: "Next prayer",
+    past: "Passed",
+    openAdhkar: "Open {prayer} prayer adhkar",
+    upcoming: "Not yet due",
+  },
   wirdBenefits: {
     title: "Why a daily wird",
     subtitle: "The case for keeping a daily portion — with its evidence",

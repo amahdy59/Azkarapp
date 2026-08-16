@@ -4,6 +4,7 @@ import type {
   CategoryId,
   ColorBlindSupport,
   LocationSettings,
+  PrayerTrackingRecord,
   ReminderSettings,
   StoredSession,
   ThemeMode,
@@ -24,6 +25,46 @@ export type { AppLanguage, AppStateSnapshot, CategoryId, StoredSession } from ".
 const STORAGE_KEY = "azkarapp.state.v1";
 const LEGACY_SAVED_ZIKR_STORAGE_KEY = "azkarapp.saved-zikr.v1";
 export const MAX_STORED_SESSIONS = 500;
+
+const PRAYER_TRACKING_NAMES = new Set(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
+
+/**
+ * Keeps only well-formed tracking records.
+ *
+ * A record with an unknown prayer id or no day is dropped rather than coerced:
+ * showing a prayer ticked that the user never ticked is worse than showing none.
+ * Records where both flags are false carry no information and are dropped too,
+ * which keeps the stored array proportional to what was actually marked.
+ */
+function normalizePrayerTracking(value: unknown): PrayerTrackingRecord[] {
+  if (!Array.isArray(value)) return [];
+  const byKey = new Map<string, PrayerTrackingRecord>();
+  for (const entry of value) {
+    if (!entry || typeof entry !== "object") continue;
+    const record = entry as Partial<PrayerTrackingRecord>;
+    if (typeof record.dayKey !== "string" || !record.dayKey) continue;
+    if (typeof record.prayer !== "string" || !PRAYER_TRACKING_NAMES.has(record.prayer)) continue;
+    const mosque = record.mosque === true;
+    const adhkar = record.adhkar === true;
+    if (!mosque && !adhkar) continue;
+    byKey.set(`${record.dayKey}:${record.prayer}`, {
+      dayKey: record.dayKey,
+      prayer: record.prayer as PrayerTrackingRecord["prayer"],
+      mosque,
+      adhkar,
+    });
+  }
+  return [...byKey.values()];
+}
+
+/** Later records win per (day, prayer); the union of both devices' days is kept. */
+function mergePrayerTracking(base: PrayerTrackingRecord[], incoming: PrayerTrackingRecord[]): PrayerTrackingRecord[] {
+  const byKey = new Map<string, PrayerTrackingRecord>();
+  for (const record of [...base, ...incoming]) {
+    byKey.set(`${record.dayKey}:${record.prayer}`, record);
+  }
+  return [...byKey.values()];
+}
 
 export const DEFAULT_APP_STATE: AppStateSnapshot = {
   settings: {
@@ -69,6 +110,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   completed: Object.fromEntries(CATEGORY_IDS.map((id) => [id, []])) as unknown as Record<CategoryId, string[]>,
   sessions: [],
   dailyCompletions: [],
+  prayerTracking: [],
   savedZikrIds: [],
 };
 
@@ -390,6 +432,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
   const dailyCompletions = Array.isArray(parsed.dailyCompletions)
     ? normalizeDailyCompletions(parsed.dailyCompletions)
     : deriveDailyCompletionsFromLegacySessions(sessions, progressDayStartHour);
+  const prayerTracking = normalizePrayerTracking(parsed.prayerTracking);
 
   const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
   const lastActiveDayKey = typeof parsed.lastActiveDayKey === "string" ? parsed.lastActiveDayKey : "";
@@ -482,6 +525,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     completed,
     sessions,
     dailyCompletions,
+    prayerTracking,
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
@@ -743,6 +787,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
               ? incoming.settings.progressDayStartHour
               : safeBase.settings.progressDayStartHour,
           ),
+    ),
+    prayerTracking: mergePrayerTracking(
+      normalizePrayerTracking(safeBase.prayerTracking),
+      normalizePrayerTracking(incoming.prayerTracking),
     ),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
   };

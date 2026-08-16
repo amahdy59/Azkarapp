@@ -1,18 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import {
-  Calendar,
-  Zap,
-  ArrowLeft,
-  ArrowRight,
-  Check,
-  Clock,
-  Sunrise,
-  Sun,
-  CloudSun,
-  Sunset,
-  MoonStar,
-} from "../components/icons";
+import { Calendar, Zap, ArrowLeft, ArrowRight } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
@@ -29,7 +17,6 @@ import {
 } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import {
-  formatPrayerTimeLabel,
   getCurrentPrayerPeriod,
   getEstimatedPrayerTimes,
   getNextPrayerCountdown,
@@ -37,6 +24,7 @@ import {
   type PrayerName,
 } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
+import { PrayerTrackerCards, type PrayerCardModel, type PrayerTrackingField } from "../components/PrayerTrackerCards";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -51,6 +39,7 @@ import type {
   LocationSettings,
   RoutineCategoryId,
   RoutineMode,
+  PrayerTrackingRecord,
 } from "../types";
 
 /**
@@ -144,23 +133,6 @@ function SectionDivider({ label }: { label: string }) {
   );
 }
 
-function prayerLabel(language: AppLanguage, prayer: PrayerName) {
-  return t(language, `notifications.${prayer}` as never);
-}
-
-function prayerTrackerLabel(language: AppLanguage, prayer: PrayerName) {
-  return language === "ar" ? `بعد ${prayerLabel(language, prayer)}` : `After ${prayerLabel(language, prayer)}`;
-}
-
-function PrayerIcon({ prayer }: { prayer: PrayerName }) {
-  const props = { size: 21, strokeWidth: 2.2, "aria-hidden": true } as const;
-  if (prayer === "fajr") return <Sunrise {...props} />;
-  if (prayer === "dhuhr") return <Sun {...props} />;
-  if (prayer === "asr") return <CloudSun {...props} />;
-  if (prayer === "maghrib") return <Sunset {...props} />;
-  return <MoonStar {...props} />;
-}
-
 export function getHomeAction(
   completed: Record<CategoryId, Set<string>>,
   now: Date = new Date(),
@@ -245,6 +217,8 @@ export function HomeScreen({
   onOpenSavedLibrary,
   onOpenBenefits,
   onOpenWirdBenefits,
+  prayerTracking = [],
+  onTogglePrayerTracking,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -266,6 +240,8 @@ export function HomeScreen({
   onOpenSavedLibrary?: () => void;
   onOpenBenefits?: () => void;
   onOpenWirdBenefits?: () => void;
+  prayerTracking?: readonly PrayerTrackingRecord[];
+  onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -306,12 +282,25 @@ export function HomeScreen({
   const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
 
+  /**
+   * Timing is derived from the clock here and never stored; tracking is stored
+   * and never derived. Keeping the two apart means a prayer that has passed
+   * still shows whatever the user marked, and marking something never changes
+   * which prayer is "now".
+   */
+  const prayerCardModels: PrayerCardModel[] = AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
+    const isNext = prayer === nextPrayerInfo.name;
+    const state =
+      index === activePrayerIndex ? "current" : isNext ? "next" : index < activePrayerIndex ? "past" : "upcoming";
+    return {
+      prayer,
+      time: currentPrayerPeriod.prayerTimes[prayer],
+      state,
+      ...(isNext ? { countdown: nextPrayerInfo.formattedCountdown } : {}),
+    };
+  });
+
   const todayKey = getProgressDayKey(now, progressDayStartHour);
-  const completedAfterPrayersToday = new Set(
-    dailyCompletions
-      .filter((record) => record.dayKey === todayKey && record.category === "after_prayer" && record.subCategory)
-      .map((record) => record.subCategory),
-  );
 
   const reminderInfo = useMemo(
     () => getTimeOfDayZikr(now, language, locationSettings),
@@ -597,124 +586,16 @@ export function HomeScreen({
                 />
               </div>
 
-              <div className="mx-4 mb-4 mt-5 sm:mx-6 sm:mb-6">
-                <div
-                  data-testid="after-prayer-carousel"
-                  className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:pb-0 lg:grid-cols-5"
-                >
-                  {AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
-                    const isActivePrayer = index === activePrayerIndex;
-                    const isPastPrayer = index < activePrayerIndex;
-                    const isCompletedPrayer = completedAfterPrayersToday.has(prayer);
-                    const isNextPrayer = prayer === nextPrayerInfo.name;
-                    const stateLabel = isCompletedPrayer
-                      ? t(language, "progress.completed")
-                      : isActivePrayer
-                        ? t(language, "home.prayerNow")
-                        : isNextPrayer
-                          ? t(language, "home.prayerNext")
-                          : isPastPrayer
-                            ? t(language, "home.prayerEarlier")
-                            : t(language, "home.prayerUpcoming");
-
-                    return (
-                      <button
-                        key={prayer}
-                        type="button"
-                        onClick={() => (onPrayerResume ? onPrayerResume(prayer) : onResume("after_prayer"))}
-                        onFocus={(event) => {
-                          if (window.matchMedia("(max-width: 639px)").matches) {
-                            event.currentTarget.scrollIntoView({
-                              behavior: "auto",
-                              block: "nearest",
-                              inline: "center",
-                            });
-                          }
-                        }}
-                        data-testid={isNextPrayer ? "next-prayer" : undefined}
-                        data-prayer-state={
-                          isCompletedPrayer
-                            ? "completed"
-                            : isActivePrayer
-                              ? "current"
-                              : isNextPrayer
-                                ? "next"
-                                : isPastPrayer
-                                  ? "earlier"
-                                  : "upcoming"
-                        }
-                        className={`relative flex min-h-24 w-[84%] min-w-[84%] snap-center items-center gap-2.5 rounded-3xl border px-3 py-2.5 text-start transition-[background-color,border-color,box-shadow,transform] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.98] sm:w-full sm:min-w-0 lg:min-h-[11rem] lg:flex-col lg:justify-center lg:gap-3 lg:px-2 lg:py-3 lg:text-center ${
-                          isCompletedPrayer
-                            ? "border-success/45 bg-success/10 text-foreground shadow-[0_12px_28px_color-mix(in_srgb,var(--success)_12%,transparent)]"
-                            : isActivePrayer
-                              ? "border-primary/60 bg-primary/12 text-foreground shadow-md hover:border-primary/50 hover:bg-card/75"
-                              : isNextPrayer
-                                ? "border-primary/30 bg-primary/5 text-foreground hover:border-primary/50 hover:bg-card/75 hover:shadow-md"
-                                : isPastPrayer
-                                  ? "border-border/70 bg-muted/35 text-foreground hover:bg-muted/60"
-                                  : "border-border/60 bg-background/35 text-foreground hover:border-primary/25 hover:bg-muted/50"
-                        }`}
-                        aria-label={`${prayerTrackerLabel(language, prayer)} - ${stateLabel} - ${formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}${isNextPrayer ? ` - ${nextPrayerInfo.formattedCountdown}` : ""}`}
-                        aria-current={isActivePrayer ? "step" : undefined}
-                      >
-                        <span
-                          className={`relative flex size-12 shrink-0 items-center justify-center rounded-2xl ${
-                            isCompletedPrayer
-                              ? "bg-success text-success-foreground"
-                              : isActivePrayer
-                                ? "bg-primary text-primary-foreground"
-                                : isNextPrayer
-                                  ? "bg-primary/12 text-primary"
-                                  : "bg-muted text-muted-foreground"
-                          }`}
-                        >
-                          <PrayerIcon prayer={prayer} />
-                          {isCompletedPrayer ? (
-                            <span className="absolute -end-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-success text-success-foreground">
-                              <Check size={11} strokeWidth={3} aria-hidden="true" />
-                            </span>
-                          ) : isActivePrayer || isNextPrayer ? (
-                            <span className="absolute -end-1 -top-1 flex size-5 items-center justify-center rounded-full border-2 border-card bg-card text-primary">
-                              <Clock size={11} strokeWidth={3} aria-hidden="true" />
-                            </span>
-                          ) : null}
-                        </span>
-
-                        <div className="min-w-0 flex-1 lg:flex-none">
-                          <span
-                            className="block text-[1rem] font-black leading-tight text-foreground lg:text-[1.0625rem]"
-                            dir="auto"
-                          >
-                            {prayerTrackerLabel(language, prayer)}
-                          </span>
-                          <time
-                            data-testid={isNextPrayer ? "next-prayer-time" : undefined}
-                            className="mt-1.5 block text-[0.8125rem] font-black text-foreground"
-                            dateTime={currentPrayerPeriod.prayerTimes[prayer]}
-                          >
-                            {formatPrayerTimeLabel(currentPrayerPeriod.prayerTimes[prayer], isArabic)}
-                          </time>
-                          <span
-                            className={`mt-2 inline-flex min-h-6 items-center rounded-full px-2.5 py-0.5 text-[0.6875rem] font-black ${
-                              isCompletedPrayer
-                                ? "bg-success/15 text-success"
-                                : isActivePrayer || isNextPrayer
-                                  ? "bg-primary/12 text-primary"
-                                  : "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {stateLabel}
-                          </span>
-                          {isNextPrayer ? (
-                            <span className="mt-1.5 block text-[0.6875rem] font-bold text-primary" dir="auto">
-                              {formatNumerals(nextPrayerInfo.formattedCountdown, language)}
-                            </span>
-                          ) : null}
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
+              <div className="mb-6 mt-5">
+                <PrayerTrackerCards
+                  models={prayerCardModels}
+                  language={language}
+                  direction={direction}
+                  records={prayerTracking}
+                  dayKey={todayKey}
+                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                  onOpen={(prayer) => (onPrayerResume ? onPrayerResume(prayer) : onResume("after_prayer"))}
+                />
               </div>
             </section>
           </div>

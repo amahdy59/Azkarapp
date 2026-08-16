@@ -1,8 +1,8 @@
-import type { LocationSettings } from "../types";
+import type { LocationSettings, PrayerName } from "../types";
 import { getPrayerTimes } from "./prayerCalculation";
 import { formatNumerals } from "../formatting";
 
-export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
+export type { PrayerName };
 
 export const PRAYER_NAMES = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
 

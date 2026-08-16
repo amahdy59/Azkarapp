@@ -13,6 +13,7 @@ import type {
   RoutineMode,
   TextSizeOption,
   ThemeMode,
+  PrayerName,
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
@@ -57,6 +58,7 @@ import {
   millisecondsUntilNextProgressDay,
   resetStaleCompletedCollections,
   getEffectiveCompletedForSubcategory,
+  getProgressDayKey,
   type GrowthEvent,
 } from "./progress";
 
@@ -229,6 +231,32 @@ function AppContent() {
     initialState.settings.calendarType ?? "hijri",
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
+  const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
+
+  /**
+   * Upserts one of the two flags for a prayer on the current progress day.
+   *
+   * Keyed by (dayKey, prayer) so a record always names the prayer it belongs
+   * to; nothing here consults the clock, which keeps tracking independent of
+   * which prayer happens to be current when the tick is made.
+   */
+  const handleTogglePrayerTracking = useCallback(
+    (prayer: PrayerName, field: "mosque" | "adhkar", next: boolean) => {
+      const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
+      setPrayerTracking((current) => {
+        const index = current.findIndex((record) => record.dayKey === dayKey && record.prayer === prayer);
+        const existing = index >= 0 ? current[index]! : { dayKey, prayer, mosque: false, adhkar: false };
+        const updated = { ...existing, [field]: next };
+        if (index >= 0) {
+          const copy = current.slice();
+          copy[index] = updated;
+          return copy;
+        }
+        return [...current, updated];
+      });
+    },
+    [progressDayStartHour],
+  );
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
@@ -370,6 +398,7 @@ function AppContent() {
       completed: fromCompletedSets(completed),
       sessions,
       dailyCompletions,
+      prayerTracking,
       savedZikrIds: [...savedZikrIds].sort(),
     }),
     [
@@ -397,6 +426,7 @@ function AppContent() {
       selectedLang,
       sessions,
       dailyCompletions,
+      prayerTracking,
       savedZikrIds,
       showTranslation,
       showTransliteration,
@@ -534,6 +564,7 @@ function AppContent() {
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
+    setPrayerTracking(state.prayerTracking);
     setCompleted(
       resetStaleCompletedCollections(
         toCompletedSets(state.completed),
@@ -934,6 +965,8 @@ function AppContent() {
                   }}
                   onOpenBenefits={() => push("benefits")}
                   onOpenWirdBenefits={() => push("wird_benefits")}
+                  prayerTracking={prayerTracking}
+                  onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
               )}
               {view === "wird_benefits" && (

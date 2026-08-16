@@ -1,4 +1,8 @@
 export type AppLanguage = "en" | "ar";
+
+/** The five daily prayers. Canonical here so persisted records and the prayer
+ *  time helpers cannot drift apart. */
+export type PrayerName = "fajr" | "dhuhr" | "asr" | "maghrib" | "isha";
 export const CATEGORY_IDS = [
   "morning",
   "evening",
@@ -212,6 +216,23 @@ export interface UserProfileState {
   accountUserId: string;
 }
 
+/**
+ * Two independent booleans per prayer, per day.
+ *
+ * Keyed by a stable prayer id rather than a card index, so reordering the cards
+ * or changing how many are shown can never re-point yesterday's record at a
+ * different prayer. Timing state (which prayer is current) is derived from the
+ * clock and is deliberately not stored here.
+ */
+export interface PrayerTrackingRecord {
+  dayKey: string;
+  prayer: PrayerName;
+  /** Prayed in congregation at the mosque. */
+  mosque: boolean;
+  /** Completed the adhkar that follow the prayer. */
+  adhkar: boolean;
+}
+
 export interface AppStateSnapshot {
   settings: UserSettingsState;
   profile: UserProfileState;
@@ -219,6 +240,8 @@ export interface AppStateSnapshot {
   completed: Record<CategoryId, string[]>;
   sessions: StoredSession[];
   dailyCompletions: DailyCollectionCompletion[];
+  /** Per-prayer mosque/adhkar tracking, by day and stable prayer id. */
+  prayerTracking: PrayerTrackingRecord[];
   /** Stable content IDs saved by the user for quick return and account sync. */
   savedZikrIds: string[];
   /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
