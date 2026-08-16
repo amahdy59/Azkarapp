@@ -145,20 +145,30 @@ export function BenefitsScreen({
         className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-3 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="benefits-scroll-region"
       >
-        <TabList
-          value={activeSection}
-          onChange={setActiveSection}
-          tabs={tabs}
-          direction={direction}
-          idPrefix="benefits"
-          aria-label={t(language, "benefits.sectionsLabel")}
-          className="mb-5 grid grid-cols-2 gap-2 rounded-3xl border border-border bg-card p-2"
-          itemClassName={(selected) =>
-            `min-h-11 rounded-2xl px-3 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-              selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
-            }`
-          }
-        />
+        {/* The filter stays reachable after scrolling: it sticks to the top of
+            this scroll region rather than scrolling away with the first card.
+            The negative margins let its background span the region's 20px
+            gutters so cards pass underneath it, and the matching top padding
+            keeps the gap above it once it is stuck. */}
+        <div
+          className="sticky top-0 z-10 -mx-5 -mt-3 mb-5 bg-background px-5 pb-3 pt-3"
+          data-testid="benefits-filter-bar"
+        >
+          <TabList
+            value={activeSection}
+            onChange={setActiveSection}
+            tabs={tabs}
+            direction={direction}
+            idPrefix="benefits"
+            aria-label={t(language, "benefits.sectionsLabel")}
+            className="grid grid-cols-2 gap-2 rounded-3xl border border-border bg-card p-2"
+            itemClassName={(selected) =>
+              `min-h-11 rounded-2xl px-3 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+              }`
+            }
+          />
+        </div>
 
         <section
           {...tabPanelProps("benefits", activeSection)}

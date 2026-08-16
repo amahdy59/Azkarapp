@@ -139,6 +139,21 @@
   outline-offset: 2px;
 }
 
+/* The main landmark carries tabindex="-1" only so route changes and the skip
+   link can move screen-reader position to it. It is not an operable control,
+   and it is full-bleed, so the rule above painted a 3px ring around the entire
+   viewport. It showed up as a stray gold line above the Reader counter: the
+   counter answers the space bar, so the last input was a key, and Chrome grants
+   :focus-visible to a programmatically focused element in that state.
+
+   Scoped to this one landmark rather than excluding negative tabindex globally,
+   because roving-tabindex widgets legitimately focus tabindex="-1" items and
+   still need the fallback ring. */
+#main-content:focus,
+#main-content:focus-visible {
+  outline: none;
+}
+
 /* Composite fields: a borderless input sitting inside a rounded shell.
    The shell is the control the reader sees, so it carries the focus ring and
    the input inside carries none. Without this the fallback above draws its
