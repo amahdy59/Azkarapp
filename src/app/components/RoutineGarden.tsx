@@ -44,6 +44,7 @@ export function TodayRoutineGarden({
   progressDayStartHour = 4,
   onSelectCategory,
   visibleCategoryIds,
+  onOpenWirdBenefits,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -55,6 +56,8 @@ export function TodayRoutineGarden({
   dailyCompletions?: DailyCollectionCompletion[];
   progressDayStartHour?: number;
   onSelectCategory?: (categoryId: CategoryId) => void;
+  /** Passed through to the day view; see ProgressDayView for the contract. */
+  onOpenWirdBenefits?: () => void;
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -214,6 +217,7 @@ export function TodayRoutineGarden({
             onSelectCategory={onSelectCategory}
             visibleCategoryIds={visibleCategoryIds}
             headingLevel={hideTabs ? 3 : 2}
+            onOpenWirdBenefits={onOpenWirdBenefits}
           />
         )}
 

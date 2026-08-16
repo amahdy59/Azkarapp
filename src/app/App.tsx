@@ -93,6 +93,9 @@ const ProgressScreen = retryableScreen(() =>
 const BenefitsScreen = retryableScreen(() =>
   import("./screens/BenefitsScreen").then((module) => ({ default: module.BenefitsScreen })),
 );
+const WirdBenefitsScreen = retryableScreen(() =>
+  import("./screens/WirdBenefitsScreen").then((module) => ({ default: module.WirdBenefitsScreen })),
+);
 const FridayModeScreen = retryableScreen(() =>
   import("./screens/FridayModeScreen").then((module) => ({ default: module.FridayModeScreen })),
 );
@@ -662,6 +665,7 @@ function AppContent() {
     "home",
     "library",
     "benefits",
+    "wird_benefits",
     "category",
     "reader",
     "settings",
@@ -929,7 +933,11 @@ function AppContent() {
                     push("library");
                   }}
                   onOpenBenefits={() => push("benefits")}
+                  onOpenWirdBenefits={() => push("wird_benefits")}
                 />
+              )}
+              {view === "wird_benefits" && (
+                <WirdBenefitsScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
               )}
               {view === "benefits" && (
                 <BenefitsScreen language={selectedLang} direction={layoutDirection} onBack={pop} />

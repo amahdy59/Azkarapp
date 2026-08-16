@@ -25,6 +25,7 @@ import {
   Star,
   Sprout,
   Sparkles,
+  BookOpen,
 } from "./icons";
 
 function isAr(language: AppLanguage) {
@@ -179,6 +180,7 @@ export function ProgressDayView({
   onSelectCategory,
   visibleCategoryIds,
   headingLevel = 2,
+  onOpenWirdBenefits,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -193,6 +195,8 @@ export function ProgressDayView({
   visibleCategoryIds?: readonly CategoryId[];
   /** Home nests this card below its own section heading; Progress owns an h2. */
   headingLevel?: 2 | 3;
+  /** Opens the evidence for keeping a wird. Omitted where that route is unreachable. */
+  onOpenWirdBenefits?: () => void;
 }) {
   const isArabic = isAr(language);
   const completedToday = summary.today.completedCategories;
@@ -335,6 +339,26 @@ export function ProgressDayView({
             );
           })}
         </div>
+
+        {/* The card shows whether today's wird is done; this answers why it is
+            worth doing at all. It sits with the routines rather than in a menu
+            because that question tends to arrive while looking at an unfinished
+            row. */}
+        {onOpenWirdBenefits && (
+          <button
+            type="button"
+            onClick={onOpenWirdBenefits}
+            data-testid="open-wird-benefits"
+            className={`mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:mt-6 ${
+              isHomeSubset
+                ? "border-on-media/20 bg-black/35 text-on-media hover:bg-black/50"
+                : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"
+            }`}
+          >
+            <BookOpen size={16} aria-hidden="true" />
+            {t(language, "wirdBenefits.openCta")}
+          </button>
+        )}
       </div>
     </div>
   );

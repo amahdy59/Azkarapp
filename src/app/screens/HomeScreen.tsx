@@ -244,6 +244,7 @@ export function HomeScreen({
   onOpenSavedZikr,
   onOpenSavedLibrary,
   onOpenBenefits,
+  onOpenWirdBenefits,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
@@ -264,6 +265,7 @@ export function HomeScreen({
   onOpenSavedZikr?: (categoryId: CategoryId, index: number) => void;
   onOpenSavedLibrary?: () => void;
   onOpenBenefits?: () => void;
+  onOpenWirdBenefits?: () => void;
 }) {
   const isArabic = language === "ar";
   const [now, setNow] = useState(() => new Date());
@@ -561,6 +563,7 @@ export function HomeScreen({
                       progressDayStartHour={progressDayStartHour}
                       onSelectCategory={onResume}
                       visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
+                      onOpenWirdBenefits={onOpenWirdBenefits}
                     />
                   </div>
                 )}

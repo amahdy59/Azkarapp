@@ -157,6 +157,16 @@ const ar = {
     fridayContinue: "تابع رفيق الجمعة",
     fridayReview: "راجع رفيق الجمعة",
   },
+  wirdBenefits: {
+    title: "أهمية الوِرد",
+    subtitle: "لماذا تحافظ على وردك اليومي — بالدليل",
+    quran: "القرآن",
+    hadith: "السنة",
+    salaf: "السلف والعلماء",
+    sectionsLabel: "أقسام أدلة أهمية الورد",
+    shareHeading: "من أهمية المداومة على الورد:",
+    openCta: "لماذا الورد مهم؟",
+  },
   benefits: {
     title: "فوائد الذكر",
     subtitle: "القرآن والأحاديث الصحيحة والفوائد الموثقة",

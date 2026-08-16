@@ -156,6 +156,16 @@ const en = {
     fridayContinue: "Continue Friday companion",
     fridayReview: "Review Friday companion",
   },
+  wirdBenefits: {
+    title: "Why a daily wird",
+    subtitle: "The case for keeping a daily portion — with its evidence",
+    quran: "Qur'an",
+    hadith: "Sunnah",
+    salaf: "Salaf & scholars",
+    sectionsLabel: "Sections of evidence for keeping a wird",
+    shareHeading: "On keeping a daily wird:",
+    openCta: "Why a daily wird?",
+  },
   benefits: {
     title: "Zikr Benefits",
     subtitle: "Qur’an, authentic hadith, and traceable benefits",

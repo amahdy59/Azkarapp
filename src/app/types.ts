@@ -48,6 +48,7 @@ export type View =
   | "library"
   | "progress"
   | "benefits"
+  | "wird_benefits"
   | "friday"
   | "friday_salawat"
   | "category"
