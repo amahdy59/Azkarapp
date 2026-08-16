@@ -1,0 +1,516 @@
+/* tokens.css — part of the theme layer, split from a single 1,422-line file (DEC-077).
+   Palettes, theme modes, accessibility modes and the Reader category accents.
+
+   These parts are imported by theme.css in a fixed order and are NOT independent:
+   the split was strictly sequential so the cascade is unchanged. Moving a rule
+   between parts, or reordering the imports, can change which declaration wins. */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --motion-duration-press: 90ms;
+  --motion-duration-fast: 150ms;
+  --motion-duration-standard: 220ms;
+  /* Screen/content entrance, per the motion contract's 240-300ms band. */
+  --motion-duration-entrance: 260ms;
+  /* Emphasis: counter readiness and completion. 500ms sits inside the
+     contract's documented 440-600ms band. It was 360ms, which belonged to
+     no band at all and is why duration-500/700 sites stayed off the token
+     (DEC-071). */
+  --motion-duration-emphasis: 500ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
+  --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --motion-scale-pressed: 0.98;
+  --font-size: 16px;
+  --font-ui-latin: "Noto Sans Arabic Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-ui-arabic:
+    "Noto Sans Arabic Variable", "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
+  --background: #080808;
+  --foreground: #f2f2ea;
+  --card: #0c0c0c;
+  --card-foreground: #e3e8f2;
+  --popover: #0c0c0c;
+  --popover-foreground: #f2f2ea;
+  --primary: #d7a528;
+  --primary-foreground: #000000;
+  /* Content sitting on the photographic hero scrim. That scrim is dark in
+     every theme, so these stay light-on-dark and must not follow --primary,
+     which is a dark gold (#835806) in Light and fails contrast there. */
+  --on-media: #ffffff;
+  --on-media-muted: rgba(255, 255, 255, 0.9);
+  --on-media-accent: #f0c14b;
+  --secondary: #c5f2e5;
+  --secondary-foreground: #081026;
+  --muted: #0a0a0a;
+  --muted-foreground: #d8dfec;
+  --accent: #d7a528;
+  --accent-foreground: #000000;
+  --destructive: #851c14;
+  --destructive-foreground: #f5f0e8;
+  --border-subtle: #24304f;
+  --border-control: #5f6f91;
+  --border: #24304f;
+  --input: #5f6f91;
+  --input-background: #182040;
+  --switch-background: #314066;
+  --font-weight-medium: 500;
+  --font-weight-normal: 400;
+  --ring: #d7a528;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
+}
+
+/* px-page compiles to padding-inline: var(--spacing-page), so widening the
+   variable per tier widens every page gutter in step with the hero (DEC-075). */
+@media (min-width: 40rem) {
+  :root {
+    --spacing-page: 1.5rem;
+  }
+}
+@media (min-width: 48rem) {
+  :root {
+    --spacing-page: 2rem;
+  }
+}
+
+/* Pre-app flows share the form measure. Center compact flows only when the
+   viewport is tall enough; short desktop/landscape windows stay top-aligned
+   and scroll instead of clipping their first or primary action. */
+@media (min-width: 56.25rem) and (min-height: 36rem) {
+  .pre-app-flow-centered {
+    justify-content: center;
+  }
+}
+
+.dark,
+.theme-dark {
+  color-scheme: dark;
+  --background: #0d0d0d;
+  --foreground: #f5f0e8;
+  --card: #171717;
+  --card-foreground: #d4d0e0;
+  --popover: #171717;
+  --popover-foreground: #f5f0e8;
+  --primary: #d4a020;
+  --primary-foreground: #0d0d0d;
+  --secondary: #1a7060;
+  --secondary-foreground: #f5f0e8;
+  --muted: #222222;
+  --muted-foreground: #b0aed0;
+  --accent: #e8b420;
+  --accent-foreground: #0d0d0d;
+  --destructive: #f09890;
+  --destructive-foreground: #0d0d0d;
+  --border-subtle: #555555;
+  --border-control: #6f6f6f;
+  --border: #555555;
+  --input: #6f6f6f;
+  --input-background: #222222;
+  --switch-background: #2d2d2d;
+  --ring: #e8b420;
+  --nav-active: #d4a020;
+  --nav-inactive: #b0aed0;
+  --counter-zone: #171717;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
+}
+
+.light-mode,
+.theme-light {
+  color-scheme: light;
+  --background: #f8f5f0;
+  --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #4a4570;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
+  --primary: #835806;
+  --primary-foreground: #ffffff;
+  --secondary: #1a7060;
+  --secondary-foreground: #ffffff;
+  --muted: #f2eee9;
+  --muted-foreground: #4a4570;
+  --accent: #d4a020;
+  --accent-foreground: #1a1228;
+  --destructive: #8b2015;
+  --destructive-foreground: #ffffff;
+  --border-subtle: #c4bcb0;
+  --border-control: #81776b;
+  --border: #c4bcb0;
+  --input: #81776b;
+  --input-background: #f2eee9;
+  --switch-background: #e5e0d8;
+  --ring: #835806;
+  --nav-active: #835806;
+  --nav-inactive: #8e8aaa;
+  --counter-zone: #f2eee9;
+  --success: #14663d;
+  --success-foreground: #ffffff;
+  --warning: #8a5a0a;
+  --warning-foreground: #ffffff;
+  --info: #1f5fa8;
+  --info-foreground: #ffffff;
+}
+
+.theme-midnight {
+  color-scheme: dark;
+  --background: #0a1228;
+  --foreground: #f5f0e8;
+  --card: #111b35;
+  --card-foreground: #d4d0e0;
+  --popover: #111b35;
+  --popover-foreground: #f5f0e8;
+  --primary: #d4a020;
+  --primary-foreground: #0a1228;
+  --secondary: #1a7060;
+  --secondary-foreground: #f5f0e8;
+  --muted: #1d2c4b;
+  --muted-foreground: #cbd5e1;
+  --accent: #e8b420;
+  --accent-foreground: #0a1228;
+  --destructive: #f09890;
+  --destructive-foreground: #0a1228;
+  --border-subtle: #334a75;
+  --border-control: #66789d;
+  --border: #334a75;
+  --input: #66789d;
+  --input-background: #182540;
+  --switch-background: #2a3f66;
+  --ring: #e8b420;
+  --nav-active: #d4a020;
+  --nav-inactive: #b0aed0;
+  --counter-zone: #111b35;
+  --success: #5ec88a;
+  --success-foreground: #062e16;
+  --warning: #b87b10;
+  --warning-foreground: #1f1400;
+  --info: #56a8f5;
+  --info-foreground: #04213f;
+}
+
+:root {
+  --sleep: #9f7aea;
+  /* --sleep must stay the FIRST declaration in this block, with nothing between
+     it and the selector: theme.tokens.test.ts anchors the geometry block on the
+     literal `:root {\n  --sleep` to guard against a theme-independent
+     --success/--warning pair reappearing here. Add new comments below it. */
+  /* Decorative collection colours. Progress marks the three time-of-day
+     routines by hue: morning uses --primary, evening and sleep need their own.
+     --sleep already existed but was never wired to Tailwind, so the code used
+     raw indigo instead (DEC-069 / F17). These are decorative, not semantic --
+     they never carry meaning alone; a text label always accompanies them. */
+  --evening: #fb923c;
+  /* Panels that sit ON the hero photography. Dark in every theme for the same
+     reason --on-media is light in every theme: the ground is the photograph,
+     not the app surface. */
+  --on-media-surface: #020617;
+  /* The dark-navy brand band behind the Home hero and the wide-desktop Reader
+     hero. DESIGN_SYSTEM.md defines it as independent of the active theme, so
+     it is a fixed brand constant, not a theme token (DEC-069 / F17). */
+  --brand-hero: #0b1426;
+  /* Garden illustration palette. These are artwork colours, not semantic ones:
+     the leaf and palm marks are drawings, and forcing them onto --primary would
+     make the garden monochrome. Named so they are themeable and greppable
+     rather than being hex literals inside SVG paths (DEC-069 / F17). */
+  --garden-leaf: #f59e0b;
+  --garden-leaf-edge: #d97706;
+  --garden-leaf-vein: #92400e;
+  --garden-palm: #10b981;
+  --garden-palm-edge: #059669;
+  --garden-palm-shade: #064e3b;
+  --garden-gold: #e4a84a;
+  /* Celebration confetti ramps, one token per burst. Held as comma-separated
+     lists because canvas-confetti takes an array of colours. */
+  --confetti-session: #16a34a, #22c55e, #4ade80;
+  --confetti-group: #d7a528, #fbbf24, #fde68a, #a3e635;
+  /* Page gutter, matching the hero's own padding at each tier so that content
+     inside the hero and content in the sections below share one measure. */
+  --ds-control-height-compact: 2.75rem;
+  --ds-control-height: 3rem;
+  --ds-control-height-prominent: 3.25rem;
+  --ds-icon-size: 2.75rem;
+  --ds-stroke: 1px;
+  --ds-radius-small: 0.5rem;
+  --ds-radius-control: 0.875rem;
+  --ds-radius-card: 1.25rem;
+  --ds-radius-overlay: 1.5rem;
+  /* Two radii that sit outside the card/overlay scale on purpose.
+     micro: heat-map day cells are ~10px square, where the 8px small radius
+     would round them almost to circles. device: the phone-canvas bezel,
+     shared with .app-shell, which is device chrome rather than a product
+     surface (DEC-069 / F13). */
+  --ds-radius-micro: 2px;
+  --ds-radius-device: 2.5rem;
+  --ds-focus-width: 3px;
+  --ds-focus-offset: 2px;
+  --radius-full: 9999px;
+  /* Three elevation roles per docs/DESIGN_SYSTEM.md — flat/bordered carries no
+     shadow, so only two shadow tokens exist. Raised = cards/rows; overlay =
+     sheets/dialogs/menus.
+
+     These are defined PER THEME (DEC-067 / F11). They used to be one value
+     shared by every theme, carried over from the light-mode glass card: 5% and
+     3% black. On the Midnight ground (#0a1228) that is imperceptible, so every
+     one of the 66 shadow-raised surfaces rendered flat and leaned entirely on a
+     border measuring 1.88-2.40:1. That is why ad-hoc shadow-xl/2xl kept being
+     added by hand. A shadow has to be read against its own ground, so the dark
+     themes need several times the alpha the light theme does.
+
+     This block is the dark default (:root is the dark palette); .theme-light
+     and .high-contrast override it below, after this rule so they win on equal
+     specificity. */
+  --ds-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.4), 0 10px 28px -8px rgba(0, 0, 0, 0.55);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.7);
+}
+
+/* Light sits on a near-white ground, where the same alpha would read as soot.
+   Kept deliberately soft, but stronger than the old 5%/3% so a card still
+   separates from #f8f5f0 without a border doing all the work. */
+.light-mode,
+.theme-light {
+  --sleep: #6d28d9;
+  --evening: #c2410c;
+  --ds-shadow-raised: 0 1px 2px rgba(0, 0, 0, 0.05), 0 8px 24px -8px rgba(0, 0, 0, 0.12);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.22);
+}
+
+/* High contrast draws every boundary with a full-strength border, so elevation
+   is structural rather than decorative here; the shadow only needs to separate
+   an overlay from the content behind it. */
+.high-contrast {
+  --ds-shadow-raised: 0 2px 4px rgba(0, 0, 0, 0.75);
+  --ds-shadow-overlay: 0 24px 64px rgba(0, 0, 0, 0.9);
+}
+
+/* --border/--border-subtle and --input/--border-control are intentionally
+   identical per theme today (two visual weights expressed as four names: a
+   passive separator pair and a stronger control-boundary pair). Keep both
+   pairs distinct if a future theme needs to diverge them; don't treat the
+   duplication as a bug. */
+
+body {
+  font-family: var(--font-ui-latin);
+}
+
+.font-sans,
+.latin-ui {
+  font-family: var(--font-ui-latin);
+}
+
+[lang="ar"] body {
+  font-family: var(--font-ui-arabic);
+}
+
+.arabic-ui,
+[lang="ar"] .font-sans:not(.latin-ui) {
+  font-family: var(--font-ui-arabic);
+}
+
+.zikr-text,
+[lang="ar"] .zikr-text {
+  font-family: var(--font-reading-arabic);
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}
+
+input,
+select,
+textarea {
+  font-size: max(1rem, 16px);
+}
+
+:root[data-color-blind-support="deuteranopia"] {
+  --primary: #f4b400;
+  --primary-foreground: #10131d;
+  --secondary: #56b4e9;
+  --secondary-foreground: #081026;
+  --accent: #f4b400;
+  --accent-foreground: #10131d;
+  --ring: #56b4e9;
+}
+
+:root[data-color-blind-support="protanopia"] {
+  --primary: #2b7fff;
+  --primary-foreground: #10131d;
+  --secondary: #ffd166;
+  --secondary-foreground: #182030;
+  --accent: #2b7fff;
+  --accent-foreground: #10131d;
+  --ring: #ffd166;
+}
+
+:root[data-color-blind-support="tritanopia"] {
+  --primary: #e68a00;
+  --primary-foreground: #111111;
+  --secondary: #00a6a6;
+  --secondary-foreground: #f7ffff;
+  --accent: #8f63ff;
+  --accent-foreground: #f7f2ff;
+  --ring: #00a6a6;
+}
+
+.high-contrast {
+  --background: #02050d;
+  --foreground: #ffffff;
+  --card: #050505;
+  --card-foreground: #ffffff;
+  --popover: #050505;
+  --popover-foreground: #ffffff;
+  --primary: #ffd75e;
+  --primary-foreground: #000000;
+  --secondary: #bdfcf0;
+  --secondary-foreground: #001018;
+  --muted: #111111;
+  --muted-foreground: #f0f0f0;
+  --accent: #ffd75e;
+  --accent-foreground: #000000;
+  --destructive: #ff6b5a;
+  --destructive-foreground: #ffffff;
+  --border-subtle: #ffffff;
+  --border-control: #ffffff;
+  --border: #ffffff;
+  --input: #ffffff;
+  --input-background: #111111;
+  --switch-background: #ffffff;
+  --ring: #ffd75e;
+  --success: #6fe0a0;
+  --success-foreground: #000000;
+  --warning: #ffc93c;
+  --warning-foreground: #000000;
+  --info: #7cc0ff;
+  --info-foreground: #000000;
+}
+
+.bold-text {
+  --font-weight-medium: 700;
+  --font-weight-normal: 500;
+}
+
+/* Reader per-category accent. Each collection tints --primary/--ring for its
+   own reading session. These sixteen values used to be hex literals inside a
+   switch in ReaderScreen.tsx, applied as an inline style (DEC-069 / F17); they
+   belong with the rest of the palette, where they can be seen next to the
+   themes they have to work against. Behaviour is unchanged: the attribute sits
+   on the reader root and descendants inherit the custom properties.
+
+   Dark grounds first, matching :root; the light theme overrides below. */
+
+[data-reader-category="morning"] {
+  --primary: #fbbf24;
+  --ring: #fbbf24;
+}
+
+[data-reader-category="evening"] {
+  --primary: #2dd4bf;
+  --ring: #2dd4bf;
+}
+
+[data-reader-category="before_sleep"] {
+  --primary: #a78bfa;
+  --ring: #a78bfa;
+}
+
+[data-reader-category="after_prayer"] {
+  --primary: #34d399;
+  --ring: #34d399;
+}
+
+[data-reader-category="waking_up"] {
+  --primary: #38bdf8;
+  --ring: #38bdf8;
+}
+
+[data-reader-category="illness_ruqyah"] {
+  --primary: #fb7185;
+  --ring: #fb7185;
+}
+
+[data-reader-category="distress_anxiety"] {
+  --primary: #818cf8;
+  --ring: #818cf8;
+}
+
+[data-reader-category="travel"] {
+  --primary: #fbbf24;
+  --ring: #fbbf24;
+}
+
+/* Light needs the darker 700-weight variants to hold contrast on #f8f5f0. */
+
+.light-mode [data-reader-category="morning"],
+.theme-light [data-reader-category="morning"] {
+  --primary: #b45309;
+  --ring: #b45309;
+}
+
+.light-mode [data-reader-category="evening"],
+.theme-light [data-reader-category="evening"] {
+  --primary: #0f766e;
+  --ring: #0f766e;
+}
+
+.light-mode [data-reader-category="before_sleep"],
+.theme-light [data-reader-category="before_sleep"] {
+  --primary: #6d28d9;
+  --ring: #6d28d9;
+}
+
+.light-mode [data-reader-category="after_prayer"],
+.theme-light [data-reader-category="after_prayer"] {
+  --primary: #047857;
+  --ring: #047857;
+}
+
+.light-mode [data-reader-category="waking_up"],
+.theme-light [data-reader-category="waking_up"] {
+  --primary: #0369a1;
+  --ring: #0369a1;
+}
+
+.light-mode [data-reader-category="illness_ruqyah"],
+.theme-light [data-reader-category="illness_ruqyah"] {
+  --primary: #be123c;
+  --ring: #be123c;
+}
+
+.light-mode [data-reader-category="distress_anxiety"],
+.theme-light [data-reader-category="distress_anxiety"] {
+  --primary: #4338ca;
+  --ring: #4338ca;
+}
+
+.light-mode [data-reader-category="travel"],
+.theme-light [data-reader-category="travel"] {
+  --primary: #d97706;
+  --ring: #d97706;
+}
+
+/* Untitled UI directional icons mirror from the nearest language direction. */
+[data-rtl-flip]:dir(rtl) {
+  transform: scaleX(-1);
+}
+
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+  transition-duration: 0.01ms !important;
+}

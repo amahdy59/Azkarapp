@@ -1,0 +1,320 @@
+/* surfaces.css — part of the theme layer, split from a single 1,422-line file (DEC-077).
+   Scrollbars, shell surfaces, press micro-interactions and reduced motion.
+
+   These parts are imported by theme.css in a fixed order and are NOT independent:
+   the split was strictly sequential so the cascade is unchanged. Moving a rule
+   between parts, or reordering the imports, can change which declaration wins. */
+
+/* Hide native scrollbar on compact touch screens; show elegant thin scrollbars on tablet & desktop */
+@media (max-width: 767px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: none;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) {
+  .app-shell,
+  .app-shell * {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--primary) 45%, var(--muted-foreground) 30%) transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar {
+    display: block;
+    width: 6px;
+    height: 6px;
+  }
+
+  .app-shell *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--primary) 35%, var(--muted-foreground) 30%);
+    border-radius: 9999px;
+  }
+
+  .app-shell *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary);
+  }
+}
+
+[data-slot="dropdown-menu-radio-item"][data-state="checked"],
+[data-slot="dropdown-menu-checkbox-item"][data-state="checked"] {
+  color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 14%, var(--popover));
+}
+
+.app-viewport {
+  box-sizing: border-box;
+  width: 100%;
+  height: 100dvh;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.app-shell {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: min(100vw, 390px);
+  height: min(100dvh, 882px);
+  border-radius: var(--ds-radius-device);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.marketing-landing {
+  box-sizing: border-box;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+@media (min-width: 768px) {
+  .app-shell {
+    width: 390px;
+    height: min(100dvh, 882px);
+    border: 1px solid color-mix(in srgb, var(--border) 72%, transparent);
+  }
+}
+
+.skip-link {
+  position: fixed;
+  inset-block-start: 0.5rem;
+  inset-inline-start: 0.5rem;
+  z-index: 100;
+  transform: translateY(-160%);
+  border-radius: 0.5rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+  padding: 0.75rem 1rem;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.app-status {
+  grid-area: status;
+  min-width: 0;
+}
+
+.network-status {
+  z-index: 20;
+  background: var(--destructive);
+  color: var(--destructive-foreground);
+  padding: 0 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sync-status {
+  z-index: 19;
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  background: var(--card);
+  color: var(--card-foreground);
+  padding: 0.35rem 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.sync-status-error {
+  justify-content: space-between;
+  background: color-mix(in srgb, var(--destructive) 16%, var(--card));
+  color: var(--foreground);
+}
+
+:where(button, a, input, select, textarea, [tabindex]):focus-visible {
+  outline: var(--ds-focus-width) solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Full-bleed across the whole compact tier (up to 599px, where the fluid grid
+   takes over), so this matches useLayoutMode's 600px compact boundary. Ending
+   it at 430px used to leave 431–599px rendering a letterboxed 390px "phone
+   card" that belonged to no documented tier. */
+@media (max-width: 599px) {
+  .app-viewport {
+    height: 100dvh;
+    min-height: 100dvh;
+    align-items: stretch;
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 0;
+  }
+  .app-shell {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    box-shadow: none;
+  }
+}
+
+:root {
+  --theme-transition:
+    background-color 200ms cubic-bezier(0.4, 0, 0.2, 1), border-color 200ms cubic-bezier(0.4, 0, 0.2, 1),
+    color 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.app-viewport,
+.app-shell {
+  transition: var(--theme-transition);
+}
+
+@keyframes pulse-horizontal-ltr {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(4px);
+    opacity: 0.65;
+  }
+}
+@keyframes pulse-horizontal-rtl {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-4px);
+    opacity: 0.65;
+  }
+}
+
+.animate-pulse-horizontal {
+  animation: pulse-horizontal-ltr 1.2s ease-in-out 3;
+}
+[dir="rtl"] .animate-pulse-horizontal {
+  animation: pulse-horizontal-rtl 1.2s ease-in-out 3;
+}
+/* .element-pop is declared with .favorite-pop above, on the motion tokens. */
+
+.font-arabic,
+.zikr-text {
+  font-family: var(--font-reading-arabic);
+}
+
+/* ─── Universal Press Micro-interactions ─────────────────────────────
+   Placed OUTSIDE @layer so they override Tailwind utility classes
+   (transition-all, transition-colors, etc.) which live in @layer utilities.
+   ──────────────────────────────────────────────────────────────────── */
+
+button:not(:disabled):not(.no-press),
+[role="button"]:not([aria-disabled="true"]):not(.no-press),
+a[href]:not(.no-press),
+.interactive-elem {
+  touch-action: manipulation;
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    opacity var(--motion-duration-press) var(--motion-ease-standard);
+}
+
+button:not(:disabled):not(.no-press):active,
+[role="button"]:not([aria-disabled="true"]):not(.no-press):active,
+a[href]:not(.no-press):active,
+.interactive-elem:active {
+  transform: scale(var(--motion-scale-pressed)) !important;
+  opacity: 0.88;
+}
+
+/* Elastic Overscroll & Container Boundaries */
+.scroll-container,
+[data-radix-scroll-area-viewport] {
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Reduce-motion overrides for press effects */
+.reduce-motion button:active,
+.reduce-motion [role="button"]:active,
+.reduce-motion a:active,
+.reduce-motion .interactive-elem:active {
+  opacity: 0.88;
+}
+
+.reduce-motion button,
+.reduce-motion [role="button"],
+.reduce-motion a:not(.skip-link),
+.reduce-motion .interactive-elem {
+  transition: opacity var(--motion-duration-press) var(--motion-ease-standard) !important;
+  transform: none !important;
+}
+
+.reduce-motion .skip-link {
+  transition: none !important;
+}
+
+/* The per-component `.tap-ripple` reduced-motion rule that used to sit here is
+   owned by ZikrComponents.css alongside the ripple itself (DEC-067 / F22). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Adaptive Layout Tokens */
+:root {
+  --content-reading: 37.5rem;
+  --content-form: 40rem;
+  --content-dashboard: 90rem;
+  --content-app-shell: 100rem;
+  --nav-rail-width: 5rem;
+  --nav-sidebar-width: 16rem;
+}
+
+/* Responsive Typography */
+.screen-title {
+  font-size: clamp(1.375rem, 1.2rem + 0.5vw, 1.875rem);
+}
+.arabic-zikr {
+  font-size: clamp(1.75rem, 1.55rem + 0.75vw, 2.5rem);
+}
+.body-text {
+  font-size: clamp(1rem, 0.96rem + 0.15vw, 1.125rem);
+}
+
+/* .app-main compact base */
+.app-main {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Global subtle noise texture overlay for all screens to reduce visual flatness and eye strain.
+   The texture is high-contrast-safe and scales across the entire shell background. */
+.app-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.04'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 150px 150px;
+  mix-blend-mode: overlay;
+}
+
+.reduce-transparency .app-shell::after,
+.high-contrast .app-shell::after {
+  display: none !important;
+}

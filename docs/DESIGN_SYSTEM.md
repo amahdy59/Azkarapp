@@ -10,8 +10,8 @@ This is the implementation source of truth for visual and interaction decisions.
 | Core screens                | Nodes `443:2541`, `443:1533`, `443:1401`, and `443:1747`                    |
 | Additional Midnight screens | Nodes `443:2376` and `450:2648`                                             |
 | Theme modes                 | Light, Midnight, and Dark/OLED variable modes in the Figma appearance panel |
-| Semantic tokens             | `src/styles/theme.css`                                                      |
-| Typography                  | Offline system-family stacks in `src/styles/theme.css`                      |
+| Semantic tokens             | `src/styles/theme/tokens.css`                                               |
+| Typography                  | Offline system-family stacks in `src/styles/theme/tokens.css`               |
 | Shared shell/navigation     | `src/app/components/LayoutShells.tsx`                                       |
 | Reader implementation       | `src/app/screens/ReaderScreen.tsx`                                          |
 | Product icon library        | Untitled UI Icons via `src/app/components/icons.ts`                         |
@@ -63,13 +63,13 @@ Rules:
 - Spacing follows a 4 px grid. Page gutters are role-based: 16 px for dense settings, 20 px for standard app screens, and 24 px for focused onboarding and sheets. Documented set: 4, 8, 12, 16, 20, 24, 32, 40, 48, 64.
 - **Compact sub-scale.** Chips, badges, icon-and-label rows and other compact internal elements may use the 2 px half-steps between those values — 2, 6, 10, 14, 18 px (`gap-1.5`, `py-2.5`, `p-3.5`, and so on). This is a deliberate part of the contract, not drift: at the scale of a 20 px badge the next full step is a 100% jump, and the app already relies on these in roughly 175 places. The half-steps are for spacing _inside_ a component. Page gutters, section rhythm and the gaps between cards stay on the full 4 px set above.
 - Radius roles are 8 px for compact internal elements, 12-14 px for controls, 16-20 px for standard cards, and 24 px for major containers and sheets. Full-radius for chips and compact segmented controls only.
-- Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
+- Elevation: Use three levels only (Flat/bordered surface, Raised card, Modal/sheet). Avoid applying a large soft shadow to every card. Raised and Modal/sheet are backed by the `--ds-shadow-raised`/`--ds-shadow-overlay` tokens (`src/styles/theme/tokens.css`), mapped to the `shadow-raised`/`shadow-overlay` Tailwind utilities.
 - Control heights have three roles: compact 44 px, regular 48 px, and prominent 52 px. Every interactive target remains at least 44×44 CSS px.
 - Use subtle borders to separate passive surfaces and the higher-contrast control border for inputs and toggles. Meaningful control boundaries must reach 3:1 non-text contrast.
 - Focus indicators have exactly two roles:
   - **Controls** (buttons, links, inputs, tabs, radios, switches, cards acting as buttons) use `focus-visible:ring-[3px] focus-visible:ring-ring` — the semantic ring color at the full 3 px width. Add `focus-visible:ring-inset` only where an ancestor's `overflow: hidden` would clip an outward ring (e.g. rows inside a clipped settings card). Destructive actions may substitute `focus-visible:ring-destructive`.
   - **Scroll regions** (non-control containers that are focusable only so keyboard users can scroll them) use `focus-visible:ring-1 focus-visible:ring-ring/40` — deliberately subtle, because a full 3 px ring around a page-sized region is visually overwhelming and the region is not an actionable control.
-- The global `:focus-visible` outline rule in `src/styles/theme.css` remains the automatic fallback, so an element that opts out of both treatments still gets a visible token-driven indicator rather than none.
+- The global `:focus-visible` outline rule in `src/styles/theme/surfaces.css` remains the automatic fallback, so an element that opts out of both treatments still gets a visible token-driven indicator rather than none.
 
 ## Color roles
 
@@ -219,7 +219,7 @@ Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease
 
 ## Responsive shell
 
-Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in `src/styles/theme.css` must agree on these boundaries — a mismatch previously left one range with no navigation at all.
+Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in `src/styles/theme/layout.css` must agree on these boundaries — a mismatch previously left one range with no navigation at all.
 
 | Tier       | Width        | Shell                               | Navigation          |
 | ---------- | ------------ | ----------------------------------- | ------------------- |

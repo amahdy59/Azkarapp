@@ -70,7 +70,7 @@ will change shape or close outright once the design-system primitives actually c
 | F32 | Medium   | Test coverage   | Automated a11y gate cannot see geometry defects                             | 15 ✅ |
 | F33 | Medium   | Hygiene         | Working files committed to the repository                                   | 18 ✅ |
 | F34 | Medium   | Hygiene         | Blanket `*.png` ignore silently drops new image assets                      | 18 ✅ |
-| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | ⏸     |
+| F35 | Medium   | Maintainability | `theme.css` is a 1,296-line monolith                                        | 20 ✅ |
 | F36 | Medium   | Documentation   | Documentation drift and scaffolding leftovers                               | 20 ✅ |
 | F37 | High     | Test coverage   | Touch-target test measures the Category screen before it is laid out        | ✅    |
 
@@ -97,10 +97,9 @@ Recorded so the register does not imply more completeness than exists.
   produce: `requestAnimationFrame` delivers zero frames because the browser pane does not
   composite. The phase briefs explicitly require a measurement rather than an assumption for
   the noise overlay, and a profile before any memoisation. Both need real hardware.
-- **F35 is not attempted.** Splitting `theme.css` is a pure file move whose only risk is
-  cascade order. Mixing a 1,400-line reorganisation into the same commit as behavioural
-  motion changes would make both unreviewable. It deserves its own change, verified by
-  diffing the built CSS before and after.
+- **F35 is done** (DEC-077), in its own change as recommended. The split is strictly
+  sequential and the built CSS is byte-identical at 139,697 bytes, so the cascade provably
+  did not shift.
 - **A token/contract mismatch was found rather than fixed.** `--motion-duration-emphasis`
   is 360ms while the motion contract documents an emphasis band of 440–600ms. The
   `duration-500`/`700` sites that belong in that band were left alone rather than sped up to

@@ -1,0 +1,131 @@
+/* motion.css — part of the theme layer, split from a single 1,422-line file (DEC-077).
+   Keyframes and the animation classes that drive them.
+
+   These parts are imported by theme.css in a fixed order and are NOT independent:
+   the split was strictly sequential so the cascade is unchanged. Moving a rule
+   between parts, or reordering the imports, can change which declaration wins. */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+/* This animated opacity only, so it was a duplicate of fade-in wearing a
+   misleading name (DEC-070 / F21). It now does what it says. */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* The motion contract requires the save control to "pop once". Three components
+   apply .favorite-pop and .element-pop referenced these keyframes, but they
+   were never defined anywhere, so the microinteraction did nothing at all
+   (DEC-070 / F18). Restrained scale only, at the timing table's small
+   state-change band. */
+@keyframes favorite-pop {
+  0% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(1.18);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+@keyframes waveform {
+  0%,
+  100% {
+    transform: scaleY(0.4);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+@keyframes hint-fade-out {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Both ran at 500ms and 400ms on the wrong easing, outside the 240-300ms
+   screen/content entrance band in the motion contract (DEC-070 / F20).
+   .fade-in is on all four Progress views, so this was the slowest entrance in
+   the app on the screen users open most repeatedly. */
+.fade-in {
+  animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
+}
+
+.slide-up {
+  animation: slide-up var(--motion-duration-entrance) var(--motion-ease-enter) both;
+}
+
+/* Both class names are in use for the same intent; they resolve to one
+   animation so the behaviour cannot diverge. */
+.favorite-pop,
+.element-pop {
+  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) both;
+}
+
+.waveform-bar {
+  animation: waveform 1s ease-in-out infinite;
+}
+
+.tap-anywhere-hint {
+  /* Reserve height so layout never reflows when hint disappears */
+  min-height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    opacity 200ms ease,
+    transform 200ms ease;
+}
+
+.tap-anywhere-hint.hint-hidden {
+  animation: hint-fade-out 180ms cubic-bezier(0.4, 0, 0.6, 1) both;
+  pointer-events: none;
+}
+
+/* The counter surface, its states, the tap ripple and its keyframes used to be
+   declared here AND in ZikrComponents.css with conflicting values — 38px
+   translucent glass here, 24px opaque there. Which one won depended on bundler
+   CSS ordering, and the shipped result was a hybrid: the opaque background from
+   ZikrComponents with this file's backdrop-filter leaking through, i.e. a 24px
+   GPU blur behind a fully opaque surface, costing paint time for no visual
+   effect and creating an unexpected stacking context. ZikrComponents.css owns
+   all of it now (DEC-067 / F12, F22); it is the copy matching DEC-003's
+   opaque-surface rule and DEC-065's 24px radius. Do not re-add counter rules
+   here. */

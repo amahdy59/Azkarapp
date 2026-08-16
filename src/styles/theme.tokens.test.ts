@@ -2,8 +2,20 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 
+/**
+ * theme.css is a barrel of sequential parts (DEC-077), so these contracts are
+ * asserted against the concatenation in the barrel's own import order — which
+ * is the CSS the browser actually sees. Reading the parts through the barrel
+ * rather than naming them keeps this test correct if a rule moves between
+ * parts, and fails loudly if a part stops being imported.
+ */
 const themeCssPath = resolve(process.cwd(), "src/styles/theme.css");
-const themeCss = readFileSync(themeCssPath, "utf-8");
+const barrel = readFileSync(themeCssPath, "utf-8");
+const importedParts = [...barrel.matchAll(/@import\s+"\.\/([^"]+)"/g)].map((match) => match[1]);
+if (importedParts.length === 0) throw new Error("theme.css imports no parts; the theme layer cannot be verified");
+const themeCss = importedParts
+  .map((part) => readFileSync(resolve(process.cwd(), "src/styles", part), "utf-8"))
+  .join("\n");
 
 function themeBlock(selector: string): string {
   const start = themeCss.indexOf(selector);
