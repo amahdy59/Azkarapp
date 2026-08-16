@@ -27,6 +27,20 @@ The app uses offline system-family stacks so first render, installed-PWA use, an
 | Zikr, du'a, Qur'anic, and Arabic evidence text            | Native Arabic reading stack            | Add the `zikr-text` class and `lang="ar"`                                              | RTL                          |
 | Numeric counters                                          | Existing numeral formatter/font helper | `counterNumeralFontFamily` or `numeralFontFamily`                                      | LTR inside the numeric group |
 
+### Display title role
+
+The largest in-app heading — the category name on Home's routine card, and any future card
+that leads with a single short phrase — uses `text-[clamp(1.5rem,4.5vw,1.875rem)]` with
+`md:text-[2.25rem]`: 24 px compact, 36 px desktop.
+
+It was 28–48 px, which crowded the card it sits in and, because the heading truncates to one
+line, clipped long Arabic category names sooner than it needed to. 36 px still reads as
+unmistakably dominant against the 14 px body copy beneath it — a 2.6× ratio — while leaving
+the card's other content room to breathe (DEC-074).
+
+This is the ceiling for in-app headings. The marketing landing page is a separate context
+and keeps its own larger scale.
+
 Rules:
 
 - A zikr excerpt remains zikr content even when it appears on Home, Category, onboarding, reader, counter, or reference surfaces; use `zikr-text` in every location.

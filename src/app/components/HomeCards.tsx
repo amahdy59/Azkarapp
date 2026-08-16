@@ -66,75 +66,77 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
-      <div className="flex flex-1 flex-col justify-between gap-5 rounded-3xl border border-white/15 bg-on-media-surface/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
-        <div className="flex w-full flex-col items-start gap-3 px-1">
-          <h2
-            id="current-zikr-heading"
-            className="block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,7vw,2.25rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-5xl"
-            dir="auto"
-            style={{ lineHeight: "1.25" }}
-          >
-            {categoryName}
-          </h2>
-          <p className="max-w-[52ch] text-[0.875rem] font-semibold leading-6 text-on-media-muted" dir="auto">
-            {description}
-          </p>
-        </div>
-
-        <div>
-          <SegmentedControl
-            value={mode}
-            onChange={onModeChange}
-            direction={direction}
-            aria-label={t(language, "home.routineMode")}
-            className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
-            itemClassName={(selected) =>
-              `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
-              }`
-            }
-            options={[
-              { value: "complete", label: t(language, "home.routineComplete") },
-              { value: "core", label: t(language, "home.routineAbbreviated") },
-            ]}
-          />
-        </div>
-
-        {totalCount > 0 && (
-          <div className="mt-1 flex w-full flex-col gap-2">
-            <div
-              id={progressId}
-              className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.8125rem] font-bold text-on-media"
+      <div className="flex flex-1 flex-col gap-5 rounded-3xl border border-white/15 bg-on-media-surface/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          <div className="flex w-full flex-col items-start gap-3 px-1">
+            <h2
+              id="current-zikr-heading"
+              className="block max-w-full truncate whitespace-nowrap text-[clamp(1.5rem,4.5vw,1.875rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-[2.25rem]"
               dir="auto"
+              style={{ lineHeight: "1.25" }}
             >
-              <span>
-                {formatNumerals(completedCount, language)} {t(language, "home.ofSeparator")}{" "}
-                {formatNumerals(totalCount, language)}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
-                {t(language, "home.estimatedMinutes", {
-                  count: formatNumerals(estimatedMinutes, language),
-                })}
-              </span>
-            </div>
-            <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
-              <div
-                className={`h-full w-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
-                  direction === "rtl" ? "origin-right" : "origin-left"
-                }`}
-                style={{ transform: `scaleX(${progress})` } as CSSProperties}
-              />
-            </div>
+              {categoryName}
+            </h2>
+            <p className="max-w-[52ch] text-[0.875rem] font-semibold leading-6 text-on-media-muted" dir="auto">
+              {description}
+            </p>
           </div>
-        )}
+
+          <div>
+            <SegmentedControl
+              value={mode}
+              onChange={onModeChange}
+              direction={direction}
+              aria-label={t(language, "home.routineMode")}
+              className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
+              itemClassName={(selected) =>
+                `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
+                }`
+              }
+              options={[
+                { value: "complete", label: t(language, "home.routineComplete") },
+                { value: "core", label: t(language, "home.routineAbbreviated") },
+              ]}
+            />
+          </div>
+
+          {totalCount > 0 && (
+            <div className="flex w-full flex-col gap-2">
+              <div
+                id={progressId}
+                className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.8125rem] font-bold text-on-media"
+                dir="auto"
+              >
+                <span>
+                  {formatNumerals(completedCount, language)} {t(language, "home.ofSeparator")}{" "}
+                  {formatNumerals(totalCount, language)}
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
+                  {t(language, "home.estimatedMinutes", {
+                    count: formatNumerals(estimatedMinutes, language),
+                  })}
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
+                <div
+                  className={`h-full w-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
+                    direction === "rtl" ? "origin-right" : "origin-left"
+                  }`}
+                  style={{ transform: `scaleX(${progress})` } as CSSProperties}
+                />
+              </div>
+            </div>
+          )}
+        </div>
 
         <button
           type="button"
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-1 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-auto flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
           <DirectionArrow

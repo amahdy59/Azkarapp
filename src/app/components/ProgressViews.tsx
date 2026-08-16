@@ -94,7 +94,7 @@ function MainDhikrGroupCard({
       </div>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col gap-2 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+        className={`flex min-w-0 flex-1 flex-col gap-3 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
         <span className="text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem]">{name}</span>
         <span
