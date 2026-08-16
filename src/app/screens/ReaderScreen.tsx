@@ -46,9 +46,29 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
+import { getReadingFontSize } from "./readingTypography";
+
+/**
+ * Same three steps, same labels and same order as Settings → Accessibility →
+ * Text size, because both controls write the one `textSize` setting. If these
+ * drift apart the reader and Settings start describing the same value
+ * differently.
+ */
+const READER_TEXT_SIZE_OPTIONS: ReadonlyArray<{
+  value: TextSizeOption;
+  labelKey: string;
+  sampleClass: string;
+}> = [
+  { value: "small", labelKey: "settings.textSmall", sampleClass: "text-[0.75rem]" },
+  { value: "medium", labelKey: "settings.medium", sampleClass: "text-[0.9375rem]" },
+  { value: "large", labelKey: "settings.textLarge", sampleClass: "text-[1.125rem]" },
+];
 
 /** Shared ghost icon-button treatment for every control in the phone header row. */
 const READER_HEADER_ACTION_CLASS =
@@ -66,16 +86,23 @@ const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
   error: "reader.shareCardError",
 };
 
-function getReaderZikrTitle(zikr: Zikr, language: AppLanguage, fallback: string) {
+/**
+ * The heading above the reading canvas, or null when there is nothing worth
+ * saying there.
+ *
+ * This used to fall back to the zikr's own first clause, which meant that for
+ * a short dhikr the heading was a verbatim copy of the text directly beneath
+ * it — the same words twice, once as a label for itself. The other fallback,
+ * the category name, simply repeated the header title. Neither told the reader
+ * anything, and both cost vertical space above the canvas and an extra stop in
+ * the screen-reader running order.
+ *
+ * A real surah name is different: it names a passage the text itself does not,
+ * so it is the only case that earns the heading.
+ */
+function getReaderZikrTitle(zikr: Zikr, language: AppLanguage): string | null {
   const surahName = language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish;
-  if (surahName?.trim()) return surahName.trim();
-
-  const primaryText = (language === "ar" ? zikr.arabicText : zikr.translation).replace(/\s+/g, " ").trim();
-  const firstClause = primaryText.split(/[,،;؛.!?؟]/)[0]?.trim() ?? "";
-  if (firstClause.length >= 4) {
-    return firstClause.length > 58 ? `${firstClause.slice(0, 57).trimEnd()}…` : firstClause;
-  }
-  return fallback;
+  return surahName?.trim() ? surahName.trim() : null;
 }
 
 function vibrate(pattern: number | number[]) {
@@ -100,6 +127,7 @@ export function ReaderScreen({
   showTranslation,
   showTransliteration,
   textSize,
+  onTextSizeChange,
   savedZikrIds,
   onBack,
   onComplete,
@@ -127,6 +155,7 @@ export function ReaderScreen({
   showTranslation: boolean;
   showTransliteration: boolean;
   textSize: TextSizeOption;
+  onTextSizeChange: (value: TextSizeOption) => void;
   savedZikrIds: Set<string>;
   onBack: () => void;
   onComplete: (idx: number) => void;
@@ -325,19 +354,17 @@ export function ReaderScreen({
   const wordMeanings = getQuranWordMeanings(z);
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
-  // Dynamic typography scaling: slightly increase size for short text.
-  let scaleFactor = 1;
-  const arabicLength = z.arabicText.length;
-  if (!longSurah) {
-    if (arabicLength < 30) scaleFactor = 1.3;
-    else if (arabicLength < 60) scaleFactor = 1.15;
-    else if (arabicLength < 80) scaleFactor = 1.05;
-  }
-  const baseSize = { small: 16, medium: 18.5, large: 21.5 }[textSize];
-  const readingFontSize = `${baseSize * scaleFactor}px`;
+  // Shorter azkar read larger, long surahs stay at the size their Mushaf pages
+  // were reviewed at, and nothing drops below the legibility floor. The table
+  // and both guarantees live in readingTypography.ts, under test.
+  const readingFontSize = getReadingFontSize({
+    textSize,
+    arabicLength: z.arabicText.length,
+    longSurah,
+  });
   const readingFontFamily = "var(--font-reading-arabic)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
-  const readerZikrTitle = getReaderZikrTitle(z, language, displayCategoryName);
+  const readerZikrTitle = getReaderZikrTitle(z, language);
   const localizedReadingPercent = formatNumerals(readingPercent, language);
 
   const handleShare = async () => {
@@ -607,24 +634,62 @@ export function ReaderScreen({
 
       <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
 
-      {layout === "mobile" && (
-        <>
-          <DropdownMenuItem
-            onClick={handleToggleSaved}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      {/* Reading size, in the reader rather than only three taps away in
+          Settings — it is the one preference people reach for mid-session,
+          when the text in front of them is the thing that is too small. It
+          drives the same app-wide setting Settings does, so the two can never
+          disagree; changing it here also resizes the app's chrome. */}
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-[0.75rem] font-bold uppercase tracking-wide text-muted-foreground">
+        {t(language, "settings.textSize")}
+      </DropdownMenuLabel>
+      <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
+        {READER_TEXT_SIZE_OPTIONS.map(({ value, labelKey, sampleClass }) => (
+          <DropdownMenuRadioItem
+            key={value}
+            value={value}
+            data-testid={`reader-text-size-${value}`}
+            className="cursor-pointer rounded-xl py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
           >
-            <Bookmark size={18} className={savedZikrIds.has(z.id) ? "favorite-pop fill-current" : ""} />
-            {savedZikrIds.has(z.id) ? t(language, "reader.unsave") : t(language, "reader.save")}
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={toggleSound}
-            className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
-          >
-            {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-            {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-          </DropdownMenuItem>
-        </>
-      )}
+            <span className="flex items-center gap-3">
+              {/* The glyph previews the step; the word carries the meaning,
+                  so size is never the only thing distinguishing the options. */}
+              <span aria-hidden="true" className={`w-5 text-center font-bold leading-none ${sampleClass}`}>
+                Aa
+              </span>
+              {t(language, labelKey)}
+            </span>
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
+
+      <DropdownMenuSeparator className="my-1.5 h-px bg-border/60" />
+
+      {/* Save, share and sound live here on every tier now, not just on
+          phones: the header keeps two actions at most, so these three moved
+          off the desktop hero toolbar into the same menu. */}
+      <DropdownMenuItem
+        onClick={handleToggleSaved}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
+        {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={() => void handleShare()}
+        disabled={isSharing}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+      >
+        <Share2 size={18} />
+        {t(language, "reader.share")}
+      </DropdownMenuItem>
+      <DropdownMenuItem
+        onClick={toggleSound}
+        data-testid={`reader-counter-sound-toggle-${layout}`}
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+      >
+        {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
+        {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
+      </DropdownMenuItem>
 
       <DropdownMenuItem
         onClick={handleResetCounter}
@@ -730,24 +795,15 @@ export function ReaderScreen({
               <ArrowPrevious size={20} />
             </IconButton>
 
-            {/* Page-level actions live with the back control in the hero —
-                a single toolbar row — rather than in a second row inside the
-                card below. Icon-only throughout (the "Benefit" pill lost its
-                text label; its tooltip now previews the actual benefit text
-                instead of repeating the button's own name). */}
-            <div className="absolute end-4 top-4 flex items-center gap-2">
-              <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger
-                  aria-label={t(language, "reader.menu")}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  <MoreVertical size={18} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[210px]">
-                  {renderReaderMenuItems("desktop")}
-                </DropdownMenuContent>
-              </DropdownMenu>
-
+            {/* Two actions, the same two as on phones: Benefit, then the
+                overflow menu. Save, share and sound used to sit out here as
+                three more icons — five ghost circles competing with the
+                collection name for the top of the reading screen. They are one
+                tap away in the menu now, and the toolbar reads as a pair
+                rather than a strip. Icon-only throughout; the Benefit tooltip
+                previews the actual benefit text rather than repeating the
+                button's own name. */}
+            <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
               <IconButton
                 onClick={(event) => {
                   event.stopPropagation();
@@ -761,47 +817,19 @@ export function ReaderScreen({
                 <BookOpen size={18} />
               </IconButton>
 
-              <IconButton
-                onClick={(event) => {
-                  event.stopPropagation();
-                  handleToggleSaved();
-                }}
-                label={isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
-                aria-pressed={isSaved}
-                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 hover:bg-[color:var(--on-media)]/20"
-                style={{ color: isSaved ? "var(--on-media-accent)" : "var(--on-media)" }}
-              >
-                <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
-              </IconButton>
-
-              <IconButton
-                onClick={(event) => {
-                  event.stopPropagation();
-                  void handleShare();
-                }}
-                label={t(language, "reader.share")}
-                disabled={isSharing}
-                aria-busy={isSharing || undefined}
-                onPointerEnter={() => void prepareZikrShareCardFonts()}
-                onFocus={() => void prepareZikrShareCardFonts()}
-                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
-              >
-                <Share2 size={18} />
-              </IconButton>
-
-              <IconButton
-                onClick={(event) => {
-                  event.stopPropagation();
-                  toggleSound();
-                }}
-                label={t(language, "counter.sound")}
-                title={t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
-                aria-pressed={soundEnabled}
-                data-testid="reader-counter-sound-toggle"
-                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
-              >
-                {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-              </IconButton>
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger
+                  aria-label={t(language, "reader.menu")}
+                  onPointerEnter={() => void prepareZikrShareCardFonts()}
+                  onFocus={() => void prepareZikrShareCardFonts()}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                >
+                  <MoreVertical size={18} />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="min-w-[210px]">
+                  {renderReaderMenuItems("desktop")}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
 
             <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
@@ -829,13 +857,20 @@ export function ReaderScreen({
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
               />
-              <h2
-                className="w-full truncate text-start text-[0.875rem] font-extrabold text-[color:var(--on-media)]"
-                dir="auto"
-                title={readerZikrTitle}
-              >
-                {readerZikrTitle}
-              </h2>
+              {/* Only surah names reach here. This margin adds to the column's
+                  gap-2 for 14px under the bar — comfortably past the 4px
+                  minimum, which Arabic needs because harakat sit well above
+                  the cap line and would otherwise crowd the track. */}
+              {readerZikrTitle && (
+                <h2
+                  className="mt-1.5 w-full truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                  dir="auto"
+                  title={readerZikrTitle}
+                  data-testid="reader-zikr-title"
+                >
+                  {readerZikrTitle}
+                </h2>
+              )}
             </div>
           </div>
 
@@ -888,11 +923,12 @@ export function ReaderScreen({
               onBack={onBack}
               language={language}
               right={
-                // Phone layout: Benefit and Share join the overflow control in
-                // this single top row (the old bottom action bar is gone, and
-                // with it the second row of chrome). All three share the
-                // header's ghost icon-button treatment, so the row reads as one
-                // set rather than a pill next to two icons.
+                // Two actions at most: Benefit, then the overflow control.
+                // Share used to sit between them; at 320-390px a third 44px
+                // target was the difference between the collection name
+                // fitting and being truncated to "أذكار ال…", and share is not
+                // a per-zikr primary. Both share the header's ghost
+                // icon-button treatment so the row reads as one set.
                 <div className="flex items-center gap-1" data-testid="reader-actions">
                   <button
                     type="button"
@@ -909,25 +945,17 @@ export function ReaderScreen({
                     <BookOpen size={20} />
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      void handleShare();
-                    }}
-                    disabled={isSharing}
-                    aria-busy={isSharing || undefined}
-                    onPointerEnter={() => void prepareZikrShareCardFonts()}
-                    onFocus={() => void prepareZikrShareCardFonts()}
-                    className={READER_HEADER_ACTION_CLASS}
-                    aria-label={t(language, "reader.share")}
-                    title={t(language, "reader.share")}
-                  >
-                    <Share2 size={20} />
-                  </button>
-
                   <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger aria-label={t(language, "reader.menu")} className={READER_HEADER_ACTION_CLASS}>
+                    {/* The share-card fonts used to be prefetched on the share
+                        button's own hover/focus. That button is in the menu
+                        now, so the trigger warms them instead — still ahead of
+                        the click, one step earlier in the same gesture. */}
+                    <DropdownMenuTrigger
+                      aria-label={t(language, "reader.menu")}
+                      className={READER_HEADER_ACTION_CLASS}
+                      onPointerEnter={() => void prepareZikrShareCardFonts()}
+                      onFocus={() => void prepareZikrShareCardFonts()}
+                    >
                       <MoreVertical size={20} />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="min-w-[210px]">
@@ -958,13 +986,18 @@ export function ReaderScreen({
               direction={direction}
               aria-label={t(language, "reader.groupProgress")}
             />
-            <h2
-              className="mt-2 block max-w-full truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold text-foreground"
-              dir="auto"
-              title={readerZikrTitle}
-            >
-              {readerZikrTitle}
-            </h2>
+            {/* See the desktop heading: only surah names render, and the 10px
+                margin keeps harakat clear of the progress track. */}
+            {readerZikrTitle && (
+              <h2
+                className="mt-2.5 block max-w-full truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
+                dir="auto"
+                title={readerZikrTitle}
+                data-testid="reader-zikr-title"
+              >
+                {readerZikrTitle}
+              </h2>
+            )}
           </div>
 
           {/* Main Layout Area */}

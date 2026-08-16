@@ -158,8 +158,13 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   // Page-level actions live in the hero toolbar on this tier, not in a second
   // row under the counter.
   await expect(page.getByTestId("reader-actions")).toHaveCount(0);
-  await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toBeVisible();
-  await expect(desktopHero.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
+  // Two actions, the same pair as on phones: Benefit and the overflow menu.
+  // Save, share and sound used to sit out here as three more icons.
+  const heroActions = page.getByTestId("reader-hero-actions");
+  await expect(heroActions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
+  await expect(heroActions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
+  await expect(heroActions.getByRole("button")).toHaveCount(2);
+  await expect(desktopHero.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
 });
 
 type CompletionCueRecord = {
@@ -308,14 +313,11 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   const counterSurface = page.getByTestId("counter-surface");
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
-  const saveButton = page.getByRole("button", { name: "Save zikr", exact: true });
-  if ((page.viewportSize()?.width ?? 0) >= 768) {
-    await expect(saveButton).toBeVisible();
-    await saveButton.click();
-  } else {
-    await page.getByRole("button", { name: "Reader options", exact: true }).click();
-    await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
-  }
+  // Save lives in the overflow menu on every tier now — the header carries at
+  // most two actions, Benefit and the menu, so there is no width branch.
+  await expect(page.getByRole("button", { name: "Save zikr", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Save zikr", exact: true }).click();
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   await page.getByRole("button", { name: "Benefit", exact: true }).click();
@@ -423,16 +425,17 @@ test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await openFirstMorningZikr(page);
 
-  // Phone chrome is one header row (Benefit, Share, More) with no bottom
-  // action bar and no tab bar, so the reading surface owns the viewport.
+  // Phone chrome is one header row (Benefit, More) with no bottom action bar
+  // and no tab bar, so the reading surface owns the viewport. Share moved into
+  // the menu: at 320px a third 44px target was the difference between the
+  // collection name fitting and being truncated.
   await expect(page.getByTestId("reader-actions")).toBeVisible();
+  await expect(page.getByTestId("reader-actions").getByRole("button")).toHaveCount(2);
   await expect(page.getByTestId("nav-azkar")).toHaveCount(0);
 
   const readerBox = await page.getByTestId("reader-screen").boundingBox();
   const actionBoxes = await Promise.all(
-    ["Share zikr", "Benefit", "Reader options"].map((name) =>
-      page.getByRole("button", { name, exact: true }).boundingBox(),
-    ),
+    ["Benefit", "Reader options"].map((name) => page.getByRole("button", { name, exact: true }).boundingBox()),
   );
   expect(readerBox).not.toBeNull();
   if (!readerBox) return;
@@ -657,4 +660,71 @@ test("resetting the counter clears an accidental completion from stored progress
 
   // Without clearing the record, isDone would restore the completion on remount.
   await expect.poll(stored).toHaveLength(0);
+});
+
+/** The header carries the Benefit button and the overflow menu, nothing else. */
+function readerHeaderActions(page: Page) {
+  // The phone header row and the wide-desktop hero toolbar are the same
+  // contract under different test ids; exactly one of them is mounted.
+  return page.getByTestId("reader-actions").or(page.getByTestId("reader-hero-actions"));
+}
+
+test("the reader header carries exactly two actions on every tier", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  const actions = readerHeaderActions(page);
+  await expect(actions).toBeVisible();
+  await expect(actions.getByRole("button")).toHaveCount(2);
+  await expect(actions.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
+  await expect(actions.getByRole("button", { name: "Reader options", exact: true })).toBeVisible();
+
+  // The three that moved are reachable, just not as header chrome.
+  await expect(page.getByRole("button", { name: "Share zikr", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Reader options", exact: true }).click();
+  for (const name of ["Save zikr", "Share zikr"]) {
+    await expect(page.getByRole("menuitem", { name, exact: true })).toBeVisible();
+  }
+});
+
+test("a short zikr gets no heading, because the heading used to repeat it", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  // The heading is derived from a real surah name only. The first waking-up
+  // zikr has none, so nothing should sit between the bar and the canvas.
+  await expect(page.getByTestId("reader-zikr-title")).toHaveCount(0);
+
+  const zikr = page.getByTestId("zikr-text");
+  await expect(zikr).toBeVisible();
+  const body = ((await zikr.textContent()) ?? "").trim();
+  expect(body.length).toBeGreaterThan(0);
+  // Whatever else is on screen, no element may restate the zikr as a label.
+  const restated = await page
+    .locator("h1, h2")
+    .filter({ hasText: body.slice(0, 24) })
+    .count();
+  expect(restated, "no heading may repeat the zikr text").toBe(0);
+});
+
+test("the reader's text-size control resizes the zikr and never goes below the floor", async ({ page }) => {
+  await openFirstMorningZikr(page);
+
+  const zikr = page.getByTestId("zikr-text");
+  const sizePx = async () => Number.parseFloat(await zikr.evaluate((node) => window.getComputedStyle(node).fontSize));
+
+  const measured: Record<string, number> = {};
+  for (const step of ["small", "medium", "large"] as const) {
+    await page.getByRole("button", { name: "Reader options", exact: true }).click();
+    await page.getByTestId(`reader-text-size-${step}`).click();
+    // The menu writes the one app-wide setting, so the root token moves too.
+    await expect
+      .poll(async () =>
+        page.evaluate(() => window.getComputedStyle(document.documentElement).getPropertyValue("--font-size").trim()),
+      )
+      .toBe({ small: "14px", medium: "16px", large: "18px" }[step]);
+    measured[step] = await sizePx();
+  }
+
+  expect(measured.small, "smallest step must stay legible").toBeGreaterThanOrEqual(21.3);
+  expect(measured.medium).toBeGreaterThan(measured.small);
+  expect(measured.large).toBeGreaterThan(measured.medium);
 });

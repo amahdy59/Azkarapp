@@ -49,6 +49,44 @@ async function expectNoHorizontalOverflow(page: Page, context: string) {
   expect(overflow.scrollWidth, `${context}: page scrolls horizontally`).toBeLessThanOrEqual(overflow.clientWidth + 1);
 }
 
+/**
+ * The shared screen-header title no longer promises one line — it promises the
+ * whole name. It wraps to at most two lines and steps down a size below 360px
+ * rather than truncating, because a collection name cut to "أذكار ال…" names
+ * nothing and fitting the longest names on one line at 320px would need a
+ * ~14px h1.
+ *
+ * Clipping is measured against an unclamped probe at the same width and font.
+ * `scrollHeight > clientHeight` is meaningless here: `line-clamp` renders the
+ * heading as a `-webkit-box`, where the two differ even when nothing is cut.
+ */
+async function expectUnclippedHeading(heading: Locator, context: string) {
+  await expect(heading).toBeVisible();
+  const metrics = await heading.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const lineHeight = Number.parseFloat(style.lineHeight);
+
+    const probe = document.createElement("div");
+    probe.style.cssText =
+      `position:absolute;visibility:hidden;left:-9999px;top:0;width:${element.clientWidth}px;` +
+      `font-family:${style.fontFamily};font-size:${style.fontSize};font-weight:${style.fontWeight};` +
+      `line-height:${style.lineHeight};letter-spacing:${style.letterSpacing};white-space:normal;`;
+    probe.dir = document.documentElement.dir;
+    probe.textContent = element.textContent;
+    document.body.appendChild(probe);
+    const naturalLines = Math.round(probe.scrollHeight / lineHeight);
+    probe.remove();
+
+    return { naturalLines, fontSize: Number.parseFloat(style.fontSize), text: element.textContent ?? "" };
+  });
+
+  expect(
+    metrics.naturalLines,
+    `${context}: "${metrics.text}" needs more than two lines, so it is clipped`,
+  ).toBeLessThanOrEqual(2);
+  expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
+}
+
 async function expectSingleLineHeading(heading: Locator, context: string) {
   await expect(heading).toBeVisible();
   const metrics = await heading.evaluate((element) => {
@@ -124,7 +162,9 @@ for (const viewport of VIEWPORTS.filter((item) => item.width <= 412)) {
     await seedAndOpen(page);
     await page.getByTestId("nav-progress").click();
 
-    await expectSingleLineHeading(
+    // The page title is the shared header h1, which now wraps rather than
+    // truncates; the card headings below it keep the one-line contract.
+    await expectUnclippedHeading(
       page.getByRole("heading", { name: "Progress", exact: true, level: 1 }),
       `${viewport.name} page title`,
     );
@@ -359,3 +399,31 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
   await page.keyboard.press("Escape");
   await expect(page.getByRole("navigation")).toBeVisible();
 });
+
+// The header title is the app's most space-constrained string: the longest
+// collection names have to survive a 320px viewport minus back button,
+// gutters and the reader's two actions.
+for (const language of ["ar", "en"] as const) {
+  test(`mobile headings: ${language.toUpperCase()} longest collection name is never clipped at 320px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await seedAndOpen(page, { language });
+    await page.getByTestId("nav-azkar").click();
+
+    // "أذكار الظواهر الطبيعية" / "Natural Events" — the longest of the set.
+    await page.getByTestId("category-card-natural_events").click();
+    await expectUnclippedHeading(
+      page.getByRole("heading", { level: 1 }).first(),
+      `${language} category header at 320px`,
+    );
+
+    // And again in the reader, where two header actions compete for the row.
+    await page
+      .getByRole("button", { name: /Start Session|ابدأ/ })
+      .first()
+      .click();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    await expectUnclippedHeading(page.getByRole("heading", { level: 1 }).first(), `${language} reader header at 320px`);
+  });
+}

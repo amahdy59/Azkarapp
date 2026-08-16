@@ -1135,6 +1135,7 @@ function AppContent() {
                   showTranslation={showTranslation}
                   showTransliteration={showTransliteration}
                   textSize={textSize}
+                  onTextSizeChange={setTextSize}
                   savedZikrIds={savedZikrIds}
                   onBack={
                     activeCat === "friday_kahf"

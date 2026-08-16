@@ -36,6 +36,7 @@ describe("ReaderScreen audio identity", () => {
         showTranslation
         showTransliteration
         textSize="medium"
+        onTextSizeChange={() => undefined}
         savedZikrIds={new Set()}
         onBack={() => undefined}
         onComplete={() => undefined}
@@ -48,12 +49,13 @@ describe("ReaderScreen audio identity", () => {
     );
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-zikr-id", "m-hm-75");
-    // Phone chrome: Benefit, Share and the overflow control share one header
-    // row; the counter-sound toggle moved into that overflow menu.
+    // Header chrome is two actions: Benefit and the overflow control. Share,
+    // save and the counter-sound toggle all live inside that overflow menu.
     expect(screen.getByRole("button", { name: "Benefit" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Share zikr" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Reader options" })).toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Counter sound" })).toBeNull();
+    for (const name of ["Share zikr", "Save zikr", "Counter sound"]) {
+      expect(screen.queryByRole("button", { name })).toBeNull();
+    }
   });
 
   it("renders reviewed Mushaf pages with a stable long-surah counter", () => {
@@ -74,6 +76,7 @@ describe("ReaderScreen audio identity", () => {
         showTranslation={false}
         showTransliteration={false}
         textSize="medium"
+        onTextSizeChange={() => undefined}
         savedZikrIds={new Set()}
         onBack={() => undefined}
         onComplete={onComplete}
@@ -135,6 +138,7 @@ describe("ReaderScreen audio identity", () => {
         showTranslation={false}
         showTransliteration={false}
         textSize="medium"
+        onTextSizeChange={() => undefined}
         savedZikrIds={new Set()}
         onBack={() => undefined}
         onComplete={onComplete}
@@ -173,6 +177,7 @@ describe("ReaderScreen audio identity", () => {
         showTranslation={false}
         showTransliteration={false}
         textSize="medium"
+        onTextSizeChange={() => undefined}
         savedZikrIds={new Set()}
         onBack={() => undefined}
         onComplete={onComplete}

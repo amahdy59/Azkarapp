@@ -107,15 +107,9 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   await page.getByTestId("category-card-morning").click();
   await page.getByRole("button", { name: /Start session/i }).click();
 
-  const isMobile = (page.viewportSize()?.width ?? 1024) < 768;
-  if (isMobile) {
-    await page.getByRole("button", { name: /Reader options/i }).click();
-  }
-
-  const saveBtn = page
-    .getByRole("menuitem", { name: /Save zikr/i })
-    .first()
-    .or(page.getByRole("button", { name: /Save zikr/i }).first());
+  // Save is a menu item on every tier now, so no width branch.
+  await page.getByRole("button", { name: /Reader options/i }).click();
+  const saveBtn = page.getByRole("menuitem", { name: /Save zikr/i }).first();
   await expect(saveBtn).toBeVisible();
   await saveBtn.click();
 
@@ -134,9 +128,7 @@ test("Saved zikr keyboard removal", async ({ page }) => {
   await page.keyboard.press("Enter");
 
   // Focus unsave button and press enter
-  if (isMobile) {
-    await page.getByRole("button", { name: /Reader options/i }).click();
-  }
+  await page.getByRole("button", { name: /Reader options/i }).click();
   const unsaveBtn = page
     .getByRole("menuitem", { name: /Remove saved zikr/i })
     .first()

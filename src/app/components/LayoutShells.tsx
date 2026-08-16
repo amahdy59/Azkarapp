@@ -68,7 +68,22 @@ export function Header({
         </IconButton>
       )}
       <div className="flex-1 min-w-0">
-        <h1 className="block max-w-full truncate whitespace-nowrap font-sans text-xl font-extrabold leading-tight text-foreground sm:text-2xl">
+        {/* Wraps to a second line rather than truncating.
+            At 320px the header's chrome — back button, gutters, two actions —
+            leaves 136px, and only the shortest collection name fits that on
+            one line: "أذكار الظواهر الطبيعية" needs 193px and
+            "أذكار بعد الصلاة · المغرب" needs 220px. Truncating turned those
+            into "أذكار ال…", which names nothing. Fitting them on one line
+            would need a ~14px h1, too small to read as a title, so the second
+            line is the honest trade: the name is always complete, and the
+            56px minimum absorbs two lines without the header growing.
+            The size step at 360px keeps the longer English names to two
+            lines as well. `title` still carries the full string for a
+            pointer, and truncation remains the backstop past two lines. */}
+        <h1
+          className="line-clamp-2 max-w-full font-sans text-lg font-extrabold leading-tight text-foreground min-[360px]:text-xl sm:text-2xl"
+          title={title}
+        >
           {title}
         </h1>
         {subtitle && <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
