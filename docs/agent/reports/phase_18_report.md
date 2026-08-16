@@ -73,20 +73,18 @@ regression demonstration, and the entry-by-entry precache validation.
 
 ## Known limitations or remaining risks
 
-- **F27 deferred, not done.** The brief requires the noise overlay to be measured rather
-  than assumed. This environment cannot composite frames — `requestAnimationFrame`
-  delivered zero frames in four seconds — so any paint-cost figure would be invented.
-  Removing it on a guess would have violated the brief's own instruction. Carried to
-  Phase 20.
+- ~~F27 deferred, not done.~~ **Closed by DEC-073.** The obstacle was the inspection pane,
+  not the project: Playwright composites. Measured at 4× CPU throttle, the overlay costs
+  0.2 ms of median frame time — inside run-to-run noise, with the overlay-on run the fastest
+  of three. It stays.
 - ~~The master images are still untracked.~~ **Resolved by DEC-071:** `design-sources/` is
   now tracked. Before committing, the tree was deduplicated — the nested `public/` subtree
   was removed after all 28 generated files were proven byte-identical to the tracked copies,
   and three of four `Originals/*.png` after proving them identical to their masters. 17 MB
   became 13 MB, 21 files, eight PNGs with eight distinct hashes.
-- **Two large PNGs now dominate the precache.** `images/mosque_prophet.png` and
-  `images/benefits_zikr.png`, ~1.6 MB each at 1254×1254, are 3.3 MB of the 5.8 MB precache.
-  Both are genuinely referenced. Re-encoding to WebP/AVIF is the next largest win but
-  touches reviewed artwork, so it was not attempted.
+- ~~Two large PNGs now dominate the precache.~~ **Closed by DEC-072.** Both were encoded to
+  AVIF and WebP at unchanged dimensions — about 4% of the source at ~40 dB PSNR — taking the
+  precache from 5,977 KiB to 2,925 KiB and `dist` to 3.3 MB.
 - **Deleted files are recoverable from git history, but the conversation dumps are too.**
   `msgs.txt` and `full_msgs.txt` were transcripts. They are gone from the working tree but
   remain in history; if they contain anything sensitive, that needs a history rewrite,
