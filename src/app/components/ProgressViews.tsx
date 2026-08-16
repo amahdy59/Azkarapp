@@ -815,7 +815,7 @@ export function ProgressMonthView({
                         : t(language, "progress.monthDayUnstarted"),
                   })}
                   aria-pressed={isSelected}
-                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+                  className={`flex flex-col items-center justify-center aspect-square rounded-2xl border transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                     isSelected
                       ? "border-primary ring-2 ring-primary/50 bg-primary/20 scale-105 z-10"
                       : isPalm
@@ -1158,7 +1158,7 @@ export function ProgressYearView({
           return (
             <div
               key={idx}
-              className={`p-3 rounded-2xl bg-card border transition-all ${
+              className={`p-3 rounded-2xl bg-card border transition-colors ${
                 isBest ? "border-success/60 ring-1 ring-success/40 bg-success/5 shadow-md" : "border-border/40"
               }`}
             >

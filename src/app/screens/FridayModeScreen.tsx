@@ -270,7 +270,7 @@ export function FridayModeScreen({
           type="button"
           onClick={onOpenSalawat}
           aria-labelledby="salawat-heading"
-          className="flex min-h-24 shrink-0 items-center gap-4 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-primary/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="flex min-h-24 shrink-0 items-center gap-4 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
             <MoonStar size={24} className="fill-current/15" aria-hidden="true" />
@@ -297,7 +297,7 @@ export function FridayModeScreen({
           onClick={onStartDuasSession}
           disabled={isDuasLoading || duasLoadError}
           aria-busy={isDuasLoading || undefined}
-          className="flex min-h-24 shrink-0 items-center gap-3 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-primary/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring lg:col-span-2"
+          className="flex min-h-24 shrink-0 items-center gap-3 rounded-3xl border border-border/40 bg-card p-5 text-start shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring lg:col-span-2"
         >
           <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-primary/15 text-primary">
             <Clock size={23} />

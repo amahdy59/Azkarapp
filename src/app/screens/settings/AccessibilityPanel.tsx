@@ -28,7 +28,7 @@ function PanelRadioOption({ value, active, label }: { value: string; active: boo
   return (
     <RadioGroupPrimitive.Item
       value={value}
-      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-all active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-[color,background-color,border-color,box-shadow,transform] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
         active ? "border-primary bg-primary text-primary-foreground" : "border-border/40 bg-card text-foreground"
       }`}
     >

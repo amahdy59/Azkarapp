@@ -188,7 +188,7 @@ export function SearchScreen({
                   <button
                     type="button"
                     onClick={() => setQ(term)}
-                    className="min-h-11 px-4 text-[0.8125rem] font-medium font-sans leading-[20px] text-start transition-all active:scale-95"
+                    className="min-h-11 px-4 text-[0.8125rem] font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95"
                   >
                     {term}
                   </button>
@@ -247,7 +247,7 @@ export function SearchScreen({
                       title: accessibleTitle,
                       category: isArabic ? category.nameArabic : category.name,
                     })}
-                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-primary/40 transition-all"
+                    className="flex min-h-[72px] w-full items-center justify-between rounded-3xl border border-border/40 bg-card px-4 py-3 shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow]"
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p

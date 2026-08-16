@@ -58,12 +58,12 @@ will change shape or close outright once the design-system primitives actually c
 | F20 | Medium   | Motion          | Entrance animations exceed the documented 240–300ms band                    | 20 ✅ |
 | F21 | Medium   | Motion          | `slide-up` animates opacity only; the name is misleading                    | 20 ✅ |
 | F22 | Medium   | CSS structure   | Duplicated keyframes and rules across two stylesheets                       | 16 ✅ |
-| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20 ⚠  |
+| F23 | Medium   | Motion          | `transition-all` in 19 files animates layout properties                     | 20 ✅ |
 | F24 | High     | Performance     | 24MB of unreferenced imagery deployed on every release                      | 18 ✅ |
 | F25 | High     | Build gate      | Bundle budget cannot see static `public/` assets                            | 18 ✅ |
 | F26 | Medium   | Performance     | 3 of 4 `<img>` lack loading/decoding hints and intrinsic size               | 18 ✅ |
-| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 20 ⏸  |
-| F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | ⏸     |
+| F27 | Medium   | Performance     | Full-viewport blended noise layer paints on every screen                    | 20 ✅ |
+| F28 | Medium   | Performance     | No memoisation, on top of several very large components                     | 20 ✅ |
 | F29 | Passing  | Responsive      | No overflow at 320px; no sub-44px targets; tier boundaries agree            | —     |
 | F30 | Medium   | Responsive      | Two undocumented breakpoints alongside the four-tier contract               | 20 ✅ |
 | F31 | Medium   | Accessibility   | Sidebar language control named inconsistently with its sibling              | 17 ✅ |
@@ -82,11 +82,17 @@ will change shape or close outright once the design-system primitives actually c
 
 Recorded so the register does not imply more completeness than exists.
 
-- **F23 is partial: 12 of 33** `transition-all` sites narrowed to explicit property lists.
-  The per-site reading this needs was vindicated immediately — `ProgressBar` animates its
+- **F23 is complete: 33 of 33** `transition-all` sites narrowed to explicit property lists
+  (DEC-073). The per-site reading was vindicated immediately — `ProgressBar` animates its
   inline `width` through `transition-all`, so the obvious blanket swap to `transition-colors`
   would have silently killed the progress animation. It became `transition-[width]` instead.
-  The remaining 21 still need the same individual reading.
+- **F27 and F28 are closed by measurement, not by change** (DEC-073). Both had been deferred
+  because the inspection pane does not composite; Playwright does, and running them there
+  settled both. The noise overlay costs 0.2 ms of median frame time at 4× CPU throttle —
+  inside the noise, with the overlay-on run actually the fastest of three — so it stays. The
+  counting session runs at 27.4 ms median tap-to-paint under the same throttle, so no
+  memoisation was added; the brief requires a profile first, and the profile shows nothing
+  to fix.
 - **F27 and F28 are deferred, twice over.** Both require measurement this environment cannot
   produce: `requestAnimationFrame` delivers zero frames because the browser pane does not
   composite. The phase briefs explicitly require a measurement rather than an assumption for

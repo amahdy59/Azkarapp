@@ -313,7 +313,7 @@ export function AzkarLibraryScreen({
                         onZikr(zikr.category, itemIndex);
                       }}
                       style={{ animationDelay: `${index * 45}ms` }}
-                      className="stagger-enter flex min-h-[100px] w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="stagger-enter flex min-h-[100px] w-full items-start gap-3 rounded-3xl border border-border/40 bg-card p-4 text-start shadow-raised hover:border-primary/40 transition-[color,background-color,border-color,box-shadow] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${isArabic ? category.nameArabic : category.name}: ${
                         isArabic ? zikr.arabicText.split("\n")[0] : zikr.translation
                       }`}

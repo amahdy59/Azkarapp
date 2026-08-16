@@ -152,7 +152,7 @@ function AboutRow({
         <button
           type="button"
           onClick={onPress}
-          className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70"
+          className="flex h-[72px] w-full items-center gap-4 bg-card px-4 text-start transition-[background-color,opacity] active:opacity-70"
         >
           {content}
         </button>
@@ -184,7 +184,7 @@ function SupportRow({
       <button
         type="button"
         onClick={onPress}
-        className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-all active:opacity-70"
+        className="flex h-[56px] w-full items-center gap-4 bg-card px-4 text-start transition-[background-color,opacity] active:opacity-70"
       >
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-foreground">{icon}</div>
         <p className="flex-1 font-sans text-[0.9375rem] font-medium text-foreground">{label}</p>

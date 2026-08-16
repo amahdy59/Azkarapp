@@ -111,7 +111,7 @@ function WordMeaningContent({
             href={QURAN_WORD_MEANING_SOURCE.url}
             target="_blank"
             rel="noreferrer"
-            className="group flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-xs transition-all hover:border-primary/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="group flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-xs transition-[color,background-color,border-color,box-shadow] hover:border-primary/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="min-w-0 flex-1 text-start">
               <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-muted-foreground/80">

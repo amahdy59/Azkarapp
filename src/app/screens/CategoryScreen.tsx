@@ -258,7 +258,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onPlayAllAudio}
-                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-[0.8125rem] font-bold text-primary shadow-xs transition-all hover:bg-primary/20 active:scale-95 dark:text-primary"
+                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-[0.8125rem] font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
                     aria-label={t(language, "category.playAllAudio")}
                     title={
                       audioCoverage
@@ -548,7 +548,7 @@ function ZikrAccordion({
   return (
     <div
       id={`zikr-card-${index}`}
-      className={`flex w-full flex-col bg-transparent transition-all ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
+      className={`flex w-full flex-col bg-transparent transition-[opacity,filter] ${isCardCompleted ? "opacity-60 grayscale" : ""}`}
     >
       <div
         role="button"

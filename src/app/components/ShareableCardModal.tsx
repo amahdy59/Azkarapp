@@ -70,7 +70,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           type="button"
           onClick={onClose}
           aria-label={t(language, "common.cancel")}
-          className={`absolute top-4 ${isArabic ? "right-4" : "left-4"} z-10 flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-all`}
+          className={`absolute top-4 ${isArabic ? "right-4" : "left-4"} z-10 flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-[color,background-color,border-color,transform]`}
         >
           <X size={18} />
         </button>
@@ -146,7 +146,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
             onClick={() => void handleShare()}
             disabled={isSharing}
             aria-busy={isSharing || undefined}
-            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[0.9375rem] font-black text-primary-foreground shadow-md transition-all hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[0.9375rem] font-black text-primary-foreground shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
           >
             <Share2 size={18} />
             <span>{t(language, "shareModal.shareMilestone")}</span>
