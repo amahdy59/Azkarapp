@@ -455,7 +455,7 @@ export function HomeScreen({
         <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
           <header
             data-testid="home-utility-header"
-            className="mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 px-5 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:pt-5 lg:px-8"
+            className="px-page mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] sm:pt-5"
             dir="ltr"
           >
             <div
@@ -502,10 +502,10 @@ export function HomeScreen({
             </div>
           </header>
         </div>
-        <div className="flex w-full flex-col gap-4 lg:gap-5">
+        <div className="mx-auto flex w-full max-w-[80rem] flex-col gap-4 lg:gap-5">
           <div
             data-testid="home-hero"
-            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-3xl bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-3xl sm:shadow-raised lg:min-h-[34rem]"
+            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-3xl bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-3xl sm:shadow-raised lg:min-h-[30rem]"
           >
             <div
               data-testid="time-of-day-scene-window"

@@ -12,7 +12,20 @@ import {
 } from "../gardenViews";
 import { getCalendarMonthPeriod, getCalendarYearPeriods, type CalendarType } from "../calendarPeriods";
 import { type GardenSummary } from "../progress";
-import { Zap, Check, CheckCircle2, Calendar, Sun, Moon, Star, Sprout, Sparkles } from "./icons";
+import {
+  Zap,
+  Check,
+  CheckCircle2,
+  Calendar,
+  Sun,
+  Moon,
+  Sunrise,
+  Sunset,
+  MoonStar,
+  Star,
+  Sprout,
+  Sparkles,
+} from "./icons";
 
 function isAr(language: AppLanguage) {
   return language === "ar";
@@ -64,7 +77,7 @@ function MainDhikrGroupCard({
       onClick={onPress}
       className={`group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
-          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center"
+          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[9.5rem] lg:gap-2.5 lg:px-2.5 lg:py-3.5 xl:min-h-[9.5rem] xl:gap-3 xl:px-4 xl:py-4"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
@@ -79,7 +92,7 @@ function MainDhikrGroupCard({
     >
       <div
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
-          compact ? "size-11 sm:size-14" : "size-14"
+          compact ? "size-11 sm:size-14 lg:size-11 xl:size-12" : "size-14"
         } ${
           isCompleted
             ? compact
@@ -94,11 +107,17 @@ function MainDhikrGroupCard({
       </div>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col gap-3 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+        className={`flex min-w-0 flex-1 flex-col gap-3 lg:gap-2 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
-        <span className="text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem]">{name}</span>
         <span
-          className={`inline-flex items-center justify-center rounded-full px-3 py-1 text-[0.75rem] font-bold ${
+          className={`text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem] ${
+            compact ? "lg:text-[0.9375rem]" : ""
+          }`}
+        >
+          {name}
+        </span>
+        <span
+          className={`inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : compact
@@ -179,17 +198,17 @@ export function ProgressDayView({
     {
       id: "morning" as const,
       name: t(language, "progress.morningAzkar"),
-      icon: <Sun size={20} />,
+      icon: <Sunrise size={20} />,
     },
     {
       id: "evening" as const,
       name: t(language, "progress.eveningAzkar"),
-      icon: <Sun size={20} />,
+      icon: <Sunset size={20} />,
     },
     {
       id: "before_sleep" as const,
       name: t(language, "progress.sleepAzkar"),
-      icon: <Moon size={20} />,
+      icon: <MoonStar size={20} />,
     },
     {
       id: "after_prayer" as const,
@@ -213,7 +232,7 @@ export function ProgressDayView({
     // Progress screen the parent has no definite height, so both resolve to
     // auto and nothing changes there.
     <div
-      className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem] ${
+      className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem] ${
         isHomeSubset ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
       }`}
       dir={isArabic ? "rtl" : "ltr"}
@@ -389,7 +408,7 @@ export function ProgressWeekView({
 
   return (
     <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
       {/* Top 3 Stat Cards */}
@@ -448,19 +467,19 @@ export function ProgressWeekView({
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Sun size={15} className="text-success" />
+                    <Sunrise size={15} className="text-success" />
                     <span>{t(language, "progress.morningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Sun size={15} className="text-primary" />
+                    <Sunset size={15} className="text-primary" />
                     <span>{t(language, "progress.eveningShort")}</span>
                   </div>
                 </th>
                 <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
-                    <Moon size={15} className="text-sleep" />
+                    <MoonStar size={15} className="text-sleep" />
                     <span>{t(language, "progress.sleepShort")}</span>
                   </div>
                 </th>
@@ -584,7 +603,7 @@ export function ProgressWeekView({
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.morningShort")}</span>
-              <Sun size={14} className="text-success" />
+              <Sunrise size={14} className="text-success" />
             </div>
           </div>
 
@@ -601,7 +620,7 @@ export function ProgressWeekView({
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.eveningShort")}</span>
-              <Sun size={14} className="text-primary" />
+              <Sunset size={14} className="text-primary" />
             </div>
           </div>
 
@@ -618,7 +637,7 @@ export function ProgressWeekView({
             </div>
             <div className="flex items-center gap-1 text-foreground shrink-0">
               <span>{t(language, "progress.sleepShort")}</span>
-              <Moon size={14} className="text-sleep" />
+              <MoonStar size={14} className="text-sleep" />
             </div>
           </div>
 
@@ -724,7 +743,7 @@ export function ProgressMonthView({
 
   return (
     <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
       {/* Top 4 Stat Cards */}
@@ -888,7 +907,7 @@ export function ProgressMonthView({
             {/* Morning Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Sun size={16} className="text-primary" />
+                <Sunrise size={16} className="text-primary" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.morningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("morning") ? (
@@ -901,7 +920,7 @@ export function ProgressMonthView({
             {/* Evening Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Sun size={16} className="text-evening" />
+                <Sunset size={16} className="text-evening" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.eveningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("evening") ? (
@@ -914,7 +933,7 @@ export function ProgressMonthView({
             {/* Sleep Status */}
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
-                <Moon size={16} className="text-sleep" />
+                <MoonStar size={16} className="text-sleep" />
                 <span className="text-[0.8125rem] font-bold">{t(language, "progress.sleepAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("before_sleep") ? (
@@ -1004,7 +1023,7 @@ export function ProgressYearView({
 
   return (
     <div
-      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[72rem]"
+      className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem]"
       dir={isArabic ? "rtl" : "ltr"}
     >
       {/* Top 4 Stat Cards */}

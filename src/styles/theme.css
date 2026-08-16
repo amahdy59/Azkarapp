@@ -60,6 +60,19 @@
   --info-foreground: #04213f;
 }
 
+/* px-page compiles to padding-inline: var(--spacing-page), so widening the
+   variable per tier widens every page gutter in step with the hero (DEC-075). */
+@media (min-width: 40rem) {
+  :root {
+    --spacing-page: 1.5rem;
+  }
+}
+@media (min-width: 48rem) {
+  :root {
+    --spacing-page: 2rem;
+  }
+}
+
 /* Pre-app flows share the form measure. Center compact flows only when the
    viewport is tall enough; short desktop/landscape windows stay top-aligned
    and scroll instead of clipping their first or primary action. */
@@ -214,6 +227,8 @@
      lists because canvas-confetti takes an array of colours. */
   --confetti-session: #16a34a, #22c55e, #4ade80;
   --confetti-group: #d7a528, #fbbf24, #fde68a, #a3e635;
+  /* Page gutter, matching the hero's own padding at each tier so that content
+     inside the hero and content in the sections below share one measure. */
   --ds-control-height-compact: 2.75rem;
   --ds-control-height: 3rem;
   --ds-control-height-prominent: 3.25rem;

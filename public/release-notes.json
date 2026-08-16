@@ -1,16 +1,14 @@
 {
   "ar": [
-    "أصبح رأس الصفحة الرئيسية شفافًا وثابتًا فوق الصورة، مع بطاقات متساوية الارتفاع وحواف أكثر نعومة على الهاتف.",
-    "تبقى أسهم التنقل والعداد في موضع ثابت أثناء قراءة السور الطويلة، دون خط تركيز زائد فوق العداد.",
-    "أصبحت صفحة فوائد الذكر أهدأ، بمراجع مختصرة وفوائد الحديث الإضافية داخل قسم قابل للفتح.",
-    "أصبح اختيار هدف المسبحة والصلاة على النبي قائمة واحدة، ويمكن العد بالنقر في المساحة غير التفاعلية.",
-    "انتقل فلتر المجموعة بين زري المتابعة وإعادة التعيين لسهولة الوصول."
+    "أصبح حجم التطبيق أصغر بكثير، فيفتح ويُحدَّث أسرع وببيانات أقل.",
+    "أصبحت أوضاع التباين العالي وعمى الألوان تُطبَّق على كل عناصر التطبيق.",
+    "توحّد شكل القوائم ونوافذ التأكيد، مع محاذاة صحيحة في العربية وخلفية معتمة واضحة.",
+    "أيقونتان مختلفتان لأذكار الصباح والمساء، وبطاقات أوضح في السمات الداكنة."
   ],
   "en": [
-    "Home now has a transparent sticky header, equal-height hero cards, and softer mobile corners.",
-    "Long-surah navigation and the counter stay fixed while the Quran text scrolls, without an extra focus line.",
-    "Benefits are calmer to scan, with concise citations and secondary hadith benefits inside a disclosure.",
-    "Masbaha and Friday Salawat now use one target menu and support counting from non-interactive canvas space.",
-    "The collection filter now sits between Continue and Reset for easier reach."
+    "The app is much smaller, so it opens and updates faster and uses less data.",
+    "High-contrast and colour-blind modes now apply across every part of the app.",
+    "Menus and confirmation dialogs share one look, mirror correctly in Arabic, and dim the background.",
+    "Morning and evening azkar now have distinct icons, and cards read more clearly in dark themes."
   ]
 }

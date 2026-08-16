@@ -3,7 +3,7 @@ import type { AppLanguage } from "./types";
 export type ReleaseNotes = Readonly<Record<AppLanguage, readonly string[]>>;
 
 function normalizeList(value: unknown): string[] | null {
-  if (!Array.isArray(value) || value.length < 3 || value.length > 5) {
+  if (!Array.isArray(value) || value.length < 3 || value.length > 4) {
     return null;
   }
 

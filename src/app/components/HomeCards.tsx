@@ -67,7 +67,7 @@ export function PrayerRoutineCard({
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
       <div className="flex flex-1 flex-col gap-5 rounded-3xl border border-white/15 bg-on-media-surface/82 px-5 py-6 text-start shadow-raised backdrop-blur-lg sm:px-6 sm:py-7 md:p-7">
-        <div className="flex flex-1 flex-col justify-center gap-4">
+        <div className="flex flex-col gap-5">
           <div className="flex w-full flex-col items-start gap-3 px-1">
             <h2
               id="current-zikr-heading"

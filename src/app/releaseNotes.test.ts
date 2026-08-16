@@ -10,7 +10,7 @@ const validNotes = {
 describe("release notes", () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it("keeps the deployed manifest bilingual and within the 3–5 item limit", () => {
+  it("keeps the deployed manifest bilingual and within the 3–4 item limit", () => {
     const deployedNotes = JSON.parse(readFileSync("public/release-notes.json", "utf8"));
     const parsed = parseReleaseNotes(deployedNotes);
 
@@ -18,11 +18,15 @@ describe("release notes", () => {
     expect(parsed?.ar).toHaveLength(parsed?.en.length ?? 0);
   });
 
-  it("accepts and trims three to five bilingual notes", () => {
-    expect(parseReleaseNotes({ ...validNotes, en: [" First ", "Second", "Third", "Fourth", "Fifth"] })).toEqual({
+  it("accepts and trims three to four bilingual notes", () => {
+    expect(parseReleaseNotes({ ...validNotes, en: [" First ", "Second", "Third", "Fourth"] })).toEqual({
       ...validNotes,
-      en: ["First", "Second", "Third", "Fourth", "Fifth"],
+      en: ["First", "Second", "Third", "Fourth"],
     });
+  });
+
+  it("rejects a fifth note so the prompt stays a summary", () => {
+    expect(parseReleaseNotes({ ...validNotes, en: ["1", "2", "3", "4", "5"] })).toBeNull();
   });
 
   it.each([

@@ -189,7 +189,10 @@ export function SettingsScreen({
       };
 
   return (
-    <div className="relative flex h-full flex-col overflow-hidden bg-background" dir={direction}>
+    <div
+      className="relative mx-auto flex h-full w-full max-w-[80rem] flex-col overflow-hidden bg-background"
+      dir={direction}
+    >
       {isTwoPaneLayout ? (
         /* ── Two-pane layout (Expanded 900px+) ── */
         <div className="settings-two-pane h-full">

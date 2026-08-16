@@ -105,7 +105,7 @@ export function AzkarLibraryScreen({
 
   return (
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
-      <div className="relative z-10 flex flex-col min-h-screen">
+      <div className="relative z-10 mx-auto flex w-full max-w-[80rem] flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
           <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-[1.5rem]">
             {t(language, "library.title")}
