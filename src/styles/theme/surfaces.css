@@ -139,6 +139,26 @@
   outline-offset: 2px;
 }
 
+/* Composite fields: a borderless input sitting inside a rounded shell.
+   The shell is the control the reader sees, so it carries the focus ring and
+   the input inside carries none. Without this the fallback above draws its
+   outline around the input's own box — which has no radius — producing a
+   square stroke inside the shell's rounded border.
+
+   Both rules must stay OUTSIDE @layer: the fallback is unlayered, and an
+   unlayered rule beats a layered one whatever the specificity, so a Tailwind
+   `focus:outline-none` on the input cannot switch it off. `:focus` rather than
+   `:focus-visible` because the shell shows its ring for pointer focus too, and
+   two indicators at once is worse than one. */
+.field-shell:focus-within {
+  outline: var(--ds-focus-width) solid var(--ring);
+  outline-offset: 2px;
+}
+
+.field-shell :is(input, textarea, select):focus {
+  outline: none;
+}
+
 /* Full-bleed across the whole compact tier (up to 599px, where the fluid grid
    takes over), so this matches useLayoutMode's 600px compact boundary. Ending
    it at 430px used to leave 431–599px rendering a letterboxed 390px "phone

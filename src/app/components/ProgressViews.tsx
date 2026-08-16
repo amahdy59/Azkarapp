@@ -77,7 +77,7 @@ function MainDhikrGroupCard({
       onClick={onPress}
       className={`group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
-          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[11rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[9.5rem] lg:gap-2.5 lg:px-2.5 lg:py-3.5 xl:min-h-[9.5rem] xl:gap-3 xl:px-4 xl:py-4"
+          ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[13rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[11.5rem] lg:gap-2.5 lg:px-2.5 lg:py-4 xl:min-h-[11.5rem] xl:gap-3 xl:px-4 xl:py-4"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
@@ -92,7 +92,7 @@ function MainDhikrGroupCard({
     >
       <div
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
-          compact ? "size-11 sm:size-14 lg:size-11 xl:size-12" : "size-14"
+          compact ? "size-14 sm:size-16 lg:size-13 xl:size-14" : "size-16"
         } ${
           isCompleted
             ? compact
@@ -107,7 +107,7 @@ function MainDhikrGroupCard({
       </div>
 
       <div
-        className={`flex min-w-0 flex-1 flex-col gap-3 lg:gap-2 ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
+        className={`flex min-w-0 flex-1 flex-col ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
         <span
           className={`text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem] ${
@@ -117,7 +117,10 @@ function MainDhikrGroupCard({
           {name}
         </span>
         <span
-          className={`inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
+          /* 32px clear of the name. The column used to space every child
+             equally, so this gap could not grow without shoving the
+             after-prayer dots down with it. */
+          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : compact
@@ -129,7 +132,7 @@ function MainDhikrGroupCard({
         </span>
 
         {subItems && subItems.length > 0 && (
-          <div className="mt-1 flex flex-wrap items-center justify-center gap-1">
+          <div className="mt-3 flex flex-wrap items-center justify-center gap-1">
             {subItems.map((item) => (
               <span
                 key={item.id}
@@ -198,17 +201,17 @@ export function ProgressDayView({
     {
       id: "morning" as const,
       name: t(language, "progress.morningAzkar"),
-      icon: <Sunrise size={20} />,
+      icon: <Sunrise size={28} />,
     },
     {
       id: "evening" as const,
       name: t(language, "progress.eveningAzkar"),
-      icon: <Sunset size={20} />,
+      icon: <Sunset size={28} />,
     },
     {
       id: "before_sleep" as const,
       name: t(language, "progress.sleepAzkar"),
-      icon: <MoonStar size={20} />,
+      icon: <MoonStar size={28} />,
     },
     {
       id: "after_prayer" as const,

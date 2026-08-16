@@ -142,7 +142,7 @@ export function SearchScreen({
           <label htmlFor={searchInputId} className="mb-1.5 block text-[0.75rem] font-semibold text-muted-foreground">
             {t(language, "search.inputAriaLabel")}
           </label>
-          <div className="flex h-12 items-center gap-3 rounded-full border border-border-control bg-card px-4 focus-within:ring-[3px] focus-within:ring-ring">
+          <div className="field-shell flex h-12 items-center gap-3 rounded-full border border-border-control bg-card px-4">
             <Search size={18} className="shrink-0 text-primary" aria-hidden="true" />
             <input
               id={searchInputId}

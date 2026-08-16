@@ -126,7 +126,7 @@ export function AzkarLibraryScreen({
                 {t(language, "library.search")}
               </label>
               <div className="flex items-center gap-2">
-                <div className="flex h-12 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
+                <div className="field-shell flex h-12 min-w-0 flex-1 items-center gap-3 rounded-2xl border border-border-control bg-card px-4 shadow-raised transition-colors focus-within:border-primary">
                   <Search size={19} className="shrink-0 text-primary" aria-hidden="true" />
                   <input
                     id={searchInputId}
