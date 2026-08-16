@@ -162,6 +162,111 @@ test("desktop and tablet place navigation at the card sides and shortcuts below 
   await expect(desktopHero.getByRole("button", { name: "Benefit", exact: true })).toBeVisible();
 });
 
+type CompletionCueRecord = {
+  seenAt: number | null;
+  goneAt: number | null;
+  hadCheckIcon: boolean;
+  text: string;
+  sawLegacyCompleteCopy: boolean;
+};
+
+type CueWindow = Window & {
+  __completionCue?: CompletionCueRecord;
+  __completionCueObserver?: MutationObserver;
+};
+
+/**
+ * The completion cue is deliberately transient: `useZikrCounter` holds
+ * `justCompleted` for COUNTER_ADVANCE_DELAY_MS (500 ms), then swaps the
+ * element's test id and advances the zikr, so the cue never comes back.
+ * Asserting on it *after* an action therefore races that window — if the
+ * machine stalls between the action returning and the locator query, the cue
+ * has already gone and a healthy app fails a five-second wait. That is the
+ * exact shape of the mobile-chromium failure this helper replaces.
+ *
+ * So arm a recorder before the action and assert on what it caught. It reads
+ * the MutationRecords rather than querying live DOM, because under a hard
+ * stall the appearance and the disappearance batch into a single callback and
+ * a live query would see only the final, absent state.
+ */
+async function armCompletionCueRecorder(page: Page) {
+  await page.evaluate(() => {
+    const cueWindow = window as CueWindow;
+    const CUE = '[data-testid="counter-completion-cue"]';
+    cueWindow.__completionCueObserver?.disconnect();
+
+    const record: CompletionCueRecord = {
+      seenAt: null,
+      goneAt: null,
+      hadCheckIcon: false,
+      text: "",
+      sawLegacyCompleteCopy: false,
+    };
+    cueWindow.__completionCue = record;
+
+    const latchSeen = (element: Element) => {
+      if (record.seenAt !== null) return;
+      record.seenAt = performance.now();
+      record.hadCheckIcon = element.querySelector("svg") !== null;
+      record.text = (element.textContent ?? "").trim();
+      record.sawLegacyCompleteCopy = (document.body.textContent ?? "").includes("Complete!");
+    };
+    const latchGone = () => {
+      if (record.seenAt !== null && record.goneAt === null) record.goneAt = performance.now();
+    };
+
+    const existing = document.querySelector(CUE);
+    if (existing) latchSeen(existing);
+
+    const observer = new MutationObserver((records) => {
+      for (const entry of records) {
+        if (entry.type === "childList") {
+          for (const node of entry.addedNodes) {
+            if (!(node instanceof Element)) continue;
+            const found = node.matches(CUE) ? node : node.querySelector(CUE);
+            if (found) latchSeen(found);
+          }
+        } else if (entry.type === "attributes" && entry.target instanceof Element) {
+          if (entry.target.getAttribute("data-testid") === "counter-completion-cue") latchSeen(entry.target);
+        }
+      }
+      // Disappearance is a second pass so an appear-then-vanish batch records
+      // both, in order, rather than only whichever mutation came last.
+      for (const entry of records) {
+        if (entry.type === "attributes" && entry.oldValue === "counter-completion-cue") latchGone();
+        if (entry.type !== "childList") continue;
+        for (const node of entry.removedNodes) {
+          if (!(node instanceof Element)) continue;
+          if (node.matches(CUE) || node.querySelector(CUE)) latchGone();
+        }
+      }
+    });
+    observer.observe(document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeOldValue: true,
+      attributeFilter: ["data-testid"],
+    });
+    cueWindow.__completionCueObserver = observer;
+  });
+}
+
+async function readCompletionCue(page: Page): Promise<CompletionCueRecord | null> {
+  return page.evaluate(() => (window as CueWindow).__completionCue ?? null);
+}
+
+/** Waits until the recorder has caught the cue, then returns what it caught. */
+async function expectCompletionCueSeen(page: Page): Promise<CompletionCueRecord> {
+  await expect
+    .poll(async () => (await readCompletionCue(page))?.seenAt ?? null, {
+      message: "the counter completion cue never appeared",
+      timeout: 5000,
+    })
+    .not.toBeNull();
+  return (await readCompletionCue(page))!;
+}
+
 test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywhere instruction", async ({ page }) => {
   await openFirstMorningZikr(page);
 
@@ -171,24 +276,30 @@ test("counter shows a checkmark-only completion for 500 ms and a clear tap-anywh
   expect(firstZikr).toBeTruthy();
   await expect(page.getByText("Take a calm breath, then tap to begin", { exact: true })).toHaveCount(0);
 
-  const startedAt = Date.now();
+  await armCompletionCueRecorder(page);
   await counterSurface.click();
 
-  const completionCue = page.getByTestId("counter-completion-cue");
-  await expect(completionCue).toBeVisible();
-  await expect(completionCue.locator("svg")).toBeVisible();
+  const cue = await expectCompletionCueSeen(page);
   // The check now carries a short text label beside it for non-visual clarity.
-  await expect(counterSurface).toHaveText("Done");
-  await expect(page.getByText("Complete!", { exact: true })).toHaveCount(0);
+  expect(cue.hadCheckIcon).toBe(true);
+  expect(cue.text).toBe("Done");
+  expect(cue.sawLegacyCompleteCopy).toBe(false);
 
-  const elapsed = Date.now() - startedAt;
-  if (elapsed < 300) {
-    await page.waitForTimeout(300 - elapsed);
-    await expect(zikr).toHaveText(firstZikr!);
-  }
+  await expect(zikr).not.toHaveText(firstZikr!, { timeout: 5000 });
 
-  await expect(zikr).not.toHaveText(firstZikr!, { timeout: 1000 });
-  expect(Date.now() - startedAt).toBeGreaterThanOrEqual(450);
+  // Measured in-page between the two mutations rather than as wall clock around
+  // the click, so it survives a slow harness and carries no Node/browser clock
+  // skew. Only the lower bound is a real contract: the cue must not flash past
+  // too quickly to read. A stall can stretch the observed window but never
+  // shorten it, so there is deliberately no tight upper bound.
+  await expect
+    .poll(async () => (await readCompletionCue(page))?.goneAt ?? null, {
+      message: "the completion cue never gave way to the next zikr",
+      timeout: 5000,
+    })
+    .not.toBeNull();
+  const settled = (await readCompletionCue(page))!;
+  expect(settled.goneAt! - settled.seenAt!).toBeGreaterThanOrEqual(300);
 });
 
 test("the full reader canvas counts taps while controls and the benefit sheet never do", async ({ page }) => {
@@ -214,8 +325,9 @@ test("the full reader canvas counts taps while controls and the benefit sheet ne
   await expect(counterSurface).toHaveAttribute("aria-label", /0 \/ 1$/);
 
   // Chrome outside the reading text still counts: tap the screen's own margin.
+  await armCompletionCueRecorder(page);
   await page.getByTestId("reader-screen").click({ position: { x: 2, y: 2 } });
-  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+  await expectCompletionCueSeen(page);
 });
 
 test("full surahs count only from the counter and expose sourced difficult-word help", async ({ page }) => {
@@ -289,9 +401,22 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   const lastPage = page.getByTestId("mushaf-page").last();
   await lastPage.scrollIntoViewIfNeeded();
   await expect(lastPage).toBeInViewport();
-  const completionCue = page.getByTestId("counter-completion-cue");
+  await armCompletionCueRecorder(page);
   await counter.click();
-  await expect(completionCue.or(page.getByTestId("friday-mode-screen"))).toBeVisible();
+  // A full surah either completes in place or hands straight back to Friday
+  // mode. Both remain acceptable; the recorder just removes the race on the
+  // first, which the previous `.or()` masked rather than fixed.
+  await expect
+    .poll(
+      async () =>
+        ((await readCompletionCue(page))?.seenAt ?? null) !== null ||
+        (await page.getByTestId("friday-mode-screen").isVisible()),
+      {
+        message: "neither the completion cue nor the Friday mode screen appeared",
+        timeout: 5000,
+      },
+    )
+    .toBe(true);
 });
 
 test("reader actions stay inside a 320 px app canvas", async ({ page }) => {
@@ -491,9 +616,10 @@ test("the counter completes from the keyboard, not only by pointer", async ({ pa
   // a pointer — tap-anywhere counting is a convenience, not the only path.
   await counterSurface.focus();
   await expect(counterSurface).toBeFocused();
+  await armCompletionCueRecorder(page);
   await page.keyboard.press("Enter");
 
-  await expect(page.getByTestId("counter-completion-cue")).toBeVisible();
+  await expectCompletionCueSeen(page);
 });
 
 test("reader progress is announced politely rather than interrupting", async ({ page }) => {
