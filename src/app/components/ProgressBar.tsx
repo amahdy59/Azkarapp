@@ -29,7 +29,7 @@ export function ProgressBar({
       dir={direction}
     >
       <div
-        className="h-full rounded-full transition-all duration-standard"
+        className="h-full rounded-full transition-[width] duration-standard"
         data-slot="progress-fill"
         style={{ width: `${pct}%`, background: fillColor }}
       />

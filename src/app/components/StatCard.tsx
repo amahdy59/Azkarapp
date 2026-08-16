@@ -10,7 +10,7 @@ export interface StatCardProps {
 
 export function StatCard({ title, icon, value, subtitle }: StatCardProps) {
   return (
-    <Card className="flex flex-col justify-between transition-all">
+    <Card className="flex flex-col justify-between transition-colors">
       <div className="flex items-center justify-between">
         <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
@@ -45,7 +45,7 @@ export function CompactActionCard({
   onAction,
 }: CompactActionCardProps) {
   return (
-    <Card className="flex flex-col justify-between transition-all">
+    <Card className="flex flex-col justify-between transition-colors">
       <div className="flex items-center justify-between">
         <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>

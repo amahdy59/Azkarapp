@@ -63,10 +63,11 @@ desktop, which is the gap that let it through.
 - **F23 is 7 of 33.** The rest need per-site verification of animated properties.
 - **F35 not attempted.** A 1,400-line file move belongs in its own commit, verified by
   diffing the built CSS, not mixed with behavioural motion changes.
-- **`--motion-duration-emphasis` (360ms) contradicts the contract's 440–600ms emphasis
-  band.** The `duration-500`/`700` sites that belong in that band were left alone rather
-  than sped up to satisfy a token that disagrees with the documentation. Someone should
-  decide which is right.
+- ~~`--motion-duration-emphasis` contradicts the contract's emphasis band.~~ **Resolved by
+  DEC-071:** the document is authoritative. The token moved 360ms → 500ms, inside the
+  440–600ms band, and the `duration-500`/`700` sites moved onto it. 500 was chosen so the
+  three existing 500ms sites keep their exact timing; only the out-of-band 700ms Progress
+  bar-chart grow changes.
 
 ## Out-of-scope findings
 

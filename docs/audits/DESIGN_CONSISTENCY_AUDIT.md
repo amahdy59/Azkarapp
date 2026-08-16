@@ -82,9 +82,11 @@ will change shape or close outright once the design-system primitives actually c
 
 Recorded so the register does not imply more completeness than exists.
 
-- **F23 is partial.** 7 of 33 `transition-all` sites were narrowed to explicit property
-  lists. The remaining 26 each need their animated properties verified individually; a blind
-  rewrite risks breaking hover and press behaviour for no measurable gain.
+- **F23 is partial: 12 of 33** `transition-all` sites narrowed to explicit property lists.
+  The per-site reading this needs was vindicated immediately — `ProgressBar` animates its
+  inline `width` through `transition-all`, so the obvious blanket swap to `transition-colors`
+  would have silently killed the progress animation. It became `transition-[width]` instead.
+  The remaining 21 still need the same individual reading.
 - **F27 and F28 are deferred, twice over.** Both require measurement this environment cannot
   produce: `requestAnimationFrame` delivers zero frames because the browser pane does not
   composite. The phase briefs explicitly require a measurement rather than an assumption for

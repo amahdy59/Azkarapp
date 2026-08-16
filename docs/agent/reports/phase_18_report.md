@@ -78,11 +78,11 @@ regression demonstration, and the entry-by-entry precache validation.
   delivered zero frames in four seconds — so any paint-cost figure would be invented.
   Removing it on a guess would have violated the brief's own instruction. Carried to
   Phase 20.
-- **The master images are still untracked.** `design-sources/` is gitignored, so the 8
-  unique masters exist only on this machine. This is not a regression — they were untracked
-  inside `public/` too — but it is now deliberate and recorded rather than accidental. They
-  are the source from which the deployed AVIF/WebP set was generated. **This needs a
-  decision:** committing them adds ~12 MB to every clone permanently and is hard to reverse.
+- ~~The master images are still untracked.~~ **Resolved by DEC-071:** `design-sources/` is
+  now tracked. Before committing, the tree was deduplicated — the nested `public/` subtree
+  was removed after all 28 generated files were proven byte-identical to the tracked copies,
+  and three of four `Originals/*.png` after proving them identical to their masters. 17 MB
+  became 13 MB, 21 files, eight PNGs with eight distinct hashes.
 - **Two large PNGs now dominate the precache.** `images/mosque_prophet.png` and
   `images/benefits_zikr.png`, ~1.6 MB each at 1254×1254, are 3.3 MB of the 5.8 MB precache.
   Both are genuinely referenced. Re-encoding to WebP/AVIF is the next largest win but

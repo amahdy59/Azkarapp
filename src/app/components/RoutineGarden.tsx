@@ -99,7 +99,7 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className="h-full w-full transition-all"
+      className="h-full w-full transition-colors"
     >
       {!hideTabs && (
         <>
@@ -111,7 +111,7 @@ export function TodayRoutineGarden({
             aria-label={t(language, "garden.viewMode")}
             className="mb-4 flex rounded-full border border-border bg-muted p-1"
             itemClassName={(selected) =>
-              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 selected
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "text-muted-foreground hover:text-foreground"
