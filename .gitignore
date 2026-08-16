@@ -18,11 +18,10 @@ playwright-report/**/*.png
 test-results/**/*.png
 coverage/**/*.png
 
-# Uncompressed masters and design references. Kept out of public/ so they are
-# never deployed (DEC-066 / F24). They are also the only copies in existence —
-# see the preservation note in docs/agent/phases/PHASE_18_BUILD_WEIGHT.md
-# before deleting this directory or moving it to another machine.
-design-sources/
+# design-sources/ is deliberately TRACKED (DEC-071). It holds the uncompressed
+# masters the deployed AVIF/WebP set was generated from, and they existed in
+# exactly one copy each — on one machine — until they were committed. It stays
+# out of public/ so it is never deployed, but it is not ignored.
 
 .agents/
 skills-lock.json

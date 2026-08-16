@@ -336,7 +336,7 @@
   gap: 10px;
 }
 .counter-complete-cue {
-  animation: counter-complete-pop 500ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: counter-complete-pop var(--motion-duration-emphasis) var(--motion-ease-enter) both;
 }
 
 .counter-check-mark {

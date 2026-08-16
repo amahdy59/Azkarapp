@@ -584,7 +584,7 @@ export function HomeScreen({
 
               <div className="mx-4 mt-5 h-2 overflow-hidden rounded-full bg-muted sm:mx-6" aria-hidden="true">
                 <div
-                  className={`h-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
+                  className={`h-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
                     direction === "rtl" ? "origin-right" : "origin-left"
                   }`}
                   style={{

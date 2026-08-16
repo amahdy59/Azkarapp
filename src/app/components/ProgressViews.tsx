@@ -1087,7 +1087,7 @@ export function ProgressYearView({
                   </span>
                   <div className="w-full bg-black/10 dark:bg-white/10 rounded-t-lg h-[90px] flex items-end">
                     <div
-                      className={`w-full rounded-t-lg transition-[height,background-color] duration-700 ${
+                      className={`w-full rounded-t-lg transition-[height,background-color] duration-emphasis ${
                         isBest
                           ? "bg-primary shadow-md shadow-primary/30"
                           : "bg-primary/40 dark:bg-primary/30 group-hover:bg-primary/70"

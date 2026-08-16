@@ -119,7 +119,7 @@ export function PrayerRoutineCard({
             </div>
             <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
               <div
-                className={`h-full w-full rounded-full bg-primary transition-[transform] duration-500 ease-out ${
+                className={`h-full w-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
                   direction === "rtl" ? "origin-right" : "origin-left"
                 }`}
                 style={{ transform: `scaleX(${progress})` } as CSSProperties}

@@ -22,7 +22,7 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
       role="status"
       aria-label={completedTitle}
       aria-live="polite"
-      className={`w-full transition-[opacity,transform] duration-500 ease-out ${
+      className={`w-full transition-[opacity,transform] duration-emphasis ease-out ${
         isExiting ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
       }`}
     >

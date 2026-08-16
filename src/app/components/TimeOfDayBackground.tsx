@@ -19,7 +19,7 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
       <AzkarHeroBackground
         kind={kind}
         priority={true}
-        className="w-full h-full absolute inset-0 transition-opacity duration-[360ms] ease-out"
+        className="w-full h-full absolute inset-0 transition-opacity duration-entrance ease-out"
       />
     </div>
   );
