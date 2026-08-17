@@ -20,7 +20,7 @@ import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
 import {
   FRIDAY_KAHF_WEEK_KEY,
   fridayKahfOpenedKey,
-  getIsoWeekKey,
+  getFridayCycleKey,
   readFridayDuaProgress,
   writeFridayDuaProgress,
 } from "./fridayProgress";
@@ -275,11 +275,15 @@ function AppContent() {
   const [isFridayDuasLoading, setIsFridayDuasLoading] = useState(false);
   const [fridayDuasError, setFridayDuasError] = useState(false);
 
+  /* Keyed to the Friday the progress belongs to, not the ISO week. The week
+     rolls on Monday, which left a finished Friday on screen all weekend; the
+     cycle rolls the moment Friday ends. This is the trigger for the actual
+     reset, so it has to agree with the storage keys in fridayProgress. */
   const ensureCurrentFridayWeek = useCallback(() => {
-    const currentWeek = getIsoWeekKey();
+    const currentCycle = getFridayCycleKey();
     try {
-      if (window.localStorage.getItem(FRIDAY_KAHF_WEEK_KEY) === currentWeek) return true;
-      window.localStorage.setItem(FRIDAY_KAHF_WEEK_KEY, currentWeek);
+      if (window.localStorage.getItem(FRIDAY_KAHF_WEEK_KEY) === currentCycle) return true;
+      window.localStorage.setItem(FRIDAY_KAHF_WEEK_KEY, currentCycle);
     } catch {
       // Keep the in-memory reset when persistent storage is unavailable.
     }
@@ -292,12 +296,12 @@ function AppContent() {
     try {
       setIsFridayDuasLoading(true);
       setFridayDuasError(false);
-      const week = getIsoWeekKey();
+      const cycle = getFridayCycleKey();
       const { COMPREHENSIVE_DUAS } = await import("./content/comprehensiveDuas");
       registerLazyCollection("comprehensive_duas", COMPREHENSIVE_DUAS);
       const duaIds = COMPREHENSIVE_DUAS.filter((dua) => !dua.isCollectionIntroduction).map((dua) => dua.id);
-      const stored = readFridayDuaProgress(duaIds, week);
-      writeFridayDuaProgress(stored, week);
+      const stored = readFridayDuaProgress(duaIds, cycle);
+      writeFridayDuaProgress(stored, cycle);
       setFridayDuaTotalCount(duaIds.length);
       setFridayDuaCompletedIds(stored);
       return true;

@@ -24,8 +24,11 @@ async function openReturningGuest(
 ) {
   await page.addInitScript(
     ({ saved, comprehensiveDuas, locale }) => {
+      // The progress day starts at midnight (DEC: day boundary moved from 04:00
+      // to 00:00), so the seeded completion has to carry *today's* key. The old
+      // four-hour shift silently dated it to yesterday whenever the suite ran
+      // between midnight and 4am, and the collection was then pruned as stale.
       const progressDate = new Date();
-      progressDate.setHours(progressDate.getHours() - 4);
       const progressDayKey = [
         progressDate.getFullYear(),
         String(progressDate.getMonth() + 1).padStart(2, "0"),
