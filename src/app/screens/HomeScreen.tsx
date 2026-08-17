@@ -19,12 +19,12 @@ import { CATEGORIES } from "../content/categories";
 import {
   getCurrentPrayerPeriod,
   getEstimatedPrayerTimes,
-  getNextPrayerCountdown,
   timeToMinutes,
   type PrayerName,
 } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
-import { PrayerTrackerCards, type PrayerCardModel, type PrayerTrackingField } from "../components/PrayerTrackerCards";
+import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
+import { buildPrayerCardModels } from "../prayerCardModels";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -278,27 +278,10 @@ export function HomeScreen({
     () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
     [dailyCompletions, now, progressDayStartHour],
   );
-  const nextPrayerInfo = getNextPrayerCountdown(now, language, locationSettings);
   const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
 
-  /**
-   * Timing is derived from the clock here and never stored; tracking is stored
-   * and never derived. Keeping the two apart means a prayer that has passed
-   * still shows whatever the user marked, and marking something never changes
-   * which prayer is "now".
-   */
-  const prayerCardModels: PrayerCardModel[] = AFTER_PRAYER_TRACKER_ORDER.map((prayer, index) => {
-    const isNext = prayer === nextPrayerInfo.name;
-    const state =
-      index === activePrayerIndex ? "current" : isNext ? "next" : index < activePrayerIndex ? "past" : "upcoming";
-    return {
-      prayer,
-      time: currentPrayerPeriod.prayerTimes[prayer],
-      state,
-      ...(isNext ? { countdown: nextPrayerInfo.formattedCountdown } : {}),
-    };
-  });
+  const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
 
   const todayKey = getProgressDayKey(now, progressDayStartHour);
 

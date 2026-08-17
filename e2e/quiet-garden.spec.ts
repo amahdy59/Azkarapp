@@ -109,8 +109,9 @@ for (const language of ["en", "ar"] as const) {
     const box = await dayView.boundingBox();
     expect(box).not.toBeNull();
     expect(box!.width).toBeGreaterThan(800);
+    // Three: after-prayer adhkar are tracked per prayer in their own section.
     const routineCards = dayView.getByRole("button");
-    await expect(routineCards).toHaveCount(4);
+    await expect(routineCards).toHaveCount(3);
     const routineCardTops = await routineCards.evaluateAll((cards) =>
       cards.map((card) => Math.round(card.getBoundingClientRect().top)),
     );
@@ -212,22 +213,38 @@ test("month view shows the calendar without the removed summary card", async ({ 
   await expect(page.getByText("Full Palms", { exact: true })).toHaveCount(0);
 });
 
-test("Home lists the three time-of-day routines while Progress keeps all four", async ({ page }) => {
+test("both Home and Progress keep after-prayer outside the wird card", async ({ page }) => {
   await seedReturningGardenUser(page, { completedToday: ["morning"] });
   await openReturningHome(page);
 
-  // Home's wird card: after-prayer azkar are deliberately absent, since they
-  // are getting a dedicated card of their own.
+  // The wird is the three time-of-day routines. After-prayer adhkar are
+  // tracked per prayer rather than as one routine, so they are not a fourth
+  // tile in this card on either screen.
   const garden = page.getByTestId("today-garden-card");
-  await expect(garden.getByRole("button", { name: /Morning Azkar/ })).toBeVisible();
-  await expect(garden.getByRole("button", { name: /Evening Azkar/ })).toBeVisible();
-  await expect(garden.getByRole("button", { name: /Sleep Azkar/ })).toBeVisible();
+  for (const routine of [/Morning Azkar/, /Evening Azkar/, /Sleep Azkar/]) {
+    await expect(garden.getByRole("button", { name: routine })).toBeVisible();
+  }
   await expect(garden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
 
-  // Progress still accounts for every main collection, so the routine stays
-  // reachable and leaf/palm maths is unchanged.
   await page.getByRole("button", { name: "Progress", exact: true }).click();
-  await expect(page.getByRole("button", { name: /After Prayer Azkar/ }).first()).toBeVisible();
+
+  const progressGarden = page.getByTestId("today-garden-card");
+  await expect(progressGarden.getByRole("button", { name: /After Prayer Azkar/ })).toHaveCount(0);
+
+  // It stays reachable, in a section of its own that follows the wird card.
+  const afterPrayer = page.getByTestId("progress-after-prayer");
+  await expect(afterPrayer).toBeVisible();
+  await expect(afterPrayer.locator("article[data-prayer-state]").first()).toBeVisible();
+  await expect(afterPrayer.locator('input[type="checkbox"]').first()).toBeAttached();
+  expect(
+    await page.evaluate(() => {
+      // Compared inside the page: Node.DOCUMENT_POSITION_* only exists there.
+      const card = document.querySelector('[data-testid="today-garden-card"]');
+      const section = document.querySelector('[data-testid="progress-after-prayer"]');
+      if (!card || !section) return false;
+      return Boolean(card.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING);
+    }),
+  ).toBe(true);
 });
 
 test("the week grid conveys completion as text, not shape alone", async ({ page }) => {

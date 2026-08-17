@@ -297,7 +297,27 @@ a[href]:not(.no-press),
   touch-action: manipulation;
   transition:
     transform var(--motion-duration-press) var(--motion-ease-standard),
+    filter var(--motion-duration-fast) var(--motion-ease-standard),
     opacity var(--motion-duration-press) var(--motion-ease-standard);
+}
+
+/* One hover treatment for everything that acts.
+   Hovers were previously per-component and mostly absent, so the app felt
+   static under a mouse. A brightness lift is used rather than a transform or a
+   background change: it costs no layout, it works on a photograph, a gradient
+   and a flat fill alike, and it cannot fight whatever background a component
+   already sets — which is why a global `hover:bg-*` would not have worked.
+
+   Gated on a real hovering pointer so touch devices do not get a state that
+   sticks after a tap. Reduced motion keeps the change but removes its
+   transition, through the rule above. */
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):not(.no-press):hover,
+  [role="button"]:not([aria-disabled="true"]):not(.no-press):hover,
+  a[href]:not(.no-press):not(.skip-link):hover,
+  .interactive-elem:hover {
+    filter: brightness(1.08);
+  }
 }
 
 button:not(:disabled):not(.no-press):active,

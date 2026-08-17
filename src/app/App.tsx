@@ -1006,6 +1006,10 @@ function AppContent() {
                   direction={layoutDirection}
                   onOpenShareModal={() => setShowShareModal(true)}
                   onSelectCategory={openCategory}
+                  locationSettings={locationSettings}
+                  prayerTracking={prayerTracking}
+                  onTogglePrayerTracking={handleTogglePrayerTracking}
+                  onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (
