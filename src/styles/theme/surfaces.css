@@ -272,6 +272,26 @@ a[href]:not(.no-press):active,
   -webkit-overflow-scrolling: touch;
 }
 
+/* The in-app Reduce motion setting must do what the OS preference does.
+   It used to reach only transitions on buttons, links and .interactive-elem,
+   so every keyframe animation — entrances, the save pop, the counter ripple,
+   the nav cue — kept running for someone who had turned the setting on but
+   whose OS reported no preference. This mirrors the
+   prefers-reduced-motion block below.
+
+   Deliberately placed before the press rules that follow: both use
+   !important, so the later, more specific rule still wins and a press keeps
+   its opacity feedback. Reduced motion means "stop moving", not "stop
+   responding". */
+.reduce-motion *,
+.reduce-motion *::before,
+.reduce-motion *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
 /* Reduce-motion overrides for press effects */
 .reduce-motion button:active,
 .reduce-motion [role="button"]:active,

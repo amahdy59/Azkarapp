@@ -22,12 +22,15 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
       role="status"
       aria-label={completedTitle}
       aria-live="polite"
+      // Enters on the shared slide-up curve, leaves on the existing exit
+      // transition. `slide-up` is applied only while present so the exit is
+      // not fighting an animation holding its end state.
       className={`w-full transition-[opacity,transform] duration-emphasis ease-out ${
-        isExiting ? "translate-y-3 opacity-0" : "translate-y-0 opacity-100"
+        isExiting ? "translate-y-3 opacity-0" : "slide-up translate-y-0 opacity-100"
       }`}
     >
       <div className="flex flex-col items-center gap-5 rounded-3xl border border-white/10 bg-black/30 px-5 py-6 text-center shadow-[0_24px_48px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:px-6 sm:py-7">
-        <div className="flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
+        <div className="completion-badge-pop flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
           <Check size={34} strokeWidth={2.8} aria-hidden="true" />
         </div>
 

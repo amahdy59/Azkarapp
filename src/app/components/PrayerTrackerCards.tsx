@@ -72,22 +72,28 @@ function TrackingCheckbox({
   return (
     <label
       htmlFor={id}
-      className={`flex h-12 items-center justify-between gap-3 rounded-2xl px-2 transition-colors duration-fast ${
+      className={`relative flex h-12 items-center justify-between gap-3 rounded-2xl px-2 transition-colors duration-fast ${
         disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-on-media/8"
       }`}
     >
-      <span className="min-w-0 truncate text-[0.875rem] font-bold text-on-media">{label}</span>
+      {/* The input *is* the row: it fills the full 48px rather than being
+          clipped to a screen-reader pinpoint. Keyboard focus then lands on
+          something the size of the target it represents — an sr-only input
+          reads as a clipped control to auditing tools, and its hit area no
+          longer matches what the eye is aiming at. Transparent, not hidden,
+          so the visual circle beneath stays the only thing drawn. */}
       <input
         id={id}
         type="checkbox"
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.currentTarget.checked)}
-        className="peer sr-only"
+        className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
+      <span className="pointer-events-none min-w-0 truncate text-[0.875rem] font-bold text-on-media">{label}</span>
       <span
         aria-hidden="true"
-        className="flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-on-media/45 text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground peer-focus-visible:outline-none peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent"
+        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-on-media/45 text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent"
       >
         <Check size={14} strokeWidth={3} />
       </span>
@@ -236,7 +242,7 @@ export function PrayerTrackerCards({
       // width and the gaps stay 24px whatever the container does. Narrower
       // tiers fall back to two columns and then one; the card itself is
       // unchanged at every tier.
-      className="grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-5 lg:px-8"
+      className="stagger-in grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-5 lg:px-8"
     >
       {PRAYER_ORDER.map((prayer) => {
         const model = models.find((candidate) => candidate.prayer === prayer);

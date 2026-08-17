@@ -451,3 +451,68 @@ for (const language of ["ar", "en"] as const) {
     await expectUnclippedHeading(page.getByRole("heading", { level: 1 }).first(), `${language} reader header at 320px`);
   });
 }
+
+// ─── Motion ──────────────────────────────────────────────────────────────────
+// Checklist row: "Reduce motion stops animation without stopping feedback."
+test("the Reduce motion setting neutralises animation but keeps press feedback", async ({ page }) => {
+  await seedAndOpen(page, { reduceMotion: true });
+
+  const metrics = await page.evaluate(() => {
+    const toMs = (value: string) => (value.endsWith("ms") ? parseFloat(value) : parseFloat(value) * 1000);
+    // Probe the rule itself rather than whichever cards a given viewport
+    // happens to mount: the contract is global, so an injected element on a
+    // stock animation class is the tier-independent way to measure it.
+    const probe = document.createElement("div");
+    probe.className = "fade-in";
+    document.body.appendChild(probe);
+    const probeStyle = getComputedStyle(probe);
+    const animationMs = toMs(probeStyle.animationDuration);
+    probe.remove();
+
+    const button = document.querySelector("button");
+    return {
+      rootFlagged: document.documentElement.classList.contains("reduce-motion"),
+      animationMs,
+      buttonTransitionMs: button ? toMs(getComputedStyle(button).transitionDuration) : null,
+      buttonTransitionProperty: button ? getComputedStyle(button).transitionProperty : null,
+    };
+  });
+
+  expect(metrics.rootFlagged).toBe(true);
+  // The app-level setting must reach keyframe animations, not just transitions
+  // on interactive elements — that gap meant entrances kept playing for anyone
+  // who turned the setting on without an OS preference.
+  expect(metrics.animationMs).toBeLessThan(1);
+  // Reduced motion means "stop moving", not "stop responding": a press keeps
+  // its opacity feedback.
+  expect(metrics.buttonTransitionProperty).toContain("opacity");
+  expect(metrics.buttonTransitionMs).toBeGreaterThan(1);
+});
+
+test("motion stays on when the setting is off", async ({ page }) => {
+  await seedAndOpen(page, { reduceMotion: false });
+
+  const metrics = await page.evaluate(() => {
+    const toMs = (value: string) => (value.endsWith("ms") ? parseFloat(value) : parseFloat(value) * 1000);
+    // Build the stagger container directly so the assertion holds at every
+    // viewport, not only the tiers that mount the prayer grid.
+    const probe = document.createElement("div");
+    probe.className = "stagger-in";
+    probe.innerHTML = "<span></span><span></span><span></span>";
+    document.body.appendChild(probe);
+    const children = [...probe.children].map((child) => getComputedStyle(child));
+    const result = {
+      animationName: children[0]?.animationName ?? null,
+      animationMs: children[0] ? toMs(children[0].animationDuration) : null,
+      firstDelayMs: children[0] ? toMs(children[0].animationDelay) : null,
+      thirdDelayMs: children[2] ? toMs(children[2].animationDelay) : null,
+    };
+    probe.remove();
+    return result;
+  });
+
+  expect(metrics.animationName).toBe("slide-up");
+  expect(metrics.animationMs).toBeGreaterThan(1);
+  // Each child enters a beat after the one before it.
+  expect(metrics.thirdDelayMs).toBeGreaterThan(metrics.firstDelayMs ?? 0);
+});
