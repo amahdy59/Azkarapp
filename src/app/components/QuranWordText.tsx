@@ -43,7 +43,13 @@ export function QuranWordText({
               word: segment.text,
               ayah: formatNumerals(segment.meanings[0]!.ayahNumber, language),
             })}
-            className="relative -mx-0.5 inline cursor-help rounded-md bg-primary/10 px-0.5 font-semibold text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            // A button does not inherit font-size or line-height from its
+            // paragraph — the UA sheet gives it a 16px default — so a
+            // highlighted word rendered several pixels smaller than the ayah
+            // around it, and the gap grew with the reading-size setting.
+            // Inherited explicitly; the heavier weight stays, since that is
+            // the highlight.
+            className="relative -mx-0.5 inline cursor-help rounded-md bg-primary/10 px-0.5 text-[length:inherit] font-semibold leading-[inherit] text-primary underline decoration-primary/60 decoration-dotted underline-offset-[0.22em] transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {segment.text}
           </button>

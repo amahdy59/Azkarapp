@@ -742,3 +742,34 @@ test("the reader's text-size control resizes the zikr and never goes below the f
   expect(measured.medium).toBeGreaterThan(measured.small);
   expect(measured.large).toBeGreaterThan(measured.medium);
 });
+
+test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {
+  await openFridayKahf(page);
+
+  const paragraph = page.getByTestId("zikr-text").first();
+  await expect(paragraph).toBeVisible();
+
+  const metrics = await paragraph.evaluate((element) => {
+    const paragraphStyle = window.getComputedStyle(element);
+    // A button does not inherit font-size from its paragraph: the UA sheet
+    // gives it a fixed default, so a highlighted word used to render several
+    // pixels smaller than the verse it sits in, and the gap widened with the
+    // reading-size setting.
+    const word = element.querySelector('[data-testid="quran-word-help"]');
+    if (!word) return null;
+    const wordStyle = window.getComputedStyle(word);
+    return {
+      paragraphSize: paragraphStyle.fontSize,
+      wordSize: wordStyle.fontSize,
+      paragraphLeading: paragraphStyle.lineHeight,
+      wordLeading: wordStyle.lineHeight,
+      wordWeight: wordStyle.fontWeight,
+    };
+  });
+
+  if (!metrics) return;
+  expect(metrics.wordSize).toBe(metrics.paragraphSize);
+  expect(metrics.wordLeading).toBe(metrics.paragraphLeading);
+  // The highlight is still carried by weight and colour, not by size.
+  expect(Number(metrics.wordWeight)).toBeGreaterThan(500);
+});
