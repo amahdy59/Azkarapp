@@ -286,59 +286,62 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
   expect(imageWidth).toBeGreaterThan(0);
 });
 
-test("post-prayer cards form an equal-height grid followed by Masbaha", async ({ page }) => {
+test("post-prayer cards hide what cannot be acted on and stay equal height", async ({ page }) => {
   await seedAndOpen(page);
 
   const tracker = page.getByTestId("after-prayer-trackers");
   const grid = page.getByTestId("prayer-tracker-cards");
   const masbaha = page.getByTestId("home-masbaha-entry");
-  const [trackerBox, masbahaBox, metrics] = await Promise.all([
-    tracker.boundingBox(),
-    masbaha.boundingBox(),
-    grid.evaluate((element) => {
-      const cards = [...element.querySelectorAll("article[data-prayer-state]")];
-      const style = window.getComputedStyle(element);
-      const offsetsWithin = (card: Element) => {
-        const top = card.getBoundingClientRect().top;
-        const at = (selector: string) => {
-          const node = card.querySelector(selector);
-          return node ? Math.round(node.getBoundingClientRect().top - top) : -1;
-        };
-        return [at("h3"), at('[data-testid^="prayer-status-"]'), at("hr"), at("fieldset")].join("|");
-      };
-      return {
-        cardCount: cards.length,
-        columns: style.gridTemplateColumns.split(" ").length,
-        gap: style.columnGap,
-        heights: [...new Set(cards.map((card) => Math.round(card.getBoundingClientRect().height)))],
-        widths: [...new Set(cards.map((card) => Math.round(card.getBoundingClientRect().width)))],
-        // Every card must place its sections at the same offsets whatever its state.
-        layouts: [...new Set(cards.map(offsetsWithin))],
-        checkboxCount: element.querySelectorAll('input[type="checkbox"]').length,
-        radioCount: element.querySelectorAll('input[type="radio"]').length,
-        fieldsets: element.querySelectorAll("fieldset").length,
-      };
-    }),
-  ]);
+  const cards = grid.locator("article[data-prayer-state]");
 
-  expect(metrics.cardCount).toBe(5);
+  const [trackerBox, masbahaBox] = await Promise.all([tracker.boundingBox(), masbaha.boundingBox()]);
   expect(masbahaBox?.y).toBeGreaterThanOrEqual((trackerBox?.y ?? 0) + (trackerBox?.height ?? 0));
+
+  // A prayer that has not arrived cannot be tracked or read, so it is not
+  // shown until asked for. What has passed, what is open, and what is next
+  // always are.
+  const collapsedStates = await cards.evaluateAll((nodes) =>
+    nodes.map((node) => (node as HTMLElement).dataset.prayerState),
+  );
+  expect(collapsedStates).not.toContain("upcoming");
+  expect(collapsedStates).toContain("next");
+
+  const toggle = page.getByTestId("prayer-show-upcoming");
+  if (await toggle.count()) {
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await toggle.click();
+    await expect(toggle).toHaveAttribute("aria-expanded", "true");
+    const expanded = await cards.evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.prayerState));
+    expect(expanded.length).toBe(5);
+    expect(expanded).toContain("upcoming");
+  }
+
+  const metrics = await grid.evaluate((element) => {
+    const all = [...element.querySelectorAll("article[data-prayer-state]")];
+    const offsetsWithin = (card: Element) => {
+      const top = card.getBoundingClientRect().top;
+      const at = (selector: string) => {
+        const node = card.querySelector(selector);
+        return node ? Math.round(node.getBoundingClientRect().top - top) : -1;
+      };
+      return [at("h3"), at('[data-testid^="prayer-status-"]'), at("hr"), at("fieldset")].join("|");
+    };
+    return {
+      heights: [...new Set(all.map((card) => Math.round(card.getBoundingClientRect().height)))],
+      layouts: [...new Set(all.map(offsetsWithin))],
+      checkboxCount: element.querySelectorAll('input[type="checkbox"]').length,
+      radioCount: element.querySelectorAll('input[type="radio"]').length,
+      fieldsets: element.querySelectorAll("fieldset").length,
+    };
+  });
 
   // Two independent checkboxes per prayer, never radios, each in its own fieldset.
   expect(metrics.checkboxCount).toBe(10);
   expect(metrics.radioCount).toBe(0);
   expect(metrics.fieldsets).toBe(5);
-
-  // Identical dimensions and identical internal vertical positions.
+  // Identical height and identical internal vertical positions whatever the state.
   expect(metrics.heights).toHaveLength(1);
-  expect(metrics.widths).toHaveLength(1);
   expect(metrics.layouts).toHaveLength(1);
-  expect(metrics.gap).toBe("24px");
-
-  if ((page.viewportSize()?.width ?? 0) >= 1024) {
-    expect(metrics.columns).toBe(5);
-    expect(metrics.heights[0]).toBe(432);
-  }
 });
 
 test("forced colors preserves focus and selected-state cues", async ({ page }) => {

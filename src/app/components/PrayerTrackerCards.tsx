@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check } from "./icons";
 import { t } from "../i18n";
+import { formatNumerals } from "../formatting";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
@@ -72,7 +74,7 @@ function TrackingCheckbox({
   return (
     <label
       htmlFor={id}
-      className={`relative flex h-12 items-center justify-between gap-3 rounded-2xl px-2 transition-colors duration-fast ${
+      className={`relative flex h-11 items-center justify-between gap-2 rounded-xl px-2 transition-colors duration-fast ${
         disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-on-media/8"
       }`}
     >
@@ -90,7 +92,7 @@ function TrackingCheckbox({
         onChange={(event) => onChange(event.currentTarget.checked)}
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
-      <span className="pointer-events-none min-w-0 truncate text-[0.875rem] font-bold text-on-media">{label}</span>
+      <span className="pointer-events-none min-w-0 truncate text-[0.8125rem] font-bold text-on-media">{label}</span>
       {/* No focus ring here: the input covers the row and is the element
           that actually receives focus, so the global :focus-visible outline
           already draws one around the whole 48px target. A ring on this
@@ -130,7 +132,7 @@ function PrayerCard({
     <article
       data-testid={`prayer-card-${prayer}`}
       data-prayer-state={state}
-      className={`flex h-[27rem] flex-col rounded-[var(--ds-radius-card-large)] border p-6 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard ${
+      className={`flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-4 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-5 ${
         isCurrent
           ? "border-primary bg-primary/10 shadow-overlay"
           : state === "past"
@@ -151,13 +153,13 @@ function PrayerCard({
       >
         <span
           aria-hidden="true"
-          className={`flex size-16 items-center justify-center rounded-full ${
+          className={`flex size-12 items-center justify-center rounded-full ${
             isCurrent ? "bg-primary/20 text-primary" : "bg-on-media/10 text-on-media"
           }`}
         >
-          <Icon size={30} />
+          <Icon size={24} />
         </span>
-        <h3 className="mt-3 text-[1.0625rem] font-black text-on-media" dir="auto">
+        <h3 className="mt-2 text-[0.9375rem] font-black text-on-media" dir="auto">
           {name}
         </h3>
         {/* The time is the strongest thing in the card: it is what the reader
@@ -166,7 +168,7 @@ function PrayerCard({
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-1 text-[2rem] font-black leading-none tracking-tight text-on-media"
+          className="mt-1 text-[1.5rem] font-black leading-none tracking-tight text-on-media"
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -175,7 +177,7 @@ function PrayerCard({
 
       {/* Section 2 — temporal status. Fixed height so the divider below never
           moves when the next prayer adds its countdown line. */}
-      <div className="mt-3 flex h-[3.25rem] flex-col items-center justify-start gap-1">
+      <div className="mt-2 flex h-[2.75rem] flex-col items-center justify-start gap-0.5">
         <span
           data-testid={`prayer-status-${prayer}`}
           className={`inline-flex items-center rounded-full px-3 py-1 text-[0.75rem] font-black ${
@@ -193,12 +195,12 @@ function PrayerCard({
         )}
       </div>
 
-      <hr className="mt-5 border-t border-on-media/12" />
+      <hr className="mt-2 border-t border-on-media/12" />
 
       {/* Section 3 — personal tracking. Its own fieldset so a screen reader
           announces which prayer these two controls belong to; the row of five
           otherwise repeats the same two labels with no context. */}
-      <fieldset className="mt-3 flex flex-col gap-1 border-0 p-0">
+      <fieldset className="mt-2 flex flex-col border-0 p-0">
         <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
         <TrackingCheckbox
           id={`prayer-${prayer}-mosque`}
@@ -237,32 +239,57 @@ export function PrayerTrackerCards({
   onOpen?: (prayer: PrayerName) => void;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
+  const [showUpcoming, setShowUpcoming] = useState(false);
+
+  const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
+    (model): model is PrayerCardModel => Boolean(model),
+  );
+  // A prayer that has not arrived cannot be tracked and cannot be read yet, so
+  // by default it only takes up room. The ones that can be acted on — what has
+  // passed, what is open now, and what is next — stay in view; the rest are one
+  // tap away. "Next" is never hidden: it is the one people look for.
+  const hidden = ordered.filter((model) => model.state === "upcoming");
+  const visible = showUpcoming ? ordered : ordered.filter((model) => model.state !== "upcoming");
 
   return (
-    <div
-      dir={direction}
-      data-testid="prayer-tracker-cards"
-      // Five equal columns rather than space-between, so every card is the same
-      // width and the gaps stay 24px whatever the container does. Narrower
-      // tiers fall back to two columns and then one; the card itself is
-      // unchanged at every tier.
-      className="stagger-in grid grid-cols-1 gap-6 px-4 sm:grid-cols-2 sm:px-6 lg:grid-cols-5 lg:px-8"
-    >
-      {PRAYER_ORDER.map((prayer) => {
-        const model = models.find((candidate) => candidate.prayer === prayer);
-        if (!model) return null;
-        const record = byPrayer.get(prayer);
-        return (
-          <PrayerCard
-            key={prayer}
-            model={model}
-            language={language}
-            tracking={{ mosque: record?.mosque ?? false, adhkar: record?.adhkar ?? false }}
-            onToggle={onToggle}
-            onOpen={onOpen}
-          />
-        );
-      })}
+    <div className="flex flex-col gap-3">
+      <div
+        dir={direction}
+        data-testid="prayer-tracker-cards"
+        // A snap carousel on phones, an even grid from the small tier up. The
+        // grid uses as many columns as there are cards so hiding the upcoming
+        // ones does not leave a gap where they were.
+        className="stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:px-8"
+        style={{ ["--prayer-columns" as string]: String(visible.length) }}
+      >
+        {visible.map((model) => {
+          const record = byPrayer.get(model.prayer);
+          return (
+            <PrayerCard
+              key={model.prayer}
+              model={model}
+              language={language}
+              tracking={{ mosque: record?.mosque ?? false, adhkar: record?.adhkar ?? false }}
+              onToggle={onToggle}
+              onOpen={onOpen}
+            />
+          );
+        })}
+      </div>
+
+      {hidden.length > 0 && (
+        <button
+          type="button"
+          onClick={() => setShowUpcoming((current) => !current)}
+          aria-expanded={showUpcoming}
+          data-testid="prayer-show-upcoming"
+          className="mx-auto flex min-h-11 items-center justify-center rounded-2xl border border-on-media/20 px-4 text-[0.8125rem] font-black text-on-media transition-colors duration-fast hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          {showUpcoming
+            ? t(language, "prayerTracking.hideUpcoming")
+            : t(language, "prayerTracking.showUpcoming", { count: formatNumerals(hidden.length, language) })}
+        </button>
+      )}
     </div>
   );
 }

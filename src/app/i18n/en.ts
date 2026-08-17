@@ -163,6 +163,8 @@ const en = {
     now: "Now",
     next: "Next prayer",
     past: "Passed",
+    showUpcoming: "Show {count} upcoming",
+    hideUpcoming: "Hide upcoming",
     openAdhkar: "Open {prayer} prayer adhkar",
     upcoming: "Not yet due",
   },

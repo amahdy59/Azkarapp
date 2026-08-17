@@ -102,30 +102,36 @@ describe("HomeScreen quick access", () => {
 
     expect(screen.getByTestId("after-prayer-trackers")).toBeInTheDocument();
 
-    // Five cards, one per prayer, each carrying its own temporal state.
+    // Only the prayers that can be acted on are shown; the ones that have not
+    // arrived are behind the show-more control.
     const grid = screen.getByTestId("prayer-tracker-cards");
-    expect(grid.querySelectorAll("article[data-prayer-state]")).toHaveLength(5);
-    // Exactly one card is "next" and one is "current"; which prayer that is
-    // depends on the mocked clock, so find them rather than assume.
-    const nextCard = grid.querySelector('article[data-prayer-state="next"]');
-    expect(nextCard).not.toBeNull();
-    expect(nextCard!.querySelector('[data-testid^="prayer-status-"]')).toHaveTextContent("Next prayer");
-    expect(grid.querySelectorAll('article[data-prayer-state="current"]')).toHaveLength(1);
+    const shownStates = [...grid.querySelectorAll("article[data-prayer-state]")].map(
+      (card) => (card as HTMLElement).dataset.prayerState,
+    );
+    expect(shownStates).not.toContain("upcoming");
+    expect(shownStates).toContain("next");
+    expect(shownStates.filter((state) => state === "current")).toHaveLength(1);
+
+    // Which prayer is next depends on the mocked clock, so find it.
+    const nextCard = grid.querySelector('article[data-prayer-state="next"]')!;
+    expect(nextCard.querySelector('[data-testid^="prayer-status-"]')).toHaveTextContent("Next prayer");
 
     // Tracking is two independent native checkboxes per card, inside a
-    // fieldset that names the prayer, and disabled until the prayer arrives.
-    for (const prayer of ["fajr", "dhuhr", "asr", "maghrib", "isha"]) {
-      const card = screen.getByTestId(`prayer-card-${prayer}`);
-      const boxes = card.querySelectorAll('input[type="checkbox"]');
-      expect(boxes).toHaveLength(2);
+    // fieldset that names the prayer.
+    for (const card of grid.querySelectorAll("article[data-prayer-state]")) {
+      expect(card.querySelectorAll('input[type="checkbox"]')).toHaveLength(2);
       expect(card.querySelector("fieldset legend")).toHaveTextContent(/prayer tracking/i);
     }
     // A prayer that has not arrived keeps its controls visible but inert.
-    const nextBoxes = nextCard!.querySelectorAll('input[type="checkbox"]');
+    const nextBoxes = nextCard.querySelectorAll('input[type="checkbox"]');
     expect([...nextBoxes].every((box) => (box as HTMLInputElement).disabled)).toBe(true);
     const currentCard = grid.querySelector('article[data-prayer-state="current"]')!;
     const currentBoxes = currentCard.querySelectorAll('input[type="checkbox"]');
     expect([...currentBoxes].some((box) => (box as HTMLInputElement).disabled)).toBe(false);
+
+    // The hidden ones are one tap away, and revealing them completes the five.
+    fireEvent.click(screen.getByTestId("prayer-show-upcoming"));
+    expect(grid.querySelectorAll("article[data-prayer-state]")).toHaveLength(5);
 
     expect(
       screen.getByTestId("after-prayer-trackers").compareDocumentPosition(screen.getByTestId("home-masbaha-entry")),

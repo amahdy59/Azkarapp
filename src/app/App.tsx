@@ -244,15 +244,18 @@ function AppContent() {
     (prayer: PrayerName, field: "mosque" | "adhkar", next: boolean) => {
       const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
       setPrayerTracking((current) => {
-        const index = current.findIndex((record) => record.dayKey === dayKey && record.prayer === prayer);
-        const existing = index >= 0 ? current[index]! : { dayKey, prayer, mosque: false, adhkar: false };
+        // Guarded rather than trusted: this reducer is the one place a bad
+        // restore turns into a crash on the user's first tap.
+        const records = current ?? [];
+        const index = records.findIndex((record) => record.dayKey === dayKey && record.prayer === prayer);
+        const existing = index >= 0 ? records[index]! : { dayKey, prayer, mosque: false, adhkar: false };
         const updated = { ...existing, [field]: next };
         if (index >= 0) {
-          const copy = current.slice();
+          const copy = records.slice();
           copy[index] = updated;
           return copy;
         }
-        return [...current, updated];
+        return [...records, updated];
       });
     },
     [progressDayStartHour],
@@ -564,7 +567,10 @@ function AppContent() {
     setIsGuest(state.profile.isGuest);
     setAccountUserId(state.profile.accountUserId);
     setDailyCompletions(state.dailyCompletions);
-    setPrayerTracking(state.prayerTracking);
+    // Any snapshot written before this field existed — which is every stored
+    // or synced state from an earlier version — has no prayerTracking. The
+    // type says otherwise, but restore data does not obey the type.
+    setPrayerTracking(state.prayerTracking ?? []);
     setCompleted(
       resetStaleCompletedCollections(
         toCompletedSets(state.completed),

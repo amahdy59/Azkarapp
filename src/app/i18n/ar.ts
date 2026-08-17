@@ -164,6 +164,8 @@ const ar = {
     now: "حان وقتها",
     next: "الصلاة القادمة",
     past: "مضت",
+    showUpcoming: "عرض {count} من الصلوات القادمة",
+    hideUpcoming: "إخفاء الصلوات القادمة",
     openAdhkar: "فتح أذكار صلاة {prayer}",
     upcoming: "لم يحن وقتها",
   },

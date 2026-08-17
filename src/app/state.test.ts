@@ -407,3 +407,51 @@ describe("state merging", () => {
     ]);
   });
 });
+
+describe("prayer tracking persistence", () => {
+  it("gives a state written before the field existed an empty array, not undefined", () => {
+    // Every stored or synced snapshot from an earlier version lacks this key.
+    // It reached the setter untouched, and the first tap did undefined.findIndex.
+    const legacy = normalizeAppState({
+      settings: { language: "ar" },
+      completed: {},
+      sessions: [],
+      dailyCompletions: [],
+      savedZikrIds: [],
+    });
+    expect(legacy.prayerTracking).toEqual([]);
+  });
+
+  it("keys records by day and stable prayer id, dropping anything malformed", () => {
+    const normalized = normalizeAppState({
+      ...DEFAULT_APP_STATE,
+      prayerTracking: [
+        { dayKey: "2026-08-17", prayer: "fajr", mosque: true, adhkar: false },
+        { dayKey: "2026-08-17", prayer: "not-a-prayer", mosque: true, adhkar: true },
+        { dayKey: "", prayer: "asr", mosque: true, adhkar: true },
+        // Both flags false carries no information.
+        { dayKey: "2026-08-17", prayer: "isha", mosque: false, adhkar: false },
+        "nonsense",
+      ],
+    });
+    expect(normalized.prayerTracking).toEqual([{ dayKey: "2026-08-17", prayer: "fajr", mosque: true, adhkar: false }]);
+  });
+
+  it("merges by (day, prayer) so two devices cannot duplicate a prayer", () => {
+    const base = normalizeAppState({
+      ...DEFAULT_APP_STATE,
+      prayerTracking: [{ dayKey: "2026-08-17", prayer: "fajr", mosque: true, adhkar: false }],
+    });
+    const merged = mergeAppStates(base, {
+      ...DEFAULT_APP_STATE,
+      prayerTracking: [
+        { dayKey: "2026-08-17", prayer: "fajr", mosque: true, adhkar: true },
+        { dayKey: "2026-08-16", prayer: "isha", mosque: true, adhkar: true },
+      ],
+    });
+    const fajr = merged.prayerTracking.filter((r) => r.dayKey === "2026-08-17" && r.prayer === "fajr");
+    expect(fajr).toHaveLength(1);
+    expect(fajr[0]?.adhkar).toBe(true);
+    expect(merged.prayerTracking).toHaveLength(2);
+  });
+});
