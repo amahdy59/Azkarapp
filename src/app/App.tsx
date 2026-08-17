@@ -1010,6 +1010,7 @@ function AppContent() {
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                   onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onOpenFriday={() => push("friday")}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

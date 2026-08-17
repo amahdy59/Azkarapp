@@ -5,6 +5,8 @@ import { t } from "../i18n";
 import { getGardenSummary, getProgressDayKey } from "../progress";
 import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
+import { FridayProgressCard } from "../components/FridayProgressCard";
+import { getFridaySummary } from "../fridaySummary";
 import type {
   AppLanguage,
   CategoryId,
@@ -30,6 +32,7 @@ export function ProgressScreen({
   prayerTracking = [],
   onTogglePrayerTracking,
   onPrayerResume,
+  onOpenFriday,
 }: {
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
@@ -42,9 +45,11 @@ export function ProgressScreen({
   prayerTracking?: readonly PrayerTrackingRecord[];
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
+  onOpenFriday?: () => void;
 }) {
   const now = new Date();
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
+  const fridaySummary = getFridaySummary();
   return (
     <ScreenContainer
       dir={direction}
@@ -94,6 +99,8 @@ export function ProgressScreen({
             />
           </div>
         </section>
+
+        <FridayProgressCard summary={fridaySummary} language={language} direction={direction} onOpen={onOpenFriday} />
       </div>
     </ScreenContainer>
   );

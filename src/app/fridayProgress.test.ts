@@ -5,6 +5,7 @@ import {
   fridayKahfOpenedKey,
   fridaySalawatKey,
   FRIDAY_KAHF_WEEK_KEY,
+  getFridayCycleKey,
   getIsoWeekKey,
   pruneStaleFridayProgress,
   readFridaySalawatProgress,
@@ -12,6 +13,33 @@ import {
   writeFridayDuaProgress,
   writeFridaySalawatProgress,
 } from "./fridayProgress";
+
+describe("Friday cycle boundary", () => {
+  // 2026-08-20 Thu, 08-21 Fri, 08-22 Sat, 08-28 the following Fri.
+  it("clears the companion once Friday ends rather than on Monday", () => {
+    expect(getFridayCycleKey(new Date(2026, 7, 21))).toBe("2026-08-21");
+    // Thursday evening counts toward the Friday it prepares for.
+    expect(getFridayCycleKey(new Date(2026, 7, 20))).toBe("2026-08-21");
+    // Saturday has already rolled forward, so Friday's progress is gone.
+    expect(getFridayCycleKey(new Date(2026, 7, 22))).toBe("2026-08-28");
+  });
+
+  it("kept Friday's progress visible on Saturday under the old ISO week", () => {
+    // The bug this replaced: Friday and the Saturday after it shared a bucket.
+    expect(getIsoWeekKey(new Date(2026, 7, 21))).toBe(getIsoWeekKey(new Date(2026, 7, 22)));
+  });
+
+  it("prunes keys left behind by the previous ISO-week scheme", () => {
+    localStorage.clear();
+    localStorage.setItem(fridayDuasKey("2026-W34"), "[]");
+    localStorage.setItem(fridayChecklistKey("2026-08-21"), "[]");
+
+    pruneStaleFridayProgress("2026-08-21");
+
+    expect(localStorage.getItem(fridayDuasKey("2026-W34"))).toBeNull();
+    expect(localStorage.getItem(fridayChecklistKey("2026-08-21"))).toBe("[]");
+  });
+});
 
 describe("Friday weekly progress", () => {
   it("uses the ISO week across a year boundary", () => {

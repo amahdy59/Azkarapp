@@ -15,53 +15,71 @@ export function getIsoWeekKey(date = new Date()): string {
   return `${target.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
 }
 
-export function fridayChecklistKey(week = getIsoWeekKey()): string {
-  return `azkarapp.friday-checklist.${week}`;
-}
-
-export function fridayKahfOpenedKey(week = getIsoWeekKey()): string {
-  return `azkarapp.friday-kahf-opened.${week}`;
-}
-
-export function fridaySalawatKey(week = getIsoWeekKey()): string {
-  return `azkarapp.friday-salawat.${week}`;
-}
-
-export function fridayDuasKey(week = getIsoWeekKey()): string {
-  return `azkarapp.friday-duas.${week}`;
-}
-
 /**
- * Matches only the week-scoped Friday keys. `FRIDAY_KAHF_WEEK_KEY` ends in
- * `.v1` rather than an ISO week, so it can never match and is never pruned.
+ * The Friday a piece of progress belongs to, as `YYYY-MM-DD`.
+ *
+ * Progress used to be keyed by ISO week, which rolls on *Monday* — so Friday's
+ * completed checklist stayed on screen through Saturday and Sunday before
+ * clearing. Keying by the current-or-upcoming Friday resets the companion the
+ * moment Friday ends, and lets work done on Thursday evening count toward the
+ * Friday it is preparing for.
  */
-const WEEK_SCOPED_FRIDAY_KEY = /^azkarapp\.friday-[a-z-]+\.(\d{4}-W\d{2})$/;
+export function getFridayCycleKey(date = new Date()): string {
+  const day = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  day.setDate(day.getDate() + ((5 - day.getDay() + 7) % 7));
+  const month = String(day.getMonth() + 1).padStart(2, "0");
+  return `${day.getFullYear()}-${month}-${String(day.getDate()).padStart(2, "0")}`;
+}
+
+export function fridayChecklistKey(cycle = getFridayCycleKey()): string {
+  return `azkarapp.friday-checklist.${cycle}`;
+}
+
+export function fridayKahfOpenedKey(cycle = getFridayCycleKey()): string {
+  return `azkarapp.friday-kahf-opened.${cycle}`;
+}
+
+export function fridaySalawatKey(cycle = getFridayCycleKey()): string {
+  return `azkarapp.friday-salawat.${cycle}`;
+}
+
+export function fridayDuasKey(cycle = getFridayCycleKey()): string {
+  return `azkarapp.friday-duas.${cycle}`;
+}
 
 /**
- * Friday progress is written under a fresh ISO week every seven days and was
- * never cleaned up, so a long-lived install accumulated four dead keys per week
- * indefinitely. Only the current week is ever read, so anything else is waste.
+ * Matches cycle-scoped Friday keys. The ISO-week form is still matched so that
+ * keys written before the switch are pruned on first launch rather than left
+ * behind forever. `FRIDAY_KAHF_WEEK_KEY` ends in `.v1` and matches neither, so
+ * it is never pruned.
+ */
+const CYCLE_SCOPED_FRIDAY_KEY = /^azkarapp\.friday-[a-z-]+\.(\d{4}-W\d{2}|\d{4}-\d{2}-\d{2})$/;
+
+/**
+ * Friday progress is written under a fresh cycle every seven days and was never
+ * cleaned up, so a long-lived install accumulated four dead keys per week
+ * indefinitely. Only the current cycle is ever read, so anything else is waste.
  *
  * Called once at startup from `main.tsx`, deliberately not from the read
- * functions: those take an explicit `week`, so pruning against *today* inside a
- * read would delete the very data a non-current-week read asked for.
+ * functions: those take an explicit `cycle`, so pruning against *today* inside
+ * a read would delete the very data a non-current-cycle read asked for.
  */
-export function pruneStaleFridayProgress(currentWeek = getIsoWeekKey()): void {
+export function pruneStaleFridayProgress(currentCycle = getFridayCycleKey()): void {
   try {
     for (let index = localStorage.length - 1; index >= 0; index -= 1) {
       const key = localStorage.key(index);
-      const week = key?.match(WEEK_SCOPED_FRIDAY_KEY)?.[1];
-      if (key && week && week !== currentWeek) localStorage.removeItem(key);
+      const cycle = key?.match(CYCLE_SCOPED_FRIDAY_KEY)?.[1];
+      if (key && cycle && cycle !== currentCycle) localStorage.removeItem(key);
     }
   } catch {
     // Stale weeks only occupy storage; failing to prune them changes nothing.
   }
 }
 
-export function readFridayDuaProgress(allowedIds: Iterable<string>, week = getIsoWeekKey()): Set<string> {
+export function readFridayDuaProgress(allowedIds: Iterable<string>, cycle = getFridayCycleKey()): Set<string> {
   try {
     const allowed = new Set(allowedIds);
-    const parsed: unknown = JSON.parse(localStorage.getItem(fridayDuasKey(week)) ?? "[]");
+    const parsed: unknown = JSON.parse(localStorage.getItem(fridayDuasKey(cycle)) ?? "[]");
     return new Set(
       Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string" && allowed.has(id)) : [],
     );
@@ -70,17 +88,19 @@ export function readFridayDuaProgress(allowedIds: Iterable<string>, week = getIs
   }
 }
 
-export function writeFridayDuaProgress(ids: Iterable<string>, week = getIsoWeekKey()): void {
+export function writeFridayDuaProgress(ids: Iterable<string>, cycle = getFridayCycleKey()): void {
   try {
-    localStorage.setItem(fridayDuasKey(week), JSON.stringify([...new Set(ids)].sort()));
+    localStorage.setItem(fridayDuasKey(cycle), JSON.stringify([...new Set(ids)].sort()));
   } catch {
     // Weekly progress remains usable in memory when storage is unavailable.
   }
 }
 
-export function readFridaySalawatProgress(week = getIsoWeekKey()): FridaySalawatProgress {
+export function readFridaySalawatProgress(cycle = getFridayCycleKey()): FridaySalawatProgress {
   try {
-    const parsed = JSON.parse(localStorage.getItem(fridaySalawatKey(week)) ?? "null") as Partial<FridaySalawatProgress>;
+    const parsed = JSON.parse(
+      localStorage.getItem(fridaySalawatKey(cycle)) ?? "null",
+    ) as Partial<FridaySalawatProgress>;
     const target = Number.isFinite(parsed?.target) ? Math.min(100_000, Math.max(1, Math.floor(parsed.target!))) : 100;
     const count = Number.isFinite(parsed?.count) ? Math.max(0, Math.floor(parsed.count!)) : 0;
     return { count, target };
@@ -89,11 +109,11 @@ export function readFridaySalawatProgress(week = getIsoWeekKey()): FridaySalawat
   }
 }
 
-export function writeFridaySalawatProgress(progress: FridaySalawatProgress, week = getIsoWeekKey()): void {
+export function writeFridaySalawatProgress(progress: FridaySalawatProgress, cycle = getFridayCycleKey()): void {
   try {
     const target = Math.min(100_000, Math.max(1, Math.floor(progress.target)));
     const count = Math.max(0, Math.floor(progress.count));
-    localStorage.setItem(fridaySalawatKey(week), JSON.stringify({ count, target }));
+    localStorage.setItem(fridaySalawatKey(cycle), JSON.stringify({ count, target }));
   } catch {
     // Counting remains usable in memory when storage is unavailable.
   }
