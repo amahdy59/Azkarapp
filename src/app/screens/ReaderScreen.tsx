@@ -39,6 +39,7 @@ import { Header } from "../components/LayoutShells";
 import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
+import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { getQuranWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
@@ -178,6 +179,7 @@ export function ReaderScreen({
   }`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
+  const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
@@ -613,6 +615,18 @@ export function ReaderScreen({
 
   const renderReaderMenuItems = (layout: "mobile" | "desktop") => (
     <>
+      {/* Long surahs only: the immersive view pages a mushaf sideways, which
+          means nothing for a zikr that fits on one screen. */}
+      {longSurah && (
+        <DropdownMenuItem
+          onClick={() => setImmersiveOpen(true)}
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        >
+          <BookOpen size={18} />
+          {t(language, "reader.immersiveOpen")}
+        </DropdownMenuItem>
+      )}
+
       <DropdownMenuItem
         disabled={!audioAvailable}
         onClick={onPlayAudio}
@@ -1050,6 +1064,21 @@ export function ReaderScreen({
         direction={direction}
         onClose={() => setSelectedWordMeanings(null)}
       />
+
+      {immersiveOpen && longSurah && (
+        <MushafImmersiveReader
+          zikr={z}
+          arabicText={displayArabicText}
+          meanings={wordMeanings}
+          language={language}
+          direction={direction}
+          title={readerZikrTitle ?? displayCategoryName}
+          reducedMotion={reducedMotion}
+          textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+          onSelectMeanings={setSelectedWordMeanings}
+          onClose={() => setImmersiveOpen(false)}
+        />
+      )}
     </ScreenContainer>
   );
 }

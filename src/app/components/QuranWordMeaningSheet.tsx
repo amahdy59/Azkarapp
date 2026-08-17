@@ -66,37 +66,35 @@ function WordMeaningContent({
         tabIndex={0}
         dir={direction}
       >
-        <div className="flex flex-col gap-5 pb-4">
+        {/* One card per word rather than a headline card stacked on a meaning
+            card. The pair always belonged together — splitting them doubled the
+            vertical cost of every word and made a multi-word selection read as
+            a long alternating stack instead of a short glossary. */}
+        <div className="flex flex-col gap-3 pb-4">
           {meanings.map((meaning) => (
-            <div key={meaning.id} className="flex flex-col gap-3">
-              {/* Featured Word & Ayah Header Card */}
-              <div className="rounded-2xl border border-primary/30 bg-primary/10 p-4 text-center shadow-xs">
+            <div
+              key={meaning.id}
+              data-testid="quran-word-meaning-entry"
+              className="overflow-hidden rounded-2xl border border-border/60 bg-card shadow-xs"
+            >
+              <div className="flex items-baseline justify-between gap-3 border-b border-border/50 bg-primary/10 px-4 py-3">
                 <p
-                  className="zikr-text text-[1.375rem] font-extrabold leading-relaxed text-primary"
+                  className="zikr-text min-w-0 text-[1.25rem] font-extrabold leading-relaxed text-primary"
                   lang="ar"
                   dir="rtl"
                 >
                   {meaning.word}
                 </p>
-                <p className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">
+                {/* Isolated so the ayah number cannot reorder against the word. */}
+                <bdi className="shrink-0 text-[0.75rem] font-bold text-muted-foreground">
                   {t(language, "reader.ayahLabel", {
                     ayah: formatNumerals(meaning.ayahNumber, language),
                   })}
-                </p>
+                </bdi>
               </div>
-
-              {/* Exegesis & Meaning Card */}
-              <div className="rounded-2xl border border-border/60 bg-muted/30 p-4 space-y-2">
-                <div className="flex items-center gap-2">
-                  <span className="h-4 w-1 rounded-full bg-primary" aria-hidden="true" />
-                  <h3 className="text-[0.8125rem] font-bold tracking-wide uppercase text-muted-foreground">
-                    {t(language, "reader.wordMeaningTitle")}
-                  </h3>
-                </div>
-                <p className="text-[1rem] leading-7 font-medium text-foreground" lang="ar" dir="rtl">
-                  {meaning.explanationArabic}
-                </p>
-              </div>
+              <p className="px-4 py-3 text-[1rem] font-medium leading-7 text-foreground" lang="ar" dir="rtl">
+                {meaning.explanationArabic}
+              </p>
             </div>
           ))}
 

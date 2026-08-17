@@ -896,6 +896,11 @@ const ar = {
     mushafPageRange: "\u0627\u0644\u0622\u064a\u0627\u062a {start}\u2013{end}",
     mushafPageEnd:
       "\u0646\u0647\u0627\u064a\u0629 \u0635\u0641\u062d\u0629 \u0627\u0644\u0645\u0635\u062d\u0641 {page}",
+    immersiveOpen: "وضع المصحف",
+    immersiveTitle: "وضع المصحف",
+    immersiveClose: "إغلاق وضع المصحف",
+    immersiveNext: "الصفحة التالية",
+    immersivePrevious: "الصفحة السابقة",
     jumpToCounter: "الانتقال إلى العداد",
     wordMeaningAria: "\u0645\u0639\u0646\u0649 {word}\u060c \u0627\u0644\u0622\u064a\u0629 {ayah}",
     wordMeaningTitle: "\u0645\u0639\u0646\u0649 \u0627\u0644\u0643\u0644\u0645\u0629",
