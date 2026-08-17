@@ -91,9 +91,13 @@ function TrackingCheckbox({
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
       <span className="pointer-events-none min-w-0 truncate text-[0.875rem] font-bold text-on-media">{label}</span>
+      {/* No focus ring here: the input covers the row and is the element
+          that actually receives focus, so the global :focus-visible outline
+          already draws one around the whole 48px target. A ring on this
+          circle as well produced two indicators for one control. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-on-media/45 text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground peer-focus-visible:ring-[3px] peer-focus-visible:ring-ring peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-transparent"
+        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-on-media/45 text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground"
       >
         <Check size={14} strokeWidth={3} />
       </span>

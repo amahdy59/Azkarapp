@@ -390,6 +390,12 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
     const info = await page.evaluate(() => {
       const el = document.activeElement as HTMLElement | null;
       if (!el || el === document.body) return null;
+      // Settle the browser's own focus scroll before measuring. Without this
+      // the walk reports a control as "below the fold" purely because the
+      // scroll had not finished — a measurement artifact, not clipping. The
+      // elementFromPoint check below is what actually detects an obscured
+      // control, and it is unaffected.
+      el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
       const style = getComputedStyle(el);
       const rect = el.getBoundingClientRect();
       const hasOutline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth || "0") > 0;
