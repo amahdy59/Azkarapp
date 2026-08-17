@@ -566,7 +566,10 @@ export function HomeScreen({
               dir={direction}
               className="overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
             >
-              <div className="border-b border-border/70 bg-muted/35 px-4 py-5 text-start sm:px-6">
+              {/* The header sits above a hairline in the brand gold, as in the
+                  approved design: it separates chrome from the row of cards
+                  without adding another filled band. */}
+              <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-5 text-start sm:px-6">
                 <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
                   {t(language, "progress.postPrayerAzkar")}
                 </h2>

@@ -247,6 +247,19 @@
    (transition-all, transition-colors, etc.) which live in @layer utilities.
    ──────────────────────────────────────────────────────────────────── */
 
+/* The per-prayer icon chip.
+   The tint is mixed explicitly against --card rather than expressed as an
+   alpha on the accent: an opacity modifier over an arbitrary var() does not
+   reliably resolve, which left the glyph sitting on a near-identical fill
+   (1.29:1 in light mode). Mixing against the card guarantees a light tint on
+   light grounds and a dark one on dark grounds, so the glyph always has a
+   surface to contrast with. */
+.prayer-chip {
+  background-color: color-mix(in srgb, var(--prayer-accent) 9%, var(--card));
+  border-color: color-mix(in srgb, var(--prayer-accent) 34%, transparent);
+  color: var(--prayer-accent);
+}
+
 /* A pointer on anything that acts.
    Browsers give <button> a default arrow, so most of this app looked inert to
    a mouse even though nearly all of it is clickable — only two dozen call

@@ -105,7 +105,7 @@ function TrackingCheckbox({
           circle as well produced two indicators for one control. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border-control text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground"
+        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border-control text-transparent transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-hover:border-info peer-enabled:peer-hover:bg-info/10 peer-checked:scale-105 peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground peer-checked:shadow-[0_2px_8px_-2px_var(--info)]"
       >
         <Check size={14} strokeWidth={3} />
       </span>
@@ -137,13 +137,14 @@ function PrayerCard({
   return (
     <article
       data-testid={`prayer-card-${prayer}`}
+      data-prayer={prayer}
       data-prayer-state={state}
-      className={`flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-4 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-5 ${
+      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-4 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-5 ${
         isCurrent
-          ? "border-primary bg-primary/10 shadow-overlay"
+          ? "border-primary bg-gradient-to-b from-primary/12 to-transparent shadow-[0_0_0_1px_var(--primary),0_12px_32px_-12px_var(--primary)]"
           : state === "past"
             ? "border-border/60 bg-muted/40"
-            : "border-border bg-card"
+            : "border-border bg-gradient-to-b from-card to-muted/30 shadow-raised"
       }`}
     >
       {/* Section 1 — identity and timing, and the way into this prayer's
@@ -159,9 +160,9 @@ function PrayerCard({
       >
         <span
           aria-hidden="true"
-          className={`flex size-12 items-center justify-center rounded-full ${
-            isCurrent ? "bg-primary/20 text-primary" : "bg-muted text-foreground"
-          }`}
+          // The chip is the only place the per-prayer hue appears. Tinting the
+          // whole card would put five competing colours behind the content.
+          className="prayer-chip flex size-12 items-center justify-center rounded-full border transition-transform duration-standard ease-standard group-hover/card:scale-105"
         >
           <Icon size={24} />
         </span>

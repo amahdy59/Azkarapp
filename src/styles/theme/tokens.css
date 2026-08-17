@@ -405,6 +405,63 @@ textarea {
   --font-weight-normal: 500;
 }
 
+/* Per-prayer accent for the after-prayer cards.
+
+   Each prayer gets a hue that matches its time of day — dawn gold, midday
+   sun, an overcast blue for 'Asr, sunset orange, night indigo — so the row
+   reads as a passage through the day rather than five identical tiles. Kept
+   here beside the palettes for the same reason the reader accents are: these
+   have to hold contrast against every theme, and that is only checkable when
+   they sit next to the grounds they run on.
+
+   Dark grounds first, matching :root; the light theme overrides below with
+   darker weights, since a dawn gold that reads on #0a1228 disappears on
+   #f8f5f0. Only the icon chip uses these — the card itself stays on theme
+   surfaces so the row never competes with the content inside it. */
+
+[data-prayer="fajr"] {
+  --prayer-accent: #fbbf24;
+}
+[data-prayer="dhuhr"] {
+  --prayer-accent: #f6c344;
+}
+[data-prayer="asr"] {
+  --prayer-accent: #60a5fa;
+}
+[data-prayer="maghrib"] {
+  --prayer-accent: #fb923c;
+}
+[data-prayer="isha"] {
+  --prayer-accent: #a5b4fc;
+}
+
+.light-mode [data-prayer="fajr"],
+.theme-light [data-prayer="fajr"] {
+  --prayer-accent: #7c3a06;
+}
+.light-mode [data-prayer="dhuhr"],
+.theme-light [data-prayer="dhuhr"] {
+  --prayer-accent: #6b4106;
+}
+.light-mode [data-prayer="asr"],
+.theme-light [data-prayer="asr"] {
+  --prayer-accent: #1e3a8a;
+}
+.light-mode [data-prayer="maghrib"],
+.theme-light [data-prayer="maghrib"] {
+  --prayer-accent: #7c2d12;
+}
+.light-mode [data-prayer="isha"],
+.theme-light [data-prayer="isha"] {
+  --prayer-accent: #312e81;
+}
+
+/* High contrast drops the per-prayer hues entirely: the mode exists to remove
+   decorative colour, and five tinted chips are exactly that. */
+.high-contrast [data-prayer] {
+  --prayer-accent: var(--foreground);
+}
+
 /* Reader per-category accent. Each collection tints --primary/--ring for its
    own reading session. These sixteen values used to be hex literals inside a
    switch in ReaderScreen.tsx, applied as an inline style (DEC-069 / F17); they
