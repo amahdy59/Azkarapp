@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check } from "./icons";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -245,6 +245,29 @@ export function PrayerTrackerCards({
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [showUpcoming, setShowUpcoming] = useState(false);
+  // Collapsing keeps the cards mounted for the length of the exit so they can
+  // animate away instead of disappearing between two frames.
+  const [isCollapsing, setIsCollapsing] = useState(false);
+  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(
+    () => () => {
+      if (collapseTimer.current) clearTimeout(collapseTimer.current);
+    },
+    [],
+  );
+
+  const toggleUpcoming = () => {
+    if (collapseTimer.current) clearTimeout(collapseTimer.current);
+    if (showUpcoming) {
+      setIsCollapsing(true);
+      collapseTimer.current = setTimeout(() => {
+        setShowUpcoming(false);
+        setIsCollapsing(false);
+      }, 150);
+      return;
+    }
+    setShowUpcoming(true);
+  };
 
   const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
@@ -264,7 +287,7 @@ export function PrayerTrackerCards({
         // A snap carousel on phones, an even grid from the small tier up. The
         // grid uses as many columns as there are cards so hiding the upcoming
         // ones does not leave a gap where they were.
-        className="stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:px-8"
+        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:px-8`}
         style={{ ["--prayer-columns" as string]: String(visible.length) }}
       >
         {visible.map((model) => {
@@ -285,7 +308,7 @@ export function PrayerTrackerCards({
       {hidden.length > 0 && (
         <button
           type="button"
-          onClick={() => setShowUpcoming((current) => !current)}
+          onClick={toggleUpcoming}
           aria-expanded={showUpcoming}
           data-testid="prayer-show-upcoming"
           className="mx-auto flex min-h-11 items-center justify-center rounded-2xl border border-border-control px-4 text-[0.8125rem] font-black text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"

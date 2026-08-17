@@ -99,6 +99,26 @@
   animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) both;
 }
 
+@keyframes slide-down-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* Departure, on the exit curve rather than the entrance one.
+   Things arriving should decelerate into place; things leaving should
+   accelerate away, which is why these use different easings. Elements used to
+   simply unmount, so a collapsing group vanished on one frame while the layout
+   reflowed underneath — read as a stutter rather than as movement. */
+.collapse-out > * {
+  animation: slide-down-out var(--motion-duration-fast) var(--motion-ease-exit) both;
+}
+
 /* Staggered entrance for a group of siblings.
    Put .stagger-in on the container; each child enters on the same slide-up
    curve, a beat after the one before it. The delay is capped at the sixth

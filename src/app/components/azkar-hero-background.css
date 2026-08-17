@@ -57,3 +57,15 @@
     display: none;
   }
 }
+
+/* Fallback ground when the hero photograph cannot load.
+   Built from the brand hero token rather than a literal, so it tracks the
+   theme, and kept deliberately dark: every element drawn on the hero uses the
+   on-media colours, which are light in every theme. A pale fallback would
+   leave that text unreadable. The gradient mirrors the Reader hero band so the
+   two degrade to the same surface. */
+.azkar-hero__fallback {
+  background:
+    radial-gradient(120% 140% at 50% 10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 60%),
+    linear-gradient(180deg, color-mix(in srgb, var(--brand-hero) 92%, #000000), var(--brand-hero));
+}

@@ -367,9 +367,6 @@ export function FridayHomeCard({
               <li>{t(language, "home.fridayVirtueEarly")}</li>
               <li>{t(language, "home.fridayVirtueDua")}</li>
             </ul>
-            <p className="mt-3 border-t border-border/60 pt-3 text-xs font-semibold leading-5 text-muted-foreground">
-              {t(language, "home.fridayReadingSource")}
-            </p>
           </div>
         </div>
       </div>

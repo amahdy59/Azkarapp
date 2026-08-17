@@ -209,7 +209,6 @@ export function FridayModeScreen({
               <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
                 {t(language, "friday.kahfHadith")}
               </p>
-              <p className="mt-2 text-[0.6875rem] font-bold text-primary">{t(language, "home.fridayReadingSource")}</p>
             </div>
             <div className="rounded-2xl bg-background/55 p-3 text-start">
               <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "home.fridayVirtues")}</h3>

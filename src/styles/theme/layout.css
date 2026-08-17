@@ -264,10 +264,19 @@
    completion card, the routine card and the wird card cannot drift apart —
    they sit side by side and any difference between them shows. */
 .hero-glass {
-  background-color: rgb(0 0 0 / 0.3);
+  background-color: rgb(0 0 0 / 0.34);
   border: 1px solid rgb(255 255 255 / 0.1);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
+  /* 18px, not 40px. Backdrop-filter cost scales with radius and area, and
+     these are large cards over a photograph — three of them at 40px made
+     scrolling the hero visibly sluggish. The extra opacity below carries the
+     legibility the wider radius used to, at a fraction of the compositing
+     cost, and the two read the same at this size.
+
+     `contain: paint` stops the browser re-sampling the backdrop for anything
+     outside each card's own box. */
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  contain: paint;
   box-shadow: var(--ds-shadow-overlay);
 }
 
