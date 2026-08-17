@@ -256,6 +256,21 @@
   mix-blend-mode: color-burn;
 }
 
+/* Cards that sit on the hero photograph.
+   Distinct from .glass-card, which is opaque by design (DEC-003 keeps
+   functional surfaces stable). These float over an image, so they read as
+   glass: a dark wash rather than a filled surface, and a heavier blur so the
+   photo behind stays a texture rather than competing detail. One class so the
+   completion card, the routine card and the wird card cannot drift apart —
+   they sit side by side and any difference between them shows. */
+.hero-glass {
+  background-color: rgb(0 0 0 / 0.3);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  box-shadow: var(--ds-shadow-overlay);
+}
+
 /* Glassmorphic Card Backdrop & Styling — opt-in only (DEC-003: functional/
    devotional content uses stable opaque surfaces). .bg-card itself stays
    opaque; reach for .glass-card/.wird-card explicitly on decorative,

@@ -245,10 +245,8 @@ export function ProgressDayView({
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
-        className={`flex w-full flex-col rounded-3xl border p-5 shadow-raised sm:p-7 md:p-8 ${
-          isHomeSubset
-            ? "flex-1 border-white/15 bg-on-media-surface/82 backdrop-blur-lg"
-            : "border-border bg-card text-foreground"
+        className={`flex w-full flex-col rounded-3xl p-5 sm:p-7 md:p-8 ${
+          isHomeSubset ? "hero-glass flex-1" : "border border-border bg-card text-foreground shadow-raised"
         }`}
       >
         <div className="flex items-start justify-between gap-3">

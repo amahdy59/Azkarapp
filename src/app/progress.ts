@@ -3,7 +3,16 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep", "after_prayer"];
-export const DEFAULT_PROGRESS_DAY_START_HOUR = 4;
+/**
+ * The progress day rolls at midnight.
+ *
+ * It used to roll at 04:00, on the reasoning that sleep azkar read at 1am
+ * belong to the day that is ending. That is defensible, but it means the date
+ * on screen and the date the progress counts against disagree for four hours
+ * every night, which is the more confusing of the two problems. Readers can
+ * still choose 2, 4 or 6am in Settings -> Progress.
+ */
+export const DEFAULT_PROGRESS_DAY_START_HOUR = 0;
 
 export type GrowthEventKind = "leaf" | "palm" | "repeat" | "extra_leaf";
 export type GardenMessageKind = "first" | "partial" | "complete" | "continue" | "welcome_back" | "yesterday_partial";

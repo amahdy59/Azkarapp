@@ -198,7 +198,9 @@ describe("app state persistence", () => {
     });
 
     expect(state.settings.quietProgressEnabled).toBe(true);
-    expect(state.settings.progressDayStartHour).toBe(4);
+    // Asserts the default rather than a literal, so changing the day boundary
+    // does not silently break an unrelated repair test.
+    expect(state.settings.progressDayStartHour).toBe(DEFAULT_APP_STATE.settings.progressDayStartHour);
   });
 
   it("normalizes prayer location, method, timezone, and manual adjustments", () => {
