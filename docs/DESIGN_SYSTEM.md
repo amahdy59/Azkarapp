@@ -250,7 +250,7 @@ Four tiers, defined by width only. `useLayoutMode` and the CSS media queries in 
 - Masbaha and Friday Salawat use the Reader session hierarchy: icon actions in the header, compact progress metadata and track, centered devotional text, the shared counter surface, and target/reset controls below. Evidence opens from the header's book action instead of occupying the counting canvas.
 - Progress always presents the current Wird views directly. The obsolete garden-visibility banner and hidden-state card are not part of the canonical Progress screen, and legacy stored visibility values cannot hide the Home current Wird.
 - Dashboard-tier screens opt into `.page-content-center` (max `--content-dashboard`); Settings uses its own two-pane with `--content-form` on the detail pane.
-- Progress Day, Week, Month, and Year keep the compact 44rem measure through the expanded tier, then may use up to 72rem at the large desktop tier for calendars, summaries, and charts. Their semantic order and compact text size do not change.
+- Progress Day, Week, Month, and Year keep the compact 44rem measure through the expanded tier, then may use up to 80rem at the large desktop tier for calendars, summaries, and charts. Their semantic order and compact text size do not change.
 - The reference layouts are verified at 320×700, 390×844, 643×275, and 1110×835. Playwright protects narrow-phone, phone, tablet, and desktop shell geometry.
 
 ## Change control

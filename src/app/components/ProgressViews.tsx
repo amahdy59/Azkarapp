@@ -76,7 +76,7 @@ function MainDhikrGroupCard({
     <button
       type="button"
       onClick={onPress}
-      className={`group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
+      className={`stagger-content group relative flex w-full rounded-3xl border transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 active:scale-[0.99] ${
         compact
           ? "min-h-[6.5rem] items-center gap-3 px-4 py-4 text-start sm:min-h-[13rem] sm:flex-col sm:justify-between sm:gap-4 sm:px-4 sm:py-5 sm:text-center lg:min-h-[11.5rem] lg:gap-2.5 lg:px-2.5 lg:py-4 xl:min-h-[11.5rem] xl:gap-3 xl:px-4 xl:py-4"
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"

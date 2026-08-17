@@ -52,7 +52,10 @@ export function ProgressScreen({
       className="relative px-page py-4 overflow-y-auto page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
       screenName={t(language, "common.progress")}
     >
-      <div className="relative z-10 w-full flex flex-col items-center">
+      {/* Capped at the same 80rem measure the day/week/month views use internally.
+          Without it the page container's 90rem let the tabs, summary strip, and
+          after-prayer card run 51px wider per side than the charts they frame. */}
+      <div className="relative z-10 mx-auto w-full max-w-[80rem] flex flex-col items-center">
         <Header title={t(language, "common.progress")} language={language} />
         <TodayRoutineGarden
           summary={getGardenSummary(dailyCompletions, new Date(), progressDayStartHour)}

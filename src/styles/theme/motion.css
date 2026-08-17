@@ -128,26 +128,41 @@
    Only the first paint is animated — `both` holds the end state — so
    re-renders do not replay it. Reduced motion collapses the whole thing
    through the .reduce-motion rule in surfaces.css. */
+/* The delay is carried on a custom property rather than set directly, because
+   custom properties inherit: a nested .stagger-content reads its card's own
+   delay and sequences its contents from the moment that card lands instead of
+   from first paint. */
 .stagger-in > * {
-  animation: slide-up var(--motion-duration-entrance) var(--motion-ease-enter) both;
-}
-.stagger-in > *:nth-child(1) {
-  animation-delay: 0ms;
+  --stagger-delay: 0ms;
+  animation: slide-up var(--motion-duration-entrance) var(--motion-ease-enter) var(--stagger-delay) both;
 }
 .stagger-in > *:nth-child(2) {
-  animation-delay: 40ms;
+  --stagger-delay: 40ms;
 }
 .stagger-in > *:nth-child(3) {
-  animation-delay: 80ms;
+  --stagger-delay: 80ms;
 }
 .stagger-in > *:nth-child(4) {
-  animation-delay: 120ms;
+  --stagger-delay: 120ms;
 }
 .stagger-in > *:nth-child(5) {
-  animation-delay: 160ms;
+  --stagger-delay: 160ms;
 }
 .stagger-in > *:nth-child(n + 6) {
-  animation-delay: 200ms;
+  --stagger-delay: 200ms;
+}
+
+/* Cards inside cards: the icon arrives first and the name/status column follows
+   a beat later, so a nested card reads as one object assembling rather than two
+   pieces landing together. The icon reuses favorite-pop — the app's single
+   "pop once" gesture — so this does not introduce a second vocabulary for it. */
+.stagger-content > :first-child {
+  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter)
+    calc(var(--stagger-delay, 0ms) + 70ms) both;
+}
+.stagger-content > :first-child ~ * {
+  animation: slide-up var(--motion-duration-standard) var(--motion-ease-enter) calc(var(--stagger-delay, 0ms) + 130ms)
+    both;
 }
 
 /* The completion badge lands a beat after the card that carries it, so the
