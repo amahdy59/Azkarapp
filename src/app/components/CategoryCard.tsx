@@ -76,9 +76,19 @@ export function CategoryCard({
               {/* A shape, not just the chevron's hue, marks a finished
                   collection — colour alone is not a sufficient cue. */}
               {isComplete && <Check size={15} className="shrink-0 text-primary" aria-hidden="true" />}
+              {/* Each phrase is its own bidi isolate. Both end and begin with
+                  numerals, and in an RTL run the algorithm reordered them
+                  across the separator: "٢٥ ذكرًا · ٠ من ٢٥" rendered as
+                  "٢٥٠ ذكرًا ٢٥٠", which reads as a wrong total. <bdi> is
+                  exactly the element for this. */}
               <span>
-                {routineSummary ? `${routineSummary} · ` : ""}
-                {progressText}
+                {routineSummary ? (
+                  <>
+                    <bdi>{routineSummary}</bdi>
+                    <span aria-hidden="true"> · </span>
+                  </>
+                ) : null}
+                <bdi>{progressText}</bdi>
               </span>
             </span>
           </div>

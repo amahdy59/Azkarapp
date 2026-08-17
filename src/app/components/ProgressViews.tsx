@@ -284,7 +284,7 @@ export function ProgressDayView({
         </div>
 
         <div
-          className={`mt-5 grid flex-1 grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
+          className={`stagger-in mt-5 grid flex-1 grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
             isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >

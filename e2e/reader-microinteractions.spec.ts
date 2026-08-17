@@ -30,19 +30,23 @@ async function openReturningGuestHome(page: Page, language: "en" | "ar") {
 
 async function expectFillToStartAt(progress: ReturnType<Page["getByRole"]>, direction: ReadingDirection) {
   await expect(progress).toHaveAttribute("dir", direction);
-  const trackBox = await progress.boundingBox();
-  const fillBox = await progress.locator('[data-slot="progress-fill"]').boundingBox();
-  expect(trackBox).not.toBeNull();
-  expect(fillBox).not.toBeNull();
-  if (!trackBox || !fillBox) return;
+  // The fill animates in from zero on first paint, so a single sample can
+  // catch it mid-transition. Poll until it settles rather than racing it.
+  await expect(async () => {
+    const trackBox = await progress.boundingBox();
+    const fillBox = await progress.locator('[data-slot="progress-fill"]').boundingBox();
+    expect(trackBox).not.toBeNull();
+    expect(fillBox).not.toBeNull();
+    if (!trackBox || !fillBox) return;
 
-  expect(fillBox.width).toBeGreaterThan(0);
-  expect(fillBox.width).toBeLessThan(trackBox.width);
-  if (direction === "rtl") {
-    expect(Math.abs(fillBox.x + fillBox.width - (trackBox.x + trackBox.width))).toBeLessThanOrEqual(1);
-  } else {
-    expect(Math.abs(fillBox.x - trackBox.x)).toBeLessThanOrEqual(1);
-  }
+    expect(fillBox.width).toBeGreaterThan(0);
+    expect(fillBox.width).toBeLessThan(trackBox.width);
+    if (direction === "rtl") {
+      expect(Math.abs(fillBox.x + fillBox.width - (trackBox.x + trackBox.width))).toBeLessThanOrEqual(1);
+    } else {
+      expect(Math.abs(fillBox.x - trackBox.x)).toBeLessThanOrEqual(1);
+    }
+  }).toPass();
 }
 
 async function openFirstMorningZikr(page: Page) {
