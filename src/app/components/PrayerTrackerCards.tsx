@@ -9,6 +9,12 @@ import { formatPrayerTimeLabel } from "../content/prayerTimes";
 /**
  * The five after-prayer cards.
  *
+ * These cards sit on a normal card surface, not on the hero photograph, so
+ * they use theme-aware tokens throughout. They previously used the on-media
+ * family, which is white in every theme because its ground is a photograph —
+ * in light mode that rendered white text and borders on a light card, and
+ * left the show-more control effectively invisible.
+ *
  * Two rules drive the whole layout. First, every card is the same height with
  * its icon, name, time, status, divider and both tracking rows at the same
  * vertical offsets — so the row of cards reads as a table, and a prayer
@@ -75,7 +81,7 @@ function TrackingCheckbox({
     <label
       htmlFor={id}
       className={`relative flex h-11 items-center justify-between gap-2 rounded-xl px-2 transition-colors duration-fast ${
-        disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-on-media/8"
+        disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-muted"
       }`}
     >
       {/* The input *is* the row: it fills the full 48px rather than being
@@ -92,14 +98,14 @@ function TrackingCheckbox({
         onChange={(event) => onChange(event.currentTarget.checked)}
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
-      <span className="pointer-events-none min-w-0 truncate text-[0.8125rem] font-bold text-on-media">{label}</span>
+      <span className="pointer-events-none min-w-0 truncate text-[0.8125rem] font-bold text-foreground">{label}</span>
       {/* No focus ring here: the input covers the row and is the element
           that actually receives focus, so the global :focus-visible outline
           already draws one around the whole 48px target. A ring on this
           circle as well produced two indicators for one control. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-on-media/45 text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground"
+        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border-control text-transparent transition-[background-color,border-color,transform] duration-standard ease-standard peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground"
       >
         <Check size={14} strokeWidth={3} />
       </span>
@@ -136,8 +142,8 @@ function PrayerCard({
         isCurrent
           ? "border-primary bg-primary/10 shadow-overlay"
           : state === "past"
-            ? "border-on-media/12 bg-on-media-surface/45"
-            : "border-on-media/18 bg-on-media-surface/70"
+            ? "border-border/60 bg-muted/40"
+            : "border-border bg-card"
       }`}
     >
       {/* Section 1 — identity and timing, and the way into this prayer's
@@ -154,12 +160,12 @@ function PrayerCard({
         <span
           aria-hidden="true"
           className={`flex size-12 items-center justify-center rounded-full ${
-            isCurrent ? "bg-primary/20 text-primary" : "bg-on-media/10 text-on-media"
+            isCurrent ? "bg-primary/20 text-primary" : "bg-muted text-foreground"
           }`}
         >
           <Icon size={24} />
         </span>
-        <h3 className="mt-2 text-[0.9375rem] font-black text-on-media" dir="auto">
+        <h3 className="mt-2 text-[0.9375rem] font-black text-foreground" dir="auto">
           {name}
         </h3>
         {/* The time is the strongest thing in the card: it is what the reader
@@ -168,7 +174,7 @@ function PrayerCard({
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-1 text-[1.5rem] font-black leading-none tracking-tight text-on-media"
+          className="mt-1 text-[1.5rem] font-black leading-none tracking-tight text-foreground"
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -181,9 +187,7 @@ function PrayerCard({
         <span
           data-testid={`prayer-status-${prayer}`}
           className={`inline-flex items-center rounded-full px-3 py-1 text-[0.75rem] font-black ${
-            state === "current" || state === "next"
-              ? "bg-primary text-primary-foreground"
-              : "bg-on-media/10 text-on-media-muted"
+            state === "current" || state === "next" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
           }`}
         >
           {statusLabel(language, state)}
@@ -195,7 +199,7 @@ function PrayerCard({
         )}
       </div>
 
-      <hr className="mt-2 border-t border-on-media/12" />
+      <hr className="mt-2 border-t border-border/60" />
 
       {/* Section 3 — personal tracking. Its own fieldset so a screen reader
           announces which prayer these two controls belong to; the row of five
@@ -283,7 +287,7 @@ export function PrayerTrackerCards({
           onClick={() => setShowUpcoming((current) => !current)}
           aria-expanded={showUpcoming}
           data-testid="prayer-show-upcoming"
-          className="mx-auto flex min-h-11 items-center justify-center rounded-2xl border border-on-media/20 px-4 text-[0.8125rem] font-black text-on-media transition-colors duration-fast hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="mx-auto flex min-h-11 items-center justify-center rounded-2xl border border-border-control px-4 text-[0.8125rem] font-black text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {showUpcoming
             ? t(language, "prayerTracking.hideUpcoming")
