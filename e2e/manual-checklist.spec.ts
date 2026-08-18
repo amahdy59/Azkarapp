@@ -72,9 +72,20 @@ async function expectUnclippedHeading(heading: Locator, context: string) {
       `font-family:${style.fontFamily};font-size:${style.fontSize};font-weight:${style.fontWeight};` +
       `line-height:${style.lineHeight};letter-spacing:${style.letterSpacing};white-space:normal;`;
     probe.dir = document.documentElement.dir;
-    probe.textContent = element.textContent;
     document.body.appendChild(probe);
-    const naturalLines = Math.round(probe.scrollHeight / lineHeight);
+
+    /* `line-height: normal` parses to NaN, which turned the whole ratio into
+       NaN and failed the assertion with no layout problem to show for it. When
+       the computed value is not a number, measure one rendered line instead of
+       trusting the style. */
+    let unit = lineHeight;
+    if (!Number.isFinite(unit) || unit <= 0) {
+      probe.textContent = "A";
+      unit = probe.scrollHeight;
+    }
+
+    probe.textContent = element.textContent;
+    const naturalLines = unit > 0 ? Math.round(probe.scrollHeight / unit) : Number.NaN;
     probe.remove();
 
     return { naturalLines, fontSize: Number.parseFloat(style.fontSize), text: element.textContent ?? "" };
