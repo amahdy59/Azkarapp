@@ -127,6 +127,24 @@ export function MushafImmersiveReader({
         </button>
       </header>
 
+      {/* How far through the surah, at a glance. The page numbers above are the
+          mushaf's own and mean little as a fraction; this answers "how much is
+          left" without the reader doing the arithmetic. */}
+      <div
+        className="h-1 shrink-0 bg-muted"
+        role="progressbar"
+        aria-valuemin={1}
+        aria-valuemax={pageCount}
+        aria-valuenow={index + 1}
+        aria-label={t(language, "reader.immersiveProgress")}
+        data-testid="mushaf-immersive-progress"
+      >
+        <div
+          className="h-full bg-primary transition-[width] duration-standard ease-standard"
+          style={{ width: `${((index + 1) / pageCount) * 100}%` }}
+        />
+      </div>
+
       <div
         ref={trackRef}
         onScroll={onScroll}
@@ -141,7 +159,7 @@ export function MushafImmersiveReader({
             aria-label={t(language, "reader.mushafPage", { page: formatNumerals(page.page, language) })}
             className="flex h-full w-full shrink-0 snap-center flex-col overflow-y-auto px-5 py-6 sm:px-10"
           >
-            <div className="mx-auto flex w-full max-w-2xl flex-col">
+            <div className="mx-auto flex w-full max-w-[52rem] flex-col">
               {pageIndex === 0 && <QuranPrelude zikr={zikr} className="pointer-events-none mb-6" />}
               <QuranWordText
                 text={page.text}

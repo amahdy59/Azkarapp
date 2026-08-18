@@ -26,12 +26,20 @@ async function openHome(page: Page) {
  * makes the test pass or fail on the time of day.
  */
 async function firstTrackedPrayer(page: Page): Promise<string> {
+  /* The first *actionable* card, not simply the first one.
+   *
+   * A prayer that has not arrived renders its controls so the card keeps its
+   * shape, but they are disabled — nothing has happened yet to record. Which
+   * prayers are past, current or still to come depends on the wall clock, and
+   * narrow viewports render only two cards, so picking index 0 made the test
+   * pass or fail on the time of day: run it before Fajr and the only card on
+   * screen is one that cannot be ticked. */
   const prayer = await page
     .getByTestId("prayer-tracker-cards")
-    .locator("article[data-prayer]")
+    .locator('article[data-prayer-state="past"], article[data-prayer-state="current"]')
     .first()
     .getAttribute("data-prayer");
-  expect(prayer).toBeTruthy();
+  expect(prayer, "no prayer has arrived yet, so none can be recorded").toBeTruthy();
   return prayer!;
 }
 

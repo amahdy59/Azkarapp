@@ -903,6 +903,7 @@ const ar = {
     immersiveOpen: "وضع المصحف",
     immersiveTitle: "وضع المصحف",
     immersiveClose: "إغلاق وضع المصحف",
+    immersiveProgress: "التقدم في السورة",
     immersiveNext: "الصفحة التالية",
     immersivePrevious: "الصفحة السابقة",
     wordMeaningAll: "جميع المعاني",

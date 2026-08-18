@@ -104,7 +104,11 @@ const SHARE_STATUS_KEYS: Record<ZikrShareCardStatus, string> = {
  */
 function getReaderZikrTitle(zikr: Zikr, language: AppLanguage): string | null {
   const surahName = language === "ar" ? zikr.surahNameArabic : zikr.surahNameEnglish;
-  return surahName?.trim() ? surahName.trim() : null;
+  if (!surahName?.trim()) return null;
+  /* A surah is named "سورة الكهف", not "الكهف". The bare name reads as a noun
+     dropped into the layout; the prefix is part of how the passage is referred
+     to, and the reference chip elsewhere already writes it that way. */
+  return language === "ar" ? `سورة ${surahName.trim()}` : `Surah ${surahName.trim()}`;
 }
 
 function vibrate(pattern: number | number[]) {

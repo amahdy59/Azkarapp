@@ -893,6 +893,7 @@ const en = {
     immersiveOpen: "Mushaf mode",
     immersiveTitle: "Mushaf mode",
     immersiveClose: "Exit Mushaf mode",
+    immersiveProgress: "Progress through the surah",
     immersiveNext: "Next page",
     immersivePrevious: "Previous page",
     wordMeaningAll: "All meanings",

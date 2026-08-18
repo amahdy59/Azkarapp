@@ -834,6 +834,13 @@ export const FRIDAY_KAHF: ZikrDraft[] = [
     benefitArabic: "تُقرأ سورة الكهف يوم الجمعة.",
     repetitionCount: 1,
     countLabel: "1",
+    /* The benefit stated the practice but cited nothing for it, so the reference
+       sheet showed a claim and a Qur'an citation with no narration between them.
+       This is the Muslim-graded wording; the widely quoted "light between the two
+       Fridays" narration is graded by later scholars rather than by Muslim, so the
+       stronger chain is the one shown. */
+    hadithText: "«مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ»",
+    authenticityNote: "صحيح مسلم ٨٠٩.",
     sourceReference: "Qur'an 18:1-110.",
     sourceReferenceArabic: "القرآن الكريم، سورة الكهف (١٨:١-١١٠).",
     preferredTiming: "Friday.",

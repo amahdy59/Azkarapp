@@ -236,6 +236,17 @@ function ReferenceContent({
               >
                 {zikr.hadithText}
               </p>
+              {/* A narration without its collection is an assertion, not
+                  evidence. This sat in the data and was never rendered, so the
+                  sheet showed a hadith the reader had no way to verify. */}
+              {zikr.authenticityNote && (
+                <bdi
+                  data-testid="reference-hadith-attribution"
+                  className="mt-2 block text-[0.75rem] font-bold text-muted-foreground"
+                >
+                  {zikr.authenticityNote}
+                </bdi>
+              )}
             </section>
           )}
 
