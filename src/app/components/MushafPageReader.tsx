@@ -1,5 +1,5 @@
 import { Fragment, type CSSProperties } from "react";
-import type { QuranWordMeaning } from "../content/quranWordMeanings";
+import type { QuranWordMeaning, WordMeaningSelection } from "../content/quranWordMeanings";
 import { splitMushafPages } from "../content/mushafPages";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -21,7 +21,7 @@ export function MushafPageReader({
   meanings: readonly QuranWordMeaning[];
   language: AppLanguage;
   textStyle: CSSProperties;
-  onSelectMeanings: (meanings: QuranWordMeaning[]) => void;
+  onSelectMeanings: (selection: WordMeaningSelection) => void;
   /**
    * When the reader already wraps the whole reading column in its own card
    * (the wide-desktop reader), each page's own border/shadow/radius nests a

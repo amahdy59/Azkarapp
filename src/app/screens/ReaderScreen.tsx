@@ -41,7 +41,7 @@ import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
 import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
-import { getQuranWordMeanings, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import {
   DropdownMenu,
@@ -184,7 +184,7 @@ export function ReaderScreen({
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
-  const [selectedWordMeanings, setSelectedWordMeanings] = useState<QuranWordMeaning[] | null>(null);
+  const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
@@ -249,7 +249,7 @@ export function ReaderScreen({
   }, []);
 
   useEffect(() => {
-    setSelectedWordMeanings(null);
+    setWordMeaningSelection(null);
   }, [z?.id]);
 
   useLayoutEffect(() => {
@@ -286,9 +286,9 @@ export function ReaderScreen({
       // opens menus, and activates the focused action as expected.
       if (focusedControl) return;
 
-      if (benefitOpen || selectedWordMeanings) {
+      if (benefitOpen || wordMeaningSelection) {
         if (e.key === "Escape") {
-          if (selectedWordMeanings) setSelectedWordMeanings(null);
+          if (wordMeaningSelection) setWordMeaningSelection(null);
           else if (benefitOpen) setBenefitOpen(false);
         }
         return;
@@ -341,7 +341,7 @@ export function ReaderScreen({
     handleResetCounter,
     handleToggleSaved,
     benefitOpen,
-    selectedWordMeanings,
+    wordMeaningSelection,
     longSurah,
   ]);
 
@@ -432,7 +432,7 @@ export function ReaderScreen({
           meanings={wordMeanings}
           language={language}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setSelectedWordMeanings}
+          onSelectMeanings={setWordMeaningSelection}
           flat={true}
         />
       ) : wordMeanings.length > 0 ? (
@@ -441,7 +441,7 @@ export function ReaderScreen({
           meanings={wordMeanings}
           language={language}
           style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setSelectedWordMeanings}
+          onSelectMeanings={setWordMeaningSelection}
         />
       ) : (
         <p
@@ -1029,10 +1029,11 @@ export function ReaderScreen({
         />
       )}
       <QuranWordMeaningSheet
-        meanings={selectedWordMeanings}
+        selection={wordMeaningSelection}
         language={language}
         direction={direction}
-        onClose={() => setSelectedWordMeanings(null)}
+        onNavigate={(index) => setWordMeaningSelection((current) => (current ? { ...current, index } : current))}
+        onClose={() => setWordMeaningSelection(null)}
       />
 
       {immersiveOpen && longSurah && (
@@ -1045,7 +1046,7 @@ export function ReaderScreen({
           title={readerZikrTitle ?? displayCategoryName}
           reducedMotion={reducedMotion}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setSelectedWordMeanings}
+          onSelectMeanings={setWordMeaningSelection}
           onClose={() => setImmersiveOpen(false)}
         />
       )}

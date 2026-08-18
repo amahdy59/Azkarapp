@@ -193,3 +193,19 @@ export function buildQuranTextSegments(text: string, meanings: readonly QuranWor
   if (cursor < text.length) segments.push({ text: text.slice(cursor) });
   return segments;
 }
+
+/**
+ * An open word-meaning lookup, plus the passage it came from.
+ *
+ * Carrying every annotated group — not just the tapped one — is what lets the
+ * sheet step from word to word. Looking one word up almost always means
+ * looking the next one up too, and the sheet previously had no way to know
+ * what "next" was, so each word cost a dismiss and another precise tap on a
+ * small target inside running Arabic text.
+ */
+export interface WordMeaningSelection {
+  /** Every annotated word in the passage, in reading order. */
+  groups: QuranWordMeaning[][];
+  /** Which group is showing. */
+  index: number;
+}

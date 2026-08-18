@@ -1,5 +1,5 @@
 import { useMemo, type CSSProperties } from "react";
-import { buildQuranTextSegments, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { buildQuranTextSegments, type QuranWordMeaning, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -15,9 +15,14 @@ export function QuranWordText({
   meanings: readonly QuranWordMeaning[];
   language: AppLanguage;
   style: CSSProperties;
-  onSelectMeanings: (meanings: QuranWordMeaning[]) => void;
+  onSelectMeanings: (selection: WordMeaningSelection) => void;
 }) {
   const segments = useMemo(() => buildQuranTextSegments(text, meanings), [meanings, text]);
+
+  /* Reading order, so "next word" in the sheet matches the next highlight the
+     eye reaches on the page. */
+  const groups = useMemo(() => segments.flatMap((segment) => (segment.meanings ? [segment.meanings] : [])), [segments]);
+  let groupIndex = -1;
 
   return (
     <p
@@ -28,8 +33,11 @@ export function QuranWordText({
       translate="no"
       style={style}
     >
-      {segments.map((segment, index) =>
-        segment.meanings ? (
+      {segments.map((segment, index) => {
+        if (!segment.meanings) return <span key={`text-${index}`}>{segment.text}</span>;
+        groupIndex += 1;
+        const currentGroupIndex = groupIndex;
+        return (
           <button
             key={segment.meanings.map((meaning) => meaning.id).join("-")}
             type="button"
@@ -37,7 +45,7 @@ export function QuranWordText({
             data-prevent-count="true"
             onClick={(event) => {
               event.stopPropagation();
-              onSelectMeanings(segment.meanings!);
+              onSelectMeanings({ groups, index: currentGroupIndex });
             }}
             aria-label={t(language, "reader.wordMeaningAria", {
               word: segment.text,
@@ -53,10 +61,8 @@ export function QuranWordText({
           >
             {segment.text}
           </button>
-        ) : (
-          <span key={`text-${index}`}>{segment.text}</span>
-        ),
-      )}
+        );
+      })}
     </p>
   );
 }

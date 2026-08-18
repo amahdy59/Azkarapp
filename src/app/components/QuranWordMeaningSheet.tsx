@@ -1,6 +1,10 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { ExternalLink, Info, BookOpen, X } from "./icons";
-import { QURAN_WORD_MEANING_SOURCE, type QuranWordMeaning } from "../content/quranWordMeanings";
+import { ArrowLeft, ArrowRight, ExternalLink, Info, BookOpen, X } from "./icons";
+import {
+  QURAN_WORD_MEANING_SOURCE,
+  type QuranWordMeaning,
+  type WordMeaningSelection,
+} from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -11,14 +15,19 @@ import { useLayoutMode } from "../hooks/useLayoutMode";
 
 function WordMeaningContent({
   meanings,
+  position,
   language,
   direction,
+  onNavigate,
   onClose,
   variant,
 }: {
   meanings: QuranWordMeaning[];
+  /** Where this word sits among the passage's annotated words, 1-based. */
+  position: { index: number; total: number };
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  onNavigate?: (index: number) => void;
   onClose: () => void;
   variant: "sheet" | "dialog";
 }) {
@@ -125,31 +134,97 @@ function WordMeaningContent({
           </a>
         </div>
       </div>
+
+      {/* Stepping through the passage's words in place. Looking one word up
+          almost always means looking the next one up too, and without this the
+          reader had to dismiss the sheet and hit another small target inside
+          running Arabic text for every single word. */}
+      {onNavigate && position.total > 1 && (
+        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-border/40 px-6 py-3">
+          <StepButton
+            onClick={() => onNavigate(position.index - 2)}
+            disabled={position.index <= 1}
+            label={t(language, "reader.immersivePrevious")}
+            direction={direction}
+            testId="word-meaning-previous"
+            back
+          />
+          <bdi data-testid="word-meaning-position" className="text-[0.75rem] font-bold text-muted-foreground">
+            {formatNumerals(position.index, language)} / {formatNumerals(position.total, language)}
+          </bdi>
+          <StepButton
+            onClick={() => onNavigate(position.index)}
+            disabled={position.index >= position.total}
+            label={t(language, "reader.immersiveNext")}
+            direction={direction}
+            testId="word-meaning-next"
+          />
+        </div>
+      )}
     </div>
+  );
+}
+
+function StepButton({
+  onClick,
+  disabled,
+  label,
+  direction,
+  testId,
+  back = false,
+}: {
+  onClick: () => void;
+  disabled: boolean;
+  label: string;
+  direction: "ltr" | "rtl";
+  testId: string;
+  back?: boolean;
+}) {
+  // The arrow points the way the reader physically moves through the passage.
+  const Icon = back === (direction === "ltr") ? ArrowLeft : ArrowRight;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      data-testid={testId}
+      aria-label={label}
+      className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-[0.8125rem] font-bold text-foreground transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+    >
+      <Icon size={16} aria-hidden="true" />
+      <span className="hidden sm:inline">{label}</span>
+    </button>
   );
 }
 
 // ─── Public component ─────────────────────────────────────────────────────────
 
 export function QuranWordMeaningSheet({
-  meanings,
+  selection,
   language,
   direction,
+  onNavigate,
   onClose,
 }: {
-  meanings: QuranWordMeaning[] | null;
+  selection: WordMeaningSelection | null;
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  onNavigate?: (index: number) => void;
   onClose: () => void;
 }) {
   const layoutMode = useLayoutMode();
-  const isOpen = Boolean(meanings?.length);
 
-  if (!isOpen || !meanings) return null;
+  /* Clamped rather than trusted: the passage changes when the reader moves to
+     another zikr, and a stale index would otherwise index past the new list. */
+  const total = selection?.groups.length ?? 0;
+  const index = selection ? Math.min(Math.max(selection.index, 0), Math.max(total - 1, 0)) : 0;
+  const meanings = selection?.groups[index];
+
+  if (!selection || !meanings?.length) return null;
 
   return (
     <ResponsiveSheet
-      open={isOpen}
+      open
       onClose={onClose}
       title={t(language, "reader.wordMeaningTitle")}
       direction={direction}
@@ -158,8 +233,10 @@ export function QuranWordMeaningSheet({
     >
       <WordMeaningContent
         meanings={meanings}
+        position={{ index: index + 1, total }}
         language={language}
         direction={direction}
+        onNavigate={onNavigate}
         onClose={onClose}
         variant={layoutMode === "compact" ? "sheet" : "dialog"}
       />

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowLeft, ArrowRight, X } from "./icons";
 import { splitMushafPages } from "../content/mushafPages";
-import type { QuranWordMeaning } from "../content/quranWordMeanings";
+import type { QuranWordMeaning, WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
@@ -38,7 +38,7 @@ export function MushafImmersiveReader({
   /** Honours the in-app Reduce motion setting: pages jump instead of gliding. */
   reducedMotion?: boolean;
   textStyle: CSSProperties;
-  onSelectMeanings: (meanings: QuranWordMeaning[]) => void;
+  onSelectMeanings: (selection: WordMeaningSelection) => void;
   onClose: () => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
