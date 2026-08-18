@@ -154,11 +154,32 @@ parallelism to 3 during the heavy pre-push gate. The pnpm workaround stopped bei
 necessary once `node_modules` was reinstalled under the pinned pnpm 11. With it removed,
 the full suite runs 420/420 on two workers.
 
-**Latent risk, not fixed:** the suite has 68 geometry measurements and only 2 are guarded
-by `expect.toPass()`. The other 66 are the same shape as F37 and could fail the same way
-under load. They are not rewritten here because none of them has been observed failing, and
-speculatively rewriting working tests carries its own risk. Worth a dedicated pass if the
-flakiness recurs.
+**Latent risk, partially realized (August 2026).** The suite has 68 geometry measurements
+and only 2 are guarded by `expect.toPass()`. The other 66 are the same shape as F37.
+
+The recurrence condition has now been met, though the observed failures are timeouts rather
+than geometry drift. Three distinct full-suite runs failed on reader tests that pass in
+isolation:
+
+- `reader-microinteractions` "reference dialog … closes on Escape" failed on CI while the
+  identical commit passed the local pre-push gate.
+- A later docs-only commit — no code change whatsoever — failed four `tablet-chromium`
+  reader tests locally with 60s `locator.click` timeouts. Re-running the same commit
+  unchanged passed the whole gate.
+- `manual-checklist` "EN longest collection name is never clipped at 320px" failed on CI
+  with `NaN`, which was a genuine defect in the probe (it divided by
+  `parseFloat(getComputedStyle().lineHeight)`, which is `NaN` for `line-height: normal`)
+  and is fixed.
+
+Running `reader-microinteractions.spec.ts` alone passes all 20 tests; the file only fails
+inside the full 470-test, multi-project run. That points at contention rather than at any
+one assertion, so the dedicated pass should start by reducing reader-test setup cost — the
+Al-Kahf fixture mounts 258 interactive word buttons — before rewriting assertions one by
+one.
+
+Until that pass happens: an isolated reader-test failure in a full-gate run is not by
+itself evidence of a regression. Confirm by re-running the same commit unchanged, and by
+running the spec file alone, before changing product code.
 
 ### F01 — Tailwind never compiles utilities used only in `components/ui/` · Critical
 
