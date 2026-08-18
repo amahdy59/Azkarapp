@@ -46,21 +46,31 @@ test.describe("after-prayer tracking", () => {
     );
     expect(primary).not.toBe("");
 
-    const before = await circle.evaluate((el) => getComputedStyle(el).backgroundColor);
+    /* Alpha, not the colour string. Chromium serialises the same transparent
+       value as `rgba(0, 0, 0, 0)` or `oklab(0 0 0 / 0)` depending on whether a
+       transition is in flight, so comparing strings let a pure formatting
+       change read as a fill and the assertion passed on CI while the circle
+       was still empty. */
+    const isOpaque = () =>
+      circle.evaluate((el) => {
+        const value = getComputedStyle(el).backgroundColor;
+        return !/\/\s*0\s*\)/.test(value) && !/rgba\([^)]*,\s*0\s*\)/.test(value) && value !== "transparent";
+      });
+
+    expect(await isOpaque()).toBe(false);
 
     await page.locator(`#prayer-${prayer}-mosque`).check();
 
+    await expect(circle).toHaveAttribute("data-checked", "true");
     // The state was previously announced but invisible: the circle kept a
     // transparent fill, so "completed" and "not completed" looked identical.
-    await expect.poll(async () => circle.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toBe(before);
-    await expect(circle).toHaveAttribute("data-checked", "true");
+    await expect.poll(isOpaque, { timeout: 10_000 }).toBe(true);
 
     const filled = await circle.evaluate((el) => ({
       bg: getComputedStyle(el).backgroundColor,
       border: getComputedStyle(el).borderTopColor,
     }));
     expect(filled.bg).toBe(filled.border);
-    expect(filled.bg).not.toBe("rgba(0, 0, 0, 0)");
   });
 
   test("shows the prayer's virtue after recording it at the mosque, and not on undo", async ({ page }) => {
