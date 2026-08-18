@@ -11,7 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
-import { ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import { useWakeLock } from "../hooks/useWakeLock";
@@ -234,24 +234,15 @@ export function FridaySalawatScreen({
             </div>
           </div>
 
-          <div
-            dir="ltr"
-            className="mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-5 py-2 text-[0.75rem] font-medium text-muted-foreground md:flex"
-          >
-            <span className="flex items-center gap-1.5" dir={direction}>
-              <kbd className="rounded bg-card border border-border px-1.5 py-0.5 font-mono text-[0.6875rem] shadow-2xs font-bold text-foreground">
-                Space
-              </kbd>
-              <span>{t(language, "counter.count")}</span>
-            </span>
-            <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-            <span className="flex items-center gap-1.5" dir={direction}>
-              <kbd className="rounded bg-card border border-border px-1.5 py-0.5 font-mono text-[0.6875rem] shadow-2xs font-bold text-foreground">
-                R
-              </kbd>
-              <span>{t(language, "counter.reset")}</span>
-            </span>
-          </div>
+          <CounterShortcutHints
+            language={language}
+            direction={direction}
+            ariaLabel={t(language, "reader.keyboardShortcuts")}
+            shortcuts={[
+              { keys: ["Space"], label: t(language, "counter.count") },
+              { keys: ["R"], label: t(language, "counter.reset") },
+            ]}
+          />
         </footer>
       </div>
 

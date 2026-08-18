@@ -29,7 +29,7 @@ import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
-import { tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterShortcutHints, tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
@@ -558,52 +558,22 @@ export function ReaderScreen({
   );
 
   const renderKeyboardShortcutsHint = () => (
-    <div
-      role="group"
-      className="mx-auto mt-5 hidden w-fit max-w-full items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex"
-      data-testid="reader-keyboard-shortcuts"
-      aria-label={t(language, "reader.keyboardShortcuts")}
-    >
-      {/* Space only counts once the counter itself is focused in
-          long-Surah mode (the reader canvas deliberately never counts a
-          full Surah — see the counter-only contract in
-          docs/DESIGN_SYSTEM.md), so the discoverable global shortcut
-          doesn't apply here and the hint would be misleading. */}
-      {!longSurah && (
-        <>
-          <span className="flex items-center gap-1">
-            <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-              Space
-            </kbd>
-            <span>{t(language, "reader.shortcutCount")}</span>
-          </span>
-          <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-        </>
-      )}
-      <span className="flex items-center gap-1">
-        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-          →
-        </kbd>
-        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-          ←
-        </kbd>
-        <span>{t(language, "reader.shortcutNavigate")}</span>
-      </span>
-      <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-      <span className="flex items-center gap-1">
-        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-          R
-        </kbd>
-        <span>{t(language, "reader.shortcutReset")}</span>
-      </span>
-      <span className="h-3 w-px bg-border/60" aria-hidden="true" />
-      <span className="flex items-center gap-1">
-        <kbd className="px-1.5 py-0.5 rounded bg-card border border-border text-[0.6875rem] font-mono shadow-2xs text-foreground font-bold">
-          Esc
-        </kbd>
-        <span>{t(language, "reader.shortcutBack")}</span>
-      </span>
-    </div>
+    <CounterShortcutHints
+      language={language}
+      direction={direction}
+      testId="reader-keyboard-shortcuts"
+      ariaLabel={t(language, "reader.keyboardShortcuts")}
+      shortcuts={[
+        /* Space only counts once the counter itself is focused in long-Surah
+           mode (the reader canvas deliberately never counts a full Surah — see
+           the counter-only contract in docs/DESIGN_SYSTEM.md), so the global
+           shortcut does not apply and the hint would be misleading. */
+        ...(longSurah ? [] : [{ keys: ["Space"], label: t(language, "reader.shortcutCount") }]),
+        { keys: ["→", "←"], label: t(language, "reader.shortcutNavigate") },
+        { keys: ["R"], label: t(language, "reader.shortcutReset") },
+        { keys: ["Esc"], label: t(language, "reader.shortcutBack") },
+      ]}
+    />
   );
 
   const renderCounterStack = () => (

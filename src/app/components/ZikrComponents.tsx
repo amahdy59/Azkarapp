@@ -275,3 +275,66 @@ export function WaveformBars({ active }: { active: boolean }) {
     </div>
   );
 }
+
+/** One hint: the keycaps to press, and what pressing them does. */
+export interface CounterShortcut {
+  /** Rendered side by side, so an either-key hint is one entry: ["→", "←"]. */
+  keys: readonly string[];
+  label: string;
+}
+
+/**
+ * The keyboard-shortcut pill shown under a counter on pointer-capable screens.
+ *
+ * The Reader, the Masbaha, and the Salawat counter each carried their own copy
+ * of this markup, and the copies had drifted: two paddings, two inner gaps, and
+ * only the Reader's version announced itself as a group. Any keycap restyle had
+ * to be made in three places and, in practice, was not.
+ *
+ * The row is forced LTR so entries always read keycap-then-label in the same
+ * order, while each label keeps the app's own direction — otherwise an Arabic
+ * label drags its keycap to the far side of the entry.
+ */
+export function CounterShortcutHints({
+  shortcuts,
+  ariaLabel,
+  language,
+  direction,
+  testId,
+}: {
+  shortcuts: readonly CounterShortcut[];
+  ariaLabel: string;
+  language: AppLanguage;
+  direction: "ltr" | "rtl";
+  testId?: string;
+}) {
+  if (shortcuts.length === 0) return null;
+
+  return (
+    <div
+      role="group"
+      aria-label={ariaLabel}
+      data-testid={testId}
+      dir="ltr"
+      lang={language}
+      className="mx-auto mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex"
+    >
+      {shortcuts.map((shortcut, index) => (
+        <React.Fragment key={shortcut.label}>
+          {index > 0 && <span className="h-3 w-px bg-border/60" aria-hidden="true" />}
+          <span className="flex items-center gap-1" dir={direction}>
+            {shortcut.keys.map((key) => (
+              <kbd
+                key={key}
+                className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground shadow-2xs"
+              >
+                {key}
+              </kbd>
+            ))}
+            <span>{shortcut.label}</span>
+          </span>
+        </React.Fragment>
+      ))}
+    </div>
+  );
+}
