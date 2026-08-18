@@ -81,6 +81,43 @@ test.describe("after-prayer tracking", () => {
     await expect(modal).toBeHidden();
   });
 
+  test("scrolls rather than squeezing the cards where five columns do not fit", async ({ page }) => {
+    await openHome(page);
+    const grid = page.getByTestId("prayer-tracker-cards");
+    const cards = grid.locator("article[data-prayer]");
+
+    // The tightest tier: five columns just turned on, with the least room.
+    await page.setViewportSize({ width: 1024, height: 800 });
+    await expect(cards).toHaveCount(5);
+
+    const tight = await grid.evaluate((el) => ({
+      cardWidth: el.querySelector("article")!.getBoundingClientRect().width,
+      scrollable: el.scrollWidth > el.clientWidth,
+    }));
+    /* Equal columns squeezed each card to 151px here, which left the tracking
+       labels exactly as much room as they needed and nothing to spare. */
+    expect(tight.cardWidth).toBeGreaterThanOrEqual(175);
+    expect(tight.scrollable).toBe(true);
+
+    // Nothing may leave its own card at any width.
+    const escaped = await grid.evaluate((el) => {
+      let count = 0;
+      for (const card of el.querySelectorAll("article")) {
+        const box = card.getBoundingClientRect();
+        for (const child of card.querySelectorAll("*")) {
+          const r = child.getBoundingClientRect();
+          if (r.width && (r.left < box.left - 2 || r.right > box.right + 2)) count += 1;
+        }
+      }
+      return count;
+    });
+    expect(escaped).toBe(0);
+
+    // Wide viewports still fit all five without a scrollbar.
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await expect.poll(async () => grid.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(false);
+  });
+
   test("shows every prayer on desktop and two with a reveal below it on mobile", async ({ page }) => {
     await openHome(page);
     const cards = page.getByTestId("prayer-tracker-cards").locator("article");

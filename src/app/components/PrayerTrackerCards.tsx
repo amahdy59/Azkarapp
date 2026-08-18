@@ -326,7 +326,14 @@ export function PrayerTrackerCards({
         // A snap carousel on phones, an even grid from the small tier up. The
         // grid uses as many columns as there are cards so hiding the upcoming
         // ones does not leave a gap where they were.
-        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:px-8`}
+        //
+        // Columns hold an 11rem floor rather than shrinking to fit. Five equal
+        // columns at the lg breakpoint squeezed each card to 151px, which left
+        // the tracking labels with exactly as much room as they needed and
+        // nothing to spare — one longer word, or the largest text size, and
+        // they clip. Below the floor the row scrolls instead of compressing,
+        // which is the same gesture the phone carousel already uses.
+        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8`}
         style={{ ["--prayer-columns" as string]: String(visible.length) }}
       >
         {visible.map((model) => {
