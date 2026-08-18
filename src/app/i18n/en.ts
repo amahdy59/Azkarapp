@@ -894,6 +894,8 @@ const en = {
     immersiveClose: "Exit Mushaf mode",
     immersiveNext: "Next page",
     immersivePrevious: "Previous page",
+    wordMeaningAll: "All meanings",
+    wordMeaningMore: "{count} more",
     jumpToCounter: "Go to counter",
     wordMeaningAria: "Meaning of {word}, ayah {ayah}",
     wordMeaningTitle: "Word meaning",

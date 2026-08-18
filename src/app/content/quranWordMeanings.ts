@@ -208,4 +208,6 @@ export interface WordMeaningSelection {
   groups: QuranWordMeaning[][];
   /** Which group is showing. */
   index: number;
+  /** The word element the gloss is anchored under, when opened by tapping. */
+  anchor?: HTMLElement | null;
 }

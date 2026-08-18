@@ -41,6 +41,7 @@ import { QuranWordText } from "../components/QuranWordText";
 import { MushafPageReader } from "../components/MushafPageReader";
 import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
+import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import {
@@ -185,6 +186,12 @@ export function ReaderScreen({
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
+  /* The popover answers the tap; the sheet is the deliberate "all meanings"
+     step, so the same selection drives both and only this flag differs. */
+  const [wordSheetOpen, setWordSheetOpen] = useState(false);
+  const activeWordId = wordSheetOpen
+    ? null
+    : (wordMeaningSelection?.groups[wordMeaningSelection.index]?.[0]?.id ?? null);
   const closeReference = useCallback(() => setBenefitOpen(false), []);
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
@@ -288,8 +295,10 @@ export function ReaderScreen({
 
       if (benefitOpen || wordMeaningSelection) {
         if (e.key === "Escape") {
-          if (wordMeaningSelection) setWordMeaningSelection(null);
-          else if (benefitOpen) setBenefitOpen(false);
+          if (wordMeaningSelection) {
+            setWordSheetOpen(false);
+            setWordMeaningSelection(null);
+          } else if (benefitOpen) setBenefitOpen(false);
         }
         return;
       }
@@ -433,6 +442,7 @@ export function ReaderScreen({
           language={language}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
           onSelectMeanings={setWordMeaningSelection}
+          activeWordId={activeWordId}
           flat={true}
         />
       ) : wordMeanings.length > 0 ? (
@@ -442,6 +452,7 @@ export function ReaderScreen({
           language={language}
           style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
           onSelectMeanings={setWordMeaningSelection}
+          activeWordId={activeWordId}
         />
       ) : (
         <p
@@ -1028,14 +1039,25 @@ export function ReaderScreen({
           onAnnouncement={setShareMessage}
         />
       )}
-      <QuranWordMeaningSheet
-        selection={wordMeaningSelection}
+      <QuranWordPopover
+        meanings={wordSheetOpen ? null : (wordMeaningSelection?.groups[wordMeaningSelection.index] ?? null)}
+        anchorEl={wordMeaningSelection?.anchor ?? null}
         language={language}
         direction={direction}
-        onNavigate={(index) => setWordMeaningSelection((current) => (current ? { ...current, index } : current))}
+        onShowAll={() => setWordSheetOpen(true)}
         onClose={() => setWordMeaningSelection(null)}
       />
 
+      <QuranWordMeaningSheet
+        selection={wordSheetOpen ? wordMeaningSelection : null}
+        language={language}
+        direction={direction}
+        onNavigate={(index) => setWordMeaningSelection((current) => (current ? { ...current, index } : current))}
+        onClose={() => {
+          setWordSheetOpen(false);
+          setWordMeaningSelection(null);
+        }}
+      />
       {immersiveOpen && longSurah && (
         <MushafImmersiveReader
           zikr={z}
@@ -1047,6 +1069,7 @@ export function ReaderScreen({
           reducedMotion={reducedMotion}
           textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
           onSelectMeanings={setWordMeaningSelection}
+          activeWordId={activeWordId}
           onClose={() => setImmersiveOpen(false)}
         />
       )}

@@ -10,12 +10,15 @@ export function QuranWordText({
   language,
   style,
   onSelectMeanings,
+  activeWordId,
 }: {
   text: string;
   meanings: readonly QuranWordMeaning[];
   language: AppLanguage;
   style: CSSProperties;
   onSelectMeanings: (selection: WordMeaningSelection) => void;
+  /** The word the popover is currently anchored to, so it can mark itself. */
+  activeWordId?: string | null;
 }) {
   const segments = useMemo(() => buildQuranTextSegments(text, meanings), [meanings, text]);
 
@@ -43,10 +46,12 @@ export function QuranWordText({
             type="button"
             data-testid="quran-word-help"
             data-prevent-count="true"
+            onPointerDown={(event) => event.stopPropagation()}
             onClick={(event) => {
               event.stopPropagation();
-              onSelectMeanings({ groups, index: currentGroupIndex });
+              onSelectMeanings({ groups, index: currentGroupIndex, anchor: event.currentTarget });
             }}
+            data-word-active={segment.meanings[0]!.id === activeWordId ? "true" : undefined}
             aria-label={t(language, "reader.wordMeaningAria", {
               word: segment.text,
               ayah: formatNumerals(segment.meanings[0]!.ayahNumber, language),

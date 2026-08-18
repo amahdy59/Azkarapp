@@ -382,6 +382,11 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   expect(await difficultWords.count()).toBeGreaterThan(0);
   await difficultWords.first().click();
 
+  // A tap answers in place, anchored under the word; the full sheet is the
+  // deliberate next step behind "All meanings".
+  await expect(page.getByTestId("quran-word-popover")).toBeVisible();
+  await page.getByTestId("quran-word-popover-all").click();
+
   const meaningSheet = page.getByTestId("quran-word-meaning-sheet");
   await expect(meaningSheet).toBeVisible();
   const closeMeaning = meaningSheet.getByRole("button", { name: "Close word meaning", exact: true });

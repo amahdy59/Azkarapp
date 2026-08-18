@@ -1,0 +1,154 @@
+/* wordPopover.css — the anchored Qur'an word gloss.
+
+   Positioning uses the CSS anchor API where available (Baseline 2026, ~91%)
+   and falls back to measured `top`/`left` written by the component. No
+   positioning library: the whole behaviour is three properties plus one
+   fallback rule, and the bundle budget is enforced. */
+
+/* The tapped word lends its box to the popover. Only ever one at a time. */
+[data-word-active="true"] {
+  anchor-name: --quran-active-word;
+}
+
+.quran-word-popover {
+  position: fixed;
+  z-index: 60;
+  max-width: min(22rem, calc(100vw - 2rem));
+  /* Keeps the box off the screen edge when it is clamped. Without it the
+     browser parks it flush against the edge on a phone, which reads as
+     clipped rather than placed. */
+  margin-inline: 0.75rem;
+  border-radius: var(--ds-radius-card, 1rem);
+  border: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  /* Reads as a layer above the page rather than another card in it: the tint
+     leans on the highlight colour the word already uses, so the eye connects
+     the two without a connecting line. */
+  background: color-mix(in srgb, var(--primary) 10%, var(--popover, var(--card)));
+  color: var(--popover-foreground, var(--card-foreground));
+  box-shadow:
+    0 1px 2px rgb(0 0 0 / 0.28),
+    0 12px 28px -10px rgb(0 0 0 / 0.45);
+  padding: 0.75rem 0.875rem 0.625rem;
+  /* Cheap to composite and cheap to repaint: no blur, no filter. */
+  will-change: transform, opacity;
+}
+
+@supports (anchor-name: --a) {
+  .quran-word-popover {
+    position-anchor: --quran-active-word;
+    position-area: block-end;
+    justify-self: anchor-center;
+    margin-block-start: 0.5rem;
+    /* Flips above the word near the bottom edge instead of being clipped. */
+    position-try-fallbacks: flip-block;
+    position-visibility: anchors-visible;
+  }
+}
+
+/* Caret. Centred under anchor positioning (the popover is anchor-centred);
+   the fallback path hands us the word's centre as --caret-x so the caret
+   still points at the word after the box is clamped to the viewport. */
+.quran-word-popover::before {
+  content: "";
+  position: absolute;
+  inset-block-start: -0.3125rem;
+  /* Clamped so it stays on the box even when the box is pushed away
+     from the word by the viewport edge. */
+  left: clamp(0.875rem, var(--caret-x, 50%), calc(100% - 0.875rem));
+  translate: -50% 0;
+  width: 0.625rem;
+  height: 0.625rem;
+  rotate: 45deg;
+  border-inline-start: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-block-start: 1px solid color-mix(in srgb, var(--primary) 28%, transparent);
+  border-start-start-radius: 2px;
+  background: inherit;
+}
+
+/* Flipped above: the caret moves to the bottom edge and turns to match. */
+.quran-word-popover[data-above="true"]::before {
+  inset-block-start: auto;
+  inset-block-end: -0.3125rem;
+  rotate: 225deg;
+}
+
+.quran-word-popover__gloss {
+  margin: 0;
+  font-size: 0.9375rem;
+  line-height: 1.75;
+  font-weight: 500;
+  text-align: start;
+}
+
+.quran-word-popover__word {
+  font-weight: 800;
+  color: var(--primary);
+}
+
+.quran-word-popover__sep {
+  color: var(--muted-foreground);
+  margin-inline: 0.25rem;
+}
+
+.quran-word-popover__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-block-start: 0.5rem;
+  padding-block-start: 0.5rem;
+  border-block-start: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.quran-word-popover__ayah {
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--muted-foreground);
+}
+
+.quran-word-popover__footer button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  /* 44px target without 44px of visible chrome: the padding does the work. */
+  min-height: 2.75rem;
+  margin-block: -0.625rem;
+  padding-inline: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--primary);
+  border-radius: 999px;
+  transition: background-color var(--motion-duration-press) var(--motion-ease-standard);
+}
+
+.quran-word-popover__footer button:hover {
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.quran-word-popover__footer button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--ring);
+}
+
+/* Entrance. Scales from the word rather than from its own middle, so it reads
+   as growing out of the tap: 150ms sits in the 125-200ms band for tooltips,
+   and 0.96 keeps it a settle rather than a zoom. */
+@keyframes quran-word-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.25rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.quran-word-popover {
+  transform-origin: var(--caret-x, 50%) 0;
+  animation: quran-word-popover-in var(--motion-duration-fast) var(--motion-ease-enter) both;
+}
+
+.quran-word-popover[data-above="true"] {
+  transform-origin: var(--caret-x, 50%) 100%;
+}

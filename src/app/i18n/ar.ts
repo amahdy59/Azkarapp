@@ -904,6 +904,8 @@ const ar = {
     immersiveClose: "إغلاق وضع المصحف",
     immersiveNext: "الصفحة التالية",
     immersivePrevious: "الصفحة السابقة",
+    wordMeaningAll: "جميع المعاني",
+    wordMeaningMore: "{count} معانٍ أخرى",
     jumpToCounter: "الانتقال إلى العداد",
     wordMeaningAria: "\u0645\u0639\u0646\u0649 {word}\u060c \u0627\u0644\u0622\u064a\u0629 {ayah}",
     wordMeaningTitle: "\u0645\u0639\u0646\u0649 \u0627\u0644\u0643\u0644\u0645\u0629",

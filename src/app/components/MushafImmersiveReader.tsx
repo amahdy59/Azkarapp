@@ -26,6 +26,7 @@ export function MushafImmersiveReader({
   reducedMotion = false,
   textStyle,
   onSelectMeanings,
+  activeWordId,
   onClose,
 }: {
   zikr: Zikr;
@@ -39,6 +40,7 @@ export function MushafImmersiveReader({
   reducedMotion?: boolean;
   textStyle: CSSProperties;
   onSelectMeanings: (selection: WordMeaningSelection) => void;
+  activeWordId?: string | null;
   onClose: () => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -147,6 +149,7 @@ export function MushafImmersiveReader({
                 language={language}
                 style={{ ...textStyle, textAlign: "justify", textAlignLast: "center" }}
                 onSelectMeanings={onSelectMeanings}
+                activeWordId={activeWordId}
               />
             </div>
           </section>

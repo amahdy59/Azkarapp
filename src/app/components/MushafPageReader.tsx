@@ -14,6 +14,7 @@ export function MushafPageReader({
   language,
   textStyle,
   onSelectMeanings,
+  activeWordId,
   flat = false,
 }: {
   zikr: Zikr;
@@ -22,6 +23,7 @@ export function MushafPageReader({
   language: AppLanguage;
   textStyle: CSSProperties;
   onSelectMeanings: (selection: WordMeaningSelection) => void;
+  activeWordId?: string | null;
   /**
    * When the reader already wraps the whole reading column in its own card
    * (the wide-desktop reader), each page's own border/shadow/radius nests a
@@ -73,6 +75,7 @@ export function MushafPageReader({
                 language={language}
                 style={{ ...textStyle, textAlign: "justify", textAlignLast: "center" }}
                 onSelectMeanings={onSelectMeanings}
+                activeWordId={activeWordId}
               />
             </section>
 

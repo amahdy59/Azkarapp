@@ -29,6 +29,8 @@ test.describe("Quran word meanings", () => {
 
     const firstPage = page.getByTestId("mushaf-page").first();
     await firstPage.getByTestId("quran-word-help").first().click();
+    await expect(page.getByTestId("quran-word-popover")).toBeVisible();
+    await page.getByTestId("quran-word-popover-all").click();
     await expect(page.getByTestId("quran-word-meaning-sheet")).toBeVisible();
 
     const position = page.getByTestId("word-meaning-position");
@@ -50,6 +52,52 @@ test.describe("Quran word meanings", () => {
     await expect(page.getByTestId("word-meaning-previous")).toBeDisabled();
   });
 
+  test("anchors the gloss under the tapped word and dismisses on Escape", async ({ page }) => {
+    await openKahf(page);
+
+    const word = page.getByTestId("mushaf-page").first().getByTestId("quran-word-help").first();
+    await word.click();
+
+    const popover = page.getByTestId("quran-word-popover");
+    await expect(popover).toBeVisible();
+
+    /* The box cannot always centre on the word — on a phone it is wider than
+       the space beside it and clamps to the viewport, which is correct. What
+       must hold everywhere is that the caret still points at the word, so that
+       is what is asserted; centring is only checked when there was room. */
+    const geometry = await page.evaluate(() => {
+      const el = document.querySelector('[data-testid="quran-word-popover"]')!;
+      const w = document.querySelector('[data-testid="quran-word-help"]')!.getBoundingClientRect();
+      const p = el.getBoundingClientRect();
+      const caretX = Number.parseFloat(getComputedStyle(el, "::before").left);
+      return {
+        gap: Math.round(p.top - w.bottom),
+        caretTipX: p.left + caretX,
+        wordCentreX: w.left + w.width / 2,
+        // The box keeps a 0.75rem margin off the edge, so "clamped" means it
+        // reached that margin — not that it touched the viewport border.
+        clamped: p.left <= 14 || p.right >= window.innerWidth - 14,
+        centreOffset: Math.round(p.left + p.width / 2 - (w.left + w.width / 2)),
+        insideViewport: p.left >= 0 && p.right <= window.innerWidth && p.bottom <= window.innerHeight,
+      };
+    });
+
+    expect(geometry.gap).toBeGreaterThanOrEqual(0);
+    expect(geometry.gap).toBeLessThanOrEqual(16);
+    expect(geometry.insideViewport).toBe(true);
+    // Caret lands on the word it explains, clamped layout or not.
+    expect(Math.abs(geometry.caretTipX - geometry.wordCentreX)).toBeLessThanOrEqual(16);
+    if (!geometry.clamped) {
+      expect(Math.abs(geometry.centreOffset)).toBeLessThanOrEqual(2);
+    }
+
+    // The tapped word marks itself so the anchor and the highlight agree.
+    await expect(word).toHaveAttribute("data-word-active", "true");
+
+    await page.keyboard.press("Escape");
+    await expect(popover).toBeHidden();
+  });
+
   test("stops at the last annotated word of the page", async ({ page }) => {
     await openKahf(page);
 
@@ -57,6 +105,8 @@ test.describe("Quran word meanings", () => {
     const words = secondPage.getByTestId("quran-word-help");
     const total = await words.count();
     await words.nth(total - 1).click();
+    await expect(page.getByTestId("quran-word-popover")).toBeVisible();
+    await page.getByTestId("quran-word-popover-all").click();
 
     await expect(page.getByTestId("word-meaning-next")).toBeDisabled();
     await expect(page.getByTestId("word-meaning-previous")).toBeEnabled();
