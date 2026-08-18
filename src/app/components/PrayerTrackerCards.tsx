@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check } from "./icons";
 import { t } from "../i18n";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import { formatNumerals } from "../formatting";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
@@ -34,6 +36,8 @@ const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
   maghrib: Sunset,
   isha: MoonStar,
 };
+
+const COMPACT_VISIBLE_COUNT = 2;
 
 export type PrayerTemporalState = "past" | "current" | "next" | "upcoming";
 
@@ -103,9 +107,19 @@ function TrackingCheckbox({
           that actually receives focus, so the global :focus-visible outline
           already draws one around the whole 48px target. A ring on this
           circle as well produced two indicators for one control. */}
+      {/* Checked styling comes from React rather than a `peer-checked:` variant.
+          The sibling selector matched and even drove the pop animation, yet the
+          colour declarations never landed, so a ticked box kept a transparent
+          fill and a grey ring — the state was announced correctly but invisible.
+          Reading the prop we already hold removes the indirection entirely. */}
       <span
         aria-hidden="true"
-        className="pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 border-border-control text-transparent transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-hover:border-info peer-enabled:peer-hover:bg-info/10 peer-checked:scale-105 peer-checked:border-info peer-checked:bg-info peer-checked:text-info-foreground peer-checked:shadow-[0_2px_8px_-2px_var(--info)]"
+        data-checked={checked ? "true" : undefined}
+        className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+          checked
+            ? "border-info bg-info text-info-foreground shadow-[0_2px_8px_-2px_var(--info)]"
+            : "border-border-control text-transparent peer-enabled:peer-hover:border-info peer-enabled:peer-hover:bg-info/10"
+        }`}
       >
         <Check size={14} strokeWidth={3} />
       </span>
@@ -139,7 +153,7 @@ function PrayerCard({
       data-testid={`prayer-card-${prayer}`}
       data-prayer={prayer}
       data-prayer-state={state}
-      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-4 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-5 ${
+      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-4 ${
         isCurrent
           ? "border-primary bg-gradient-to-b from-primary/12 to-transparent shadow-[0_0_0_1px_var(--primary),0_12px_32px_-12px_var(--primary)]"
           : state === "past"
@@ -162,11 +176,11 @@ function PrayerCard({
           aria-hidden="true"
           // The chip is the only place the per-prayer hue appears. Tinting the
           // whole card would put five competing colours behind the content.
-          className="prayer-chip flex size-12 items-center justify-center rounded-full border transition-transform duration-standard ease-standard group-hover/card:scale-105"
+          className="prayer-chip flex size-10 items-center justify-center rounded-full border transition-transform duration-standard ease-standard group-hover/card:scale-105"
         >
-          <Icon size={24} />
+          <Icon size={20} />
         </span>
-        <h3 className="mt-2 text-[0.9375rem] font-black text-foreground" dir="auto">
+        <h3 className="mt-1.5 text-[0.9375rem] font-black text-foreground" dir="auto">
           {name}
         </h3>
         {/* The time is the strongest thing in the card: it is what the reader
@@ -175,7 +189,7 @@ function PrayerCard({
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-1 text-[1.5rem] font-black leading-none tracking-tight text-foreground"
+          className="mt-0.5 text-[1.375rem] font-black leading-none tracking-tight text-foreground"
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -184,7 +198,7 @@ function PrayerCard({
 
       {/* Section 2 — temporal status. Fixed height so the divider below never
           moves when the next prayer adds its countdown line. */}
-      <div className="mt-2 flex h-[2.75rem] flex-col items-center justify-start gap-0.5">
+      <div className="mt-1.5 flex h-[2.5rem] flex-col items-center justify-start gap-0.5">
         <span
           data-testid={`prayer-status-${prayer}`}
           className={`inline-flex items-center rounded-full px-3 py-1 text-[0.75rem] font-black ${
@@ -200,12 +214,12 @@ function PrayerCard({
         )}
       </div>
 
-      <hr className="mt-2 border-t border-border/60" />
+      <hr className="mt-1.5 border-t border-border/60" />
 
       {/* Section 3 — personal tracking. Its own fieldset so a screen reader
           announces which prayer these two controls belong to; the row of five
           otherwise repeats the same two labels with no context. */}
-      <fieldset className="mt-2 flex flex-col border-0 p-0">
+      <fieldset className="mt-1.5 flex flex-col border-0 p-0">
         <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
         <TrackingCheckbox
           id={`prayer-${prayer}-mosque`}
@@ -245,6 +259,14 @@ export function PrayerTrackerCards({
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [showUpcoming, setShowUpcoming] = useState(false);
+  /* Acknowledges praying in congregation. Only ever opened by ticking the box
+     on, never by clearing it — undoing a mistake should stay silent. */
+  const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
+  /* Desktop has room for all five at once, so hiding any of them there only
+     costs a click to see what is already affordable to show. Below that the
+     row becomes a carousel and two cards is what fits without shrinking the
+     time — the thing people are scanning for — so the rest stay one tap away. */
+  const isWide = useMediaQuery("(min-width: 64rem)");
   // Collapsing keeps the cards mounted for the length of the exit so they can
   // animate away instead of disappearing between two frames.
   const [isCollapsing, setIsCollapsing] = useState(false);
@@ -276,8 +298,14 @@ export function PrayerTrackerCards({
   // by default it only takes up room. The ones that can be acted on — what has
   // passed, what is open now, and what is next — stay in view; the rest are one
   // tap away. "Next" is never hidden: it is the one people look for.
-  const hidden = ordered.filter((model) => model.state === "upcoming");
-  const visible = showUpcoming ? ordered : ordered.filter((model) => model.state !== "upcoming");
+  // The two most actionable cards: whatever is open now, then what follows.
+  const focusIndex = Math.max(
+    0,
+    ordered.findIndex((model) => model.state === "current" || model.state === "next"),
+  );
+  const compactStart = Math.min(focusIndex, Math.max(0, ordered.length - COMPACT_VISIBLE_COUNT));
+  const visible = isWide || showUpcoming ? ordered : ordered.slice(compactStart, compactStart + COMPACT_VISIBLE_COUNT);
+  const hiddenCount = ordered.length - visible.length;
 
   return (
     <div className="flex flex-col gap-3">
@@ -298,14 +326,17 @@ export function PrayerTrackerCards({
               model={model}
               language={language}
               tracking={{ mosque: record?.mosque ?? false, adhkar: record?.adhkar ?? false }}
-              onToggle={onToggle}
+              onToggle={(prayer, field, next) => {
+                onToggle(prayer, field, next);
+                if (field === "mosque" && next) setVirtuePrayer(prayer);
+              }}
               onOpen={onOpen}
             />
           );
         })}
       </div>
 
-      {hidden.length > 0 && (
+      {hiddenCount > 0 && (
         <button
           type="button"
           onClick={toggleUpcoming}
@@ -315,9 +346,16 @@ export function PrayerTrackerCards({
         >
           {showUpcoming
             ? t(language, "prayerTracking.hideUpcoming")
-            : t(language, "prayerTracking.showUpcoming", { count: formatNumerals(hidden.length, language) })}
+            : t(language, "prayerTracking.showUpcoming", { count: formatNumerals(hiddenCount, language) })}
         </button>
       )}
+
+      <PrayerVirtueModal
+        prayer={virtuePrayer}
+        language={language}
+        direction={direction}
+        onClose={() => setVirtuePrayer(null)}
+      />
     </div>
   );
 }

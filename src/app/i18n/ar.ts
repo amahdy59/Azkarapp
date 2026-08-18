@@ -160,6 +160,7 @@ const ar = {
   prayerTracking: {
     mosque: "صليت في المسجد",
     adhkar: "أتممت أذكار الصلاة",
+    virtueTitle: "من فضل صلاة {prayer}",
     legend: "متابعة صلاة {prayer}",
     now: "حان وقتها",
     next: "الصلاة القادمة",

@@ -45,10 +45,13 @@ export function TodayRoutineGarden({
   onSelectCategory,
   visibleCategoryIds,
   onOpenWirdBenefits,
+  onMedia = true,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
   hideTabs?: boolean;
+  /** See ProgressDayView: media surfaces get overlays and a reserved height. */
+  onMedia?: boolean;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   visibleCategoryIds?: readonly CategoryId[];
   onOpenShareModal?: () => void;
@@ -102,7 +105,7 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className="h-full w-full transition-colors"
+      className={`w-full transition-colors ${onMedia ? "h-full" : ""}`}
     >
       {!hideTabs && (
         <>
@@ -211,6 +214,7 @@ export function TodayRoutineGarden({
       >
         {activeTab === "day" && (
           <ProgressDayView
+            onMedia={onMedia}
             summary={summary}
             language={language}
             dynamicSubtitle={dynamicSubtitle}

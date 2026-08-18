@@ -72,6 +72,7 @@ export function ProgressScreen({
           onOpenShareModal={onOpenShareModal}
           onSelectCategory={onSelectCategory}
           visibleCategoryIds={WIRD_CATEGORY_IDS}
+          onMedia={false}
         />
 
         {/* After-prayer adhkar are tracked per prayer, not as one routine, so

@@ -58,6 +58,7 @@ function MainDhikrGroupCard({
   pendingLabel,
   onPress,
   compact = false,
+  onMedia = true,
   subItems,
 }: {
   name: string;
@@ -67,6 +68,13 @@ function MainDhikrGroupCard({
   pendingLabel: string;
   onPress?: () => void;
   compact?: boolean;
+  /**
+   * Home stacks these over the hero photograph, so they use fixed white/black
+   * overlays that stay legible on any image. Progress has no image behind it,
+   * where those same overlays read as a stray pane of glass and ignore the
+   * active theme. `false` swaps them for ordinary theme surfaces.
+   */
+  onMedia?: boolean;
   subItems?: { id: string; name: string; isCompleted: boolean }[];
 }) {
   const isCompleted = status === "completed";
@@ -82,10 +90,10 @@ function MainDhikrGroupCard({
           : "min-h-[9.5rem] flex-col items-center justify-between px-3 py-4 text-center"
       } ${
         isCompleted
-          ? compact
+          ? compact && onMedia
             ? "border-primary/55 bg-primary/15 text-white shadow-raised"
             : "border-primary/55 bg-primary/10 text-foreground shadow-raised"
-          : compact
+          : compact && onMedia
             ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
@@ -99,7 +107,7 @@ function MainDhikrGroupCard({
             ? compact
               ? "border-primary/50 bg-primary/20 text-primary"
               : "border-primary/50 bg-primary/15 text-primary"
-            : compact
+            : compact && onMedia
               ? "border-white/10 bg-black/40 text-on-media-muted"
               : "border-border bg-muted text-primary"
         }`}
@@ -124,7 +132,7 @@ function MainDhikrGroupCard({
           className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
-              : compact
+              : compact && onMedia
                 ? "border border-white/5 bg-black/45 text-white/60"
                 : "bg-muted text-muted-foreground"
           }`}
@@ -181,6 +189,7 @@ export function ProgressDayView({
   visibleCategoryIds,
   headingLevel = 2,
   onOpenWirdBenefits,
+  onMedia = true,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -197,6 +206,13 @@ export function ProgressDayView({
   headingLevel?: 2 | 3;
   /** Opens the evidence for keeping a wird. Omitted where that route is unreachable. */
   onOpenWirdBenefits?: () => void;
+  /**
+   * Home renders this over the hero image and reserves a fixed height so the
+   * card cannot resize under the photograph as routines complete. Progress
+   * sits on a plain surface and scrolls, so the reservation there is simply
+   * empty space below the routines — roughly 150px of it.
+   */
+  onMedia?: boolean;
 }) {
   const isArabic = isAr(language);
   const completedToday = summary.today.completedCategories;
@@ -240,7 +256,7 @@ export function ProgressDayView({
     // auto and nothing changes there.
     <div
       className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem] ${
-        isHomeSubset ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
+        isHomeSubset && onMedia ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
       }`}
       dir={isArabic ? "rtl" : "ltr"}
     >
@@ -332,6 +348,7 @@ export function ProgressDayView({
                 pendingLabel={t(language, "progress.notCompleted")}
                 onPress={() => onSelectCategory?.(col.id)}
                 compact={Boolean(visibleCategoryIds)}
+                onMedia={onMedia}
                 subItems={subItems}
               />
             );

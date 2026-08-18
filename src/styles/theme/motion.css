@@ -203,3 +203,32 @@
    all of it now (DEC-067 / F12, F22); it is the copy matching DEC-003's
    opaque-surface rule and DEC-065's 24px radius. Do not re-add counter rules
    here. */
+
+/* The completion check answers a tap, so it pops once on the way in rather
+   than easing between two states. Applying the animation only under
+   :checked means the property is added at the moment the box is ticked,
+   which is what replays it on every re-check. Unchecking simply removes it,
+   so clearing a mistake stays quiet. */
+@keyframes tracking-check-pop {
+  0% {
+    transform: scale(0.7);
+  }
+  55% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* The pop stays in CSS — it is keyed to the attribute React sets, so it
+   replays every time the box is ticked and stays quiet when one is cleared. */
+.tracking-check[data-checked="true"] {
+  animation: tracking-check-pop var(--motion-duration-standard) var(--motion-ease-enter) both;
+}
+
+/* The tick itself draws in a beat after the circle fills, so the two read as
+   one gesture rather than appearing together already finished. */
+.tracking-check[data-checked="true"] > svg {
+  animation: favorite-pop var(--motion-duration-fast) var(--motion-ease-enter) 60ms both;
+}
