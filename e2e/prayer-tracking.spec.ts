@@ -18,19 +18,37 @@ async function openHome(page: Page) {
   await expect(page.getByTestId("prayer-tracker-cards")).toBeVisible();
 }
 
+/**
+ * The first card on screen, whichever prayer that is.
+ *
+ * Narrow viewports render only the two most actionable cards, so which prayers
+ * exist in the DOM depends on the clock and the viewport. Naming one prayer
+ * makes the test pass or fail on the time of day.
+ */
+async function firstTrackedPrayer(page: Page): Promise<string> {
+  const prayer = await page
+    .getByTestId("prayer-tracker-cards")
+    .locator("article[data-prayer]")
+    .first()
+    .getAttribute("data-prayer");
+  expect(prayer).toBeTruthy();
+  return prayer!;
+}
+
 test.describe("after-prayer tracking", () => {
-  test("fills the completion circle with the info colour when ticked", async ({ page }) => {
+  test("fills the completion circle with the theme colour when ticked", async ({ page }) => {
     await openHome(page);
 
-    const circle = page.locator("label:has(#prayer-fajr-mosque) .tracking-check");
-    const info = await page.evaluate(() =>
-      getComputedStyle(document.documentElement).getPropertyValue("--info").trim(),
+    const prayer = await firstTrackedPrayer(page);
+    const circle = page.locator(`label:has(#prayer-${prayer}-mosque) .tracking-check`);
+    const primary = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue("--primary").trim(),
     );
-    expect(info).not.toBe("");
+    expect(primary).not.toBe("");
 
     const before = await circle.evaluate((el) => getComputedStyle(el).backgroundColor);
 
-    await page.locator("#prayer-fajr-mosque").check();
+    await page.locator(`#prayer-${prayer}-mosque`).check();
 
     // The state was previously announced but invisible: the circle kept a
     // transparent fill, so "completed" and "not completed" looked identical.
@@ -47,7 +65,8 @@ test.describe("after-prayer tracking", () => {
 
   test("shows the prayer's virtue after recording it at the mosque, and not on undo", async ({ page }) => {
     await openHome(page);
-    await page.locator("#prayer-fajr-mosque").check();
+    const prayer = await firstTrackedPrayer(page);
+    await page.locator(`#prayer-${prayer}-mosque`).check();
 
     const modal = page.getByTestId("prayer-virtue-modal");
     await expect(modal).toBeVisible();
@@ -58,7 +77,7 @@ test.describe("after-prayer tracking", () => {
     await expect(modal).toBeHidden();
 
     // Clearing a mistake must stay silent.
-    await page.locator("#prayer-fajr-mosque").uncheck();
+    await page.locator(`#prayer-${prayer}-mosque`).uncheck();
     await expect(modal).toBeHidden();
   });
 

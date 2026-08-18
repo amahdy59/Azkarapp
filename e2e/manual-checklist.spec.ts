@@ -308,23 +308,28 @@ test("post-prayer cards hide what cannot be acted on and stay equal height", asy
   const [trackerBox, masbahaBox] = await Promise.all([tracker.boundingBox(), masbaha.boundingBox()]);
   expect(masbahaBox?.y).toBeGreaterThanOrEqual((trackerBox?.y ?? 0) + (trackerBox?.height ?? 0));
 
-  // A prayer that has not arrived cannot be tracked or read, so it is not
-  // shown until asked for. What has passed, what is open, and what is next
-  // always are.
+  /* Wide viewports have room for all five, so hiding any of them there would
+     only cost a click to reveal what already fits. Narrower ones show the two
+     most actionable — what is open now and what follows — and keep the rest
+     one tap away. Either way the next prayer is always on screen: it is the
+     one people are looking for. */
+  const isWide = (page.viewportSize()?.width ?? 0) >= 1024;
   const collapsedStates = await cards.evaluateAll((nodes) =>
     nodes.map((node) => (node as HTMLElement).dataset.prayerState),
   );
-  expect(collapsedStates).not.toContain("upcoming");
   expect(collapsedStates).toContain("next");
 
   const toggle = page.getByTestId("prayer-show-upcoming");
-  if (await toggle.count()) {
+  if (isWide) {
+    expect(collapsedStates.length).toBe(5);
+    await expect(toggle).toHaveCount(0);
+  } else {
+    expect(collapsedStates.length).toBe(2);
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");
     const expanded = await cards.evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.prayerState));
     expect(expanded.length).toBe(5);
-    expect(expanded).toContain("upcoming");
   }
 
   const metrics = await grid.evaluate((element) => {

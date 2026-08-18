@@ -107,7 +107,13 @@ function TrackingCheckbox({
           that actually receives focus, so the global :focus-visible outline
           already draws one around the whole 48px target. A ring on this
           circle as well produced two indicators for one control. */}
-      {/* Checked styling comes from React rather than a `peer-checked:` variant.
+      {/* Gold, matching the rest of the theme. The earlier rule reserved gold
+          for temporal status and gave completion blue; that is overridden here
+          by an explicit product decision. The two never collide in practice —
+          status is a filled pill of text in the section above, completion is a
+          24px circle in the tracking rows.
+
+          Checked styling comes from React rather than a `peer-checked:` variant.
           The sibling selector matched and even drove the pop animation, yet the
           colour declarations never landed, so a ticked box kept a transparent
           fill and a grey ring — the state was announced correctly but invisible.
@@ -117,8 +123,8 @@ function TrackingCheckbox({
         data-checked={checked ? "true" : undefined}
         className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
           checked
-            ? "border-info bg-info text-info-foreground shadow-[0_2px_8px_-2px_var(--info)]"
-            : "border-border-control text-transparent peer-enabled:peer-hover:border-info peer-enabled:peer-hover:bg-info/10"
+            ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
+            : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
         }`}
       >
         <Check size={14} strokeWidth={3} />
@@ -305,7 +311,12 @@ export function PrayerTrackerCards({
   );
   const compactStart = Math.min(focusIndex, Math.max(0, ordered.length - COMPACT_VISIBLE_COUNT));
   const visible = isWide || showUpcoming ? ordered : ordered.slice(compactStart, compactStart + COMPACT_VISIBLE_COUNT);
-  const hiddenCount = ordered.length - visible.length;
+  /* Whether a reveal is offered at all depends on the viewport, not on how many
+     cards happen to be on screen right now. Deriving it from the current count
+     made the control disappear the moment it was used, stranding the expanded
+     row with no way back. */
+  const isCollapsible = !isWide && ordered.length > COMPACT_VISIBLE_COUNT;
+  const hiddenCount = ordered.length - COMPACT_VISIBLE_COUNT;
 
   return (
     <div className="flex flex-col gap-3">
@@ -336,7 +347,7 @@ export function PrayerTrackerCards({
         })}
       </div>
 
-      {hiddenCount > 0 && (
+      {isCollapsible && (
         <button
           type="button"
           onClick={toggleUpcoming}
