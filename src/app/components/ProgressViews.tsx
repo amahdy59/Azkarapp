@@ -845,7 +845,14 @@ export function ProgressMonthView({
           {/* Weekday headers */}
           <div className="grid grid-cols-7 gap-1 mb-2 text-center">
             {weekdays.map((day) => (
-              <div key={day} className="text-[0.75rem] font-bold text-muted-foreground py-1">
+              /* Steps down on a phone and clips rather than pushing the column
+                 open: the longest Arabic weekday needs 44px in a 40px cell, and
+                 Intl's "short" form for Arabic is the full word, so there is no
+                 shorter label to fall back on. */
+              <div
+                key={day}
+                className="truncate text-[0.6875rem] font-bold text-muted-foreground py-1 sm:text-[0.75rem]"
+              >
                 {day}
               </div>
             ))}
@@ -1132,13 +1139,17 @@ export function ProgressYearView({
           </p>
 
           {/* Bar Chart */}
-          <div className="flex-1 flex items-end justify-between gap-1.5 pt-6 pb-2 min-h-[140px]">
+          <div className="flex-1 flex items-end justify-between gap-1 sm:gap-1.5 pt-6 pb-2 min-h-[140px]">
             {yearStats.months.map((m, idx) => {
               const rate = m.completionRate;
               const isBest = yearStats.bestMonthIndex !== null && idx === yearStats.bestMonthIndex;
 
               return (
-                <div key={idx} className="flex-1 flex flex-col items-center h-full justify-end group">
+                /* min-w-0 because a flex item defaults to min-width:auto, so the month
+                   label underneath set a floor and twelve columns could not shrink to
+                   fit a phone: the row measured 338px inside 301px and pushed the
+                   overflow up through four ancestors. The label already truncates. */
+                <div key={idx} className="flex-1 min-w-0 flex flex-col items-center h-full justify-end group">
                   <span
                     className={`text-[0.625rem] font-black mb-1 opacity-0 group-hover:opacity-100 transition-opacity ${
                       isBest ? "opacity-100 text-primary" : "text-muted-foreground"
