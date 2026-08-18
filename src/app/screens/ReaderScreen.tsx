@@ -860,15 +860,31 @@ export function ReaderScreen({
                   gap-2 for 14px under the bar — comfortably past the 4px
                   minimum, which Arabic needs because harakat sit well above
                   the cap line and would otherwise crowd the track. */}
+              {/* The way into Mushaf mode sits on the title's own line rather
+                  than only inside the overflow menu: it belongs to this
+                  passage, so it reads as part of naming it. */}
               {readerZikrTitle && (
-                <h2
-                  className="mt-1.5 w-full truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
-                  dir="auto"
-                  title={readerZikrTitle}
-                  data-testid="reader-zikr-title"
-                >
-                  {readerZikrTitle}
-                </h2>
+                <div className="mt-1.5 flex w-full items-center justify-between gap-3">
+                  <h2
+                    className="min-w-0 truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                    dir="auto"
+                    title={readerZikrTitle}
+                    data-testid="reader-zikr-title"
+                  >
+                    {readerZikrTitle}
+                  </h2>
+                  {longSurah && (
+                    <button
+                      type="button"
+                      onClick={() => setImmersiveOpen(true)}
+                      data-testid="reader-mushaf-button"
+                      className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    >
+                      <BookOpen size={14} aria-hidden="true" />
+                      {t(language, "reader.immersiveOpen")}
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
@@ -988,14 +1004,27 @@ export function ReaderScreen({
             {/* See the desktop heading: only surah names render, and the 10px
                 margin keeps harakat clear of the progress track. */}
             {readerZikrTitle && (
-              <h2
-                className="mt-2.5 block max-w-full truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
-                dir="auto"
-                title={readerZikrTitle}
-                data-testid="reader-zikr-title"
-              >
-                {readerZikrTitle}
-              </h2>
+              <div className="mt-2.5 flex w-full items-center justify-between gap-3">
+                <h2
+                  className="min-w-0 truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
+                  dir="auto"
+                  title={readerZikrTitle}
+                  data-testid="reader-zikr-title"
+                >
+                  {readerZikrTitle}
+                </h2>
+                {longSurah && (
+                  <button
+                    type="button"
+                    onClick={() => setImmersiveOpen(true)}
+                    data-testid="reader-mushaf-button"
+                    className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    <BookOpen size={14} aria-hidden="true" />
+                    {t(language, "reader.immersiveOpen")}
+                  </button>
+                )}
+              </div>
             )}
           </div>
 
