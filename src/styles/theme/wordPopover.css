@@ -152,3 +152,21 @@
 .quran-word-popover[data-above="true"] {
   transform-origin: var(--caret-x, 50%) 100%;
 }
+
+/* Mushaf pages skip rendering work while off-screen.
+   A long surah mounts every page at once — Al-Kahf is twelve pages carrying
+   258 interactive word buttons — so the browser laid out and painted the lot
+   on open, whether or not any of it was near the viewport. That cost lands on
+   the phone as a slow first paint and on CI as reader specs that time out
+   under load while passing alone.
+   The content stays in the DOM: find-in-page, anchor links and assistive
+   technology still reach it, and `contain-intrinsic-size` keeps the scrollbar
+   honest by reserving each page's approximate height until it is rendered
+   for real. */
+@supports (content-visibility: auto) {
+  [data-testid="mushaf-page"],
+  [data-testid="mushaf-immersive-page"] {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 40rem;
+  }
+}

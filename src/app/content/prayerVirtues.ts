@@ -9,6 +9,10 @@ import type { PrayerName } from "../types";
  * widely authenticated collections, with book and number recorded so a
  * reviewer can check the wording rather than take it on trust.
  *
+ * Every entry is a complete quotation. A narration cut off before its point,
+ * or elided mid-sentence with an ellipsis, reads as a fragment and invites the
+ * reader to fill the gap themselves — the guard in the test file enforces this.
+ *
  * Three per prayer is the cap. This appears at the moment of an action, not as
  * a reading screen; a longer list would turn an acknowledgement into homework.
  */
@@ -63,7 +67,7 @@ export const PRAYER_VIRTUES: Readonly<Record<PrayerName, readonly PrayerVirtue[]
     },
     {
       textArabic:
-        "«أَرَأَيْتُمْ لَوْ أَنَّ نَهَرًا بِبَابِ أَحَدِكُمْ يَغْتَسِلُ مِنْهُ كُلَّ يَوْمٍ خَمْسَ مَرَّاتٍ، هَلْ يَبْقَى مِنْ دَرَنِهِ شَيْءٌ؟»",
+        "«أَرَأَيْتُمْ لَوْ أَنَّ نَهَرًا بِبَابِ أَحَدِكُمْ يَغْتَسِلُ مِنْهُ كُلَّ يَوْمٍ خَمْسَ مَرَّاتٍ، هَلْ يَبْقَى مِنْ دَرَنِهِ شَيْءٌ؟ قَالُوا: لَا يَبْقَى مِنْ دَرَنِهِ شَيْءٌ، قَالَ: فَذَلِكَ مَثَلُ الصَّلَوَاتِ الْخَمْسِ، يَمْحُو اللَّهُ بِهِنَّ الْخَطَايَا»",
       referenceArabic: "صحيح البخاري ٥٢٨، وصحيح مسلم ٦٦٧",
       referenceEnglish: "Sahih al-Bukhari 528; Sahih Muslim 667",
     },
@@ -87,7 +91,7 @@ export const PRAYER_VIRTUES: Readonly<Record<PrayerName, readonly PrayerVirtue[]
     },
     {
       textArabic:
-        "«مَنْ تَطَهَّرَ فِي بَيْتِهِ ثُمَّ مَضَى إِلَى بَيْتٍ مِنْ بُيُوتِ اللَّهِ... كَانَتْ خَطْوَتَاهُ إِحْدَاهُمَا تَحُطُّ خَطِيئَةً وَالْأُخْرَى تَرْفَعُ دَرَجَةً»",
+        "«مَنْ تَطَهَّرَ فِي بَيْتِهِ ثُمَّ مَشَى إِلَى بَيْتٍ مِنْ بُيُوتِ اللَّهِ لِيَقْضِيَ فَرِيضَةً مِنْ فَرَائِضِ اللَّهِ، كَانَتْ خَطْوَتَاهُ إِحْدَاهُمَا تَحُطُّ خَطِيئَةً وَالْأُخْرَى تَرْفَعُ دَرَجَةً»",
       referenceArabic: "صحيح مسلم ٦٦٦",
       referenceEnglish: "Sahih Muslim 666",
     },
