@@ -262,10 +262,11 @@ Create one **public** bucket named `audio`. Public matters: the manifest is
 static and must not carry expiring signed URLs, so the objects have to be
 readable without a token. Nothing private belongs in this bucket.
 
-Supabase serves public objects from a fixed prefix, so the base URL is:
+Supabase serves public objects from a fixed prefix. The project reference is
+recorded in [docs/SUPABASE_SETUP.md](../SUPABASE_SETUP.md), so the base URL is:
 
 ```text
-VITE_AUDIO_BASE_URL=https://<project-ref>.supabase.co/storage/v1/object/public/audio
+VITE_AUDIO_BASE_URL=https://vanjwanmnusgnavzzzpz.supabase.co/storage/v1/object/public/audio
 ```
 
 Object keys inside the bucket are exactly the `relativePath` values in the

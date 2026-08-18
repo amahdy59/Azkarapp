@@ -48,6 +48,34 @@ Apple:
 - Set a six-month secret-rotation reminder.
 - Keep `VITE_APPLE_AUTH_ENABLED=false` until the provider is verified.
 
+## Audio storage
+
+Supabase Storage also hosts the recitation audio. This is independent of the
+account integration above — audio needs no auth provider, no key, and works
+while the app is in guest mode.
+
+Create one bucket named `audio` with **Public** enabled. Public is required,
+not a convenience: the audio manifest is a static file baked into the build,
+so it cannot carry expiring signed URLs. Nothing private belongs in it.
+
+The resulting base URL for this project is:
+
+```text
+https://vanjwanmnusgnavzzzpz.supabase.co/storage/v1/object/public/audio
+```
+
+Object keys mirror the manifest's `relativePath` values, keyed by the stable
+voice id from `src/app/audio/audioVoices.ts` rather than the display name:
+
+```text
+dua/<asset-id>/<voice-id>/v<n>/<asset-id>.<ext>
+```
+
+Uploads must set `Content-Type` and `Cache-Control` explicitly — Supabase
+infers neither usefully, and the dashboard guesses `video/mp4` for an `.mp4`
+audio file. Full runbook, including the verification probes and the metadata
+each manifest record needs: [docs/audio/adding-your-own-audio.md](audio/adding-your-own-audio.md).
+
 ## GitHub Actions
 
 Variables:
@@ -56,6 +84,8 @@ Variables:
 - `VITE_GOOGLE_AUTH_ENABLED`
 - `VITE_EMAIL_AUTH_ENABLED`
 - `VITE_APPLE_AUTH_ENABLED`
+- `VITE_AUDIO_BASE_URL` — a public URL, so a variable rather than a secret. It
+  must be present for both the manifest validation step and the Vite build.
 
 Repository secret:
 
