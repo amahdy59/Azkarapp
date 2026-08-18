@@ -9,7 +9,8 @@ import { reportError } from "../../../lib/observability";
 import { InformationCard } from "./InformationCard";
 import { SubHeader } from "./SettingsPrimitives";
 import { getAzkarForMode } from "../../content/azkar";
-import { loadAudioPreferences } from "../../audio/audioPreferences";
+import { loadAudioPreferences, saveAudioPreferences } from "../../audio/audioPreferences";
+import { getAudioVoices } from "../../audio/audioVoices";
 import {
   downloadAudioForZikrs,
   estimateAudioDownloadBytes,
@@ -41,7 +42,20 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [successMessage, setSuccessMessage] = useState("");
   const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
-  const audioPreferences = useMemo(loadAudioPreferences, []);
+  const [audioPreferences, setAudioPreferences] = useState(loadAudioPreferences);
+  const voices = useMemo(() => getAudioVoices(language), [language]);
+
+  /* Persisted immediately rather than on a Save button: every other
+     preference in Settings applies on change, and a lone deferred one
+     reads as a bug. The id is stable, so the stored choice survives a
+     renamed display label. */
+  const handleVoiceChange = useCallback((voiceId: string) => {
+    setAudioPreferences((previous) => {
+      const next = { ...previous, duaVoiceId: voiceId };
+      saveAudioPreferences(next);
+      return next;
+    });
+  }, []);
   const audioCollections = useMemo(
     () =>
       (["morning", "evening", "before_sleep"] as const).map((category) => {
@@ -133,6 +147,32 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           title={t(language, "downloads.bundledTitle")}
           body={t(language, "downloads.bundledBody")}
         />
+
+        <Card as="section" padding="lg" aria-labelledby="audio-reciter-title">
+          <h2 id="audio-reciter-title" className="text-[0.9375rem] font-extrabold text-foreground">
+            {t(language, "downloads.reciterTitle")}
+          </h2>
+          <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">{t(language, "downloads.reciterHint")}</p>
+          <label
+            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-[0.8125rem] font-semibold text-foreground"
+            htmlFor="audio-reciter"
+          >
+            <span>{t(language, "downloads.reciterLabel")}</span>
+            <select
+              id="audio-reciter"
+              value={audioPreferences.duaVoiceId}
+              onChange={(event) => handleVoiceChange(event.target.value)}
+              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-[0.8125rem] font-bold text-foreground"
+              dir={language === "ar" ? "rtl" : "ltr"}
+            >
+              {voices.map((voice) => (
+                <option key={voice.id} value={voice.id}>
+                  {language === "ar" ? voice.nameArabic : voice.nameEnglish}
+                </option>
+              ))}
+            </select>
+          </label>
+        </Card>
 
         <Card as="section" padding="lg" aria-labelledby="offline-status-title">
           <div className="flex items-start gap-3">

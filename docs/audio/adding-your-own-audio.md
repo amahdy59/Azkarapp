@@ -251,6 +251,57 @@ curl.exe -sS -D - -o NUL -H 'Origin: https://amahdy59.github.io' -H 'Range: byte
 
 Do not use expiring signed URLs in the static manifest. Do not compress MP3 responses again at the CDN. If a Content Security Policy is introduced, permit the audio origin in both `media-src` and `connect-src`; offline download uses `fetch()`.
 
+### Supabase Storage as the audio host
+
+Supabase is the chosen host for this project. It satisfies the requirements above
+without a separate CDN, and it survives the eventual Flutter/Play Store port
+because the files are served over plain public HTTPS rather than through any
+web-only mechanism.
+
+Create one **public** bucket named `audio`. Public matters: the manifest is
+static and must not carry expiring signed URLs, so the objects have to be
+readable without a token. Nothing private belongs in this bucket.
+
+Supabase serves public objects from a fixed prefix, so the base URL is:
+
+```text
+VITE_AUDIO_BASE_URL=https://<project-ref>.supabase.co/storage/v1/object/public/audio
+```
+
+Object keys inside the bucket are exactly the `relativePath` values in the
+manifest, so the layout mirrors the naming scheme in _File naming and immutable
+versions_:
+
+```text
+<content-kind>/<asset-id>/<voice-id>/v<n>/<asset-id>.<ext>
+dua/morning-asbahna/muhammad-moataz/v1/morning-asbahna.m4a
+quran/ayat-al-kursi/muhammad-moataz/v1/ayat-al-kursi.m4a
+```
+
+`<voice-id>` is the stable id from `src/app/audio/audioVoices.ts`
+(`abdullah-muhammad`, `muhammad-alshara`, `muhammad-moataz`) — never the display
+name, which is localized and may be re-worded.
+
+Set the object metadata on upload; Supabase does not infer a usable
+`Cache-Control` on its own. Because every path carries an immutable `v<n>`,
+long-lived caching is safe:
+
+```bash
+supabase storage cp ./morning-asbahna.m4a   ss:///audio/dua/morning-asbahna/muhammad-moataz/v1/morning-asbahna.m4a   --content-type audio/mp4   --cache-control "public, max-age=31536000, immutable"
+```
+
+Supabase Storage already returns `Accept-Ranges: bytes`, answers `Range` probes
+with `206`, and sends `Access-Control-Allow-Origin: *` for public buckets, so
+the verification commands in the previous section apply unchanged. Run them
+against a real uploaded object before marking anything `approved` — the
+manifest validator fetches each variant and compares byte size, checksum, and
+`Content-Type` against the record.
+
+Note on format: recordings delivered as `.mp4`/`.m4a` are AAC and must be
+declared `audio/mp4`, which `AudioVariant["mimeType"]` accepts alongside
+`audio/mpeg` and `audio/ogg`. Do not relabel an AAC file as `audio/mpeg` to make
+it fit — the validator compares the served `Content-Type` and will reject it.
+
 ## Configure Azkarapp
 
 For local development, add to `.env.local`:

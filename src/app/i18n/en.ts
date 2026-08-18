@@ -383,6 +383,9 @@ const en = {
     bundledTitle: "Core content is included",
     bundledBody:
       "All azkar are included with the app. Offline reloads are available after the production service worker caches the app shell.",
+    reciterTitle: "Recitation voice",
+    reciterHint: "Applies to the adhkar and dua recordings that are available.",
+    reciterLabel: "Reciter",
     statusTitle: "Current browser status",
     checking: "Checking offline storage…",
     serviceWorker: "Service worker",
