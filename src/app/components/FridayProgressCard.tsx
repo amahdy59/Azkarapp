@@ -83,7 +83,9 @@ export function FridayProgressCard({
               {row.icon}
             </span>
             <span className="flex min-w-0 flex-col">
-              <span className="truncate text-[0.9375rem] font-black leading-snug text-foreground">{row.label}</span>
+              <span dir="auto" className="truncate text-[0.9375rem] font-black leading-snug text-foreground">
+                {row.label}
+              </span>
               {/* Isolated so a Latin "3 / 7" cannot reorder against Arabic around it. */}
               <bdi className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">{row.value}</bdi>
             </span>

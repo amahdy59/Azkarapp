@@ -119,6 +119,7 @@ function MainDhikrGroupCard({
         className={`flex min-w-0 flex-1 flex-col ${compact ? "items-start sm:items-center" : "w-full items-center"}`}
       >
         <span
+          dir="auto"
           className={`text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem] ${
             compact ? "lg:text-[0.9375rem]" : ""
           }`}
@@ -126,6 +127,7 @@ function MainDhikrGroupCard({
           {name}
         </span>
         <span
+          dir="auto"
           /* 32px clear of the name. The column used to space every child
              equally, so this gap could not grow without shoving the
              after-prayer dots down with it. */
@@ -244,6 +246,12 @@ export function ProgressDayView({
     ? allCategories.filter((category) => visibleCategoryIds.includes(category.id))
     : allCategories;
   const isHomeSubset = visibleCategoryIds !== undefined;
+  /* Glass chrome — the black wash, the white-on-photo text, the dark pills —
+     belongs to the hero photograph, not to the three-routine subset. Progress
+     asks for the same subset on a plain themed surface, and keying the chrome
+     off the subset gave it a card that ignored the active theme and read as a
+     black pane in every mode. `onMedia` is the question actually being asked. */
+  const onGlass = isHomeSubset && onMedia;
   const Heading = headingLevel === 3 ? "h3" : "h2";
   // Keep the semantic order stable. The RTL grid places Morning at the right
   // edge while preserving the same keyboard and assistive-technology order.
@@ -256,13 +264,13 @@ export function ProgressDayView({
     // auto and nothing changes there.
     <div
       className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem] ${
-        isHomeSubset && onMedia ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
+        onGlass ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
       }`}
       dir={isArabic ? "rtl" : "ltr"}
     >
       <div
         className={`flex w-full flex-col rounded-3xl p-5 sm:p-7 md:p-8 ${
-          isHomeSubset ? "hero-glass flex-1" : "border border-border bg-card text-foreground shadow-raised"
+          onGlass ? "hero-glass flex-1" : "border border-border bg-card text-foreground shadow-raised"
         }`}
       >
         <div className="flex items-start justify-between gap-3">
@@ -270,7 +278,14 @@ export function ProgressDayView({
             <Heading
               data-testid="progress-primary-heading"
               className={`block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight sm:text-[1.375rem] md:text-[1.5rem] ${
-                isHomeSubset ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-foreground"
+                onGlass
+                  ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                  : isHomeSubset
+                    ? // Off the photograph the gold has to come from the theme rather
+                      // than the fixed on-media accent, which is the same colour in
+                      // every mode because its ground is an image.
+                      "text-primary"
+                    : "text-foreground"
               }`}
               dir="auto"
             >
@@ -278,7 +293,7 @@ export function ProgressDayView({
             </Heading>
             <p
               className={`mt-1 text-[0.8125rem] font-semibold sm:text-[0.875rem] ${
-                isHomeSubset ? "text-on-media-muted" : "text-muted-foreground"
+                onGlass ? "text-on-media-muted" : "text-muted-foreground"
               }`}
               dir="auto"
             >
@@ -288,14 +303,14 @@ export function ProgressDayView({
 
           <div
             className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[0.8125rem] font-black ${
-              isHomeSubset
+              onGlass
                 ? "border-on-media/16 bg-black/45 text-on-media"
                 : "border-border-control bg-muted text-foreground"
             }`}
           >
-            <span>{formatNumerals(completedCount, language)}</span>
-            <span aria-hidden="true">/</span>
-            <span>{formatNumerals(categories.length, language)}</span>
+            {/* Isolated: a bare "0 / 3" between Arabic siblings gets reordered
+                by the bidi algorithm and starts reading as "3 / 0". */}
+            <bdi>{formatRatio(completedCount, categories.length, language)}</bdi>
           </div>
         </div>
 
@@ -365,7 +380,7 @@ export function ProgressDayView({
             onClick={onOpenWirdBenefits}
             data-testid="open-wird-benefits"
             className={`mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:mt-6 ${
-              isHomeSubset
+              onGlass
                 ? "border-on-media/20 bg-black/35 text-on-media hover:bg-black/50"
                 : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"
             }`}
