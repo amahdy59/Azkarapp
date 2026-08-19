@@ -9,12 +9,18 @@ const { loadReleaseNotes, reportError } = vi.hoisted(() => ({
   reportError: vi.fn(),
 }));
 
-vi.mock("../releaseNotes", () => ({ loadReleaseNotes }));
+// Only the network call is faked: the seen-release helpers are plain
+// localStorage, and the recap logic is only worth testing against the real ones.
+vi.mock("../releaseNotes", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../releaseNotes")>()),
+  loadReleaseNotes,
+}));
 vi.mock("../../lib/observability", () => ({ reportError }));
 
 beforeEach(() => {
   window.localStorage.clear();
   loadReleaseNotes.mockReset();
+  loadReleaseNotes.mockResolvedValue(null);
   reportError.mockReset();
 });
 
@@ -42,6 +48,40 @@ describe("usePwaLifecycle", () => {
     expect(result.current.updateAvailable).toBe(false);
     expect(result.current.releaseNotes).toBeNull();
     window.removeEventListener("azkar-apply-update", applyListener);
+  });
+
+  it("recaps the notes for a release the reader never saw", async () => {
+    window.localStorage.setItem("azkarapp.release-seen", "2026-07-01");
+    const notes = { release: "2026-08-19", en: ["Mushaf paging"], ar: ["تصفح المصحف"] };
+    loadReleaseNotes.mockResolvedValue(notes);
+
+    const { result } = renderHook(() => usePwaLifecycle("en"));
+    await waitFor(() => expect(result.current.updatedNotes).toEqual(notes));
+
+    act(() => result.current.dismissUpdatedNotes());
+    expect(result.current.updatedNotes).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.release-seen")).toBe("2026-08-19");
+  });
+
+  it("stays quiet on a first run rather than greeting a new reader with a changelog", async () => {
+    loadReleaseNotes.mockResolvedValue({ release: "2026-08-19", en: ["Mushaf paging"], ar: ["تصفح المصحف"] });
+
+    const { result } = renderHook(() => usePwaLifecycle("en"));
+    await waitFor(() => expect(window.localStorage.getItem("azkarapp.release-seen")).toBe("2026-08-19"));
+    expect(result.current.updatedNotes).toBeNull();
+  });
+
+  it("does not recap notes the reader has just read in the update prompt", async () => {
+    window.localStorage.setItem("azkarapp.release-seen", "2026-07-01");
+    const notes = { release: "2026-08-19", en: ["Mushaf paging"], ar: ["تصفح المصحف"] };
+    loadReleaseNotes.mockResolvedValue(notes);
+
+    const { result } = renderHook(() => usePwaLifecycle("en"));
+    act(() => window.dispatchEvent(new Event("azkar-update-available")));
+    await waitFor(() => expect(result.current.releaseNotes).toEqual(notes));
+
+    act(() => result.current.applyUpdate());
+    expect(window.localStorage.getItem("azkarapp.release-seen")).toBe("2026-08-19");
   });
 
   it("handles install acceptance and persists a later dismissal", async () => {

@@ -1,14 +1,15 @@
 {
+  "release": "2026-08-19",
   "ar": [
-    "أصبح حجم التطبيق أصغر بكثير، فيفتح ويُحدَّث أسرع وببيانات أقل.",
-    "أصبحت أوضاع التباين العالي وعمى الألوان تُطبَّق على كل عناصر التطبيق.",
-    "توحّد شكل القوائم ونوافذ التأكيد، مع محاذاة صحيحة في العربية وخلفية معتمة واضحة.",
-    "أيقونتان مختلفتان لأذكار الصباح والمساء، وبطاقات أوضح في السمات الداكنة."
+    "أصبح بإمكانك قراءة السور الطويلة صفحة صفحة كالمصحف، والضغط على أي كلمة لمعرفة معناها.",
+    "لكل صلاة بطاقة خاصة، تُسجّل فيها صلاتك في المسجد وأذكار ما بعد الصلاة كلاً على حدة.",
+    "يمكنك اختيار القارئ الذي تستمع إليه من الإعدادات.",
+    "شاشة التقدم تعرض تقدمك في يوم الجمعة، وبطاقاتها تتبع السمة التي اخترتها في كل الأوضاع."
   ],
   "en": [
-    "The app is much smaller, so it opens and updates faster and uses less data.",
-    "High-contrast and colour-blind modes now apply across every part of the app.",
-    "Menus and confirmation dialogs share one look, mirror correctly in Arabic, and dim the background.",
-    "Morning and evening azkar now have distinct icons, and cards read more clearly in dark themes."
+    "Long surahs now turn page by page like a mushaf, and tapping any word shows its meaning.",
+    "Every prayer has its own card, tracking the mosque and the after-prayer adhkar separately.",
+    "You can choose which reciter you listen to in Settings.",
+    "Progress now shows your Friday companion, and its cards follow your chosen theme in every mode."
   ]
 }

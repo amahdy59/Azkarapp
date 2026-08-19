@@ -45,6 +45,9 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
+echo "Verifying that the release notes describe this release..."
+"$PNPM" run check:release-notes
+
 echo "Verifying the pinned Node and pnpm toolchain..."
 "$PNPM" run verify:toolchain
 

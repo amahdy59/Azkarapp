@@ -16,9 +16,9 @@ export function PwaNotice({
   title: string;
   body?: string;
   items?: readonly string[];
-  actionLabel: string;
+  actionLabel?: string;
   dismissLabel: string;
-  onAction: () => void;
+  onAction?: () => void;
   onDismiss: () => void;
   isActionLoading?: boolean;
   statusMessage?: string;
@@ -38,8 +38,10 @@ export function PwaNotice({
       {body && <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>}
       {items && (
         <ul className="mt-2 list-disc space-y-1 ps-5 text-[0.8125rem] leading-5 text-muted-foreground">
-          {items.map((item) => (
-            <li key={item}>{item}</li>
+          {items.map((item, index) => (
+            // The list is static and never reorders, so the position is the
+            // stable identity here; two identical notes would collide on text.
+            <li key={index}>{item}</li>
           ))}
         </ul>
       )}
@@ -64,20 +66,22 @@ export function PwaNotice({
         >
           {dismissLabel}
         </Button>
-        <Button
-          type="button"
-          onClick={onAction}
-          disabled={isActionLoading}
-          className="text-[0.8125rem] disabled:cursor-not-allowed"
-        >
-          {isActionLoading && (
-            <div
-              className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
-              aria-hidden="true"
-            />
-          )}
-          {actionLabel}
-        </Button>
+        {actionLabel && onAction && (
+          <Button
+            type="button"
+            onClick={onAction}
+            disabled={isActionLoading}
+            className="text-[0.8125rem] disabled:cursor-not-allowed"
+          >
+            {isActionLoading && (
+              <div
+                className="h-4 w-4 animate-spin rounded-full border-2 border-primary-foreground/30 border-t-primary-foreground"
+                aria-hidden="true"
+              />
+            )}
+            {actionLabel}
+          </Button>
+        )}
       </div>
     </aside>
   );

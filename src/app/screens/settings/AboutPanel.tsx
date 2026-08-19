@@ -1,5 +1,15 @@
 import React from "react";
-import { BookOpen, ExternalLink, FileText, Globe, HelpCircle, Info, MessageChat, Star } from "../../components/icons";
+import {
+  BookOpen,
+  ExternalLink,
+  FileText,
+  Globe,
+  HelpCircle,
+  Info,
+  MessageChat,
+  Sparkles,
+  Star,
+} from "../../components/icons";
 import { CrescentMark } from "../../components/CrescentMark";
 import { t } from "../../i18n";
 import type { AppLanguage } from "../../types";
@@ -24,12 +34,14 @@ export function AboutPanel({
   onHelp,
   onLegal,
   onSources,
+  onWhatsNew,
   onBack,
 }: {
   language: AppLanguage;
   onHelp: () => void;
   onLegal: () => void;
   onSources: () => void;
+  onWhatsNew: () => void;
   onBack: () => void;
 }) {
   return (
@@ -88,6 +100,11 @@ export function AboutPanel({
               icon={<HelpCircle size={18} className="text-background" />}
               label={t(language, "about.faq")}
               onPress={onHelp}
+            />
+            <SupportRow
+              icon={<Sparkles size={18} className="text-background" />}
+              label={t(language, "about.whatsNew")}
+              onPress={onWhatsNew}
             />
             <SupportRow
               icon={<Globe size={18} className="text-background" />}

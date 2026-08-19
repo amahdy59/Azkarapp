@@ -30,6 +30,7 @@ export type SettingsSubScreen =
   | "help"
   | "legal"
   | "sources"
+  | "whats-new"
   | "about";
 
 const iconBackground = "color-mix(in srgb, var(--primary) 12%, transparent)";

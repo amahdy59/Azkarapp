@@ -26,6 +26,7 @@ import {
   ProgressPanel,
   SettingsRootPanel,
   SourcesPanel,
+  WhatsNewPanel,
   type SettingsSubScreen,
 } from "./SettingsPanels";
 
@@ -355,6 +356,8 @@ export function SettingsScreen({
         return <LegalPanel language={language} onBack={goBack} />;
       case "sources":
         return <SourcesPanel language={language} onBack={goBack} />;
+      case "whats-new":
+        return <WhatsNewPanel language={language} onBack={goBack} />;
       case "about":
         return (
           <AboutPanel
@@ -362,6 +365,7 @@ export function SettingsScreen({
             onHelp={() => setSub("help")}
             onLegal={() => setSub("legal")}
             onSources={() => setSub("sources")}
+            onWhatsNew={() => setSub("whats-new")}
             onBack={goBack}
           />
         );

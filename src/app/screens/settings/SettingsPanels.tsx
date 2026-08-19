@@ -9,3 +9,4 @@ export { AboutPanel } from "./AboutPanel";
 export { HelpPanel } from "./HelpPanel";
 export { LegalPanel } from "./LegalPanel";
 export { SourcesPanel } from "./SourcesPanel";
+export { WhatsNewPanel } from "./WhatsNewPanel";

@@ -220,6 +220,42 @@ The agent must not:
 - Change reviewed religious content as part of deployment remediation.
 - repeatedly push arbitrary changes merely to trigger a deployment.
 
+### Required release notes on every deployment
+
+`public/release-notes.json` is what the update prompt shows people when a new
+version is waiting. It is fetched from the deployed site, not bundled, so it
+describes the release being shipped — it is not a changelog and it does not
+accumulate.
+
+Before every push that deploys, the agent must:
+
+- Rewrite the file to cover **only** what changed since the last deployed
+  commit. `pnpm run check:release-notes` prints that commit range.
+- Replace every entry. An item that still describes an earlier release is a
+  stale note, even if it is still true.
+- Bump `"release"` to a new stamp (the deployment date, for example
+  `"2026-08-19"`). The app compares this stamp against the last one it showed,
+  so notes that change without it are never recapped to the reader.
+- Keep 3–4 entries in each language, `ar` and `en`, with the same count in both.
+  `parseReleaseNotes` rejects anything else and the prompt silently falls back
+  to the generic message.
+- Describe user-visible outcomes in plain language — what a reader can now do,
+  not the refactor that enabled it. No file names, component names, or commit
+  subjects.
+
+`scripts/check-release-notes.mjs` enforces all of the above and runs first in
+`.githooks/pre-push`, so a stale manifest fails the push before the slow gates
+run. It lists the unannounced commits by subject line, which is also the fastest
+way to write the notes.
+
+Tests, docs, and tooling commits do not require notes; the check ignores those
+paths. For a release that genuinely has nothing to announce, set
+`ALLOW_STALE_RELEASE_NOTES=1` for that push and say so in the phase report.
+
+`src/app/releaseNotes.test.ts` checks only the shape of the deployed manifest.
+A file frozen for months still has a valid shape, which is why freshness is
+enforced by the check above rather than by the suite.
+
 ### Required local gate before every push
 
 Before pushing to `main`, the agent must run:

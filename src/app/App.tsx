@@ -203,6 +203,8 @@ function AppContent() {
     pwaError,
     pwaStatus,
     releaseNotes,
+    updatedNotes,
+    dismissUpdatedNotes,
     updateAvailable,
   } = usePwaLifecycle(selectedLang);
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
@@ -1391,6 +1393,7 @@ function AppContent() {
 
         {((persistenceError && !persistenceNoticeDismissed) ||
           updateAvailable ||
+          updatedNotes ||
           (installPrompt && sessions.length > 0 && !installDismissed)) && (
           <div
             className="absolute inset-x-0 z-40"
@@ -1421,6 +1424,14 @@ function AppContent() {
                 errorMessage={pwaError}
                 onAction={applyUpdate}
                 onDismiss={dismissUpdate}
+              />
+            ) : updatedNotes ? (
+              <PwaNotice
+                title={t(selectedLang, "pwa.updatedTitle")}
+                body={t(selectedLang, "pwa.updatedBody")}
+                items={updatedNotes[selectedLang]}
+                dismissLabel={t(selectedLang, "common.close")}
+                onDismiss={dismissUpdatedNotes}
               />
             ) : (
               <PwaNotice

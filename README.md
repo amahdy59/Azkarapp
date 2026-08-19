@@ -204,7 +204,7 @@ Repository settings must use **GitHub Actions** as the Pages source. Add `VITE_S
 
 1. Fetch `origin/main` and confirm the working tree scope.
 2. Make the smallest domain-appropriate change.
-3. Update `public/release-notes.json` with the 3–5 most important user-facing changes in simple Arabic and English.
+3. Rewrite `public/release-notes.json` so it covers only what changed since the last deployment: replace every entry with the 3–4 most important user-facing changes in simple Arabic and English, and bump `"release"`. Run `pnpm run check:release-notes` to list the commits still waiting to be announced; the same check runs first in the pre-push hook.
 4. Add or update colocated unit tests and relevant Playwright coverage.
 5. Update documentation when behavior, state shape, environment variables, or operational procedures change.
 6. Run `pnpm run verify:toolchain`, `pnpm install --frozen-lockfile`, `pnpm check`, the relevant Playwright specs, and `pnpm build:pages`.

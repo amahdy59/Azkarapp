@@ -26,6 +26,7 @@
     "test:coverage": "vitest run --coverage",
     "test:run": "vitest run",
     "budget": "node scripts/check-bundle-budget.mjs",
+    "check:release-notes": "node scripts/check-release-notes.mjs",
     "typecheck": "tsc --noEmit",
     "validate:audio": "node scripts/validate-audio-manifest.mjs",
     "verify:toolchain": "node scripts/verify-toolchain.mjs",
