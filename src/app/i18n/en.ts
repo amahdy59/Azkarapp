@@ -221,7 +221,7 @@ const en = {
     homeSubtitle: "Salawat counter & Surah Al-Kahf",
     bannerHeading: "Blessed Friday Routine",
     bannerHadith: "Multiply prayers upon Prophet Muhammad ﷺ on Friday",
-    salawatHeading: "Salawat Counter ﷺ",
+    salawatHeading: "Salawat ﷺ",
     salawatResetLabel: "Reset",
     salawatResetAriaLabel: "Reset counter",
     salawatText: "Allahumma salli wa sallim 'ala Nabiyyina Muhammad",

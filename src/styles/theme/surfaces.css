@@ -390,7 +390,7 @@ a[href]:not(.no-press):active,
 
 /* Adaptive Layout Tokens */
 :root {
-  --content-reading: 37.5rem;
+  --content-reading: 34rem;
   --content-form: 40rem;
   --content-dashboard: 90rem;
   --content-app-shell: 100rem;

@@ -23,3 +23,15 @@
     margin-inline: auto;
   }
 }
+
+/* The one place the reading measure is set.
+
+   Both readers used to name their own cap — the immersive one a hard 480px,
+   the Mushaf page a 42rem `max-w-2xl` nested inside it — so on a tablet the
+   inner cap won on width, overflowed the outer one, and the page slid off to
+   one side rather than centring. One token, applied once, cannot disagree
+   with itself. On a phone the max never binds: the column is already narrower
+   than the measure. */
+.reading-measure {
+  max-width: var(--content-reading);
+}

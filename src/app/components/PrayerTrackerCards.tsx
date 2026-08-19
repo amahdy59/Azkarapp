@@ -37,7 +37,16 @@ const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
   isha: MoonStar,
 };
 
-const COMPACT_VISIBLE_COUNT = 2;
+/**
+ * How many cards the row shows before the reveal, per tier.
+ *
+ * Two on a phone is what fits without shrinking the time — the thing people
+ * are scanning for. A tablet has room for the pair plus the one after it, and
+ * a desktop has room for all five, so hiding any of them there only costs a
+ * click to see what was already affordable to show.
+ */
+const PHONE_VISIBLE_COUNT = 2;
+const TABLET_VISIBLE_COUNT = 3;
 
 export type PrayerTemporalState = "past" | "current" | "next" | "upcoming";
 
@@ -268,11 +277,9 @@ export function PrayerTrackerCards({
   /* Acknowledges praying in congregation. Only ever opened by ticking the box
      on, never by clearing it — undoing a mistake should stay silent. */
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
-  /* Desktop has room for all five at once, so hiding any of them there only
-     costs a click to see what is already affordable to show. Below that the
-     row becomes a carousel and two cards is what fits without shrinking the
-     time — the thing people are scanning for — so the rest stay one tap away. */
   const isWide = useMediaQuery("(min-width: 64rem)");
+  const isTablet = useMediaQuery("(min-width: 40rem)");
+  const compactCount = isTablet ? TABLET_VISIBLE_COUNT : PHONE_VISIBLE_COUNT;
   // Collapsing keeps the cards mounted for the length of the exit so they can
   // animate away instead of disappearing between two frames.
   const [isCollapsing, setIsCollapsing] = useState(false);
@@ -301,22 +308,23 @@ export function PrayerTrackerCards({
     (model): model is PrayerCardModel => Boolean(model),
   );
   // A prayer that has not arrived cannot be tracked and cannot be read yet, so
-  // by default it only takes up room. The ones that can be acted on — what has
-  // passed, what is open now, and what is next — stay in view; the rest are one
-  // tap away. "Next" is never hidden: it is the one people look for.
-  // The two most actionable cards: whatever is open now, then what follows.
+  // by default it only takes up room. The window opens on whatever is open now
+  // and runs forward from there, so at Asr the row shows Asr and Maghrib rather
+  // than the morning it has already left behind. "Next" is never dropped: it is
+  // the one people look for. Late in the day the window is clamped back from
+  // the end so it always holds a full set rather than trailing off after Isha.
   const focusIndex = Math.max(
     0,
     ordered.findIndex((model) => model.state === "current" || model.state === "next"),
   );
-  const compactStart = Math.min(focusIndex, Math.max(0, ordered.length - COMPACT_VISIBLE_COUNT));
-  const visible = isWide || showUpcoming ? ordered : ordered.slice(compactStart, compactStart + COMPACT_VISIBLE_COUNT);
+  const compactStart = Math.min(focusIndex, Math.max(0, ordered.length - compactCount));
+  const visible = isWide || showUpcoming ? ordered : ordered.slice(compactStart, compactStart + compactCount);
   /* Whether a reveal is offered at all depends on the viewport, not on how many
      cards happen to be on screen right now. Deriving it from the current count
      made the control disappear the moment it was used, stranding the expanded
      row with no way back. */
-  const isCollapsible = !isWide && ordered.length > COMPACT_VISIBLE_COUNT;
-  const hiddenCount = ordered.length - COMPACT_VISIBLE_COUNT;
+  const isCollapsible = !isWide && ordered.length > compactCount;
+  const hiddenCount = ordered.length - compactCount;
 
   return (
     <div className="flex flex-col gap-3">
@@ -333,7 +341,7 @@ export function PrayerTrackerCards({
         // nothing to spare — one longer word, or the largest text size, and
         // they clip. Below the floor the row scrolls instead of compressing,
         // which is the same gesture the phone carousel already uses.
-        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8`}
+        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8`}
         style={{ ["--prayer-columns" as string]: String(visible.length) }}
       >
         {visible.map((model) => {

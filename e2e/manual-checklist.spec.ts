@@ -313,7 +313,12 @@ test("post-prayer cards hide what cannot be acted on and stay equal height", asy
      most actionable — what is open now and what follows — and keep the rest
      one tap away. Either way the next prayer is always on screen: it is the
      one people are looking for. */
-  const isWide = (page.viewportSize()?.width ?? 0) >= 1024;
+  /* Three tiers, matching PrayerTrackerCards: every prayer from 64rem up where
+     there is room for five, three from 40rem, two on a phone where a third
+     would squeeze the time that people are scanning for. */
+  const width = page.viewportSize()?.width ?? 0;
+  const isWide = width >= 1024;
+  const expectedCollapsed = width >= 640 ? 3 : 2;
   const collapsedStates = await cards.evaluateAll((nodes) =>
     nodes.map((node) => (node as HTMLElement).dataset.prayerState),
   );
@@ -324,7 +329,7 @@ test("post-prayer cards hide what cannot be acted on and stay equal height", asy
     expect(collapsedStates.length).toBe(5);
     await expect(toggle).toHaveCount(0);
   } else {
-    expect(collapsedStates.length).toBe(2);
+    expect(collapsedStates.length).toBe(expectedCollapsed);
     await expect(toggle).toHaveAttribute("aria-expanded", "false");
     await toggle.click();
     await expect(toggle).toHaveAttribute("aria-expanded", "true");

@@ -14,6 +14,19 @@ describe("BenefitsScreen", () => {
     expect(screen.getAllByRole("article")).toHaveLength(7);
   });
 
+  it("keeps the filter out of the scroll region so cards cannot surface over it", () => {
+    render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
+
+    const filter = screen.getByTestId("benefits-filter-bar");
+    const region = screen.getByTestId("benefits-scroll-region");
+
+    // Sticky-inside-the-scroller is what let cards appear in the strip above
+    // the filter and down both gutters beside it. Outside, there is no strip.
+    expect(region).not.toContainElement(filter);
+    expect(filter.className).not.toMatch(/sticky/);
+    expect(filter.compareDocumentPosition(region) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("shows authenticated hadith entries in a keyboard-scrollable batch", () => {
     render(<BenefitsScreen language="en" direction="ltr" onBack={() => undefined} />);
 

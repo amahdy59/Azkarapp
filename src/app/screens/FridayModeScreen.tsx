@@ -1,20 +1,25 @@
 import { useState, type ReactNode } from "react";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { formatNumerals, formatRatio } from "../formatting";
 import type { AppLanguage } from "../types";
 import {
+  Announcement,
   BookOpen,
-  Building,
+  Brush,
   Check,
   CheckCircle2,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Clock,
   Droplets,
+  Dropper,
   MoonStar,
+  Route,
   Sparkles,
-  User,
+  Star,
 } from "../components/icons";
 import { t } from "../i18n";
 import { fridayChecklistKey, fridayKahfOpenedKey, readFridaySalawatProgress } from "../fridayProgress";
@@ -36,15 +41,33 @@ function loadChecklist(): Set<PracticeId> {
   }
 }
 
+/**
+ * One Friday deed.
+ *
+ * The number is the deed's place in the ten the progress bar counts, kept
+ * running across both sections rather than restarting per section — the bar
+ * above says "3 / 10", and a row numbered 1 in the second group would not
+ * agree with it. It is decoration for the eye only: the accessible name is the
+ * label, and prefixing it with a numeral would make every row announce a
+ * position a screen-reader user already gets from the list itself.
+ *
+ * The trailing icon is what the deed *is*, one per row. Three of the seven
+ * used to share two glyphs — two Sparkles, two Users — which made the column
+ * read as a decoration rather than as a way to find a row at a glance.
+ */
 function PracticeRow({
+  index,
   label,
   icon,
   checked,
+  language,
   onClick,
 }: {
+  index: number;
   label: string;
   icon: ReactNode;
   checked: boolean;
+  language: AppLanguage;
   onClick: () => void;
 }) {
   return (
@@ -62,6 +85,12 @@ function PracticeRow({
         aria-hidden="true"
       >
         <Check size={15} strokeWidth={3} />
+      </span>
+      <span
+        aria-hidden="true"
+        className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-[0.6875rem] font-black tabular-nums text-muted-foreground"
+      >
+        {formatNumerals(index, language)}
       </span>
       <span className="min-w-0 flex-1 text-[0.875rem] font-extrabold text-foreground">{label}</span>
       <span className="text-primary" aria-hidden="true">
@@ -101,6 +130,11 @@ export function FridayModeScreen({
   const language: AppLanguage = isArabic ? "ar" : "en";
   const [checkedPractices, setCheckedPractices] = useState(loadChecklist);
   const [salawatProgress] = useState(readFridaySalawatProgress);
+  /* `null` means "follow the viewport"; a tap pins it either way. */
+  const isRoomy = useMediaQuery("(min-width: 40rem)");
+  const [virtuesChoice, setVirtuesChoice] = useState<boolean | null>(null);
+  const virtuesOpen = virtuesChoice ?? isRoomy;
+  const setVirtuesOpen = (next: boolean) => setVirtuesChoice(next);
   const [kahfStarted] = useState(() => {
     try {
       return localStorage.getItem(fridayKahfOpenedKey()) === "true";
@@ -148,20 +182,25 @@ export function FridayModeScreen({
       title: t(language, "friday.preparationHeading"),
       items: [
         { id: "ghusl", label: t(language, "friday.ghusl"), icon: <Droplets size={19} /> },
-        { id: "siwak", label: t(language, "friday.siwak"), icon: <Sparkles size={19} /> },
-        { id: "perfume", label: t(language, "friday.perfume"), icon: <Sparkles size={19} /> },
-        { id: "best_clothes", label: t(language, "friday.bestClothes"), icon: <User size={19} /> },
+        { id: "siwak", label: t(language, "friday.siwak"), icon: <Brush size={19} /> },
+        { id: "perfume", label: t(language, "friday.perfume"), icon: <Dropper size={19} /> },
+        { id: "best_clothes", label: t(language, "friday.bestClothes"), icon: <Star size={19} /> },
       ],
     },
     {
       title: t(language, "friday.goingHeading"),
       items: [
         { id: "early", label: t(language, "friday.goEarly"), icon: <Clock size={19} /> },
-        { id: "walking", label: t(language, "friday.walkIfPossible"), icon: <User size={19} /> },
-        { id: "listen", label: t(language, "friday.listenToKhutbah"), icon: <Building size={19} /> },
+        { id: "walking", label: t(language, "friday.walkIfPossible"), icon: <Route size={19} /> },
+        { id: "listen", label: t(language, "friday.listenToKhutbah"), icon: <Announcement size={19} /> },
       ],
     },
   ];
+
+  /* The number a row carries is its place among the ten the progress bar
+     counts, so it keeps running across the section break. Computed from the
+     canonical order rather than the render loop's index, which restarts. */
+  const practiceNumber = (id: PracticeId) => PRACTICE_IDS.indexOf(id) + 1;
 
   return (
     <ScreenContainer
@@ -203,20 +242,47 @@ export function FridayModeScreen({
               {t(language, "friday.progressContinue")}
             </p>
           ) : null}
-          <div className="mt-5 grid gap-3 border-t border-primary/20 pt-4 sm:grid-cols-2">
-            <div className="rounded-2xl bg-background/55 p-3 text-start">
-              <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
-              <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
-                {t(language, "friday.kahfHadith")}
-              </p>
-            </div>
-            <div className="rounded-2xl bg-background/55 p-3 text-start">
-              <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "home.fridayVirtues")}</h3>
-              <ul className="mt-1 list-disc space-y-1 ps-4 text-xs font-semibold leading-5 text-muted-foreground">
-                <li>{t(language, "home.fridayVirtueFajr")}</li>
-                <li>{t(language, "home.fridayVirtueDua")}</li>
-              </ul>
-            </div>
+          {/* The two evidence tiles are worth reading once and then getting out
+              of the way — they are the same text every week, above the actions
+              that change. So they fold. The default follows the room available
+              rather than a stored preference: on a phone they cost most of a
+              screen, from the small tier up they cost a row nothing else wanted.
+              An explicit toggle wins over that default for as long as the screen
+              is open, which is the whole span the choice was made about. */}
+          <div className="mt-5 border-t border-primary/20 pt-3">
+            <button
+              type="button"
+              onClick={() => setVirtuesOpen(!virtuesOpen)}
+              aria-expanded={virtuesOpen}
+              aria-controls="friday-virtues"
+              data-testid="friday-virtues-toggle"
+              className="flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl px-1 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span className="text-[0.8125rem] font-black text-foreground">{t(language, "home.fridayVirtues")}</span>
+              <ChevronDown
+                size={18}
+                aria-hidden="true"
+                className={`shrink-0 text-muted-foreground transition-transform duration-standard ease-standard ${
+                  virtuesOpen ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+            {virtuesOpen && (
+              <div id="friday-virtues" className="mt-2 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl bg-background/55 p-3 text-start">
+                  <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
+                  <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
+                    {t(language, "friday.kahfHadith")}
+                  </p>
+                </div>
+                <div className="rounded-2xl bg-background/55 p-3 text-start">
+                  <ul className="list-disc space-y-1 ps-4 text-xs font-semibold leading-5 text-muted-foreground">
+                    <li>{t(language, "home.fridayVirtueFajr")}</li>
+                    <li>{t(language, "home.fridayVirtueDua")}</li>
+                  </ul>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
@@ -229,9 +295,11 @@ export function FridayModeScreen({
               {section.items.map((item) => (
                 <PracticeRow
                   key={item.id}
+                  index={practiceNumber(item.id)}
                   label={item.label}
                   icon={item.icon}
                   checked={checkedPractices.has(item.id)}
+                  language={language}
                   onClick={() => togglePractice(item.id)}
                 />
               ))}

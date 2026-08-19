@@ -25,6 +25,7 @@ import {
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
+import { useNow } from "../hooks/useNow";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
@@ -244,23 +245,13 @@ export function HomeScreen({
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
 }) {
   const isArabic = language === "ar";
-  const [now, setNow] = useState(() => new Date());
+  const now = useNow();
   const [, setPrayerTimesRevision] = useState(0);
   const [savedOpenState, setSavedOpenState] = useState<{
     loadingId: string | null;
     errorId: string | null;
   }>({ loadingId: null, errorId: null });
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
-
-  useEffect(() => {
-    let timer: ReturnType<typeof setTimeout>;
-    const updateAtNextMinute = () => {
-      setNow(new Date());
-      timer = setTimeout(updateAtNextMinute, 60_050 - (Date.now() % 60_000));
-    };
-    timer = setTimeout(updateAtNextMinute, 60_050 - (Date.now() % 60_000));
-    return () => clearTimeout(timer);
-  }, []);
 
   const prayerDateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
 

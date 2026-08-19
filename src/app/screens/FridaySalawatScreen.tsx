@@ -21,7 +21,7 @@ import type { AppLanguage } from "../types";
 
 const COPY = {
   en: {
-    title: "Salawat Counter ﷺ",
+    title: "Salawat ﷺ",
     subtitle: "Choose a target and count with intention",
     phrase: "Allahumma salli wa sallim ‘ala Nabiyyina Muhammad",
     target: "Target",
@@ -34,7 +34,7 @@ const COPY = {
     fridaySource: "Sunan Abi Dawud 1047 — Sahih",
   },
   ar: {
-    title: "الصلاة على النبي ﷺ",
+    title: "صلاة على النبي ﷺ",
     subtitle: "اختر هدفًا واحتسب الأجر",
     phrase: "اللَّهُمَّ صَلِّ وَسَلِّمْ عَلَى نَبِيِّنَا مُحَمَّدٍ",
     target: "الهدف",

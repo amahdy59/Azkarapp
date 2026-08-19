@@ -121,36 +121,39 @@ export function WirdBenefitsScreen({
         language={language}
       />
 
+      {/* The filter sits outside the scroll region, not sticky inside it.
+          Sticky put it in the same scroll box as the cards, which meant its
+          background had to be stretched back over the region's gutters and its
+          top padding to hide them — and both of those bleeds were measured
+          against a 20px gutter the region only has on a phone. From the small
+          tier up the gutter is 24px and the top padding was never covered at
+          all, so cards surfaced in a strip above the filter and down both
+          sides of it. A sibling of the scroll region cannot be scrolled over
+          at any width, and needs no bleed to prove it. */}
+      <div className="page-content-center shrink-0 px-5 pb-3 pt-3" data-testid="wird-benefits-filter-bar">
+        <TabList
+          value={activeSection}
+          onChange={setActiveSection}
+          tabs={tabs}
+          direction={direction}
+          idPrefix="wird-benefits"
+          aria-label={t(language, "wirdBenefits.sectionsLabel")}
+          className="grid grid-cols-3 gap-2 rounded-3xl border border-border bg-card p-2"
+          itemClassName={(selected) =>
+            `min-h-11 rounded-2xl px-2 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+              selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
+            }`
+          }
+        />
+      </div>
+
       <div
         role="region"
         aria-label={t(language, "wirdBenefits.title")}
         tabIndex={0}
-        className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-3 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="page-content-center min-h-0 flex-1 overflow-y-auto px-5 pb-8 pt-1 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         data-testid="wird-benefits-scroll-region"
       >
-        {/* Same sticky treatment as the Zikr benefits index: the filter belongs
-            to the scroll region, not to the first card, so it stays reachable
-            after scrolling. */}
-        <div
-          className="sticky top-0 z-10 -mx-5 -mt-3 mb-5 bg-background px-5 pb-3 pt-3"
-          data-testid="wird-benefits-filter-bar"
-        >
-          <TabList
-            value={activeSection}
-            onChange={setActiveSection}
-            tabs={tabs}
-            direction={direction}
-            idPrefix="wird-benefits"
-            aria-label={t(language, "wirdBenefits.sectionsLabel")}
-            className="grid grid-cols-3 gap-2 rounded-3xl border border-border bg-card p-2"
-            itemClassName={(selected) =>
-              `min-h-11 rounded-2xl px-2 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
-              }`
-            }
-          />
-        </div>
-
         <section
           {...tabPanelProps("wird-benefits", activeSection)}
           className="rounded-xl outline-none focus-visible:ring-[3px] focus-visible:ring-ring"

@@ -37,7 +37,7 @@ export function MushafPageReader({
   if (pages.length === 0) return null;
 
   return (
-    <div className={flat ? "max-w-2xl mx-auto" : "max-w-2xl mx-auto space-y-5"} data-testid="mushaf-pages">
+    <div className={flat ? "mx-auto w-full" : "mx-auto w-full space-y-5"} data-testid="mushaf-pages">
       {pages.map((page, index) => {
         const headingId = `mushaf-page-${zikr.id}-${page.page}`;
         const pageNumber = formatNumerals(page.page, language);

@@ -81,6 +81,32 @@ describe("FridayModeScreen", () => {
     expect(screen.getByText("Completed")).toBeInTheDocument();
   });
 
+  it("folds the virtues away on a phone and opens them on request", () => {
+    // jsdom reports no matchMedia match, which is the narrow tier — the one
+    // where the two evidence tiles cost most of a screen above the actions.
+    render(
+      <FridayModeScreen
+        isArabic={false}
+        direction="ltr"
+        kahfCompletedCount={0}
+        duasCompletedCount={0}
+        duasTotalCount={47}
+        onBack={() => undefined}
+        onStartKahf={() => undefined}
+        onOpenSalawat={() => undefined}
+        onStartDuasSession={() => undefined}
+      />,
+    );
+
+    const toggle = screen.getByTestId("friday-virtues-toggle");
+    expect(toggle).toHaveAttribute("aria-expanded", "false");
+    expect(screen.queryByText(/best of your days/i)).not.toBeInTheDocument();
+
+    fireEvent.click(toggle);
+    expect(toggle).toHaveAttribute("aria-expanded", "true");
+    expect(document.getElementById("friday-virtues")).toBeInTheDocument();
+  });
+
   it("keeps the Sunnahs as a weekly checklist and the duas behind one action", () => {
     const onStartDuasSession = vi.fn();
     const onOpenSalawat = vi.fn();
@@ -105,7 +131,7 @@ describe("FridayModeScreen", () => {
 
     expect(screen.getAllByRole("checkbox")).toHaveLength(7);
 
-    fireEvent.click(screen.getByRole("button", { name: /Salawat Counter/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Salawat/ }));
     expect(onOpenSalawat).toHaveBeenCalledOnce();
 
     fireEvent.click(screen.getByRole("button", { name: /Comprehensive Duas/ }));

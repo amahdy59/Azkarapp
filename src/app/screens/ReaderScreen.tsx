@@ -913,7 +913,7 @@ export function ReaderScreen({
                       animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
                       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
                       transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                      className="mx-auto flex min-h-full max-w-[480px] w-full flex-col py-4"
+                      className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
                     >
                       <div
                         className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
