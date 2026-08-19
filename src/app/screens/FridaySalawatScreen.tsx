@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
-import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, X } from "../components/icons";
+import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, Volume2, VolumeX, X } from "../components/icons";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { Modal } from "../components/ResponsiveSheet";
@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
+import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import { useWakeLock } from "../hooks/useWakeLock";
@@ -91,9 +92,16 @@ export function FridaySalawatScreen({
     writeFridaySalawatProgress(next);
   }, []);
 
+  /* The same tap feedback the reader and the masbaha give. This counter had
+     none, so the one action it exists for was the only counting tap in the app
+     that answered silently. */
+  const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
+
   const increment = useCallback(() => {
-    if (!complete) persist(progress.count + 1, progress.target);
-  }, [complete, persist, progress.count, progress.target]);
+    if (complete) return;
+    playClickFeedback();
+    persist(progress.count + 1, progress.target);
+  }, [complete, persist, playClickFeedback, progress.count, progress.target]);
 
   const reset = useCallback(() => persist(0, progress.target), [persist, progress.target]);
 
@@ -165,6 +173,14 @@ export function FridaySalawatScreen({
                 <MoreVertical size={20} aria-hidden="true" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={toggleSound}>
+                  {soundEnabled ? (
+                    <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                  ) : (
+                    <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                  )}
+                  <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                </DropdownMenuItem>
                 <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
                   <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
                   <span>{copy.reset}</span>
