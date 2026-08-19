@@ -16,6 +16,7 @@ import { useCounterClickFeedback } from "../hooks/useCounterClickFeedback";
 import { formatNumerals } from "../formatting";
 import { readFridaySalawatProgress, writeFridaySalawatProgress, type FridaySalawatTarget } from "../fridayProgress";
 import { useWakeLock } from "../hooks/useWakeLock";
+import { vibrateIfEnabled } from "../motionPreferences";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
 
@@ -72,11 +73,14 @@ export function FridaySalawatScreen({
   direction,
   onBack,
   reduceMotion = false,
+  hapticFeedback = true,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onBack: () => void;
   reduceMotion?: boolean;
+  /** Matches the reader and the Masbaha: counting is felt, not only heard. */
+  hapticFeedback?: boolean;
 }) {
   const copy = COPY[language];
   const [progress, setProgress] = useState(readFridaySalawatProgress);
@@ -100,8 +104,15 @@ export function FridaySalawatScreen({
   const increment = useCallback(() => {
     if (complete) return;
     playClickFeedback();
-    persist(progress.count + 1, progress.target);
-  }, [complete, persist, playClickFeedback, progress.count, progress.target]);
+    /* The reader and the Masbaha both answer a count with a short pulse, and
+       reaching the target with a distinct pattern. This counter played the
+       sound and nothing else, so the one screen people tap hundreds of times
+       was the one that felt like nothing was happening. Same durations, so the
+       three do not develop separate vocabularies. */
+    const next = progress.count + 1;
+    vibrateIfEnabled(hapticFeedback, next >= progress.target ? [30, 50, 30, 50, 50] : 15);
+    persist(next, progress.target);
+  }, [complete, hapticFeedback, persist, playClickFeedback, progress.count, progress.target]);
 
   const reset = useCallback(() => persist(0, progress.target), [persist, progress.target]);
 

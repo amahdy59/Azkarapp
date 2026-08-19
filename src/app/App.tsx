@@ -1095,6 +1095,7 @@ function AppContent() {
                   language={selectedLang}
                   direction={layoutDirection}
                   reduceMotion={reduceMotion}
+                  hapticFeedback={hapticFeedback}
                   onBack={() => {
                     window.history.replaceState({ view: "friday" }, "", "?view=friday");
                     setView("friday");
