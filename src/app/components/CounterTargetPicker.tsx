@@ -54,7 +54,11 @@ export function CounterTargetPicker({
   };
 
   return (
-    <fieldset className="w-full" dir={direction}>
+    /* min-w-0 because a fieldset defaults to `min-width: min-content` in every
+       browser's UA sheet, so it refuses to shrink below its longest label. In a
+       grid column that is narrower than the text — "Target: Open" at 320px —
+       the fieldset pushed the whole screen sideways rather than truncating. */
+    <fieldset className="w-full min-w-0" dir={direction}>
       <legend className="sr-only">{t(language, "counter.targetLabel")}</legend>
       <DropdownMenu dir={direction}>
         <DropdownMenuTrigger asChild>

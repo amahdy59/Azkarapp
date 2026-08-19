@@ -12,8 +12,7 @@ import {
   VolumeX,
   X,
 } from "../components/icons";
-import { Header } from "../components/LayoutShells";
-import { ProgressBar } from "../components/ProgressBar";
+import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Button } from "../components/ui/button";
@@ -36,6 +35,12 @@ import type { AppLanguage } from "../types";
 
 const HEADER_ACTION_CLASS =
   "interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+/* The wide band is a fixed navy surface, so its controls take on-media colours
+   rather than theme ones. Reusing the compact class there is what produced
+   white-on-white the last time these two treatments were conflated. */
+const HERO_ACTION_CLASS =
+  "flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 export function CustomCounterScreen({
   isArabic,
@@ -144,42 +149,103 @@ export function CustomCounterScreen({
       screenName={t(language, "counter.tasbeehTitle")}
     >
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
-        <Header
+        <ReadingScreenChrome
+          language={language}
+          direction={direction}
           title={t(language, "counter.tasbeehTitle")}
           onBack={onBack}
-          language={language}
-          right={
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setShowReference(true)}
-                className={HEADER_ACTION_CLASS}
-                aria-label={t(language, "counter.virtueReference")}
-                aria-haspopup="dialog"
-              >
-                <BookOpen size={20} aria-hidden="true" />
-              </button>
-              <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger className={HEADER_ACTION_CLASS} aria-label={t(language, "common.moreOptions")}>
-                  <MoreVertical size={20} aria-hidden="true" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={toggleSound}>
-                    {soundEnabled ? (
-                      <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                    ) : (
-                      <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                    )}
-                    <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleReset} disabled={count === 0 && laps === 0}>
-                    <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                    <span>{t(language, "reader.resetCounter")}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+          testId="custom-counter"
+          /* An open target has nothing to fill, so it reports the tally and
+             skips the bar rather than drawing a track that never moves. */
+          progress={{
+            value: count,
+            ...(isTargetMode ? { max: target } : {}),
+            percentLabel: isTargetMode
+              ? `${formatNumerals(progressPercent, language)}%`
+              : t(language, "counter.targetOpen"),
+            countLabel: isTargetMode
+              ? `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`
+              : formatNumerals(count, language),
+            ariaLabel: t(language, "counter.targetLabel"),
+          }}
+          subRow={
+            <div className="w-full" data-prevent-count="true">
+              <div className="relative z-20 mb-4 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
+                <div className="min-w-0">
+                  <DropdownMenu dir={direction}>
+                    <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+                      <span className="truncate text-start flex-1">
+                        {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
+                      </span>
+                      <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent
+                      align="start"
+                      className="max-h-[250px] w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
+                    >
+                      <DropdownMenuRadioGroup
+                        value={selectedAuthentic.id}
+                        onValueChange={(id) => {
+                          const item = AUTHENTIC_AZKAR_COLLECTION.find((x) => x.id === id);
+                          if (item) handleSelectAuthenticZikr(item);
+                        }}
+                      >
+                        {AUTHENTIC_AZKAR_COLLECTION.map((item) => (
+                          <DropdownMenuRadioItem key={item.id} value={item.id} className="text-[0.875rem] font-bold">
+                            {isArabic ? item.categoryNameAr : item.categoryNameEn}
+                          </DropdownMenuRadioItem>
+                        ))}
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </div>
+
+                <div className="min-w-0">
+                  <CounterTargetPicker
+                    activeTarget={target}
+                    onTargetChange={changeTarget}
+                    language={language}
+                    direction={direction}
+                  />
+                </div>
+              </div>
             </div>
           }
+          actions={(tier) => {
+            const actionClass = tier === "wide" ? HERO_ACTION_CLASS : HEADER_ACTION_CLASS;
+            return (
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowReference(true)}
+                  className={actionClass}
+                  aria-label={t(language, "counter.virtueReference")}
+                  aria-haspopup="dialog"
+                >
+                  <BookOpen size={20} aria-hidden="true" />
+                </button>
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                    <MoreVertical size={20} aria-hidden="true" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={toggleSound}>
+                      {soundEnabled ? (
+                        <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                      ) : (
+                        <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                      )}
+                      <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={handleReset} disabled={count === 0 && laps === 0}>
+                      <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                      <span>{t(language, "reader.resetCounter")}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            );
+          }}
         />
 
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
@@ -189,68 +255,6 @@ export function CustomCounterScreen({
           data-counting-mode="canvas"
           onClick={handleCanvasClick}
         >
-          {/* Controls Bar */}
-          <div className="relative z-20 mb-4 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
-            <div className="min-w-0">
-              <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-                  <span className="truncate text-start flex-1">
-                    {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
-                  </span>
-                  <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent
-                  align="start"
-                  className="max-h-[250px] w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
-                >
-                  <DropdownMenuRadioGroup
-                    value={selectedAuthentic.id}
-                    onValueChange={(id) => {
-                      const item = AUTHENTIC_AZKAR_COLLECTION.find((x) => x.id === id);
-                      if (item) handleSelectAuthenticZikr(item);
-                    }}
-                  >
-                    {AUTHENTIC_AZKAR_COLLECTION.map((item) => (
-                      <DropdownMenuRadioItem key={item.id} value={item.id} className="text-[0.875rem] font-bold">
-                        {isArabic ? item.categoryNameAr : item.categoryNameEn}
-                      </DropdownMenuRadioItem>
-                    ))}
-                  </DropdownMenuRadioGroup>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <div className="min-w-0">
-              <CounterTargetPicker
-                activeTarget={target}
-                onTargetChange={changeTarget}
-                language={language}
-                direction={direction}
-              />
-            </div>
-          </div>
-
-          <section
-            className="relative z-10 space-y-3 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-raised"
-            aria-label={t(language, "counter.targetLabel")}
-          >
-            <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
-              <span>
-                {isTargetMode ? `${formatNumerals(progressPercent, language)}%` : t(language, "counter.targetOpen")}
-              </span>
-              <span>
-                {isTargetMode
-                  ? `${formatNumerals(count, language)} / ${formatNumerals(target, language)}`
-                  : formatNumerals(count, language)}
-              </span>
-            </div>
-            <ProgressBar
-              value={count}
-              max={isTargetMode ? target : 1}
-              direction={direction}
-              aria-label={t(language, "counter.targetLabel")}
-            />
-          </section>
           <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
             <p
               className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"

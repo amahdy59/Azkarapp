@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useState, type MouseEvent } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, Volume2, VolumeX, X } from "../components/icons";
-import { Header } from "../components/LayoutShells";
-import { ProgressBar } from "../components/ProgressBar";
+import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
 import { ScreenContainer } from "../components/ScreenContainer";
 import {
@@ -67,6 +66,14 @@ function ReferenceLink({ text, source, href }: { text: string; source: string; h
     </article>
   );
 }
+
+const COMPACT_ACTION_CLASS =
+  "interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+
+/* The wide band is a fixed navy surface, so its controls take on-media colours
+   rather than theme ones — the same split the Reader makes. */
+const HERO_ACTION_CLASS =
+  "flex size-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 
 export function FridaySalawatScreen({
   language,
@@ -161,45 +168,65 @@ export function FridaySalawatScreen({
       className="relative flex flex-col overflow-y-auto page-content-center"
       screenName={copy.title}
     >
-      <Header
+      <ReadingScreenChrome
+        language={language}
+        direction={direction}
         title={copy.title}
         onBack={onBack}
-        language={language}
-        right={
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={() => setShowBenefits(true)}
-              className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-              aria-label={copy.benefits}
-              aria-haspopup="dialog"
-            >
-              <BookOpen size={20} aria-hidden="true" />
-            </button>
-            <DropdownMenu dir={direction}>
-              <DropdownMenuTrigger
-                className="interactive-elem flex size-11 items-center justify-center rounded-full border border-border-control bg-card text-foreground shadow-xs hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                aria-label={t(language, "common.moreOptions")}
-              >
-                <MoreVertical size={20} aria-hidden="true" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={toggleSound}>
-                  {soundEnabled ? (
-                    <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                  ) : (
-                    <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                  )}
-                  <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
-                  <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                  <span>{copy.reset}</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+        testId="salawat"
+        progress={{
+          value: progress.count,
+          max: progress.target,
+          percentLabel: `${formatNumerals(progressPercent, language)}%`,
+          countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
+          ariaLabel: copy.target,
+        }}
+        subRow={
+          <div className="w-full" data-prevent-count="true">
+            <CounterTargetPicker
+              activeTarget={progress.target}
+              onTargetChange={(target) => persist(0, target)}
+              language={language}
+              direction={direction}
+              allowOpen={false}
+            />
           </div>
         }
+        actions={(tier) => {
+          const actionClass = tier === "wide" ? HERO_ACTION_CLASS : COMPACT_ACTION_CLASS;
+          return (
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setShowBenefits(true)}
+                className={actionClass}
+                aria-label={copy.benefits}
+                aria-haspopup="dialog"
+              >
+                <BookOpen size={20} aria-hidden="true" />
+              </button>
+              <DropdownMenu dir={direction}>
+                <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                  <MoreVertical size={20} aria-hidden="true" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={toggleSound}>
+                    {soundEnabled ? (
+                      <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                    ) : (
+                      <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                    )}
+                    <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
+                    <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                    <span>{copy.reset}</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          );
+        }}
       />
       <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
         {complete ? copy.completed : ""}
@@ -211,29 +238,6 @@ export function FridaySalawatScreen({
         data-counting-mode="canvas"
         onClick={handleCanvasClick}
       >
-        <section
-          className="space-y-3 rounded-3xl border border-border bg-card p-4 sm:p-5 shadow-raised"
-          aria-label={copy.target}
-        >
-          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
-            <span>{formatNumerals(progressPercent, language)}%</span>
-            <span>
-              {formatNumerals(progress.count, language)} / {formatNumerals(progress.target, language)}
-            </span>
-          </div>
-          <ProgressBar value={progress.count} max={progress.target} direction={direction} aria-label={copy.target} />
-        </section>
-
-        <div className="relative z-20 mt-4 flex w-full" data-prevent-count="true">
-          <CounterTargetPicker
-            activeTarget={progress.target}
-            onTargetChange={(target) => persist(0, target)}
-            language={language}
-            direction={direction}
-            allowOpen={false}
-          />
-        </div>
-
         <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
           <p
             className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
