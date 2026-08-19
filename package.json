@@ -29,7 +29,8 @@
     "typecheck": "tsc --noEmit",
     "validate:audio": "node scripts/validate-audio-manifest.mjs",
     "verify:toolchain": "node scripts/verify-toolchain.mjs",
-    "report:audio": "node scripts/generate-audio-mapping-report.mjs"
+    "report:audio": "node scripts/generate-audio-mapping-report.mjs",
+    "prepare:audio": "node scripts/prepare-audio-asset.mjs"
   },
   "dependencies": {
     "@fontsource-variable/noto-sans-arabic": "5.3.0",
