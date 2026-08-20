@@ -107,6 +107,8 @@ See `DESIGN_SYSTEM.md` for the authoritative typography, icon, geometry, and mot
 
 The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys, such as the daily prayer-time cache. Local session history retains the newest 500 entries to keep persistence bounded. Failed writes are surfaced in the application with retry and dismiss actions instead of failing silently.
 
+The active practice day has one fixed boundary: local 00:00. `App.tsx` schedules the rollover and reconciles again when a backgrounded app becomes visible. A rollover clears partial and complete state for Morning, Evening, Before Sleep, Waking Up, and After Prayer while retaining immutable daily-completion history, streaks, saved items, sessions, and resumable situational collections. Legacy 02:00/04:00/06:00 preferences normalize to midnight. The shared minute clock advances Home and Progress to the new local date; their date-keyed prayer refresh then resolves the current day's cache or offline calculation before replacing it with fresh Aladhan data when available.
+
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
 
 Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to

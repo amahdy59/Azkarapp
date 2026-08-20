@@ -3,7 +3,13 @@ import "./RoutineGarden.css";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import { getGardenSummary, type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
+import {
+  DEFAULT_PROGRESS_DAY_START_HOUR,
+  getGardenSummary,
+  type GardenMilestoneId,
+  type GardenSummary,
+  type GrowthEvent,
+} from "../progress";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import { TabList, tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
@@ -41,7 +47,7 @@ export function TodayRoutineGarden({
   onOpenShareModal: _onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
-  progressDayStartHour = 4,
+  progressDayStartHour = DEFAULT_PROGRESS_DAY_START_HOUR,
   onSelectCategory,
   visibleCategoryIds,
   onOpenWirdBenefits,

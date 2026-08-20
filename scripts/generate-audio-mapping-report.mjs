@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import prettier from "prettier";
 import { loadTypeScriptModule } from "./load-typescript-module.mjs";
 
 const root = process.cwd();
@@ -34,6 +35,17 @@ const licenseWarnings = issues.filter((issue) =>
   ["missing-source", "missing-attribution", "missing-license"].includes(issue.code),
 ).length;
 const quranErrors = issues.filter((issue) => issue.code === "quran-range").length;
+const recordingInventory = [...canonicalGroups.entries()].map(([canonicalKey, items]) => {
+  const representative = items[0];
+  const contentKind = representative.isSurah || canonicalKey.startsWith("quran-") ? "quran" : "dua";
+  return {
+    canonicalKey,
+    assetId: representative.id,
+    fileName: `${representative.id}.mp3`,
+    uploadKey: `${contentKind}/${representative.id}/<voice-id>/v1/${representative.id}.mp3`,
+    instanceIds: items.map((item) => item.id),
+  };
+});
 const report = `# Generated audio mapping report
 
 Generated: ${new Date().toISOString()}
@@ -55,16 +67,30 @@ Generated: ${new Date().toISOString()}
 
 ${reused.map(([key, items]) => `- \`${key}\`: ${items.map((item) => `\`${item.id}\``).join(", ")}`).join("\n") || "- None"}
 
+## Recording filenames and upload keys
+
+Record one file per canonical row, not one file per screen instance. The filename and object key below match the current \`prepare:audio\` convention. Replace \`<voice-id>\` with \`abdullah-muhammad\`, \`muhammad-alshara\`, or \`muhammad-moataz\`.
+
+| Canonical content | Asset ID | Recording filename | Supabase \`audio\` bucket object key | App instance IDs |
+| --- | --- | --- | --- | --- |
+${recordingInventory
+  .map(
+    ({ canonicalKey, assetId, fileName, uploadKey, instanceIds }) =>
+      `| \`${canonicalKey}\` | \`${assetId}\` | \`${fileName}\` | \`${uploadKey}\` | ${instanceIds.map((id) => `\`${id}\``).join(", ")} |`,
+  )
+  .join("\n")}
+
 ## Unmatched zikrs
 
 ${unmatched.map((zikr) => `- \`${zikr.id}\` — \`${zikr.canonicalKey}\``).join("\n") || "- None"}
 `;
+const formattedReport = await prettier.format(report, { parser: "markdown" });
 
 if (process.argv.includes("--write")) {
   const target = path.join(root, "docs/audio/generated-mapping-report.md");
   fs.mkdirSync(path.dirname(target), { recursive: true });
-  fs.writeFileSync(target, report);
+  fs.writeFileSync(target, formattedReport);
   console.log(`Wrote ${path.relative(root, target)}`);
 } else {
-  process.stdout.write(report);
+  process.stdout.write(formattedReport);
 }

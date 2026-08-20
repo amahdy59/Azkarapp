@@ -584,11 +584,9 @@ const en = {
     gardenHiddenTitle: "Garden progress is hidden",
     gardenHiddenBody: "Completions are still recorded privately, so nothing is lost if you show it again.",
     dayBoundaryTitle: "Practice day",
-    dayBoundaryHint:
-      "Choose when a new practice day begins. Existing completion dates stay fixed, and unfinished-only reminders follow this time.",
+    dayBoundaryHint: "Daily routine progress and prayer tracking start fresh with the local calendar day.",
     dayStartsAt: "A new practice day begins at",
     midnight: "Midnight",
-    hourAm: "{hour}:00 AM",
     todayBreakdown: "Today's collections",
     gardenState: "Today's garden state",
     todayStats: "Today's stats",

@@ -87,7 +87,7 @@ if (!mimeType) {
   process.exit(1);
 }
 
-const contentKind = zikr.isSurah ? "quran" : "dua";
+const contentKind = zikr.isSurah || zikr.canonicalKey.startsWith("quran-") ? "quran" : "dua";
 const relativePath = `${contentKind}/${zikr.id}/${voiceId}/v${version}/${zikr.id}${extension}`;
 const fingerprint = matching.createArabicTextFingerprint(zikr.arabicText);
 const voiceName = voices.getAudioVoiceName(voiceId, "ar");

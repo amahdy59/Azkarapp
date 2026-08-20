@@ -73,7 +73,6 @@ interface SettingsScreenProps {
   onLocationChange?: (value: LocationSettings) => void;
   onWeeklyGoalDaysChange: (value: number) => void;
   onQuietProgressEnabledChange: (value: boolean) => void;
-  onProgressDayStartHourChange: (value: number) => void;
   onActivateAccount: () => void;
   onSignOut: () => void;
   onExportData: () => void;
@@ -125,7 +124,6 @@ export function SettingsScreen({
   onLocationChange,
   onWeeklyGoalDaysChange,
   onQuietProgressEnabledChange,
-  onProgressDayStartHourChange,
   onActivateAccount,
   onSignOut,
   onExportData,
@@ -325,7 +323,6 @@ export function SettingsScreen({
             progressDayStartHour={progressDayStartHour}
             weeklyGoalDays={weeklyGoalDays}
             onQuietProgressEnabledChange={onQuietProgressEnabledChange}
-            onProgressDayStartHourChange={onProgressDayStartHourChange}
             onWeeklyGoalDaysChange={onWeeklyGoalDaysChange}
             onBack={goBack}
           />

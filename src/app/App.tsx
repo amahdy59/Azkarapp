@@ -56,6 +56,7 @@ import {
   getFirstIncompleteZikrIndex,
   getNextIncompleteZikrIndex,
   millisecondsUntilNextProgressDay,
+  resetDailyRoutineProgress,
   resetStaleCompletedCollections,
   getEffectiveCompletedForSubcategory,
   getProgressDayKey,
@@ -229,6 +230,7 @@ function AppContent() {
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
+  const activeProgressDayRef = useRef(getProgressDayKey(new Date(), progressDayStartHour));
   const [calendarType, setCalendarType] = useState<"hijri" | "gregorian">(
     initialState.settings.calendarType ?? "hijri",
   );
@@ -651,10 +653,12 @@ function AppContent() {
   useForegroundReminders({ reminders, dailyCompletions, progressDayStartHour, language: selectedLang });
 
   const reconcileDailyProgress = useCallback(() => {
-    setCompleted((previous) =>
-      resetStaleCompletedCollections(previous, dailyCompletions, new Date(), progressDayStartHour),
-    );
-  }, [dailyCompletions, progressDayStartHour]);
+    const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
+    if (activeProgressDayRef.current === currentDayKey) return;
+
+    activeProgressDayRef.current = currentDayKey;
+    setCompleted((previous) => resetDailyRoutineProgress(previous));
+  }, [progressDayStartHour]);
 
   useEffect(() => {
     let timerId: number | undefined;
@@ -1329,7 +1333,6 @@ function AppContent() {
                   onLocationChange={handleLocationChange}
                   onWeeklyGoalDaysChange={setWeeklyGoalDays}
                   onQuietProgressEnabledChange={setQuietProgressEnabled}
-                  onProgressDayStartHourChange={setProgressDayStartHour}
                   onActivateAccount={handleOpenAccountAuth}
                   onSignOut={handleSignOut}
                   onExportData={handleExportData}

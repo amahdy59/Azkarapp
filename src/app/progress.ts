@@ -3,14 +3,16 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep", "after_prayer"];
+export const DAILY_ROUTINE_CATEGORY_IDS: readonly CategoryId[] = [
+  "morning",
+  "evening",
+  "before_sleep",
+  "waking_up",
+  "after_prayer",
+];
 /**
- * The progress day rolls at midnight.
- *
- * It used to roll at 04:00, on the reasoning that sleep azkar read at 1am
- * belong to the day that is ending. That is defensible, but it means the date
- * on screen and the date the progress counts against disagree for four hours
- * every night, which is the more confusing of the two problems. Readers can
- * still choose 2, 4 or 6am in Settings -> Progress.
+ * The progress day always rolls at local midnight so the displayed calendar
+ * date, prayer schedule, prayer tracking, and routine progress change together.
  */
 export const DEFAULT_PROGRESS_DAY_START_HOUR = 0;
 
@@ -474,6 +476,16 @@ export function resetStaleCompletedCollections(
       const isFull = getAzkarByCategory(category).every((zikr) => categoryProgress.has(zikr.id));
       return [category, isFull && !completedToday.has(category) ? new Set<string>() : new Set(categoryProgress)];
     }),
+  ) as Record<CategoryId, Set<string>>;
+}
+
+/** Starts a new local day without erasing history or resumable situational collections. */
+export function resetDailyRoutineProgress(completed: Record<CategoryId, Set<string>>) {
+  return Object.fromEntries(
+    CATEGORY_IDS.map((category) => [
+      category,
+      DAILY_ROUTINE_CATEGORY_IDS.includes(category) ? new Set<string>() : new Set(completed[category] ?? []),
+    ]),
   ) as Record<CategoryId, Set<string>>;
 }
 

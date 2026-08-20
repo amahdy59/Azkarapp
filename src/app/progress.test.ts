@@ -10,6 +10,7 @@ import {
   getProgressDayKey,
   mergeDailyCompletions,
   recordDailyCollectionCompletion,
+  resetDailyRoutineProgress,
   resetStaleCompletedCollections,
 } from "./progress";
 import type { CategoryId, DailyCollectionCompletion, StoredSession } from "./types";
@@ -176,6 +177,19 @@ describe("quiet garden progress", () => {
 
     expect(reset.morning.size).toBe(0);
     expect([...reset.evening]).toEqual(["e-hm-75a", "e-hm-75"]);
+  });
+
+  it("starts a new day with empty daily routines while preserving situational progress", () => {
+    const completed = Object.fromEntries(
+      CATEGORY_IDS.map((id) => [id, new Set<string>([`${id}-partial`])]),
+    ) as Record<CategoryId, Set<string>>;
+
+    const reset = resetDailyRoutineProgress(completed);
+
+    for (const category of ["morning", "evening", "before_sleep", "waking_up", "after_prayer"] as const) {
+      expect(reset[category].size).toBe(0);
+    }
+    expect([...reset.travel]).toEqual(["travel-partial"]);
   });
 
   it("wraps to an earlier unfinished zikr instead of treating the final index as collection completion", () => {

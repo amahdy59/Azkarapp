@@ -11,6 +11,7 @@ import type {
 } from "./types";
 import {
   CATEGORY_IDS,
+  DAILY_ROUTINE_CATEGORY_IDS,
   DEFAULT_PROGRESS_DAY_START_HOUR,
   deriveDailyCompletionsFromLegacySessions,
   getProgressDayKey,
@@ -127,7 +128,7 @@ function isWeeklyGoalDays(value: unknown): value is number {
 }
 
 function isProgressDayStartHour(value: unknown): value is number {
-  return typeof value === "number" && [0, 2, 4, 6].includes(value);
+  return value === DEFAULT_PROGRESS_DAY_START_HOUR;
 }
 
 function isColorBlindSupport(value: string): value is ColorBlindSupport {
@@ -440,7 +441,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
 
   const completed = Object.fromEntries(
     CATEGORY_IDS.map((id) => {
-      const isDailyRoutine = ["morning", "evening", "before_sleep", "waking_up", "after_prayer"].includes(id);
+      const isDailyRoutine = DAILY_ROUTINE_CATEGORY_IDS.includes(id);
       if (isNewDay && isDailyRoutine) {
         return [id, []];
       }

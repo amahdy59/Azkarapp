@@ -11,6 +11,7 @@ import {
   saveAppState,
   toCompletedSets,
 } from "./state";
+import { getProgressDayKey, shiftProgressDayKey } from "./progress";
 
 describe("app state persistence", () => {
   beforeEach(() => window.localStorage.clear());
@@ -159,7 +160,7 @@ describe("app state persistence", () => {
     expect(state.sessions).toEqual([]);
   });
 
-  it("migrates legacy complete sessions once and keeps their progress-day keys stable", () => {
+  it("migrates legacy progress boundaries to midnight", () => {
     const completedAt = new Date(2026, 6, 18, 2, 30).toISOString();
     const migrated = normalizeAppState({
       settings: { ...DEFAULT_APP_STATE.settings, progressDayStartHour: 4 },
@@ -178,18 +179,31 @@ describe("app state persistence", () => {
 
     expect(migrated.dailyCompletions).toEqual([
       {
-        dayKey: "2026-07-17",
+        dayKey: "2026-07-18",
         category: "morning",
         timeZone: expect.any(String),
         completionLevel: "complete",
       },
     ]);
 
-    const afterBoundaryChange = normalizeAppState({
-      ...migrated,
-      settings: { ...migrated.settings, progressDayStartHour: 0 },
+    expect(migrated.settings.progressDayStartHour).toBe(0);
+  });
+
+  it("starts persisted daily routine progress fresh on a new local date", () => {
+    const todayKey = getProgressDayKey();
+    const state = normalizeAppState({
+      ...DEFAULT_APP_STATE,
+      lastActiveDayKey: shiftProgressDayKey(todayKey, -1),
+      completed: {
+        ...DEFAULT_APP_STATE.completed,
+        morning: ["m-hm-75a"],
+        travel: ["tr-ref-1"],
+      },
     });
-    expect(afterBoundaryChange.dailyCompletions).toEqual(migrated.dailyCompletions);
+
+    expect(state.completed.morning).toEqual([]);
+    expect(state.completed.travel).toEqual(["tr-ref-1"]);
+    expect(state.lastActiveDayKey).toBe(todayKey);
   });
 
   it("repairs invalid quiet-progress preferences", () => {

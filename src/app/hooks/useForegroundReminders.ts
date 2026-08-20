@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { getEstimatedPrayerTimes, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
-import { getProgressDayKey } from "../progress";
+import { DEFAULT_PROGRESS_DAY_START_HOUR, getProgressDayKey } from "../progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings, ReminderSettings } from "../types";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
@@ -53,7 +53,7 @@ export function getDueReminder(
   reminders: ReminderSettings,
   dailyCompletions: DailyCollectionCompletion[],
   now = new Date(),
-  progressDayStartHour = 4,
+  progressDayStartHour = DEFAULT_PROGRESS_DAY_START_HOUR,
   wasAlreadyNotified: (kind: ReminderKind) => boolean = () => false,
 ): DueReminder | null {
   const candidates: Array<{ kind: ReminderKind; category: CategoryId }> = [

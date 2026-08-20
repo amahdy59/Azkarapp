@@ -185,4 +185,8 @@ describe("remote settings", () => {
       }),
     ).not.toHaveProperty("location");
   });
+
+  it("tags synced partial progress with the current midnight-based day", () => {
+    expect(buildRemoteSettingsJson(DEFAULT_APP_STATE).lastActiveDayKey).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
 });

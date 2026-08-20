@@ -253,6 +253,8 @@ Do not use expiring signed URLs in the static manifest. Do not compress MP3 resp
 
 ### Supabase Storage as the audio host
 
+Google Drive is suitable for private master-file backup or reviewer handoff, but it is not the production audio origin. Drive sharing links are document/download flows rather than one stable public asset base with controlled object paths, response metadata, CORS, cache headers, and unauthenticated browser range requests. Keep WAV masters in Drive if useful; publish the reviewed MP3 delivery files to the project's Supabase Storage bucket.
+
 Supabase is the chosen host for this project. It satisfies the requirements above
 without a separate CDN, and it survives the eventual Flutter/Play Store port
 because the files are served over plain public HTTPS rather than through any

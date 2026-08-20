@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-19",
+  "release": "2026-08-20",
   "ar": [
-    "أصبح بإمكانك قراءة السور الطويلة صفحة صفحة كالمصحف، والضغط على أي كلمة لمعرفة معناها.",
-    "لكل صلاة بطاقة خاصة، تُسجّل فيها صلاتك في المسجد وأذكار ما بعد الصلاة كلاً على حدة.",
-    "يمكنك اختيار القارئ الذي تستمع إليه من الإعدادات.",
-    "شاشة التقدم تعرض تقدمك في يوم الجمعة، وبطاقاتها تتبع السمة التي اخترتها في كل الأوضاع."
+    "يبدأ تقدم أذكارك اليومية من جديد عند منتصف الليل، حتى إذا تركت التطبيق مفتوحاً.",
+    "تنتقل مواقيت الصلاة وبطاقات تتبع الصلوات تلقائياً إلى اليوم المحلي الجديد.",
+    "تبقى سجلاتك السابقة وسلاسل الاستمرار وتقدم الأذكار المرتبطة بالمواقف محفوظة بعد بدء اليوم الجديد."
   ],
   "en": [
-    "Long surahs now turn page by page like a mushaf, and tapping any word shows its meaning.",
-    "Every prayer has its own card, tracking the mosque and the after-prayer adhkar separately.",
-    "You can choose which reciter you listen to in Settings.",
-    "Progress now shows your Friday companion, and its cards follow your chosen theme in every mode."
+    "Daily adhkar progress now starts fresh at local midnight, even when the app is left open.",
+    "Prayer times and prayer-tracking cards automatically move to the new local day.",
+    "Past history, streaks, and resumable situational adhkar remain intact when the new day begins."
   ]
 }

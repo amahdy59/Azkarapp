@@ -24,7 +24,6 @@ export function ProgressPanel({
   progressDayStartHour,
   weeklyGoalDays,
   onQuietProgressEnabledChange,
-  onProgressDayStartHourChange,
   onWeeklyGoalDaysChange,
 }: {
   onBack: () => void;
@@ -36,7 +35,6 @@ export function ProgressPanel({
   progressDayStartHour: number;
   weeklyGoalDays: number;
   onQuietProgressEnabledChange: (value: boolean) => void;
-  onProgressDayStartHourChange: (value: number) => void;
   onWeeklyGoalDaysChange: (value: number) => void;
 }) {
   const now = new Date();
@@ -160,27 +158,12 @@ export function ProgressPanel({
           <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
             {t(language, "progressPanel.dayBoundaryHint")}
           </p>
-          <label
-            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-[0.8125rem] font-semibold text-foreground"
-            htmlFor="progress-day-start-hour"
-          >
+          <div className="mt-3 flex min-h-11 items-center justify-between gap-3 text-[0.8125rem] font-semibold text-foreground">
             <span>{t(language, "progressPanel.dayStartsAt")}</span>
-            <select
-              id="progress-day-start-hour"
-              value={progressDayStartHour}
-              onChange={(event) => onProgressDayStartHourChange(Number(event.target.value))}
-              className="h-11 rounded-xl border border-border-control bg-background px-3 text-[0.8125rem] font-bold text-foreground"
-              dir={direction}
-            >
-              {[0, 2, 4, 6].map((hour) => (
-                <option key={hour} value={hour}>
-                  {hour === 0
-                    ? t(language, "progressPanel.midnight")
-                    : t(language, "progressPanel.hourAm", { hour: formatNumerals(hour, language) })}
-                </option>
-              ))}
-            </select>
-          </label>
+            <span className="flex min-h-11 items-center rounded-xl border border-border-control bg-background px-3 font-bold">
+              {t(language, "progressPanel.midnight")}
+            </span>
+          </div>
         </section>
 
         <section aria-labelledby="recent-sessions-title">

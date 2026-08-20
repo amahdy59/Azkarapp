@@ -1,8 +1,14 @@
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state";
 import type { UserProfileState } from "../app/types";
-import { DEFAULT_APP_STATE, mergeAppStates } from "../app/state";
-import { mergeDailyCompletions, normalizeDailyCompletions } from "../app/progress";
+import { DEFAULT_APP_STATE, fromCompletedSets, mergeAppStates, toCompletedSets } from "../app/state";
+import {
+  DEFAULT_PROGRESS_DAY_START_HOUR,
+  getProgressDayKey,
+  mergeDailyCompletions,
+  normalizeDailyCompletions,
+  resetDailyRoutineProgress,
+} from "../app/progress";
 import { getAuthCallbackUrl, getSupabaseClient, isSupabaseConfigured } from "./supabase";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
@@ -139,6 +145,7 @@ type RemoteProfileRow = {
 type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
   savedZikrIds?: AppStateSnapshot["savedZikrIds"];
   dailyCompletions?: AppStateSnapshot["dailyCompletions"];
+  lastActiveDayKey?: string;
 };
 
 export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettingsJson {
@@ -161,6 +168,7 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     routineModes: state.settings.routineModes,
     savedZikrIds: state.savedZikrIds,
     dailyCompletions: state.dailyCompletions,
+    lastActiveDayKey: getProgressDayKey(new Date(), DEFAULT_PROGRESS_DAY_START_HOUR),
   };
 }
 
@@ -326,6 +334,11 @@ export async function loadRemoteState(
       })),
     ),
   );
+  const currentDayKey = getProgressDayKey(new Date(), DEFAULT_PROGRESS_DAY_START_HOUR);
+  const remoteCompleted =
+    settings?.settings_json?.lastActiveDayKey === currentDayKey
+      ? (progress?.completed ?? localState.completed)
+      : fromCompletedSets(resetDailyRoutineProgress(toCompletedSets(progress?.completed ?? localState.completed)));
 
   const remoteState: Partial<AppStateSnapshot> = {
     settings: options.preserveLocalPreferences
@@ -361,7 +374,7 @@ export async function loadRemoteState(
       isGuest: false,
       accountUserId: userId,
     },
-    completed: progress?.completed ?? localState.completed,
+    completed: remoteCompleted,
     sessions: (sessions ?? []).map((item) => ({
       id: item.id,
       category: item.category,
