@@ -900,6 +900,8 @@ const en = {
     immersiveProgress: "Progress through the surah",
     immersiveNext: "Next page",
     immersivePrevious: "Previous page",
+    immersiveModeFit: "Fit Page",
+    immersiveModeComfort: "Comfort Reading",
     wordMeaningAll: "All meanings",
     wordMeaningMore: "{count} more",
     jumpToCounter: "Go to counter",

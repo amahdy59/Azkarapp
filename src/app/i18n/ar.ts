@@ -910,6 +910,8 @@ const ar = {
     immersiveProgress: "التقدم في السورة",
     immersiveNext: "الصفحة التالية",
     immersivePrevious: "الصفحة السابقة",
+    immersiveModeFit: "صفحة كاملة",
+    immersiveModeComfort: "قراءة مريحة",
     wordMeaningAll: "جميع المعاني",
     wordMeaningMore: "{count} معانٍ أخرى",
     jumpToCounter: "الانتقال إلى العداد",

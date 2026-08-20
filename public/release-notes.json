@@ -1,13 +1,15 @@
 {
   "release": "2026-08-20",
   "ar": [
-    "يبدأ تقدم أذكارك اليومية من جديد عند منتصف الليل، حتى إذا تركت التطبيق مفتوحاً.",
-    "تنتقل مواقيت الصلاة وبطاقات تتبع الصلوات تلقائياً إلى اليوم المحلي الجديد.",
-    "تبقى سجلاتك السابقة وسلاسل الاستمرار وتقدم الأذكار المرتبطة بالمواقف محفوظة بعد بدء اليوم الجديد."
+    "إضافة وضعين للقراءة في المصحف: \"صفحة كاملة\" و \"قراءة مريحة\" يمكن التبديل بينهما.",
+    "إخفاء أدوات التحكم تلقائياً أثناء القراءة لتوفير مساحة أكبر وعرض الصفحة بالكامل.",
+    "إضافة خاصية التكبير والتصغير باستخدام النقر المزدوج أو السحب للمساعدة في القراءة.",
+    "إصلاح مشكلة استبدال خلفية التطبيق بخلفية يوم الجمعة عند اختيار أذكار الصباح أو المساء أو النوم."
   ],
   "en": [
-    "Daily adhkar progress now starts fresh at local midnight, even when the app is left open.",
-    "Prayer times and prayer-tracking cards automatically move to the new local day.",
-    "Past history, streaks, and resumable situational adhkar remain intact when the new day begins."
+    "Added two Mushaf reading modes: \"Fit Page\" and \"Comfort Reading\" for a better experience.",
+    "Reading controls now auto-hide to provide an immersive, full-screen view of the page.",
+    "You can now double-tap or pinch to zoom in and out while reading the Mushaf.",
+    "Fixed an issue where the Friday background would override Morning, Evening, and Sleep backgrounds."
   ]
 }

@@ -58,7 +58,7 @@ describe("getHomeAction", () => {
   });
 
   it("uses the Friday scene on Home without changing the recommended routine", () => {
-    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 7, 9), "morning")).toBe("friday_kahf");
+    expect(getHomeBackgroundCategoryId(new Date(2026, 7, 7, 9), "morning")).toBe("morning");
     expect(getHomeBackgroundCategoryId(new Date(2026, 7, 8, 9), "morning")).toBe("morning");
   });
 

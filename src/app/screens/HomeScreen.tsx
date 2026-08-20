@@ -101,7 +101,7 @@ export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage =
 }
 
 export function getHomeBackgroundCategoryId(now: Date, routineCategoryId: CategoryId): CategoryId {
-  return now.getDay() === 5 ? "friday_kahf" : routineCategoryId;
+  return routineCategoryId;
 }
 
 export function isFridayFeatureWindow(now: Date, location?: LocationSettings): boolean {
