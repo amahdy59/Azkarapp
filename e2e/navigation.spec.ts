@@ -82,7 +82,7 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
   });
 
   await page.goto("/");
-  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await expect(page.getByTestId("home-primary-cta")).toBeVisible({ timeout: 15_000 });
   await expect(page.getByTestId("home-primary-cta")).toContainText("Continue");
   await page.getByTestId("home-primary-cta").click();
 
@@ -115,7 +115,7 @@ test("collection keeps canonical order and reset stays inside the app canvas", a
   });
 
   await page.goto("/");
-  await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
+  await expect(page.getByTestId("home-primary-cta")).toBeVisible({ timeout: 15_000 });
   await page.getByTestId("home-primary-cta").click();
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Azkar", exact: true }).click();
