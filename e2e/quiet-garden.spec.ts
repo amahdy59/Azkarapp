@@ -36,7 +36,7 @@ async function seedReturningGardenUser(
       }
       window.sessionStorage.setItem(seedMarker, "true");
 
-      const progressDayStartHour = 4;
+      const progressDayStartHour = 0;
       const progressDate = new Date();
       progressDate.setHours(progressDate.getHours() - progressDayStartHour);
       const dayKey = [
