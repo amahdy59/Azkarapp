@@ -180,9 +180,10 @@ describe("quiet garden progress", () => {
   });
 
   it("starts a new day with empty daily routines while preserving situational progress", () => {
-    const completed = Object.fromEntries(
-      CATEGORY_IDS.map((id) => [id, new Set<string>([`${id}-partial`])]),
-    ) as Record<CategoryId, Set<string>>;
+    const completed = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>([`${id}-partial`])])) as Record<
+      CategoryId,
+      Set<string>
+    >;
 
     const reset = resetDailyRoutineProgress(completed);
 
