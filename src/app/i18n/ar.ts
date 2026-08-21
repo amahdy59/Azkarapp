@@ -90,6 +90,8 @@ const ar = {
     consecutiveDays: "أيام متتالية",
     totalAzkar: "إجمالي الأذكار",
     collectionsCompleted: "أوراد مكتملة",
+    khatmahTitle: "ختمة القرآن",
+    khatmahDescription: "قراءة مستمرة بنسخة المدينة",
     fridayAzkar: "أذكار يوم الجمعة",
     kahfMerit: "فضل قراءة سورة الكهف والذكر",
     viewFridayAzkar: "عرض أذكار الجمعة",

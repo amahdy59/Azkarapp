@@ -1,6 +1,6 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, ArrowLeft, ArrowRight } from "../components/icons";
+import { Calendar, Zap, ArrowLeft, ArrowRight, BookOpen } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
@@ -218,6 +218,7 @@ export function HomeScreen({
   onOpenSavedLibrary,
   onOpenBenefits,
   onOpenWirdBenefits,
+  onOpenKhatmah,
   prayerTracking = [],
   onTogglePrayerTracking,
 }: {
@@ -241,6 +242,7 @@ export function HomeScreen({
   onOpenSavedLibrary?: () => void;
   onOpenBenefits?: () => void;
   onOpenWirdBenefits?: () => void;
+  onOpenKhatmah?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
 }) {
@@ -672,6 +674,34 @@ export function HomeScreen({
                 </div>
               </button>
             )}
+          </div>
+
+          <div className="px-page mt-2 mb-2">
+            <button
+              onClick={onOpenKhatmah}
+              className="group flex w-full items-center justify-between rounded-2xl bg-card border border-border p-4 shadow-raised hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                  <BookOpen size={20} />
+                </div>
+                <div className="text-start">
+                  <div className="text-[1.05rem] font-bold text-foreground" dir="auto">
+                    {t(language, "home.khatmahTitle")}
+                  </div>
+                  <div className="text-[0.8125rem] font-medium text-muted-foreground mt-0.5" dir="auto">
+                    {t(language, "home.khatmahDescription")}
+                  </div>
+                </div>
+              </div>
+              <div className="flex shrink-0 items-center justify-center text-muted-foreground transition-transform group-hover:text-primary">
+                {direction === "rtl" ? (
+                  <ArrowLeft size={20} className="group-hover:-translate-x-1" />
+                ) : (
+                  <ArrowRight size={20} className="group-hover:translate-x-1" />
+                )}
+              </div>
+            </button>
           </div>
 
           <SectionDivider label={t(language, "home.fridayAzkar")} />

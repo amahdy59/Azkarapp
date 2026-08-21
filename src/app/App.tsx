@@ -984,6 +984,7 @@ function AppContent() {
                   }}
                   onOpenBenefits={() => push("benefits")}
                   onOpenWirdBenefits={() => push("wird_benefits")}
+                  onOpenKhatmah={() => push("khatmah")}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />

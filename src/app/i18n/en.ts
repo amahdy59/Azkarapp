@@ -90,6 +90,8 @@ const en = {
     consecutiveDays: "consecutive days",
     totalAzkar: "Total Azkar",
     collectionsCompleted: "collections completed",
+    khatmahTitle: "Quran Khatmah",
+    khatmahDescription: "Continuous reading with Madinah layout",
     fridayAzkar: "Friday Azkar",
     kahfMerit: "The merit of reciting Surat Al-Kahf",
     viewFridayAzkar: "View Friday Azkar",
