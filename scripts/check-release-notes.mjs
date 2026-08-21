@@ -55,6 +55,16 @@ function validateNoteList(value, language, problems) {
   if (!value.every(isNonEmptyString)) {
     problems.push(`"${language}" contains an empty or non-string note.`);
   }
+  if (language === "ar") {
+    for (const note of value) {
+      if (typeof note === "string" && !/[\u0600-\u06FF]/.test(note)) {
+        problems.push(`"ar" note contains no Arabic characters: "${note}".`);
+      }
+      if (typeof note === "string" && /\?{3,}/.test(note)) {
+        problems.push(`"ar" note contains corrupted question marks: "${note}".`);
+      }
+    }
+  }
 }
 
 /**

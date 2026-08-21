@@ -26,6 +26,10 @@ describe("release notes", () => {
     expect(parsed).toEqual(deployedNotes);
     expect(parsed?.ar).toHaveLength(parsed?.en.length ?? 0);
     expect(parsed?.release).toBeTruthy();
+    for (const arNote of parsed?.ar ?? []) {
+      expect(arNote).toMatch(/[\u0600-\u06FF]/);
+      expect(arNote).not.toMatch(/\?{3,}/);
+    }
   });
 
   it("accepts and trims three to four bilingual notes", () => {
