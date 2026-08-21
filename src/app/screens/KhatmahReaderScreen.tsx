@@ -93,7 +93,7 @@ export function KhatmahReaderScreen({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: swipeDirection > 0 ? (isArabic ? 300 : -300) : isArabic ? -300 : 300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-full max-w-[var(--content-reading)] h-full max-h-[85vh] bg-[#fdfaf6] dark:bg-[#0c0c0c] border border-border shadow-sm rounded-xl p-4 flex flex-col justify-between"
+              className="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[600px] h-full max-h-[90vh] overflow-y-auto bg-[#fdfaf6] dark:bg-[#0c0c0c] border border-border shadow-sm rounded-xl p-4 flex flex-col justify-between"
               dir="rtl"
               style={{ fontFamily: "var(--font-mushaf)" }}
             >

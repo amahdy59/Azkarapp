@@ -308,12 +308,13 @@ export function ReaderScreen({
       // opens menus, and activates the focused action as expected.
       if (focusedControl) return;
 
-      if (benefitOpen || wordMeaningSelection) {
+      if (benefitOpen || wordMeaningSelection || immersiveOpen) {
         if (e.key === "Escape") {
           if (wordMeaningSelection) {
             setWordSheetOpen(false);
             setWordMeaningSelection(null);
           } else if (benefitOpen) setBenefitOpen(false);
+          else if (immersiveOpen) setImmersiveOpen(false);
         }
         return;
       }
