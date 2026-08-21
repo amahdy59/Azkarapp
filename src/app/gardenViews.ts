@@ -174,7 +174,7 @@ export function getWeekGardenStats(
     morningCompletedCount,
     eveningCompletedCount,
     sleepCompletedCount,
-        completedDaysCount,
+    completedDaysCount,
     mostMissedRoutine,
     bestStreakDays,
     bestRoutine,

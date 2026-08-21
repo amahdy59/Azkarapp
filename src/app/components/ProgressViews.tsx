@@ -540,7 +540,6 @@ export function ProgressWeekView({
                     <span>{t(language, "progress.sleepShort")}</span>
                   </div>
                 </th>
-
               </tr>
             </thead>
             <tbody className="divide-y divide-white/20 dark:divide-white/5">
@@ -573,8 +572,6 @@ export function ProgressWeekView({
                     label={t(language, "progress.sleepShort")}
                     language={language}
                   />
-
-
                 </tr>
               ))}
             </tbody>
@@ -681,8 +678,6 @@ export function ProgressWeekView({
               <MoonStar size={14} className="text-sleep" />
             </div>
           </div>
-
-
         </div>
       </div>
     </div>
