@@ -219,13 +219,7 @@ export function FridaySalawatScreen({
         ))}
       </div>
 
-      <div
-        className="relative z-10 flex min-h-0 flex-1 flex-col origin-center"
-        style={{
-          transform: isCanvasPressed && !reduceMotion ? "scale(0.985)" : "scale(1)",
-          transition: "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
-        }}
-      >
+      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
         <ReadingScreenChrome
           language={language}
           direction={direction}
@@ -296,7 +290,13 @@ export function FridaySalawatScreen({
           data-counting-mode="canvas"
           onClick={handleCanvasClick}
         >
-          <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
+          <div
+            className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10 origin-center"
+            style={{
+              transform: isCanvasPressed && !reduceMotion ? "scale(0.97)" : "scale(1)",
+              transition: "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+            }}
+          >
             <p
               className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
               dir="rtl"

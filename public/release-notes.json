@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-21T09:41",
+  "release": "2026-08-21b",
   "ar": [
-    "عدگاد تفاعلي: تمت إضافة تУثيرصركي مرن عند الضغ֋صلى الشاشة للتسبيح ليعطيك إحساساڋ أفضل باللمس.",
-    "قوائم منسقة: تم تحسين حجم وتصديم القوائم المنسدلة في صفحة المسبحة لتناسب حجم النص دون مساحات زائدة.",
-    "إرشاداؠ الإستخدام: تمت إضافة عبارث 'اضغ֋؁ي أي مكان للعد' أسفل العدادات لتوضيح إدكانية لمس أي جزء من� الشاشة."
+    "يمكنك الآن الوصول إلى مصحف كامل مع ١٥ سطرًا لكل صفحة بخط عثماني أصيل — يعمل بالكامل دون اتصال بالإنترنت",
+    "إصلاح الإحساس اللمسي: يتحرك نص الذكر عند الضغط عليه فقط، لا الشاشة بأكملها",
+    "أصبح كل بند في القائمة المنسدلة في المسبحة وصلاة على النبي على سطر واحد دون اقتطاع",
+    "زيادة المسافة بين شريط التقدم والقوائم المنسدلة"
   ],
   "en": [
-    "Tactile Counting: Added a satisfying animated bounce when tapping the screen to count your Azkar and Masbaha.",
-    "Menu Sizing: Dropdown menus for categories and targets now neatly hug their text without excess spacing.",
-    "Helpful Hints: The 'Tap anywhere to count' instruction is now consistently displayed under all standalone counters."
+    "A complete 604-page offline Mushaf is now available with the authentic Uthmani script — works without internet",
+    "Tactile feedback fix: only the zikr text scales on press, not the whole screen",
+    "Dropdown items in the Masbaha and Salawat pages no longer wrap to two lines",
+    "Added extra breathing room between the progress bar and the dropdowns"
   ]
 }

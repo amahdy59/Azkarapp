@@ -150,7 +150,7 @@ export function ReadingScreenChrome({
               )}
             </>
           )}
-          {subRow && <div className={progress ? "mt-3" : ""}>{subRow}</div>}
+          {subRow && <div className={progress ? "mt-3.5" : ""}>{subRow}</div>}
         </div>
       )}
     </>

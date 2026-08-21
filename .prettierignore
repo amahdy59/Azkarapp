@@ -5,3 +5,5 @@ src/app/components/ui
 pnpm-lock.yaml
 .agents
 skills-lock.json
+
+public/data/mushaf/

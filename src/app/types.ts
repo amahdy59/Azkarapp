@@ -248,4 +248,3 @@ export interface AppStateSnapshot {
   /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
   lastActiveDayKey?: string;
 }
-

@@ -88,7 +88,11 @@ export function CounterTargetPicker({
             }}
           >
             {presets.map((preset) => (
-              <DropdownMenuRadioItem key={preset.value} value={String(preset.value)} className="font-bold">
+              <DropdownMenuRadioItem
+                key={preset.value}
+                value={String(preset.value)}
+                className="font-bold whitespace-nowrap"
+              >
                 {preset.label}
               </DropdownMenuRadioItem>
             ))}
