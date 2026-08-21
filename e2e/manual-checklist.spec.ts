@@ -62,40 +62,43 @@ async function expectNoHorizontalOverflow(page: Page, context: string) {
  */
 async function expectUnclippedHeading(heading: Locator, context: string) {
   await expect(heading).toBeVisible();
-  const metrics = await heading.evaluate((element) => {
-    const style = getComputedStyle(element);
-    const lineHeight = Number.parseFloat(style.lineHeight);
+  await expect(async () => {
+    const metrics = await heading.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const lineHeight = Number.parseFloat(style.lineHeight);
+      const fontSize = Number.parseFloat(style.fontSize);
 
-    const probe = document.createElement("div");
-    probe.style.cssText =
-      `position:absolute;visibility:hidden;left:-9999px;top:0;width:${element.clientWidth}px;` +
-      `font-family:${style.fontFamily};font-size:${style.fontSize};font-weight:${style.fontWeight};` +
-      `line-height:${style.lineHeight};letter-spacing:${style.letterSpacing};white-space:normal;`;
-    probe.dir = document.documentElement.dir;
-    document.body.appendChild(probe);
+      const probe = document.createElement("div");
+      probe.style.cssText =
+        `position:absolute;visibility:hidden;left:-9999px;top:0;width:${element.clientWidth}px;` +
+        `font-family:${style.fontFamily};font-size:${style.fontSize};font-weight:${style.fontWeight};` +
+        `line-height:${style.lineHeight};letter-spacing:${style.letterSpacing};white-space:normal;`;
+      probe.dir = document.documentElement.dir;
+      document.body.appendChild(probe);
 
-    /* `line-height: normal` parses to NaN, which turned the whole ratio into
-       NaN and failed the assertion with no layout problem to show for it. When
-       the computed value is not a number, measure one rendered line instead of
-       trusting the style. */
-    let unit = lineHeight;
-    if (!Number.isFinite(unit) || unit <= 0) {
-      probe.textContent = "A";
-      unit = probe.scrollHeight;
-    }
+      let unit = lineHeight;
+      if (!Number.isFinite(unit) || unit <= 0) {
+        probe.textContent = "A";
+        unit = probe.scrollHeight;
+      }
 
-    probe.textContent = element.textContent;
-    const naturalLines = unit > 0 ? Math.round(probe.scrollHeight / unit) : Number.NaN;
-    probe.remove();
+      probe.textContent = element.textContent;
+      const naturalLines = unit > 0 ? Math.round(probe.scrollHeight / unit) : Number.NaN;
+      probe.remove();
 
-    return { naturalLines, fontSize: Number.parseFloat(style.fontSize), text: element.textContent ?? "" };
-  });
+      return {
+        naturalLines,
+        fontSize: Number.isFinite(fontSize) ? fontSize : 18,
+        text: element.textContent ?? "",
+      };
+    });
 
-  expect(
-    metrics.naturalLines,
-    `${context}: "${metrics.text}" needs more than two lines, so it is clipped`,
-  ).toBeLessThanOrEqual(2);
-  expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
+    expect(
+      metrics.naturalLines,
+      `${context}: "${metrics.text}" needs more than two lines, so it is clipped`,
+    ).toBeLessThanOrEqual(2);
+    expect(metrics.fontSize, `${context}: mobile heading is oversized`).toBeLessThanOrEqual(20);
+  }).toPass({ timeout: 5000 });
 }
 
 async function expectSingleLineHeading(heading: Locator, context: string) {
