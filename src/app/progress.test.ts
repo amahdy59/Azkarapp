@@ -49,7 +49,8 @@ describe("quiet garden progress", () => {
     expect(first.event.kind).toBe("leaf");
     expect(duplicate.event.kind).toBe("repeat");
     expect(duplicate.records).toHaveLength(1);
-    expect(fourth.event).toMatchObject({ kind: "palm", leafCount: 4 });
+    expect(third.event).toMatchObject({ kind: "palm", leafCount: 3 });
+    expect(fourth.event).toMatchObject({ kind: "extra_leaf", leafCount: 3 });
     expect(fourth.records).toHaveLength(4);
   });
 

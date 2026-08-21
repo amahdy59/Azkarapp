@@ -667,7 +667,7 @@ const ar = {
     yearlyOasisMap: "خريطة واحة العام",
     weeklyRecord: "سجل الأسبوع",
     noRecordedActivity: "لا يوجد نشاط مسجل للأوراد في هذه الفترة.",
-    weekCompletedDays: "أكملت الأوراد الأربعة في {count} أيام",
+    weekCompletedDays: "أتممت الأوراد الثلاثة في {count} أيام",
     weekBestRoutine: "أكثر ورد سجلته هذا الأسبوع: {routine}.",
     monthRecordTitle: "سجل هذا الشهر",
     monthFullDays: "سُجلت {count} أيام مكتملة هذا الشهر.",

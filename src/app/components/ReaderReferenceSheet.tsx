@@ -251,7 +251,7 @@ function ReferenceContent({
           )}
 
           {/* If the item is a Surah and the user is in English mode, provide the translation here instead of the main view. */}
-          {zikr.isSurah && !isArabic && zikr.translation && (
+          {!!zikr.surahNameArabic && !isArabic && zikr.translation && (
             <section className="mt-4 border-t border-border/50 pt-4" aria-labelledby="reference-translation-heading">
               <h3 id="reference-translation-heading" className="mb-2 text-[0.9375rem] font-extrabold text-primary">
                 {t(language, "reader.translationLabel")}

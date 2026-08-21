@@ -681,7 +681,7 @@ const en = {
     yearlyOasisMap: "Yearly Oasis Map",
     weeklyRecord: "Weekly Record",
     noRecordedActivity: "No routine activity recorded for this period.",
-    weekCompletedDays: "Completed all four routines on {count} days",
+    weekCompletedDays: "Completed all three routines on {count} days",
     weekBestRoutine: "Most recorded this week: {routine}.",
     monthRecordTitle: "This month's record",
     monthFullDays: "{count} full days recorded this month.",

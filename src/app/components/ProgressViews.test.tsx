@@ -78,9 +78,9 @@ describe("ProgressViews components", () => {
       <ProgressWeekView language="en" dailyCompletions={[]} referenceDate={new Date(2026, 7, 5)} />,
     );
 
-    expect(screen.getByText("Completed all four routines on 0 days")).toBeInTheDocument();
+    expect(screen.getByText("Completed all three routines on 0 days")).toBeInTheDocument();
     expect(screen.getByText("No routine activity recorded for this period.")).toBeInTheDocument();
-    expect(screen.getAllByText("0 of 7")).toHaveLength(5);
+    expect(screen.getAllByText("0 of 7")).toHaveLength(4);
 
     rerender(<ProgressMonthView language="en" targetYear={2026} targetMonth={7} dailyCompletions={[]} />);
 

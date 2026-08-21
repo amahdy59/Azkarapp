@@ -17,13 +17,13 @@ const records: DailyCollectionCompletion[] = [
   { dayKey: "2024-02-01", category: "morning", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-01", category: "evening", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-01", category: "before_sleep", timeZone: "Africa/Cairo" },
-  { dayKey: "2024-02-01", category: "after_prayer", subCategory: "fajr", timeZone: "Africa/Cairo" },
-  { dayKey: "2024-02-01", category: "after_prayer", subCategory: "dhuhr", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-01", category: "evening", subCategory: "fajr", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-01", category: "evening", subCategory: "dhuhr", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-02", category: "travel", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
   { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
-  { dayKey: "2024-02-03", category: "after_prayer", subCategory: "maghrib", timeZone: "Africa/Cairo" },
+  { dayKey: "2024-02-03", category: "evening", subCategory: "maghrib", timeZone: "Africa/Cairo" },
   { dayKey: "2025-02-01", category: "morning", timeZone: "Africa/Cairo" },
 ];
 
@@ -33,7 +33,7 @@ describe("garden view selectors", () => {
     const days = getMonthGardenDays(index, 2024, 1);
 
     expect(days).toHaveLength(29);
-    expect(days[0]).toMatchObject({ completedCount: 4, isPalm: true, status: "complete" });
+    expect(days[0]).toMatchObject({ completedCount: 3, isPalm: true, status: "complete" });
     expect(days[1]).toMatchObject({ completedCount: 0, isPalm: false, status: "unstarted" });
   });
 
@@ -55,7 +55,7 @@ describe("garden view selectors", () => {
   it("scopes year totals and active days to the requested year", () => {
     const stats = getYearGardenStats(createDailyCompletionIndex(records), 2024);
 
-    expect(stats).toEqual({ totalPalms: 2, totalCollections: 8, activeDays: 2 });
+    expect(stats).toEqual({ totalPalms: 2, totalCollections: 6, activeDays: 2 });
   });
 
   it("calculates weekly commitment matrix and routine totals accurately", () => {
@@ -88,13 +88,13 @@ describe("garden view selectors", () => {
       { dayKey: "2024-03-01", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-01", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-01", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-03-01", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-01", category: "travel", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-02", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-03", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-03", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-03", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-03-03", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-03", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-04-01", category: "morning", timeZone: "Africa/Cairo" },
     ];
     const index = createDailyCompletionIndex(periodRecords);
@@ -128,7 +128,7 @@ describe("garden view selectors", () => {
     ]);
     expect(yearStats).toMatchObject({
       totalPalms: 2,
-      totalCollections: 9,
+      totalCollections: 7,
       activeDays: 3,
       longestStreak: 1,
       currentStreak: 1,
@@ -195,16 +195,16 @@ describe("garden view selectors", () => {
 
   it("counts all four main routines while excluding unrelated collections", () => {
     const mixedRecords: DailyCollectionCompletion[] = [
-      { dayKey: "2024-03-01", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-03-01", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-03-01", category: "travel", timeZone: "Africa/Cairo" },
     ];
     const index = createDailyCompletionIndex(mixedRecords);
 
-    expect(getWeekGardenStats(index, new Date(2024, 2, 1), "ar").bestRoutine).toBe("after_prayer");
+    expect(getWeekGardenStats(index, new Date(2024, 2, 1), "ar").bestRoutine).toBe("evening");
     expect(getMonthGardenDays(index, 2024, 2)[0]).toMatchObject({ completedCount: 1, status: "partial" });
-    expect(getMonthDetailedStats(index, 2024, 2).bestRoutine).toBe("after_prayer");
+    expect(getMonthDetailedStats(index, 2024, 2).bestRoutine).toBe("evening");
     expect(getYearGardenStats(index, 2024)).toEqual({ totalPalms: 0, totalCollections: 1, activeDays: 1 });
-    expect(getYearDetailedStats(index, 2024).mostConsistentRoutine).toBe("after_prayer");
+    expect(getYearDetailedStats(index, 2024).mostConsistentRoutine).toBe("evening");
   });
 
   it("names the weakest and strongest routine when the week is uneven", () => {
@@ -220,8 +220,8 @@ describe("garden view selectors", () => {
       { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-04", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-02-03", category: "after_prayer", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-02-04", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "evening", timeZone: "Africa/Cairo" },
     ];
     // "ar" starts the week on Saturday, so Feb 3 2024 (a Saturday) opens the
     // window and all three fixture days fall inside it. Under "en" the same
@@ -259,7 +259,7 @@ describe("garden view selectors", () => {
         { dayKey, category: "morning", timeZone: "Africa/Cairo" },
         { dayKey, category: "evening", timeZone: "Africa/Cairo" },
         { dayKey, category: "before_sleep", timeZone: "Africa/Cairo" },
-        { dayKey, category: "after_prayer", timeZone: "Africa/Cairo" },
+        { dayKey, category: "evening", timeZone: "Africa/Cairo" },
       );
     }
     const perfectIndex = createDailyCompletionIndex(perfectWeekRecords);
@@ -272,16 +272,16 @@ describe("garden view selectors", () => {
       { dayKey: "2024-02-03", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-03", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-02-03", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-03", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-04", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-04", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-04", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-02-04", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-04", category: "evening", timeZone: "Africa/Cairo" },
       // Feb 5 missed
       { dayKey: "2024-02-06", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-06", category: "evening", timeZone: "Africa/Cairo" },
       { dayKey: "2024-02-06", category: "before_sleep", timeZone: "Africa/Cairo" },
-      { dayKey: "2024-02-06", category: "after_prayer", timeZone: "Africa/Cairo" },
+      { dayKey: "2024-02-06", category: "evening", timeZone: "Africa/Cairo" },
     ];
     const brokenIndex = createDailyCompletionIndex(brokenStreakRecords);
     const brokenStats = getWeekGardenStats(brokenIndex, new Date(2024, 1, 3), "ar");
@@ -296,7 +296,6 @@ describe("garden view selectors", () => {
     const today = stats.days.find((d) => d.isToday);
     expect(today?.eveningStatus).toBe("partial");
     expect(today?.sleepStatus).toBe("partial");
-    expect(today?.afterPrayerStatus).toBe("partial");
   });
 });
 

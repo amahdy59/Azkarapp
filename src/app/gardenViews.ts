@@ -1,7 +1,7 @@
 import { MAIN_CATEGORY_IDS } from "./progress";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "./types";
 
-export type DailyCompletionIndex = Map<string, { categories: Set<CategoryId>; afterPrayers: Set<string> }>;
+export type DailyCompletionIndex = Map<string, { categories: Set<CategoryId> }>;
 
 export type MonthGardenDay = {
   dayKey: string;
@@ -83,11 +83,8 @@ export function formatDayKey(date: Date): string {
 export function createDailyCompletionIndex(records: DailyCollectionCompletion[]): DailyCompletionIndex {
   const index: DailyCompletionIndex = new Map();
   for (const record of records) {
-    const entry = index.get(record.dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const entry = index.get(record.dayKey) ?? { categories: new Set<CategoryId>() };
     entry.categories.add(record.category);
-    if (record.category === "after_prayer" && record.subCategory) {
-      entry.afterPrayers.add(record.subCategory);
-    }
     index.set(record.dayKey, entry);
   }
   return index;
@@ -122,7 +119,7 @@ export function getWeekGardenStats(
     const d = new Date(startOfWeek);
     d.setDate(startOfWeek.getDate() + i);
     const dayKey = formatDayKey(d);
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const isToday = dayKey === todayKey;
 
@@ -192,7 +189,7 @@ export function getMonthGardenDays(
   return Array.from({ length: daysInMonth }, (_, dayIndex): MonthGardenDay => {
     const dayNum = dayIndex + 1;
     const dayKey = `${year}-${pad(zeroBasedMonth + 1)}-${pad(dayNum)}`;
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));
@@ -225,7 +222,7 @@ export function getMonthGardenDaysForDates(
   const todayKey = formatDayKey(new Date());
   return dates.map((date, dayIndex) => {
     const dayKey = formatDayKey(date);
-    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>(), afterPrayers: new Set<string>() };
+    const entry = index.get(dayKey) ?? { categories: new Set<CategoryId>() };
     const categories = entry.categories;
     const completedCount = countMainCompletions(categories);
     const isPalm = MAIN_CATEGORY_IDS.every((category) => categories.has(category));

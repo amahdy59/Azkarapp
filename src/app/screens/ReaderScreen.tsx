@@ -488,7 +488,7 @@ export function ReaderScreen({
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
-          {showTranslation && (
+          {showTranslation && !z.surahNameArabic && z.translation && (
             <section aria-labelledby="reader-translation-title">
               <h2
                 id="reader-translation-title"
