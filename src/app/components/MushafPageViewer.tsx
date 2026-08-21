@@ -1,9 +1,9 @@
 import { useState, useMemo } from "react";
-import type { AppLanguage } from "../types";
+import type { AppLanguage, MushafTheme } from "../types";
 import { getQuranWordMeaning } from "../content/quranWordMeanings";
 import * as Popover from "@radix-ui/react-popover";
 import { t } from "../i18n";
-import { X } from "./icons";
+import { X, Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getSurahDisplayName } from "../content/surahInfo";
 
@@ -14,8 +14,18 @@ export interface MushafWordToken {
   text: string;
 }
 
-export function AyahMarker({ number, language }: { number: string | number; language: AppLanguage }) {
+export function AyahMarker({
+  number,
+  language,
+  theme = "parchment",
+}: {
+  number: string | number;
+  language: AppLanguage;
+  theme?: MushafTheme;
+}) {
   const displayNum = formatNumerals(number, language);
+  const isOled = theme === "oled";
+
   return (
     <span
       className="inline-flex items-center justify-center relative mx-1 align-middle select-none shrink-0"
@@ -27,7 +37,7 @@ export function AyahMarker({ number, language }: { number: string | number; lang
         height="26"
         viewBox="0 0 32 32"
         fill="none"
-        className="text-primary/90 transition-transform drop-shadow-xs"
+        className={`${isOled ? "text-white drop-shadow-xs" : "text-primary/90 transition-transform drop-shadow-xs"}`}
         aria-hidden="true"
       >
         <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.5" className="opacity-90" />
@@ -42,7 +52,9 @@ export function AyahMarker({ number, language }: { number: string | number; lang
         />
       </svg>
       <span
-        className="absolute inset-0 flex items-center justify-center text-[0.625rem] sm:text-[0.6875rem] font-bold text-primary font-sans leading-none pt-0.5"
+        className={`absolute inset-0 flex items-center justify-center text-[0.625rem] sm:text-[0.6875rem] font-bold font-sans leading-none pt-0.5 ${
+          isOled ? "text-white" : "text-primary"
+        }`}
         style={{ fontVariantNumeric: "tabular-nums" }}
         aria-hidden="true"
       >
@@ -52,18 +64,32 @@ export function AyahMarker({ number, language }: { number: string | number; lang
   );
 }
 
-function SurahHeaderBox({ surahNumber, language }: { surahNumber: number | string; language: AppLanguage }) {
+function SurahHeaderBox({
+  surahNumber,
+  language,
+  theme = "parchment",
+}: {
+  surahNumber: number | string;
+  language: AppLanguage;
+  theme?: MushafTheme;
+}) {
   const title = getSurahDisplayName(surahNumber, language);
+  const isOled = theme === "oled";
+
   return (
     <div className="flex items-center justify-center w-full my-2 select-none" dir="rtl">
-      <div className="relative flex items-center justify-between w-full max-w-[96%] sm:max-w-[92%] px-4 py-1.5 border-2 border-primary/60 rounded-xl bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 shadow-xs">
-        <span className="text-primary text-[0.875rem] opacity-80" aria-hidden="true">
+      <div
+        className={`relative flex items-center justify-between w-full max-w-[96%] sm:max-w-[92%] px-4 py-1.5 border-2 rounded-xl shadow-xs ${
+          isOled
+            ? "border-white bg-white/10 text-white"
+            : "border-primary/60 bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 text-primary"
+        }`}
+      >
+        <span className="text-[0.875rem] opacity-80" aria-hidden="true">
           ۞
         </span>
-        <span className="font-arabic font-extrabold text-[1rem] sm:text-[1.125rem] text-primary tracking-wide">
-          {title}
-        </span>
-        <span className="text-primary text-[0.875rem] opacity-80" aria-hidden="true">
+        <span className="font-arabic font-extrabold text-[1rem] sm:text-[1.125rem] tracking-wide">{title}</span>
+        <span className="text-[0.875rem] opacity-80" aria-hidden="true">
           ۞
         </span>
       </div>
@@ -75,7 +101,7 @@ function BismillahLine() {
   return (
     <div className="flex items-center justify-center w-full my-1.5 select-none text-center" dir="rtl">
       <p
-        className="font-arabic font-bold text-[1.125rem] sm:text-[1.25rem] text-foreground/90 tracking-wide"
+        className="font-arabic font-bold text-[1.125rem] sm:text-[1.25rem] tracking-wide opacity-95"
         style={{ fontFamily: "var(--font-mushaf)" }}
       >
         بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
@@ -92,6 +118,8 @@ export function MushafPageViewer({
   juzNumber,
   highlightGhareeb,
   direction,
+  theme = "parchment",
+  isBookmarked = false,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -100,6 +128,8 @@ export function MushafPageViewer({
   juzNumber: number;
   highlightGhareeb: boolean;
   direction: "ltr" | "rtl";
+  theme?: MushafTheme;
+  isBookmarked?: boolean;
 }) {
   const isArabic = language === "ar";
 
@@ -151,15 +181,43 @@ export function MushafPageViewer({
 
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
 
+  // Theme styling classes
+  const themeClasses = {
+    parchment: "bg-[#fbf7ee] dark:bg-[#141820] text-[#1c1917] dark:text-[#f3f4f6] border-primary/40 ring-primary/20",
+    dark: "bg-[#0b0e14] text-[#f3f4f6] border-primary/30 ring-primary/15",
+    oled: "bg-[#000000] text-[#ffffff] border-white/50 ring-white/30",
+    white: "bg-[#ffffff] text-[#111827] border-gray-300 ring-gray-200",
+  }[theme];
+
+  const headerBgClass = {
+    parchment: "bg-primary/5 border-primary/20 text-foreground/80",
+    dark: "bg-primary/10 border-primary/20 text-foreground/80",
+    oled: "bg-white/10 border-white/30 text-white",
+    white: "bg-gray-100 border-gray-200 text-gray-800",
+  }[theme];
+
   return (
     <div
-      className="flex flex-col h-full w-full bg-[#fbf7ee] dark:bg-[#0c0f14] text-foreground rounded-2xl shadow-raised border-2 border-primary/40 ring-1 ring-primary/20 overflow-hidden"
+      className={`relative flex flex-col h-full w-full rounded-2xl shadow-raised border-2 ring-1 overflow-hidden transition-colors duration-200 ${themeClasses}`}
       dir="rtl"
     >
+      {/* Bookmark Ribbon on top-end corner */}
+      {isBookmarked && (
+        <div
+          className="absolute top-0 end-4 z-20 flex items-center justify-center text-primary drop-shadow-md pointer-events-none"
+          role="img"
+          aria-label={t(language, "mushaf.bookmarkSaved")}
+        >
+          <Bookmark size={26} className="fill-primary text-primary" />
+        </div>
+      )}
+
       {/* Decorative Mushaf Header Banner */}
-      <div className="flex justify-between items-center px-4 sm:px-6 py-2.5 border-b border-primary/20 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground/80 font-sans bg-primary/5">
-        <span className="font-arabic font-extrabold text-primary">{surahName}</span>
-        <span className="font-arabic font-bold text-muted-foreground">{formattedJuz}</span>
+      <div
+        className={`flex justify-between items-center px-4 sm:px-6 py-2.5 border-b text-[0.8125rem] sm:text-[0.875rem] font-bold font-sans ${headerBgClass}`}
+      >
+        <span className="font-arabic font-extrabold">{surahName}</span>
+        <span className="font-arabic font-bold opacity-80">{formattedJuz}</span>
       </div>
 
       {/* 15-Line Mushaf Page Canvas */}
@@ -173,7 +231,7 @@ export function MushafPageViewer({
       >
         {lineDetails.map((line, lineIdx) => {
           if (line.type === "surah-header") {
-            return <SurahHeaderBox key={lineIdx} surahNumber={line.surah} language={language} />;
+            return <SurahHeaderBox key={lineIdx} surahNumber={line.surah} language={language} theme={theme} />;
           }
 
           if (line.type === "bismillah") {
@@ -201,6 +259,7 @@ export function MushafPageViewer({
                       key={`${w.verseKey}-${w.position}-${wIdx}`}
                       number={w.text || w.verseKey.split(":")[1] || ""}
                       language={language}
+                      theme={theme}
                     />
                   );
                 }
@@ -266,7 +325,9 @@ export function MushafPageViewer({
       </div>
 
       {/* Decorative Mushaf Page Number Footer */}
-      <div className="flex justify-center items-center px-4 py-2 border-t border-primary/20 text-[0.8125rem] font-bold text-muted-foreground bg-primary/5 font-sans">
+      <div
+        className={`flex justify-center items-center px-4 py-2 border-t text-[0.8125rem] font-bold font-sans ${headerBgClass}`}
+      >
         <span>{formatNumerals(pageNumber, language)}</span>
       </div>
     </div>

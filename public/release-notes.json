@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-21g",
+  "release": "2026-08-21h",
   "ar": [
-    "إعادة تصميم عرض صفحات المصحف الشريف وفق معايير المصحف الشريف برسم متناسق وزخارف مذهبة للآيات.",
-    "إضافة ترويسات السور المزخرفة والبسملة وتنسيق أرقام الأجزاء والسور بدقة عالية.",
-    "تحسين تباعد الكلمات وتدفق الآيات القرآنية لضمان تجربة تلاوة هادئة ومريحة للعين."
+    "إضافة فهرس متكامل للمصحف الشريف يتيح البحث والتنقل السريع بين الـ ١١٤ سورة والـ ٣٠ جزءاً.",
+    "دعم أنماط عرض متعددة تشمل الورقي الكلاسيكي، والوضع الليلي، والوضع عالي التباين لشاشات الأوليد (OLED).",
+    "إمكانية حفظ العلامات المرجعية ومتابعة الورد القرآني اليومي ونسبة إتمام الختمة المباركة."
   ],
   "en": [
-    "Redesigned the Mushaf page layout with authentic typography, natural word flow, and illuminated Ayah markers.",
-    "Added decorative Surah header banners, Bismillah headings, and accurate Juz numbering.",
-    "Optimized Quran text spacing and layout for a peaceful, distraction-free reading experience."
+    "Added a complete Quran Index with search and instant navigation across all 114 Surahs and 30 Ajza'.",
+    "Introduced versatile display themes including Classic Parchment, Devotional Night, and High-Contrast OLED B&W.",
+    "Added page bookmarking, daily wird progress tracking, and Khatmah completion metrics."
   ]
 }

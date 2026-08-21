@@ -234,6 +234,8 @@ export interface PrayerTrackingRecord {
   adhkar: boolean;
 }
 
+export type MushafTheme = "parchment" | "dark" | "oled" | "white";
+
 export interface AppStateSnapshot {
   settings: UserSettingsState;
   profile: UserProfileState;
@@ -249,4 +251,12 @@ export interface AppStateSnapshot {
   lastActiveDayKey?: string;
   /** User's current reading position in the Quran Khatmah (page number 1-604). */
   khatmahPage?: number;
+  /** Mushaf color theme preference (parchment, dark, oled, white). */
+  mushafTheme?: MushafTheme;
+  /** Bookmarked Mushaf pages (1-604). */
+  mushafBookmarks?: number[];
+  /** Daily Quran reading goal in pages (default: 4). */
+  dailyWirdGoal?: number;
+  /** Map of date key (YYYY-MM-DD) to list of pages read on that day. */
+  wirdHistory?: Record<string, number[]>;
 }

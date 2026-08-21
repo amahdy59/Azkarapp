@@ -14,6 +14,7 @@ import type {
   TextSizeOption,
   ThemeMode,
   PrayerName,
+  MushafTheme,
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
@@ -240,6 +241,10 @@ function AppContent() {
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
+  const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "parchment");
+  const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
+  const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
+  const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
 
   /**
    * Upserts one of the two flags for a prayer on the current progress day.
@@ -415,6 +420,11 @@ function AppContent() {
       dailyCompletions,
       prayerTracking,
       savedZikrIds: [...savedZikrIds].sort(),
+      khatmahPage,
+      mushafTheme,
+      mushafBookmarks,
+      dailyWirdGoal,
+      wirdHistory,
     }),
     [
       boldText,
@@ -443,6 +453,11 @@ function AppContent() {
       dailyCompletions,
       prayerTracking,
       savedZikrIds,
+      khatmahPage,
+      mushafTheme,
+      mushafBookmarks,
+      dailyWirdGoal,
+      wirdHistory,
       showTranslation,
       showTransliteration,
       textSize,
@@ -1364,6 +1379,14 @@ function AppContent() {
                   onBack={pop}
                   khatmahPage={khatmahPage}
                   setKhatmahPage={setKhatmahPage}
+                  mushafTheme={mushafTheme}
+                  setMushafTheme={setMushafTheme}
+                  mushafBookmarks={mushafBookmarks}
+                  setMushafBookmarks={setMushafBookmarks}
+                  dailyWirdGoal={dailyWirdGoal}
+                  setDailyWirdGoal={setDailyWirdGoal}
+                  wirdHistory={wirdHistory}
+                  setWirdHistory={setWirdHistory}
                 />
               )}
               {view === "custom_counter" && (

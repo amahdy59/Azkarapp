@@ -113,10 +113,19 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   dailyCompletions: [],
   prayerTracking: [],
   savedZikrIds: [],
+  khatmahPage: 1,
+  mushafTheme: "parchment",
+  mushafBookmarks: [],
+  dailyWirdGoal: 4,
+  wirdHistory: {},
 };
 
 function isLanguage(value: string): value is AppLanguage {
   return ["en", "ar"].includes(value);
+}
+
+function isMushafTheme(value: unknown): value is "parchment" | "dark" | "oled" | "white" {
+  return typeof value === "string" && ["parchment", "dark", "oled", "white"].includes(value);
 }
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
@@ -530,6 +539,28 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
     savedZikrIds: Array.isArray(parsed.savedZikrIds)
       ? dedupeSavedZikrIds(parsed.savedZikrIds)
       : dedupeSavedZikrIds(fallbackSavedZikrIds),
+    khatmahPage:
+      typeof parsed.khatmahPage === "number" && parsed.khatmahPage >= 1 && parsed.khatmahPage <= 604
+        ? Math.floor(parsed.khatmahPage)
+        : 1,
+    mushafTheme: isMushafTheme(parsed.mushafTheme) ? parsed.mushafTheme : "parchment",
+    mushafBookmarks: Array.isArray(parsed.mushafBookmarks)
+      ? Array.from(
+          new Set(
+            parsed.mushafBookmarks
+              .filter((p: unknown) => typeof p === "number" && p >= 1 && p <= 604)
+              .map((p: number) => Math.floor(p)),
+          ),
+        )
+      : [],
+    dailyWirdGoal:
+      typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
+        ? Math.floor(parsed.dailyWirdGoal)
+        : 4,
+    wirdHistory:
+      typeof parsed.wirdHistory === "object" && parsed.wirdHistory !== null && !Array.isArray(parsed.wirdHistory)
+        ? (parsed.wirdHistory as Record<string, number[]>)
+        : {},
     ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
@@ -794,6 +825,11 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       normalizePrayerTracking(incoming.prayerTracking),
     ),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
+    khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
+    mushafTheme: incoming.mushafTheme ?? safeBase.mushafTheme ?? "parchment",
+    mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
+    dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
+    wirdHistory: { ...(safeBase.wirdHistory ?? {}), ...(incoming.wirdHistory ?? {}) },
   };
 }
 
@@ -807,5 +843,8 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     sessions: [],
     dailyCompletions: [],
     savedZikrIds: [],
+    khatmahPage: 1,
+    mushafBookmarks: [],
+    wirdHistory: {},
   };
 }

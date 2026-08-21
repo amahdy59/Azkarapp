@@ -1,13 +1,25 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
-import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import type { AppLanguage } from "../types";
-import { ChevronRight, ChevronLeft, RotateCcw } from "../components/icons";
+import type { AppLanguage, MushafTheme } from "../types";
+import {
+  ChevronRight,
+  ChevronLeft,
+  RotateCcw,
+  BookOpen,
+  Bookmark,
+  ArrowRight,
+  ArrowLeft,
+  SlidersHorizontal,
+} from "../components/icons";
 import { motion, AnimatePresence } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
+import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import * as Switch from "@radix-ui/react-switch";
+import * as Popover from "@radix-ui/react-popover";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
+import { formatNumerals } from "../formatting";
+import { getProgressDayKey } from "../progress";
 
 export function KhatmahReaderScreen({
   language,
@@ -15,20 +27,85 @@ export function KhatmahReaderScreen({
   onBack,
   khatmahPage,
   setKhatmahPage,
+  mushafTheme: initialTheme = "parchment",
+  setMushafTheme: onUpdateTheme,
+  mushafBookmarks: initialBookmarks = [],
+  setMushafBookmarks: onUpdateBookmarks,
+  dailyWirdGoal = 4,
+  setDailyWirdGoal: _onUpdateGoal,
+  wirdHistory = {},
+  setWirdHistory: onUpdateWirdHistory,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onBack: () => void;
   khatmahPage: number;
   setKhatmahPage: (page: number) => void;
+  mushafTheme?: MushafTheme;
+  setMushafTheme?: (theme: MushafTheme) => void;
+  mushafBookmarks?: number[];
+  setMushafBookmarks?: (bookmarks: number[]) => void;
+  dailyWirdGoal?: number;
+  setDailyWirdGoal?: (goal: number) => void;
+  wirdHistory?: Record<string, number[]>;
+  setWirdHistory?: (history: Record<string, number[]>) => void;
 }) {
   const currentPage = Math.max(1, Math.min(604, khatmahPage || 1));
 
+  const [theme, setTheme] = useState<MushafTheme>(initialTheme);
+  const [bookmarks, setBookmarks] = useState<number[]>(initialBookmarks);
   const [pageData, setPageData] = useState<{ k: string; w: [number, number, number, string][] }[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const [highlightGhareeb, setHighlightGhareeb] = useState(false);
+  const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+
+  // Sync internal theme with prop updates
+  useEffect(() => {
+    if (initialTheme) setTheme(initialTheme);
+  }, [initialTheme]);
+
+  // Sync bookmarks with prop updates
+  useEffect(() => {
+    if (initialBookmarks) setBookmarks(initialBookmarks);
+  }, [initialBookmarks]);
+
+  const handleSelectTheme = (newTheme: MushafTheme) => {
+    setTheme(newTheme);
+    onUpdateTheme?.(newTheme);
+    setIsThemeMenuOpen(false);
+  };
+
+  const isCurrentBookmarked = bookmarks.includes(currentPage);
+
+  const toggleBookmark = () => {
+    const nextBookmarks = isCurrentBookmarked
+      ? bookmarks.filter((p) => p !== currentPage)
+      : [...bookmarks, currentPage].sort((a, b) => a - b);
+    setBookmarks(nextBookmarks);
+    onUpdateBookmarks?.(nextBookmarks);
+  };
+
+  // Track page reading for daily wird
+  const todayKey = useMemo(() => getProgressDayKey(new Date(), 3), []);
+  const todayPagesRead = useMemo(() => {
+    const list = wirdHistory[todayKey] ?? [];
+    return list;
+  }, [todayKey, wirdHistory]);
+
+  const recordPageRead = useCallback(
+    (page: number) => {
+      if (!onUpdateWirdHistory) return;
+      const currentList = wirdHistory[todayKey] ?? [];
+      if (!currentList.includes(page)) {
+        const nextList = [...currentList, page];
+        onUpdateWirdHistory({ ...wirdHistory, [todayKey]: nextList });
+      }
+    },
+    [onUpdateWirdHistory, todayKey, wirdHistory],
+  );
 
   const loadPage = useCallback(
     (page: number) => {
@@ -49,6 +126,7 @@ export function KhatmahReaderScreen({
           if (active) {
             setPageData(data);
             setLoading(false);
+            recordPageRead(page);
           }
         })
         .catch((err) => {
@@ -63,14 +141,14 @@ export function KhatmahReaderScreen({
         active = false;
       };
     },
-    [language],
+    [language, recordPageRead],
   );
 
   useEffect(() => {
     return loadPage(currentPage);
   }, [currentPage, loadPage]);
 
-  // Transform data into lines (1 to 15)
+  // Transform data into 15 lines
   const lines = useMemo(() => {
     if (!pageData) return [];
     const lineMap = new Map<number, { verseKey: string; position: number; isEnd: number; text: string }[]>();
@@ -88,7 +166,7 @@ export function KhatmahReaderScreen({
     return result;
   }, [pageData]);
 
-  // Compute the current Surah and Juz for the header
+  // Compute Surah and Juz for the header
   const { surahName, juzNumber } = useMemo(() => {
     if (!pageData || pageData.length === 0) {
       return {
@@ -96,7 +174,6 @@ export function KhatmahReaderScreen({
         juzNumber: getJuzNumberForPage(currentPage),
       };
     }
-    // Get the first verse on the page
     const firstVerseKey = pageData[0]?.k || "1:1";
     const [surah] = firstVerseKey.split(":");
     return {
@@ -105,27 +182,173 @@ export function KhatmahReaderScreen({
     };
   }, [pageData, currentPage, language]);
 
-  const paginate = (newDirection: number) => {
-    const nextPage = currentPage + newDirection;
-    if (nextPage < 1 || nextPage > 604) return;
-    setSwipeDirection(newDirection);
-    setKhatmahPage(nextPage);
-  };
+  const paginate = useCallback(
+    (newDirection: number) => {
+      const nextPage = currentPage + newDirection;
+      if (nextPage < 1 || nextPage > 604) return;
+      setSwipeDirection(newDirection);
+      setKhatmahPage(nextPage);
+    },
+    [currentPage, setKhatmahPage],
+  );
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        paginate(direction === "rtl" ? 1 : -1);
+      } else if (e.key === "ArrowRight") {
+        paginate(direction === "rtl" ? -1 : 1);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [direction, paginate]);
 
   const isArabic = language === "ar";
-  // In Arabic (RTL), next page in Mushaf goes to left (higher page), previous to right
+  const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const nextIcon = isArabic ? <ChevronLeft size={24} /> : <ChevronRight size={24} />;
   const prevIcon = isArabic ? <ChevronRight size={24} /> : <ChevronLeft size={24} />;
+
+  const khatmahPercent = Math.round((currentPage / 604) * 100);
+  const wirdPagesCount = todayPagesRead.length;
 
   return (
     <ScreenContainer
       dir={direction}
-      screenName={t(language, "common.mushaf") || "Mushaf"}
-      className="relative flex flex-col h-full bg-background"
+      screenName={t(language, "common.mushaf")}
+      className="relative flex flex-col h-full bg-background select-none overflow-hidden"
     >
-      <Header title={t(language, "common.mushaf") || "Mushaf"} onBack={onBack} language={language} />
+      {/* Top Header & Tool Ribbon */}
+      <header className="flex items-center justify-between px-3 sm:px-5 py-2.5 bg-card border-b border-border shadow-xs z-20">
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onBack}
+            className="flex size-10 items-center justify-center rounded-xl bg-muted/60 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t(language, "common.back")}
+          >
+            {backIcon}
+          </button>
+          <span className="font-arabic font-bold text-base sm:text-lg text-foreground">
+            {t(language, "common.mushaf")}
+          </span>
+        </div>
 
-      <div className="flex-1 relative overflow-hidden flex flex-col items-center justify-center p-2 sm:p-4">
+        {/* Action Controls */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
+          {/* Index Button */}
+          <button
+            type="button"
+            onClick={() => setIsIndexOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground text-xs sm:text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t(language, "mushaf.indexTitle")}
+          >
+            <BookOpen size={16} className="text-primary" />
+            <span>{t(language, "mushaf.tabSurahs")}</span>
+          </button>
+
+          {/* Theme Selector Popover */}
+          <Popover.Root open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen}>
+            <Popover.Trigger asChild>
+              <button
+                type="button"
+                className="flex size-10 items-center justify-center rounded-xl bg-muted/60 hover:bg-muted text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={t(language, "mushaf.themeTitle")}
+              >
+                <SlidersHorizontal size={18} />
+              </button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content
+                side="bottom"
+                align="end"
+                sideOffset={8}
+                dir={direction}
+                className="z-50 w-52 p-2 rounded-2xl bg-popover text-popover-foreground shadow-overlay border border-border animate-in fade-in zoom-in-95"
+              >
+                <div className="flex flex-col gap-1">
+                  <span className="text-xs font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
+                    {t(language, "mushaf.themeTitle")}
+                  </span>
+                  {[
+                    {
+                      id: "parchment" as const,
+                      label: t(language, "mushaf.themeParchment"),
+                      color: "bg-[#fbf7ee] text-[#1c1917] border-primary/40",
+                    },
+                    {
+                      id: "dark" as const,
+                      label: t(language, "mushaf.themeDark"),
+                      color: "bg-[#0c0f14] text-[#f3f4f6] border-primary/30",
+                    },
+                    {
+                      id: "oled" as const,
+                      label: t(language, "mushaf.themeOled"),
+                      color: "bg-[#000000] text-[#ffffff] border-white/50",
+                    },
+                    {
+                      id: "white" as const,
+                      label: t(language, "mushaf.themeWhite"),
+                      color: "bg-[#ffffff] text-[#111827] border-gray-300",
+                    },
+                  ].map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => handleSelectTheme(item.id)}
+                      className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
+                        theme === item.id ? "bg-primary/15 text-primary" : "hover:bg-muted text-foreground"
+                      }`}
+                    >
+                      <span>{item.label}</span>
+                      <span className={`size-4 rounded-full border ${item.color}`} />
+                    </button>
+                  ))}
+                </div>
+              </Popover.Content>
+            </Popover.Portal>
+          </Popover.Root>
+
+          {/* Bookmark Toggle */}
+          <button
+            type="button"
+            onClick={toggleBookmark}
+            className={`flex size-10 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              isCurrentBookmarked
+                ? "bg-primary/15 text-primary"
+                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+            aria-label={t(language, "mushaf.toggleBookmark")}
+            aria-pressed={isCurrentBookmarked}
+          >
+            <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
+          </button>
+        </div>
+      </header>
+
+      {/* Wird & Khatmah Progress Banner */}
+      <div className="flex items-center justify-between px-4 sm:px-6 py-2 bg-muted/30 border-b border-border/40 text-xs font-bold text-muted-foreground font-sans">
+        <div className="flex items-center gap-2">
+          <span>{t(language, "mushaf.wirdTitle")}:</span>
+          <span className="text-foreground">
+            {t(language, "mushaf.wirdProgress", {
+              read: formatNumerals(wirdPagesCount, language),
+              goal: formatNumerals(dailyWirdGoal, language),
+            })}
+          </span>
+          {wirdPagesCount >= dailyWirdGoal && (
+            <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold">✓</span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-1.5 text-foreground">
+          <span>{t(language, "mushaf.khatmahProgress", { percent: formatNumerals(khatmahPercent, language) })}</span>
+        </div>
+      </div>
+
+      {/* Main Mushaf Page Display Canvas */}
+      <main className="flex-1 relative overflow-hidden flex flex-col items-center justify-center p-2 sm:p-4">
         {loading && !pageData && (
           <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
             <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
@@ -166,16 +389,19 @@ export function KhatmahReaderScreen({
                   juzNumber={juzNumber}
                   highlightGhareeb={highlightGhareeb}
                   direction={direction}
+                  theme={theme}
+                  isBookmarked={isCurrentBookmarked}
                 />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </main>
 
-      <div className="flex-shrink-0 p-4 flex flex-col gap-4 bg-card border-t border-border shadow-raised z-10">
-        <div className="flex justify-between items-center px-2">
-          <label className="flex items-center gap-3 cursor-pointer text-sm font-medium">
+      {/* Bottom Control Toolbar */}
+      <footer className="flex-shrink-0 p-3 sm:p-4 flex flex-col gap-3 bg-card border-t border-border shadow-raised z-20">
+        <div className="flex justify-between items-center px-1">
+          <label className="flex items-center gap-3 cursor-pointer text-xs sm:text-sm font-medium">
             <Switch.Root
               className="w-10 h-6 bg-switch-background rounded-full relative data-[state=checked]:bg-primary outline-none focus:ring-2 focus:ring-ring"
               checked={highlightGhareeb}
@@ -184,34 +410,60 @@ export function KhatmahReaderScreen({
             >
               <Switch.Thumb className="block w-5 h-5 bg-white rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[1.125rem]" />
             </Switch.Root>
-            {t(language, "mushaf.highlightGhareeb") || "Highlight Difficult Words"}
+            {t(language, "mushaf.highlightGhareeb")}
           </label>
+
+          <button
+            type="button"
+            onClick={() => setIsIndexOpen(true)}
+            className="text-xs font-bold text-primary hover:underline"
+          >
+            {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+          </button>
         </div>
 
         <div className="flex justify-between items-center">
           <button
+            type="button"
             onClick={() => paginate(isArabic ? 1 : -1)}
             disabled={currentPage === (isArabic ? 604 : 1)}
             className="ui-icon-button"
-            aria-label={t(language, "common.next") || "Next"}
+            aria-label={t(language, "common.next")}
           >
             {prevIcon}
           </button>
 
-          <span className="text-sm font-medium text-muted-foreground flex items-center gap-2" dir="ltr">
-            {Math.round((currentPage / 604) * 100)}%
-          </span>
+          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-muted-foreground font-sans">
+            <span>
+              {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
+            </span>
+          </div>
 
           <button
+            type="button"
             onClick={() => paginate(isArabic ? -1 : 1)}
             disabled={currentPage === (isArabic ? 1 : 604)}
             className="ui-icon-button"
-            aria-label={t(language, "common.previous") || "Previous"}
+            aria-label={t(language, "common.previous")}
           >
             {nextIcon}
           </button>
         </div>
-      </div>
+      </footer>
+
+      {/* Index & Navigation Modal */}
+      <MushafNavigationModal
+        isOpen={isIndexOpen}
+        onClose={() => setIsIndexOpen(false)}
+        currentPage={currentPage}
+        onSelectPage={(page) => {
+          setSwipeDirection(0);
+          setKhatmahPage(page);
+        }}
+        language={language}
+        direction={direction}
+        bookmarks={bookmarks}
+      />
     </ScreenContainer>
   );
 }
