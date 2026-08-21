@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-21f",
+  "release": "2026-08-21g",
   "ar": [
-    "إصلاح وتحسين تحميل صفحات المصحف الشريف وقارئ الختمة بسلاسة وموثوقية.",
-    "تبسيط الواجهة الرئيسية وترويسة الشاشة بإزالة شارات التتابع التنافسية للحفاظ على سكينة القراءة.",
-    "إضافة بيانات السور القرآنية وحساب الأجزاء بدقة لتسهيل التنقل أثناء القراءة."
+    "إعادة تصميم عرض صفحات المصحف الشريف وفق معايير المصحف الشريف برسم متناسق وزخارف مذهبة للآيات.",
+    "إضافة ترويسات السور المزخرفة والبسملة وتنسيق أرقام الأجزاء والسور بدقة عالية.",
+    "تحسين تباعد الكلمات وتدفق الآيات القرآنية لضمان تجربة تلاوة هادئة ومريحة للعين."
   ],
   "en": [
-    "Fixed and enhanced Mushaf Quran reader and Khatmah page loading reliability.",
-    "Simplified the Home screen and hero header by removing gamified streak badges for a calm devotional experience.",
-    "Added accurate Surah metadata and Juz navigation across the Quran reader."
+    "Redesigned the Mushaf page layout with authentic typography, natural word flow, and illuminated Ayah markers.",
+    "Added decorative Surah header banners, Bismillah headings, and accurate Juz numbering.",
+    "Optimized Quran text spacing and layout for a peaceful, distraction-free reading experience."
   ]
 }

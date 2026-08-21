@@ -157,7 +157,7 @@ export function KhatmahReaderScreen({
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               className="absolute inset-0 p-2 sm:p-4 flex items-center justify-center pointer-events-none"
             >
-              <div className="w-full h-full max-w-[480px] sm:max-w-[540px] md:max-w-[600px] max-h-[85vh] pointer-events-auto">
+              <div className="w-full h-full max-w-[500px] sm:max-w-[580px] md:max-w-[660px] lg:max-w-[720px] max-h-[88vh] pointer-events-auto">
                 <MushafPageViewer
                   lines={lines}
                   language={language}

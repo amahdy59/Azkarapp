@@ -1,9 +1,88 @@
-import { useState } from "react";
-import { AppLanguage } from "../types";
+import { useState, useMemo } from "react";
+import type { AppLanguage } from "../types";
 import { getQuranWordMeaning } from "../content/quranWordMeanings";
 import * as Popover from "@radix-ui/react-popover";
 import { t } from "../i18n";
 import { X } from "./icons";
+import { formatNumerals } from "../formatting";
+import { getSurahDisplayName } from "../content/surahInfo";
+
+export interface MushafWordToken {
+  verseKey: string;
+  position: number;
+  isEnd: number;
+  text: string;
+}
+
+export function AyahMarker({ number, language }: { number: string | number; language: AppLanguage }) {
+  const displayNum = formatNumerals(number, language);
+  return (
+    <span
+      className="inline-flex items-center justify-center relative mx-1 align-middle select-none shrink-0"
+      role="img"
+      aria-label={`آية ${displayNum}`}
+    >
+      <svg
+        width="26"
+        height="26"
+        viewBox="0 0 32 32"
+        fill="none"
+        className="text-primary/90 transition-transform drop-shadow-xs"
+        aria-hidden="true"
+      >
+        <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.5" className="opacity-90" />
+        <circle
+          cx="16"
+          cy="16"
+          r="12"
+          stroke="currentColor"
+          strokeWidth="0.75"
+          strokeDasharray="2 1.5"
+          className="opacity-60"
+        />
+      </svg>
+      <span
+        className="absolute inset-0 flex items-center justify-center text-[0.625rem] sm:text-[0.6875rem] font-bold text-primary font-sans leading-none pt-0.5"
+        style={{ fontVariantNumeric: "tabular-nums" }}
+        aria-hidden="true"
+      >
+        {displayNum}
+      </span>
+    </span>
+  );
+}
+
+function SurahHeaderBox({ surahNumber, language }: { surahNumber: number | string; language: AppLanguage }) {
+  const title = getSurahDisplayName(surahNumber, language);
+  return (
+    <div className="flex items-center justify-center w-full my-2 select-none" dir="rtl">
+      <div className="relative flex items-center justify-between w-full max-w-[96%] sm:max-w-[92%] px-4 py-1.5 border-2 border-primary/60 rounded-xl bg-gradient-to-r from-primary/10 via-primary/20 to-primary/10 shadow-xs">
+        <span className="text-primary text-[0.875rem] opacity-80" aria-hidden="true">
+          ۞
+        </span>
+        <span className="font-arabic font-extrabold text-[1rem] sm:text-[1.125rem] text-primary tracking-wide">
+          {title}
+        </span>
+        <span className="text-primary text-[0.875rem] opacity-80" aria-hidden="true">
+          ۞
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function BismillahLine() {
+  return (
+    <div className="flex items-center justify-center w-full my-1.5 select-none text-center" dir="rtl">
+      <p
+        className="font-arabic font-bold text-[1.125rem] sm:text-[1.25rem] text-foreground/90 tracking-wide"
+        style={{ fontFamily: "var(--font-mushaf)" }}
+      >
+        بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+      </p>
+    </div>
+  );
+}
 
 export function MushafPageViewer({
   lines,
@@ -14,7 +93,7 @@ export function MushafPageViewer({
   highlightGhareeb,
   direction,
 }: {
-  lines: { verseKey: string; position: number; isEnd: number; text: string }[][];
+  lines: MushafWordToken[][];
   language: AppLanguage;
   pageNumber: number;
   surahName: string;
@@ -31,43 +110,102 @@ export function MushafPageViewer({
     meaning: string;
   } | null>(null);
 
+  // Analyze page lines to identify Surah headers and Bismillah
+  const lineDetails = useMemo(() => {
+    // Collect all first-verse instances on this page
+    const surahStarts: { surah: number; startLine: number }[] = [];
+    for (let l = 0; l < lines.length; l++) {
+      const lineWords = lines[l];
+      if (!lineWords || lineWords.length === 0) continue;
+      for (const w of lineWords) {
+        const [s, a] = w.verseKey.split(":");
+        if (a === "1" && !surahStarts.some((item) => item.surah === Number(s))) {
+          surahStarts.push({ surah: Number(s), startLine: l + 1 });
+        }
+      }
+    }
+
+    return lines.map((words, idx) => {
+      const lineNum = idx + 1;
+      const isEmpty = !words || words.length === 0;
+
+      // Check if this empty line corresponds to a Surah Header or Bismillah
+      if (isEmpty) {
+        for (const start of surahStarts) {
+          if (start.surah === 1 && lineNum === 1) {
+            return { type: "surah-header" as const, surah: 1 };
+          }
+          if (lineNum === start.startLine - 2) {
+            return { type: "surah-header" as const, surah: start.surah };
+          }
+          if (lineNum === start.startLine - 1 && start.surah !== 9) {
+            return { type: "bismillah" as const };
+          }
+        }
+        return { type: "empty" as const };
+      }
+
+      return { type: "text" as const, words };
+    });
+  }, [lines]);
+
+  const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+
   return (
     <div
-      className="flex flex-col h-full w-full bg-[#fdfaf6] dark:bg-[#0c0c0c] text-foreground rounded-xl shadow-sm border border-border/40 overflow-hidden"
+      className="flex flex-col h-full w-full bg-[#fbf7ee] dark:bg-[#0c0f14] text-foreground rounded-2xl shadow-raised border-2 border-primary/40 ring-1 ring-primary/20 overflow-hidden"
       dir="rtl"
     >
-      <div className="flex justify-between items-center px-4 py-3 border-b border-border/50 text-[0.875rem] font-bold text-muted-foreground font-sans bg-black/5 dark:bg-white/5">
-        <span>{surahName}</span>
-        <span>{t(language, "common.juz", { number: juzNumber }) || `Juz ${juzNumber}`}</span>
+      {/* Decorative Mushaf Header Banner */}
+      <div className="flex justify-between items-center px-4 sm:px-6 py-2.5 border-b border-primary/20 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground/80 font-sans bg-primary/5">
+        <span className="font-arabic font-extrabold text-primary">{surahName}</span>
+        <span className="font-arabic font-bold text-muted-foreground">{formattedJuz}</span>
       </div>
 
+      {/* 15-Line Mushaf Page Canvas */}
       <div
-        className="flex-1 px-4 sm:px-6 py-6 overflow-y-auto flex flex-col justify-around min-h-[500px]"
+        className="flex-1 px-3 sm:px-6 py-4 flex flex-col justify-between overflow-y-auto"
         style={{
           fontFamily: "var(--font-mushaf)",
-          fontSize: "1.25rem",
-          lineHeight: "2.5",
+          fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
+          lineHeight: "2.4",
         }}
       >
-        {lines.map((lineWords, lineIdx) => {
-          if (!lineWords || lineWords.length === 0) {
-            return <div key={lineIdx} className="h-8" aria-hidden="true" />;
+        {lineDetails.map((line, lineIdx) => {
+          if (line.type === "surah-header") {
+            return <SurahHeaderBox key={lineIdx} surahNumber={line.surah} language={language} />;
           }
 
+          if (line.type === "bismillah") {
+            return <BismillahLine key={lineIdx} />;
+          }
+
+          if (line.type === "empty") {
+            return <div key={lineIdx} className="h-6" aria-hidden="true" />;
+          }
+
+          const lineWords = line.words;
+
           return (
-            <div key={lineIdx} className="flex justify-between items-baseline w-full">
+            <div
+              key={lineIdx}
+              className="flex items-baseline justify-center flex-wrap sm:flex-nowrap w-full py-0.5 select-text gap-x-1 sm:gap-x-1.5 md:gap-x-2"
+            >
               {lineWords.map((w, wIdx) => {
                 const meaning = highlightGhareeb ? getQuranWordMeaning(w.verseKey, w.text) : undefined;
                 const isGhareeb = !!meaning;
 
-                const wordContent = w.isEnd ? (
-                  <span className="inline-flex items-center justify-center relative mx-1 text-primary">
-                    <span className="text-[1.5rem]">۝</span>
-                    <span className="absolute text-[0.5rem] font-sans font-bold leading-none select-none">
-                      {w.verseKey.split(":")[1]}
-                    </span>
-                  </span>
-                ) : (
+                if (w.isEnd) {
+                  return (
+                    <AyahMarker
+                      key={`${w.verseKey}-${w.position}-${wIdx}`}
+                      number={w.text || w.verseKey.split(":")[1] || ""}
+                      language={language}
+                    />
+                  );
+                }
+
+                const wordContent = (
                   <span className="select-text" title={!isArabic && isGhareeb ? meaning : undefined}>
                     {w.text}
                   </span>
@@ -76,7 +214,7 @@ export function MushafPageViewer({
                 if (isGhareeb) {
                   return (
                     <Popover.Root
-                      key={w.verseKey + "-" + w.position}
+                      key={`${w.verseKey}-${w.position}`}
                       open={activeWord?.verseKey === w.verseKey && activeWord?.wordPosition === w.position}
                       onOpenChange={(open) => {
                         if (open)
@@ -86,8 +224,8 @@ export function MushafPageViewer({
                       }}
                     >
                       <Popover.Trigger asChild>
-                        <button className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded">
-                          <span className="text-primary/90 underline decoration-primary/40 decoration-dotted underline-offset-4">
+                        <button className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-0.5">
+                          <span className="text-primary font-bold underline decoration-primary/70 decoration-dotted underline-offset-4">
                             {w.text}
                           </span>
                         </button>
@@ -95,20 +233,23 @@ export function MushafPageViewer({
                       <Popover.Portal>
                         <Popover.Content
                           side="top"
-                          sideOffset={5}
-                          className="z-50 max-w-[280px] p-3 rounded-xl bg-popover text-popover-foreground shadow-overlay border border-border/50 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95"
+                          sideOffset={6}
+                          className="z-50 max-w-[290px] p-3.5 rounded-xl bg-popover text-popover-foreground shadow-overlay border border-border/60 animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95"
                           dir={direction}
                         >
-                          <div className="flex flex-col gap-1">
-                            <div className="flex justify-between items-center w-full">
-                              <span className="font-bold text-primary" style={{ fontFamily: "var(--font-mushaf)" }}>
+                          <div className="flex flex-col gap-1.5">
+                            <div className="flex justify-between items-center w-full border-b border-border/40 pb-1.5">
+                              <span
+                                className="font-bold text-primary text-[1.125rem]"
+                                style={{ fontFamily: "var(--font-mushaf)" }}
+                              >
                                 {w.text}
                               </span>
                               <Popover.Close className="text-muted-foreground hover:text-foreground rounded-full p-1 focus:outline-none focus:ring-2 focus:ring-ring">
                                 <X size={14} />
                               </Popover.Close>
                             </div>
-                            <p className="text-[0.875rem] leading-relaxed">{meaning}</p>
+                            <p className="text-[0.875rem] font-sans font-medium leading-relaxed">{meaning}</p>
                           </div>
                           <Popover.Arrow className="fill-popover" />
                         </Popover.Content>
@@ -117,15 +258,16 @@ export function MushafPageViewer({
                   );
                 }
 
-                return <span key={w.verseKey + "-" + w.position + "-" + wIdx}>{wordContent}</span>;
+                return <span key={`${w.verseKey}-${w.position}-${wIdx}`}>{wordContent}</span>;
               })}
             </div>
           );
         })}
       </div>
 
-      <div className="flex justify-center items-center px-4 py-2 border-t border-border/50 text-[0.75rem] font-medium text-muted-foreground bg-black/5 dark:bg-white/5 font-sans">
-        {pageNumber}
+      {/* Decorative Mushaf Page Number Footer */}
+      <div className="flex justify-center items-center px-4 py-2 border-t border-primary/20 text-[0.8125rem] font-bold text-muted-foreground bg-primary/5 font-sans">
+        <span>{formatNumerals(pageNumber, language)}</span>
       </div>
     </div>
   );

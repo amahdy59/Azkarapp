@@ -139,6 +139,11 @@ export function getJuzNumberForPage(page: number): number {
   return 1;
 }
 
+export function getSurahMeta(surahNumber: number | string): SurahMeta | undefined {
+  const num = typeof surahNumber === "string" ? parseInt(surahNumber, 10) : surahNumber;
+  return SURAHS.find((s) => s.number === num);
+}
+
 export function getSurahDisplayName(surahNumber: number | string, language: AppLanguage): string {
   const num = typeof surahNumber === "string" ? parseInt(surahNumber, 10) : surahNumber;
   const surah = SURAHS.find((s) => s.number === num);
