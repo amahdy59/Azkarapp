@@ -308,34 +308,17 @@ test("post-prayer cards hide what cannot be acted on and stay equal height", asy
   const [trackerBox, masbahaBox] = await Promise.all([tracker.boundingBox(), masbaha.boundingBox()]);
   expect(masbahaBox?.y).toBeGreaterThanOrEqual((trackerBox?.y ?? 0) + (trackerBox?.height ?? 0));
 
-  /* Wide viewports have room for all five, so hiding any of them there would
-     only cost a click to reveal what already fits. Narrower ones show the two
-     most actionable — what is open now and what follows — and keep the rest
-     one tap away. Either way the next prayer is always on screen: it is the
-     one people are looking for. */
-  /* Three tiers, matching PrayerTrackerCards: every prayer from 64rem up where
-     there is room for five, three from 40rem, two on a phone where a third
-     would squeeze the time that people are scanning for. */
-  const width = page.viewportSize()?.width ?? 0;
-  const isWide = width >= 1024;
-  const expectedCollapsed = width >= 640 ? 3 : 2;
+  /* Now that it's a carousel, we render all 5 cards on all viewports,
+     and rely on CSS snapping and JS scrolling to show the relevant ones.
+     The 'Show More' toggle has been removed. */
   const collapsedStates = await cards.evaluateAll((nodes) =>
     nodes.map((node) => (node as HTMLElement).dataset.prayerState),
   );
   expect(collapsedStates).toContain("next");
+  expect(collapsedStates.length).toBe(5);
 
   const toggle = page.getByTestId("prayer-show-upcoming");
-  if (isWide) {
-    expect(collapsedStates.length).toBe(5);
-    await expect(toggle).toHaveCount(0);
-  } else {
-    expect(collapsedStates.length).toBe(expectedCollapsed);
-    await expect(toggle).toHaveAttribute("aria-expanded", "false");
-    await toggle.click();
-    await expect(toggle).toHaveAttribute("aria-expanded", "true");
-    const expanded = await cards.evaluateAll((nodes) => nodes.map((node) => (node as HTMLElement).dataset.prayerState));
-    expect(expanded.length).toBe(5);
-  }
+  await expect(toggle).toHaveCount(0);
 
   const metrics = await grid.evaluate((element) => {
     const all = [...element.querySelectorAll("article[data-prayer-state]")];
