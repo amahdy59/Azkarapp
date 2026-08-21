@@ -182,7 +182,7 @@ export function deriveDailyCompletionsFromLegacySessions(
     sessions
       .filter((session) => session.isComplete)
       .map((session) => ({
-        dayKey: getProgressDayKey(new Date(session.completedAt), boundaryHour),
+        dayKey: getProgressDayKey(new Date(session.completedAt), boundaryHour, session.category),
         category: session.category,
         timeZone,
         completionLevel: session.completionLevel === "core" ? "core" : "complete",
@@ -473,18 +473,15 @@ export function resetStaleCompletedCollections(
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
 ) {
-  const todayKey = getProgressDayKey(now, boundaryHour);
-  const completedToday = new Set(
-    normalizeDailyCompletions(records)
-      .filter((record) => record.dayKey === todayKey)
-      .map((record) => record.category),
-  );
+  const normalized = normalizeDailyCompletions(records);
 
   return Object.fromEntries(
     CATEGORY_IDS.map((category) => {
+      const catDayKey = getProgressDayKey(now, boundaryHour, category);
+      const isCompletedToday = normalized.some((r) => r.dayKey === catDayKey && r.category === category);
       const categoryProgress = completed[category] ?? new Set<string>();
       const isFull = getAzkarByCategory(category).every((zikr) => categoryProgress.has(zikr.id));
-      return [category, isFull && !completedToday.has(category) ? new Set<string>() : new Set(categoryProgress)];
+      return [category, isFull && !isCompletedToday ? new Set<string>() : new Set(categoryProgress)];
     }),
   ) as Record<CategoryId, Set<string>>;
 }
