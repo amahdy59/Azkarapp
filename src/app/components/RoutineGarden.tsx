@@ -52,6 +52,7 @@ export function TodayRoutineGarden({
   visibleCategoryIds,
   onOpenWirdBenefits,
   onMedia = true,
+  onTabChange,
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -67,6 +68,7 @@ export function TodayRoutineGarden({
   onSelectCategory?: (categoryId: CategoryId) => void;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   onOpenWirdBenefits?: () => void;
+  onTabChange?: (tab: "day" | "week" | "month" | "year") => void;
 }) {
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -93,6 +95,7 @@ export function TodayRoutineGarden({
   const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
     setActiveTab(tab);
     setOffset(0);
+    onTabChange?.(tab);
   };
 
   const completedCount = summary.today.completedCategories.length;

@@ -70,6 +70,7 @@ export function ProgressScreen({
     };
   }, [locationSettings, prayerDateKey]);
 
+  const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
   const fridaySummary = getFridaySummary();
   return (
@@ -95,35 +96,45 @@ export function ProgressScreen({
           onSelectCategory={onSelectCategory}
           visibleCategoryIds={WIRD_CATEGORY_IDS}
           onMedia={false}
+          onTabChange={setActiveTab}
         />
 
-        {/* After-prayer adhkar are tracked per prayer, not as one routine, so
+        {activeTab === "day" && (
+          <>
+            {/* After-prayer adhkar are tracked per prayer, not as one routine, so
             they get their own section rather than a fourth tile inside the
             wird card — the same separation Home makes. */}
-        <section
-          data-testid="progress-after-prayer"
-          dir={direction}
-          className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
-        >
-          <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
-            <h2 className="text-[1.125rem] font-black leading-tight text-foreground" dir="auto">
-              {t(language, "progress.postPrayerAzkar")}
-            </h2>
-          </div>
-          <div className="py-4">
-            <PrayerTrackerCards
-              models={prayerCardModels}
+            <section
+              data-testid="progress-after-prayer"
+              dir={direction}
+              className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+            >
+              <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
+                <h2 className="text-[1.125rem] font-black leading-tight text-foreground" dir="auto">
+                  {t(language, "progress.postPrayerAzkar")}
+                </h2>
+              </div>
+              <div className="py-4">
+                <PrayerTrackerCards
+                  models={prayerCardModels}
+                  language={language}
+                  direction={direction}
+                  records={prayerTracking}
+                  dayKey={getProgressDayKey(now, progressDayStartHour)}
+                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                  onOpen={onPrayerResume}
+                />
+              </div>
+            </section>
+
+            <FridayProgressCard
+              summary={fridaySummary}
               language={language}
               direction={direction}
-              records={prayerTracking}
-              dayKey={getProgressDayKey(now, progressDayStartHour)}
-              onToggle={onTogglePrayerTracking ?? (() => undefined)}
-              onOpen={onPrayerResume}
+              onOpen={onOpenFriday}
             />
-          </div>
-        </section>
-
-        <FridayProgressCard summary={fridaySummary} language={language} direction={direction} onOpen={onOpenFriday} />
+          </>
+        )}
       </div>
     </ScreenContainer>
   );
