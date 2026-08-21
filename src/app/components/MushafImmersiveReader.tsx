@@ -383,11 +383,9 @@ export function MushafImmersiveReader({
           <section className="flex h-full w-full shrink-0 snap-center flex-col items-center justify-center px-5 py-6">
             <div className="text-center mb-8">
               <h2 className="text-2xl font-bold mb-2 font-arabic text-primary">
-                {language === "ar" ? "تمت القراءة" : "Completed"}
+                {t(language, "reader.mushafCompleted")}
               </h2>
-              <p className="text-muted-foreground font-sans">
-                {language === "ar" ? "تقبل الله منا ومنكم صالح الأعمال" : "May Allah accept from us and from you"}
-              </p>
+              <p className="text-muted-foreground font-sans">{t(language, "reader.mushafAccept")}</p>
             </div>
             <button
               onClick={() => {
@@ -396,7 +394,7 @@ export function MushafImmersiveReader({
               }}
               className="bg-primary text-primary-foreground px-8 py-4 rounded-full font-bold shadow-md hover:bg-primary/90 transition-transform active:scale-95"
             >
-              {language === "ar" ? "العودة إلى الأذكار" : "Return to Azkar"}
+              {t(language, "reader.mushafReturn")}
             </button>
           </section>
         )}
