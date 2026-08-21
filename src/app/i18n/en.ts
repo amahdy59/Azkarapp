@@ -1,5 +1,6 @@
 const en = {
   common: {
+    mushaf: "Mushaf",
     settings: "Settings",
     home: "Home",
     azkar: "Azkar",

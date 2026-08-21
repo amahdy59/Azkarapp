@@ -135,3 +135,4 @@ export function parseLocation(search: string, hash: string): RouteState | null {
 
   return null;
 }
+

@@ -81,6 +81,9 @@ const FloatingAudioPlayer = lazy(() =>
 const CompletionScreen = retryableScreen(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
 );
+const KhatmahReaderScreen = retryableScreen(() =>
+  import("./screens/KhatmahReaderScreen").then((module) => ({ default: module.KhatmahReaderScreen })),
+);
 const CustomCounterScreen = retryableScreen(() =>
   import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
 );
@@ -1351,6 +1354,9 @@ function AppContent() {
                     openReader(catId, i, "complete");
                   }}
                 />
+              )}
+              {view === "khatmah" && (
+                <KhatmahReaderScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
               )}
               {view === "custom_counter" && (
                 <CustomCounterScreen
