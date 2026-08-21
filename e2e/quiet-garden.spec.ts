@@ -104,13 +104,14 @@ for (const language of ["en", "ar"] as const) {
     await page.getByTestId("nav-progress").click();
 
     const garden = page.getByTestId("today-garden-card");
-    const dayView = garden.locator('[role="tabpanel"]');
-    await expect(dayView).toBeVisible();
-    const box = await dayView.boundingBox();
-    expect(box).not.toBeNull();
-    expect(box!.width).toBeGreaterThan(800);
+    await expect(garden).toBeVisible();
+    await expect(async () => {
+      const box = await garden.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.width).toBeGreaterThan(800);
+    }).toPass();
     // Three: after-prayer adhkar are tracked per prayer in their own section.
-    const routineCards = dayView.getByRole("button");
+    const routineCards = garden.getByRole("button");
     await expect(routineCards).toHaveCount(3);
     const routineCardTops = await routineCards.evaluateAll((cards) =>
       cards.map((card) => Math.round(card.getBoundingClientRect().top)),
@@ -166,14 +167,14 @@ test("populated Home exposes leaf progress through text, state, and accessible n
 
   // Verify screen reader text for progress
   const headerStats = page.locator('div[aria-label*="leaves"]');
-  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 4/i);
+  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 3/i);
 
   await expectNoWcagViolations(page);
 });
 
-test("four completed main collections are announced as a palm without points or rank", async ({ page }) => {
+test("three completed main collections are announced as a palm without points or rank", async ({ page }) => {
   await seedReturningGardenUser(page, {
-    completedToday: ["morning", "evening", "before_sleep", "after_prayer"],
+    completedToday: ["morning", "evening", "before_sleep"],
   });
   await openReturningHome(page);
 
@@ -259,11 +260,11 @@ test("the week grid conveys completion as text, not shape alone", async ({ page 
 
   // Cells used to contain only an icon or an empty bordered circle, so a
   // screen reader announced the whole grid as blank.
-  await expect(table.locator("td .sr-only")).toHaveCount(28);
+  await expect(table.locator("td .sr-only")).toHaveCount(21);
   await expect(table).toContainText(/Morning: (Completed|Not completed)/);
-  await expect(table).toContainText(/Post-Prayer: (Completed|Not completed)/);
+  await expect(table).not.toContainText(/Post-Prayer: (Completed|Not completed)/);
 
   // Headers must be associated with their column for grid navigation.
   const scoped = await table.locator("th[scope='col']").count();
-  expect(scoped).toBeGreaterThan(3);
+  expect(scoped).toBe(4);
 });

@@ -150,6 +150,7 @@ export function ProgressScreen({
             </button>
 
             <span
+              data-testid="garden-view-date"
               className="px-2 text-center text-[0.9375rem] font-black tracking-wide text-foreground"
               dir="auto"
               aria-live="polite"

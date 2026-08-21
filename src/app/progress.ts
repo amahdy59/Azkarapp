@@ -2,7 +2,7 @@ import { getAzkarByCategory } from "./content/azkar";
 import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type StoredSession } from "./types";
 
 export { CATEGORY_IDS } from "./types";
-export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep", "after_prayer"];
+export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
 export const DAILY_ROUTINE_CATEGORY_IDS: readonly CategoryId[] = [
   "morning",
   "evening",

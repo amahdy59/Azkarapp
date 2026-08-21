@@ -540,12 +540,7 @@ export function ProgressWeekView({
                     <span>{t(language, "progress.sleepShort")}</span>
                   </div>
                 </th>
-                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
-                  <div className="flex items-center justify-center gap-1">
-                    <CheckCircle2 size={15} className="text-success" />
-                    <span>{t(language, "progress.postPrayerShort")}</span>
-                  </div>
-                </th>
+
               </tr>
             </thead>
             <tbody className="divide-y divide-white/20 dark:divide-white/5">
@@ -579,18 +574,7 @@ export function ProgressWeekView({
                     language={language}
                   />
 
-                  <WeekStatusCell
-                    done={day.afterPrayerStatus === "complete"}
-                    label={t(language, "progress.postPrayerShort")}
-                    language={language}
-                    subItems={[
-                      day.completedAfterPrayers.includes("fajr"),
-                      day.completedAfterPrayers.includes("dhuhr"),
-                      day.completedAfterPrayers.includes("asr"),
-                      day.completedAfterPrayers.includes("maghrib"),
-                      day.completedAfterPrayers.includes("isha"),
-                    ]}
-                  />
+
                 </tr>
               ))}
             </tbody>
@@ -698,22 +682,7 @@ export function ProgressWeekView({
             </div>
           </div>
 
-          {/* Post-Prayer Bar */}
-          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
-            <span className="text-muted-foreground w-14 shrink-0">
-              {formatNumerals(weekStats.afterPrayerCompletedCount, language)} {t(language, "progress.ofSeven")}
-            </span>
-            <div className="flex-1 h-2 rounded-full bg-black/10 dark:bg-white/10 overflow-hidden">
-              <div
-                className="h-full bg-success rounded-full"
-                style={{ width: `${Math.round((weekStats.afterPrayerCompletedCount / 7) * 100)}%` }}
-              />
-            </div>
-            <div className="flex items-center gap-1 text-foreground shrink-0">
-              <span>{t(language, "progress.postPrayerShort")}</span>
-              <CheckCircle2 size={14} className="text-success" />
-            </div>
-          </div>
+
         </div>
       </div>
     </div>

@@ -22,8 +22,6 @@ export interface WeekDayRecord {
   morningStatus: RoutineStatus;
   eveningStatus: RoutineStatus;
   sleepStatus: RoutineStatus;
-  afterPrayerStatus: RoutineStatus;
-  completedAfterPrayers: string[];
   completedCount: number;
   isPalm: boolean;
 }
@@ -33,7 +31,6 @@ export interface WeekGardenStats {
   morningCompletedCount: number;
   eveningCompletedCount: number;
   sleepCompletedCount: number;
-  afterPrayerCompletedCount: number;
   completedDaysCount: number;
   mostMissedRoutine: CategoryId | null;
   bestStreakDays: number;
@@ -115,7 +112,6 @@ export function getWeekGardenStats(
   let morningCompletedCount = 0;
   let eveningCompletedCount = 0;
   let sleepCompletedCount = 0;
-  let afterPrayerCompletedCount = 0;
   let completedDaysCount = 0;
   let currentRun = 0;
   let bestStreakDays = 0;
@@ -133,14 +129,12 @@ export function getWeekGardenStats(
     const hasMorning = categories.has("morning");
     const hasEvening = categories.has("evening");
     const hasSleep = categories.has("before_sleep");
-    const hasAfterPrayer = categories.has("after_prayer");
 
     if (hasMorning) morningCompletedCount++;
     if (hasEvening) eveningCompletedCount++;
     if (hasSleep) sleepCompletedCount++;
-    if (hasAfterPrayer) afterPrayerCompletedCount++;
 
-    const isPalm = hasMorning && hasEvening && hasSleep && hasAfterPrayer;
+    const isPalm = hasMorning && hasEvening && hasSleep;
     if (isPalm) {
       completedDaysCount++;
       currentRun++;
@@ -157,9 +151,7 @@ export function getWeekGardenStats(
       morningStatus: hasMorning ? "complete" : "missed",
       eveningStatus: hasEvening ? "complete" : isToday ? "partial" : "missed",
       sleepStatus: hasSleep ? "complete" : isToday ? "partial" : "missed",
-      afterPrayerStatus: hasAfterPrayer ? "complete" : isToday ? "partial" : "missed",
-      completedAfterPrayers: Array.from(entry.afterPrayers),
-      completedCount: [hasMorning, hasEvening, hasSleep, hasAfterPrayer].filter(Boolean).length,
+      completedCount: [hasMorning, hasEvening, hasSleep].filter(Boolean).length,
       isPalm,
     });
   }
@@ -169,7 +161,6 @@ export function getWeekGardenStats(
     { id: "morning" as CategoryId, count: morningCompletedCount },
     { id: "evening" as CategoryId, count: eveningCompletedCount },
     { id: "before_sleep" as CategoryId, count: sleepCompletedCount },
-    { id: "after_prayer" as CategoryId, count: afterPrayerCompletedCount },
   ];
 
   const totalRoutineCompletions = routineCounts.reduce((total, routine) => total + routine.count, 0);
@@ -183,8 +174,7 @@ export function getWeekGardenStats(
     morningCompletedCount,
     eveningCompletedCount,
     sleepCompletedCount,
-    afterPrayerCompletedCount,
-    completedDaysCount,
+        completedDaysCount,
     mostMissedRoutine,
     bestStreakDays,
     bestRoutine,
@@ -342,7 +332,6 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
   let morningTotal = 0;
   let eveningTotal = 0;
   let sleepTotal = 0;
-  let afterPrayerTotal = 0;
   let bestMonthIndex: number | null = null;
   let bestMonthRate = 0;
   let totalPossibleAllYear = 0;
@@ -392,7 +381,6 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
       if (categories.has("morning")) morningTotal++;
       if (categories.has("evening")) eveningTotal++;
       if (categories.has("before_sleep")) sleepTotal++;
-      if (categories.has("after_prayer")) afterPrayerTotal++;
 
       const level: 0 | 1 | 2 = isPalm ? 2 : count > 0 ? 1 : 0;
       dayCells.push({ dayNum: i + 1, level, isPalm });
@@ -419,7 +407,6 @@ export function getYearDetailedStats(index: DailyCompletionIndex, year: number):
     { id: "morning" as CategoryId, count: morningTotal },
     { id: "evening" as CategoryId, count: eveningTotal },
     { id: "before_sleep" as CategoryId, count: sleepTotal },
-    { id: "after_prayer" as CategoryId, count: afterPrayerTotal },
   ];
   const highest = routineCounts.reduce((current, routine) => (routine.count > current.count ? routine : current));
   const mostConsistentRoutine = totalCollections > 0 ? highest.id : null;
