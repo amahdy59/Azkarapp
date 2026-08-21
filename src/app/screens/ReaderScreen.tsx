@@ -244,12 +244,20 @@ export function ReaderScreen({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idx, isDone, onUncomplete]);
 
-  const { onTouchStart, onTouchMove, onTouchEnd } = useSwipeGestures({
+  const {
+    onTouchStart: baseTouchStart,
+    onTouchMove: baseTouchMove,
+    onTouchEnd: baseTouchEnd,
+  } = useSwipeGestures({
     direction,
     onNext,
     onPrev,
     suppressTap,
   });
+
+  const onTouchStart = immersiveOpen ? undefined : baseTouchStart;
+  const onTouchMove = immersiveOpen ? undefined : baseTouchMove;
+  const onTouchEnd = immersiveOpen ? undefined : baseTouchEnd;
 
   useEffect(() => {
     return () => {
@@ -275,6 +283,8 @@ export function ReaderScreen({
 
   // Desktop & Tablet Keyboard Navigation (Space to count, Arrow keys for Zikr navigation, R to reset, Esc to return)
   useEffect(() => {
+    if (immersiveOpen) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
       const activeEl = document.activeElement;
       const focusedControl =
@@ -356,6 +366,7 @@ export function ReaderScreen({
     benefitOpen,
     wordMeaningSelection,
     longSurah,
+    immersiveOpen,
   ]);
 
   if (!z || !category) {
@@ -1104,6 +1115,9 @@ export function ReaderScreen({
           onSelectMeanings={setWordMeaningSelection}
           activeWordId={activeWordId}
           onClose={() => setImmersiveOpen(false)}
+          onComplete={() => {
+            if (!isDone) onComplete(idx);
+          }}
         />
       )}
     </ScreenContainer>

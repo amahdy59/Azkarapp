@@ -91,9 +91,19 @@ function safeBoundaryHour(boundaryHour: number) {
 }
 
 /** Resolves a devotional progress day; before-sleep activity before 04:00 stays with the previous date. */
-export function getProgressDayKey(date = new Date(), boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR) {
+export function getProgressDayKey(
+  date = new Date(),
+  boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
+  routineId?: string,
+) {
   const shifted = new Date(date);
-  shifted.setHours(shifted.getHours() - safeBoundaryHour(boundaryHour));
+  const hour = shifted.getHours();
+  // Apply a 4-hour grace period specifically for "before_sleep" routine
+  if (routineId === "before_sleep" && hour < 4) {
+    shifted.setHours(hour - 4);
+  } else {
+    shifted.setHours(hour - safeBoundaryHour(boundaryHour));
+  }
   return formatLocalDay(shifted);
 }
 

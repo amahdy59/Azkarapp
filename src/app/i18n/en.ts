@@ -902,6 +902,7 @@ const en = {
     immersivePrevious: "Previous page",
     immersiveModeFit: "Fit Page",
     immersiveModeComfort: "Comfort Reading",
+    immersiveComplete: "Complete & Return",
     wordMeaningAll: "All meanings",
     wordMeaningMore: "{count} more",
     jumpToCounter: "Go to counter",

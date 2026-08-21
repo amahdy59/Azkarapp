@@ -912,6 +912,7 @@ const ar = {
     immersivePrevious: "الصفحة السابقة",
     immersiveModeFit: "صفحة كاملة",
     immersiveModeComfort: "قراءة مريحة",
+    immersiveComplete: "أتممت القراءة",
     wordMeaningAll: "جميع المعاني",
     wordMeaningMore: "{count} معانٍ أخرى",
     jumpToCounter: "الانتقال إلى العداد",

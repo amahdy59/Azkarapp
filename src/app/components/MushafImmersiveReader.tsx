@@ -199,6 +199,7 @@ export function MushafImmersiveReader({
   onSelectMeanings,
   activeWordId,
   onClose,
+  onComplete,
 }: {
   zikr: Zikr;
   arabicText: string;
@@ -211,6 +212,7 @@ export function MushafImmersiveReader({
   onSelectMeanings: (selection: WordMeaningSelection) => void;
   activeWordId?: string | null;
   onClose: () => void;
+  onComplete?: () => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
@@ -282,11 +284,15 @@ export function MushafImmersiveReader({
     setIndex((current) => (next === current ? current : Math.min(Math.max(next, 0), pageCount - 1)));
   }, [pageCount]);
 
-  if (pageCount === 0) return null;
-
-  const current = pages[Math.min(index, pageCount - 1)]!;
+  const current = pages[Math.min(index, Math.max(pageCount - 1, 0))]!;
   const atStart = index <= 0;
-  const atEnd = index >= pageCount - 1;
+  const atEnd = pageCount > 0 && index >= pageCount - 1;
+
+  useEffect(() => {
+    if (atEnd) onComplete?.();
+  }, [atEnd, onComplete]);
+
+  if (pageCount === 0) return null;
 
   return (
     <div
@@ -400,16 +406,27 @@ export function MushafImmersiveReader({
           >
             {formatNumerals(index + 1, language)} / {formatNumerals(pageCount, language)}
           </bdi>
-          <FlipButton
-            onClick={() => {
-              flip(1);
-              onInteract();
-            }}
-            disabled={atEnd}
-            label={t(language, "reader.immersiveNext")}
-            testId="mushaf-immersive-next"
-            direction={direction}
-          />
+          {atEnd ? (
+            <button
+              type="button"
+              onClick={onClose}
+              data-testid="mushaf-immersive-return"
+              className="flex min-h-11 items-center gap-2 rounded-full border border-primary bg-primary px-4 text-[0.875rem] font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {t(language, "reader.immersiveComplete")}
+            </button>
+          ) : (
+            <FlipButton
+              onClick={() => {
+                flip(1);
+                onInteract();
+              }}
+              disabled={atEnd}
+              label={t(language, "reader.immersiveNext")}
+              testId="mushaf-immersive-next"
+              direction={direction}
+            />
+          )}
         </nav>
       </div>
     </div>

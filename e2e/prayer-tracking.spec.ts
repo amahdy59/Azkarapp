@@ -136,7 +136,7 @@ test.describe("after-prayer tracking", () => {
     await expect.poll(async () => grid.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(false);
   });
 
-  test("shows every prayer on desktop and two with a reveal below it on mobile", async ({ page }) => {
+  test("renders every prayer as a scrollable carousel on mobile without a reveal button", async ({ page }) => {
     await openHome(page);
     const cards = page.getByTestId("prayer-tracker-cards").locator("article");
 
@@ -145,8 +145,7 @@ test.describe("after-prayer tracking", () => {
     await expect(page.getByTestId("prayer-show-upcoming")).toHaveCount(0);
 
     await page.setViewportSize({ width: 375, height: 812 });
-    await expect(cards).toHaveCount(2);
-    await page.getByTestId("prayer-show-upcoming").click();
     await expect(cards).toHaveCount(5);
+    await expect(page.getByTestId("prayer-show-upcoming")).toHaveCount(0);
   });
 });

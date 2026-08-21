@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-20",
+  "release": "2026-08-21",
   "ar": [
-    "إضافة وضعين للقراءة في المصحف: \"صفحة كاملة\" و \"قراءة مريحة\" يمكن التبديل بينهما.",
-    "إخفاء أدوات التحكم تلقائياً أثناء القراءة لتوفير مساحة أكبر وعرض الصفحة بالكامل.",
-    "إضافة خاصية التكبير والتصغير باستخدام النقر المزدوج أو السحب للمساعدة في القراءة.",
-    "إصلاح مشكلة استبدال خلفية التطبيق بخلفية يوم الجمعة عند اختيار أذكار الصباح أو المساء أو النوم."
+    "تحديث موعد تجديد الأذكار: أذكار قبل النوم التي تقرأ بعد منتصف الليل تُحسب الآن لليوم السابق وليس لليوم الجديد.",
+    "تحسين التصفح في المصحف: منع الانتقال العشوائي للأذكار التالية عند السحب، مع إضافة زر العودة.",
+    "تطوير بطاقات أذكار ما بعد الصلاة: أصبحت الآن تركز تلقائياً على الصلاة الحالية لتسهيل الوصول إليها على الجوال."
   ],
   "en": [
-    "Added two Mushaf reading modes: \"Fit Page\" and \"Comfort Reading\" for a better experience.",
-    "Reading controls now auto-hide to provide an immersive, full-screen view of the page.",
-    "You can now double-tap or pinch to zoom in and out while reading the Mushaf.",
-    "Fixed an issue where the Friday background would override Morning, Evening, and Sleep backgrounds."
+    "Night Owl Grace Period: Before Sleep Azkar read after midnight now correctly count towards the previous day.",
+    "Mushaf Navigation: Prevents accidental skipping to the next zikr while swiping, with a clear Complete button at the end.",
+    "After-Prayer Focus: The tracker on your phone now automatically centers on your current prayer so it is always ready."
   ]
 }

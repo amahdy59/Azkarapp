@@ -70,30 +70,9 @@ function renderRow(current: PrayerName) {
 
 afterEach(() => vi.unstubAllGlobals());
 
-describe("PrayerTrackerCards windowing", () => {
-  it("opens on the current prayer rather than on the start of the day", () => {
+describe("PrayerTrackerCards", () => {
+  it("renders all five cards unconditionally", () => {
     stubViewport([]);
-    expect(renderRow("asr")).toEqual(["asr", "maghrib"]);
-  });
-
-  it("shows the pair from the moment the day starts", () => {
-    stubViewport([]);
-    expect(renderRow("fajr")).toEqual(["fajr", "dhuhr"]);
-  });
-
-  it("clamps back from the end so the last prayer never renders alone", () => {
-    stubViewport([]);
-    expect(renderRow("isha")).toEqual(["maghrib", "isha"]);
-  });
-
-  it("takes the third card once a tablet has room for it", () => {
-    stubViewport(["(min-width: 40rem)"]);
-    expect(renderRow("asr")).toEqual(["asr", "maghrib", "isha"]);
-  });
-
-  it("shows all five on a desktop, with nothing left to reveal", () => {
-    stubViewport(["(min-width: 40rem)", "(min-width: 64rem)"]);
-    expect(renderRow("asr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
-    expect(screen.queryByTestId("prayer-show-upcoming")).not.toBeInTheDocument();
+    expect(renderRow("fajr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
   });
 });

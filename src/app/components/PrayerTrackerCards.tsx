@@ -1,9 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check } from "./icons";
 import { t } from "../i18n";
-import { useMediaQuery } from "../hooks/useMediaQuery";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
-import { formatNumerals } from "../formatting";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
@@ -36,17 +34,6 @@ const PRAYER_ICON: Record<PrayerName, typeof Sun> = {
   maghrib: Sunset,
   isha: MoonStar,
 };
-
-/**
- * How many cards the row shows before the reveal, per tier.
- *
- * Two on a phone is what fits without shrinking the time — the thing people
- * are scanning for. A tablet has room for the pair plus the one after it, and
- * a desktop has room for all five, so hiding any of them there only costs a
- * click to see what was already affordable to show.
- */
-const PHONE_VISIBLE_COUNT = 2;
-const TABLET_VISIBLE_COUNT = 3;
 
 export type PrayerTemporalState = "past" | "current" | "next" | "upcoming";
 
@@ -273,78 +260,47 @@ export function PrayerTrackerCards({
   onOpen?: (prayer: PrayerName) => void;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
-  const [showUpcoming, setShowUpcoming] = useState(false);
-  /* Acknowledges praying in congregation. Only ever opened by ticking the box
-     on, never by clearing it — undoing a mistake should stay silent. */
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
-  const isWide = useMediaQuery("(min-width: 64rem)");
-  const isTablet = useMediaQuery("(min-width: 40rem)");
-  const compactCount = isTablet ? TABLET_VISIBLE_COUNT : PHONE_VISIBLE_COUNT;
-  // Collapsing keeps the cards mounted for the length of the exit so they can
-  // animate away instead of disappearing between two frames.
-  const [isCollapsing, setIsCollapsing] = useState(false);
-  const collapseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(
-    () => () => {
-      if (collapseTimer.current) clearTimeout(collapseTimer.current);
-    },
-    [],
-  );
-
-  const toggleUpcoming = () => {
-    if (collapseTimer.current) clearTimeout(collapseTimer.current);
-    if (showUpcoming) {
-      setIsCollapsing(true);
-      collapseTimer.current = setTimeout(() => {
-        setShowUpcoming(false);
-        setIsCollapsing(false);
-      }, 150);
-      return;
-    }
-    setShowUpcoming(true);
-  };
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   const ordered = PRAYER_ORDER.map((prayer) => models.find((model) => model.prayer === prayer)).filter(
     (model): model is PrayerCardModel => Boolean(model),
   );
-  // A prayer that has not arrived cannot be tracked and cannot be read yet, so
-  // by default it only takes up room. The window opens on whatever is open now
-  // and runs forward from there, so at Asr the row shows Asr and Maghrib rather
-  // than the morning it has already left behind. "Next" is never dropped: it is
-  // the one people look for. Late in the day the window is clamped back from
-  // the end so it always holds a full set rather than trailing off after Isha.
+
   const focusIndex = Math.max(
     0,
     ordered.findIndex((model) => model.state === "current" || model.state === "next"),
   );
-  const compactStart = Math.min(focusIndex, Math.max(0, ordered.length - compactCount));
-  const visible = isWide || showUpcoming ? ordered : ordered.slice(compactStart, compactStart + compactCount);
-  /* Whether a reveal is offered at all depends on the viewport, not on how many
-     cards happen to be on screen right now. Deriving it from the current count
-     made the control disappear the moment it was used, stranding the expanded
-     row with no way back. */
-  const isCollapsible = !isWide && ordered.length > compactCount;
-  const hiddenCount = ordered.length - compactCount;
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container || focusIndex <= 0) return;
+    const card = container.children[focusIndex] as HTMLElement | undefined;
+    if (card) {
+      // Keep the focused card fully visible. We do a manual calculation
+      // instead of scrollIntoView to prevent the whole page from jumping.
+      const offset =
+        direction === "rtl"
+          ? card.offsetLeft + card.offsetWidth - (container.offsetLeft + container.offsetWidth)
+          : card.offsetLeft - container.offsetLeft;
+      if (typeof container.scrollTo === "function") {
+        container.scrollTo({ left: offset, behavior: "auto" });
+      } else {
+        container.scrollLeft = offset;
+      }
+    }
+  }, [focusIndex, direction]);
 
   return (
     <div className="flex flex-col gap-3">
       <div
+        ref={scrollRef}
         dir={direction}
         data-testid="prayer-tracker-cards"
-        // A snap carousel on phones, an even grid from the small tier up. The
-        // grid uses as many columns as there are cards so hiding the upcoming
-        // ones does not leave a gap where they were.
-        //
-        // Columns hold an 11rem floor rather than shrinking to fit. Five equal
-        // columns at the lg breakpoint squeezed each card to 151px, which left
-        // the tracking labels with exactly as much room as they needed and
-        // nothing to spare — one longer word, or the largest text size, and
-        // they clip. Below the floor the row scrolls instead of compressing,
-        // which is the same gesture the phone carousel already uses.
-        className={`${isCollapsing ? "collapse-out" : "stagger-in"} flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8`}
-        style={{ ["--prayer-columns" as string]: String(visible.length) }}
+        className="stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8"
+        style={{ ["--prayer-columns" as string]: "5" }}
       >
-        {visible.map((model) => {
+        {ordered.map((model) => {
           const record = byPrayer.get(model.prayer);
           return (
             <PrayerCard
@@ -361,20 +317,6 @@ export function PrayerTrackerCards({
           );
         })}
       </div>
-
-      {isCollapsible && (
-        <button
-          type="button"
-          onClick={toggleUpcoming}
-          aria-expanded={showUpcoming}
-          data-testid="prayer-show-upcoming"
-          className="mx-auto flex min-h-11 items-center justify-center rounded-2xl border border-border-control px-4 text-[0.8125rem] font-black text-foreground transition-colors duration-fast hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-        >
-          {showUpcoming
-            ? t(language, "prayerTracking.hideUpcoming")
-            : t(language, "prayerTracking.showUpcoming", { count: formatNumerals(hiddenCount, language) })}
-        </button>
-      )}
 
       <PrayerVirtueModal
         prayer={virtuePrayer}
