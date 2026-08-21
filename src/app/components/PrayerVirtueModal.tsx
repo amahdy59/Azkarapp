@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { Modal } from "./ResponsiveSheet";
 import { getPrayerVirtues, PRAYER_VIRTUE_CLOSING_ARABIC } from "../content/prayerVirtues";
 import { t } from "../i18n";
@@ -46,7 +47,12 @@ export function PrayerVirtueModal({
           </h2>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-4">
+        <div
+          className="min-h-0 flex-1 overflow-y-auto px-5 py-4"
+          tabIndex={0}
+          role="region"
+          aria-label={t(language, "prayerTracking.virtueTitle", { prayer: name })}
+        >
           <ul className="flex flex-col gap-3">
             {virtues.map((virtue) => (
               <li

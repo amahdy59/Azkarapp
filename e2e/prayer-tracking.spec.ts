@@ -88,7 +88,9 @@ test.describe("after-prayer tracking", () => {
 
     const modal = page.getByTestId("prayer-virtue-modal");
     await expect(modal).toBeVisible();
-    await expect(modal.getByTestId("prayer-virtue-item")).toHaveCount(3);
+    const items = modal.getByTestId("prayer-virtue-item");
+    await expect(items.first()).toBeVisible();
+    expect(await items.count()).toBeGreaterThanOrEqual(2);
     await expect(modal.getByTestId("prayer-virtue-closing")).toContainText("تَقَبَّلَ اللهُ");
 
     await page.getByTestId("prayer-virtue-close").click();

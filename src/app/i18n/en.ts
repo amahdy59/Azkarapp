@@ -1141,6 +1141,7 @@ const en = {
     alwaysOn: "Always available",
     showTranslation: "Show translation in Reader",
     showTransliteration: "Show pronunciation in Reader",
+    showDifficultWords: "Highlight difficult words",
     resetPreferencesTitle: "Restore Defaults",
     resetPreferencesConfirm: "Restore default preferences? Your progress, sessions, and saved azkar will be kept.",
     prayerTimesAndReminders: "Prayer Times & Reminders",

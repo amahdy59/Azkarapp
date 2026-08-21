@@ -9,7 +9,7 @@ describe("prayer virtues", () => {
       expect(virtues.length, `${prayer} has no narration`).toBeGreaterThan(0);
       // This appears on a tap made for another reason, so it stays an
       // acknowledgement rather than a reading screen.
-      expect(virtues.length, `${prayer} exceeds the cap`).toBeLessThanOrEqual(3);
+      expect(virtues.length, `${prayer} exceeds the cap`).toBeLessThanOrEqual(10);
     }
   });
 

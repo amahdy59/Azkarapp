@@ -47,6 +47,20 @@ const ANGELS_GATHER: PrayerVirtue = {
   referenceEnglish: "Sahih al-Bukhari 555; Sahih Muslim 632",
 };
 
+const ISHA_FAJR_VIRTUE_1: PrayerVirtue = {
+  textArabic:
+    "«مَنْ صَلَّى العِشَاءَ فِي جَمَاعَةٍ فَكَأَنَّمَا قَامَ نِصْفَ اللَّيْلِ، وَمَنْ صَلَّى الصُّبْحَ فِي جَمَاعَةٍ فَكَأَنَّمَا صَلَّى اللَّيْلَ كُلَّهُ»",
+  referenceArabic: "صحيح مسلم ٦٥٦",
+  referenceEnglish: "Sahih Muslim 656",
+};
+
+const ISHA_FAJR_VIRTUE_2: PrayerVirtue = {
+  textArabic:
+    "«أَثْقَلُ الصَّلَاةِ عَلَى المُنَافِقِينَ صَلَاةُ العِشَاءِ وَصَلَاةُ الفَجْرِ، وَلَوْ يَعْلَمُونَ مَا فِيهِمَا لَأَتَوْهُمَا وَلَوْ حَبْوًا»",
+  referenceArabic: "صحيح البخاري ٦٥٧؛ صحيح مسلم ٦٥١",
+  referenceEnglish: "Sahih al-Bukhari 657; Sahih Muslim 651",
+};
+
 export const PRAYER_VIRTUES: Readonly<Record<PrayerName, readonly PrayerVirtue[]>> = Object.freeze({
   fajr: [
     {
@@ -56,6 +70,8 @@ export const PRAYER_VIRTUES: Readonly<Record<PrayerName, readonly PrayerVirtue[]
     },
     TWO_COOL_PRAYERS,
     ANGELS_GATHER,
+    ISHA_FAJR_VIRTUE_1,
+    ISHA_FAJR_VIRTUE_2,
   ],
   dhuhr: [
     CONGREGATION_DEGREES,
@@ -96,21 +112,7 @@ export const PRAYER_VIRTUES: Readonly<Record<PrayerName, readonly PrayerVirtue[]
       referenceEnglish: "Sahih Muslim 666",
     },
   ],
-  isha: [
-    {
-      textArabic:
-        "«مَنْ صَلَّى الْعِشَاءَ فِي جَمَاعَةٍ فَكَأَنَّمَا قَامَ نِصْفَ اللَّيْلِ، وَمَنْ صَلَّى الصُّبْحَ فِي جَمَاعَةٍ فَكَأَنَّمَا صَلَّى اللَّيْلَ كُلَّهُ»",
-      referenceArabic: "صحيح مسلم ٦٥٦",
-      referenceEnglish: "Sahih Muslim 656",
-    },
-    {
-      textArabic:
-        "«أَثْقَلُ الصَّلَاةِ عَلَى الْمُنَافِقِينَ صَلَاةُ الْعِشَاءِ وَصَلَاةُ الْفَجْرِ، وَلَوْ يَعْلَمُونَ مَا فِيهِمَا لَأَتَوْهُمَا وَلَوْ حَبْوًا»",
-      referenceArabic: "صحيح البخاري ٦٥٧، وصحيح مسلم ٦٥١",
-      referenceEnglish: "Sahih al-Bukhari 657; Sahih Muslim 651",
-    },
-    CONGREGATION_DEGREES,
-  ],
+  isha: [ISHA_FAJR_VIRTUE_1, ISHA_FAJR_VIRTUE_2, CONGREGATION_DEGREES],
 });
 
 export function getPrayerVirtues(prayer: PrayerName): readonly PrayerVirtue[] {

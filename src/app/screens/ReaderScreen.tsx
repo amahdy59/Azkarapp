@@ -30,6 +30,7 @@ import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Z
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterShortcutHints, tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
+import { ToggleTrack } from "../components/SettingsRow";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
@@ -188,6 +189,7 @@ export function ReaderScreen({
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [isCanvasPressed, setIsCanvasPressed] = useState(false);
+  const [showDifficultWords, setShowDifficultWords] = useState(true);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
@@ -379,7 +381,8 @@ export function ReaderScreen({
     language,
     longSurah ? "reader.tapCounterWhenFinished" : isDesktopReader ? "reader.tapAnywhereDesktop" : "reader.tapAnywhere",
   );
-  const wordMeanings = getQuranWordMeanings(z);
+  const allWordMeanings = getQuranWordMeanings(z);
+  const wordMeanings = showDifficultWords ? allWordMeanings : [];
   const readingProgressValue = Math.min(collectionCompletedCount, azkar.length);
   const isSaved = savedZikrIds.has(z.id);
   // Shorter azkar read larger, long surahs stay at the size their Mushaf pages
@@ -892,17 +895,35 @@ export function ReaderScreen({
                   >
                     {readerZikrTitle}
                   </h2>
-                  {longSurah && (
-                    <button
-                      type="button"
-                      onClick={() => setImmersiveOpen(true)}
-                      data-testid="reader-mushaf-button"
-                      className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    >
-                      <BookOpen size={14} aria-hidden="true" />
-                      {t(language, "reader.immersiveOpen")}
-                    </button>
-                  )}
+                  <div className="flex shrink-0 items-center gap-3">
+                    {z.isSurah && allWordMeanings.length > 0 && (
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-checked={showDifficultWords}
+                        onClick={() => setShowDifficultWords((v) => !v)}
+                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
+                        aria-label={t(language, "settings.showDifficultWords")}
+                        title={t(language, "settings.showDifficultWords")}
+                      >
+                        <span className="text-[0.75rem] font-bold text-[color:var(--on-media)] hidden sm:inline">
+                          {t(language, "settings.showDifficultWords")}
+                        </span>
+                        <ToggleTrack checked={showDifficultWords} />
+                      </button>
+                    )}
+                    {longSurah && (
+                      <button
+                        type="button"
+                        onClick={() => setImmersiveOpen(true)}
+                        data-testid="reader-mushaf-button"
+                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      >
+                        <BookOpen size={14} aria-hidden="true" />
+                        {t(language, "reader.immersiveOpen")}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )}
             </div>
@@ -1034,17 +1055,35 @@ export function ReaderScreen({
                 >
                   {readerZikrTitle}
                 </h2>
-                {longSurah && (
-                  <button
-                    type="button"
-                    onClick={() => setImmersiveOpen(true)}
-                    data-testid="reader-mushaf-button"
-                    className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  >
-                    <BookOpen size={14} aria-hidden="true" />
-                    {t(language, "reader.immersiveOpen")}
-                  </button>
-                )}
+                <div className="flex shrink-0 items-center gap-3">
+                  {z.isSurah && allWordMeanings.length > 0 && (
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={showDifficultWords}
+                      onClick={() => setShowDifficultWords((v) => !v)}
+                      className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full"
+                      aria-label={t(language, "settings.showDifficultWords")}
+                      title={t(language, "settings.showDifficultWords")}
+                    >
+                      <span className="text-[0.75rem] font-bold text-muted-foreground hidden sm:inline">
+                        {t(language, "settings.showDifficultWords")}
+                      </span>
+                      <ToggleTrack checked={showDifficultWords} />
+                    </button>
+                  )}
+                  {longSurah && (
+                    <button
+                      type="button"
+                      onClick={() => setImmersiveOpen(true)}
+                      data-testid="reader-mushaf-button"
+                      className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    >
+                      <BookOpen size={14} aria-hidden="true" />
+                      {t(language, "reader.immersiveOpen")}
+                    </button>
+                  )}
+                </div>
               </div>
             )}
           </div>

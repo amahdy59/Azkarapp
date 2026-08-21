@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-21b",
+  "release": "2026-08-21c",
   "ar": [
-    "يمكنك الآن الوصول إلى مصحف كامل مع ١٥ سطرًا لكل صفحة بخط عثماني أصيل — يعمل بالكامل دون اتصال بالإنترنت",
-    "إصلاح الإحساس اللمسي: يتحرك نص الذكر عند الضغط عليه فقط، لا الشاشة بأكملها",
-    "أصبح كل بند في القائمة المنسدلة في المسبحة وصلاة على النبي على سطر واحد دون اقتطاع",
-    "زيادة المسافة بين شريط التقدم والقوائم المنسدلة"
+    "يمكنك الآن عرض ترجمة السور القرآنية داخل شاشة المراجع بدلاً من القارئ المباشر.",
+    "أضفنا زرًا جديدًا تحت شريط التقدم للتحكم في إظهار الكلمات الغريبة وتظليلها.",
+    "قمنا بزيادة عدد الأحاديث في فضائل الصلوات بعد تسجيل الصلاة في المسجد.",
+    "تحسينات برمجية شاملة لضمان عمل التطبيق بشكل موثوق بدون أخطاء."
   ],
   "en": [
-    "A complete 604-page offline Mushaf is now available with the authentic Uthmani script — works without internet",
-    "Tactile feedback fix: only the zikr text scales on press, not the whole screen",
-    "Dropdown items in the Masbaha and Salawat pages no longer wrap to two lines",
-    "Added extra breathing room between the progress bar and the dropdowns"
+    "Quranic verses no longer show inline translations, keeping the text focused; translation is available in the Reference sheet.",
+    "Added a new toggle below the progress bar to show or hide difficult word highlights during reading.",
+    "Expanded the number of authentic Hadiths displayed when recording your prayer in congregation.",
+    "Overall stability improvements and accessibility fixes to ensure a smooth reading experience."
   ]
 }

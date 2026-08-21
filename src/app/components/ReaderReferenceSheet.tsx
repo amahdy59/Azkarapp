@@ -250,6 +250,18 @@ function ReferenceContent({
             </section>
           )}
 
+          {/* If the item is a Surah and the user is in English mode, provide the translation here instead of the main view. */}
+          {zikr.isSurah && !isArabic && zikr.translation && (
+            <section className="mt-4 border-t border-border/50 pt-4" aria-labelledby="reference-translation-heading">
+              <h3 id="reference-translation-heading" className="mb-2 text-[0.9375rem] font-extrabold text-primary">
+                {t(language, "reader.translationLabel")}
+              </h3>
+              <p className="text-[1rem] leading-7 text-foreground" lang="en" dir="ltr">
+                {zikr.translation}
+              </p>
+            </section>
+          )}
+
           {/* Citation last, and named once. The old card repeated "source" as
               its own heading and again inside itself. */}
           <section className="mt-4 border-t border-border/50 pt-4" aria-labelledby="reference-source-heading">

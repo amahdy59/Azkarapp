@@ -1161,6 +1161,7 @@ const ar = {
     alwaysOn: "متاح دائماً",
     showTranslation: "إظهار الترجمة في القارئ",
     showTransliteration: "إظهار النطق في القارئ",
+    showDifficultWords: "تظليل الكلمات الغريبة",
     resetPreferencesTitle: "استعادة الإعدادات الافتراضية",
     resetPreferencesConfirm: "هل تريد استعادة التفضيلات الافتراضية؟ سيبقى تقدمك وجلساتك والأذكار المحفوظة.",
     prayerTimesAndReminders: "مواقيت الصلاة والتذكيرات",

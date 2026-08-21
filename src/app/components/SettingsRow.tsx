@@ -178,7 +178,7 @@ export function RowValue({ value, withChevron = true }: { value: string; withChe
   );
 }
 
-function ToggleTrack({ checked }: { checked: boolean }) {
+export function ToggleTrack({ checked }: { checked: boolean }) {
   return (
     <span
       aria-hidden="true"
