@@ -150,6 +150,30 @@ export function FridaySalawatScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [increment, onBack, reset, showBenefits]);
 
+  const [isCanvasPressed, setIsCanvasPressed] = useState(false);
+  const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-prevent-count='true']",
+      )
+    ) {
+      return;
+    }
+    setIsCanvasPressed(true);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setCanvasRipples((current) => [
+      ...current.slice(-3),
+      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
+    ]);
+  };
+
+  const handlePointerUp = () => setIsCanvasPressed(false);
+
   const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
     const element = event.target;
     if (
@@ -167,114 +191,152 @@ export function FridaySalawatScreen({
       dir={direction}
       className="relative flex flex-col overflow-y-auto page-content-center"
       screenName={copy.title}
+      onClick={handleCanvasClick}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onPointerLeave={handlePointerUp}
     >
-      <ReadingScreenChrome
-        language={language}
-        direction={direction}
-        title={copy.title}
-        onBack={onBack}
-        testId="salawat"
-        progress={{
-          value: progress.count,
-          max: progress.target,
-          percentLabel: `${formatNumerals(progressPercent, language)}%`,
-          countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
-          ariaLabel: copy.target,
-        }}
-        subRow={
-          <div className="w-full" data-prevent-count="true">
-            <CounterTargetPicker
-              activeTarget={progress.target}
-              onTargetChange={(target) => persist(0, target)}
-              language={language}
-              direction={direction}
-              allowOpen={false}
-            />
-          </div>
-        }
-        actions={(tier) => {
-          const actionClass = tier === "wide" ? HERO_ACTION_CLASS : COMPACT_ACTION_CLASS;
-          return (
-            <div className="flex items-center gap-1.5">
-              <button
-                type="button"
-                onClick={() => setShowBenefits(true)}
-                className={actionClass}
-                aria-label={copy.benefits}
-                aria-haspopup="dialog"
-              >
-                <BookOpen size={20} aria-hidden="true" />
-              </button>
-              <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
-                  <MoreVertical size={20} aria-hidden="true" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={toggleSound}>
-                    {soundEnabled ? (
-                      <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
-                    ) : (
-                      <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                    )}
-                    <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
-                    <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
-                    <span>{copy.reset}</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          );
-        }}
-      />
-      <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
-        {complete ? copy.completed : ""}
-      </p>
+      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
+        {canvasRipples.map((ripple) => (
+          <span
+            key={ripple.id}
+            className="tap-ripple"
+            style={{
+              position: "absolute",
+              width: 150,
+              height: 150,
+              transform: "translate(-50%, -50%) scale(0)",
+              borderRadius: "50%",
+              backgroundColor: "currentColor",
+              opacity: 0.1,
+              animation: "ripple 600ms linear",
+              left: ripple.x,
+              top: ripple.y,
+            }}
+            onAnimationEnd={() => setCanvasRipples((current) => current.filter((item) => item.id !== ripple.id))}
+          />
+        ))}
+      </div>
 
-      {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
-        className="relative z-10 mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
-        data-counting-mode="canvas"
-        onClick={handleCanvasClick}
+        className="relative z-10 flex min-h-0 flex-1 flex-col origin-center"
+        style={{
+          transform: isCanvasPressed && !reduceMotion ? "scale(0.985)" : "scale(1)",
+          transition: "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
       >
-        <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
-          <p
-            className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
-            dir="rtl"
-            lang="ar"
-          >
-            {copy.phrase}
-          </p>
-        </div>
-
-        <footer className="shrink-0 flex flex-col items-center justify-center pb-3 pt-2">
-          <div className="flex w-full items-center justify-center gap-2.5">
-            <div className="flex min-w-0 flex-1 justify-center">
-              <ZikrCounterSurface
-                count={progress.count}
-                total={progress.target}
-                complete={complete}
-                onTap={increment}
+        <ReadingScreenChrome
+          language={language}
+          direction={direction}
+          title={copy.title}
+          onBack={onBack}
+          testId="salawat"
+          progress={{
+            value: progress.count,
+            max: progress.target,
+            percentLabel: `${formatNumerals(progressPercent, language)}%`,
+            countLabel: `${formatNumerals(progress.count, language)} / ${formatNumerals(progress.target, language)}`,
+            ariaLabel: copy.target,
+          }}
+          subRow={
+            <div className="w-full" data-prevent-count="true">
+              <CounterTargetPicker
+                activeTarget={progress.target}
+                onTargetChange={(target) => persist(0, target)}
                 language={language}
-                instructionText={t(language, "reader.tapAnywhere")}
-                testId="salawat-counter"
-                reduceMotion={reduceMotion}
-                className="salawat-counter-surface"
+                direction={direction}
+                allowOpen={false}
               />
             </div>
+          }
+          actions={(tier) => {
+            const actionClass = tier === "wide" ? HERO_ACTION_CLASS : COMPACT_ACTION_CLASS;
+            return (
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setShowBenefits(true)}
+                  className={actionClass}
+                  aria-label={copy.benefits}
+                  aria-haspopup="dialog"
+                >
+                  <BookOpen size={20} aria-hidden="true" />
+                </button>
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger className={actionClass} aria-label={t(language, "common.moreOptions")}>
+                    <MoreVertical size={20} aria-hidden="true" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={toggleSound}>
+                      {soundEnabled ? (
+                        <Volume2 size={16} className="text-primary me-2" aria-hidden="true" />
+                      ) : (
+                        <VolumeX size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                      )}
+                      <span>{t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={reset} disabled={progress.count === 0}>
+                      <RotateCcw size={16} className="text-muted-foreground me-2" aria-hidden="true" />
+                      <span>{copy.reset}</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            );
+          }}
+        />
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {complete ? copy.completed : ""}
+        </p>
+
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
+        <div
+          className="relative z-10 mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
+          data-counting-mode="canvas"
+          onClick={handleCanvasClick}
+        >
+          <div className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10">
+            <p
+              className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
+              dir="rtl"
+              lang="ar"
+            >
+              {copy.phrase}
+            </p>
           </div>
 
-          <CounterShortcutHints
-            language={language}
-            direction={direction}
-            ariaLabel={t(language, "reader.keyboardShortcuts")}
-            shortcuts={[
-              { keys: ["Space"], label: t(language, "counter.count") },
-              { keys: ["R"], label: t(language, "counter.reset") },
-            ]}
-          />
-        </footer>
+          <footer className="shrink-0 flex flex-col items-center justify-center pb-3 pt-2">
+            <div className="flex w-full items-center justify-center gap-2.5">
+              <div className="flex min-w-0 flex-1 justify-center">
+                <ZikrCounterSurface
+                  count={progress.count}
+                  total={progress.target}
+                  complete={complete}
+                  onTap={increment}
+                  language={language}
+                  instructionText={t(language, "reader.tapAnywhere")}
+                  testId="salawat-counter"
+                  reduceMotion={reduceMotion}
+                  className="salawat-counter-surface"
+                />
+              </div>
+            </div>
+            <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
+              {t(language, "reader.tapAnywhere")}
+            </p>
+
+            <CounterShortcutHints
+              language={language}
+              direction={direction}
+              ariaLabel={t(language, "reader.keyboardShortcuts")}
+              shortcuts={[
+                { keys: ["Space"], label: t(language, "counter.count") },
+                { keys: ["R"], label: t(language, "counter.reset") },
+              ]}
+            />
+          </footer>
+        </div>
       </div>
 
       {showBenefits && (

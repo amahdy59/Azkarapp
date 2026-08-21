@@ -77,7 +77,7 @@ export function CounterTargetPicker({
             <ChevronDown size={16} className="shrink-0 text-muted-foreground" aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="min-w-[13rem]">
+        <DropdownMenuContent align="start" className="min-w-[var(--radix-dropdown-menu-trigger-width)]">
           <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
             {t(language, "counter.targetLabel")}
           </DropdownMenuLabel>

@@ -98,6 +98,30 @@ export function CustomCounterScreen({
     handleReset();
   };
 
+  const [isCanvasPressed, setIsCanvasPressed] = useState(false);
+  const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
+
+  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (reduceMotion) return;
+    const target = event.target;
+    if (
+      target instanceof Element &&
+      target.closest(
+        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-prevent-count='true']",
+      )
+    ) {
+      return;
+    }
+    setIsCanvasPressed(true);
+    const rect = event.currentTarget.getBoundingClientRect();
+    setCanvasRipples((current) => [
+      ...current.slice(-3),
+      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
+    ]);
+  };
+
+  const handlePointerUp = () => setIsCanvasPressed(false);
+
   const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
     const element = event.target;
     if (
@@ -147,8 +171,39 @@ export function CustomCounterScreen({
       dir={direction}
       className="relative flex flex-col overflow-y-auto page-content-center"
       screenName={t(language, "counter.tasbeehTitle")}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onPointerLeave={handlePointerUp}
     >
-      <div className="relative z-10 flex min-h-0 flex-1 flex-col">
+      <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
+        {canvasRipples.map((ripple) => (
+          <span
+            key={ripple.id}
+            className="tap-ripple"
+            style={{
+              position: "absolute",
+              width: 150,
+              height: 150,
+              transform: "translate(-50%, -50%) scale(0)",
+              borderRadius: "50%",
+              backgroundColor: "currentColor",
+              opacity: 0.1,
+              animation: "ripple 600ms linear",
+              left: ripple.x,
+              top: ripple.y,
+            }}
+            onAnimationEnd={() => setCanvasRipples((current) => current.filter((item) => item.id !== ripple.id))}
+          />
+        ))}
+      </div>
+      <div
+        className="relative z-10 flex min-h-0 flex-1 flex-col origin-center"
+        style={{
+          transform: isCanvasPressed && !reduceMotion ? "scale(0.985)" : "scale(1)",
+          transition: "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+        }}
+      >
         <ReadingScreenChrome
           language={language}
           direction={direction}
@@ -181,7 +236,7 @@ export function CustomCounterScreen({
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
                       align="start"
-                      className="max-h-[250px] w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
+                      className="max-h-[250px] min-w-[var(--radix-dropdown-menu-trigger-width)] overflow-y-auto"
                     >
                       <DropdownMenuRadioGroup
                         value={selectedAuthentic.id}
@@ -280,6 +335,9 @@ export function CustomCounterScreen({
                 />
               </div>
             </div>
+            <p className="mt-3 text-center text-sm font-medium text-muted-foreground">
+              {t(language, "reader.tapAnywhere")}
+            </p>
 
             <CounterShortcutHints
               language={language}

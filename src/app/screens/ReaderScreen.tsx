@@ -187,6 +187,7 @@ export function ReaderScreen({
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
+  const [isCanvasPressed, setIsCanvasPressed] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
@@ -732,12 +733,15 @@ export function ReaderScreen({
     ) {
       return;
     }
+    setIsCanvasPressed(true);
     const rect = event.currentTarget.getBoundingClientRect();
     setCanvasRipples((current) => [
       ...current.slice(-3),
       { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
     ]);
   };
+
+  const handlePointerUp = () => setIsCanvasPressed(false);
 
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
@@ -752,6 +756,9 @@ export function ReaderScreen({
       screenName={displayCategoryName}
       onClick={handleSurfaceTap}
       onPointerDown={handleReaderPointerDown}
+      onPointerUp={handlePointerUp}
+      onPointerCancel={handlePointerUp}
+      onPointerLeave={handlePointerUp}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -921,7 +928,9 @@ export function ReaderScreen({
                     <motion.div
                       key={z.id}
                       initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                      animate={
+                        reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0, scale: isCanvasPressed ? 0.985 : 1 }
+                      }
                       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
                       transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
                       className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
