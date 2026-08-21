@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { Calendar, Zap, ArrowLeft, ArrowRight, BookOpen } from "../components/icons";
+import { ArrowLeft, ArrowRight, BookOpen } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
-import { TodayRoutineGarden, GoldenPalmMark, PalmTreeMark } from "../components/RoutineGarden";
+import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
@@ -29,9 +29,8 @@ import { useNow } from "../hooks/useNow";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { StatCard } from "../components/StatCard";
 import { TimeOfDayBackground } from "../components/TimeOfDayBackground";
-import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey, MAIN_CATEGORY_IDS } from "../progress";
+import { getFirstIncompleteZikrIndex, getGardenSummary, getProgressDayKey } from "../progress";
 import { fridayKahfOpenedKey } from "../fridayProgress";
 import type {
   AppLanguage,
@@ -330,16 +329,6 @@ export function HomeScreen({
             count: formatNumerals(Math.max(0, totalCount - doneCount), language),
           });
 
-  const streakDays = gardenSummary.currentUsageStreak ?? gardenSummary.activeDaysLast7 ?? 0;
-  const activeDaysThisWeek = gardenSummary.activeDaysLast7 ?? 0;
-  // Recorded main-routine completions, lifetime. This used to be
-  // `lifetimePalms * 3 + today.goldenLeafCount`, which was wrong twice over:
-  // the multiplier predates DEC-042 making a palm four routines rather than
-  // three, and counting only palm days meant someone who completed 3 of 4
-  // every day for a month was shown zero. `lifetimeGoldenLeaves` is the
-  // ledger's own count of MAIN_CATEGORY_IDS completions, so it needs no
-  // arithmetic here and cannot drift from the routine count again.
-  const completedCollections = gardenSummary.lifetimeGoldenLeaves;
   const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
@@ -432,40 +421,6 @@ export function HomeScreen({
               <time className="block truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
               </time>
-            </div>
-
-            <div
-              role="img"
-              data-testid="home-header-stats"
-              className="flex shrink-0 items-center gap-3"
-              aria-label={t(language, "home.headerStatsAria", {
-                palms: formatNumerals(gardenSummary.lifetimePalms, language),
-                leaves: formatNumerals(gardenSummary.today.goldenLeafCount, language),
-                total: formatNumerals(MAIN_CATEGORY_IDS.length, language),
-                streak: formatNumerals(streakDays, language),
-              })}
-            >
-              <div
-                data-testid="header-streak"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
-                title={t(language, "progress.dailyStreak")}
-              >
-                <Zap className="h-[13px] w-[13px] text-on-media-accent" strokeWidth={2.5} aria-hidden="true" />
-                <span>{formatNumerals(streakDays, language)}</span>
-              </div>
-              <div
-                data-testid="header-palms"
-                className="flex items-center justify-center gap-1 text-[0.75rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]"
-                title={t(language, "progress.palmsTitle")}
-              >
-                <PalmTreeMark
-                  size={14}
-                  strokeWidth={4}
-                  filled={gardenSummary.lifetimePalms > 0}
-                  className="text-on-media-accent"
-                />
-                <span>{formatNumerals(gardenSummary.lifetimePalms, language)}</span>
-              </div>
             </div>
           </header>
         </div>
@@ -582,38 +537,6 @@ export function HomeScreen({
               <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
             </div>
           )}
-
-          <div
-            role="region"
-            aria-label={t(language, "home.thisWeek")}
-            tabIndex={0}
-            className="px-page flex gap-3.5 overflow-x-auto pb-2 snap-x snap-mandatory [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-          >
-            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
-              <StatCard
-                title={t(language, "home.thisWeek")}
-                icon={<Calendar size={18} />}
-                value={formatNumerals(activeDaysThisWeek, language)}
-                subtitle={t(language, "home.ofSevenDays")}
-              />
-            </div>
-            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
-              <StatCard
-                title={t(language, "home.streakTitle")}
-                icon={<Zap size={18} />}
-                value={formatNumerals(streakDays, language)}
-                subtitle={t(language, "home.consecutiveDays")}
-              />
-            </div>
-            <div className="min-w-[14rem] sm:min-w-0 sm:flex-1 snap-center">
-              <StatCard
-                title={t(language, "home.totalAzkar")}
-                icon={<GoldenPalmMark size={18} />}
-                value={formatNumerals(completedCollections, language)}
-                subtitle={t(language, "home.collectionsCompleted")}
-              />
-            </div>
-          </div>
 
           <div className="px-page">
             <SectionDivider label={t(language, "home.yourLibrary")} />

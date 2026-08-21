@@ -818,6 +818,8 @@ const en = {
   },
   mushaf: {
     highlightGhareeb: "Highlight Difficult Words",
+    loadFailed: "Failed to load Mushaf page. Please try again.",
+    retry: "Try again",
   },
   reader: {
     playAudioOnce: "Play audio once",

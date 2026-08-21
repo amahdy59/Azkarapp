@@ -46,26 +46,7 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByTestId("home-hero")).not.toHaveClass("sm:mt-4");
     expect(screen.getByTestId("home-hero")).toHaveClass("rounded-b-3xl");
     expect(screen.getByTestId("home-hero").closest(".app-screen-surface")).toHaveStyle({ paddingTop: "0px" });
-    expect(screen.getByTestId("home-header-stats")).toBeInTheDocument();
-    expect(screen.getByTestId("header-streak").compareDocumentPosition(screen.getByTestId("header-palms"))).toBe(
-      Node.DOCUMENT_POSITION_FOLLOWING,
-    );
-
-    // The compact visual treatment is icon + number only; the parent keeps
-    // the full accessible announcement for screen readers.
-    expect(screen.getByTestId("header-streak")).not.toHaveTextContent(/days/i);
-    expect(screen.getByTestId("header-palms")).not.toHaveTextContent(/palms/i);
-
-    // "Total Azkar" counts recorded main-routine completions for all time. It
-    // was `lifetimePalms * 3 + today's leaves`, which both used the pre-DEC-042
-    // three-routine multiplier and showed zero to anyone who never completed a
-    // full day. The fixture below has palms but no complete day.
-    expect(screen.getByText("collections completed")).toBeInTheDocument();
-
-    // The streak/palms cluster must be reachable by role. Before it carried
-    // role="img" its aria-label sat on a roleless div, so assistive technology
-    // announced the two chips as bare unlabelled numerals.
-    expect(screen.getByRole("img", { name: /Daily streak/i })).toBeInTheDocument();
+    expect(screen.queryByTestId("home-header-stats")).not.toBeInTheDocument();
     expect(screen.queryByText("The full reviewed collection.")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByTestId("home-saved-section").getElementsByTagName("button")[0]!);

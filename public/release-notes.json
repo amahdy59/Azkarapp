@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-21e",
+  "release": "2026-08-21f",
   "ar": [
-    "تحديث قسم التقدم: أصبح عداد أيام النخلة يعتمد على الأوراد الرئيسية الثلاثة (الصباح والمساء وقبل النوم) فقط.",
-    "الآيات القرآنية: تعرض الترجمة في صحيفة المرجع عند الحاجة للحفاظ على صفاء شاشة القراءة.",
-    "إضافة قارئ ختمة تفاعلي لتتبع الختمة والمزامنة بسلاسة.",
-    "تحسينات عامة في الأداء وإمكانية الوصول واستقرار التطبيق."
+    "إصلاح وتحسين تحميل صفحات المصحف الشريف وقارئ الختمة بسلاسة وموثوقية.",
+    "تبسيط الواجهة الرئيسية وترويسة الشاشة بإزالة شارات التتابع التنافسية للحفاظ على سكينة القراءة.",
+    "إضافة بيانات السور القرآنية وحساب الأجزاء بدقة لتسهيل التنقل أثناء القراءة."
   ],
   "en": [
-    "Progress garden now tracks the three core routines (Morning, Evening, Before Sleep) as full days, with After-Prayer counted as a bonus leaf.",
-    "Quranic verse translations are now shown in the Reference sheet rather than inline, keeping reading focused on the Arabic text.",
-    "A new interactive Khatmah reader lets you track and share a Quran completion with others.",
-    "Overall stability improvements and accessibility fixes."
+    "Fixed and enhanced Mushaf Quran reader and Khatmah page loading reliability.",
+    "Simplified the Home screen and hero header by removing gamified streak badges for a calm devotional experience.",
+    "Added accurate Surah metadata and Juz navigation across the Quran reader."
   ]
 }

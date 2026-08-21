@@ -165,9 +165,8 @@ test("populated Home exposes leaf progress through text, state, and accessible n
   await expect(garden).toBeVisible();
   await expect(garden.getByRole("heading", { name: /Daily Protection|Today's practice|Today's Wird/i })).toBeVisible();
 
-  // Verify screen reader text for progress
-  const headerStats = page.locator('div[aria-label*="leaves"]');
-  await expect(headerStats).toHaveAttribute("aria-label", /Today's leaves: 2 of 3/i);
+  // Verify routine progress buttons on the card
+  await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(2);
 
   await expectNoWcagViolations(page);
 });

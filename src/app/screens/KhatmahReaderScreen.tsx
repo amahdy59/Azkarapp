@@ -1,18 +1,13 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { ChevronRight, ChevronLeft } from "../components/icons";
+import { ChevronRight, ChevronLeft, RotateCcw } from "../components/icons";
 import { motion, AnimatePresence } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import * as Switch from "@radix-ui/react-switch";
-
-// Temporary mapping. In a real app we'd load this from a JSON dictionary.
-// For now we just use a generic "Surah X"
-function getSurahName(surahNumber: string, language: AppLanguage) {
-  return language === "ar" ? `سورة ${surahNumber}` : `Surah ${surahNumber}`;
-}
+import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 
 export function KhatmahReaderScreen({
   language,
@@ -27,34 +22,55 @@ export function KhatmahReaderScreen({
   khatmahPage: number;
   setKhatmahPage: (page: number) => void;
 }) {
-  const currentPage = khatmahPage;
+  const currentPage = Math.max(1, Math.min(604, khatmahPage || 1));
 
   const [pageData, setPageData] = useState<{ k: string; w: [number, number, number, string][] }[] | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const [highlightGhareeb, setHighlightGhareeb] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    setLoading(true);
-    fetch("/data/mushaf/" + currentPage + ".json")
-      .then((res) => res.json())
-      .then((data) => {
-        if (active) {
-          setPageData(data);
-          setLoading(false);
-        }
-      })
-      .catch((err) => {
-        console.error("Failed to load Mushaf page", err);
-        if (active) setLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [currentPage]);
+  const loadPage = useCallback(
+    (page: number) => {
+      let active = true;
+      setLoading(true);
+      setError(null);
 
-  // Transform data into lines
+      const baseUrl = import.meta.env.BASE_URL || "/";
+      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      const targetUrl = `${cleanBase}data/mushaf/${page}.json`;
+
+      fetch(targetUrl)
+        .then((res) => {
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          return res.json();
+        })
+        .then((data) => {
+          if (active) {
+            setPageData(data);
+            setLoading(false);
+          }
+        })
+        .catch((err) => {
+          console.error("Failed to load Mushaf page", err);
+          if (active) {
+            setError(t(language, "mushaf.loadFailed"));
+            setLoading(false);
+          }
+        });
+
+      return () => {
+        active = false;
+      };
+    },
+    [language],
+  );
+
+  useEffect(() => {
+    return loadPage(currentPage);
+  }, [currentPage, loadPage]);
+
+  // Transform data into lines (1 to 15)
   const lines = useMemo(() => {
     if (!pageData) return [];
     const lineMap = new Map<number, { verseKey: string; position: number; isEnd: number; text: string }[]>();
@@ -74,15 +90,18 @@ export function KhatmahReaderScreen({
 
   // Compute the current Surah and Juz for the header
   const { surahName, juzNumber } = useMemo(() => {
-    if (!pageData || pageData.length === 0) return { surahName: "", juzNumber: 1 };
+    if (!pageData || pageData.length === 0) {
+      return {
+        surahName: "",
+        juzNumber: getJuzNumberForPage(currentPage),
+      };
+    }
     // Get the first verse on the page
     const firstVerseKey = pageData[0]?.k || "1:1";
     const [surah] = firstVerseKey.split(":");
-    // Simple heuristic for Juz (1 juz = 20 pages roughly)
-    const juz = Math.ceil(currentPage / 20) || 1;
     return {
-      surahName: getSurahName(surah || "1", language),
-      juzNumber: juz,
+      surahName: getSurahDisplayName(surah || "1", language),
+      juzNumber: getJuzNumberForPage(currentPage),
     };
   }, [pageData, currentPage, language]);
 
@@ -94,6 +113,7 @@ export function KhatmahReaderScreen({
   };
 
   const isArabic = language === "ar";
+  // In Arabic (RTL), next page in Mushaf goes to left (higher page), previous to right
   const nextIcon = isArabic ? <ChevronLeft size={24} /> : <ChevronRight size={24} />;
   const prevIcon = isArabic ? <ChevronRight size={24} /> : <ChevronLeft size={24} />;
 
@@ -107,8 +127,22 @@ export function KhatmahReaderScreen({
 
       <div className="flex-1 relative overflow-hidden flex flex-col items-center justify-center p-2 sm:p-4">
         {loading && !pageData && (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
             <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+          </div>
+        )}
+
+        {error && !loading && !pageData && (
+          <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <p className="text-[0.9375rem] font-bold text-destructive">{error}</p>
+            <button
+              type="button"
+              onClick={() => loadPage(currentPage)}
+              className="flex items-center gap-2 rounded-btn bg-primary px-4 py-2 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <RotateCcw size={16} />
+              <span>{t(language, "mushaf.retry")}</span>
+            </button>
           </div>
         )}
 

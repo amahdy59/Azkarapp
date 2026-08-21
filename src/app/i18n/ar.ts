@@ -804,6 +804,8 @@ const ar = {
   },
   mushaf: {
     highlightGhareeb: "تظليل الكلمات الصعبة",
+    loadFailed: "تعذر تحميل صفحة المصحف. يرجى المحاولة مجدداً.",
+    retry: "إعادة المحاولة",
   },
   reader: {
     playAudioOnce: "تشغيل مرة واحدة",

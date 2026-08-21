@@ -96,15 +96,12 @@ test("Home utility status stays on one line without horizontal overflow", async 
         hero: bounds("home-hero"),
         date: bounds("hijri-date"),
         time: bounds("next-prayer-time"),
-        streak: bounds("header-streak"),
-        palms: bounds("header-palms"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
     expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
     expect(geometry.hero.y, `Home hero starts flush at ${viewport.width}px`).toBeLessThanOrEqual(1);
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
-    expect(Math.abs(geometry.streak.y - geometry.palms.y), `streak/palms row at ${viewport.width}px`).toBeLessThan(1);
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
   }
 });
