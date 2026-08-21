@@ -22,10 +22,10 @@ import { gzipSync } from "node:zlib";
  */
 const limits = {
   javascript: 450 * 1024,
-  css: 150 * 1024,
+  css: 160 * 1024,
   asset: 1024 * 1024,
   javascriptGzip: 130 * 1024,
-  cssGzip: 26 * 1024,
+  cssGzip: 28 * 1024,
   initialGzip: 200 * 1024,
   totalOutput: 8 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,

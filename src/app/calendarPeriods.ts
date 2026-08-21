@@ -151,3 +151,52 @@ export function getCalendarYearPeriods(referenceDate: Date, calendarType: Calend
   }
   return periods;
 }
+
+export function getPeriodRange(
+  activeTab: "day" | "week" | "month" | "year",
+  displayDate: Date,
+  language: AppLanguage,
+  calendarType: CalendarType,
+): { startKey: string; endKey: string } {
+  const formatKey = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
+  if (activeTab === "day") {
+    const key = formatKey(displayDate);
+    return { startKey: key, endKey: key };
+  }
+
+  if (activeTab === "week") {
+    const isArabic = language === "ar";
+    const currentDayOfWeek = displayDate.getDay();
+    const startOffset = isArabic ? (currentDayOfWeek + 1) % 7 : currentDayOfWeek;
+
+    const startOfWeek = new Date(displayDate);
+    startOfWeek.setHours(12, 0, 0, 0);
+    startOfWeek.setDate(displayDate.getDate() - startOffset);
+
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+
+    return { startKey: formatKey(startOfWeek), endKey: formatKey(endOfWeek) };
+  }
+
+  if (activeTab === "month") {
+    const period = getCalendarMonthPeriod(displayDate, calendarType, language);
+    return { startKey: formatKey(period.startDate), endKey: formatKey(period.endDate) };
+  }
+
+  if (activeTab === "year") {
+    const periods = getCalendarYearPeriods(displayDate, calendarType, language);
+    return {
+      startKey: formatKey(periods[0]?.startDate || displayDate),
+      endKey: formatKey(periods[periods.length - 1]?.endDate || displayDate),
+    };
+  }
+
+  return { startKey: "0000-00-00", endKey: "9999-99-99" };
+}

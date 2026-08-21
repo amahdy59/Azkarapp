@@ -211,3 +211,28 @@ export interface WordMeaningSelection {
   /** The word element the gloss is anchored under, when opened by tapping. */
   anchor?: HTMLElement | null;
 }
+
+export function getQuranWordMeaning(verseKey: string, wordText: string): string | undefined {
+  const parts = verseKey.split(":");
+  if (parts.length < 2) return undefined;
+  const surah = parts[0];
+  const ayah = parts[1];
+  if (!surah || !ayah) return undefined;
+  const chapter = MEANINGS[surah];
+  if (!chapter) return undefined;
+  const ayahMeanings = chapter[ayah];
+  if (!ayahMeanings) return undefined;
+
+  // Direct match
+  if (ayahMeanings[wordText]) return ayahMeanings[wordText] as string;
+
+  // Normalized match
+  const normalizedWord = normalizeArabic(wordText).value;
+  for (const [key, meaning] of Object.entries(ayahMeanings)) {
+    if (normalizeArabic(key).value === normalizedWord) {
+      return meaning as string;
+    }
+  }
+
+  return undefined;
+}

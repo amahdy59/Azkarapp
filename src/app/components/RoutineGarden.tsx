@@ -1,17 +1,10 @@
-import { useMemo, useState } from "react";
 import "./RoutineGarden.css";
 import { CATEGORIES } from "../content/categories";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import {
-  DEFAULT_PROGRESS_DAY_START_HOUR,
-  getGardenSummary,
-  type GardenMilestoneId,
-  type GardenSummary,
-  type GrowthEvent,
-} from "../progress";
+import { type GardenMilestoneId, type GardenSummary, type GrowthEvent } from "../progress";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
-import { TabList, tabPanelProps } from "./Tabs";
+import { tabPanelProps } from "./Tabs";
 import type { AppLanguage, CategoryId, DailyCollectionCompletion } from "../types";
 import { Zap } from "./icons";
 
@@ -28,8 +21,6 @@ export {
 } from "./GardenMarks";
 export { getGardenDateLabel } from "./gardenDateLabel";
 import { GoldenLeafMark, GreenLeafMark, PalmTreeMark } from "./GardenMarks";
-import { getGardenDateLabel } from "./gardenDateLabel";
-import { shiftCalendarDate } from "../calendarPeriods";
 
 function categoryName(category: CategoryId, language: AppLanguage) {
   const item = CATEGORIES.find((candidate) => candidate.id === category);
@@ -41,18 +32,18 @@ function categoryName(category: CategoryId, language: AppLanguage) {
 /** Golden Leaf Mark — earned for completing core daily protection azkar (morning, evening, before sleep). */
 
 export function TodayRoutineGarden({
-  summary: initialSummary,
+  summary,
   language,
   hideTabs = false,
   onOpenShareModal: _onOpenShareModal,
   calendarType = "hijri",
   dailyCompletions = [],
-  progressDayStartHour = DEFAULT_PROGRESS_DAY_START_HOUR,
   onSelectCategory,
   visibleCategoryIds,
   onOpenWirdBenefits,
   onMedia = true,
-  onTabChange,
+  activeTab = "day",
+  displayDate = new Date(),
 }: {
   summary: GardenSummary;
   language: AppLanguage;
@@ -64,39 +55,15 @@ export function TodayRoutineGarden({
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
-  progressDayStartHour?: number;
   onSelectCategory?: (categoryId: CategoryId) => void;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   onOpenWirdBenefits?: () => void;
-  onTabChange?: (tab: "day" | "week" | "month" | "year") => void;
+  activeTab?: "day" | "week" | "month" | "year";
+  displayDate?: Date;
 }) {
-  const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
-  const [offset, setOffset] = useState(0);
-
-  const isArabic = language === "ar";
-
-  const displayDate = useMemo(() => {
-    return shiftCalendarDate(new Date(), activeTab, offset, calendarType);
-  }, [activeTab, calendarType, offset]);
-
-  const summary = useMemo(
-    () =>
-      offset === 0 && activeTab === "day"
-        ? initialSummary
-        : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour),
-    [initialSummary, dailyCompletions, displayDate, offset, activeTab, progressDayStartHour],
-  );
-
   const totalPalms = summary.lifetimePalms;
   const streak = summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0;
-
-  const dateLabel = getGardenDateLabel(displayDate, activeTab, offset, language, calendarType);
-
-  const handleTabChange = (tab: "day" | "week" | "month" | "year") => {
-    setActiveTab(tab);
-    setOffset(0);
-    onTabChange?.(tab);
-  };
+  // Fallback to internal navigation if not hidden (e.g. for HomeScreen where it uses its own simple label)
 
   const completedCount = summary.today.completedCategories.length;
   const dynamicSubtitle = t(
@@ -116,77 +83,6 @@ export function TodayRoutineGarden({
       aria-label={t(language, "garden.todayTitle")}
       className={`w-full transition-colors ${onMedia ? "h-full" : ""}`}
     >
-      {!hideTabs && (
-        <>
-          <TabList
-            value={activeTab}
-            onChange={handleTabChange}
-            direction={isArabic ? "rtl" : "ltr"}
-            idPrefix="garden"
-            aria-label={t(language, "garden.viewMode")}
-            className="mb-4 flex rounded-full border border-border bg-muted p-1"
-            itemClassName={(selected) =>
-              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                selected
-                  ? "bg-primary text-primary-foreground shadow-md"
-                  : "text-muted-foreground hover:text-foreground"
-              }`
-            }
-            tabs={(["day", "week", "month", "year"] as const).map((tab) => ({
-              value: tab,
-              label: t(
-                language,
-                (
-                  {
-                    day: "garden.tabDay",
-                    week: "garden.tabWeek",
-                    month: "garden.tabMonth",
-                    year: "garden.tabYear",
-                  } as const
-                )[tab],
-              ),
-            }))}
-          />
-
-          <div className="mb-4 flex items-center justify-between rounded-3xl border border-border/40 bg-card px-3 py-2 shadow-raised">
-            <button
-              type="button"
-              onClick={() => setOffset((prev) => prev - 1)}
-              aria-label={t(language, "garden.prevPeriod")}
-              title={t(language, "garden.prevPeriod")}
-              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <polyline points={isArabic ? "9 18 15 12 9 6" : "15 18 9 12 15 6"} />
-              </svg>
-            </button>
-
-            <span
-              className="px-2 text-center text-[0.9375rem] font-black tracking-wide text-foreground"
-              data-testid="garden-view-date"
-              dir="auto"
-              aria-live="polite"
-              aria-atomic="true"
-            >
-              {dateLabel}
-            </span>
-
-            <button
-              type="button"
-              onClick={() => setOffset((prev) => Math.min(0, prev + 1))}
-              disabled={offset >= 0}
-              aria-label={t(language, "garden.nextPeriod")}
-              title={t(language, "garden.nextPeriod")}
-              className="flex h-[44px] min-h-[44px] w-[44px] min-w-[44px] items-center justify-center rounded-xl border border-border/60 hover:bg-muted text-foreground transition-colors disabled:opacity-40 disabled:cursor-not-allowed active:scale-95 shrink-0 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5}>
-                <polyline points={isArabic ? "15 18 9 12 15 6" : "9 18 15 12 9 6"} />
-              </svg>
-            </button>
-          </div>
-        </>
-      )}
-
       {!hideTabs && (
         <div className="mb-4 flex items-center justify-around rounded-3xl border border-border bg-card px-3 py-3 shadow-sm">
           <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>

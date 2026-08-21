@@ -247,4 +247,6 @@ export interface AppStateSnapshot {
   savedZikrIds: string[];
   /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
   lastActiveDayKey?: string;
+  /** User's current reading position in the Quran Khatmah (page number 1-604). */
+  khatmahPage?: number;
 }

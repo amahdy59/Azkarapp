@@ -239,6 +239,7 @@ function AppContent() {
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
+  const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
 
   /**
    * Upserts one of the two flags for a prayer on the current progress day.
@@ -1357,7 +1358,13 @@ function AppContent() {
                 />
               )}
               {view === "khatmah" && (
-                <KhatmahReaderScreen language={selectedLang} direction={layoutDirection} onBack={pop} />
+                <KhatmahReaderScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  onBack={pop}
+                  khatmahPage={khatmahPage}
+                  setKhatmahPage={setKhatmahPage}
+                />
               )}
               {view === "custom_counter" && (
                 <CustomCounterScreen

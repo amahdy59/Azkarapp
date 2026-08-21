@@ -522,10 +522,8 @@ export function HomeScreen({
                     <TodayRoutineGarden
                       summary={gardenSummary}
                       language={language}
-                      hideTabs={true}
                       calendarType={calendarType}
                       dailyCompletions={dailyCompletions}
-                      progressDayStartHour={progressDayStartHour}
                       onSelectCategory={onResume}
                       visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
                       onOpenWirdBenefits={onOpenWirdBenefits}

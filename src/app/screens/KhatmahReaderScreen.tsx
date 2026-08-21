@@ -3,22 +3,36 @@ import { Header } from "../components/LayoutShells";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { ChevronRight, ChevronLeft, BookOpen, Settings } from "../components/icons";
+import { ChevronRight, ChevronLeft } from "../components/icons";
 import { motion, AnimatePresence } from "motion/react";
+import { MushafPageViewer } from "../components/MushafPageViewer";
+import * as Switch from "@radix-ui/react-switch";
+
+// Temporary mapping. In a real app we'd load this from a JSON dictionary.
+// For now we just use a generic "Surah X"
+function getSurahName(surahNumber: string, language: AppLanguage) {
+  return language === "ar" ? `سورة ${surahNumber}` : `Surah ${surahNumber}`;
+}
 
 export function KhatmahReaderScreen({
   language,
   direction,
   onBack,
+  khatmahPage,
+  setKhatmahPage,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   onBack: () => void;
+  khatmahPage: number;
+  setKhatmahPage: (page: number) => void;
 }) {
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const currentPage = khatmahPage;
+
   const [pageData, setPageData] = useState<{ k: string; w: [number, number, number, string][] }[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [swipeDirection, setSwipeDirection] = useState(0);
+  const [highlightGhareeb, setHighlightGhareeb] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -58,11 +72,25 @@ export function KhatmahReaderScreen({
     return result;
   }, [pageData]);
 
+  // Compute the current Surah and Juz for the header
+  const { surahName, juzNumber } = useMemo(() => {
+    if (!pageData || pageData.length === 0) return { surahName: "", juzNumber: 1 };
+    // Get the first verse on the page
+    const firstVerseKey = pageData[0]?.k || "1:1";
+    const [surah] = firstVerseKey.split(":");
+    // Simple heuristic for Juz (1 juz = 20 pages roughly)
+    const juz = Math.ceil(currentPage / 20) || 1;
+    return {
+      surahName: getSurahName(surah || "1", language),
+      juzNumber: juz,
+    };
+  }, [pageData, currentPage, language]);
+
   const paginate = (newDirection: number) => {
     const nextPage = currentPage + newDirection;
     if (nextPage < 1 || nextPage > 604) return;
     setSwipeDirection(newDirection);
-    setCurrentPage(nextPage);
+    setKhatmahPage(nextPage);
   };
 
   const isArabic = language === "ar";
@@ -93,77 +121,62 @@ export function KhatmahReaderScreen({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: swipeDirection > 0 ? (isArabic ? 300 : -300) : isArabic ? -300 : 300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="w-full max-w-[480px] sm:max-w-[540px] md:max-w-[600px] h-full max-h-[90vh] overflow-y-auto bg-[#fdfaf6] dark:bg-[#0c0c0c] border border-border shadow-sm rounded-xl p-4 flex flex-col justify-between"
-              dir="rtl"
-              style={{ fontFamily: "var(--font-mushaf)" }}
+              className="absolute inset-0 p-2 sm:p-4 flex items-center justify-center pointer-events-none"
             >
-              <div className="flex justify-between items-center px-4 mb-4 text-[0.75rem] font-bold text-muted-foreground font-sans">
-                <span>?????</span>
-                <span>????</span>
-              </div>
-
-              <div className="flex-1 flex flex-col justify-around">
-                {lines.map((lineWords, lineIdx) => {
-                  if (!lineWords || lineWords.length === 0) {
-                    return <div key={lineIdx} className="h-8" aria-hidden="true" />;
-                  }
-
-                  return (
-                    <div
-                      key={lineIdx}
-                      className="flex justify-between items-baseline w-full"
-                      style={{ direction: "rtl" }}
-                    >
-                      {lineWords.map((w, wIdx) => (
-                        <span
-                          key={w.verseKey + "-" + w.position + "-" + wIdx}
-                          className={
-                            "inline-block leading-tight text-center " +
-                            (w.isEnd
-                              ? "text-primary text-[1.1em] mx-1"
-                              : "text-[1.5rem] sm:text-[1.8rem] md:text-[2rem]")
-                          }
-                          dangerouslySetInnerHTML={{ __html: w.text }}
-                        />
-                      ))}
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="flex justify-center items-center mt-4 text-[0.75rem] font-bold text-muted-foreground font-sans">
-                {currentPage}
+              <div className="w-full h-full max-w-[480px] sm:max-w-[540px] md:max-w-[600px] max-h-[85vh] pointer-events-auto">
+                <MushafPageViewer
+                  lines={lines}
+                  language={language}
+                  pageNumber={currentPage}
+                  surahName={surahName}
+                  juzNumber={juzNumber}
+                  highlightGhareeb={highlightGhareeb}
+                  direction={direction}
+                />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="flex-shrink-0 p-4 flex justify-between items-center bg-card border-t border-border shadow-raised">
-        <button
-          onClick={() => paginate(isArabic ? 1 : -1)}
-          disabled={currentPage === (isArabic ? 604 : 1)}
-          className="p-3 rounded-full bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50"
-        >
-          {prevIcon}
-        </button>
-
-        <div className="flex gap-2">
-          <button className="p-3 rounded-full bg-muted text-foreground hover:bg-muted/80">
-            <BookOpen size={20} />
-          </button>
-          <button className="p-3 rounded-full bg-muted text-foreground hover:bg-muted/80">
-            <Settings size={20} />
-          </button>
+      <div className="flex-shrink-0 p-4 flex flex-col gap-4 bg-card border-t border-border shadow-raised z-10">
+        <div className="flex justify-between items-center px-2">
+          <label className="flex items-center gap-3 cursor-pointer text-sm font-medium">
+            <Switch.Root
+              className="w-10 h-6 bg-switch-background rounded-full relative data-[state=checked]:bg-primary outline-none focus:ring-2 focus:ring-ring"
+              checked={highlightGhareeb}
+              onCheckedChange={setHighlightGhareeb}
+              id="ghareeb-toggle"
+            >
+              <Switch.Thumb className="block w-5 h-5 bg-white rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[1.125rem]" />
+            </Switch.Root>
+            {t(language, "mushaf.highlightGhareeb") || "Highlight Difficult Words"}
+          </label>
         </div>
 
-        <button
-          onClick={() => paginate(isArabic ? -1 : 1)}
-          disabled={currentPage === (isArabic ? 1 : 604)}
-          className="p-3 rounded-full bg-muted text-foreground hover:bg-muted/80 disabled:opacity-50"
-        >
-          {nextIcon}
-        </button>
+        <div className="flex justify-between items-center">
+          <button
+            onClick={() => paginate(isArabic ? 1 : -1)}
+            disabled={currentPage === (isArabic ? 604 : 1)}
+            className="ui-icon-button"
+            aria-label={t(language, "common.next") || "Next"}
+          >
+            {prevIcon}
+          </button>
+
+          <span className="text-sm font-medium text-muted-foreground flex items-center gap-2" dir="ltr">
+            {Math.round((currentPage / 604) * 100)}%
+          </span>
+
+          <button
+            onClick={() => paginate(isArabic ? -1 : 1)}
+            disabled={currentPage === (isArabic ? 1 : 604)}
+            className="ui-icon-button"
+            aria-label={t(language, "common.previous") || "Previous"}
+          >
+            {nextIcon}
+          </button>
+        </div>
       </div>
     </ScreenContainer>
   );

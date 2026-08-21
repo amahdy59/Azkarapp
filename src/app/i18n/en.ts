@@ -1,5 +1,8 @@
 const en = {
   common: {
+    juz: "Juz",
+    next: "Next",
+    previous: "Previous",
     mushaf: "Mushaf",
     settings: "Settings",
     home: "Home",
@@ -219,6 +222,10 @@ const en = {
     loadMore: "Show {count} more",
   },
   friday: {
+    progressTitle: "Friday Progress ({count})",
+    practicesDone: "Practices completed",
+    kahfOpened: "Surah Al-Kahf opened",
+    salawatCount: "Total Salawat",
     title: "Friday Companion",
     subtitle: "Surah Al-Kahf and Friday Sunnahs",
     homeSubtitle: "Salawat counter & Surah Al-Kahf",
@@ -808,6 +815,9 @@ const en = {
     finalWords: "Final words before sleeping",
     coreCompleted: "Core completed",
     continueAdditional: "Continue with {count} additional adhkar",
+  },
+  mushaf: {
+    highlightGhareeb: "Highlight Difficult Words",
   },
   reader: {
     playAudioOnce: "Play audio once",

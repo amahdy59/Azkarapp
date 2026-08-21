@@ -1,5 +1,8 @@
 const ar = {
   common: {
+    juz: "الجزء",
+    next: "التالي",
+    previous: "السابق",
     mushaf: "المصحف",
     settings: "\u0627\u0644\u0625\u0639\u062f\u0627\u062f\u0627\u062a",
     home: "\u0627\u0644\u0631\u0626\u064a\u0633\u064a\u0629",
@@ -218,6 +221,10 @@ const ar = {
     loadMore: "عرض {count} إضافية",
   },
   friday: {
+    progressTitle: "إنجازات الجمعة ({count})",
+    practicesDone: "السنن المكتملة",
+    kahfOpened: "قراءة سورة الكهف",
+    salawatCount: "إجمالي الصلوات على النبي",
     title: "رفيق الجمعة",
     subtitle: "سورة الكهف وسنن يوم الجمعة",
     homeSubtitle: "الصلاة على النبي ﷺ سورة الكهف",
@@ -794,6 +801,9 @@ const ar = {
     finalWords: "آخر ما يقال قبل النوم",
     coreCompleted: "اكتملت المختصرة",
     continueAdditional: "تابع {count} ذكرًا إضافيًا",
+  },
+  mushaf: {
+    highlightGhareeb: "تظليل الكلمات الصعبة",
   },
   reader: {
     playAudioOnce: "تشغيل مرة واحدة",
