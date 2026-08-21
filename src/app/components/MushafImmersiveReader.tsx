@@ -159,7 +159,7 @@ function MushafPage({
       onTouchMove={onTouchMove}
       style={{ touchAction: zoomScale > 1 ? "none" : mode === "fit" ? "pan-x pinch-zoom" : "pan-x pan-y pinch-zoom" }}
     >
-      <div ref={containerRef} className="mx-auto flex h-full w-full max-w-[52rem] flex-col relative">
+      <div ref={containerRef} className="mx-auto flex h-full w-full max-w-[var(--content-reading)] flex-col relative">
         <div
           ref={contentRef}
           style={{
