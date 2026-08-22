@@ -25,6 +25,25 @@ function planLabel(language: AppLanguage, plan: QuranWirdPlan) {
   return t(language, "mushaf.planDaily");
 }
 
+function effectiveDailyGoal(plan: QuranWirdPlan, history: Record<string, number[]>) {
+  if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) return plan.dailyPages;
+  const [year, month, day] = plan.startedDayKey.split("-").map(Number);
+  const today = new Date();
+  const elapsed = Math.max(
+    0,
+    Math.floor(
+      (Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(year!, month! - 1, day!)) /
+        86_400_000,
+    ),
+  );
+  const completed = new Set(
+    Object.entries(history)
+      .filter(([dayKey]) => dayKey >= plan.startedDayKey!)
+      .flatMap(([, pages]) => pages),
+  ).size;
+  return Math.max(1, Math.ceil(Math.max(0, TOTAL_PAGES - completed) / Math.max(1, plan.durationDays - elapsed)));
+}
+
 export function QuranWirdScreen({
   language,
   direction,
@@ -51,7 +70,8 @@ export function QuranWirdScreen({
   const todayKey = getProgressDayKey();
   const completedPages = wirdHistory[todayKey] ?? [];
   const read = completedPages.length;
-  const goal = plan.dailyPages;
+  const goal = effectiveDailyGoal(plan, wirdHistory);
+  const redistributed = plan.kind !== "daily" && goal !== plan.dailyPages;
   const progress = Math.min(100, Math.round((read / goal) * 100));
   const remaining = Math.max(goal - read, 0);
   const circumference = 2 * Math.PI * 42;
@@ -213,9 +233,9 @@ export function QuranWirdScreen({
               const kind = event.target.value as QuranWirdPlan["kind"];
               onPlanChange(
                 kind === "khatmah30"
-                  ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 30), durationDays: 30 }
+                  ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 30), durationDays: 30, startedDayKey: todayKey }
                   : kind === "custom"
-                    ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 60), durationDays: 60 }
+                    ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 60), durationDays: 60, startedDayKey: todayKey }
                     : { kind, dailyPages: 4 },
               );
             }}
@@ -235,13 +255,23 @@ export function QuranWirdScreen({
                 value={plan.durationDays ?? 60}
                 onChange={(event) => {
                   const days = Math.min(604, Math.max(1, Number(event.target.value) || 1));
-                  onPlanChange({ kind: "custom", durationDays: days, dailyPages: Math.ceil(TOTAL_PAGES / days) });
+                  onPlanChange({
+                    kind: "custom",
+                    durationDays: days,
+                    dailyPages: Math.ceil(TOTAL_PAGES / days),
+                    startedDayKey: plan.startedDayKey ?? todayKey,
+                  });
                 }}
                 className="mt-2 min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               />
             </label>
           )}
           <p className="mt-3 text-xs leading-5 text-muted-foreground">{t(language, "mushaf.redistributeNote")}</p>
+          {redistributed && (
+            <p className="mt-2 text-xs font-bold text-primary">
+              {t(language, "mushaf.redistributedGoal", { count: formatNumerals(goal, language) })}
+            </p>
+          )}
         </section>
 
         <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">

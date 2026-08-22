@@ -252,6 +252,7 @@ export interface QuranWirdPlan {
   kind: QuranWirdPlanKind;
   dailyPages: number;
   durationDays?: number;
+  startedDayKey?: string;
 }
 
 export interface AppStateSnapshot {

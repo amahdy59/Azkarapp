@@ -40,6 +40,8 @@ describe("QuranWirdScreen", () => {
     const props = renderScreen();
     fireEvent.change(screen.getByLabelText("Choose a plan"), { target: { value: "khatmah30" } });
 
-    expect(props.onPlanChange).toHaveBeenCalledWith({ kind: "khatmah30", dailyPages: 21, durationDays: 30 });
+    expect(props.onPlanChange).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "khatmah30", dailyPages: 21, durationDays: 30 }),
+    );
   });
 });

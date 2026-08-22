@@ -859,6 +859,7 @@ const ar = {
     planCustomChoice: "ختمة مخصصة",
     durationDays: "أيام الإتمام",
     redistributeNote: "إذا فات يوم، تُوزّع الصفحات المتبقية برفق على الأيام المتبقية.",
+    redistributedGoal: "هدف اليوم بعد التوزيع: {count} صفحات",
     thisWeek: "هذا الأسبوع",
     weeklySummary: "قرأت في {count} من آخر ٧ أيام",
     dayPages: "اليوم {day}: تمت قراءة {count} صفحات",

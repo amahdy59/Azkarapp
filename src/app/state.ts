@@ -164,10 +164,15 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
     plan.durationDays <= 604
       ? plan.durationDays
       : undefined;
+  const startedDayKey =
+    typeof plan.startedDayKey === "string" && /^\d{4}-\d{2}-\d{2}$/.test(plan.startedDayKey)
+      ? plan.startedDayKey
+      : undefined;
   return {
     kind: plan.kind === "khatmah30" || plan.kind === "custom" ? plan.kind : "daily",
     dailyPages: plan.kind === "khatmah30" ? 21 : dailyPages,
-    ...(plan.kind === "custom" && durationDays ? { durationDays } : {}),
+    ...((plan.kind === "custom" || plan.kind === "khatmah30") && durationDays ? { durationDays } : {}),
+    ...((plan.kind === "custom" || plan.kind === "khatmah30") && startedDayKey ? { startedDayKey } : {}),
   };
 }
 

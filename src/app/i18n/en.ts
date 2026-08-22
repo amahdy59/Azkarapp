@@ -873,6 +873,7 @@ const en = {
     planCustomChoice: "Custom Khatmah",
     durationDays: "Days to complete",
     redistributeNote: "If a day is missed, your remaining pages are gently spread across the days left.",
+    redistributedGoal: "Today’s adjusted target: {count} pages",
     thisWeek: "This week",
     weeklySummary: "Read on {count} of the last 7 days",
     dayPages: "Day {day}: {count} pages read",
