@@ -66,8 +66,8 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
-      <div className="hero-glass flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
-        <div className="flex flex-col gap-5">
+      <div className="hero-glass flex flex-1 flex-col gap-4 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
+        <div className="flex flex-col gap-4">
           <div className="flex w-full flex-col items-start gap-3 px-1">
             <h2
               id="current-zikr-heading"
@@ -136,7 +136,7 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group mt-auto flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
           <DirectionArrow

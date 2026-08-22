@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, ArrowRight, BookOpen } from "../components/icons";
+import { ArrowLeft, ArrowRight, BookOpen, Zap } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
-import { TodayRoutineGarden } from "../components/RoutineGarden";
+import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
@@ -245,6 +245,7 @@ export function HomeScreen({
   prayerTracking?: readonly PrayerTrackingRecord[];
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
 }) {
+  const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
   const isArabic = language === "ar";
   const now = useNow();
   const [, setPrayerTimesRevision] = useState(0);
@@ -406,12 +407,16 @@ export function HomeScreen({
         role="region"
         aria-label={t(language, "home.title")}
         className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
       >
         {/* Sticky Header Overlay */}
         <div className="pointer-events-none sticky inset-x-0 top-0 z-50 h-0 overflow-visible">
           <header
             data-testid="home-utility-header"
-            className="px-page mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] sm:pt-5"
+            data-scrolled={hasScrolledHomeContent || undefined}
+            className={`px-page mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
+              hasScrolledHomeContent ? "bg-background/72 shadow-sm backdrop-blur-md" : ""
+            }`}
             dir="ltr"
           >
             <div
@@ -421,6 +426,24 @@ export function HomeScreen({
               <time className="block truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
               </time>
+            </div>
+            <div
+              data-testid="home-header-routine-summary"
+              className="flex shrink-0 items-center gap-2 text-[0.8125rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-[0.9375rem]"
+            >
+              <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
+                <Zap className="size-4 sm:size-[1.125rem]" strokeWidth={2.5} aria-hidden="true" />
+                <bdi>
+                  {formatNumerals(gardenSummary.currentPalmRhythm ?? gardenSummary.currentUsageStreak ?? 0, language)}
+                </bdi>
+                <span>{t(language, "progress.days")}</span>
+              </span>
+              <span className="h-4 w-px bg-on-media/45" aria-hidden="true" />
+              <span className="flex items-center gap-1" title={t(language, "progress.palmsTitle")}>
+                <PalmTreeMark size={18} filled={gardenSummary.lifetimePalms > 0} aria-hidden="true" />
+                <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
+                <span>{t(language, "progress.palmsUnit")}</span>
+              </span>
             </div>
           </header>
         </div>
@@ -477,6 +500,7 @@ export function HomeScreen({
                     <TodayRoutineGarden
                       summary={gardenSummary}
                       language={language}
+                      hideTabs
                       calendarType={calendarType}
                       dailyCompletions={dailyCompletions}
                       onSelectCategory={onResume}

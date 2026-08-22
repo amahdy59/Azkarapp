@@ -95,6 +95,7 @@ test("Home utility status stays on one line without horizontal overflow", async 
         header: bounds("home-utility-header"),
         hero: bounds("home-hero"),
         date: bounds("hijri-date"),
+        routineSummary: bounds("home-header-routine-summary"),
         time: bounds("next-prayer-time"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
@@ -102,7 +103,17 @@ test("Home utility status stays on one line without horizontal overflow", async 
     expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
     expect(geometry.hero.y, `Home hero starts flush at ${viewport.width}px`).toBeLessThanOrEqual(1);
     expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
+    expect(geometry.routineSummary.height, `Home routine summary stays visible at ${viewport.width}px`).toBeGreaterThan(
+      0,
+    );
     expect(geometry.overflow, `horizontal overflow at ${viewport.width}px`).toBeLessThanOrEqual(0);
+    await expect(page.getByTestId("today-garden-card").getByTestId("routine-garden-summary")).toHaveCount(0);
+
+    await page.evaluate(() => {
+      const scroller = document.querySelector<HTMLElement>('[role="region"][aria-label]');
+      if (scroller) scroller.scrollTop = 8;
+    });
+    await expect(page.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
   }
 });
 

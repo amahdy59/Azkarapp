@@ -315,7 +315,7 @@ export function ProgressDayView({
         </div>
 
         <div
-          className={`stagger-in mt-5 grid flex-1 grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
+          className={`stagger-in mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${
             isHomeSubset ? "sm:grid-cols-3" : "sm:grid-cols-2 xl:grid-cols-4"
           }`}
         >
@@ -379,7 +379,7 @@ export function ProgressDayView({
             type="button"
             onClick={onOpenWirdBenefits}
             data-testid="open-wird-benefits"
-            className={`mt-5 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:mt-6 ${
+            className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
                 ? "border-on-media/20 bg-black/35 text-on-media hover:bg-black/50"
                 : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"

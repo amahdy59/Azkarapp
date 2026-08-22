@@ -33,6 +33,8 @@ describe("HomeCards", () => {
       "aria-describedby",
       "home-routine-progress",
     );
+    expect(screen.getByTestId("home-primary-cta")).not.toHaveClass("mt-auto");
+    expect(screen.getByTestId("home-primary-cta").parentElement).toHaveClass("gap-4");
   });
 
   it("gives Saved items explicit source names and announces loading and errors", () => {

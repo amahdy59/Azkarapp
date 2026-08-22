@@ -84,7 +84,10 @@ export function TodayRoutineGarden({
       className={`w-full transition-colors ${onMedia ? "h-full" : ""}`}
     >
       {!hideTabs && (
-        <div className="mb-4 flex items-center justify-around rounded-3xl border border-border bg-card px-3 py-3 shadow-sm">
+        <div
+          data-testid="routine-garden-summary"
+          className="mb-4 flex items-center justify-around rounded-3xl border border-border bg-card px-3 py-3 shadow-sm"
+        >
           <div className="flex items-center gap-1.5" title={t(language, "progress.dailyStreak")}>
             <Zap
               className={`h-[1.25rem] w-[1.25rem] ${streak > 0 ? "text-primary" : "text-muted-foreground/40"}`}
