@@ -11,6 +11,7 @@ import {
   formatUtcOffset,
   getTimeZoneStatus,
 } from "../../content/prayerCalculation";
+import { searchPrayerLocations, type PrayerLocationPreset } from "../../content/prayerLocations";
 import type { AppLanguage, LocationSettings, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
@@ -132,8 +133,10 @@ export function NotificationsPanel({
   const [longitudeDraft, setLongitudeDraft] = useState(String(locationSettings?.longitude ?? ""));
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
   const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
+  const [citySearch, setCitySearch] = useState("");
   const locationRequestId = useRef(0);
   const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
+  const cityResults = searchPrayerLocations(citySearch);
 
   useEffect(() => {
     setLatitudeDraft(String(locationSettings?.latitude ?? ""));
@@ -245,6 +248,25 @@ export function NotificationsPanel({
       timeZone: timeZoneDraft.trim() || Intl.DateTimeFormat().resolvedOptions().timeZone,
     });
     setLocationStatus(t(language, "notifications.manualLocationSaved"));
+    setLocationStatusIsError(false);
+  };
+
+  const handleCitySelect = (location: PrayerLocationPreset) => {
+    locationRequestId.current += 1;
+    const localizedCityName = isArabic ? location.nameArabic : location.nameEnglish;
+    setCityDraft(location.nameEnglish);
+    setTimeZoneDraft(location.timeZone);
+    setLatitudeDraft(String(location.latitude));
+    setLongitudeDraft(String(location.longitude));
+    onLocationChange?.({
+      ...(locationSettings ?? DEFAULT_LOCATION),
+      latitude: location.latitude,
+      longitude: location.longitude,
+      cityName: location.nameEnglish,
+      autoDetect: false,
+      timeZone: location.timeZone,
+    });
+    setLocationStatus(t(language, "notifications.citySelected", { city: localizedCityName }));
     setLocationStatusIsError(false);
   };
 
@@ -403,6 +425,57 @@ export function NotificationsPanel({
                 ))}
               </select>
             </div>
+
+            <fieldset className="space-y-2 border-t border-border pt-4">
+              <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
+                {t(language, "notifications.chooseCity")}
+              </legend>
+              <p className="text-[0.75rem] leading-5 text-muted-foreground">
+                {t(language, "notifications.citySearchHint")}
+              </p>
+              <input
+                type="search"
+                value={citySearch}
+                onChange={(event) => setCitySearch(event.target.value)}
+                placeholder={t(language, "notifications.citySearchPlaceholder")}
+                aria-label={t(language, "notifications.citySearchLabel")}
+                className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
+              />
+              <p className="text-[0.75rem] font-semibold text-muted-foreground">
+                {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
+              </p>
+              {cityResults.length > 0 ? (
+                <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {cityResults.map((location) => {
+                    const cityName = isArabic ? location.nameArabic : location.nameEnglish;
+                    const countryName = isArabic ? location.countryArabic : location.countryEnglish;
+                    const isSelected =
+                      locationSettings?.latitude === location.latitude &&
+                      locationSettings?.longitude === location.longitude;
+                    return (
+                      <li key={location.id}>
+                        <button
+                          type="button"
+                          onClick={() => handleCitySelect(location)}
+                          aria-pressed={isSelected}
+                          className="flex min-h-11 w-full items-center gap-2 rounded-xl border border-border-control bg-background px-3 py-2 text-start text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring aria-pressed:border-primary aria-pressed:bg-primary/10"
+                        >
+                          <MapPin size={17} className="shrink-0 text-primary" aria-hidden="true" />
+                          <span className="min-w-0">
+                            <span className="block text-[0.8125rem] font-bold">{cityName}</span>
+                            <span className="block text-[0.75rem] text-muted-foreground">{countryName}</span>
+                          </span>
+                        </button>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="rounded-xl bg-muted p-3 text-[0.8125rem] text-muted-foreground" role="status">
+                  {t(language, "notifications.noCitiesFound")}
+                </p>
+              )}
+            </fieldset>
 
             <fieldset className="space-y-2 border-t border-border pt-4">
               <legend className="mb-2 text-[0.875rem] font-bold text-foreground">

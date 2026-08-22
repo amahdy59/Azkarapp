@@ -1406,3 +1406,14 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** Retain the selected calculation method and use its twilight angle as a fraction of the real night (`angle / 60 × night duration`) only when that angle is unavailable. The normal solar calculation remains unchanged.
 - **Consequences:** This protects ordering for high-latitude summer twilight gaps. Polar day and polar night remain subject to the reader's local authority.
 - **Tests/evidence required:** High-latitude ordering regression test and the normal prayer-time suite.
+
+## DEC-085 — Offline city presets reuse the manual location boundary
+
+- **Date:** 2026-08-22
+- **Status:** Approved
+- **Owner:** User (approved the next non-Mushaf improvement while Quran work ran separately)
+- **Related scope:** `prayerLocations.ts`, `NotificationsPanel.tsx`, both i18n tables, and `PRAYER_TIMES.md`
+- **Context:** Readers who decline or cannot use GPS previously had to know and enter a city-centre latitude, longitude, and IANA timezone manually. That path works offline but asks for specialist data most readers do not know.
+- **Decision:** Ship a curated, bilingual, searchable catalogue of representative city-centre coordinates and IANA timezones in the application bundle. Selecting a city immediately persists through the existing manual `LocationSettings` boundary with `autoDetect: false`. Keep the existing raw fields as the fallback for any place outside the catalogue. Do not add a geocoding service, runtime dependency, or persistence migration.
+- **Consequences:** City search and selection work without GPS or network access and do not disclose a reader's location. The catalogue is intentionally finite and uses representative city-centre coordinates; it is not an address-level geocoder.
+- **Tests/evidence required:** English, Arabic, country, and alias search coverage; unique IDs; valid coordinate ranges and runtime-recognized IANA timezones; component selection/persistence coverage; narrow-width and RTL visual inspection; full local release gates; green Quality and Pages workflows; and production verification.

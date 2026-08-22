@@ -446,7 +446,10 @@ export function KhatmahReaderScreen({
             >
               {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
             </button>
-            <span aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}>
+            <span
+              role="status"
+              aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+            >
               {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
             </span>
           </div>

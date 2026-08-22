@@ -10,7 +10,8 @@ The Home prayer header displays the next prayer and a live countdown. Settings â
 - Review the effective IANA timezone and current UTC offset
 - See whether daylight saving or standard time is active
 - Select a calculation authority
-- Enter a manual city, timezone, latitude, and longitude
+- Search and select a built-in city without sharing GPS data; the preset coordinates and IANA timezone remain available offline
+- Enter a manual city, timezone, latitude, and longitude when the built-in list does not include the required location
 - Apply a minute adjustment to each prayer
 
 The five calculated prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha.
@@ -66,6 +67,8 @@ When the user selects **Detect My Location**:
 4. The selected timezone is persisted in `UserSettingsState.location`.
 
 The Settings status card makes the effective timezone and UTC offset auditable. If a device is configured with the wrong timezone and the app is offline during detection, the user can correct the IANA timezone manually.
+
+The built-in city selector is a convenience catalogue, not an online geocoder. Selecting a result immediately persists its representative city-centre coordinates and IANA timezone through the same `LocationSettings` boundary as manual entry. Search compares English names, Arabic names, countries, and common aliases without changing displayed text. Locations outside the catalogue remain supported through the manual fields.
 
 ## Calculation methods
 

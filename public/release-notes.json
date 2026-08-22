@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22",
+  "release": "2026-08-22-2",
   "ar": [
-    "أصبح حساب أوقات الصلاة دون اتصال أكثر موثوقية في المناطق عالية العرض عند تعذر ظهور الشفق المعتاد.",
-    "يمكنك تنزيل صفحات المصحف الـ٦٠٤ كاملة للقراءة دون اتصال بالإنترنت.",
-    "تعمل أزرار التشغيل والإيقاف والتقديم في مشغّل الصوت الآن من شاشة القفل والأدوات المدعومة.",
-    "تحسن عرض صفحات المصحف على الشاشات الصغيرة جدًا."
+    "تعرض صفحة ورد القرآن هدف اليوم وتقدمك وآخر موضع قراءة قبل فتح المصحف.",
+    "يمكنك متابعة القراءة من موضعك الصحيح، ولا تُحتسب الصفحة كمقروءة بمجرد فتحها.",
+    "اختر ختمة في ٣٠ يومًا أو هدف صفحات يوميًا أو خطة مخصصة، مع توزيع الصفحات الفائتة برفق.",
+    "ابحث عن مدينة واحفظ مواقيتها دون مشاركة موقعك أو الحاجة إلى اتصال بالإنترنت."
   ],
   "en": [
-    "Offline prayer times are more reliable at high latitudes when normal twilight does not occur.",
-    "You can download all 604 Mushaf pages for offline reading.",
-    "Supported lock-screen and notification controls can now play, pause, and seek audio.",
-    "Mushaf pages fit more comfortably on very small screens."
+    "The Quran Wird overview shows today’s goal, progress, and last reading position before you open the Mushaf.",
+    "Continue from the correct place; simply opening a page no longer marks it as read.",
+    "Choose a 30-day Khatmah, daily page goal, or custom plan with gentle redistribution after missed days.",
+    "Search and save a city for prayer times without sharing your location or needing an internet connection."
   ]
 }
