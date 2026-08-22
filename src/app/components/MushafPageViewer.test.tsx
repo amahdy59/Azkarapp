@@ -25,7 +25,7 @@ describe("MushafPageViewer", () => {
     ],
   ];
 
-  it("renders surah name, juz number and page number cleanly", () => {
+  it("renders one semantic page with surah and juz context", () => {
     render(
       <MushafPageViewer
         lines={sampleLines}
@@ -33,17 +33,36 @@ describe("MushafPageViewer", () => {
         pageNumber={3}
         surahName="سورة البقرة"
         juzNumber={1}
-        highlightGhareeb={false}
         direction="rtl"
       />,
     );
 
     expect(screen.getByText("سورة البقرة")).toBeInTheDocument();
     expect(screen.getByText("الجزء ١")).toBeInTheDocument();
-    expect(screen.getByText("٣")).toBeInTheDocument();
     expect(screen.getByText("إِنَّ")).toBeInTheDocument();
     expect(screen.getByText("٦")).toBeInTheDocument();
     expect(screen.getByRole("article", { name: "صفحة ٣" })).toBeInTheDocument();
+  });
+
+  it("always exposes reviewed difficult words as accessible buttons", () => {
+    render(
+      <MushafPageViewer
+        lines={[
+          [
+            { verseKey: "2:255", position: 1, isEnd: 0, text: "ٱلۡقَيُّومُ" },
+            { verseKey: "2:255", position: 2, isEnd: 1, text: "٢٥٥" },
+          ],
+        ]}
+        language="en"
+        pageNumber={42}
+        surahName="Surah Al-Baqarah"
+        juzNumber={3}
+        direction="ltr"
+      />,
+    );
+
+    const word = screen.getByRole("button", { name: "Meaning of ٱلۡقَيُّومُ" });
+    expect(word).toHaveClass("underline");
   });
 
   it("renders surah header banner when an empty line precedes a new surah start", () => {
@@ -63,7 +82,6 @@ describe("MushafPageViewer", () => {
         pageNumber={2}
         surahName="سورة البقرة"
         juzNumber={1}
-        highlightGhareeb={false}
         direction="rtl"
       />,
     );

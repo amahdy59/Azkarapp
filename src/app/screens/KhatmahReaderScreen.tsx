@@ -12,10 +12,9 @@ import {
   ArrowLeft,
   SlidersHorizontal,
 } from "../components/icons";
-import { motion, AnimatePresence } from "motion/react";
+import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
-import * as Switch from "@radix-ui/react-switch";
 import * as Popover from "@radix-ui/react-popover";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
@@ -31,8 +30,6 @@ export function KhatmahReaderScreen({
   setMushafTheme: onUpdateTheme,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
-  dailyWirdGoal = 4,
-  setDailyWirdGoal: _onUpdateGoal,
   wirdHistory = {},
   setWirdHistory: onUpdateWirdHistory,
   onReadingPositionChange,
@@ -46,8 +43,6 @@ export function KhatmahReaderScreen({
   setMushafTheme?: (theme: MushafTheme) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
-  dailyWirdGoal?: number;
-  setDailyWirdGoal?: (goal: number) => void;
   wirdHistory?: Record<string, number[]>;
   setWirdHistory?: (history: Record<string, number[]>) => void;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
@@ -60,9 +55,9 @@ export function KhatmahReaderScreen({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState(0);
-  const [highlightGhareeb, setHighlightGhareeb] = useState(false);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const reduceMotion = useReducedMotion();
 
   // Sync internal theme with prop updates
   useEffect(() => {
@@ -211,11 +206,8 @@ export function KhatmahReaderScreen({
 
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
-  const nextIcon = isArabic ? <ChevronLeft size={24} /> : <ChevronRight size={24} />;
-  const prevIcon = isArabic ? <ChevronRight size={24} /> : <ChevronLeft size={24} />;
-
-  const khatmahPercent = Math.round((currentPage / 604) * 100);
-  const wirdPagesCount = todayPagesRead.length;
+  const leftPageDelta = isArabic ? 1 : -1;
+  const rightPageDelta = -leftPageDelta;
 
   return (
     <ScreenContainer
@@ -313,20 +305,6 @@ export function KhatmahReaderScreen({
             </Popover.Portal>
           </Popover.Root>
 
-          <div className="relative flex size-10 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground focus-within:ring-2 focus-within:ring-ring">
-            <Switch.Root
-              className="peer flex size-10 items-center justify-center rounded-xl outline-none"
-              checked={highlightGhareeb}
-              onCheckedChange={setHighlightGhareeb}
-              aria-label={t(language, "mushaf.highlightGhareeb")}
-            >
-              <span aria-hidden="true" className="font-arabic text-lg font-bold text-primary">
-                ع
-              </span>
-              <span className="absolute bottom-1 h-0.5 w-4 rounded-full bg-primary opacity-0 transition-opacity peer-data-[state=checked]:opacity-100" />
-            </Switch.Root>
-          </div>
-
           {/* Bookmark Toggle */}
           <button
             type="button"
@@ -344,24 +322,8 @@ export function KhatmahReaderScreen({
         </div>
       </header>
 
-      <div className="flex items-center justify-between gap-3 border-b border-border/45 bg-muted/20 px-4 py-1.5 text-[0.6875rem] font-semibold text-muted-foreground sm:px-6 sm:text-xs">
-        <span className="min-w-0 truncate">
-          {t(language, "mushaf.wirdProgress", {
-            read: formatNumerals(wirdPagesCount, language),
-            goal: formatNumerals(dailyWirdGoal, language),
-          })}
-        </span>
-        <span
-          role="status"
-          className="shrink-0 text-foreground"
-          aria-label={t(language, "mushaf.khatmahProgress", { percent: formatNumerals(khatmahPercent, language) })}
-        >
-          {formatNumerals(khatmahPercent, language)}%
-        </span>
-      </div>
-
       {/* Main Mushaf Page Display Canvas */}
-      <main className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-muted/15 p-1.5 sm:p-3">
+      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-muted/15 p-0 sm:p-3">
         {loading && !pageData && (
           <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
             <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
@@ -387,20 +349,26 @@ export function KhatmahReaderScreen({
             <motion.div
               key={currentPage}
               custom={swipeDirection}
-              initial={{ x: swipeDirection > 0 ? (isArabic ? -300 : 300) : isArabic ? 300 : -300, opacity: 0 }}
+              initial={{ x: reduceMotion ? 0 : swipeDirection > 0 ? 300 : -300, opacity: reduceMotion ? 1 : 0 }}
               animate={{ x: 0, opacity: 1 }}
-              exit={{ x: swipeDirection > 0 ? (isArabic ? 300 : -300) : isArabic ? -300 : 300, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 flex items-center justify-center p-1.5 sm:p-3 pointer-events-none"
+              exit={{ x: reduceMotion ? 0 : swipeDirection > 0 ? -300 : 300, opacity: reduceMotion ? 1 : 0 }}
+              transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
+              drag="x"
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.16}
+              onDragEnd={(_, info) => {
+                if (info.offset.x <= -60 || info.velocity.x <= -500) paginate(1);
+                else if (info.offset.x >= 60 || info.velocity.x >= 500) paginate(-1);
+              }}
+              className="absolute inset-0 flex cursor-grab items-center justify-center p-0 active:cursor-grabbing sm:p-3"
             >
-              <div className="h-full w-full max-w-[500px] sm:max-w-[580px] md:max-w-[640px] pointer-events-auto">
+              <div className="h-full w-full max-w-[500px] sm:max-w-[580px] md:max-w-[640px]">
                 <MushafPageViewer
                   lines={lines}
                   language={language}
                   pageNumber={currentPage}
                   surahName={surahName}
                   juzNumber={juzNumber}
-                  highlightGhareeb={highlightGhareeb}
                   direction={direction}
                   theme={theme}
                   isBookmarked={isCurrentBookmarked}
@@ -409,25 +377,29 @@ export function KhatmahReaderScreen({
             </motion.div>
           )}
         </AnimatePresence>
-      </main>
+      </div>
 
-      <footer className="z-20 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-3 py-2.5 shadow-raised sm:px-5">
+      <nav
+        dir="ltr"
+        aria-label={t(language, "mushaf.pageNavigation")}
+        className="z-20 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-3 py-2.5 shadow-raised sm:px-5"
+      >
         <button
           type="button"
-          onClick={() => paginate(isArabic ? 1 : -1)}
-          disabled={currentPage === (isArabic ? 604 : 1)}
+          onClick={() => paginate(leftPageDelta)}
+          disabled={currentPage + leftPageDelta < 1 || currentPage + leftPageDelta > 604}
           className="ui-icon-button shrink-0"
-          aria-label={t(language, "common.next")}
+          aria-label={t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}
         >
-          {prevIcon}
+          <ChevronLeft size={24} />
         </button>
 
-        <div className="flex min-w-0 items-center justify-center gap-2 text-xs font-bold text-muted-foreground font-sans sm:text-sm">
+        <div className="flex min-w-0 items-center justify-center gap-1.5 text-xs font-bold text-muted-foreground font-sans sm:gap-2 sm:text-sm">
           <button
             type="button"
             onClick={recordCurrentPage}
             disabled={todayPagesRead.includes(currentPage)}
-            className="min-h-11 shrink-0 rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="min-h-11 shrink-0 rounded-xl bg-primary px-2.5 text-xs font-bold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3"
           >
             {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
           </button>
@@ -443,14 +415,14 @@ export function KhatmahReaderScreen({
 
         <button
           type="button"
-          onClick={() => paginate(isArabic ? -1 : 1)}
-          disabled={currentPage === (isArabic ? 1 : 604)}
+          onClick={() => paginate(rightPageDelta)}
+          disabled={currentPage + rightPageDelta < 1 || currentPage + rightPageDelta > 604}
           className="ui-icon-button shrink-0"
-          aria-label={t(language, "common.previous")}
+          aria-label={t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}
         >
-          {nextIcon}
+          <ChevronRight size={24} />
         </button>
-      </footer>
+      </nav>
 
       {/* Index & Navigation Modal */}
       <MushafNavigationModal

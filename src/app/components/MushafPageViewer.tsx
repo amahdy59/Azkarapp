@@ -116,7 +116,6 @@ export function MushafPageViewer({
   pageNumber,
   surahName,
   juzNumber,
-  highlightGhareeb,
   direction,
   theme = "parchment",
   isBookmarked = false,
@@ -126,7 +125,6 @@ export function MushafPageViewer({
   pageNumber: number;
   surahName: string;
   juzNumber: number;
-  highlightGhareeb: boolean;
   direction: "ltr" | "rtl";
   theme?: MushafTheme;
   isBookmarked?: boolean;
@@ -198,7 +196,7 @@ export function MushafPageViewer({
 
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border shadow-raised ring-1 transition-colors duration-200 sm:rounded-2xl ${themeClasses}`}
+      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden border-0 shadow-none ring-0 transition-colors duration-200 sm:rounded-2xl sm:border sm:shadow-raised sm:ring-1 ${themeClasses}`}
       dir="rtl"
       aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
     >
@@ -223,14 +221,11 @@ export function MushafPageViewer({
 
       {/* 15-Line Mushaf Page Canvas */}
       <div
-        className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto overscroll-contain px-2 py-2.5 min-[360px]:px-3 min-[360px]:py-3 sm:px-5 sm:py-4"
+        className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden px-2 py-2 min-[360px]:px-3 sm:px-5 sm:py-3"
         style={{
           fontFamily: "var(--font-mushaf)",
-          // The former 2.05 minimum line-height made a full page need to scroll
-          // even on ordinary phones. This preserves generous diacritic clearance
-          // while leaving the page's 15-line rhythm intact.
-          fontSize: "clamp(0.9375rem, 4.15vw, 1.35rem)",
-          lineHeight: "clamp(1.72, 5vw, 2.12)",
+          fontSize: "clamp(0.75rem, 3.45vw, 1.35rem)",
+          lineHeight: 1.75,
         }}
       >
         {lineDetails.map((line, lineIdx) => {
@@ -251,10 +246,10 @@ export function MushafPageViewer({
           return (
             <div
               key={lineIdx}
-              className="flex w-full select-text flex-wrap items-baseline justify-center gap-x-0.5 py-px min-[360px]:gap-x-1 sm:flex-nowrap sm:gap-x-1.5 md:gap-x-2"
+              className="flex w-full select-text flex-nowrap items-baseline justify-center gap-x-0.5 whitespace-nowrap py-px min-[360px]:gap-x-1 sm:gap-x-1.5 md:gap-x-2"
             >
               {lineWords.map((w, wIdx) => {
-                const meaning = highlightGhareeb ? getQuranWordMeaning(w.verseKey, w.text) : undefined;
+                const meaning = getQuranWordMeaning(w.verseKey, w.text);
                 const isGhareeb = !!meaning;
 
                 if (w.isEnd) {
@@ -287,10 +282,12 @@ export function MushafPageViewer({
                       }}
                     >
                       <Popover.Trigger asChild>
-                        <button className="relative group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded px-0.5">
-                          <span className="text-primary font-bold underline decoration-primary/70 decoration-dotted underline-offset-4">
-                            {w.text}
-                          </span>
+                        <button
+                          type="button"
+                          className="relative rounded bg-primary/10 px-0.5 text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
+                        >
+                          <span className="font-bold">{w.text}</span>
                         </button>
                       </Popover.Trigger>
                       <Popover.Portal>
@@ -327,13 +324,6 @@ export function MushafPageViewer({
           );
         })}
       </div>
-
-      {/* Decorative Mushaf Page Number Footer */}
-      <footer
-        className={`flex shrink-0 items-center justify-center border-t px-4 py-1.5 text-[0.75rem] font-bold font-sans sm:text-[0.8125rem] ${headerBgClass}`}
-      >
-        <span>{formatNumerals(pageNumber, language)}</span>
-      </footer>
     </article>
   );
 }

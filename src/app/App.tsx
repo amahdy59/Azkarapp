@@ -1407,14 +1407,6 @@ function AppContent() {
                     setQuranWirdPlan(plan);
                     setDailyWirdGoal(plan.dailyPages);
                   }}
-                  onRecordPage={() => {
-                    const dayKey = getProgressDayKey();
-                    const page = quranReadingPosition.page;
-                    setWirdHistory((current) => {
-                      const pages = current[dayKey] ?? [];
-                      return pages.includes(page) ? current : { ...current, [dayKey]: [...pages, page] };
-                    });
-                  }}
                   onUndoPage={() => {
                     const dayKey = getProgressDayKey();
                     setWirdHistory((current) => {
@@ -1436,8 +1428,6 @@ function AppContent() {
                   setMushafTheme={setMushafTheme}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
-                  dailyWirdGoal={dailyWirdGoal}
-                  setDailyWirdGoal={setDailyWirdGoal}
                   wirdHistory={wirdHistory}
                   setWirdHistory={setWirdHistory}
                   onReadingPositionChange={setQuranReadingPosition}

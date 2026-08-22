@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22-4",
+  "release": "2026-08-22-5",
   "ar": [
-    "تظهر سلسلة المواظبة والنخيل الآن بجوار التاريخ في أعلى الصفحة الرئيسية.",
-    "يبقى شريط العنوان شفافًا فوق المشهد، ثم يصبح زجاجيًا واضحًا عند التمرير.",
-    "أزلنا الشريط المكرر من بطاقة وردك وقلّلنا المساحات قبل أزرار البدء.",
-    "صار المصحف أهدأ للعين: صفحة قراءة أوضح، وسياق مختصر، وأزرار انتقال وتسجيل في صف واحد."
+    "تعرض صفحة المصحف رقم الصفحة مرة واحدة، وتنتقل بالسحب أو الأسهم أو لوحة المفاتيح.",
+    "تظهر الكلمات الصعبة دائمًا بلون وتسطير واضحين، ويمكن فتح معناها مباشرة.",
+    "أصبح تقدم ورد القرآن مختصرًا ويتحرك من اليمين إلى اليسار في العربية.",
+    "يبدأ أسبوع الورد يوم السبت، وتبقى إعدادات الخطة مطوية حتى تحتاج إليها."
   ],
   "en": [
-    "Your streak and palms now appear beside the date at the top of Home.",
-    "The Home header stays clear over the scene, then becomes a readable glass surface as you scroll.",
-    "We removed the duplicate Wird bar and tightened the space before start actions.",
-    "The Mushaf is easier on the eyes with a clearer reading page, quieter context, and one-row navigation and recording controls."
+    "The Mushaf shows one page number and turns by swipe, buttons, or arrow keys.",
+    "Difficult words are always visibly marked and open their reviewed meaning directly.",
+    "Quran Wird progress is now concise and fills right-to-left in Arabic.",
+    "The Wird week starts on Saturday, while plan settings stay folded until needed."
   ]
 }
