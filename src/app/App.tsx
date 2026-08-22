@@ -762,6 +762,7 @@ function AppContent() {
     "friday",
     "friday_salawat",
     "custom_counter",
+    "khatmah_overview",
   ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];

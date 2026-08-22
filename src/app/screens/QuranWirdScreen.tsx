@@ -9,6 +9,7 @@ import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
 import type { AppLanguage, QuranReadingPosition, QuranWirdPlan } from "../types";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 const TOTAL_PAGES = 604;
 
@@ -155,11 +156,10 @@ export function QuranWirdScreen({
             <label className="mt-4 block text-sm font-bold text-foreground" htmlFor="quran-wird-plan">
               {t(language, "mushaf.changePlan")}
             </label>
-            <select
-              id="quran-wird-plan"
+            <Select
               value={plan.kind}
-              onChange={(event) => {
-                const kind = event.target.value as QuranWirdPlan["kind"];
+              onValueChange={(value) => {
+                const kind = value as QuranWirdPlan["kind"];
                 onPlanChange(
                   kind === "khatmah30"
                     ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 30), durationDays: 30, startedDayKey: todayKey }
@@ -168,12 +168,20 @@ export function QuranWirdScreen({
                       : { kind, dailyPages: 4 },
                 );
               }}
-              className="mt-2 min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <option value="khatmah30">{t(language, "mushaf.planKhatmah30")}</option>
-              <option value="daily">{t(language, "mushaf.planDaily")}</option>
-              <option value="custom">{t(language, "mushaf.planCustomChoice")}</option>
-            </select>
+              <SelectTrigger
+                id="quran-wird-plan"
+                className="mt-2 font-bold"
+                aria-label={t(language, "mushaf.changePlan")}
+              >
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent dir={direction} position="popper">
+                <SelectItem value="khatmah30">{t(language, "mushaf.planKhatmah30")}</SelectItem>
+                <SelectItem value="daily">{t(language, "mushaf.planDaily")}</SelectItem>
+                <SelectItem value="custom">{t(language, "mushaf.planCustomChoice")}</SelectItem>
+              </SelectContent>
+            </Select>
             {plan.kind === "custom" && (
               <label className="mt-3 block text-sm font-bold text-foreground">
                 {t(language, "mushaf.durationDays")}

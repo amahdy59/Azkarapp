@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22-5",
+  "release": "2026-08-22-6",
   "ar": [
-    "تعرض صفحة المصحف رقم الصفحة مرة واحدة، وتنتقل بالسحب أو الأسهم أو لوحة المفاتيح.",
-    "تظهر الكلمات الصعبة دائمًا بلون وتسطير واضحين، ويمكن فتح معناها مباشرة.",
-    "أصبح تقدم ورد القرآن مختصرًا ويتحرك من اليمين إلى اليسار في العربية.",
-    "يبدأ أسبوع الورد يوم السبت، وتبقى إعدادات الخطة مطوية حتى تحتاج إليها."
+    "اتحد اسم ورد القرآن في الصفحة الرئيسية وصفحة الخطة، مع عودة شريط التنقل المعتاد.",
+    "أصبحت قائمة خطة القراءة متوافقة مع عناصر التطبيق واتجاه العربية.",
+    "انتقلت أدوات السورة والجزء والصفحة إلى داخل المصحف، وتختفي بهدوء عند القراءة.",
+    "يمكن إظهار معاني الكلمات الصعبة عند الحاجة، مع خط صفحة المدينة الأصلي عند توفره وبقاء القراءة دون اتصال."
   ],
   "en": [
-    "The Mushaf shows one page number and turns by swipe, buttons, or arrow keys.",
-    "Difficult words are always visibly marked and open their reviewed meaning directly.",
-    "Quran Wird progress is now concise and fills right-to-left in Arabic.",
-    "The Wird week starts on Saturday, while plan settings stay folded until needed."
+    "Quran Wird now has one consistent name on Home and the plan page, with normal app navigation restored.",
+    "The reading-plan menu now matches the app controls and Arabic direction.",
+    "Surah, juz, and page controls now sit inside the Mushaf and quietly hide while reading.",
+    "Difficult-word meanings can be shown when needed, with the original Madinah page font when available and offline reading preserved."
   ]
 }

@@ -6,11 +6,12 @@ import {
   ChevronRight,
   ChevronLeft,
   RotateCcw,
-  BookOpen,
   Bookmark,
   ArrowRight,
   ArrowLeft,
   SlidersHorizontal,
+  Eye,
+  ChevronDown,
 } from "../components/icons";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
@@ -19,6 +20,13 @@ import * as Popover from "@radix-ui/react-popover";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
+import {
+  fetchQcfPage,
+  getQcfFontFamily,
+  getQcfFontUrl,
+  mergeQcfPage,
+  type MushafVerseData,
+} from "../content/qcfMushaf";
 
 export function KhatmahReaderScreen({
   language,
@@ -51,12 +59,16 @@ export function KhatmahReaderScreen({
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
   const [bookmarks, setBookmarks] = useState<number[]>(initialBookmarks);
-  const [pageData, setPageData] = useState<{ k: string; w: [number, number, number, string][] }[] | null>(null);
+  const [pageData, setPageData] = useState<MushafVerseData[] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [controlsFocused, setControlsFocused] = useState(false);
+  const [showWordMeanings, setShowWordMeanings] = useState(false);
+  const [qcfFontReady, setQcfFontReady] = useState(false);
   const reduceMotion = useReducedMotion();
 
   // Sync internal theme with prop updates
@@ -104,34 +116,49 @@ export function KhatmahReaderScreen({
   const loadPage = useCallback(
     (page: number) => {
       let active = true;
+      const controller = new AbortController();
       setLoading(true);
       setError(null);
+      setQcfFontReady(false);
 
       const baseUrl = import.meta.env.BASE_URL || "/";
       const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
       const targetUrl = `${cleanBase}data/mushaf/${page}.json`;
 
-      fetch(targetUrl)
-        .then((res) => {
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          return res.json();
-        })
-        .then((data) => {
+      void (async () => {
+        let localPage: MushafVerseData[] | null = null;
+        try {
+          const response = await fetch(targetUrl, { signal: controller.signal });
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          localPage = (await response.json()) as MushafVerseData[];
           if (active) {
-            setPageData(data);
+            setPageData(localPage);
             setLoading(false);
           }
-        })
-        .catch((err) => {
-          console.error("Failed to load Mushaf page", err);
+        } catch (localError) {
+          if (controller.signal.aborted) return;
+          console.error("Failed to load local Mushaf page", localError);
+        }
+
+        try {
+          const qcfPage = await fetchQcfPage(page, controller.signal);
           if (active) {
+            setPageData(localPage ? mergeQcfPage(localPage, qcfPage) : qcfPage);
+            setLoading(false);
+          }
+        } catch (qcfError) {
+          if (controller.signal.aborted) return;
+          if (!localPage && active) {
+            console.error("Failed to load Mushaf page", qcfError);
             setError(t(language, "mushaf.loadFailed"));
             setLoading(false);
           }
-        });
+        }
+      })();
 
       return () => {
         active = false;
+        controller.abort();
       };
     },
     [language],
@@ -141,15 +168,50 @@ export function KhatmahReaderScreen({
     return loadPage(currentPage);
   }, [currentPage, loadPage]);
 
+  useEffect(() => {
+    if (!pageData?.some((verse) => verse.w.some((word) => Boolean(word[4])))) return;
+    if (typeof FontFace === "undefined" || !document.fonts) return;
+    let active = true;
+    const pageFont = new FontFace(getQcfFontFamily(currentPage), `url(${getQcfFontUrl(currentPage)})`, {
+      display: "swap",
+    });
+    void pageFont
+      .load()
+      .then((loadedFont) => {
+        if (!active) return;
+        document.fonts.add(loadedFont);
+        setQcfFontReady(true);
+      })
+      .catch(() => {
+        if (active) setQcfFontReady(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [currentPage, pageData]);
+
+  useEffect(() => {
+    setControlsVisible(true);
+  }, [currentPage]);
+
+  useEffect(() => {
+    if (!controlsVisible || controlsFocused || isIndexOpen || isThemeMenuOpen) return;
+    const timer = window.setTimeout(() => setControlsVisible(false), 3500);
+    return () => window.clearTimeout(timer);
+  }, [controlsVisible, controlsFocused, currentPage, isIndexOpen, isThemeMenuOpen]);
+
   // Transform data into 15 lines
   const lines = useMemo(() => {
     if (!pageData) return [];
-    const lineMap = new Map<number, { verseKey: string; position: number; isEnd: number; text: string }[]>();
+    const lineMap = new Map<
+      number,
+      { verseKey: string; position: number; isEnd: number; text: string; qcfCode?: string }[]
+    >();
     for (const verse of pageData) {
       for (const w of verse.w) {
-        const [position, lineNumber, isEnd, text] = w;
+        const [position, lineNumber, isEnd, text, qcfCode] = w;
         if (!lineMap.has(lineNumber)) lineMap.set(lineNumber, []);
-        lineMap.get(lineNumber)!.push({ verseKey: verse.k, position, isEnd, text });
+        lineMap.get(lineNumber)!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
       }
     }
     const result = [];
@@ -209,119 +271,154 @@ export function KhatmahReaderScreen({
   const leftPageDelta = isArabic ? 1 : -1;
   const rightPageDelta = -leftPageDelta;
 
+  const pageHeader = (
+    <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
+      <button
+        type="button"
+        onClick={onBack}
+        className="ui-icon-button shrink-0"
+        aria-label={t(language, "common.back")}
+      >
+        {backIcon}
+      </button>
+      <button
+        type="button"
+        onClick={() => setIsIndexOpen(true)}
+        className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 rounded-xl px-1.5 text-center font-arabic focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={t(language, "mushaf.indexTitle")}
+      >
+        <span className="min-w-0 truncate text-sm font-extrabold">{surahName}</span>
+        <span className="shrink-0 text-[0.6875rem] font-bold opacity-70">
+          · {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
+        </span>
+        <ChevronDown size={16} className="shrink-0 opacity-60" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={() => setShowWordMeanings((shown) => !shown)}
+        className={`ui-icon-button shrink-0 ${showWordMeanings ? "bg-primary/15 text-primary" : ""}`}
+        aria-label={t(language, showWordMeanings ? "mushaf.hideWordMeanings" : "mushaf.showWordMeanings")}
+        aria-pressed={showWordMeanings}
+      >
+        <Eye size={18} />
+      </button>
+      <Popover.Root open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen}>
+        <Popover.Trigger asChild>
+          <button type="button" className="ui-icon-button shrink-0" aria-label={t(language, "mushaf.themeTitle")}>
+            <SlidersHorizontal size={18} />
+          </button>
+        </Popover.Trigger>
+        <Popover.Portal>
+          <Popover.Content
+            side="bottom"
+            align="end"
+            sideOffset={8}
+            dir={direction}
+            className="z-50 w-52 rounded-2xl border border-border bg-popover p-2 text-popover-foreground shadow-overlay"
+          >
+            <div className="flex flex-col gap-1">
+              <span className="px-2 py-1 text-xs font-bold text-muted-foreground">
+                {t(language, "mushaf.themeTitle")}
+              </span>
+              {(
+                [
+                  ["parchment", t(language, "mushaf.themeParchment")],
+                  ["dark", t(language, "mushaf.themeDark")],
+                  ["oled", t(language, "mushaf.themeOled")],
+                  ["white", t(language, "mushaf.themeWhite")],
+                ] as const
+              ).map(([id, label]) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => handleSelectTheme(id)}
+                  className={`min-h-11 rounded-xl px-3 text-start text-xs font-bold ${theme === id ? "bg-primary/15 text-primary" : "hover:bg-muted"}`}
+                  aria-pressed={theme === id}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </Popover.Content>
+        </Popover.Portal>
+      </Popover.Root>
+      <button
+        type="button"
+        onClick={toggleBookmark}
+        className={`ui-icon-button shrink-0 ${isCurrentBookmarked ? "bg-primary/15 text-primary" : ""}`}
+        aria-label={t(language, "mushaf.toggleBookmark")}
+        aria-pressed={isCurrentBookmarked}
+      >
+        <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
+      </button>
+    </div>
+  );
+
+  const pageFooter = (
+    <nav
+      dir="ltr"
+      aria-label={t(language, "mushaf.pageNavigation")}
+      className="flex w-full items-center justify-between gap-1"
+    >
+      <button
+        type="button"
+        onClick={() => paginate(leftPageDelta)}
+        disabled={currentPage + leftPageDelta < 1 || currentPage + leftPageDelta > 604}
+        className="ui-icon-button shrink-0"
+        aria-label={t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}
+      >
+        <ChevronLeft size={22} />
+      </button>
+      <button
+        type="button"
+        onClick={recordCurrentPage}
+        disabled={todayPagesRead.includes(currentPage)}
+        className="ui-icon-button shrink-0 bg-primary text-primary-foreground disabled:opacity-45"
+        aria-label={t(language, "mushaf.recordPage")}
+      >
+        <span aria-hidden="true" className="text-base font-black">
+          {todayPagesRead.includes(currentPage) ? "✓" : "+"}
+        </span>
+      </button>
+      <button
+        type="button"
+        onClick={() => setIsIndexOpen(true)}
+        className="min-h-11 min-w-16 rounded-xl px-3 text-sm font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+      >
+        {formatNumerals(currentPage, language)}
+      </button>
+      <button
+        type="button"
+        onClick={() => paginate(rightPageDelta)}
+        disabled={currentPage + rightPageDelta < 1 || currentPage + rightPageDelta > 604}
+        className="ui-icon-button shrink-0"
+        aria-label={t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}
+      >
+        <ChevronRight size={22} />
+      </button>
+    </nav>
+  );
+
+  const revealPageControls = (
+    <div className="flex w-full justify-center">
+      <button
+        type="button"
+        onClick={() => setControlsVisible(true)}
+        className="ui-icon-button"
+        aria-label={t(language, "mushaf.showPageControls")}
+      >
+        <SlidersHorizontal size={18} />
+      </button>
+    </div>
+  );
+
   return (
     <ScreenContainer
       dir={direction}
       screenName={t(language, "common.mushaf")}
       className="relative flex flex-col h-full bg-background select-none overflow-hidden"
     >
-      {/* Keep the reading surface dominant: the header holds orientation and only
-          the controls that change the page, not a second competing toolbar. */}
-      <header className="flex min-h-14 items-center justify-between gap-2 border-b border-border/70 bg-card px-3 py-2 shadow-xs z-20">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onBack}
-            className="flex size-10 items-center justify-center rounded-xl bg-muted/60 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={t(language, "common.back")}
-          >
-            {backIcon}
-          </button>
-          <span className="font-arabic font-bold text-base text-foreground">{t(language, "common.mushaf")}</span>
-        </div>
-
-        {/* Action Controls */}
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          {/* Index Button */}
-          <button
-            type="button"
-            onClick={() => setIsIndexOpen(true)}
-            className="flex size-10 items-center justify-center rounded-xl bg-muted/60 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
-            aria-label={t(language, "mushaf.indexTitle")}
-          >
-            <BookOpen size={16} className="text-primary" />
-            <span className="sr-only sm:not-sr-only">{t(language, "mushaf.tabSurahs")}</span>
-          </button>
-
-          {/* Theme Selector Popover */}
-          <Popover.Root open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen}>
-            <Popover.Trigger asChild>
-              <button
-                type="button"
-                className="flex size-10 items-center justify-center rounded-xl bg-muted/60 hover:bg-muted text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={t(language, "mushaf.themeTitle")}
-              >
-                <SlidersHorizontal size={18} />
-              </button>
-            </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content
-                side="bottom"
-                align="end"
-                sideOffset={8}
-                dir={direction}
-                className="z-50 w-52 p-2 rounded-2xl bg-popover text-popover-foreground shadow-overlay border border-border animate-in fade-in zoom-in-95"
-              >
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold text-muted-foreground px-2 py-1 uppercase tracking-wider">
-                    {t(language, "mushaf.themeTitle")}
-                  </span>
-                  {[
-                    {
-                      id: "parchment" as const,
-                      label: t(language, "mushaf.themeParchment"),
-                      color: "bg-[#fbf7ee] text-[#1c1917] border-primary/40",
-                    },
-                    {
-                      id: "dark" as const,
-                      label: t(language, "mushaf.themeDark"),
-                      color: "bg-[#0c0f14] text-[#f3f4f6] border-primary/30",
-                    },
-                    {
-                      id: "oled" as const,
-                      label: t(language, "mushaf.themeOled"),
-                      color: "bg-[#000000] text-[#ffffff] border-white/50",
-                    },
-                    {
-                      id: "white" as const,
-                      label: t(language, "mushaf.themeWhite"),
-                      color: "bg-[#ffffff] text-[#111827] border-gray-300",
-                    },
-                  ].map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleSelectTheme(item.id)}
-                      className={`flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-bold transition-colors ${
-                        theme === item.id ? "bg-primary/15 text-primary" : "hover:bg-muted text-foreground"
-                      }`}
-                    >
-                      <span>{item.label}</span>
-                      <span className={`size-4 rounded-full border ${item.color}`} />
-                    </button>
-                  ))}
-                </div>
-              </Popover.Content>
-            </Popover.Portal>
-          </Popover.Root>
-
-          {/* Bookmark Toggle */}
-          <button
-            type="button"
-            onClick={toggleBookmark}
-            className={`flex size-10 items-center justify-center rounded-xl transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              isCurrentBookmarked
-                ? "bg-primary/15 text-primary"
-                : "bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground"
-            }`}
-            aria-label={t(language, "mushaf.toggleBookmark")}
-            aria-pressed={isCurrentBookmarked}
-          >
-            <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
-          </button>
-        </div>
-      </header>
-
       {/* Main Mushaf Page Display Canvas */}
       <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-muted/15 p-0 sm:p-3">
         {loading && !pageData && (
@@ -356,6 +453,7 @@ export function KhatmahReaderScreen({
               drag="x"
               dragConstraints={{ left: 0, right: 0 }}
               dragElastic={0.16}
+              onDragStart={() => setControlsVisible(false)}
               onDragEnd={(_, info) => {
                 if (info.offset.x <= -60 || info.velocity.x <= -500) paginate(1);
                 else if (info.offset.x >= 60 || info.velocity.x >= 500) paginate(-1);
@@ -372,57 +470,19 @@ export function KhatmahReaderScreen({
                   direction={direction}
                   theme={theme}
                   isBookmarked={isCurrentBookmarked}
+                  useQcfGlyphs={qcfFontReady}
+                  showWordMeanings={showWordMeanings}
+                  controlsVisible={controlsVisible}
+                  headerContent={pageHeader}
+                  footerContent={pageFooter}
+                  hiddenControlsContent={revealPageControls}
+                  onControlsFocusChange={setControlsFocused}
                 />
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       </div>
-
-      <nav
-        dir="ltr"
-        aria-label={t(language, "mushaf.pageNavigation")}
-        className="z-20 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-3 py-2.5 shadow-raised sm:px-5"
-      >
-        <button
-          type="button"
-          onClick={() => paginate(leftPageDelta)}
-          disabled={currentPage + leftPageDelta < 1 || currentPage + leftPageDelta > 604}
-          className="ui-icon-button shrink-0"
-          aria-label={t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}
-        >
-          <ChevronLeft size={24} />
-        </button>
-
-        <div className="flex min-w-0 items-center justify-center gap-1.5 text-xs font-bold text-muted-foreground font-sans sm:gap-2 sm:text-sm">
-          <button
-            type="button"
-            onClick={recordCurrentPage}
-            disabled={todayPagesRead.includes(currentPage)}
-            className="min-h-11 shrink-0 rounded-xl bg-primary px-2.5 text-xs font-bold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3"
-          >
-            {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
-          </button>
-          <button
-            type="button"
-            onClick={() => setIsIndexOpen(true)}
-            className="min-w-0 truncate rounded-md px-1.5 py-2 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
-          >
-            {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
-          </button>
-        </div>
-
-        <button
-          type="button"
-          onClick={() => paginate(rightPageDelta)}
-          disabled={currentPage + rightPageDelta < 1 || currentPage + rightPageDelta > 604}
-          className="ui-icon-button shrink-0"
-          aria-label={t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}
-        >
-          <ChevronRight size={24} />
-        </button>
-      </nav>
 
       {/* Index & Navigation Modal */}
       <MushafNavigationModal

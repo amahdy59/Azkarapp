@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo, type ReactNode } from "react";
 import type { AppLanguage, MushafTheme } from "../types";
 import { getQuranWordMeaning } from "../content/quranWordMeanings";
 import * as Popover from "@radix-ui/react-popover";
@@ -12,6 +12,7 @@ export interface MushafWordToken {
   position: number;
   isEnd: number;
   text: string;
+  qcfCode?: string;
 }
 
 export function AyahMarker({
@@ -119,6 +120,13 @@ export function MushafPageViewer({
   direction,
   theme = "parchment",
   isBookmarked = false,
+  useQcfGlyphs = false,
+  showWordMeanings = false,
+  controlsVisible = true,
+  headerContent,
+  footerContent,
+  hiddenControlsContent,
+  onControlsFocusChange,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -128,6 +136,13 @@ export function MushafPageViewer({
   direction: "ltr" | "rtl";
   theme?: MushafTheme;
   isBookmarked?: boolean;
+  useQcfGlyphs?: boolean;
+  showWordMeanings?: boolean;
+  controlsVisible?: boolean;
+  headerContent?: ReactNode;
+  footerContent?: ReactNode;
+  hiddenControlsContent?: ReactNode;
+  onControlsFocusChange?: (focused: boolean) => void;
 }) {
   const isArabic = language === "ar";
 
@@ -137,6 +152,10 @@ export function MushafPageViewer({
     text: string;
     meaning: string;
   } | null>(null);
+
+  useEffect(() => {
+    if (!showWordMeanings) setActiveWord(null);
+  }, [showWordMeanings]);
 
   // Analyze page lines to identify Surah headers and Bismillah
   const lineDetails = useMemo(() => {
@@ -187,7 +206,7 @@ export function MushafPageViewer({
     white: "bg-[#ffffff] text-[#111827] border-gray-300 ring-gray-200",
   }[theme];
 
-  const headerBgClass = {
+  const chromeBgClass = {
     parchment: "bg-primary/5 border-primary/20 text-foreground/80",
     dark: "bg-primary/10 border-primary/20 text-foreground/80",
     oled: "bg-white/10 border-white/30 text-white",
@@ -197,9 +216,13 @@ export function MushafPageViewer({
   return (
     <article
       className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden border-0 shadow-none ring-0 transition-colors duration-200 sm:rounded-2xl sm:border sm:shadow-raised sm:ring-1 ${themeClasses}`}
+      style={{ containerType: "inline-size" }}
       dir="rtl"
       aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
     >
+      <h1 className="sr-only">
+        {surahName} · {formattedJuz}
+      </h1>
       {/* Bookmark Ribbon on top-end corner */}
       {isBookmarked && (
         <div
@@ -211,22 +234,26 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* Decorative Mushaf Header Banner */}
+      {/* Page chrome occupies the physical Mushaf header/footer space. Hiding it
+          never reflows the reviewed 15-line reading canvas. */}
       <div
-        className={`flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2 text-[0.75rem] font-bold font-sans sm:px-5 sm:text-[0.8125rem] ${headerBgClass}`}
+        className={`flex h-14 shrink-0 items-center border-b px-2 transition-opacity sm:px-3 ${chromeBgClass} ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}
+        aria-hidden={!controlsVisible}
+        onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
+        onBlurCapture={() => onControlsFocusChange?.(false)}
       >
-        <span className="font-arabic font-extrabold">{surahName}</span>
-        <span className="font-arabic font-bold opacity-80">{formattedJuz}</span>
+        {controlsVisible ? headerContent : null}
       </div>
 
       {/* 15-Line Mushaf Page Canvas */}
       <div
         className="flex min-h-0 flex-1 flex-col justify-between overflow-hidden px-2 py-2 min-[360px]:px-3 sm:px-5 sm:py-3"
         style={{
-          fontFamily: "var(--font-mushaf)",
-          fontSize: "clamp(0.75rem, 3.45vw, 1.35rem)",
-          lineHeight: 1.75,
+          fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}` : "var(--font-mushaf)",
+          fontSize: useQcfGlyphs ? "clamp(0.75rem, 4.8cqi, 1.3rem)" : "clamp(0.75rem, 3.45cqi, 1.35rem)",
+          lineHeight: useQcfGlyphs ? 1.55 : 1.75,
         }}
+        data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       >
         {lineDetails.map((line, lineIdx) => {
           if (line.type === "surah-header") {
@@ -253,6 +280,18 @@ export function MushafPageViewer({
                 const isGhareeb = !!meaning;
 
                 if (w.isEnd) {
+                  if (useQcfGlyphs && w.qcfCode) {
+                    return (
+                      <span
+                        key={`${w.verseKey}-${w.position}-${wIdx}`}
+                        className="inline-block shrink-0 select-none align-baseline"
+                        role="img"
+                        aria-label={`آية ${formatNumerals(w.verseKey.split(":")[1] || w.text, language)}`}
+                      >
+                        {w.qcfCode}
+                      </span>
+                    );
+                  }
                   return (
                     <AyahMarker
                       key={`${w.verseKey}-${w.position}-${wIdx}`}
@@ -263,13 +302,21 @@ export function MushafPageViewer({
                   );
                 }
 
-                const wordContent = (
-                  <span className="select-text" title={!isArabic && isGhareeb ? meaning : undefined}>
-                    {w.text}
-                  </span>
-                );
+                const wordContent =
+                  useQcfGlyphs && w.qcfCode ? (
+                    <>
+                      <span aria-hidden="true" className="select-none">
+                        {w.qcfCode}
+                      </span>
+                      <span className="sr-only">{w.text}</span>
+                    </>
+                  ) : (
+                    <span className="select-text" title={!isArabic && isGhareeb ? meaning : undefined}>
+                      {w.text}
+                    </span>
+                  );
 
-                if (isGhareeb) {
+                if (isGhareeb && showWordMeanings) {
                   return (
                     <Popover.Root
                       key={`${w.verseKey}-${w.position}`}
@@ -287,7 +334,7 @@ export function MushafPageViewer({
                           className="relative rounded bg-primary/10 px-0.5 text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
                         >
-                          <span className="font-bold">{w.text}</span>
+                          <span className="font-bold">{wordContent}</span>
                         </button>
                       </Popover.Trigger>
                       <Popover.Portal>
@@ -323,6 +370,14 @@ export function MushafPageViewer({
             </div>
           );
         })}
+      </div>
+
+      <div
+        className={`flex h-14 shrink-0 items-center border-t px-2 transition-colors sm:px-3 ${chromeBgClass}`}
+        onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
+        onBlurCapture={() => onControlsFocusChange?.(false)}
+      >
+        {controlsVisible ? footerContent : hiddenControlsContent}
       </div>
     </article>
   );

@@ -37,11 +37,17 @@ describe("QuranWirdScreen", () => {
 
   it("offers the three focused plan choices", () => {
     const props = renderScreen();
-    fireEvent.change(screen.getByLabelText("Choose a plan"), { target: { value: "khatmah30" } });
+    fireEvent.click(screen.getByRole("combobox", { name: "Choose a plan" }));
+    fireEvent.click(screen.getByRole("option", { name: "30-day Khatmah" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(
       expect.objectContaining({ kind: "khatmah30", dailyPages: 21, durationDays: 30 }),
     );
+  });
+
+  it("uses the shared design-system select instead of a native browser menu", () => {
+    renderScreen();
+    expect(screen.getByRole("combobox", { name: "Choose a plan" })).toHaveAttribute("data-slot", "select-trigger");
   });
 
   it("uses a Saturday-to-Friday week and fills Arabic progress from the right", () => {

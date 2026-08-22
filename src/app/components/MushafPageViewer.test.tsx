@@ -37,14 +37,13 @@ describe("MushafPageViewer", () => {
       />,
     );
 
-    expect(screen.getByText("سورة البقرة")).toBeInTheDocument();
-    expect(screen.getByText("الجزء ١")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: /سورة البقرة.*الجزء ١/ })).toBeInTheDocument();
     expect(screen.getByText("إِنَّ")).toBeInTheDocument();
     expect(screen.getByText("٦")).toBeInTheDocument();
     expect(screen.getByRole("article", { name: "صفحة ٣" })).toBeInTheDocument();
   });
 
-  it("always exposes reviewed difficult words as accessible buttons", () => {
+  it("exposes reviewed difficult words only when the reader turns meanings on", () => {
     render(
       <MushafPageViewer
         lines={[
@@ -58,11 +57,44 @@ describe("MushafPageViewer", () => {
         surahName="Surah Al-Baqarah"
         juzNumber={3}
         direction="ltr"
+        showWordMeanings
       />,
     );
 
     const word = screen.getByRole("button", { name: "Meaning of ٱلۡقَيُّومُ" });
     expect(word).toHaveClass("underline");
+  });
+
+  it("keeps difficult words visually clean when meanings are off", () => {
+    render(
+      <MushafPageViewer
+        lines={[[{ verseKey: "2:255", position: 1, isEnd: 0, text: "ٱلۡقَيُّومُ" }]]}
+        language="ar"
+        pageNumber={42}
+        surahName="سورة البقرة"
+        juzNumber={3}
+        direction="rtl"
+      />,
+    );
+    expect(screen.queryByRole("button", { name: /معنى كلمة/ })).not.toBeInTheDocument();
+    expect(screen.getByText("ٱلۡقَيُّومُ")).toBeInTheDocument();
+  });
+
+  it("renders official QCF glyphs with semantic text retained for assistive technology", () => {
+    render(
+      <MushafPageViewer
+        lines={[[{ verseKey: "5:1", position: 1, isEnd: 0, text: "يَـٰٓأَيُّهَا", qcfCode: "" }]]}
+        language="ar"
+        pageNumber={106}
+        surahName="سورة المائدة"
+        juzNumber={6}
+        direction="rtl"
+        useQcfGlyphs
+      />,
+    );
+    expect(screen.getByText("")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByText("يَـٰٓأَيُّهَا")).toHaveClass("sr-only");
+    expect(screen.getByRole("article").querySelector('[data-mushaf-rendering="qcf-v2"]')).not.toBeNull();
   });
 
   it("renders surah header banner when an empty line precedes a new surah start", () => {
