@@ -43,6 +43,7 @@ describe("MushafPageViewer", () => {
     expect(screen.getByText("٣")).toBeInTheDocument();
     expect(screen.getByText("إِنَّ")).toBeInTheDocument();
     expect(screen.getByText("٦")).toBeInTheDocument();
+    expect(screen.getByRole("article", { name: "صفحة ٣" })).toBeInTheDocument();
   });
 
   it("renders surah header banner when an empty line precedes a new surah start", () => {

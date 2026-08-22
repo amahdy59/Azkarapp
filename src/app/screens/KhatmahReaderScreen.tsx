@@ -223,8 +223,9 @@ export function KhatmahReaderScreen({
       screenName={t(language, "common.mushaf")}
       className="relative flex flex-col h-full bg-background select-none overflow-hidden"
     >
-      {/* Top Header & Tool Ribbon */}
-      <header className="flex items-center justify-between px-3 sm:px-5 py-2.5 bg-card border-b border-border shadow-xs z-20">
+      {/* Keep the reading surface dominant: the header holds orientation and only
+          the controls that change the page, not a second competing toolbar. */}
+      <header className="flex min-h-14 items-center justify-between gap-2 border-b border-border/70 bg-card px-3 py-2 shadow-xs z-20">
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -234,9 +235,7 @@ export function KhatmahReaderScreen({
           >
             {backIcon}
           </button>
-          <span className="font-arabic font-bold text-base sm:text-lg text-foreground">
-            {t(language, "common.mushaf")}
-          </span>
+          <span className="font-arabic font-bold text-base text-foreground">{t(language, "common.mushaf")}</span>
         </div>
 
         {/* Action Controls */}
@@ -245,11 +244,11 @@ export function KhatmahReaderScreen({
           <button
             type="button"
             onClick={() => setIsIndexOpen(true)}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-muted/60 hover:bg-muted text-foreground text-xs sm:text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            className="flex size-10 items-center justify-center rounded-xl bg-muted/60 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:size-auto sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
             aria-label={t(language, "mushaf.indexTitle")}
           >
             <BookOpen size={16} className="text-primary" />
-            <span>{t(language, "mushaf.tabSurahs")}</span>
+            <span className="sr-only sm:not-sr-only">{t(language, "mushaf.tabSurahs")}</span>
           </button>
 
           {/* Theme Selector Popover */}
@@ -314,6 +313,20 @@ export function KhatmahReaderScreen({
             </Popover.Portal>
           </Popover.Root>
 
+          <div className="relative flex size-10 items-center justify-center rounded-xl bg-muted/60 text-muted-foreground hover:bg-muted hover:text-foreground focus-within:ring-2 focus-within:ring-ring">
+            <Switch.Root
+              className="peer flex size-10 items-center justify-center rounded-xl outline-none"
+              checked={highlightGhareeb}
+              onCheckedChange={setHighlightGhareeb}
+              aria-label={t(language, "mushaf.highlightGhareeb")}
+            >
+              <span aria-hidden="true" className="font-arabic text-lg font-bold text-primary">
+                ع
+              </span>
+              <span className="absolute bottom-1 h-0.5 w-4 rounded-full bg-primary opacity-0 transition-opacity peer-data-[state=checked]:opacity-100" />
+            </Switch.Root>
+          </div>
+
           {/* Bookmark Toggle */}
           <button
             type="button"
@@ -331,28 +344,24 @@ export function KhatmahReaderScreen({
         </div>
       </header>
 
-      {/* Wird & Khatmah Progress Banner */}
-      <div className="flex items-center justify-between px-4 sm:px-6 py-2 bg-muted/30 border-b border-border/40 text-xs font-bold text-muted-foreground font-sans">
-        <div className="flex items-center gap-2">
-          <span>{t(language, "mushaf.wirdTitle")}:</span>
-          <span className="text-foreground">
-            {t(language, "mushaf.wirdProgress", {
-              read: formatNumerals(wirdPagesCount, language),
-              goal: formatNumerals(dailyWirdGoal, language),
-            })}
-          </span>
-          {wirdPagesCount >= dailyWirdGoal && (
-            <span className="px-2 py-0.5 rounded-full bg-primary/20 text-primary font-bold">✓</span>
-          )}
-        </div>
-
-        <div className="flex items-center gap-1.5 text-foreground">
-          <span>{t(language, "mushaf.khatmahProgress", { percent: formatNumerals(khatmahPercent, language) })}</span>
-        </div>
+      <div className="flex items-center justify-between gap-3 border-b border-border/45 bg-muted/20 px-4 py-1.5 text-[0.6875rem] font-semibold text-muted-foreground sm:px-6 sm:text-xs">
+        <span className="min-w-0 truncate">
+          {t(language, "mushaf.wirdProgress", {
+            read: formatNumerals(wirdPagesCount, language),
+            goal: formatNumerals(dailyWirdGoal, language),
+          })}
+        </span>
+        <span
+          role="status"
+          className="shrink-0 text-foreground"
+          aria-label={t(language, "mushaf.khatmahProgress", { percent: formatNumerals(khatmahPercent, language) })}
+        >
+          {formatNumerals(khatmahPercent, language)}%
+        </span>
       </div>
 
       {/* Main Mushaf Page Display Canvas */}
-      <main className="flex-1 relative overflow-hidden flex flex-col items-center justify-center p-2 sm:p-4">
+      <main className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-muted/15 p-1.5 sm:p-3">
         {loading && !pageData && (
           <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
             <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
@@ -382,9 +391,9 @@ export function KhatmahReaderScreen({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: swipeDirection > 0 ? (isArabic ? 300 : -300) : isArabic ? -300 : 300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0 p-2 sm:p-4 flex items-center justify-center pointer-events-none"
+              className="absolute inset-0 flex items-center justify-center p-1.5 sm:p-3 pointer-events-none"
             >
-              <div className="w-full h-full max-w-[500px] sm:max-w-[580px] md:max-w-[660px] lg:max-w-[720px] max-h-[88vh] pointer-events-auto">
+              <div className="h-full w-full max-w-[500px] sm:max-w-[580px] md:max-w-[640px] pointer-events-auto">
                 <MushafPageViewer
                   lines={lines}
                   language={language}
@@ -402,68 +411,45 @@ export function KhatmahReaderScreen({
         </AnimatePresence>
       </main>
 
-      {/* Bottom Control Toolbar */}
-      <footer className="flex-shrink-0 p-3 sm:p-4 flex flex-col gap-3 bg-card border-t border-border shadow-raised z-20">
-        <div className="flex justify-between items-center px-1">
-          <label className="flex items-center gap-3 cursor-pointer text-xs sm:text-sm font-medium">
-            <Switch.Root
-              className="w-10 h-6 bg-switch-background rounded-full relative data-[state=checked]:bg-primary outline-none focus:ring-2 focus:ring-ring"
-              checked={highlightGhareeb}
-              onCheckedChange={setHighlightGhareeb}
-              id="ghareeb-toggle"
-            >
-              <Switch.Thumb className="block w-5 h-5 bg-white rounded-full transition-transform duration-100 translate-x-0.5 will-change-transform data-[state=checked]:translate-x-[1.125rem]" />
-            </Switch.Root>
-            {t(language, "mushaf.highlightGhareeb")}
-          </label>
+      <footer className="z-20 flex shrink-0 items-center justify-between gap-2 border-t border-border bg-card px-3 py-2.5 shadow-raised sm:px-5">
+        <button
+          type="button"
+          onClick={() => paginate(isArabic ? 1 : -1)}
+          disabled={currentPage === (isArabic ? 604 : 1)}
+          className="ui-icon-button shrink-0"
+          aria-label={t(language, "common.next")}
+        >
+          {prevIcon}
+        </button>
 
+        <div className="flex min-w-0 items-center justify-center gap-2 text-xs font-bold text-muted-foreground font-sans sm:text-sm">
+          <button
+            type="button"
+            onClick={recordCurrentPage}
+            disabled={todayPagesRead.includes(currentPage)}
+            className="min-h-11 shrink-0 rounded-xl bg-primary px-3 text-xs font-bold text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
+          </button>
           <button
             type="button"
             onClick={() => setIsIndexOpen(true)}
-            className="text-xs font-bold text-primary hover:underline"
+            className="min-w-0 truncate rounded-md px-1.5 py-2 text-foreground hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
           >
-            {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+            {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
           </button>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <button
-            type="button"
-            onClick={() => paginate(isArabic ? 1 : -1)}
-            disabled={currentPage === (isArabic ? 604 : 1)}
-            className="ui-icon-button"
-            aria-label={t(language, "common.next")}
-          >
-            {prevIcon}
-          </button>
-
-          <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-muted-foreground font-sans">
-            <button
-              type="button"
-              onClick={recordCurrentPage}
-              disabled={todayPagesRead.includes(currentPage)}
-              className="min-h-11 rounded-xl border border-border bg-background px-3 text-xs font-bold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-            >
-              {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
-            </button>
-            <span
-              role="status"
-              aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
-            >
-              {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
-            </span>
-          </div>
-
-          <button
-            type="button"
-            onClick={() => paginate(isArabic ? -1 : 1)}
-            disabled={currentPage === (isArabic ? 1 : 604)}
-            className="ui-icon-button"
-            aria-label={t(language, "common.previous")}
-          >
-            {nextIcon}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => paginate(isArabic ? -1 : 1)}
+          disabled={currentPage === (isArabic ? 1 : 604)}
+          className="ui-icon-button shrink-0"
+          aria-label={t(language, "common.previous")}
+        >
+          {nextIcon}
+        </button>
       </footer>
 
       {/* Index & Navigation Modal */}

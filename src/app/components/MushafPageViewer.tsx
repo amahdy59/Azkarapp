@@ -197,9 +197,10 @@ export function MushafPageViewer({
   }[theme];
 
   return (
-    <div
-      className={`relative flex flex-col h-full w-full rounded-2xl shadow-raised border-2 ring-1 overflow-hidden transition-colors duration-200 ${themeClasses}`}
+    <article
+      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden rounded-xl border shadow-raised ring-1 transition-colors duration-200 sm:rounded-2xl ${themeClasses}`}
       dir="rtl"
+      aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
     >
       {/* Bookmark Ribbon on top-end corner */}
       {isBookmarked && (
@@ -214,7 +215,7 @@ export function MushafPageViewer({
 
       {/* Decorative Mushaf Header Banner */}
       <div
-        className={`flex justify-between items-center px-4 sm:px-6 py-2.5 border-b text-[0.8125rem] sm:text-[0.875rem] font-bold font-sans ${headerBgClass}`}
+        className={`flex shrink-0 items-center justify-between gap-3 border-b px-3 py-2 text-[0.75rem] font-bold font-sans sm:px-5 sm:text-[0.8125rem] ${headerBgClass}`}
       >
         <span className="font-arabic font-extrabold">{surahName}</span>
         <span className="font-arabic font-bold opacity-80">{formattedJuz}</span>
@@ -222,11 +223,14 @@ export function MushafPageViewer({
 
       {/* 15-Line Mushaf Page Canvas */}
       <div
-        className="flex-1 px-2 min-[360px]:px-3 sm:px-6 py-3 min-[360px]:py-4 flex flex-col justify-between overflow-y-auto"
+        className="flex min-h-0 flex-1 flex-col justify-between overflow-y-auto overscroll-contain px-2 py-2.5 min-[360px]:px-3 min-[360px]:py-3 sm:px-5 sm:py-4"
         style={{
           fontFamily: "var(--font-mushaf)",
-          fontSize: "clamp(1rem, 4.8vw, 1.35rem)",
-          lineHeight: "clamp(2.05, 10vw, 2.4)",
+          // The former 2.05 minimum line-height made a full page need to scroll
+          // even on ordinary phones. This preserves generous diacritic clearance
+          // while leaving the page's 15-line rhythm intact.
+          fontSize: "clamp(0.9375rem, 4.15vw, 1.35rem)",
+          lineHeight: "clamp(1.72, 5vw, 2.12)",
         }}
       >
         {lineDetails.map((line, lineIdx) => {
@@ -247,7 +251,7 @@ export function MushafPageViewer({
           return (
             <div
               key={lineIdx}
-              className="flex items-baseline justify-center flex-wrap sm:flex-nowrap w-full py-0.5 select-text gap-x-0.5 min-[360px]:gap-x-1 sm:gap-x-1.5 md:gap-x-2"
+              className="flex w-full select-text flex-wrap items-baseline justify-center gap-x-0.5 py-px min-[360px]:gap-x-1 sm:flex-nowrap sm:gap-x-1.5 md:gap-x-2"
             >
               {lineWords.map((w, wIdx) => {
                 const meaning = highlightGhareeb ? getQuranWordMeaning(w.verseKey, w.text) : undefined;
@@ -325,11 +329,11 @@ export function MushafPageViewer({
       </div>
 
       {/* Decorative Mushaf Page Number Footer */}
-      <div
-        className={`flex justify-center items-center px-4 py-2 border-t text-[0.8125rem] font-bold font-sans ${headerBgClass}`}
+      <footer
+        className={`flex shrink-0 items-center justify-center border-t px-4 py-1.5 text-[0.75rem] font-bold font-sans sm:text-[0.8125rem] ${headerBgClass}`}
       >
         <span>{formatNumerals(pageNumber, language)}</span>
-      </div>
-    </div>
+      </footer>
+    </article>
   );
 }
