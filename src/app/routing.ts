@@ -27,6 +27,7 @@ export interface RouteState {
 
 /** Views that map to a stable, linkable path. */
 const VIEW_PATHS = {
+  khatmah_overview: "/quran-wird",
   home: "/home",
   library: "/azkar",
   progress: "/progress",

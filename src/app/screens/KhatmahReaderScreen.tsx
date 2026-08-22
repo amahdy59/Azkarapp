@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import type { AppLanguage, MushafTheme } from "../types";
+import type { AppLanguage, MushafTheme, QuranReadingPosition } from "../types";
 import {
   ChevronRight,
   ChevronLeft,
@@ -35,6 +35,7 @@ export function KhatmahReaderScreen({
   setDailyWirdGoal: _onUpdateGoal,
   wirdHistory = {},
   setWirdHistory: onUpdateWirdHistory,
+  onReadingPositionChange,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -49,6 +50,7 @@ export function KhatmahReaderScreen({
   setDailyWirdGoal?: (goal: number) => void;
   wirdHistory?: Record<string, number[]>;
   setWirdHistory?: (history: Record<string, number[]>) => void;
+  onReadingPositionChange?: (position: QuranReadingPosition) => void;
 }) {
   const currentPage = Math.max(1, Math.min(604, khatmahPage || 1));
 
@@ -88,24 +90,21 @@ export function KhatmahReaderScreen({
     onUpdateBookmarks?.(nextBookmarks);
   };
 
-  // Track page reading for daily wird
-  const todayKey = useMemo(() => getProgressDayKey(new Date(), 3), []);
+  const todayKey = getProgressDayKey();
   const todayPagesRead = useMemo(() => {
     const list = wirdHistory[todayKey] ?? [];
     return list;
   }, [todayKey, wirdHistory]);
 
-  const recordPageRead = useCallback(
-    (page: number) => {
-      if (!onUpdateWirdHistory) return;
-      const currentList = wirdHistory[todayKey] ?? [];
-      if (!currentList.includes(page)) {
-        const nextList = [...currentList, page];
-        onUpdateWirdHistory({ ...wirdHistory, [todayKey]: nextList });
-      }
-    },
-    [onUpdateWirdHistory, todayKey, wirdHistory],
-  );
+  const recordCurrentPage = useCallback(() => {
+    if (!onUpdateWirdHistory) return;
+    const dayKey = getProgressDayKey();
+    const currentList = wirdHistory[dayKey] ?? [];
+    if (!currentList.includes(currentPage)) {
+      const nextList = [...currentList, currentPage];
+      onUpdateWirdHistory({ ...wirdHistory, [dayKey]: nextList });
+    }
+  }, [currentPage, onUpdateWirdHistory, wirdHistory]);
 
   const loadPage = useCallback(
     (page: number) => {
@@ -126,7 +125,6 @@ export function KhatmahReaderScreen({
           if (active) {
             setPageData(data);
             setLoading(false);
-            recordPageRead(page);
           }
         })
         .catch((err) => {
@@ -141,7 +139,7 @@ export function KhatmahReaderScreen({
         active = false;
       };
     },
-    [language, recordPageRead],
+    [language],
   );
 
   useEffect(() => {
@@ -181,6 +179,12 @@ export function KhatmahReaderScreen({
       juzNumber: getJuzNumberForPage(currentPage),
     };
   }, [pageData, currentPage, language]);
+
+  useEffect(() => {
+    if (!pageData?.length) return;
+    const [surahNumber, ayahNumber] = (pageData.at(-1)?.k ?? "1:1").split(":").map(Number);
+    onReadingPositionChange?.({ page: currentPage, surahNumber, ayahNumber, juzNumber });
+  }, [currentPage, juzNumber, onReadingPositionChange, pageData]);
 
   const paginate = useCallback(
     (newDirection: number) => {
@@ -422,7 +426,7 @@ export function KhatmahReaderScreen({
           </button>
         </div>
 
-        <div className="flex justify-between items-center">
+        <div className="flex items-center justify-between gap-3">
           <button
             type="button"
             onClick={() => paginate(isArabic ? 1 : -1)}
@@ -434,7 +438,15 @@ export function KhatmahReaderScreen({
           </button>
 
           <div className="flex items-center gap-2 text-xs sm:text-sm font-bold text-muted-foreground font-sans">
-            <span>
+            <button
+              type="button"
+              onClick={recordCurrentPage}
+              disabled={todayPagesRead.includes(currentPage)}
+              className="min-h-11 rounded-xl border border-border bg-background px-3 text-xs font-bold text-foreground transition-colors hover:bg-muted disabled:cursor-not-allowed disabled:opacity-45 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              {todayPagesRead.includes(currentPage) ? "✓" : "+"} {t(language, "mushaf.recordPage")}
+            </button>
+            <span aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}>
               {formatNumerals(currentPage, language)} / {formatNumerals(604, language)}
             </span>
           </div>

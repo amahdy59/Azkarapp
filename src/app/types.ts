@@ -48,6 +48,7 @@ export type ZikrAttributionType =
   | "companion_supplication";
 
 export type View =
+  | "khatmah_overview"
   | "khatmah"
   | "home"
   | "library"
@@ -236,6 +237,23 @@ export interface PrayerTrackingRecord {
 
 export type MushafTheme = "parchment" | "dark" | "oled" | "white";
 
+export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom";
+
+/** The last verified page the reader opened, with enough context for a useful resume label. */
+export interface QuranReadingPosition {
+  page: number;
+  surahNumber?: number;
+  ayahNumber?: number;
+  juzNumber?: number;
+}
+
+/** One active plan keeps the daily reading decision clear rather than competing plans. */
+export interface QuranWirdPlan {
+  kind: QuranWirdPlanKind;
+  dailyPages: number;
+  durationDays?: number;
+}
+
 export interface AppStateSnapshot {
   settings: UserSettingsState;
   profile: UserProfileState;
@@ -259,4 +277,8 @@ export interface AppStateSnapshot {
   dailyWirdGoal?: number;
   /** Map of date key (YYYY-MM-DD) to list of pages read on that day. */
   wirdHistory?: Record<string, number[]>;
+  /** Context shown before opening the Mushaf. */
+  quranReadingPosition?: QuranReadingPosition;
+  /** The single active daily Quran plan. */
+  quranWirdPlan?: QuranWirdPlan;
 }

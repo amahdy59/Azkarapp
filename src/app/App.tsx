@@ -15,6 +15,8 @@ import type {
   ThemeMode,
   PrayerName,
   MushafTheme,
+  QuranReadingPosition,
+  QuranWirdPlan,
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
@@ -84,6 +86,9 @@ const CompletionScreen = retryableScreen(() =>
 );
 const KhatmahReaderScreen = retryableScreen(() =>
   import("./screens/KhatmahReaderScreen").then((module) => ({ default: module.KhatmahReaderScreen })),
+);
+const QuranWirdScreen = retryableScreen(() =>
+  import("./screens/QuranWirdScreen").then((module) => ({ default: module.QuranWirdScreen })),
 );
 const CustomCounterScreen = retryableScreen(() =>
   import("./screens/CustomCounterScreen").then((module) => ({ default: module.CustomCounterScreen })),
@@ -245,6 +250,12 @@ function AppContent() {
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
   const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
   const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
+  const [quranReadingPosition, setQuranReadingPosition] = useState<QuranReadingPosition>(
+    initialState.quranReadingPosition ?? { page: initialState.khatmahPage ?? 1 },
+  );
+  const [quranWirdPlan, setQuranWirdPlan] = useState<QuranWirdPlan>(
+    initialState.quranWirdPlan ?? { kind: "daily", dailyPages: initialState.dailyWirdGoal ?? 4 },
+  );
 
   /**
    * Upserts one of the two flags for a prayer on the current progress day.
@@ -425,6 +436,8 @@ function AppContent() {
       mushafBookmarks,
       dailyWirdGoal,
       wirdHistory,
+      quranReadingPosition,
+      quranWirdPlan,
     }),
     [
       boldText,
@@ -458,6 +471,8 @@ function AppContent() {
       mushafBookmarks,
       dailyWirdGoal,
       wirdHistory,
+      quranReadingPosition,
+      quranWirdPlan,
       showTranslation,
       showTransliteration,
       textSize,
@@ -608,6 +623,13 @@ function AppContent() {
     );
     setSessions(state.sessions);
     setSavedZikrIds(new Set(state.savedZikrIds));
+    setKhatmahPage(state.khatmahPage ?? 1);
+    setMushafTheme(state.mushafTheme ?? "parchment");
+    setMushafBookmarks(state.mushafBookmarks ?? []);
+    setDailyWirdGoal(state.dailyWirdGoal ?? 4);
+    setWirdHistory(state.wirdHistory ?? {});
+    setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
+    setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
   }, []);
 
   const {
@@ -1000,7 +1022,7 @@ function AppContent() {
                   }}
                   onOpenBenefits={() => push("benefits")}
                   onOpenWirdBenefits={() => push("wird_benefits")}
-                  onOpenKhatmah={() => push("khatmah")}
+                  onOpenKhatmah={() => push("khatmah_overview")}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                 />
@@ -1372,6 +1394,37 @@ function AppContent() {
                   }}
                 />
               )}
+              {view === "khatmah_overview" && (
+                <QuranWirdScreen
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  position={quranReadingPosition}
+                  plan={quranWirdPlan}
+                  wirdHistory={wirdHistory}
+                  onBack={pop}
+                  onContinue={() => push("khatmah")}
+                  onPlanChange={(plan) => {
+                    setQuranWirdPlan(plan);
+                    setDailyWirdGoal(plan.dailyPages);
+                  }}
+                  onRecordPage={() => {
+                    const dayKey = getProgressDayKey();
+                    const page = quranReadingPosition.page;
+                    setWirdHistory((current) => {
+                      const pages = current[dayKey] ?? [];
+                      return pages.includes(page) ? current : { ...current, [dayKey]: [...pages, page] };
+                    });
+                  }}
+                  onUndoPage={() => {
+                    const dayKey = getProgressDayKey();
+                    setWirdHistory((current) => {
+                      const pages = current[dayKey] ?? [];
+                      if (pages.length === 0) return current;
+                      return { ...current, [dayKey]: pages.slice(0, -1) };
+                    });
+                  }}
+                />
+              )}
               {view === "khatmah" && (
                 <KhatmahReaderScreen
                   language={selectedLang}
@@ -1387,6 +1440,7 @@ function AppContent() {
                   setDailyWirdGoal={setDailyWirdGoal}
                   wirdHistory={wirdHistory}
                   setWirdHistory={setWirdHistory}
+                  onReadingPositionChange={setQuranReadingPosition}
                 />
               )}
               {view === "custom_counter" && (

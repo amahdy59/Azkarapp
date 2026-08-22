@@ -49,6 +49,22 @@ describe("app state persistence", () => {
     });
   });
 
+  it("normalizes Quran reading context and a custom wird plan without trusting invalid values", () => {
+    const valid = normalizeAppState({
+      quranReadingPosition: { page: 22, surahNumber: 2, ayahNumber: 142, juzNumber: 2 },
+      quranWirdPlan: { kind: "custom", dailyPages: 11, durationDays: 55 },
+    });
+    const invalid = normalizeAppState({
+      quranReadingPosition: { page: 700, surahNumber: 200 },
+      quranWirdPlan: { kind: "custom", dailyPages: 0, durationDays: 700 },
+    });
+
+    expect(valid.quranReadingPosition).toEqual({ page: 22, surahNumber: 2, ayahNumber: 142, juzNumber: 2 });
+    expect(valid.quranWirdPlan).toEqual({ kind: "custom", dailyPages: 11, durationDays: 55 });
+    expect(invalid.quranReadingPosition?.page).toBe(1);
+    expect(invalid.quranWirdPlan).toEqual({ kind: "custom", dailyPages: 4 });
+  });
+
   it("reports storage write failures without throwing", () => {
     const write = vi.spyOn(Storage.prototype, "setItem").mockImplementationOnce(() => {
       throw new DOMException("Storage full", "QuotaExceededError");

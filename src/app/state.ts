@@ -5,6 +5,8 @@ import type {
   ColorBlindSupport,
   LocationSettings,
   PrayerTrackingRecord,
+  QuranReadingPosition,
+  QuranWirdPlan,
   ReminderSettings,
   StoredSession,
   ThemeMode,
@@ -118,6 +120,8 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   mushafBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
+  quranReadingPosition: { page: 1, surahNumber: 1, ayahNumber: 1, juzNumber: 1 },
+  quranWirdPlan: { kind: "daily", dailyPages: 4 },
 };
 
 function isLanguage(value: string): value is AppLanguage {
@@ -126,6 +130,45 @@ function isLanguage(value: string): value is AppLanguage {
 
 function isMushafTheme(value: unknown): value is "parchment" | "dark" | "oled" | "white" {
   return typeof value === "string" && ["parchment", "dark", "oled", "white"].includes(value);
+}
+
+function normalizeQuranReadingPosition(value: unknown): QuranReadingPosition {
+  if (!value || typeof value !== "object") return { page: 1, surahNumber: 1, ayahNumber: 1, juzNumber: 1 };
+  const position = value as Partial<QuranReadingPosition>;
+  const safe = (candidate: unknown, min: number, max: number) =>
+    typeof candidate === "number" && Number.isInteger(candidate) && candidate >= min && candidate <= max
+      ? candidate
+      : undefined;
+  return {
+    page: safe(position.page, 1, 604) ?? 1,
+    surahNumber: safe(position.surahNumber, 1, 114),
+    ayahNumber: safe(position.ayahNumber, 1, 286),
+    juzNumber: safe(position.juzNumber, 1, 30),
+  };
+}
+
+function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWirdPlan {
+  if (!value || typeof value !== "object") return { kind: "daily", dailyPages: fallbackGoal };
+  const plan = value as Partial<QuranWirdPlan>;
+  const dailyPages =
+    typeof plan.dailyPages === "number" &&
+    Number.isInteger(plan.dailyPages) &&
+    plan.dailyPages >= 1 &&
+    plan.dailyPages <= 604
+      ? plan.dailyPages
+      : fallbackGoal;
+  const durationDays =
+    typeof plan.durationDays === "number" &&
+    Number.isInteger(plan.durationDays) &&
+    plan.durationDays >= 1 &&
+    plan.durationDays <= 604
+      ? plan.durationDays
+      : undefined;
+  return {
+    kind: plan.kind === "khatmah30" || plan.kind === "custom" ? plan.kind : "daily",
+    dailyPages: plan.kind === "khatmah30" ? 21 : dailyPages,
+    ...(plan.kind === "custom" && durationDays ? { durationDays } : {}),
+  };
 }
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
@@ -561,6 +604,13 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       typeof parsed.wirdHistory === "object" && parsed.wirdHistory !== null && !Array.isArray(parsed.wirdHistory)
         ? (parsed.wirdHistory as Record<string, number[]>)
         : {},
+    quranReadingPosition: normalizeQuranReadingPosition(parsed.quranReadingPosition),
+    quranWirdPlan: normalizeQuranWirdPlan(
+      parsed.quranWirdPlan,
+      typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
+        ? Math.floor(parsed.dailyWirdGoal)
+        : 4,
+    ),
     ...(typeof parsed.lastActiveDayKey === "string" ? { lastActiveDayKey: currentDayKey } : {}),
   };
 }
@@ -830,6 +880,11 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
     dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
     wirdHistory: { ...(safeBase.wirdHistory ?? {}), ...(incoming.wirdHistory ?? {}) },
+    quranReadingPosition: normalizeQuranReadingPosition(incoming.quranReadingPosition ?? safeBase.quranReadingPosition),
+    quranWirdPlan: normalizeQuranWirdPlan(
+      incoming.quranWirdPlan ?? safeBase.quranWirdPlan,
+      incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
+    ),
   };
 }
 
@@ -846,5 +901,6 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     khatmahPage: 1,
     mushafBookmarks: [],
     wirdHistory: {},
+    quranReadingPosition: DEFAULT_APP_STATE.quranReadingPosition,
   };
 }
