@@ -8,7 +8,7 @@
  * They are intentionally about observable output, not implementation detail, so
  * they survive the refactor that follows.
  */
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import {
   GoldenLeafMark,
@@ -132,11 +132,27 @@ describe("Home wird card", () => {
       />,
     );
 
-    expect(screen.getAllByRole("button").map((button) => button.getAttribute("aria-label"))).toEqual([
-      "Morning Azkar - Completed",
-      "Evening Azkar - Completed",
-      "Sleep Azkar - Not completed",
-    ]);
+    expect(
+      screen
+        .getAllByRole("button")
+        .slice(1)
+        .map((button) => button.getAttribute("aria-label")),
+    ).toEqual(["Morning Azkar - Completed", "Evening Azkar - Completed", "Sleep Azkar - Not completed"]);
+  });
+
+  it("keeps the Home title concise and explains how to earn a palm on demand", () => {
+    render(
+      <TodayRoutineGarden
+        summary={makeSummary()}
+        language="en"
+        hideTabs
+        visibleCategoryIds={["morning", "evening", "before_sleep"]}
+      />,
+    );
+
+    expect(screen.queryByText(/Great start!/i)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "How a palm is earned" }));
+    expect(screen.getByText(/Complete Morning, Evening, and Before Sleep Azkar/i)).toBeInTheDocument();
   });
 });
 

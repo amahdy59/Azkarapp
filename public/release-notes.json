@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22-6",
+  "release": "2026-08-22-7",
   "ar": [
-    "اتحد اسم ورد القرآن في الصفحة الرئيسية وصفحة الخطة، مع عودة شريط التنقل المعتاد.",
-    "أصبحت قائمة خطة القراءة متوافقة مع عناصر التطبيق واتجاه العربية.",
-    "انتقلت أدوات السورة والجزء والصفحة إلى داخل المصحف، وتختفي بهدوء عند القراءة.",
-    "يمكن إظهار معاني الكلمات الصعبة عند الحاجة، مع خط صفحة المدينة الأصلي عند توفره وبقاء القراءة دون اتصال."
+    "أصبح قسم وردك اليوم أكثر هدوءاً دون النص المساند أسفل العنوان.",
+    "يمكنك معرفة طريقة إضافة نخلة من زر المعلومات بجوار عنوان الورد.",
+    "تظهر أيقونات الأوراد المكتملة بلون نجاح واضح يسهل تمييزه.",
+    "يبقى شريط الصفحة الرئيسية واضحاً ومقروءاً أثناء التمرير فوق الخلفية."
   ],
   "en": [
-    "Quran Wird now has one consistent name on Home and the plan page, with normal app navigation restored.",
-    "The reading-plan menu now matches the app controls and Arabic direction.",
-    "Surah, juz, and page controls now sit inside the Mushaf and quietly hide while reading.",
-    "Difficult-word meanings can be shown when needed, with the original Madinah page font when available and offline reading preserved."
+    "Today's Wird is calmer without supporting text below its title.",
+    "Use the information button beside the Wird title to learn how to earn a palm.",
+    "Completed routine icons now use a clearer success color.",
+    "The Home header remains clear and readable while scrolling over the background."
   ]
 }

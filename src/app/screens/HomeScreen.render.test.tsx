@@ -122,6 +122,29 @@ describe("HomeScreen quick access", () => {
     expect(onOpenCustomCounter).toHaveBeenCalledOnce();
   });
 
+  it("keeps the utility header readable over the image while Home content scrolls", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled={true}
+        progressDayStartHour={4}
+        language="en"
+        direction="ltr"
+        onResume={() => undefined}
+        routineModes={routineModes}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    fireEvent.scroll(screen.getByRole("region", { name: "Azkar" }), { target: { scrollTop: 12 } });
+    expect(screen.getByTestId("home-utility-header")).toHaveAttribute("data-scrolled", "true");
+    expect(screen.getByTestId("home-utility-header")).toHaveClass("bg-on-media-surface/95");
+  });
+
   it("shows the completion card briefly, without actions, then returns to the normal hero", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));

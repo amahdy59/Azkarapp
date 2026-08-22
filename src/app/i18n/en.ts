@@ -663,6 +663,7 @@ const en = {
     nextMilestoneHint: "Next: {current} of {target}",
     explanation:
       "Each completed collection adds one leaf. Complete Morning, Evening, and Before Sleep Azkar in one progress day to add a palm. This reflects progress in the app; it does not measure spiritual reward or rank.",
+    explanationLabel: "How a palm is earned",
     private: "Private by default and never shared as a ranking.",
     shown: "Garden shown",
     hidden: "Garden hidden",

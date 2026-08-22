@@ -415,7 +415,7 @@ export function HomeScreen({
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
             className={`px-page mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
-              hasScrolledHomeContent ? "bg-background/72 shadow-sm backdrop-blur-md" : ""
+              hasScrolledHomeContent ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md" : ""
             }`}
             dir="ltr"
           >

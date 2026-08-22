@@ -26,6 +26,7 @@ import {
   Sprout,
   Sparkles,
   BookOpen,
+  Info,
 } from "./icons";
 
 function isAr(language: AppLanguage) {
@@ -105,8 +106,8 @@ function MainDhikrGroupCard({
         } ${
           isCompleted
             ? compact
-              ? "border-primary/50 bg-primary/20 text-primary"
-              : "border-primary/50 bg-primary/15 text-primary"
+              ? "border-success/60 bg-success/20 text-success"
+              : "border-success/60 bg-success/15 text-success"
             : compact && onMedia
               ? "border-white/10 bg-black/40 text-on-media-muted"
               : "border-border bg-muted text-primary"
@@ -257,6 +258,7 @@ export function ProgressDayView({
   // edge while preserving the same keyboard and assistive-technology order.
   const displayCategories = categories;
   const completedCount = categories.filter((category) => completedToday.includes(category.id)).length;
+  const [isWirdInfoOpen, setIsWirdInfoOpen] = useState(false);
 
   return (
     // h-full/flex-1 let Home stretch this card to the hero's height. On the
@@ -275,30 +277,51 @@ export function ProgressDayView({
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <Heading
-              data-testid="progress-primary-heading"
-              className={`block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight sm:text-[1.375rem] md:text-[1.5rem] ${
-                onGlass
-                  ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
-                  : isHomeSubset
-                    ? // Off the photograph the gold has to come from the theme rather
-                      // than the fixed on-media accent, which is the same colour in
-                      // every mode because its ground is an image.
-                      "text-primary"
-                    : "text-foreground"
-              }`}
-              dir="auto"
-            >
-              {t(language, "progress.todayWird")}
-            </Heading>
-            <p
-              className={`mt-1 text-[0.8125rem] font-semibold sm:text-[0.875rem] ${
-                onGlass ? "text-on-media-muted" : "text-muted-foreground"
-              }`}
-              dir="auto"
-            >
-              {dynamicSubtitle}
-            </p>
+            <div className="flex items-center gap-2">
+              <Heading
+                data-testid="progress-primary-heading"
+                className={`block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight sm:text-[1.375rem] md:text-[1.5rem] ${
+                  onGlass
+                    ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
+                    : isHomeSubset
+                      ? // Off the photograph the gold has to come from the theme rather
+                        // than the fixed on-media accent, which is the same colour in
+                        // every mode because its ground is an image.
+                        "text-primary"
+                      : "text-foreground"
+                }`}
+                dir="auto"
+              >
+                {t(language, "progress.todayWird")}
+              </Heading>
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-expanded={isWirdInfoOpen}
+                  aria-label={t(language, "garden.explanationLabel")}
+                  onClick={() => setIsWirdInfoOpen((open) => !open)}
+                  className={`flex size-11 shrink-0 items-center justify-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    onGlass ? "text-on-media-muted hover:bg-black/25" : "text-muted-foreground hover:bg-muted"
+                  }`}
+                >
+                  <Info size={18} aria-hidden="true" />
+                </button>
+                {isWirdInfoOpen && (
+                  <div
+                    role="tooltip"
+                    className="absolute start-0 top-full z-20 mt-2 w-[min(18rem,calc(100vw-3rem))] rounded-2xl border border-border bg-popover p-3 text-[0.8125rem] font-medium leading-6 text-popover-foreground shadow-overlay"
+                    dir={isArabic ? "rtl" : "ltr"}
+                  >
+                    {t(language, "garden.explanation")}
+                  </div>
+                )}
+              </div>
+            </div>
+            {!onGlass && (
+              <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground sm:text-[0.875rem]" dir="auto">
+                {dynamicSubtitle}
+              </p>
+            )}
           </div>
 
           <div
