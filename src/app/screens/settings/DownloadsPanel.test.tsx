@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const audioMocks = vi.hoisted(() => ({
@@ -14,6 +14,10 @@ vi.mock("../../audio/audioOfflineCache", () => ({
   estimateAudioDownloadBytes: () => 1024,
   getDownloadedAudioSummary: audioMocks.summary,
   removeDownloadedAudio: audioMocks.remove,
+}));
+vi.mock("../../content/mushafOfflineCache", () => ({
+  downloadMushaf: vi.fn(),
+  getMushafDownloadStatus: vi.fn().mockResolvedValue({ downloadedPages: 0, totalPages: 604 }),
 }));
 
 import { DownloadsPanel } from "./DownloadsPanel";
@@ -44,7 +48,7 @@ describe("DownloadsPanel", () => {
     expect(screen.queryByText(/raw download/i)).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Remove downloaded audio" }));
-    expect(await screen.findByRole("alert")).toHaveTextContent("Could not remove downloaded audio");
+    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("Could not remove downloaded audio"));
     expect(screen.queryByText(/raw cache/i)).not.toBeInTheDocument();
   });
 });

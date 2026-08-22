@@ -17,6 +17,7 @@ import {
   getDownloadedAudioSummary,
   removeDownloadedAudio,
 } from "../../audio/audioOfflineCache";
+import { downloadMushaf, getMushafDownloadStatus } from "../../content/mushafOfflineCache";
 
 type OfflineStatus = {
   cacheCount: number;
@@ -25,6 +26,7 @@ type OfflineStatus = {
   quotaBytes?: number;
   downloadedAudioAssets: number;
   downloadedAudioBytes: number;
+  downloadedMushafPages: number;
 };
 
 function formatMegabytes(bytes: number | undefined, language: AppLanguage) {
@@ -41,6 +43,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
   const [downloadProgress, setDownloadProgress] = useState<{ completed: number; total: number } | null>(null);
+  const [mushafProgress, setMushafProgress] = useState<{ completed: number; total: number } | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const [audioPreferences, setAudioPreferences] = useState(loadAudioPreferences);
   const voices = useMemo(() => getAudioVoices(language), [language]);
@@ -71,10 +74,11 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       setSuccessMessage("");
       setIsLoading(true);
 
-      const [registration, cacheNames, storage] = await Promise.all([
+      const [registration, cacheNames, storage, mushafStatus] = await Promise.all([
         "serviceWorker" in navigator ? navigator.serviceWorker.getRegistration() : Promise.resolve(undefined),
         "caches" in window ? caches.keys() : Promise.resolve([]),
         navigator.storage?.estimate ? navigator.storage.estimate() : Promise.resolve({} as StorageEstimate),
+        getMushafDownloadStatus(),
       ]);
 
       const audioSummary = getDownloadedAudioSummary();
@@ -85,6 +89,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         quotaBytes: storage.quota,
         downloadedAudioAssets: audioSummary.assetCount,
         downloadedAudioBytes: audioSummary.byteSize,
+        downloadedMushafPages: mushafStatus.downloadedPages,
       });
     } catch (error) {
       reportError(error, "offline-storage-status");
@@ -135,6 +140,31 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
     } catch (error) {
       reportError(error, "audio-download-remove");
       setErrorMessage(t(language, "downloads.removeError"));
+    }
+  };
+
+  const downloadCompleteMushaf = async () => {
+    const controller = new AbortController();
+    abortRef.current = controller;
+    setErrorMessage("");
+    setSuccessMessage("");
+    setMushafProgress({ completed: 0, total: 604 });
+    try {
+      await downloadMushaf({
+        signal: controller.signal,
+        onProgress: (completed, total) => setMushafProgress({ completed, total }),
+      });
+      await refreshStatus();
+      setSuccessMessage(t(language, "downloads.mushafDownloadComplete"));
+    } catch (error) {
+      if (controller.signal.aborted) setSuccessMessage(t(language, "downloads.downloadCancelled"));
+      else {
+        reportError(error, "mushaf-download");
+        setErrorMessage(t(language, "downloads.downloadErrorDescription"));
+      }
+    } finally {
+      abortRef.current = null;
+      setMushafProgress(null);
     }
   };
 
@@ -203,6 +233,12 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                     </dd>
                   </div>
                   <div className="flex justify-between gap-3">
+                    <dt className="text-muted-foreground">{t(language, "downloads.downloadedMushaf")}</dt>
+                    <dd className="font-medium text-foreground">
+                      {formatNumerals(status.downloadedMushafPages, language)} / {formatNumerals(604, language)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between gap-3">
                     <dt className="text-muted-foreground">{t(language, "downloads.caches")}</dt>
                     <dd className="font-medium text-foreground">{status.cacheCount}</dd>
                   </div>
@@ -240,6 +276,49 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
               {errorMessage}
             </p>
+          )}
+        </Card>
+
+        <Card as="section" padding="lg" aria-labelledby="mushaf-download-title">
+          <h2 id="mushaf-download-title" className="text-[1.0625rem] font-semibold text-foreground">
+            {t(language, "downloads.mushafTitle")}
+          </h2>
+          <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
+            {t(language, "downloads.mushafBody")}
+          </p>
+          <Button
+            type="button"
+            onClick={() => void downloadCompleteMushaf()}
+            disabled={downloadProgress !== null || mushafProgress !== null}
+            className="mt-4 w-full"
+          >
+            <Download size={18} aria-hidden="true" />
+            {t(language, "downloads.downloadMushaf")}
+          </Button>
+          {mushafProgress && (
+            <div className="mt-3">
+              <progress
+                className="w-full"
+                max={mushafProgress.total}
+                value={mushafProgress.completed}
+                aria-label={t(language, "downloads.mushafProgressLabel")}
+              />
+              <p className="mt-1 text-center text-[0.75rem] font-semibold text-muted-foreground" role="status">
+                {t(language, "downloads.mushafProgressValue", {
+                  completed: formatNumerals(mushafProgress.completed, language),
+                  total: formatNumerals(mushafProgress.total, language),
+                })}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => abortRef.current?.abort()}
+                className="mt-2 w-full border-border"
+              >
+                <X size={18} aria-hidden="true" />
+                {t(language, "downloads.cancelDownload")}
+              </Button>
+            </div>
           )}
         </Card>
 

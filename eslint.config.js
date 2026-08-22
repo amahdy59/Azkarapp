@@ -6,7 +6,15 @@ import { azkarLintRules } from "./scripts/eslint-rules.mjs";
 
 export default tseslint.config(
   {
-    ignores: ["dist/**", ".playwright-dist/**", "node_modules/**", "test-results/**", "playwright-report/**"],
+    ignores: [
+      "dist/**",
+      ".playwright-dist/**",
+      "node_modules/**",
+      "test-results/**",
+      "playwright-report/**",
+      "coverage/**",
+      ".perf-audit-dist/**",
+    ],
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

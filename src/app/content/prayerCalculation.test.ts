@@ -84,6 +84,19 @@ describe("prayerCalculation", () => {
     expect(maghribHour).toBeLessThanOrEqual(20);
   });
 
+  it("keeps high-latitude summer times in prayer order when twilight angles do not occur", () => {
+    const times = calculateOfflinePrayerTimes(new Date(2026, 5, 21, 12), 51.5074, -0.1278, 5, "Europe/London");
+    const minutes = (value: string) => {
+      const [hours, mins] = value.split(":").map(Number);
+      return hours! * 60 + mins!;
+    };
+
+    expect(minutes(times.fajr)).toBeLessThan(minutes(times.dhuhr));
+    expect(minutes(times.dhuhr)).toBeLessThan(minutes(times.asr));
+    expect(minutes(times.asr)).toBeLessThan(minutes(times.maghrib));
+    expect(minutes(times.maghrib)).toBeLessThan(minutes(times.isha));
+  });
+
   it("returns fallback offline prayer times when cache is empty", () => {
     const date = new Date(2026, 0, 15, 10, 0); // Jan 15, 2026
     const times = getPrayerTimes(date, DEFAULT_LOCATION);

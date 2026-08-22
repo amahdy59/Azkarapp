@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-21h",
+  "release": "2026-08-22",
   "ar": [
-    "إضافة فهرس متكامل للمصحف الشريف يتيح البحث والتنقل السريع بين الـ ١١٤ سورة والـ ٣٠ جزءاً.",
-    "دعم أنماط عرض متعددة تشمل الورقي الكلاسيكي، والوضع الليلي، والوضع عالي التباين لشاشات الأوليد (OLED).",
-    "إمكانية حفظ العلامات المرجعية ومتابعة الورد القرآني اليومي ونسبة إتمام الختمة المباركة."
+    "أصبح حساب أوقات الصلاة دون اتصال أكثر موثوقية في المناطق عالية العرض عند تعذر ظهور الشفق المعتاد.",
+    "يمكنك تنزيل صفحات المصحف الـ٦٠٤ كاملة للقراءة دون اتصال بالإنترنت.",
+    "تعمل أزرار التشغيل والإيقاف والتقديم في مشغّل الصوت الآن من شاشة القفل والأدوات المدعومة.",
+    "تحسن عرض صفحات المصحف على الشاشات الصغيرة جدًا."
   ],
   "en": [
-    "Added a complete Quran Index with search and instant navigation across all 114 Surahs and 30 Ajza'.",
-    "Introduced versatile display themes including Classic Parchment, Devotional Night, and High-Contrast OLED B&W.",
-    "Added page bookmarking, daily wird progress tracking, and Khatmah completion metrics."
+    "Offline prayer times are more reliable at high latitudes when normal twilight does not occur.",
+    "You can download all 604 Mushaf pages for offline reading.",
+    "Supported lock-screen and notification controls can now play, pause, and seek audio.",
+    "Mushaf pages fit more comfortably on very small screens."
   ]
 }

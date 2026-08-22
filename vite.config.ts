@@ -83,6 +83,15 @@ export default defineConfig(({ mode }) => {
           globIgnores: ["**/FridayModeScreen-*.js"],
           runtimeCaching: [
             {
+              urlPattern: /\/data\/mushaf\/\d+\.json$/,
+              handler: "CacheFirst" as const,
+              method: "GET" as const,
+              options: {
+                cacheName: "azkar-mushaf-v1",
+                expiration: { maxEntries: 604, maxAgeSeconds: 365 * 24 * 60 * 60 },
+              },
+            },
+            {
               urlPattern: /\/assets\/.*\.(?:js|css)$/,
               handler: "StaleWhileRevalidate" as const,
               method: "GET" as const,

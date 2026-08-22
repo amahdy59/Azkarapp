@@ -386,6 +386,13 @@ const ar = {
   },
   downloads: {
     downloadedAudio: "الصوت المحمّل",
+    downloadedMushaf: "صفحات المصحف المحمّلة",
+    mushafTitle: "المصحف كاملًا دون اتصال",
+    mushafBody: "نزّل الصفحات الـ٦٠٤ كلها للقراءة دون اتصال بالإنترنت.",
+    downloadMushaf: "تنزيل المصحف كاملًا",
+    mushafProgressLabel: "تقدم تنزيل المصحف",
+    mushafProgressValue: "تم تنزيل {completed} من {total} صفحة",
+    mushafDownloadComplete: "اكتمل تنزيل المصحف كاملًا.",
     optionalAudioDownloads: "تنزيلات الصوت الاختيارية",
     cancelDownload: "إلغاء التنزيل",
     removeDownloadedAudio: "حذف الصوت المحمّل",

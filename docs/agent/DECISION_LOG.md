@@ -1395,3 +1395,14 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** Local 00:00 is the only practice-day boundary. Legacy alternative boundaries normalize to midnight and Settings presents the boundary as fixed. When the calendar date changes, partial and complete state is cleared for Morning, Evening, Before Sleep, Waking Up, and After Prayer. Immutable daily-completion history, streaks, session history, saved items, and situational collection progress remain intact. The same date transition advances prayer tracking and triggers Home/Progress to resolve the current day's prayer schedule.
 - **Consequences:** A before-sleep routine continued after midnight belongs to the new displayed calendar day. This is preferred over showing one date while writing progress to another. Existing completion-history day keys are not rewritten; only the obsolete boundary preference and active daily routine state migrate.
 - **Tests/evidence required:** State migration, persisted new-day reset, live daily-routine reset, minute-clock midnight crossing and visibility resynchronization, focused prayer-time tests, full local gates, green Quality and Pages workflows, and production verification.
+
+## DEC-084 — Angle-based high-latitude fallback
+
+- **Date:** 2026-08-22
+- **Status:** Approved
+- **Owner:** User (first reliability batch)
+- **Related scope:** `prayerCalculation.ts`, `PRAYER_TIMES.md`, and offline calculation tests
+- **Context:** The local fallback could place Fajr after Dhuhr or Isha before Maghrib when the selected twilight angle does not occur.
+- **Decision:** Retain the selected calculation method and use its twilight angle as a fraction of the real night (`angle / 60 × night duration`) only when that angle is unavailable. The normal solar calculation remains unchanged.
+- **Consequences:** This protects ordering for high-latitude summer twilight gaps. Polar day and polar night remain subject to the reader's local authority.
+- **Tests/evidence required:** High-latitude ordering regression test and the normal prayer-time suite.

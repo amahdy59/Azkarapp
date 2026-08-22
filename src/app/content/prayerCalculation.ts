@@ -312,12 +312,21 @@ export function calculateOfflinePrayerTimes(
   const asrAltitude = (Math.atan(1 / (1 + Math.tan(Math.abs(latitudeRad - declinationRad)))) * 180) / Math.PI;
   const asrAngle = hourAngleForAltitude(asrAltitude);
 
-  const fajr = solarNoon - (fajrAngle ?? 1.5);
+  const sunriseAngle = hourAngleForAltitude(-0.833);
+  // When twilight never reaches the selected angle, use that angle as a
+  // fraction of the real night (angle / 60). This preserves ordering without
+  // changing the selected calculation authority's normal-day result.
+  const nightHours = sunsetAngle !== null && sunriseAngle !== null ? 24 - 2 * sunsetAngle : null;
+  const highLatitudePortion = (angle: number) => (nightHours === null ? null : (angle / 60) * nightHours);
+  const fajr = solarNoon - (fajrAngle ?? (sunsetAngle ?? 6) + (highLatitudePortion(method.fajrAngle) ?? 1.5));
   const dhuhr = solarNoon + 2 / 60;
   const asr = solarNoon + (asrAngle ?? 3);
   const maghrib = solarNoon + (sunsetAngle ?? 6);
   const ishaAngle = method.ishaAngle > 0 ? hourAngleForAltitude(-method.ishaAngle) : null;
-  const isha = method.ishaMinutes !== undefined ? maghrib + method.ishaMinutes / 60 : solarNoon + (ishaAngle ?? 7.5);
+  const isha =
+    method.ishaMinutes !== undefined
+      ? maghrib + method.ishaMinutes / 60
+      : solarNoon + (ishaAngle ?? (sunsetAngle ?? 6) + (highLatitudePortion(method.ishaAngle) ?? 1.5));
 
   return {
     fajr: formatHours(fajr),

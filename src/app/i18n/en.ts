@@ -387,6 +387,13 @@ const en = {
   },
   downloads: {
     downloadedAudio: "Downloaded audio",
+    downloadedMushaf: "Downloaded Mushaf pages",
+    mushafTitle: "Complete Mushaf offline",
+    mushafBody: "Download all 604 pages for reading without a connection.",
+    downloadMushaf: "Download complete Mushaf",
+    mushafProgressLabel: "Mushaf download progress",
+    mushafProgressValue: "{completed} of {total} pages downloaded",
+    mushafDownloadComplete: "Complete Mushaf downloaded.",
     optionalAudioDownloads: "Optional audio downloads",
     cancelDownload: "Cancel download",
     removeDownloadedAudio: "Remove downloaded audio",

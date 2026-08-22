@@ -90,7 +90,7 @@ Method definitions live in `CALCULATION_METHODS`. IDs and parameters must remain
 - Standard-school Asr from shadow factor 1
 - Maghrib from sunset at 0.833° below the horizon
 
-High-latitude cases where the sun does not reach an angle use bounded fallback intervals. These fallbacks keep the UI functional but should be compared with the user's local authority.
+High-latitude cases where the sun reaches sunset but not the selected Fajr or Isha angle use the angle-based portion of the night: `angle / 60 × night duration`. This preserves the normal calculation method on ordinary days and keeps Fajr before Dhuhr and Isha after Maghrib. Polar-day and polar-night results still need comparison with the user's local authority.
 
 ## Manual adjustments
 

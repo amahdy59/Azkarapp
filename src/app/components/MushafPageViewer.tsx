@@ -222,11 +222,11 @@ export function MushafPageViewer({
 
       {/* 15-Line Mushaf Page Canvas */}
       <div
-        className="flex-1 px-3 sm:px-6 py-4 flex flex-col justify-between overflow-y-auto"
+        className="flex-1 px-2 min-[360px]:px-3 sm:px-6 py-3 min-[360px]:py-4 flex flex-col justify-between overflow-y-auto"
         style={{
           fontFamily: "var(--font-mushaf)",
-          fontSize: "clamp(1.1rem, 2.2vw, 1.35rem)",
-          lineHeight: "2.4",
+          fontSize: "clamp(1rem, 4.8vw, 1.35rem)",
+          lineHeight: "clamp(2.05, 10vw, 2.4)",
         }}
       >
         {lineDetails.map((line, lineIdx) => {
@@ -247,7 +247,7 @@ export function MushafPageViewer({
           return (
             <div
               key={lineIdx}
-              className="flex items-baseline justify-center flex-wrap sm:flex-nowrap w-full py-0.5 select-text gap-x-1 sm:gap-x-1.5 md:gap-x-2"
+              className="flex items-baseline justify-center flex-wrap sm:flex-nowrap w-full py-0.5 select-text gap-x-0.5 min-[360px]:gap-x-1 sm:gap-x-1.5 md:gap-x-2"
             >
               {lineWords.map((w, wIdx) => {
                 const meaning = highlightGhareeb ? getQuranWordMeaning(w.verseKey, w.text) : undefined;

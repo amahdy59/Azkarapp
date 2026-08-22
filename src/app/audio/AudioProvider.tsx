@@ -63,6 +63,17 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     return audioRef.current;
   }, []);
 
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    const entry = state.plan?.entries[state.entryIndex];
+    if (!entry) return;
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: entry.titleArabic,
+      artist: state.currentVoiceId ?? entry.titleEnglish,
+      album: "Azkar",
+    });
+  }, [state.currentVoiceId, state.entryIndex, state.plan]);
+
   const updatePreferences = useCallback((next: AudioPreferences) => {
     preferencesRef.current = next;
     setPreferences(next);
@@ -306,6 +317,41 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     if (!audio || !Number.isFinite(seconds)) return;
     audio.currentTime = Math.max(0, Math.min(seconds, Number.isFinite(audio.duration) ? audio.duration : seconds));
   }, []);
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator)) return;
+    const setHandler = (action: MediaSessionAction, handler: MediaSessionActionHandler) => {
+      try {
+        navigator.mediaSession.setActionHandler(action, handler);
+      } catch {
+        // Browsers expose different subsets of MediaSession actions.
+      }
+    };
+    setHandler("play", play);
+    setHandler("pause", pause);
+    setHandler("previoustrack", previous);
+    setHandler("nexttrack", next);
+    setHandler("seekbackward", (details) => seek((audioRef.current?.currentTime ?? 0) - (details.seekOffset ?? 10)));
+    setHandler("seekforward", (details) => seek((audioRef.current?.currentTime ?? 0) + (details.seekOffset ?? 10)));
+    setHandler("seekto", (details) => seek(details.seekTime ?? 0));
+    return () => {
+      for (const action of [
+        "play",
+        "pause",
+        "previoustrack",
+        "nexttrack",
+        "seekbackward",
+        "seekforward",
+        "seekto",
+      ] as const) {
+        try {
+          navigator.mediaSession.setActionHandler(action, null);
+        } catch {
+          // See the compatibility note above.
+        }
+      }
+    };
+  }, [next, pause, play, previous, seek]);
 
   const setPlaybackRate = useCallback(
     (playbackRate: number) => {
