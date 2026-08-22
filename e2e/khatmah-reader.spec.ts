@@ -30,23 +30,53 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "هذا الأسبوع" }).getByRole("listitem").first()).toContainText("السبت");
 
+  await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
-  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
-  await expect(page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" })).toBeVisible();
+  const mushafPage = page.getByRole("article", { name: "صفحة ٤٢" });
+  const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
+  const revealControls = page.getByRole("button", { name: "إظهار أدوات صفحة المصحف" });
+  await expect(mushafPage).toBeVisible();
+  await expect(pageNavigation).toBeVisible();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "إظهار معاني الكلمات الصعبة" })).toBeVisible();
-  await page.getByRole("button", { name: "إظهار معاني الكلمات الصعبة" }).click();
+  await expect(pageNavigation).toHaveCount(0, { timeout: 5000 });
+  await revealControls.click();
+  await expect(pageNavigation).toBeVisible();
+  const initialBox = await mushafPage.boundingBox();
+  expect(initialBox?.height).toBeGreaterThanOrEqual(665);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
+
+  const optionsButton = page.getByRole("button", { name: "خيارات" });
+  await optionsButton.focus();
+  const lines = mushafPage.locator("[data-mushaf-rendering] > div");
+  const lineRectsBefore = await lines.evaluateAll((elements) =>
+    elements.map((element, _index, allLines) => {
+      const rect = element.getBoundingClientRect();
+      return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
+    }),
+  );
+  await optionsButton.click();
+  const difficultWords = page.getByRole("menuitemcheckbox", { name: "كلمات صعبة" });
+  await expect(difficultWords).toBeVisible();
+  await difficultWords.click();
   await expect(page.getByRole("button", { name: /معنى كلمة/ })).toHaveCount(3);
+  const lineRectsAfter = await lines.evaluateAll((elements) =>
+    elements.map((element, _index, allLines) => {
+      const rect = element.getBoundingClientRect();
+      return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
+    }),
+  );
+  expect(lineRectsAfter).toEqual(lineRectsBefore);
+  await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await expect(page.getByText(/ختمة المصحف:/)).toHaveCount(0);
 
-  await expect(page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: "إظهار أدوات صفحة المصحف" }).click();
-  await expect(page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" })).toBeVisible();
+  await expect(pageNavigation).toHaveCount(0, { timeout: 5000 });
+  await revealControls.click();
+  await expect(pageNavigation).toBeVisible();
   await page.keyboard.press("Tab");
   await page.getByRole("button", { name: "رجوع" }).focus();
   await expect(page.getByRole("button", { name: "رجوع" })).toBeFocused();
   await page.waitForTimeout(3800);
-  await expect(page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" })).toBeVisible();
+  await expect(pageNavigation).toBeVisible();
 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
   expect(pageBox).not.toBeNull();

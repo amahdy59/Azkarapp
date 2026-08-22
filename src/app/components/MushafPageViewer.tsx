@@ -237,6 +237,7 @@ export function MushafPageViewer({
       {/* Page chrome occupies the physical Mushaf header/footer space. Hiding it
           never reflows the reviewed 15-line reading canvas. */}
       <div
+        data-mushaf-chrome="header"
         className={`flex h-14 shrink-0 items-center border-b px-2 transition-opacity sm:px-3 ${chromeBgClass} ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}
         aria-hidden={!controlsVisible}
         onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
@@ -331,10 +332,10 @@ export function MushafPageViewer({
                       <Popover.Trigger asChild>
                         <button
                           type="button"
-                          className="relative rounded bg-primary/10 px-0.5 text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                          className="relative inline appearance-none border-0 p-0 align-baseline [font:inherit] [line-height:inherit] rounded-sm bg-primary/10 text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                           aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
                         >
-                          <span className="font-bold">{wordContent}</span>
+                          {wordContent}
                         </button>
                       </Popover.Trigger>
                       <Popover.Portal>
@@ -373,6 +374,7 @@ export function MushafPageViewer({
       </div>
 
       <div
+        data-mushaf-chrome="footer"
         className={`flex h-14 shrink-0 items-center border-t px-2 transition-colors sm:px-3 ${chromeBgClass}`}
         onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
         onBlurCapture={() => onControlsFocusChange?.(false)}

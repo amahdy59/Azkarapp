@@ -23,7 +23,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   await page.setViewportSize({ width: 834, height: 900 });
   await openReturningGuest(page, "en");
 
-  const ltrCards = page.getByTestId("today-garden-card").getByRole("button");
+  const ltrCards = page.getByTestId("today-garden-card").getByRole("button", { name: / - (Completed|Not completed)$/ });
   const ltrBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
   expect(ltrBoxes.every(Boolean)).toBe(true);
   if (ltrBoxes[0] && ltrBoxes[1] && ltrBoxes[2]) {
@@ -42,7 +42,7 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   await openReturningGuest(page, "ar");
   await page.setViewportSize({ width: 834, height: 900 });
   await page.waitForFunction(() => window.innerWidth === 834);
-  const rtlCards = page.getByTestId("today-garden-card").getByRole("button");
+  const rtlCards = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
   const rtlBoxes = await Promise.all([0, 1, 2].map((index) => rtlCards.nth(index).boundingBox()));
   expect(rtlBoxes.every(Boolean)).toBe(true);
   if (rtlBoxes[0] && rtlBoxes[1] && rtlBoxes[2]) {

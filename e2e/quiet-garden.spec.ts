@@ -111,7 +111,7 @@ for (const language of ["en", "ar"] as const) {
       expect(box!.width).toBeGreaterThan(800);
     }).toPass();
     // Three: after-prayer adhkar are tracked per prayer in their own section.
-    const routineCards = garden.getByRole("button");
+    const routineCards = garden.getByRole("button", { name: / - (Completed|Not completed|مكتملة|غير مكتملة)$/ });
     await expect(routineCards).toHaveCount(3);
     const routineCardTops = await routineCards.evaluateAll((cards) =>
       cards.map((card) => Math.round(card.getBoundingClientRect().top)),
@@ -171,7 +171,7 @@ test("populated Home exposes leaf progress through text, state, and accessible n
   await expectNoWcagViolations(page);
 });
 
-test("three completed main collections are announced as a palm without points or rank", async ({ page }) => {
+test("three completed main collections stay concise and explain the palm on demand", async ({ page }) => {
   await seedReturningGardenUser(page, {
     completedToday: ["morning", "evening", "before_sleep"],
   });
@@ -179,12 +179,12 @@ test("three completed main collections are announced as a palm without points or
 
   const garden = page.getByTestId("today-garden-card");
 
-  await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toBeVisible();
-  // Home lists only the three time-of-day routines; after-prayer azkar are
-  // getting their own card. A palm still requires all four main collections,
-  // which is why the all-complete message above is the real assertion here.
+  await expect(garden.getByText("Masha'Allah! All today's routines completed! 🌴", { exact: false })).toHaveCount(0);
   await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
+  await garden.getByRole("button", { name: "How a palm is earned" }).click();
+  await expect(garden.getByRole("tooltip")).toContainText("Morning, Evening, and Before Sleep Azkar");
+  await expect(garden.getByRole("tooltip")).toContainText("does not measure spiritual reward or rank");
 });
 
 test("legacy garden visibility preferences no longer hide the current Wird or add a Progress toggle", async ({

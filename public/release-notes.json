@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22-7",
+  "release": "2026-08-22-8",
   "ar": [
-    "أصبح قسم وردك اليوم أكثر هدوءاً دون النص المساند أسفل العنوان.",
-    "يمكنك معرفة طريقة إضافة نخلة من زر المعلومات بجوار عنوان الورد.",
-    "تظهر أيقونات الأوراد المكتملة بلون نجاح واضح يسهل تمييزه.",
-    "يبقى شريط الصفحة الرئيسية واضحاً ومقروءاً أثناء التمرير فوق الخلفية."
+    "أصبح قسم وردك اليوم أكثر هدوءاً، مع شرح واضح لإضافة النخلة وتمييز أفضل للأوراد المكتملة.",
+    "تظهر صفحة المصحف مرة واحدة بخطها النهائي دون انتقال مزعج من عرض صغير إلى عرض أكبر.",
+    "يملأ المصحف شاشة الهاتف تقريباً، وتجمع أدواته الواضحة بين الأيقونة والنص ثم تختفي أثناء القراءة.",
+    "يمكنك تمييز الكلمات الصعبة من قائمة الخيارات والضغط عليها لمعرفة معناها، مع انتقال أسرع إلى الصفحة التالية."
   ],
   "en": [
-    "Today's Wird is calmer without supporting text below its title.",
-    "Use the information button beside the Wird title to learn how to earn a palm.",
-    "Completed routine icons now use a clearer success color.",
-    "The Home header remains clear and readable while scrolling over the background."
+    "Today's Wird is calmer, with clearer palm guidance and stronger completed-routine feedback.",
+    "The Mushaf page now appears once in its final typeface instead of resizing from a smaller view.",
+    "The Mushaf fills almost the entire phone screen, with clear icon-and-text controls that recede while reading.",
+    "Turn on difficult-word highlights from Options and tap a word for its meaning, with faster next-page turns."
   ]
 }

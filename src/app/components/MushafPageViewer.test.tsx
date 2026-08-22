@@ -63,6 +63,7 @@ describe("MushafPageViewer", () => {
 
     const word = screen.getByRole("button", { name: "Meaning of ٱلۡقَيُّومُ" });
     expect(word).toHaveClass("underline");
+    expect(word).not.toHaveClass("px-0.5", "font-bold");
   });
 
   it("keeps difficult words visually clean when meanings are off", () => {

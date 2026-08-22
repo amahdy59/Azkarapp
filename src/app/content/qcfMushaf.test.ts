@@ -1,5 +1,5 @@
-import { describe, expect, it } from "vitest";
-import { getQcfFontUrl, getQcfPageUrl, mergeQcfPage, parseQcfPageResponse } from "./qcfMushaf";
+import { describe, expect, it, vi } from "vitest";
+import { getQcfFontUrl, getQcfPageUrl, loadQcfFont, mergeQcfPage, parseQcfPageResponse } from "./qcfMushaf";
 
 describe("QCF Mushaf enhancement", () => {
   it("uses the official page-specific data and font locations", () => {
@@ -51,5 +51,26 @@ describe("QCF Mushaf enhancement", () => {
     expect(
       mergeQcfPage([{ k: "5:1", w: [[1, 7, 0, "LOCAL"]] }], [{ k: "5:1", w: [[1, 8, 0, "REMOTE", ""]] }]),
     ).toEqual([{ k: "5:1", w: [[1, 8, 0, "LOCAL", ""]] }]);
+  });
+
+  it("does not report a QCF page font ready until the font has loaded", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    const add = vi.fn();
+    const load = vi.fn().mockResolvedValue({ family: "qcf-v2-page-601" });
+    class TestFontFace {
+      load = load;
+    }
+
+    vi.stubGlobal("FontFace", TestFontFace);
+    Object.defineProperty(document, "fonts", { configurable: true, value: { add } });
+
+    await expect(loadQcfFont(601)).resolves.toBe(true);
+    await expect(loadQcfFont(601)).resolves.toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+    expect(add).toHaveBeenCalledTimes(1);
+
+    vi.unstubAllGlobals();
+    if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+    else Reflect.deleteProperty(document, "fonts");
   });
 });

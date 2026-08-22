@@ -27,6 +27,9 @@ interface QcfVerse {
 
 const QCF_API_ROOT = "https://api.quran.com/api/v4";
 const QCF_FONT_ROOT = "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2";
+const qcfPageCache = new Map<number, MushafVerseData[]>();
+const loadedQcfFonts = new Set<string>();
+const MAX_MEMORY_PAGES = 4;
 
 export function getQcfPageUrl(page: number) {
   return `${QCF_API_ROOT}/verses/by_page/${page}?words=true&word_fields=code_v2,text_qpc_hafs,text_uthmani_simple&per_page=50`;
@@ -98,9 +101,32 @@ export function mergeQcfPage(localPage: MushafVerseData[], qcfPage: MushafVerseD
 }
 
 export async function fetchQcfPage(page: number, signal: AbortSignal) {
+  const cached = qcfPageCache.get(page);
+  if (cached) return cached;
+
   const response = await fetch(getQcfPageUrl(page), { signal });
   if (!response.ok) throw new Error(`QCF page request failed with HTTP ${response.status}`);
   const parsed = parseQcfPageResponse(await response.json());
   if (!parsed) throw new Error("QCF page response did not match the expected schema");
+
+  qcfPageCache.delete(page);
+  qcfPageCache.set(page, parsed);
+  while (qcfPageCache.size > MAX_MEMORY_PAGES) {
+    const oldestPage = qcfPageCache.keys().next().value;
+    if (oldestPage === undefined) break;
+    qcfPageCache.delete(oldestPage);
+  }
   return parsed;
+}
+
+export async function loadQcfFont(page: number) {
+  if (typeof FontFace === "undefined" || typeof document === "undefined" || !document.fonts) return false;
+
+  const family = getQcfFontFamily(page);
+  if (loadedQcfFonts.has(family)) return true;
+
+  const loadedFont = await new FontFace(family, `url(${getQcfFontUrl(page)})`).load();
+  document.fonts.add(loadedFont);
+  loadedQcfFonts.add(family);
+  return true;
 }

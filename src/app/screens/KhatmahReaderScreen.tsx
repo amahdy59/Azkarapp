@@ -12,21 +12,28 @@ import {
   SlidersHorizontal,
   Eye,
   ChevronDown,
+  CheckCircle2,
+  BookOpen,
+  MoreHorizontal,
+  Brush,
 } from "../components/icons";
 import { motion, AnimatePresence, useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
-import * as Popover from "@radix-ui/react-popover";
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "../components/ui/dropdown-menu";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
-import {
-  fetchQcfPage,
-  getQcfFontFamily,
-  getQcfFontUrl,
-  mergeQcfPage,
-  type MushafVerseData,
-} from "../content/qcfMushaf";
+import { fetchQcfPage, loadQcfFont, mergeQcfPage, type MushafVerseData } from "../content/qcfMushaf";
 
 export function KhatmahReaderScreen({
   language,
@@ -64,7 +71,7 @@ export function KhatmahReaderScreen({
   const [error, setError] = useState<string | null>(null);
   const [swipeDirection, setSwipeDirection] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
-  const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
+  const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [controlsFocused, setControlsFocused] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
@@ -84,7 +91,7 @@ export function KhatmahReaderScreen({
   const handleSelectTheme = (newTheme: MushafTheme) => {
     setTheme(newTheme);
     onUpdateTheme?.(newTheme);
-    setIsThemeMenuOpen(false);
+    setIsOptionsMenuOpen(false);
   };
 
   const isCurrentBookmarked = bookmarks.includes(currentPage);
@@ -117,8 +124,10 @@ export function KhatmahReaderScreen({
     (page: number) => {
       let active = true;
       const controller = new AbortController();
+      const enhancementController = new AbortController();
       setLoading(true);
       setError(null);
+      setPageData(null);
       setQcfFontReady(false);
 
       const baseUrl = import.meta.env.BASE_URL || "/";
@@ -126,39 +135,43 @@ export function KhatmahReaderScreen({
       const targetUrl = `${cleanBase}data/mushaf/${page}.json`;
 
       void (async () => {
-        let localPage: MushafVerseData[] | null = null;
-        try {
+        const localPagePromise = (async () => {
           const response = await fetch(targetUrl, { signal: controller.signal });
           if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          localPage = (await response.json()) as MushafVerseData[];
-          if (active) {
-            setPageData(localPage);
-            setLoading(false);
-          }
-        } catch (localError) {
-          if (controller.signal.aborted) return;
-          console.error("Failed to load local Mushaf page", localError);
-        }
+          return (await response.json()) as MushafVerseData[];
+        })();
+        const enhancementTimeout = window.setTimeout(() => enhancementController.abort(), 1800);
+        const qcfEnhancementPromise = Promise.all([fetchQcfPage(page, enhancementController.signal), loadQcfFont(page)])
+          .then(([qcfPage, fontReady]) => {
+            if (!fontReady) throw new Error("QCF page font is unavailable");
+            return qcfPage;
+          })
+          .finally(() => window.clearTimeout(enhancementTimeout));
 
-        try {
-          const qcfPage = await fetchQcfPage(page, controller.signal);
-          if (active) {
-            setPageData(localPage ? mergeQcfPage(localPage, qcfPage) : qcfPage);
-            setLoading(false);
-          }
-        } catch (qcfError) {
-          if (controller.signal.aborted) return;
-          if (!localPage && active) {
-            console.error("Failed to load Mushaf page", qcfError);
-            setError(t(language, "mushaf.loadFailed"));
-            setLoading(false);
-          }
+        const [localResult, qcfResult] = await Promise.allSettled([localPagePromise, qcfEnhancementPromise]);
+        if (!active || controller.signal.aborted) return;
+
+        const localPage = localResult.status === "fulfilled" ? localResult.value : null;
+        const qcfPage = qcfResult.status === "fulfilled" ? qcfResult.value : null;
+
+        if (qcfPage) {
+          setPageData(localPage ? mergeQcfPage(localPage, qcfPage) : qcfPage);
+          setQcfFontReady(true);
+        } else if (localPage) {
+          setPageData(localPage);
+        } else {
+          const localError = localResult.status === "rejected" ? localResult.reason : undefined;
+          const qcfError = qcfResult.status === "rejected" ? qcfResult.reason : undefined;
+          console.error("Failed to load Mushaf page", localError, qcfError);
+          setError(t(language, "mushaf.loadFailed"));
         }
+        setLoading(false);
       })();
 
       return () => {
         active = false;
         controller.abort();
+        enhancementController.abort();
       };
     },
     [language],
@@ -169,36 +182,29 @@ export function KhatmahReaderScreen({
   }, [currentPage, loadPage]);
 
   useEffect(() => {
-    if (!pageData?.some((verse) => verse.w.some((word) => Boolean(word[4])))) return;
-    if (typeof FontFace === "undefined" || !document.fonts) return;
-    let active = true;
-    const pageFont = new FontFace(getQcfFontFamily(currentPage), `url(${getQcfFontUrl(currentPage)})`, {
-      display: "swap",
-    });
-    void pageFont
-      .load()
-      .then((loadedFont) => {
-        if (!active) return;
-        document.fonts.add(loadedFont);
-        setQcfFontReady(true);
-      })
-      .catch(() => {
-        if (active) setQcfFontReady(false);
-      });
+    if (!qcfFontReady || currentPage >= 604) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+
+    const controller = new AbortController();
+    const timer = window.setTimeout(() => {
+      void Promise.allSettled([fetchQcfPage(currentPage + 1, controller.signal), loadQcfFont(currentPage + 1)]);
+    }, 400);
     return () => {
-      active = false;
+      window.clearTimeout(timer);
+      controller.abort();
     };
-  }, [currentPage, pageData]);
+  }, [currentPage, qcfFontReady]);
 
   useEffect(() => {
     setControlsVisible(true);
   }, [currentPage]);
 
   useEffect(() => {
-    if (!controlsVisible || controlsFocused || isIndexOpen || isThemeMenuOpen) return;
+    if (!controlsVisible || controlsFocused || isIndexOpen || isOptionsMenuOpen) return;
     const timer = window.setTimeout(() => setControlsVisible(false), 3500);
     return () => window.clearTimeout(timer);
-  }, [controlsVisible, controlsFocused, currentPage, isIndexOpen, isThemeMenuOpen]);
+  }, [controlsVisible, controlsFocused, currentPage, isIndexOpen, isOptionsMenuOpen]);
 
   // Transform data into 15 lines
   const lines = useMemo(() => {
@@ -270,16 +276,16 @@ export function KhatmahReaderScreen({
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const leftPageDelta = isArabic ? 1 : -1;
   const rightPageDelta = -leftPageDelta;
+  const headerActionClass =
+    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1 rounded-xl px-1.5 text-[0.6875rem] font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+  const footerActionClass =
+    "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[0.625rem] font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-40";
 
   const pageHeader = (
     <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
-      <button
-        type="button"
-        onClick={onBack}
-        className="ui-icon-button shrink-0"
-        aria-label={t(language, "common.back")}
-      >
+      <button type="button" onClick={onBack} className={headerActionClass} aria-label={t(language, "common.back")}>
         {backIcon}
+        <span>{t(language, "common.back")}</span>
       </button>
       <button
         type="button"
@@ -293,64 +299,46 @@ export function KhatmahReaderScreen({
         </span>
         <ChevronDown size={16} className="shrink-0 opacity-60" aria-hidden="true" />
       </button>
-      <button
-        type="button"
-        onClick={() => setShowWordMeanings((shown) => !shown)}
-        className={`ui-icon-button shrink-0 ${showWordMeanings ? "bg-primary/15 text-primary" : ""}`}
-        aria-label={t(language, showWordMeanings ? "mushaf.hideWordMeanings" : "mushaf.showWordMeanings")}
-        aria-pressed={showWordMeanings}
-      >
-        <Eye size={18} />
-      </button>
-      <Popover.Root open={isThemeMenuOpen} onOpenChange={setIsThemeMenuOpen}>
-        <Popover.Trigger asChild>
-          <button type="button" className="ui-icon-button shrink-0" aria-label={t(language, "mushaf.themeTitle")}>
-            <SlidersHorizontal size={18} />
+      <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
+        <DropdownMenuTrigger asChild>
+          <button type="button" className={headerActionClass} aria-label={t(language, "mushaf.options")}>
+            <MoreHorizontal size={18} />
+            <span>{t(language, "mushaf.options")}</span>
           </button>
-        </Popover.Trigger>
-        <Popover.Portal>
-          <Popover.Content
-            side="bottom"
-            align="end"
-            sideOffset={8}
-            dir={direction}
-            className="z-50 w-52 rounded-2xl border border-border bg-popover p-2 text-popover-foreground shadow-overlay"
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-[14rem]">
+          <DropdownMenuCheckboxItem
+            checked={showWordMeanings}
+            onCheckedChange={(checked) => setShowWordMeanings(checked === true)}
           >
-            <div className="flex flex-col gap-1">
-              <span className="px-2 py-1 text-xs font-bold text-muted-foreground">
-                {t(language, "mushaf.themeTitle")}
-              </span>
-              {(
-                [
-                  ["parchment", t(language, "mushaf.themeParchment")],
-                  ["dark", t(language, "mushaf.themeDark")],
-                  ["oled", t(language, "mushaf.themeOled")],
-                  ["white", t(language, "mushaf.themeWhite")],
-                ] as const
-              ).map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  onClick={() => handleSelectTheme(id)}
-                  className={`min-h-11 rounded-xl px-3 text-start text-xs font-bold ${theme === id ? "bg-primary/15 text-primary" : "hover:bg-muted"}`}
-                  aria-pressed={theme === id}
-                >
-                  {label}
-                </button>
-              ))}
-            </div>
-          </Popover.Content>
-        </Popover.Portal>
-      </Popover.Root>
-      <button
-        type="button"
-        onClick={toggleBookmark}
-        className={`ui-icon-button shrink-0 ${isCurrentBookmarked ? "bg-primary/15 text-primary" : ""}`}
-        aria-label={t(language, "mushaf.toggleBookmark")}
-        aria-pressed={isCurrentBookmarked}
-      >
-        <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
-      </button>
+            <Eye size={18} />
+            <span>{t(language, "mushaf.difficultWords")}</span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuCheckboxItem checked={isCurrentBookmarked} onCheckedChange={toggleBookmark}>
+            <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
+            <span>{t(language, "mushaf.toggleBookmark")}</span>
+          </DropdownMenuCheckboxItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
+            <Brush size={16} aria-hidden="true" />
+            <span>{t(language, "mushaf.themeTitle")}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
+            {(
+              [
+                ["parchment", t(language, "mushaf.themeParchment")],
+                ["dark", t(language, "mushaf.themeDark")],
+                ["oled", t(language, "mushaf.themeOled")],
+                ["white", t(language, "mushaf.themeWhite")],
+              ] as const
+            ).map(([id, label]) => (
+              <DropdownMenuRadioItem key={id} value={id}>
+                {label}
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 
@@ -364,38 +352,42 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={() => paginate(leftPageDelta)}
         disabled={currentPage + leftPageDelta < 1 || currentPage + leftPageDelta > 604}
-        className="ui-icon-button shrink-0"
+        className={footerActionClass}
         aria-label={t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}
       >
         <ChevronLeft size={22} />
+        <span className="truncate">{t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}</span>
       </button>
       <button
         type="button"
         onClick={recordCurrentPage}
         disabled={todayPagesRead.includes(currentPage)}
-        className="ui-icon-button shrink-0 bg-primary text-primary-foreground disabled:opacity-45"
+        className={`${footerActionClass} bg-primary text-primary-foreground`}
         aria-label={t(language, "mushaf.recordPage")}
       >
-        <span aria-hidden="true" className="text-base font-black">
-          {todayPagesRead.includes(currentPage) ? "✓" : "+"}
-        </span>
+        <CheckCircle2 size={19} aria-hidden="true" />
+        <span className="truncate">{t(language, "mushaf.recordPage")}</span>
       </button>
       <button
         type="button"
         onClick={() => setIsIndexOpen(true)}
-        className="min-h-11 min-w-16 rounded-xl px-3 text-sm font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className={footerActionClass}
         aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
       >
-        {formatNumerals(currentPage, language)}
+        <BookOpen size={19} aria-hidden="true" />
+        <span className="truncate">
+          {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+        </span>
       </button>
       <button
         type="button"
         onClick={() => paginate(rightPageDelta)}
         disabled={currentPage + rightPageDelta < 1 || currentPage + rightPageDelta > 604}
-        className="ui-icon-button shrink-0"
+        className={footerActionClass}
         aria-label={t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}
       >
         <ChevronRight size={22} />
+        <span className="truncate">{t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}</span>
       </button>
     </nav>
   );
@@ -405,10 +397,11 @@ export function KhatmahReaderScreen({
       <button
         type="button"
         onClick={() => setControlsVisible(true)}
-        className="ui-icon-button"
+        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={t(language, "mushaf.showPageControls")}
       >
         <SlidersHorizontal size={18} />
+        <span>{t(language, "mushaf.pageControls")}</span>
       </button>
     </div>
   );
