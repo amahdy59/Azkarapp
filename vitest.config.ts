@@ -1,11 +1,32 @@
 import { defineConfig } from "vitest/config";
 
+import { ISOLATED_SUITES } from "./src/test/isolatedSuites";
+
+const ALL_SUITES = ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"];
+
+/**
+ * Suite speed (this machine, 16 cores): 3 m 34 s on the stock `forks` pool with
+ * per-file isolation, 1 m 49 s on worker threads, 33 s once the threads share a
+ * module registry. Nearly all of it was environment and import cost paid once
+ * per file — 918 s of accumulated worker time against 306 s of actual tests.
+ */
+const shared = {
+  testTimeout: 15000,
+  environment: "jsdom" as const,
+  pool: "threads" as const,
+  setupFiles: ["./src/test/setup.ts"],
+};
+
 export default defineConfig({
   test: {
-    testTimeout: 15000,
-    environment: "jsdom",
-    include: ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"],
-    setupFiles: ["./src/test/setup.ts"],
+    projects: [
+      {
+        test: { ...shared, name: "shared-registry", include: ALL_SUITES, exclude: ISOLATED_SUITES, isolate: false },
+      },
+      {
+        test: { ...shared, name: "isolated", include: ISOLATED_SUITES, isolate: true },
+      },
+    ],
     coverage: {
       provider: "v8",
       clean: false,
