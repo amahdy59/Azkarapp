@@ -116,20 +116,16 @@ function SurahHeaderBand({
   const isOled = theme === "oled";
 
   return (
-    <div className="flex h-full w-full items-center justify-center px-1 select-none" dir="rtl">
-      <div
-        className={`flex h-[86%] w-full items-center justify-between gap-2 rounded-md border px-2 ${
-          isOled ? "border-white/80 bg-white/10 text-white" : "border-primary/50 bg-primary/8 text-primary"
-        }`}
-      >
-        <span className="shrink-0 text-[0.7em] opacity-70" aria-hidden="true">
-          ۞
-        </span>
-        <span className="truncate font-arabic text-[0.82em] font-bold leading-none tracking-wide">{title}</span>
-        <span className="shrink-0 text-[0.7em] opacity-70" aria-hidden="true">
-          ۞
-        </span>
-      </div>
+    <div className="flex h-full w-full items-center justify-center gap-2 px-2 select-none" dir="rtl">
+      <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
+      <span className="shrink-0 text-[0.5em] opacity-50" aria-hidden="true">
+        ۞
+      </span>
+      <span className="shrink-0 truncate font-arabic text-[0.6em] font-bold tracking-[0.08em]">{title}</span>
+      <span className="shrink-0 text-[0.5em] opacity-50" aria-hidden="true">
+        ۞
+      </span>
+      <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
     </div>
   );
 }
@@ -156,27 +152,17 @@ function SurahOpeningBand({
   const isOled = theme === "oled";
 
   return (
-    <div className="flex h-full w-full items-center justify-center px-1 select-none" dir="rtl">
-      <div
-        className={`flex h-[94%] w-full flex-col items-center justify-center gap-px rounded-md border px-2 ${
-          isOled ? "border-white/80 bg-white/10 text-white" : "border-primary/50 bg-primary/8 text-primary"
-        }`}
-      >
-        <span className="flex w-full items-center justify-between gap-2">
-          <span className="shrink-0 text-[0.52em] opacity-70" aria-hidden="true">
-            ۞
-          </span>
-          <span className="truncate font-arabic text-[0.6em] font-bold leading-none tracking-wide">{title}</span>
-          <span className="shrink-0 text-[0.52em] opacity-70" aria-hidden="true">
-            ۞
-          </span>
+    <div className="flex h-full w-full flex-col items-center justify-center gap-px px-2 select-none" dir="rtl">
+      <span className="flex w-full items-center justify-center gap-2">
+        <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
+        <span className="shrink-0 truncate font-arabic text-[0.55em] font-bold tracking-[0.08em]">{title}</span>
+        <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
+      </span>
+      {withBismillah && (
+        <span className="font-arabic text-[0.52em] leading-none opacity-90" style={{ fontFamily: "inherit" }}>
+          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </span>
-        {withBismillah && (
-          <span className="font-arabic text-[0.55em] leading-none" style={{ fontFamily: "inherit" }}>
-            بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-          </span>
-        )}
-      </div>
+      )}
     </div>
   );
 }
@@ -394,7 +380,13 @@ function measureNaturalWidth(content: HTMLElement) {
  * scaling it to the same rule stacked one line's kasrahs into the next line's
  * ink.
  */
-const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.94, fallback: 0.7 } as const;
+/**
+ * How much of a line slot the line box may claim; the rest is leading.
+ *
+ * Nudged down from 0.94 to 0.88 for QCF — a small, deliberate increase in the
+ * air between lines, which readers found tight.
+ */
+const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.88, fallback: 0.68 } as const;
 
 function useLineFitter(dependencyKey: string, inkAllowance: number) {
   const canvasRef = useRef<HTMLDivElement | null>(null);

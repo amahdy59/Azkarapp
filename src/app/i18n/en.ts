@@ -24,6 +24,7 @@ const en = {
     bottomNavigation: "Bottom Navigation",
     primaryNavigation: "Main Navigation",
     cancel: "Cancel",
+    clear: "Clear",
     close: "Close",
     reset: "Reset",
     moreOptions: "More options",

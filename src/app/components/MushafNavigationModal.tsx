@@ -54,7 +54,7 @@ export function MushafNavigationModal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in" />
         <Dialog.Content
           dir={direction}
-          className="fixed inset-x-3 bottom-3 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 flex max-h-[88vh] sm:h-[620px] w-full max-w-[560px] flex-col rounded-2xl bg-card text-card-foreground shadow-overlay border border-border overflow-hidden animate-in fade-in zoom-in-95"
+          className="fixed inset-x-2 bottom-2 top-2 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 flex max-h-[100dvh] sm:h-[min(620px,88dvh)] w-auto sm:w-full max-w-[560px] flex-col rounded-2xl bg-card text-card-foreground shadow-overlay border border-border overflow-hidden animate-in fade-in zoom-in-95"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/40">
@@ -137,27 +137,31 @@ export function MushafNavigationModal({
             {/* Surahs Tab */}
             {activeTab === "surahs" && (
               <div className="flex flex-col gap-3">
-                {/* Search Bar */}
-                <div className="relative flex items-center">
-                  <span className="absolute start-3 text-muted-foreground pointer-events-none">
-                    <Search size={18} />
-                  </span>
-                  <input
-                    type="search"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder={t(language, "mushaf.searchSurahs")}
-                    className="w-full rounded-xl bg-input-background border border-border ps-9 pe-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                  />
-                  {searchQuery && (
-                    <button
-                      type="button"
-                      onClick={() => setSearchQuery("")}
-                      className="absolute end-3 text-muted-foreground hover:text-foreground p-1"
-                    >
-                      <X size={14} />
-                    </button>
-                  )}
+                {/* Search Bar — sticky, so results scroll under it rather than
+                    pushing it off the top on a phone with the keyboard open. */}
+                <div className="sticky top-0 z-10 -mx-4 -mt-4 flex items-center gap-2 border-b border-border/60 bg-card px-4 pb-3 pt-4">
+                  <div className="relative flex flex-1 items-center">
+                    <span className="absolute start-3 text-muted-foreground pointer-events-none">
+                      <Search size={18} />
+                    </span>
+                    <input
+                      type="search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder={t(language, "mushaf.searchSurahs")}
+                      className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-9 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                    />
+                    {searchQuery && (
+                      <button
+                        type="button"
+                        onClick={() => setSearchQuery("")}
+                        aria-label={t(language, "common.clear")}
+                        className="absolute end-2 flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      >
+                        <X size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 {/* Surahs List */}
