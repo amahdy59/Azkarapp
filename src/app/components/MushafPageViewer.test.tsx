@@ -115,6 +115,52 @@ describe("MushafPageViewer", () => {
     expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
   });
 
+  it("keeps both the heading and the basmalah when a surah opens with one slot to spare", () => {
+    // Nineteen pages look like this: line 1 free, the surah's first verse on
+    // line 2. The heading used to be dropped on the floor.
+    render(
+      <MushafPageViewer
+        lines={[
+          [],
+          [
+            { verseKey: "4:1", position: 1, isEnd: 0, text: "يَـٰٓأَيُّهَا" },
+            { verseKey: "4:1", position: 2, isEnd: 1, text: "١" },
+          ],
+        ]}
+        language="ar"
+        pageNumber={77}
+        surahName="سورة النساء"
+        juzNumber={4}
+        direction="rtl"
+      />,
+    );
+
+    expect(screen.getAllByText("سورة النساء").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toBeInTheDocument();
+  });
+
+  it("omits the basmalah for At-Tawbah, which takes none, but still names the surah", () => {
+    render(
+      <MushafPageViewer
+        lines={[
+          [],
+          [
+            { verseKey: "9:1", position: 1, isEnd: 0, text: "بَرَآءَةٌۭ" },
+            { verseKey: "9:1", position: 2, isEnd: 1, text: "١" },
+          ],
+        ]}
+        language="ar"
+        pageNumber={187}
+        surahName="سورة التوبة"
+        juzNumber={10}
+        direction="rtl"
+      />,
+    );
+
+    expect(screen.getAllByText("سورة التوبة").length).toBeGreaterThanOrEqual(1);
+    expect(screen.queryByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).not.toBeInTheDocument();
+  });
+
   it("renders surah header banner when an empty line precedes a new surah start", () => {
     const surahStartLines = [
       [], // Line 1: empty -> should be Surah Header

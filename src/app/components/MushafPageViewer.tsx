@@ -63,12 +63,15 @@ export function AyahMarker({
       role="img"
       aria-label={`آية ${displayNum}`}
     >
+      {/* Drawn in the page's own ink, not the accent colour. A coloured
+          medallion every few words pulled the eye out of the line; print sets
+          the marker in the same ink as the text it closes. */}
       <svg
         width="1.15em"
         height="1.15em"
         viewBox="0 0 32 32"
         fill="none"
-        className={isOled ? "text-white" : "text-primary/90"}
+        className={isOled ? "text-white" : "text-current opacity-75"}
         aria-hidden="true"
       >
         <circle cx="16" cy="16" r="14.5" stroke="currentColor" strokeWidth="1.5" className="opacity-90" />
@@ -84,7 +87,7 @@ export function AyahMarker({
       </svg>
       <span
         className={`absolute inset-0 flex items-center justify-center font-sans text-[0.42em] font-bold leading-none ${
-          isOled ? "text-white" : "text-primary"
+          isOled ? "text-white" : "text-current opacity-85"
         }`}
         style={{ fontVariantNumeric: "tabular-nums" }}
         aria-hidden="true"
@@ -131,6 +134,53 @@ function SurahHeaderBand({
   );
 }
 
+/**
+ * Nineteen surahs begin on the second line of their page, leaving exactly one
+ * slot where the heading and the basmalah both belong. The old inference put
+ * the basmalah there and silently dropped the name — and on At-Tawbah's page,
+ * which takes no basmalah, left the slot blank. Both belong on the page, so
+ * both go in the one slot.
+ */
+function SurahOpeningBand({
+  surahNumber,
+  language,
+  theme = "parchment",
+  withBismillah,
+}: {
+  surahNumber: number | string;
+  language: AppLanguage;
+  theme?: MushafTheme;
+  withBismillah: boolean;
+}) {
+  const title = getSurahDisplayName(surahNumber, language);
+  const isOled = theme === "oled";
+
+  return (
+    <div className="flex h-full w-full items-center justify-center px-1 select-none" dir="rtl">
+      <div
+        className={`flex h-[94%] w-full flex-col items-center justify-center gap-px rounded-md border px-2 ${
+          isOled ? "border-white/80 bg-white/10 text-white" : "border-primary/50 bg-primary/8 text-primary"
+        }`}
+      >
+        <span className="flex w-full items-center justify-between gap-2">
+          <span className="shrink-0 text-[0.52em] opacity-70" aria-hidden="true">
+            ۞
+          </span>
+          <span className="truncate font-arabic text-[0.6em] font-bold leading-none tracking-wide">{title}</span>
+          <span className="shrink-0 text-[0.52em] opacity-70" aria-hidden="true">
+            ۞
+          </span>
+        </span>
+        {withBismillah && (
+          <span className="font-arabic text-[0.55em] leading-none" style={{ fontFamily: "inherit" }}>
+            بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function BismillahLine() {
   return (
     <div className="flex h-full w-full items-center justify-center select-none" dir="rtl">
@@ -143,6 +193,7 @@ function BismillahLine() {
 
 type LineDetail =
   | { type: "surah-header"; surah: number }
+  | { type: "surah-opening"; surah: number; withBismillah: boolean }
   | { type: "bismillah" }
   | { type: "empty" }
   | { type: "text"; words: MushafWordToken[] };
@@ -172,6 +223,8 @@ const MushafTextLine = memo(function MushafTextLine({
   useQcfGlyphs: boolean;
   showWordMeanings: boolean;
   meanings: ReadonlyMap<string, string>;
+  /** The open word *on this line*, or null. Passing the page-wide value here
+   *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
   onActiveWordChange: (word: ActiveWord | null) => void;
 }) {
@@ -187,7 +240,12 @@ const MushafTextLine = memo(function MushafTextLine({
           exceeds the page get scaled by the fitter above — never clipped. */}
       <div
         data-mushaf-line-content=""
-        className="flex w-full shrink-0 flex-nowrap items-baseline justify-between gap-x-0.5 whitespace-nowrap"
+        // No inter-word gap in QCF: the glyph advances already carry the
+        // spacing the page was cut with, and adding our own widened it. The
+        // Unicode fallback has no such spacing built in, so it keeps the gap.
+        className={`flex w-full shrink-0 flex-nowrap items-baseline justify-between whitespace-nowrap ${
+          useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"
+        }`}
       >
         {words.map((w, wIdx) => {
           const key = `${w.verseKey}:${w.position}:${wIdx}`;
@@ -527,8 +585,15 @@ export function MushafPageViewer({
             slot = { type: "surah-header", surah: start.surah };
             break;
           }
-          if (lineNum === start.startLine - 1 && start.surah !== 9) {
-            slot = { type: "bismillah" };
+          if (lineNum === start.startLine - 1) {
+            // Only one slot to spare: the heading and the basmalah share it
+            // rather than one of them going missing.
+            slot =
+              start.startLine - 2 < 1
+                ? { type: "surah-opening", surah: start.surah, withBismillah: start.surah !== 9 }
+                : start.surah !== 9
+                  ? { type: "bismillah" }
+                  : { type: "empty" };
             break;
           }
         }
@@ -646,6 +711,13 @@ export function MushafPageViewer({
             <div key={lineIdx} className="min-h-0 w-full flex-1">
               {line.type === "surah-header" ? (
                 <SurahHeaderBand surahNumber={line.surah} language={language} theme={theme} />
+              ) : line.type === "surah-opening" ? (
+                <SurahOpeningBand
+                  surahNumber={line.surah}
+                  language={language}
+                  theme={theme}
+                  withBismillah={line.withBismillah}
+                />
               ) : line.type === "bismillah" ? (
                 <BismillahLine />
               ) : line.type === "text" ? (
@@ -657,7 +729,12 @@ export function MushafPageViewer({
                   useQcfGlyphs={useQcfGlyphs}
                   showWordMeanings={showWordMeanings}
                   meanings={meanings}
-                  activeWord={activeWord}
+                  activeWord={
+                    activeWord &&
+                    line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
+                      ? activeWord
+                      : null
+                  }
                   onActiveWordChange={handleActiveWordChange}
                 />
               ) : (
