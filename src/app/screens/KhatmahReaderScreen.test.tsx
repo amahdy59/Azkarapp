@@ -84,6 +84,24 @@ describe("KhatmahReaderScreen navigation", () => {
   });
 });
 
+describe("KhatmahReaderScreen wird progress", () => {
+  it("shows progress against the goal chosen on the overview", async () => {
+    const today = new Date().toISOString().slice(0, 10);
+    renderReader({ quranWirdPlan: { kind: "daily", dailyPages: 4 }, wirdHistory: { [today]: [41, 42] } });
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+
+    const progress = screen.getByRole("progressbar", { name: /أكملت ٢ من ٤/ });
+    expect(progress).toHaveAttribute("aria-valuenow", "2");
+    expect(progress).toHaveAttribute("aria-valuemax", "4");
+  });
+
+  it("says nothing about a wird when no plan has been chosen", async () => {
+    renderReader();
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+});
+
 describe("KhatmahReaderScreen difficult words", () => {
   it("exposes a switch that reveals the reviewed meanings", async () => {
     const user = userEvent.setup();

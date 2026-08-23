@@ -887,6 +887,8 @@ const en = {
     hideWordMeanings: "Hide difficult-word meanings",
     difficultWords: "Difficult words",
     options: "Options",
+    wirdToday: "Today's wird",
+    pageRecorded: "Recorded",
     qcfUnavailable: "The local Quran font is shown until the Madinah page font is available.",
   },
   reader: {

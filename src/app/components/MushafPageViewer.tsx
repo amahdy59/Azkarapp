@@ -1,4 +1,14 @@
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+  type MutableRefObject,
+} from "react";
 import type { AppLanguage, MushafTheme } from "../types";
 import { getQuranWordMeaning } from "../content/quranWordMeanings";
 import * as Popover from "@radix-ui/react-popover";
@@ -27,6 +37,13 @@ export const MUSHAF_LINES_PER_PAGE = 15;
  * left the bottom half of the paper blank.
  */
 const OPENING_PAGES = new Set([1, 2]);
+
+/**
+ * The chrome follows the page's measure, but never shrinks below a comfortable
+ * toolbar width — a 300px page on a tall narrow window should not squeeze four
+ * controls into 300px when the screen has room.
+ */
+const CHROME_MEASURE = "min(100%, max(var(--mushaf-measure, 100%), 22rem))";
 
 export function AyahMarker({
   number,
@@ -322,7 +339,7 @@ function measureNaturalWidth(content: HTMLElement) {
 const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.94, fallback: 0.7 } as const;
 
 function useLineFitter(dependencyKey: string, inkAllowance: number) {
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -341,8 +358,12 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       // stylesheet would set it. Only the two custom properties are ever
       // written; the font-size expression itself belongs to React, and clearing
       // that left the page at the browser default.
-      column.style.setProperty("--mushaf-measure", "100%");
-      column.style.setProperty("--mushaf-fit", "1");
+      // Written on the page, not the column: the header and footer are the
+      // column's siblings and have to line up with the same measure, and a
+      // custom property only inherits downwards.
+      const page = (canvas.parentElement as HTMLElement | null) ?? column;
+      page.style.setProperty("--mushaf-measure", "100%");
+      page.style.setProperty("--mushaf-fit", "1");
       for (const content of contents) {
         content.style.transform = "";
         content.style.justifyContent = "";
@@ -374,8 +395,8 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const measure = Math.min(widest * verticalScale, available);
       const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
 
-      column.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
-      column.style.setProperty("--mushaf-fit", scale.toFixed(3));
+      page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
+      page.style.setProperty("--mushaf-fit", scale.toFixed(3));
 
       // Pass two — settle each line at the size the page actually ended up with.
       const fills = contents.map((content) => {
@@ -427,6 +448,10 @@ export function MushafPageViewer({
   showWordMeanings = false,
   headerContent,
   footerContent,
+  footerStatus,
+  progressBar,
+  chromeVisible = true,
+  paperRef,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -440,6 +465,14 @@ export function MushafPageViewer({
   showWordMeanings?: boolean;
   headerContent?: ReactNode;
   footerContent?: ReactNode;
+  /** Shown in the footer's reserved space once the action rows step aside, so
+   *  the reader never loses their place. */
+  footerStatus?: ReactNode;
+  /** Always visible, whatever the chrome is doing. */
+  progressBar?: ReactNode;
+  chromeVisible?: boolean;
+  /** The paper itself. A page turn drags this, never the chrome around it. */
+  paperRef?: MutableRefObject<HTMLDivElement | null>;
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -516,6 +549,15 @@ export function MushafPageViewer({
     useQcfGlyphs ? SLOT_INK_ALLOWANCE["qcf-v2"] : SLOT_INK_ALLOWANCE.fallback,
   );
 
+  // One node, two owners: the fitter measures it and the reader drags it.
+  const setPaper = useCallback(
+    (node: HTMLDivElement | null) => {
+      canvasRef.current = node;
+      if (paperRef) paperRef.current = node;
+    },
+    [canvasRef, paperRef],
+  );
+
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
 
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
@@ -558,21 +600,29 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* Page chrome occupies the physical Mushaf header/footer space, and stays
-          there. It used to fade out after 3.5s, taking the surah name, the juz,
-          the page number and every control with it — a printed Mushaf keeps its
-          running heads on the paper, and so does this one. */}
+      {/* The chrome occupies the physical Mushaf header/footer band, and keeps
+          that space whether or not it is showing anything: hiding the controls
+          must never resize the reading canvas underneath them.
+
+          Its content is held to the same measure as the page, so on a wide
+          screen Previous and Next sit under the paper they turn rather than out
+          at the far corners of the display. */}
       <div
         data-mushaf-chrome="header"
-        className={`flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
+        className={`flex h-14 shrink-0 items-center border-b px-2 transition-[opacity,visibility] duration-200 sm:px-3 ${chromeBgClass} ${
+          chromeVisible ? "visible opacity-100" : "invisible opacity-0"
+        }`}
+        aria-hidden={!chromeVisible}
       >
-        {headerContent}
+        <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
+          {headerContent}
+        </div>
       </div>
 
       {/* 15-line Mushaf page canvas. `container-type: size` lets the type scale
           off the page height, so all fifteen lines always fit the paper. */}
       <div
-        ref={canvasRef}
+        ref={setPaper}
         className="min-h-0 flex-1 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2"
         style={{ containerType: "size" }}
         data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
@@ -620,9 +670,25 @@ export function MushafPageViewer({
 
       <div
         data-mushaf-chrome="footer"
-        className={`flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
+        className={`relative flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
       >
-        {footerContent}
+        {/* `relative` matters: the row that steps aside is positioned against
+            this measure, not against the full-width footer. Without it the
+            hidden controls stretched across a 2000px display. */}
+        <div className="relative mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
+          <div
+            className={`w-full transition-[opacity,visibility] duration-200 ${chromeVisible ? "visible opacity-100" : "invisible absolute inset-x-0 opacity-0"}`}
+          >
+            {footerContent}
+          </div>
+          <div
+            className={`w-full transition-[opacity,visibility] duration-200 ${chromeVisible ? "invisible absolute inset-x-0 opacity-0" : "visible opacity-100"}`}
+          >
+            {footerStatus}
+          </div>
+        </div>
+        {/* Outside both, because the reader's progress is never in the way. */}
+        {progressBar}
       </div>
     </article>
   );

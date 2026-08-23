@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import type { AppLanguage, MushafTheme, QuranReadingPosition } from "../types";
+import type { AppLanguage, MushafTheme, QuranReadingPosition, QuranWirdPlan } from "../types";
 import {
   ChevronRight,
   ChevronLeft,
@@ -32,6 +32,7 @@ import {
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
+import { effectiveDailyGoal } from "./quranWirdGoal";
 import {
   getCachedMushafPage,
   isQcfFontReady,
@@ -53,6 +54,14 @@ const PAPER_SETTLE = "transform 160ms ease-out";
  * a dead network never holds the reader up.
  */
 const FONT_WAIT_MS = 1200;
+/**
+ * How long the controls stay up once you stop touching them.
+ *
+ * Long enough to read the page number and reach for a button, short enough that
+ * the paper is the only thing on screen while you are actually reading. Tapping
+ * the page brings them back, so nothing is ever more than one tap away.
+ */
+const CHROME_IDLE_MS = 4500;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -76,6 +85,7 @@ export function KhatmahReaderScreen({
   setMushafBookmarks: onUpdateBookmarks,
   wirdHistory = {},
   setWirdHistory: onUpdateWirdHistory,
+  quranWirdPlan,
   onReadingPositionChange,
 }: {
   language: AppLanguage;
@@ -89,6 +99,7 @@ export function KhatmahReaderScreen({
   setMushafBookmarks?: (bookmarks: number[]) => void;
   wirdHistory?: Record<string, number[]>;
   setWirdHistory?: (history: Record<string, number[]>) => void;
+  quranWirdPlan?: QuranWirdPlan;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
 }) {
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
@@ -105,6 +116,15 @@ export function KhatmahReaderScreen({
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
+  const [chromeVisible, setChromeVisible] = useState(true);
+  const [chromeFocused, setChromeFocused] = useState(false);
+  /**
+   * Hidden controls are `visibility: hidden`, which correctly takes them out of
+   * the tab order — and would strand a keyboard reader with no way to reach
+   * them at all. So once someone is driving by keyboard the controls stay put
+   * until they touch the page again.
+   */
+  const [keyboardDriven, setKeyboardDriven] = useState(false);
   const reduceMotion = useReducedMotion();
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -142,6 +162,18 @@ export function KhatmahReaderScreen({
 
   const todayKey = getProgressDayKey();
   const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
+
+  // The goal the reader chose on the overview, computed by the same function
+  // that screen uses so the two can never disagree about today's target.
+  const wirdGoal = useMemo(
+    () => (quranWirdPlan ? effectiveDailyGoal(quranWirdPlan, wirdHistory) : 0),
+    [quranWirdPlan, wirdHistory],
+  );
+  const wirdRead = Math.min(todayPagesRead.length, wirdGoal || todayPagesRead.length);
+  const wirdLabel = t(language, "mushaf.todayProgress", {
+    read: formatNumerals(wirdRead, language),
+    goal: formatNumerals(wirdGoal, language),
+  });
 
   const recordCurrentPage = useCallback(() => {
     if (!onUpdateWirdHistory) return;
@@ -189,6 +221,20 @@ export function KhatmahReaderScreen({
       active = false;
     };
   }, [currentPage, language, reloadToken]);
+
+  const revealChrome = useCallback(() => setChromeVisible(true), []);
+
+  useEffect(() => {
+    setChromeVisible(true);
+  }, [currentPage]);
+
+  useEffect(() => {
+    // Never step on a reader who is mid-interaction: an open menu, an open
+    // dialog, or keyboard focus inside the toolbar all hold it open.
+    if (!chromeVisible || chromeFocused || keyboardDriven || isIndexOpen || isOptionsMenuOpen) return;
+    const timer = window.setTimeout(() => setChromeVisible(false), CHROME_IDLE_MS);
+    return () => window.clearTimeout(timer);
+  }, [chromeVisible, chromeFocused, keyboardDriven, currentPage, isIndexOpen, isOptionsMenuOpen]);
 
   // Warm both neighbours once the reader has settled, so a turn in either
   // direction is a cache hit rather than a fetch.
@@ -263,6 +309,8 @@ export function KhatmahReaderScreen({
       if (isIndexOpen) return;
       const target = e.target as HTMLElement | null;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      setKeyboardDriven(true);
+      setChromeVisible(true);
       if (e.key === "ArrowRight") paginate(1);
       else if (e.key === "ArrowLeft") paginate(-1);
     };
@@ -295,6 +343,7 @@ export function KhatmahReaderScreen({
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
+    setKeyboardDriven(false);
     drag.current = { pointerId: event.pointerId, startX: event.clientX, engaged: false };
   };
 
@@ -304,6 +353,7 @@ export function KhatmahReaderScreen({
     if (!drag.current.engaged) {
       if (Math.abs(offset) < 12) return;
       drag.current.engaged = true;
+      setChromeVisible(false);
       if (event.currentTarget.hasPointerCapture?.(event.pointerId) === false) {
         event.currentTarget.setPointerCapture(event.pointerId);
       }
@@ -317,9 +367,16 @@ export function KhatmahReaderScreen({
 
   const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
+    const wasDragging = drag.current.engaged;
     endDrag(event.clientX);
+    // A tap on the paper — not a drag, not a control — is the gesture every
+    // reader tries first for "show me the controls again".
+    if (!wasDragging && !(event.target as HTMLElement).closest("[data-mushaf-chrome], button, a")) {
+      setChromeVisible((visible) => !visible);
+    }
   };
 
+  const pageAlreadyRecorded = todayPagesRead.includes(currentPage);
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
@@ -358,6 +415,7 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-difficult-words-switch"
       >
         <Eye size={18} aria-hidden="true" />
+        <span className="hidden sm:inline">{t(language, "mushaf.difficultWords")}</span>
         <span
           aria-hidden="true"
           className={`flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors ${
@@ -424,12 +482,18 @@ export function KhatmahReaderScreen({
       <button
         type="button"
         onClick={recordCurrentPage}
-        disabled={todayPagesRead.includes(currentPage)}
-        className={`${footerActionClass} bg-primary text-primary-foreground`}
-        aria-label={t(language, "mushaf.recordPage")}
+        disabled={pageAlreadyRecorded}
+        className={`${footerActionClass} shrink-0 basis-auto px-4 ${
+          pageAlreadyRecorded
+            ? "bg-primary/15 text-foreground/70 disabled:opacity-100"
+            : "bg-primary text-primary-foreground"
+        }`}
+        aria-label={pageAlreadyRecorded ? t(language, "mushaf.pageRecorded") : t(language, "mushaf.recordPage")}
       >
-        <CheckCircle2 size={19} aria-hidden="true" />
-        <span className="truncate">{t(language, "mushaf.recordPage")}</span>
+        <CheckCircle2 size={19} aria-hidden="true" className={pageAlreadyRecorded ? "fill-primary/30" : ""} />
+        <span className="truncate">
+          {pageAlreadyRecorded ? t(language, "mushaf.pageRecorded") : t(language, "mushaf.recordPage")}
+        </span>
       </button>
       <button
         type="button"
@@ -455,6 +519,44 @@ export function KhatmahReaderScreen({
     </nav>
   );
 
+  /** What stays on the paper once the controls step aside: where you are, and
+   *  how today's wird is going. Both are the questions a reader actually asks
+   *  mid-page, and neither is worth a tap. */
+  const pageStatus = (
+    <div
+      className="flex w-full items-center justify-center gap-3 text-[0.6875rem] font-bold opacity-70"
+      dir={direction}
+    >
+      <span>{t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}</span>
+      {wirdGoal > 0 && (
+        <>
+          <span aria-hidden="true">·</span>
+          <span>
+            {t(language, "mushaf.wirdToday")} {formatNumerals(wirdRead, language)}/{formatNumerals(wirdGoal, language)}
+          </span>
+        </>
+      )}
+    </div>
+  );
+
+  const wirdProgressBar =
+    wirdGoal > 0 ? (
+      <div
+        className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-current/10"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={wirdGoal}
+        aria-valuenow={wirdRead}
+        aria-label={wirdLabel}
+        data-testid="mushaf-wird-progress"
+      >
+        <div
+          className="h-full bg-primary transition-[width] duration-standard ease-standard"
+          style={{ width: `${Math.min(100, (wirdRead / wirdGoal) * 100)}%` }}
+        />
+      </div>
+    ) : null;
+
   return (
     <ScreenContainer
       dir={direction}
@@ -469,6 +571,13 @@ export function KhatmahReaderScreen({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
         onPointerCancel={onPointerEnd}
+        onFocusCapture={(event) => {
+          if ((event.target as HTMLElement).closest("[data-mushaf-chrome]")) {
+            setChromeFocused(true);
+            revealChrome();
+          }
+        }}
+        onBlurCapture={() => setChromeFocused(false)}
         style={{ touchAction: "pan-y" }}
       >
         {!pageData && !error && (
@@ -492,11 +601,7 @@ export function KhatmahReaderScreen({
         )}
 
         {pageData && (
-          <div
-            ref={paperRef}
-            key={displayPage}
-            className={`h-full w-full ${reduceMotion ? "" : "animate-in fade-in duration-150"}`}
-          >
+          <div key={displayPage} className={`h-full w-full ${reduceMotion ? "" : "animate-in fade-in duration-150"}`}>
             <MushafPageViewer
               lines={lines}
               language={language}
@@ -510,6 +615,10 @@ export function KhatmahReaderScreen({
               showWordMeanings={showWordMeanings}
               headerContent={pageHeader}
               footerContent={pageFooter}
+              footerStatus={pageStatus}
+              progressBar={wirdProgressBar}
+              chromeVisible={chromeVisible}
+              paperRef={paperRef}
             />
           </div>
         )}

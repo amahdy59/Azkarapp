@@ -81,15 +81,16 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await expect(page.getByText(/ختمة المصحف:/)).toHaveCount(0);
 
-  // The page chrome is permanent. It used to fade out after 3.5s, taking the
-  // surah, the juz, the page number and every control with it.
-  await page.keyboard.press("Tab");
+  // Driving by keyboard holds the controls open: they hide by becoming
+  // invisible, which takes them out of the tab order, and a keyboard reader who
+  // could not tab back to them would be stranded.
+  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowLeft");
   await page.getByRole("button", { name: "رجوع" }).focus();
   await expect(page.getByRole("button", { name: "رجوع" })).toBeFocused();
-  await page.waitForTimeout(4200);
+  await page.waitForTimeout(5200);
   await expect(pageNavigation).toBeVisible();
   await expect(page.getByRole("switch", { name: "كلمات صعبة" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "رجوع" })).toBeVisible();
 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
   expect(pageBox).not.toBeNull();

@@ -873,6 +873,8 @@ const ar = {
     hideWordMeanings: "إخفاء معاني الكلمات الصعبة",
     difficultWords: "كلمات صعبة",
     options: "خيارات",
+    wirdToday: "ورد اليوم",
+    pageRecorded: "تم التسجيل",
     qcfUnavailable: "يُعرض الخط القرآني المحلي حتى يتوفر خط صفحة المدينة.",
   },
   reader: {
