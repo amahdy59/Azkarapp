@@ -1530,3 +1530,24 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Why:** This is the only mapping where the buttons, the arrow keys and the swipe all agree. Dragging the paper rightwards already brought the earlier page back — the gesture was right the whole time, and the arrows were arguing with it. Anchoring to the physical object rather than to a media-player metaphor also gives a reason that will still hold next time someone asks.
 - **Consequences:** DEC-089 and DEC-092's inverted mapping are superseded; DEC-086's original convention is restored and now stated with its reasoning. Asked before implementing this time, after two flips: the owner chose the paper convention explicitly.
 - **Tests/evidence required:** unit coverage of both arrow keys and both footer controls in Arabic, both readers' specs asserting the direction, and full local gates.
+
+## DEC-095 — the page reads itself; the chrome gets out of the way
+
+- **Date:** 2026-08-23
+- **Status:** Approved
+- **Owner:** User (Mushaf review: record button unnecessary, page number tangled with progress, heading still heavy, switch label flat, options menu off-system, soft dark not soft, bar contents mispositioned, menu should split, plus "search online for Quran best practices and apply them")
+- **Related scope:** `MushafPageViewer.tsx`, `KhatmahReaderScreen.tsx`, i18n, both readers' tests
+- **Research applied:** dark-mode guidance converges on avoiding pure black for long reading — near-white on near-black causes halation, and 4.5:1 is the AA floor rather than a target. The night themes were running 17.6:1 (soft dark) and 16.2:1 (parchment at night), roughly four times the floor.
+- **Decision:**
+  - **Pages count themselves.** The record button is gone; a page is credited after a four-second dwell, which separates reading it from flicking past it. Asking for a tap to log work already done put a receipt in the reader's way while their hands were on the swipe.
+  - **Finishing the wird says so.** The progress bar turns to the success colour and a `role="status"` notice appears once per day. It is a notice, not a dialog — reading past the goal is a good thing to do and nothing should need dismissing first.
+  - **Location and effort are separate.** The page number sits alone in the footer; wird progress lives on the bar above it and, when the chrome steps aside, at the opposite end of the status line. Running them together read as one number.
+  - **The heading gets quieter still**: 0.52em, semibold rather than bold, wider tracking, and a double rule either side — the printed ornament, carried at one line height.
+  - **The basmalah is set deliberately** in the Mushaf face rather than falling through the stack from a page font that has no glyph for it.
+  - **Night themes soften** to about 12:1 — parchment-at-night `#191d26` on `#e6e1d6`, soft dark `#1a1d23` on `#ded8cc`, warm rather than blue. OLED keeps pure black deliberately: it is the high-contrast option and is labelled as such.
+  - **The bar splits by kind.** Saving your place is a frequent, reversible, single act, so it is a control on the bar rather than two taps inside a menu; what remains behind the menu is one kind of thing — how the page looks. The switch reads **معاني الكلمات / Word meanings**, an invitation rather than a warning about difficulty.
+- **Why the bars carry what they carry:** the top names _what_ you are reading (surah and juz) because that is stable across many pages and is what you look up when you return; the bottom carries _where_ you are (page) and _how far_ you have come (wird), which change with every turn. Identity above, position below — so the eye learns one place for each question.
+- **Performance:** glosses no longer block a page turn unless the switch is on. Awaiting them unconditionally put a 73 kB fetch in front of every page of Al-Baqarah to pay for a feature that was switched off; with the switch off they warm in the background.
+- **Consequences:** `mushaf.recordPage`, `mushaf.pageRecorded` and `mushaf.difficultWords` fall out of use; the last is removed. DEC-093's heading sizing and DEC-088's manual recording are superseded.
+- **Tests/evidence required:** auto-record verified against persisted state, completion notice rendered, measured theme contrast, unit and e2e updated for the renamed switch, full local gates.
+- **Noted, not taken:** a dedicated surah-name font exists (QUL "Surah name font v2", ligatures `surah001`–`surah114`). It would give authentic calligraphy for headings but adds a third-party font fetch; deferred against the same request's performance ask.

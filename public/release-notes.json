@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-6",
+  "release": "2026-08-23-7",
   "ar": [
-    "صار شرح الكلمات الغريبة متاحاً في المصحف كله بدل ثماني سور فقط — أكثر من أحد عشر ألف كلمة.",
-    "اسم السورة صار أخف وأصغر بلا إطار ملوّن، وزادت المسافة بين الأسطر قليلاً لراحة القراءة.",
-    "فهرس المصحف صار يملأ الشاشة على الهاتف، ويبقى مربع البحث ثابتاً فوق النتائج.",
-    "زر التالي انتقل إلى اليسار وزر السابق إلى اليمين، ليوافق ترتيب صفحات المصحف وحركة السحب."
+    "لم يعد عليك الضغط على زر لتسجيل الصفحة — تُحتسب وحدها أثناء القراءة، ويظهر لك إشعار عند إتمام ورد اليوم.",
+    "أصبح النمط الليلي أهدأ للعين، بحبر دافئ على خلفية رمادية داكنة بدل الأبيض على الأسود.",
+    "خفّ عنوان السورة أكثر بخطين رفيعين على جانبيه، وكُتبت البسملة بخط المصحف نفسه.",
+    "حفظ موضع القراءة صار زراً مستقلاً، وبقيت أنماط الصفحة في قائمة واحدة واضحة."
   ],
   "en": [
-    "Difficult-word meanings now cover the whole Mushaf instead of eight surahs — over eleven thousand words.",
-    "The surah heading is lighter and smaller with no coloured frame, and lines have a little more space between them.",
-    "The index fills the screen on a phone, and the search box stays above its results.",
-    "Next moved to the left and Previous to the right, matching how a Mushaf is bound and how the swipe already worked."
+    "No more tapping to record a page — pages count themselves as you read, and a notice tells you when today's wird is complete.",
+    "Night reading is gentler on the eyes: warm ink on dark grey instead of white on black.",
+    "The surah heading is lighter, framed by two fine rules, and the basmalah is set in the Mushaf's own face.",
+    "Saving your place is now its own button, and page styles have a menu of their own."
   ]
 }
