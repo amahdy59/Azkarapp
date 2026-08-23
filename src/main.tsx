@@ -19,7 +19,10 @@ const initialAppearance = loadAppState().settings;
 applyAppAppearance(isMarketingLanding ? { ...initialAppearance, language: "en", forceRtl: false } : initialAppearance);
 startPerformanceMonitoring();
 // Best-effort startup cleanup, alongside cleanupStaleAudioDownloads below.
-if (!isMarketingLanding) pruneStaleFridayProgress();
+if (!isMarketingLanding) {
+  pruneStaleFridayProgress();
+  void import("./app/content/qcfMushaf.ts").then((module) => module.discardRetiredCaches());
+}
 
 document.querySelector<HTMLAnchorElement>(".skip-link")?.addEventListener("click", (event) => {
   event.preventDefault();

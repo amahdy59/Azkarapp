@@ -194,6 +194,30 @@ export function loadQcfFont(page: number): Promise<boolean> {
   return request;
 }
 
+/**
+ * Caches this app no longer routes anything to.
+ *
+ * DEC-089 dropped the two Workbox runtime routes that fed them, and Workbox
+ * only tidies up its own precache — so every browser that had visited before
+ * that release still carries them, holding page data we now ship and fonts we
+ * now store ourselves. Nothing reads them again, so they are pure dead weight
+ * in the reader's storage quota.
+ */
+const RETIRED_CACHES = ["azkar-qcf-page-data-v1", "azkar-qcf-page-fonts-v1"];
+
+export async function discardRetiredCaches(): Promise<string[]> {
+  if (typeof caches === "undefined") return [];
+  const discarded: string[] = [];
+  for (const name of RETIRED_CACHES) {
+    try {
+      if (await caches.delete(name)) discarded.push(name);
+    } catch {
+      /* A browser that will not let go of a cache is not worth failing over. */
+    }
+  }
+  return discarded;
+}
+
 /** Warms a neighbouring page without ever surfacing its failure. */
 export function prefetchMushafPage(page: number) {
   if (page < 1 || page > 604) return;
