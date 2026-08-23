@@ -1518,3 +1518,15 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Also fixed:** the generator silently deleted Al-Baqarah's reviewed glosses on every run — they shipped in its output but were absent from its list, and their wording and orthography are hand-authored, not the source's. It now names everything it ships and carries reviewed surahs across untouched, so it can be re-run safely.
 - **Tests/evidence required:** i18n key integrity for the new clear-search label, unit coverage unchanged, e2e gloss count relaxed from exactly three to at least three, and full local gates.
 - **Left open:** the page-turn direction, which has now been specified two opposite ways; and the two-page desktop spread from DEC-092.
+
+## DEC-094 — the Mushaf turns the way the pages are bound
+
+- **Date:** 2026-08-23
+- **Status:** Approved
+- **Owner:** User ("the right button or the arrow indicating right should move back (matching the correct swipe on mobile) and left button should have next text instead of before and should move users forward")
+- **Related scope:** `KhatmahReaderScreen.tsx`, `MushafImmersiveReader.tsx`, both readers' specs
+- **Context:** Page-turn direction was specified three times and implemented two opposite ways. DEC-086 shipped the paper convention. DEC-089 inverted it to right = forward after "the navigation works the opposite way I expect", and DEC-092 spread that inversion to the immersive reader for consistency. The owner then reported the arrows as switched again, with the reasoning that a right-pointing control should move rightward — which in a right-to-left book is backwards.
+- **Decision:** The Mushaf follows the paper. **Moving right moves back towards page one; moving left moves forward.** The footer puts التالي on the left with a left chevron and السابق on the right with a right chevron; `ArrowRight` goes back and `ArrowLeft` goes forward. Both readers follow the same rule, and it does not vary by interface language: the book is bound right-to-left whatever the UI is set to.
+- **Why:** This is the only mapping where the buttons, the arrow keys and the swipe all agree. Dragging the paper rightwards already brought the earlier page back — the gesture was right the whole time, and the arrows were arguing with it. Anchoring to the physical object rather than to a media-player metaphor also gives a reason that will still hold next time someone asks.
+- **Consequences:** DEC-089 and DEC-092's inverted mapping are superseded; DEC-086's original convention is restored and now stated with its reasoning. Asked before implementing this time, after two flips: the owner chose the paper convention explicitly.
+- **Tests/evidence required:** unit coverage of both arrow keys and both footer controls in Arabic, both readers' specs asserting the direction, and full local gates.

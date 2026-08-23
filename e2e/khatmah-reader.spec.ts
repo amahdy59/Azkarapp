@@ -104,8 +104,8 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.mouse.up();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 
-  // The arrow that points backwards goes backwards, in Arabic as in English.
-  await page.keyboard.press("ArrowLeft");
+  // The pages are bound right-to-left: moving right moves back (DEC-094).
+  await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();

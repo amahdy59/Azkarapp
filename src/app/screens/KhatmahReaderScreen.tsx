@@ -305,9 +305,13 @@ export function KhatmahReaderScreen({
   );
 
   /**
-   * DEC-089: the control that points forward advances the Mushaf, in Arabic and
-   * in English alike. The reader used to invert both the arrow keys and the
-   * footer buttons under RTL, which read as backwards to everyone using it.
+   * The Mushaf is a right-to-left book, and the controls follow the paper
+   * rather than a media player (DEC-094).
+   *
+   * Moving *right* moves back towards page one; moving *left* moves forward.
+   * That is how the pages are bound, it is what the swipe already did — drag
+   * the paper rightwards and the earlier page comes back — and it is what the
+   * arrows now do, so the gesture and the keys can no longer disagree.
    */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -318,8 +322,8 @@ export function KhatmahReaderScreen({
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       setKeyboardDriven(true);
       setChromeVisible(true);
-      if (e.key === "ArrowRight") paginate(1);
-      else if (e.key === "ArrowLeft") paginate(-1);
+      if (e.key === "ArrowRight") paginate(-1);
+      else if (e.key === "ArrowLeft") paginate(1);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
@@ -480,15 +484,16 @@ export function KhatmahReaderScreen({
       aria-label={t(language, "mushaf.pageNavigation")}
       className="flex w-full items-center justify-between gap-1"
     >
+      {/* Forward sits on the left, because that is the way the pages turn. */}
       <button
         type="button"
-        onClick={() => paginate(-1)}
-        disabled={currentPage <= 1}
+        onClick={() => paginate(1)}
+        disabled={currentPage >= LAST_PAGE}
         className={footerActionClass}
-        aria-label={t(language, "common.previous")}
+        aria-label={t(language, "common.next")}
       >
         <ChevronLeft size={22} />
-        <span className="truncate">{t(language, "common.previous")}</span>
+        <span className="truncate">{t(language, "common.next")}</span>
       </button>
       <button
         type="button"
@@ -523,13 +528,13 @@ export function KhatmahReaderScreen({
       </div>
       <button
         type="button"
-        onClick={() => paginate(1)}
-        disabled={currentPage >= LAST_PAGE}
+        onClick={() => paginate(-1)}
+        disabled={currentPage <= 1}
         className={footerActionClass}
-        aria-label={t(language, "common.next")}
+        aria-label={t(language, "common.previous")}
       >
         <ChevronRight size={22} />
-        <span className="truncate">{t(language, "common.next")}</span>
+        <span className="truncate">{t(language, "common.previous")}</span>
       </button>
     </nav>
   );

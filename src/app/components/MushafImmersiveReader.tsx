@@ -263,17 +263,15 @@ export function MushafImmersiveReader({
         onClose();
         return;
       }
-      // One rule for the whole app (DEC-092): the control that points forward
-      // advances, in Arabic and in English alike. This surface used to invert
-      // it under RTL while the Mushaf reader did not, so the same key turned
-      // the page two different ways depending on which reader you were in.
+      // Same rule as the Mushaf reader (DEC-094): the pages are bound
+      // right-to-left, so moving right goes back and moving left goes forward.
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        flip(1);
+        flip(-1);
         onInteract();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        flip(-1);
+        flip(1);
         onInteract();
       }
     };
@@ -413,13 +411,13 @@ export function MushafImmersiveReader({
         >
           <FlipButton
             onClick={() => {
-              flip(-1);
+              flip(1);
               onInteract();
             }}
-            disabled={atStart}
-            label={t(language, "reader.immersivePrevious")}
-            testId="mushaf-immersive-previous"
-            back
+            disabled={atEnd}
+            label={t(language, "reader.immersiveNext")}
+            testId="mushaf-immersive-next"
+            forward
           />
           <bdi
             data-testid="mushaf-immersive-indicator-mobile"
@@ -439,12 +437,12 @@ export function MushafImmersiveReader({
           ) : (
             <FlipButton
               onClick={() => {
-                flip(1);
+                flip(-1);
                 onInteract();
               }}
-              disabled={atEnd}
-              label={t(language, "reader.immersiveNext")}
-              testId="mushaf-immersive-next"
+              disabled={atStart}
+              label={t(language, "reader.immersivePrevious")}
+              testId="mushaf-immersive-previous"
             />
           )}
         </nav>
@@ -458,17 +456,17 @@ function FlipButton({
   disabled,
   label,
   testId,
-  back = false,
+  forward = false,
 }: {
   onClick: () => void;
   disabled: boolean;
   label: string;
   testId: string;
-  back?: boolean;
+  forward?: boolean;
 }) {
-  // Physical, not logical: back points left and forward points right on every
-  // screen, which is what the footer's own left-to-right order promises.
-  const Icon = back ? ArrowLeft : ArrowRight;
+  // The pages are bound right-to-left, so forward points left and back points
+  // right — which is also the order the footer lays them out in.
+  const Icon = forward ? ArrowLeft : ArrowRight;
   return (
     <button
       type="button"

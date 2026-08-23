@@ -48,7 +48,7 @@ afterEach(() => {
 });
 
 describe("KhatmahReaderScreen navigation", () => {
-  it("advances with the forward control and retreats with the back one, in Arabic", async () => {
+  it("turns the way the pages are bound: forward on the left, back on the right", async () => {
     const user = userEvent.setup();
     const { setKhatmahPage } = renderReader();
 
@@ -66,11 +66,12 @@ describe("KhatmahReaderScreen navigation", () => {
     const { setKhatmahPage } = renderReader();
     await screen.findByRole("article", { name: "صفحة ٤٢" });
 
+    // Moving right moves back through a right-to-left book (DEC-094).
     await user.keyboard("{ArrowRight}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
 
     await user.keyboard("{ArrowLeft}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
   });
 
   it("stops at both ends of the Mushaf", async () => {
@@ -79,7 +80,7 @@ describe("KhatmahReaderScreen navigation", () => {
     await screen.findByRole("article", { name: "صفحة ١" });
 
     expect(screen.getByRole("button", { name: "السابق" })).toBeDisabled();
-    await user.keyboard("{ArrowLeft}");
+    await user.keyboard("{ArrowRight}");
     expect(setKhatmahPage).not.toHaveBeenCalled();
   });
 });

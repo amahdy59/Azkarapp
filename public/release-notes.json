@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-5",
+  "release": "2026-08-23-6",
   "ar": [
     "صار شرح الكلمات الغريبة متاحاً في المصحف كله بدل ثماني سور فقط — أكثر من أحد عشر ألف كلمة.",
     "اسم السورة صار أخف وأصغر بلا إطار ملوّن، وزادت المسافة بين الأسطر قليلاً لراحة القراءة.",
     "فهرس المصحف صار يملأ الشاشة على الهاتف، ويبقى مربع البحث ثابتاً فوق النتائج.",
-    "زر الصفحة في الشريط السفلي صار يعرض تقدّمك في ورد اليوم بدل تكرار فتح الفهرس."
+    "زر التالي انتقل إلى اليسار وزر السابق إلى اليمين، ليوافق ترتيب صفحات المصحف وحركة السحب."
   ],
   "en": [
     "Difficult-word meanings now cover the whole Mushaf instead of eight surahs — over eleven thousand words.",
     "The surah heading is lighter and smaller with no coloured frame, and lines have a little more space between them.",
     "The index fills the screen on a phone, and the search box stays above its results.",
-    "The page control in the bottom bar now shows your progress through today's wird instead of repeating the index."
+    "Next moved to the left and Previous to the right, matching how a Mushaf is bound and how the swipe already worked."
   ]
 }
