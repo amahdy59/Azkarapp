@@ -97,7 +97,11 @@ Raised from the reader review of 2026-08-23 against `9b68fdc`.
       machine.
 - [x] 8.2 Switch Vitest to the threads pool and share the module registry between files in a
       worker; keep every test passing and coverage thresholds unchanged.
-- [x] 8.3 `pnpm check` runs its independent gates concurrently instead of strictly serially.
+- [x] 8.3 `pnpm check` runs its independent gates concurrently instead of strictly serially — but
+      only three at a time. Running all six at once let the build and the type-checker fight the
+      unit suite's own worker pool: the suite stretched from 31 s to 157 s and one ordinary
+      CategoryScreen render crossed its 15 s timeout inside the pre-push gate. Bounded, the gate
+      is 1 m 33 s and the suite stays near 87 s.
 - [x] 8.4 Playwright: workers go to **3 everywhere**, the pool CI had already validated. The
       ceiling is not the sixteen cores, it is the single `vite preview` process feeding every
       browser: at 8 workers six load-sensitive reader and navigation specs timed out, and at 4
@@ -119,7 +123,7 @@ Raised from the reader review of 2026-08-23 against `9b68fdc`.
 | Gate                            | Before   | After    |
 | ------------------------------- | -------- | -------- |
 | `pnpm test:run`                 | 3 m 34 s | 0 m 31 s |
-| `pnpm check` (whole merge gate) | ~6 min   | 1 m 02 s |
+| `pnpm check` (whole merge gate) | ~6 min   | 1 m 33 s |
 | `pnpm test:e2e` test-runs       | 514      | 312      |
 | `pnpm test:e2e` wall clock      | —        | 7 m 05 s |
 | Playwright local workers        | 2        | 3        |

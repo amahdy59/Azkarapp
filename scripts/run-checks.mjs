@@ -14,6 +14,18 @@
  */
 
 import { spawn } from "node:child_process";
+import os from "node:os";
+
+/**
+ * How many stages may run at once.
+ *
+ * Not "all of them": the unit suite runs its own worker pool, and letting the
+ * build, the type-checker and the linter fight it for the same cores stretched
+ * a 31-second suite to 157 seconds — long enough for one ordinary test to blow
+ * through its 15-second timeout inside the pre-push gate. Two heavy stages plus
+ * a light one is the shape that stays honest on a sixteen-core machine.
+ */
+const MAX_CONCURRENT_STAGES = Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4)));
 
 const TOOLCHAIN = { name: "toolchain", command: "node scripts/verify-toolchain.mjs" };
 
@@ -62,15 +74,23 @@ const toolchain = await run(TOOLCHAIN);
 report(toolchain);
 results.push(toolchain);
 
+async function runPool(stages, limit) {
+  const queue = [...stages];
+  const collected = [];
+  const workers = Array.from({ length: Math.min(limit, queue.length) }, async () => {
+    while (queue.length > 0) {
+      const stage = queue.shift();
+      const result = await run(stage);
+      report(result);
+      collected.push(result);
+    }
+  });
+  await Promise.all(workers);
+  return collected;
+}
+
 if (toolchain.code === 0) {
-  const concurrent = await Promise.all(
-    CONCURRENT.map((stage) =>
-      run(stage).then((result) => {
-        report(result);
-        return result;
-      }),
-    ),
-  );
+  const concurrent = await runPool(CONCURRENT, MAX_CONCURRENT_STAGES);
   results.push(...concurrent);
 
   const build = concurrent.find((result) => result.name === "build");

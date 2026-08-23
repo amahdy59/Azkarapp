@@ -1,4 +1,7 @@
+import os from "node:os";
 import { defineConfig } from "vitest/config";
+
+const cpuCount = os.cpus().length || 4;
 
 import { ISOLATED_SUITES } from "./src/test/isolatedSuites";
 
@@ -11,9 +14,23 @@ const ALL_SUITES = ["src/**/*.test.{ts,tsx}", "scripts/**/*.test.mjs"];
  * per file — 918 s of accumulated worker time against 306 s of actual tests.
  */
 const shared = {
-  testTimeout: 15000,
+  /**
+   * 15s is ample for any single test here in isolation — the whole suite runs
+   * in about 31s. The headroom is for `pnpm check`, where the suite shares the
+   * machine with the production build and the type-checker: measured under that
+   * contention the suite takes ~87s rather than 31s, and one ordinary
+   * CategoryScreen render once crossed 15s and failed the gate for no reason of
+   * its own.
+   */
+  testTimeout: 25000,
   environment: "jsdom" as const,
   pool: "threads" as const,
+  /**
+   * Leave the machine some room. `pnpm check` runs the suite alongside the
+   * build and the type-checker; an unbounded pool took every core, and the
+   * resulting contention stretched an ordinary test past its 15-second timeout.
+   */
+  maxWorkers: Math.max(2, Math.floor(cpuCount / 2)),
   setupFiles: ["./src/test/setup.ts"],
 };
 
