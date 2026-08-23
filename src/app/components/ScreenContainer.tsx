@@ -6,17 +6,35 @@ interface ScreenContainerProps extends HTMLAttributes<HTMLDivElement> {
   className?: string;
   dir?: "ltr" | "rtl";
   screenName?: string;
+  /**
+   * Drops the screen's own block padding so a surface can run to the physical
+   * edges of the viewport. Only the Mushaf uses it: the printed page is the
+   * whole screen, and the safe-area insets move onto its header and footer
+   * chrome instead of sitting outside the paper.
+   */
+  edgeToEdge?: boolean;
 }
 
-export function ScreenContainer({ children, className = "", dir, screenName, ...props }: ScreenContainerProps) {
+export function ScreenContainer({
+  children,
+  className = "",
+  dir,
+  screenName,
+  edgeToEdge = false,
+  ...props
+}: ScreenContainerProps) {
   useScreenFocus(screenName);
+
+  const blockPadding = edgeToEdge
+    ? ""
+    : "pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))]";
 
   return (
     // Deliberately a div, not <main>: App.tsx already renders the single
     // #main-content landmark that wraps every screen. Nesting a second <main>
     // inside it produced two main landmarks.
     <div
-      className={`app-screen-surface scroll-container flex flex-1 min-h-0 w-full flex-col bg-background pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(0.5rem,env(safe-area-inset-top))] ${className}`}
+      className={`app-screen-surface scroll-container flex flex-1 min-h-0 w-full flex-col bg-background ${blockPadding} ${className}`}
       dir={dir}
       {...props}
     >

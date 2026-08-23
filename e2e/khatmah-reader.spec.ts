@@ -1,7 +1,9 @@
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
-  await page.route("https://api.quran.com/**", (route) => route.abort());
+  // The reader no longer talks to api.quran.com at all; blocking the remote
+  // page font keeps the run deterministic on the shipped Unicode fallback.
+  await page.route("https://verses.quran.foundation/**", (route) => route.abort());
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -42,22 +44,36 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await revealControls.click();
   await expect(pageNavigation).toBeVisible();
   const initialBox = await mushafPage.boundingBox();
-  expect(initialBox?.height).toBeGreaterThanOrEqual(665);
+  // The Mushaf is the whole screen: no card, no gutter, no letterbox.
+  expect(initialBox?.x ?? 99).toBeLessThanOrEqual(1);
+  expect(initialBox?.width ?? 0).toBeGreaterThanOrEqual(319);
+  expect(initialBox?.height ?? 0).toBeGreaterThanOrEqual(690);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
 
   const optionsButton = page.getByRole("button", { name: "خيارات" });
   await optionsButton.focus();
-  const lines = mushafPage.locator("[data-mushaf-rendering] > div");
+  const lines = mushafPage.locator("[data-mushaf-line-content]");
+  await expect(mushafPage.locator("[data-mushaf-rendering] > div > div")).toHaveCount(15);
+  // No line may paint outside the slot it sits in — overlong lines are scaled
+  // down to fit, never clipped at the page edge.
+  const bleed = await lines.evaluateAll((elements) =>
+    elements.flatMap((element) => {
+      const slot = element.parentElement?.getBoundingClientRect();
+      const painted = element.getBoundingClientRect();
+      return slot ? [painted.width - slot.width, painted.height - slot.height] : [];
+    }),
+  );
+  expect(bleed.filter((delta) => delta > 1)).toEqual([]);
   const lineRectsBefore = await lines.evaluateAll((elements) =>
     elements.map((element, _index, allLines) => {
       const rect = element.getBoundingClientRect();
       return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
     }),
   );
-  await optionsButton.click();
-  const difficultWords = page.getByRole("menuitemcheckbox", { name: "كلمات صعبة" });
-  await expect(difficultWords).toBeVisible();
+  const difficultWords = page.getByRole("switch", { name: "كلمات صعبة" });
+  await expect(difficultWords).toHaveAttribute("aria-checked", "false");
   await difficultWords.click();
+  await expect(difficultWords).toHaveAttribute("aria-checked", "true");
   await expect(page.getByRole("button", { name: /معنى كلمة/ })).toHaveCount(3);
   const lineRectsAfter = await lines.evaluateAll((elements) =>
     elements.map((element, _index, allLines) => {
@@ -87,7 +103,8 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.mouse.up();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 
-  await page.keyboard.press("ArrowRight");
+  // The arrow that points backwards goes backwards, in Arabic as in English.
+  await page.keyboard.press("ArrowLeft");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();

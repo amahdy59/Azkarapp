@@ -1,58 +1,103 @@
-import { describe, expect, it, vi } from "vitest";
-import { getQcfFontUrl, getQcfPageUrl, loadQcfFont, mergeQcfPage, parseQcfPageResponse } from "./qcfMushaf";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import {
+  getQcfFontFamily,
+  getQcfFontUrl,
+  getMushafPageUrl,
+  loadMushafPage,
+  loadQcfFont,
+  pageHasQcfGlyphs,
+  parseMushafPage,
+} from "./qcfMushaf";
 
-describe("QCF Mushaf enhancement", () => {
-  it("uses the official page-specific data and font locations", () => {
-    expect(getQcfPageUrl(106)).toContain("/verses/by_page/106");
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe("Mushaf page data", () => {
+  it("reads pages from the shipped reference layout, not from a remote API", () => {
+    expect(getMushafPageUrl(106)).toMatch(/data\/mushaf\/106\.json$/);
     expect(getQcfFontUrl(106)).toBe("https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p106.woff2");
+    expect(getQcfFontFamily(106)).toBe("qcf-v2-page-106");
   });
 
-  it("keeps semantic text beside each QCF glyph code", () => {
+  it("keeps the reviewed semantic text beside each QCF glyph code", () => {
     expect(
-      parseQcfPageResponse({
-        verses: [
-          {
-            verse_key: "5:1",
-            words: [
-              {
-                position: 1,
-                line_number: 8,
-                char_type_name: "word",
-                text_qpc_hafs: "يَـٰٓأَيُّهَا",
-                code_v2: "",
-              },
-              {
-                position: 12,
-                line_number: 10,
-                char_type_name: "end",
-                text_qpc_hafs: "١",
-                code_v2: "ﲓ",
-              },
-            ],
-          },
-        ],
-      }),
+      parseMushafPage([
+        {
+          k: "5:1",
+          w: [
+            [1, 8, 0, "يَـٰٓأَيُّهَا", ""],
+            [12, 10, 1, "١", "ﲓ"],
+          ],
+        },
+      ]),
     ).toEqual([
       {
         k: "5:1",
         w: [
-          [1, 8, 0, "يَـٰٓأَيُّهَا", ""],
+          [1, 8, 0, "يَـٰٓأَيُّهَا", ""],
           [12, 10, 1, "١", "ﲓ"],
         ],
       },
     ]);
   });
 
-  it("rejects incomplete remote data so the local page remains authoritative fallback", () => {
-    expect(parseQcfPageResponse({ verses: [{ verse_key: "5:1", words: [{ position: 1 }] }] })).toBeNull();
+  it("rejects a page whose line numbers fall outside the 15-line reference grid", () => {
+    expect(parseMushafPage([{ k: "5:1", w: [[1, 16, 0, "يَـٰٓأَيُّهَا"]] }])).toBeNull();
+    expect(parseMushafPage([{ k: "5:1", w: [[1]] }])).toBeNull();
+    expect(parseMushafPage([])).toBeNull();
   });
 
-  it("adds official glyph and line data without replacing reviewed local Quran text", () => {
+  it("only claims QCF rendering when every word on the page carries a glyph", () => {
     expect(
-      mergeQcfPage([{ k: "5:1", w: [[1, 7, 0, "LOCAL"]] }], [{ k: "5:1", w: [[1, 8, 0, "REMOTE", ""]] }]),
-    ).toEqual([{ k: "5:1", w: [[1, 8, 0, "LOCAL", ""]] }]);
+      pageHasQcfGlyphs([
+        {
+          k: "5:1",
+          w: [
+            [1, 8, 0, "a", "ﱁ"],
+            [2, 8, 1, "١", "ﱂ"],
+          ],
+        },
+      ]),
+    ).toBe(true);
+    expect(
+      pageHasQcfGlyphs([
+        {
+          k: "5:1",
+          w: [
+            [1, 8, 0, "a", "ﱁ"],
+            [2, 8, 1, "١"],
+          ],
+        },
+      ]),
+    ).toBe(false);
   });
 
+  it("serves a second request for the same page from memory", async () => {
+    const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const first = await loadMushafPage(511);
+    const second = await loadMushafPage(511);
+
+    expect(first).toBe(second);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("shares one in-flight request between the reader and the neighbour prefetch", async () => {
+    const json = [{ k: "5:1", w: [[1, 8, 0, "يَـٰٓأَيُّهَا", "ﱁ"]] }];
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, json: async () => json });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const [a, b] = await Promise.all([loadMushafPage(512), loadMushafPage(512)]);
+
+    expect(a).toBe(b);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("QCF page fonts", () => {
   it("does not report a QCF page font ready until the font has loaded", async () => {
     const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
     const add = vi.fn();
@@ -69,7 +114,21 @@ describe("QCF Mushaf enhancement", () => {
     expect(load).toHaveBeenCalledTimes(1);
     expect(add).toHaveBeenCalledTimes(1);
 
-    vi.unstubAllGlobals();
+    if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+    else Reflect.deleteProperty(document, "fonts");
+  });
+
+  it("reports the font unavailable instead of rejecting when the network fails", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    class TestFontFace {
+      load = vi.fn().mockRejectedValue(new Error("offline"));
+    }
+
+    vi.stubGlobal("FontFace", TestFontFace);
+    Object.defineProperty(document, "fonts", { configurable: true, value: { add: vi.fn() } });
+
+    await expect(loadQcfFont(602)).resolves.toBe(false);
+
     if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
     else Reflect.deleteProperty(document, "fonts");
   });

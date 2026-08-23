@@ -98,6 +98,23 @@ describe("MushafPageViewer", () => {
     expect(screen.getByRole("article").querySelector('[data-mushaf-rendering="qcf-v2"]')).not.toBeNull();
   });
 
+  it("always lays out the fifteen reference line slots, however few lines carry words", () => {
+    const { container } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+
+    expect(container.querySelectorAll("[data-mushaf-rendering] > div > div")).toHaveLength(15);
+    // The printed Mushaf justifies each line to both margins.
+    expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
+  });
+
   it("renders surah header banner when an empty line precedes a new surah start", () => {
     const surahStartLines = [
       [], // Line 1: empty -> should be Surah Header

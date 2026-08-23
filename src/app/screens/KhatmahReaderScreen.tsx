@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type { AppLanguage, MushafTheme, QuranReadingPosition } from "../types";
@@ -17,7 +17,7 @@ import {
   MoreHorizontal,
   Brush,
 } from "../components/icons";
-import { motion, AnimatePresence, useReducedMotion } from "motion/react";
+import { useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import {
@@ -33,7 +33,26 @@ import {
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
-import { fetchQcfPage, loadQcfFont, mergeQcfPage, type MushafVerseData } from "../content/qcfMushaf";
+import {
+  getCachedMushafPage,
+  isQcfFontReady,
+  loadMushafPage,
+  loadQcfFont,
+  pageHasQcfGlyphs,
+  prefetchMushafPage,
+  type MushafVerseData,
+} from "../content/qcfMushaf";
+
+const LAST_PAGE = 604;
+/** Past this many pixels of horizontal travel a drag is a page turn. */
+const SWIPE_THRESHOLD = 60;
+/** Settling a released drag, and the only transform animation on this screen. */
+const PAPER_SETTLE = "transform 160ms ease-out";
+
+interface ResolvedPage {
+  page: number;
+  data: MushafVerseData[];
+}
 
 export function KhatmahReaderScreen({
   language,
@@ -62,30 +81,39 @@ export function KhatmahReaderScreen({
   setWirdHistory?: (history: Record<string, number[]>) => void;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
 }) {
-  const currentPage = Math.max(1, Math.min(604, khatmahPage || 1));
+  const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
   const [bookmarks, setBookmarks] = useState<number[]>(initialBookmarks);
-  const [pageData, setPageData] = useState<MushafVerseData[] | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
+    const cached = getCachedMushafPage(currentPage);
+    return cached ? { page: currentPage, data: cached } : null;
+  });
   const [error, setError] = useState<string | null>(null);
-  const [swipeDirection, setSwipeDirection] = useState(0);
+  const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [controlsFocused, setControlsFocused] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
-  const [qcfFontReady, setQcfFontReady] = useState(false);
+  const [qcfFontReady, setQcfFontReady] = useState(() => isQcfFontReady(currentPage));
   const reduceMotion = useReducedMotion();
+  const paperRef = useRef<HTMLDivElement>(null);
 
   // Sync internal theme with prop updates
   useEffect(() => {
     if (initialTheme) setTheme(initialTheme);
   }, [initialTheme]);
 
-  // Sync bookmarks with prop updates
+  // Sync bookmarks with prop updates. Compared by value, not by identity: the
+  // prop has a default `[]`, so a plain assignment re-rendered on every render
+  // and never settled.
   useEffect(() => {
-    if (initialBookmarks) setBookmarks(initialBookmarks);
+    setBookmarks((current) =>
+      current.length === initialBookmarks.length && current.every((page, index) => page === initialBookmarks[index])
+        ? current
+        : initialBookmarks,
+    );
   }, [initialBookmarks]);
 
   const handleSelectTheme = (newTheme: MushafTheme) => {
@@ -105,96 +133,67 @@ export function KhatmahReaderScreen({
   };
 
   const todayKey = getProgressDayKey();
-  const todayPagesRead = useMemo(() => {
-    const list = wirdHistory[todayKey] ?? [];
-    return list;
-  }, [todayKey, wirdHistory]);
+  const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
 
   const recordCurrentPage = useCallback(() => {
     if (!onUpdateWirdHistory) return;
     const dayKey = getProgressDayKey();
     const currentList = wirdHistory[dayKey] ?? [];
     if (!currentList.includes(currentPage)) {
-      const nextList = [...currentList, currentPage];
-      onUpdateWirdHistory({ ...wirdHistory, [dayKey]: nextList });
+      onUpdateWirdHistory({ ...wirdHistory, [dayKey]: [...currentList, currentPage] });
     }
   }, [currentPage, onUpdateWirdHistory, wirdHistory]);
 
-  const loadPage = useCallback(
-    (page: number) => {
-      let active = true;
-      const controller = new AbortController();
-      const enhancementController = new AbortController();
-      setLoading(true);
+  /**
+   * The page never blanks to a spinner mid-turn. `resolved` keeps the paper that
+   * is on screen until the next one is in hand, and every page now comes from a
+   * local file behind an in-memory cache, so a prefetched neighbour resolves in
+   * the same tick that the button is pressed.
+   */
+  useEffect(() => {
+    let active = true;
+
+    const cached = getCachedMushafPage(currentPage);
+    if (cached) {
+      setResolved({ page: currentPage, data: cached });
       setError(null);
-      setPageData(null);
-      setQcfFontReady(false);
+    }
 
-      const baseUrl = import.meta.env.BASE_URL || "/";
-      const cleanBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-      const targetUrl = `${cleanBase}data/mushaf/${page}.json`;
+    void loadMushafPage(currentPage)
+      .then((data) => {
+        if (!active) return;
+        setResolved({ page: currentPage, data });
+        setError(null);
+      })
+      .catch((reason) => {
+        if (!active) return;
+        console.error("Failed to load Mushaf page", reason);
+        setError(t(language, "mushaf.loadFailed"));
+      });
 
-      void (async () => {
-        const localPagePromise = (async () => {
-          const response = await fetch(targetUrl, { signal: controller.signal });
-          if (!response.ok) throw new Error(`HTTP ${response.status}`);
-          return (await response.json()) as MushafVerseData[];
-        })();
-        const enhancementTimeout = window.setTimeout(() => enhancementController.abort(), 1800);
-        const qcfEnhancementPromise = Promise.all([fetchQcfPage(page, enhancementController.signal), loadQcfFont(page)])
-          .then(([qcfPage, fontReady]) => {
-            if (!fontReady) throw new Error("QCF page font is unavailable");
-            return qcfPage;
-          })
-          .finally(() => window.clearTimeout(enhancementTimeout));
+    setQcfFontReady(isQcfFontReady(currentPage));
+    void loadQcfFont(currentPage).then((ready) => {
+      if (active && ready) setQcfFontReady(isQcfFontReady(currentPage));
+    });
 
-        const [localResult, qcfResult] = await Promise.allSettled([localPagePromise, qcfEnhancementPromise]);
-        if (!active || controller.signal.aborted) return;
+    return () => {
+      active = false;
+    };
+  }, [currentPage, language, reloadToken]);
 
-        const localPage = localResult.status === "fulfilled" ? localResult.value : null;
-        const qcfPage = qcfResult.status === "fulfilled" ? qcfResult.value : null;
-
-        if (qcfPage) {
-          setPageData(localPage ? mergeQcfPage(localPage, qcfPage) : qcfPage);
-          setQcfFontReady(true);
-        } else if (localPage) {
-          setPageData(localPage);
-        } else {
-          const localError = localResult.status === "rejected" ? localResult.reason : undefined;
-          const qcfError = qcfResult.status === "rejected" ? qcfResult.reason : undefined;
-          console.error("Failed to load Mushaf page", localError, qcfError);
-          setError(t(language, "mushaf.loadFailed"));
-        }
-        setLoading(false);
-      })();
-
-      return () => {
-        active = false;
-        controller.abort();
-        enhancementController.abort();
-      };
-    },
-    [language],
-  );
-
+  // Warm both neighbours once the reader has settled, so a turn in either
+  // direction is a cache hit rather than a fetch.
   useEffect(() => {
-    return loadPage(currentPage);
-  }, [currentPage, loadPage]);
-
-  useEffect(() => {
-    if (!qcfFontReady || currentPage >= 604) return;
+    if (resolved?.page !== currentPage) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     if (connection?.saveData) return;
 
-    const controller = new AbortController();
     const timer = window.setTimeout(() => {
-      void Promise.allSettled([fetchQcfPage(currentPage + 1, controller.signal), loadQcfFont(currentPage + 1)]);
-    }, 400);
-    return () => {
-      window.clearTimeout(timer);
-      controller.abort();
-    };
-  }, [currentPage, qcfFontReady]);
+      prefetchMushafPage(currentPage + 1);
+      prefetchMushafPage(currentPage - 1);
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [currentPage, resolved?.page]);
 
   useEffect(() => {
     setControlsVisible(true);
@@ -206,7 +205,10 @@ export function KhatmahReaderScreen({
     return () => window.clearTimeout(timer);
   }, [controlsVisible, controlsFocused, currentPage, isIndexOpen, isOptionsMenuOpen]);
 
-  // Transform data into 15 lines
+  const displayPage = resolved?.page ?? currentPage;
+  const pageData = resolved?.data ?? null;
+
+  // Transform data into the reference 15 lines
   const lines = useMemo(() => {
     if (!pageData) return [];
     const lineMap = new Map<
@@ -221,61 +223,108 @@ export function KhatmahReaderScreen({
       }
     }
     const result = [];
-    for (let i = 1; i <= 15; i++) {
-      result.push(lineMap.get(i) || []);
-    }
+    for (let i = 1; i <= 15; i++) result.push(lineMap.get(i) || []);
     return result;
   }, [pageData]);
 
+  const pageCarriesGlyphs = useMemo(() => !!pageData && pageHasQcfGlyphs(pageData), [pageData]);
+  const useQcfGlyphs = qcfFontReady && displayPage === currentPage && pageCarriesGlyphs;
+
   // Compute Surah and Juz for the header
   const { surahName, juzNumber } = useMemo(() => {
-    if (!pageData || pageData.length === 0) {
-      return {
-        surahName: "",
-        juzNumber: getJuzNumberForPage(currentPage),
-      };
-    }
-    const firstVerseKey = pageData[0]?.k || "1:1";
-    const [surah] = firstVerseKey.split(":");
-    return {
-      surahName: getSurahDisplayName(surah || "1", language),
-      juzNumber: getJuzNumberForPage(currentPage),
-    };
-  }, [pageData, currentPage, language]);
+    const juz = getJuzNumberForPage(displayPage);
+    if (!pageData || pageData.length === 0) return { surahName: "", juzNumber: juz };
+    const [surah] = (pageData[0]?.k || "1:1").split(":");
+    return { surahName: getSurahDisplayName(surah || "1", language), juzNumber: juz };
+  }, [pageData, displayPage, language]);
 
   useEffect(() => {
     if (!pageData?.length) return;
     const [surahNumber, ayahNumber] = (pageData.at(-1)?.k ?? "1:1").split(":").map(Number);
-    onReadingPositionChange?.({ page: currentPage, surahNumber, ayahNumber, juzNumber });
-  }, [currentPage, juzNumber, onReadingPositionChange, pageData]);
+    onReadingPositionChange?.({ page: displayPage, surahNumber, ayahNumber, juzNumber });
+  }, [displayPage, juzNumber, onReadingPositionChange, pageData]);
 
   const paginate = useCallback(
-    (newDirection: number) => {
-      const nextPage = currentPage + newDirection;
-      if (nextPage < 1 || nextPage > 604) return;
-      setSwipeDirection(newDirection);
+    (delta: number) => {
+      const nextPage = currentPage + delta;
+      if (nextPage < 1 || nextPage > LAST_PAGE) return;
       setKhatmahPage(nextPage);
     },
     [currentPage, setKhatmahPage],
   );
 
-  // Keyboard navigation
+  /**
+   * DEC-089: the control that points forward advances the Mushaf, in Arabic and
+   * in English alike. The reader used to invert both the arrow keys and the
+   * footer buttons under RTL, which read as backwards to everyone using it.
+   */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") {
-        paginate(direction === "rtl" ? 1 : -1);
-      } else if (e.key === "ArrowRight") {
-        paginate(direction === "rtl" ? -1 : 1);
-      }
+      // Not while the index dialog is open, and not while someone is typing a
+      // page number into it — the arrows belong to the caret there.
+      if (isIndexOpen) return;
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (e.key === "ArrowRight") paginate(1);
+      else if (e.key === "ArrowLeft") paginate(-1);
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [direction, paginate]);
+  }, [isIndexOpen, paginate]);
+
+  // Pointer-driven page turn. The transform is written straight to the node, so
+  // dragging costs no React render at all — the previous implementation ran a
+  // spring through component state on every frame.
+  const drag = useRef({ pointerId: -1, startX: 0, engaged: false });
+
+  const endDrag = useCallback(
+    (clientX: number | null) => {
+      const paper = paperRef.current;
+      if (paper) {
+        paper.style.transition = PAPER_SETTLE;
+        paper.style.transform = "";
+      }
+      if (drag.current.engaged && clientX !== null) {
+        const offset = clientX - drag.current.startX;
+        if (offset <= -SWIPE_THRESHOLD) paginate(1);
+        else if (offset >= SWIPE_THRESHOLD) paginate(-1);
+      }
+      drag.current = { pointerId: -1, startX: 0, engaged: false };
+    },
+    [paginate],
+  );
+
+  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
+    drag.current = { pointerId: event.pointerId, startX: event.clientX, engaged: false };
+  };
+
+  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current.pointerId !== event.pointerId) return;
+    const offset = event.clientX - drag.current.startX;
+    if (!drag.current.engaged) {
+      if (Math.abs(offset) < 12) return;
+      drag.current.engaged = true;
+      setControlsVisible(false);
+      if (event.currentTarget.hasPointerCapture?.(event.pointerId) === false) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+    }
+    const paper = paperRef.current;
+    if (paper) {
+      paper.style.transition = "none";
+      paper.style.transform = `translateX(${(offset * 0.35).toFixed(1)}px)`;
+    }
+  };
+
+  const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current.pointerId !== event.pointerId) return;
+    endDrag(event.clientX);
+  };
 
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
-  const leftPageDelta = isArabic ? 1 : -1;
-  const rightPageDelta = -leftPageDelta;
   const headerActionClass =
     "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1 rounded-xl px-1.5 text-[0.6875rem] font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
   const footerActionClass =
@@ -294,10 +343,34 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.indexTitle")}
       >
         <span className="min-w-0 truncate text-sm font-extrabold">{surahName}</span>
-        <span className="shrink-0 text-[0.6875rem] font-bold opacity-70">
+        {/* Four targets share a 320px header now that difficult words has its own
+            switch. The juz and the chevron are the parts a reader can lose: the
+            surah name is the one that must never truncate to a single letter. */}
+        <span className="hidden shrink-0 text-[0.6875rem] font-bold opacity-70 min-[380px]:inline">
           · {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
         </span>
-        <ChevronDown size={16} className="shrink-0 opacity-60" aria-hidden="true" />
+        <ChevronDown size={16} className="hidden shrink-0 opacity-60 min-[360px]:block" aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={showWordMeanings}
+        onClick={() => setShowWordMeanings((current) => !current)}
+        className={`${headerActionClass} gap-1.5`}
+        aria-label={t(language, "mushaf.difficultWords")}
+        data-testid="mushaf-difficult-words-switch"
+      >
+        <Eye size={18} aria-hidden="true" />
+        <span
+          aria-hidden="true"
+          className={`flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors ${
+            showWordMeanings ? "justify-end border-primary bg-primary" : "justify-start border-current/40 bg-current/15"
+          }`}
+        >
+          <span
+            className={`m-px size-3 rounded-full ${showWordMeanings ? "bg-primary-foreground" : "bg-current opacity-70"}`}
+          />
+        </span>
       </button>
       <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
         <DropdownMenuTrigger asChild>
@@ -307,13 +380,6 @@ export function KhatmahReaderScreen({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[14rem]">
-          <DropdownMenuCheckboxItem
-            checked={showWordMeanings}
-            onCheckedChange={(checked) => setShowWordMeanings(checked === true)}
-          >
-            <Eye size={18} />
-            <span>{t(language, "mushaf.difficultWords")}</span>
-          </DropdownMenuCheckboxItem>
           <DropdownMenuCheckboxItem checked={isCurrentBookmarked} onCheckedChange={toggleBookmark}>
             <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
             <span>{t(language, "mushaf.toggleBookmark")}</span>
@@ -350,13 +416,13 @@ export function KhatmahReaderScreen({
     >
       <button
         type="button"
-        onClick={() => paginate(leftPageDelta)}
-        disabled={currentPage + leftPageDelta < 1 || currentPage + leftPageDelta > 604}
+        onClick={() => paginate(-1)}
+        disabled={currentPage <= 1}
         className={footerActionClass}
-        aria-label={t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}
+        aria-label={t(language, "common.previous")}
       >
         <ChevronLeft size={22} />
-        <span className="truncate">{t(language, leftPageDelta > 0 ? "common.next" : "common.previous")}</span>
+        <span className="truncate">{t(language, "common.previous")}</span>
       </button>
       <button
         type="button"
@@ -381,13 +447,13 @@ export function KhatmahReaderScreen({
       </button>
       <button
         type="button"
-        onClick={() => paginate(rightPageDelta)}
-        disabled={currentPage + rightPageDelta < 1 || currentPage + rightPageDelta > 604}
+        onClick={() => paginate(1)}
+        disabled={currentPage >= LAST_PAGE}
         className={footerActionClass}
-        aria-label={t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}
+        aria-label={t(language, "common.next")}
       >
         <ChevronRight size={22} />
-        <span className="truncate">{t(language, rightPageDelta > 0 ? "common.next" : "common.previous")}</span>
+        <span className="truncate">{t(language, "common.next")}</span>
       </button>
     </nav>
   );
@@ -409,23 +475,31 @@ export function KhatmahReaderScreen({
   return (
     <ScreenContainer
       dir={direction}
+      edgeToEdge
       screenName={t(language, "common.mushaf")}
-      className="relative flex flex-col h-full bg-background select-none overflow-hidden"
+      className="relative flex h-full select-none flex-col overflow-hidden bg-background"
     >
-      {/* Main Mushaf Page Display Canvas */}
-      <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-muted/15 p-0 sm:p-3">
-        {loading && !pageData && (
+      {/* The Mushaf page is the screen: no card, no gutter, no letterbox. */}
+      <div
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerEnd}
+        onPointerCancel={onPointerEnd}
+        style={{ touchAction: "pan-y" }}
+      >
+        {!pageData && !error && (
           <div className="absolute inset-0 flex items-center justify-center" aria-live="polite">
-            <div className="size-8 rounded-full border-4 border-primary border-t-transparent animate-spin" />
+            <div className="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
           </div>
         )}
 
-        {error && !loading && !pageData && (
-          <div className="flex flex-col items-center justify-center gap-3 p-6 text-center">
+        {error && !pageData && (
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
             <p className="text-[0.9375rem] font-bold text-destructive">{error}</p>
             <button
               type="button"
-              onClick={() => loadPage(currentPage)}
+              onClick={() => setReloadToken((token) => token + 1)}
               className="flex items-center gap-2 rounded-btn bg-primary px-4 py-2 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <RotateCcw size={16} />
@@ -434,47 +508,31 @@ export function KhatmahReaderScreen({
           </div>
         )}
 
-        <AnimatePresence initial={false} custom={swipeDirection}>
-          {!loading && pageData && (
-            <motion.div
-              key={currentPage}
-              custom={swipeDirection}
-              initial={{ x: reduceMotion ? 0 : swipeDirection > 0 ? 300 : -300, opacity: reduceMotion ? 1 : 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              exit={{ x: reduceMotion ? 0 : swipeDirection > 0 ? -300 : 300, opacity: reduceMotion ? 1 : 0 }}
-              transition={reduceMotion ? { duration: 0 } : { type: "spring", stiffness: 300, damping: 30 }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 0 }}
-              dragElastic={0.16}
-              onDragStart={() => setControlsVisible(false)}
-              onDragEnd={(_, info) => {
-                if (info.offset.x <= -60 || info.velocity.x <= -500) paginate(1);
-                else if (info.offset.x >= 60 || info.velocity.x >= 500) paginate(-1);
-              }}
-              className="absolute inset-0 flex cursor-grab items-center justify-center p-0 active:cursor-grabbing sm:p-3"
-            >
-              <div className="h-full w-full max-w-[500px] sm:max-w-[580px] md:max-w-[640px]">
-                <MushafPageViewer
-                  lines={lines}
-                  language={language}
-                  pageNumber={currentPage}
-                  surahName={surahName}
-                  juzNumber={juzNumber}
-                  direction={direction}
-                  theme={theme}
-                  isBookmarked={isCurrentBookmarked}
-                  useQcfGlyphs={qcfFontReady}
-                  showWordMeanings={showWordMeanings}
-                  controlsVisible={controlsVisible}
-                  headerContent={pageHeader}
-                  footerContent={pageFooter}
-                  hiddenControlsContent={revealPageControls}
-                  onControlsFocusChange={setControlsFocused}
-                />
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {pageData && (
+          <div
+            ref={paperRef}
+            key={displayPage}
+            className={`h-full w-full ${reduceMotion ? "" : "animate-in fade-in duration-150"}`}
+          >
+            <MushafPageViewer
+              lines={lines}
+              language={language}
+              pageNumber={displayPage}
+              surahName={surahName}
+              juzNumber={juzNumber}
+              direction={direction}
+              theme={theme}
+              isBookmarked={isCurrentBookmarked}
+              useQcfGlyphs={useQcfGlyphs}
+              showWordMeanings={showWordMeanings}
+              controlsVisible={controlsVisible}
+              headerContent={pageHeader}
+              footerContent={pageFooter}
+              hiddenControlsContent={revealPageControls}
+              onControlsFocusChange={setControlsFocused}
+            />
+          </div>
+        )}
       </div>
 
       {/* Index & Navigation Modal */}
@@ -482,10 +540,7 @@ export function KhatmahReaderScreen({
         isOpen={isIndexOpen}
         onClose={() => setIsIndexOpen(false)}
         currentPage={currentPage}
-        onSelectPage={(page) => {
-          setSwipeDirection(0);
-          setKhatmahPage(page);
-        }}
+        onSelectPage={setKhatmahPage}
         language={language}
         direction={direction}
         bookmarks={bookmarks}

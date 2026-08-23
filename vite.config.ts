@@ -82,27 +82,10 @@ export default defineConfig(({ mode }) => {
           // it out of public/ instead.
           globIgnores: ["**/FridayModeScreen-*.js"],
           runtimeCaching: [
-            {
-              urlPattern: /^https:\/\/api\.quran\.com\/api\/v4\/verses\/by_page\/\d+/,
-              handler: "NetworkFirst" as const,
-              method: "GET" as const,
-              options: {
-                cacheName: "azkar-qcf-page-data-v1",
-                networkTimeoutSeconds: 4,
-                cacheableResponse: { statuses: [0, 200] },
-                expiration: { maxEntries: 40, maxAgeSeconds: 30 * 24 * 60 * 60 },
-              },
-            },
-            {
-              urlPattern: /^https:\/\/verses\.quran\.foundation\/fonts\/quran\/hafs\/v2\/woff2\/p\d+\.woff2$/,
-              handler: "CacheFirst" as const,
-              method: "GET" as const,
-              options: {
-                cacheName: "azkar-qcf-page-fonts-v1",
-                cacheableResponse: { statuses: [0, 200] },
-                expiration: { maxEntries: 40, maxAgeSeconds: 365 * 24 * 60 * 60 },
-              },
-            },
+            // The Mushaf page data now ships with the app, so no api.quran.com
+            // route is needed. The QCF page fonts are stored explicitly by
+            // src/app/content/qcfMushaf.ts in `azkar-qcf-fonts-v1`, which works
+            // before the service worker has ever activated.
             {
               urlPattern: /\/data\/mushaf\/\d+\.json$/,
               handler: "CacheFirst" as const,
