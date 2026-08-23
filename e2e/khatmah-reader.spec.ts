@@ -46,7 +46,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   expect(initialBox?.height ?? 0).toBeGreaterThanOrEqual(690);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
 
-  const optionsButton = page.getByRole("button", { name: "خيارات" });
+  // Options split in two (DEC-095): saving your place is its own control, and
+  // what is left behind the menu is page styling.
+  const optionsButton = page.getByRole("button", { name: "نمط الصفحة" });
+  await expect(page.getByRole("button", { name: "حفظ موضع القراءة" })).toBeVisible();
   await optionsButton.focus();
   const lines = mushafPage.locator("[data-mushaf-line-content]");
   await expect(mushafPage.locator("[data-mushaf-rendering] > div > div")).toHaveCount(15);
@@ -66,7 +69,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
       return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
     }),
   );
-  const difficultWords = page.getByRole("switch", { name: "كلمات صعبة" });
+  const difficultWords = page.getByRole("switch", { name: "معاني الكلمات" });
   await expect(difficultWords).toHaveAttribute("aria-checked", "false");
   await difficultWords.click();
   await expect(difficultWords).toHaveAttribute("aria-checked", "true");
@@ -93,7 +96,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(page.getByRole("button", { name: "رجوع" })).toBeFocused();
   await page.waitForTimeout(5200);
   await expect(pageNavigation).toBeVisible();
-  await expect(page.getByRole("switch", { name: "كلمات صعبة" })).toBeVisible();
+  await expect(page.getByRole("switch", { name: "معاني الكلمات" })).toBeVisible();
 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
   expect(pageBox).not.toBeNull();

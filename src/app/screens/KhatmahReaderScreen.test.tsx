@@ -109,7 +109,7 @@ describe("KhatmahReaderScreen difficult words", () => {
     renderReader();
     await screen.findByRole("article", { name: "صفحة ٤٢" });
 
-    const toggle = screen.getByRole("switch", { name: "كلمات صعبة" });
+    const toggle = screen.getByRole("switch", { name: "معاني الكلمات" });
     expect(toggle).toHaveAttribute("aria-checked", "false");
     expect(screen.queryByRole("button", { name: /معنى كلمة/ })).not.toBeInTheDocument();
 

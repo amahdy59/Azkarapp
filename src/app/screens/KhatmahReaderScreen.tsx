@@ -5,14 +5,14 @@ import type { AppLanguage, MushafTheme, QuranReadingPosition, QuranWirdPlan } fr
 import {
   ChevronRight,
   ChevronLeft,
+  CheckCircle2,
+  X,
   RotateCcw,
   Bookmark,
   ArrowRight,
   ArrowLeft,
   Eye,
   ChevronDown,
-  CheckCircle2,
-  MoreHorizontal,
   Brush,
 } from "../components/icons";
 import { useReducedMotion } from "motion/react";
@@ -20,12 +20,10 @@ import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import {
   DropdownMenu,
-  DropdownMenuCheckboxItem,
   DropdownMenuContent,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
@@ -54,6 +52,8 @@ const PAPER_SETTLE = "transform 160ms ease-out";
  * a dead network never holds the reader up.
  */
 const FONT_WAIT_MS = 1200;
+/** How long a page must be open before it counts as read rather than passed. */
+const PAGE_DWELL_MS = 4000;
 /**
  * How long the controls stay up once you stop touching them.
  *
@@ -116,6 +116,11 @@ export function KhatmahReaderScreen({
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
+  const [completionSeen, setCompletionSeen] = useState<string | null>(null);
+  /** Read inside the loader without making the switch a dependency of it —
+   *  flipping it must not re-fetch the page. */
+  const showMeaningsRef = useRef(showWordMeanings);
+  showMeaningsRef.current = showWordMeanings;
   const [chromeVisible, setChromeVisible] = useState(true);
   const [chromeFocused, setChromeFocused] = useState(false);
   /**
@@ -170,6 +175,7 @@ export function KhatmahReaderScreen({
     [quranWirdPlan, wirdHistory],
   );
   const wirdRead = Math.min(todayPagesRead.length, wirdGoal || todayPagesRead.length);
+  const wirdComplete = wirdGoal > 0 && wirdRead >= wirdGoal;
   const wirdLabel = t(language, "mushaf.todayProgress", {
     read: formatNumerals(wirdRead, language),
     goal: formatNumerals(wirdGoal, language),
@@ -204,12 +210,19 @@ export function KhatmahReaderScreen({
         return;
       }
 
-      // Glosses settle with the page too, so the difficult-words switch never
-      // reveals an empty page and then fills it in a moment later. Usually one
-      // surah, occasionally two where a page straddles a break.
-      const surahs = new Set(data.map((verse) => verse.k.split(":")[0] ?? ""));
-      await Promise.all([...surahs].filter(Boolean).map((surah) => loadSurahWordMeanings(surah)));
-      if (!active) return;
+      /**
+       * Glosses block the page only when the reader has actually asked for
+       * them. Awaiting them unconditionally put a 73 kB fetch (Al-Baqarah) in
+       * front of every page turn to pay for a feature that was switched off —
+       * so with the switch off they warm in the background instead, and the
+       * page mounts as soon as its own text is ready.
+       */
+      const surahs = [...new Set(data.map((verse) => verse.k.split(":")[0] ?? ""))].filter(Boolean);
+      const glosses = Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
+      if (showMeaningsRef.current) {
+        await glosses;
+        if (!active) return;
+      }
 
       // The page mounts once, already in its final typeface. Showing the
       // Unicode fallback first and swapping to QCF a moment later resized every
@@ -242,6 +255,31 @@ export function KhatmahReaderScreen({
     const timer = window.setTimeout(() => setChromeVisible(false), CHROME_IDLE_MS);
     return () => window.clearTimeout(timer);
   }, [chromeVisible, chromeFocused, keyboardDriven, currentPage, isIndexOpen, isOptionsMenuOpen]);
+
+  /**
+   * A page counts itself once it has actually been read.
+   *
+   * Asking for a tap to record a page you have just finished reading is a
+   * receipt for work already done — and the reader's hands are on the swipe,
+   * not on a button. A short dwell separates reading a page from flicking past
+   * it on the way somewhere else.
+   */
+  useEffect(() => {
+    if (resolved?.page !== currentPage) return;
+    const timer = window.setTimeout(() => recordCurrentPage(), PAGE_DWELL_MS);
+    return () => window.clearTimeout(timer);
+  }, [currentPage, recordCurrentPage, resolved?.page]);
+
+  /**
+   * Finishing the day's wird is worth saying out loud once — the progress bar
+   * filling is easy to miss when your eyes are on the text. It is a notice, not
+   * a dialog: nothing to dismiss before carrying on reading, because reading
+   * past the goal is a perfectly good thing to do.
+   */
+  useEffect(() => {
+    if (!wirdComplete) return;
+    setCompletionSeen((seen) => (seen === todayKey ? seen : todayKey));
+  }, [todayKey, wirdComplete]);
 
   // Warm both neighbours once the reader has settled, so a turn in either
   // direction is a cache hit rather than a fetch.
@@ -387,7 +425,6 @@ export function KhatmahReaderScreen({
     }
   };
 
-  const pageAlreadyRecorded = todayPagesRead.includes(currentPage);
   /** The options menu opens in a portal, outside the page, so it cannot inherit
    *  the paper. Without this it arrived in the app's own popover colours and
    *  read as a different product sitting on top of the Mushaf. */
@@ -436,27 +473,40 @@ export function KhatmahReaderScreen({
         className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border px-2.5 text-[0.6875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3 ${
           showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-current/25 bg-current/5"
         }`}
-        aria-label={t(language, "mushaf.difficultWords")}
+        aria-label={t(language, "mushaf.difficultWordsInvite")}
         data-testid="mushaf-difficult-words-switch"
       >
         <Eye size={17} aria-hidden="true" />
-        <span className="hidden min-[420px]:inline">{t(language, "mushaf.difficultWords")}</span>
+        <span className="hidden min-[420px]:inline">{t(language, "mushaf.difficultWordsInvite")}</span>
       </button>
+      {/* Saving your place is a single, frequent, reversible act — it belongs on
+          the bar, not two taps deep behind a menu of unrelated settings. */}
+      <button
+        type="button"
+        onClick={toggleBookmark}
+        aria-pressed={isCurrentBookmarked}
+        className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          isCurrentBookmarked ? "border-primary bg-primary text-primary-foreground" : "border-current/25 bg-current/5"
+        }`}
+        aria-label={t(language, "mushaf.savePlace")}
+        data-testid="mushaf-save-place"
+      >
+        <Bookmark size={17} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
+      </button>
+      {/* What is left is one kind of thing: how the page looks. */}
       <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
         <DropdownMenuTrigger asChild>
-          <button type="button" className={headerActionClass} aria-label={t(language, "mushaf.options")}>
-            <MoreHorizontal size={18} />
-            <span>{t(language, "mushaf.options")}</span>
+          <button
+            type="button"
+            className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-current/25 bg-current/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={t(language, "mushaf.themeMenu")}
+          >
+            <Brush size={17} aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className={`min-w-[14rem] ${menuSurfaceClass}`}>
-          <DropdownMenuCheckboxItem checked={isCurrentBookmarked} onCheckedChange={toggleBookmark}>
-            <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
-            <span>{t(language, "mushaf.toggleBookmark")}</span>
-          </DropdownMenuCheckboxItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
-            <Brush size={16} aria-hidden="true" />
+        <DropdownMenuContent align="end" className={`min-w-[12rem] ${menuSurfaceClass}`}>
+          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold opacity-70">
+            <Brush size={15} aria-hidden="true" />
             <span>{t(language, "mushaf.themeTitle")}</span>
           </DropdownMenuLabel>
           <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
@@ -495,36 +545,13 @@ export function KhatmahReaderScreen({
         <ChevronLeft size={22} />
         <span className="truncate">{t(language, "common.next")}</span>
       </button>
-      <button
-        type="button"
-        onClick={recordCurrentPage}
-        disabled={pageAlreadyRecorded}
-        className={`${footerActionClass} shrink-0 basis-auto px-4 ${
-          pageAlreadyRecorded
-            ? "bg-primary/15 text-foreground/70 disabled:opacity-100"
-            : "bg-primary text-primary-foreground"
-        }`}
-        aria-label={pageAlreadyRecorded ? t(language, "mushaf.pageRecorded") : t(language, "mushaf.recordPage")}
-      >
-        <CheckCircle2 size={19} aria-hidden="true" className={pageAlreadyRecorded ? "fill-primary/30" : ""} />
-        <span className="truncate">
-          {pageAlreadyRecorded ? t(language, "mushaf.pageRecorded") : t(language, "mushaf.recordPage")}
-        </span>
-      </button>
-      {/* A readout, not a control: this used to be a second button opening the
-          same index as the surah name in the header. One way in is enough. */}
-      <div className="flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1" dir={direction}>
-        <span className="truncate text-[0.625rem] font-extrabold">
+      {/* Where you are on the paper. Kept apart from how today's wird is going,
+          which lives on the bar above it — one is a location, the other is a
+          measure of effort, and running them together read as one number. */}
+      <div className="flex min-h-14 min-w-0 flex-1 items-center justify-center px-1" dir={direction}>
+        <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
           {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
         </span>
-        {/* Text only. The progressbar the screen reader announces is the
-            hairline along the bottom edge, which is always on screen — two
-            elements carrying the same name announced it twice. */}
-        {wirdGoal > 0 && (
-          <span className="truncate text-[0.5625rem] font-bold opacity-70">
-            {t(language, "mushaf.wirdToday")} {formatNumerals(wirdRead, language)}/{formatNumerals(wirdGoal, language)}
-          </span>
-        )}
       </div>
       <button
         type="button"
@@ -544,17 +571,21 @@ export function KhatmahReaderScreen({
    *  mid-page, and neither is worth a tap. */
   const pageStatus = (
     <div
-      className="flex w-full items-center justify-center gap-3 text-[0.6875rem] font-bold opacity-70"
+      className="flex w-full items-center justify-between gap-3 text-[0.6875rem] font-bold opacity-70"
       dir={direction}
     >
-      <span>{t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}</span>
+      <span className="tabular-nums">
+        {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+      </span>
       {wirdGoal > 0 && (
-        <>
-          <span aria-hidden="true">·</span>
-          <span>
-            {t(language, "mushaf.wirdToday")} {formatNumerals(wirdRead, language)}/{formatNumerals(wirdGoal, language)}
-          </span>
-        </>
+        <span className={wirdComplete ? "text-success opacity-100" : ""}>
+          {wirdComplete
+            ? t(language, "mushaf.wirdComplete")
+            : t(language, "mushaf.wirdRemaining", {
+                count: formatNumerals(Math.max(wirdGoal - wirdRead, 0), language),
+                goal: formatNumerals(wirdGoal, language),
+              })}
+        </span>
       )}
     </div>
   );
@@ -571,7 +602,9 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-wird-progress"
       >
         <div
-          className="h-full bg-primary transition-[width] duration-standard ease-standard"
+          className={`h-full transition-[width] duration-standard ease-standard ${
+            wirdComplete ? "bg-success" : "bg-primary"
+          }`}
           style={{ width: `${Math.min(100, (wirdRead / wirdGoal) * 100)}%` }}
         />
       </div>
@@ -643,6 +676,33 @@ export function KhatmahReaderScreen({
           </div>
         )}
       </div>
+
+      {/* Wird completed */}
+      {wirdComplete && completionSeen === todayKey && (
+        <div
+          role="status"
+          data-testid="mushaf-wird-complete"
+          className="pointer-events-none absolute inset-x-0 bottom-16 z-20 flex justify-center px-4"
+        >
+          <div className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl border border-success/40 bg-success/12 px-4 py-2.5 shadow-raised backdrop-blur">
+            <CheckCircle2 size={20} className="shrink-0 text-success" aria-hidden="true" />
+            <div className="min-w-0" dir={direction}>
+              <p className="truncate text-[0.8125rem] font-extrabold">{t(language, "mushaf.wirdComplete")}</p>
+              <p className="truncate text-[0.6875rem] opacity-80">
+                {t(language, "mushaf.wirdCompleteBody", { goal: formatNumerals(wirdGoal, language) })}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCompletionSeen(null)}
+              className="ms-1 shrink-0 rounded-full p-1 opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              aria-label={t(language, "common.close")}
+            >
+              <X size={15} aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Index & Navigation Modal */}
       <MushafNavigationModal
