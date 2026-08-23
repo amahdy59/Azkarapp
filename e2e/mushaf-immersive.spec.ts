@@ -66,7 +66,7 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
   });
 
-  test("ArrowLeft advances the page in RTL and Escape closes", async ({ page }) => {
+  test("ArrowRight advances the page in RTL too, and Escape closes", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("mushaf-pages")).toBeVisible();
     await openImmersive(page);
@@ -75,8 +75,14 @@ test.describe("immersive mushaf mode", () => {
       .getByTestId("mushaf-immersive-track")
       .evaluate((el) => (el as HTMLElement).clientWidth);
 
-    // Arrow keys are physical, so in RTL the next page lies to the left.
+    // One rule everywhere (DEC-092): the forward-pointing key advances, in
+    // Arabic as in English. This surface used to invert it under RTL while the
+    // Mushaf reader did not.
+    await page.keyboard.press("ArrowRight");
+    await expect.poll(() => scrolled(page)).toBe(trackWidth);
     await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => scrolled(page)).toBe(0);
+    await page.keyboard.press("ArrowRight");
     await expect.poll(() => scrolled(page)).toBe(trackWidth);
 
     await page.keyboard.press("Escape");

@@ -263,13 +263,17 @@ export function MushafImmersiveReader({
         onClose();
         return;
       }
+      // One rule for the whole app (DEC-092): the control that points forward
+      // advances, in Arabic and in English alike. This surface used to invert
+      // it under RTL while the Mushaf reader did not, so the same key turned
+      // the page two different ways depending on which reader you were in.
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        flip(direction === "rtl" ? -1 : 1);
+        flip(1);
         onInteract();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        flip(direction === "rtl" ? 1 : -1);
+        flip(-1);
         onInteract();
       }
     };
@@ -403,7 +407,10 @@ export function MushafImmersiveReader({
       <div
         className={`absolute inset-x-0 bottom-0 z-10 transition-opacity duration-300 ${controlsVisible ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
-        <nav className="flex shrink-0 items-center justify-between gap-3 border-t border-border/60 bg-background/95 px-4 py-3 backdrop-blur shadow-sm">
+        <nav
+          dir="ltr"
+          className="flex shrink-0 items-center justify-between gap-3 border-t border-border/60 bg-background/95 px-4 py-3 backdrop-blur shadow-sm"
+        >
           <FlipButton
             onClick={() => {
               flip(-1);
@@ -412,7 +419,6 @@ export function MushafImmersiveReader({
             disabled={atStart}
             label={t(language, "reader.immersivePrevious")}
             testId="mushaf-immersive-previous"
-            direction={direction}
             back
           />
           <bdi
@@ -439,7 +445,6 @@ export function MushafImmersiveReader({
               disabled={atEnd}
               label={t(language, "reader.immersiveNext")}
               testId="mushaf-immersive-next"
-              direction={direction}
             />
           )}
         </nav>
@@ -453,18 +458,17 @@ function FlipButton({
   disabled,
   label,
   testId,
-  direction,
   back = false,
 }: {
   onClick: () => void;
   disabled: boolean;
   label: string;
   testId: string;
-  direction: "ltr" | "rtl";
   back?: boolean;
 }) {
-  const pointsLeft = back === (direction === "ltr");
-  const Icon = pointsLeft ? ArrowLeft : ArrowRight;
+  // Physical, not logical: back points left and forward points right on every
+  // screen, which is what the footer's own left-to-right order promises.
+  const Icon = back ? ArrowLeft : ArrowRight;
   return (
     <button
       type="button"
