@@ -73,12 +73,20 @@ in the verse, its line number on the page, whether it is the ayah marker, its re
 text, and its QCF v2 `code_v2` glyph. The reference is fixed by DEC-089 — the King Fahd Complex
 Madani Mushaf, fifteen lines a page — and nothing else may be used as a layout source.
 
+- All three facts that define a page — which words are on it, which line each word sits on, and
+  which glyph draws it — come from the reference. Taking only some of them from the reference is
+  what put verse 5:77 after 5:83 on page 121 (DEC-090).
+- **`api.quran.com` answers a different question depending on the fields you ask for.**
+  `word_fields=page_number` returns the default script's pagination; `word_fields=code_v2,page_number`
+  returns the v2 font's, and the two disagree on 25 pages. Only the second matches the glyphs, so
+  every word is placed by its **v2** `page_number`.
 - Regenerate with `pnpm prepare:mushaf` (needs network access to api.quran.com; nothing at runtime
-  does). `--pages 1-10` limits the range and `--dry-run` writes nothing.
-- The script only ever rewrites the **layout metadata**: line number and glyph. Each word's
-  reviewed Uthmani `text` is carried through untouched, and a page is written only when every one
-  of its words matches the reference one-to-one. A page with any mismatch is left alone and
-  reported.
+  does). `--dry-run` writes nothing and reports how many files would change.
+- The script only ever rewrites **layout**: page, line and glyph. Each word's reviewed Uthmani
+  `text` is carried across untouched, looked up by verse and position rather than read from the page
+  being rewritten — because a rebuild moves words between pages. Nothing is written unless every
+  word in the Mushaf is accounted for exactly once, so a partial or reordered rebuild fails loudly
+  instead of shipping.
 - Reviewing a regeneration means reviewing a layout change, not a text change. `git diff` on these
   files should show no change to any Arabic word; if it does, stop and treat it as a content change
   under the rules above.

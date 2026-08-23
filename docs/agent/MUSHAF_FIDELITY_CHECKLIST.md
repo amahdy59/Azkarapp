@@ -159,3 +159,45 @@ if you want to compare directly.
       now does the opposite (item 5.1). Two opposite page-turn conventions in one app is worse
       than either one — say the word and I will flip the immersive reader to match, along with
       its own spec and the DEC-086 note.
+
+---
+
+# Round two — review of 2026-08-23 (DEC-090)
+
+Raised from a reader screenshot showing two lines of garbage at the foot of the page and a narrow
+ragged column. Numbering matches the review handed to the owner.
+
+## Done
+
+- [x] **1. 25 pages placed verses on the wrong page.** Verse 5:77 printed after 5:83 on page 121,
+      in page 120's glyphs. Cause: `api.quran.com` returns a different pagination depending on the
+      fields requested, and the generator took v2 line numbers and glyphs while keeping the old
+      verse-to-page assignment. All three now come from the reference. 36 files changed; 83,665
+      words before and after, zero Arabic characters changed. `mushafPageData.test.ts` now holds
+      the offline invariants; its reading-order check failed 1714 times on the old data.
+- [x] **2. The generator could not catch it.** It now places every word by its v2 `page_number` and
+      refuses to write unless the whole Mushaf is accounted for exactly once.
+- [x] **3. The measure is derived, not chosen.** Was capped at `92cqh`, leaving the widest line at
+      0.76 of the column on tablet and desktop so every line was centred instead of justified.
+      Measured after: line fill 0.97–1.01, type size unchanged (35.0 px → 34.7 px).
+- [x] **4. Vertical leading.** Governed by `SLOT_INK_ALLOWANCE` per renderer.
+- [x] **6. First page no longer reflows.** Data and font settle together, bounded at 1200 ms, so a
+      page mounts once in its final typeface.
+- [x] **7–9. The header and footer are permanent** — explicit owner instruction. The 3.5 s
+      auto-hide, the reveal control and its two i18n keys are gone.
+
+## Open
+
+- [ ] **5.** QCF lines still carry a 2 px inter-word gap and are justified with `space-between`.
+      QCF v2 advances already include word spacing; the gap should be zero for QCF and the font left
+      to justify. Cosmetic now that the measure is right.
+- [ ] **10.** No two-page spread on wide screens — the honest answer to a 1440 px desktop.
+- [ ] **11.** Fallback ayah markers are coloured circles that break the line rhythm.
+- [ ] **12.** A surah starting on line 1 or 2 of a page has nowhere for its header band; the
+      inference silently drops it.
+- [ ] **13.** The bookmark ribbon is pinned at `top-14`, tied to the header.
+- [ ] **14.** Opening a word popover re-renders all fifteen lines.
+- [ ] **15.** `azkar-qcf-page-data-v1` and `azkar-qcf-page-fonts-v1` linger in existing browsers as
+      dead storage from routes removed in DEC-089.
+- [ ] **16. [needs you]** The immersive reader still uses the old inverted arrow mapping, so the app
+      carries two opposite page-turn conventions.

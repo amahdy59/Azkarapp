@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-1",
+  "release": "2026-08-23-2",
   "ar": [
-    "صفحة المصحف تملأ الشاشة كاملة، بخط أوضح قليلاً وعنوان سورة رفيع كما في المصحف المطبوع.",
-    "كل صفحة صارت مطابقة لمصحف المدينة بخمسة عشر سطراً، فلا تُقتطع الأسطر عند حواف الصفحة.",
-    "زرّا السابق والتالي صارا في اتجاههما الصحيح، وتقليب الصفحات صار فورياً ويعمل دون اتصال بالإنترنت.",
-    "مفتاح «كلمات صعبة» صار ظاهراً في شريط الأدوات، فتظهر معاني الكلمات بضغطة واحدة."
+    "صُحّحت خمس وعشرون صفحة كانت تعرض آيات في غير موضعها من المصحف، وبعضها بحروف غير مقروءة.",
+    "امتلأت الأسطر من الحافة إلى الحافة كما في المصحف المطبوع، بعد أن كانت تظهر في عمود ضيق غير مستوٍ.",
+    "شريط العنوان وشريط التنقل صارا ثابتين لا يختفيان، فاسم السورة والجزء ورقم الصفحة أمامك دائماً.",
+    "تظهر الصفحة بخطها النهائي من أول مرة، دون تغيّر حجم النص بعد لحظة من فتحها."
   ],
   "en": [
-    "The Mushaf page now fills the whole screen, with slightly clearer type and a slim surah heading like the printed page.",
-    "Every page matches the fifteen-line Madinah Mushaf, so lines are no longer cut off at the page edges.",
-    "Previous and Next now point the way you expect, and turning a page is instant and works offline.",
-    "A Difficult words switch sits on the toolbar, so a word's meaning is one tap away."
+    "Fixed 25 pages that placed verses on the wrong page — some of them drawn in unreadable glyphs.",
+    "Lines now run margin to margin as in the printed Mushaf, instead of a narrow ragged column.",
+    "The header and footer no longer disappear, so the surah, juz and page number are always in view.",
+    "A page now appears in its final typeface straight away, with no resize a moment after it opens."
   ]
 }
