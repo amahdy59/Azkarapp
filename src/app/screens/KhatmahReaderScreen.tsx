@@ -9,7 +9,6 @@ import {
   Bookmark,
   ArrowRight,
   ArrowLeft,
-  SlidersHorizontal,
   Eye,
   ChevronDown,
   CheckCircle2,
@@ -48,10 +47,21 @@ const LAST_PAGE = 604;
 const SWIPE_THRESHOLD = 60;
 /** Settling a released drag, and the only transform animation on this screen. */
 const PAPER_SETTLE = "transform 160ms ease-out";
+/**
+ * How long a page will wait for its QCF font before mounting in the Unicode
+ * fallback instead. Long enough for a warm Cache Storage hit, short enough that
+ * a dead network never holds the reader up.
+ */
+const FONT_WAIT_MS = 1200;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 interface ResolvedPage {
   page: number;
   data: MushafVerseData[];
+  /** Settled with the page, never after it: flipping this later reflowed the
+   *  whole canvas as the Unicode fallback gave way to QCF. */
+  qcf: boolean;
 }
 
 export function KhatmahReaderScreen({
@@ -87,16 +97,14 @@ export function KhatmahReaderScreen({
   const [bookmarks, setBookmarks] = useState<number[]>(initialBookmarks);
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
-    return cached ? { page: currentPage, data: cached } : null;
+    if (!cached) return null;
+    return { page: currentPage, data: cached, qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cached) };
   });
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
-  const [controlsVisible, setControlsVisible] = useState(true);
-  const [controlsFocused, setControlsFocused] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
-  const [qcfFontReady, setQcfFontReady] = useState(() => isQcfFontReady(currentPage));
   const reduceMotion = useReducedMotion();
   const paperRef = useRef<HTMLDivElement>(null);
 
@@ -153,28 +161,29 @@ export function KhatmahReaderScreen({
   useEffect(() => {
     let active = true;
 
-    const cached = getCachedMushafPage(currentPage);
-    if (cached) {
-      setResolved({ page: currentPage, data: cached });
-      setError(null);
-    }
-
-    void loadMushafPage(currentPage)
-      .then((data) => {
-        if (!active) return;
-        setResolved({ page: currentPage, data });
-        setError(null);
-      })
-      .catch((reason) => {
-        if (!active) return;
+    void (async () => {
+      const data = await loadMushafPage(currentPage).catch((reason) => {
         console.error("Failed to load Mushaf page", reason);
-        setError(t(language, "mushaf.loadFailed"));
+        return null;
       });
+      if (!active) return;
+      if (!data) {
+        setError(t(language, "mushaf.loadFailed"));
+        return;
+      }
 
-    setQcfFontReady(isQcfFontReady(currentPage));
-    void loadQcfFont(currentPage).then((ready) => {
-      if (active && ready) setQcfFontReady(isQcfFontReady(currentPage));
-    });
+      // The page mounts once, already in its final typeface. Showing the
+      // Unicode fallback first and swapping to QCF a moment later resized every
+      // line under the reader's eyes.
+      const wantsQcf = pageHasQcfGlyphs(data);
+      const qcf = wantsQcf
+        ? await Promise.race([loadQcfFont(currentPage), sleep(FONT_WAIT_MS).then(() => false)])
+        : false;
+      if (!active) return;
+
+      setResolved({ page: currentPage, data, qcf });
+      setError(null);
+    })();
 
     return () => {
       active = false;
@@ -194,16 +203,6 @@ export function KhatmahReaderScreen({
     }, 250);
     return () => window.clearTimeout(timer);
   }, [currentPage, resolved?.page]);
-
-  useEffect(() => {
-    setControlsVisible(true);
-  }, [currentPage]);
-
-  useEffect(() => {
-    if (!controlsVisible || controlsFocused || isIndexOpen || isOptionsMenuOpen) return;
-    const timer = window.setTimeout(() => setControlsVisible(false), 3500);
-    return () => window.clearTimeout(timer);
-  }, [controlsVisible, controlsFocused, currentPage, isIndexOpen, isOptionsMenuOpen]);
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
@@ -227,8 +226,7 @@ export function KhatmahReaderScreen({
     return result;
   }, [pageData]);
 
-  const pageCarriesGlyphs = useMemo(() => !!pageData && pageHasQcfGlyphs(pageData), [pageData]);
-  const useQcfGlyphs = qcfFontReady && displayPage === currentPage && pageCarriesGlyphs;
+  const useQcfGlyphs = resolved?.qcf ?? false;
 
   // Compute Surah and Juz for the header
   const { surahName, juzNumber } = useMemo(() => {
@@ -306,7 +304,6 @@ export function KhatmahReaderScreen({
     if (!drag.current.engaged) {
       if (Math.abs(offset) < 12) return;
       drag.current.engaged = true;
-      setControlsVisible(false);
       if (event.currentTarget.hasPointerCapture?.(event.pointerId) === false) {
         event.currentTarget.setPointerCapture(event.pointerId);
       }
@@ -458,20 +455,6 @@ export function KhatmahReaderScreen({
     </nav>
   );
 
-  const revealPageControls = (
-    <div className="flex w-full justify-center">
-      <button
-        type="button"
-        onClick={() => setControlsVisible(true)}
-        className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-3 text-xs font-extrabold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={t(language, "mushaf.showPageControls")}
-      >
-        <SlidersHorizontal size={18} />
-        <span>{t(language, "mushaf.pageControls")}</span>
-      </button>
-    </div>
-  );
-
   return (
     <ScreenContainer
       dir={direction}
@@ -525,11 +508,8 @@ export function KhatmahReaderScreen({
               isBookmarked={isCurrentBookmarked}
               useQcfGlyphs={useQcfGlyphs}
               showWordMeanings={showWordMeanings}
-              controlsVisible={controlsVisible}
               headerContent={pageHeader}
               footerContent={pageFooter}
-              hiddenControlsContent={revealPageControls}
-              onControlsFocusChange={setControlsFocused}
             />
           </div>
         )}

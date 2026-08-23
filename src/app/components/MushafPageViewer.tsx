@@ -337,32 +337,44 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const first = contents[0];
       if (!column || !first) return;
 
-      const available = first.clientWidth;
-      const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
-      // Bail before writing anything: a zero-sized canvas (mid page-turn, or
-      // detached) would otherwise leave the page reset and never restored.
-      if (available <= 0 || slotHeight <= 0) return;
-
-      // Pass one — back to the stylesheet's own scale, then measure against it.
-      // Only `--mushaf-fit` is ever written; the font-size expression itself
-      // belongs to React, and clearing it left the page at the browser default.
+      // Pass one — release both constraints, then measure the page as the
+      // stylesheet would set it. Only the two custom properties are ever
+      // written; the font-size expression itself belongs to React, and clearing
+      // that left the page at the browser default.
+      column.style.setProperty("--mushaf-measure", "100%");
       column.style.setProperty("--mushaf-fit", "1");
       for (const content of contents) {
         content.style.transform = "";
         content.style.justifyContent = "";
       }
 
+      const available = first.clientWidth;
+      const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
+      if (available <= 0 || slotHeight <= 0) return;
+
       // Only full lines say anything about the page's natural measure; a
       // two-word closing line would drag the whole page's type up.
       const fullLines = contents.filter((content) => content.children.length >= 5).map(measureNaturalWidth);
       const widest = fullLines.length > 0 ? Math.max(...fullLines) : 0;
-
-      // Never taller than the slot the line has to live in.
       const lineHeight = first.offsetHeight;
-      const verticalHeadroom = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
 
-      const widthFill = widest > 0 ? available / widest : 1;
-      const scale = Math.min(Math.max(widthFill, 0.6), verticalHeadroom, 2.4);
+      /**
+       * The measure is derived, not chosen.
+       *
+       * Fifteen lines have to fit the page height, which caps how large the type
+       * can be; the type size in turn fixes how wide a line wants to be. Picking
+       * the column width independently — it was capped at `92cqh` — left the
+       * widest line covering only three quarters of it on a tablet or desktop,
+       * so every line fell short of the justify threshold and the page rendered
+       * as a narrow ragged column with wide margins. Setting the measure to what
+       * the vertically-limited type actually spans makes the two agree, and the
+       * type comes out the same size either way.
+       */
+      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
+      const measure = Math.min(widest * verticalScale, available);
+      const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
+
+      column.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
       column.style.setProperty("--mushaf-fit", scale.toFixed(3));
 
       // Pass two — settle each line at the size the page actually ended up with.
@@ -413,11 +425,8 @@ export function MushafPageViewer({
   isBookmarked = false,
   useQcfGlyphs = false,
   showWordMeanings = false,
-  controlsVisible = true,
   headerContent,
   footerContent,
-  hiddenControlsContent,
-  onControlsFocusChange,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -429,11 +438,8 @@ export function MushafPageViewer({
   isBookmarked?: boolean;
   useQcfGlyphs?: boolean;
   showWordMeanings?: boolean;
-  controlsVisible?: boolean;
   headerContent?: ReactNode;
   footerContent?: ReactNode;
-  hiddenControlsContent?: ReactNode;
-  onControlsFocusChange?: (focused: boolean) => void;
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -552,16 +558,15 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* Page chrome occupies the physical Mushaf header/footer space. Hiding it
-          never reflows the reviewed 15-line reading canvas. */}
+      {/* Page chrome occupies the physical Mushaf header/footer space, and stays
+          there. It used to fade out after 3.5s, taking the surah name, the juz,
+          the page number and every control with it — a printed Mushaf keeps its
+          running heads on the paper, and so does this one. */}
       <div
         data-mushaf-chrome="header"
-        className={`flex h-14 shrink-0 items-center border-b px-2 transition-opacity sm:px-3 ${chromeBgClass} ${controlsVisible ? "opacity-100" : "pointer-events-none opacity-0"}`}
-        aria-hidden={!controlsVisible}
-        onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
-        onBlurCapture={() => onControlsFocusChange?.(false)}
+        className={`flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
       >
-        {controlsVisible ? headerContent : null}
+        {headerContent}
       </div>
 
       {/* 15-line Mushaf page canvas. `container-type: size` lets the type scale
@@ -573,15 +578,13 @@ export function MushafPageViewer({
         data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       >
         <div
-          // Full width up to a page-shaped measure. A 15-line page stretched
-          // across a 1440px desktop would set the type to a whisper; capping the
-          // column against the page height keeps the printed proportion while
-          // the paper itself still fills the screen.
-          className="mx-auto flex h-full w-full max-w-[92cqh] flex-col"
+          // The measure and the type size are both derived by `useLineFitter`
+          // from the one thing that is fixed — fifteen lines in the height of
+          // the paper — so the widest line always lands exactly on the margin.
+          className="mx-auto flex h-full w-full flex-col"
           style={{
+            maxWidth: "var(--mushaf-measure, 100%)",
             fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-            // The starting size; `useLineFitter` then scales it through
-            // `--mushaf-fit` until the longest line lands on the margin.
             fontSize: useQcfGlyphs
               ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
               : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
@@ -617,11 +620,9 @@ export function MushafPageViewer({
 
       <div
         data-mushaf-chrome="footer"
-        className={`flex h-14 shrink-0 items-center border-t px-2 transition-colors sm:px-3 ${chromeBgClass}`}
-        onFocusCapture={(event) => onControlsFocusChange?.((event.target as HTMLElement).matches(":focus-visible"))}
-        onBlurCapture={() => onControlsFocusChange?.(false)}
+        className={`flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
       >
-        {controlsVisible ? footerContent : hiddenControlsContent}
+        {footerContent}
       </div>
     </article>
   );

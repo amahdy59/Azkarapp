@@ -36,13 +36,9 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   const mushafPage = page.getByRole("article", { name: "صفحة ٤٢" });
   const pageNavigation = page.getByRole("navigation", { name: "التنقل بين صفحات المصحف" });
-  const revealControls = page.getByRole("button", { name: "إظهار أدوات صفحة المصحف" });
   await expect(mushafPage).toBeVisible();
   await expect(pageNavigation).toBeVisible();
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toHaveCount(0);
-  await expect(pageNavigation).toHaveCount(0, { timeout: 5000 });
-  await revealControls.click();
-  await expect(pageNavigation).toBeVisible();
   const initialBox = await mushafPage.boundingBox();
   // The Mushaf is the whole screen: no card, no gutter, no letterbox.
   expect(initialBox?.x ?? 99).toBeLessThanOrEqual(1);
@@ -85,14 +81,15 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await expect(page.getByText(/ختمة المصحف:/)).toHaveCount(0);
 
-  await expect(pageNavigation).toHaveCount(0, { timeout: 5000 });
-  await revealControls.click();
-  await expect(pageNavigation).toBeVisible();
+  // The page chrome is permanent. It used to fade out after 3.5s, taking the
+  // surah, the juz, the page number and every control with it.
   await page.keyboard.press("Tab");
   await page.getByRole("button", { name: "رجوع" }).focus();
   await expect(page.getByRole("button", { name: "رجوع" })).toBeFocused();
-  await page.waitForTimeout(3800);
+  await page.waitForTimeout(4200);
   await expect(pageNavigation).toBeVisible();
+  await expect(page.getByRole("switch", { name: "كلمات صعبة" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "رجوع" })).toBeVisible();
 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
   expect(pageBox).not.toBeNull();

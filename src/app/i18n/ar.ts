@@ -873,8 +873,6 @@ const ar = {
     hideWordMeanings: "إخفاء معاني الكلمات الصعبة",
     difficultWords: "كلمات صعبة",
     options: "خيارات",
-    pageControls: "الأدوات",
-    showPageControls: "إظهار أدوات صفحة المصحف",
     qcfUnavailable: "يُعرض الخط القرآني المحلي حتى يتوفر خط صفحة المدينة.",
   },
   reader: {
