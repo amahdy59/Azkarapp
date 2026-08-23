@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-2",
+  "release": "2026-08-23-3",
   "ar": [
-    "صُحّحت خمس وعشرون صفحة كانت تعرض آيات في غير موضعها من المصحف، وبعضها بحروف غير مقروءة.",
-    "امتلأت الأسطر من الحافة إلى الحافة كما في المصحف المطبوع، بعد أن كانت تظهر في عمود ضيق غير مستوٍ.",
-    "شريط العنوان وشريط التنقل صارا ثابتين لا يختفيان، فاسم السورة والجزء ورقم الصفحة أمامك دائماً.",
-    "تظهر الصفحة بخطها النهائي من أول مرة، دون تغيّر حجم النص بعد لحظة من فتحها."
+    "أزرار التنقل صارت أسفل الصفحة نفسها على الشاشات الكبيرة، بعد أن كانت متباعدة في أطراف الشاشة.",
+    "عند تقليب الصفحة تتحرك الورقة وحدها، ولا تنزلق معها أشرطة الأدوات.",
+    "تنزوي الأدوات أثناء القراءة وتعود بلمسة على الصفحة، ويبقى رقم الصفحة وتقدّم وردك ظاهرين دائماً.",
+    "يظهر تقدّم ورد اليوم أثناء القراءة وفق الخطة التي اخترتها."
   ],
   "en": [
-    "Fixed 25 pages that placed verses on the wrong page — some of them drawn in unreadable glyphs.",
-    "Lines now run margin to margin as in the printed Mushaf, instead of a narrow ragged column.",
-    "The header and footer no longer disappear, so the surah, juz and page number are always in view.",
-    "A page now appears in its final typeface straight away, with no resize a moment after it opens."
+    "On large screens the page controls now sit under the page itself instead of at the far corners.",
+    "Turning a page moves the paper alone — the toolbars no longer slide away with it.",
+    "The controls step aside while you read and return with a tap; the page number and your wird stay put.",
+    "Your progress through today's wird is now visible while you read, against the plan you chose."
   ]
 }
