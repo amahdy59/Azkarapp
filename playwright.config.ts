@@ -30,12 +30,18 @@ export default defineConfig({
   testDir: "./e2e",
   testIgnore: ["**/.*", "**/*-temp.spec.ts"],
   fullyParallel: true,
-  // The default of 2 left fourteen of sixteen cores idle on a developer
-  // machine. Capped at 4: at 8 the machine is loaded enough that the
-  // load-sensitive reader and navigation specs start timing out, and a gate
-  // that fails at random is worth less than the minutes it saves. CI keeps its
-  // own deliberately tuned pool.
-  workers: process.env.CI ? 3 : Math.max(2, Math.min(4, Math.floor(os.cpus().length / 4))),
+  /**
+   * Three everywhere, matching the pool CI has already validated.
+   *
+   * The default of 2 left fourteen of sixteen cores idle, but the ceiling here
+   * is not the cores — it is the single `vite preview` process feeding every
+   * browser. At 8 workers six load-sensitive reader and navigation specs timed
+   * out, and at 4 the home hero's photograph was dropped often enough that the
+   * component fell back to its flat ground and the imagery spec failed. Both
+   * pass in isolation; a gate that fails at random is worth less than the
+   * minutes it saves.
+   */
+  workers: Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4))),
   retries: 0,
   reporter: process.env.CI ? "github" : "list",
   use: {

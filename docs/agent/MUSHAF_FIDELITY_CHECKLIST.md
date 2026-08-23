@@ -98,9 +98,12 @@ Raised from the reader review of 2026-08-23 against `9b68fdc`.
 - [x] 8.2 Switch Vitest to the threads pool and share the module registry between files in a
       worker; keep every test passing and coverage thresholds unchanged.
 - [x] 8.3 `pnpm check` runs its independent gates concurrently instead of strictly serially.
-- [x] 8.4 Playwright: raise local workers off `2`, but cap at 4. Eight workers loaded the
-      machine enough that six load-sensitive reader/navigation specs timed out; all six pass
-      in isolation. A gate that fails at random is worth less than the minutes it saves.
+- [x] 8.4 Playwright: workers go to **3 everywhere**, the pool CI had already validated. The
+      ceiling is not the sixteen cores, it is the single `vite preview` process feeding every
+      browser: at 8 workers six load-sensitive reader and navigation specs timed out, and at 4
+      the home hero's photograph was dropped often enough that the component fell back to its
+      flat ground and the imagery spec failed. All of them pass in isolation. A gate that fails
+      at random is worth less than the minutes it saves.
 - [x] 8.5 Playwright: stop running all 25 device-agnostic specs three times over. The two
       non-desktop Chromium projects now run only the nine specs whose assertions depend on the
       device, named in `playwright.config.ts`; `E2E_FULL_MATRIX=1` restores the full matrix for
@@ -119,7 +122,7 @@ Raised from the reader review of 2026-08-23 against `9b68fdc`.
 | `pnpm check` (whole merge gate) | ~6 min   | 1 m 02 s |
 | `pnpm test:e2e` test-runs       | 514      | 312      |
 | `pnpm test:e2e` wall clock      | —        | 7 m 05 s |
-| Playwright local workers        | 2        | 4        |
+| Playwright local workers        | 2        | 3        |
 
 Where the test-run win came from: the stock `forks` pool stood up a process and a jsdom for each
 of the 105 files — 918 s of accumulated worker time on environment setup against 306 s actually
