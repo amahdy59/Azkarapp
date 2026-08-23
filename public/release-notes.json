@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-4",
+  "release": "2026-08-23-5",
   "ar": [
-    "ظهر اسم السورة في تسع عشرة صفحة كانت تبدأ بسورة جديدة دون أن يظهر اسمها.",
-    "صار تقليب الصفحات في وضع القراءة الغامرة بنفس اتجاه المصحف، فالسهم المتّجه للأمام يتقدّم دائماً.",
-    "أصبحت علامات الآيات بلون النص نفسه، فلا تقطع انسياب السطر.",
-    "حُذفت ملفات مؤقتة قديمة لم تعد مستخدمة، لتوفير مساحة على جهازك."
+    "صار شرح الكلمات الغريبة متاحاً في المصحف كله بدل ثماني سور فقط — أكثر من أحد عشر ألف كلمة.",
+    "اسم السورة صار أخف وأصغر بلا إطار ملوّن، وزادت المسافة بين الأسطر قليلاً لراحة القراءة.",
+    "فهرس المصحف صار يملأ الشاشة على الهاتف، ويبقى مربع البحث ثابتاً فوق النتائج.",
+    "زر الصفحة في الشريط السفلي صار يعرض تقدّمك في ورد اليوم بدل تكرار فتح الفهرس."
   ],
   "en": [
-    "Nineteen pages that open a new surah now show its name — it used to be dropped.",
-    "Immersive reading turns pages the same way the Mushaf does: the forward arrow always advances.",
-    "Ayah markers are set in the text's own ink, so they no longer interrupt the line.",
-    "Old unused cache files are cleared on startup, freeing space on your device."
+    "Difficult-word meanings now cover the whole Mushaf instead of eight surahs — over eleven thousand words.",
+    "The surah heading is lighter and smaller with no coloured frame, and lines have a little more space between them.",
+    "The index fills the screen on a phone, and the search box stays above its results.",
+    "The page control in the bottom bar now shows your progress through today's wird instead of repeating the index."
   ]
 }
