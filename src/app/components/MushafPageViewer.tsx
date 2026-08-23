@@ -115,17 +115,27 @@ function SurahHeaderBand({
   const title = getSurahDisplayName(surahNumber, language);
   const isOled = theme === "oled";
 
+  const rule = isOled ? "bg-white/35" : "bg-current opacity-20";
+
   return (
-    <div className="flex h-full w-full items-center justify-center gap-2 px-2 select-none" dir="rtl">
-      <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
-      <span className="shrink-0 text-[0.5em] opacity-50" aria-hidden="true">
+    <div className="flex h-full w-full items-center justify-center gap-2.5 px-2 select-none" dir="rtl">
+      {/* A double rule either side — the printed heading's ornament, carried at
+          one line height rather than the boxed panel it used to be. */}
+      <span className="flex flex-1 flex-col gap-[0.15em]" aria-hidden="true">
+        <span className={`h-px w-full ${rule}`} />
+        <span className={`h-px w-full ${rule}`} />
+      </span>
+      <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
         ۞
       </span>
-      <span className="shrink-0 truncate font-arabic text-[0.6em] font-bold tracking-[0.08em]">{title}</span>
-      <span className="shrink-0 text-[0.5em] opacity-50" aria-hidden="true">
+      <span className="shrink-0 truncate font-arabic text-[0.52em] font-semibold tracking-[0.12em]">{title}</span>
+      <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
         ۞
       </span>
-      <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
+      <span className="flex flex-1 flex-col gap-[0.15em]" aria-hidden="true">
+        <span className={`h-px w-full ${rule}`} />
+        <span className={`h-px w-full ${rule}`} />
+      </span>
     </div>
   );
 }
@@ -155,11 +165,11 @@ function SurahOpeningBand({
     <div className="flex h-full w-full flex-col items-center justify-center gap-px px-2 select-none" dir="rtl">
       <span className="flex w-full items-center justify-center gap-2">
         <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
-        <span className="shrink-0 truncate font-arabic text-[0.55em] font-bold tracking-[0.08em]">{title}</span>
+        <span className="shrink-0 truncate font-arabic text-[0.48em] font-semibold tracking-[0.12em]">{title}</span>
         <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
       </span>
       {withBismillah && (
-        <span className="font-arabic text-[0.52em] leading-none opacity-90" style={{ fontFamily: "inherit" }}>
+        <span className="font-arabic text-[0.5em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </span>
       )}
@@ -622,9 +632,19 @@ export function MushafPageViewer({
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of
   // extra weight for legibility: QCF v2 is a single-weight face, so synthetic
   // bold would smear the counters instead of thickening the stem.
+  /**
+   * Reading surfaces, not UI surfaces.
+   *
+   * The night themes used to run near-white ink on near-black paper — 17.6:1,
+   * four times the 4.5:1 that AA asks for. That much contrast is what makes
+   * glyphs bloom and smear on a dark ground over a long sitting. These sit
+   * around 12:1: comfortably past AA, warm rather than blue, and calm enough to
+   * read a juz by. OLED keeps its pure black on purpose — it is the
+   * high-contrast choice, and it says so on the tin.
+   */
   const themeClasses = {
-    parchment: "bg-[#fbf7ee] dark:bg-[#141820] text-[#1c1917] dark:text-[#f3f4f6]",
-    dark: "bg-[#0b0e14] text-[#f3f4f6]",
+    parchment: "bg-[#fbf7ee] dark:bg-[#191d26] text-[#1c1917] dark:text-[#e6e1d6]",
+    dark: "bg-[#1a1d23] text-[#ded8cc]",
     oled: "bg-[#000000] text-[#ffffff]",
     white: "bg-[#ffffff] text-[#111827]",
   }[theme];
