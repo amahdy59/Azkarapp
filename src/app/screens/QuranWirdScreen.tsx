@@ -4,6 +4,7 @@ import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ArrowNext, BookOpen, ChevronDown, Undo } from "../components/icons";
 import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
+import { effectiveDailyGoal } from "./quranWirdGoal";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
@@ -18,25 +19,6 @@ function planLabel(language: AppLanguage, plan: QuranWirdPlan) {
   if (plan.kind === "custom")
     return t(language, "mushaf.planCustom", { days: formatNumerals(plan.durationDays ?? 30, language) });
   return t(language, "mushaf.planDaily");
-}
-
-function effectiveDailyGoal(plan: QuranWirdPlan, history: Record<string, number[]>) {
-  if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) return plan.dailyPages;
-  const [year, month, day] = plan.startedDayKey.split("-").map(Number);
-  const today = new Date();
-  const elapsed = Math.max(
-    0,
-    Math.floor(
-      (Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(year!, month! - 1, day!)) /
-        86_400_000,
-    ),
-  );
-  const completed = new Set(
-    Object.entries(history)
-      .filter(([dayKey]) => dayKey >= plan.startedDayKey!)
-      .flatMap(([, pages]) => pages),
-  ).size;
-  return Math.max(1, Math.ceil(Math.max(0, TOTAL_PAGES - completed) / Math.max(1, plan.durationDays - elapsed)));
 }
 
 export function QuranWirdScreen({

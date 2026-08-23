@@ -1431,6 +1431,7 @@ function AppContent() {
                   setMushafBookmarks={setMushafBookmarks}
                   wirdHistory={wirdHistory}
                   setWirdHistory={setWirdHistory}
+                  quranWirdPlan={quranWirdPlan}
                   onReadingPositionChange={setQuranReadingPosition}
                 />
               )}
