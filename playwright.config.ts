@@ -50,6 +50,15 @@ export default defineConfig({
     reducedMotion: "reduce",
   },
   timeout: 60_000,
+  /**
+   * Playwright's default assertion timeout is 5s, which is generous on an idle
+   * machine and too tight inside the pre-push gate, where the suite starts the
+   * moment `pnpm check` releases the cores. Two ordinary Library assertions blew
+   * it there while taking 12.9s and 17.5s; the same two pass in 3.7s in
+   * isolation. Waiting longer weakens nothing — an element that never arrives
+   * still fails, four times sooner than the per-test timeout would catch it.
+   */
+  expect: { timeout: 15_000 },
   projects: [
     { name: "desktop-chromium", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile-chromium", testMatch: deviceMatrix, use: { ...devices["Pixel 7"] } },
