@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-3",
+  "release": "2026-08-23-4",
   "ar": [
-    "أزرار التنقل صارت أسفل الصفحة نفسها على الشاشات الكبيرة، بعد أن كانت متباعدة في أطراف الشاشة.",
-    "عند تقليب الصفحة تتحرك الورقة وحدها، ولا تنزلق معها أشرطة الأدوات.",
-    "تنزوي الأدوات أثناء القراءة وتعود بلمسة على الصفحة، ويبقى رقم الصفحة وتقدّم وردك ظاهرين دائماً.",
-    "يظهر تقدّم ورد اليوم أثناء القراءة وفق الخطة التي اخترتها."
+    "ظهر اسم السورة في تسع عشرة صفحة كانت تبدأ بسورة جديدة دون أن يظهر اسمها.",
+    "صار تقليب الصفحات في وضع القراءة الغامرة بنفس اتجاه المصحف، فالسهم المتّجه للأمام يتقدّم دائماً.",
+    "أصبحت علامات الآيات بلون النص نفسه، فلا تقطع انسياب السطر.",
+    "حُذفت ملفات مؤقتة قديمة لم تعد مستخدمة، لتوفير مساحة على جهازك."
   ],
   "en": [
-    "On large screens the page controls now sit under the page itself instead of at the far corners.",
-    "Turning a page moves the paper alone — the toolbars no longer slide away with it.",
-    "The controls step aside while you read and return with a tap; the page number and your wird stay put.",
-    "Your progress through today's wird is now visible while you read, against the plan you chose."
+    "Nineteen pages that open a new surah now show its name — it used to be dropped.",
+    "Immersive reading turns pages the same way the Mushaf does: the forward arrow always advances.",
+    "Ayah markers are set in the text's own ink, so they no longer interrupt the line.",
+    "Old unused cache files are cleared on startup, freeing space on your device."
   ]
 }

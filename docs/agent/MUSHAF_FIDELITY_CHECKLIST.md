@@ -188,16 +188,18 @@ ragged column. Numbering matches the review handed to the owner.
 
 ## Open
 
-- [ ] **5.** QCF lines still carry a 2 px inter-word gap and are justified with `space-between`.
-      QCF v2 advances already include word spacing; the gap should be zero for QCF and the font left
-      to justify. Cosmetic now that the measure is right.
-- [ ] **10.** No two-page spread on wide screens — the honest answer to a 1440 px desktop.
-- [ ] **11.** Fallback ayah markers are coloured circles that break the line rhythm.
-- [ ] **12.** A surah starting on line 1 or 2 of a page has nowhere for its header band; the
-      inference silently drops it.
-- [ ] **13.** The bookmark ribbon is pinned at `top-14`, tied to the header.
-- [ ] **14.** Opening a word popover re-renders all fifteen lines.
-- [ ] **15.** `azkar-qcf-page-data-v1` and `azkar-qcf-page-fonts-v1` linger in existing browsers as
-      dead storage from routes removed in DEC-089.
-- [ ] **16. [needs you]** The immersive reader still uses the old inverted arrow mapping, so the app
-      carries two opposite page-turn conventions.
+- [x] **5.** QCF lines carry no inter-word gap — the glyph advances already hold the page's own word
+      spacing. The Unicode fallback keeps its gap, having none built in. (DEC-092)
+- [ ] **10.** No two-page spread on wide screens. **Left open deliberately:** it changes the page
+      model rather than its styling — one set of chrome across two canvases, navigation stepping by
+      two, the fitter measuring two pages — and deserves its own change.
+- [x] **11.** Fallback ayah markers are set in the page's own ink, not the accent colour. (DEC-092)
+- [x] **12.** A surah opening with one slot to spare now shows a combined band carrying both the
+      name and the basmalah. Nineteen pages were dropping the surah name; At-Tawbah's page, which
+      takes no basmalah, was showing a blank line. (DEC-092)
+- [x] **13.** Moot: the bookmark ribbon sits under a header band that keeps its height whether or
+      not the controls are showing.
+- [x] **14.** A word popover is passed only to the line that holds it. (DEC-092)
+- [x] **15.** The two caches DEC-089 orphaned are deleted at startup. (DEC-092)
+- [x] **16.** The immersive reader adopts DEC-089's page-turn rule, so the app no longer carries two
+      opposite conventions. (DEC-092)
