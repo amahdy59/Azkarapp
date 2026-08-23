@@ -1,23 +1,34 @@
 /**
  * Mushaf page preparation
  * -----------------------
- * Rebuilds `public/data/mushaf/<page>.json` so that every page carries the
- * official QCF v2 (King Fahd Complex, Madani, 15 lines) layout:
+ * Rebuilds every `public/data/mushaf/<page>.json` from one source of truth: the
+ * official QCF v2 layout (King Fahd Complex, Madani, 15 lines per page).
  *
- *   - `lineNumber` comes from the reference layout, not from whatever the
- *     original scrape produced. Page 599 was a worked example of the drift:
- *     the shipped file put 10 words on line 1 where the reference puts 12, and
- *     placed the surah-break slots on lines 3/4 and 10/11 instead of 6/7 and
- *     12/13. Rendering a reference layout with non-reference line breaks is why
- *     lines overflowed the page edge.
- *   - `qcfCode` is baked in, so a page turn needs zero calls to api.quran.com
- *     at runtime and the glyph rendering works offline.
+ * Three things define a printed page, and all three must come from the same
+ * edition or the page is a chimera:
  *
- * The reviewed Uthmani `text` of every word is preserved byte for byte — this
- * script never rewrites Qur'anic text, only the layout metadata beside it
- * (AGENTS.md §8). A page is written only when every word matches one-to-one.
+ *   1. which words are on the page,
+ *   2. which line each word sits on,
+ *   3. which glyph draws it.
  *
- * Usage: node scripts/prepare-mushaf-pages.mjs [--pages 1-604] [--dry-run]
+ * An earlier version took (2) and (3) from the reference but left (1) as it
+ * found it, and the two disagree on 25 pages. Page 121 was the worked example:
+ * the reference puts verse 5:77 at the foot of page 120, the old assignment put
+ * it on 121, so the reader printed 5:77 *after* 5:83 — in page 120's glyphs,
+ * which page 121's font cannot draw, so it came out as garbage.
+ *
+ * The trap is that api.quran.com answers a different question depending on the
+ * fields you ask for. `word_fields=page_number` returns the default script's
+ * pagination; `word_fields=code_v2,page_number` returns the v2 font's. Only the
+ * latter matches the glyphs, so every word here is placed by its *v2*
+ * `page_number`, never by the response it happened to arrive in.
+ *
+ * The reviewed Uthmani `text` of every word is carried across untouched — this
+ * script never rewrites Qur'anic text, only the layout around it (AGENTS.md §8).
+ * Nothing is written unless every word in the Mushaf is accounted for exactly
+ * once, so a partial or reordered rebuild fails loudly instead of shipping.
+ *
+ * Usage: node scripts/prepare-mushaf-pages.mjs [--dry-run]
  */
 
 /* global fetch */
@@ -27,138 +38,217 @@ import path from "node:path";
 const API_ROOT = "https://api.quran.com/api/v4";
 const PAGE_DIRECTORY = path.resolve("public/data/mushaf");
 const TOTAL_PAGES = 604;
+const LINES_PER_PAGE = 15;
 const CONCURRENCY = 6;
 const MAX_ATTEMPTS = 4;
 
-function parseRange(value) {
-  if (!value) return { from: 1, to: TOTAL_PAGES };
-  const [from, to] = value.split("-").map(Number);
-  return { from: from || 1, to: to || from || TOTAL_PAGES };
+const dryRun = process.argv.includes("--dry-run");
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-const args = process.argv.slice(2);
-const dryRun = args.includes("--dry-run");
-const range = parseRange(
-  args[args.indexOf("--pages") + 1] && args.includes("--pages") ? args[args.indexOf("--pages") + 1] : "",
-);
-
-async function sleep(ms) {
-  await new Promise((resolve) => setTimeout(resolve, ms));
+function wordKey(verseKey, position) {
+  return `${verseKey}:${position}`;
 }
 
-async function fetchReferencePage(page) {
-  const words = new Map();
-  let apiPage = 1;
-  let totalApiPages;
+/** Verses sort by surah then ayah; words by position within the verse. */
+function compareVerseKeys(a, b) {
+  const [surahA, ayahA] = a.split(":").map(Number);
+  const [surahB, ayahB] = b.split(":").map(Number);
+  return surahA - surahB || ayahA - ayahB;
+}
 
-  do {
-    const url = `${API_ROOT}/verses/by_page/${page}?words=true&word_fields=code_v2,text_qpc_hafs&per_page=50&page=${apiPage}`;
-    let payload;
-    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        payload = await response.json();
-        break;
-      } catch (error) {
-        if (attempt === MAX_ATTEMPTS) throw error;
-        await sleep(attempt * 750);
+/**
+ * The reviewed Qur'anic text as it stands today, keyed by verse and position.
+ * A rebuild moves words between pages, so the text has to be looked up by
+ * identity rather than read from the page being rewritten.
+ */
+async function readReviewedText() {
+  const text = new Map();
+  for (let page = 1; page <= TOTAL_PAGES; page += 1) {
+    const verses = JSON.parse(await readFile(path.join(PAGE_DIRECTORY, `${page}.json`), "utf8"));
+    for (const verse of verses) {
+      for (const word of verse.w) {
+        const key = wordKey(verse.k, word[0]);
+        if (text.has(key)) throw new Error(`${key} appears on more than one page in the current data`);
+        text.set(key, word[3]);
       }
     }
+  }
+  return text;
+}
 
-    if (!Array.isArray(payload?.verses)) throw new Error("unexpected payload shape");
-    for (const verse of payload.verses) {
-      for (const word of verse.words ?? []) {
-        if (typeof word.position !== "number" || typeof word.line_number !== "number") {
-          throw new Error(`word metadata missing on ${verse.verse_key}`);
+async function fetchJson(url) {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return await response.json();
+    } catch (error) {
+      if (attempt === MAX_ATTEMPTS) throw error;
+      await sleep(attempt * 750);
+    }
+  }
+  return null;
+}
+
+/**
+ * Collects every word the reference knows about, bucketed by the page the
+ * reference puts it on.
+ *
+ * A verse that straddles a page break is listed under both pages, so sweeping
+ * all 604 responses and trusting each word's own `page_number` covers every
+ * boundary without asking for any page twice.
+ */
+async function collectReferenceWords() {
+  const byPage = new Map();
+  const seen = new Set();
+  const queue = [];
+  for (let page = 1; page <= TOTAL_PAGES; page += 1) queue.push(page);
+
+  let fetched = 0;
+  async function worker() {
+    while (queue.length > 0) {
+      const page = queue.shift();
+      let apiPage = 1;
+      let totalApiPages;
+      do {
+        const url =
+          `${API_ROOT}/verses/by_page/${page}` +
+          `?words=true&word_fields=code_v2,page_number&per_page=50&page=${apiPage}`;
+        const payload = await fetchJson(url);
+        if (!Array.isArray(payload?.verses)) throw new Error(`page ${page}: unexpected payload`);
+
+        for (const verse of payload.verses) {
+          for (const word of verse.words ?? []) {
+            const key = wordKey(verse.verse_key, word.position);
+            if (seen.has(key)) continue;
+            if (typeof word.page_number !== "number" || typeof word.line_number !== "number") {
+              throw new Error(`${key}: reference is missing page or line`);
+            }
+            seen.add(key);
+            const bucket = byPage.get(word.page_number) ?? [];
+            bucket.push({
+              verseKey: verse.verse_key,
+              position: word.position,
+              lineNumber: word.line_number,
+              isEnd: word.char_type_name === "end" ? 1 : 0,
+              code: typeof word.code_v2 === "string" ? word.code_v2 : "",
+            });
+            byPage.set(word.page_number, bucket);
+          }
         }
-        words.set(`${verse.verse_key}:${word.position}`, {
-          lineNumber: word.line_number,
-          code: typeof word.code_v2 === "string" ? word.code_v2 : "",
-          isEnd: word.char_type_name === "end" ? 1 : 0,
-        });
-      }
+        totalApiPages = payload.pagination?.total_pages ?? 1;
+        apiPage += 1;
+      } while (apiPage <= totalApiPages);
+
+      fetched += 1;
+      if (fetched % 50 === 0) process.stdout.write(`  read ${fetched}/${TOTAL_PAGES} reference pages\n`);
     }
+  }
 
-    totalApiPages = payload.pagination?.total_pages ?? 1;
-    apiPage += 1;
-  } while (apiPage <= totalApiPages);
+  await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+  return byPage;
+}
 
+let repairedMarkers = 0;
+
+/**
+ * A word may never sit on an earlier line than the word before it in its own
+ * verse — that is not a layout choice, it is an impossibility.
+ *
+ * The reference carries exactly one such record: on page 589 it puts the ayah
+ * marker of 84:21 on line 13 while words 3-6 of the same verse are on line 14,
+ * which would print the verse number in the middle of the sentence, a line
+ * above the words it closes. Pulling the stray word down to the line its
+ * predecessor is on is the smallest correction that restores reading order, and
+ * it invents nothing.
+ */
+function settleReadingOrder(words) {
+  let line = 0;
+  for (const word of words) {
+    if (word[1] < line) {
+      word[1] = line;
+      repairedMarkers += 1;
+    }
+    line = word[1];
+  }
   return words;
 }
 
-async function preparePage(page) {
-  const filePath = path.join(PAGE_DIRECTORY, `${page}.json`);
-  const local = JSON.parse(await readFile(filePath, "utf8"));
-  const reference = await fetchReferencePage(page);
-
-  const problems = [];
-  const next = local.map((verse) => ({
-    k: verse.k,
-    w: verse.w.map((word) => {
-      const [position, , isEnd, text] = word;
-      const match = reference.get(`${verse.k}:${position}`);
-      if (!match) {
-        problems.push(`${verse.k}:${position} missing from the reference layout`);
-        return word;
-      }
-      if (match.isEnd !== isEnd) {
-        problems.push(`${verse.k}:${position} disagrees on the ayah-marker flag`);
-      }
-      if (!match.code) {
-        problems.push(`${verse.k}:${position} has no code_v2 glyph`);
-      }
-      return match.code
-        ? [position, match.lineNumber, isEnd, text, match.code]
-        : [position, match.lineNumber, isEnd, text];
-    }),
-  }));
-
-  const usedLines = new Set();
-  for (const verse of next) for (const word of verse.w) usedLines.add(word[1]);
-  for (const line of usedLines) {
-    if (!Number.isInteger(line) || line < 1 || line > 15) problems.push(`line ${line} is outside the 15-line grid`);
-  }
-
-  if (problems.length > 0) {
-    return { page, written: false, problems };
-  }
-
-  const serialised = JSON.stringify(next);
-  if (!dryRun) await writeFile(filePath, serialised, "utf8");
-  return { page, written: !dryRun, bytes: serialised.length, problems: [] };
-}
-
-const queue = [];
-for (let page = range.from; page <= range.to; page += 1) queue.push(page);
-
-const failures = [];
-let done = 0;
-
-async function worker() {
-  while (queue.length > 0) {
-    const page = queue.shift();
-    try {
-      const result = await preparePage(page);
-      if (result.problems.length > 0) {
-        failures.push({ page, problems: result.problems.slice(0, 4) });
-      }
-    } catch (error) {
-      failures.push({ page, problems: [error.message] });
+function buildPage(page, words, reviewedText, problems) {
+  const byVerse = new Map();
+  for (const word of words) {
+    if (word.lineNumber < 1 || word.lineNumber > LINES_PER_PAGE) {
+      problems.push(`page ${page}: ${wordKey(word.verseKey, word.position)} is on line ${word.lineNumber}`);
     }
-    done += 1;
-    if (done % 25 === 0) process.stdout.write(`  prepared ${done}/${range.to - range.from + 1} pages\n`);
+    if (!word.code) {
+      problems.push(`page ${page}: ${wordKey(word.verseKey, word.position)} has no code_v2 glyph`);
+    }
+    const text = reviewedText.get(wordKey(word.verseKey, word.position));
+    if (text === undefined) {
+      problems.push(`page ${page}: ${wordKey(word.verseKey, word.position)} has no reviewed text`);
+      continue;
+    }
+    const bucket = byVerse.get(word.verseKey) ?? [];
+    bucket.push([word.position, word.lineNumber, word.isEnd, text, word.code]);
+    byVerse.set(word.verseKey, bucket);
   }
+
+  return [...byVerse.keys()].sort(compareVerseKeys).map((verseKey) => ({
+    k: verseKey,
+    w: settleReadingOrder(byVerse.get(verseKey).sort((a, b) => a[0] - b[0])),
+  }));
 }
 
-await Promise.all(Array.from({ length: CONCURRENCY }, () => worker()));
+console.log("Reading the reviewed text that ships today...");
+const reviewedText = await readReviewedText();
+console.log(`  ${reviewedText.size} words.`);
 
-if (failures.length > 0) {
-  console.error(`\n${failures.length} page(s) were left untouched:`);
-  for (const failure of failures.sort((a, b) => a.page - b.page)) {
-    console.error(`  page ${failure.page}: ${failure.problems.join("; ")}`);
+console.log("Reading the QCF v2 reference layout...");
+const referenceWords = await collectReferenceWords();
+
+const problems = [];
+const pages = new Map();
+let placed = 0;
+
+for (let page = 1; page <= TOTAL_PAGES; page += 1) {
+  const words = referenceWords.get(page);
+  if (!words || words.length === 0) {
+    problems.push(`page ${page}: the reference placed no words here`);
+    continue;
   }
-  process.exitCode = 1;
-} else {
-  console.log(`\nAll ${range.to - range.from + 1} pages match the QCF v2 reference layout.`);
+  const built = buildPage(page, words, reviewedText, problems);
+  placed += built.reduce((sum, verse) => sum + verse.w.length, 0);
+  pages.set(page, built);
 }
+
+// Every word the Mushaf has must land on exactly one page. Anything less means
+// the rebuild would drop or duplicate Qur'an, which is never an acceptable
+// trade for a tidier layout.
+if (placed !== reviewedText.size) {
+  problems.push(`the rebuild places ${placed} words but the reviewed text has ${reviewedText.size}`);
+}
+
+if (problems.length > 0) {
+  console.error(`\nRefusing to write. ${problems.length} problem(s):`);
+  for (const problem of problems.slice(0, 40)) console.error(`  ${problem}`);
+  if (problems.length > 40) console.error(`  ...and ${problems.length - 40} more`);
+  process.exit(1);
+}
+
+let rewritten = 0;
+for (const [page, verses] of pages) {
+  const serialised = JSON.stringify(verses);
+  const filePath = path.join(PAGE_DIRECTORY, `${page}.json`);
+  if ((await readFile(filePath, "utf8")) === serialised) continue;
+  if (!dryRun) await writeFile(filePath, serialised, "utf8");
+  rewritten += 1;
+}
+
+console.log(
+  `\nAll ${TOTAL_PAGES} pages match the QCF v2 reference: ${placed} words, ` +
+    `${repairedMarkers} out-of-order word(s) settled, ` +
+    `${rewritten} file(s) ${dryRun ? "would change" : "rewritten"}.`,
+);
