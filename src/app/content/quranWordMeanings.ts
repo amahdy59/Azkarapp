@@ -212,13 +212,58 @@ export interface WordMeaningSelection {
   anchor?: HTMLElement | null;
 }
 
+/**
+ * Glosses for surahs the app did not bundle.
+ *
+ * The azkar reader shows a fixed handful of surahs, so those ship with the app.
+ * The Mushaf can land on any of the 604 pages, and bundling all 11,365 glosses
+ * (1.03 MB) to serve one page at a time would be paid for by every visitor, so
+ * the rest are fetched a surah at a time and kept here.
+ */
+const lazyChapters = new Map<string, Record<string, Record<string, string>>>();
+const pendingChapters = new Map<string, Promise<void>>();
+
+function wordMeaningsUrl(surah: string) {
+  const base = import.meta.env.BASE_URL || "/";
+  return `${base.endsWith("/") ? base : `${base}/`}data/word-meanings/${surah}.json`;
+}
+
+/**
+ * Warms one surah's glosses. Never rejects: a page with no glosses available is
+ * a page with nothing underlined, which is exactly how it reads today.
+ */
+export function loadSurahWordMeanings(surahNumber: number | string): Promise<void> {
+  const surah = String(surahNumber);
+  if (MEANINGS[surah] || lazyChapters.has(surah)) return Promise.resolve();
+
+  const pending = pendingChapters.get(surah);
+  if (pending) return pending;
+
+  const request = fetch(wordMeaningsUrl(surah))
+    .then((response) => (response.ok ? response.json() : null))
+    .then((value: unknown) => {
+      if (value && typeof value === "object" && !Array.isArray(value)) {
+        lazyChapters.set(surah, value as Record<string, Record<string, string>>);
+      }
+    })
+    .catch(() => undefined)
+    .finally(() => {
+      pendingChapters.delete(surah);
+    });
+
+  pendingChapters.set(surah, request);
+  return request;
+}
+
 export function getQuranWordMeaning(verseKey: string, wordText: string): string | undefined {
   const parts = verseKey.split(":");
   if (parts.length < 2) return undefined;
   const surah = parts[0];
   const ayah = parts[1];
   if (!surah || !ayah) return undefined;
-  const chapter = MEANINGS[surah];
+  // Reviewed glosses win over the sourced ones: Al-Baqarah's passages are
+  // written by hand and worded differently from the source.
+  const chapter = MEANINGS[surah] ?? lazyChapters.get(surah);
   if (!chapter) return undefined;
   const ayahMeanings = chapter[ayah];
   if (!ayahMeanings) return undefined;

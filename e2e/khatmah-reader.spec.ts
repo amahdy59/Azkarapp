@@ -70,7 +70,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(difficultWords).toHaveAttribute("aria-checked", "false");
   await difficultWords.click();
   await expect(difficultWords).toHaveAttribute("aria-checked", "true");
-  await expect(page.getByRole("button", { name: /معنى كلمة/ })).toHaveCount(3);
+  // Ghareeb glosses now cover all 114 surahs, not the eight the azkar reader
+  // bundles, so this page carries well more than the three it used to.
+  await expect(page.getByRole("button", { name: /معنى كلمة/ }).first()).toBeVisible();
+  expect(await page.getByRole("button", { name: /معنى كلمة/ }).count()).toBeGreaterThanOrEqual(3);
   const lineRectsAfter = await lines.evaluateAll((elements) =>
     elements.map((element, _index, allLines) => {
       const rect = element.getBoundingClientRect();

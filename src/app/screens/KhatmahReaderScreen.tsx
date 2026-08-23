@@ -12,7 +12,6 @@ import {
   Eye,
   ChevronDown,
   CheckCircle2,
-  BookOpen,
   MoreHorizontal,
   Brush,
 } from "../components/icons";
@@ -30,6 +29,7 @@ import {
   DropdownMenuTrigger,
 } from "../components/ui/dropdown-menu";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
+import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
 import { effectiveDailyGoal } from "./quranWirdGoal";
@@ -204,6 +204,13 @@ export function KhatmahReaderScreen({
         return;
       }
 
+      // Glosses settle with the page too, so the difficult-words switch never
+      // reveals an empty page and then fills it in a moment later. Usually one
+      // surah, occasionally two where a page straddles a break.
+      const surahs = new Set(data.map((verse) => verse.k.split(":")[0] ?? ""));
+      await Promise.all([...surahs].filter(Boolean).map((surah) => loadSurahWordMeanings(surah)));
+      if (!active) return;
+
       // The page mounts once, already in its final typeface. Showing the
       // Unicode fallback first and swapping to QCF a moment later resized every
       // line under the reader's eyes.
@@ -377,6 +384,15 @@ export function KhatmahReaderScreen({
   };
 
   const pageAlreadyRecorded = todayPagesRead.includes(currentPage);
+  /** The options menu opens in a portal, outside the page, so it cannot inherit
+   *  the paper. Without this it arrived in the app's own popover colours and
+   *  read as a different product sitting on top of the Mushaf. */
+  const menuSurfaceClass = {
+    parchment: "bg-[#fbf7ee] text-[#1c1917] border-primary/25 dark:bg-[#141820] dark:text-[#f3f4f6]",
+    dark: "bg-[#0b0e14] text-[#f3f4f6] border-primary/25",
+    oled: "bg-black text-white border-white/40",
+    white: "bg-white text-[#111827] border-gray-300",
+  }[theme];
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
@@ -405,27 +421,22 @@ export function KhatmahReaderScreen({
         </span>
         <ChevronDown size={16} className="hidden shrink-0 opacity-60 min-[360px]:block" aria-hidden="true" />
       </button>
+      {/* A pill that fills when it is on. The old control was an icon beside a
+          4x7 track — technically a switch, but too small to read at a glance
+          and too small to be an easy target. */}
       <button
         type="button"
         role="switch"
         aria-checked={showWordMeanings}
         onClick={() => setShowWordMeanings((current) => !current)}
-        className={`${headerActionClass} gap-1.5`}
+        className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border px-2.5 text-[0.6875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3 ${
+          showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-current/25 bg-current/5"
+        }`}
         aria-label={t(language, "mushaf.difficultWords")}
         data-testid="mushaf-difficult-words-switch"
       >
-        <Eye size={18} aria-hidden="true" />
-        <span className="hidden sm:inline">{t(language, "mushaf.difficultWords")}</span>
-        <span
-          aria-hidden="true"
-          className={`flex h-4 w-7 shrink-0 items-center rounded-full border transition-colors ${
-            showWordMeanings ? "justify-end border-primary bg-primary" : "justify-start border-current/40 bg-current/15"
-          }`}
-        >
-          <span
-            className={`m-px size-3 rounded-full ${showWordMeanings ? "bg-primary-foreground" : "bg-current opacity-70"}`}
-          />
-        </span>
+        <Eye size={17} aria-hidden="true" />
+        <span className="hidden min-[420px]:inline">{t(language, "mushaf.difficultWords")}</span>
       </button>
       <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
         <DropdownMenuTrigger asChild>
@@ -434,7 +445,7 @@ export function KhatmahReaderScreen({
             <span>{t(language, "mushaf.options")}</span>
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="min-w-[14rem]">
+        <DropdownMenuContent align="end" className={`min-w-[14rem] ${menuSurfaceClass}`}>
           <DropdownMenuCheckboxItem checked={isCurrentBookmarked} onCheckedChange={toggleBookmark}>
             <Bookmark size={18} className={isCurrentBookmarked ? "fill-primary" : ""} />
             <span>{t(language, "mushaf.toggleBookmark")}</span>
@@ -495,17 +506,21 @@ export function KhatmahReaderScreen({
           {pageAlreadyRecorded ? t(language, "mushaf.pageRecorded") : t(language, "mushaf.recordPage")}
         </span>
       </button>
-      <button
-        type="button"
-        onClick={() => setIsIndexOpen(true)}
-        className={footerActionClass}
-        aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
-      >
-        <BookOpen size={19} aria-hidden="true" />
-        <span className="truncate">
+      {/* A readout, not a control: this used to be a second button opening the
+          same index as the surah name in the header. One way in is enough. */}
+      <div className="flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-1 px-1" dir={direction}>
+        <span className="truncate text-[0.625rem] font-extrabold">
           {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
         </span>
-      </button>
+        {/* Text only. The progressbar the screen reader announces is the
+            hairline along the bottom edge, which is always on screen — two
+            elements carrying the same name announced it twice. */}
+        {wirdGoal > 0 && (
+          <span className="truncate text-[0.5625rem] font-bold opacity-70">
+            {t(language, "mushaf.wirdToday")} {formatNumerals(wirdRead, language)}/{formatNumerals(wirdGoal, language)}
+          </span>
+        )}
+      </div>
       <button
         type="button"
         onClick={() => paginate(1)}
