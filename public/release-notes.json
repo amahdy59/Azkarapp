@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-22-8",
+  "release": "2026-08-23-1",
   "ar": [
-    "أصبح قسم وردك اليوم أكثر هدوءاً، مع شرح واضح لإضافة النخلة وتمييز أفضل للأوراد المكتملة.",
-    "تظهر صفحة المصحف مرة واحدة بخطها النهائي دون انتقال مزعج من عرض صغير إلى عرض أكبر.",
-    "يملأ المصحف شاشة الهاتف تقريباً، وتجمع أدواته الواضحة بين الأيقونة والنص ثم تختفي أثناء القراءة.",
-    "يمكنك تمييز الكلمات الصعبة من قائمة الخيارات والضغط عليها لمعرفة معناها، مع انتقال أسرع إلى الصفحة التالية."
+    "صفحة المصحف تملأ الشاشة كاملة، بخط أوضح قليلاً وعنوان سورة رفيع كما في المصحف المطبوع.",
+    "كل صفحة صارت مطابقة لمصحف المدينة بخمسة عشر سطراً، فلا تُقتطع الأسطر عند حواف الصفحة.",
+    "زرّا السابق والتالي صارا في اتجاههما الصحيح، وتقليب الصفحات صار فورياً ويعمل دون اتصال بالإنترنت.",
+    "مفتاح «كلمات صعبة» صار ظاهراً في شريط الأدوات، فتظهر معاني الكلمات بضغطة واحدة."
   ],
   "en": [
-    "Today's Wird is calmer, with clearer palm guidance and stronger completed-routine feedback.",
-    "The Mushaf page now appears once in its final typeface instead of resizing from a smaller view.",
-    "The Mushaf fills almost the entire phone screen, with clear icon-and-text controls that recede while reading.",
-    "Turn on difficult-word highlights from Options and tap a word for its meaning, with faster next-page turns."
+    "The Mushaf page now fills the whole screen, with slightly clearer type and a slim surah heading like the printed page.",
+    "Every page matches the fifteen-line Madinah Mushaf, so lines are no longer cut off at the page edges.",
+    "Previous and Next now point the way you expect, and turning a page is instant and works offline.",
+    "A Difficult words switch sits on the toolbar, so a word's meaning is one tap away."
   ]
 }

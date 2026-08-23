@@ -66,6 +66,23 @@ The dedicated Benefits screen reads `src/app/content/zikrBenefits.ts`; it must n
 - Multi-page metadata is the explicit signal for long-surah behavior. Short surahs continue to use the ordinary reader interaction unless separately reviewed multi-page metadata exists.
 - Generators that rewrite content modules must preserve this metadata. Add tests for contiguous coverage, expected page ranges, generator preservation, and byte-for-byte reconstruction.
 
+### The 604-page Mushaf layout files
+
+`public/data/mushaf/<page>.json` holds the layout of one printed page: for each word, its position
+in the verse, its line number on the page, whether it is the ayah marker, its reviewed Uthmani
+text, and its QCF v2 `code_v2` glyph. The reference is fixed by DEC-089 — the King Fahd Complex
+Madani Mushaf, fifteen lines a page — and nothing else may be used as a layout source.
+
+- Regenerate with `pnpm prepare:mushaf` (needs network access to api.quran.com; nothing at runtime
+  does). `--pages 1-10` limits the range and `--dry-run` writes nothing.
+- The script only ever rewrites the **layout metadata**: line number and glyph. Each word's
+  reviewed Uthmani `text` is carried through untouched, and a page is written only when every one
+  of its words matches the reference one-to-one. A page with any mismatch is left alone and
+  reported.
+- Reviewing a regeneration means reviewing a layout change, not a text change. `git diff` on these
+  files should show no change to any Arabic word; if it does, stop and treat it as a content change
+  under the rules above.
+
 Changing a page range requires the same independent source review as adding it. It does not authorize any change to Quran wording, spelling, diacritics, verse markers, translation, attribution, or repetition count.
 
 ## Add a new collection
