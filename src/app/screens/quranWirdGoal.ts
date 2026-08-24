@@ -31,5 +31,13 @@ export function effectiveDailyGoal(plan: QuranWirdPlan, history: Record<string, 
       .flatMap(([, pages]) => pages),
   ).size;
 
-  return Math.max(1, Math.ceil(Math.max(0, TOTAL_MUSHAF_PAGES - completed) / Math.max(1, plan.durationDays - elapsed)));
+  const startPage = plan.startPage ?? 0;
+  const remainingPagesToRead = Math.max(0, TOTAL_MUSHAF_PAGES - startPage - completed);
+
+  if (remainingPagesToRead > 0 && elapsed >= plan.durationDays) {
+    return 0; // Plan expired
+  }
+
+  const remainingDays = Math.max(1, plan.durationDays - elapsed);
+  return Math.ceil(remainingPagesToRead / remainingDays);
 }

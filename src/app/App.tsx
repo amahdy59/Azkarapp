@@ -247,6 +247,10 @@ function AppContent() {
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
+  const [mushafLayout, setMushafLayout] = useState<"auto" | "single" | "spread">(initialState.mushafLayout ?? "auto");
+  const [mushafKeepControlsVisible, setMushafKeepControlsVisible] = useState<boolean>(
+    initialState.mushafKeepControlsVisible ?? false,
+  );
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
   const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
   const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
@@ -995,6 +999,10 @@ function AppContent() {
                   quietProgressEnabled={true}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
+                  quranReadingPosition={quranReadingPosition}
+                  quranWirdPlan={quranWirdPlan}
+                  wirdHistory={wirdHistory}
+                  onContinueKhatmah={() => push("khatmah")}
                   onResume={resumeCategory}
                   onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
                   onOpenFridayMode={() => {
@@ -1401,6 +1409,7 @@ function AppContent() {
                   direction={layoutDirection}
                   position={quranReadingPosition}
                   plan={quranWirdPlan}
+                  progressDayStartHour={progressDayStartHour}
                   wirdHistory={wirdHistory}
                   onBack={pop}
                   onContinue={() => push("khatmah")}
@@ -1425,9 +1434,14 @@ function AppContent() {
                   onBack={pop}
                   khatmahPage={khatmahPage}
                   setKhatmahPage={setKhatmahPage}
+                  progressDayStartHour={progressDayStartHour}
                   mushafTheme={mushafTheme}
                   appTheme={themeMode}
                   setMushafTheme={setMushafTheme}
+                  mushafLayout={mushafLayout}
+                  setMushafLayout={setMushafLayout}
+                  mushafKeepControlsVisible={mushafKeepControlsVisible}
+                  setMushafKeepControlsVisible={setMushafKeepControlsVisible}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
                   wirdHistory={wirdHistory}

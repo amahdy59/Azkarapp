@@ -118,6 +118,8 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   savedZikrIds: [],
   khatmahPage: 1,
   mushafTheme: "follow-app",
+  mushafLayout: "auto",
+  mushafKeepControlsVisible: false,
   mushafBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
@@ -600,6 +602,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         ? Math.floor(parsed.khatmahPage)
         : 1,
     mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
+    mushafLayout: parsed.mushafLayout === "single" || parsed.mushafLayout === "spread" ? parsed.mushafLayout : "auto",
+    mushafKeepControlsVisible: !!parsed.mushafKeepControlsVisible,
     mushafBookmarks: Array.isArray(parsed.mushafBookmarks)
       ? Array.from(
           new Set(
@@ -890,6 +894,8 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
     mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
+    mushafLayout: incoming.mushafLayout ?? safeBase.mushafLayout ?? "auto",
+    mushafKeepControlsVisible: incoming.mushafKeepControlsVisible ?? safeBase.mushafKeepControlsVisible ?? false,
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
     dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
     wirdHistory: { ...(safeBase.wirdHistory ?? {}), ...(incoming.wirdHistory ?? {}) },

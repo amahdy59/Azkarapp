@@ -256,6 +256,7 @@ export interface QuranWirdPlan {
   dailyPages: number;
   durationDays?: number;
   startedDayKey?: string;
+  startPage?: number;
 }
 
 export interface AppStateSnapshot {
@@ -275,6 +276,8 @@ export interface AppStateSnapshot {
   khatmahPage?: number;
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
+  mushafLayout?: "auto" | "single" | "spread";
+  mushafKeepControlsVisible?: boolean;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
   /** Daily Quran reading goal in pages (default: 4). */

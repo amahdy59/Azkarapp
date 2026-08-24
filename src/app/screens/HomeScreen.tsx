@@ -1,11 +1,12 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { useState, useEffect, useMemo } from "react";
-import { ArrowLeft, ArrowRight, BookOpen, Zap } from "../components/icons";
+import { ArrowLeft, ArrowRight, Zap } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
 import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
+import { QuranHomeCard } from "../components/QuranHomeCard";
 import {
   ALL_AZKAR,
   estimateCompletionMinutes,
@@ -40,6 +41,8 @@ import type {
   RoutineCategoryId,
   RoutineMode,
   PrayerTrackingRecord,
+  QuranReadingPosition,
+  QuranWirdPlan,
 } from "../types";
 
 /**
@@ -218,11 +221,19 @@ export function HomeScreen({
   onOpenBenefits,
   onOpenWirdBenefits,
   onOpenKhatmah,
+  onContinueKhatmah,
+  quranReadingPosition,
+  quranWirdPlan,
+  wirdHistory,
   prayerTracking = [],
   onTogglePrayerTracking,
 }: {
   completed: Record<CategoryId, Set<string>>;
   dailyCompletions: DailyCollectionCompletion[];
+  quranReadingPosition?: QuranReadingPosition;
+  quranWirdPlan?: QuranWirdPlan;
+  wirdHistory?: Record<string, number[]>;
+  onContinueKhatmah?: () => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
@@ -621,33 +632,17 @@ export function HomeScreen({
             )}
           </div>
 
-          <div className="px-page mt-2 mb-2">
-            <button
-              onClick={onOpenKhatmah}
-              className="group flex w-full items-center justify-between rounded-2xl bg-card border border-border p-4 shadow-raised hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                  <BookOpen size={20} />
-                </div>
-                <div className="text-start">
-                  <div className="text-[1.05rem] font-bold text-foreground" dir="auto">
-                    {t(language, "home.khatmahTitle")}
-                  </div>
-                  <div className="text-[0.8125rem] font-medium text-muted-foreground mt-0.5" dir="auto">
-                    {t(language, "home.khatmahDescription")}
-                  </div>
-                </div>
-              </div>
-              <div className="flex shrink-0 items-center justify-center text-muted-foreground transition-transform group-hover:text-primary">
-                {direction === "rtl" ? (
-                  <ArrowLeft size={20} className="group-hover:-translate-x-1" />
-                ) : (
-                  <ArrowRight size={20} className="group-hover:translate-x-1" />
-                )}
-              </div>
-            </button>
-          </div>
+          <QuranHomeCard
+            language={language}
+            direction={direction}
+            position={quranReadingPosition}
+            plan={quranWirdPlan}
+            wirdHistory={wirdHistory ?? {}}
+            progressDayStartHour={progressDayStartHour}
+            now={now}
+            onContinue={onContinueKhatmah ?? (() => {})}
+            onOverview={onOpenKhatmah ?? (() => {})}
+          />
 
           <SectionDivider label={t(language, "home.fridayAzkar")} />
 

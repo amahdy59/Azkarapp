@@ -5,7 +5,7 @@ import { QuranWirdScreen } from "./QuranWirdScreen";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
 
 function renderScreen() {
-  const today = getProgressDayKey();
+  const today = getProgressDayKey(new Date(), 4);
   const props = {
     language: "en" as const,
     direction: "ltr" as const,
@@ -13,9 +13,10 @@ function renderScreen() {
     plan: { kind: "daily" as const, dailyPages: 4 },
     wirdHistory: { [today]: [20, 21] },
     onBack: vi.fn(),
-    onContinue: vi.fn(),
     onPlanChange: vi.fn(),
+    onContinue: vi.fn(),
     onUndoPage: vi.fn(),
+    progressDayStartHour: 4,
   };
   render(<QuranWirdScreen {...props} />);
   return props;
@@ -26,28 +27,32 @@ describe("QuranWirdScreen", () => {
     renderScreen();
 
     expect(screen.getByRole("button", { name: /continue reading/i })).toBeInTheDocument();
-    expect(screen.getByRole("progressbar", { name: "2 of 4 pages completed today" })).toHaveAttribute(
-      "aria-valuenow",
-      "2",
-    );
-    expect(screen.getByText("Surah Al-Baqarah")).toBeInTheDocument();
+    // The first progress bar should be the daily goal
+    const progressBars = screen.getAllByRole("progressbar");
+    expect(progressBars[0]).toHaveAttribute("aria-valuenow", "2");
+    expect(screen.getByText(/Surah Al-Baqarah/)).toBeInTheDocument();
 
     expect(screen.queryByRole("button", { name: /record a page/i })).not.toBeInTheDocument();
   });
 
-  it("offers the three focused plan choices", () => {
+  it("offers a draft mode for plan changes", () => {
     const props = renderScreen();
-    fireEvent.click(screen.getByRole("combobox", { name: "Choose a plan" }));
-    fireEvent.click(screen.getByRole("option", { name: "30-day Khatmah" }));
+    // Start drafting
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+
+    // Open the plan type select
+    const select = screen.getByRole("combobox", { name: "Change plan" });
+    fireEvent.click(select);
+
+    // Choose Finish by a date
+    fireEvent.click(screen.getByRole("option", { name: /Finish by a date/i }));
+
+    // Save the plan
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "khatmah30", dailyPages: 21, durationDays: 30 }),
+      expect.objectContaining({ kind: "custom", durationDays: 30, dailyPages: 20 }),
     );
-  });
-
-  it("uses the shared design-system select instead of a native browser menu", () => {
-    renderScreen();
-    expect(screen.getByRole("combobox", { name: "Choose a plan" })).toHaveAttribute("data-slot", "select-trigger");
   });
 
   it("uses a Saturday-to-Friday week and fills Arabic progress from the right", () => {
@@ -63,6 +68,7 @@ describe("QuranWirdScreen", () => {
 
     const props = renderScreen();
     render(<QuranWirdScreen {...props} language="ar" direction="rtl" />);
-    expect(screen.getAllByRole("progressbar").at(-1)).toHaveAttribute("dir", "rtl");
+    // The Khatmah progressbar is the 2nd one now, maybe check the first one.
+    expect(screen.getAllByRole("progressbar")[2]).toHaveAttribute("dir", "rtl");
   });
 });

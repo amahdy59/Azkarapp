@@ -9,11 +9,13 @@ import {
   X,
   RotateCcw,
   Bookmark,
+  BookOpen,
   ArrowRight,
   ArrowLeft,
   Eye,
   ChevronDown,
   Brush,
+  Settings,
 } from "../components/icons";
 import { useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
@@ -25,11 +27,14 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
+  DropdownMenuCheckboxItem,
 } from "../components/ui/dropdown-menu";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
+import { useNow } from "../hooks/useNow";
 import { effectiveDailyGoal } from "./quranWirdGoal";
 import {
   getCachedMushafPage,
@@ -52,8 +57,6 @@ const PAPER_SETTLE = "transform 160ms ease-out";
  * a dead network never holds the reader up.
  */
 const FONT_WAIT_MS = 1200;
-/** How long a page must be open before it counts as read rather than passed. */
-const PAGE_DWELL_MS = 4000;
 
 /**
  * A spread is only worth showing when both pages still read comfortably.
@@ -119,12 +122,17 @@ export function KhatmahReaderScreen({
   mushafTheme: initialTheme = "follow-app",
   appTheme = "midnight",
   setMushafTheme: onUpdateTheme,
+  mushafLayout = "auto",
+  setMushafLayout,
+  mushafKeepControlsVisible = false,
+  setMushafKeepControlsVisible,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
   wirdHistory = {},
   setWirdHistory: onUpdateWirdHistory,
   quranWirdPlan,
   onReadingPositionChange,
+  progressDayStartHour,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -134,12 +142,17 @@ export function KhatmahReaderScreen({
   mushafTheme?: MushafTheme;
   appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
+  mushafLayout?: "auto" | "single" | "spread";
+  setMushafLayout?: (layout: "auto" | "single" | "spread") => void;
+  mushafKeepControlsVisible?: boolean;
+  setMushafKeepControlsVisible?: (visible: boolean) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
   wirdHistory?: Record<string, number[]>;
   setWirdHistory?: (history: Record<string, number[]>) => void;
   quranWirdPlan?: QuranWirdPlan;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
+  progressDayStartHour: number;
 }) {
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
 
@@ -171,7 +184,7 @@ export function KhatmahReaderScreen({
    */
   const [keyboardDriven, setKeyboardDriven] = useState(false);
   const reduceMotion = useReducedMotion();
-  const [spreadRoom, setSpreadRoom] = useState(
+  const [autoSpreadRoom, setSpreadRoom] = useState(
     () => typeof window !== "undefined" && fitsTwoPages(window.innerWidth, window.innerHeight),
   );
 
@@ -181,6 +194,7 @@ export function KhatmahReaderScreen({
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
+  const spreadRoom = mushafLayout === "single" ? false : mushafLayout === "spread" ? true : autoSpreadRoom;
   const paperRef = useRef<HTMLDivElement>(null);
 
   // Sync internal theme with prop updates
@@ -215,7 +229,8 @@ export function KhatmahReaderScreen({
     onUpdateBookmarks?.(nextBookmarks);
   };
 
-  const todayKey = getProgressDayKey();
+  const now = useNow();
+  const todayKey = getProgressDayKey(now, progressDayStartHour);
   const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
 
   // The goal the reader chose on the overview, computed by the same function
@@ -230,15 +245,6 @@ export function KhatmahReaderScreen({
     read: formatNumerals(wirdRead, language),
     goal: formatNumerals(wirdGoal, language),
   });
-
-  const recordCurrentPage = useCallback(() => {
-    if (!onUpdateWirdHistory) return;
-    const dayKey = getProgressDayKey();
-    const currentList = wirdHistory[dayKey] ?? [];
-    if (!currentList.includes(currentPage)) {
-      onUpdateWirdHistory({ ...wirdHistory, [dayKey]: [...currentList, currentPage] });
-    }
-  }, [currentPage, onUpdateWirdHistory, wirdHistory]);
 
   /**
    * The page never blanks to a spinner mid-turn. `resolved` keeps the paper that
@@ -301,10 +307,26 @@ export function KhatmahReaderScreen({
   useEffect(() => {
     // Never step on a reader who is mid-interaction: an open menu, an open
     // dialog, or keyboard focus inside the toolbar all hold it open.
-    if (!chromeVisible || chromeFocused || keyboardDriven || isIndexOpen || isOptionsMenuOpen) return;
+    if (
+      !chromeVisible ||
+      chromeFocused ||
+      keyboardDriven ||
+      isIndexOpen ||
+      isOptionsMenuOpen ||
+      mushafKeepControlsVisible
+    )
+      return;
     const timer = window.setTimeout(() => setChromeVisible(false), CHROME_IDLE_MS);
     return () => window.clearTimeout(timer);
-  }, [chromeVisible, chromeFocused, keyboardDriven, currentPage, isIndexOpen, isOptionsMenuOpen]);
+  }, [
+    chromeVisible,
+    chromeFocused,
+    keyboardDriven,
+    currentPage,
+    isIndexOpen,
+    isOptionsMenuOpen,
+    mushafKeepControlsVisible,
+  ]);
 
   /**
    * A page counts itself once it has actually been read.
@@ -314,11 +336,6 @@ export function KhatmahReaderScreen({
    * not on a button. A short dwell separates reading a page from flicking past
    * it on the way somewhere else.
    */
-  useEffect(() => {
-    if (resolved?.page !== currentPage) return;
-    const timer = window.setTimeout(() => recordCurrentPage(), PAGE_DWELL_MS);
-    return () => window.clearTimeout(timer);
-  }, [currentPage, recordCurrentPage, resolved?.page]);
 
   /**
    * Finishing the day's wird is worth saying out loud once — the progress bar
@@ -365,7 +382,58 @@ export function KhatmahReaderScreen({
   const rightNumber = spreadRoom ? spreadStart(displayPage) : displayPage;
   const leftNumber = spreadRoom && rightNumber + 1 <= LAST_PAGE ? rightNumber + 1 : null;
   const otherNumber = leftNumber === null ? null : displayPage === rightNumber ? leftNumber : rightNumber;
+
+  // The spread numbers are captured in a ref so recordCurrentSpread doesn't need to depend on them
+  // which would cause it to be recreated on every page turn.
+  const visiblePagesRef = useRef<number[]>([]);
+  useEffect(() => {
+    const pages = [displayPage];
+    if (spreadRoom && leftNumber !== null && rightNumber !== null) {
+      pages.length = 0;
+      pages.push(rightNumber, leftNumber);
+    }
+    visiblePagesRef.current = pages;
+  }, [displayPage, spreadRoom, leftNumber, rightNumber]);
+
+  const recordCurrentSpread = useCallback(() => {
+    if (!onUpdateWirdHistory) return;
+    const currentList = wirdHistory[todayKey] ?? [];
+    let updated = false;
+    const nextList = [...currentList];
+
+    for (const p of visiblePagesRef.current) {
+      if (!nextList.includes(p)) {
+        nextList.push(p);
+        updated = true;
+      }
+    }
+
+    if (updated) {
+      onUpdateWirdHistory({ ...wirdHistory, [todayKey]: nextList });
+    }
+  }, [onUpdateWirdHistory, wirdHistory, todayKey]);
   const [other, setOther] = useState<ResolvedPage | null>(null);
+
+  // Prefetching surrounding spreads/pages so that moving in either
+  // direction is a cache hit rather than a fetch.
+  useEffect(() => {
+    if (resolved?.page !== currentPage) return;
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+
+    const timer = window.setTimeout(() => {
+      if (spreadRoom && leftNumber !== null) {
+        if (leftNumber + 1 <= LAST_PAGE) prefetchMushafPage(leftNumber + 1);
+        if (leftNumber + 2 <= LAST_PAGE) prefetchMushafPage(leftNumber + 2);
+        if (rightNumber - 1 >= 1) prefetchMushafPage(rightNumber - 1);
+        if (rightNumber - 2 >= 1) prefetchMushafPage(rightNumber - 2);
+      } else {
+        if (currentPage + 1 <= LAST_PAGE) prefetchMushafPage(currentPage + 1);
+        if (currentPage - 1 >= 1) prefetchMushafPage(currentPage - 1);
+      }
+    }, 250);
+    return () => window.clearTimeout(timer);
+  }, [currentPage, resolved?.page, spreadRoom, leftNumber, rightNumber]);
 
   useEffect(() => {
     if (otherNumber === null) {
@@ -414,8 +482,8 @@ export function KhatmahReaderScreen({
 
   useEffect(() => {
     if (!pageData?.length) return;
-    const [surahNumber, ayahNumber] = (pageData.at(-1)?.k ?? "1:1").split(":").map(Number);
-    onReadingPositionChange?.({ page: displayPage, surahNumber, ayahNumber, juzNumber });
+    const [surahNumber] = (pageData[0]?.k ?? "1:1").split(":").map(Number);
+    onReadingPositionChange?.({ page: displayPage, surahNumber, juzNumber });
   }, [displayPage, juzNumber, onReadingPositionChange, pageData]);
 
   /** One page at a time, or a whole spread when two are showing. */
@@ -424,9 +492,10 @@ export function KhatmahReaderScreen({
     (delta: number) => {
       const nextPage = currentPage + delta * pageStep;
       if (nextPage < 1 || nextPage > LAST_PAGE) return;
+      if (delta > 0) recordCurrentSpread();
       setKhatmahPage(nextPage);
     },
-    [currentPage, pageStep, setKhatmahPage],
+    [currentPage, pageStep, setKhatmahPage, recordCurrentSpread],
   );
 
   /**
@@ -508,7 +577,7 @@ export function KhatmahReaderScreen({
     // A tap on the paper — not a drag, not a control — is the gesture every
     // reader tries first for "show me the controls again".
     if (!wasDragging && !(event.target as HTMLElement).closest("[data-mushaf-chrome], button, a")) {
-      setChromeVisible((visible) => !visible);
+      setChromeVisible((visible) => (mushafKeepControlsVisible ? true : !visible));
     }
   };
 
@@ -539,54 +608,23 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.indexTitle")}
       >
         <span className="min-w-0 truncate text-sm font-extrabold">{surahName}</span>
-        {/* Four targets share a 320px header now that difficult words has its own
-            switch. The juz and the chevron are the parts a reader can lose: the
+        {/* The juz and the chevron are the parts a reader can lose: the
             surah name is the one that must never truncate to a single letter. */}
         <span className="hidden shrink-0 text-[0.6875rem] font-bold opacity-70 min-[380px]:inline">
-          · {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
+          ، {t(language, "common.juz")} {formatNumerals(juzNumber, language)}
         </span>
         <ChevronDown size={16} className="hidden shrink-0 opacity-60 min-[360px]:block" aria-hidden="true" />
       </button>
-      {/* A pill that fills when it is on. The old control was an icon beside a
-          4x7 track — technically a switch, but too small to read at a glance
-          and too small to be an easy target. */}
-      <button
-        type="button"
-        role="switch"
-        aria-checked={showWordMeanings}
-        onClick={() => setShowWordMeanings((current) => !current)}
-        className={`inline-flex min-h-11 shrink-0 items-center justify-center gap-1.5 rounded-full border px-2.5 text-[0.6875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring sm:px-3 ${
-          showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-current/25 bg-current/5"
-        }`}
-        aria-label={t(language, "mushaf.difficultWordsInvite")}
-        data-testid="mushaf-difficult-words-switch"
-      >
-        <Eye size={17} aria-hidden="true" />
-        <span className="hidden min-[420px]:inline">{t(language, "mushaf.difficultWordsInvite")}</span>
-      </button>
-      {/* Saving your place is a single, frequent, reversible act — it belongs on
-          the bar, not two taps deep behind a menu of unrelated settings. */}
-      <button
-        type="button"
-        onClick={toggleBookmark}
-        aria-pressed={isCurrentBookmarked}
-        className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-          isCurrentBookmarked ? "border-primary bg-primary text-primary-foreground" : "border-current/25 bg-current/5"
-        }`}
-        aria-label={t(language, "mushaf.savePlace")}
-        data-testid="mushaf-save-place"
-      >
-        <Bookmark size={17} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
-      </button>
-      {/* What is left is one kind of thing: how the page looks. */}
+
+      {/* Reading Settings Menu */}
       <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-current/25 bg-current/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={t(language, "mushaf.themeMenu")}
+            aria-label={t(language, "common.settings")}
           >
-            <Brush size={17} aria-hidden="true" />
+            <Settings size={17} aria-hidden="true" />
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className={`min-w-[12rem] ${menuSurfaceClass}`}>
@@ -609,6 +647,33 @@ export function KhatmahReaderScreen({
               </DropdownMenuRadioItem>
             ))}
           </DropdownMenuRadioGroup>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold opacity-70">
+            <BookOpen size={15} aria-hidden="true" />
+            <span>{t(language, "mushaf.layoutTitle")}</span>
+          </DropdownMenuLabel>
+          <DropdownMenuRadioGroup
+            value={mushafLayout}
+            onValueChange={(value) => {
+              setMushafLayout?.(value as "auto" | "single" | "spread");
+              setIsOptionsMenuOpen(false);
+            }}
+          >
+            <DropdownMenuRadioItem value="auto">{t(language, "mushaf.layoutAuto")}</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="single">{t(language, "mushaf.layoutSingle")}</DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="spread">{t(language, "mushaf.layoutSpread")}</DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+
+          <DropdownMenuSeparator />
+
+          <DropdownMenuCheckboxItem
+            checked={mushafKeepControlsVisible}
+            onCheckedChange={(checked) => setMushafKeepControlsVisible?.(checked)}
+          >
+            {t(language, "mushaf.keepControlsVisible")}
+          </DropdownMenuCheckboxItem>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -620,6 +685,21 @@ export function KhatmahReaderScreen({
       aria-label={t(language, "mushaf.pageNavigation")}
       className="flex w-full items-center justify-between gap-1"
     >
+      {/* Difficult Words Toggle on the far left. */}
+      <button
+        type="button"
+        role="switch"
+        aria-checked={showWordMeanings}
+        onClick={() => setShowWordMeanings((current) => !current)}
+        className={`inline-flex min-h-14 min-w-14 shrink-0 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
+        }`}
+        aria-label={t(language, "mushaf.difficultWordsInvite")}
+        data-testid="mushaf-difficult-words-switch"
+      >
+        <Eye size={19} aria-hidden="true" />
+      </button>
+
       {/* Forward sits on the left, because that is the way the pages turn. */}
       <button
         type="button"
@@ -631,9 +711,8 @@ export function KhatmahReaderScreen({
         <ChevronLeft size={22} />
         <span className="truncate">{t(language, "common.next")}</span>
       </button>
-      {/* Where you are on the paper. Kept apart from how today's wird is going,
-          which lives on the bar above it — one is a location, the other is a
-          measure of effort, and running them together read as one number. */}
+
+      {/* Where you are on the paper. */}
       <div className="flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center px-1" dir={direction}>
         <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
           {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
@@ -642,6 +721,8 @@ export function KhatmahReaderScreen({
           {t(language, "mushaf.keyboardNavigationHint")}
         </span>
       </div>
+
+      {/* Previous sits on the right. */}
       <button
         type="button"
         onClick={() => paginate(-1)}
@@ -652,12 +733,22 @@ export function KhatmahReaderScreen({
         <ChevronRight size={22} />
         <span className="truncate">{t(language, "common.previous")}</span>
       </button>
+
+      {/* Bookmark Toggle on the far right. */}
+      <button
+        type="button"
+        onClick={toggleBookmark}
+        aria-pressed={isCurrentBookmarked}
+        className={`inline-flex min-h-14 min-w-14 shrink-0 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          isCurrentBookmarked ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
+        }`}
+        aria-label={t(language, "mushaf.savePlace")}
+        data-testid="mushaf-save-place"
+      >
+        <Bookmark size={19} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
+      </button>
     </nav>
   );
-
-  /** What stays on the paper once the controls step aside: where you are, and
-   *  how today's wird is going. Both are the questions a reader actually asks
-   *  mid-page, and neither is worth a tap. */
   const pageStatus = (
     <div
       className="flex w-full items-center justify-between gap-3 text-[0.6875rem] font-bold opacity-70"

@@ -23,6 +23,7 @@ function renderReader(overrides: Partial<Parameters<typeof KhatmahReaderScreen>[
   const setKhatmahPage = vi.fn();
   render(
     <KhatmahReaderScreen
+      progressDayStartHour={4}
       language="ar"
       direction="rtl"
       onBack={vi.fn()}
@@ -188,5 +189,31 @@ describe("KhatmahReaderScreen facing pages", () => {
     resize(820, 1180);
     renderReader({ khatmahPage: 50 });
     await screen.findByRole("article", { name: "صفحة ٥٠" });
+  });
+});
+
+describe("KhatmahReaderScreen settings menu", () => {
+  it("exposes controls for layout and visibility", async () => {
+    const user = userEvent.setup();
+    const setMushafLayout = vi.fn();
+    const setMushafKeepControlsVisible = vi.fn();
+
+    renderReader({
+      language: "en",
+      setMushafLayout,
+      setMushafKeepControlsVisible,
+    });
+
+    const settingsBtn = screen.getByRole("button", { name: "Settings" });
+    await user.click(settingsBtn);
+
+    const layoutRadio = screen.getByRole("menuitemradio", { name: "Two Pages" });
+    await user.click(layoutRadio);
+    expect(setMushafLayout).toHaveBeenCalledWith("spread");
+
+    await user.click(settingsBtn);
+    const keepVisibleCb = screen.getByRole("menuitemcheckbox", { name: "Keep controls visible" });
+    await user.click(keepVisibleCb);
+    expect(setMushafKeepControlsVisible).toHaveBeenCalledWith(true);
   });
 });

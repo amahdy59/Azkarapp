@@ -1,13 +1,14 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { ArrowNext, BookOpen, ChevronDown, Undo } from "../components/icons";
+import { ArrowNext, BookOpen, Check, Undo } from "../components/icons";
 import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
 import { effectiveDailyGoal } from "./quranWirdGoal";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
+import { useNow } from "../hooks/useNow";
 import type { AppLanguage, QuranReadingPosition, QuranWirdPlan } from "../types";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
@@ -31,6 +32,7 @@ export function QuranWirdScreen({
   onContinue,
   onPlanChange,
   onUndoPage,
+  progressDayStartHour,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -41,63 +43,99 @@ export function QuranWirdScreen({
   onContinue: () => void;
   onPlanChange: (plan: QuranWirdPlan) => void;
   onUndoPage: () => void;
+  progressDayStartHour: number;
 }) {
-  const todayKey = getProgressDayKey();
+  const isArabic = language === "ar";
+  const now = useNow();
+  const todayKey = getProgressDayKey(now, progressDayStartHour);
   const completedPages = wirdHistory[todayKey] ?? [];
   const read = completedPages.length;
   const goal = effectiveDailyGoal(plan, wirdHistory);
-  const redistributed = plan.kind !== "daily" && goal !== plan.dailyPages;
+
   const remaining = Math.max(goal - read, 0);
-  const positionSurah = position.surahNumber ? getSurahDisplayName(position.surahNumber, language) : "";
+  const targetEndPage = Math.min(position.page + remaining - 1, TOTAL_PAGES);
+
+  const positionSurah = getSurahDisplayName(position.surahNumber ?? 1, language);
   const positionJuz = position.juzNumber ?? getJuzNumberForPage(position.page);
+
+  const khatmahPagesRead = Math.max(0, position.page - 1);
+  const khatmahPercent = Math.floor((khatmahPagesRead / TOTAL_PAGES) * 100);
+
   const week = useMemo(() => currentSaturdayWeekKeys(), []);
-  const activeDays = week.filter((dayKey) => (wirdHistory[dayKey] ?? []).length > 0).length;
+
+  // Draft State
+  const [isDrafting, setIsDrafting] = useState(false);
+  const [draftPlan, setDraftPlan] = useState<QuranWirdPlan>(plan);
+
+  const draftGoal = effectiveDailyGoal(draftPlan, wirdHistory);
+  const draftCompletionDate = useMemo(() => {
+    if (draftPlan.kind === "daily") {
+      const remainingPages = TOTAL_PAGES - position.page;
+      const days = Math.ceil(remainingPages / draftPlan.dailyPages);
+      const d = new Date(now);
+      d.setDate(d.getDate() + days);
+      return new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { month: "long", day: "numeric" }).format(d);
+    } else {
+      const d = new Date(now);
+      d.setDate(d.getDate() + (draftPlan.durationDays ?? 30));
+      return new Intl.DateTimeFormat(isArabic ? "ar-EG" : "en", { month: "long", day: "numeric" }).format(d);
+    }
+  }, [draftPlan, position.page, now, isArabic]);
 
   return (
     <ScreenContainer dir={direction} screenName={t(language, "mushaf.wirdTitle")} className="overflow-y-auto">
       <Header title={t(language, "mushaf.wirdTitle")} onBack={onBack} language={language} />
       <div className="mx-auto flex w-full max-w-[44rem] flex-col gap-4 px-4 pb-8 pt-3 sm:px-6">
+        {/* EXACT DAILY PORTION */}
         <section
           className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
           aria-labelledby="wird-today-title"
         >
-          <div className="flex items-end justify-between gap-3">
+          <div className="flex items-end justify-between gap-3 mb-2">
             <h2 id="wird-today-title" className="text-xl font-extrabold text-foreground">
-              {t(language, "mushaf.todayTarget")}
+              {isArabic ? "????? ?????" : "Today's reading"}
             </h2>
-            <bdi dir="ltr" className="shrink-0 text-sm font-extrabold text-primary">
-              {formatNumerals(read, language)} / {formatNumerals(goal, language)}
-            </bdi>
           </div>
-          <div className="mt-3">
-            <ProgressBar
-              value={Math.min(read, goal)}
-              max={goal}
-              height={8}
-              direction={direction}
-              aria-label={t(language, "mushaf.todayProgress", {
-                read: formatNumerals(read, language),
-                goal: formatNumerals(goal, language),
-              })}
-            />
+
+          <div className="flex flex-col gap-1 mb-4">
+            <div className="text-lg font-bold text-primary" dir="auto">
+              {isArabic ? "???????" : "Pages"} {formatNumerals(position.page, language)}
+              {remaining > 0 ? "�" + formatNumerals(targetEndPage, language) : ""}
+            </div>
+            <div className="text-sm font-medium text-muted-foreground" dir="auto">
+              {positionSurah} � {isArabic ? "?????" : "Juz"} {formatNumerals(positionJuz, language)}
+            </div>
           </div>
-          <p className="mt-3 text-sm font-medium text-muted-foreground">
-            {remaining > 0
-              ? t(language, "mushaf.pagesRemaining", { count: formatNumerals(remaining, language) })
-              : t(language, "mushaf.wirdGoalReached")}
-          </p>
-          <div className="mt-4 border-y border-border/60 py-3">
-            <p className="arabic-ui text-sm font-bold text-foreground" dir="auto">
-              {positionSurah}
+
+          <div className="flex items-center justify-between mb-2 text-sm font-bold text-foreground">
+            <span>
+              {formatNumerals(read, language)} {isArabic ? "??" : "of"} {formatNumerals(goal, language)}{" "}
+              {isArabic ? "??????" : "completed"}
+            </span>
+          </div>
+
+          <ProgressBar
+            aria-label={t(language, "mushaf.todayProgress", {
+              read: formatNumerals(read, language),
+              goal: formatNumerals(goal, language),
+            })}
+            value={Math.min(read, goal)}
+            max={goal}
+            height={8}
+            direction={direction}
+          />
+
+          {remaining > 0 ? (
+            <p className="mt-3 text-sm font-medium text-muted-foreground">
+              {isArabic ? "???? ?? ??????" : "Continue from page"} {formatNumerals(position.page, language)}
             </p>
-            <p className="mt-1 text-xs font-medium text-muted-foreground">
-              {t(language, "mushaf.positionDetail", {
-                page: formatNumerals(position.page, language),
-                juz: formatNumerals(positionJuz, language),
-                ayah: position.ayahNumber ? formatNumerals(position.ayahNumber, language) : "—",
-              })}
-            </p>
-          </div>
+          ) : (
+            <div className="mt-3 flex items-center gap-2 text-primary font-bold">
+              <Check size={16} />
+              <span>{isArabic ? "????? ??? ?????" : "Today's Wird complete"}</span>
+            </div>
+          )}
+
           <button
             type="button"
             onClick={onContinue}
@@ -107,6 +145,7 @@ export function QuranWirdScreen({
             {t(language, "mushaf.continueReading")}
             <ArrowNext size={18} aria-hidden="true" />
           </button>
+
           {read > 0 && (
             <button
               type="button"
@@ -119,107 +158,214 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        <details className="group rounded-3xl border border-border bg-card p-5 shadow-xs">
-          <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-3 rounded-xl pb-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-            <div className="min-w-0 flex-1">
+        {/* KHATMAH PROGRESS */}
+        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs">
+          <div className="flex justify-between items-center mb-2">
+            <h2 className="text-base font-extrabold text-foreground">
+              {isArabic ? "?????? ???????" : "Current Khatmah"}
+            </h2>
+            <span className="text-sm font-bold text-primary">{formatNumerals(khatmahPercent, language)}%</span>
+          </div>
+          <div className="text-sm font-medium text-muted-foreground mb-3">
+            {formatNumerals(khatmahPagesRead, language)} / {formatNumerals(TOTAL_PAGES, language)}{" "}
+            {isArabic ? "????" : "pages"}
+          </div>
+          <ProgressBar
+            aria-label={t(language, "mushaf.todayProgress", {
+              read: formatNumerals(read, language),
+              goal: formatNumerals(goal, language),
+            })}
+            value={khatmahPagesRead}
+            max={TOTAL_PAGES}
+            height={6}
+            direction={direction}
+          />
+        </section>
+
+        {/* PLAN DRAFTING */}
+        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs">
+          <div className="flex justify-between items-start mb-4">
+            <div>
               <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.planTitle")}</h2>
-              <p className="mt-1 text-sm font-medium leading-6 text-muted-foreground">
-                {planLabel(language, plan)} ·{" "}
-                {t(language, "mushaf.pagesPerDay", { count: formatNumerals(goal, language) })}
-              </p>
+              {!isDrafting && (
+                <p className="mt-1 text-sm font-medium text-muted-foreground">{planLabel(language, plan)}</p>
+              )}
             </div>
-            <ChevronDown
-              size={20}
-              className="shrink-0 text-primary transition-transform group-open:rotate-180"
-              aria-hidden="true"
-            />
-          </summary>
-          <div className="border-t border-border/60 pt-4">
-            <label className="block text-sm font-bold text-foreground" htmlFor="quran-wird-plan">
-              {t(language, "mushaf.changePlan")}
-            </label>
-            <Select
-              value={plan.kind}
-              onValueChange={(value) => {
-                const kind = value as QuranWirdPlan["kind"];
-                onPlanChange(
-                  kind === "khatmah30"
-                    ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 30), durationDays: 30, startedDayKey: todayKey }
-                    : kind === "custom"
-                      ? { kind, dailyPages: Math.ceil(TOTAL_PAGES / 60), durationDays: 60, startedDayKey: todayKey }
-                      : { kind, dailyPages: 4 },
-                );
-              }}
-            >
-              <SelectTrigger
-                id="quran-wird-plan"
-                className="mt-2 font-bold"
-                aria-label={t(language, "mushaf.changePlan")}
-              >
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent dir={direction} position="popper">
-                <SelectItem value="khatmah30">{t(language, "mushaf.planKhatmah30")}</SelectItem>
-                <SelectItem value="daily">{t(language, "mushaf.planDaily")}</SelectItem>
-                <SelectItem value="custom">{t(language, "mushaf.planCustomChoice")}</SelectItem>
-              </SelectContent>
-            </Select>
-            {plan.kind === "custom" && (
-              <label className="mt-3 block text-sm font-bold text-foreground">
-                {t(language, "mushaf.durationDays")}
-                <input
-                  type="number"
-                  min="1"
-                  max="604"
-                  value={plan.durationDays ?? 60}
-                  onChange={(event) => {
-                    const days = Math.min(604, Math.max(1, Number(event.target.value) || 1));
-                    onPlanChange({
-                      kind: "custom",
-                      durationDays: days,
-                      dailyPages: Math.ceil(TOTAL_PAGES / days),
-                      startedDayKey: plan.startedDayKey ?? todayKey,
-                    });
-                  }}
-                  className="mt-2 min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                />
-              </label>
-            )}
-            <p className="mt-3 text-xs leading-5 text-muted-foreground">{t(language, "mushaf.redistributeNote")}</p>
-            {redistributed && (
-              <p className="mt-2 text-xs font-bold text-primary">
-                {t(language, "mushaf.redistributedGoal", { count: formatNumerals(goal, language) })}
-              </p>
+            {!isDrafting && (
+              <button onClick={() => setIsDrafting(true)} className="text-sm font-bold text-primary hover:underline">
+                {isArabic ? "?????" : "Edit"}
+              </button>
             )}
           </div>
-        </details>
 
+          {isDrafting ? (
+            <div className="border-t border-border/60 pt-4 flex flex-col gap-4">
+              <div>
+                <label className="block text-sm font-bold text-foreground mb-2">
+                  {isArabic ? "??? ?????" : "Plan type"}
+                </label>
+                <Select
+                  value={draftPlan.kind === "daily" ? "daily" : "custom"}
+                  onValueChange={(val) => {
+                    if (val === "daily") {
+                      setDraftPlan({ kind: "daily", dailyPages: 4 });
+                    } else {
+                      setDraftPlan({
+                        kind: "custom",
+                        durationDays: 30,
+                        dailyPages: Math.ceil(Math.max(0, TOTAL_PAGES - position.page) / 30),
+                        startedDayKey: todayKey,
+                        startPage: position.page,
+                      });
+                    }
+                  }}
+                >
+                  <SelectTrigger aria-label={isArabic ? "????? ?????" : "Change plan"} className="font-bold">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent dir={direction} position="popper">
+                    <SelectItem value="daily">
+                      <div className="flex flex-col text-start">
+                        <span>{isArabic ? "????? ?????" : "Pages per day"}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {isArabic ? "???? ??? ?????? ?? ???" : "Read the same amount every day"}
+                        </span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="custom">
+                      <div className="flex flex-col text-start">
+                        <span>{isArabic ? "????? ??????" : "Finish by a date"}</span>
+                        <span className="text-xs font-normal text-muted-foreground">
+                          {isArabic ? "???? ?????? ??? ??????" : "The daily amount adapts if you read more or less"}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {draftPlan.kind === "daily" ? (
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-2">
+                    {isArabic ? "????? ?? ?????" : "Pages per day"}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="604"
+                    value={draftPlan.dailyPages}
+                    onChange={(e) =>
+                      setDraftPlan({ ...draftPlan, dailyPages: Math.max(1, Number(e.target.value) || 1) })
+                    }
+                    className="min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm font-bold text-foreground mb-2">
+                    {isArabic ? "????? ???????? (????)" : "Finish in (days)"}
+                  </label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="604"
+                    value={draftPlan.durationDays ?? 30}
+                    onChange={(e) => {
+                      const days = Math.max(1, Number(e.target.value) || 1);
+                      setDraftPlan({
+                        kind: "custom",
+                        durationDays: days,
+                        dailyPages: Math.ceil(Math.max(0, TOTAL_PAGES - position.page) / days),
+                        startedDayKey: todayKey,
+                        startPage: position.page,
+                      });
+                    }}
+                    className="min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  />
+                </div>
+              )}
+
+              <div className="rounded-xl bg-muted p-4 flex flex-col gap-1">
+                <div className="text-sm font-medium text-foreground">
+                  {isArabic ? "?????" : "Around"}{" "}
+                  <span className="font-bold text-primary">{formatNumerals(draftGoal, language)}</span>{" "}
+                  {isArabic ? "???? / ???" : "pages/day"}
+                </div>
+                <div className="text-sm font-medium text-foreground">
+                  {isArabic ? "????? ???????? ???????:" : "Estimated completion:"}{" "}
+                  <span className="font-bold">{draftCompletionDate}</span>
+                </div>
+              </div>
+
+              <div className="flex gap-3 mt-2">
+                <button
+                  onClick={() => {
+                    setDraftPlan(plan);
+                    setIsDrafting(false);
+                  }}
+                  className="flex-1 rounded-xl border border-border py-2.5 font-bold hover:bg-muted"
+                >
+                  {isArabic ? "?????" : "Cancel"}
+                </button>
+                <button
+                  onClick={() => {
+                    onPlanChange(draftPlan);
+                    setIsDrafting(false);
+                  }}
+                  className="flex-1 rounded-xl bg-primary text-primary-foreground py-2.5 font-bold hover:bg-primary/90"
+                >
+                  {isArabic ? "??? ?????" : "Save plan"}
+                </button>
+              </div>
+            </div>
+          ) : null}
+        </section>
+
+        {/* WEEKLY PROGRESS */}
         <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">
           <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
             {t(language, "mushaf.thisWeek")}
           </h2>
-          <p className="mt-1 text-sm font-medium text-muted-foreground">
-            {t(language, "mushaf.weeklySummary", { count: formatNumerals(activeDays, language) })}
-          </p>
-          <div className="mt-4 grid grid-cols-7 gap-2" role="list" aria-label={t(language, "mushaf.thisWeek")}>
+          <div className="mt-4 flex flex-col gap-3" role="list" aria-label={t(language, "mushaf.thisWeek")}>
             {week.map((dayKey) => {
               const count = (wirdHistory[dayKey] ?? []).length;
+              // We compare against the current goal. A fully accurate history would store daily goals, but we estimate against the current goal for visual simplicity.
+              const dayGoal = goal;
+
               const dayLabel = new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en", {
                 weekday: "short",
-              }).format(new Date(`${dayKey}T12:00:00`));
+              }).format(new Date(dayKey + "T12:00:00"));
+
+              const isToday = dayKey === todayKey;
+
               return (
-                <div key={dayKey} role="listitem" className="text-center">
-                  <span
-                    className={`mx-auto block h-2.5 w-full rounded-full ${count ? "bg-primary" : "bg-muted"}`}
-                    aria-hidden="true"
-                  />
-                  <span className="mt-2 block text-[0.6875rem] font-bold text-muted-foreground">{dayLabel}</span>
-                  <span className="sr-only">
-                    {t(language, "mushaf.dayPages", {
-                      day: dayLabel,
-                      count: formatNumerals(count, language),
-                    })}
-                  </span>
+                <div
+                  key={dayKey}
+                  role="listitem"
+                  className={"flex items-center justify-between p-3 rounded-xl " + (isToday ? "bg-muted" : "")}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="w-12 text-[0.875rem] font-bold text-foreground">{dayLabel}</span>
+                    {count >= dayGoal && dayGoal > 0 ? (
+                      <div className="flex items-center justify-center w-5 h-5 rounded-full bg-primary text-primary-foreground">
+                        <Check size={12} strokeWidth={3} />
+                      </div>
+                    ) : (
+                      <div className="w-5 h-5" />
+                    )}
+                  </div>
+                  <bdi dir="ltr" className="text-[0.875rem] font-bold text-muted-foreground">
+                    {count > 0 ? (
+                      <>
+                        <span className={count >= dayGoal ? "text-foreground" : ""}>
+                          {formatNumerals(count, language)}
+                        </span>{" "}
+                        / {formatNumerals(dayGoal, language)}
+                      </>
+                    ) : (
+                      <span>�</span>
+                    )}
+                  </bdi>
                 </div>
               );
             })}

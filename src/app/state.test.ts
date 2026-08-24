@@ -143,6 +143,14 @@ describe("app state persistence", () => {
     expect(normalizeAppState({ mushafTheme: "unknown" }).mushafTheme).toBe("follow-app");
   });
 
+  it("normalizes mushaf layout and visibility settings safely", () => {
+    expect(normalizeAppState({ mushafLayout: "spread" }).mushafLayout).toBe("spread");
+    expect(normalizeAppState({ mushafLayout: "invalid" }).mushafLayout).toBe("auto");
+    expect(normalizeAppState({ mushafKeepControlsVisible: true }).mushafKeepControlsVisible).toBe(true);
+    expect(normalizeAppState({ mushafKeepControlsVisible: "yes" }).mushafKeepControlsVisible).toBe(true);
+    expect(normalizeAppState({ mushafKeepControlsVisible: false }).mushafKeepControlsVisible).toBe(false);
+  });
+
   it("migrates Reader-only saved zikr into app state", () => {
     window.localStorage.setItem("azkarapp.saved-zikr.v1", JSON.stringify(["m-hm-75", "m-hm-75", 3]));
 
