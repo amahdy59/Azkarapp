@@ -4,12 +4,10 @@ import { t } from "../i18n";
 import type {
   AppLanguage,
   MushafLayout,
-  MushafReadingMode,
   MushafTheme,
   QuranReadingPosition,
   QuranVerseBookmark,
   QuranWirdPlan,
-  TextSizeOption,
   ThemeMode,
 } from "../types";
 import {
@@ -40,6 +38,9 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
   DropdownMenuCheckboxItem,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
 } from "../components/ui/dropdown-menu";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
@@ -87,14 +88,6 @@ function fitsTwoPages(width: number, height: number) {
 function spreadStart(page: number) {
   return page % 2 === 1 ? page : page - 1;
 }
-/**
- * How long the controls stay up once you stop touching them.
- *
- * Long enough to read the page number and reach for a button, short enough that
- * the paper is the only thing on screen while you are actually reading. Tapping
- * the page brings them back, so nothing is ever more than one tap away.
- */
-const CHROME_IDLE_MS = 4500;
 const COMPLETION_NOTICE_MS = 4000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -161,12 +154,6 @@ export function KhatmahReaderScreen({
   setMushafTheme: onUpdateTheme,
   mushafLayout = "auto",
   setMushafLayout,
-  mushafReadingMode = "page",
-  setMushafReadingMode,
-  textSize = "medium",
-  onTextSizeChange,
-  mushafKeepControlsVisible = false,
-  setMushafKeepControlsVisible,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
   quranReadingBookmark,
@@ -189,12 +176,6 @@ export function KhatmahReaderScreen({
   setMushafTheme?: (theme: MushafTheme) => void;
   mushafLayout?: MushafLayout;
   setMushafLayout?: (layout: MushafLayout) => void;
-  mushafReadingMode?: MushafReadingMode;
-  setMushafReadingMode?: (mode: MushafReadingMode) => void;
-  textSize?: TextSizeOption;
-  onTextSizeChange?: (size: TextSizeOption) => void;
-  mushafKeepControlsVisible?: boolean;
-  setMushafKeepControlsVisible?: (visible: boolean) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
   quranReadingBookmark?: QuranReadingPosition;
@@ -216,6 +197,7 @@ export function KhatmahReaderScreen({
     if (!cached) return null;
     return { page: currentPage, data: cached, qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cached) };
   });
+  const [other, setOther] = useState<ResolvedPage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
@@ -226,8 +208,6 @@ export function KhatmahReaderScreen({
    *  flipping it must not re-fetch the page. */
   const showMeaningsRef = useRef(showWordMeanings);
   showMeaningsRef.current = showWordMeanings;
-  const [chromeVisible, setChromeVisible] = useState(true);
-  const [chromeFocused, setChromeFocused] = useState(false);
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
@@ -252,13 +232,6 @@ export function KhatmahReaderScreen({
     const timer = window.setTimeout(() => setHighlightedVerseKey(null), 4_000);
     return () => window.clearTimeout(timer);
   }, [highlightedVerseKey]);
-  /**
-   * Hidden controls are `visibility: hidden`, which correctly takes them out of
-   * the tab order — and would strand a keyboard reader with no way to reach
-   * them at all. So once someone is driving by keyboard the controls stay put
-   * until they touch the page again.
-   */
-  const [keyboardDriven, setKeyboardDriven] = useState(false);
   const reduceMotion = useReducedMotion();
   const [autoSpreadRoom, setSpreadRoom] = useState(
     () => typeof window !== "undefined" && fitsTwoPages(window.innerWidth, window.innerHeight),
@@ -270,9 +243,9 @@ export function KhatmahReaderScreen({
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
-  const spreadRoom =
-    mushafReadingMode === "page" &&
-    (mushafLayout === "single" ? false : mushafLayout === "spread" ? true : autoSpreadRoom);
+  // A stored desktop preference never forces two pages onto a phone or tall
+  // tablet. The physical fit gate is authoritative; settings only opt out.
+  const spreadRoom = autoSpreadRoom && mushafLayout !== "single";
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
 
@@ -314,57 +287,40 @@ export function KhatmahReaderScreen({
    */
   useEffect(() => {
     let active = true;
+    const rightPage = spreadStart(currentPage);
+    const leftPage = rightPage + 1 <= LAST_PAGE ? rightPage + 1 : null;
+    const facingPage = spreadRoom && leftPage !== null ? (currentPage === rightPage ? leftPage : rightPage) : null;
 
     void (async () => {
-      const next = await resolveMushafPage(currentPage, showMeaningsRef.current).catch((reason) => {
-        reportError(reason, "mushaf-page-load");
-        return null;
-      });
+      // Settle both halves together. The previous sequential effects rendered
+      // one fresh page while its neighbour was still loading, which made a
+      // desktop turn feel visibly slower than the same local files warranted.
+      const [next, facing] = await Promise.all([
+        resolveMushafPage(currentPage, showMeaningsRef.current).catch((reason) => {
+          reportError(reason, "mushaf-page-load");
+          return null;
+        }),
+        facingPage === null
+          ? Promise.resolve(null)
+          : resolveMushafPage(facingPage, showMeaningsRef.current).catch((reason) => {
+              reportError(reason, "mushaf-facing-page-load");
+              return null;
+            }),
+      ]);
       if (!active) return;
       if (!next) {
         setError(t(language, "mushaf.loadFailed"));
         return;
       }
       setResolved(next);
+      setOther(facing);
       setError(null);
     })();
 
     return () => {
       active = false;
     };
-  }, [currentPage, language, reloadToken]);
-
-  const revealChrome = useCallback(() => setChromeVisible(true), []);
-
-  useEffect(() => {
-    setChromeVisible(true);
-  }, [currentPage]);
-
-  useEffect(() => {
-    // Never step on a reader who is mid-interaction: an open menu, an open
-    // dialog, or keyboard focus inside the toolbar all hold it open.
-    if (
-      !chromeVisible ||
-      chromeFocused ||
-      keyboardDriven ||
-      isIndexOpen ||
-      isOptionsMenuOpen ||
-      activeAyah ||
-      mushafKeepControlsVisible
-    )
-      return;
-    const timer = window.setTimeout(() => setChromeVisible(false), CHROME_IDLE_MS);
-    return () => window.clearTimeout(timer);
-  }, [
-    chromeVisible,
-    chromeFocused,
-    keyboardDriven,
-    currentPage,
-    isIndexOpen,
-    isOptionsMenuOpen,
-    activeAyah,
-    mushafKeepControlsVisible,
-  ]);
+  }, [currentPage, language, reloadToken, spreadRoom]);
 
   /**
    * A page counts itself once it has actually been read.
@@ -417,8 +373,6 @@ export function KhatmahReaderScreen({
     const newlyRead = visiblePages.filter((page) => !currentList.includes(page));
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, todayKey, visiblePages, wirdGoal, wirdHistory]);
-  const [other, setOther] = useState<ResolvedPage | null>(null);
-
   // Prefetching surrounding spreads/pages so that moving in either
   // direction is a cache hit rather than a fetch.
   useEffect(() => {
@@ -439,24 +393,6 @@ export function KhatmahReaderScreen({
     }, 250);
     return () => window.clearTimeout(timer);
   }, [currentPage, resolved?.page, spreadRoom, leftNumber, rightNumber]);
-
-  useEffect(() => {
-    if (otherNumber === null) {
-      setOther(null);
-      return;
-    }
-    let active = true;
-    void (async () => {
-      const next = await resolveMushafPage(otherNumber, showMeaningsRef.current).catch((error) => {
-        reportError(error, "mushaf-facing-page-load");
-        return null;
-      });
-      if (active) setOther(next);
-    })();
-    return () => {
-      active = false;
-    };
-  }, [otherNumber]);
 
   // Transform data into the reference 15 lines
   const lines = useMemo(() => toMushafLines(pageData), [pageData]);
@@ -512,15 +448,8 @@ export function KhatmahReaderScreen({
     [currentPage, pageStep, setKhatmahPage, recordCurrentSpread],
   );
 
-  /**
-   * The Mushaf is a right-to-left book, and the controls follow the paper
-   * rather than a media player (DEC-094).
-   *
-   * Moving *right* moves back towards page one; moving *left* moves forward.
-   * That is how the pages are bound, it is what the swipe already did — drag
-   * the paper rightwards and the earlier page comes back — and it is what the
-   * arrows now do, so the gesture and the keys can no longer disagree.
-   */
+  /** Physical direction is the product rule: right advances, left goes back.
+   *  Buttons, keys, and swipes all call the same signed paginator. */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (isIndexOpen || isOptionsMenuOpen || activeAyah) return;
@@ -529,10 +458,8 @@ export function KhatmahReaderScreen({
       if (target && target !== document.body && target.id !== "main-content" && !root?.contains(target)) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       let handled = true;
-      setKeyboardDriven(true);
-      setChromeVisible(true);
-      if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
-      else if (e.key === "ArrowLeft" || e.key === "PageDown") paginate(1);
+      if (e.key === "ArrowRight" || e.key === "PageDown") paginate(1);
+      else if (e.key === "ArrowLeft" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
       else if (e.key === "Escape") onBack();
@@ -557,8 +484,8 @@ export function KhatmahReaderScreen({
       }
       if (drag.current.engaged && clientX !== null) {
         const offset = clientX - drag.current.startX;
-        if (offset <= -SWIPE_THRESHOLD) paginate(1);
-        else if (offset >= SWIPE_THRESHOLD) paginate(-1);
+        if (offset >= SWIPE_THRESHOLD) paginate(1);
+        else if (offset <= -SWIPE_THRESHOLD) paginate(-1);
       }
       drag.current = { pointerId: -1, startX: 0, engaged: false };
     },
@@ -568,7 +495,6 @@ export function KhatmahReaderScreen({
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
-    setKeyboardDriven(false);
     drag.current = { pointerId: event.pointerId, startX: event.clientX, engaged: false };
   };
 
@@ -578,7 +504,6 @@ export function KhatmahReaderScreen({
     if (!drag.current.engaged) {
       if (Math.abs(offset) < 12) return;
       drag.current.engaged = true;
-      setChromeVisible(false);
       if (event.currentTarget.hasPointerCapture?.(event.pointerId) === false) {
         event.currentTarget.setPointerCapture(event.pointerId);
       }
@@ -592,13 +517,7 @@ export function KhatmahReaderScreen({
 
   const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
-    const wasDragging = drag.current.engaged;
     endDrag(event.clientX);
-    // A tap on the paper — not a drag, not a control — is the gesture every
-    // reader tries first for "show me the controls again".
-    if (!wasDragging && !(event.target as HTMLElement).closest("[data-mushaf-chrome], button, a")) {
-      setChromeVisible((visible) => (mushafKeepControlsVisible ? true : !visible));
-    }
   };
 
   /** The options menu opens in a portal, outside the page, so it cannot inherit
@@ -614,6 +533,20 @@ export function KhatmahReaderScreen({
     "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1 rounded-xl px-1.5 text-[0.6875rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
   const footerActionClass =
     "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[0.625rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+  const themeOptions = [
+    ["follow-app", t(language, "mushaf.themeFollowApp")],
+    ["midnight", t(language, "mushaf.themeMidnight")],
+    ["dark", t(language, "mushaf.themeDark")],
+    ["light", t(language, "mushaf.themeLight")],
+    ["oled", t(language, "mushaf.themeOled")],
+  ] as const;
+  const currentThemeLabel = themeOptions.find(([id]) => id === theme)?.[1];
+  const layoutOptions = [
+    ["auto", t(language, "mushaf.layoutAuto")],
+    ["single", t(language, "mushaf.layoutSingle")],
+    ["spread", t(language, "mushaf.layoutSpread")],
+  ] as const;
+  const currentLayoutLabel = layoutOptions.find(([id]) => id === mushafLayout)?.[1];
 
   const pageHeader = (
     <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
@@ -648,77 +581,49 @@ export function KhatmahReaderScreen({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className={menuSurfaceClass} style={{ minWidth: "12rem" }}>
-          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold opacity-70">
-            <Brush size={15} aria-hidden="true" />
-            <span>{t(language, "mushaf.themeTitle")}</span>
+          <DropdownMenuLabel className="px-2 pb-0 text-[0.6875rem] font-bold opacity-60">
+            {t(language, "common.settings")}
           </DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
-            {(
-              [
-                ["follow-app", t(language, "mushaf.themeFollowApp")],
-                ["midnight", t(language, "mushaf.themeMidnight")],
-                ["dark", t(language, "mushaf.themeDark")],
-                ["light", t(language, "mushaf.themeLight")],
-                ["oled", t(language, "mushaf.themeOled")],
-              ] as const
-            ).map(([id, label]) => (
-              <DropdownMenuRadioItem key={id} value={id}>
-                {label}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger className="gap-2">
+              <Brush size={15} aria-hidden="true" />
+              <span>{t(language, "mushaf.themeTitle")}</span>
+              <span className="ms-auto max-w-24 truncate text-xs opacity-60">{currentThemeLabel}</span>
+            </DropdownMenuSubTrigger>
+            <DropdownMenuSubContent className={menuSurfaceClass}>
+              <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
+                {themeOptions.map(([id, label]) => (
+                  <DropdownMenuRadioItem key={id} value={id}>
+                    {label}
+                  </DropdownMenuRadioItem>
+                ))}
+              </DropdownMenuRadioGroup>
+            </DropdownMenuSubContent>
+          </DropdownMenuSub>
 
-          <DropdownMenuSeparator />
-
-          <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold opacity-70">
-            <BookOpen size={15} aria-hidden="true" />
-            <span>{t(language, "mushaf.readingModeTitle")}</span>
-          </DropdownMenuLabel>
-          <DropdownMenuRadioGroup
-            value={mushafReadingMode}
-            onValueChange={(value) => {
-              setMushafReadingMode?.(value as MushafReadingMode);
-              setIsOptionsMenuOpen(false);
-            }}
-          >
-            <DropdownMenuRadioItem value="page">{t(language, "mushaf.readingModePage")}</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value="comfort">{t(language, "mushaf.readingModeComfort")}</DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-
-          {mushafReadingMode === "page" ? (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="flex items-center gap-2 text-xs font-bold opacity-70">
+          {autoSpreadRoom && (
+            <DropdownMenuSub>
+              <DropdownMenuSubTrigger className="gap-2" data-testid="mushaf-layout-submenu">
                 <BookOpen size={15} aria-hidden="true" />
                 <span>{t(language, "mushaf.layoutTitle")}</span>
-              </DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={mushafLayout}
-                onValueChange={(value) => {
-                  setMushafLayout?.(value as MushafLayout);
-                  setIsOptionsMenuOpen(false);
-                }}
-              >
-                <DropdownMenuRadioItem value="auto">{t(language, "mushaf.layoutAuto")}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="single">{t(language, "mushaf.layoutSingle")}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="spread">{t(language, "mushaf.layoutSpread")}</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </>
-          ) : (
-            <>
-              <DropdownMenuSeparator />
-              <DropdownMenuLabel className="text-xs font-bold opacity-70">
-                {t(language, "mushaf.comfortTextSize")}
-              </DropdownMenuLabel>
-              <DropdownMenuRadioGroup
-                value={textSize}
-                onValueChange={(value) => onTextSizeChange?.(value as TextSizeOption)}
-              >
-                <DropdownMenuRadioItem value="small">A− · {t(language, "settings.textSmall")}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="medium">A · {t(language, "settings.medium")}</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="large">A+ · {t(language, "settings.textLarge")}</DropdownMenuRadioItem>
-              </DropdownMenuRadioGroup>
-            </>
+                <span className="ms-auto max-w-24 truncate text-xs opacity-60">{currentLayoutLabel}</span>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuSubContent className={menuSurfaceClass}>
+                <DropdownMenuRadioGroup
+                  value={mushafLayout}
+                  onValueChange={(value) => {
+                    setMushafLayout?.(value as MushafLayout);
+                    setIsOptionsMenuOpen(false);
+                  }}
+                >
+                  {layoutOptions.map(([id, label]) => (
+                    <DropdownMenuRadioItem key={id} value={id}>
+                      {label}
+                    </DropdownMenuRadioItem>
+                  ))}
+                </DropdownMenuRadioGroup>
+              </DropdownMenuSubContent>
+            </DropdownMenuSub>
           )}
 
           <DropdownMenuSeparator />
@@ -733,15 +638,6 @@ export function KhatmahReaderScreen({
             }}
           >
             {t(language, "mushaf.bookmarkCurrentPage")}
-          </DropdownMenuCheckboxItem>
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuCheckboxItem
-            checked={mushafKeepControlsVisible}
-            onCheckedChange={(checked) => setMushafKeepControlsVisible?.(checked)}
-          >
-            {t(language, "mushaf.keepControlsVisible")}
           </DropdownMenuCheckboxItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -770,7 +666,7 @@ export function KhatmahReaderScreen({
       </button>
 
       {/* Page-turn controls are a physical LTR group inside direction-aware UI.
-          Their DOM order never changes: forward is always left, back is right. */}
+          Their DOM order matches the gesture: back left, forward right. */}
       <div
         className="grid min-w-0 items-center gap-1"
         style={{ gridTemplateColumns: "minmax(2.75rem,1fr) minmax(4rem,0.8fr) minmax(2.75rem,1fr)" }}
@@ -778,14 +674,14 @@ export function KhatmahReaderScreen({
       >
         <button
           type="button"
-          onClick={() => paginate(1)}
-          disabled={currentPage >= LAST_PAGE}
+          onClick={() => paginate(-1)}
+          disabled={currentPage <= 1}
           className={footerActionClass}
-          aria-label={t(language, "common.next")}
+          aria-label={t(language, "common.previous")}
         >
           <ChevronLeft size={22} aria-hidden="true" />
           <span className="truncate" dir={direction}>
-            {t(language, "common.next")}
+            {t(language, "common.previous")}
           </span>
         </button>
 
@@ -800,14 +696,14 @@ export function KhatmahReaderScreen({
 
         <button
           type="button"
-          onClick={() => paginate(-1)}
-          disabled={currentPage <= 1}
+          onClick={() => paginate(1)}
+          disabled={currentPage >= LAST_PAGE}
           className={footerActionClass}
-          aria-label={t(language, "common.previous")}
+          aria-label={t(language, "common.next")}
         >
           <ChevronRight size={22} aria-hidden="true" />
           <span className="truncate" dir={direction}>
-            {t(language, "common.previous")}
+            {t(language, "common.next")}
           </span>
         </button>
       </div>
@@ -826,27 +722,6 @@ export function KhatmahReaderScreen({
       </button>
     </nav>
   );
-  const pageStatus = (
-    <div
-      className="flex w-full items-center justify-between gap-3 text-[0.6875rem] font-bold opacity-70"
-      dir={direction}
-    >
-      <span className="tabular-nums">
-        {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
-      </span>
-      {wirdGoal > 0 && (
-        <span className={wirdComplete ? "text-success opacity-100" : ""}>
-          {wirdComplete
-            ? t(language, "mushaf.wirdComplete")
-            : t(language, "mushaf.wirdRemaining", {
-                count: formatNumerals(Math.max(wirdGoal - wirdRead, 0), language),
-                goal: formatNumerals(wirdGoal, language),
-              })}
-        </span>
-      )}
-    </div>
-  );
-
   const wirdProgressBar =
     wirdGoal > 0 ? (
       <div
@@ -882,13 +757,6 @@ export function KhatmahReaderScreen({
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
         onPointerCancel={onPointerEnd}
-        onFocusCapture={(event) => {
-          if ((event.target as HTMLElement).closest("[data-mushaf-chrome]")) {
-            setChromeFocused(true);
-            revealChrome();
-          }
-        }}
-        onBlurCapture={() => setChromeFocused(false)}
         style={{ touchAction: "pan-y" }}
       >
         {!pageData && !error && (
@@ -932,19 +800,15 @@ export function KhatmahReaderScreen({
               isBookmarked={isCurrentBookmarked}
               useQcfGlyphs={spreadReady && rightSide ? rightSide.qcf : useQcfGlyphs}
               showWordMeanings={showWordMeanings}
-              readingMode={mushafReadingMode}
-              textSize={textSize}
               highlightedVerseKey={highlightedVerseKey}
               facingPage={
-                mushafReadingMode === "page" && spreadReady && leftSide
+                spreadReady && leftSide
                   ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: leftSide.qcf }
                   : undefined
               }
               headerContent={pageHeader}
               footerContent={pageFooter}
-              footerStatus={pageStatus}
               progressBar={wirdProgressBar}
-              chromeVisible={chromeVisible}
               paperRef={paperRef}
               onAyahAction={handleAyahAction}
             />

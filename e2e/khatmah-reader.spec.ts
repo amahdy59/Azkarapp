@@ -46,8 +46,8 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   expect(initialBox?.height ?? 0).toBeGreaterThanOrEqual(690);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
 
-  // Options split in two (DEC-095): saving your place is its own control, and
-  // what is left behind the menu is page styling.
+  // The mobile menu stays contextual: theme and page bookmark only. Layout is
+  // desktop-only and the retired alternate text view cannot reappear here.
   const optionsButton = page.getByRole("button", { name: /الإعدادات/ });
   const savePlaceButton = page.getByRole("button", { name: "حفظ موضع القراءة" });
   if (!(await savePlaceButton.isVisible())) {
@@ -55,6 +55,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   }
   await expect(savePlaceButton).toBeVisible();
   await optionsButton.focus();
+  await optionsButton.click();
+  await expect(page.getByText("تخطيط الصفحة")).toHaveCount(0);
+  await expect(page.getByText("قراءة مريحة")).toHaveCount(0);
+  await page.keyboard.press("Escape");
   const lines = mushafPage.locator("[data-mushaf-line-content]");
   await expect(mushafPage.locator("[data-mushaf-rendering] > div > div")).toHaveCount(15);
   // No line may paint outside the slot it sits in — overlong lines are scaled
@@ -103,11 +107,10 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await expect(page.getByText(/ختمة المصحف:/)).toHaveCount(0);
 
-  // Driving by keyboard holds the controls open: they hide by becoming
-  // invisible, which takes them out of the tab order, and a keyboard reader who
-  // could not tab back to them would be stranded.
+  // Controls remain visible while reading, so orientation and page actions are
+  // never hidden behind a discovery tap.
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("article", { name: "صفحة ٤١" })).toBeVisible();
+  await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
   await page.keyboard.press("ArrowLeft");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   const backButton = page.getByRole("button", { name: "رجوع" });
@@ -120,14 +123,14 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const pageBox = await page.getByRole("article", { name: "صفحة ٤٢" }).boundingBox();
   expect(pageBox).not.toBeNull();
   if (!pageBox) return;
-  await page.mouse.move(pageBox.x + pageBox.width * 0.8, pageBox.y + pageBox.height / 2);
+  await page.mouse.move(pageBox.x + pageBox.width * 0.2, pageBox.y + pageBox.height / 2);
   await page.mouse.down();
-  await page.mouse.move(pageBox.x + pageBox.width * 0.2, pageBox.y + pageBox.height / 2, { steps: 8 });
+  await page.mouse.move(pageBox.x + pageBox.width * 0.8, pageBox.y + pageBox.height / 2, { steps: 8 });
   await page.mouse.up();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 
-  // The pages are bound right-to-left: moving right moves back (DEC-094).
-  await page.keyboard.press("ArrowRight");
+  // Moving left goes back; the labelled controls keep the same semantics.
+  await page.keyboard.press("ArrowLeft");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();

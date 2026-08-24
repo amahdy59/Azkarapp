@@ -263,15 +263,15 @@ export function MushafImmersiveReader({
         onClose();
         return;
       }
-      // Same rule as the Mushaf reader (DEC-094): the pages are bound
-      // right-to-left, so moving right goes back and moving left goes forward.
+      // Same physical rule as the standalone Mushaf: right advances and left
+      // goes back, independent of the surrounding interface language.
       if (event.key === "ArrowRight") {
         event.preventDefault();
-        flip(-1);
+        flip(1);
         onInteract();
       } else if (event.key === "ArrowLeft") {
         event.preventDefault();
-        flip(1);
+        flip(-1);
         onInteract();
       }
     };
@@ -411,13 +411,12 @@ export function MushafImmersiveReader({
         >
           <FlipButton
             onClick={() => {
-              flip(1);
+              flip(-1);
               onInteract();
             }}
-            disabled={atEnd}
-            label={t(language, "reader.immersiveNext")}
-            testId="mushaf-immersive-next"
-            forward
+            disabled={atStart}
+            label={t(language, "reader.immersivePrevious")}
+            testId="mushaf-immersive-previous"
           />
           <bdi
             data-testid="mushaf-immersive-indicator-mobile"
@@ -437,12 +436,13 @@ export function MushafImmersiveReader({
           ) : (
             <FlipButton
               onClick={() => {
-                flip(-1);
+                flip(1);
                 onInteract();
               }}
-              disabled={atStart}
-              label={t(language, "reader.immersivePrevious")}
-              testId="mushaf-immersive-previous"
+              disabled={atEnd}
+              label={t(language, "reader.immersiveNext")}
+              testId="mushaf-immersive-next"
+              forward
             />
           )}
         </nav>
@@ -464,9 +464,7 @@ function FlipButton({
   testId: string;
   forward?: boolean;
 }) {
-  // The pages are bound right-to-left, so forward points left and back points
-  // right — which is also the order the footer lays them out in.
-  const Icon = forward ? ArrowLeft : ArrowRight;
+  const Icon = forward ? ArrowRight : ArrowLeft;
   return (
     <button
       type="button"

@@ -143,12 +143,12 @@ describe("app state persistence", () => {
     expect(normalizeAppState({ mushafTheme: "unknown" }).mushafTheme).toBe("follow-app");
   });
 
-  it("normalizes mushaf layout and visibility settings safely", () => {
+  it("normalizes Mushaf layout and drops retired reader preferences", () => {
     expect(normalizeAppState({ mushafLayout: "spread" }).mushafLayout).toBe("spread");
     expect(normalizeAppState({ mushafLayout: "invalid" }).mushafLayout).toBe("auto");
-    expect(normalizeAppState({ mushafKeepControlsVisible: true }).mushafKeepControlsVisible).toBe(true);
-    expect(normalizeAppState({ mushafKeepControlsVisible: "yes" }).mushafKeepControlsVisible).toBe(false);
-    expect(normalizeAppState({ mushafKeepControlsVisible: false }).mushafKeepControlsVisible).toBe(false);
+    const legacy = normalizeAppState({ mushafReadingMode: "comfort", mushafKeepControlsVisible: false });
+    expect(legacy).not.toHaveProperty("mushafReadingMode");
+    expect(legacy).not.toHaveProperty("mushafKeepControlsVisible");
   });
 
   it("normalizes resilient Quran bookmarks and preserves an adaptive plan range", () => {

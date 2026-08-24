@@ -184,7 +184,10 @@ describe("MushafPageViewer", () => {
     );
 
     expect(screen.getAllByText("سورة البقرة").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toBeInTheDocument();
+    const bismillah = screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
+    expect(bismillah).toHaveClass("text-[0.68em]");
+    expect(bismillah).toHaveStyle({ fontFamily: "var(--font-mushaf)" });
+    expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(2);
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
   });
 });

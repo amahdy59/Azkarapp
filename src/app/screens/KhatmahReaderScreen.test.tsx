@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KhatmahReaderScreen } from "./KhatmahReaderScreen";
@@ -51,7 +51,7 @@ afterEach(() => {
 });
 
 describe("KhatmahReaderScreen navigation", () => {
-  it("turns the way the pages are bound: forward on the left, back on the right", async () => {
+  it("keeps semantic next and previous controls aligned with physical direction", async () => {
     const user = userEvent.setup();
     const { setKhatmahPage } = renderReader();
 
@@ -69,12 +69,11 @@ describe("KhatmahReaderScreen navigation", () => {
     const { setKhatmahPage } = renderReader();
     await screen.findByRole("article", { name: "صفحة ٤٢" });
 
-    // Moving right moves back through a right-to-left book (DEC-094).
     await user.keyboard("{ArrowRight}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
 
     await user.keyboard("{ArrowLeft}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
   });
 
   it("keeps the physical page-turn contract invariant in an English UI", async () => {
@@ -86,12 +85,12 @@ describe("KhatmahReaderScreen navigation", () => {
     const navigation = screen.getByRole("navigation", { name: "Mushaf page navigation" });
     const next = screen.getByRole("button", { name: "Next" });
     const previous = screen.getByRole("button", { name: "Previous" });
-    expect(next.compareDocumentPosition(previous) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(previous.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(navigation.querySelector('[dir="ltr"]')).toBeInTheDocument();
 
-    await user.keyboard("{ArrowLeft}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
     await user.keyboard("{ArrowRight}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    await user.keyboard("{ArrowLeft}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
   });
 
@@ -117,7 +116,7 @@ describe("KhatmahReaderScreen navigation", () => {
     await screen.findByRole("article", { name: "صفحة ١" });
 
     expect(screen.getByRole("button", { name: "السابق" })).toBeDisabled();
-    await user.keyboard("{ArrowRight}");
+    await user.keyboard("{ArrowLeft}");
     expect(setKhatmahPage).not.toHaveBeenCalled();
   });
 });
@@ -248,24 +247,59 @@ describe("KhatmahReaderScreen facing pages", () => {
     expect([...canvases].every((canvas) => canvas.classList.contains("mushaf-spread__page"))).toBe(true);
   });
 
+  it("starts both facing-page loads together instead of waiting on one half", async () => {
+    resize(1440, 900);
+    const requested: number[] = [];
+    let release!: () => void;
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string) => {
+        const page = Number(String(input).match(/(\d+)\.json$/)?.[1] ?? 1);
+        requested.push(page);
+        await gate;
+        return { ok: true, json: async () => pageFixture(page) };
+      }),
+    );
+
+    renderReader({ khatmahPage: 101 });
+    await waitFor(() => expect([...requested].sort((a, b) => a - b)).toEqual([101, 102]));
+    release();
+    await screen.findByRole("article", { name: "صفحتا ١٠١ و١٠٢" });
+  });
+
   it("shows a single page when the screen has no room for two", async () => {
     resize(820, 1180);
     renderReader({ khatmahPage: 50 });
     await screen.findByRole("article", { name: "صفحة ٥٠" });
   });
+
+  it("never lets a stored spread preference force two pages onto mobile", async () => {
+    resize(390, 844);
+    renderReader({ khatmahPage: 50, mushafLayout: "spread" });
+    const article = await screen.findByRole("article", { name: "صفحة ٥٠" });
+    expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
+  });
 });
 
 describe("KhatmahReaderScreen settings menu", () => {
-  it("exposes controls for layout and visibility", async () => {
+  const resize = (width: number, height: number) => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+    Object.defineProperty(window, "innerHeight", { configurable: true, value: height });
+    window.dispatchEvent(new Event("resize"));
+  };
+
+  afterEach(() => resize(1024, 768));
+
+  it("keeps mobile settings contextual and free of the alternate reader", async () => {
     const user = userEvent.setup();
-    const setMushafLayout = vi.fn();
-    const setMushafKeepControlsVisible = vi.fn();
     const setMushafBookmarks = vi.fn();
+    resize(390, 844);
 
     renderReader({
       language: "en",
-      setMushafLayout,
-      setMushafKeepControlsVisible,
       setMushafBookmarks,
     });
 
@@ -273,29 +307,28 @@ describe("KhatmahReaderScreen settings menu", () => {
     const settingsBtn = screen.getByRole("button", { name: "Settings" });
     await user.click(settingsBtn);
 
-    const layoutRadio = screen.getByRole("menuitemradio", { name: "Two Pages" });
-    await user.click(layoutRadio);
-    expect(setMushafLayout).toHaveBeenCalledWith("spread");
-
-    await user.click(settingsBtn);
+    expect(screen.queryByText("Page Layout")).not.toBeInTheDocument();
+    expect(screen.queryByText("Comfort reading")).not.toBeInTheDocument();
+    expect(screen.queryByText("Keep controls visible")).not.toBeInTheDocument();
     const pageBookmark = screen.getByRole("menuitemcheckbox", { name: "Bookmark this page" });
     await user.click(pageBookmark);
     expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
-
-    await user.click(settingsBtn);
-    const keepVisibleCb = screen.getByRole("menuitemcheckbox", { name: "Keep controls visible" });
-    await user.click(keepVisibleCb);
-    expect(setMushafKeepControlsVisible).toHaveBeenCalledWith(true);
   });
 
-  it("offers Comfort mode without changing canonical page mode geometry", async () => {
+  it("offers facing-page layout only when the desktop can fit it", async () => {
     const user = userEvent.setup();
-    const setMushafReadingMode = vi.fn();
-    renderReader({ language: "en", direction: "ltr", setMushafReadingMode });
-    await screen.findByRole("article", { name: "Page 42" });
+    const setMushafLayout = vi.fn();
+    resize(1440, 900);
+    renderReader({ language: "en", direction: "ltr", setMushafLayout });
+    await screen.findByRole("article", { name: "Pages 41 and 42" });
 
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    await user.click(screen.getByRole("menuitemradio", { name: "Comfort reading" }));
-    expect(setMushafReadingMode).toHaveBeenCalledWith("comfort");
+    const layoutSubmenu = screen.getByTestId("mushaf-layout-submenu");
+    layoutSubmenu.focus();
+    await user.keyboard("{ArrowRight}");
+    const spreadOption = await screen.findByRole("menuitemradio", { name: "Two Pages" });
+    spreadOption.focus();
+    await user.keyboard("{Enter}");
+    expect(setMushafLayout).toHaveBeenCalledWith("spread");
   });
 });

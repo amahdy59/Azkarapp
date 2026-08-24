@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type MutableRefObject,
 } from "react";
-import type { AppLanguage, MushafPageTheme, MushafReadingMode, TextSizeOption } from "../types";
+import type { AppLanguage, MushafPageTheme } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
 import { Bookmark } from "./icons";
@@ -115,28 +115,41 @@ function SurahHeaderBand({
   const title = getSurahDisplayName(surahNumber, language);
   const isOled = theme === "oled";
 
-  const rule = isOled ? "bg-white/35" : "bg-current opacity-20";
-
   return (
-    <div className="flex h-full w-full items-center justify-center gap-2.5 px-2 select-none" dir="rtl">
-      {/* A double rule either side — the printed heading's ornament, carried at
-          one line height rather than the boxed panel it used to be. */}
-      <span className="flex flex-1 flex-col gap-[0.15em]" aria-hidden="true">
-        <span className={`h-px w-full ${rule}`} />
-        <span className={`h-px w-full ${rule}`} />
-      </span>
-      <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
-        ۞
-      </span>
-      <span className="arabic-ui shrink-0 truncate text-[0.52em] font-semibold tracking-[0.12em]">{title}</span>
-      <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
-        ۞
-      </span>
-      <span className="flex flex-1 flex-col gap-[0.15em]" aria-hidden="true">
-        <span className={`h-px w-full ${rule}`} />
-        <span className={`h-px w-full ${rule}`} />
-      </span>
+    <div
+      className={`flex h-full w-full items-center justify-center gap-2 border-y px-1 select-none ${
+        isOled ? "border-white/35" : "border-current/20"
+      }`}
+      dir="rtl"
+      data-testid="mushaf-surah-heading"
+    >
+      <SurahOrnament />
+      <span className="arabic-ui shrink-0 truncate text-[0.48em] font-semibold tracking-[0.1em]">{title}</span>
+      <SurahOrnament mirrored />
     </div>
+  );
+}
+
+/** Compact, repository-native arabesque artwork. It uses the page's own ink,
+ *  so the heading remains authentic-looking without another image or font. */
+function SurahOrnament({ mirrored = false }: { mirrored?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 96 18"
+      preserveAspectRatio="none"
+      className={`h-[0.52em] min-w-0 flex-1 opacity-45 ${mirrored ? "-scale-x-100" : ""}`}
+      aria-hidden="true"
+      data-testid="mushaf-surah-ornament"
+    >
+      <path d="M0 9h21M75 9h21M21 9c8-9 18-9 27 0 9 9 19 9 27 0" fill="none" stroke="currentColor" strokeWidth="1" />
+      <path
+        d="M34 9c5-7 9-7 14 0-5 7-9 7-14 0Zm14 0c5-7 9-7 14 0-5 7-9 7-14 0Z"
+        fill="currentColor"
+        fillOpacity=".22"
+      />
+      <circle cx="48" cy="9" r="3.25" fill="none" stroke="currentColor" strokeWidth="1" />
+      <circle cx="48" cy="9" r="1.25" fill="currentColor" />
+    </svg>
   );
 }
 
@@ -163,13 +176,15 @@ function SurahOpeningBand({
 
   return (
     <div className="flex h-full w-full flex-col items-center justify-center gap-px px-2 select-none" dir="rtl">
-      <span className="flex w-full items-center justify-center gap-2">
-        <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
-        <span className="arabic-ui shrink-0 truncate text-[0.48em] font-semibold tracking-[0.12em]">{title}</span>
-        <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
+      <span
+        className={`flex w-full items-center justify-center gap-1.5 border-y ${isOled ? "border-white/35" : "border-current/20"}`}
+      >
+        <SurahOrnament />
+        <span className="arabic-ui shrink-0 truncate text-[0.42em] font-semibold tracking-[0.1em]">{title}</span>
+        <SurahOrnament mirrored />
       </span>
       {withBismillah && (
-        <span className="text-[0.5em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
+        <span className="text-[0.36em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </span>
       )}
@@ -180,7 +195,11 @@ function SurahOpeningBand({
 function BismillahLine() {
   return (
     <div className="flex h-full w-full items-center justify-center select-none" dir="rtl">
-      <p className="text-[0.92em] leading-none tracking-wide" style={{ fontFamily: "inherit" }}>
+      <p
+        className="text-[0.68em] leading-none tracking-[0.03em]"
+        style={{ fontFamily: "var(--font-mushaf)" }}
+        data-testid="mushaf-bismillah"
+      >
         بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
       </p>
     </div>
@@ -711,144 +730,6 @@ function MushafPageCanvas({
   );
 }
 
-function groupVerses(lines: MushafWordToken[][]) {
-  const verseMap = new Map<string, MushafWordToken[]>();
-  for (const line of lines) {
-    for (const word of line ?? []) {
-      const words = verseMap.get(word.verseKey) ?? [];
-      words.push(word);
-      verseMap.set(word.verseKey, words);
-    }
-  }
-  return [...verseMap.entries()];
-}
-
-function ComfortPageCanvas({
-  lines,
-  pageNumber,
-  language,
-  direction,
-  textSize,
-  showWordMeanings,
-  highlightedVerseKey,
-  onAyahAction,
-}: {
-  lines: MushafWordToken[][];
-  pageNumber: number;
-  language: AppLanguage;
-  direction: "ltr" | "rtl";
-  textSize: TextSizeOption;
-  showWordMeanings: boolean;
-  highlightedVerseKey?: string | null;
-  onAyahAction?: (verseKey: string, pageNumber: number) => void;
-}) {
-  const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
-  const verses = useMemo(() => groupVerses(lines), [lines]);
-  const sizeClass = {
-    small: "text-[1.35rem] leading-[2.15]",
-    medium: "text-[1.7rem] leading-[2.2]",
-    large: "text-[2.05rem] leading-[2.25]",
-  }[textSize];
-
-  useEffect(() => {
-    setActiveWord(null);
-  }, [pageNumber, showWordMeanings]);
-
-  return (
-    <section
-      className="relative h-full min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-10"
-      aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(pageNumber, language) })}
-      dir="rtl"
-      lang="ar"
-      data-mushaf-page={pageNumber}
-      data-mushaf-rendering="comfort"
-    >
-      <div className={`zikr-text mx-auto ${sizeClass}`} style={{ maxWidth: "44rem" }}>
-        {verses.map(([verseKey, words]) => (
-          <p
-            key={verseKey}
-            className={`mb-5 rounded-xl px-1 transition-colors ${
-              highlightedVerseKey === verseKey ? "bg-primary/10 ring-2 ring-ring" : ""
-            }`}
-          >
-            {words.map((word, index) => {
-              const key = `${verseKey}:${word.position}:${index}`;
-              if (word.isEnd) {
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => onAyahAction?.(verseKey, pageNumber)}
-                    className="mx-1 inline-flex size-11 items-center justify-center rounded-full border-0 bg-transparent p-0 align-middle [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    style={{ lineHeight: 1 }}
-                    aria-label={t(language, "reader.openAyahActions", {
-                      ayah: formatNumerals(verseKey.split(":")[1] ?? "", language),
-                    })}
-                  >
-                    <AyahMarker number={verseKey.split(":")[1] ?? word.text} language={language} />
-                  </button>
-                );
-              }
-
-              const meaning = showWordMeanings ? getQuranWordMeaningEntry(verseKey, word.text) : undefined;
-              if (meaning) {
-                const isOpen = activeWord?.verseKey === verseKey && activeWord.wordPosition === word.position;
-                return (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={(event) =>
-                      setActiveWord(
-                        isOpen
-                          ? null
-                          : {
-                              verseKey,
-                              wordPosition: word.position,
-                              meaning,
-                              anchor: event.currentTarget,
-                            },
-                      )
-                    }
-                    onContextMenu={(event) => {
-                      event.preventDefault();
-                      onAyahAction?.(verseKey, pageNumber);
-                    }}
-                    className="rounded-sm bg-primary/10 px-0.5 text-primary underline decoration-dotted underline-offset-4 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    style={{ lineHeight: "inherit" }}
-                    aria-label={t(language, "mushaf.wordMeaning", { word: word.text })}
-                  >
-                    {word.text}{" "}
-                  </button>
-                );
-              }
-
-              return (
-                <span
-                  key={key}
-                  onContextMenu={(event) => {
-                    event.preventDefault();
-                    onAyahAction?.(verseKey, pageNumber);
-                  }}
-                >
-                  {word.text}{" "}
-                </span>
-              );
-            })}
-          </p>
-        ))}
-      </div>
-      <QuranWordPopover
-        meanings={activeWord ? [activeWord.meaning] : null}
-        anchorEl={activeWord?.anchor ?? null}
-        language={language}
-        direction={direction}
-        showSource
-        onClose={() => setActiveWord(null)}
-      />
-    </section>
-  );
-}
-
 function ScreenReaderVerses({
   lines,
   language,
@@ -903,14 +784,10 @@ export function MushafPageViewer({
   showWordMeanings = false,
   headerContent,
   footerContent,
-  footerStatus,
   progressBar,
-  chromeVisible = true,
   paperRef,
   facingPage,
   onAyahAction,
-  readingMode = "page",
-  textSize = "medium",
   highlightedVerseKey,
 }: {
   lines: MushafWordToken[][];
@@ -927,17 +804,11 @@ export function MushafPageViewer({
   showWordMeanings?: boolean;
   headerContent?: ReactNode;
   footerContent?: ReactNode;
-  /** Shown in the footer's reserved space once the action rows step aside, so
-   *  the reader never loses their place. */
-  footerStatus?: ReactNode;
   /** Always visible, whatever the chrome is doing. */
   progressBar?: ReactNode;
-  chromeVisible?: boolean;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
-  readingMode?: MushafReadingMode;
-  textSize?: TextSizeOption;
   highlightedVerseKey?: string | null;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
@@ -958,8 +829,6 @@ export function MushafPageViewer({
   const themeClasses = theme === "oled" ? "bg-black text-white" : "bg-background text-foreground";
 
   const inkStroke = { midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme];
-
-  const gutterClass = theme === "oled" ? "bg-white/25" : "bg-border";
 
   const chromeBgClass =
     theme === "oled" ? "bg-black border-white/30 text-white" : "bg-card border-border text-card-foreground";
@@ -991,19 +860,13 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* The chrome occupies the physical Mushaf header/footer band, and keeps
-          that space whether or not it is showing anything: hiding the controls
-          must never resize the reading canvas underneath them.
-
+      {/* The chrome occupies the physical Mushaf header/footer band permanently.
           Its content is held to the same measure as the page, so on a wide
           screen Previous and Next sit under the paper they turn rather than out
           at the far corners of the display. */}
       <div
         data-mushaf-chrome="header"
-        className={`flex h-14 shrink-0 items-center border-b px-2 transition-[opacity,visibility] duration-200 sm:px-3 ${chromeBgClass} ${
-          chromeVisible ? "visible opacity-100" : "invisible opacity-0"
-        }`}
-        aria-hidden={!chromeVisible}
+        className={`flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
       >
         <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
           {headerContent}
@@ -1014,67 +877,52 @@ export function MushafPageViewer({
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
       <div ref={paperRef} className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`} dir="rtl">
-        {readingMode === "comfort" ? (
-          <ComfortPageCanvas
+        {/* Plain visual words step aside from the accessibility tree until
+            study mode is enabled; ayah-marker buttons remain operable in
+            either mode, while the cohesive page regions below carry the
+            normal reading experience. */}
+        <div className="contents">
+          <MushafPageCanvas
             lines={lines}
-            pageNumber={pageNumber}
             language={language}
+            pageNumber={pageNumber}
             direction={direction}
-            textSize={textSize}
+            theme={theme}
+            useQcfGlyphs={useQcfGlyphs}
             showWordMeanings={showWordMeanings}
-            highlightedVerseKey={highlightedVerseKey}
+            inkStroke={inkStroke}
+            spreadSide={facingPage ? "right" : undefined}
             onAyahAction={onAyahAction}
+            highlightedVerseKey={highlightedVerseKey}
           />
-        ) : (
-          <>
-            {/* Plain visual words step aside from the accessibility tree until
-                study mode is enabled; ayah-marker buttons remain operable in
-                either mode, while the cohesive page regions below carry the
-                normal reading experience. */}
-            <div className="contents">
+          {facingPage && (
+            <>
+              <div className="mushaf-spread__gutter" aria-hidden="true" />
               <MushafPageCanvas
-                lines={lines}
+                lines={facingPage.lines}
                 language={language}
-                pageNumber={pageNumber}
+                pageNumber={facingPage.pageNumber}
                 direction={direction}
                 theme={theme}
-                useQcfGlyphs={useQcfGlyphs}
+                useQcfGlyphs={facingPage.useQcfGlyphs}
                 showWordMeanings={showWordMeanings}
                 inkStroke={inkStroke}
-                spreadSide={facingPage ? "right" : undefined}
+                spreadSide="left"
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
               />
-              {facingPage && (
-                <>
-                  <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
-                  <MushafPageCanvas
-                    lines={facingPage.lines}
-                    language={language}
-                    pageNumber={facingPage.pageNumber}
-                    direction={direction}
-                    theme={theme}
-                    useQcfGlyphs={facingPage.useQcfGlyphs}
-                    showWordMeanings={showWordMeanings}
-                    inkStroke={inkStroke}
-                    spreadSide="left"
-                    onAyahAction={onAyahAction}
-                    highlightedVerseKey={highlightedVerseKey}
-                  />
-                </>
-              )}
-            </div>
+            </>
+          )}
+        </div>
 
-            {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
-            {!showWordMeanings && (
-              <div className="sr-only">
-                <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
-                {facingPage && (
-                  <ScreenReaderVerses lines={facingPage.lines} language={language} pageNumber={facingPage.pageNumber} />
-                )}
-              </div>
+        {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
+        {!showWordMeanings && (
+          <div className="sr-only">
+            <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
+            {facingPage && (
+              <ScreenReaderVerses lines={facingPage.lines} language={language} pageNumber={facingPage.pageNumber} />
             )}
-          </>
+          </div>
         )}
       </div>
 
@@ -1082,20 +930,8 @@ export function MushafPageViewer({
         data-mushaf-chrome="footer"
         className={`relative flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
       >
-        {/* `relative` matters: the row that steps aside is positioned against
-            this measure, not against the full-width footer. Without it the
-            hidden controls stretched across a 2000px display. */}
-        <div className="relative mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
-          <div
-            className={`w-full transition-[opacity,visibility] duration-200 ${chromeVisible ? "visible opacity-100" : "invisible absolute inset-x-0 opacity-0"}`}
-          >
-            {footerContent}
-          </div>
-          <div
-            className={`w-full transition-[opacity,visibility] duration-200 ${chromeVisible ? "invisible absolute inset-x-0 opacity-0" : "visible opacity-100"}`}
-          >
-            {footerStatus}
-          </div>
+        <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
+          {footerContent}
         </div>
         {/* Outside both, because the reader's progress is never in the way. */}
         {progressBar}

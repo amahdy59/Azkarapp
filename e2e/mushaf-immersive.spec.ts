@@ -66,7 +66,7 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
   });
 
-  test("ArrowLeft advances the page and ArrowRight goes back, and Escape closes", async ({ page }) => {
+  test("ArrowRight advances the page and ArrowLeft goes back, and Escape closes", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("mushaf-pages")).toBeVisible();
     await openImmersive(page);
@@ -75,13 +75,12 @@ test.describe("immersive mushaf mode", () => {
       .getByTestId("mushaf-immersive-track")
       .evaluate((el) => (el as HTMLElement).clientWidth);
 
-    // The pages are bound right-to-left, so left goes forward and right goes
-    // back — the same rule the Mushaf reader follows (DEC-094).
-    await page.keyboard.press("ArrowLeft");
-    await expect.poll(() => scrolled(page)).toBe(trackWidth);
+    // Physical direction stays consistent across both Mushaf readers.
     await page.keyboard.press("ArrowRight");
-    await expect.poll(() => scrolled(page)).toBe(0);
+    await expect.poll(() => scrolled(page)).toBe(trackWidth);
     await page.keyboard.press("ArrowLeft");
+    await expect.poll(() => scrolled(page)).toBe(0);
+    await page.keyboard.press("ArrowRight");
     await expect.poll(() => scrolled(page)).toBe(trackWidth);
 
     await page.keyboard.press("Escape");

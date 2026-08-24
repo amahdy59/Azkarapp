@@ -240,7 +240,6 @@ export interface PrayerTrackingRecord {
 export type MushafTheme = "follow-app" | ThemeMode | "oled";
 export type MushafPageTheme = ThemeMode | "oled";
 export type MushafLayout = "auto" | "single" | "spread";
-export type MushafReadingMode = "page" | "comfort";
 
 export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom";
 
@@ -292,8 +291,6 @@ export interface AppStateSnapshot {
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
   mushafLayout?: MushafLayout;
-  mushafReadingMode?: MushafReadingMode;
-  mushafKeepControlsVisible?: boolean;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
   /** One intentional place used by Continue reading. */

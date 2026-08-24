@@ -15,7 +15,6 @@ import type {
   ThemeMode,
   PrayerName,
   MushafLayout,
-  MushafReadingMode,
   MushafTheme,
   QuranReadingEvent,
   QuranReadingPosition,
@@ -252,12 +251,6 @@ function AppContent() {
   const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
   const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
-  const [mushafReadingMode, setMushafReadingMode] = useState<MushafReadingMode>(
-    initialState.mushafReadingMode ?? "page",
-  );
-  const [mushafKeepControlsVisible, setMushafKeepControlsVisible] = useState<boolean>(
-    initialState.mushafKeepControlsVisible ?? false,
-  );
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
   const [quranReadingBookmark, setQuranReadingBookmark] = useState<QuranReadingPosition | undefined>(
     initialState.quranReadingBookmark,
@@ -457,8 +450,6 @@ function AppContent() {
       khatmahPage,
       mushafTheme,
       mushafLayout,
-      mushafReadingMode,
-      mushafKeepControlsVisible,
       mushafBookmarks,
       quranReadingBookmark,
       mushafVerseBookmarks,
@@ -499,8 +490,6 @@ function AppContent() {
       khatmahPage,
       mushafTheme,
       mushafLayout,
-      mushafReadingMode,
-      mushafKeepControlsVisible,
       mushafBookmarks,
       quranReadingBookmark,
       mushafVerseBookmarks,
@@ -663,8 +652,6 @@ function AppContent() {
     setKhatmahPage(state.khatmahPage ?? 1);
     setMushafTheme(state.mushafTheme ?? "follow-app");
     setMushafLayout(state.mushafLayout ?? "auto");
-    setMushafReadingMode(state.mushafReadingMode ?? "page");
-    setMushafKeepControlsVisible(state.mushafKeepControlsVisible ?? false);
     setMushafBookmarks(state.mushafBookmarks ?? []);
     setQuranReadingBookmark(state.quranReadingBookmark);
     setMushafVerseBookmarks(state.mushafVerseBookmarks ?? []);
@@ -1487,12 +1474,6 @@ function AppContent() {
                   setMushafTheme={setMushafTheme}
                   mushafLayout={mushafLayout}
                   setMushafLayout={setMushafLayout}
-                  mushafReadingMode={mushafReadingMode}
-                  setMushafReadingMode={setMushafReadingMode}
-                  textSize={textSize}
-                  onTextSizeChange={setTextSize}
-                  mushafKeepControlsVisible={mushafKeepControlsVisible}
-                  setMushafKeepControlsVisible={setMushafKeepControlsVisible}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
                   quranReadingBookmark={quranReadingBookmark}
