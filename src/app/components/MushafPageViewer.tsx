@@ -210,6 +210,7 @@ const MushafTextLine = memo(function MushafTextLine({
   meanings,
   activeWord,
   onActiveWordChange,
+  onCopyAyah,
 }: {
   words: MushafWordToken[];
   language: AppLanguage;
@@ -221,6 +222,7 @@ const MushafTextLine = memo(function MushafTextLine({
    *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
   onActiveWordChange: (word: ActiveWord | null) => void;
+  onCopyAyah?: (verseKey: string) => void;
 }) {
   const isArabic = language === "ar";
 
@@ -253,18 +255,25 @@ const MushafTextLine = memo(function MushafTextLine({
                   className="inline-block shrink-0 select-none align-baseline"
                   role="img"
                   aria-label={`آية ${formatNumerals(w.verseKey.split(":")[1] || w.text, language)}`}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    onCopyAyah?.(w.verseKey);
+                  }}
                 >
                   {w.qcfCode}
                 </span>
               );
             }
             return (
-              <AyahMarker
+              <span
                 key={key}
-                number={w.text || w.verseKey.split(":")[1] || ""}
-                language={language}
-                theme={theme}
-              />
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  onCopyAyah?.(w.verseKey);
+                }}
+              >
+                <AyahMarker number={w.text || w.verseKey.split(":")[1] || ""} language={language} theme={theme} />
+              </span>
             );
           }
 
@@ -282,11 +291,11 @@ const MushafTextLine = memo(function MushafTextLine({
               </span>
             );
 
-          if (meaning && showWordMeanings) {
+          if (showWordMeanings && meaning) {
             const isOpen = activeWord?.verseKey === w.verseKey && activeWord?.wordPosition === w.position;
             return (
               <button
-                key={`${w.verseKey}-${w.position}`}
+                key={key}
                 type="button"
                 data-word-active={isOpen ? "true" : undefined}
                 onClick={(event) => {
@@ -295,6 +304,10 @@ const MushafTextLine = memo(function MushafTextLine({
                       ? null
                       : { verseKey: w.verseKey, wordPosition: w.position, meaning, anchor: event.currentTarget },
                   );
+                }}
+                onContextMenu={(e) => {
+                  e.preventDefault();
+                  onCopyAyah?.(w.verseKey);
                 }}
                 className="relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/14 p-0 align-baseline text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors [font:inherit] [line-height:inherit] hover:bg-primary/24 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
@@ -305,7 +318,14 @@ const MushafTextLine = memo(function MushafTextLine({
           }
 
           return (
-            <span key={key} className="shrink-0">
+            <span
+              key={key}
+              className="shrink-0"
+              onContextMenu={(e) => {
+                e.preventDefault();
+                onCopyAyah?.(w.verseKey);
+              }}
+            >
               {wordContent}
             </span>
           );
@@ -544,6 +564,7 @@ function MushafPageCanvas({
   showWordMeanings,
   inkStroke,
   spreadSide,
+  onCopyAyah,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -554,6 +575,7 @@ function MushafPageCanvas({
   showWordMeanings: boolean;
   inkStroke: string;
   spreadSide?: "right" | "left";
+  onCopyAyah?: (text: string) => void;
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -584,6 +606,26 @@ function MushafPageCanvas({
     useQcfGlyphs ? SLOT_INK_ALLOWANCE["qcf-v2"] : SLOT_INK_ALLOWANCE.fallback,
   );
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
+
+  const handleCopyAyah = useCallback(
+    (verseKey: string) => {
+      if (!onCopyAyah) return;
+      const verseWords = [];
+      for (const line of lines) {
+        if (!line) continue;
+        for (const w of line) {
+          if (w.verseKey === verseKey && !w.isEnd) {
+            verseWords.push(w.text);
+          }
+        }
+      }
+      const text = verseWords.join(" ");
+      if (text) {
+        onCopyAyah(text);
+      }
+    },
+    [lines, onCopyAyah],
+  );
 
   return (
     <div
@@ -633,6 +675,7 @@ function MushafPageCanvas({
                     : null
                 }
                 onActiveWordChange={handleActiveWordChange}
+                onCopyAyah={handleCopyAyah}
               />
             ) : (
               <div className="h-full" aria-hidden="true" />
@@ -649,6 +692,39 @@ function MushafPageCanvas({
         onClose={() => setActiveWord(null)}
       />
     </div>
+  );
+}
+
+function ScreenReaderVerses({ lines, language }: { lines: MushafWordToken[][]; language: AppLanguage }) {
+  const verses = useMemo(() => {
+    const verseMap = new Map<string, string[]>();
+    for (const line of lines) {
+      if (!line) continue;
+      for (const w of line) {
+        if (w.isEnd) continue; // the end marker is just a glyph
+        const textArr = verseMap.get(w.verseKey) || [];
+        textArr.push(w.text);
+        verseMap.set(w.verseKey, textArr);
+      }
+    }
+    return Array.from(verseMap.entries()).map(([key, words]) => ({
+      key,
+      text: words.join(" "),
+    }));
+  }, [lines]);
+
+  return (
+    <>
+      {verses.map(({ key, text }) => {
+        const [surah, ayah] = key.split(":");
+        const surahName = getSurahDisplayName(Number(surah), language);
+        return (
+          <p key={key}>
+            {surahName}, {t(language, "reader.ayahLabel", { ayah: formatNumerals(Number(ayah), language) })}: {text}
+          </p>
+        );
+      })}
+    </>
   );
 }
 
@@ -670,6 +746,7 @@ export function MushafPageViewer({
   chromeVisible = true,
   paperRef,
   facingPage,
+  onCopyAyah,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -693,6 +770,7 @@ export function MushafPageViewer({
   chromeVisible?: boolean;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
+  onCopyAyah?: (text: string) => void;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
 
@@ -768,32 +846,46 @@ export function MushafPageViewer({
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
       <div ref={paperRef} className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`} dir="rtl">
-        <MushafPageCanvas
-          lines={lines}
-          language={language}
-          pageNumber={pageNumber}
-          direction={direction}
-          theme={theme}
-          useQcfGlyphs={useQcfGlyphs}
-          showWordMeanings={showWordMeanings}
-          inkStroke={inkStroke}
-          spreadSide={facingPage ? "right" : undefined}
-        />
-        {facingPage && (
-          <>
-            <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
-            <MushafPageCanvas
-              lines={facingPage.lines}
-              language={language}
-              pageNumber={facingPage.pageNumber}
-              direction={direction}
-              theme={theme}
-              useQcfGlyphs={facingPage.useQcfGlyphs}
-              showWordMeanings={showWordMeanings}
-              inkStroke={inkStroke}
-              spreadSide="left"
-            />
-          </>
+        {/* The visual page, which is hidden from screen readers unless they are
+            specifically exploring word meanings, to prevent choppy word-by-word reading. */}
+        <div className="contents" aria-hidden={!showWordMeanings}>
+          <MushafPageCanvas
+            lines={lines}
+            language={language}
+            pageNumber={pageNumber}
+            direction={direction}
+            theme={theme}
+            useQcfGlyphs={useQcfGlyphs}
+            showWordMeanings={showWordMeanings}
+            inkStroke={inkStroke}
+            spreadSide={facingPage ? "right" : undefined}
+            onCopyAyah={onCopyAyah}
+          />
+          {facingPage && (
+            <>
+              <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
+              <MushafPageCanvas
+                lines={facingPage.lines}
+                language={language}
+                pageNumber={facingPage.pageNumber}
+                direction={direction}
+                theme={theme}
+                useQcfGlyphs={facingPage.useQcfGlyphs}
+                showWordMeanings={showWordMeanings}
+                inkStroke={inkStroke}
+                spreadSide="left"
+                onCopyAyah={onCopyAyah}
+              />
+            </>
+          )}
+        </div>
+
+        {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
+        {!showWordMeanings && (
+          <div className="sr-only">
+            <ScreenReaderVerses lines={lines} language={language} />
+            {facingPage && <ScreenReaderVerses lines={facingPage.lines} language={language} />}
+          </div>
         )}
       </div>
 

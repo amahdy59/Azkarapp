@@ -176,6 +176,17 @@ export function KhatmahReaderScreen({
   showMeaningsRef.current = showWordMeanings;
   const [chromeVisible, setChromeVisible] = useState(true);
   const [chromeFocused, setChromeFocused] = useState(false);
+  const [copyFeedback, setCopyFeedback] = useState(false);
+
+  const handleCopyAyah = useCallback((text: string) => {
+    navigator.clipboard
+      .writeText(text)
+      .then(() => {
+        setCopyFeedback(true);
+        setTimeout(() => setCopyFeedback(false), 2000);
+      })
+      .catch(() => {});
+  }, []);
   /**
    * Hidden controls are `visibility: hidden`, which correctly takes them out of
    * the tab order — and would strand a keyboard reader with no way to reach
@@ -857,10 +868,17 @@ export function KhatmahReaderScreen({
               progressBar={wirdProgressBar}
               chromeVisible={chromeVisible}
               paperRef={paperRef}
+              onCopyAyah={handleCopyAyah}
             />
           </div>
         )}
       </div>
+
+      {copyFeedback && (
+        <div className="absolute bottom-20 left-1/2 -translate-x-1/2 z-50 rounded-full bg-foreground/90 px-4 py-2 text-sm text-background shadow-lg animate-in fade-in slide-in-from-bottom-4 pointer-events-none">
+          {t(language, "reader.referenceCopied")}
+        </div>
+      )}
 
       {/* Wird completed */}
       {wirdComplete && completionSeen === todayKey && (
