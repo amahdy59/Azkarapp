@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  canonicalAyahText,
   getQcfFontFamily,
   getQcfFontUrl,
   getMushafPageUrl,
@@ -40,6 +41,26 @@ describe("Mushaf page data", () => {
         ],
       },
     ]);
+  });
+
+  it("reconstructs canonical text across page boundaries instead of copying QCF glyphs", () => {
+    expect(
+      canonicalAyahText(
+        [
+          [{ k: "2:282", w: [[1, 15, 0, "يَـٰٓأَيُّهَا", "private-one"]] }],
+          [
+            {
+              k: "2:282",
+              w: [
+                [2, 1, 0, "ٱلَّذِينَ", "private-two"],
+                [3, 1, 1, "٢٨٢", "private-marker"],
+              ],
+            },
+          ],
+        ],
+        "2:282",
+      ),
+    ).toBe("يَـٰٓأَيُّهَا ٱلَّذِينَ");
   });
 
   it("rejects a page whose line numbers fall outside the 15-line reference grid", () => {

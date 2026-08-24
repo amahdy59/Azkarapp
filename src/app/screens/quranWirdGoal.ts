@@ -2,42 +2,59 @@ import type { QuranWirdPlan } from "../types";
 
 export const TOTAL_MUSHAF_PAGES = 604;
 
-/**
- * How many pages today's wird asks for.
- *
- * A plain daily plan asks for the same number every day. A khatmah plan asks
- * for whatever is left over the days that remain, so a missed day is spread
- * gently across the rest rather than piling up as a debt.
- *
- * Shared by the Wird overview and the reader: the reader shows progress against
- * this while you read, and two copies of this arithmetic would eventually
- * disagree about what today's goal is.
- */
-export function effectiveDailyGoal(plan: QuranWirdPlan, history: Record<string, number[]>): number {
-  if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) return plan.dailyPages;
+export interface QuranWirdGoalResult {
+  dailyGoal: number;
+  expired: boolean;
+  remainingPages: number;
+}
 
-  const [year, month, day] = plan.startedDayKey.split("-").map(Number);
-  const today = new Date();
-  const elapsed = Math.max(
-    0,
-    Math.floor(
-      (Date.UTC(today.getFullYear(), today.getMonth(), today.getDate()) - Date.UTC(year!, month! - 1, day!)) /
-        86_400_000,
-    ),
-  );
+function dayNumber(dayKey: string) {
+  const [year, month, day] = dayKey.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return Math.floor(Date.UTC(year, month - 1, day) / 86_400_000);
+}
+
+/**
+ * Resolves the target for one devotional day from the range the reader chose.
+ * The day key is passed in rather than read from the system clock so the Wird
+ * overview, reader, Home card, and after-midnight boundary all use one day.
+ */
+export function getQuranWirdGoal(
+  plan: QuranWirdPlan,
+  history: Record<string, number[]>,
+  activeDayKey: string,
+): QuranWirdGoalResult {
+  if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) {
+    return { dailyGoal: plan.dailyPages, expired: false, remainingPages: TOTAL_MUSHAF_PAGES };
+  }
+
+  const startPage = plan.startPage ?? 1;
+  const targetPage = plan.targetPage ?? TOTAL_MUSHAF_PAGES;
   const completed = new Set(
     Object.entries(history)
       .filter(([dayKey]) => dayKey >= plan.startedDayKey!)
-      .flatMap(([, pages]) => pages),
+      .flatMap(([, pages]) => pages)
+      .filter((page) => page >= startPage && page <= targetPage),
   ).size;
+  const remainingPages = Math.max(0, targetPage - startPage + 1 - completed);
 
-  const startPage = plan.startPage ?? 0;
-  const remainingPagesToRead = Math.max(0, TOTAL_MUSHAF_PAGES - startPage - completed);
-
-  if (remainingPagesToRead > 0 && elapsed >= plan.durationDays) {
-    return 0; // Plan expired
-  }
-
+  const started = dayNumber(plan.startedDayKey);
+  const active = dayNumber(activeDayKey);
+  const elapsed = started === null || active === null ? 0 : Math.max(0, active - started);
+  const expired = remainingPages > 0 && elapsed >= plan.durationDays;
   const remainingDays = Math.max(1, plan.durationDays - elapsed);
-  return Math.ceil(remainingPagesToRead / remainingDays);
+
+  return {
+    dailyGoal: expired ? 0 : Math.ceil(remainingPages / remainingDays),
+    expired,
+    remainingPages,
+  };
+}
+
+export function effectiveDailyGoal(
+  plan: QuranWirdPlan,
+  history: Record<string, number[]>,
+  activeDayKey: string,
+): number {
+  return getQuranWirdGoal(plan, history, activeDayKey).dailyGoal;
 }

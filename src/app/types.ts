@@ -239,6 +239,8 @@ export interface PrayerTrackingRecord {
  * high-contrast reading override rather than a fourth product theme. */
 export type MushafTheme = "follow-app" | ThemeMode | "oled";
 export type MushafPageTheme = ThemeMode | "oled";
+export type MushafLayout = "auto" | "single" | "spread";
+export type MushafReadingMode = "page" | "comfort";
 
 export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom";
 
@@ -250,6 +252,18 @@ export interface QuranReadingPosition {
   juzNumber?: number;
 }
 
+/** A saved verse is separate from the one intentional continue-reading place. */
+export interface QuranVerseBookmark {
+  verseKey: string;
+  page: number;
+}
+
+/** The last forward page-turn event, retained so Undo removes a whole spread. */
+export interface QuranReadingEvent {
+  dayKey: string;
+  pages: number[];
+}
+
 /** One active plan keeps the daily reading decision clear rather than competing plans. */
 export interface QuranWirdPlan {
   kind: QuranWirdPlanKind;
@@ -257,6 +271,7 @@ export interface QuranWirdPlan {
   durationDays?: number;
   startedDayKey?: string;
   startPage?: number;
+  targetPage?: number;
 }
 
 export interface AppStateSnapshot {
@@ -276,14 +291,23 @@ export interface AppStateSnapshot {
   khatmahPage?: number;
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
-  mushafLayout?: "auto" | "single" | "spread";
+  mushafLayout?: MushafLayout;
+  mushafReadingMode?: MushafReadingMode;
   mushafKeepControlsVisible?: boolean;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
+  /** One intentional place used by Continue reading. */
+  quranReadingBookmark?: QuranReadingPosition;
+  /** User-curated verse bookmarks, distinct from the continue-reading place. */
+  mushafVerseBookmarks?: QuranVerseBookmark[];
   /** Daily Quran reading goal in pages (default: 4). */
   dailyWirdGoal?: number;
   /** Map of date key (YYYY-MM-DD) to list of pages read on that day. */
   wirdHistory?: Record<string, number[]>;
+  /** Snapshot of the goal shown on each reading day for truthful weekly history. */
+  quranWirdDailyGoals?: Record<string, number>;
+  /** Most recent forward page-turn event, used by spread-aware Undo. */
+  quranLastReadingEvent?: QuranReadingEvent;
   /** Context shown before opening the Mushaf. */
   quranReadingPosition?: QuranReadingPosition;
   /** The single active daily Quran plan. */

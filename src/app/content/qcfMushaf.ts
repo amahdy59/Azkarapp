@@ -136,6 +136,58 @@ export function loadMushafPage(page: number): Promise<MushafVerseData[]> {
   return request;
 }
 
+export function canonicalAyahText(pages: ReadonlyArray<ReadonlyArray<MushafVerseData>>, verseKey: string) {
+  const words = new Map<number, string>();
+  for (const page of pages) {
+    for (const verse of page) {
+      if (verse.k !== verseKey) continue;
+      for (const [position, , isEnd, text] of verse.w) {
+        if (!isEnd) words.set(position, text);
+      }
+    }
+  }
+  return [...words.entries()]
+    .sort(([a], [b]) => a - b)
+    .map(([, text]) => text)
+    .join(" ");
+}
+
+/**
+ * Loads the complete reviewed Uthmani ayah, including the rare case where an
+ * ayah crosses a page boundary. QCF glyphs are never copied: they are private
+ * code points for drawing, while this returns the semantic text shipped beside
+ * each word.
+ */
+export async function loadCanonicalAyahText(verseKey: string, pageNumber: number) {
+  const pages = new Map<number, MushafVerseData[]>();
+  const current = await loadMushafPage(pageNumber);
+  if (!current.some((verse) => verse.k === verseKey)) throw new Error(`Ayah ${verseKey} is not on page ${pageNumber}`);
+  pages.set(pageNumber, current);
+
+  let previousPage = pageNumber;
+  while (previousPage > 1 && pages.get(previousPage)?.[0]?.k === verseKey) {
+    previousPage -= 1;
+    const previous = await loadMushafPage(previousPage);
+    pages.set(previousPage, previous);
+    if (previous.at(-1)?.k !== verseKey) break;
+  }
+
+  let nextPage = pageNumber;
+  while (nextPage < 604 && pages.get(nextPage)?.at(-1)?.k === verseKey) {
+    nextPage += 1;
+    const next = await loadMushafPage(nextPage);
+    pages.set(nextPage, next);
+    if (next[0]?.k !== verseKey) break;
+  }
+
+  const text = canonicalAyahText(
+    [...pages.entries()].sort(([a], [b]) => a - b).map(([, page]) => page),
+    verseKey,
+  );
+  if (!text) throw new Error(`Ayah ${verseKey} has no semantic text`);
+  return text;
+}
+
 async function openFontCache(): Promise<Cache | null> {
   if (typeof caches === "undefined") return null;
   try {

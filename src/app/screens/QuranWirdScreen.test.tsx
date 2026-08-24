@@ -12,10 +12,11 @@ function renderScreen() {
     position: { page: 22, surahNumber: 2, ayahNumber: 142, juzNumber: 2 },
     plan: { kind: "daily" as const, dailyPages: 4 },
     wirdHistory: { [today]: [20, 21] },
+    quranWirdDailyGoals: { [today]: 4 },
     onBack: vi.fn(),
     onPlanChange: vi.fn(),
     onContinue: vi.fn(),
-    onUndoPage: vi.fn(),
+    onUndoReadingEvent: vi.fn(),
     progressDayStartHour: 4,
   };
   render(<QuranWirdScreen {...props} />);
@@ -41,7 +42,7 @@ describe("QuranWirdScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
 
     // Open the plan type select
-    const select = screen.getByRole("combobox", { name: "Change plan" });
+    const select = screen.getByRole("combobox", { name: "Choose a plan" });
     fireEvent.click(select);
 
     // Choose Finish by a date
@@ -51,8 +52,49 @@ describe("QuranWirdScreen", () => {
     fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(
-      expect.objectContaining({ kind: "custom", durationDays: 30, dailyPages: 20 }),
+      expect.objectContaining({
+        kind: "custom",
+        durationDays: 30,
+        dailyPages: 20,
+        startPage: 22,
+        targetPage: 604,
+      }),
     );
+  });
+
+  it("undoes the complete last reading event rather than guessing one page", () => {
+    const props = renderScreen();
+    const today = getProgressDayKey(new Date(), 4);
+    render(
+      <QuranWirdScreen
+        {...props}
+        lastReadingEvent={{ dayKey: today, pages: [22, 23] }}
+        onUndoReadingEvent={props.onUndoReadingEvent}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: "Undo pages 22–23" }));
+    expect(props.onUndoReadingEvent).toHaveBeenCalledOnce();
+  });
+
+  it("shows an expired plan as an action state, not as completed progress", () => {
+    const props = renderScreen();
+    render(
+      <QuranWirdScreen
+        {...props}
+        plan={{
+          kind: "custom",
+          dailyPages: 20,
+          durationDays: 1,
+          startedDayKey: "2026-01-01",
+          startPage: 22,
+          targetPage: 604,
+        }}
+      />,
+    );
+
+    expect(screen.getByText("Your plan has ended. Choose a new completion date.")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Adjust plan" })).toBeInTheDocument();
   });
 
   it("uses a Saturday-to-Friday week and fills Arabic progress from the right", () => {

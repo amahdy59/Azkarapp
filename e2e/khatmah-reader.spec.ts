@@ -23,7 +23,7 @@ test.beforeEach(async ({ page }) => {
 
   await page.goto("/");
   await expect(page.getByRole("status", { name: "Loading Azkar" })).toHaveCount(0, { timeout: 5000 });
-  await page.getByRole("button", { name: /ورد القرآن/ }).click();
+  await page.getByRole("button", { name: /خطة القراءة/ }).click();
 });
 
 test("keeps progress in the Wird overview and turns one semantic page by swipe, key, or button", async ({ page }) => {
@@ -48,7 +48,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
   // Options split in two (DEC-095): saving your place is its own control, and
   // what is left behind the menu is page styling.
-  const optionsButton = page.getByRole("button", { name: "نمط الصفحة" });
+  const optionsButton = page.getByRole("button", { name: /الإعدادات/ });
   const savePlaceButton = page.getByRole("button", { name: "حفظ موضع القراءة" });
   if (!(await savePlaceButton.isVisible())) {
     await mushafPage.click({ position: { x: 160, y: 350 } });
@@ -88,6 +88,18 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
     }),
   );
   expect(lineRectsAfter).toEqual(lineRectsBefore);
+
+  // QCF draws private-use glyphs, so ayah actions must expose the canonical
+  // Unicode text rather than relying on selection-copy from the paper.
+  await page.getByRole("button", { name: "فتح إجراءات الآية ٢٥٥" }).click();
+  const ayahSheet = page.getByTestId("ayah-interaction-sheet");
+  await expect(ayahSheet).toBeVisible();
+  await expect(ayahSheet).toContainText("ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ");
+  await expect(ayahSheet.getByRole("button", { name: "نسخ الآية" })).toBeEnabled();
+  await ayahSheet.getByRole("button", { name: "حفظ الآية" }).click();
+  await expect(ayahSheet.getByRole("status")).toHaveText("تم حفظ الآية.");
+  await ayahSheet.getByRole("button", { name: "إغلاق" }).click();
+
   await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur());
   await expect(page.getByText(/ختمة المصحف:/)).toHaveCount(0);
 
@@ -95,9 +107,12 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // invisible, which takes them out of the tab order, and a keyboard reader who
   // could not tab back to them would be stranded.
   await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("article", { name: "صفحة ٤١" })).toBeVisible();
   await page.keyboard.press("ArrowLeft");
-  await page.getByRole("button", { name: "رجوع" }).focus();
-  await expect(page.getByRole("button", { name: "رجوع" })).toBeFocused();
+  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  const backButton = page.getByRole("button", { name: "رجوع" });
+  await backButton.focus();
+  await expect(backButton).toBeFocused();
   await page.waitForTimeout(5200);
   await expect(pageNavigation).toBeVisible();
   await expect(page.getByRole("switch", { name: "معاني الكلمات" })).toBeVisible();

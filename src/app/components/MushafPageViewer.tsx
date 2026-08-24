@@ -9,7 +9,7 @@ import {
   type ReactNode,
   type MutableRefObject,
 } from "react";
-import type { AppLanguage, MushafPageTheme } from "../types";
+import type { AppLanguage, MushafPageTheme, MushafReadingMode, TextSizeOption } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
 import { Bookmark } from "./icons";
@@ -61,7 +61,7 @@ export function AyahMarker({
     <span
       className="relative inline-flex shrink-0 select-none items-center justify-center align-middle mx-0.5"
       role="img"
-      aria-label={`آية ${displayNum}`}
+      aria-label={t(language, "reader.ayahLabel", { ayah: displayNum })}
     >
       {/* Drawn in the page's own ink, not the accent colour. A coloured
           medallion every few words pulled the eye out of the line; print sets
@@ -209,8 +209,9 @@ const MushafTextLine = memo(function MushafTextLine({
   showWordMeanings,
   meanings,
   activeWord,
+  highlightedVerseKey,
   onActiveWordChange,
-  onCopyAyah,
+  onAyahAction,
 }: {
   words: MushafWordToken[];
   language: AppLanguage;
@@ -221,8 +222,9 @@ const MushafTextLine = memo(function MushafTextLine({
   /** The open word *on this line*, or null. Passing the page-wide value here
    *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
+  highlightedVerseKey?: string | null;
   onActiveWordChange: (word: ActiveWord | null) => void;
-  onCopyAyah?: (verseKey: string) => void;
+  onAyahAction?: (verseKey: string) => void;
 }) {
   const isArabic = language === "ar";
 
@@ -250,30 +252,45 @@ const MushafTextLine = memo(function MushafTextLine({
           if (w.isEnd) {
             if (useQcfGlyphs && w.qcfCode) {
               return (
-                <span
+                <button
                   key={key}
-                  className="inline-block shrink-0 select-none align-baseline"
-                  role="img"
-                  aria-label={`آية ${formatNumerals(w.verseKey.split(":")[1] || w.text, language)}`}
+                  type="button"
+                  className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""
+                  }`}
+                  style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
+                  aria-label={t(language, "reader.openAyahActions", {
+                    ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
+                  })}
+                  onClick={() => onAyahAction?.(w.verseKey)}
                   onContextMenu={(e) => {
                     e.preventDefault();
-                    onCopyAyah?.(w.verseKey);
+                    onAyahAction?.(w.verseKey);
                   }}
                 >
                   {w.qcfCode}
-                </span>
+                </button>
               );
             }
             return (
-              <span
+              <button
                 key={key}
+                type="button"
+                className={`shrink-0 rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""
+                }`}
+                style={{ lineHeight: "inherit" }}
+                aria-label={t(language, "reader.openAyahActions", {
+                  ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
+                })}
+                onClick={() => onAyahAction?.(w.verseKey)}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  onCopyAyah?.(w.verseKey);
+                  onAyahAction?.(w.verseKey);
                 }}
               >
                 <AyahMarker number={w.text || w.verseKey.split(":")[1] || ""} language={language} theme={theme} />
-              </span>
+              </button>
             );
           }
 
@@ -307,9 +324,12 @@ const MushafTextLine = memo(function MushafTextLine({
                 }}
                 onContextMenu={(e) => {
                   e.preventDefault();
-                  onCopyAyah?.(w.verseKey);
+                  onAyahAction?.(w.verseKey);
                 }}
-                className="relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/14 p-0 align-baseline text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors [font:inherit] [line-height:inherit] hover:bg-primary/24 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className={`relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  highlightedVerseKey === w.verseKey ? "ring-2 ring-primary/55" : ""
+                }`}
+                style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >
                 {wordContent}
@@ -320,10 +340,11 @@ const MushafTextLine = memo(function MushafTextLine({
           return (
             <span
               key={key}
-              className="shrink-0"
+              className={`shrink-0 rounded-sm ${highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""}`}
+              aria-hidden={!showWordMeanings}
               onContextMenu={(e) => {
                 e.preventDefault();
-                onCopyAyah?.(w.verseKey);
+                onAyahAction?.(w.verseKey);
               }}
             >
               {wordContent}
@@ -386,6 +407,11 @@ function measureNaturalWidth(content: HTMLElement) {
  *
  * Nudged down from 0.94 to 0.88 for QCF — a small, deliberate increase in the
  * air between lines, which readers found tight.
+ */
+/**
+ * CRITICAL RULE: The 15-line page is a facsimile and its geometry is data, not styling.
+ * This non-negotiable rule prevents 'just nudging' leading or line counts, which breaks the Mushaf layout.
+ * SLOT_INK_ALLOWANCE adjusts the ink-to-slot ratio (internal letter scaling) without altering the 15-line geometry.
  */
 const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.88, fallback: 0.68 } as const;
 
@@ -564,7 +590,8 @@ function MushafPageCanvas({
   showWordMeanings,
   inkStroke,
   spreadSide,
-  onCopyAyah,
+  onAyahAction,
+  highlightedVerseKey,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -575,7 +602,8 @@ function MushafPageCanvas({
   showWordMeanings: boolean;
   inkStroke: string;
   spreadSide?: "right" | "left";
-  onCopyAyah?: (text: string) => void;
+  onAyahAction?: (verseKey: string, pageNumber: number) => void;
+  highlightedVerseKey?: string | null;
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -607,24 +635,11 @@ function MushafPageCanvas({
   );
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
 
-  const handleCopyAyah = useCallback(
+  const handleAyahAction = useCallback(
     (verseKey: string) => {
-      if (!onCopyAyah) return;
-      const verseWords = [];
-      for (const line of lines) {
-        if (!line) continue;
-        for (const w of line) {
-          if (w.verseKey === verseKey && !w.isEnd) {
-            verseWords.push(w.text);
-          }
-        }
-      }
-      const text = verseWords.join(" ");
-      if (text) {
-        onCopyAyah(text);
-      }
+      onAyahAction?.(verseKey, pageNumber);
     },
-    [lines, onCopyAyah],
+    [onAyahAction, pageNumber],
   );
 
   return (
@@ -674,8 +689,9 @@ function MushafPageCanvas({
                     ? activeWord
                     : null
                 }
+                highlightedVerseKey={highlightedVerseKey}
                 onActiveWordChange={handleActiveWordChange}
-                onCopyAyah={handleCopyAyah}
+                onAyahAction={handleAyahAction}
               />
             ) : (
               <div className="h-full" aria-hidden="true" />
@@ -695,7 +711,153 @@ function MushafPageCanvas({
   );
 }
 
-function ScreenReaderVerses({ lines, language }: { lines: MushafWordToken[][]; language: AppLanguage }) {
+function groupVerses(lines: MushafWordToken[][]) {
+  const verseMap = new Map<string, MushafWordToken[]>();
+  for (const line of lines) {
+    for (const word of line ?? []) {
+      const words = verseMap.get(word.verseKey) ?? [];
+      words.push(word);
+      verseMap.set(word.verseKey, words);
+    }
+  }
+  return [...verseMap.entries()];
+}
+
+function ComfortPageCanvas({
+  lines,
+  pageNumber,
+  language,
+  direction,
+  textSize,
+  showWordMeanings,
+  highlightedVerseKey,
+  onAyahAction,
+}: {
+  lines: MushafWordToken[][];
+  pageNumber: number;
+  language: AppLanguage;
+  direction: "ltr" | "rtl";
+  textSize: TextSizeOption;
+  showWordMeanings: boolean;
+  highlightedVerseKey?: string | null;
+  onAyahAction?: (verseKey: string, pageNumber: number) => void;
+}) {
+  const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
+  const verses = useMemo(() => groupVerses(lines), [lines]);
+  const sizeClass = {
+    small: "text-[1.35rem] leading-[2.15]",
+    medium: "text-[1.7rem] leading-[2.2]",
+    large: "text-[2.05rem] leading-[2.25]",
+  }[textSize];
+
+  useEffect(() => {
+    setActiveWord(null);
+  }, [pageNumber, showWordMeanings]);
+
+  return (
+    <section
+      className="relative h-full min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-10"
+      aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(pageNumber, language) })}
+      dir="rtl"
+      lang="ar"
+      data-mushaf-page={pageNumber}
+      data-mushaf-rendering="comfort"
+    >
+      <div className={`zikr-text mx-auto ${sizeClass}`} style={{ maxWidth: "44rem" }}>
+        {verses.map(([verseKey, words]) => (
+          <p
+            key={verseKey}
+            className={`mb-5 rounded-xl px-1 transition-colors ${
+              highlightedVerseKey === verseKey ? "bg-primary/10 ring-2 ring-ring" : ""
+            }`}
+          >
+            {words.map((word, index) => {
+              const key = `${verseKey}:${word.position}:${index}`;
+              if (word.isEnd) {
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => onAyahAction?.(verseKey, pageNumber)}
+                    className="mx-1 inline-flex size-11 items-center justify-center rounded-full border-0 bg-transparent p-0 align-middle [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ lineHeight: 1 }}
+                    aria-label={t(language, "reader.openAyahActions", {
+                      ayah: formatNumerals(verseKey.split(":")[1] ?? "", language),
+                    })}
+                  >
+                    <AyahMarker number={verseKey.split(":")[1] ?? word.text} language={language} />
+                  </button>
+                );
+              }
+
+              const meaning = showWordMeanings ? getQuranWordMeaningEntry(verseKey, word.text) : undefined;
+              if (meaning) {
+                const isOpen = activeWord?.verseKey === verseKey && activeWord.wordPosition === word.position;
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={(event) =>
+                      setActiveWord(
+                        isOpen
+                          ? null
+                          : {
+                              verseKey,
+                              wordPosition: word.position,
+                              meaning,
+                              anchor: event.currentTarget,
+                            },
+                      )
+                    }
+                    onContextMenu={(event) => {
+                      event.preventDefault();
+                      onAyahAction?.(verseKey, pageNumber);
+                    }}
+                    className="rounded-sm bg-primary/10 px-0.5 text-primary underline decoration-dotted underline-offset-4 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ lineHeight: "inherit" }}
+                    aria-label={t(language, "mushaf.wordMeaning", { word: word.text })}
+                  >
+                    {word.text}{" "}
+                  </button>
+                );
+              }
+
+              return (
+                <span
+                  key={key}
+                  onContextMenu={(event) => {
+                    event.preventDefault();
+                    onAyahAction?.(verseKey, pageNumber);
+                  }}
+                >
+                  {word.text}{" "}
+                </span>
+              );
+            })}
+          </p>
+        ))}
+      </div>
+      <QuranWordPopover
+        meanings={activeWord ? [activeWord.meaning] : null}
+        anchorEl={activeWord?.anchor ?? null}
+        language={language}
+        direction={direction}
+        showSource
+        onClose={() => setActiveWord(null)}
+      />
+    </section>
+  );
+}
+
+function ScreenReaderVerses({
+  lines,
+  language,
+  pageNumber,
+}: {
+  lines: MushafWordToken[][];
+  language: AppLanguage;
+  pageNumber: number;
+}) {
   const verses = useMemo(() => {
     const verseMap = new Map<string, string[]>();
     for (const line of lines) {
@@ -714,7 +876,7 @@ function ScreenReaderVerses({ lines, language }: { lines: MushafWordToken[][]; l
   }, [lines]);
 
   return (
-    <>
+    <section aria-label={t(language, "mushaf.pageRegion", { page: formatNumerals(pageNumber, language) })}>
       {verses.map(({ key, text }) => {
         const [surah, ayah] = key.split(":");
         const surahName = getSurahDisplayName(Number(surah), language);
@@ -724,7 +886,7 @@ function ScreenReaderVerses({ lines, language }: { lines: MushafWordToken[][]; l
           </p>
         );
       })}
-    </>
+    </section>
   );
 }
 
@@ -746,7 +908,10 @@ export function MushafPageViewer({
   chromeVisible = true,
   paperRef,
   facingPage,
-  onCopyAyah,
+  onAyahAction,
+  readingMode = "page",
+  textSize = "medium",
+  highlightedVerseKey,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
@@ -770,7 +935,10 @@ export function MushafPageViewer({
   chromeVisible?: boolean;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
-  onCopyAyah?: (text: string) => void;
+  onAyahAction?: (verseKey: string, pageNumber: number) => void;
+  readingMode?: MushafReadingMode;
+  textSize?: TextSizeOption;
+  highlightedVerseKey?: string | null;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
 
@@ -846,46 +1014,67 @@ export function MushafPageViewer({
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
       <div ref={paperRef} className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`} dir="rtl">
-        {/* The visual page, which is hidden from screen readers unless they are
-            specifically exploring word meanings, to prevent choppy word-by-word reading. */}
-        <div className="contents" aria-hidden={!showWordMeanings}>
-          <MushafPageCanvas
+        {readingMode === "comfort" ? (
+          <ComfortPageCanvas
             lines={lines}
-            language={language}
             pageNumber={pageNumber}
+            language={language}
             direction={direction}
-            theme={theme}
-            useQcfGlyphs={useQcfGlyphs}
+            textSize={textSize}
             showWordMeanings={showWordMeanings}
-            inkStroke={inkStroke}
-            spreadSide={facingPage ? "right" : undefined}
-            onCopyAyah={onCopyAyah}
+            highlightedVerseKey={highlightedVerseKey}
+            onAyahAction={onAyahAction}
           />
-          {facingPage && (
-            <>
-              <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
+        ) : (
+          <>
+            {/* Plain visual words step aside from the accessibility tree until
+                study mode is enabled; ayah-marker buttons remain operable in
+                either mode, while the cohesive page regions below carry the
+                normal reading experience. */}
+            <div className="contents">
               <MushafPageCanvas
-                lines={facingPage.lines}
+                lines={lines}
                 language={language}
-                pageNumber={facingPage.pageNumber}
+                pageNumber={pageNumber}
                 direction={direction}
                 theme={theme}
-                useQcfGlyphs={facingPage.useQcfGlyphs}
+                useQcfGlyphs={useQcfGlyphs}
                 showWordMeanings={showWordMeanings}
                 inkStroke={inkStroke}
-                spreadSide="left"
-                onCopyAyah={onCopyAyah}
+                spreadSide={facingPage ? "right" : undefined}
+                onAyahAction={onAyahAction}
+                highlightedVerseKey={highlightedVerseKey}
               />
-            </>
-          )}
-        </div>
+              {facingPage && (
+                <>
+                  <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
+                  <MushafPageCanvas
+                    lines={facingPage.lines}
+                    language={language}
+                    pageNumber={facingPage.pageNumber}
+                    direction={direction}
+                    theme={theme}
+                    useQcfGlyphs={facingPage.useQcfGlyphs}
+                    showWordMeanings={showWordMeanings}
+                    inkStroke={inkStroke}
+                    spreadSide="left"
+                    onAyahAction={onAyahAction}
+                    highlightedVerseKey={highlightedVerseKey}
+                  />
+                </>
+              )}
+            </div>
 
-        {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
-        {!showWordMeanings && (
-          <div className="sr-only">
-            <ScreenReaderVerses lines={lines} language={language} />
-            {facingPage && <ScreenReaderVerses lines={facingPage.lines} language={language} />}
-          </div>
+            {/* The cohesive verse text, cleanly readable for screen readers when they aren't in study mode. */}
+            {!showWordMeanings && (
+              <div className="sr-only">
+                <ScreenReaderVerses lines={lines} language={language} pageNumber={pageNumber} />
+                {facingPage && (
+                  <ScreenReaderVerses lines={facingPage.lines} language={language} pageNumber={facingPage.pageNumber} />
+                )}
+              </div>
+            )}
+          </>
         )}
       </div>
 

@@ -109,6 +109,8 @@ The versioned local state key is `azkarapp.state.v1`. Additional narrow caches u
 
 The active practice day has one fixed boundary: local 00:00. `App.tsx` schedules the rollover and reconciles again when a backgrounded app becomes visible. A rollover clears partial and complete state for Morning, Evening, Before Sleep, Waking Up, and After Prayer while retaining immutable daily-completion history, streaks, saved items, sessions, and resumable situational collections. Legacy 02:00/04:00/06:00 preferences normalize to midnight. The shared minute clock advances Home and Progress to the new local date; their date-keyed prayer refresh then resolves the current day's cache or offline calculation before replacing it with fresh Aladhan data when available.
 
+Quran persistence deliberately separates the page currently open, one intentional continue-reading bookmark, completed-page history, whole-page bookmarks, and verse bookmarks. A forward reader turn records only newly read visible pages and keeps the last event for spread-aware Undo. Adaptive plans persist their inclusive start/target range, while per-day goal snapshots keep historical weekly comparisons stable. These fields pass through the same local normalization, private-data clearing, and deterministic remote merge boundaries as other account-owned progress; reusable Mushaf components receive callbacks and never write storage directly.
+
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
 
 Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to

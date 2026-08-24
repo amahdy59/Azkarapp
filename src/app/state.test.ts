@@ -147,8 +147,39 @@ describe("app state persistence", () => {
     expect(normalizeAppState({ mushafLayout: "spread" }).mushafLayout).toBe("spread");
     expect(normalizeAppState({ mushafLayout: "invalid" }).mushafLayout).toBe("auto");
     expect(normalizeAppState({ mushafKeepControlsVisible: true }).mushafKeepControlsVisible).toBe(true);
-    expect(normalizeAppState({ mushafKeepControlsVisible: "yes" }).mushafKeepControlsVisible).toBe(true);
+    expect(normalizeAppState({ mushafKeepControlsVisible: "yes" }).mushafKeepControlsVisible).toBe(false);
     expect(normalizeAppState({ mushafKeepControlsVisible: false }).mushafKeepControlsVisible).toBe(false);
+  });
+
+  it("normalizes resilient Quran bookmarks and preserves an adaptive plan range", () => {
+    const state = normalizeAppState({
+      quranWirdPlan: {
+        kind: "custom",
+        dailyPages: 20,
+        durationDays: 30,
+        startedDayKey: "2026-08-24",
+        startPage: 22,
+        targetPage: 604,
+      },
+      mushafVerseBookmarks: ["2:255", { verseKey: "2:255", page: 42 }, { verseKey: "18:10", page: 293 }],
+      quranReadingBookmark: { page: 293, surahNumber: 18, ayahNumber: 1, juzNumber: 15 },
+    });
+
+    expect(state.quranWirdPlan).toMatchObject({ startPage: 22, targetPage: 604 });
+    expect(state.mushafVerseBookmarks).toEqual([
+      { verseKey: "2:255", page: 42 },
+      { verseKey: "18:10", page: 293 },
+    ]);
+    expect(state.quranReadingBookmark?.page).toBe(293);
+  });
+
+  it("normalizes and merges Quran reading days without losing concurrent pages", () => {
+    const base = normalizeAppState({ wirdHistory: { "2026-08-24": [42, 41, 42, 0, 605, "43"] } });
+    const incoming = normalizeAppState({ wirdHistory: { "2026-08-24": [42, 43] } });
+    const merged = mergeAppStates(base, incoming);
+
+    expect(base.wirdHistory).toEqual({ "2026-08-24": [41, 42] });
+    expect(merged.wirdHistory).toEqual({ "2026-08-24": [41, 42, 43] });
   });
 
   it("migrates Reader-only saved zikr into app state", () => {

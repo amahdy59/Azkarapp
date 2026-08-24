@@ -77,6 +77,40 @@ describe("KhatmahReaderScreen navigation", () => {
     expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
   });
 
+  it("keeps the physical page-turn contract invariant in an English UI", async () => {
+    const user = userEvent.setup();
+    const { setKhatmahPage } = renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Page 42" });
+
+    expect(article).toHaveAttribute("dir", "rtl");
+    const navigation = screen.getByRole("navigation", { name: "Mushaf page navigation" });
+    const next = screen.getByRole("button", { name: "Next" });
+    const previous = screen.getByRole("button", { name: "Previous" });
+    expect(next.compareDocumentPosition(previous) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(navigation.querySelector('[dir="ltr"]')).toBeInTheDocument();
+
+    await user.keyboard("{ArrowLeft}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    await user.keyboard("{ArrowRight}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
+  });
+
+  it("supports Page Down, Home, End, and Escape without leaking through controls", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    const { setKhatmahPage } = renderReader({ language: "en", direction: "ltr", onBack });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.keyboard("{PageDown}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    await user.keyboard("{Home}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(1);
+    await user.keyboard("{End}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(604);
+    await user.keyboard("{Escape}");
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
   it("stops at both ends of the Mushaf", async () => {
     const user = userEvent.setup();
     const { setKhatmahPage } = renderReader({ khatmahPage: 1 });
@@ -89,6 +123,21 @@ describe("KhatmahReaderScreen navigation", () => {
 });
 
 describe("KhatmahReaderScreen wird progress", () => {
+  it("records the complete forward page event against the supplied devotional day", async () => {
+    const user = userEvent.setup();
+    const onRecordPages = vi.fn();
+    renderReader({
+      language: "en",
+      direction: "ltr",
+      quranWirdPlan: { kind: "daily", dailyPages: 4 },
+      onRecordPages,
+    });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(onRecordPages).toHaveBeenCalledWith(getProgressDayKey(new Date(), 4), [42], 4);
+  });
+
   it("shows progress against the goal chosen on the overview", async () => {
     const today = getProgressDayKey();
     renderReader({ quranWirdPlan: { kind: "daily", dailyPages: 4 }, wirdHistory: { [today]: [41, 42] } });
@@ -171,6 +220,20 @@ describe("KhatmahReaderScreen facing pages", () => {
 
   afterEach(() => resize(1024, 768));
 
+  it.each([
+    [1, "صفحتا ١ و٢", ["1", "2"]],
+    [2, "صفحتا ١ و٢", ["1", "2"]],
+    [603, "صفحتا ٦٠٣ و٦٠٤", ["603", "604"]],
+    [604, "صفحتا ٦٠٣ و٦٠٤", ["603", "604"]],
+  ] as const)("keeps endpoint page %i in its authoritative spread", async (page, label, expectedPages) => {
+    resize(1440, 900);
+    renderReader({ khatmahPage: page });
+
+    const spread = await screen.findByRole("article", { name: label });
+    const canvases = spread.querySelectorAll("[data-mushaf-rendering]");
+    expect([...canvases].map((canvas) => canvas.getAttribute("data-mushaf-page"))).toEqual([...expectedPages]);
+  });
+
   it("pairs the odd page on the right whichever half you arrive on", async () => {
     resize(1440, 900);
     renderReader({ khatmahPage: 50 });
@@ -197,13 +260,16 @@ describe("KhatmahReaderScreen settings menu", () => {
     const user = userEvent.setup();
     const setMushafLayout = vi.fn();
     const setMushafKeepControlsVisible = vi.fn();
+    const setMushafBookmarks = vi.fn();
 
     renderReader({
       language: "en",
       setMushafLayout,
       setMushafKeepControlsVisible,
+      setMushafBookmarks,
     });
 
+    await screen.findByRole("article", { name: "Page 42" });
     const settingsBtn = screen.getByRole("button", { name: "Settings" });
     await user.click(settingsBtn);
 
@@ -212,8 +278,24 @@ describe("KhatmahReaderScreen settings menu", () => {
     expect(setMushafLayout).toHaveBeenCalledWith("spread");
 
     await user.click(settingsBtn);
+    const pageBookmark = screen.getByRole("menuitemcheckbox", { name: "Bookmark this page" });
+    await user.click(pageBookmark);
+    expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
+
+    await user.click(settingsBtn);
     const keepVisibleCb = screen.getByRole("menuitemcheckbox", { name: "Keep controls visible" });
     await user.click(keepVisibleCb);
     expect(setMushafKeepControlsVisible).toHaveBeenCalledWith(true);
+  });
+
+  it("offers Comfort mode without changing canonical page mode geometry", async () => {
+    const user = userEvent.setup();
+    const setMushafReadingMode = vi.fn();
+    renderReader({ language: "en", direction: "ltr", setMushafReadingMode });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByRole("button", { name: "Settings" }));
+    await user.click(screen.getByRole("menuitemradio", { name: "Comfort reading" }));
+    expect(setMushafReadingMode).toHaveBeenCalledWith("comfort");
   });
 });

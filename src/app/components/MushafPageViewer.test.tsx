@@ -5,13 +5,12 @@ import { MushafPageViewer, AyahMarker } from "./MushafPageViewer";
 describe("AyahMarker", () => {
   it("renders the localized ayah numeral within the medallion badge", () => {
     render(<AyahMarker number="6" language="ar" />);
-    expect(screen.getByRole("img", { name: "آية ٦" })).toBeInTheDocument();
-    expect(screen.getByRole("img", { name: "آية ٦" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "الآية ٦" })).toBeInTheDocument();
   });
 
   it("renders English numerals when language is English", () => {
     render(<AyahMarker number="6" language="en" />);
-    expect(screen.getByRole("img", { name: "آية 6" })).toBeInTheDocument();
+    expect(screen.getByRole("img", { name: "Ayah 6" })).toBeInTheDocument();
   });
 });
 
@@ -41,6 +40,8 @@ describe("MushafPageViewer", () => {
     expect(screen.getByText("إِنَّ")).toBeInTheDocument();
     expect(screen.getByText("٦")).toBeInTheDocument();
     expect(screen.getByRole("article", { name: "صفحة ٣" })).toBeInTheDocument();
+    expect(screen.getAllByRole("region", { name: "صفحة القرآن ٣" })).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "فتح إجراءات الآية ٦" })).toBeInTheDocument();
   });
 
   it("exposes reviewed difficult words only when the reader turns meanings on", () => {

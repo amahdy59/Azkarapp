@@ -27,6 +27,35 @@ describe("MushafNavigationModal", () => {
 
     // Verify first surah
     expect(screen.getByText("الفاتحة")).toBeInTheDocument();
+    expect(screen.getByRole("tab", { name: /السور/ })).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByRole("tabpanel")).toHaveAccessibleName(/السور/);
+  });
+
+  it("navigates to and highlights a bookmarked verse", () => {
+    const handleSelectPage = vi.fn();
+    const handleSelectVerseBookmark = vi.fn();
+    const handleClose = vi.fn();
+    const bookmark = { verseKey: "2:255", page: 42 };
+
+    render(
+      <MushafNavigationModal
+        isOpen
+        onClose={handleClose}
+        currentPage={1}
+        onSelectPage={handleSelectPage}
+        onSelectVerseBookmark={handleSelectVerseBookmark}
+        language="en"
+        direction="ltr"
+        verseBookmarks={[bookmark]}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("tab", { name: /Bookmarks/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Al-Baqarah.*255/ }));
+
+    expect(handleSelectVerseBookmark).toHaveBeenCalledWith(bookmark);
+    expect(handleSelectPage).toHaveBeenCalledWith(42);
+    expect(handleClose).toHaveBeenCalled();
   });
 
   it("filters surahs by search query", () => {

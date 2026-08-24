@@ -14,8 +14,12 @@ import type {
   TextSizeOption,
   ThemeMode,
   PrayerName,
+  MushafLayout,
+  MushafReadingMode,
   MushafTheme,
+  QuranReadingEvent,
   QuranReadingPosition,
+  QuranVerseBookmark,
   QuranWirdPlan,
 } from "./types";
 import { DEFAULT_LOCATION } from "./content/prayerCalculation";
@@ -247,13 +251,28 @@ function AppContent() {
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
-  const [mushafLayout, setMushafLayout] = useState<"auto" | "single" | "spread">(initialState.mushafLayout ?? "auto");
+  const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
+  const [mushafReadingMode, setMushafReadingMode] = useState<MushafReadingMode>(
+    initialState.mushafReadingMode ?? "page",
+  );
   const [mushafKeepControlsVisible, setMushafKeepControlsVisible] = useState<boolean>(
     initialState.mushafKeepControlsVisible ?? false,
   );
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
+  const [quranReadingBookmark, setQuranReadingBookmark] = useState<QuranReadingPosition | undefined>(
+    initialState.quranReadingBookmark,
+  );
+  const [mushafVerseBookmarks, setMushafVerseBookmarks] = useState<QuranVerseBookmark[]>(
+    initialState.mushafVerseBookmarks ?? [],
+  );
   const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
   const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
+  const [quranWirdDailyGoals, setQuranWirdDailyGoals] = useState<Record<string, number>>(
+    initialState.quranWirdDailyGoals ?? {},
+  );
+  const [quranLastReadingEvent, setQuranLastReadingEvent] = useState<QuranReadingEvent | undefined>(
+    initialState.quranLastReadingEvent,
+  );
   const [quranReadingPosition, setQuranReadingPosition] = useState<QuranReadingPosition>(
     initialState.quranReadingPosition ?? { page: initialState.khatmahPage ?? 1 },
   );
@@ -437,9 +456,16 @@ function AppContent() {
       savedZikrIds: [...savedZikrIds].sort(),
       khatmahPage,
       mushafTheme,
+      mushafLayout,
+      mushafReadingMode,
+      mushafKeepControlsVisible,
       mushafBookmarks,
+      quranReadingBookmark,
+      mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
+      quranWirdDailyGoals,
+      quranLastReadingEvent,
       quranReadingPosition,
       quranWirdPlan,
     }),
@@ -472,9 +498,16 @@ function AppContent() {
       savedZikrIds,
       khatmahPage,
       mushafTheme,
+      mushafLayout,
+      mushafReadingMode,
+      mushafKeepControlsVisible,
       mushafBookmarks,
+      quranReadingBookmark,
+      mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
+      quranWirdDailyGoals,
+      quranLastReadingEvent,
       quranReadingPosition,
       quranWirdPlan,
       showTranslation,
@@ -629,9 +662,16 @@ function AppContent() {
     setSavedZikrIds(new Set(state.savedZikrIds));
     setKhatmahPage(state.khatmahPage ?? 1);
     setMushafTheme(state.mushafTheme ?? "follow-app");
+    setMushafLayout(state.mushafLayout ?? "auto");
+    setMushafReadingMode(state.mushafReadingMode ?? "page");
+    setMushafKeepControlsVisible(state.mushafKeepControlsVisible ?? false);
     setMushafBookmarks(state.mushafBookmarks ?? []);
+    setQuranReadingBookmark(state.quranReadingBookmark);
+    setMushafVerseBookmarks(state.mushafVerseBookmarks ?? []);
     setDailyWirdGoal(state.dailyWirdGoal ?? 4);
     setWirdHistory(state.wirdHistory ?? {});
+    setQuranWirdDailyGoals(state.quranWirdDailyGoals ?? {});
+    setQuranLastReadingEvent(state.quranLastReadingEvent);
     setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
     setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
   }, []);
@@ -999,10 +1039,13 @@ function AppContent() {
                   quietProgressEnabled={true}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
-                  quranReadingPosition={quranReadingPosition}
+                  quranReadingPosition={quranReadingBookmark ?? quranReadingPosition}
                   quranWirdPlan={quranWirdPlan}
                   wirdHistory={wirdHistory}
-                  onContinueKhatmah={() => push("khatmah")}
+                  onContinueKhatmah={() => {
+                    setKhatmahPage((quranReadingBookmark ?? quranReadingPosition).page);
+                    push("khatmah");
+                  }}
                   onResume={resumeCategory}
                   onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
                   onOpenFridayMode={() => {
@@ -1411,19 +1454,23 @@ function AppContent() {
                   plan={quranWirdPlan}
                   progressDayStartHour={progressDayStartHour}
                   wirdHistory={wirdHistory}
+                  quranWirdDailyGoals={quranWirdDailyGoals}
+                  lastReadingEvent={quranLastReadingEvent}
                   onBack={pop}
                   onContinue={() => push("khatmah")}
                   onPlanChange={(plan) => {
                     setQuranWirdPlan(plan);
                     setDailyWirdGoal(plan.dailyPages);
                   }}
-                  onUndoPage={() => {
-                    const dayKey = getProgressDayKey();
+                  onUndoReadingEvent={() => {
+                    const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
+                    if (!quranLastReadingEvent || quranLastReadingEvent.dayKey !== dayKey) return;
                     setWirdHistory((current) => {
                       const pages = current[dayKey] ?? [];
-                      if (pages.length === 0) return current;
-                      return { ...current, [dayKey]: pages.slice(0, -1) };
+                      const undone = new Set(quranLastReadingEvent.pages);
+                      return { ...current, [dayKey]: pages.filter((page) => !undone.has(page)) };
                     });
+                    setQuranLastReadingEvent(undefined);
                   }}
                 />
               )}
@@ -1440,12 +1487,34 @@ function AppContent() {
                   setMushafTheme={setMushafTheme}
                   mushafLayout={mushafLayout}
                   setMushafLayout={setMushafLayout}
+                  mushafReadingMode={mushafReadingMode}
+                  setMushafReadingMode={setMushafReadingMode}
+                  textSize={textSize}
+                  onTextSizeChange={setTextSize}
                   mushafKeepControlsVisible={mushafKeepControlsVisible}
                   setMushafKeepControlsVisible={setMushafKeepControlsVisible}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
+                  quranReadingBookmark={quranReadingBookmark}
+                  onReadingBookmarkChange={setQuranReadingBookmark}
+                  mushafVerseBookmarks={mushafVerseBookmarks}
+                  setMushafVerseBookmarks={setMushafVerseBookmarks}
                   wirdHistory={wirdHistory}
-                  setWirdHistory={setWirdHistory}
+                  onRecordPages={(dayKey, pages, goal) => {
+                    const alreadyRead = new Set(wirdHistory[dayKey] ?? []);
+                    const newlyRead = pages.filter((page) => !alreadyRead.has(page));
+                    if (newlyRead.length === 0) return;
+                    setWirdHistory((current) => ({
+                      ...current,
+                      [dayKey]: Array.from(new Set([...(current[dayKey] ?? []), ...newlyRead])).sort((a, b) => a - b),
+                    }));
+                    setQuranLastReadingEvent({ dayKey, pages: newlyRead });
+                    if (goal > 0) {
+                      setQuranWirdDailyGoals((current) =>
+                        current[dayKey] === goal ? current : { ...current, [dayKey]: goal },
+                      );
+                    }
+                  }}
                   quranWirdPlan={quranWirdPlan}
                   onReadingPositionChange={setQuranReadingPosition}
                 />

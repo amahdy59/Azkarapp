@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-24-3",
+  "release": "2026-08-24-4",
   "ar": [
-    "يتبع المصحف الآن نمط التطبيق تلقائياً في الأوضاع الكحلي والداكن والفاتح، مع خيار OLED عالي التباين.",
-    "أصبحت الصفحتان المتقابلتان أقرب على الشاشات الكبيرة، مع تباعد أسطر أريح على الحاسوب والجهاز اللوحي.",
-    "تعرض بطاقة معنى الكلمة شرحاً أوضح ورقم الآية والمصدر الموثوق دون حجب موضع القراءة.",
-    "أصبحت أرقام الأذكار أوضح، ونص سلسلة النخلة أقصر، وحركة بطاقة الإتمام أكثر هدوءاً وتدرجاً."
+    "أصبح احتساب ورد القرآن دقيقاً للصفحة والصفحتين المتقابلتين، مع تراجع كامل عن آخر انتقال وخطة تتكيف بوضوح.",
+    "تعرض الرئيسية موضع المتابعة وهدف اليوم مباشرة، وتفصل شاشة الورد بين تقدم اليوم وتقدم الختمة.",
+    "يمكن فتح إجراءات أي آية لنسخ نصها القرآني الصحيح أو مشاركتها أو حفظها، ثم الرجوع إليها من فهرس العلامات.",
+    "أضيف نمط قراءة مريحة بحجم نص قابل للتغيير، مع تنقل أفضل بلوحة المفاتيح واتجاه ثابت لأزرار تقليب الصفحات."
   ],
   "en": [
-    "The Mushaf now follows the app's Midnight, Dark, or Light theme automatically, with an OLED high-contrast option.",
-    "Facing pages sit closer together on large screens, with more comfortable line spacing on desktop and tablet.",
-    "Word meaning cards now show a clearer explanation, ayah number, and trusted source without losing the reading position.",
-    "Zikr numbers are clearer, Palm streak guidance is shorter, and the completion card moves in a calmer sequence."
+    "Quran Wird now counts single and facing pages accurately, with whole-turn Undo and clearly adaptive reading plans.",
+    "Home shows the resume point and today's goal directly, while the Wird overview separates daily and Khatmah progress.",
+    "Open any ayah to copy its correct Quran text, share it, or bookmark it, then return from the Bookmarks index.",
+    "Comfort reading adds adjustable text size, alongside better keyboard navigation and invariant physical page-turn controls."
   ]
 }

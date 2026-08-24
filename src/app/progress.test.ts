@@ -37,6 +37,15 @@ describe("quiet garden progress", () => {
     expect(getProgressDayKey(new Date(2026, 6, 18, 4, 0), 4)).toBe("2026-07-18");
   });
 
+  it("assigns Quran and azkar activity at 01:30 to the same devotional day with a 03:00 boundary", () => {
+    const at0130 = new Date(2026, 7, 24, 1, 30);
+    const dayKey = getProgressDayKey(at0130, 3);
+    const azkar = recordDailyCollectionCompletion([], "morning", at0130, 3);
+
+    expect(dayKey).toBe("2026-08-23");
+    expect(azkar.records[0]?.dayKey).toBe(dayKey);
+  });
+
   it("records one leaf per main category and creates a palm for the four main categories", () => {
     const now = new Date(2026, 6, 18, 10);
     const first = recordDailyCollectionCompletion([], "morning", now, 4);

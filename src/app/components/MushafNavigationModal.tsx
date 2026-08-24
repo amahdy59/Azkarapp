@@ -1,10 +1,13 @@
-import { useState, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import type { AppLanguage } from "../types";
+import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
 import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
 import { X, Search, Bookmark, ChevronRight, ChevronLeft } from "./icons";
+import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
+
+type NavigationTab = "surahs" | "juzs" | "jump" | "bookmarks";
 
 export function MushafNavigationModal({
   isOpen,
@@ -14,6 +17,8 @@ export function MushafNavigationModal({
   language,
   direction,
   bookmarks = [],
+  verseBookmarks = [],
+  onSelectVerseBookmark,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -22,10 +27,16 @@ export function MushafNavigationModal({
   language: AppLanguage;
   direction: "ltr" | "rtl";
   bookmarks?: number[];
+  verseBookmarks?: QuranVerseBookmark[];
+  onSelectVerseBookmark?: (bookmark: QuranVerseBookmark) => void;
 }) {
-  const [activeTab, setActiveTab] = useState<"surahs" | "juzs" | "jump" | "bookmarks">("surahs");
+  const [activeTab, setActiveTab] = useState<NavigationTab>("surahs");
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPage, setInputPage] = useState(currentPage.toString());
+
+  useEffect(() => {
+    if (isOpen) setInputPage(currentPage.toString());
+  }, [currentPage, isOpen]);
 
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);
@@ -47,6 +58,41 @@ export function MushafNavigationModal({
 
   const isArabic = language === "ar";
   const chevron = isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />;
+  const tabs: ReadonlyArray<TabDefinition<NavigationTab>> = [
+    {
+      value: "surahs",
+      label: (
+        <>
+          <span>{t(language, "mushaf.tabSurahs")}</span>
+          <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(114, language)})</span>
+        </>
+      ),
+    },
+    {
+      value: "juzs",
+      label: (
+        <>
+          <span>{t(language, "mushaf.tabJuzs")}</span>
+          <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(30, language)})</span>
+        </>
+      ),
+    },
+    { value: "jump", label: <span>{t(language, "mushaf.tabJump")}</span> },
+    {
+      value: "bookmarks",
+      label: (
+        <>
+          <Bookmark size={15} aria-hidden="true" />
+          <span>{t(language, "mushaf.tabBookmarks")}</span>
+          {(bookmarks.length > 0 || verseBookmarks.length > 0) && (
+            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs">
+              {formatNumerals(bookmarks.length + verseBookmarks.length, language)}
+            </span>
+          )}
+        </>
+      ),
+    },
+  ];
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -54,7 +100,7 @@ export function MushafNavigationModal({
         <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs animate-in fade-in" />
         <Dialog.Content
           dir={direction}
-          className="fixed inset-x-2 bottom-2 top-2 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 z-50 flex max-h-[100dvh] sm:h-[min(620px,88dvh)] w-auto sm:w-full max-w-[560px] flex-col rounded-2xl bg-card text-card-foreground shadow-overlay border border-border overflow-hidden animate-in fade-in zoom-in-95"
+          className="fixed inset-x-2 bottom-2 top-2 z-50 flex w-auto max-w-xl flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-overlay animate-in fade-in zoom-in-95 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:h-[min(620px,88dvh)] sm:w-full sm:-translate-x-1/2 sm:-translate-y-1/2"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/40">
@@ -65,7 +111,7 @@ export function MushafNavigationModal({
             <Dialog.Close asChild>
               <button
                 type="button"
-                className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 aria-label={t(language, "common.close")}
               >
                 <X size={20} />
@@ -77,63 +123,22 @@ export function MushafNavigationModal({
           {/* Four tabs share the width rather than overflowing it. They used to
               scroll sideways, which on a 390px phone left the last one cut off
               at the edge with nothing to say it was there. */}
-          <div className="flex border-b border-border bg-muted/20 px-1 pt-2 sm:px-3">
-            <button
-              type="button"
-              onClick={() => setActiveTab("surahs")}
-              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
-                activeTab === "surahs"
+          <TabList
+            value={activeTab}
+            onChange={setActiveTab}
+            tabs={tabs}
+            direction={direction}
+            idPrefix="mushaf-index"
+            aria-label={t(language, "mushaf.indexTitle")}
+            className="flex border-b border-border bg-muted/20 px-1 pt-2 sm:px-3"
+            itemClassName={(selected) =>
+              `flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:gap-1.5 sm:px-3 sm:text-sm ${
+                selected
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span>{t(language, "mushaf.tabSurahs")}</span>
-              <span className="hidden text-xs opacity-70 min-[420px]:inline">({formatNumerals(114, language)})</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("juzs")}
-              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
-                activeTab === "juzs"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span>{t(language, "mushaf.tabJuzs")}</span>
-              <span className="hidden text-xs opacity-70 min-[420px]:inline">({formatNumerals(30, language)})</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("jump")}
-              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
-                activeTab === "jump"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <span>{t(language, "mushaf.tabJump")}</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setActiveTab("bookmarks")}
-              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
-                activeTab === "bookmarks"
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <Bookmark size={15} />
-              <span>{t(language, "mushaf.tabBookmarks")}</span>
-              {bookmarks.length > 0 && (
-                <span className="text-xs px-1.5 py-0.5 rounded-full bg-primary/15 text-primary">
-                  {formatNumerals(bookmarks.length, language)}
-                </span>
-              )}
-            </button>
-          </div>
+              }`
+            }
+          />
 
           {/* The filter sits outside the scrolling area, not stuck to the top of
               it. Sticky positioning left the list visible in the strip above the
@@ -147,6 +152,7 @@ export function MushafNavigationModal({
                   <Search size={18} />
                 </span>
                 <input
+                  aria-label={t(language, "mushaf.searchSurahs")}
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -158,7 +164,8 @@ export function MushafNavigationModal({
                     type="button"
                     onClick={() => setSearchQuery("")}
                     aria-label={t(language, "common.clear")}
-                    className="absolute end-2 flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    className="absolute flex size-11 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    style={{ insetInlineEnd: 0 }}
                   >
                     <X size={14} />
                   </button>
@@ -168,7 +175,10 @@ export function MushafNavigationModal({
           )}
 
           {/* Tab Content */}
-          <div className="min-h-0 flex-1 overflow-y-auto p-4">
+          <div
+            {...tabPanelProps("mushaf-index", activeTab)}
+            className="min-h-0 flex-1 overflow-y-auto p-4 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+          >
             {/* Surahs Tab */}
             {activeTab === "surahs" && (
               <div className="flex flex-col gap-3">
@@ -341,41 +351,79 @@ export function MushafNavigationModal({
             {/* Bookmarks Tab */}
             {activeTab === "bookmarks" && (
               <div className="flex flex-col gap-2">
-                {bookmarks.length === 0 ? (
+                {bookmarks.length === 0 && verseBookmarks.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center text-muted-foreground gap-3">
                     <Bookmark size={36} className="opacity-40" />
                     <p className="text-sm font-medium">{t(language, "mushaf.noBookmarks")}</p>
                   </div>
                 ) : (
-                  bookmarks.map((page) => {
-                    const juzNum = getJuzNumberForPage(page);
-                    return (
-                      <button
-                        key={page}
-                        type="button"
-                        onClick={() => handleJump(page)}
-                        className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-all text-start group"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                            <Bookmark size={16} />
-                          </span>
-                          <div>
-                            <div className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
-                              {t(language, "mushaf.pageLabel", { page: formatNumerals(page, language) })}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {t(language, "common.juz")} {formatNumerals(juzNum, language)}
+                  <>
+                    {bookmarks.map((page) => {
+                      const juzNum = getJuzNumberForPage(page);
+                      return (
+                        <button
+                          key={page}
+                          type="button"
+                          onClick={() => handleJump(page)}
+                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-all text-start group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                              <Bookmark size={16} />
+                            </span>
+                            <div>
+                              <div className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
+                                {t(language, "mushaf.pageLabel", { page: formatNumerals(page, language) })}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {t(language, "common.juz")} {formatNumerals(juzNum, language)}
+                              </div>
                             </div>
                           </div>
-                        </div>
 
-                        <span className="text-muted-foreground group-hover:text-primary transition-transform">
-                          {chevron}
-                        </span>
-                      </button>
-                    );
-                  })
+                          <span className="text-muted-foreground group-hover:text-primary transition-transform">
+                            {chevron}
+                          </span>
+                        </button>
+                      );
+                    })}
+                    {verseBookmarks.map((bookmark) => {
+                      const [surah, ayah] = bookmark.verseKey.split(":");
+                      const surahName = getSurahDisplayName(surah || "", language);
+                      return (
+                        <button
+                          key={`verse-${bookmark.verseKey}`}
+                          type="button"
+                          onClick={() => {
+                            onSelectVerseBookmark?.(bookmark);
+                            handleJump(bookmark.page);
+                          }}
+                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-all text-start group"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                              <Bookmark size={16} className="fill-primary" />
+                            </span>
+                            <div>
+                              <div className="font-bold text-base text-foreground group-hover:text-primary transition-colors">
+                                {surahName} -{" "}
+                                {t(language, "reader.ayahLabel", { ayah: formatNumerals(ayah || "", language) })}
+                              </div>
+                              <div className="text-xs text-muted-foreground">
+                                {t(language, "mushaf.pageLabel", {
+                                  page: formatNumerals(bookmark.page, language),
+                                })}
+                              </div>
+                            </div>
+                          </div>
+
+                          <span className="text-muted-foreground group-hover:text-primary transition-transform">
+                            {chevron}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </>
                 )}
               </div>
             )}

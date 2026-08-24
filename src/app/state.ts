@@ -6,7 +6,9 @@ import type {
   LocationSettings,
   MushafTheme,
   PrayerTrackingRecord,
+  QuranReadingEvent,
   QuranReadingPosition,
+  QuranVerseBookmark,
   QuranWirdPlan,
   ReminderSettings,
   StoredSession,
@@ -119,10 +121,15 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   khatmahPage: 1,
   mushafTheme: "follow-app",
   mushafLayout: "auto",
+  mushafReadingMode: "page",
   mushafKeepControlsVisible: false,
   mushafBookmarks: [],
+  quranReadingBookmark: undefined,
+  mushafVerseBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
+  quranWirdDailyGoals: {},
+  quranLastReadingEvent: undefined,
   quranReadingPosition: { page: 1, surahNumber: 1, ayahNumber: 1, juzNumber: 1 },
   quranWirdPlan: { kind: "daily", dailyPages: 4 },
 };
@@ -157,6 +164,86 @@ function normalizeQuranReadingPosition(value: unknown): QuranReadingPosition {
   };
 }
 
+function normalizeOptionalQuranReadingPosition(value: unknown): QuranReadingPosition | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const page = (value as Partial<QuranReadingPosition>).page;
+  return typeof page === "number" && Number.isInteger(page) && page >= 1 && page <= 604
+    ? normalizeQuranReadingPosition(value)
+    : undefined;
+}
+
+function normalizeQuranVerseBookmarks(value: unknown): QuranVerseBookmark[] {
+  if (!Array.isArray(value)) return [];
+  const byVerse = new Map<string, QuranVerseBookmark>();
+  for (const candidate of value) {
+    let verseKey: unknown;
+    let page: unknown;
+    if (typeof candidate === "string") {
+      const parts = candidate.split(":");
+      verseKey = parts.length >= 2 ? `${parts[0]}:${parts[1]}` : undefined;
+      page = Number(parts[2]);
+    } else if (candidate && typeof candidate === "object") {
+      ({ verseKey, page } = candidate as Partial<QuranVerseBookmark>);
+    }
+    if (typeof verseKey !== "string" || typeof page !== "number" || !Number.isInteger(page)) continue;
+    const match = /^(\d{1,3}):(\d{1,3})$/.exec(verseKey);
+    if (!match) continue;
+    const surah = Number(match[1]);
+    const ayah = Number(match[2]);
+    if (surah < 1 || surah > 114 || ayah < 1 || ayah > 286 || page < 1 || page > 604) continue;
+    byVerse.set(verseKey, { verseKey, page });
+  }
+  return [...byVerse.values()];
+}
+
+function normalizeQuranWirdDailyGoals(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([dayKey, goal]) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(dayKey) && Number.isInteger(goal) && Number(goal) >= 1 && Number(goal) <= 604,
+    ),
+  ) as Record<string, number>;
+}
+
+function normalizeWirdHistory(value: unknown): Record<string, number[]> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).flatMap(([dayKey, pages]) => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(dayKey) || !Array.isArray(pages)) return [];
+      const validPages = Array.from(
+        new Set(
+          pages.filter(
+            (page): page is number => typeof page === "number" && Number.isInteger(page) && page >= 1 && page <= 604,
+          ),
+        ),
+      ).sort((a, b) => a - b);
+      return validPages.length > 0 ? [[dayKey, validPages] as const] : [];
+    }),
+  );
+}
+
+function mergeWirdHistories(base: unknown, incoming: unknown): Record<string, number[]> {
+  const left = normalizeWirdHistory(base);
+  const right = normalizeWirdHistory(incoming);
+  const merged = { ...left };
+  for (const [dayKey, pages] of Object.entries(right)) {
+    merged[dayKey] = Array.from(new Set([...(merged[dayKey] ?? []), ...pages])).sort((a, b) => a - b);
+  }
+  return merged;
+}
+
+function normalizeQuranReadingEvent(value: unknown): QuranReadingEvent | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const event = value as Partial<QuranReadingEvent>;
+  if (typeof event.dayKey !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(event.dayKey)) return undefined;
+  if (!Array.isArray(event.pages)) return undefined;
+  const pages = Array.from(
+    new Set(event.pages.filter((page): page is number => Number.isInteger(page) && page >= 1 && page <= 604)),
+  ).sort((a, b) => a - b);
+  return pages.length > 0 ? { dayKey: event.dayKey, pages } : undefined;
+}
+
 function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWirdPlan {
   if (!value || typeof value !== "object") return { kind: "daily", dailyPages: fallbackGoal };
   const plan = value as Partial<QuranWirdPlan>;
@@ -178,11 +265,28 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
     typeof plan.startedDayKey === "string" && /^\d{4}-\d{2}-\d{2}$/.test(plan.startedDayKey)
       ? plan.startedDayKey
       : undefined;
+  const startPage =
+    typeof plan.startPage === "number" &&
+    Number.isInteger(plan.startPage) &&
+    plan.startPage >= 1 &&
+    plan.startPage <= 604
+      ? plan.startPage
+      : undefined;
+  const targetPage =
+    typeof plan.targetPage === "number" &&
+    Number.isInteger(plan.targetPage) &&
+    plan.targetPage >= 1 &&
+    plan.targetPage <= 604 &&
+    plan.targetPage >= (startPage ?? 1)
+      ? plan.targetPage
+      : undefined;
   return {
     kind: plan.kind === "khatmah30" || plan.kind === "custom" ? plan.kind : "daily",
     dailyPages: plan.kind === "khatmah30" ? 21 : dailyPages,
     ...((plan.kind === "custom" || plan.kind === "khatmah30") && durationDays ? { durationDays } : {}),
-    ...((plan.kind === "custom" || plan.kind === "khatmah30") && startedDayKey ? { startedDayKey } : {}),
+    ...(startedDayKey ? { startedDayKey } : {}),
+    ...((plan.kind === "custom" || plan.kind === "khatmah30") && startPage !== undefined ? { startPage } : {}),
+    ...((plan.kind === "custom" || plan.kind === "khatmah30") && targetPage !== undefined ? { targetPage } : {}),
   };
 }
 
@@ -603,7 +707,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         : 1,
     mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
     mushafLayout: parsed.mushafLayout === "single" || parsed.mushafLayout === "spread" ? parsed.mushafLayout : "auto",
-    mushafKeepControlsVisible: !!parsed.mushafKeepControlsVisible,
+    mushafReadingMode: parsed.mushafReadingMode === "comfort" ? "comfort" : "page",
+    mushafKeepControlsVisible: parsed.mushafKeepControlsVisible === true,
     mushafBookmarks: Array.isArray(parsed.mushafBookmarks)
       ? Array.from(
           new Set(
@@ -613,14 +718,15 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ),
         )
       : [],
+    quranReadingBookmark: normalizeOptionalQuranReadingPosition(parsed.quranReadingBookmark),
+    mushafVerseBookmarks: normalizeQuranVerseBookmarks(parsed.mushafVerseBookmarks),
     dailyWirdGoal:
       typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
         ? Math.floor(parsed.dailyWirdGoal)
         : 4,
-    wirdHistory:
-      typeof parsed.wirdHistory === "object" && parsed.wirdHistory !== null && !Array.isArray(parsed.wirdHistory)
-        ? (parsed.wirdHistory as Record<string, number[]>)
-        : {},
+    wirdHistory: normalizeWirdHistory(parsed.wirdHistory),
+    quranWirdDailyGoals: normalizeQuranWirdDailyGoals(parsed.quranWirdDailyGoals),
+    quranLastReadingEvent: normalizeQuranReadingEvent(parsed.quranLastReadingEvent),
     quranReadingPosition: normalizeQuranReadingPosition(parsed.quranReadingPosition),
     quranWirdPlan: normalizeQuranWirdPlan(
       parsed.quranWirdPlan,
@@ -894,11 +1000,33 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
     mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
-    mushafLayout: incoming.mushafLayout ?? safeBase.mushafLayout ?? "auto",
-    mushafKeepControlsVisible: incoming.mushafKeepControlsVisible ?? safeBase.mushafKeepControlsVisible ?? false,
+    mushafLayout:
+      incoming.mushafLayout === "single" || incoming.mushafLayout === "spread"
+        ? incoming.mushafLayout
+        : (safeBase.mushafLayout ?? "auto"),
+    mushafReadingMode:
+      incoming.mushafReadingMode === "comfort" || incoming.mushafReadingMode === "page"
+        ? incoming.mushafReadingMode
+        : (safeBase.mushafReadingMode ?? "page"),
+    mushafKeepControlsVisible:
+      typeof incoming.mushafKeepControlsVisible === "boolean"
+        ? incoming.mushafKeepControlsVisible
+        : (safeBase.mushafKeepControlsVisible ?? false),
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
+    quranReadingBookmark: normalizeOptionalQuranReadingPosition(
+      incoming.quranReadingBookmark ?? safeBase.quranReadingBookmark,
+    ),
+    mushafVerseBookmarks: normalizeQuranVerseBookmarks([
+      ...(safeBase.mushafVerseBookmarks ?? []),
+      ...(incoming.mushafVerseBookmarks ?? []),
+    ]),
     dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
-    wirdHistory: { ...(safeBase.wirdHistory ?? {}), ...(incoming.wirdHistory ?? {}) },
+    wirdHistory: mergeWirdHistories(safeBase.wirdHistory, incoming.wirdHistory),
+    quranWirdDailyGoals: {
+      ...(safeBase.quranWirdDailyGoals ?? {}),
+      ...normalizeQuranWirdDailyGoals(incoming.quranWirdDailyGoals),
+    },
+    quranLastReadingEvent: normalizeQuranReadingEvent(incoming.quranLastReadingEvent ?? safeBase.quranLastReadingEvent),
     quranReadingPosition: normalizeQuranReadingPosition(incoming.quranReadingPosition ?? safeBase.quranReadingPosition),
     quranWirdPlan: normalizeQuranWirdPlan(
       incoming.quranWirdPlan ?? safeBase.quranWirdPlan,
@@ -919,7 +1047,11 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     savedZikrIds: [],
     khatmahPage: 1,
     mushafBookmarks: [],
+    quranReadingBookmark: undefined,
+    mushafVerseBookmarks: [],
     wirdHistory: {},
+    quranWirdDailyGoals: {},
+    quranLastReadingEvent: undefined,
     quranReadingPosition: DEFAULT_APP_STATE.quranReadingPosition,
   };
 }
