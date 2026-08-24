@@ -74,37 +74,40 @@ export function MushafNavigationModal({
           </div>
 
           {/* Navigation Tabs */}
-          <div className="flex border-b border-border px-3 pt-2 bg-muted/20 gap-1 overflow-x-auto">
+          {/* Four tabs share the width rather than overflowing it. They used to
+              scroll sideways, which on a 390px phone left the last one cut off
+              at the edge with nothing to say it was there. */}
+          <div className="flex border-b border-border bg-muted/20 px-1 pt-2 sm:px-3">
             <button
               type="button"
               onClick={() => setActiveTab("surahs")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
                 activeTab === "surahs"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <span>{t(language, "mushaf.tabSurahs")}</span>
-              <span className="text-xs opacity-70">({formatNumerals(114, language)})</span>
+              <span className="hidden text-xs opacity-70 min-[420px]:inline">({formatNumerals(114, language)})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("juzs")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
                 activeTab === "juzs"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
               }`}
             >
               <span>{t(language, "mushaf.tabJuzs")}</span>
-              <span className="text-xs opacity-70">({formatNumerals(30, language)})</span>
+              <span className="hidden text-xs opacity-70 min-[420px]:inline">({formatNumerals(30, language)})</span>
             </button>
 
             <button
               type="button"
               onClick={() => setActiveTab("jump")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
                 activeTab === "jump"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -116,7 +119,7 @@ export function MushafNavigationModal({
             <button
               type="button"
               onClick={() => setActiveTab("bookmarks")}
-              className={`flex items-center gap-1.5 px-3.5 py-2 text-sm font-bold border-b-2 transition-colors whitespace-nowrap ${
+              className={`flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors sm:gap-1.5 sm:px-3 sm:text-sm ${
                 activeTab === "bookmarks"
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -132,38 +135,43 @@ export function MushafNavigationModal({
             </button>
           </div>
 
+          {/* The filter sits outside the scrolling area, not stuck to the top of
+              it. Sticky positioning left the list visible in the strip above the
+              input as it scrolled past — and on a phone with the keyboard open
+              the results had nowhere to go. Nothing scrolls behind this row
+              because nothing scrolls under it. */}
+          {activeTab === "surahs" && (
+            <div className="shrink-0 border-b border-border/60 bg-card px-4 py-3">
+              <div className="relative flex items-center">
+                <span className="absolute start-3 text-muted-foreground pointer-events-none">
+                  <Search size={18} />
+                </span>
+                <input
+                  type="search"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder={t(language, "mushaf.searchSurahs")}
+                  className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-9 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery("")}
+                    aria-label={t(language, "common.clear")}
+                    className="absolute end-2 flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Tab Content */}
-          <div className="flex-1 overflow-y-auto p-4">
+          <div className="min-h-0 flex-1 overflow-y-auto p-4">
             {/* Surahs Tab */}
             {activeTab === "surahs" && (
               <div className="flex flex-col gap-3">
-                {/* Search Bar — sticky, so results scroll under it rather than
-                    pushing it off the top on a phone with the keyboard open. */}
-                <div className="sticky top-0 z-10 -mx-4 -mt-4 flex items-center gap-2 border-b border-border/60 bg-card px-4 pb-3 pt-4">
-                  <div className="relative flex flex-1 items-center">
-                    <span className="absolute start-3 text-muted-foreground pointer-events-none">
-                      <Search size={18} />
-                    </span>
-                    <input
-                      type="search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder={t(language, "mushaf.searchSurahs")}
-                      className="min-h-11 w-full rounded-xl border border-border bg-input-background ps-9 pe-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                    />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery("")}
-                        aria-label={t(language, "common.clear")}
-                        className="absolute end-2 flex size-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                      >
-                        <X size={14} />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
                 {/* Surahs List */}
                 <div className="flex flex-col gap-1.5 mt-1">
                   {filteredSurahs.map((surah) => {
