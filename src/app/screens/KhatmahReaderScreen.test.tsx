@@ -123,3 +123,30 @@ describe("KhatmahReaderScreen difficult words", () => {
     expect(screen.queryByRole("button", { name: /معنى كلمة/ })).not.toBeInTheDocument();
   });
 });
+
+describe("KhatmahReaderScreen facing pages", () => {
+  const resize = (width: number, height: number) => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+    Object.defineProperty(window, "innerHeight", { configurable: true, value: height });
+  };
+
+  afterEach(() => resize(1024, 768));
+
+  it("pairs the odd page on the right whichever half you arrive on", async () => {
+    resize(1440, 900);
+    renderReader({ khatmahPage: 50 });
+
+    // The Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4)...
+    // Arriving on the even half must still show the same spread, not page 50
+    // twice — which is what assuming the current page was the right-hand one did.
+    const spread = await screen.findByRole("article", { name: "صفحتا ٤٩ و٥٠" });
+    const canvases = spread.querySelectorAll("[data-mushaf-rendering]");
+    expect([...canvases].map((c) => c.getAttribute("data-mushaf-page"))).toEqual(["49", "50"]);
+  });
+
+  it("shows a single page when the screen has no room for two", async () => {
+    resize(820, 1180);
+    renderReader({ khatmahPage: 50 });
+    await screen.findByRole("article", { name: "صفحة ٥٠" });
+  });
+});

@@ -848,6 +848,7 @@ const en = {
     meccan: "Meccan",
     medinan: "Medinan",
     ayahCount: "{count} verses",
+    spreadLabel: "Pages {first} and {second}",
     pageLabel: "Page {page}",
     enterPageNumber: "Enter page number (1-604)",
     jumpButton: "Go",

@@ -495,70 +495,10 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
   return canvasRef;
 }
 
-export function MushafPageViewer({
-  lines,
-  language,
-  pageNumber,
-  surahName,
-  juzNumber,
-  direction,
-  theme = "parchment",
-  isBookmarked = false,
-  useQcfGlyphs = false,
-  showWordMeanings = false,
-  headerContent,
-  footerContent,
-  footerStatus,
-  progressBar,
-  chromeVisible = true,
-  paperRef,
-}: {
-  lines: MushafWordToken[][];
-  language: AppLanguage;
-  pageNumber: number;
-  surahName: string;
-  juzNumber: number;
-  direction: "ltr" | "rtl";
-  theme?: MushafTheme;
-  isBookmarked?: boolean;
-  useQcfGlyphs?: boolean;
-  showWordMeanings?: boolean;
-  headerContent?: ReactNode;
-  footerContent?: ReactNode;
-  /** Shown in the footer's reserved space once the action rows step aside, so
-   *  the reader never loses their place. */
-  footerStatus?: ReactNode;
-  /** Always visible, whatever the chrome is doing. */
-  progressBar?: ReactNode;
-  chromeVisible?: boolean;
-  /** The paper itself. A page turn drags this, never the chrome around it. */
-  paperRef?: MutableRefObject<HTMLDivElement | null>;
-}) {
-  const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
-
-  useEffect(() => {
-    if (!showWordMeanings) setActiveWord(null);
-  }, [showWordMeanings]);
-
-  useEffect(() => {
-    setActiveWord(null);
-  }, [pageNumber]);
-
-  // One lookup per word per page, rather than one per word per render. A page
-  // holds roughly 150 words and the canvas re-renders on every control toggle.
-  const meanings = useMemo(() => {
-    const found = new Map<string, string>();
-    for (const words of lines) {
-      for (const word of words) {
-        if (word.isEnd) continue;
-        const meaning = getQuranWordMeaning(word.verseKey, word.text);
-        if (meaning) found.set(`${word.verseKey}:${word.position}`, meaning);
-      }
-    }
-    return found;
-  }, [lines]);
-
-  const lineDetails = useMemo<LineDetail[]>(() => {
+/** Which of the fifteen slots carry words, and which carry a heading or the
+ *  basmalah. Shared by both pages of a spread. */
+function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
+  return useMemo<LineDetail[]>(() => {
     const surahStarts: { surah: number; startLine: number }[] = [];
     for (let l = 0; l < lines.length; l++) {
       const lineWords = lines[l];
@@ -610,23 +550,167 @@ export function MushafPageViewer({
     const lastUsed = slots.reduce((last, slot, index) => (slot.type === "empty" ? last : index + 1), 0);
     return lastUsed > 0 ? slots.slice(0, lastUsed) : slots;
   }, [lines, pageNumber]);
+}
 
+/**
+ * One printed page: its glosses, its fifteen slots, its own fitter.
+ *
+ * Lifted out of the viewer so a wide screen can hold two side by side.
+ * Everything here is per-page and must not be shared — the measure and the type
+ * size are derived from this page's own longest line, and an open gloss belongs
+ * to the page it was tapped on.
+ */
+function MushafPageCanvas({
+  lines,
+  language,
+  pageNumber,
+  direction,
+  theme,
+  useQcfGlyphs,
+  showWordMeanings,
+  inkStroke,
+}: {
+  lines: MushafWordToken[][];
+  language: AppLanguage;
+  pageNumber: number;
+  direction: "ltr" | "rtl";
+  theme: MushafTheme;
+  useQcfGlyphs: boolean;
+  showWordMeanings: boolean;
+  inkStroke: string;
+}) {
+  const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
+
+  useEffect(() => {
+    if (!showWordMeanings) setActiveWord(null);
+  }, [showWordMeanings]);
+
+  useEffect(() => {
+    setActiveWord(null);
+  }, [pageNumber]);
+
+  // One lookup per word per page, rather than one per word per render.
+  const meanings = useMemo(() => {
+    const found = new Map<string, string>();
+    for (const words of lines) {
+      for (const word of words) {
+        if (word.isEnd) continue;
+        const meaning = getQuranWordMeaning(word.verseKey, word.text);
+        if (meaning) found.set(`${word.verseKey}:${word.position}`, meaning);
+      }
+    }
+    return found;
+  }, [lines]);
+
+  const lineDetails = useLineDetails(lines, pageNumber);
   const canvasRef = useLineFitter(
     `${pageNumber}:${useQcfGlyphs}:${lines.length}`,
     useQcfGlyphs ? SLOT_INK_ALLOWANCE["qcf-v2"] : SLOT_INK_ALLOWANCE.fallback,
   );
-
-  // One node, two owners: the fitter measures it and the reader drags it.
-  const setPaper = useCallback(
-    (node: HTMLDivElement | null) => {
-      canvasRef.current = node;
-      if (paperRef) paperRef.current = node;
-    },
-    [canvasRef, paperRef],
-  );
-
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
 
+  return (
+    <div
+      ref={canvasRef}
+      className="min-h-0 min-w-0 flex-1 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2"
+      style={{ containerType: "size" }}
+      data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
+      data-mushaf-page={pageNumber}
+    >
+      <div
+        className="mx-auto flex h-full w-full flex-col"
+        style={{
+          maxWidth: "var(--mushaf-measure, 100%)",
+          fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+          fontSize: useQcfGlyphs
+            ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
+            : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
+          WebkitTextStrokeWidth: inkStroke,
+          WebkitTextStrokeColor: "currentColor",
+        }}
+      >
+        {lineDetails.map((line, lineIdx) => (
+          <div key={lineIdx} className="min-h-0 w-full flex-1">
+            {line.type === "surah-header" ? (
+              <SurahHeaderBand surahNumber={line.surah} language={language} theme={theme} />
+            ) : line.type === "surah-opening" ? (
+              <SurahOpeningBand
+                surahNumber={line.surah}
+                language={language}
+                theme={theme}
+                withBismillah={line.withBismillah}
+              />
+            ) : line.type === "bismillah" ? (
+              <BismillahLine />
+            ) : line.type === "text" ? (
+              <MushafTextLine
+                words={line.words}
+                language={language}
+                direction={direction}
+                theme={theme}
+                useQcfGlyphs={useQcfGlyphs}
+                showWordMeanings={showWordMeanings}
+                meanings={meanings}
+                activeWord={
+                  activeWord &&
+                  line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
+                    ? activeWord
+                    : null
+                }
+                onActiveWordChange={handleActiveWordChange}
+              />
+            ) : (
+              <div className="h-full" aria-hidden="true" />
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function MushafPageViewer({
+  lines,
+  language,
+  pageNumber,
+  surahName,
+  juzNumber,
+  direction,
+  theme = "parchment",
+  isBookmarked = false,
+  useQcfGlyphs = false,
+  showWordMeanings = false,
+  headerContent,
+  footerContent,
+  footerStatus,
+  progressBar,
+  chromeVisible = true,
+  paperRef,
+  facingPage,
+}: {
+  lines: MushafWordToken[][];
+  language: AppLanguage;
+  pageNumber: number;
+  /** The left-hand page of a spread, when the screen has room for one. */
+  facingPage?: { pageNumber: number; lines: MushafWordToken[][]; useQcfGlyphs: boolean };
+  surahName: string;
+  juzNumber: number;
+  direction: "ltr" | "rtl";
+  theme?: MushafTheme;
+  isBookmarked?: boolean;
+  useQcfGlyphs?: boolean;
+  showWordMeanings?: boolean;
+  headerContent?: ReactNode;
+  footerContent?: ReactNode;
+  /** Shown in the footer's reserved space once the action rows step aside, so
+   *  the reader never loses their place. */
+  footerStatus?: ReactNode;
+  /** Always visible, whatever the chrome is doing. */
+  progressBar?: ReactNode;
+  chromeVisible?: boolean;
+  /** The paper itself. A page turn drags this, never the chrome around it. */
+  paperRef?: MutableRefObject<HTMLDivElement | null>;
+}) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
 
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of
@@ -651,6 +735,10 @@ export function MushafPageViewer({
 
   const inkStroke = { parchment: "0.021em", dark: "0.016em", oled: "0.012em", white: "0.021em" }[theme];
 
+  const gutterClass = { parchment: "bg-current/15", dark: "bg-current/15", oled: "bg-white/25", white: "bg-black/10" }[
+    theme
+  ];
+
   const chromeBgClass = {
     parchment: "bg-primary/5 border-primary/20 text-foreground/80",
     dark: "bg-primary/10 border-primary/20 text-foreground/80",
@@ -662,7 +750,14 @@ export function MushafPageViewer({
     <article
       className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden transition-colors duration-200 ${themeClasses}`}
       dir="rtl"
-      aria-label={t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
+      aria-label={
+        facingPage
+          ? t(language, "mushaf.spreadLabel", {
+              first: formatNumerals(pageNumber, language),
+              second: formatNumerals(facingPage.pageNumber, language),
+            })
+          : t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })
+      }
     >
       <h1 className="sr-only">
         {surahName} · {formattedJuz}
@@ -696,65 +791,35 @@ export function MushafPageViewer({
         </div>
       </div>
 
-      {/* 15-line Mushaf page canvas. `container-type: size` lets the type scale
-          off the page height, so all fifteen lines always fit the paper. */}
-      <div
-        ref={setPaper}
-        className="min-h-0 flex-1 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2"
-        style={{ containerType: "size" }}
-        data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
-      >
-        <div
-          // The measure and the type size are both derived by `useLineFitter`
-          // from the one thing that is fixed — fifteen lines in the height of
-          // the paper — so the widest line always lands exactly on the margin.
-          className="mx-auto flex h-full w-full flex-col"
-          style={{
-            maxWidth: "var(--mushaf-measure, 100%)",
-            fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-            fontSize: useQcfGlyphs
-              ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
-              : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
-            WebkitTextStrokeWidth: inkStroke,
-            WebkitTextStrokeColor: "currentColor",
-          }}
-        >
-          {lineDetails.map((line, lineIdx) => (
-            <div key={lineIdx} className="min-h-0 w-full flex-1">
-              {line.type === "surah-header" ? (
-                <SurahHeaderBand surahNumber={line.surah} language={language} theme={theme} />
-              ) : line.type === "surah-opening" ? (
-                <SurahOpeningBand
-                  surahNumber={line.surah}
-                  language={language}
-                  theme={theme}
-                  withBismillah={line.withBismillah}
-                />
-              ) : line.type === "bismillah" ? (
-                <BismillahLine />
-              ) : line.type === "text" ? (
-                <MushafTextLine
-                  words={line.words}
-                  language={language}
-                  direction={direction}
-                  theme={theme}
-                  useQcfGlyphs={useQcfGlyphs}
-                  showWordMeanings={showWordMeanings}
-                  meanings={meanings}
-                  activeWord={
-                    activeWord &&
-                    line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
-                      ? activeWord
-                      : null
-                  }
-                  onActiveWordChange={handleActiveWordChange}
-                />
-              ) : (
-                <div className="h-full" aria-hidden="true" />
-              )}
-            </div>
-          ))}
-        </div>
+      {/* One page, or two facing pages when the screen has room for both at a
+          readable size. Ordered as the Mushaf is bound: the lower page number
+          on the right, the reader moving leftwards. */}
+      <div ref={paperRef} className="flex min-h-0 flex-1" dir="rtl">
+        <MushafPageCanvas
+          lines={lines}
+          language={language}
+          pageNumber={pageNumber}
+          direction={direction}
+          theme={theme}
+          useQcfGlyphs={useQcfGlyphs}
+          showWordMeanings={showWordMeanings}
+          inkStroke={inkStroke}
+        />
+        {facingPage && (
+          <>
+            <div className={`w-px shrink-0 self-stretch ${gutterClass}`} aria-hidden="true" />
+            <MushafPageCanvas
+              lines={facingPage.lines}
+              language={language}
+              pageNumber={facingPage.pageNumber}
+              direction={direction}
+              theme={theme}
+              useQcfGlyphs={facingPage.useQcfGlyphs}
+              showWordMeanings={showWordMeanings}
+              inkStroke={inkStroke}
+            />
+          </>
+        )}
       </div>
 
       <div

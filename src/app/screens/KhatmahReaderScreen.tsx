@@ -54,6 +54,23 @@ const PAPER_SETTLE = "transform 160ms ease-out";
 const FONT_WAIT_MS = 1200;
 /** How long a page must be open before it counts as read rather than passed. */
 const PAGE_DWELL_MS = 4000;
+
+/**
+ * A spread is only worth showing when both pages still read comfortably.
+ *
+ * A Mushaf page is about two thirds as wide as it is tall, so two of them plus
+ * a gutter need roughly 1.4x the height in width. Below that the pair would be
+ * narrower than a single page is now, which trades legibility for novelty.
+ */
+function fitsTwoPages(width: number, height: number) {
+  return width >= 1024 && width / height >= 1.4;
+}
+
+/** The right-hand page of a spread is the odd one: the Mushaf opens with page 1
+ *  on the right, so pairs run (1,2), (3,4) and so on. */
+function spreadStart(page: number) {
+  return page % 2 === 1 ? page : page - 1;
+}
 /**
  * How long the controls stay up once you stop touching them.
  *
@@ -64,6 +81,25 @@ const PAGE_DWELL_MS = 4000;
 const CHROME_IDLE_MS = 4500;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** A page's words, bucketed into the reference's fifteen line slots. */
+function toMushafLines(pageData: MushafVerseData[] | null) {
+  if (!pageData) return [];
+  const lineMap = new Map<
+    number,
+    { verseKey: string; position: number; isEnd: number; text: string; qcfCode?: string }[]
+  >();
+  for (const verse of pageData) {
+    for (const w of verse.w) {
+      const [position, lineNumber, isEnd, text, qcfCode] = w;
+      if (!lineMap.has(lineNumber)) lineMap.set(lineNumber, []);
+      lineMap.get(lineNumber)!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
+    }
+  }
+  const result = [];
+  for (let i = 1; i <= 15; i++) result.push(lineMap.get(i) || []);
+  return result;
+}
 
 interface ResolvedPage {
   page: number;
@@ -131,6 +167,16 @@ export function KhatmahReaderScreen({
    */
   const [keyboardDriven, setKeyboardDriven] = useState(false);
   const reduceMotion = useReducedMotion();
+  const [spreadRoom, setSpreadRoom] = useState(
+    () => typeof window !== "undefined" && fitsTwoPages(window.innerWidth, window.innerHeight),
+  );
+
+  useEffect(() => {
+    const measure = () => setSpreadRoom(fitsTwoPages(window.innerWidth, window.innerHeight));
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
   const paperRef = useRef<HTMLDivElement>(null);
 
   // Sync internal theme with prop updates
@@ -298,24 +344,53 @@ export function KhatmahReaderScreen({
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
 
-  // Transform data into the reference 15 lines
-  const lines = useMemo(() => {
-    if (!pageData) return [];
-    const lineMap = new Map<
-      number,
-      { verseKey: string; position: number; isEnd: number; text: string; qcfCode?: string }[]
-    >();
-    for (const verse of pageData) {
-      for (const w of verse.w) {
-        const [position, lineNumber, isEnd, text, qcfCode] = w;
-        if (!lineMap.has(lineNumber)) lineMap.set(lineNumber, []);
-        lineMap.get(lineNumber)!.push({ verseKey: verse.k, position, isEnd, text, qcfCode });
-      }
+  /**
+   * The other half of the spread.
+   *
+   * The Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4) and so
+   * on: the odd page is always the right-hand one. The page the reader is on
+   * can be either half, so the pair is derived from its parity rather than
+   * assuming it is the right — assuming that showed page 50 twice.
+   */
+  const rightNumber = spreadRoom ? spreadStart(displayPage) : displayPage;
+  const leftNumber = spreadRoom && rightNumber + 1 <= LAST_PAGE ? rightNumber + 1 : null;
+  const otherNumber = leftNumber === null ? null : displayPage === rightNumber ? leftNumber : rightNumber;
+  const [other, setOther] = useState<ResolvedPage | null>(null);
+
+  useEffect(() => {
+    if (otherNumber === null) {
+      setOther(null);
+      return;
     }
-    const result = [];
-    for (let i = 1; i <= 15; i++) result.push(lineMap.get(i) || []);
-    return result;
-  }, [pageData]);
+    let active = true;
+    void (async () => {
+      const data = await loadMushafPage(otherNumber).catch(() => null);
+      if (!active || !data) return;
+      const qcf = pageHasQcfGlyphs(data) ? await loadQcfFont(otherNumber) : false;
+      if (!active) return;
+      setOther({ page: otherNumber, data, qcf });
+    })();
+    return () => {
+      active = false;
+    };
+  }, [otherNumber]);
+
+  // Transform data into the reference 15 lines
+  const lines = useMemo(() => toMushafLines(pageData), [pageData]);
+
+  const otherLines = useMemo(() => (other ? toMushafLines(other.data) : []), [other]);
+  const otherReady = other && other.page === otherNumber ? { ...other, lines: otherLines } : null;
+
+  // The right-hand page is drawn first, because that is the one read first.
+  const rightSide =
+    displayPage === rightNumber
+      ? { page: displayPage, lines, qcf: resolved?.qcf ?? false }
+      : otherReady && { page: otherReady.page, lines: otherReady.lines, qcf: otherReady.qcf };
+  const leftSide =
+    displayPage === rightNumber
+      ? otherReady && { page: otherReady.page, lines: otherReady.lines, qcf: otherReady.qcf }
+      : { page: displayPage, lines, qcf: resolved?.qcf ?? false };
+  const spreadReady = Boolean(leftNumber && rightSide && leftSide);
 
   const useQcfGlyphs = resolved?.qcf ?? false;
 
@@ -333,13 +408,15 @@ export function KhatmahReaderScreen({
     onReadingPositionChange?.({ page: displayPage, surahNumber, ayahNumber, juzNumber });
   }, [displayPage, juzNumber, onReadingPositionChange, pageData]);
 
+  /** One page at a time, or a whole spread when two are showing. */
+  const pageStep = spreadReady ? 2 : 1;
   const paginate = useCallback(
     (delta: number) => {
-      const nextPage = currentPage + delta;
+      const nextPage = currentPage + delta * pageStep;
       if (nextPage < 1 || nextPage > LAST_PAGE) return;
       setKhatmahPage(nextPage);
     },
-    [currentPage, setKhatmahPage],
+    [currentPage, pageStep, setKhatmahPage],
   );
 
   /**
@@ -656,16 +733,21 @@ export function KhatmahReaderScreen({
         {pageData && (
           <div key={displayPage} className={`h-full w-full ${reduceMotion ? "" : "animate-in fade-in duration-150"}`}>
             <MushafPageViewer
-              lines={lines}
+              lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}
-              pageNumber={displayPage}
+              pageNumber={spreadReady && rightSide ? rightSide.page : displayPage}
               surahName={surahName}
               juzNumber={juzNumber}
               direction={direction}
               theme={theme}
               isBookmarked={isCurrentBookmarked}
-              useQcfGlyphs={useQcfGlyphs}
+              useQcfGlyphs={spreadReady && rightSide ? rightSide.qcf : useQcfGlyphs}
               showWordMeanings={showWordMeanings}
+              facingPage={
+                spreadReady && leftSide
+                  ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: leftSide.qcf }
+                  : undefined
+              }
               headerContent={pageHeader}
               footerContent={pageFooter}
               footerStatus={pageStatus}

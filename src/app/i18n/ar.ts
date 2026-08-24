@@ -834,6 +834,7 @@ const ar = {
     meccan: "مكية",
     medinan: "مدنية",
     ayahCount: "{count} آية",
+    spreadLabel: "صفحتا {first} و{second}",
     pageLabel: "صفحة {page}",
     enterPageNumber: "أدخل رقم الصفحة (١-٦٠٤)",
     jumpButton: "انتقال",
