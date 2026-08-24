@@ -116,7 +116,7 @@ describe("MushafPageViewer", () => {
     expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
   });
 
-  it("keeps both the heading and the basmalah when a surah opens with one slot to spare", () => {
+  it("keeps the curved heading and the full-size basmalah inside one canonical slot", () => {
     // Nineteen pages look like this: line 1 free, the surah's first verse on
     // line 2. The heading used to be dropped on the floor.
     render(
@@ -137,7 +137,14 @@ describe("MushafPageViewer", () => {
     );
 
     expect(screen.getAllByText("سورة النساء").length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "سورة النساء" })).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-surah-heading")).toHaveAttribute("data-variant", "curved");
+    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toHaveStyle({
+      fontSize: "clamp(13px, min(4.4cqi, 2.4cqh), 18px)",
+    });
+    expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
+    expect(screen.getByTestId("mushaf-surah-ornament")).toHaveAttribute("aria-hidden", "true");
+    expect(screen.getByTestId("mushaf-surah-ornament")).toHaveAttribute("focusable", "false");
   });
 
   it("omits the basmalah for At-Tawbah, which takes none, but still names the surah", () => {
@@ -185,9 +192,12 @@ describe("MushafPageViewer", () => {
 
     expect(screen.getAllByText("سورة البقرة").length).toBeGreaterThanOrEqual(1);
     const bismillah = screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
-    expect(bismillah).toHaveClass("text-[0.68em]");
-    expect(bismillah).toHaveStyle({ fontFamily: "var(--font-mushaf)" });
-    expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(2);
+    expect(bismillah).toHaveStyle({
+      fontFamily: "var(--font-mushaf)",
+      fontSize: "clamp(13px, min(4.4cqi, 2.4cqh), 18px)",
+    });
+    expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
+    expect(screen.getByRole("heading", { level: 2, name: "سورة البقرة" })).toBeInTheDocument();
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
   });
 });

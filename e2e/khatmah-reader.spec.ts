@@ -135,3 +135,55 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 });
+
+test("keeps the curved Surah header and Bismillah consistent without changing the page grid", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+
+  const openSurah = async (name: RegExp, pageName: string) => {
+    await page.getByRole("button", { name: "فهرس المصحف الشريف" }).click();
+    await page.getByRole("button", { name }).click();
+    await expect(page.getByRole("article", { name: pageName })).toBeVisible();
+  };
+
+  await openSurah(/٢ البقرة/, "صفحة ٢");
+  const ordinaryBismillahSize = await page
+    .getByTestId("mushaf-bismillah")
+    .evaluate((element) => getComputedStyle(element).fontSize);
+  const ornament = page.getByTestId("mushaf-surah-ornament");
+  await expect(page.getByRole("heading", { level: 2, name: "سورة البقرة" })).toBeVisible();
+  await expect(ornament).toHaveAttribute("aria-hidden", "true");
+  await expect(ornament).toHaveAttribute("focusable", "false");
+
+  await openSurah(/٤ النساء/, "صفحة ٧٧");
+  const oneSlotBismillah = page.getByTestId("mushaf-bismillah");
+  const oneSlotBismillahSize = await oneSlotBismillah.evaluate((element) => getComputedStyle(element).fontSize);
+  expect(oneSlotBismillahSize).toBe(ordinaryBismillahSize);
+  await expect(
+    page.getByRole("article", { name: "صفحة ٧٧" }).locator("[data-mushaf-rendering] > div > div"),
+  ).toHaveCount(15);
+
+  const geometry = await page.evaluate(() => {
+    const title = document.querySelector<HTMLElement>('[data-testid="mushaf-surah-title"]');
+    const bismillah = document.querySelector<HTMLElement>('[data-testid="mushaf-bismillah"]');
+    const firstVerse = document.querySelector<HTMLElement>("[data-mushaf-line]");
+    if (!title || !bismillah || !firstVerse) return null;
+    return {
+      titleBottom: title.getBoundingClientRect().bottom,
+      titleClips: title.scrollWidth > title.clientWidth,
+      bismillahTop: bismillah.getBoundingClientRect().top,
+      bismillahBottom: bismillah.getBoundingClientRect().bottom,
+      firstVerseTop: firstVerse.getBoundingClientRect().top,
+      overflow: document.documentElement.scrollWidth - window.innerWidth,
+    };
+  });
+  expect(geometry).not.toBeNull();
+  expect(geometry?.titleClips).toBe(false);
+  expect(geometry?.titleBottom ?? 1).toBeLessThanOrEqual(geometry?.bismillahTop ?? 0);
+  expect(geometry?.bismillahBottom ?? 1).toBeLessThanOrEqual((geometry?.firstVerseTop ?? 0) + 1);
+  expect(geometry?.overflow).toBe(0);
+
+  await openSurah(/٩ التوبة/, "صفحة ١٨٧");
+  await expect(page.getByRole("heading", { level: 2, name: "سورة التوبة" })).toBeVisible();
+  await expect(page.getByTestId("mushaf-bismillah")).toHaveCount(0);
+});

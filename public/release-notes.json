@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-24-6",
+  "release": "2026-08-24-7",
   "ar": [
-    "تظهر أسماء السور بزخرفة عربية مدمجة، مع بسملة أصغر تترك مساحة أوضح لبداية السورة.",
-    "تبقى أدوات المصحف العلوية والسفلية ظاهرة دائماً لمعرفة الموضع والتقدم والتحكم في الصفحات.",
-    "السحب إلى اليمين والسهم الأيمن وزر التالي تتقدم، بينما تعود الحركات المقابلة إلى الصفحة السابقة.",
-    "يعرض الحاسوب صفحتين متقابلتين بمسافة أريح وانتقال أسرع، بينما يبقى الهاتف على صفحة واحدة وإعدادات أبسط."
+    "تظهر أسماء السور الآن داخل إطار مصحفي منحني ورقيق بزخارف متوازنة، من دون زيادة ارتفاع الصفحة.",
+    "تحافظ البسملة على الحجم المدمج نفسه في كل بدايات السور، بما فيها البدايات التي تشارك فيها العنوان موضعاً واحداً.",
+    "تبقى بدايات السور واضحة ومحاذاة بدقة على الهواتف القصيرة والصفحات المتقابلة وفي جميع أنماط العرض."
   ],
   "en": [
-    "Surah names now use a compact Arabic ornament, with a smaller Bismillah that leaves more room for the opening verses.",
-    "The Mushaf's top and bottom controls remain visible so page position, progress, and actions are always available.",
-    "Swiping right, pressing the right arrow, or choosing Next advances; the opposite actions return to the previous page.",
-    "Desktop facing pages have a calmer gutter and faster turns, while phones stay single-page with simpler settings."
+    "Surah names now sit in a refined curved Mushaf-inspired frame with balanced ornaments and no extra page height.",
+    "The Bismillah now keeps the same compact size at every Surah opening, including openings that share one line slot.",
+    "Surah openings stay clear and precisely aligned on short phones, facing pages, and every reader theme."
   ]
 }

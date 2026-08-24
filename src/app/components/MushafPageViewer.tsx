@@ -99,57 +99,99 @@ export function AyahMarker({
 }
 
 /**
- * The printed Mushaf sets a surah heading in a thin ornamented band exactly one
- * line tall. The previous rounded card was three times that height and pushed
- * the reading canvas off the reference grid.
+ * A Surah title is presentation around the Quran, never Quran data. This
+ * curved outline stays inside the line slot it receives, so decoration cannot
+ * change the canonical fifteen-line geometry.
  */
-function SurahHeaderBand({
+function MushafSurahHeader({
   surahNumber,
   language,
-  theme = "light",
+  compact = false,
 }: {
   surahNumber: number | string;
   language: AppLanguage;
-  theme?: MushafPageTheme;
+  compact?: boolean;
 }) {
   const title = getSurahDisplayName(surahNumber, language);
-  const isOled = theme === "oled";
 
   return (
     <div
-      className={`flex h-full w-full items-center justify-center gap-2 border-y px-1 select-none ${
-        isOled ? "border-white/35" : "border-current/20"
-      }`}
+      className="relative flex h-full w-full min-w-0 items-center justify-center px-[17%] select-none"
       dir="rtl"
       data-testid="mushaf-surah-heading"
+      data-variant="curved"
     >
-      <SurahOrnament />
-      <span className="arabic-ui shrink-0 truncate text-[0.48em] font-semibold tracking-[0.1em]">{title}</span>
-      <SurahOrnament mirrored />
+      <svg
+        viewBox="0 0 320 40"
+        preserveAspectRatio="none"
+        className="absolute inset-x-0 top-1/2 h-[88%] w-full -translate-y-1/2 text-accent opacity-70"
+        aria-hidden="true"
+        focusable="false"
+        data-testid="mushaf-surah-ornament"
+      >
+        <path
+          d="M0 20h24c8 0 10-10 18-10h8c2-6 8-9 16-9h188c8 0 14 3 16 9h8c8 0 10 10 18 10h24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          vectorEffect="non-scaling-stroke"
+        />
+        <path
+          d="M42 10c0 18 8 29 24 29h188c16 0 24-11 24-29"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          vectorEffect="non-scaling-stroke"
+        />
+        <CurvedHeaderRosette transform="translate(56 20)" />
+        <CurvedHeaderRosette transform="translate(264 20) scale(-1 1)" />
+      </svg>
+      <h2
+        className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-medium leading-none"
+        style={{
+          fontSize: compact ? "clamp(11px, min(3.8cqi, 2cqh), 15px)" : "clamp(14px, min(4.2cqi, 2.5cqh), 18px)",
+        }}
+        data-testid="mushaf-surah-title"
+      >
+        {title}
+      </h2>
     </div>
   );
 }
 
-/** Compact, repository-native arabesque artwork. It uses the page's own ink,
- *  so the heading remains authentic-looking without another image or font. */
-function SurahOrnament({ mirrored = false }: { mirrored?: boolean }) {
+function CurvedHeaderRosette({ transform }: { transform: string }) {
   return (
-    <svg
-      viewBox="0 0 96 18"
-      preserveAspectRatio="none"
-      className={`h-[0.52em] min-w-0 flex-1 opacity-45 ${mirrored ? "-scale-x-100" : ""}`}
-      aria-hidden="true"
-      data-testid="mushaf-surah-ornament"
-    >
-      <path d="M0 9h21M75 9h21M21 9c8-9 18-9 27 0 9 9 19 9 27 0" fill="none" stroke="currentColor" strokeWidth="1" />
+    <g transform={transform}>
       <path
-        d="M34 9c5-7 9-7 14 0-5 7-9 7-14 0Zm14 0c5-7 9-7 14 0-5 7-9 7-14 0Z"
-        fill="currentColor"
-        fillOpacity=".22"
+        d="M0-8c4 2 5 5 0 8 5 3 4 6 0 8-4-2-5-5 0-8-5-3-4-6 0-8Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        vectorEffect="non-scaling-stroke"
       />
-      <circle cx="48" cy="9" r="3.25" fill="none" stroke="currentColor" strokeWidth="1" />
-      <circle cx="48" cy="9" r="1.25" fill="currentColor" />
-    </svg>
+      <path
+        d="M-8 0c2-4 5-5 8 0 3-5 6-4 8 0-2 4-5 5-8 0-3 5-6 4-8 0Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1"
+        vectorEffect="non-scaling-stroke"
+      />
+      <circle r="1.4" fill="currentColor" />
+    </g>
+  );
+}
+
+const BISMILLAH_FONT_SIZE = "clamp(13px, min(4.4cqi, 2.4cqh), 18px)";
+
+function BismillahText({ text }: { text: string }) {
+  return (
+    <p
+      className="leading-none tracking-[0.03em]"
+      style={{ fontFamily: "var(--font-mushaf)", fontSize: BISMILLAH_FONT_SIZE }}
+      data-testid="mushaf-bismillah"
+    >
+      {text}
+    </p>
   );
 }
 
@@ -163,30 +205,24 @@ function SurahOrnament({ mirrored = false }: { mirrored?: boolean }) {
 function SurahOpeningBand({
   surahNumber,
   language,
-  theme = "light",
   withBismillah,
 }: {
   surahNumber: number | string;
   language: AppLanguage;
-  theme?: MushafPageTheme;
   withBismillah: boolean;
 }) {
-  const title = getSurahDisplayName(surahNumber, language);
-  const isOled = theme === "oled";
-
   return (
-    <div className="flex h-full w-full flex-col items-center justify-center gap-px px-2 select-none" dir="rtl">
-      <span
-        className={`flex w-full items-center justify-center gap-1.5 border-y ${isOled ? "border-white/35" : "border-current/20"}`}
-      >
-        <SurahOrnament />
-        <span className="arabic-ui shrink-0 truncate text-[0.42em] font-semibold tracking-[0.1em]">{title}</span>
-        <SurahOrnament mirrored />
-      </span>
+    <div
+      className={`grid h-full w-full min-w-0 items-center select-none ${withBismillah ? "grid-rows-2" : "grid-rows-1"}`}
+      dir="rtl"
+    >
+      <div className="h-full min-h-0 w-full">
+        <MushafSurahHeader surahNumber={surahNumber} language={language} compact={withBismillah} />
+      </div>
       {withBismillah && (
-        <span className="text-[0.36em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
-          بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-        </span>
+        <div className="flex h-full min-h-0 items-center justify-center">
+          <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
+        </div>
       )}
     </div>
   );
@@ -195,13 +231,7 @@ function SurahOpeningBand({
 function BismillahLine() {
   return (
     <div className="flex h-full w-full items-center justify-center select-none" dir="rtl">
-      <p
-        className="text-[0.68em] leading-none tracking-[0.03em]"
-        style={{ fontFamily: "var(--font-mushaf)" }}
-        data-testid="mushaf-bismillah"
-      >
-        بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
-      </p>
+      <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
     </div>
   );
 }
@@ -684,14 +714,9 @@ function MushafPageCanvas({
         {lineDetails.map((line, lineIdx) => (
           <div key={lineIdx} className="min-h-0 w-full flex-1">
             {line.type === "surah-header" ? (
-              <SurahHeaderBand surahNumber={line.surah} language={language} theme={theme} />
+              <MushafSurahHeader surahNumber={line.surah} language={language} />
             ) : line.type === "surah-opening" ? (
-              <SurahOpeningBand
-                surahNumber={line.surah}
-                language={language}
-                theme={theme}
-                withBismillah={line.withBismillah}
-              />
+              <SurahOpeningBand surahNumber={line.surah} language={language} withBismillah={line.withBismillah} />
             ) : line.type === "bismillah" ? (
               <BismillahLine />
             ) : line.type === "text" ? (
