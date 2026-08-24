@@ -564,7 +564,7 @@ function ZikrAccordion({
         dir={direction}
       >
         {/* Index */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/35 bg-primary/15 text-[0.875rem] font-extrabold text-primary">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-[0.875rem] font-extrabold text-primary-foreground shadow-xs">
           {formatNumerals(index + 1, language)}
         </div>
 

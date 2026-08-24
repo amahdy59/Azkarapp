@@ -4,6 +4,7 @@ import type {
   CategoryId,
   ColorBlindSupport,
   LocationSettings,
+  MushafTheme,
   PrayerTrackingRecord,
   QuranReadingPosition,
   QuranWirdPlan,
@@ -116,7 +117,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   prayerTracking: [],
   savedZikrIds: [],
   khatmahPage: 1,
-  mushafTheme: "parchment",
+  mushafTheme: "follow-app",
   mushafBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
@@ -128,8 +129,15 @@ function isLanguage(value: string): value is AppLanguage {
   return ["en", "ar"].includes(value);
 }
 
-function isMushafTheme(value: unknown): value is "parchment" | "dark" | "oled" | "white" {
-  return typeof value === "string" && ["parchment", "dark", "oled", "white"].includes(value);
+function normalizeMushafTheme(value: unknown): MushafTheme {
+  if (value === "follow-app" || value === "midnight" || value === "light" || value === "dark" || value === "oled") {
+    return value;
+  }
+  // Legacy parchment already followed dark mode; pure white remains an
+  // explicit light preference so an existing choice is not silently lost.
+  if (value === "parchment") return "follow-app";
+  if (value === "white") return "light";
+  return "follow-app";
 }
 
 function normalizeQuranReadingPosition(value: unknown): QuranReadingPosition {
@@ -591,7 +599,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       typeof parsed.khatmahPage === "number" && parsed.khatmahPage >= 1 && parsed.khatmahPage <= 604
         ? Math.floor(parsed.khatmahPage)
         : 1,
-    mushafTheme: isMushafTheme(parsed.mushafTheme) ? parsed.mushafTheme : "parchment",
+    mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
     mushafBookmarks: Array.isArray(parsed.mushafBookmarks)
       ? Array.from(
           new Set(
@@ -881,7 +889,7 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     ),
     savedZikrIds: dedupeSavedZikrIds([...(safeBase.savedZikrIds ?? []), ...(incoming.savedZikrIds ?? [])]),
     khatmahPage: incoming.khatmahPage ?? safeBase.khatmahPage ?? 1,
-    mushafTheme: incoming.mushafTheme ?? safeBase.mushafTheme ?? "parchment",
+    mushafTheme: normalizeMushafTheme(incoming.mushafTheme ?? safeBase.mushafTheme),
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
     dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
     wirdHistory: { ...(safeBase.wirdHistory ?? {}), ...(incoming.wirdHistory ?? {}) },

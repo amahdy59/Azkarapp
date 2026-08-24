@@ -324,3 +324,25 @@
   opacity: 0;
   animation: stagger-enter 400ms var(--motion-ease-enter) forwards;
 }
+/* Facing Mushaf pages keep their paper measure near the spine. The perceived
+   gap therefore stays well inside the 64px ceiling, even on ultrawide
+   screens where each page's derived text measure is narrower than its half. */
+.mushaf-spread {
+  justify-content: center;
+  gap: clamp(0.25rem, 1vw, 1rem);
+  padding-inline: clamp(0.25rem, 1vw, 1rem);
+}
+
+.mushaf-spread__page {
+  flex: 0 1 calc((100% - clamp(0.25rem, 1vw, 1rem)) / 2);
+  max-width: 44rem;
+}
+
+/* The inner padding remains on the outer paper edges, not at the spine. */
+.mushaf-spread__page:first-child {
+  padding-left: 0;
+}
+
+.mushaf-spread__page:last-child {
+  padding-right: 0;
+}

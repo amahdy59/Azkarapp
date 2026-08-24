@@ -137,6 +137,12 @@ describe("app state persistence", () => {
     expect(loadAppState().settings.themeMode).toBe("light");
   });
 
+  it("migrates legacy Mushaf surfaces to the shared app theme model", () => {
+    expect(normalizeAppState({ mushafTheme: "parchment" }).mushafTheme).toBe("follow-app");
+    expect(normalizeAppState({ mushafTheme: "white" }).mushafTheme).toBe("light");
+    expect(normalizeAppState({ mushafTheme: "unknown" }).mushafTheme).toBe("follow-app");
+  });
+
   it("migrates Reader-only saved zikr into app state", () => {
     window.localStorage.setItem("azkarapp.saved-zikr.v1", JSON.stringify(["m-hm-75", "m-hm-75", 3]));
 

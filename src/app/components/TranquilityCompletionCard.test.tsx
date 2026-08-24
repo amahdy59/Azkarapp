@@ -20,4 +20,10 @@ describe("TranquilityCompletionCard", () => {
     expect(card.querySelector(".tranquility-completion-title")).toBeInTheDocument();
     expect(card.querySelector(".tranquility-completion-subtitle")).toBeInTheDocument();
   });
+
+  it("reveals the surface, copy, and icon in a staged entrance", () => {
+    render(<TranquilityCompletionCard categoryId="evening" language="en" />);
+    expect(screen.getByRole("status")).toHaveClass("is-entering");
+    expect(screen.getByRole("status").querySelector(".completion-badge-pop")).not.toBeInTheDocument();
+  });
 });

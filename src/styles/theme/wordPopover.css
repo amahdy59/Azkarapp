@@ -74,15 +74,33 @@
 
 .quran-word-popover__gloss {
   margin: 0;
-  font-size: 0.9375rem;
-  line-height: 1.75;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 1rem;
+  line-height: 1.8;
   font-weight: 500;
   text-align: start;
 }
 
 .quran-word-popover__word {
+  font-family: var(--font-mushaf);
+  font-size: 1.5rem;
   font-weight: 800;
   color: var(--primary);
+}
+
+.quran-word-popover__meaning-label {
+  margin-block-start: 0.125rem;
+  font-family: var(--font-ui-arabic);
+  font-size: 0.6875rem;
+  font-weight: 800;
+  line-height: 1.4;
+  color: var(--primary);
+}
+
+.quran-word-popover__meaning {
+  font-family: var(--font-ui-arabic);
+  font-weight: 600;
 }
 
 .quran-word-popover__sep {
@@ -104,6 +122,20 @@
   font-size: 0.6875rem;
   font-weight: 700;
   color: var(--muted-foreground);
+}
+
+.quran-word-popover__meta {
+  display: grid;
+  gap: 0.125rem;
+  min-width: 0;
+}
+
+.quran-word-popover__source {
+  max-width: 18rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  line-height: 1.45;
+  color: var(--primary);
 }
 
 .quran-word-popover__footer button {

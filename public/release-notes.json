@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-24-2",
+  "release": "2026-08-24-3",
   "ar": [
-    "أصبحت أدوات المصحف واضحة في الأنماط الداكنة، وتختفي رسالة إتمام الورد تلقائياً دون حجب الصفحة.",
-    "تتكيف خطة القراءة وشرح سلسلة النخلة مع شاشات الهاتف دون تداخل أو خروج عن البطاقة.",
-    "أصبحت خطوط الواجهة العربية أكثر اتساقاً، مع انتقال ألطف عند إتمام الورد اليومي.",
-    "يبقى بحث فهرس المصحف ثابتاً وواضحاً، ولا تظهر أسماء السور خلف خانة البحث أثناء التمرير."
+    "يتبع المصحف الآن نمط التطبيق تلقائياً في الأوضاع الكحلي والداكن والفاتح، مع خيار OLED عالي التباين.",
+    "أصبحت الصفحتان المتقابلتان أقرب على الشاشات الكبيرة، مع تباعد أسطر أريح على الحاسوب والجهاز اللوحي.",
+    "تعرض بطاقة معنى الكلمة شرحاً أوضح ورقم الآية والمصدر الموثوق دون حجب موضع القراءة.",
+    "أصبحت أرقام الأذكار أوضح، ونص سلسلة النخلة أقصر، وحركة بطاقة الإتمام أكثر هدوءاً وتدرجاً."
   ],
   "en": [
-    "Mushaf controls now stay legible in dark page styles, and the Wird-complete notice clears without covering the page.",
-    "The reading plan and Palm streak explanation now fit phone screens without overlap or clipping.",
-    "Arabic interface typography is more consistent, with a gentler transition after completing the daily routine.",
-    "Mushaf index search stays clear while scrolling, with surah results no longer showing behind the search field."
+    "The Mushaf now follows the app's Midnight, Dark, or Light theme automatically, with an OLED high-contrast option.",
+    "Facing pages sit closer together on large screens, with more comfortable line spacing on desktop and tablet.",
+    "Word meaning cards now show a clearer explanation, ayah number, and trusted source without losing the reading position.",
+    "Zikr numbers are clearer, Palm streak guidance is shorter, and the completion card moves in a calmer sequence."
   ]
 }

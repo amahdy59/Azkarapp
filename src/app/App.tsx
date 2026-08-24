@@ -246,7 +246,7 @@ function AppContent() {
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
   const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
-  const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "parchment");
+  const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
   const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
   const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
@@ -624,7 +624,7 @@ function AppContent() {
     setSessions(state.sessions);
     setSavedZikrIds(new Set(state.savedZikrIds));
     setKhatmahPage(state.khatmahPage ?? 1);
-    setMushafTheme(state.mushafTheme ?? "parchment");
+    setMushafTheme(state.mushafTheme ?? "follow-app");
     setMushafBookmarks(state.mushafBookmarks ?? []);
     setDailyWirdGoal(state.dailyWirdGoal ?? 4);
     setWirdHistory(state.wirdHistory ?? {});
@@ -1426,6 +1426,7 @@ function AppContent() {
                   khatmahPage={khatmahPage}
                   setKhatmahPage={setKhatmahPage}
                   mushafTheme={mushafTheme}
+                  appTheme={themeMode}
                   setMushafTheme={setMushafTheme}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}

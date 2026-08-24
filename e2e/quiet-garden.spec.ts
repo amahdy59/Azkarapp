@@ -184,7 +184,7 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
   await garden.getByRole("button", { name: "How a palm is earned" }).click();
   await expect(garden.getByRole("tooltip")).toHaveText(
-    "Complete Morning, Evening, and Before Sleep Azkar each day to grow your palm streak.",
+    "Complete Morning, Evening, and Before Sleep Azkar to build your daily palm streak.",
   );
   await expect(garden.getByRole("tooltip")).toBeInViewport();
 });

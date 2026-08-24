@@ -9,13 +9,13 @@ import {
   type ReactNode,
   type MutableRefObject,
 } from "react";
-import type { AppLanguage, MushafTheme } from "../types";
-import { getQuranWordMeaning } from "../content/quranWordMeanings";
-import * as Popover from "@radix-ui/react-popover";
+import type { AppLanguage, MushafPageTheme } from "../types";
+import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
-import { X, Bookmark } from "./icons";
+import { Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getSurahDisplayName } from "../content/surahInfo";
+import { QuranWordPopover } from "./QuranWordPopover";
 
 export interface MushafWordToken {
   verseKey: string;
@@ -48,11 +48,11 @@ const CHROME_MEASURE = "min(100%, max(var(--mushaf-measure, 100%), 22rem))";
 export function AyahMarker({
   number,
   language,
-  theme = "parchment",
+  theme = "light",
 }: {
   number: string | number;
   language: AppLanguage;
-  theme?: MushafTheme;
+  theme?: MushafPageTheme;
 }) {
   const displayNum = formatNumerals(number, language);
   const isOled = theme === "oled";
@@ -106,11 +106,11 @@ export function AyahMarker({
 function SurahHeaderBand({
   surahNumber,
   language,
-  theme = "parchment",
+  theme = "light",
 }: {
   surahNumber: number | string;
   language: AppLanguage;
-  theme?: MushafTheme;
+  theme?: MushafPageTheme;
 }) {
   const title = getSurahDisplayName(surahNumber, language);
   const isOled = theme === "oled";
@@ -150,12 +150,12 @@ function SurahHeaderBand({
 function SurahOpeningBand({
   surahNumber,
   language,
-  theme = "parchment",
+  theme = "light",
   withBismillah,
 }: {
   surahNumber: number | string;
   language: AppLanguage;
-  theme?: MushafTheme;
+  theme?: MushafPageTheme;
   withBismillah: boolean;
 }) {
   const title = getSurahDisplayName(surahNumber, language);
@@ -197,14 +197,13 @@ type LineDetail =
 interface ActiveWord {
   verseKey: string;
   wordPosition: number;
-  text: string;
-  meaning: string;
+  meaning: QuranWordMeaning;
+  anchor: HTMLElement;
 }
 
 const MushafTextLine = memo(function MushafTextLine({
   words,
   language,
-  direction,
   theme,
   useQcfGlyphs,
   showWordMeanings,
@@ -214,11 +213,10 @@ const MushafTextLine = memo(function MushafTextLine({
 }: {
   words: MushafWordToken[];
   language: AppLanguage;
-  direction: "ltr" | "rtl";
-  theme: MushafTheme;
+  theme: MushafPageTheme;
   useQcfGlyphs: boolean;
   showWordMeanings: boolean;
-  meanings: ReadonlyMap<string, string>;
+  meanings: ReadonlyMap<string, QuranWordMeaning>;
   /** The open word *on this line*, or null. Passing the page-wide value here
    *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
@@ -279,7 +277,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 <span className="sr-only">{w.text}</span>
               </>
             ) : (
-              <span className="select-text" title={!isArabic && meaning ? meaning : undefined}>
+              <span className="select-text" title={!isArabic && meaning ? meaning.explanationArabic : undefined}>
                 {w.text}
               </span>
             );
@@ -287,49 +285,22 @@ const MushafTextLine = memo(function MushafTextLine({
           if (meaning && showWordMeanings) {
             const isOpen = activeWord?.verseKey === w.verseKey && activeWord?.wordPosition === w.position;
             return (
-              <Popover.Root
+              <button
                 key={`${w.verseKey}-${w.position}`}
-                open={isOpen}
-                onOpenChange={(open) => {
-                  if (open)
-                    onActiveWordChange({ verseKey: w.verseKey, wordPosition: w.position, text: w.text, meaning });
-                  else if (isOpen) onActiveWordChange(null);
+                type="button"
+                data-word-active={isOpen ? "true" : undefined}
+                onClick={(event) => {
+                  onActiveWordChange(
+                    isOpen
+                      ? null
+                      : { verseKey: w.verseKey, wordPosition: w.position, meaning, anchor: event.currentTarget },
+                  );
                 }}
+                className="relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/14 p-0 align-baseline text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors [font:inherit] [line-height:inherit] hover:bg-primary/24 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >
-                <Popover.Trigger asChild>
-                  <button
-                    type="button"
-                    className="relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/10 p-0 align-baseline text-primary underline decoration-2 decoration-dotted underline-offset-4 transition-colors [font:inherit] [line-height:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
-                  >
-                    {wordContent}
-                  </button>
-                </Popover.Trigger>
-                <Popover.Portal>
-                  <Popover.Content
-                    side="top"
-                    sideOffset={6}
-                    className="z-50 max-w-[290px] rounded-xl border border-border/60 bg-popover p-3.5 text-popover-foreground shadow-overlay animate-in fade-in zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out data-[state=closed]:zoom-out-95"
-                    dir={direction}
-                  >
-                    <div className="flex flex-col gap-1.5">
-                      <div className="flex w-full items-center justify-between border-b border-border/40 pb-1.5">
-                        <span
-                          className="text-[1.125rem] font-bold text-primary"
-                          style={{ fontFamily: "var(--font-mushaf)" }}
-                        >
-                          {w.text}
-                        </span>
-                        <Popover.Close className="rounded-full p-1 text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
-                          <X size={14} />
-                        </Popover.Close>
-                      </div>
-                      <p className="font-sans text-[0.875rem] font-medium leading-relaxed">{meaning}</p>
-                    </div>
-                    <Popover.Arrow className="fill-popover" />
-                  </Popover.Content>
-                </Popover.Portal>
-              </Popover.Root>
+                {wordContent}
+              </button>
             );
           }
 
@@ -451,7 +422,10 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
        * the vertically-limited type actually spans makes the two agree, and the
        * type comes out the same size either way.
        */
-      const verticalScale = lineHeight > 0 ? (slotHeight * inkAllowance) / lineHeight : 1;
+      // Tablet and desktop pages can trade a little glyph size for calmer
+      // leading while retaining all fifteen canonical line slots.
+      const responsiveInkAllowance = window.innerWidth >= 768 ? Math.max(0.58, inkAllowance - 0.06) : inkAllowance;
+      const verticalScale = lineHeight > 0 ? (slotHeight * responsiveInkAllowance) / lineHeight : 1;
       const measure = Math.min(widest * verticalScale, available);
       const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
 
@@ -569,15 +543,17 @@ function MushafPageCanvas({
   useQcfGlyphs,
   showWordMeanings,
   inkStroke,
+  spreadSide,
 }: {
   lines: MushafWordToken[][];
   language: AppLanguage;
   pageNumber: number;
   direction: "ltr" | "rtl";
-  theme: MushafTheme;
+  theme: MushafPageTheme;
   useQcfGlyphs: boolean;
   showWordMeanings: boolean;
   inkStroke: string;
+  spreadSide?: "right" | "left";
 }) {
   const [activeWord, setActiveWord] = useState<ActiveWord | null>(null);
 
@@ -591,11 +567,11 @@ function MushafPageCanvas({
 
   // One lookup per word per page, rather than one per word per render.
   const meanings = useMemo(() => {
-    const found = new Map<string, string>();
+    const found = new Map<string, QuranWordMeaning>();
     for (const words of lines) {
       for (const word of words) {
         if (word.isEnd) continue;
-        const meaning = getQuranWordMeaning(word.verseKey, word.text);
+        const meaning = getQuranWordMeaningEntry(word.verseKey, word.text);
         if (meaning) found.set(`${word.verseKey}:${word.position}`, meaning);
       }
     }
@@ -612,13 +588,13 @@ function MushafPageCanvas({
   return (
     <div
       ref={canvasRef}
-      className="min-h-0 min-w-0 flex-1 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2"
+      className={`${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2`}
       style={{ containerType: "size" }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
       <div
-        className="mx-auto flex h-full w-full flex-col"
+        className={`flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
         style={{
           maxWidth: "var(--mushaf-measure, 100%)",
           fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
@@ -646,7 +622,6 @@ function MushafPageCanvas({
               <MushafTextLine
                 words={line.words}
                 language={language}
-                direction={direction}
                 theme={theme}
                 useQcfGlyphs={useQcfGlyphs}
                 showWordMeanings={showWordMeanings}
@@ -665,6 +640,14 @@ function MushafPageCanvas({
           </div>
         ))}
       </div>
+      <QuranWordPopover
+        meanings={activeWord ? [activeWord.meaning] : null}
+        anchorEl={activeWord?.anchor ?? null}
+        language={language}
+        direction={direction}
+        showSource
+        onClose={() => setActiveWord(null)}
+      />
     </div>
   );
 }
@@ -676,7 +659,7 @@ export function MushafPageViewer({
   surahName,
   juzNumber,
   direction,
-  theme = "parchment",
+  theme = "light",
   isBookmarked = false,
   useQcfGlyphs = false,
   showWordMeanings = false,
@@ -696,7 +679,7 @@ export function MushafPageViewer({
   surahName: string;
   juzNumber: number;
   direction: "ltr" | "rtl";
-  theme?: MushafTheme;
+  theme?: MushafPageTheme;
   isBookmarked?: boolean;
   useQcfGlyphs?: boolean;
   showWordMeanings?: boolean;
@@ -726,29 +709,19 @@ export function MushafPageViewer({
    * read a juz by. OLED keeps its pure black on purpose — it is the
    * high-contrast choice, and it says so on the tin.
    */
-  const themeClasses = {
-    parchment: "bg-[#fbf7ee] dark:bg-[#191d26] text-[#1c1917] dark:text-[#e6e1d6]",
-    dark: "bg-[#1a1d23] text-[#ded8cc]",
-    oled: "bg-[#000000] text-[#ffffff]",
-    white: "bg-[#ffffff] text-[#111827]",
-  }[theme];
+  const themeClasses = theme === "oled" ? "bg-black text-white" : "bg-background text-foreground";
 
-  const inkStroke = { parchment: "0.021em", dark: "0.016em", oled: "0.012em", white: "0.021em" }[theme];
+  const inkStroke = { midnight: "0.016em", dark: "0.016em", oled: "0.012em", light: "0.021em" }[theme];
 
-  const gutterClass = { parchment: "bg-current/15", dark: "bg-current/15", oled: "bg-white/25", white: "bg-black/10" }[
-    theme
-  ];
+  const gutterClass = theme === "oled" ? "bg-white/25" : "bg-border";
 
-  const chromeBgClass = {
-    parchment: "bg-[#f7f0e3] border-[#9b7a35]/25 text-[#29231a] dark:bg-[#151923] dark:text-[#e6e1d6]",
-    dark: "bg-[#12151b] border-[#c8a45b]/25 text-[#e6e1d6]",
-    oled: "bg-white/10 border-white/30 text-white",
-    white: "bg-gray-100 border-gray-200 text-gray-800",
-  }[theme];
+  const chromeBgClass =
+    theme === "oled" ? "bg-black border-white/30 text-white" : "bg-card border-border text-card-foreground";
 
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden transition-colors duration-200 ${themeClasses}`}
+      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden transition-colors duration-200 ${themeClasses} ${theme === "oled" ? "" : `theme-${theme}`}`}
+      data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
       aria-label={
         facingPage
@@ -794,7 +767,7 @@ export function MushafPageViewer({
       {/* One page, or two facing pages when the screen has room for both at a
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
-      <div ref={paperRef} className="flex min-h-0 flex-1" dir="rtl">
+      <div ref={paperRef} className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`} dir="rtl">
         <MushafPageCanvas
           lines={lines}
           language={language}
@@ -804,6 +777,7 @@ export function MushafPageViewer({
           useQcfGlyphs={useQcfGlyphs}
           showWordMeanings={showWordMeanings}
           inkStroke={inkStroke}
+          spreadSide={facingPage ? "right" : undefined}
         />
         {facingPage && (
           <>
@@ -817,6 +791,7 @@ export function MushafPageViewer({
               useQcfGlyphs={facingPage.useQcfGlyphs}
               showWordMeanings={showWordMeanings}
               inkStroke={inkStroke}
+              spreadSide="left"
             />
           </>
         )}

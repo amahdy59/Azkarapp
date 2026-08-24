@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { ChevronUp } from "./icons";
-import type { QuranWordMeaning } from "../content/quranWordMeanings";
+import { QURAN_WORD_MEANING_SOURCE, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
@@ -26,13 +26,15 @@ export function QuranWordPopover({
   language,
   direction,
   onShowAll,
+  showSource = false,
   onClose,
 }: {
   meanings: QuranWordMeaning[] | null;
   anchorEl: HTMLElement | null;
   language: AppLanguage;
   direction: "ltr" | "rtl";
-  onShowAll: () => void;
+  onShowAll?: () => void;
+  showSource?: boolean;
   onClose: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -153,22 +155,29 @@ export function QuranWordPopover({
     >
       <p className="quran-word-popover__gloss" lang="ar" dir="rtl">
         <span className="quran-word-popover__word">{primary.word}</span>
-        <span aria-hidden="true" className="quran-word-popover__sep">
-          :
-        </span>{" "}
-        {primary.explanationArabic}
+        <span className="quran-word-popover__meaning-label">{t(language, "reader.wordMeaningLabel")}</span>
+        <span className="quran-word-popover__meaning">{primary.explanationArabic}</span>
       </p>
 
       <div className="quran-word-popover__footer">
-        <bdi className="quran-word-popover__ayah">
-          {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
-        </bdi>
-        <button type="button" onClick={onShowAll} data-testid="quran-word-popover-all">
-          {extra > 0
-            ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
-            : t(language, "reader.wordMeaningAll")}
-          <ChevronUp size={14} aria-hidden="true" />
-        </button>
+        <span className="quran-word-popover__meta">
+          <bdi className="quran-word-popover__ayah">
+            {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
+          </bdi>
+          {showSource && (
+            <span className="quran-word-popover__source">
+              {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
+            </span>
+          )}
+        </span>
+        {onShowAll && (
+          <button type="button" onClick={onShowAll} data-testid="quran-word-popover-all">
+            {extra > 0
+              ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
+              : t(language, "reader.wordMeaningAll")}
+            <ChevronUp size={14} aria-hidden="true" />
+          </button>
+        )}
       </div>
     </div>
   );

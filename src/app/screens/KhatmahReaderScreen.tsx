@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
-import type { AppLanguage, MushafTheme, QuranReadingPosition, QuranWirdPlan } from "../types";
+import type { AppLanguage, MushafTheme, QuranReadingPosition, QuranWirdPlan, ThemeMode } from "../types";
 import {
   ChevronRight,
   ChevronLeft,
@@ -116,7 +116,8 @@ export function KhatmahReaderScreen({
   onBack,
   khatmahPage,
   setKhatmahPage,
-  mushafTheme: initialTheme = "parchment",
+  mushafTheme: initialTheme = "follow-app",
+  appTheme = "midnight",
   setMushafTheme: onUpdateTheme,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
@@ -131,6 +132,7 @@ export function KhatmahReaderScreen({
   khatmahPage: number;
   setKhatmahPage: (page: number) => void;
   mushafTheme?: MushafTheme;
+  appTheme?: ThemeMode;
   setMushafTheme?: (theme: MushafTheme) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
@@ -142,6 +144,7 @@ export function KhatmahReaderScreen({
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
 
   const [theme, setTheme] = useState<MushafTheme>(initialTheme);
+  const resolvedTheme = theme === "follow-app" ? appTheme : theme;
   const [bookmarks, setBookmarks] = useState<number[]>(initialBookmarks);
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
@@ -512,12 +515,10 @@ export function KhatmahReaderScreen({
   /** The options menu opens in a portal, outside the page, so it cannot inherit
    *  the paper. Without this it arrived in the app's own popover colours and
    *  read as a different product sitting on top of the Mushaf. */
-  const menuSurfaceClass = {
-    parchment: "bg-[#fbf7ee] text-[#1c1917] border-primary/25 dark:bg-[#141820] dark:text-[#f3f4f6]",
-    dark: "bg-[#0b0e14] text-[#f3f4f6] border-primary/25",
-    oled: "bg-black text-white border-white/40",
-    white: "bg-white text-[#111827] border-gray-300",
-  }[theme];
+  const menuSurfaceClass =
+    resolvedTheme === "oled"
+      ? "bg-black text-white border-white/40"
+      : `theme-${resolvedTheme} bg-popover text-popover-foreground border-border`;
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
@@ -596,10 +597,11 @@ export function KhatmahReaderScreen({
           <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
             {(
               [
-                ["parchment", t(language, "mushaf.themeParchment")],
+                ["follow-app", t(language, "mushaf.themeFollowApp")],
+                ["midnight", t(language, "mushaf.themeMidnight")],
                 ["dark", t(language, "mushaf.themeDark")],
+                ["light", t(language, "mushaf.themeLight")],
                 ["oled", t(language, "mushaf.themeOled")],
-                ["white", t(language, "mushaf.themeWhite")],
               ] as const
             ).map(([id, label]) => (
               <DropdownMenuRadioItem key={id} value={id}>
@@ -749,7 +751,7 @@ export function KhatmahReaderScreen({
               surahName={surahName}
               juzNumber={juzNumber}
               direction={direction}
-              theme={theme}
+              theme={resolvedTheme}
               isBookmarked={isCurrentBookmarked}
               useQcfGlyphs={spreadReady && rightSide ? rightSide.qcf : useQcfGlyphs}
               showWordMeanings={showWordMeanings}

@@ -22,11 +22,11 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
       role="status"
       aria-label={completedTitle}
       aria-live="polite"
-      className={`tranquility-completion grid w-full ${isExiting ? "is-exiting" : "slide-up"}`}
+      className={`tranquility-completion grid w-full ${isExiting ? "is-exiting" : "is-entering"}`}
     >
       <div className="min-h-0 overflow-hidden">
         <div className="hero-glass tranquility-completion-card flex flex-col items-center gap-5 rounded-3xl px-5 py-6 text-center sm:px-6 sm:py-7">
-          <div className="completion-badge-pop tranquility-completion-icon flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
+          <div className="tranquility-completion-icon flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
             <Check size={34} strokeWidth={2.8} aria-hidden="true" />
           </div>
 

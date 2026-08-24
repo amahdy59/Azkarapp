@@ -256,6 +256,10 @@ export function loadSurahWordMeanings(surahNumber: number | string): Promise<voi
 }
 
 export function getQuranWordMeaning(verseKey: string, wordText: string): string | undefined {
+  return getQuranWordMeaningEntry(verseKey, wordText)?.explanationArabic;
+}
+
+export function getQuranWordMeaningEntry(verseKey: string, wordText: string): QuranWordMeaning | undefined {
   const parts = verseKey.split(":");
   if (parts.length < 2) return undefined;
   const surah = parts[0];
@@ -269,13 +273,27 @@ export function getQuranWordMeaning(verseKey: string, wordText: string): string 
   if (!ayahMeanings) return undefined;
 
   // Direct match
-  if (ayahMeanings[wordText]) return ayahMeanings[wordText] as string;
+  if (ayahMeanings[wordText]) {
+    return {
+      id: `${surah}:${ayah}:${wordText}`,
+      surahNumber: Number(surah),
+      ayahNumber: Number(ayah),
+      word: wordText,
+      explanationArabic: ayahMeanings[wordText] as string,
+    };
+  }
 
   // Normalized match
   const normalizedWord = normalizeArabic(wordText).value;
   for (const [key, meaning] of Object.entries(ayahMeanings)) {
     if (normalizeArabic(key).value === normalizedWord) {
-      return meaning as string;
+      return {
+        id: `${surah}:${ayah}:${key}`,
+        surahNumber: Number(surah),
+        ayahNumber: Number(ayah),
+        word: key,
+        explanationArabic: meaning as string,
+      };
     }
   }
 

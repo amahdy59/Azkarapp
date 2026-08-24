@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KhatmahReaderScreen } from "./KhatmahReaderScreen";
@@ -116,11 +116,17 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
   });
 
-  it("keeps dark Mushaf chrome readable and exposes the desktop key hint", async () => {
+  it("uses semantic dark Mushaf chrome and exposes the desktop key hint", async () => {
     renderReader({ mushafTheme: "dark" });
     const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
-    expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("text-[#e6e1d6]");
+    expect(article).toHaveAttribute("data-theme", "dark");
+    expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("bg-card", "text-card-foreground");
     expect(screen.getByText("← / → للتنقل بين الصفحات")).toBeInTheDocument();
+  });
+
+  it("follows the app theme by default", async () => {
+    renderReader({ mushafTheme: "follow-app", appTheme: "light" });
+    expect(await screen.findByRole("article", { name: "صفحة ٤٢" })).toHaveAttribute("data-theme", "light");
   });
 
   it("says nothing about a wird when no plan has been chosen", async () => {
@@ -143,7 +149,12 @@ describe("KhatmahReaderScreen difficult words", () => {
     await user.click(toggle);
 
     expect(toggle).toHaveAttribute("aria-checked", "true");
-    await waitFor(() => expect(screen.getByRole("button", { name: /معنى كلمة/ })).toBeInTheDocument());
+    const word = await screen.findByRole("button", { name: /معنى كلمة/ });
+    await user.click(word);
+    const popover = await screen.findByRole("tooltip");
+    expect(popover).toHaveTextContent("المعنى");
+    expect(popover).toHaveTextContent("آية ٢٥٥");
+    expect(popover).toHaveTextContent("مجمع الملك فهد");
 
     await user.click(toggle);
     expect(toggle).toHaveAttribute("aria-checked", "false");
@@ -169,6 +180,8 @@ describe("KhatmahReaderScreen facing pages", () => {
     const spread = await screen.findByRole("article", { name: "صفحتا ٤٩ و٥٠" });
     const canvases = spread.querySelectorAll("[data-mushaf-rendering]");
     expect([...canvases].map((c) => c.getAttribute("data-mushaf-page"))).toEqual(["49", "50"]);
+    expect(spread.querySelector(".mushaf-spread")).toBeInTheDocument();
+    expect([...canvases].every((canvas) => canvas.classList.contains("mushaf-spread__page"))).toBe(true);
   });
 
   it("shows a single page when the screen has no room for two", async () => {

@@ -165,16 +165,9 @@
     both;
 }
 
-/* The completion badge lands a beat after the card that carries it, so the
-   check reads as the result of the card arriving rather than part of the same
-   movement. Reuses the favorite-pop curve — the app already has one "pop once"
-   gesture and a second would be a different vocabulary for the same idea. */
-.completion-badge-pop {
-  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) 160ms both;
-}
-
-/* The Home completion card leaves as one quiet sequence: result first, copy
-   next, then the surface contracts so the content below moves without a jump. */
+/* The Home completion card enters surface, copy, then check. It leaves in the
+   exact reverse order: check, copy, then surface, so the next card can settle
+   into place without an abrupt swap. */
 .tranquility-completion {
   grid-template-rows: 1fr;
   opacity: 1;
@@ -183,6 +176,41 @@
     grid-template-rows var(--motion-duration-emphasis) var(--motion-ease-exit) 120ms,
     opacity 180ms var(--motion-ease-exit) 220ms,
     transform 220ms var(--motion-ease-exit) 180ms;
+}
+
+.tranquility-completion.is-entering .tranquility-completion-card {
+  animation: tranquility-surface-in var(--motion-duration-standard) var(--motion-ease-enter) both;
+}
+
+.tranquility-completion.is-entering .tranquility-completion-title,
+.tranquility-completion.is-entering .tranquility-completion-subtitle {
+  animation: tranquility-copy-in var(--motion-duration-standard) var(--motion-ease-enter) 90ms both;
+}
+
+.tranquility-completion.is-entering .tranquility-completion-icon {
+  animation: favorite-pop var(--motion-duration-standard) var(--motion-ease-enter) 170ms both;
+}
+
+@keyframes tranquility-surface-in {
+  from {
+    opacity: 0;
+    transform: scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes tranquility-copy-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.2rem) scaleX(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scaleX(1);
+  }
 }
 
 .tranquility-completion-icon,
@@ -200,8 +228,8 @@
 }
 
 .tranquility-completion.is-exiting .tranquility-completion-icon {
-  opacity: 0.35;
-  transform: scale(0.82);
+  opacity: 0;
+  transform: scale(0.72);
 }
 
 .tranquility-completion.is-exiting .tranquility-completion-title {

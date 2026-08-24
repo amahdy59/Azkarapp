@@ -235,7 +235,10 @@ export interface PrayerTrackingRecord {
   adhkar: boolean;
 }
 
-export type MushafTheme = "parchment" | "dark" | "oled" | "white";
+/** The Mushaf follows the app by default, while OLED remains an explicit
+ * high-contrast reading override rather than a fourth product theme. */
+export type MushafTheme = "follow-app" | ThemeMode | "oled";
+export type MushafPageTheme = ThemeMode | "oled";
 
 export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom";
 
@@ -270,7 +273,7 @@ export interface AppStateSnapshot {
   lastActiveDayKey?: string;
   /** User's current reading position in the Quran Khatmah (page number 1-604). */
   khatmahPage?: number;
-  /** Mushaf color theme preference (parchment, dark, oled, white). */
+  /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
