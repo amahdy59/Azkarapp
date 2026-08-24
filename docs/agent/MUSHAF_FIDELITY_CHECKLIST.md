@@ -153,7 +153,7 @@ if you want to compare directly.
 
 ## 10. Raised while doing the work — needs your call
 
-- [ ] **[needs you]** The immersive Mushaf reader (`MushafImmersiveReader`, opened from the azkar
+- [x] Done in DEC-094: the immersive Mushaf reader (`MushafImmersiveReader`, opened from the azkar
       reader for multi-page surahs) still uses the _old_ Arabic convention that DEC-086 approved:
       `ArrowLeft` advances, and the footer's start-side button is Previous. The standalone Mushaf
       now does the opposite (item 5.1). Two opposite page-turn conventions in one app is worse
@@ -190,9 +190,9 @@ ragged column. Numbering matches the review handed to the owner.
 
 - [x] **5.** QCF lines carry no inter-word gap — the glyph advances already hold the page's own word
       spacing. The Unicode fallback keeps its gap, having none built in. (DEC-092)
-- [ ] **10.** No two-page spread on wide screens. **Left open deliberately:** it changes the page
-      model rather than its styling — one set of chrome across two canvases, navigation stepping by
-      two, the fitter measuring two pages — and deserves its own change.
+- [x] **10.** Two facing pages on a wide screen (DEC-096). The page canvas is its own component so
+      two can sit side by side, each with its own fitter and its own measure; the pair is derived
+      from parity so arriving on either half shows the same spread; turns step by two.
 - [x] **11.** Fallback ayah markers are set in the page's own ink, not the accent colour. (DEC-092)
 - [x] **12.** A surah opening with one slot to spare now shows a combined band carrying both the
       name and the basmalah. Nineteen pages were dropping the surah name; At-Tawbah's page, which

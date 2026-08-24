@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-23-7",
+  "release": "2026-08-24-1",
   "ar": [
-    "لم يعد عليك الضغط على زر لتسجيل الصفحة — تُحتسب وحدها أثناء القراءة، ويظهر لك إشعار عند إتمام ورد اليوم.",
-    "أصبح النمط الليلي أهدأ للعين، بحبر دافئ على خلفية رمادية داكنة بدل الأبيض على الأسود.",
-    "خفّ عنوان السورة أكثر بخطين رفيعين على جانبيه، وكُتبت البسملة بخط المصحف نفسه.",
-    "حفظ موضع القراءة صار زراً مستقلاً، وبقيت أنماط الصفحة في قائمة واحدة واضحة."
+    "على الشاشات العريضة يظهر المصحف بصفحتين متقابلتين كما في المصحف المطبوع، وتنتقل الصفحتان معاً.",
+    "الصفحة ذات الرقم الفردي على اليمين والزوجية على اليسار، مطابقةً لترتيب صفحات المصحف.",
+    "تبقى كل صفحة بمقاسها وخطها المستقلين، فلا تؤثر إحداهما على الأخرى.",
+    "على الشاشات الأضيق تبقى صفحة واحدة كما هي، لأن صفحتين ضيقتين أصعب في القراءة."
   ],
   "en": [
-    "No more tapping to record a page — pages count themselves as you read, and a notice tells you when today's wird is complete.",
-    "Night reading is gentler on the eyes: warm ink on dark grey instead of white on black.",
-    "The surah heading is lighter, framed by two fine rules, and the basmalah is set in the Mushaf's own face.",
-    "Saving your place is now its own button, and page styles have a menu of their own."
+    "Wide screens now show two facing pages like a printed Mushaf, and turn both together.",
+    "The odd page sits on the right and the even on the left, matching how a Mushaf is bound.",
+    "Each page keeps its own measure and type size, so neither crowds the other.",
+    "Narrower screens stay on a single page, because a cramped pair reads worse than one page."
   ]
 }

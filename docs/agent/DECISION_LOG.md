@@ -1551,3 +1551,17 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** `mushaf.recordPage`, `mushaf.pageRecorded` and `mushaf.difficultWords` fall out of use; the last is removed. DEC-093's heading sizing and DEC-088's manual recording are superseded.
 - **Tests/evidence required:** auto-record verified against persisted state, completion notice rendered, measured theme contrast, unit and e2e updated for the renamed switch, full local gates.
 - **Noted, not taken:** a dedicated surah-name font exists (QUL "Surah name font v2", ligatures `surah001`–`surah114`). It would give authentic calligraphy for headings but adds a third-party font fetch; deferred against the same request's performance ask.
+
+## DEC-096 — two facing pages on a screen with room for them
+
+- **Date:** 2026-08-24
+- **Status:** Approved
+- **Owner:** User ("implement any missing recommendation or missing items from before")
+- **Related scope:** `MushafPageViewer.tsx`, `KhatmahReaderScreen.tsx`, i18n, unit tests
+- **Context:** The last item left open across DEC-092, DEC-093 and DEC-095. A single page on a 1440px display leaves most of the screen empty, because the measure is derived from the page's own proportion and cannot honestly be widened.
+- **Decision:** On a screen with room — at least 1024px wide and at least 1.4 times as wide as it is tall — the reader shows the two facing pages of a spread. Below that it stays single, because a narrower pair would read worse than one page does now. The page canvas is now its own component, so each page keeps its own fitter, its own derived measure and its own open gloss; nothing about a page is shared with its neighbour. Turns step by two when a spread is showing.
+- **The pairing:** the Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4)… — the odd page is always the right-hand one, and the reader moves leftwards. The pair is derived from the current page's **parity**, not from assuming the current page is the right-hand one. That assumption was the first implementation and it rendered page 50 twice.
+- **Why the threshold is a ratio, not a width:** a Mushaf page is about two thirds as wide as it is tall, so two of them plus a gutter need roughly 1.4× the height in width. A short, wide window and a tall, wide window are different problems, and only the width test would have got the second one wrong.
+- **Consequences:** the `article` names both pages when it holds both, so assistive technology announces the spread rather than one arbitrary half. Specs that drive the reader at desktop size and assert a single page must set a narrow viewport, as `khatmah-reader.spec.ts` already does.
+- **Tests/evidence required:** unit coverage that arriving on either half yields the same pair with the odd page first, and that a narrow screen stays single; full local gates; a desktop screenshot.
+- **Still not taken:** the QUL surah-name font. Self-hosting it would answer the runtime-dependency objection, but redistributing a third-party font is a licensing decision rather than an engineering one, so it stays with the owner.
