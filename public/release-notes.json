@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-24-4",
+  "release": "2026-08-24-5",
   "ar": [
-    "أصبح احتساب ورد القرآن دقيقاً للصفحة والصفحتين المتقابلتين، مع تراجع كامل عن آخر انتقال وخطة تتكيف بوضوح.",
-    "تعرض الرئيسية موضع المتابعة وهدف اليوم مباشرة، وتفصل شاشة الورد بين تقدم اليوم وتقدم الختمة.",
-    "يمكن فتح إجراءات أي آية لنسخ نصها القرآني الصحيح أو مشاركتها أو حفظها، ثم الرجوع إليها من فهرس العلامات.",
-    "أضيف نمط قراءة مريحة بحجم نص قابل للتغيير، مع تنقل أفضل بلوحة المفاتيح واتجاه ثابت لأزرار تقليب الصفحات."
+    "يبقى التنقل بين الشاشات سريعاً وموثوقاً حتى إذا تجاوز المتصفح حركة انتقال اختيارية.",
+    "يحترم التنقل تفضيل تقليل الحركة ويعمل بأمان داخل المتصفحات المضمنة القديمة.",
+    "تُعلن الحوارات ولوحات الإجراءات بعناوين واضحة مرة واحدة، من دون تكرار مربك لقارئ الشاشة."
   ],
   "en": [
-    "Quran Wird now counts single and facing pages accurately, with whole-turn Undo and clearly adaptive reading plans.",
-    "Home shows the resume point and today's goal directly, while the Wird overview separates daily and Khatmah progress.",
-    "Open any ayah to copy its correct Quran text, share it, or bookmark it, then return from the Bookmarks index.",
-    "Comfort reading adds adjustable text size, alongside better keyboard navigation and invariant physical page-turn controls."
+    "Screen navigation stays fast and reliable when a browser skips an optional transition animation.",
+    "Navigation respects reduced motion and remains safe in older embedded browsers.",
+    "Dialogs and action sheets are announced once with clear titles, without confusing screen-reader repetition."
   ]
 }

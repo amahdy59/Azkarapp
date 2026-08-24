@@ -97,6 +97,8 @@ The following animation patterns are strictly prohibited:
 
 Users who prefer reduced motion should have a comfortable experience. This is controlled via the OS `prefers-reduced-motion` media query and the app-level `.reduce-motion` class.
 
+The shared screen-transition boundary treats the View Transitions API as optional enhancement. If the browser skips an animation, the destination state remains authoritative and the animation-level rejection is contained; update-callback failures must still surface. Embedded browsers without `matchMedia` continue without throwing.
+
 **Key Requirements:**
 
 - Remove scale, translation, spring physics, and parallax effects.

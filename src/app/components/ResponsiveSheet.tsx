@@ -1,6 +1,6 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { useEffect, type ReactNode } from "react";
-import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from "./ui/drawer";
+import { Drawer, DrawerContent, DrawerTitle } from "./ui/drawer";
 import { useLayoutMode } from "../hooks/useLayoutMode";
 
 /**
@@ -79,7 +79,6 @@ export function Modal({
           className={`fixed left-1/2 top-1/2 z-[100] flex w-[calc(100%-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col ${maxWidthClassName} max-h-[85vh] overflow-hidden rounded-3xl border border-border/60 bg-card shadow-overlay outline-none animate-in fade-in-0 zoom-in-95 duration-standard ${className}`.trim()}
         >
           <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
-          <DialogPrimitive.Description className="sr-only">{title}</DialogPrimitive.Description>
           {children}
         </DialogPrimitive.Content>
       </DialogPrimitive.Portal>
@@ -148,7 +147,6 @@ export function ResponsiveSheet({
         className={`fixed inset-x-0 bottom-0 z-[100] mx-auto flex w-full max-w-lg flex-col rounded-t-3xl border-t border-border/40 bg-background shadow-overlay outline-none focus-visible:outline-none max-h-[88vh] pb-safe ${drawerClassName}`.trim()}
       >
         <DrawerTitle className="sr-only">{title}</DrawerTitle>
-        <DrawerDescription className="sr-only">{title}</DrawerDescription>
         {children}
       </DrawerContent>
     </Drawer>

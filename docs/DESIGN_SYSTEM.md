@@ -112,6 +112,7 @@ Every interactive component should define:
 - A newly occurring recoverable error uses `role="alert"`, explains what remains safe, and provides the smallest useful recovery. Move focus to the recovery heading only when the failure blocks the current screen.
 - Loading states include visible text, `aria-busy`, and a restrained indicator that yields to reduced motion. Do not rely on an unlabeled spinner.
 - Success, cancellation, reconnect, and other non-urgent outcomes use a narrowly scoped polite status. Never make an entire interactive card, sheet, or notice a live region.
+- Dialogs and responsive sheets expose one accessible title. They use a separate caller-owned description only when it adds useful context; repeating the title as the description creates a duplicate screen-reader announcement and is prohibited.
 - Disable the initiating action while an asynchronous operation is pending. Retry must be idempotent and must not duplicate writes.
 - Offline feedback may briefly occupy the full status row, then collapses to a 44 px user-expandable indicator. Account-sync errors remain independently retryable/dismissible, while reading and counting stay available.
 - Raw provider, network, cache, clipboard, and database messages are diagnostic data, not product copy. Map them to localized user-safe outcomes and send only privacy-safe metadata to observability.
