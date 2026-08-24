@@ -70,4 +70,10 @@ describe("theme token contracts (Phase 02 delta)", () => {
   it("no longer references the removed orphaned word-meaning-dialog CSS", () => {
     expect(themeCss).not.toContain("word-meaning-dialog");
   });
+
+  it("keeps Arabic UI and devotional reading typography as separate contracts", () => {
+    expect(themeCss).not.toMatch(/\.font-arabic\s*,\s*\n\s*\.zikr-text/);
+    expect(themeBlock(".arabic-ui,")).toContain("font-family: var(--font-ui-arabic)");
+    expect(themeBlock(".zikr-text,")).toContain("font-family: var(--font-reading-arabic)");
+  });
 });

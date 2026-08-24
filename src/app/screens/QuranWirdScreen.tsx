@@ -87,7 +87,7 @@ export function QuranWirdScreen({
               : t(language, "mushaf.wirdGoalReached")}
           </p>
           <div className="mt-4 border-y border-border/60 py-3">
-            <p className="font-arabic text-sm font-bold text-foreground" dir="auto">
+            <p className="arabic-ui text-sm font-bold text-foreground" dir="auto">
               {positionSurah}
             </p>
             <p className="mt-1 text-xs font-medium text-muted-foreground">
@@ -120,10 +120,10 @@ export function QuranWirdScreen({
         </section>
 
         <details className="group rounded-3xl border border-border bg-card p-5 shadow-xs">
-          <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
-            <div>
+          <summary className="flex min-h-11 cursor-pointer list-none items-start justify-between gap-3 rounded-xl pb-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring">
+            <div className="min-w-0 flex-1">
               <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.planTitle")}</h2>
-              <p className="mt-1 text-sm font-medium text-muted-foreground">
+              <p className="mt-1 text-sm font-medium leading-6 text-muted-foreground">
                 {planLabel(language, plan)} ·{" "}
                 {t(language, "mushaf.pagesPerDay", { count: formatNumerals(goal, language) })}
               </p>
@@ -135,7 +135,7 @@ export function QuranWirdScreen({
             />
           </summary>
           <div className="border-t border-border/60 pt-4">
-            <label className="mt-4 block text-sm font-bold text-foreground" htmlFor="quran-wird-plan">
+            <label className="block text-sm font-bold text-foreground" htmlFor="quran-wird-plan">
               {t(language, "mushaf.changePlan")}
             </label>
             <Select

@@ -9,4 +9,15 @@ describe("TranquilityCompletionCard", () => {
     expect(screen.getByRole("status")).toBeInTheDocument();
     expect(screen.queryByRole("button")).not.toBeInTheDocument();
   });
+
+  it("stages its exit and collapses its layout row", () => {
+    const { rerender } = render(<TranquilityCompletionCard categoryId="morning" language="en" />);
+    rerender(<TranquilityCompletionCard categoryId="morning" language="en" isExiting />);
+
+    const card = screen.getByRole("status");
+    expect(card).toHaveClass("tranquility-completion", "is-exiting");
+    expect(card.querySelector(".tranquility-completion-icon")).toBeInTheDocument();
+    expect(card.querySelector(".tranquility-completion-title")).toBeInTheDocument();
+    expect(card.querySelector(".tranquility-completion-subtitle")).toBeInTheDocument();
+  });
 });

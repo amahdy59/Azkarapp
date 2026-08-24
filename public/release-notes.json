@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-24-1",
+  "release": "2026-08-24-2",
   "ar": [
-    "على الشاشات العريضة يظهر المصحف بصفحتين متقابلتين كما في المصحف المطبوع، وتنتقل الصفحتان معاً.",
-    "الصفحة ذات الرقم الفردي على اليمين والزوجية على اليسار، مطابقةً لترتيب صفحات المصحف.",
-    "تبقى كل صفحة بمقاسها وخطها المستقلين، فلا تؤثر إحداهما على الأخرى.",
-    "على الشاشات الأضيق تبقى صفحة واحدة كما هي، لأن صفحتين ضيقتين أصعب في القراءة."
+    "أصبحت أدوات المصحف واضحة في الأنماط الداكنة، وتختفي رسالة إتمام الورد تلقائياً دون حجب الصفحة.",
+    "تتكيف خطة القراءة وشرح سلسلة النخلة مع شاشات الهاتف دون تداخل أو خروج عن البطاقة.",
+    "أصبحت خطوط الواجهة العربية أكثر اتساقاً، مع انتقال ألطف عند إتمام الورد اليومي.",
+    "يبقى بحث فهرس المصحف ثابتاً وواضحاً، ولا تظهر أسماء السور خلف خانة البحث أثناء التمرير."
   ],
   "en": [
-    "Wide screens now show two facing pages like a printed Mushaf, and turn both together.",
-    "The odd page sits on the right and the even on the left, matching how a Mushaf is bound.",
-    "Each page keeps its own measure and type size, so neither crowds the other.",
-    "Narrower screens stay on a single page, because a cramped pair reads worse than one page."
+    "Mushaf controls now stay legible in dark page styles, and the Wird-complete notice clears without covering the page.",
+    "The reading plan and Palm streak explanation now fit phone screens without overlap or clipping.",
+    "Arabic interface typography is more consistent, with a gentler transition after completing the daily routine.",
+    "Mushaf index search stays clear while scrolling, with surah results no longer showing behind the search field."
   ]
 }

@@ -648,8 +648,7 @@ const ar = {
     extraLeafLabel: "إضافي",
     extraProgress: "+{count} إضافية",
     nextMilestoneHint: "التالي: {current} من {target}",
-    explanation:
-      "تضيف كل مجموعة مكتملة ورقة. وعند إكمال أذكار الصباح والمساء والنوم في يوم تقدم واحد، تُضاف نخلة. هذا يعكس التقدم داخل التطبيق، ولا يقيس الأجر أو المنزلة.",
+    explanation: "أكمل أذكار الصباح والمساء والنوم كل يوم لتنمّي سلسلة النخلة.",
     explanationLabel: "كيف تُضاف النخلة",
     private: "خاص بك افتراضياً ولا يُشارك في أي ترتيب.",
     shown: "الحديقة ظاهرة",
@@ -823,6 +822,7 @@ const ar = {
   mushaf: {
     wordMeaning: "معنى كلمة {word}",
     pageNavigation: "التنقل بين صفحات المصحف",
+    keyboardNavigationHint: "\u2190 / \u2192 للتنقل بين الصفحات",
     loadFailed: "تعذر تحميل صفحة المصحف. يرجى المحاولة مجدداً.",
     retry: "إعادة المحاولة",
     indexTitle: "فهرس المصحف الشريف",

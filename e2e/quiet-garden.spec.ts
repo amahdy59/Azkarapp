@@ -183,8 +183,10 @@ test("three completed main collections stay concise and explain the palm on dema
   await expect(garden.getByRole("button", { name: /Completed|مكتملة/ })).toHaveCount(3);
   await expect(garden).not.toContainText(/points?|rank|leaderboard/i);
   await garden.getByRole("button", { name: "How a palm is earned" }).click();
-  await expect(garden.getByRole("tooltip")).toContainText("Morning, Evening, and Before Sleep Azkar");
-  await expect(garden.getByRole("tooltip")).toContainText("does not measure spiritual reward or rank");
+  await expect(garden.getByRole("tooltip")).toHaveText(
+    "Complete Morning, Evening, and Before Sleep Azkar each day to grow your palm streak.",
+  );
+  await expect(garden.getByRole("tooltip")).toBeInViewport();
 });
 
 test("legacy garden visibility preferences no longer hide the current Wird or add a Progress toggle", async ({

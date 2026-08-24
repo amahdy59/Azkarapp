@@ -22,28 +22,28 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
       role="status"
       aria-label={completedTitle}
       aria-live="polite"
-      // Enters on the shared slide-up curve, leaves on the existing exit
-      // transition. `slide-up` is applied only while present so the exit is
-      // not fighting an animation holding its end state.
-      className={`w-full transition-[opacity,transform] duration-emphasis ease-out ${
-        isExiting ? "translate-y-3 opacity-0" : "slide-up translate-y-0 opacity-100"
-      }`}
+      className={`tranquility-completion grid w-full ${isExiting ? "is-exiting" : "slide-up"}`}
     >
-      <div className="hero-glass flex flex-col items-center gap-5 rounded-3xl px-5 py-6 text-center sm:px-6 sm:py-7">
-        <div className="completion-badge-pop flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
-          <Check size={34} strokeWidth={2.8} aria-hidden="true" />
-        </div>
+      <div className="min-h-0 overflow-hidden">
+        <div className="hero-glass tranquility-completion-card flex flex-col items-center gap-5 rounded-3xl px-5 py-6 text-center sm:px-6 sm:py-7">
+          <div className="completion-badge-pop tranquility-completion-icon flex size-24 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-[0_20px_35px_color-mix(in_srgb,var(--primary)_32%,transparent)] sm:size-28">
+            <Check size={34} strokeWidth={2.8} aria-hidden="true" />
+          </div>
 
-        <div className="flex flex-col items-center gap-2">
-          <h2 className="text-[1.75rem] font-black tracking-tight text-on-media sm:text-[1.95rem]" dir="auto">
-            {completedTitle}
-          </h2>
-          <p
-            className="max-w-[34ch] text-[0.9375rem] font-medium leading-7 text-on-media-muted sm:text-[1rem]"
-            dir="auto"
-          >
-            {completedSubtitle}
-          </p>
+          <div className="flex flex-col items-center gap-2">
+            <h2
+              className="tranquility-completion-title text-[1.75rem] font-black tracking-tight text-on-media sm:text-[1.95rem]"
+              dir="auto"
+            >
+              {completedTitle}
+            </h2>
+            <p
+              className="tranquility-completion-subtitle max-w-[34ch] text-[0.9375rem] font-medium leading-7 text-on-media-muted sm:text-[1rem]"
+              dir="auto"
+            >
+              {completedSubtitle}
+            </p>
+          </div>
         </div>
       </div>
     </section>

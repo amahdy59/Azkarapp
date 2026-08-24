@@ -58,7 +58,7 @@ export function MushafNavigationModal({
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/40">
-            <Dialog.Title className="text-base sm:text-lg font-bold font-arabic text-foreground">
+            <Dialog.Title className="arabic-ui text-base font-bold text-foreground sm:text-lg">
               {t(language, "mushaf.indexTitle")}
             </Dialog.Title>
             <Dialog.Description className="sr-only">{t(language, "mushaf.indexTitle")}</Dialog.Description>
@@ -194,7 +194,7 @@ export function MushafNavigationModal({
                             {formatNumerals(surah.number, language)}
                           </span>
                           <div>
-                            <div className="font-arabic font-bold text-[1.05rem] text-foreground group-hover:text-primary transition-colors">
+                            <div className="arabic-ui text-[1.05rem] font-bold text-foreground transition-colors group-hover:text-primary">
                               {surah.nameArabic}
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
@@ -252,7 +252,7 @@ export function MushafNavigationModal({
                           {formatNumerals(juz.number, language)}
                         </span>
                         <div>
-                          <div className="font-arabic font-bold text-base text-foreground group-hover:text-primary transition-colors">
+                          <div className="arabic-ui text-base font-bold text-foreground transition-colors group-hover:text-primary">
                             {isArabic ? juz.nameArabic : juz.nameEnglish}
                           </div>
                           <div className="text-xs text-muted-foreground mt-0.5">
@@ -325,7 +325,7 @@ export function MushafNavigationModal({
                         onClick={() => handleJump(item.page)}
                         className="flex flex-col items-start p-2.5 rounded-xl border border-border/70 hover:border-primary/50 bg-muted/30 hover:bg-primary/5 transition-all text-start"
                       >
-                        <span className="font-arabic font-bold text-sm text-foreground">
+                        <span className="arabic-ui text-sm font-bold text-foreground">
                           {isArabic ? item.name : item.en}
                         </span>
                         <span className="text-xs text-muted-foreground mt-0.5">

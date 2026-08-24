@@ -49,7 +49,11 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // Options split in two (DEC-095): saving your place is its own control, and
   // what is left behind the menu is page styling.
   const optionsButton = page.getByRole("button", { name: "نمط الصفحة" });
-  await expect(page.getByRole("button", { name: "حفظ موضع القراءة" })).toBeVisible();
+  const savePlaceButton = page.getByRole("button", { name: "حفظ موضع القراءة" });
+  if (!(await savePlaceButton.isVisible())) {
+    await mushafPage.click({ position: { x: 160, y: 350 } });
+  }
+  await expect(savePlaceButton).toBeVisible();
   await optionsButton.focus();
   const lines = mushafPage.locator("[data-mushaf-line-content]");
   await expect(mushafPage.locator("[data-mushaf-rendering] > div > div")).toHaveCount(15);

@@ -237,7 +237,6 @@
 }
 /* .element-pop is declared with .favorite-pop above, on the motion tokens. */
 
-.font-arabic,
 .zikr-text {
   font-family: var(--font-reading-arabic);
 }

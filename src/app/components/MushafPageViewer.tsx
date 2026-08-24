@@ -128,7 +128,7 @@ function SurahHeaderBand({
       <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
         ۞
       </span>
-      <span className="shrink-0 truncate font-arabic text-[0.52em] font-semibold tracking-[0.12em]">{title}</span>
+      <span className="arabic-ui shrink-0 truncate text-[0.52em] font-semibold tracking-[0.12em]">{title}</span>
       <span className="shrink-0 text-[0.42em] opacity-45" aria-hidden="true">
         ۞
       </span>
@@ -165,11 +165,11 @@ function SurahOpeningBand({
     <div className="flex h-full w-full flex-col items-center justify-center gap-px px-2 select-none" dir="rtl">
       <span className="flex w-full items-center justify-center gap-2">
         <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
-        <span className="shrink-0 truncate font-arabic text-[0.48em] font-semibold tracking-[0.12em]">{title}</span>
+        <span className="arabic-ui shrink-0 truncate text-[0.48em] font-semibold tracking-[0.12em]">{title}</span>
         <span className={`h-px flex-1 ${isOled ? "bg-white/40" : "bg-current opacity-25"}`} aria-hidden="true" />
       </span>
       {withBismillah && (
-        <span className="font-arabic text-[0.5em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
+        <span className="text-[0.5em] leading-none opacity-90" style={{ fontFamily: "var(--font-mushaf)" }}>
           بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
         </span>
       )}
@@ -180,7 +180,7 @@ function SurahOpeningBand({
 function BismillahLine() {
   return (
     <div className="flex h-full w-full items-center justify-center select-none" dir="rtl">
-      <p className="font-arabic text-[0.92em] leading-none tracking-wide" style={{ fontFamily: "inherit" }}>
+      <p className="text-[0.92em] leading-none tracking-wide" style={{ fontFamily: "inherit" }}>
         بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ
       </p>
     </div>
@@ -740,8 +740,8 @@ export function MushafPageViewer({
   ];
 
   const chromeBgClass = {
-    parchment: "bg-primary/5 border-primary/20 text-foreground/80",
-    dark: "bg-primary/10 border-primary/20 text-foreground/80",
+    parchment: "bg-[#f7f0e3] border-[#9b7a35]/25 text-[#29231a] dark:bg-[#151923] dark:text-[#e6e1d6]",
+    dark: "bg-[#12151b] border-[#c8a45b]/25 text-[#e6e1d6]",
     oled: "bg-white/10 border-white/30 text-white",
     white: "bg-gray-100 border-gray-200 text-gray-800",
   }[theme];

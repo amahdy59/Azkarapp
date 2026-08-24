@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KhatmahReaderScreen } from "./KhatmahReaderScreen";
+import { getProgressDayKey } from "../progress";
 
 /** Two consecutive pages of the reference layout, with one reviewed difficult
  *  word (2:255 "ٱلۡقَيُّومُ") so the meanings switch has something to reveal. */
@@ -44,6 +45,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  vi.useRealTimers();
   vi.unstubAllGlobals();
 });
 
@@ -87,13 +89,38 @@ describe("KhatmahReaderScreen navigation", () => {
 
 describe("KhatmahReaderScreen wird progress", () => {
   it("shows progress against the goal chosen on the overview", async () => {
-    const today = new Date().toISOString().slice(0, 10);
+    const today = getProgressDayKey();
     renderReader({ quranWirdPlan: { kind: "daily", dailyPages: 4 }, wirdHistory: { [today]: [41, 42] } });
     await screen.findByRole("article", { name: "صفحة ٤٢" });
 
     const progress = screen.getByRole("progressbar", { name: /أكملت ٢ من ٤/ });
     expect(progress).toHaveAttribute("aria-valuenow", "2");
     expect(progress).toHaveAttribute("aria-valuemax", "4");
+  });
+
+  it("uses an opaque completion notice and dismisses it automatically", async () => {
+    vi.useFakeTimers();
+    const today = getProgressDayKey();
+    renderReader({
+      quranWirdPlan: { kind: "daily", dailyPages: 2 },
+      wirdHistory: { [today]: [41, 42] },
+    });
+    await act(async () => vi.advanceTimersByTimeAsync(0));
+    expect(screen.getByRole("article", { name: "صفحة ٤٢" })).toBeInTheDocument();
+
+    const notice = screen.getByTestId("mushaf-wird-complete");
+    expect(notice.firstElementChild).toHaveClass("bg-popover");
+    expect(notice.firstElementChild).not.toHaveClass("backdrop-blur");
+
+    act(() => vi.advanceTimersByTime(4000));
+    expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
+  });
+
+  it("keeps dark Mushaf chrome readable and exposes the desktop key hint", async () => {
+    renderReader({ mushafTheme: "dark" });
+    const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
+    expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("text-[#e6e1d6]");
+    expect(screen.getByText("← / → للتنقل بين الصفحات")).toBeInTheDocument();
   });
 
   it("says nothing about a wird when no plan has been chosen", async () => {

@@ -79,6 +79,7 @@ The following animation patterns are strictly prohibited:
 | **Counter Ring Pulse**  | Subtle scale outward     | 280ms       | Enter      | Removed                         |
 | **Counter Readiness**   | Ready state indication   | 600ms       | Enter      | Removed                         |
 | **Counter Completion**  | Final state animation    | 440ms       | Enter      | Fade to completion state        |
+| **Home Exit**           | Icon, copy, then surface | 500ms       | Exit       | Instant removal                 |
 | **Counter Tap Ripple**  | Scale/opacity from input | 560ms       | Ease-out   | Removed                         |
 | **Home Hero Particles** | Finite upward drift      | 3.9-4.8s    | Ease-out   | Removed                         |
 | **Check Draw**          | SVG `stroke-dashoffset`  | 300ms       | Enter      | Instant or fast opacity (100ms) |

@@ -79,6 +79,7 @@ function spreadStart(page: number) {
  * the page brings them back, so nothing is ever more than one tap away.
  */
 const CHROME_IDLE_MS = 4500;
+const COMPLETION_NOTICE_MS = 4000;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -327,6 +328,12 @@ export function KhatmahReaderScreen({
     setCompletionSeen((seen) => (seen === todayKey ? seen : todayKey));
   }, [todayKey, wirdComplete]);
 
+  useEffect(() => {
+    if (completionSeen !== todayKey) return;
+    const timer = window.setTimeout(() => setCompletionSeen(null), COMPLETION_NOTICE_MS);
+    return () => window.clearTimeout(timer);
+  }, [completionSeen, todayKey]);
+
   // Warm both neighbours once the reader has settled, so a turn in either
   // direction is a cache hit rather than a fetch.
   useEffect(() => {
@@ -527,7 +534,7 @@ export function KhatmahReaderScreen({
       <button
         type="button"
         onClick={() => setIsIndexOpen(true)}
-        className="flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 rounded-xl px-1.5 text-center font-arabic focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className="arabic-ui flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 rounded-xl px-1.5 text-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={t(language, "mushaf.indexTitle")}
       >
         <span className="min-w-0 truncate text-sm font-extrabold">{surahName}</span>
@@ -625,9 +632,12 @@ export function KhatmahReaderScreen({
       {/* Where you are on the paper. Kept apart from how today's wird is going,
           which lives on the bar above it — one is a location, the other is a
           measure of effort, and running them together read as one number. */}
-      <div className="flex min-h-14 min-w-0 flex-1 items-center justify-center px-1" dir={direction}>
+      <div className="flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center px-1" dir={direction}>
         <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
           {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+        </span>
+        <span className="hidden text-[0.625rem] font-semibold opacity-65 md:block" dir="ltr">
+          {t(language, "mushaf.keyboardNavigationHint")}
         </span>
       </div>
       <button
@@ -764,13 +774,13 @@ export function KhatmahReaderScreen({
         <div
           role="status"
           data-testid="mushaf-wird-complete"
-          className="pointer-events-none absolute inset-x-0 bottom-16 z-20 flex justify-center px-4"
+          className="pointer-events-none absolute inset-x-0 bottom-[4.5rem] z-20 flex justify-center px-4"
         >
-          <div className="pointer-events-auto flex max-w-sm items-center gap-3 rounded-2xl border border-success/40 bg-success/12 px-4 py-2.5 shadow-raised backdrop-blur">
+          <div className="pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl border border-success/45 bg-popover px-4 py-2.5 text-popover-foreground shadow-overlay">
             <CheckCircle2 size={20} className="shrink-0 text-success" aria-hidden="true" />
             <div className="min-w-0" dir={direction}>
-              <p className="truncate text-[0.8125rem] font-extrabold">{t(language, "mushaf.wirdComplete")}</p>
-              <p className="truncate text-[0.6875rem] opacity-80">
+              <p className="text-[0.8125rem] font-extrabold leading-5">{t(language, "mushaf.wirdComplete")}</p>
+              <p className="text-[0.6875rem] leading-5 opacity-80">
                 {t(language, "mushaf.wirdCompleteBody", { goal: formatNumerals(wirdGoal, language) })}
               </p>
             </div>

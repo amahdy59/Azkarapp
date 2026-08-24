@@ -1565,3 +1565,14 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** the `article` names both pages when it holds both, so assistive technology announces the spread rather than one arbitrary half. Specs that drive the reader at desktop size and assert a single page must set a narrow viewport, as `khatmah-reader.spec.ts` already does.
 - **Tests/evidence required:** unit coverage that arriving on either half yields the same pair with the odd page first, and that a narrow screen stays single; full local gates; a desktop screenshot.
 - **Still not taken:** the QUL surah-name font. Self-hosting it would answer the runtime-dependency objection, but redistributing a third-party font is a licensing decision rather than an engineering one, so it stays with the owner.
+
+## DEC-097 — mobile feedback stays legible and inside its owning surface
+
+- **Date:** 2026-08-24
+- **Status:** Approved
+- **Owner:** User (attached mobile issue report)
+- **Related scope:** Quran Wird overview/reader, Home Wird disclosure, Arabic typography roles, Home completion motion
+- **Context:** Device screenshots exposed four shared-root defects: dark Mushaf chrome inherited black ink from a light app theme; the daily completion notice stayed over the page until dismissed; the open reading-plan divider crowded its Arabic summary; and the Palm explanation was absolutely positioned from its icon and could leave the card. The same review confirmed the legacy `font-arabic` alias mixed UI and devotional families.
+- **Decision:** Mushaf chrome now owns contrast per page theme; the completion status is opaque, wrapping, clear of the footer, and auto-dismissed after four seconds; the plan summary reserves vertical separation; and the Palm explanation is an in-flow full-width disclosure with shorter bilingual copy. Arabic UI uses `arabic-ui`, while devotional text uses `zikr-text`. The Home completion card exits icon, title, support copy, then contracts its grid row within the existing 500 ms emphasis window. Desktop/tablet Mushaf footer shows the existing arrow-key behavior as a secondary hint.
+- **Preserved:** The 1 px facing-page seam is already below the requested 64 px maximum; the fifteen derived page slots already use available height responsively; page turns already use a 150 ms opacity transition with reduced-motion support; and the concise anchored difficult-word popover already provides word, meaning, pointer, theme tokens, keyboard access, and collision handling. These were verified rather than rebuilt.
+- **Tests/evidence required:** focused unit coverage for disclosure flow, typography roles, notice lifecycle/chrome contrast, completion exit hooks, focused mobile browser coverage, then the full repository release gates.

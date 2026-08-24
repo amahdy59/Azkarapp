@@ -294,7 +294,7 @@ export function ProgressDayView({
               >
                 {t(language, "progress.todayWird")}
               </Heading>
-              <div className="relative">
+              <div>
                 <button
                   type="button"
                   aria-expanded={isWirdInfoOpen}
@@ -306,15 +306,6 @@ export function ProgressDayView({
                 >
                   <Info size={18} aria-hidden="true" />
                 </button>
-                {isWirdInfoOpen && (
-                  <div
-                    role="tooltip"
-                    className="absolute start-0 top-full z-20 mt-2 w-[min(18rem,calc(100vw-3rem))] rounded-2xl border border-border bg-popover p-3 text-[0.8125rem] font-medium leading-6 text-popover-foreground shadow-overlay"
-                    dir={isArabic ? "rtl" : "ltr"}
-                  >
-                    {t(language, "garden.explanation")}
-                  </div>
-                )}
               </div>
             </div>
             {!onGlass && (
@@ -336,6 +327,20 @@ export function ProgressDayView({
             <bdi>{formatRatio(completedCount, categories.length, language)}</bdi>
           </div>
         </div>
+
+        {isWirdInfoOpen && (
+          <div
+            role="tooltip"
+            className={`mt-3 w-full rounded-2xl border p-3 text-[0.8125rem] font-semibold leading-6 shadow-xs ${
+              onGlass
+                ? "border-on-media/20 bg-on-media-surface/95 text-on-media"
+                : "border-border bg-popover text-popover-foreground"
+            }`}
+            dir={isArabic ? "rtl" : "ltr"}
+          >
+            {t(language, "garden.explanation")}
+          </div>
+        )}
 
         <div
           className={`stagger-in mt-5 grid grid-cols-1 gap-2.5 sm:mt-6 sm:gap-3 md:gap-4 ${

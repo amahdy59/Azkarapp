@@ -662,8 +662,7 @@ const en = {
     extraLeafLabel: "Extra",
     extraProgress: "+{count} extra",
     nextMilestoneHint: "Next: {current} of {target}",
-    explanation:
-      "Each completed collection adds one leaf. Complete Morning, Evening, and Before Sleep Azkar in one progress day to add a palm. This reflects progress in the app; it does not measure spiritual reward or rank.",
+    explanation: "Complete Morning, Evening, and Before Sleep Azkar each day to grow your palm streak.",
     explanationLabel: "How a palm is earned",
     private: "Private by default and never shared as a ranking.",
     shown: "Garden shown",
@@ -837,6 +836,7 @@ const en = {
   mushaf: {
     wordMeaning: "Meaning of {word}",
     pageNavigation: "Mushaf page navigation",
+    keyboardNavigationHint: "\u2190 / \u2192 Navigate pages",
     loadFailed: "Failed to load Mushaf page. Please try again.",
     retry: "Try again",
     indexTitle: "Holy Quran Index",

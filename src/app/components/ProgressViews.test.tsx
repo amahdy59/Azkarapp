@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import { ProgressDayView, ProgressWeekView, ProgressMonthView, ProgressYearView } from "./ProgressViews";
 import type { GardenSummary } from "../progress";
@@ -50,6 +50,18 @@ describe("ProgressViews components", () => {
     expect(screen.getByText("أذكار المساء")).toBeInTheDocument();
     expect(screen.getByText("أذكار النوم")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "أذكار الصباح - مكتملة" })).toBeInTheDocument();
+  });
+
+  it("reveals the palm explanation inside the card instead of an anchored overflow", () => {
+    render(<ProgressDayView summary={mockSummary} language="en" dynamicSubtitle="One of three routines complete" />);
+
+    fireEvent.click(screen.getByRole("button", { name: "How a palm is earned" }));
+    const explanation = screen.getByRole("tooltip");
+    expect(explanation).toHaveTextContent(
+      "Complete Morning, Evening, and Before Sleep Azkar each day to grow your palm streak.",
+    );
+    expect(explanation).toHaveClass("w-full");
+    expect(explanation).not.toHaveClass("absolute");
   });
 
   it("renders ProgressWeekView with commitment matrix in Arabic", () => {

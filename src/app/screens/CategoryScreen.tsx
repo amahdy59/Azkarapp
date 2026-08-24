@@ -339,7 +339,7 @@ export function CategoryScreen({
                 </span>
               </div>
               <p
-                className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
+                className={`${isArabic ? "zikr-text" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
                 dir={isArabic ? "rtl" : "ltr"}
                 lang={isArabic ? "ar" : "en"}
               >
@@ -564,14 +564,14 @@ function ZikrAccordion({
         dir={direction}
       >
         {/* Index */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-muted/60 text-[0.875rem] font-bold text-muted-foreground">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary/35 bg-primary/15 text-[0.875rem] font-extrabold text-primary">
           {formatNumerals(index + 1, language)}
         </div>
 
         {/* Text */}
         <div className="flex-1 text-start min-w-0" dir={direction}>
           <p
-            className={`${isArabic ? "font-arabic" : "font-sans"} text-[1.0625rem] font-bold text-foreground line-clamp-1`}
+            className={`${isArabic ? "zikr-text" : "font-sans"} text-[1.0625rem] font-bold text-foreground line-clamp-1`}
             lang={isArabic ? "ar" : "en"}
           >
             {isArabic ? z.arabicText : z.translation}
@@ -618,20 +618,20 @@ function ZikrAccordion({
           <div className="min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3">
             {isArabic && z.hasSeekRefuge && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="font-arabic text-[1rem] font-bold text-primary/90 tracking-wide">
+                <p className="zikr-text text-[1rem] font-bold text-primary/90 tracking-wide">
                   أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
                 </p>
               </div>
             )}
             {isArabic && (z.hasBasmalah || z.isSurah) && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="font-arabic text-[1.05rem] font-bold text-primary/90 tracking-wide">
+                <p className="zikr-text text-[1.05rem] font-bold text-primary/90 tracking-wide">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </p>
               </div>
             )}
             <p
-              className={`${isArabic ? "zikr-text font-arabic" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+              className={`${isArabic ? "zikr-text" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
               dir={isArabic ? "rtl" : "ltr"}
               lang={isArabic ? "ar" : "en"}
             >

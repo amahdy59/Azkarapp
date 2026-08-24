@@ -384,7 +384,7 @@ export function MushafImmersiveReader({
         {atEnd && (
           <section className="flex h-full w-full shrink-0 snap-center flex-col items-center justify-center px-5 py-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-2 font-arabic text-primary">
+              <h2 className="arabic-ui mb-2 text-2xl font-bold text-primary">
                 {t(language, "reader.mushafCompleted")}
               </h2>
               <p className="text-muted-foreground font-sans">{t(language, "reader.mushafAccept")}</p>
