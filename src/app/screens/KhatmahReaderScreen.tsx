@@ -786,21 +786,23 @@ export function KhatmahReaderScreen({
           className="pointer-events-none absolute inset-x-0 z-20 flex justify-center px-4"
           style={{ bottom: "4.5rem" }}
         >
-          <div className="pointer-events-auto flex w-full max-w-sm items-center gap-3 rounded-2xl border border-success/45 bg-popover px-4 py-2.5 text-popover-foreground shadow-overlay">
-            <CheckCircle2 size={20} className="shrink-0 text-success" aria-hidden="true" />
-            <div className="min-w-0" dir={direction}>
-              <p className="text-[0.8125rem] font-extrabold leading-5">{t(language, "mushaf.wirdComplete")}</p>
-              <p className="text-[0.6875rem] leading-5 opacity-80">
+          <div className="pointer-events-auto inline-flex w-auto max-w-[calc(100vw-2rem)] items-center gap-3 rounded-full border border-success/45 bg-popover px-4 py-2 text-popover-foreground shadow-overlay">
+            <div className="flex size-7 shrink-0 items-center justify-center rounded-full bg-success/15 text-success">
+              <CheckCircle2 size={16} strokeWidth={2.5} aria-hidden="true" />
+            </div>
+            <div className="flex flex-col text-start whitespace-nowrap" dir={direction}>
+              <p className="text-[0.8125rem] font-extrabold leading-tight">{t(language, "mushaf.wirdComplete")}</p>
+              <p className="text-[0.6875rem] font-medium leading-tight opacity-80">
                 {t(language, "mushaf.wirdCompleteBody", { goal: formatNumerals(wirdGoal, language) })}
               </p>
             </div>
             <button
               type="button"
               onClick={() => setCompletionSeen(null)}
-              className="ms-1 flex size-11 shrink-0 items-center justify-center rounded-full opacity-70 hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="flex size-7 shrink-0 items-center justify-center rounded-full opacity-70 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               aria-label={t(language, "common.close")}
             >
-              <X size={15} aria-hidden="true" />
+              <X size={14} aria-hidden="true" />
             </button>
           </div>
         </div>

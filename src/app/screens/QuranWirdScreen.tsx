@@ -154,8 +154,8 @@ export function QuranWirdScreen({
                   {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
                 </p>
               ) : (
-                <div className="mt-3 flex items-center gap-2 font-bold text-success">
-                  <Check size={16} aria-hidden="true" />
+                <div className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-success/15 px-3 py-1 text-xs font-bold text-success">
+                  <Check size={14} strokeWidth={2.5} aria-hidden="true" />
                   <span>{t(language, "mushaf.wirdCompleteShort")}</span>
                 </div>
               )}
