@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-25",
+  "release": "2026-08-25b",
   "ar": [
     "قائمة إعدادات قراءة المصحف أصبحت عصرية ومباشرة بدون قوائم فرعية متداخلة لسهولة الاستخدام على الهواتف.",
-    "إعادة تصميم إطار وبدايات السور في المصحف بشكل متناظر وأنيق بخطوط مستقيمة ونقاط طرفية متوازنة.",
+    "إعادة تصميم إطار وبدايات السور في المصحف بشكل متناظر هندسياً مع دوائر وزخارف متوازنة تماماً.",
     "تحديث أيقونة خيارات القراءة لتتوافق تماماً مع النظام التصميمي للتطبيق مع دعم التبديل بنقرة واحدة."
   ],
   "en": [
     "Mushaf reading settings is now modern and flat without nested cascading menus for seamless mobile use.",
-    "Redesigned symmetrical surah header frame with straight center lines and elegant terminal dots.",
+    "Redesigned symmetrical surah header frame with geometrically balanced rosettes and true terminal circles.",
     "Updated reading options icon to match the design system with instant 1-tap theme and layout switching."
   ]
 }

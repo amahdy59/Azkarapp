@@ -24,52 +24,46 @@ export interface MushafSettingsSheetProps {
 interface ThemeOption {
   id: MushafTheme;
   nameKey: string;
-  bgClass: string;
-  borderClass: string;
-  textClass: string;
-  accentClass: string;
+  swatchBg: string;
+  swatchBorder: string;
+  swatchAccent: string;
 }
 
 const THEME_OPTIONS: readonly ThemeOption[] = [
   {
     id: "follow-app",
     nameKey: "mushaf.themeFollowApp",
-    bgClass: "bg-gradient-to-br from-card to-muted",
-    borderClass: "border-border",
-    textClass: "text-foreground",
-    accentClass: "bg-primary",
+    swatchBg: "var(--card)",
+    swatchBorder: "var(--border)",
+    swatchAccent: "var(--primary)",
   },
   {
     id: "midnight",
     nameKey: "mushaf.themeMidnight",
-    bgClass: "bg-[#0b1220]",
-    borderClass: "border-[#1e293b]",
-    textClass: "text-[#e2e8f0]",
-    accentClass: "bg-[#d4af37]",
+    swatchBg: "#0b1220",
+    swatchBorder: "#1e293b",
+    swatchAccent: "#d4af37",
   },
   {
     id: "dark",
     nameKey: "mushaf.themeDark",
-    bgClass: "bg-[#18181b]",
-    borderClass: "border-[#27272a]",
-    textClass: "text-[#f4f4f5]",
-    accentClass: "bg-[#a1a1aa]",
+    swatchBg: "#18181b",
+    swatchBorder: "#27272a",
+    swatchAccent: "#a1a1aa",
   },
   {
     id: "light",
     nameKey: "mushaf.themeLight",
-    bgClass: "bg-[#fdfbf7]",
-    borderClass: "border-[#e5e0d8]",
-    textClass: "text-[#1c1917]",
-    accentClass: "bg-[#b45309]",
+    swatchBg: "#fdfbf7",
+    swatchBorder: "#e5e0d8",
+    swatchAccent: "#b45309",
   },
   {
     id: "oled",
     nameKey: "mushaf.themeOled",
-    bgClass: "bg-black",
-    borderClass: "border-neutral-800",
-    textClass: "text-white",
-    accentClass: "bg-white",
+    swatchBg: "#000000",
+    swatchBorder: "#333333",
+    swatchAccent: "#ffffff",
   },
 ];
 
@@ -108,7 +102,7 @@ export function MushafSettingsSheet({
       title={t(language, "mushaf.readingSettings")}
       direction={direction}
       testId="mushaf-settings-sheet"
-      maxWidthClassName="max-w-[460px]"
+      maxWidthClassName="max-w-md"
       dialogClassName={sheetSurfaceClass}
       drawerClassName={sheetSurfaceClass}
     >
@@ -169,10 +163,11 @@ export function MushafSettingsSheet({
                   <div className="flex items-center gap-2.5 min-w-0">
                     {/* Visual Color Preview Swatch */}
                     <div
-                      className={`size-6 shrink-0 rounded-full border shadow-2xs flex items-center justify-center ${opt.bgClass} ${opt.borderClass}`}
+                      className="size-6 shrink-0 rounded-full border shadow-xs flex items-center justify-center"
+                      style={{ backgroundColor: opt.swatchBg, borderColor: opt.swatchBorder }}
                       aria-hidden="true"
                     >
-                      <div className={`size-2 rounded-full ${opt.accentClass}`} />
+                      <div className="size-2 rounded-full" style={{ backgroundColor: opt.swatchAccent }} />
                     </div>
                     <span className="text-xs font-semibold truncate">{label}</span>
                   </div>
