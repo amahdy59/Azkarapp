@@ -87,11 +87,11 @@ export default defineConfig(({ mode }) => {
             // src/app/content/qcfMushaf.ts in `azkar-qcf-fonts-v1`, which works
             // before the service worker has ever activated.
             {
-              urlPattern: /\/data\/mushaf\/\d+\.json$/,
+              urlPattern: /\/data\/mushaf\/\d+\.json(\?.*)?$/,
               handler: "CacheFirst" as const,
               method: "GET" as const,
               options: {
-                cacheName: "azkar-mushaf-v1",
+                cacheName: "azkar-mushaf-v3",
                 expiration: { maxEntries: 604, maxAgeSeconds: 365 * 24 * 60 * 60 },
               },
             },

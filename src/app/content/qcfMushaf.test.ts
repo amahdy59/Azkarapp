@@ -16,7 +16,7 @@ afterEach(() => {
 
 describe("Mushaf page data", () => {
   it("reads pages from the shipped reference layout, not from a remote API", () => {
-    expect(getMushafPageUrl(106)).toMatch(/data\/mushaf\/106\.json$/);
+    expect(getMushafPageUrl(106)).toMatch(/data\/mushaf\/106\.json\?v=3$/);
     expect(getQcfFontUrl(106)).toBe("https://verses.quran.foundation/fonts/quran/hafs/v2/woff2/p106.woff2");
     expect(getQcfFontFamily(106)).toBe("qcf-v2-page-106");
   });

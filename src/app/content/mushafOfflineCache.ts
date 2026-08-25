@@ -26,7 +26,9 @@ export async function getMushafDownloadStatus(): Promise<{
     const pageCache = await caches.open(MUSHAF_CACHE_NAME);
     const fontCache = await caches.open(FONT_CACHE_NAME);
     const [pageKeys, fontKeys] = await Promise.all([pageCache.keys(), fontCache.keys()]);
-    const downloadedPages = pageKeys.filter((request) => /\/data\/mushaf\/\d+\.json$/.test(request.url)).length;
+    const downloadedPages = pageKeys.filter((request) =>
+      /\/data\/mushaf\/\d+\.json(?:\?.*)?$/.test(request.url),
+    ).length;
     const downloadedFonts = fontKeys.filter((request) => /\/p\d+\.woff2$/.test(request.url)).length;
     return {
       downloadedPages,

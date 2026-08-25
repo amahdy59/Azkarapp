@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-25g",
+  "release": "2026-08-25h",
   "ar": [
     "تصميم شارة إتمام الورد القرآني بأسلوب عصري يلتف بدقة حول المحتوى متوافقاً مع أفضل معايير تجربة المستخدم.",
     "تحسين تجربة القراءة وتناسق الإشعارات والبطاقات التحفيزية أثناء تلاوة المصحف الشريف.",
-    "التنقل الفوري والسلس مع الحفاظ على الأداء الفائق وتجربة خالية تماماً من وميض الصفحات."
+    "معالجة مشكلة ظهور بعض الصفحات بخطوط قديمة لضمان عرض خط المصحف المدني بشكل ثابت ومباشر."
   ],
   "en": [
-    "Refined Quran wird completion card with a modern, content-hugging pill design adhering to best UX practices.",
-    "Enhanced reading toast ergonomics, visual polish, and motivational badges across devices.",
-    "Ultra-smooth, zero-flash devotional reading experience with instant page turns."
+    "Fixed an issue where some pages occasionally loaded with an older font style.",
+    "Ensured authentic Madani text rendering immediately takes effect across the entire Quran.",
+    "Improved offline cache behavior for a more reliable, uninterrupted reading session."
   ]
 }

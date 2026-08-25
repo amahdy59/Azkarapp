@@ -28,7 +28,7 @@ export interface MushafVerseData {
 
 const QCF_FONT_ROOT = "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2";
 const FONT_CACHE_NAME = "azkar-qcf-fonts-v1";
-const MUSHAF_CACHE_NAME = "azkar-mushaf-v2";
+const MUSHAF_CACHE_NAME = "azkar-mushaf-v3";
 const MAX_MEMORY_PAGES = 128;
 
 const pageCache = new Map<number, MushafVerseData[]>();
@@ -38,7 +38,7 @@ const pendingFonts = new Map<number, Promise<boolean>>();
 
 export function getMushafPageUrl(page: number) {
   const base = import.meta.env.BASE_URL || "/";
-  return `${base.endsWith("/") ? base : `${base}/`}data/mushaf/${page}.json`;
+  return `${base.endsWith("/") ? base : `${base}/`}data/mushaf/${page}.json?v=3`;
 }
 
 export function getQcfFontUrl(page: number) {
@@ -336,7 +336,7 @@ export function loadQcfFont(page: number): Promise<boolean> {
  * now store ourselves. Nothing reads them again, so they are pure dead weight
  * in the reader's storage quota.
  */
-const RETIRED_CACHES = ["azkar-qcf-page-data-v1", "azkar-qcf-page-fonts-v1", "azkar-mushaf-v1"];
+const RETIRED_CACHES = ["azkar-qcf-page-data-v1", "azkar-qcf-page-fonts-v1", "azkar-mushaf-v1", "azkar-mushaf-v2"];
 
 export async function discardRetiredCaches(): Promise<string[]> {
   if (typeof caches === "undefined") return [];

@@ -39,7 +39,7 @@ beforeEach(() => {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (input: string) => {
-      const page = Number(String(input).match(/(\d+)\.json$/)?.[1] ?? 1);
+      const page = Number(String(input).match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
       return { ok: true, json: async () => pageFixture(page) };
     }),
   );
@@ -257,7 +257,7 @@ describe("KhatmahReaderScreen facing pages", () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async (input: string) => {
-        const page = Number(String(input).match(/(\d+)\.json$/)?.[1] ?? 1);
+        const page = Number(String(input).match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
         requested.push(page);
         await gate;
         return { ok: true, json: async () => pageFixture(page) };
