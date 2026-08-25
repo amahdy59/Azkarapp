@@ -892,11 +892,13 @@ export function MushafPageViewer({
           at the far corners of the display. */}
       <div
         data-mushaf-chrome="header"
-        className={`flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
+        className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
       >
         <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
           {headerContent}
         </div>
+        {/* Progress bar positioned directly beneath the top header */}
+        {progressBar}
       </div>
 
       {/* One page, or two facing pages when the screen has room for both at a
@@ -959,8 +961,6 @@ export function MushafPageViewer({
         <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
           {footerContent}
         </div>
-        {/* Outside both, because the reader's progress is never in the way. */}
-        {progressBar}
       </div>
     </article>
   );

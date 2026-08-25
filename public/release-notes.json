@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-25c",
+  "release": "2026-08-25d",
   "ar": [
-    "تسريع تحميل صفحات وخطوط المصحف الشريف فورياً والقضاء التام على ظهور الرسم القديم عند التنقل.",
-    "تحسين قائمة إعدادات القراءة لتطابق ألوان السمة والنظام التصميمي بدقة مع أفضل ممارسات تجربة المستخدم.",
-    "الترقية اللحظية التلقائية لرسم المصحف بالخطوط العثمانية فور اكتمال تنزيل الخط دون تأخير."
+    "تصحيح اتجاهات أزرار التنقل بين الصفحات: السهم الأيمن للسابق والسهم الأيسر للتالي بما يطابق حركة المصحف الشريف.",
+    "نقل شريط تقدم الورد القرآني ليكون أسفل الشريط العلوي مباشرة لمتابعة الإنجاز اليومي بسلاسة ووضوح.",
+    "تحسين تجربة القراءة والتنقل وتناسق أدوات المصحف الشريف."
   ],
   "en": [
-    "Instantaneous Mushaf page and font preloading, completely eliminating old fallback rendering when jumping to surahs.",
-    "Refined reading settings sheet to perfectly adhere to semantic theme tokens, design system colors, and UX guidelines.",
-    "Automatic dynamic upgrade to authentic Madani QCF typography as soon as fonts arrive without delay."
+    "Corrected page navigation arrows: right arrow for Previous and left arrow for Next matching natural Mushaf progression.",
+    "Relocated daily reading progress track directly beneath the top header for crisp and visible progress tracking.",
+    "Enhanced devotional reading layout and header/footer ergonomics across devices."
   ]
 }

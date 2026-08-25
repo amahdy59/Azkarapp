@@ -604,12 +604,12 @@ export function KhatmahReaderScreen({
         <Eye size={19} aria-hidden="true" />
       </button>
 
-      {/* Page-turn controls are a physical LTR group inside direction-aware UI.
-          Their DOM order matches the gesture: back left, forward right. */}
+      {/* Page-turn controls follow natural reading progression:
+          In RTL (Arabic Mushaf), Previous is on the right pointing right (>) and Next is on the left pointing left (<). */}
       <div
         className="grid min-w-0 items-center gap-1"
         style={{ gridTemplateColumns: "minmax(2.75rem,1fr) minmax(4rem,0.8fr) minmax(2.75rem,1fr)" }}
-        dir="ltr"
+        dir={direction}
       >
         <button
           type="button"
@@ -618,13 +618,15 @@ export function KhatmahReaderScreen({
           className={footerActionClass}
           aria-label={t(language, "common.previous")}
         >
-          <ChevronLeft size={22} aria-hidden="true" />
-          <span className="truncate" dir={direction}>
-            {t(language, "common.previous")}
-          </span>
+          {direction === "rtl" ? (
+            <ChevronRight size={22} aria-hidden="true" />
+          ) : (
+            <ChevronLeft size={22} aria-hidden="true" />
+          )}
+          <span className="truncate">{t(language, "common.previous")}</span>
         </button>
 
-        <div className="flex min-h-14 min-w-0 flex-col items-center justify-center px-1" dir={direction}>
+        <div className="flex min-h-14 min-w-0 flex-col items-center justify-center px-1">
           <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
             {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
           </span>
@@ -640,10 +642,12 @@ export function KhatmahReaderScreen({
           className={footerActionClass}
           aria-label={t(language, "common.next")}
         >
-          <ChevronRight size={22} aria-hidden="true" />
-          <span className="truncate" dir={direction}>
-            {t(language, "common.next")}
-          </span>
+          {direction === "rtl" ? (
+            <ChevronLeft size={22} aria-hidden="true" />
+          ) : (
+            <ChevronRight size={22} aria-hidden="true" />
+          )}
+          <span className="truncate">{t(language, "common.next")}</span>
         </button>
       </div>
 
