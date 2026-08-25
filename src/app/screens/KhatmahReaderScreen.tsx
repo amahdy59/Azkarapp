@@ -41,6 +41,7 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   prefetchMushafPage,
+  subscribeQcfFontLoaded,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import { reportError } from "../../lib/observability";
@@ -52,10 +53,10 @@ const SWIPE_THRESHOLD = 60;
 const PAPER_SETTLE = "transform 160ms ease-out";
 /**
  * How long a page will wait for its QCF font before mounting in the Unicode
- * fallback instead. Long enough for a warm Cache Storage hit, short enough that
- * a dead network never holds the reader up.
+ * fallback instead. Long enough for network fetch, while live font-load
+ * subscription will upgrade the page to QCF immediately when it arrives.
  */
-const FONT_WAIT_MS = 1200;
+const FONT_WAIT_MS = 3500;
 
 /**
  * A spread is only worth showing when both pages still read comfortably.
@@ -372,10 +373,30 @@ export function KhatmahReaderScreen({
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, todayKey, visiblePages, wirdGoal, wirdHistory]);
 
-  // Prefetching surrounding spreads/pages so that moving in either
-  // direction is a cache hit rather than a fetch.
+  // Live subscription to font arrivals: dynamically upgrades any on-screen page
+  // to authentic QCF Madani glyphs the exact millisecond the font arrives.
   useEffect(() => {
-    if (resolved?.page !== currentPage) return;
+    return subscribeQcfFontLoaded((loadedPage) => {
+      setResolved((current) => {
+        if (current && current.page === loadedPage && !current.qcf) {
+          return { ...current, qcf: true };
+        }
+        return current;
+      });
+      setOther((current) => {
+        if (current && current.page === loadedPage && !current.qcf) {
+          return { ...current, qcf: true };
+        }
+        return current;
+      });
+    });
+  }, []);
+
+  // Prefetching surrounding spreads/pages after the current page settles so
+  // turning to neighbouring pages is an instant cache/memory hit without
+  // competing with the initial page load.
+  useEffect(() => {
+    if (!resolved || resolved.page !== currentPage) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
     if (connection?.saveData) return;
 
@@ -393,7 +414,7 @@ export function KhatmahReaderScreen({
       }
     }, 100);
     return () => window.clearTimeout(timer);
-  }, [currentPage, resolved?.page, spreadRoom, leftNumber, rightNumber]);
+  }, [currentPage, resolved?.page, resolved, spreadRoom, leftNumber, rightNumber]);
 
   // Transform data into the reference 15 lines
   const lines = useMemo(() => toMushafLines(pageData), [pageData]);

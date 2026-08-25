@@ -6,6 +6,7 @@ import { formatNumerals } from "../formatting";
 import { SURAHS, JUZS, searchSurahs, getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
 import { X, Search, Bookmark, ChevronRight, ChevronLeft } from "./icons";
 import { TabList, tabPanelProps, type TabDefinition } from "./Tabs";
+import { prefetchMushafPage } from "../content/qcfMushaf";
 
 type NavigationTab = "surahs" | "juzs" | "jump" | "bookmarks";
 
@@ -41,6 +42,14 @@ export function MushafNavigationModal({
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);
   }, [searchQuery, language]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    for (let i = 0; i < Math.min(8, filteredSurahs.length); i++) {
+      const page = filteredSurahs[i]?.startPage;
+      if (page) prefetchMushafPage(page);
+    }
+  }, [isOpen, filteredSurahs]);
 
   const handleJump = (page: number) => {
     const valid = Math.max(1, Math.min(604, Math.floor(page)));
@@ -193,6 +202,8 @@ export function MushafNavigationModal({
                         key={surah.number}
                         type="button"
                         onClick={() => handleJump(surah.startPage)}
+                        onMouseEnter={() => prefetchMushafPage(surah.startPage)}
+                        onPointerDown={() => prefetchMushafPage(surah.startPage)}
                         className={`flex items-center justify-between p-3 rounded-xl border transition-all text-start group ${
                           isCurrent
                             ? "bg-primary/10 border-primary/40 shadow-xs"
@@ -251,6 +262,8 @@ export function MushafNavigationModal({
                       key={juz.number}
                       type="button"
                       onClick={() => handleJump(juz.startPage)}
+                      onMouseEnter={() => prefetchMushafPage(juz.startPage)}
+                      onPointerDown={() => prefetchMushafPage(juz.startPage)}
                       className={`flex items-center justify-between p-3.5 rounded-xl border transition-all text-start group ${
                         isCurrent
                           ? "bg-primary/10 border-primary/40 shadow-xs"

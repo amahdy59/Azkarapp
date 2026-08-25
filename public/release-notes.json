@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-25b",
+  "release": "2026-08-25c",
   "ar": [
-    "قائمة إعدادات قراءة المصحف أصبحت عصرية ومباشرة بدون قوائم فرعية متداخلة لسهولة الاستخدام على الهواتف.",
-    "إعادة تصميم إطار وبدايات السور في المصحف بشكل متناظر هندسياً مع دوائر وزخارف متوازنة تماماً.",
-    "تحديث أيقونة خيارات القراءة لتتوافق تماماً مع النظام التصميمي للتطبيق مع دعم التبديل بنقرة واحدة."
+    "تسريع تحميل صفحات وخطوط المصحف الشريف فورياً والقضاء التام على ظهور الرسم القديم عند التنقل.",
+    "تحسين قائمة إعدادات القراءة لتطابق ألوان السمة والنظام التصميمي بدقة مع أفضل ممارسات تجربة المستخدم.",
+    "الترقية اللحظية التلقائية لرسم المصحف بالخطوط العثمانية فور اكتمال تنزيل الخط دون تأخير."
   ],
   "en": [
-    "Mushaf reading settings is now modern and flat without nested cascading menus for seamless mobile use.",
-    "Redesigned symmetrical surah header frame with geometrically balanced rosettes and true terminal circles.",
-    "Updated reading options icon to match the design system with instant 1-tap theme and layout switching."
+    "Instantaneous Mushaf page and font preloading, completely eliminating old fallback rendering when jumping to surahs.",
+    "Refined reading settings sheet to perfectly adhere to semantic theme tokens, design system colors, and UX guidelines.",
+    "Automatic dynamic upgrade to authentic Madani QCF typography as soon as fonts arrive without delay."
   ]
 }

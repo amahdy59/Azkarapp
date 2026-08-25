@@ -249,14 +249,15 @@ export function MushafSettingsSheet({
 
             {/* Switch pill */}
             <div
-              className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+              dir="ltr"
+              className={`relative flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors ${
                 isBookmarked ? "bg-primary" : "bg-muted-foreground/30"
               }`}
               aria-hidden="true"
             >
               <div
-                className={`absolute top-0.5 size-5 rounded-full bg-white shadow-xs transition-transform ${
-                  isBookmarked ? (direction === "rtl" ? "-translate-x-5" : "translate-x-5") : "translate-x-0.5"
+                className={`size-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
+                  isBookmarked ? "translate-x-5" : "translate-x-0"
                 }`}
               />
             </div>

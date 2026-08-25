@@ -245,6 +245,16 @@ async function createFontFace(page: number): Promise<FontFace> {
   return new FontFace(family, `url(${url})`);
 }
 
+type FontLoadListener = (page: number) => void;
+const fontLoadListeners = new Set<FontLoadListener>();
+
+export function subscribeQcfFontLoaded(listener: FontLoadListener): () => void {
+  fontLoadListeners.add(listener);
+  return () => {
+    fontLoadListeners.delete(listener);
+  };
+}
+
 export function loadQcfFont(page: number): Promise<boolean> {
   if (typeof FontFace === "undefined" || typeof document === "undefined" || !document.fonts) {
     return Promise.resolve(false);
@@ -259,6 +269,13 @@ export function loadQcfFont(page: number): Promise<boolean> {
     const loaded = await face.load();
     document.fonts.add(loaded);
     readyFonts.add(page);
+    for (const listener of fontLoadListeners) {
+      try {
+        listener(page);
+      } catch {
+        /* ignore listener errors */
+      }
+    }
     return true;
   })()
     .catch(() => false)
