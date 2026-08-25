@@ -1437,6 +1437,7 @@ function AppContent() {
                 <QuranWirdScreen
                   language={selectedLang}
                   direction={layoutDirection}
+                  calendarType={calendarType}
                   position={quranReadingPosition}
                   plan={quranWirdPlan}
                   progressDayStartHour={progressDayStartHour}

@@ -3,6 +3,8 @@ const en = {
     juz: "Juz",
     next: "Next",
     previous: "Previous",
+    increase: "Increase",
+    decrease: "Decrease",
     undo: "Undo",
     mushaf: "Mushaf",
     settings: "Settings",

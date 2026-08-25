@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Header } from "../components/LayoutShells";
 import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
-import { ArrowNext, BookOpen, Check, Undo } from "../components/icons";
+import { ArrowNext, BookOpen, Check, Undo, Minus, Plus } from "../components/icons";
 import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
 import { effectiveDailyGoal, getQuranWirdGoal, TOTAL_MUSHAF_PAGES } from "./quranWirdGoal";
 import { formatNumerals } from "../formatting";
@@ -21,10 +21,18 @@ function planLabel(language: AppLanguage, plan: QuranWirdPlan) {
   return t(language, "mushaf.planDaily");
 }
 
-function completionDate(now: Date, days: number, language: AppLanguage) {
+function completionDate(now: Date, days: number, language: AppLanguage, calendarType: "hijri" | "gregorian") {
   const date = new Date(now);
   date.setDate(date.getDate() + Math.max(0, days - 1));
-  return new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en", {
+  const locale = language === "ar" ? "ar-EG" : "en";
+  if (calendarType === "hijri") {
+    return new Intl.DateTimeFormat(`${locale}-u-ca-islamic-umalqura`, {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    }).format(date);
+  }
+  return new Intl.DateTimeFormat(locale, {
     month: "long",
     day: "numeric",
     year: "numeric",
@@ -34,6 +42,7 @@ function completionDate(now: Date, days: number, language: AppLanguage) {
 export function QuranWirdScreen({
   language,
   direction,
+  calendarType = "hijri",
   position,
   plan,
   wirdHistory,
@@ -47,6 +56,7 @@ export function QuranWirdScreen({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  calendarType?: "hijri" | "gregorian";
   position: QuranReadingPosition;
   plan: QuranWirdPlan;
   wirdHistory: Record<string, number[]>;
@@ -89,7 +99,7 @@ export function QuranWirdScreen({
     normalizedDraft.kind === "daily"
       ? Math.max(1, Math.ceil((TOTAL_MUSHAF_PAGES - position.page + 1) / normalizedDraft.dailyPages))
       : (normalizedDraft.durationDays ?? 30);
-  const draftCompletionDate = completionDate(now, draftDays, language);
+  const draftCompletionDate = completionDate(now, draftDays, language, calendarType);
   const canUndo = lastReadingEvent?.dayKey === todayKey && lastReadingEvent.pages.length > 0;
 
   return (
@@ -272,45 +282,113 @@ export function QuranWirdScreen({
               </div>
 
               {draftPlan.kind === "daily" ? (
-                <label className="block text-sm font-bold text-foreground">
-                  <span className="mb-2 block">{t(language, "mushaf.planPagesPerDay")}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={604}
-                    value={draftPlan.dailyPages}
-                    onChange={(event) =>
-                      setDraftPlan({
-                        ...draftPlan,
-                        dailyPages: Math.min(604, Math.max(1, Number(event.target.value) || 1)),
-                        startedDayKey: todayKey,
-                      })
-                    }
-                    className="min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  />
-                </label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-foreground">{t(language, "mushaf.planPagesPerDay")}</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDraftPlan({
+                          ...draftPlan,
+                          dailyPages: Math.max(1, draftPlan.dailyPages - 1),
+                          startedDayKey: todayKey,
+                        })
+                      }
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      aria-label={t(language, "common.decrease")}
+                    >
+                      <Minus size={20} />
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={604}
+                      value={draftPlan.dailyPages}
+                      onChange={(event) =>
+                        setDraftPlan({
+                          ...draftPlan,
+                          dailyPages: Math.min(604, Math.max(1, Number(event.target.value) || 1)),
+                          startedDayKey: todayKey,
+                        })
+                      }
+                      className="h-12 w-full rounded-xl border border-border bg-background px-3 text-center text-lg font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setDraftPlan({
+                          ...draftPlan,
+                          dailyPages: Math.min(604, draftPlan.dailyPages + 1),
+                          startedDayKey: todayKey,
+                        })
+                      }
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      aria-label={t(language, "common.increase")}
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </div>
+                </div>
               ) : (
-                <label className="block text-sm font-bold text-foreground">
-                  <span className="mb-2 block">{t(language, "mushaf.finishInDays")}</span>
-                  <input
-                    type="number"
-                    min={1}
-                    max={604}
-                    value={draftPlan.durationDays ?? 30}
-                    onChange={(event) => {
-                      const days = Math.min(604, Math.max(1, Number(event.target.value) || 1));
-                      setDraftPlan({
-                        kind: "custom",
-                        durationDays: days,
-                        dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
-                        startedDayKey: todayKey,
-                        startPage: position.page,
-                        targetPage: TOTAL_MUSHAF_PAGES,
-                      });
-                    }}
-                    className="min-h-12 w-full rounded-xl border border-border bg-background px-3 text-sm font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                  />
-                </label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-bold text-foreground">{t(language, "mushaf.finishInDays")}</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const days = Math.max(1, (draftPlan.durationDays ?? 30) - 1);
+                        setDraftPlan({
+                          kind: "custom",
+                          durationDays: days,
+                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
+                          startedDayKey: todayKey,
+                          startPage: position.page,
+                          targetPage: TOTAL_MUSHAF_PAGES,
+                        });
+                      }}
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      aria-label={t(language, "common.decrease")}
+                    >
+                      <Minus size={20} />
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={604}
+                      value={draftPlan.durationDays ?? 30}
+                      onChange={(event) => {
+                        const days = Math.min(604, Math.max(1, Number(event.target.value) || 1));
+                        setDraftPlan({
+                          kind: "custom",
+                          durationDays: days,
+                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
+                          startedDayKey: todayKey,
+                          startPage: position.page,
+                          targetPage: TOTAL_MUSHAF_PAGES,
+                        });
+                      }}
+                      className="h-12 w-full rounded-xl border border-border bg-background px-3 text-center text-lg font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const days = Math.min(604, (draftPlan.durationDays ?? 30) + 1);
+                        setDraftPlan({
+                          kind: "custom",
+                          durationDays: days,
+                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
+                          startedDayKey: todayKey,
+                          startPage: position.page,
+                          targetPage: TOTAL_MUSHAF_PAGES,
+                        });
+                      }}
+                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      aria-label={t(language, "common.increase")}
+                    >
+                      <Plus size={20} />
+                    </button>
+                  </div>
+                </div>
               )}
 
               <div className="flex flex-col gap-1 rounded-xl bg-muted p-4 text-sm font-medium text-foreground">

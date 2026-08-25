@@ -560,7 +560,7 @@ export function KhatmahReaderScreen({
       <button
         type="button"
         onClick={() => setIsOptionsMenuOpen(true)}
-        className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-current/25 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-current/25 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         aria-label={t(language, "common.settings")}
         data-testid="mushaf-settings-trigger"
       >
@@ -595,7 +595,7 @@ export function KhatmahReaderScreen({
       <div
         className="grid min-w-0 items-center gap-1"
         style={{ gridTemplateColumns: "minmax(2.75rem,1fr) minmax(4rem,0.8fr) minmax(2.75rem,1fr)" }}
-        dir={direction}
+        dir="rtl"
       >
         <button
           type="button"
@@ -604,11 +604,7 @@ export function KhatmahReaderScreen({
           className={footerActionClass}
           aria-label={t(language, "common.previous")}
         >
-          {direction === "rtl" ? (
-            <ChevronRight size={22} aria-hidden="true" />
-          ) : (
-            <ChevronLeft size={22} aria-hidden="true" />
-          )}
+          <ChevronRight size={22} aria-hidden="true" />
           <span className="truncate">{t(language, "common.previous")}</span>
         </button>
 
@@ -628,11 +624,7 @@ export function KhatmahReaderScreen({
           className={footerActionClass}
           aria-label={t(language, "common.next")}
         >
-          {direction === "rtl" ? (
-            <ChevronLeft size={22} aria-hidden="true" />
-          ) : (
-            <ChevronRight size={22} aria-hidden="true" />
-          )}
+          <ChevronLeft size={22} aria-hidden="true" />
           <span className="truncate">{t(language, "common.next")}</span>
         </button>
       </div>

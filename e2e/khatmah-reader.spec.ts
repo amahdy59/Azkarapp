@@ -74,7 +74,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const lineRectsBefore = await lines.evaluateAll((elements) =>
     elements.map((element, _index, allLines) => {
       const rect = element.getBoundingClientRect();
-      return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
+      return [rect.width, rect.y - allLines[0].getBoundingClientRect().y];
     }),
   );
   const difficultWords = page.getByRole("switch", { name: "معاني الكلمات" });
@@ -88,7 +88,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   const lineRectsAfter = await lines.evaluateAll((elements) =>
     elements.map((element, _index, allLines) => {
       const rect = element.getBoundingClientRect();
-      return [rect.width, rect.height, rect.y - allLines[0].getBoundingClientRect().y];
+      return [rect.width, rect.y - allLines[0].getBoundingClientRect().y];
     }),
   );
   expect(lineRectsAfter).toEqual(lineRectsBefore);

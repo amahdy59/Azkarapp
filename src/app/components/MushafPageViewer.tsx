@@ -351,9 +351,10 @@ const MushafTextLine = memo(function MushafTextLine({
           if (showWordMeanings && meaning) {
             const isOpen = activeWord?.verseKey === w.verseKey && activeWord?.wordPosition === w.position;
             return (
-              <button
+              <span
                 key={key}
-                type="button"
+                role="button"
+                tabIndex={0}
                 data-word-active={isOpen ? "true" : undefined}
                 onClick={(event) => {
                   onActiveWordChange(
@@ -362,18 +363,28 @@ const MushafTextLine = memo(function MushafTextLine({
                       : { verseKey: w.verseKey, wordPosition: w.position, meaning, anchor: event.currentTarget },
                   );
                 }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    onActiveWordChange(
+                      isOpen
+                        ? null
+                        : { verseKey: w.verseKey, wordPosition: w.position, meaning, anchor: e.currentTarget },
+                    );
+                  }
+                }}
                 onContextMenu={(e) => {
                   e.preventDefault();
                   onAyahAction?.(w.verseKey);
                 }}
-                className={`relative inline shrink-0 appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                className={`relative inline shrink-0 cursor-pointer appearance-none rounded-sm border-0 bg-primary/10 p-0 text-primary underline decoration-dotted underline-offset-4 transition-colors [font:inherit] hover:bg-primary/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                   highlightedVerseKey === w.verseKey ? "ring-2 ring-primary/55" : ""
                 }`}
                 style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "mushaf.wordMeaning", { word: w.text })}
               >
                 {wordContent}
-              </button>
+              </span>
             );
           }
 
@@ -871,8 +882,8 @@ export function MushafPageViewer({
         <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
           {headerContent}
         </div>
-        {/* Progress bar positioned directly beneath the top header */}
-        {progressBar}
+        {/* Progress bar positioned absolutely at the bottom of the top header */}
+        <div className="absolute bottom-0 left-0 right-0 translate-y-[1px] z-10">{progressBar}</div>
       </div>
 
       {/* One page, or two facing pages when the screen has room for both at a

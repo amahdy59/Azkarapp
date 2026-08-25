@@ -86,7 +86,7 @@ describe("KhatmahReaderScreen navigation", () => {
     const next = screen.getByRole("button", { name: "Next" });
     const previous = screen.getByRole("button", { name: "Previous" });
     expect(previous.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(navigation.querySelector('[dir="ltr"]')).toBeInTheDocument();
+    expect(navigation.querySelector('[dir="rtl"]')).toBeInTheDocument();
 
     await user.keyboard("{ArrowRight}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(43);

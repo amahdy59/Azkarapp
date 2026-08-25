@@ -644,15 +644,19 @@ export function HomeScreen({
             onOverview={onOpenKhatmah ?? (() => {})}
           />
 
-          <SectionDivider label={t(language, "home.fridayAzkar")} />
+          <div className="px-page">
+            <SectionDivider label={t(language, "home.fridayAzkar")} />
+          </div>
 
-          <FridayHomeCard
-            language={language}
-            direction={direction}
-            expanded={fridayInWindow}
-            status={fridayStatus}
-            onOpen={onOpenFridayMode}
-          />
+          <div className="px-page">
+            <FridayHomeCard
+              language={language}
+              direction={direction}
+              expanded={fridayInWindow}
+              status={fridayStatus}
+              onOpen={onOpenFridayMode}
+            />
+          </div>
         </div>
       </div>
     </ScreenContainer>
