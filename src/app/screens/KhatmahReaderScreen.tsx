@@ -51,12 +51,6 @@ const LAST_PAGE = 604;
 const SWIPE_THRESHOLD = 60;
 /** Settling a released drag, and the only transform animation on this screen. */
 const PAPER_SETTLE = "transform 160ms ease-out";
-/**
- * How long a page will wait for its QCF font before mounting in the Unicode
- * fallback instead. Long enough for network fetch, while live font-load
- * subscription will upgrade the page to QCF immediately when it arrives.
- */
-const FONT_WAIT_MS = 3500;
 
 /**
  * A spread is only worth showing when both pages still read comfortably.
@@ -75,8 +69,6 @@ function spreadStart(page: number) {
   return page % 2 === 1 ? page : page - 1;
 }
 const COMPLETION_NOTICE_MS = 4000;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /** A page's words, bucketed into the reference's fifteen line slots. */
 function toMushafLines(pageData: MushafVerseData[] | null) {
@@ -123,15 +115,8 @@ async function resolveMushafPage(page: number, waitForMeanings: boolean): Promis
   if (waitForMeanings) await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
   else warmGlossesWhenIdle(surahs);
 
-  let qcf = false;
-  if (pageHasQcfGlyphs(data)) {
-    if (isQcfFontReady(page)) {
-      qcf = true;
-    } else {
-      qcf = await Promise.race([loadQcfFont(page), sleep(FONT_WAIT_MS).then(() => false)]);
-    }
-  }
-  return { page, data, qcf };
+  void loadQcfFont(page);
+  return { page, data, qcf: true };
 }
 
 export function KhatmahReaderScreen({
@@ -288,8 +273,9 @@ export function KhatmahReaderScreen({
       setResolved({
         page: currentPage,
         data: cachedPrimary,
-        qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cachedPrimary),
+        qcf: true,
       });
+      void loadQcfFont(currentPage);
     }
 
     void (async () => {

@@ -221,19 +221,53 @@ async function openFontCache(): Promise<Cache | null> {
   }
 }
 
+const injectedStyles = new Set<number>();
+
+export function injectFontFaceRule(page: number) {
+  if (typeof document === "undefined" || injectedStyles.has(page)) return;
+  injectedStyles.add(page);
+  const family = getQcfFontFamily(page);
+  const primaryUrl = getQcfFontUrl(page);
+  const secondaryUrl = `https://quran.com/fonts/quran/hafs/v2/woff2/p${page}.woff2`;
+
+  const style = document.createElement("style");
+  style.setAttribute("data-qcf-page", String(page));
+  style.textContent = `
+    @font-face {
+      font-family: '${family}';
+      src: url('${primaryUrl}') format('woff2'),
+           url('${secondaryUrl}') format('woff2');
+      font-display: swap;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
 async function createFontFace(page: number): Promise<FontFace> {
   const family = getQcfFontFamily(page);
-  const url = getQcfFontUrl(page);
+  const primaryUrl = getQcfFontUrl(page);
+  const secondaryUrl = `https://quran.com/fonts/quran/hafs/v2/woff2/p${page}.woff2`;
   const cache = await openFontCache();
 
   if (cache) {
     try {
-      let response = await cache.match(url);
+      let response = await cache.match(primaryUrl);
       if (!response) {
-        const network = await fetch(url);
-        if (network.ok) {
-          await cache.put(url, network.clone());
-          response = network;
+        response = await cache.match(secondaryUrl);
+      }
+      if (!response) {
+        try {
+          const network = await fetch(primaryUrl);
+          if (network.ok) {
+            await cache.put(primaryUrl, network.clone());
+            response = network;
+          }
+        } catch {
+          const fallbackNet = await fetch(secondaryUrl);
+          if (fallbackNet.ok) {
+            await cache.put(primaryUrl, fallbackNet.clone());
+            response = fallbackNet;
+          }
         }
       }
       if (response) return new FontFace(family, await response.arrayBuffer());
@@ -242,7 +276,7 @@ async function createFontFace(page: number): Promise<FontFace> {
     }
   }
 
-  return new FontFace(family, `url(${url})`);
+  return new FontFace(family, `url(${primaryUrl}), url(${secondaryUrl})`);
 }
 
 type FontLoadListener = (page: number) => void;
@@ -256,8 +290,12 @@ export function subscribeQcfFontLoaded(listener: FontLoadListener): () => void {
 }
 
 export function loadQcfFont(page: number): Promise<boolean> {
+  if (page < 1 || page > 604) return Promise.resolve(false);
+  injectFontFaceRule(page);
+
   if (typeof FontFace === "undefined" || typeof document === "undefined" || !document.fonts) {
-    return Promise.resolve(false);
+    readyFonts.add(page);
+    return Promise.resolve(true);
   }
   if (readyFonts.has(page)) return Promise.resolve(true);
 
@@ -265,23 +303,25 @@ export function loadQcfFont(page: number): Promise<boolean> {
   if (pending) return pending;
 
   const request = (async () => {
-    const face = await createFontFace(page);
-    const loaded = await face.load();
-    document.fonts.add(loaded);
-    readyFonts.add(page);
-    for (const listener of fontLoadListeners) {
-      try {
-        listener(page);
-      } catch {
-        /* ignore listener errors */
+    try {
+      const face = await createFontFace(page);
+      const loaded = await face.load();
+      document.fonts.add(loaded);
+      readyFonts.add(page);
+      for (const listener of fontLoadListeners) {
+        try {
+          listener(page);
+        } catch {
+          /* ignore listener errors */
+        }
       }
+      return true;
+    } catch {
+      return false;
     }
-    return true;
-  })()
-    .catch(() => false)
-    .finally(() => {
-      pendingFonts.delete(page);
-    });
+  })().finally(() => {
+    pendingFonts.delete(page);
+  });
 
   pendingFonts.set(page, request);
   return request;

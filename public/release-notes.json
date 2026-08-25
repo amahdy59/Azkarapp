@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-25d",
+  "release": "2026-08-25e",
   "ar": [
-    "تصحيح اتجاهات أزرار التنقل بين الصفحات: السهم الأيمن للسابق والسهم الأيسر للتالي بما يطابق حركة المصحف الشريف.",
-    "نقل شريط تقدم الورد القرآني ليكون أسفل الشريط العلوي مباشرة لمتابعة الإنجاز اليومي بسلاسة ووضوح.",
-    "تحسين تجربة القراءة والتنقل وتناسق أدوات المصحف الشريف."
+    "حذف رسم المصحف القديم نهائياً وضمان عرض صفحات المصحف الشريف دائماً بالرسم العثماني المعتمد لمجمع الملك فهد.",
+    "تسريع تحميل الخطوط الشريفة بدعم مصادر متعددة للخطوط والربط التلقائي المسبق لسرعة فائقة حتى على شبكات الهاتف.",
+    "التنقل الفوري بين الصفحات مع التخزين المسبق السلس ودعم القراءة دون اتصال بالإنترنت."
   ],
   "en": [
-    "Corrected page navigation arrows: right arrow for Previous and left arrow for Next matching natural Mushaf progression.",
-    "Relocated daily reading progress track directly beneath the top header for crisp and visible progress tracking.",
-    "Enhanced devotional reading layout and header/footer ergonomics across devices."
+    "Permanently eliminated old fallback layout in favor of authentic King Fahd Madani Mushaf typography.",
+    "Ultra-fast font delivery powered by multi-CDN failover and native connection prewarming.",
+    "Instantaneous page turning with seamless memory preloading and offline reading support."
   ]
 }

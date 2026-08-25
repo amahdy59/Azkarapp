@@ -270,7 +270,7 @@ interface ActiveWord {
 const MushafTextLine = memo(function MushafTextLine({
   words,
   language,
-  theme,
+  theme: _theme,
   useQcfGlyphs,
   showWordMeanings,
   meanings,
@@ -292,8 +292,6 @@ const MushafTextLine = memo(function MushafTextLine({
   onActiveWordChange: (word: ActiveWord | null) => void;
   onAyahAction?: (verseKey: string) => void;
 }) {
-  const isArabic = language === "ar";
-
   return (
     // The slot deliberately does not clip: the fitter already guarantees the
     // line fits the page width, and Arabic diacritics reach into the space
@@ -316,36 +314,14 @@ const MushafTextLine = memo(function MushafTextLine({
           const meaning = meanings.get(`${w.verseKey}:${w.position}`);
 
           if (w.isEnd) {
-            if (useQcfGlyphs && w.qcfCode) {
-              return (
-                <button
-                  key={key}
-                  type="button"
-                  className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""
-                  }`}
-                  style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
-                  aria-label={t(language, "reader.openAyahActions", {
-                    ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
-                  })}
-                  onClick={() => onAyahAction?.(w.verseKey)}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    onAyahAction?.(w.verseKey);
-                  }}
-                >
-                  {w.qcfCode}
-                </button>
-              );
-            }
             return (
               <button
                 key={key}
                 type="button"
-                className={`shrink-0 rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                className={`inline-block shrink-0 select-none rounded-sm border-0 bg-transparent p-0 [font:inherit] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                   highlightedVerseKey === w.verseKey ? "bg-primary/20" : ""
                 }`}
-                style={{ lineHeight: "inherit" }}
+                style={{ lineHeight: "inherit", verticalAlign: "baseline" }}
                 aria-label={t(language, "reader.openAyahActions", {
                   ayah: formatNumerals(w.verseKey.split(":")[1] || w.text, language),
                 })}
@@ -355,7 +331,7 @@ const MushafTextLine = memo(function MushafTextLine({
                   onAyahAction?.(w.verseKey);
                 }}
               >
-                <AyahMarker number={w.text || w.verseKey.split(":")[1] || ""} language={language} theme={theme} />
+                {w.qcfCode || w.text}
               </button>
             );
           }
@@ -369,9 +345,7 @@ const MushafTextLine = memo(function MushafTextLine({
                 <span className="sr-only">{w.text}</span>
               </>
             ) : (
-              <span className="select-text" title={!isArabic && meaning ? meaning.explanationArabic : undefined}>
-                {w.text}
-              </span>
+              <span className="select-text">{w.text}</span>
             );
 
           if (showWordMeanings && meaning) {
