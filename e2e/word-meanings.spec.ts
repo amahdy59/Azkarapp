@@ -20,15 +20,14 @@ async function openKahf(page: Page) {
     );
   });
   await page.goto("/#/azkar/friday-kahf/1");
-  await expect(page.getByTestId("mushaf-pages")).toBeVisible();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 }
 
 test.describe("Quran word meanings", () => {
   test("steps from one word to the next without reopening the sheet", async ({ page }) => {
     await openKahf(page);
 
-    const firstPage = page.getByTestId("mushaf-page").first();
-    await firstPage.getByTestId("quran-word-help").first().click();
+    await page.getByTestId("quran-word-help").first().click();
     await expect(page.getByTestId("quran-word-popover")).toBeVisible();
     await page.getByTestId("quran-word-popover-all").click();
     await expect(page.getByTestId("quran-word-meaning-sheet")).toBeVisible();
@@ -55,7 +54,7 @@ test.describe("Quran word meanings", () => {
   test("anchors the gloss under the tapped word and dismisses on Escape", async ({ page }) => {
     await openKahf(page);
 
-    const word = page.getByTestId("mushaf-page").first().getByTestId("quran-word-help").first();
+    const word = page.getByTestId("quran-word-help").first();
     await word.click();
 
     const popover = page.getByTestId("quran-word-popover");
@@ -101,8 +100,7 @@ test.describe("Quran word meanings", () => {
   test("stops at the last annotated word of the page", async ({ page }) => {
     await openKahf(page);
 
-    const secondPage = page.getByTestId("mushaf-page").nth(1);
-    const words = secondPage.getByTestId("quran-word-help");
+    const words = page.getByTestId("quran-word-help");
     const total = await words.count();
     await words.nth(total - 1).click();
     await expect(page.getByTestId("quran-word-popover")).toBeVisible();

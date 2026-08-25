@@ -412,20 +412,6 @@ const JUSTIFY_FILL_THRESHOLD = 0.82;
 
 /**
  * The width this line would occupy at its natural word spacing.
- *
- * Summed from the words rather than read off the box: the line is a
- * `space-between` flex row, so its own `scrollWidth` equals the container width
- * whenever the words are being spread — which reported every under-filled line
- * as exactly full and left the page's type at its starting size. `scrollWidth`
- * is consulted only when it genuinely overflows.
- */
-function measureNaturalWidth(content: HTMLElement) {
-  const gap = Number.parseFloat(getComputedStyle(content).columnGap) || 0;
-  let natural = gap * Math.max(0, content.children.length - 1);
-  for (const child of Array.from(content.children)) natural += (child as HTMLElement).offsetWidth;
-  const overflow = content.scrollWidth > content.clientWidth ? content.scrollWidth : 0;
-  return Math.max(natural, overflow);
-}
 
 /**
  * Sizes the page to the paper.
@@ -480,17 +466,13 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const first = contents[0];
       if (!column || !first) return;
 
-      // Pass one — release both constraints, then measure the page as the
-      // stylesheet would set it. Only the two custom properties are ever
-      // written; the font-size expression itself belongs to React, and clearing
-      // that left the page at the browser default.
-      // Written on the page, not the column: the header and footer are the
-      // column's siblings and have to line up with the same measure, and a
-      // custom property only inherits downwards.
       const page = (canvas.parentElement as HTMLElement | null) ?? column;
+
+      // Reset measure & fit to base before measuring
       page.style.setProperty("--mushaf-measure", "100%");
       page.style.setProperty("--mushaf-fit", "1");
-      for (const content of contents) {
+      for (let i = 0; i < contents.length; i++) {
+        const content = contents[i]!;
         content.style.transform = "";
         content.style.justifyContent = "";
       }
@@ -499,45 +481,48 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
       if (available <= 0 || slotHeight <= 0) return;
 
-      // Only full lines say anything about the page's natural measure; a
-      // two-word closing line would drag the whole page's type up.
-      const fullLines = contents.filter((content) => content.children.length >= 5).map(measureNaturalWidth);
-      const widest = fullLines.length > 0 ? Math.max(...fullLines) : 0;
-      const lineHeight = first.offsetHeight;
+      // Single read pass: measure natural width of all lines in one loop without style mutation in between
+      const lineCount = contents.length;
+      const naturalWidths = new Float64Array(lineCount);
+      let widest = 0;
 
-      /**
-       * The measure is derived, not chosen.
-       *
-       * Fifteen lines have to fit the page height, which caps how large the type
-       * can be; the type size in turn fixes how wide a line wants to be. Picking
-       * the column width independently — it was capped at `92cqh` — left the
-       * widest line covering only three quarters of it on a tablet or desktop,
-       * so every line fell short of the justify threshold and the page rendered
-       * as a narrow ragged column with wide margins. Setting the measure to what
-       * the vertically-limited type actually spans makes the two agree, and the
-       * type comes out the same size either way.
-       */
-      // Tablet and desktop pages can trade a little glyph size for calmer
-      // leading while retaining all fifteen canonical line slots.
+      for (let i = 0; i < lineCount; i++) {
+        const content = contents[i]!;
+        const childCount = content.children.length;
+        const gap = Number.parseFloat(getComputedStyle(content).columnGap) || 0;
+        let natural = gap * Math.max(0, childCount - 1);
+        const children = content.children;
+        for (let j = 0; j < childCount; j++) {
+          natural += (children[j] as HTMLElement).offsetWidth;
+        }
+        if (content.scrollWidth > content.clientWidth) {
+          natural = Math.max(natural, content.scrollWidth);
+        }
+        naturalWidths[i] = natural;
+        if (childCount >= 5 && natural > widest) {
+          widest = natural;
+        }
+      }
+
+      const lineHeight = first.offsetHeight;
       const responsiveInkAllowance = window.innerWidth >= 768 ? Math.max(0.58, inkAllowance - 0.06) : inkAllowance;
       const verticalScale = lineHeight > 0 ? (slotHeight * responsiveInkAllowance) / lineHeight : 1;
       const measure = Math.min(widest * verticalScale, available);
       const scale = Math.min(Math.max(widest > 0 ? measure / widest : 1, 0.6), 2.4);
 
+      // Single write pass: apply calculated scale and transforms
       page.style.setProperty("--mushaf-measure", `${Math.round(measure)}px`);
       page.style.setProperty("--mushaf-fit", scale.toFixed(3));
 
-      // Pass two — settle each line at the size the page actually ended up with.
-      const fills = contents.map((content) => {
-        const width = content.clientWidth;
-        return width > 0 ? measureNaturalWidth(content) / width : 1;
-      });
+      for (let i = 0; i < lineCount; i++) {
+        const content = contents[i]!;
+        const nat = naturalWidths[i]!;
+        const scaledNat = nat * scale;
+        const fill = measure > 0 ? scaledNat / measure : 1;
 
-      contents.forEach((content, index) => {
-        const fill = fills[index] ?? 1;
         content.style.transform = fill > 1 ? `scale(${(1 / fill).toFixed(4)})` : "";
         content.style.justifyContent = fill >= JUSTIFY_FILL_THRESHOLD ? "" : "center";
-      });
+      }
     };
 
     const schedule = () => {
@@ -548,8 +533,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
     fit();
     const observer = new ResizeObserver(schedule);
     observer.observe(canvas);
-    // Web fonts settle after first paint; a line measured against the fallback
-    // metrics would otherwise stay scaled to the wrong ratio.
+
     void document.fonts?.ready?.then?.(() => {
       if (!cancelled) schedule();
     });

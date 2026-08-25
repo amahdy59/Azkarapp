@@ -17,7 +17,7 @@ import {
   getDownloadedAudioSummary,
   removeDownloadedAudio,
 } from "../../audio/audioOfflineCache";
-import { downloadMushaf, getMushafDownloadStatus } from "../../content/mushafOfflineCache";
+import { downloadMushaf, getMushafDownloadStatus, removeDownloadedMushaf } from "../../content/mushafOfflineCache";
 
 type OfflineStatus = {
   cacheCount: number;
@@ -139,6 +139,19 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
       setSuccessMessage(t(language, "downloads.removeComplete"));
     } catch (error) {
       reportError(error, "audio-download-remove");
+      setErrorMessage(t(language, "downloads.removeError"));
+    }
+  };
+
+  const removeMushaf = async () => {
+    try {
+      setErrorMessage("");
+      setSuccessMessage("");
+      await removeDownloadedMushaf();
+      await refreshStatus();
+      setSuccessMessage(t(language, "downloads.mushafRemoveComplete"));
+    } catch (error) {
+      reportError(error, "mushaf-download-remove");
       setErrorMessage(t(language, "downloads.removeError"));
     }
   };
@@ -319,6 +332,17 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 {t(language, "downloads.cancelDownload")}
               </Button>
             </div>
+          )}
+
+          {Boolean(status?.downloadedMushafPages && status.downloadedMushafPages > 0) && mushafProgress === null && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void removeMushaf()}
+              className="mt-3 w-full border-destructive/40 text-destructive"
+            >
+              {t(language, "downloads.removeDownloadedMushaf")}
+            </Button>
           )}
         </Card>
 

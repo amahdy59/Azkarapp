@@ -34,7 +34,7 @@ async function scan(page: Page, selector: string) {
 
 test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await seed(page, "/#/azkar/friday-kahf/1");
-  await expect(page.getByTestId("mushaf-pages")).toBeVisible();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 
   await page.getByTestId("reader-mushaf-button").click();
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
@@ -44,9 +44,9 @@ test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations
 
 test("the word-meaning popover has no automatically detectable WCAG A/AA violations", async ({ page }) => {
   await seed(page, "/#/azkar/friday-kahf/1");
-  await expect(page.getByTestId("mushaf-pages")).toBeVisible();
+  await expect(page.getByTestId("reader-screen")).toBeVisible();
 
-  await page.getByTestId("mushaf-page").first().getByTestId("quran-word-help").first().click();
+  await page.getByTestId("quran-word-help").first().click();
   await expect(page.getByTestId("quran-word-popover")).toBeVisible();
 
   expect(await scan(page, '[data-testid="quran-word-popover"]')).toEqual([]);

@@ -404,6 +404,8 @@ const en = {
     mushafProgressLabel: "Mushaf download progress",
     mushafProgressValue: "{completed} of {total} pages downloaded",
     mushafDownloadComplete: "Complete Mushaf downloaded.",
+    removeDownloadedMushaf: "Remove downloaded Mushaf",
+    mushafRemoveComplete: "Downloaded Mushaf files removed.",
     optionalAudioDownloads: "Optional audio downloads",
     cancelDownload: "Cancel download",
     removeDownloadedAudio: "Remove downloaded audio",

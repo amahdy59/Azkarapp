@@ -28,7 +28,8 @@ export interface MushafVerseData {
 
 const QCF_FONT_ROOT = "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2";
 const FONT_CACHE_NAME = "azkar-qcf-fonts-v1";
-const MAX_MEMORY_PAGES = 8;
+const MUSHAF_CACHE_NAME = "azkar-mushaf-v1";
+const MAX_MEMORY_PAGES = 128;
 
 const pageCache = new Map<number, MushafVerseData[]>();
 const pendingPages = new Map<number, Promise<MushafVerseData[]>>();
@@ -122,7 +123,30 @@ export function loadMushafPage(page: number): Promise<MushafVerseData[]> {
   if (pending) return pending;
 
   const request = (async () => {
-    const response = await fetch(getMushafPageUrl(page));
+    const url = getMushafPageUrl(page);
+    let response: Response | undefined;
+
+    if (typeof caches !== "undefined") {
+      try {
+        const cache = await caches.open(MUSHAF_CACHE_NAME);
+        response = await cache.match(url);
+      } catch {
+        /* Fall back to fetch */
+      }
+    }
+
+    if (!response) {
+      response = await fetch(url);
+      if (response.ok && typeof caches !== "undefined") {
+        try {
+          const cache = await caches.open(MUSHAF_CACHE_NAME);
+          await cache.put(url, response.clone());
+        } catch {
+          /* ignore cache store errors */
+        }
+      }
+    }
+
     if (!response.ok) throw new Error(`Mushaf page ${page} request failed with HTTP ${response.status}`);
     const parsed = parseMushafPage(await response.json());
     if (!parsed) throw new Error(`Mushaf page ${page} did not match the expected shape`);

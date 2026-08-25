@@ -343,18 +343,12 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   const counter = page.getByTestId("counter-surface");
   await expect(reader).toHaveAttribute("data-counting-mode", "counter-only");
 
-  // For long multi-page surahs the counter is hidden until the reader reaches
-  // the end of the pages — users must read through before they can count.
   await expect(counter).toBeVisible();
   await expect(counter).toHaveAccessibleName(/0 \/ 1/);
   await expect(counter).toBeInViewport();
+  await expect(page.getByTestId("reader-mushaf-button")).toBeVisible();
 
-  await expect(page.getByTestId("mushaf-page")).toHaveCount(12);
-  await expect(page.getByTestId("mushaf-page-separator")).toHaveCount(11);
-  await expect(page.getByRole("heading", { name: "Mushaf page 293" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Mushaf page 304" })).not.toBeInViewport();
-
-  // Clicking the text or pressing Space while the counter is hidden must NOT
+  // Clicking the text or pressing Space while in counter-only mode must NOT
   // advance the count (longSurah guard).
   await reader.click({ position: { x: 2, y: 320 } });
   await page.keyboard.press("Space");
@@ -373,7 +367,7 @@ test("full surahs count only from the counter and expose sourced difficult-word 
     expect(Math.abs(counterAfterScroll.y - counterBeforeScroll.y)).toBeLessThanOrEqual(1);
   }
 
-  // Non-counter interactions must still not count after the counter is revealed.
+  // Non-counter interactions must still not count.
   await reader.click({ position: { x: 2, y: 320 } });
   await page.keyboard.press("Space");
   await expect(counter).toHaveAttribute("aria-label", /0 \/ 1/);
@@ -409,9 +403,6 @@ test("full surahs count only from the counter and expose sourced difficult-word 
   await expect(meaningSheet).toBeHidden();
   await page.waitForTimeout(500);
 
-  const lastPage = page.getByTestId("mushaf-page").last();
-  await lastPage.scrollIntoViewIfNeeded();
-  await expect(lastPage).toBeInViewport();
   await armCompletionCueRecorder(page);
   await counter.click();
   // A full surah either completes in place or hands straight back to Friday

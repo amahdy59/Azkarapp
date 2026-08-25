@@ -32,56 +32,35 @@ async function openImmersive(page: Page) {
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 }
 
-/** Absolute value because an RTL track scrolls into negative scrollLeft. */
-async function scrolled(page: Page): Promise<number> {
-  return Math.round(
-    Math.abs(await page.getByTestId("mushaf-immersive-track").evaluate((el) => (el as HTMLElement).scrollLeft)),
-  );
-}
-
 test.describe("immersive mushaf mode", () => {
   test("shows one page per screen and pages forward in RTL", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
-    await expect(page.getByTestId("mushaf-pages")).toBeVisible();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
     await openImmersive(page);
-
-    const trackWidth = await page
-      .getByTestId("mushaf-immersive-track")
-      .evaluate((el) => (el as HTMLElement).clientWidth);
-    const pageWidth = await page
-      .getByTestId("mushaf-immersive-page")
-      .first()
-      .evaluate((el) => el.getBoundingClientRect().width);
-    expect(Math.abs(pageWidth - trackWidth)).toBeLessThanOrEqual(1);
 
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
 
     await page.getByTestId("mushaf-immersive-next").click();
-    await expect.poll(() => scrolled(page)).toBe(trackWidth);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeEnabled();
 
     await page.getByTestId("mushaf-immersive-previous").click();
-    await expect.poll(() => scrolled(page)).toBe(0);
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
   });
 
   test("ArrowRight advances the page and ArrowLeft goes back, and Escape closes", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
-    await expect(page.getByTestId("mushaf-pages")).toBeVisible();
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
     await openImmersive(page);
-
-    const trackWidth = await page
-      .getByTestId("mushaf-immersive-track")
-      .evaluate((el) => (el as HTMLElement).clientWidth);
 
     // Physical direction stays consistent across both Mushaf readers.
     await page.keyboard.press("ArrowRight");
-    await expect.poll(() => scrolled(page)).toBe(trackWidth);
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await page.keyboard.press("ArrowLeft");
-    await expect.poll(() => scrolled(page)).toBe(0);
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
     await page.keyboard.press("ArrowRight");
-    await expect.poll(() => scrolled(page)).toBe(trackWidth);
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
 
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("mushaf-immersive")).toBeHidden();

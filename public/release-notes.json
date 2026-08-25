@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-24-7",
+  "release": "2026-08-25",
   "ar": [
-    "تظهر أسماء السور الآن داخل إطار مصحفي منحني ورقيق بزخارف متوازنة، من دون زيادة ارتفاع الصفحة.",
-    "تحافظ البسملة على الحجم المدمج نفسه في كل بدايات السور، بما فيها البدايات التي تشارك فيها العنوان موضعاً واحداً.",
-    "تبقى بدايات السور واضحة ومحاذاة بدقة على الهواتف القصيرة والصفحات المتقابلة وفي جميع أنماط العرض."
+    "تقليب صفحات المصحف أصبح فورياً وسلساً تماماً دون وميض للشاشة مع استجابة فائقة السرعة.",
+    "إمكانية تحميل وتخزين المصحف الشريف كاملاً (الصفحات والخطوط) للعمل بدون إنترنت وإدارته من التنزيلات.",
+    "توحيد تجربة القراءة على المصحف المطبوع برسم المدينة ذي الـ 15 سطراً وإلغاء التقسيمات القديمة."
   ],
   "en": [
-    "Surah names now sit in a refined curved Mushaf-inspired frame with balanced ornaments and no extra page height.",
-    "The Bismillah now keeps the same compact size at every Surah opening, including openings that share one line slot.",
-    "Surah openings stay clear and precisely aligned on short phones, facing pages, and every reader theme."
+    "Mushaf page flipping is now instantaneous and completely seamless without screen flashing or delay.",
+    "Full offline download and caching for the complete 15-line Mushaf pages and authentic fonts in Downloads.",
+    "Unified reading on the authentic 15-line Madani Mushaf layout across all surahs and reader modes."
   ]
 }

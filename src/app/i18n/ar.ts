@@ -403,6 +403,8 @@ const ar = {
     mushafProgressLabel: "تقدم تنزيل المصحف",
     mushafProgressValue: "تم تنزيل {completed} من {total} صفحة",
     mushafDownloadComplete: "اكتمل تنزيل المصحف كاملًا.",
+    removeDownloadedMushaf: "حذف المصحف المحمّل",
+    mushafRemoveComplete: "تم حذف ملفات المصحف المحمّلة.",
     optionalAudioDownloads: "تنزيلات الصوت الاختيارية",
     cancelDownload: "إلغاء التنزيل",
     removeDownloadedAudio: "حذف الصوت المحمّل",

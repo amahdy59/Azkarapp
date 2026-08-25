@@ -25,7 +25,6 @@ import {
   Brush,
   Settings,
 } from "../components/icons";
-import { useReducedMotion } from "motion/react";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
@@ -137,9 +136,14 @@ async function resolveMushafPage(page: number, waitForMeanings: boolean): Promis
   if (waitForMeanings) await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
   else warmGlossesWhenIdle(surahs);
 
-  const qcf = pageHasQcfGlyphs(data)
-    ? await Promise.race([loadQcfFont(page), sleep(FONT_WAIT_MS).then(() => false)])
-    : false;
+  let qcf = false;
+  if (pageHasQcfGlyphs(data)) {
+    if (isQcfFontReady(page)) {
+      qcf = true;
+    } else {
+      qcf = await Promise.race([loadQcfFont(page), sleep(FONT_WAIT_MS).then(() => false)]);
+    }
+  }
   return { page, data, qcf };
 }
 
@@ -232,7 +236,7 @@ export function KhatmahReaderScreen({
     const timer = window.setTimeout(() => setHighlightedVerseKey(null), 4_000);
     return () => window.clearTimeout(timer);
   }, [highlightedVerseKey]);
-  const reduceMotion = useReducedMotion();
+
   const [autoSpreadRoom, setSpreadRoom] = useState(
     () => typeof window !== "undefined" && fitsTwoPages(window.innerWidth, window.innerHeight),
   );
@@ -291,10 +295,18 @@ export function KhatmahReaderScreen({
     const leftPage = rightPage + 1 <= LAST_PAGE ? rightPage + 1 : null;
     const facingPage = spreadRoom && leftPage !== null ? (currentPage === rightPage ? leftPage : rightPage) : null;
 
+    // Immediately resolve from memory if present
+    const cachedPrimary = getCachedMushafPage(currentPage);
+    if (cachedPrimary) {
+      setResolved({
+        page: currentPage,
+        data: cachedPrimary,
+        qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cachedPrimary),
+      });
+    }
+
     void (async () => {
-      // Settle both halves together. The previous sequential effects rendered
-      // one fresh page while its neighbour was still loading, which made a
-      // desktop turn feel visibly slower than the same local files warranted.
+      // Settle both halves together.
       const [next, facing] = await Promise.all([
         resolveMushafPage(currentPage, showMeaningsRef.current).catch((reason) => {
           reportError(reason, "mushaf-page-load");
@@ -309,7 +321,7 @@ export function KhatmahReaderScreen({
       ]);
       if (!active) return;
       if (!next) {
-        setError(t(language, "mushaf.loadFailed"));
+        if (!cachedPrimary) setError(t(language, "mushaf.loadFailed"));
         return;
       }
       setResolved(next);
@@ -373,6 +385,7 @@ export function KhatmahReaderScreen({
     const newlyRead = visiblePages.filter((page) => !currentList.includes(page));
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, todayKey, visiblePages, wirdGoal, wirdHistory]);
+
   // Prefetching surrounding spreads/pages so that moving in either
   // direction is a cache hit rather than a fetch.
   useEffect(() => {
@@ -382,15 +395,17 @@ export function KhatmahReaderScreen({
 
     const timer = window.setTimeout(() => {
       if (spreadRoom && leftNumber !== null) {
-        if (leftNumber + 1 <= LAST_PAGE) prefetchMushafPage(leftNumber + 1);
-        if (leftNumber + 2 <= LAST_PAGE) prefetchMushafPage(leftNumber + 2);
-        if (rightNumber - 1 >= 1) prefetchMushafPage(rightNumber - 1);
-        if (rightNumber - 2 >= 1) prefetchMushafPage(rightNumber - 2);
+        for (let offset = 1; offset <= 4; offset++) {
+          if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset);
+          if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset);
+        }
       } else {
-        if (currentPage + 1 <= LAST_PAGE) prefetchMushafPage(currentPage + 1);
-        if (currentPage - 1 >= 1) prefetchMushafPage(currentPage - 1);
+        for (let offset = 1; offset <= 3; offset++) {
+          if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset);
+          if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset);
+        }
       }
-    }, 250);
+    }, 100);
     return () => window.clearTimeout(timer);
   }, [currentPage, resolved?.page, spreadRoom, leftNumber, rightNumber]);
 
@@ -788,7 +803,7 @@ export function KhatmahReaderScreen({
         )}
 
         {pageData && (
-          <div key={displayPage} className={`h-full w-full ${reduceMotion ? "" : "animate-in fade-in duration-150"}`}>
+          <div className="h-full w-full">
             <MushafPageViewer
               lines={spreadReady && rightSide ? rightSide.lines : lines}
               language={language}

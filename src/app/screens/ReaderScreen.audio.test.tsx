@@ -92,11 +92,8 @@ describe("ReaderScreen audio identity", () => {
 
     const scrollRegion = screen.getByRole("region", { name: "نص الذكر" });
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
-    expect(screen.getAllByTestId("mushaf-page")).toHaveLength(12);
-    expect(screen.getAllByTestId("mushaf-page-separator")).toHaveLength(11);
-    const finalPage = screen.getAllByTestId("mushaf-page").at(-1)!;
+    expect(screen.getByTestId("reader-mushaf-button")).toBeInTheDocument();
     const endCounter = screen.getByTestId("counter-surface");
-    expect(finalPage.compareDocumentPosition(endCounter) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(scrollRegion).not.toContainElement(endCounter);
 
     // Reading taps and the global Space shortcut cannot complete a long surah.

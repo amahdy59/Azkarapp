@@ -39,7 +39,6 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
-import { MushafPageReader } from "../components/MushafPageReader";
 import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
@@ -452,20 +451,9 @@ export function ReaderScreen({
     <article
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
-      {!longSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
+      {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
 
-      {longSurah ? (
-        <MushafPageReader
-          zikr={z}
-          arabicText={displayArabicText}
-          meanings={wordMeanings}
-          language={language}
-          textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setWordMeaningSelection}
-          activeWordId={activeWordId}
-          flat={true}
-        />
-      ) : wordMeanings.length > 0 ? (
+      {wordMeanings.length > 0 ? (
         <QuranWordText
           text={displayArabicText}
           meanings={wordMeanings}
@@ -1154,15 +1142,10 @@ export function ReaderScreen({
       {immersiveOpen && longSurah && (
         <MushafImmersiveReader
           zikr={z}
-          arabicText={displayArabicText}
-          meanings={wordMeanings}
           language={language}
           direction={direction}
           title={readerZikrTitle ?? displayCategoryName}
-          reducedMotion={reducedMotion}
-          textStyle={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setWordMeaningSelection}
-          activeWordId={activeWordId}
+          theme={themeMode === "light" ? "light" : "midnight"}
           onClose={() => setImmersiveOpen(false)}
           onComplete={() => {
             if (!isDone) onComplete(idx);
