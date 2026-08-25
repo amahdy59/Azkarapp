@@ -12,6 +12,16 @@ if (typeof globalThis.ResizeObserver === "undefined") {
   } as unknown as typeof ResizeObserver;
 }
 
+if (typeof Element.prototype.setPointerCapture === "undefined") {
+  Element.prototype.setPointerCapture = () => {};
+}
+if (typeof Element.prototype.releasePointerCapture === "undefined") {
+  Element.prototype.releasePointerCapture = () => {};
+}
+if (typeof Element.prototype.hasPointerCapture === "undefined") {
+  Element.prototype.hasPointerCapture = () => false;
+}
+
 afterEach(() => {
   cleanup();
 });

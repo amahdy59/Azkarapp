@@ -310,7 +310,7 @@ describe("KhatmahReaderScreen settings menu", () => {
     expect(screen.queryByText("Page Layout")).not.toBeInTheDocument();
     expect(screen.queryByText("Comfort reading")).not.toBeInTheDocument();
     expect(screen.queryByText("Keep controls visible")).not.toBeInTheDocument();
-    const pageBookmark = screen.getByRole("menuitemcheckbox", { name: "Bookmark this page" });
+    const pageBookmark = screen.getByTestId("mushaf-bookmark-toggle");
     await user.click(pageBookmark);
     expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
   });
@@ -323,12 +323,8 @@ describe("KhatmahReaderScreen settings menu", () => {
     await screen.findByRole("article", { name: "Pages 41 and 42" });
 
     await user.click(screen.getByRole("button", { name: "Settings" }));
-    const layoutSubmenu = screen.getByTestId("mushaf-layout-submenu");
-    layoutSubmenu.focus();
-    await user.keyboard("{ArrowRight}");
-    const spreadOption = await screen.findByRole("menuitemradio", { name: "Two Pages" });
-    spreadOption.focus();
-    await user.keyboard("{Enter}");
+    const spreadOption = await screen.findByTestId("mushaf-layout-option-spread");
+    await user.click(spreadOption);
     expect(setMushafLayout).toHaveBeenCalledWith("spread");
   });
 });

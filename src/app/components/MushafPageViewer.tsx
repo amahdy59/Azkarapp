@@ -119,7 +119,7 @@ function MushafSurahHeader({
       className="relative flex h-full w-full min-w-0 items-center justify-center px-[17%] select-none"
       dir="rtl"
       data-testid="mushaf-surah-heading"
-      data-variant="curved"
+      data-variant="pill"
     >
       <svg
         viewBox="0 0 320 40"
@@ -129,22 +129,43 @@ function MushafSurahHeader({
         focusable="false"
         data-testid="mushaf-surah-ornament"
       >
-        <path
-          d="M0 20h24c8 0 10-10 18-10h8c2-6 8-9 16-9h188c8 0 14 3 16 9h8c8 0 10 10 18 10h24"
+        {/* Symmetrical full pill enclosing the surah title */}
+        <rect
+          x="52"
+          y="5"
+          width="216"
+          height="30"
+          rx="15"
           fill="none"
           stroke="currentColor"
           strokeWidth="1.2"
           vectorEffect="non-scaling-stroke"
         />
-        <path
-          d="M42 10c0 18 8 29 24 29h188c16 0 24-11 24-29"
-          fill="none"
+        {/* Symmetrical horizontal lines extending from the vertical center */}
+        <line
+          x1="12"
+          y1="20"
+          x2="52"
+          y2="20"
           stroke="currentColor"
           strokeWidth="1.2"
           vectorEffect="non-scaling-stroke"
         />
-        <CurvedHeaderRosette transform="translate(56 20)" />
-        <CurvedHeaderRosette transform="translate(264 20) scale(-1 1)" />
+        <line
+          x1="268"
+          y1="20"
+          x2="308"
+          y2="20"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          vectorEffect="non-scaling-stroke"
+        />
+        {/* Symmetrical terminal dots at outer ends */}
+        <circle cx="10" cy="20" r="2.5" fill="currentColor" />
+        <circle cx="310" cy="20" r="2.5" fill="currentColor" />
+        {/* Symmetrical inner flanking rosettes */}
+        <HeaderRosette transform="translate(72 20)" />
+        <HeaderRosette transform="translate(248 20)" />
       </svg>
       <h2
         className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-medium leading-none"
@@ -159,24 +180,24 @@ function MushafSurahHeader({
   );
 }
 
-function CurvedHeaderRosette({ transform }: { transform: string }) {
+function HeaderRosette({ transform }: { transform: string }) {
   return (
     <g transform={transform}>
       <path
-        d="M0-8c4 2 5 5 0 8 5 3 4 6 0 8-4-2-5-5 0-8-5-3-4-6 0-8Z"
+        d="M0-6c3 1.5 4 4 0 6 4 2 3 4.5 0 6-3-1.5-4-4 0-6-4-2-3-4.5 0-6Z"
         fill="none"
         stroke="currentColor"
         strokeWidth="1"
         vectorEffect="non-scaling-stroke"
       />
       <path
-        d="M-8 0c2-4 5-5 8 0 3-5 6-4 8 0-2 4-5 5-8 0-3 5-6 4-8 0Z"
+        d="M-6 0c1.5-3 4-4 6 0 2-4 4.5-3 6 0-1.5 3-4 4-6 0-2 4-4.5 3-6 0Z"
         fill="none"
         stroke="currentColor"
         strokeWidth="1"
         vectorEffect="non-scaling-stroke"
       />
-      <circle r="1.4" fill="currentColor" />
+      <circle r="1.3" fill="currentColor" />
     </g>
   );
 }

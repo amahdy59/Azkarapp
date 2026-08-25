@@ -1,13 +1,13 @@
 {
   "release": "2026-08-25",
   "ar": [
-    "تقليب صفحات المصحف أصبح فورياً وسلساً تماماً دون وميض للشاشة مع استجابة فائقة السرعة.",
-    "إمكانية تحميل وتخزين المصحف الشريف كاملاً (الصفحات والخطوط) للعمل بدون إنترنت وإدارته من التنزيلات.",
-    "توحيد تجربة القراءة على المصحف المطبوع برسم المدينة ذي الـ 15 سطراً وإلغاء التقسيمات القديمة."
+    "قائمة إعدادات قراءة المصحف أصبحت عصرية ومباشرة بدون قوائم فرعية متداخلة لسهولة الاستخدام على الهواتف.",
+    "إعادة تصميم إطار وبدايات السور في المصحف بشكل متناظر وأنيق بخطوط مستقيمة ونقاط طرفية متوازنة.",
+    "تحديث أيقونة خيارات القراءة لتتوافق تماماً مع النظام التصميمي للتطبيق مع دعم التبديل بنقرة واحدة."
   ],
   "en": [
-    "Mushaf page flipping is now instantaneous and completely seamless without screen flashing or delay.",
-    "Full offline download and caching for the complete 15-line Mushaf pages and authentic fonts in Downloads.",
-    "Unified reading on the authentic 15-line Madani Mushaf layout across all surahs and reader modes."
+    "Mushaf reading settings is now modern and flat without nested cascading menus for seamless mobile use.",
+    "Redesigned symmetrical surah header frame with straight center lines and elegant terminal dots.",
+    "Updated reading options icon to match the design system with instant 1-tap theme and layout switching."
   ]
 }

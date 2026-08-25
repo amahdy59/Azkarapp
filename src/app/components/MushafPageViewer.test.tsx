@@ -138,7 +138,7 @@ describe("MushafPageViewer", () => {
 
     expect(screen.getAllByText("سورة النساء").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("heading", { level: 2, name: "سورة النساء" })).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-surah-heading")).toHaveAttribute("data-variant", "curved");
+    expect(screen.getByTestId("mushaf-surah-heading")).toHaveAttribute("data-variant", "pill");
     expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toHaveStyle({
       fontSize: "clamp(13px, min(4.4cqi, 2.4cqh), 18px)",
     });

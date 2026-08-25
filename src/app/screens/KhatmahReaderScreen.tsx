@@ -17,30 +17,16 @@ import {
   X,
   RotateCcw,
   Bookmark,
-  BookOpen,
   ArrowRight,
   ArrowLeft,
   Eye,
   ChevronDown,
-  Brush,
-  Settings,
+  SlidersHorizontal,
 } from "../components/icons";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-  DropdownMenuSeparator,
-  DropdownMenuCheckboxItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "../components/ui/dropdown-menu";
+import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
 import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
@@ -535,33 +521,12 @@ export function KhatmahReaderScreen({
     endDrag(event.clientX);
   };
 
-  /** The options menu opens in a portal, outside the page, so it cannot inherit
-   *  the paper. Without this it arrived in the app's own popover colours and
-   *  read as a different product sitting on top of the Mushaf. */
-  const menuSurfaceClass =
-    resolvedTheme === "oled"
-      ? "bg-black text-white border-white/40"
-      : `theme-${resolvedTheme} bg-popover text-popover-foreground border-border`;
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
     "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1 rounded-xl px-1.5 text-[0.6875rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
   const footerActionClass =
     "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[0.625rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
-  const themeOptions = [
-    ["follow-app", t(language, "mushaf.themeFollowApp")],
-    ["midnight", t(language, "mushaf.themeMidnight")],
-    ["dark", t(language, "mushaf.themeDark")],
-    ["light", t(language, "mushaf.themeLight")],
-    ["oled", t(language, "mushaf.themeOled")],
-  ] as const;
-  const currentThemeLabel = themeOptions.find(([id]) => id === theme)?.[1];
-  const layoutOptions = [
-    ["auto", t(language, "mushaf.layoutAuto")],
-    ["single", t(language, "mushaf.layoutSingle")],
-    ["spread", t(language, "mushaf.layoutSpread")],
-  ] as const;
-  const currentLayoutLabel = layoutOptions.find(([id]) => id === mushafLayout)?.[1];
 
   const pageHeader = (
     <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
@@ -584,78 +549,16 @@ export function KhatmahReaderScreen({
         <ChevronDown size={16} className="hidden shrink-0 opacity-60 sm:block" aria-hidden="true" />
       </button>
 
-      {/* Reading Settings Menu */}
-      <DropdownMenu dir={direction} open={isOptionsMenuOpen} onOpenChange={setIsOptionsMenuOpen}>
-        <DropdownMenuTrigger asChild>
-          <button
-            type="button"
-            className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-current/25 bg-current/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={t(language, "common.settings")}
-          >
-            <Settings size={17} aria-hidden="true" />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className={menuSurfaceClass} style={{ minWidth: "12rem" }}>
-          <DropdownMenuLabel className="px-2 pb-0 text-[0.6875rem] font-bold opacity-60">
-            {t(language, "common.settings")}
-          </DropdownMenuLabel>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger className="gap-2">
-              <Brush size={15} aria-hidden="true" />
-              <span>{t(language, "mushaf.themeTitle")}</span>
-              <span className="ms-auto max-w-24 truncate text-xs opacity-60">{currentThemeLabel}</span>
-            </DropdownMenuSubTrigger>
-            <DropdownMenuSubContent className={menuSurfaceClass}>
-              <DropdownMenuRadioGroup value={theme} onValueChange={(value) => handleSelectTheme(value as MushafTheme)}>
-                {themeOptions.map(([id, label]) => (
-                  <DropdownMenuRadioItem key={id} value={id}>
-                    {label}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-            </DropdownMenuSubContent>
-          </DropdownMenuSub>
-
-          {autoSpreadRoom && (
-            <DropdownMenuSub>
-              <DropdownMenuSubTrigger className="gap-2" data-testid="mushaf-layout-submenu">
-                <BookOpen size={15} aria-hidden="true" />
-                <span>{t(language, "mushaf.layoutTitle")}</span>
-                <span className="ms-auto max-w-24 truncate text-xs opacity-60">{currentLayoutLabel}</span>
-              </DropdownMenuSubTrigger>
-              <DropdownMenuSubContent className={menuSurfaceClass}>
-                <DropdownMenuRadioGroup
-                  value={mushafLayout}
-                  onValueChange={(value) => {
-                    setMushafLayout?.(value as MushafLayout);
-                    setIsOptionsMenuOpen(false);
-                  }}
-                >
-                  {layoutOptions.map(([id, label]) => (
-                    <DropdownMenuRadioItem key={id} value={id}>
-                      {label}
-                    </DropdownMenuRadioItem>
-                  ))}
-                </DropdownMenuRadioGroup>
-              </DropdownMenuSubContent>
-            </DropdownMenuSub>
-          )}
-
-          <DropdownMenuSeparator />
-
-          <DropdownMenuCheckboxItem
-            checked={initialBookmarks.includes(displayPage)}
-            onCheckedChange={(checked) => {
-              const next = checked
-                ? Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b)
-                : initialBookmarks.filter((page) => page !== displayPage);
-              onUpdateBookmarks?.(next);
-            }}
-          >
-            {t(language, "mushaf.bookmarkCurrentPage")}
-          </DropdownMenuCheckboxItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Reading Settings Trigger Button */}
+      <button
+        type="button"
+        onClick={() => setIsOptionsMenuOpen(true)}
+        className="inline-flex size-11 shrink-0 items-center justify-center rounded-full border border-current/25 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        aria-label={t(language, "common.settings")}
+        data-testid="mushaf-settings-trigger"
+      >
+        <SlidersHorizontal size={18} aria-hidden="true" />
+      </button>
     </div>
   );
 
@@ -891,6 +794,30 @@ export function KhatmahReaderScreen({
           </div>
         </div>
       )}
+
+      {/* Reading Settings Sheet */}
+      <MushafSettingsSheet
+        open={isOptionsMenuOpen}
+        onClose={() => setIsOptionsMenuOpen(false)}
+        language={language}
+        direction={direction}
+        theme={theme}
+        appTheme={appTheme}
+        onSelectTheme={handleSelectTheme}
+        mushafLayout={mushafLayout}
+        onSelectLayout={setMushafLayout}
+        autoSpreadRoom={autoSpreadRoom}
+        isBookmarked={initialBookmarks.includes(displayPage)}
+        onToggleBookmark={() => {
+          const isBookmarked = initialBookmarks.includes(displayPage);
+          const next = isBookmarked
+            ? initialBookmarks.filter((page) => page !== displayPage)
+            : Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b);
+          onUpdateBookmarks?.(next);
+        }}
+        pageNumber={displayPage}
+        surahName={surahName}
+      />
 
       {/* Index & Navigation Modal */}
       <MushafNavigationModal
