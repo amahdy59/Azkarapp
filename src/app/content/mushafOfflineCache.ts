@@ -1,16 +1,14 @@
-const MUSHAF_CACHE_NAME = "azkar-mushaf-v1";
-const FONT_CACHE_NAME = "azkar-qcf-fonts-v1";
+import { FONT_CACHE_NAME, getMushafPageUrl, getQcfFontUrl, MUSHAF_CACHE_NAME } from "./qcfMushaf";
+
 const PAGE_COUNT = 604;
 const CONCURRENCY_LIMIT = 8;
-const QCF_FONT_ROOT = "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2";
 
 function pageUrl(page: number) {
-  const base = import.meta.env.BASE_URL || "/";
-  return new URL(`${base.endsWith("/") ? base : `${base}/`}data/mushaf/${page}.json`, window.location.href).toString();
+  return new URL(getMushafPageUrl(page), window.location.href).toString();
 }
 
 function fontUrl(page: number) {
-  return `${QCF_FONT_ROOT}/p${page}.woff2`;
+  return getQcfFontUrl(page);
 }
 
 export async function getMushafDownloadStatus(): Promise<{
@@ -82,14 +80,9 @@ export async function downloadMushaf(
     if (!hasFont) {
       fetchTasks.push(
         (async () => {
-          try {
-            const fontResponse = await fetch(fUrl, { signal: options.signal });
-            if (fontResponse.ok) {
-              await fontCache.put(fUrl, fontResponse);
-            }
-          } catch {
-            /* Font download non-fatal for individual page; will fallback to unicode if network down */
-          }
+          const fontResponse = await fetch(fUrl, { signal: options.signal });
+          if (!fontResponse.ok) throw new Error(`Mushaf font ${page} failed: ${fontResponse.status}`);
+          await fontCache.put(fUrl, fontResponse);
         })(),
       );
     }

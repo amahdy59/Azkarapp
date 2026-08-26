@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, Eye, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -72,6 +73,7 @@ export function MushafImmersiveReader({
   direction,
   title,
   theme = "midnight",
+  reducedMotion = false,
   onClose,
   onComplete,
 }: {
@@ -110,24 +112,16 @@ export function MushafImmersiveReader({
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
     if (!cached) return null;
-    return { page: currentPage, data: cached, qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cached) };
+    const hasQcfGlyphs = pageHasQcfGlyphs(cached);
+    if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
+    return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
   });
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
 
-  // Immediate in-memory resolution on pageIndex change
   useEffect(() => {
     let active = true;
-    const cached = getCachedMushafPage(currentPage);
-    if (cached) {
-      setResolved({
-        page: currentPage,
-        data: cached,
-        qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cached),
-      });
-    }
-
     void (async () => {
       try {
         const next = await resolveMushafPage(currentPage, showWordMeanings);
@@ -161,15 +155,13 @@ export function MushafImmersiveReader({
     [pageCount],
   );
 
-  // Keyboard navigation: physical direction (ArrowRight = next page, ArrowLeft = previous, Escape = close)
+  // Keyboard navigation: physical direction (ArrowRight = next page, ArrowLeft = previous).
+  // Escape is owned by the dialog so nested ayah sheets close in the right order.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeAyah) return;
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-        return;
-      }
+      const target = e.target as HTMLElement | null;
+      if (target?.closest("button, input, textarea, select, [contenteditable='true']")) return;
       if (e.key === "ArrowRight" || e.key === "PageDown") {
         e.preventDefault();
         paginate(1);
@@ -180,7 +172,7 @@ export function MushafImmersiveReader({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, onClose, paginate]);
+  }, [activeAyah, paginate]);
 
   // Drag / swipe navigation
   const drag = useRef({ pointerId: -1, startX: 0, engaged: false });
@@ -189,7 +181,7 @@ export function MushafImmersiveReader({
     (clientX: number | null) => {
       const paper = paperRef.current;
       if (paper) {
-        paper.style.transition = PAPER_SETTLE;
+        paper.style.transition = reducedMotion ? "none" : PAPER_SETTLE;
         paper.style.transform = "";
       }
       if (drag.current.engaged && clientX !== null) {
@@ -199,7 +191,7 @@ export function MushafImmersiveReader({
       }
       drag.current = { pointerId: -1, startX: 0, engaged: false };
     },
-    [paginate],
+    [paginate, reducedMotion],
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -221,7 +213,7 @@ export function MushafImmersiveReader({
     const paper = paperRef.current;
     if (paper) {
       paper.style.transition = "none";
-      paper.style.transform = `translateX(${(offset * 0.35).toFixed(1)}px)`;
+      paper.style.transform = `translateX(${offset.toFixed(1)}px)`;
     }
   };
 
@@ -274,7 +266,7 @@ export function MushafImmersiveReader({
           role="switch"
           aria-checked={showWordMeanings}
           onClick={() => setShowWordMeanings((v) => !v)}
-          className={`inline-flex size-10 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+          className={`inline-flex size-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
           }`}
           aria-label={t(language, "mushaf.difficultWordsInvite")}
@@ -287,7 +279,7 @@ export function MushafImmersiveReader({
           onClick={onClose}
           data-testid="mushaf-immersive-close"
           aria-label={t(language, "reader.immersiveClose")}
-          className="flex size-10 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           <X size={17} />
         </button>
@@ -297,7 +289,7 @@ export function MushafImmersiveReader({
 
   const pageFooter = (
     <nav
-      dir="ltr"
+      dir="rtl"
       className="flex w-full min-w-0 items-center justify-between gap-2"
       aria-label={t(language, "mushaf.pageNavigation")}
     >
@@ -309,7 +301,7 @@ export function MushafImmersiveReader({
         className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
         aria-label={t(language, "common.previous")}
       >
-        <ChevronLeft size={18} />
+        <ChevronRight size={18} />
         <span className="hidden sm:inline">{t(language, "common.previous")}</span>
       </button>
 
@@ -342,7 +334,7 @@ export function MushafImmersiveReader({
           aria-label={t(language, "common.next")}
         >
           <span className="hidden sm:inline">{t(language, "common.next")}</span>
-          <ChevronRight size={18} />
+          <ChevronLeft size={18} />
         </button>
       )}
     </nav>
@@ -359,62 +351,65 @@ export function MushafImmersiveReader({
       data-testid="mushaf-immersive-progress"
     >
       <div
-        className="h-full bg-primary transition-[width] duration-standard ease-standard"
+        className={`h-full bg-primary ${reducedMotion ? "" : "transition-[width] duration-standard ease-standard"}`}
         style={{ width: `${((pageIndex + 1) / pageCount) * 100}%` }}
       />
     </div>
   );
 
   return (
-    <div
-      data-testid="mushaf-immersive"
-      dir={direction}
-      role="dialog"
-      aria-modal="true"
-      aria-label={t(language, "reader.immersiveTitle")}
-      className="fixed inset-0 z-50 flex flex-col bg-background text-foreground select-none"
-    >
-      <div
-        data-testid="mushaf-immersive-track"
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerEnd}
-        style={{ touchAction: "pan-y" }}
-      >
-        <div className="h-full w-full">
-          <MushafPageViewer
-            lines={lines}
-            language={language}
-            pageNumber={displayPage}
-            surahName={surahName}
-            juzNumber={juzNumber}
-            direction={direction}
-            theme={theme}
-            useQcfGlyphs={useQcfGlyphs}
-            showWordMeanings={showWordMeanings}
-            headerContent={pageHeader}
-            footerContent={pageFooter}
-            progressBar={progressBar}
-            paperRef={paperRef}
-            onAyahAction={handleAyahAction}
-          />
-        </div>
-      </div>
+    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
+      <Dialog.Portal>
+        <Dialog.Content
+          data-testid="mushaf-immersive"
+          dir={direction}
+          aria-describedby={undefined}
+          className="fixed inset-0 z-50 flex flex-col bg-background text-foreground outline-none select-none"
+        >
+          <Dialog.Title className="sr-only">{t(language, "reader.immersiveTitle")}</Dialog.Title>
+          <div
+            data-testid="mushaf-immersive-track"
+            className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerEnd}
+            onPointerCancel={onPointerEnd}
+            style={{ touchAction: "pan-y" }}
+          >
+            <div className="h-full w-full">
+              <MushafPageViewer
+                lines={lines}
+                language={language}
+                pageNumber={displayPage}
+                surahName={surahName}
+                juzNumber={juzNumber}
+                direction={direction}
+                theme={theme}
+                useQcfGlyphs={useQcfGlyphs}
+                showWordMeanings={showWordMeanings}
+                headerContent={pageHeader}
+                footerContent={pageFooter}
+                progressBar={progressBar}
+                paperRef={paperRef}
+                onAyahAction={handleAyahAction}
+              />
+            </div>
+          </div>
 
-      <AyahInteractionSheet
-        isOpen={activeAyah !== null}
-        onClose={() => {
-          ayahRequestId.current += 1;
-          setActiveAyah(null);
-        }}
-        verseKey={activeAyah?.verseKey ?? null}
-        text={activeAyah?.text ?? null}
-        language={language}
-        isBookmarked={false}
-        onBookmark={() => undefined}
-      />
-    </div>
+          <AyahInteractionSheet
+            isOpen={activeAyah !== null}
+            onClose={() => {
+              ayahRequestId.current += 1;
+              setActiveAyah(null);
+            }}
+            verseKey={activeAyah?.verseKey ?? null}
+            text={activeAyah?.text ?? null}
+            language={language}
+            isBookmarked={false}
+            onBookmark={() => undefined}
+          />
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }

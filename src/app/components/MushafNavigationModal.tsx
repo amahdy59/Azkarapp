@@ -116,7 +116,7 @@ export function MushafNavigationModal({
             <Dialog.Title className="arabic-ui text-base font-bold text-foreground sm:text-lg">
               {t(language, "mushaf.indexTitle")}
             </Dialog.Title>
-            <Dialog.Description className="sr-only">{t(language, "mushaf.indexTitle")}</Dialog.Description>
+            <Dialog.Description className="sr-only">{t(language, "mushaf.indexDescription")}</Dialog.Description>
             <Dialog.Close asChild>
               <button
                 type="button"
@@ -204,11 +204,12 @@ export function MushafNavigationModal({
                         onClick={() => handleJump(surah.startPage)}
                         onMouseEnter={() => prefetchMushafPage(surah.startPage)}
                         onPointerDown={() => prefetchMushafPage(surah.startPage)}
-                        className={`flex items-center justify-between p-3 rounded-xl border transition-all text-start group ${
+                        className={`flex items-center justify-between p-3 rounded-xl border transition-colors text-start group ${
                           isCurrent
                             ? "bg-primary/10 border-primary/40 shadow-xs"
                             : "bg-card hover:bg-muted border-border/60 hover:border-border"
                         }`}
+                        style={{ contentVisibility: "auto", containIntrinsicSize: "4.5rem" }}
                       >
                         <div className="flex items-center gap-3">
                           <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xs font-bold font-sans text-primary">
@@ -219,8 +220,12 @@ export function MushafNavigationModal({
                               {surah.nameArabic}
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">
-                              <span>{surah.nameEnglish}</span>
-                              <span>·</span>
+                              {!isArabic && (
+                                <>
+                                  <span>{surah.nameEnglish}</span>
+                                  <span>·</span>
+                                </>
+                              )}
                               <span>
                                 {surah.revelationType === "meccan"
                                   ? t(language, "mushaf.meccan")
@@ -264,7 +269,7 @@ export function MushafNavigationModal({
                       onClick={() => handleJump(juz.startPage)}
                       onMouseEnter={() => prefetchMushafPage(juz.startPage)}
                       onPointerDown={() => prefetchMushafPage(juz.startPage)}
-                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-all text-start group ${
+                      className={`flex items-center justify-between p-3.5 rounded-xl border transition-colors text-start group ${
                         isCurrent
                           ? "bg-primary/10 border-primary/40 shadow-xs"
                           : "bg-card hover:bg-muted border-border/60 hover:border-border"
@@ -346,7 +351,7 @@ export function MushafNavigationModal({
                         key={item.page}
                         type="button"
                         onClick={() => handleJump(item.page)}
-                        className="flex flex-col items-start p-2.5 rounded-xl border border-border/70 hover:border-primary/50 bg-muted/30 hover:bg-primary/5 transition-all text-start"
+                        className="flex flex-col items-start p-2.5 rounded-xl border border-border/70 hover:border-primary/50 bg-muted/30 hover:bg-primary/5 transition-colors text-start"
                       >
                         <span className="arabic-ui text-sm font-bold text-foreground">
                           {isArabic ? item.name : item.en}
@@ -378,7 +383,7 @@ export function MushafNavigationModal({
                           key={page}
                           type="button"
                           onClick={() => handleJump(page)}
-                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-all text-start group"
+                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-colors text-start group"
                         >
                           <div className="flex items-center gap-3">
                             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -411,7 +416,7 @@ export function MushafNavigationModal({
                             onSelectVerseBookmark?.(bookmark);
                             handleJump(bookmark.page);
                           }}
-                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-all text-start group"
+                          className="flex items-center justify-between p-3.5 rounded-xl border border-border/70 hover:border-primary bg-card hover:bg-muted transition-colors text-start group"
                         >
                           <div className="flex items-center gap-3">
                             <span className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">

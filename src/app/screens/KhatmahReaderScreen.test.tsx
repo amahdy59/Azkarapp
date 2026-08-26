@@ -304,12 +304,14 @@ describe("KhatmahReaderScreen settings menu", () => {
     });
 
     await screen.findByRole("article", { name: "Page 42" });
+    expect(screen.getByRole("button", { name: "Set as reading place" })).toBeInTheDocument();
     const settingsBtn = screen.getByRole("button", { name: "Settings" });
     await user.click(settingsBtn);
 
     expect(screen.queryByText("Page Layout")).not.toBeInTheDocument();
     expect(screen.queryByText("Comfort reading")).not.toBeInTheDocument();
     expect(screen.queryByText("Keep controls visible")).not.toBeInTheDocument();
+    expect(screen.getByText("Add to page bookmarks")).toBeInTheDocument();
     const pageBookmark = screen.getByTestId("mushaf-bookmark-toggle");
     await user.click(pageBookmark);
     expect(setMushafBookmarks).toHaveBeenCalledWith([42]);

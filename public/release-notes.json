@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-25h",
+  "release": "2026-08-26a",
   "ar": [
-    "تصميم شارة إتمام الورد القرآني بأسلوب عصري يلتف بدقة حول المحتوى متوافقاً مع أفضل معايير تجربة المستخدم.",
-    "تحسين تجربة القراءة وتناسق الإشعارات والبطاقات التحفيزية أثناء تلاوة المصحف الشريف.",
-    "معالجة مشكلة ظهور بعض الصفحات بخطوط قديمة لضمان عرض خط المصحف المدني بشكل ثابت ومباشر."
+    "أصبح تنزيل المصحف الكامل يحفظ الصفحات وخطوطها الصحيحة مع تنبيه واضح إذا لم يكتمل التنزيل.",
+    "تظهر صفحة المصحف بخط مدني مستقر عند جاهزيته، أو بنص واضح بديل دون حروف مفقودة أو تغير مفاجئ.",
+    "تعرض خطة الورد أهداف اليوم والأسبوع بوضوح أكبر، مع محاذاة عربية ثابتة إلى اليمين وتوزيع متوازن على الشاشات الواسعة.",
+    "أصبح موضع متابعة القراءة منفصلاً بوضوح عن علامات الصفحات، وتحسنت حركة التقليب والفهرس وإتاحة وضع المصحف."
   ],
   "en": [
-    "Fixed an issue where some pages occasionally loaded with an older font style.",
-    "Ensured authentic Madani text rendering immediately takes effect across the entire Quran.",
-    "Improved offline cache behavior for a more reliable, uninterrupted reading session."
+    "A complete Mushaf download now stores the matching pages and fonts and clearly reports an incomplete download.",
+    "Each Mushaf page settles with its authentic Madani font when ready, or a readable fallback without missing glyphs or sudden reflow.",
+    "The Wird plan now presents today's target and weekly history more clearly, with explicit right-aligned Arabic and a balanced wide-screen layout.",
+    "The continue-reading place is clearly separate from page bookmarks, with smoother page movement and a more accessible index and immersive reader."
   ]
 }

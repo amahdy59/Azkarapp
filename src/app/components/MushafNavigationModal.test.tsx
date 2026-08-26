@@ -22,7 +22,7 @@ describe("MushafNavigationModal", () => {
     expect(screen.getByRole("heading", { name: "فهرس المصحف الشريف" })).toBeInTheDocument();
     expect(screen.getByText("السور")).toBeInTheDocument();
     expect(screen.getByText("الأجزاء")).toBeInTheDocument();
-    expect(screen.getByText("انتقال لصفحة")).toBeInTheDocument();
+    expect(screen.getByText("صفحة")).toBeInTheDocument();
     expect(screen.getByText("العلامات")).toBeInTheDocument();
 
     // Verify first surah

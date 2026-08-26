@@ -154,7 +154,7 @@ export function MushafSettingsSheet({
                   aria-checked={isSelected}
                   data-testid={`mushaf-theme-option-${opt.id}`}
                   onClick={() => onSelectTheme(opt.id)}
-                  className={`interactive-elem flex min-h-[48px] items-center justify-between gap-3 rounded-xl border p-2.5 text-start transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  className={`interactive-elem flex min-h-[48px] items-center justify-between gap-3 rounded-xl border p-2.5 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     isSelected
                       ? "border-primary bg-primary/10 shadow-xs ring-1 ring-primary/40 font-bold"
                       : "border-border/60 bg-muted/30 hover:bg-muted/60 text-foreground"
@@ -203,7 +203,7 @@ export function MushafSettingsSheet({
                     aria-checked={isSelected}
                     data-testid={`mushaf-layout-option-${id}`}
                     onClick={() => onSelectLayout(id)}
-                    className={`flex min-h-[44px] items-center justify-center rounded-lg px-2 text-center text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    className={`flex min-h-[44px] items-center justify-center rounded-lg px-2 text-center text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       isSelected
                         ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
                         : "text-muted-foreground hover:text-foreground"
@@ -225,7 +225,7 @@ export function MushafSettingsSheet({
             aria-checked={isBookmarked}
             data-testid="mushaf-bookmark-toggle"
             onClick={onToggleBookmark}
-            className={`interactive-elem flex min-h-[52px] w-full items-center justify-between gap-3 rounded-2xl border p-3 text-start transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`interactive-elem flex min-h-[52px] w-full items-center justify-between gap-3 rounded-2xl border p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               isBookmarked ? "border-primary/50 bg-primary/10" : "border-border/60 bg-muted/30 hover:bg-muted/60"
             }`}
           >

@@ -1146,6 +1146,7 @@ export function ReaderScreen({
           direction={direction}
           title={readerZikrTitle ?? displayCategoryName}
           theme={themeMode === "light" ? "light" : "midnight"}
+          reducedMotion={reducedMotion}
           onClose={() => setImmersiveOpen(false)}
           onComplete={() => {
             if (!isDone) onComplete(idx);

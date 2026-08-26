@@ -16,7 +16,7 @@ import {
   CheckCircle2,
   X,
   RotateCcw,
-  Bookmark,
+  MapPin,
   ArrowRight,
   ArrowLeft,
   Eye,
@@ -41,7 +41,6 @@ import {
   loadQcfFont,
   pageHasQcfGlyphs,
   prefetchMushafPage,
-  subscribeQcfFontLoaded,
   type MushafVerseData,
 } from "../content/qcfMushaf";
 import { reportError } from "../../lib/observability";
@@ -51,6 +50,7 @@ const LAST_PAGE = 604;
 const SWIPE_THRESHOLD = 60;
 /** Settling a released drag, and the only transform animation on this screen. */
 const PAPER_SETTLE = "transform 160ms ease-out";
+const FONT_WAIT_MS = 1200;
 
 /**
  * A spread is only worth showing when both pages still read comfortably.
@@ -115,8 +115,14 @@ async function resolveMushafPage(page: number, waitForMeanings: boolean): Promis
   if (waitForMeanings) await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
   else warmGlossesWhenIdle(surahs);
 
-  void loadQcfFont(page);
-  return { page, data, qcf: true };
+  const qcf =
+    pageHasQcfGlyphs(data) &&
+    (isQcfFontReady(page) ||
+      (await Promise.race([
+        loadQcfFont(page),
+        new Promise<boolean>((resolve) => window.setTimeout(() => resolve(false), FONT_WAIT_MS)),
+      ])));
+  return { page, data, qcf };
 }
 
 export function KhatmahReaderScreen({
@@ -171,7 +177,9 @@ export function KhatmahReaderScreen({
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
     if (!cached) return null;
-    return { page: currentPage, data: cached, qcf: isQcfFontReady(currentPage) && pageHasQcfGlyphs(cached) };
+    const hasQcfGlyphs = pageHasQcfGlyphs(cached);
+    if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
+    return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
   });
   const [other, setOther] = useState<ResolvedPage | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -236,8 +244,6 @@ export function KhatmahReaderScreen({
     setIsOptionsMenuOpen(false);
   };
 
-  const isCurrentBookmarked = quranReadingBookmark?.page === currentPage;
-
   const now = useNow();
   const todayKey = getProgressDayKey(now, progressDayStartHour);
   const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
@@ -267,17 +273,6 @@ export function KhatmahReaderScreen({
     const leftPage = rightPage + 1 <= LAST_PAGE ? rightPage + 1 : null;
     const facingPage = spreadRoom && leftPage !== null ? (currentPage === rightPage ? leftPage : rightPage) : null;
 
-    // Immediately resolve from memory if present
-    const cachedPrimary = getCachedMushafPage(currentPage);
-    if (cachedPrimary) {
-      setResolved({
-        page: currentPage,
-        data: cachedPrimary,
-        qcf: true,
-      });
-      void loadQcfFont(currentPage);
-    }
-
     void (async () => {
       // Settle both halves together.
       const [next, facing] = await Promise.all([
@@ -294,7 +289,7 @@ export function KhatmahReaderScreen({
       ]);
       if (!active) return;
       if (!next) {
-        if (!cachedPrimary) setError(t(language, "mushaf.loadFailed"));
+        setError(t(language, "mushaf.loadFailed"));
         return;
       }
       setResolved(next);
@@ -335,6 +330,7 @@ export function KhatmahReaderScreen({
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
+  const isCurrentBookmarked = quranReadingBookmark?.page === displayPage;
 
   /**
    * The other half of the spread.
@@ -358,25 +354,6 @@ export function KhatmahReaderScreen({
     const newlyRead = visiblePages.filter((page) => !currentList.includes(page));
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, todayKey, visiblePages, wirdGoal, wirdHistory]);
-
-  // Live subscription to font arrivals: dynamically upgrades any on-screen page
-  // to authentic QCF Madani glyphs the exact millisecond the font arrives.
-  useEffect(() => {
-    return subscribeQcfFontLoaded((loadedPage) => {
-      setResolved((current) => {
-        if (current && current.page === loadedPage && !current.qcf) {
-          return { ...current, qcf: true };
-        }
-        return current;
-      });
-      setOther((current) => {
-        if (current && current.page === loadedPage && !current.qcf) {
-          return { ...current, qcf: true };
-        }
-        return current;
-      });
-    });
-  }, []);
 
   // Prefetching surrounding spreads/pages after the current page settles so
   // turning to neighbouring pages is an instant cache/memory hit without
@@ -519,7 +496,7 @@ export function KhatmahReaderScreen({
     const paper = paperRef.current;
     if (paper) {
       paper.style.transition = "none";
-      paper.style.transform = `translateX(${(offset * 0.35).toFixed(1)}px)`;
+      paper.style.transform = `translateX(${offset.toFixed(1)}px)`;
     }
   };
 
@@ -610,7 +587,7 @@ export function KhatmahReaderScreen({
 
         <div className="flex min-h-14 min-w-0 flex-col items-center justify-center px-1">
           <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
-            {t(language, "mushaf.pageLabel", { page: formatNumerals(currentPage, language) })}
+            {t(language, "mushaf.pageLabel", { page: formatNumerals(displayPage, language) })}
           </span>
           <span className="hidden text-[0.625rem] font-semibold opacity-65 md:block">
             {t(language, "mushaf.keyboardNavigationHint")}
@@ -639,7 +616,7 @@ export function KhatmahReaderScreen({
         aria-label={t(language, "mushaf.savePlace")}
         data-testid="mushaf-save-place"
       >
-        <Bookmark size={19} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
+        <MapPin size={19} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
       </button>
     </nav>
   );

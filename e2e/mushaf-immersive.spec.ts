@@ -1,11 +1,8 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Immersive mushaf mode: one page per screen, flipped sideways.
- *
- * These assertions need a real compositing browser. The paging is a scroll
- * snap track, so both the movement and the page indicator ride on scroll
- * events, and those only fire on an animation frame.
+ * Immersive Mushaf mode: one canonical page per screen with physical
+ * right-to-advance navigation shared by buttons, keys, and pointer gestures.
  */
 
 /** Reduce motion is on so pages jump rather than glide — the landing position
@@ -37,6 +34,20 @@ test.describe("immersive mushaf mode", () => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await openImmersive(page);
+
+    const meaningToggle = page.getByRole("switch", { name: "معاني الكلمات" });
+    const closeButton = page.getByTestId("mushaf-immersive-close");
+    for (const control of [meaningToggle, closeButton]) {
+      const box = await control.boundingBox();
+      expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
+      expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
+    }
+
+    await closeButton.focus();
+    for (let index = 0; index < 8; index += 1) await page.keyboard.press("Tab");
+    expect(
+      await page.evaluate(() => document.activeElement?.closest('[data-testid="mushaf-immersive"]') !== null),
+    ).toBe(true);
 
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
 

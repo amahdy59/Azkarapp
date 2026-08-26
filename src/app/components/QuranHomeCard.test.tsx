@@ -53,4 +53,24 @@ describe("QuranHomeCard", () => {
     fireEvent.click(screen.getByRole("button", { name: "Plan & progress" }));
     expect(onOverview).toHaveBeenCalledOnce();
   });
+
+  it("declares right alignment for Arabic Quran summary text", () => {
+    render(
+      <QuranHomeCard
+        language="ar"
+        direction="rtl"
+        position={{ page: 42, surahNumber: 2 }}
+        plan={{ kind: "daily", dailyPages: 4, startedDayKey: "2026-08-24" }}
+        wirdHistory={{ "2026-08-24": [40, 41] }}
+        progressDayStartHour={0}
+        now={now}
+        onContinue={vi.fn()}
+        onOverview={vi.fn()}
+      />,
+    );
+
+    const summary = screen.getByText(/سورة البقرة · صفحة ٤٢/).closest(".px-page");
+    expect(summary).toHaveAttribute("dir", "rtl");
+    expect(summary).toHaveClass("text-right");
+  });
 });

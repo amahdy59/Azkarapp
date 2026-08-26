@@ -31,6 +31,15 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(progress).toHaveAttribute("dir", "rtl");
   await expect(page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ })).toBeVisible();
   await expect(page.getByRole("region", { name: "هذا الأسبوع" }).getByRole("listitem").first()).toContainText("السبت");
+  const arabicAlignments = await page
+    .getByTestId("quran-wird-content")
+    .locator("h2, p, label")
+    .evaluateAll((elements) =>
+      elements
+        .filter((element) => /[\u0600-\u06ff]/.test(element.textContent ?? ""))
+        .map((element) => getComputedStyle(element).textAlign),
+    );
+  expect(new Set(arabicAlignments)).toEqual(new Set(["right"]));
 
   await page.setViewportSize({ width: 320, height: 700 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
@@ -49,7 +58,7 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // The mobile menu stays contextual: theme and page bookmark only. Layout is
   // desktop-only and the retired alternate text view cannot reappear here.
   const optionsButton = page.getByRole("button", { name: /الإعدادات/ });
-  const savePlaceButton = page.getByRole("button", { name: "حفظ موضع القراءة" });
+  const savePlaceButton = page.getByRole("button", { name: "تعيين موضع المتابعة" });
   if (!(await savePlaceButton.isVisible())) {
     await mushafPage.click({ position: { x: 160, y: 350 } });
   }

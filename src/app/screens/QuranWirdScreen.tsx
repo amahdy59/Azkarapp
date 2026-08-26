@@ -75,7 +75,12 @@ export function QuranWirdScreen({
   const goalResult = getQuranWirdGoal(plan, wirdHistory, todayKey);
   const goal = goalResult.dailyGoal;
   const remaining = Math.max(goal - read, 0);
-  const targetEndPage = Math.min(position.page + Math.max(remaining, 1) - 1, TOTAL_MUSHAF_PAGES);
+  const targetPages: number[] = [];
+  for (let page = position.page; page <= TOTAL_MUSHAF_PAGES && targetPages.length < remaining; page += 1) {
+    if (!completedPages.includes(page)) targetPages.push(page);
+  }
+  const targetStartPage = targetPages[0] ?? position.page;
+  const targetEndPage = targetPages.at(-1) ?? position.page;
   const positionSurah = getSurahDisplayName(position.surahNumber ?? 1, language);
   const positionJuz = position.juzNumber ?? getJuzNumberForPage(position.page);
   // Khatmah-level progress is orientation: the current page within 604, not a
@@ -101,13 +106,17 @@ export function QuranWirdScreen({
       : (normalizedDraft.durationDays ?? 30);
   const draftCompletionDate = completionDate(now, draftDays, language, calendarType);
   const canUndo = lastReadingEvent?.dayKey === todayKey && lastReadingEvent.pages.length > 0;
+  const textAlignment = direction === "rtl" ? "text-right" : "text-left";
 
   return (
     <ScreenContainer dir={direction} screenName={t(language, "mushaf.wirdTitle")} className="overflow-y-auto">
       <Header title={t(language, "mushaf.wirdTitle")} onBack={onBack} language={language} />
-      <div className="mx-auto flex w-full flex-col gap-4 px-4 pb-8 pt-3 sm:px-6" style={{ maxWidth: "44rem" }}>
+      <div
+        data-testid="quran-wird-content"
+        className={`mx-auto grid w-full grid-cols-1 gap-4 px-4 pb-8 pt-3 sm:px-6 lg:max-w-6xl lg:grid-cols-2 lg:items-start ${textAlignment}`}
+      >
         <section
-          className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6"
+          className="rounded-3xl border border-primary/50 bg-card p-5 shadow-raised sm:p-6 lg:col-span-2"
           aria-labelledby="wird-today-title"
         >
           <h2 id="wird-today-title" className="mb-3 text-xl font-extrabold text-foreground">
@@ -128,13 +137,13 @@ export function QuranWirdScreen({
           ) : (
             <>
               <div className="mb-4 flex flex-col gap-1">
-                <p className="text-lg font-bold text-primary" dir="auto">
+                <p className="text-lg font-bold text-primary" dir={direction}>
                   {t(language, "mushaf.pagesRange", {
-                    start: formatNumerals(position.page, language),
+                    start: formatNumerals(targetStartPage, language),
                     end: formatNumerals(targetEndPage, language),
                   })}
                 </p>
-                <p className="text-sm font-medium text-muted-foreground" dir="auto">
+                <p className="text-sm font-medium text-muted-foreground" dir={direction}>
                   {t(language, "mushaf.readingContext", {
                     surah: positionSurah,
                     juz: formatNumerals(positionJuz, language),
@@ -196,7 +205,7 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs">
+        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs lg:col-span-2">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.currentKhatmah")}</h2>
             <span className="text-sm font-bold text-primary">{formatNumerals(khatmahPercent, language)}%</span>
@@ -239,7 +248,9 @@ export function QuranWirdScreen({
           {isDrafting && (
             <div className="flex flex-col gap-4 border-t border-border/60 pt-4">
               <div>
-                <label className="mb-2 block text-sm font-bold text-foreground">{t(language, "mushaf.planType")}</label>
+                <label htmlFor="quran-wird-plan-type" className="mb-2 block text-sm font-bold text-foreground">
+                  {t(language, "mushaf.planType")}
+                </label>
                 <Select
                   value={draftPlan.kind === "daily" ? "daily" : "custom"}
                   onValueChange={(value) =>
@@ -257,12 +268,16 @@ export function QuranWirdScreen({
                     )
                   }
                 >
-                  <SelectTrigger aria-label={t(language, "mushaf.changePlan")} className="font-bold">
+                  <SelectTrigger
+                    id="quran-wird-plan-type"
+                    aria-label={t(language, "mushaf.changePlan")}
+                    className="font-bold"
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent dir={direction} position="popper">
                     <SelectItem value="daily">
-                      <span className="flex flex-col text-start">
+                      <span className={`flex flex-col ${textAlignment}`}>
                         <span>{t(language, "mushaf.planPagesPerDay")}</span>
                         <span className="text-xs font-normal text-muted-foreground">
                           {t(language, "mushaf.planPagesPerDayHint")}
@@ -270,7 +285,7 @@ export function QuranWirdScreen({
                       </span>
                     </SelectItem>
                     <SelectItem value="custom">
-                      <span className="flex flex-col text-start">
+                      <span className={`flex flex-col ${textAlignment}`}>
                         <span>{t(language, "mushaf.planFinishByDate")}</span>
                         <span className="text-xs font-normal text-muted-foreground">
                           {t(language, "mushaf.planAdaptiveHint")}
@@ -283,7 +298,9 @@ export function QuranWirdScreen({
 
               {draftPlan.kind === "daily" ? (
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-bold text-foreground">{t(language, "mushaf.planPagesPerDay")}</label>
+                  <label htmlFor="quran-wird-daily-pages" className="text-sm font-bold text-foreground">
+                    {t(language, "mushaf.planPagesPerDay")}
+                  </label>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
@@ -300,6 +317,7 @@ export function QuranWirdScreen({
                       <Minus size={20} />
                     </button>
                     <input
+                      id="quran-wird-daily-pages"
                       type="number"
                       min={1}
                       max={604}
@@ -331,7 +349,9 @@ export function QuranWirdScreen({
                 </div>
               ) : (
                 <div className="flex flex-col gap-2">
-                  <label className="text-sm font-bold text-foreground">{t(language, "mushaf.finishInDays")}</label>
+                  <label htmlFor="quran-wird-duration-days" className="text-sm font-bold text-foreground">
+                    {t(language, "mushaf.finishInDays")}
+                  </label>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
@@ -352,6 +372,7 @@ export function QuranWirdScreen({
                       <Minus size={20} />
                     </button>
                     <input
+                      id="quran-wird-duration-days"
                       type="number"
                       min={1}
                       max={604}
@@ -455,7 +476,7 @@ export function QuranWirdScreen({
                     )}
                   </div>
                   <bdi dir="ltr" className="text-[0.875rem] font-bold text-muted-foreground">
-                    {dayGoal > 0 && count > 0
+                    {dayEligible && dayKey <= todayKey && dayGoal > 0
                       ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
                       : t(language, "mushaf.noReading")}
                   </bdi>

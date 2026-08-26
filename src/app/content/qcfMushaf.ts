@@ -27,8 +27,8 @@ export interface MushafVerseData {
 }
 
 const QCF_FONT_ROOT = "https://verses.quran.foundation/fonts/quran/hafs/v2/woff2";
-const FONT_CACHE_NAME = "azkar-qcf-fonts-v1";
-const MUSHAF_CACHE_NAME = "azkar-mushaf-v3";
+export const FONT_CACHE_NAME = "azkar-qcf-fonts-v1";
+export const MUSHAF_CACHE_NAME = "azkar-mushaf-v3";
 const MAX_MEMORY_PAGES = 128;
 
 const pageCache = new Map<number, MushafVerseData[]>();

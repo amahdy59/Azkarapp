@@ -40,6 +40,7 @@ describe("QuranWirdScreen", () => {
     const props = renderScreen();
     // Start drafting
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    expect(screen.getByRole("spinbutton", { name: "Pages per day" })).toBeInTheDocument();
 
     // Open the plan type select
     const select = screen.getByRole("combobox", { name: "Choose a plan" });
@@ -60,6 +61,14 @@ describe("QuranWirdScreen", () => {
         targetPage: 604,
       }),
     );
+  });
+
+  it("builds today's target from unread pages instead of counting an already credited page twice", () => {
+    const props = renderScreen();
+    const today = getProgressDayKey(new Date(), 4);
+    render(<QuranWirdScreen {...props} wirdHistory={{ [today]: [22, 24] }} />);
+
+    expect(screen.getByText("Pages 23–25")).toBeInTheDocument();
   });
 
   it("undoes the complete last reading event rather than guessing one page", () => {
@@ -110,6 +119,7 @@ describe("QuranWirdScreen", () => {
 
     const props = renderScreen();
     render(<QuranWirdScreen {...props} language="ar" direction="rtl" />);
+    expect(screen.getAllByTestId("quran-wird-content")[1]).toHaveClass("text-right");
     // The Khatmah progressbar is the 2nd one now, maybe check the first one.
     expect(screen.getAllByRole("progressbar")[2]).toHaveAttribute("dir", "rtl");
   });
