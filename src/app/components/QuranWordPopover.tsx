@@ -153,9 +153,9 @@ export function QuranWordPopover({
           : undefined
       }
     >
-      <div className="flex items-stretch gap-4 sm:gap-5 min-w-0">
+      <div className="flex items-stretch gap-3 sm:gap-4 min-w-0">
         {/* Right Section: Word & Meaning */}
-        <div className="flex flex-col justify-center gap-1.5 shrink-0">
+        <div className="flex flex-1 min-w-0 flex-col justify-center gap-1.5" lang="ar" dir="rtl">
           <div className="flex items-center gap-1.5 leading-none">
             <span className="font-mushaf text-xl font-bold text-primary">{primary.word}</span>
             <span className="font-ui-arabic text-[0.625rem] font-bold text-primary/80">
@@ -169,7 +169,7 @@ export function QuranWordPopover({
         <div className="w-px shrink-0 bg-border/40" aria-hidden="true" />
 
         {/* Left Section: Meta (Ayah & Source) & Actions */}
-        <div className="flex flex-col justify-center gap-1.5 min-w-0">
+        <div className="flex shrink-0 flex-col justify-center gap-1.5 w-[110px] sm:w-[140px]">
           <div className="flex items-center justify-between gap-3">
             <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-[0.625rem] font-bold text-muted-foreground">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
@@ -179,7 +179,7 @@ export function QuranWordPopover({
                 type="button"
                 onClick={onShowAll}
                 data-testid="quran-word-popover-all"
-                className="inline-flex min-h-[44px] items-center gap-1 rounded-full px-2 -my-2.5 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 shrink-0"
+                className="inline-flex items-center gap-1 rounded-full px-2 py-1.5 -mx-1 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 shrink-0"
               >
                 {extra > 0
                   ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
