@@ -107,7 +107,7 @@ describe("ReaderScreen audio identity", () => {
     const difficultWord = screen.getAllByTestId("quran-word-help")[0]!;
     fireEvent.click(difficultWord);
     // A tap answers in place under the word; the full sheet is one step further.
-    expect(screen.getByTestId("quran-word-popover")).toBeVisible();
+    expect(screen.getByRole("dialog", { name: /المعنى/ })).toBe(screen.getByTestId("quran-word-popover"));
     fireEvent.click(screen.getByTestId("quran-word-popover-all"));
     expect(screen.getByTestId("quran-word-meaning-sheet")).toBeVisible();
     expect(screen.getByRole("link", { name: /الميسر في غريب القرآن/ })).toHaveAttribute(

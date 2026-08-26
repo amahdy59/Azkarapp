@@ -1125,6 +1125,7 @@ export function ReaderScreen({
         anchorEl={wordMeaningSelection?.anchor ?? null}
         language={language}
         direction={direction}
+        showSource
         onShowAll={() => setWordSheetOpen(true)}
         onClose={() => setWordMeaningSelection(null)}
       />

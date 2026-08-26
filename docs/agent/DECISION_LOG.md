@@ -1661,3 +1661,13 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Why:** The controls retain their touch targets without visually filling the bars, uncached Al-Baqarah pages gain their actual study actions, the transition communicates direction without delaying ready content, and the overview answers one monthly question without three competing progress summaries.
 - **Preserved:** Quran text, QCF glyphs, fifteen-line geometry, pagination, physical page-direction semantics, offline-first chapter files, daily-plan weekly history, and free-reading behavior.
 - **Tests/evidence required:** partial-plus-complete meaning merge, async switch readiness, 44px chrome geometry, desktop/mobile Settings label visibility, forward transition hook, calendar-boundary arithmetic, named month progress, focused mobile/tablet/desktop browser coverage, full local gates, and production verification.
+
+## DEC-106 — word meanings stay compact without hiding provenance or shrinking actions
+
+- **Date:** 2026-08-26
+- **Status:** Approved
+- **Owner:** User (requested review and best-practice completion of the redesigned meaning card)
+- **Related scope:** Quran word-meaning trigger, anchored meaning card, complete meaning sheet, responsive layout, accessibility
+- **Decision:** Keep the redesigned anchored card compact, but stack its meaning and metadata regions on narrow screens and use the split layout only where it fits. Show the complete source attribution instead of truncating it. The card is a named non-modal dialog when it contains the “all meanings” action and remains a tooltip when it is informational only. Every action retains a 44px target and a visible 3px focus indicator.
+- **Preserved:** Reviewed meaning text, source attribution, word matching, Quran text, Mushaf geometry, and the existing path to the complete meaning sheet.
+- **Tests/evidence required:** semantic-role and accessible-name coverage, source visibility, 44px action geometry, automatic accessibility scan, narrow/mobile visual review, full local gates, and production verification.

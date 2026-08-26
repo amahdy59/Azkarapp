@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-26g",
+  "release": "2026-08-26h",
   "ar": [
-    "أصبح عداد المواظبة اليومية الآن يزيد عند إتمامك لأي من الأذكار الرئيسية الثلاثة (الصباح، المساء، أو النوم) بدلاً من اشتراط إتمامها كلها.",
-    "تمت إضافة أداة جديدة أعلى الشاشة الرئيسية تعرض الصلاة القادمة والوقت المتبقي لها بشكل أنيق ومريح للعين.",
-    "تحسينات مرئية وتنسيقية على الشاشة الرئيسية لتوفير مساحة أفضل وعرض الوقت المتبقي للصلاة دون التأثير على البطاقات اليومية."
+    "أصبحت بطاقة معاني الكلمات تتكيف بوضوح مع شاشات الهاتف والجهاز اللوحي وسطح المكتب دون قص أو تمرير أفقي.",
+    "يظهر مرجع معنى الكلمة كاملاً داخل البطاقة لتبقى المعلومة ومصدرها معاً.",
+    "أصبح زر جميع المعاني أسهل للمس ولوحة المفاتيح، مع اسم واضح لقارئات الشاشة."
   ],
   "en": [
-    "The daily streak counter now correctly increases when you complete any of the three main adhkar (Morning, Evening, or Sleep) rather than requiring all of them.",
-    "A new widget has been added to the top of the home screen, elegantly displaying the next prayer and a dynamic countdown.",
-    "Visual refinements to the home screen layout to neatly accommodate the new prayer countdown without cluttering the daily cards."
+    "Word-meaning cards now adapt clearly across phone, tablet, and desktop without clipping or horizontal scrolling.",
+    "The complete meaning source stays visible in the card so the explanation and its attribution remain together.",
+    "The All meanings action is easier to use by touch and keyboard, with a clear name for screen readers."
   ]
 }

@@ -42,12 +42,21 @@ test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations
   expect(await scan(page, '[data-testid="mushaf-immersive"]')).toEqual([]);
 });
 
-test("the word-meaning popover has no automatically detectable WCAG A/AA violations", async ({ page }) => {
+test("the interactive word-meaning card is named, reachable, and has no automatic WCAG A/AA violations", async ({
+  page,
+}) => {
   await seed(page, "/#/azkar/friday-kahf/1");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 
   await page.getByTestId("quran-word-help").first().click();
-  await expect(page.getByTestId("quran-word-popover")).toBeVisible();
+  const card = page.getByTestId("quran-word-popover");
+  await expect(card).toBeVisible();
+  await expect(card).toHaveRole("dialog");
+  await expect(card).toHaveAccessibleName(/المعنى/);
+
+  const actionBox = await page.getByTestId("quran-word-popover-all").boundingBox();
+  expect(actionBox?.height).toBeGreaterThanOrEqual(44);
+  await expect(card).toContainText("الميسر في غريب القرآن");
 
   expect(await scan(page, '[data-testid="quran-word-popover"]')).toEqual([]);
 });

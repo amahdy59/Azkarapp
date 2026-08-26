@@ -139,7 +139,8 @@ export function QuranWordPopover({
   return (
     <div
       ref={ref}
-      role="tooltip"
+      role={onShowAll ? "dialog" : "tooltip"}
+      aria-label={onShowAll ? `${t(language, "reader.wordMeaningLabel")}: ${primary.word}` : undefined}
       dir={direction}
       data-testid="quran-word-popover"
       data-above={fallback?.above ? "true" : undefined}
@@ -153,45 +154,42 @@ export function QuranWordPopover({
           : undefined
       }
     >
-      <div className="flex items-stretch gap-3 sm:gap-4 min-w-0">
-        {/* Right Section: Word & Meaning */}
-        <div className="flex flex-1 min-w-0 flex-col justify-center gap-1.5" lang="ar" dir="rtl">
-          <div className="flex items-center gap-1.5 leading-none">
-            <span className="font-mushaf text-xl font-bold text-primary">{primary.word}</span>
+      <div className="grid min-w-0 gap-2.5 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-stretch sm:gap-4">
+        <div className="flex min-w-0 flex-col justify-center gap-1" lang="ar" dir="rtl">
+          <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
+            <span className="font-mushaf text-xl font-bold leading-tight text-primary">{primary.word}</span>
             <span className="font-ui-arabic text-[0.625rem] font-bold text-primary/80">
               {t(language, "reader.wordMeaningLabel")}
             </span>
           </div>
-          <span className="font-ui-arabic text-sm font-bold text-foreground">{primary.explanationArabic}</span>
+          <span className="font-ui-arabic text-sm font-bold leading-relaxed text-foreground">
+            {primary.explanationArabic}
+          </span>
         </div>
 
-        {/* Divider */}
-        <div className="w-px shrink-0 bg-border/40" aria-hidden="true" />
-
-        {/* Left Section: Meta (Ayah & Source) & Actions */}
-        <div className="flex shrink-0 flex-col justify-center gap-1.5 w-[110px] sm:w-[140px]">
-          <div className="flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:w-40 sm:flex-col sm:items-stretch sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
+          <div className="flex min-w-0 flex-col items-start gap-1">
             <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-[0.625rem] font-bold text-muted-foreground">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
             </bdi>
-            {onShowAll && (
-              <button
-                type="button"
-                onClick={onShowAll}
-                data-testid="quran-word-popover-all"
-                className="inline-flex items-center gap-1 rounded-full px-2 py-1.5 -mx-1 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 shrink-0"
-              >
-                {extra > 0
-                  ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
-                  : t(language, "reader.wordMeaningAll")}
-                <ChevronUp size={12} aria-hidden="true" className="shrink-0" />
-              </button>
+            {showSource && (
+              <span className="max-w-full text-[0.625rem] font-semibold leading-snug text-muted-foreground">
+                {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
+              </span>
             )}
           </div>
-          {showSource && (
-            <span className="text-[0.5625rem] font-semibold leading-tight text-muted-foreground/80 break-words line-clamp-2 max-w-[140px] sm:max-w-[180px]">
-              {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
-            </span>
+          {onShowAll && (
+            <button
+              type="button"
+              onClick={onShowAll}
+              data-testid="quran-word-popover-all"
+              className="-my-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 text-[0.6875rem] font-bold text-primary transition-[background-color,transform] hover:bg-primary/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:my-0 sm:self-start"
+            >
+              {extra > 0
+                ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
+                : t(language, "reader.wordMeaningAll")}
+              <ChevronUp size={12} aria-hidden="true" className="shrink-0" />
+            </button>
           )}
         </div>
       </div>
