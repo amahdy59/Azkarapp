@@ -153,31 +153,47 @@ export function QuranWordPopover({
           : undefined
       }
     >
-      <p className="quran-word-popover__gloss" lang="ar" dir="rtl">
-        <span className="quran-word-popover__word">{primary.word}</span>
-        <span className="quran-word-popover__meaning-label">{t(language, "reader.wordMeaningLabel")}</span>
-        <span className="quran-word-popover__meaning">{primary.explanationArabic}</span>
-      </p>
+      <div className="flex items-stretch gap-4 sm:gap-5 min-w-0">
+        {/* Right Section: Word & Meaning */}
+        <div className="flex flex-col justify-center gap-1.5 shrink-0">
+          <div className="flex items-center gap-1.5 leading-none">
+            <span className="font-mushaf text-xl font-bold text-primary">{primary.word}</span>
+            <span className="font-ui-arabic text-[0.625rem] font-bold text-primary/80">
+              {t(language, "reader.wordMeaningLabel")}
+            </span>
+          </div>
+          <span className="font-ui-arabic text-sm font-bold text-foreground">{primary.explanationArabic}</span>
+        </div>
 
-      <div className="quran-word-popover__footer">
-        <span className="quran-word-popover__meta">
-          <bdi className="quran-word-popover__ayah">
-            {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
-          </bdi>
+        {/* Divider */}
+        <div className="w-px shrink-0 bg-border/40" aria-hidden="true" />
+
+        {/* Left Section: Meta (Ayah & Source) & Actions */}
+        <div className="flex flex-col justify-center gap-1.5 min-w-0">
+          <div className="flex items-center justify-between gap-3">
+            <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-[0.625rem] font-bold text-muted-foreground">
+              {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
+            </bdi>
+            {onShowAll && (
+              <button
+                type="button"
+                onClick={onShowAll}
+                data-testid="quran-word-popover-all"
+                className="inline-flex min-h-[44px] items-center gap-1 rounded-full px-2 -my-2.5 text-[0.6875rem] font-bold text-primary hover:bg-primary/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring active:scale-95 shrink-0"
+              >
+                {extra > 0
+                  ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
+                  : t(language, "reader.wordMeaningAll")}
+                <ChevronUp size={12} aria-hidden="true" className="shrink-0" />
+              </button>
+            )}
+          </div>
           {showSource && (
-            <span className="quran-word-popover__source">
+            <span className="text-[0.5625rem] font-semibold leading-tight text-muted-foreground/80 break-words line-clamp-2 max-w-[140px] sm:max-w-[180px]">
               {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
             </span>
           )}
-        </span>
-        {onShowAll && (
-          <button type="button" onClick={onShowAll} data-testid="quran-word-popover-all">
-            {extra > 0
-              ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })
-              : t(language, "reader.wordMeaningAll")}
-            <ChevronUp size={14} aria-hidden="true" />
-          </button>
-        )}
+        </div>
       </div>
     </div>
   );
