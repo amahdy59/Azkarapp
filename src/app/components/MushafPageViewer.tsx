@@ -16,6 +16,7 @@ import { Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
 import { getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
+import { shouldReduceMotion } from "../motionPreferences";
 
 export interface MushafWordToken {
   verseKey: string;
@@ -798,6 +799,8 @@ export function MushafPageViewer({
   footerContent,
   progressBar,
   paperRef,
+  pageTransitionDirection,
+  reduceMotion = false,
   facingPage,
   onAyahAction,
   highlightedVerseKey,
@@ -820,10 +823,27 @@ export function MushafPageViewer({
   progressBar?: ReactNode;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
+  pageTransitionDirection?: "forward" | "backward";
+  reduceMotion?: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
 }) {
   const formattedJuz = `${t(language, "common.juz")} ${formatNumerals(juzNumber, language)}`;
+
+  useLayoutEffect(() => {
+    const paper = paperRef?.current;
+    if (!paper || !pageTransitionDirection || shouldReduceMotion(reduceMotion) || typeof paper.animate !== "function") {
+      return;
+    }
+    const animation = paper.animate(
+      [
+        { opacity: 0.72, transform: `translateX(${pageTransitionDirection === "forward" ? "-6px" : "6px"})` },
+        { opacity: 1, transform: "translateX(0)" },
+      ],
+      { duration: 150, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
+    );
+    return () => animation.cancel();
+  }, [facingPage?.pageNumber, pageNumber, pageTransitionDirection, paperRef, reduceMotion]);
 
   // Theme styling classes. `--mushaf-ink-stroke` gives the glyphs a hairline of
   // extra weight for legibility: QCF v2 is a single-weight face, so synthetic
@@ -890,7 +910,13 @@ export function MushafPageViewer({
       {/* One page, or two facing pages when the screen has room for both at a
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
-      <div ref={paperRef} className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`} dir="rtl">
+      <div
+        key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
+        ref={paperRef}
+        className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
+        data-page-transition={pageTransitionDirection}
+        dir="rtl"
+      >
         {/* Plain visual words step aside from the accessibility tree until
             study mode is enabled; ayah-marker buttons remain operable in
             either mode, while the cohesive page regions below carry the

@@ -1,8 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ALL_AZKAR } from "./azkar";
 import { applyContentReview } from "./contentReview";
 import { FRIDAY_KAHF } from "./fridayKahf";
-import { buildQuranTextSegments, getQuranSurahNumber, getQuranWordMeanings } from "./quranWordMeanings";
+import {
+  buildQuranTextSegments,
+  getQuranSurahNumber,
+  getQuranWordMeaningEntry,
+  getQuranWordMeanings,
+  loadSurahWordMeanings,
+} from "./quranWordMeanings";
 
 const fridaySurah = applyContentReview(FRIDAY_KAHF.map((zikr) => ({ ...zikr })))[0]!;
 const fullSurahs = [...ALL_AZKAR.filter((zikr) => zikr.isSurah), fridaySurah].filter(
@@ -55,5 +61,23 @@ describe("Quran difficult-word meanings", () => {
 
     const segmentsBaqarah = buildQuranTextSegments(lastTwoBaqarah.arabicText, meaningsBaqarah);
     expect(segmentsBaqarah.map((s) => s.text).join("")).toBe(lastTwoBaqarah.arabicText);
+  });
+
+  it("loads the complete Mushaf chapter when only reviewed passages were bundled", async () => {
+    const wasAlreadyLoaded = getQuranWordMeaningEntry("2:135", "تَهۡتَدُواْ") !== undefined;
+    const fetchMock = vi.fn(async () => ({
+      ok: true,
+      json: async () => ({ "135": { تَهۡتَدُواْ: "تُرشدوا إلى الحق" } }),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+
+    try {
+      await loadSurahWordMeanings(2);
+
+      expect(fetchMock).toHaveBeenCalledTimes(wasAlreadyLoaded ? 0 : 1);
+      expect(getQuranWordMeaningEntry("2:135", "تَهۡتَدُواْ")?.explanationArabic).toBeDefined();
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 });

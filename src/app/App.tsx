@@ -1470,6 +1470,7 @@ function AppContent() {
                   khatmahPage={khatmahPage}
                   setKhatmahPage={setKhatmahPage}
                   progressDayStartHour={progressDayStartHour}
+                  reduceMotion={reduceMotion}
                   mushafTheme={mushafTheme}
                   appTheme={themeMode}
                   setMushafTheme={setMushafTheme}

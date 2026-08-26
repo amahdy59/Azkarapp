@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-26e",
+  "release": "2026-08-26f",
   "ar": [
-    "تم تغيير أيقونة معاني الكلمات إلى شكل كتاب لتكون أكثر وضوحاً.",
-    "أصبح تحميل وعرض معاني الكلمات أسرع وأكثر سلاسة من قبل.",
-    "أصبح التنقل بين صفحات المصحف باستخدام لوحة المفاتيح متوافقاً دائماً مع اتجاه القراءة العربية (من اليمين لليسار)، حتى لو كانت واجهة التطبيق باللغة الإنجليزية.",
-    "تم إصلاح مشكلة عدم تمييز الكلمات الصعبة فور تفعيل زر معاني الكلمات."
+    "أصبحت أزرار شريطي المصحف أكثر اتساقاً ووضوحاً، مع إظهار اسم الإعدادات على الشاشات الواسعة.",
+    "تعمل معاني الكلمات الآن في جميع صفحات المصحف المتاحة، بما فيها مواضع سورة البقرة التي لم تكن تستجيب سابقاً.",
+    "أصبح الانتقال بين صفحات المصحف سريعاً وهادئاً مع احترام تفضيل تقليل الحركة.",
+    "تعرض خطة الشهر اسمه وتقدمك خلاله بوضوح، دون تكرار موضع المصحف أو تفاصيل الأسبوع غير اللازمة."
   ],
   "en": [
-    "The 'Word meanings' button now uses a book icon to better reflect its function.",
-    "Loading difficult word meanings is now much faster and feels smoother.",
-    "Keyboard arrow navigation for the Quran now consistently follows Arabic reading direction (Right-to-Left), regardless of the app's interface language.",
-    "Fixed an issue where difficult words wouldn't highlight immediately when toggled on."
+    "Mushaf toolbar controls are now more consistent and clear, with a visible Settings label on wider screens.",
+    "Word meanings now work throughout the available Mushaf pages, including Al-Baqarah locations that previously did not respond.",
+    "Moving between Mushaf pages now uses a fast, calm transition that respects reduced-motion preferences.",
+    "Monthly plans now show the month name and progress clearly without duplicating Mushaf position or unnecessary weekly details."
   ]
 }

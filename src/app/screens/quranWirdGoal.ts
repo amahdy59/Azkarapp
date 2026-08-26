@@ -8,10 +8,10 @@ export interface QuranWirdGoalResult {
   remainingPages: number;
 }
 
-/** One reading month follows the real length of the chosen calendar month. */
+/** Days left, including today, before the chosen calendar month ends. */
 export function getReadingMonthDuration(now: Date, calendar: "hijri" | "gregorian") {
   if (calendar === "gregorian") {
-    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate() - now.getDate() + 1;
   }
 
   const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn", {
@@ -33,7 +33,7 @@ export function getReadingMonthDuration(now: Date, calendar: "hijri" | "gregoria
     candidate.setDate(candidate.getDate() + offset);
     const next = parts(candidate);
     if (next.month !== start.month || next.year !== start.year) {
-      return start.day - 1 + offset;
+      return offset;
     }
   }
 

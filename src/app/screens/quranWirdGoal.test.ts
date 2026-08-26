@@ -42,13 +42,22 @@ describe("Quran Wird goal calculation", () => {
     expect(effectiveDailyGoal(plan, {}, "2026-08-25")).toBe(11);
   });
 
-  it("uses the actual Gregorian month length", () => {
-    expect(getReadingMonthDuration(new Date(2028, 1, 10), "gregorian")).toBe(29);
-    expect(getReadingMonthDuration(new Date(2026, 7, 10), "gregorian")).toBe(31);
+  it("uses the days remaining in the current Gregorian month", () => {
+    expect(getReadingMonthDuration(new Date(2028, 1, 10), "gregorian")).toBe(20);
+    expect(getReadingMonthDuration(new Date(2026, 7, 10), "gregorian")).toBe(22);
   });
 
-  it("uses an actual Umm al-Qura month length", () => {
-    expect([29, 30]).toContain(getReadingMonthDuration(new Date(2026, 7, 24), "hijri"));
+  it("ends at the actual Umm al-Qura month boundary", () => {
+    const start = new Date(2026, 7, 24, 12);
+    const remaining = getReadingMonthDuration(start, "hijri");
+    const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn", { month: "numeric" });
+    const lastDay = new Date(start);
+    lastDay.setDate(lastDay.getDate() + remaining - 1);
+    const nextMonth = new Date(start);
+    nextMonth.setDate(nextMonth.getDate() + remaining);
+
+    expect(formatter.format(lastDay)).toBe(formatter.format(start));
+    expect(formatter.format(nextMonth)).not.toBe(formatter.format(start));
   });
 
   it("does not create a goal for free reading", () => {

@@ -185,6 +185,14 @@ test("offers clear RTL reading choices and free reading without progress trackin
     .analyze();
   expect(accessibility.violations).toEqual([]);
 
+  await page.getByRole("radio", { name: /ختمة في شهر هجري/ }).check();
+  await page.getByRole("button", { name: "حفظ الخطة" }).click();
+  await expect(page.getByText("تقدم هذا الشهر")).toBeVisible();
+  await expect(page.getByRole("progressbar", { name: /صفحة في خطة/ })).toBeVisible();
+  await expect(page.getByText("موضعك في المصحف")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "هذا الأسبوع" })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "تعديل" }).click();
   await page.getByRole("radio", { name: /قراءة حرة/ }).check();
   await expect(page.getByText(/سيُحفظ موضعك/)).toBeVisible();
   await page.getByRole("button", { name: "حفظ الخطة" }).click();
@@ -199,6 +207,38 @@ test("offers clear RTL reading choices and free reading without progress trackin
   const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("azkarapp.state.v1") ?? "{}"));
   expect(stored.quranReadingPosition?.page).toBe(43);
   expect(stored.wirdHistory).toEqual({});
+});
+
+test("keeps Mushaf bars cohesive and activates meanings on an uncached Al-Baqarah page", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+
+  const settings = page.getByTestId("mushaf-settings-trigger");
+  await expect(settings).toContainText("الإعدادات");
+  await expect(settings.locator("span")).toBeVisible();
+  const chromeControls = page.locator('[data-mushaf-chrome="header"] button, [data-mushaf-chrome="footer"] button');
+  const heights = await chromeControls.evaluateAll((elements) =>
+    elements.map((element) => element.getBoundingClientRect().height),
+  );
+  expect(heights.every((height) => height >= 44 && height <= 46)).toBe(true);
+
+  await page.getByRole("button", { name: "فهرس المصحف الشريف" }).click();
+  await page.getByRole("tab", { name: "صفحة" }).click();
+  await page.getByLabel("أدخل رقم الصفحة (١-٦٠٤)").fill("21");
+  await page.getByRole("button", { name: "انتقال" }).click();
+  await expect(page.getByRole("article", { name: /٢١/ })).toBeVisible();
+
+  const meanings = page.getByRole("switch", { name: "معاني الكلمات" });
+  await meanings.click();
+  await expect(meanings).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByRole("button", { name: /معنى كلمة/ }).first()).toBeVisible();
+
+  await page.getByRole("button", { name: "التالي" }).click();
+  await expect(page.getByRole("article", { name: /٢٣/ })).toBeVisible();
+  await expect(page.locator('[data-page-transition="forward"]')).toBeVisible();
+
+  await page.setViewportSize({ width: 320, height: 700 });
+  await expect(settings.locator("span")).toBeHidden();
 });
 
 test("keeps the curved Surah header and Bismillah consistent without changing the page grid", async ({ page }) => {

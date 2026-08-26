@@ -82,6 +82,34 @@ describe("MushafPageViewer", () => {
     expect(screen.getByText("ٱلۡقَيُّومُ")).toBeInTheDocument();
   });
 
+  it("uses a compositor-only directional entrance for a settled page turn", () => {
+    const { container, rerender } = render(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+      />,
+    );
+    expect(container.querySelector("[data-page-transition]")).toBeNull();
+
+    rerender(
+      <MushafPageViewer
+        lines={sampleLines}
+        language="ar"
+        pageNumber={4}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        pageTransitionDirection="forward"
+      />,
+    );
+
+    expect(container.querySelector('[data-page-transition="forward"]')).toBeInTheDocument();
+  });
+
   it("renders official QCF glyphs with semantic text retained for assistive technology", () => {
     render(
       <MushafPageViewer

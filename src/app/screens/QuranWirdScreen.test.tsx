@@ -113,6 +113,34 @@ describe("QuranWirdScreen", () => {
     expect(screen.getByRole("button", { name: "Adjust plan" })).toBeInTheDocument();
   });
 
+  it("names the selected calendar month and replaces duplicate overview clutter with month progress", () => {
+    const props = renderScreen();
+    cleanup();
+    render(
+      <QuranWirdScreen
+        {...props}
+        plan={{
+          kind: "gregorianMonth",
+          dailyPages: 19,
+          durationDays: 31,
+          startedDayKey: "2026-08-01",
+          startPage: 22,
+          targetPage: 604,
+        }}
+        wirdHistory={{ "2026-08-24": [22, 23] }}
+      />,
+    );
+
+    expect(screen.getByText("August 2026")).toBeInTheDocument();
+    expect(screen.getByText("Progress this month")).toBeInTheDocument();
+    expect(screen.getByRole("progressbar", { name: /2 of 583 plan pages completed in August 2026/ })).toHaveAttribute(
+      "dir",
+      "ltr",
+    );
+    expect(screen.queryByText("Your Mushaf position")).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "This week" })).not.toBeInTheDocument();
+  });
+
   it("uses a Saturday-to-Friday week and fills Arabic progress from the right", () => {
     expect(currentSaturdayWeekKeys(new Date("2026-08-22T12:00:00"))).toEqual([
       "2026-08-22",
@@ -127,8 +155,7 @@ describe("QuranWirdScreen", () => {
     const props = renderScreen();
     render(<QuranWirdScreen {...props} language="ar" direction="rtl" />);
     expect(screen.getAllByTestId("quran-wird-content")[1]).toHaveClass("text-right");
-    // The Khatmah progressbar is the 2nd one now, maybe check the first one.
-    expect(screen.getAllByRole("progressbar")[2]).toHaveAttribute("dir", "rtl");
+    expect(screen.getAllByRole("progressbar")[1]).toHaveAttribute("dir", "rtl");
 
     fireEvent.click(screen.getByRole("button", { name: "تعديل" }));
     for (const radio of screen.getAllByRole("radio")) {

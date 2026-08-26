@@ -234,7 +234,10 @@ function wordMeaningsUrl(surah: string) {
  */
 export function loadSurahWordMeanings(surahNumber: number | string): Promise<void> {
   const surah = String(surahNumber);
-  if (MEANINGS[surah] || lazyChapters.has(surah)) return Promise.resolve();
+  // The bundled map intentionally contains only a few reviewed passages for
+  // some Surahs (Al-Baqarah has 2:255 and 2:285-286). It must not be mistaken
+  // for the complete chapter file used by the Mushaf.
+  if (lazyChapters.has(surah)) return Promise.resolve();
 
   const pending = pendingChapters.get(surah);
   if (pending) return pending;
@@ -265,11 +268,12 @@ export function getQuranWordMeaningEntry(verseKey: string, wordText: string): Qu
   const surah = parts[0];
   const ayah = parts[1];
   if (!surah || !ayah) return undefined;
-  // Reviewed glosses win over the sourced ones: Al-Baqarah's passages are
-  // written by hand and worded differently from the source.
-  const chapter = MEANINGS[surah] ?? lazyChapters.get(surah);
-  if (!chapter) return undefined;
-  const ayahMeanings = chapter[ayah];
+  // Reviewed glosses win word-for-word, while the complete lazy chapter fills
+  // every other verse. Choosing one chapter map with `??` made Al-Baqarah's
+  // three bundled passages hide the other 283 ayahs after they had loaded.
+  const reviewed = MEANINGS[surah]?.[ayah];
+  const sourced = lazyChapters.get(surah)?.[ayah];
+  const ayahMeanings = reviewed || sourced ? { ...sourced, ...reviewed } : undefined;
   if (!ayahMeanings) return undefined;
 
   // Direct match

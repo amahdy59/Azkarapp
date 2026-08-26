@@ -188,6 +188,7 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(article).toHaveAttribute("data-theme", "dark");
     expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("bg-card", "text-card-foreground");
     expect(screen.getByText("← / → للتنقل بين الصفحات")).toBeInTheDocument();
+    expect(screen.getByText("الإعدادات")).toHaveClass("hidden", "lg:inline");
   });
 
   it("follows the app theme by default", async () => {
@@ -203,6 +204,34 @@ describe("KhatmahReaderScreen wird progress", () => {
 });
 
 describe("KhatmahReaderScreen difficult words", () => {
+  it("waits for the visible chapter meanings before turning study mode on", async () => {
+    let finishMeanings!: (value: { ok: true; json: () => Promise<Record<string, unknown>> }) => void;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (input: string) => {
+        if (String(input).includes("word-meanings")) {
+          return new Promise((resolve) => {
+            finishMeanings = resolve;
+          });
+        }
+        const page = Number(String(input).match(/(\d+)\.json(?:\?.*)?$/)?.[1] ?? 1);
+        return { ok: true, json: async () => pageFixture(page) };
+      }),
+    );
+    const user = userEvent.setup();
+    renderReader();
+    await screen.findByRole("article", { name: "صفحة ٤٢" });
+
+    const toggle = screen.getByRole("switch", { name: "معاني الكلمات" });
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute("aria-busy", "true");
+    expect(toggle).toHaveAttribute("aria-checked", "false");
+
+    finishMeanings({ ok: true, json: async () => ({}) });
+    await waitFor(() => expect(toggle).toHaveAttribute("aria-checked", "true"));
+    expect(toggle).toHaveAttribute("aria-busy", "false");
+  });
+
   it("exposes a switch that reveals the reviewed meanings", async () => {
     const user = userEvent.setup();
     renderReader();

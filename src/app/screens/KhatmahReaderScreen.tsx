@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef, startTransition } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type {
@@ -147,6 +147,7 @@ export function KhatmahReaderScreen({
   quranWirdPlan,
   onReadingPositionChange,
   progressDayStartHour,
+  reduceMotion = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -169,6 +170,7 @@ export function KhatmahReaderScreen({
   quranWirdPlan?: QuranWirdPlan;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
   progressDayStartHour: number;
+  reduceMotion?: boolean;
 }) {
   const currentPage = Math.max(1, Math.min(LAST_PAGE, khatmahPage || 1));
 
@@ -181,12 +183,15 @@ export function KhatmahReaderScreen({
     if (hasQcfGlyphs && !isQcfFontReady(currentPage)) return null;
     return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
   });
+  const settledPage = useRef(resolved?.page ?? currentPage);
+  const [pageTransitionDirection, setPageTransitionDirection] = useState<"forward" | "backward" | undefined>();
   const [other, setOther] = useState<ResolvedPage | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [reloadToken, setReloadToken] = useState(0);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isOptionsMenuOpen, setIsOptionsMenuOpen] = useState(false);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
+  const [isLoadingWordMeanings, setIsLoadingWordMeanings] = useState(false);
   const [completionSeen, setCompletionSeen] = useState<string | null>(null);
   /** Read inside the loader without making the switch a dependency of it —
    *  flipping it must not re-fetch the page. */
@@ -292,6 +297,10 @@ export function KhatmahReaderScreen({
         setError(t(language, "mushaf.loadFailed"));
         return;
       }
+      setPageTransitionDirection(
+        next.page === settledPage.current ? undefined : next.page > settledPage.current ? "forward" : "backward",
+      );
+      settledPage.current = next.page;
       setResolved(next);
       setOther(facing);
       setError(null);
@@ -422,6 +431,20 @@ export function KhatmahReaderScreen({
     onReadingBookmarkChange?.({ page: displayPage, surahNumber, juzNumber });
   }, [displayPage, isCurrentBookmarked, juzNumber, onReadingBookmarkChange, pageData]);
 
+  const toggleWordMeanings = useCallback(async () => {
+    if (showWordMeanings) {
+      setShowWordMeanings(false);
+      return;
+    }
+
+    setIsLoadingWordMeanings(true);
+    const visibleData = [...(pageData ?? []), ...(other?.data ?? [])];
+    const surahs = [...new Set(visibleData.map((verse) => verse.k.split(":")[0] ?? ""))].filter(Boolean);
+    await Promise.all(surahs.map((surah) => loadSurahWordMeanings(surah)));
+    setShowWordMeanings(true);
+    setIsLoadingWordMeanings(false);
+  }, [other?.data, pageData, showWordMeanings]);
+
   /** One page at a time, or a whole spread when two are showing. */
   const pageStep = spreadReady ? 2 : 1;
   const paginate = useCallback(
@@ -509,9 +532,9 @@ export function KhatmahReaderScreen({
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
-    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1 rounded-xl px-1.5 text-[0.6875rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-current/15 bg-current/5 px-2 text-[0.6875rem] font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3";
   const footerActionClass =
-    "flex min-h-14 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-[0.625rem] font-extrabold focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg px-1 text-[0.625rem] font-extrabold transition-colors hover:bg-current/5 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
 
   const pageHeader = (
     <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
@@ -538,11 +561,12 @@ export function KhatmahReaderScreen({
       <button
         type="button"
         onClick={() => setIsOptionsMenuOpen(true)}
-        className="inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-current/25 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-current/15 bg-current/5 px-2 text-xs font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring lg:w-auto lg:px-3"
         aria-label={t(language, "common.settings")}
         data-testid="mushaf-settings-trigger"
       >
         <SlidersHorizontal size={18} aria-hidden="true" />
+        <span className="hidden lg:inline">{t(language, "common.settings")}</span>
       </button>
     </div>
   );
@@ -558,15 +582,21 @@ export function KhatmahReaderScreen({
         type="button"
         role="switch"
         aria-checked={showWordMeanings}
-        onClick={() => startTransition(() => setShowWordMeanings((current) => !current))}
-        className={`inline-flex h-14 w-14 md:w-auto md:px-4 items-center justify-center gap-2 rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-          showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
+        aria-busy={isLoadingWordMeanings}
+        disabled={isLoadingWordMeanings}
+        onClick={() => void toggleWordMeanings()}
+        className={`inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 md:w-auto md:px-3 ${
+          showWordMeanings ? "border-primary/60 bg-primary/15 text-primary" : "border-current/15 bg-current/5"
         }`}
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         data-testid="mushaf-difficult-words-switch"
       >
-        <BookOpen size={19} aria-hidden="true" className="shrink-0" />
-        <span className="hidden md:block font-bold truncate max-w-[140px]">
+        {showWordMeanings ? (
+          <CheckCircle2 size={19} aria-hidden="true" className="shrink-0" />
+        ) : (
+          <BookOpen size={19} aria-hidden="true" className="shrink-0" />
+        )}
+        <span className="hidden max-w-[140px] truncate font-bold md:block">
           {t(language, "mushaf.difficultWordsInvite")}
         </span>
       </button>
@@ -589,7 +619,7 @@ export function KhatmahReaderScreen({
           <span className="truncate">{t(language, "common.previous")}</span>
         </button>
 
-        <div className="flex min-h-14 min-w-0 flex-col items-center justify-center px-1">
+        <div className="flex min-h-11 min-w-0 flex-col items-center justify-center px-1">
           <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
             {t(language, "mushaf.pageLabel", { page: formatNumerals(displayPage, language) })}
           </span>
@@ -614,8 +644,8 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={toggleReadingBookmark}
         aria-pressed={isCurrentBookmarked}
-        className={`inline-flex h-14 w-14 md:w-auto md:px-4 items-center justify-center gap-2 rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-          isCurrentBookmarked ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
+        className={`inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:w-auto md:px-3 ${
+          isCurrentBookmarked ? "border-primary/60 bg-primary/15 text-primary" : "border-current/15 bg-current/5"
         }`}
         aria-label={t(language, "mushaf.savePlace")}
         data-testid="mushaf-save-place"
@@ -713,6 +743,8 @@ export function KhatmahReaderScreen({
               footerContent={pageFooter}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
+              pageTransitionDirection={pageTransitionDirection}
+              reduceMotion={reduceMotion}
               onAyahAction={handleAyahAction}
             />
           </div>

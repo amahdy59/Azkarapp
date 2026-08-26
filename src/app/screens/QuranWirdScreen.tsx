@@ -70,6 +70,14 @@ function completionDate(now: Date, days: number, language: AppLanguage, calendar
   }).format(date);
 }
 
+function monthLabel(date: Date, calendar: "hijri" | "gregorian", language: AppLanguage) {
+  const locale = language === "ar" ? "ar-EG" : "en";
+  return new Intl.DateTimeFormat(calendar === "hijri" ? `${locale}-u-ca-islamic-umalqura` : locale, {
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
 export function QuranWirdScreen({
   language,
   direction,
@@ -102,6 +110,8 @@ export function QuranWirdScreen({
   const now = useNow();
   const todayKey = getProgressDayKey(now, progressDayStartHour);
   const isFreeReading = plan.kind === "free";
+  const planCalendar = plan.kind === "hijriMonth" ? "hijri" : plan.kind === "gregorianMonth" ? "gregorian" : null;
+  const isMonthPlan = planCalendar !== null;
   const completedPages = Array.from(new Set(wirdHistory[todayKey] ?? []));
   const read = completedPages.length;
   const goalResult = getQuranWirdGoal(plan, wirdHistory, todayKey);
@@ -115,10 +125,19 @@ export function QuranWirdScreen({
   const targetEndPage = targetPages.at(-1) ?? position.page;
   const positionSurah = getSurahDisplayName(position.surahNumber ?? 1, language);
   const positionJuz = position.juzNumber ?? getJuzNumberForPage(position.page);
-  // Khatmah-level progress is orientation: the current page within 604, not a
-  // second completion ledger. Daily completion remains in `wirdHistory`.
-  const khatmahPagesRead = position.page;
-  const khatmahPercent = Math.floor((khatmahPagesRead / TOTAL_MUSHAF_PAGES) * 100);
+  const planStartPage = plan.startPage ?? 1;
+  const planTargetPage = plan.targetPage ?? TOTAL_MUSHAF_PAGES;
+  const planPageCount = Math.max(1, planTargetPage - planStartPage + 1);
+  const monthPagesRead = isMonthPlan
+    ? new Set(
+        Object.entries(wirdHistory)
+          .filter(([dayKey]) => !plan.startedDayKey || dayKey >= plan.startedDayKey)
+          .flatMap(([, pages]) => pages)
+          .filter((page) => page >= planStartPage && page <= planTargetPage),
+      ).size
+    : 0;
+  const monthStartedAt = plan.startedDayKey ? new Date(`${plan.startedDayKey}T12:00:00`) : now;
+  const currentPlanMonth = planCalendar ? monthLabel(monthStartedAt, planCalendar, language) : "";
   const week = useMemo(() => currentSaturdayWeekKeys(now), [now]);
   const firstPlan =
     !plan.startedDayKey && position.page === 1 && Object.values(wirdHistory).every((pages) => !pages.length);
@@ -271,34 +290,17 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        {!isFreeReading && (
-          <section className="rounded-3xl border border-border bg-card p-5 shadow-xs lg:col-span-2">
-            <div className="mb-2 flex items-center justify-between">
-              <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.currentKhatmah")}</h2>
-              <span className="text-sm font-bold text-primary">{formatNumerals(khatmahPercent, language)}%</span>
-            </div>
-            <p className="mb-3 text-sm font-medium text-muted-foreground">
-              {formatNumerals(khatmahPagesRead, language)} / {formatNumerals(TOTAL_MUSHAF_PAGES, language)}{" "}
-              {t(language, "mushaf.pagesUnit")}
-            </p>
-            <ProgressBar
-              aria-label={t(language, "mushaf.khatmahProgress")}
-              value={khatmahPagesRead}
-              max={TOTAL_MUSHAF_PAGES}
-              height={6}
-              direction={direction}
-            />
-          </section>
-        )}
-
         <section
-          className={`rounded-3xl border border-border bg-card p-5 shadow-xs ${isFreeReading ? "lg:col-span-2" : ""}`}
+          className={`rounded-3xl border border-border bg-card p-5 shadow-xs ${isFreeReading || isMonthPlan ? "lg:col-span-2" : ""}`}
         >
           <div className="mb-4 flex items-start justify-between">
             <div>
               <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.planTitle")}</h2>
               {!isDrafting && (
-                <p className="mt-1 text-sm font-medium text-muted-foreground">{planLabel(language, plan)}</p>
+                <>
+                  {isMonthPlan && <p className="mt-1 text-lg font-extrabold text-foreground">{currentPlanMonth}</p>}
+                  <p className="mt-1 text-sm font-medium text-muted-foreground">{planLabel(language, plan)}</p>
+                </>
               )}
             </div>
             {!isDrafting && (
@@ -318,6 +320,28 @@ export function QuranWirdScreen({
               </button>
             )}
           </div>
+
+          {!isDrafting && isMonthPlan && (
+            <div className="border-t border-border/60 pt-4">
+              <div className="mb-2 flex items-center justify-between gap-3 text-sm font-bold text-foreground">
+                <span>{t(language, "mushaf.monthProgress")}</span>
+                <bdi dir="ltr">
+                  {formatNumerals(monthPagesRead, language)} / {formatNumerals(planPageCount, language)}
+                </bdi>
+              </div>
+              <ProgressBar
+                aria-label={t(language, "mushaf.monthProgressAria", {
+                  read: formatNumerals(monthPagesRead, language),
+                  total: formatNumerals(planPageCount, language),
+                  month: currentPlanMonth,
+                })}
+                value={monthPagesRead}
+                max={planPageCount}
+                height={8}
+                direction={direction}
+              />
+            </div>
+          )}
 
           {isDrafting && (
             <div className="flex flex-col gap-4 border-t border-border/60 pt-4">
@@ -451,7 +475,7 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        {!isFreeReading && (
+        {!isFreeReading && !isMonthPlan && (
           <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">
             <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
               {t(language, "mushaf.thisWeek")}
