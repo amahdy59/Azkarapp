@@ -223,6 +223,11 @@ export interface WordMeaningSelection {
 const lazyChapters = new Map<string, Record<string, Record<string, string>>>();
 const pendingChapters = new Map<string, Promise<void>>();
 
+export function __resetWordMeaningsCacheForTesting() {
+  lazyChapters.clear();
+  pendingChapters.clear();
+}
+
 function wordMeaningsUrl(surah: string) {
   const base = import.meta.env.BASE_URL || "/";
   return `${base.endsWith("/") ? base : `${base}/`}data/word-meanings/${surah}.json`;

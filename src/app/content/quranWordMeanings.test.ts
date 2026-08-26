@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { ALL_AZKAR } from "./azkar";
 import { applyContentReview } from "./contentReview";
 import { FRIDAY_KAHF } from "./fridayKahf";
@@ -8,6 +8,7 @@ import {
   getQuranWordMeaningEntry,
   getQuranWordMeanings,
   loadSurahWordMeanings,
+  __resetWordMeaningsCacheForTesting,
 } from "./quranWordMeanings";
 
 const fridaySurah = applyContentReview(FRIDAY_KAHF.map((zikr) => ({ ...zikr })))[0]!;
@@ -17,6 +18,14 @@ const fullSurahs = [...ALL_AZKAR.filter((zikr) => zikr.isSurah), fridaySurah].fi
 );
 
 describe("Quran difficult-word meanings", () => {
+  beforeEach(() => {
+    __resetWordMeaningsCacheForTesting();
+  });
+
+  afterEach(() => {
+    __resetWordMeaningsCacheForTesting();
+  });
+
   it("covers every full surah currently available in the app", () => {
     expect(fullSurahs.map(getQuranSurahNumber).sort((left, right) => (left ?? 0) - (right ?? 0))).toEqual([
       18, 32, 67, 109, 112, 113, 114,
