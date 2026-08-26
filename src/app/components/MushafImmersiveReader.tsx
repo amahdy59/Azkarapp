@@ -1,6 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronLeft, ChevronRight, Eye, X } from "./icons";
+import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafPageTheme, Zikr } from "../types";
@@ -265,14 +265,14 @@ export function MushafImmersiveReader({
           type="button"
           role="switch"
           aria-checked={showWordMeanings}
-          onClick={() => setShowWordMeanings((v) => !v)}
+          onClick={() => startTransition(() => setShowWordMeanings((v) => !v))}
           className={`inline-flex size-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
           }`}
           aria-label={t(language, "mushaf.difficultWordsInvite")}
           title={t(language, "mushaf.difficultWordsInvite")}
         >
-          <Eye size={17} aria-hidden="true" />
+          <BookOpen size={17} aria-hidden="true" />
         </button>
         <button
           type="button"

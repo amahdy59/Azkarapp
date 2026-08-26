@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo, useCallback, useRef } from "react";
+import { useEffect, useState, useMemo, useCallback, useRef, startTransition } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
 import type {
@@ -19,7 +19,7 @@ import {
   MapPin,
   ArrowRight,
   ArrowLeft,
-  Eye,
+  BookOpen,
   ChevronDown,
   SlidersHorizontal,
 } from "../components/icons";
@@ -551,21 +551,24 @@ export function KhatmahReaderScreen({
     <nav
       dir={direction}
       aria-label={t(language, "mushaf.pageNavigation")}
-      className="grid w-full items-center gap-1"
-      style={{ gridTemplateColumns: "3.5rem minmax(0,1fr) 3.5rem" }}
+      className="grid w-full items-center gap-1 md:gap-2"
+      style={{ gridTemplateColumns: "minmax(3.5rem, auto) minmax(0, 1fr) minmax(3.5rem, auto)" }}
     >
       <button
         type="button"
         role="switch"
         aria-checked={showWordMeanings}
-        onClick={() => setShowWordMeanings((current) => !current)}
-        className={`inline-flex size-14 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+        onClick={() => startTransition(() => setShowWordMeanings((current) => !current))}
+        className={`inline-flex h-14 w-14 md:w-auto md:px-4 items-center justify-center gap-2 rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
           showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
         }`}
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         data-testid="mushaf-difficult-words-switch"
       >
-        <Eye size={19} aria-hidden="true" />
+        <BookOpen size={19} aria-hidden="true" className="shrink-0" />
+        <span className="hidden md:block font-bold truncate max-w-[140px]">
+          {t(language, "mushaf.difficultWordsInvite")}
+        </span>
       </button>
 
       {/* Page-turn controls follow natural reading progression:
@@ -611,13 +614,14 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={toggleReadingBookmark}
         aria-pressed={isCurrentBookmarked}
-        className={`inline-flex size-14 items-center justify-center rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+        className={`inline-flex h-14 w-14 md:w-auto md:px-4 items-center justify-center gap-2 rounded-xl border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
           isCurrentBookmarked ? "border-primary bg-primary text-primary-foreground" : "border-transparent bg-current/5"
         }`}
         aria-label={t(language, "mushaf.savePlace")}
         data-testid="mushaf-save-place"
       >
-        <MapPin size={19} className={isCurrentBookmarked ? "fill-current" : ""} aria-hidden="true" />
+        <MapPin size={19} className={isCurrentBookmarked ? "fill-current shrink-0" : "shrink-0"} aria-hidden="true" />
+        <span className="hidden md:block font-bold truncate max-w-[140px]">{t(language, "mushaf.savePlace")}</span>
       </button>
     </nav>
   );

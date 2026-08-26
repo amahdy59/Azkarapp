@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-26b",
+  "release": "2026-08-26c",
   "ar": [
-    "يمكنك الآن قراءة القرآن بحرية دون التأثير على خطتك اليومية أو سجل إنجازك، مع الحفاظ على موضع قراءتك الحالي.",
-    "أصبح اختيار خطة القراءة أسهل من خلال خيارات واضحة وظاهرة دائماً بدلاً من القائمة المنسدلة.",
-    "خطط القراءة الشهرية تحسب الآن الأيام بشكل دقيق بناءً على طول الشهر الهجري أو الميلادي الحالي."
+    "تم تغيير أيقونة معاني الكلمات إلى شكل كتاب لتكون أكثر وضوحاً.",
+    "أصبح تحميل وعرض معاني الكلمات أسرع وأكثر سلاسة من قبل.",
+    "تعرض أزرار التحكم الآن نصوصاً توضيحية بجانب الأيقونات على الشاشات الكبيرة."
   ],
   "en": [
-    "You can now read the Quran freely without affecting your daily reading plan or progress history, while still saving your place.",
-    "Choosing a reading plan is easier with clear, always-visible options instead of a dropdown menu.",
-    "Monthly reading plans now correctly account for the actual number of days in the current Hijri or Gregorian month."
+    "The 'Word meanings' button now uses a book icon to better reflect its function.",
+    "Loading difficult word meanings is now much faster and feels smoother.",
+    "Action buttons now show helpful text labels on larger screens."
   ]
 }
