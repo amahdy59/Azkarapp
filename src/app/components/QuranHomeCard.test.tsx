@@ -73,4 +73,23 @@ describe("QuranHomeCard", () => {
     expect(summary).toHaveAttribute("dir", "rtl");
     expect(summary).toHaveClass("text-right");
   });
+
+  it("shows reading preferences without a progress target in free mode", () => {
+    render(
+      <QuranHomeCard
+        language="en"
+        direction="ltr"
+        position={{ page: 42, surahNumber: 2 }}
+        plan={{ kind: "free", dailyPages: 0, startedDayKey: "2026-08-24" }}
+        wirdHistory={{}}
+        progressDayStartHour={0}
+        now={now}
+        onContinue={vi.fn()}
+        onOverview={vi.fn()}
+      />,
+    );
+
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reading preferences" })).toBeInTheDocument();
+  });
 });

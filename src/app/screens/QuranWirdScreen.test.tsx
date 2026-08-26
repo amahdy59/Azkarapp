@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { getProgressDayKey } from "../progress";
 import { QuranWirdScreen } from "./QuranWirdScreen";
@@ -38,29 +38,36 @@ describe("QuranWirdScreen", () => {
 
   it("offers a draft mode for plan changes", () => {
     const props = renderScreen();
-    // Start drafting
     fireEvent.click(screen.getByRole("button", { name: "Edit" }));
     expect(screen.getByRole("spinbutton", { name: "Pages per day" })).toBeInTheDocument();
+    expect(screen.queryByRole("combobox")).not.toBeInTheDocument();
 
-    // Open the plan type select
-    const select = screen.getByRole("combobox", { name: "Choose a plan" });
-    fireEvent.click(select);
-
-    // Choose Finish by a date
-    fireEvent.click(screen.getByRole("option", { name: /Finish by a date/i }));
-
-    // Save the plan
+    fireEvent.click(screen.getByRole("radio", { name: /Finish in one Gregorian month/i }));
     fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
 
     expect(props.onPlanChange).toHaveBeenCalledWith(
       expect.objectContaining({
-        kind: "custom",
-        durationDays: 30,
-        dailyPages: 20,
+        kind: "gregorianMonth",
+        durationDays: expect.any(Number),
         startPage: 22,
         targetPage: 604,
       }),
     );
+  });
+
+  it("offers free reading without goals or history summaries", () => {
+    const props = renderScreen();
+    fireEvent.click(screen.getByRole("button", { name: "Edit" }));
+    fireEvent.click(screen.getByRole("radio", { name: /Read freely/i }));
+    fireEvent.click(screen.getByRole("button", { name: "Save plan" }));
+
+    expect(props.onPlanChange).toHaveBeenCalledWith(expect.objectContaining({ kind: "free", dailyPages: 0 }));
+
+    cleanup();
+    render(<QuranWirdScreen {...props} plan={{ kind: "free", dailyPages: 0, startedDayKey: "2026-08-24" }} />);
+    expect(screen.getByText("Free reading is on")).toBeInTheDocument();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "This week" })).not.toBeInTheDocument();
   });
 
   it("builds today's target from unread pages instead of counting an already credited page twice", () => {
@@ -122,5 +129,10 @@ describe("QuranWirdScreen", () => {
     expect(screen.getAllByTestId("quran-wird-content")[1]).toHaveClass("text-right");
     // The Khatmah progressbar is the 2nd one now, maybe check the first one.
     expect(screen.getAllByRole("progressbar")[2]).toHaveAttribute("dir", "rtl");
+
+    fireEvent.click(screen.getByRole("button", { name: "تعديل" }));
+    for (const radio of screen.getAllByRole("radio")) {
+      expect(radio.closest("label")?.querySelector("span")).toHaveClass("text-right");
+    }
   });
 });

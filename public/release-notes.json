@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-26a",
+  "release": "2026-08-26b",
   "ar": [
-    "أصبح تنزيل المصحف الكامل يحفظ الصفحات وخطوطها الصحيحة مع تنبيه واضح إذا لم يكتمل التنزيل.",
-    "تظهر صفحة المصحف بخط مدني مستقر عند جاهزيته، أو بنص واضح بديل دون حروف مفقودة أو تغير مفاجئ.",
-    "تعرض خطة الورد أهداف اليوم والأسبوع بوضوح أكبر، مع محاذاة عربية ثابتة إلى اليمين وتوزيع متوازن على الشاشات الواسعة.",
-    "أصبح موضع متابعة القراءة منفصلاً بوضوح عن علامات الصفحات، وتحسنت حركة التقليب والفهرس وإتاحة وضع المصحف."
+    "يمكنك الآن قراءة القرآن بحرية دون التأثير على خطتك اليومية أو سجل إنجازك، مع الحفاظ على موضع قراءتك الحالي.",
+    "أصبح اختيار خطة القراءة أسهل من خلال خيارات واضحة وظاهرة دائماً بدلاً من القائمة المنسدلة.",
+    "خطط القراءة الشهرية تحسب الآن الأيام بشكل دقيق بناءً على طول الشهر الهجري أو الميلادي الحالي."
   ],
   "en": [
-    "A complete Mushaf download now stores the matching pages and fonts and clearly reports an incomplete download.",
-    "Each Mushaf page settles with its authentic Madani font when ready, or a readable fallback without missing glyphs or sudden reflow.",
-    "The Wird plan now presents today's target and weekly history more clearly, with explicit right-aligned Arabic and a balanced wide-screen layout.",
-    "The continue-reading place is clearly separate from page bookmarks, with smoother page movement and a more accessible index and immersive reader."
+    "You can now read the Quran freely without affecting your daily reading plan or progress history, while still saving your place.",
+    "Choosing a reading plan is easier with clear, always-visible options instead of a dropdown menu.",
+    "Monthly reading plans now correctly account for the actual number of days in the current Hijri or Gregorian month."
   ]
 }

@@ -151,7 +151,7 @@ export function QuranHomeCard({
         >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar size={16} />
-            <span>{t(language, "mushaf.planAndProgress")}</span>
+            <span>{t(language, plan.kind === "free" ? "mushaf.readingPreferences" : "mushaf.planAndProgress")}</span>
           </div>
           <ArrowNext size={16} data-rtl-flip aria-hidden="true" />
         </button>

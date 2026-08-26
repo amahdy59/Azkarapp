@@ -241,7 +241,7 @@ export type MushafTheme = "follow-app" | ThemeMode | "oled";
 export type MushafPageTheme = ThemeMode | "oled";
 export type MushafLayout = "auto" | "single" | "spread";
 
-export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom";
+export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom" | "hijriMonth" | "gregorianMonth" | "free";
 
 /** The last verified page the reader opened, with enough context for a useful resume label. */
 export interface QuranReadingPosition {

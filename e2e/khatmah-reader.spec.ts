@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test.beforeEach(async ({ page }) => {
@@ -143,6 +144,61 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
+});
+
+test("offers clear RTL reading choices and free reading without progress tracking", async ({ page }) => {
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.getByRole("button", { name: "تعديل" }).click();
+
+  const radios = page.getByRole("radio");
+  await expect(radios).toHaveCount(4);
+  await expect(page.getByRole("combobox")).toHaveCount(0);
+  await expect(page.getByRole("radio", { name: /صفحات كل يوم/ })).toBeChecked();
+
+  const optionState = await radios.evaluateAll((elements) =>
+    elements.map((radio) => {
+      const label = radio.closest("label");
+      const text = label?.querySelector("span");
+      const box = label?.getBoundingClientRect();
+      const styles = label ? getComputedStyle(label) : null;
+      return {
+        direction: label ? getComputedStyle(label).direction : "",
+        textAlign: text ? getComputedStyle(text).textAlign : "",
+        minHeight: box?.height ?? 0,
+        backgroundColor: styles?.backgroundColor ?? "",
+        borderColor: styles?.borderColor ?? "",
+      };
+    }),
+  );
+  expect(
+    optionState.every(
+      ({ direction, textAlign, minHeight }) => direction === "rtl" && textAlign === "right" && minHeight >= 64,
+    ),
+  ).toBe(true);
+  expect(optionState[0]?.backgroundColor).not.toBe(optionState[1]?.backgroundColor);
+  expect(optionState[0]?.borderColor).not.toBe(optionState[1]?.borderColor);
+
+  const accessibility = await new AxeBuilder({ page })
+    .include('[data-testid="quran-wird-content"]')
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"])
+    .disableRules(["color-contrast"])
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
+
+  await page.getByRole("radio", { name: /قراءة حرة/ }).check();
+  await expect(page.getByText(/سيُحفظ موضعك/)).toBeVisible();
+  await page.getByRole("button", { name: "حفظ الخطة" }).click();
+  await expect(page.getByText("القراءة الحرة مفعّلة")).toBeVisible();
+  await expect(page.getByRole("progressbar")).toHaveCount(0);
+  await expect(page.getByRole("region", { name: "هذا الأسبوع" })).toHaveCount(0);
+
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
+  const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("azkarapp.state.v1") ?? "{}"));
+  expect(stored.quranReadingPosition?.page).toBe(43);
+  expect(stored.wirdHistory).toEqual({});
 });
 
 test("keeps the curved Surah header and Bismillah consistent without changing the page grid", async ({ page }) => {

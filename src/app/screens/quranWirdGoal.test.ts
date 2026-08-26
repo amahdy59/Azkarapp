@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { effectiveDailyGoal, getQuranWirdGoal } from "./quranWirdGoal";
+import { effectiveDailyGoal, getQuranWirdGoal, getReadingMonthDuration } from "./quranWirdGoal";
 import type { QuranWirdPlan } from "../types";
 
 const plan: QuranWirdPlan = {
@@ -40,5 +40,22 @@ describe("Quran Wird goal calculation", () => {
 
   it("is deterministic for a supplied devotional day key", () => {
     expect(effectiveDailyGoal(plan, {}, "2026-08-25")).toBe(11);
+  });
+
+  it("uses the actual Gregorian month length", () => {
+    expect(getReadingMonthDuration(new Date(2028, 1, 10), "gregorian")).toBe(29);
+    expect(getReadingMonthDuration(new Date(2026, 7, 10), "gregorian")).toBe(31);
+  });
+
+  it("uses an actual Umm al-Qura month length", () => {
+    expect([29, 30]).toContain(getReadingMonthDuration(new Date(2026, 7, 24), "hijri"));
+  });
+
+  it("does not create a goal for free reading", () => {
+    expect(getQuranWirdGoal({ kind: "free", dailyPages: 0 }, {}, "2026-08-24")).toEqual({
+      dailyGoal: 0,
+      expired: false,
+      remainingPages: 604,
+    });
   });
 });

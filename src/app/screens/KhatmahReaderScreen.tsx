@@ -350,10 +350,11 @@ export function KhatmahReaderScreen({
   );
 
   const recordCurrentSpread = useCallback(() => {
+    if (quranWirdPlan?.kind === "free") return;
     const currentList = wirdHistory[todayKey] ?? [];
     const newlyRead = visiblePages.filter((page) => !currentList.includes(page));
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
-  }, [onRecordPages, todayKey, visiblePages, wirdGoal, wirdHistory]);
+  }, [onRecordPages, quranWirdPlan?.kind, todayKey, visiblePages, wirdGoal, wirdHistory]);
 
   // Prefetching surrounding spreads/pages after the current page settles so
   // turning to neighbouring pages is an instant cache/memory hit without

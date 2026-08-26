@@ -8,6 +8,38 @@ export interface QuranWirdGoalResult {
   remainingPages: number;
 }
 
+/** One reading month follows the real length of the chosen calendar month. */
+export function getReadingMonthDuration(now: Date, calendar: "hijri" | "gregorian") {
+  if (calendar === "gregorian") {
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+  }
+
+  const formatter = new Intl.DateTimeFormat("en-u-ca-islamic-umalqura-nu-latn", {
+    day: "numeric",
+    month: "numeric",
+    year: "numeric",
+  });
+  const parts = (date: Date) =>
+    Object.fromEntries(
+      formatter
+        .formatToParts(date)
+        .filter(({ type }) => type === "day" || type === "month" || type === "year")
+        .map(({ type, value }) => [type, Number(value)]),
+    ) as Record<"day" | "month" | "year", number>;
+  const start = parts(now);
+
+  for (let offset = 1; offset <= 32; offset += 1) {
+    const candidate = new Date(now);
+    candidate.setDate(candidate.getDate() + offset);
+    const next = parts(candidate);
+    if (next.month !== start.month || next.year !== start.year) {
+      return start.day - 1 + offset;
+    }
+  }
+
+  return 30;
+}
+
 function dayNumber(dayKey: string) {
   const [year, month, day] = dayKey.split("-").map(Number);
   if (!year || !month || !day) return null;
@@ -24,6 +56,9 @@ export function getQuranWirdGoal(
   history: Record<string, number[]>,
   activeDayKey: string,
 ): QuranWirdGoalResult {
+  if (plan.kind === "free") {
+    return { dailyGoal: 0, expired: false, remainingPages: TOTAL_MUSHAF_PAGES };
+  }
   if (plan.kind === "daily" || !plan.durationDays || !plan.startedDayKey) {
     return { dailyGoal: plan.dailyPages, expired: false, remainingPages: TOTAL_MUSHAF_PAGES };
   }

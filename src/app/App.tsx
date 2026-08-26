@@ -1448,7 +1448,7 @@ function AppContent() {
                   onContinue={() => push("khatmah")}
                   onPlanChange={(plan) => {
                     setQuranWirdPlan(plan);
-                    setDailyWirdGoal(plan.dailyPages);
+                    if (plan.dailyPages > 0) setDailyWirdGoal(plan.dailyPages);
                   }}
                   onUndoReadingEvent={() => {
                     const dayKey = getProgressDayKey(new Date(), progressDayStartHour);

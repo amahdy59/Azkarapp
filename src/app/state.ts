@@ -245,6 +245,14 @@ function normalizeQuranReadingEvent(value: unknown): QuranReadingEvent | undefin
 function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWirdPlan {
   if (!value || typeof value !== "object") return { kind: "daily", dailyPages: fallbackGoal };
   const plan = value as Partial<QuranWirdPlan>;
+  const kind =
+    plan.kind === "khatmah30" ||
+    plan.kind === "custom" ||
+    plan.kind === "hijriMonth" ||
+    plan.kind === "gregorianMonth" ||
+    plan.kind === "free"
+      ? plan.kind
+      : "daily";
   const dailyPages =
     typeof plan.dailyPages === "number" &&
     Number.isInteger(plan.dailyPages) &&
@@ -278,13 +286,16 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
     plan.targetPage >= (startPage ?? 1)
       ? plan.targetPage
       : undefined;
+  const timed = kind === "custom" || kind === "khatmah30" || kind === "hijriMonth" || kind === "gregorianMonth";
   return {
-    kind: plan.kind === "khatmah30" || plan.kind === "custom" ? plan.kind : "daily",
-    dailyPages: plan.kind === "khatmah30" ? 21 : dailyPages,
-    ...((plan.kind === "custom" || plan.kind === "khatmah30") && durationDays ? { durationDays } : {}),
+    kind,
+    dailyPages: kind === "free" ? 0 : kind === "khatmah30" ? 21 : dailyPages,
+    ...(timed && (durationDays || kind === "hijriMonth" || kind === "gregorianMonth")
+      ? { durationDays: durationDays ?? 30 }
+      : {}),
     ...(startedDayKey ? { startedDayKey } : {}),
-    ...((plan.kind === "custom" || plan.kind === "khatmah30") && startPage !== undefined ? { startPage } : {}),
-    ...((plan.kind === "custom" || plan.kind === "khatmah30") && targetPage !== undefined ? { targetPage } : {}),
+    ...(timed && startPage !== undefined ? { startPage } : {}),
+    ...(timed && targetPage !== undefined ? { targetPage } : {}),
   };
 }
 

@@ -4,21 +4,52 @@ import { ProgressBar } from "../components/ProgressBar";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { ArrowNext, BookOpen, Check, Undo, Minus, Plus } from "../components/icons";
 import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
-import { effectiveDailyGoal, getQuranWirdGoal, TOTAL_MUSHAF_PAGES } from "./quranWirdGoal";
+import { effectiveDailyGoal, getQuranWirdGoal, getReadingMonthDuration, TOTAL_MUSHAF_PAGES } from "./quranWirdGoal";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import { getProgressDayKey } from "../progress";
 import { useNow } from "../hooks/useNow";
 import type { AppLanguage, QuranReadingEvent, QuranReadingPosition, QuranWirdPlan } from "../types";
 import { currentSaturdayWeekKeys } from "./quranWirdWeek";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 
 function planLabel(language: AppLanguage, plan: QuranWirdPlan) {
   if (plan.kind === "khatmah30") return t(language, "mushaf.planKhatmah30");
+  if (plan.kind === "hijriMonth") return t(language, "mushaf.planHijriMonth");
+  if (plan.kind === "gregorianMonth") return t(language, "mushaf.planGregorianMonth");
+  if (plan.kind === "free") return t(language, "mushaf.planFreeReading");
   if (plan.kind === "custom") {
     return t(language, "mushaf.planCustom", { days: formatNumerals(plan.durationDays ?? 30, language) });
   }
   return t(language, "mushaf.planDaily");
+}
+
+type VisiblePlanKind = "daily" | "hijriMonth" | "gregorianMonth" | "free";
+
+function createPlan(
+  kind: VisiblePlanKind,
+  now: Date,
+  todayKey: string,
+  position: QuranReadingPosition,
+  current?: QuranWirdPlan,
+): QuranWirdPlan {
+  if (kind === "free") return { kind, dailyPages: 0, startedDayKey: todayKey };
+  if (kind === "daily") {
+    return {
+      kind,
+      dailyPages: current?.kind === "daily" ? current.dailyPages : 4,
+      startedDayKey: todayKey,
+    };
+  }
+
+  const durationDays = getReadingMonthDuration(now, kind === "hijriMonth" ? "hijri" : "gregorian");
+  return {
+    kind,
+    durationDays,
+    dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / durationDays),
+    startedDayKey: todayKey,
+    startPage: position.page,
+    targetPage: TOTAL_MUSHAF_PAGES,
+  };
 }
 
 function completionDate(now: Date, days: number, language: AppLanguage, calendarType: "hijri" | "gregorian") {
@@ -70,6 +101,7 @@ export function QuranWirdScreen({
 }) {
   const now = useNow();
   const todayKey = getProgressDayKey(now, progressDayStartHour);
+  const isFreeReading = plan.kind === "free";
   const completedPages = Array.from(new Set(wirdHistory[todayKey] ?? []));
   const read = completedPages.length;
   const goalResult = getQuranWirdGoal(plan, wirdHistory, todayKey);
@@ -91,20 +123,29 @@ export function QuranWirdScreen({
   const firstPlan =
     !plan.startedDayKey && position.page === 1 && Object.values(wirdHistory).every((pages) => !pages.length);
   const [isDrafting, setIsDrafting] = useState(firstPlan);
-  const [draftPlan, setDraftPlan] = useState<QuranWirdPlan>(plan);
+  const [draftPlan, setDraftPlan] = useState<QuranWirdPlan>(() =>
+    plan.kind === "custom" || plan.kind === "khatmah30" ? createPlan("hijriMonth", now, todayKey, position) : plan,
+  );
+  const timedDraft =
+    draftPlan.kind === "custom" ||
+    draftPlan.kind === "khatmah30" ||
+    draftPlan.kind === "hijriMonth" ||
+    draftPlan.kind === "gregorianMonth";
   const normalizedDraft: QuranWirdPlan = {
     ...draftPlan,
     startedDayKey: todayKey,
-    ...(draftPlan.kind === "daily"
-      ? {}
-      : { startPage: draftPlan.startPage ?? position.page, targetPage: draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES }),
+    ...(timedDraft
+      ? { startPage: draftPlan.startPage ?? position.page, targetPage: draftPlan.targetPage ?? TOTAL_MUSHAF_PAGES }
+      : {}),
   };
   const draftGoal = effectiveDailyGoal(normalizedDraft, wirdHistory, todayKey);
   const draftDays =
-    normalizedDraft.kind === "daily"
-      ? Math.max(1, Math.ceil((TOTAL_MUSHAF_PAGES - position.page + 1) / normalizedDraft.dailyPages))
-      : (normalizedDraft.durationDays ?? 30);
-  const draftCompletionDate = completionDate(now, draftDays, language, calendarType);
+    normalizedDraft.kind === "free"
+      ? null
+      : normalizedDraft.kind === "daily"
+        ? Math.max(1, Math.ceil((TOTAL_MUSHAF_PAGES - position.page + 1) / normalizedDraft.dailyPages))
+        : (normalizedDraft.durationDays ?? 30);
+  const draftCompletionDate = draftDays === null ? null : completionDate(now, draftDays, language, calendarType);
   const canUndo = lastReadingEvent?.dayKey === todayKey && lastReadingEvent.pages.length > 0;
   const textAlignment = direction === "rtl" ? "text-right" : "text-left";
 
@@ -123,7 +164,32 @@ export function QuranWirdScreen({
             {t(language, "mushaf.todayReadingTitle")}
           </h2>
 
-          {goalResult.expired ? (
+          {isFreeReading ? (
+            <>
+              <p className="text-sm font-bold text-foreground">{t(language, "mushaf.freeReadingActive")}</p>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">
+                {t(language, "mushaf.freeReadingActiveHint")}
+              </p>
+              <p className="mt-4 text-sm font-medium text-muted-foreground" dir={direction}>
+                {t(language, "mushaf.readingContext", {
+                  surah: positionSurah,
+                  juz: formatNumerals(positionJuz, language),
+                })}
+              </p>
+              <p className="mt-1 text-sm font-medium text-muted-foreground">
+                {t(language, "mushaf.continueFromPage", { page: formatNumerals(position.page, language) })}
+              </p>
+              <button
+                type="button"
+                onClick={onContinue}
+                className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <BookOpen size={18} aria-hidden="true" />
+                {t(language, "mushaf.continueReading")}
+                <ArrowNext size={18} data-rtl-flip aria-hidden="true" />
+              </button>
+            </>
+          ) : goalResult.expired ? (
             <div className="rounded-2xl border border-border bg-muted p-4" role="status">
               <p className="text-sm font-bold text-foreground">{t(language, "mushaf.planExpired")}</p>
               <button
@@ -205,25 +271,29 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs lg:col-span-2">
-          <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.currentKhatmah")}</h2>
-            <span className="text-sm font-bold text-primary">{formatNumerals(khatmahPercent, language)}%</span>
-          </div>
-          <p className="mb-3 text-sm font-medium text-muted-foreground">
-            {formatNumerals(khatmahPagesRead, language)} / {formatNumerals(TOTAL_MUSHAF_PAGES, language)}{" "}
-            {t(language, "mushaf.pagesUnit")}
-          </p>
-          <ProgressBar
-            aria-label={t(language, "mushaf.khatmahProgress")}
-            value={khatmahPagesRead}
-            max={TOTAL_MUSHAF_PAGES}
-            height={6}
-            direction={direction}
-          />
-        </section>
+        {!isFreeReading && (
+          <section className="rounded-3xl border border-border bg-card p-5 shadow-xs lg:col-span-2">
+            <div className="mb-2 flex items-center justify-between">
+              <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.currentKhatmah")}</h2>
+              <span className="text-sm font-bold text-primary">{formatNumerals(khatmahPercent, language)}%</span>
+            </div>
+            <p className="mb-3 text-sm font-medium text-muted-foreground">
+              {formatNumerals(khatmahPagesRead, language)} / {formatNumerals(TOTAL_MUSHAF_PAGES, language)}{" "}
+              {t(language, "mushaf.pagesUnit")}
+            </p>
+            <ProgressBar
+              aria-label={t(language, "mushaf.khatmahProgress")}
+              value={khatmahPagesRead}
+              max={TOTAL_MUSHAF_PAGES}
+              height={6}
+              direction={direction}
+            />
+          </section>
+        )}
 
-        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs">
+        <section
+          className={`rounded-3xl border border-border bg-card p-5 shadow-xs ${isFreeReading ? "lg:col-span-2" : ""}`}
+        >
           <div className="mb-4 flex items-start justify-between">
             <div>
               <h2 className="text-base font-extrabold text-foreground">{t(language, "mushaf.planTitle")}</h2>
@@ -235,7 +305,11 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={() => {
-                  setDraftPlan(plan);
+                  setDraftPlan(
+                    plan.kind === "custom" || plan.kind === "khatmah30"
+                      ? createPlan("hijriMonth", now, todayKey, position)
+                      : plan,
+                  );
                   setIsDrafting(true);
                 }}
                 className="min-h-11 rounded-xl px-3 text-sm font-bold text-primary hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -247,54 +321,45 @@ export function QuranWirdScreen({
 
           {isDrafting && (
             <div className="flex flex-col gap-4 border-t border-border/60 pt-4">
-              <div>
-                <label htmlFor="quran-wird-plan-type" className="mb-2 block text-sm font-bold text-foreground">
-                  {t(language, "mushaf.planType")}
-                </label>
-                <Select
-                  value={draftPlan.kind === "daily" ? "daily" : "custom"}
-                  onValueChange={(value) =>
-                    setDraftPlan(
-                      value === "daily"
-                        ? { kind: "daily", dailyPages: 4, startedDayKey: todayKey }
-                        : {
-                            kind: "custom",
-                            durationDays: 30,
-                            dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / 30),
-                            startedDayKey: todayKey,
-                            startPage: position.page,
-                            targetPage: TOTAL_MUSHAF_PAGES,
-                          },
-                    )
-                  }
-                >
-                  <SelectTrigger
-                    id="quran-wird-plan-type"
-                    aria-label={t(language, "mushaf.changePlan")}
-                    className="font-bold"
-                  >
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent dir={direction} position="popper">
-                    <SelectItem value="daily">
-                      <span className={`flex flex-col ${textAlignment}`}>
-                        <span>{t(language, "mushaf.planPagesPerDay")}</span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {t(language, "mushaf.planPagesPerDayHint")}
+              <fieldset>
+                <legend className="mb-2 text-sm font-bold text-foreground">
+                  {t(language, "mushaf.chooseReadingStyle")}
+                </legend>
+                <p className="mb-3 text-sm text-muted-foreground">{t(language, "mushaf.chooseReadingStyleHint")}</p>
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(
+                    [
+                      ["daily", "mushaf.planPagesPerDay", "mushaf.planPagesPerDayHint"],
+                      ["hijriMonth", "mushaf.planHijriMonth", "mushaf.planHijriMonthHint"],
+                      ["gregorianMonth", "mushaf.planGregorianMonth", "mushaf.planGregorianMonthHint"],
+                      ["free", "mushaf.planFreeReading", "mushaf.planFreeReadingHint"],
+                    ] as const
+                  ).map(([kind, titleKey, hintKey]) => (
+                    <label
+                      key={kind}
+                      htmlFor={`quran-wird-plan-${kind}`}
+                      aria-label={t(language, titleKey)}
+                      className="flex min-h-16 cursor-pointer items-start gap-3 rounded-xl border border-border bg-background p-3 text-foreground transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10 hover:bg-muted focus-within:ring-[3px] focus-within:ring-ring"
+                    >
+                      <input
+                        id={`quran-wird-plan-${kind}`}
+                        type="radio"
+                        name="quran-wird-plan-type"
+                        value={kind}
+                        checked={draftPlan.kind === kind}
+                        onChange={() => setDraftPlan(createPlan(kind, now, todayKey, position, draftPlan))}
+                        className="mt-0.5 size-5 shrink-0 accent-primary"
+                      />
+                      <span className={`flex min-w-0 flex-col ${textAlignment}`}>
+                        <span className="text-sm font-bold">{t(language, titleKey)}</span>
+                        <span className="mt-0.5 text-xs leading-relaxed text-muted-foreground">
+                          {t(language, hintKey)}
                         </span>
                       </span>
-                    </SelectItem>
-                    <SelectItem value="custom">
-                      <span className={`flex flex-col ${textAlignment}`}>
-                        <span>{t(language, "mushaf.planFinishByDate")}</span>
-                        <span className="text-xs font-normal text-muted-foreground">
-                          {t(language, "mushaf.planAdaptiveHint")}
-                        </span>
-                      </span>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                    </label>
+                  ))}
+                </div>
+              </fieldset>
 
               {draftPlan.kind === "daily" ? (
                 <div className="flex flex-col gap-2">
@@ -347,74 +412,17 @@ export function QuranWirdScreen({
                     </button>
                   </div>
                 </div>
-              ) : (
-                <div className="flex flex-col gap-2">
-                  <label htmlFor="quran-wird-duration-days" className="text-sm font-bold text-foreground">
-                    {t(language, "mushaf.finishInDays")}
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const days = Math.max(1, (draftPlan.durationDays ?? 30) - 1);
-                        setDraftPlan({
-                          kind: "custom",
-                          durationDays: days,
-                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
-                          startedDayKey: todayKey,
-                          startPage: position.page,
-                          targetPage: TOTAL_MUSHAF_PAGES,
-                        });
-                      }}
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      aria-label={t(language, "common.decrease")}
-                    >
-                      <Minus size={20} />
-                    </button>
-                    <input
-                      id="quran-wird-duration-days"
-                      type="number"
-                      min={1}
-                      max={604}
-                      value={draftPlan.durationDays ?? 30}
-                      onChange={(event) => {
-                        const days = Math.min(604, Math.max(1, Number(event.target.value) || 1));
-                        setDraftPlan({
-                          kind: "custom",
-                          durationDays: days,
-                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
-                          startedDayKey: todayKey,
-                          startPage: position.page,
-                          targetPage: TOTAL_MUSHAF_PAGES,
-                        });
-                      }}
-                      className="h-12 w-full rounded-xl border border-border bg-background px-3 text-center text-lg font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const days = Math.min(604, (draftPlan.durationDays ?? 30) + 1);
-                        setDraftPlan({
-                          kind: "custom",
-                          durationDays: days,
-                          dailyPages: Math.ceil(Math.max(1, TOTAL_MUSHAF_PAGES - position.page + 1) / days),
-                          startedDayKey: todayKey,
-                          startPage: position.page,
-                          targetPage: TOTAL_MUSHAF_PAGES,
-                        });
-                      }}
-                      className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                      aria-label={t(language, "common.increase")}
-                    >
-                      <Plus size={20} />
-                    </button>
-                  </div>
-                </div>
-              )}
+              ) : null}
 
               <div className="flex flex-col gap-1 rounded-xl bg-muted p-4 text-sm font-medium text-foreground">
-                <p>{t(language, "mushaf.aroundPagesPerDay", { count: formatNumerals(draftGoal, language) })}</p>
-                <p>{t(language, "mushaf.estimatedCompletion", { date: draftCompletionDate })}</p>
+                {draftPlan.kind === "free" ? (
+                  <p>{t(language, "mushaf.freeReadingSummary")}</p>
+                ) : (
+                  <>
+                    <p>{t(language, "mushaf.aroundPagesPerDay", { count: formatNumerals(draftGoal, language) })}</p>
+                    <p>{t(language, "mushaf.estimatedCompletion", { date: draftCompletionDate ?? "" })}</p>
+                  </>
+                )}
               </div>
 
               <div className="mt-2 flex gap-3">
@@ -443,48 +451,50 @@ export function QuranWirdScreen({
           )}
         </section>
 
-        <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">
-          <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
-            {t(language, "mushaf.thisWeek")}
-          </h2>
-          <div className="mt-4 flex flex-col gap-2" role="list" aria-label={t(language, "mushaf.thisWeek")}>
-            {week.map((dayKey) => {
-              const count = new Set(wirdHistory[dayKey] ?? []).size;
-              const dayEligible = !plan.startedDayKey || dayKey >= plan.startedDayKey;
-              const dayGoal = dayEligible
-                ? (quranWirdDailyGoals[dayKey] ?? effectiveDailyGoal(plan, wirdHistory, dayKey))
-                : 0;
-              const dayLabel = new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en", {
-                weekday: "short",
-              }).format(new Date(`${dayKey}T12:00:00`));
-              const complete = dayGoal > 0 && count >= dayGoal;
+        {!isFreeReading && (
+          <section className="rounded-3xl border border-border bg-card p-5 shadow-xs" aria-labelledby="wird-week-title">
+            <h2 id="wird-week-title" className="text-base font-extrabold text-foreground">
+              {t(language, "mushaf.thisWeek")}
+            </h2>
+            <div className="mt-4 flex flex-col gap-2" role="list" aria-label={t(language, "mushaf.thisWeek")}>
+              {week.map((dayKey) => {
+                const count = new Set(wirdHistory[dayKey] ?? []).size;
+                const dayEligible = !plan.startedDayKey || dayKey >= plan.startedDayKey;
+                const dayGoal = dayEligible
+                  ? (quranWirdDailyGoals[dayKey] ?? effectiveDailyGoal(plan, wirdHistory, dayKey))
+                  : 0;
+                const dayLabel = new Intl.DateTimeFormat(language === "ar" ? "ar-EG" : "en", {
+                  weekday: "short",
+                }).format(new Date(`${dayKey}T12:00:00`));
+                const complete = dayGoal > 0 && count >= dayGoal;
 
-              return (
-                <div
-                  key={dayKey}
-                  role="listitem"
-                  className={`flex items-center justify-between rounded-xl p-3 ${dayKey === todayKey ? "bg-muted" : ""}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="w-12 text-[0.875rem] font-bold text-foreground">{dayLabel}</span>
-                    {complete ? (
-                      <span className="flex size-5 items-center justify-center rounded-full bg-success text-success-foreground">
-                        <Check size={12} strokeWidth={3} aria-hidden="true" />
-                      </span>
-                    ) : (
-                      <span className="size-5" aria-hidden="true" />
-                    )}
+                return (
+                  <div
+                    key={dayKey}
+                    role="listitem"
+                    className={`flex items-center justify-between rounded-xl p-3 ${dayKey === todayKey ? "bg-muted" : ""}`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-12 text-[0.875rem] font-bold text-foreground">{dayLabel}</span>
+                      {complete ? (
+                        <span className="flex size-5 items-center justify-center rounded-full bg-success text-success-foreground">
+                          <Check size={12} strokeWidth={3} aria-hidden="true" />
+                        </span>
+                      ) : (
+                        <span className="size-5" aria-hidden="true" />
+                      )}
+                    </div>
+                    <bdi dir="ltr" className="text-[0.875rem] font-bold text-muted-foreground">
+                      {dayEligible && dayKey <= todayKey && dayGoal > 0
+                        ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
+                        : t(language, "mushaf.noReading")}
+                    </bdi>
                   </div>
-                  <bdi dir="ltr" className="text-[0.875rem] font-bold text-muted-foreground">
-                    {dayEligible && dayKey <= todayKey && dayGoal > 0
-                      ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
-                      : t(language, "mushaf.noReading")}
-                  </bdi>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </ScreenContainer>
   );

@@ -173,6 +173,32 @@ describe("app state persistence", () => {
     expect(state.quranReadingBookmark?.page).toBe(293);
   });
 
+  it("normalizes calendar-month and free-reading plans", () => {
+    expect(
+      normalizeAppState({
+        quranWirdPlan: {
+          kind: "gregorianMonth",
+          dailyPages: 19,
+          durationDays: 31,
+          startedDayKey: "2026-08-01",
+          startPage: 22,
+          targetPage: 604,
+        },
+      }).quranWirdPlan,
+    ).toEqual({
+      kind: "gregorianMonth",
+      dailyPages: 19,
+      durationDays: 31,
+      startedDayKey: "2026-08-01",
+      startPage: 22,
+      targetPage: 604,
+    });
+    expect(normalizeAppState({ quranWirdPlan: { kind: "free", dailyPages: 99 } }).quranWirdPlan).toEqual({
+      kind: "free",
+      dailyPages: 0,
+    });
+  });
+
   it("normalizes and merges Quran reading days without losing concurrent pages", () => {
     const base = normalizeAppState({ wirdHistory: { "2026-08-24": [42, 41, 42, 0, 605, "43"] } });
     const incoming = normalizeAppState({ wirdHistory: { "2026-08-24": [42, 43] } });

@@ -137,6 +137,23 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(onRecordPages).toHaveBeenCalledWith(getProgressDayKey(new Date(), 4), [42], 4);
   });
 
+  it("saves navigation without recording progress in free reading", async () => {
+    const user = userEvent.setup();
+    const onRecordPages = vi.fn();
+    const { setKhatmahPage } = renderReader({
+      language: "en",
+      direction: "ltr",
+      quranWirdPlan: { kind: "free", dailyPages: 0 },
+      onRecordPages,
+    });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByRole("button", { name: "Next" }));
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    expect(onRecordPages).not.toHaveBeenCalled();
+    expect(screen.queryByRole("progressbar")).not.toBeInTheDocument();
+  });
+
   it("shows progress against the goal chosen on the overview", async () => {
     const today = getProgressDayKey();
     renderReader({ quranWirdPlan: { kind: "daily", dailyPages: 4 }, wirdHistory: { [today]: [41, 42] } });
