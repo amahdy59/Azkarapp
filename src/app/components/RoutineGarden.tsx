@@ -62,7 +62,7 @@ export function TodayRoutineGarden({
   displayDate?: Date;
 }) {
   const totalPalms = summary.lifetimePalms;
-  const streak = summary.currentPalmRhythm ?? summary.currentUsageStreak ?? 0;
+  const streak = summary.currentUsageStreak ?? 0;
   // Fallback to internal navigation if not hidden (e.g. for HomeScreen where it uses its own simple label)
 
   const completedCount = summary.today.completedCategories.length;

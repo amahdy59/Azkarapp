@@ -216,7 +216,7 @@ describe("quiet garden progress", () => {
 
   it("calculates daily usage streak for consecutive active days", () => {
     const records: DailyCollectionCompletion[] = [
-      { dayKey: "2026-07-16", category: "travel", timeZone: "Africa/Cairo" },
+      { dayKey: "2026-07-16", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2026-07-17", category: "morning", timeZone: "Africa/Cairo" },
       { dayKey: "2026-07-18", category: "evening", timeZone: "Africa/Cairo" },
     ];

@@ -304,7 +304,7 @@ export function getUsageStreakSummary(
 ) {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const activeKeys = [...categoryMap(records).entries()]
-    .filter(([dayKey, entry]) => dayKey <= todayKey && entry.categories.size > 0)
+    .filter(([dayKey, entry]) => dayKey <= todayKey && MAIN_CATEGORY_IDS.some((cat) => entry.categories.has(cat)))
     .map(([dayKey]) => dayKey)
     .sort();
 
