@@ -92,10 +92,10 @@ export function NextPrayerWidget({
       onClick={() => {
         document.getElementById("prayer-tracker-card")?.scrollIntoView({ behavior: "smooth" });
       }}
-      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-bold text-white shadow-md backdrop-blur-md transition-transform hover:bg-black/40 active:scale-95 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/30 px-3 py-1.5 text-xs font-bold text-white shadow-md backdrop-blur-md transition-transform hover:bg-black/40 active:scale-95 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label={`${t(language, "home.nextPrayer")} ${nextPrayerName} ${formattedTime}. ${formattedCountdown}`}
     >
-      <Clock className="size-4 sm:size-5 opacity-90" aria-hidden="true" />
+      <Clock className="size-4 opacity-90" aria-hidden="true" />
       <span className="opacity-90">{nextPrayerName}</span>
       <span className="h-4 w-px bg-white/30 mx-1" aria-hidden="true" />
       <bdi className="font-mono opacity-100" dir="ltr">
