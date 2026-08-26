@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-26c",
+  "release": "2026-08-26d",
   "ar": [
     "تم تغيير أيقونة معاني الكلمات إلى شكل كتاب لتكون أكثر وضوحاً.",
     "أصبح تحميل وعرض معاني الكلمات أسرع وأكثر سلاسة من قبل.",
-    "تعرض أزرار التحكم الآن نصوصاً توضيحية بجانب الأيقونات على الشاشات الكبيرة."
+    "تعرض أزرار التحكم الآن نصوصاً توضيحية بجانب الأيقونات على الشاشات الكبيرة.",
+    "أصبح التنقل بين صفحات المصحف باستخدام لوحة المفاتيح متوافقاً دائماً مع اتجاه القراءة العربية (من اليمين لليسار)، حتى لو كانت واجهة التطبيق باللغة الإنجليزية."
   ],
   "en": [
     "The 'Word meanings' button now uses a book icon to better reflect its function.",
     "Loading difficult word meanings is now much faster and feels smoother.",
-    "Action buttons now show helpful text labels on larger screens."
+    "Action buttons now show helpful text labels on larger screens.",
+    "Keyboard arrow navigation for the Quran now consistently follows Arabic reading direction (Right-to-Left), regardless of the app's interface language."
   ]
 }

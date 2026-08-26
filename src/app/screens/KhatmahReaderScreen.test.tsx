@@ -69,10 +69,10 @@ describe("KhatmahReaderScreen navigation", () => {
     const { setKhatmahPage } = renderReader();
     await screen.findByRole("article", { name: "صفحة ٤٢" });
 
-    await user.keyboard("{ArrowRight}");
+    await user.keyboard("{ArrowLeft}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
 
-    await user.keyboard("{ArrowLeft}");
+    await user.keyboard("{ArrowRight}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
   });
 
@@ -88,9 +88,9 @@ describe("KhatmahReaderScreen navigation", () => {
     expect(previous.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(navigation.querySelector('[dir="rtl"]')).toBeInTheDocument();
 
-    await user.keyboard("{ArrowRight}");
-    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
     await user.keyboard("{ArrowLeft}");
+    expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
+    await user.keyboard("{ArrowRight}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(41);
   });
 
@@ -116,7 +116,7 @@ describe("KhatmahReaderScreen navigation", () => {
     await screen.findByRole("article", { name: "صفحة ١" });
 
     expect(screen.getByRole("button", { name: "السابق" })).toBeDisabled();
-    await user.keyboard("{ArrowLeft}");
+    await user.keyboard("{ArrowRight}");
     expect(setKhatmahPage).not.toHaveBeenCalled();
   });
 });

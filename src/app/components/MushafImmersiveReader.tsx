@@ -155,17 +155,17 @@ export function MushafImmersiveReader({
     [pageCount],
   );
 
-  // Keyboard navigation: physical direction (ArrowRight = next page, ArrowLeft = previous).
+  // Keyboard navigation: physical direction (ArrowLeft = next page, ArrowRight = previous).
   // Escape is owned by the dialog so nested ayah sheets close in the right order.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeAyah) return;
       const target = e.target as HTMLElement | null;
       if (target?.closest("button, input, textarea, select, [contenteditable='true']")) return;
-      if (e.key === "ArrowRight" || e.key === "PageDown") {
+      if (e.key === "ArrowLeft" || e.key === "PageDown") {
         e.preventDefault();
         paginate(1);
-      } else if (e.key === "ArrowLeft" || e.key === "PageUp") {
+      } else if (e.key === "ArrowRight" || e.key === "PageUp") {
         e.preventDefault();
         paginate(-1);
       }

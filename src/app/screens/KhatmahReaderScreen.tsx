@@ -444,8 +444,8 @@ export function KhatmahReaderScreen({
       if (target && target !== document.body && target.id !== "main-content" && !root?.contains(target)) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
       let handled = true;
-      if (e.key === "ArrowRight" || e.key === "PageDown") paginate(1);
-      else if (e.key === "ArrowLeft" || e.key === "PageUp") paginate(-1);
+      if (e.key === "ArrowLeft" || e.key === "PageDown") paginate(1);
+      else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
       else if (e.key === "Escape") onBack();

@@ -60,17 +60,17 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
   });
 
-  test("ArrowRight advances the page and ArrowLeft goes back, and Escape closes", async ({ page }) => {
+  test("ArrowLeft advances the page and ArrowRight goes back, and Escape closes", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await openImmersive(page);
 
     // Physical direction stays consistent across both Mushaf readers.
-    await page.keyboard.press("ArrowRight");
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await page.keyboard.press("ArrowLeft");
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await page.keyboard.press("ArrowRight");
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
+    await page.keyboard.press("ArrowLeft");
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
 
     await page.keyboard.press("Escape");

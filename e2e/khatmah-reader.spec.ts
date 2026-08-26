@@ -119,9 +119,9 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
 
   // Controls remain visible while reading, so orientation and page actions are
   // never hidden behind a discovery tap.
-  await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
   await page.keyboard.press("ArrowLeft");
+  await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
+  await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   const backButton = page.getByRole("button", { name: "رجوع" });
   await backButton.focus();
@@ -139,8 +139,8 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   await page.mouse.up();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
 
-  // Moving left goes back; the labelled controls keep the same semantics.
-  await page.keyboard.press("ArrowLeft");
+  // Moving right goes back; the labelled controls keep the same semantics.
+  await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
   await page.getByRole("article", { name: "صفحة ٤٢" }).getByRole("button", { name: "التالي" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
@@ -194,7 +194,7 @@ test("offers clear RTL reading choices and free reading without progress trackin
 
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
-  await page.keyboard.press("ArrowRight");
+  await page.keyboard.press("ArrowLeft");
   await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
   const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("azkarapp.state.v1") ?? "{}"));
   expect(stored.quranReadingPosition?.page).toBe(43);
