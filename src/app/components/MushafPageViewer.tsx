@@ -653,6 +653,7 @@ function MushafPageCanvas({
   // One lookup per word per page, rather than one per word per render.
   const meanings = useMemo(() => {
     const found = new Map<string, QuranWordMeaning>();
+    if (!showWordMeanings) return found;
     for (const words of lines) {
       for (const word of words) {
         if (word.isEnd) continue;
@@ -661,7 +662,7 @@ function MushafPageCanvas({
       }
     }
     return found;
-  }, [lines]);
+  }, [lines, showWordMeanings]);
 
   const lineDetails = useLineDetails(lines, pageNumber);
   const canvasRef = useLineFitter(
