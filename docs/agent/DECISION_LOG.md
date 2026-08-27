@@ -1671,3 +1671,13 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Decision:** Keep the redesigned anchored card compact, but stack its meaning and metadata regions on narrow screens and use the split layout only where it fits. Show the complete source attribution instead of truncating it. The card is a named non-modal dialog when it contains the “all meanings” action and remains a tooltip when it is informational only. Every action retains a 44px target and a visible 3px focus indicator.
 - **Preserved:** Reviewed meaning text, source attribution, word matching, Quran text, Mushaf geometry, and the existing path to the complete meaning sheet.
 - **Tests/evidence required:** semantic-role and accessible-name coverage, source visibility, 44px action geometry, automatic accessibility scan, narrow/mobile visual review, full local gates, and production verification.
+
+## DEC-107 — sharing follows semantic themes and the last third foregrounds dua
+
+- **Date:** 2026-08-27
+- **Status:** Approved
+- **Owner:** User (explicit request for accessible themed RTL sharing, consistent Mushaf openings, and a last-third dua card)
+- **Related scope:** progress share dialog, generated zikr share image, Home time-aware recommendation, Mushaf Surah openings
+- **Decision:** The progress share surface uses the active semantic theme, logical RTL placement, a labelled definition list, hidden decorative emoji, and existing dialog focus/status behavior. Generated Arabic zikr images right-align their devotional content while retaining the selected app palette and localized supporting sections. From the calculated start of the final third between Maghrib and the following Fajr, Home replaces the sleep-routine recommendation with the reviewed comprehensive-dua route, keeping the same card, CTA, and progress anatomy while removing routine-length choices that do not apply. The Surah frame stays unchanged because it already preserves the real Arabic heading inside one canonical slot; the fitter-independent Bismillah receives a larger shared clamp, and every page retains the same base Quran size and fifteen-slot geometry.
+- **Why:** Logical alignment and semantic labels make sharing understandable without depending on color or visual order. Prayer-derived timing avoids fixed clock assumptions. Reusing the reviewed dua collection and existing in-code ornament preserves offline behavior, source review, theme compatibility, and performance without a new graphics dependency.
+- **Tests/evidence required:** Arabic dialog semantics, share status recovery, Arabic share-image direction, final-third boundary and Home rendering, existing Mushaf opening/slot tests, full local gates, and production verification.

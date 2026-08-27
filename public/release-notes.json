@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-26h",
+  "release": "2026-08-27",
   "ar": [
-    "أصبحت بطاقة معاني الكلمات تتكيف بوضوح مع شاشات الهاتف والجهاز اللوحي وسطح المكتب دون قص أو تمرير أفقي.",
-    "يظهر مرجع معنى الكلمة كاملاً داخل البطاقة لتبقى المعلومة ومصدرها معاً.",
-    "أصبح زر جميع المعاني أسهل للمس ولوحة المفاتيح، مع اسم واضح لقارئات الشاشة."
+    "أصبحت بطاقات المشاركة متوافقة مع اتجاه العربية والمظهر المختار، مع تسميات أوضح لقارئات الشاشة.",
+    "يتحول اقتراح الصفحة الرئيسية إلى الأدعية الجامعة عند دخول الثلث الأخير من الليل بحسب مواقيت الصلاة.",
+    "أصبحت البسملة أوضح وأكبر في بدايات السور مع بقاء تخطيط المصحف ذي الخمسة عشر سطراً دون تغيير."
   ],
   "en": [
-    "Word-meaning cards now adapt clearly across phone, tablet, and desktop without clipping or horizontal scrolling.",
-    "The complete meaning source stays visible in the card so the explanation and its attribution remain together.",
-    "The All meanings action is easier to use by touch and keyboard, with a clear name for screen readers."
+    "Share cards now follow Arabic direction and the selected theme, with clearer labels for screen readers.",
+    "Home now recommends the reviewed comprehensive duas during the prayer-time-calculated last third of the night.",
+    "The Bismillah is clearer and larger at Surah openings while the canonical fifteen-line Mushaf layout stays unchanged."
   ]
 }

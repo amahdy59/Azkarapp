@@ -74,7 +74,39 @@ function suggestedCategoryId(date: Date, location?: LocationSettings): CategoryI
   return getTimeOfDayZikr(date, "en", location).categoryId;
 }
 
+export function isLastThirdOfNight(now: Date = new Date(), location?: LocationSettings): boolean {
+  const fajrToday = timeToMinutes(getEstimatedPrayerTimes(now, location).fajr);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const nightStart = new Date(now);
+  const nightEnd = new Date(now);
+
+  if (currentMinutes < fajrToday) {
+    nightStart.setDate(nightStart.getDate() - 1);
+    const maghribYesterday = timeToMinutes(getEstimatedPrayerTimes(nightStart, location).maghrib);
+    nightStart.setHours(Math.floor(maghribYesterday / 60), maghribYesterday % 60, 0, 0);
+    nightEnd.setHours(Math.floor(fajrToday / 60), fajrToday % 60, 0, 0);
+  } else {
+    const maghribToday = timeToMinutes(getEstimatedPrayerTimes(now, location).maghrib);
+    if (currentMinutes < maghribToday) return false;
+    nightStart.setHours(Math.floor(maghribToday / 60), maghribToday % 60, 0, 0);
+    nightEnd.setDate(nightEnd.getDate() + 1);
+    const fajrTomorrow = timeToMinutes(getEstimatedPrayerTimes(nightEnd, location).fajr);
+    nightEnd.setHours(Math.floor(fajrTomorrow / 60), fajrTomorrow % 60, 0, 0);
+  }
+
+  const lastThirdStartsAt = nightStart.getTime() + ((nightEnd.getTime() - nightStart.getTime()) * 2) / 3;
+  return now.getTime() >= lastThirdStartsAt && now.getTime() < nightEnd.getTime();
+}
+
 export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar", location?: LocationSettings) {
+  if (isLastThirdOfNight(now, location)) {
+    return {
+      categoryId: "comprehensive_duas" as CategoryId,
+      title: t(language, "home.lastThirdTitle"),
+      desc: t(language, "home.lastThirdDesc"),
+    };
+  }
+
   const prayerTimes = getEstimatedPrayerTimes(now, location);
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const fajrMinutes = timeToMinutes(prayerTimes.fajr);
@@ -294,6 +326,7 @@ export function HomeScreen({
     [now, language, locationSettings],
   );
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
+  const isLastThirdDua = reminderInfo.categoryId === "comprehensive_duas";
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 
   const reminderMode = isRoutineCategory(reminderInfo.categoryId) ? routineModes[reminderInfo.categoryId] : "complete";
@@ -304,8 +337,8 @@ export function HomeScreen({
         done: visibleReminderAzkar.filter((zikr) => doneSet.has(zikr.id)).length,
         total: visibleReminderAzkar.length,
       };
-  const totalCount = reminderProgress.total;
-  const doneCount = reminderProgress.done;
+  const totalCount = isLastThirdDua ? 47 : reminderProgress.total;
+  const doneCount = isLastThirdDua ? Math.min(doneSet.size, totalCount) : reminderProgress.done;
   const isComplete = doneCount >= totalCount && totalCount > 0;
   const [completionCardState, setCompletionCardState] = useState<"hidden" | "visible" | "exiting">("hidden");
 
@@ -331,8 +364,9 @@ export function HomeScreen({
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
-  const ctaLabel =
-    actionKind === "start"
+  const ctaLabel = isLastThirdDua
+    ? t(language, "home.lastThirdAction")
+    : actionKind === "start"
       ? t(language, "home.startGroup", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
       : actionKind === "again"
         ? t(language, "home.readGroupAgain", { name: isArabic ? reminderCategory.nameArabic : reminderCategory.name })
@@ -341,7 +375,10 @@ export function HomeScreen({
             count: formatNumerals(Math.max(0, totalCount - doneCount), language),
           });
 
-  const homeBackgroundCategoryId = getHomeBackgroundCategoryId(now, reminderInfo.categoryId);
+  const homeBackgroundCategoryId = getHomeBackgroundCategoryId(
+    now,
+    isLastThirdDua ? "before_sleep" : reminderInfo.categoryId,
+  );
   const fridayInWindow = isFridayFeatureWindow(now, locationSettings);
   const fridayKahfComplete = completed.friday_kahf?.has("friday-kahf") ?? false;
   const fridayStatus = fridayKahfComplete ? "review" : fridayKahfStarted ? "continue" : "start";
@@ -488,9 +525,16 @@ export function HomeScreen({
                   <PrayerRoutineCard
                     language={language}
                     direction={direction}
-                    categoryName={isArabic ? reminderCategory.nameArabic : reminderCategory.name}
+                    categoryName={
+                      isLastThirdDua
+                        ? reminderInfo.title
+                        : isArabic
+                          ? reminderCategory.nameArabic
+                          : reminderCategory.name
+                    }
                     description={reminderInfo.desc}
                     mode={reminderMode}
+                    showModeSelector={!isLastThirdDua}
                     onModeChange={(mode) => {
                       if (isRoutineCategory(reminderInfo.categoryId)) {
                         onSetRoutineMode?.(reminderInfo.categoryId, mode);
@@ -499,6 +543,7 @@ export function HomeScreen({
                     completedCount={doneCount}
                     totalCount={totalCount}
                     estimatedMinutes={estimatedMinutes}
+                    showEstimate={!isLastThirdDua}
                     ctaLabel={ctaLabel}
                     onOpen={() => onResume(reminderInfo.categoryId)}
                   />

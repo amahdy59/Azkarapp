@@ -460,7 +460,7 @@ function sectionStyle(section: ShareCardSection, palette: CardPalette): TextSect
     case "arabic":
       return {
         ...common,
-        textAlign: "center",
+        textAlign: "right",
         maxFontSize: 62,
         minFontSize: 34,
         lineHeightRatio: 1.62,

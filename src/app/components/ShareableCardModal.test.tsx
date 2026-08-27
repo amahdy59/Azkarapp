@@ -32,4 +32,15 @@ describe("ShareableCardModal", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Could not share this achievement");
     expect(action).not.toBeDisabled();
   });
+
+  it("uses RTL semantics and labelled statistics for Arabic", () => {
+    render(<ShareableCardModal palms={1} golden={2} green={3} dateStr="١٢ شعبان" language="ar" onClose={vi.fn()} />);
+
+    const dialog = screen.getByRole("dialog", { name: "بطاقة مشاركة الإنجاز" });
+    expect(dialog).toHaveAttribute("dir", "rtl");
+    expect(screen.getByText("نخيل").tagName).toBe("DT");
+    expect(screen.getByText("ذهبية").tagName).toBe("DT");
+    expect(screen.getByText("خضراء").tagName).toBe("DT");
+    expect(screen.getByRole("button", { name: "إلغاء" })).toHaveClass("end-3");
+  });
 });

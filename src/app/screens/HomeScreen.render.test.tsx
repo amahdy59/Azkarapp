@@ -18,6 +18,33 @@ const routineModes = {
 describe("HomeScreen quick access", () => {
   afterEach(() => vi.useRealTimers());
 
+  it("replaces the sleep routine card with a focused dua card in the last third of the night", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 10, 3, 0));
+    const onResume = vi.fn();
+
+    render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled={false}
+        progressDayStartHour={4}
+        language="ar"
+        direction="rtl"
+        onResume={onResume}
+        routineModes={routineModes}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    expect(screen.getByRole("heading", { name: "وقت الدعاء" })).toBeInTheDocument();
+    expect(screen.getByText("الثلث الأخير من الليل وقت للدعاء والسؤال والاستغفار")).toBeInTheDocument();
+    expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
+    expect(screen.queryByText(/دقيقة/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: /افتح الأدعية الجامعة/ }));
+    expect(onResume).toHaveBeenCalledWith("comprehensive_duas");
+  });
+
   it("overlays the transparent utility header on the hero and exposes saved and benefit actions", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 7, 9, 5));

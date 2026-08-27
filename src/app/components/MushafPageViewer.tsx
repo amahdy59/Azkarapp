@@ -199,7 +199,7 @@ function HeaderRosette({ transform }: { transform: string }) {
   );
 }
 
-const BISMILLAH_FONT_SIZE = "clamp(13px, min(4.4cqi, 2.4cqh), 18px)";
+const BISMILLAH_FONT_SIZE = "clamp(16px, min(5.4cqi, 3.2cqh), 24px)";
 
 function BismillahText({ text }: { text: string }) {
   return (

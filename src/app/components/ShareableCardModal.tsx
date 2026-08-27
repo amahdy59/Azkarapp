@@ -62,7 +62,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
       title={t(language, "shareModal.dialogAria")}
       direction={direction}
       maxWidthClassName="max-w-sm"
-      className="border-primary/30 p-6 dark:border-white/10"
+      className="border-border bg-card p-5 text-foreground sm:p-6"
     >
       <div className="relative">
         {/* Close Button — dynamically positioned based on direction */}
@@ -70,7 +70,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           type="button"
           onClick={onClose}
           aria-label={t(language, "common.cancel")}
-          className={`absolute top-4 ${isArabic ? "right-4" : "left-4"} z-10 flex size-11 items-center justify-center rounded-full bg-muted/80 text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 transition-[color,background-color,border-color,transform]`}
+          className="absolute end-3 top-3 z-10 flex size-11 items-center justify-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition-[color,background-color,border-color,transform] hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:end-4 sm:top-4"
         >
           <X size={18} />
         </button>
@@ -78,7 +78,8 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         {/* Shareable Card Content */}
         <div
           ref={cardRef}
-          className="flex flex-col items-center rounded-2xl border border-primary/30 bg-gradient-to-b from-primary/15 via-primary/5 to-transparent p-6 text-center shadow-inner dark:from-primary/20"
+          className="flex flex-col items-center rounded-2xl border border-border bg-gradient-to-b from-primary/12 via-card to-card p-6 text-center shadow-inner"
+          dir={direction}
         >
           {/* Logo Badge */}
           <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-primary">
@@ -99,39 +100,33 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           </p>
 
           {/* Stats Badge Pill Row */}
-          <div className="my-5 flex w-full items-center justify-around rounded-2xl border border-primary/30 bg-card/90 py-3 px-4 shadow-sm">
-            <div className="flex flex-col items-center gap-1">
+          <dl className="my-5 grid w-full grid-cols-3 divide-x divide-border overflow-hidden rounded-2xl border border-border bg-background/70 px-2 py-3 shadow-sm rtl:divide-x-reverse">
+            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
               <PalmTreeMark
                 size={24}
                 filled={palms > 0}
                 className={palms > 0 ? "text-primary" : "text-muted-foreground/40"}
               />
-              <span
-                className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}
-              >
+              <dd className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
                 {formatNumerals(palms, language)}
-              </span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {t(language, "shareModal.palms")}
-              </span>
+              </dd>
+              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.palms")}</dt>
             </div>
-            <span className="h-8 w-px bg-primary/30" />
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[1.25rem]">🍂</span>
-              <span className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {t(language, "shareModal.golden")}
+            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
+              <span className="text-[1.25rem]" aria-hidden="true">
+                🍂
               </span>
+              <dd className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</dd>
+              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.golden")}</dt>
             </div>
-            <span className="h-8 w-px bg-primary/30" />
-            <div className="flex flex-col items-center gap-1">
-              <span className="text-[1.25rem]">🍃</span>
-              <span className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</span>
-              <span className="text-[0.6875rem] font-bold text-muted-foreground">
-                {t(language, "shareModal.green")}
+            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
+              <span className="text-[1.25rem]" aria-hidden="true">
+                🍃
               </span>
+              <dd className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</dd>
+              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.green")}</dt>
             </div>
-          </div>
+          </dl>
 
           {/* Date Label */}
           <span className="text-[0.75rem] font-extrabold text-muted-foreground" dir="auto">

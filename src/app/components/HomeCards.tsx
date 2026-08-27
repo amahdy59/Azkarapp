@@ -38,10 +38,12 @@ export function PrayerRoutineCard({
   categoryName,
   description,
   mode,
+  showModeSelector = true,
   onModeChange,
   completedCount,
   totalCount,
   estimatedMinutes,
+  showEstimate = true,
   ctaLabel,
   onOpen,
 }: {
@@ -50,10 +52,12 @@ export function PrayerRoutineCard({
   categoryName: string;
   description: string;
   mode: RoutineMode;
+  showModeSelector?: boolean;
   onModeChange: (mode: RoutineMode) => void;
   completedCount: number;
   totalCount: number;
   estimatedMinutes: number;
+  showEstimate?: boolean;
   ctaLabel: string;
   onOpen: () => void;
 }) {
@@ -82,24 +86,26 @@ export function PrayerRoutineCard({
             </p>
           </div>
 
-          <div>
-            <SegmentedControl
-              value={mode}
-              onChange={onModeChange}
-              direction={direction}
-              aria-label={t(language, "home.routineMode")}
-              className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
-              itemClassName={(selected) =>
-                `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                  selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
-                }`
-              }
-              options={[
-                { value: "complete", label: t(language, "home.routineComplete") },
-                { value: "core", label: t(language, "home.routineAbbreviated") },
-              ]}
-            />
-          </div>
+          {showModeSelector && (
+            <div>
+              <SegmentedControl
+                value={mode}
+                onChange={onModeChange}
+                direction={direction}
+                aria-label={t(language, "home.routineMode")}
+                className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
+                itemClassName={(selected) =>
+                  `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
+                  }`
+                }
+                options={[
+                  { value: "complete", label: t(language, "home.routineComplete") },
+                  { value: "core", label: t(language, "home.routineAbbreviated") },
+                ]}
+              />
+            </div>
+          )}
 
           {totalCount > 0 && (
             <div className="flex w-full flex-col gap-2">
@@ -112,12 +118,14 @@ export function PrayerRoutineCard({
                   {formatNumerals(completedCount, language)} {t(language, "home.ofSeparator")}{" "}
                   {formatNumerals(totalCount, language)}
                 </span>
-                <span className="flex items-center gap-1.5">
-                  <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
-                  {t(language, "home.estimatedMinutes", {
-                    count: formatNumerals(estimatedMinutes, language),
-                  })}
-                </span>
+                {showEstimate && (
+                  <span className="flex items-center gap-1.5">
+                    <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
+                    {t(language, "home.estimatedMinutes", {
+                      count: formatNumerals(estimatedMinutes, language),
+                    })}
+                  </span>
+                )}
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
                 <div

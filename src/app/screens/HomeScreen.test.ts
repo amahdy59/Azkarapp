@@ -1,7 +1,13 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { getHomeAction, getHomeBackgroundCategoryId, getTimeOfDayZikr, isFridayFeatureWindow } from "./HomeScreen";
+import {
+  getHomeAction,
+  getHomeBackgroundCategoryId,
+  getTimeOfDayZikr,
+  isFridayFeatureWindow,
+  isLastThirdOfNight,
+} from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
-import { getEstimatedPrayerTimes } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, timeToMinutes } from "../content/prayerTimes";
 import { getAzkarByCategory } from "../content/azkar";
 import type { CategoryId, LocationSettings } from "../types";
 
@@ -55,6 +61,28 @@ describe("getHomeAction", () => {
     expect(getTimeOfDayZikr(atTime(date, times.asr), "en", cairo).categoryId).toBe("evening");
     expect(getTimeOfDayZikr(atTime(date, times.isha, -1), "en", cairo).categoryId).toBe("evening");
     expect(getTimeOfDayZikr(atTime(date, times.isha), "en", cairo).categoryId).toBe("before_sleep");
+  });
+
+  it("switches from sleep azkar to duas only during the calculated last third of the night", () => {
+    const date = new Date(2026, 6, 17, 12);
+    const previousDay = new Date(date);
+    previousDay.setDate(previousDay.getDate() - 1);
+    const maghrib = timeToMinutes(getEstimatedPrayerTimes(previousDay, cairo).maghrib);
+    const fajr = timeToMinutes(getEstimatedPrayerTimes(date, cairo).fajr);
+    const nightDuration = 24 * 60 - maghrib + fajr;
+    const startMinutes = (maghrib + (nightDuration * 2) / 3) % (24 * 60);
+    const before = new Date(date);
+    before.setHours(Math.floor(startMinutes / 60), Math.floor(startMinutes % 60) - 1, 0, 0);
+    const start = new Date(date);
+    start.setHours(Math.floor(startMinutes / 60), Math.ceil(startMinutes % 60), 0, 0);
+
+    expect(isLastThirdOfNight(before, cairo)).toBe(false);
+    expect(isLastThirdOfNight(start, cairo)).toBe(true);
+    expect(getTimeOfDayZikr(start, "en", cairo)).toMatchObject({
+      categoryId: "comprehensive_duas",
+      title: "Time for Dua",
+    });
+    expect(isLastThirdOfNight(atTime(date, getEstimatedPrayerTimes(date, cairo).fajr), cairo)).toBe(false);
   });
 
   it("uses the Friday scene on Home without changing the recommended routine", () => {

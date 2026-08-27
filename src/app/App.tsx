@@ -1033,7 +1033,13 @@ function AppContent() {
                     setKhatmahPage((quranReadingBookmark ?? quranReadingPosition).page);
                     push("khatmah");
                   }}
-                  onResume={resumeCategory}
+                  onResume={(categoryId) => {
+                    if (categoryId === "comprehensive_duas") {
+                      void openCategory(categoryId);
+                    } else {
+                      resumeCategory(categoryId);
+                    }
+                  }}
                   onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
