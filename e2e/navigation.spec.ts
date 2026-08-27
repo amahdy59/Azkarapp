@@ -42,7 +42,11 @@ test("hash routes restore lazy collections, reject invalid positions, and preser
 test("saved zikr is visible from the first-class Saved library tab", async ({ page }) => {
   await enterAsEnglishGuest(page);
 
-  await page.getByTestId("home-primary-cta").click();
+  // Enter a fixed collection directly: the Home CTA intentionally changes to
+  // Comprehensive Duas during the last third of the night.
+  await page.getByRole("button", { name: "Azkar", exact: true }).click();
+  await page.getByTestId("category-card-morning").click();
+  await page.getByRole("button", { name: "Start Session", exact: true }).click();
   // Save lives in the reader's overflow menu on every tier: the header carries
   // at most two actions, Benefit and the menu.
   await page.getByRole("button", { name: "Reader options", exact: true }).click();
