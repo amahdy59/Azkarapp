@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-27",
+  "release": "2026-08-27-2",
   "ar": [
-    "أصبحت بطاقات المشاركة متوافقة مع اتجاه العربية والمظهر المختار، مع تسميات أوضح لقارئات الشاشة.",
-    "يتحول اقتراح الصفحة الرئيسية إلى الأدعية الجامعة عند دخول الثلث الأخير من الليل بحسب مواقيت الصلاة.",
-    "أصبحت البسملة أوضح وأكبر في بدايات السور مع بقاء تخطيط المصحف ذي الخمسة عشر سطراً دون تغيير."
+    "أصبحت نافذة الدليل أقصر وأهدأ، بمقبض سحب واحد ومساحات أكثر توازناً.",
+    "يعرض الدليل الآن نص الحديث ومصدره فقط، دون تكرار الفائدة أو الوقت أو نص الذكر.",
+    "تظهر المصادر بالعربية في الواجهة العربية، مع الاحتفاظ بأسماء كتب الحديث وأرقامها."
   ],
   "en": [
-    "Share cards now follow Arabic direction and the selected theme, with clearer labels for screen readers.",
-    "Home now recommends the reviewed comprehensive duas during the prayer-time-calculated last third of the night.",
-    "The Bismillah is clearer and larger at Surah openings while the canonical fifteen-line Mushaf layout stays unchanged."
+    "The Reference sheet is shorter and calmer, with one drag handle and balanced spacing.",
+    "References now show only the hadith and its source, without repeating benefits, timing, or the current zikr.",
+    "Arabic mode keeps citations Arabic while preserving collection names and reference numbers."
   ]
 }

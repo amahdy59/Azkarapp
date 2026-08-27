@@ -50,10 +50,10 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await expectNoHorizontalOverflow(page, "Reader");
 
-  await page.getByRole("button", { name: "Benefit", exact: true }).click();
+  await page.getByRole("button", { name: "Reference", exact: true }).click();
   await expect(page.getByTestId("reference-sheet")).toBeVisible();
-  await expectNoHorizontalOverflow(page, "Benefit sheet");
-  await page.getByTestId("reference-sheet").getByRole("button", { name: "Close benefit", exact: true }).click();
+  await expectNoHorizontalOverflow(page, "Reference sheet");
+  await page.getByTestId("reference-sheet").getByRole("button", { name: "Close reference", exact: true }).click();
 
   await page.getByRole("button", { name: "Back", exact: true }).click();
   await page.getByRole("button", { name: "Back", exact: true }).click();

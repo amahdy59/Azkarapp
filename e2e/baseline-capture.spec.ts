@@ -92,7 +92,7 @@ test.describe("Baseline Capture Suite", () => {
     await expect(page.getByTestId("reader-screen")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-reader-session.png"), fullPage: true });
 
-    await page.getByRole("button", { name: /Benefit|فائدة|الفائدة/ }).click();
+    await page.getByRole("button", { name: /Reference|الدليل/ }).click();
     await expect(page.getByTestId("reference-sheet")).toBeVisible();
     await page.screenshot({ path: testInfo.outputPath("baseline-benefit-sheet.png"), fullPage: true });
   });
