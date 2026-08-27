@@ -155,6 +155,8 @@ describe("KhatmahReaderScreen wird progress", () => {
   });
 
   it("shows progress against the goal chosen on the overview", async () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    vi.setSystemTime(new Date(2026, 7, 10, 12));
     const today = getProgressDayKey();
     renderReader({ quranWirdPlan: { kind: "daily", dailyPages: 4 }, wirdHistory: { [today]: [41, 42] } });
     await screen.findByRole("article", { name: "صفحة ٤٢" });
@@ -166,6 +168,7 @@ describe("KhatmahReaderScreen wird progress", () => {
 
   it("uses an opaque completion notice and dismisses it automatically", async () => {
     vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 10, 12));
     const today = getProgressDayKey();
     renderReader({
       quranWirdPlan: { kind: "daily", dailyPages: 2 },
