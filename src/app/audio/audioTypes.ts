@@ -29,7 +29,7 @@ export interface AudioVariant {
   voiceName: string;
   relativePath: string;
   /** `audio/mp4` covers the m4a/mp4 masters the reciters record to. */
-  mimeType: "audio/mpeg" | "audio/ogg" | "audio/mp4";
+  mimeType: "audio/mpeg" | "audio/ogg" | "audio/mp4" | "audio/wav";
   durationMs: number;
   byteSize: number;
   sha256: string;
