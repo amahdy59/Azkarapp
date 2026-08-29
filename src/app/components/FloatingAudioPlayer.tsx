@@ -104,7 +104,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
     <section
       aria-label={copy.region}
       dir={direction}
-      className="fixed bottom-16 inset-x-0 mx-auto z-40 w-[calc(100%-1rem)] max-w-lg rounded-2xl border border-primary/30 bg-card/95 p-3 shadow-overlay backdrop-blur-md dark:border-white/10 dark:bg-card/95"
+      className="fixed bottom-16 sm:bottom-6 inset-x-0 mx-auto z-40 w-[calc(100%-1rem)] sm:max-w-md rounded-2xl border border-primary/20 bg-card/95 p-3.5 shadow-overlay backdrop-blur-xl dark:border-white/10"
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}

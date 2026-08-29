@@ -1,13 +1,13 @@
 {
   "release": "2026-08-29",
   "ar": [
-    "تم تحديث تلاوة سورة الكهف إلى نسخة القارئ محمد الشرع لتقديم تجربة استماع أصفى.",
-    "أصبحت واجهة مشغل الصوت وأسماء القراء معربة بالكامل عند استخدام التطبيق باللغة العربية.",
-    "تم إصلاح مشكلة ظهور قائمة سرعة التشغيل خارج حدود المشغل لضمان تجربة سلسة على جميع الأجهزة."
+    "أضفنا أذكار المساء بصوت القارئ عبد الله محمد.",
+    "تم تحسين تصميم وتجاوب مشغل الصوت ليناسب جميع الشاشات (الجوال والتابلت والديسكتوب).",
+    "تظهر الآن أسماء القراء وأزرار التحكم باللغة العربية بشكل كامل."
   ],
   "en": [
-    "Updated Surah Al-Kahf recitation to Muhammad Al-Shara for a clearer listening experience.",
-    "Audio controls and reciter names are now fully localized when using the Arabic interface.",
-    "Fixed a visual bug with the playback speed menu to ensure perfect alignment across all devices."
+    "Added Evening Azkar recitation by reciter Abdullah Muhammad.",
+    "Improved the audio player UI responsiveness across all screen sizes (mobile, tablet, and desktop).",
+    "Audio controls and reciter names are now fully localized."
   ]
 }
