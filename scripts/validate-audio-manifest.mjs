@@ -50,7 +50,10 @@ const approvedVariants = Object.values(manifest.AUDIO_CATALOG.assets)
   .flatMap((asset) =>
     asset.segments.flatMap((segment) => segment.variants.filter((variant) => variant.reviewStatus === "approved")),
   );
-const baseUrl = process.env.VITE_AUDIO_BASE_URL?.replace(/\/+$/, "");
+const baseUrl = (process.env.VITE_AUDIO_BASE_URL || "https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev").replace(
+  /\/+$/,
+  "",
+);
 if (approvedVariants.length > 0 && !baseUrl) {
   issues.push({ code: "missing-base-url", message: "VITE_AUDIO_BASE_URL is required when approved assets exist." });
 }
