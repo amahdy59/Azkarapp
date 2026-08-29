@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-27-2",
+  "release": "2026-08-29",
   "ar": [
-    "أصبحت نافذة الدليل أقصر وأهدأ، بمقبض سحب واحد ومساحات أكثر توازناً.",
-    "يعرض الدليل الآن نص الحديث ومصدره فقط، دون تكرار الفائدة أو الوقت أو نص الذكر.",
-    "تظهر المصادر بالعربية في الواجهة العربية، مع الاحتفاظ بأسماء كتب الحديث وأرقامها."
+    "تم تحديث تلاوة سورة الكهف إلى نسخة القارئ محمد الشرع لتقديم تجربة استماع أصفى.",
+    "أصبحت واجهة مشغل الصوت وأسماء القراء معربة بالكامل عند استخدام التطبيق باللغة العربية.",
+    "تم إصلاح مشكلة ظهور قائمة سرعة التشغيل خارج حدود المشغل لضمان تجربة سلسة على جميع الأجهزة."
   ],
   "en": [
-    "The Reference sheet is shorter and calmer, with one drag handle and balanced spacing.",
-    "References now show only the hadith and its source, without repeating benefits, timing, or the current zikr.",
-    "Arabic mode keeps citations Arabic while preserving collection names and reference numbers."
+    "Updated Surah Al-Kahf recitation to Muhammad Al-Shara for a clearer listening experience.",
+    "Audio controls and reciter names are now fully localized when using the Arabic interface.",
+    "Fixed a visual bug with the playback speed menu to ensure perfect alignment across all devices."
   ]
 }

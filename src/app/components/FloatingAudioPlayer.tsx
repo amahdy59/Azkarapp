@@ -2,6 +2,7 @@ import { Pause, Play, RotateCcw, SkipBack, SkipForward, X } from "./icons";
 import type { AppLanguage } from "../types";
 import type { AudioController } from "../audio/AudioProvider";
 import { formatNumerals } from "../formatting";
+import { getAudioVoiceName } from "../audio/audioVoices";
 
 const COPY = {
   en: {
@@ -103,7 +104,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
     <section
       aria-label={copy.region}
       dir={direction}
-      className="fixed bottom-16 left-1/2 z-40 w-[calc(100%-1rem)] max-w-lg -translate-x-1/2 rounded-2xl border border-primary/30 bg-card/95 p-3 shadow-overlay backdrop-blur-md dark:border-white/10 dark:bg-card/95"
+      className="fixed bottom-16 inset-x-0 mx-auto z-40 w-[calc(100%-1rem)] max-w-lg rounded-2xl border border-primary/30 bg-card/95 p-3 shadow-overlay backdrop-blur-md dark:border-white/10 dark:bg-card/95"
     >
       <div className="sr-only" aria-live="polite" aria-atomic="true">
         {liveMessage}
@@ -244,6 +245,7 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
           <label className="grid gap-1 text-[0.75rem] font-bold text-muted-foreground">
             {copy.speed}
             <select
+              dir="ltr"
               value={state.playbackRate}
               onChange={(event) => controller.setPlaybackRate(Number(event.currentTarget.value))}
               className="min-h-11 rounded-xl border border-border-control bg-background px-3 text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
@@ -266,7 +268,9 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
               >
                 {currentEntry.availableVoiceIds.map((voiceId) => (
                   <option key={voiceId} value={voiceId}>
-                    {currentEntry.segmentsByVoice[voiceId]?.[0]?.voiceName ?? voiceId}
+                    {getAudioVoiceName(voiceId, language) ??
+                      currentEntry.segmentsByVoice[voiceId]?.[0]?.voiceName ??
+                      voiceId}
                   </option>
                 ))}
               </select>
@@ -275,8 +279,12 @@ export function FloatingAudioPlayer({ controller, language }: { controller: Audi
 
           {currentSegment && (
             <p className="text-[0.75rem] leading-5 text-muted-foreground sm:col-span-2">
-              <span className="font-bold text-foreground">{currentSegment.voiceName}</span>
-              {` · ${currentSegment.sourceName} · ${currentSegment.attribution}`}
+              <span className="font-bold text-foreground">
+                {getAudioVoiceName(state.currentVoiceId ?? currentEntry.defaultVoiceId, language) ??
+                  currentSegment.voiceName}
+              </span>
+              {currentSegment.sourceName && ` · ${currentSegment.sourceName}`}
+              {currentSegment.attribution && ` · ${currentSegment.attribution}`}
             </p>
           )}
 

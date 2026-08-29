@@ -2,6 +2,7 @@
 // Arabic: Uthmani text from the Noble Qur'an Encyclopedia; English: Saheeh International.
 import type { ZikrDraft } from "../types";
 
+import { applyContentReview } from "./contentReview";
 const VERSES = [
   {
     id: 1,
@@ -802,7 +803,7 @@ const VERSES = [
 
 const arabicNumber = (value: number) => String(value).replace(/\d/g, (digit) => "٠١٢٣٤٥٦٧٨٩"[Number(digit)]!);
 
-export const FRIDAY_KAHF: ZikrDraft[] = [
+const FRIDAY_KAHF_DRAFT: ZikrDraft[] = [
   {
     id: "friday-kahf",
     category: "friday_kahf",
@@ -846,3 +847,5 @@ export const FRIDAY_KAHF: ZikrDraft[] = [
     preferredTiming: "Friday.",
   },
 ];
+
+export const FRIDAY_KAHF = applyContentReview(FRIDAY_KAHF_DRAFT);

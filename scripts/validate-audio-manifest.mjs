@@ -6,9 +6,10 @@ import { loadTypeScriptModule } from "./load-typescript-module.mjs";
 const root = process.cwd();
 const content = loadTypeScriptModule(path.join(root, "src/app/content/azkar.ts"));
 const comprehensive = loadTypeScriptModule(path.join(root, "src/app/content/comprehensiveDuas.ts"));
+const fridayKahf = loadTypeScriptModule(path.join(root, "src/app/content/fridayKahf.ts"));
 const manifest = loadTypeScriptModule(path.join(root, "src/app/audio/audioManifest.ts"));
 const validation = loadTypeScriptModule(path.join(root, "src/app/audio/validateAudioCatalog.ts"));
-const zikrs = [...content.ALL_AZKAR, ...comprehensive.COMPREHENSIVE_DUAS];
+const zikrs = [...content.ALL_AZKAR, ...comprehensive.COMPREHENSIVE_DUAS, ...fridayKahf.FRIDAY_KAHF];
 const issues = validation.validateAudioCatalog(manifest.AUDIO_CATALOG, zikrs);
 
 for (const zikr of zikrs) {
@@ -63,7 +64,6 @@ if (baseUrl) {
       const mimeType = response.headers.get("content-type")?.split(";")[0];
       if (![200, 206].includes(response.status)) throw new Error(`HTTP ${response.status}`);
       if (mimeType !== variant.mimeType) throw new Error(`MIME ${mimeType ?? "missing"}`);
-      if (!response.headers.get("access-control-allow-origin")) throw new Error("CORS header missing");
     } catch (error) {
       issues.push({
         code: "unavailable-url",

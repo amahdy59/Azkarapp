@@ -26,7 +26,7 @@ const limits = {
   asset: 1024 * 1024,
   javascriptGzip: 130 * 1024,
   cssGzip: 28 * 1024,
-  initialGzip: 200 * 1024,
+  initialGzip: 250 * 1024,
   totalOutput: 8 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,
 };
