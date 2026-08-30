@@ -52,10 +52,13 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
 
     await page.getByTestId("mushaf-immersive-next").click();
+    // Wait for AnimatePresence to finish: only one indicator should remain visible.
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeEnabled();
 
     await page.getByTestId("mushaf-immersive-previous").click();
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
     await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
   });
@@ -67,10 +70,13 @@ test.describe("immersive mushaf mode", () => {
 
     // Physical direction stays consistent across both Mushaf readers.
     await page.keyboard.press("ArrowLeft");
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
     await page.keyboard.press("ArrowRight");
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
     await page.keyboard.press("ArrowLeft");
+    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
     await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
 
     await page.keyboard.press("Escape");
