@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
@@ -91,14 +92,14 @@ export function MushafImmersiveReader({
   onClose: () => void;
   onComplete?: () => void;
 }) {
-  const pageNumbers = useMemo<number[]>(() => {
+  const pageNumbers = useMemo(() => {
     if (zikr.mushafPages && zikr.mushafPages.length > 0) {
       return zikr.mushafPages.map((p) => p.page);
     }
     return [1];
   }, [zikr.mushafPages]);
 
-  const [pageIndex, setPageIndex] = useState(0);
+  const [[pageIndex, slideDir], setPageTuple] = useState([0, 1]);
   const [showWordMeanings, setShowWordMeanings] = useState(false);
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
@@ -150,7 +151,10 @@ export function MushafImmersiveReader({
 
   const paginate = useCallback(
     (delta: number) => {
-      setPageIndex((current) => Math.max(0, Math.min(pageCount - 1, current + delta)));
+      setPageTuple((prev) => {
+        const nextIndex = Math.max(0, Math.min(pageCount - 1, prev[0] + delta));
+        return nextIndex !== prev[0] ? [nextIndex, delta] : prev;
+      });
     },
     [pageCount],
   );
@@ -376,23 +380,35 @@ export function MushafImmersiveReader({
             onPointerCancel={onPointerEnd}
             style={{ touchAction: "pan-y" }}
           >
-            <div className="h-full w-full">
-              <MushafPageViewer
-                lines={lines}
-                language={language}
-                pageNumber={displayPage}
-                surahName={surahName}
-                juzNumber={juzNumber}
-                direction={direction}
-                theme={theme}
-                useQcfGlyphs={useQcfGlyphs}
-                showWordMeanings={showWordMeanings}
-                headerContent={pageHeader}
-                footerContent={pageFooter}
-                progressBar={progressBar}
-                paperRef={paperRef}
-                onAyahAction={handleAyahAction}
-              />
+            <div className="relative h-full w-full">
+              <AnimatePresence initial={false} custom={slideDir} mode="popLayout">
+                <motion.div
+                  key={displayPage}
+                  custom={slideDir}
+                  initial={reducedMotion ? { opacity: 0 } : (dir: number) => ({ opacity: 0, x: dir > 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) })}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={reducedMotion ? { opacity: 0 } : (dir: number) => ({ opacity: 0, x: dir < 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) })}
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  className="absolute inset-0"
+                >
+                  <MushafPageViewer
+                    lines={lines}
+                    language={language}
+                    pageNumber={displayPage}
+                    surahName={surahName}
+                    juzNumber={juzNumber}
+                    direction={direction}
+                    theme={theme}
+                    useQcfGlyphs={useQcfGlyphs}
+                    showWordMeanings={showWordMeanings}
+                    headerContent={pageHeader}
+                    footerContent={pageFooter}
+                    progressBar={progressBar}
+                    paperRef={paperRef}
+                    onAyahAction={handleAyahAction}
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
           </div>
 
