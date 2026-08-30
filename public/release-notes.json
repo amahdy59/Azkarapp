@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-30e",
+  "release": "2026-08-30f",
   "ar": [
-    "مشغل صوتي مرن ومطور يدعم التبديل بين الشريط المصغر ونافذة التحكم الكاملة دون حجب النص.",
-    "أزرار تقديم وتأخير مخصصة لعشر ثوانٍ لتسهيل التنقل والتكرار في المقاطع والتلاوات الطويلة.",
-    "تسميات دقيقة ومترجمة بالكامل لكل من السور القرآنية والأذكار وتلاوات القراء.",
-    "تحكم كامل من لوحة المفاتيح وتكامل متقدم مع إشعارات شاشة القفل والتحكم الصوتي."
+    "استجابة لمسية واهتزاز خفيف عند الضغط على زر المسبحة لتأكيد التفاعل دون تشتيت.",
+    "تحسين سرعة بدء تشغيل المقاطع الصوتية عبر الاتصال المسبق بخوادم التلاوات.",
+    "الحفاظ على بطاقات وردك اليوم ومتابعة الصلوات والخلفيات الزمنية كما اعتدت عليها.",
+    "توافق كامل مع إعدادات تقليل الحركة والوصول السهل لجميع الأجهزة."
   ],
   "en": [
-    "Flexible dual-state audio player supporting compact docking and full controls without obscuring text.",
-    "10-second skip forward and rewind buttons for precise playback navigation and recitation listening.",
-    "Context-aware localized titles and reciter attributions for Surahs and Azkar.",
-    "Full keyboard shortcuts and enhanced lock screen playback control integration."
+    "Tactile haptic pulse feedback when pressing the Masbaha counter button on mobile devices.",
+    "Faster audio startup latency with optimized preconnection to recitation CDN servers.",
+    "Preserved daily wird and prayer tracker card layouts and time-of-day backgrounds.",
+    "Full compatibility with reduce-motion preferences and mobile accessibility standards."
   ]
 }

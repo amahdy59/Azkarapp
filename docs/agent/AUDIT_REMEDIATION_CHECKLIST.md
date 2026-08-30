@@ -21,11 +21,11 @@ Next free decision number when this file was written: **DEC-087**.
 These gate a third of the list. Nothing else in section 1 or 2 can complete without them.
 
 - [ ] **[needs you]** Decide and supply the three legal values: **app owner / controller name**,
-      **support email address**, and **governing jurisdiction**.
+      **support email address**, and **governing jurisdiction**. name Ahmed Mahdy - email: amahdy59@yahoo.com
 - [ ] **[needs you]** Decide the Aladhan question: keep the network call and disclose it, or drop it
-      and rely on the offline calculation only. See item 1.2 for the trade-off.
+      and rely on the offline calculation only. See item 1.2 for the trade-off. - select recommended option
 - [ ] **[needs you]** Decide the audio question: gate the reciter UI until recordings exist (item
-      3.1), or commit to sourcing licensed recordings.
+      3.1), or commit to sourcing licensed recordings. - don't use sourcing licensed recordings yet, I'll provide you with the recordings in 2 weeks
 
 ---
 

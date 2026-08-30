@@ -1,6 +1,7 @@
 import React from "react";
 import { ArrowLeft, ArrowRight } from "./icons";
 import { t } from "../i18n";
+import { vibrateIfEnabled } from "../motionPreferences";
 import type { AppLanguage } from "../types";
 
 export function TasbeehIcon({ size = 26, className = "" }: { size?: number; className?: string }) {
@@ -48,15 +49,20 @@ export function TasbeehCounterButton({
   onClick,
   language,
   direction = "ltr",
+  hapticFeedback = true,
 }: {
   onClick: () => void;
   language: AppLanguage;
   direction?: "ltr" | "rtl";
+  hapticFeedback?: boolean;
 }) {
   return (
     <button
       type="button"
-      onClick={onClick}
+      onClick={() => {
+        vibrateIfEnabled(hapticFeedback, 12);
+        onClick();
+      }}
       dir={direction}
       className="interactive-elem group relative mx-auto flex min-h-16 w-full max-w-[80rem] items-center justify-between rounded-2xl border border-white/40 bg-card/65 p-3 text-foreground shadow-sm backdrop-blur-xl transition-[background-color,border-color,box-shadow,transform] duration-standard hover:border-primary/50 hover:bg-card/75 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring active:scale-[0.99] sm:min-h-[4.5rem] sm:rounded-3xl sm:p-4 md:p-5 dark:border-white/15 dark:bg-black/55 dark:hover:bg-black/65 cursor-pointer"
       aria-label={t(language, "counter.tasbeehTitle")}
