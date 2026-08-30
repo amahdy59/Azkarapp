@@ -78,7 +78,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         {/* Shareable Card Content */}
         <div
           ref={cardRef}
-          className="flex flex-col items-center rounded-2xl border border-border bg-gradient-to-b from-primary/12 via-card to-card p-6 text-center shadow-inner"
+          className="flex flex-col items-center rounded-2xl border border-border bg-card p-6 text-center shadow-sm"
           dir={direction}
         >
           {/* Logo Badge */}
@@ -87,6 +87,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
               size={20}
               filled={palms > 0}
               className={palms > 0 ? "text-primary" : "text-muted-foreground opacity-40"}
+              aria-hidden="true"
             />
             <span>{t(language, "common.azkar")}</span>
           </div>
@@ -100,36 +101,41 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           </p>
 
           {/* Stats Badge Pill Row */}
-          <dl className="my-5 grid w-full grid-cols-3 divide-x divide-border overflow-hidden rounded-2xl border border-border bg-background/70 px-2 py-3 shadow-sm rtl:divide-x-reverse">
-            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
+          <div 
+            className="my-5 flex w-full overflow-hidden rounded-2xl border border-border bg-muted/40 shadow-sm"
+            role="group" 
+            aria-label={t(language, "progress.dailyStreak")}
+          >
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
               <PalmTreeMark
                 size={24}
                 filled={palms > 0}
                 className={palms > 0 ? "text-primary" : "text-muted-foreground/40"}
+                aria-hidden="true"
               />
-              <dd className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
+              <span className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
                 {formatNumerals(palms, language)}
-              </dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.palms")}</dt>
+              </span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.palms")}</span>
             </div>
-            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
               <span className="text-[1.25rem]" aria-hidden="true">
                 🍂
               </span>
-              <dd className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.golden")}</dt>
+              <span className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.golden")}</span>
             </div>
-            <div className="flex min-w-0 flex-col items-center gap-1 px-2">
+            <div className="flex min-w-0 flex-1 flex-col items-center gap-1 p-3">
               <span className="text-[1.25rem]" aria-hidden="true">
-                🍃
+                🌿
               </span>
-              <dd className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.green")}</dt>
+              <span className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</span>
+              <span className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.green")}</span>
             </div>
-          </dl>
+          </div>
 
           {/* Date Label */}
-          <span className="text-[0.75rem] font-extrabold text-muted-foreground" dir="auto">
+          <span className="text-[0.75rem] font-extrabold text-muted-foreground" dir={direction}>
             {dateStr}
           </span>
         </div>

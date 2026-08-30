@@ -480,9 +480,6 @@ export function resetStaleCompletedCollections(
       const catDayKey = getProgressDayKey(now, boundaryHour, category);
       const isCompletedToday = normalized.some((r) => r.dayKey === catDayKey && r.category === category);
       const categoryProgress = completed[category] ?? new Set<string>();
-      if (!isCompletedToday && DAILY_ROUTINE_CATEGORY_IDS.includes(category)) {
-        return [category, new Set<string>()];
-      }
       const isFull = getAzkarByCategory(category).every((zikr) => categoryProgress.has(zikr.id));
       return [category, isFull && !isCompletedToday ? new Set<string>() : new Set(categoryProgress)];
     }),
