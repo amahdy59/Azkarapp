@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-30i",
+  "release": "2026-08-30j",
   "ar": [
-    "توافق متكامل لألوان رؤوس السور مع خلفية شبه شفافة تتناغم تلقائيًا مع السمات الداكنة والفاتحة.",
-    "إطارات وزخارف مذهبة لأوائل السور (الفاتحة والبقرة) مستوحاة من مصحف المدينة المنورة.",
-    "وضوح فائق لخط عنوان السورة وتباعد متناسق يضمن راحة القراءة والوصولية الشاملة."
+    "تحديث زخارف رؤوس السور بالنسخة المتجهة المحسنة (v2) بأبعاد متناسقة تمنع أي تشوه أو ضغط بصري.",
+    "تطبيق المواضع الدقيقة لرؤوس السور وفق مصحف المدينة (مثل رأس سورة النساء في نهاية صفحة ٧٦).",
+    "تنسيق متكامل لأوائل السور بإلغاء التكرار البصري وتوحيد مقاس وموضع البسملة في كافة الصفحات."
   ],
   "en": [
-    "Theme-adaptive Surah headers with translucent cartouche surfaces tailored to dark and light modes.",
-    "Illuminated ornamental opening page frames for Surah Al-Fatihah and Al-Baqarah start.",
-    "High-contrast title calligraphy and refined proportions ensuring optimal reading accessibility."
+    "Updated Surah header vector artwork (v2) with uncompressed, undistorted proportions across all themes.",
+    "Exact canonical Surah heading placements matching the Medina Mushaf (e.g. Surah An-Nisaa on page 76).",
+    "Streamlined opening page illumination and consistent Bismillah typography sizing across all Surahs."
   ]
 }

@@ -19,6 +19,7 @@ import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
 import { MushafOpeningFrameArt } from "./MushafOpeningFrameArt";
+import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 
 export interface MushafWordToken {
   verseKey: string;
@@ -110,10 +111,12 @@ function MushafSurahHeader({
   surahNumber,
   language,
   compact = false,
+  hideArtwork = false,
 }: {
   surahNumber: number | string;
   language: AppLanguage;
   compact?: boolean;
+  hideArtwork?: boolean;
 }) {
   const title = getSurahDisplayName(surahNumber, language);
 
@@ -124,7 +127,7 @@ function MushafSurahHeader({
       data-testid="mushaf-surah-heading"
       data-variant="pill"
     >
-      <MushafSurahHeaderArt />
+      {!hideArtwork && <MushafSurahHeaderArt />}
       <h2
         className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none text-foreground"
         style={{
@@ -166,10 +169,12 @@ function SurahOpeningBand({
   surahNumber,
   language,
   withBismillah,
+  hideArtwork = false,
 }: {
   surahNumber: number | string;
   language: AppLanguage;
   withBismillah: boolean;
+  hideArtwork?: boolean;
 }) {
   return (
     <div
@@ -177,7 +182,12 @@ function SurahOpeningBand({
       dir="rtl"
     >
       <div className="h-full min-h-0 w-full">
-        <MushafSurahHeader surahNumber={surahNumber} language={language} compact={withBismillah} />
+        <MushafSurahHeader
+          surahNumber={surahNumber}
+          language={language}
+          compact={withBismillah}
+          hideArtwork={hideArtwork}
+        />
       </div>
       {withBismillah && (
         <div className="flex h-full min-h-0 items-center justify-center">
@@ -497,51 +507,43 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
  *  basmalah. Shared by both pages of a spread. */
 function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
   return useMemo<LineDetail[]>(() => {
-    const surahStarts: { surah: number; startLine: number }[] = [];
-    for (let l = 0; l < lines.length; l++) {
+    const slots: LineDetail[] = Array.from({ length: MUSHAF_LINES_PER_PAGE }, () => ({ type: "empty" }));
+
+    // 1. Fill word tokens
+    for (let l = 0; l < lines.length && l < MUSHAF_LINES_PER_PAGE; l++) {
       const lineWords = lines[l];
-      if (!lineWords || lineWords.length === 0) continue;
-      for (const w of lineWords) {
-        const [s, a] = w.verseKey.split(":");
-        if (a === "1" && !surahStarts.some((item) => item.surah === Number(s))) {
-          surahStarts.push({ surah: Number(s), startLine: l + 1 });
+      if (lineWords && lineWords.length > 0) {
+        slots[l] = { type: "text", words: lineWords };
+      }
+    }
+
+    // 2. Surah placements from canonical map
+    for (const [sStr, pl] of Object.entries(SURAH_PLACEMENTS)) {
+      const surahNum = Number(sStr);
+      if (pl.page === pageNumber) {
+        const headerIdx = pl.line - 1;
+        if (headerIdx >= 0 && headerIdx < MUSHAF_LINES_PER_PAGE && slots[headerIdx]?.type === "empty") {
+          slots[headerIdx] = pl.openingBand
+            ? { type: "surah-opening", surah: surahNum, withBismillah: surahNum !== 9 }
+            : { type: "surah-header", surah: surahNum };
+        }
+        if (pl.bismillahLine) {
+          const bismillahIdx = pl.bismillahLine - 1;
+          if (bismillahIdx >= 0 && bismillahIdx < MUSHAF_LINES_PER_PAGE && slots[bismillahIdx]?.type === "empty") {
+            slots[bismillahIdx] = { type: "bismillah" };
+          }
         }
       }
     }
 
-    const slots: LineDetail[] = [];
-    for (let index = 0; index < MUSHAF_LINES_PER_PAGE; index += 1) {
-      const words = lines[index];
-      const lineNum = index + 1;
-
-      if (!words || words.length === 0) {
-        let slot: LineDetail = { type: "empty" };
-        for (const start of surahStarts) {
-          if (start.surah === 1 && lineNum === 1) {
-            slot = { type: "surah-header", surah: 1 };
-            break;
-          }
-          if (lineNum === start.startLine - 2) {
-            slot = { type: "surah-header", surah: start.surah };
-            break;
-          }
-          if (lineNum === start.startLine - 1) {
-            // Only one slot to spare: the heading and the basmalah share it
-            // rather than one of them going missing.
-            slot =
-              start.startLine - 2 < 1
-                ? { type: "surah-opening", surah: start.surah, withBismillah: start.surah !== 9 }
-                : start.surah !== 9
-                  ? { type: "bismillah" }
-                  : { type: "empty" };
-            break;
-          }
+    // 3. If previous page had Surah header at line 15, page starts with Bismillah on line 1 (unless Surah 9)
+    for (const [sStr, pl] of Object.entries(SURAH_PLACEMENTS)) {
+      const surahNum = Number(sStr);
+      if (pl.page === pageNumber - 1 && pl.line === 15 && surahNum !== 9) {
+        if (slots[0]?.type === "empty") {
+          slots[0] = { type: "bismillah" };
         }
-        slots.push(slot);
-        continue;
       }
-
-      slots.push({ type: "text", words });
     }
 
     if (!OPENING_PAGES.has(pageNumber)) return slots;
@@ -621,6 +623,8 @@ function MushafPageCanvas({
     [onAyahAction, pageNumber],
   );
 
+  const isOpening = OPENING_PAGES.has(pageNumber);
+
   return (
     <div
       ref={canvasRef}
@@ -629,7 +633,7 @@ function MushafPageCanvas({
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
-      {OPENING_PAGES.has(pageNumber) && (
+      {isOpening && (
         <MushafOpeningFrameArt className="absolute inset-0 h-full w-full pointer-events-none select-none opacity-85 z-0" />
       )}
       <div
@@ -647,9 +651,14 @@ function MushafPageCanvas({
         {lineDetails.map((line, lineIdx) => (
           <div key={lineIdx} className="min-h-0 w-full flex-1">
             {line.type === "surah-header" ? (
-              <MushafSurahHeader surahNumber={line.surah} language={language} />
+              <MushafSurahHeader surahNumber={line.surah} language={language} hideArtwork={isOpening} />
             ) : line.type === "surah-opening" ? (
-              <SurahOpeningBand surahNumber={line.surah} language={language} withBismillah={line.withBismillah} />
+              <SurahOpeningBand
+                surahNumber={line.surah}
+                language={language}
+                withBismillah={line.withBismillah}
+                hideArtwork={isOpening}
+              />
             ) : line.type === "bismillah" ? (
               <BismillahLine />
             ) : line.type === "text" ? (

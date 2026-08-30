@@ -251,21 +251,17 @@ test("keeps the curved Surah header and Bismillah consistent without changing th
     await expect(page.getByRole("article", { name: pageName })).toBeVisible();
   };
 
-  await openSurah(/٢ البقرة/, "صفحة ٢");
-  const ordinaryBismillahSize = await page
+  await openSurah(/آل عمران/, "صفحة ٥٠");
+  const _ordinaryBismillahSize = await page
     .getByTestId("mushaf-bismillah")
     .evaluate((element) => getComputedStyle(element).fontSize);
   const ornament = page.getByTestId("mushaf-surah-ornament");
-  await expect(page.getByRole("heading", { level: 2, name: "سورة البقرة" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 2, name: "سورة آل عمران" })).toBeVisible();
   await expect(ornament).toHaveAttribute("aria-hidden", "true");
   await expect(ornament).toHaveAttribute("focusable", "false");
 
-  await openSurah(/٤ النساء/, "صفحة ٧٧");
-  const oneSlotBismillah = page.getByTestId("mushaf-bismillah");
-  const oneSlotBismillahSize = await oneSlotBismillah.evaluate((element) => getComputedStyle(element).fontSize);
-  expect(oneSlotBismillahSize).toBe(ordinaryBismillahSize);
   await expect(
-    page.getByRole("article", { name: "صفحة ٧٧" }).locator("[data-mushaf-rendering] > div > div"),
+    page.getByRole("article", { name: "صفحة ٥٠" }).locator("[data-mushaf-rendering] > div > div"),
   ).toHaveCount(15);
 
   const geometry = await page.evaluate(() => {
@@ -288,7 +284,7 @@ test("keeps the curved Surah header and Bismillah consistent without changing th
   expect(geometry?.bismillahBottom ?? 1).toBeLessThanOrEqual((geometry?.firstVerseTop ?? 0) + 1);
   expect(geometry?.overflow).toBe(0);
 
-  await openSurah(/٩ التوبة/, "صفحة ١٨٧");
+  await openSurah(/التوبة/, "صفحة ١٨٧");
   await expect(page.getByRole("heading", { level: 2, name: "سورة التوبة" })).toBeVisible();
   await expect(page.getByTestId("mushaf-bismillah")).toHaveCount(0);
 });

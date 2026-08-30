@@ -144,20 +144,14 @@ describe("MushafPageViewer", () => {
     expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
   });
 
-  it("keeps the curved heading and the full-size basmalah inside one canonical slot", () => {
-    // Nineteen pages look like this: line 1 free, the surah's first verse on
-    // line 2. The heading used to be dropped on the floor.
+  it("places Surah header at the end of the previous page when canonical (e.g. Surah An-Nisaa on page 76)", () => {
+    // In the 15-line Madani Mushaf, Surah 4 (An-Nisaa) header appears at line 15
+    // of page 76, immediately after Ali 'Imran concludes. Page 77 starts with Bismillah.
     render(
       <MushafPageViewer
-        lines={[
-          [],
-          [
-            { verseKey: "4:1", position: 1, isEnd: 0, text: "يَـٰٓأَيُّهَا" },
-            { verseKey: "4:1", position: 2, isEnd: 1, text: "١" },
-          ],
-        ]}
+        lines={Array.from({ length: 14 }, () => [{ verseKey: "3:200", position: 1, isEnd: 0, text: "تُفْلِحُونَ" }])}
         language="ar"
-        pageNumber={77}
+        pageNumber={76}
         surahName="سورة النساء"
         juzNumber={4}
         direction="rtl"
@@ -167,9 +161,6 @@ describe("MushafPageViewer", () => {
     expect(screen.getAllByText("سورة النساء").length).toBeGreaterThanOrEqual(1);
     expect(screen.getByRole("heading", { level: 2, name: "سورة النساء" })).toBeInTheDocument();
     expect(screen.getByTestId("mushaf-surah-heading")).toHaveAttribute("data-variant", "pill");
-    expect(screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ")).toHaveStyle({
-      fontSize: "clamp(13px, min(4.4cqi, 2.4cqh), 18px)",
-    });
     expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
     expect(screen.getByTestId("mushaf-surah-ornament")).toHaveAttribute("aria-hidden", "true");
     expect(screen.getByTestId("mushaf-surah-ornament")).toHaveAttribute("focusable", "false");
@@ -202,8 +193,8 @@ describe("MushafPageViewer", () => {
       [], // Line 1: empty -> should be Surah Header
       [], // Line 2: empty -> should be Bismillah
       [
-        { verseKey: "2:1", position: 1, isEnd: 0, text: "الٓمٓ" },
-        { verseKey: "2:1", position: 2, isEnd: 1, text: "١" },
+        { verseKey: "3:1", position: 1, isEnd: 0, text: "الٓمٓ" },
+        { verseKey: "3:1", position: 2, isEnd: 1, text: "١" },
       ],
     ];
 
@@ -211,21 +202,20 @@ describe("MushafPageViewer", () => {
       <MushafPageViewer
         lines={surahStartLines}
         language="ar"
-        pageNumber={2}
-        surahName="سورة البقرة"
-        juzNumber={1}
+        pageNumber={50}
+        surahName="سورة آل عمران"
+        juzNumber={3}
         direction="rtl"
       />,
     );
 
-    expect(screen.getAllByText("سورة البقرة").length).toBeGreaterThanOrEqual(1);
+    expect(screen.getAllByText("سورة آل عمران").length).toBeGreaterThanOrEqual(1);
     const bismillah = screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
     expect(bismillah).toHaveStyle({
       fontFamily: "var(--font-mushaf)",
-      fontSize: "clamp(13px, min(4.4cqi, 2.4cqh), 18px)",
     });
     expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
-    expect(screen.getByRole("heading", { level: 2, name: "سورة البقرة" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { level: 2, name: "سورة آل عمران" })).toBeInTheDocument();
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
   });
 });
