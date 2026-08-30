@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-30d",
+  "release": "2026-08-30e",
   "ar": [
-    "يظهر الآن نص حديث النزول الإلهي كاملاً في بطاقة ثلث الليل الأخير.",
-    "تم إصلاح بطاقة مشاركة الإنجازات لتعمل بشكل صحيح مع الوضع الداكن واتجاه النص العربي.",
-    "صفحات بداية المصحف (الفاتحة والبقرة) أصبحت متمركزة بشكل صحيح بنفس حجم الخط.",
-    "تم تحسين حجم البسملة في صفحات المصحف لتكون أكثر وضوحاً."
+    "مشغل صوتي مرن ومطور يدعم التبديل بين الشريط المصغر ونافذة التحكم الكاملة دون حجب النص.",
+    "أزرار تقديم وتأخير مخصصة لعشر ثوانٍ لتسهيل التنقل والتكرار في المقاطع والتلاوات الطويلة.",
+    "تسميات دقيقة ومترجمة بالكامل لكل من السور القرآنية والأذكار وتلاوات القراء.",
+    "تحكم كامل من لوحة المفاتيح وتكامل متقدم مع إشعارات شاشة القفل والتحكم الصوتي."
   ],
   "en": [
-    "The full Hadith of the Divine Descent now appears in the Last Third of the Night card.",
-    "The progress sharing card now displays correctly in dark mode and right-to-left layouts.",
-    "Mushaf opening pages (Al-Fatihah and Al-Baqarah) are now centered on the 15-line grid.",
-    "Bismillah text size in the Mushaf has been increased for better readability."
+    "Flexible dual-state audio player supporting compact docking and full controls without obscuring text.",
+    "10-second skip forward and rewind buttons for precise playback navigation and recitation listening.",
+    "Context-aware localized titles and reciter attributions for Surahs and Azkar.",
+    "Full keyboard shortcuts and enhanced lock screen playback control integration."
   ]
 }

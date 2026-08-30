@@ -15,6 +15,7 @@ import { loadAudioPreferences, saveAudioPreferences } from "./audioPreferences";
 import { withPlaybackMode } from "./buildPlaybackPlan";
 import type { AudioPreferences, PlaybackEntry, PlaybackPlan, ResolvedAudioSegment } from "./audioTypes";
 import { getNextPlaybackPosition } from "./playbackProgression";
+import { getAudioVoiceName } from "./audioVoices";
 
 type PlaybackMode = "play-once" | "repeat-prescribed-count";
 
@@ -67,12 +68,29 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     if (!("mediaSession" in navigator)) return;
     const entry = state.plan?.entries[state.entryIndex];
     if (!entry) return;
+    const voiceId = state.currentVoiceId ?? entry.defaultVoiceId;
+    const reciterName = getAudioVoiceName(voiceId, "ar") ?? voiceId;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: entry.titleArabic,
-      artist: state.currentVoiceId ?? entry.titleEnglish,
-      album: "Azkar",
+      artist: reciterName,
+      album: entry.contentKind === "quran" ? "القرآن الكريم" : "أذكار المسلم",
     });
   }, [state.currentVoiceId, state.entryIndex, state.plan]);
+
+  useEffect(() => {
+    if (!("mediaSession" in navigator) || !navigator.mediaSession.setPositionState) return;
+    if (Number.isFinite(state.duration) && state.duration > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: state.duration,
+          playbackRate: state.playbackRate,
+          position: Math.max(0, Math.min(state.currentTime, state.duration)),
+        });
+      } catch {
+        // Position state non-fatal on unsupported environments
+      }
+    }
+  }, [state.currentTime, state.duration, state.playbackRate]);
 
   const updatePreferences = useCallback((next: AudioPreferences) => {
     preferencesRef.current = next;

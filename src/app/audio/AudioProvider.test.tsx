@@ -131,4 +131,25 @@ describe("AudioProvider integration", () => {
     expect(screen.getByRole("button", { name: "Retry" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Skip this item" })).toBeInTheDocument();
   });
+
+  it("toggles between expanded and mini-player modes without stopping audio", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start" }));
+    expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
+
+    // Minimize player
+    fireEvent.click(screen.getByRole("button", { name: "Minimize player" }));
+    expect(screen.getByRole("button", { name: "Expand player" })).toBeInTheDocument();
+
+    // Expand player back
+    fireEvent.click(screen.getByRole("button", { name: "Expand player" }));
+    expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();
+  });
 });
