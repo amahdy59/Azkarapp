@@ -1,15 +1,13 @@
 {
-  "release": "2026-08-30g",
+  "release": "2026-08-30h",
   "ar": [
-    "إمكانية التراجع الفوري عند إعادة تعيين العداد بالخطأ لاستعادة تقدمك في القراءة.",
-    "أزرار تصنيف سريعة في مكتبة الأذكار للتنقل المباشر بين مجموعات الأذكار والأدعية.",
-    "تحسين حركة تقليب صفحات المصحف لتصبح أكثر سلاسة وانسيابية.",
-    "إبراز خط البسملة وتناسق حجمها في فواصل السور القرآنية."
+    "زخرفة مذهبة أصيلة لرؤوس السور مستوحاة من مصحف المدينة المنورة.",
+    "إبراز عنوان السورة داخل إطار هندسي متناسق مع الحفاظ على شبكة القراءة.",
+    "توافق كامل لألوان إطار السورة وتفاصيله مع جميع السمات الفاتحة والداكنة."
   ],
   "en": [
-    "Instant Undo option when resetting the counter to recover active reading progress.",
-    "Quick category group filter pills in the Azkar Library for focused browsing.",
-    "Smoother, more natural horizontal page-turn transitions in the Mushaf reader.",
-    "Enhanced Basmala typography and balanced proportions across Surah openings."
+    "Authentic Medina Mushaf golden illumination artwork for Surah opening headers.",
+    "Refined Surah title cartouche proportioned to the 15-line reading grid.",
+    "Harmonious ornamentation styling seamlessly adapted to light and dark themes."
   ]
 }

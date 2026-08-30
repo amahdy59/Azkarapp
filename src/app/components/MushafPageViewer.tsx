@@ -17,6 +17,7 @@ import { formatNumerals } from "../formatting";
 import { getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
+import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
 
 export interface MushafWordToken {
   verseKey: string;
@@ -122,54 +123,9 @@ function MushafSurahHeader({
       data-testid="mushaf-surah-heading"
       data-variant="pill"
     >
-      <svg
-        viewBox="0 0 320 40"
-        preserveAspectRatio="xMidYMid meet"
-        className="absolute inset-0 h-full w-full text-accent opacity-70 pointer-events-none"
-        aria-hidden="true"
-        focusable="false"
-        data-testid="mushaf-surah-ornament"
-      >
-        {/* Symmetrical full pill enclosing the surah title */}
-        <rect
-          x="52"
-          y="5"
-          width="216"
-          height="30"
-          rx="15"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Symmetrical straight horizontal lines from vertical center */}
-        <line
-          x1="8"
-          y1="20"
-          x2="52"
-          y2="20"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          vectorEffect="non-scaling-stroke"
-        />
-        <line
-          x1="268"
-          y1="20"
-          x2="312"
-          y2="20"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          vectorEffect="non-scaling-stroke"
-        />
-        {/* Perfect symmetrical terminal circular dots */}
-        <circle cx="8" cy="20" r="2.5" fill="currentColor" />
-        <circle cx="312" cy="20" r="2.5" fill="currentColor" />
-        {/* Mathematically symmetrical 4-petal floral rosettes */}
-        <HeaderRosette transform="translate(72 20)" />
-        <HeaderRosette transform="translate(248 20)" />
-      </svg>
+      <MushafSurahHeaderArt />
       <h2
-        className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none"
+        className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none text-[#162420]"
         style={{
           fontSize: compact ? "clamp(11px, min(3.8cqi, 2cqh), 15px)" : "clamp(13px, min(4.2cqi, 2.5cqh), 17px)",
         }}
@@ -178,24 +134,6 @@ function MushafSurahHeader({
         {title}
       </h2>
     </div>
-  );
-}
-
-/**
- * 100% mathematically and visually symmetrical 4-petal floral rosette.
- * Constructed with 4 identical petals rotated 0°, 90°, 180°, and 270° around a central disc.
- */
-function HeaderRosette({ transform }: { transform: string }) {
-  return (
-    <g transform={transform}>
-      <g stroke="currentColor" strokeWidth="1" fill="none" vectorEffect="non-scaling-stroke">
-        <path d="M0 -1 C-2.6 -3.2, -2.6 -6.5, 0 -8 C2.6 -6.5, 2.6 -3.2, 0 -1 Z" />
-        <path d="M0 -1 C-2.6 -3.2, -2.6 -6.5, 0 -8 C2.6 -6.5, 2.6 -3.2, 0 -1 Z" transform="rotate(90)" />
-        <path d="M0 -1 C-2.6 -3.2, -2.6 -6.5, 0 -8 C2.6 -6.5, 2.6 -3.2, 0 -1 Z" transform="rotate(180)" />
-        <path d="M0 -1 C-2.6 -3.2, -2.6 -6.5, 0 -8 C2.6 -6.5, 2.6 -3.2, 0 -1 Z" transform="rotate(270)" />
-      </g>
-      <circle cx="0" cy="0" r="1.3" fill="currentColor" />
-    </g>
   );
 }
 
