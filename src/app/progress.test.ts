@@ -172,7 +172,7 @@ describe("quiet garden progress", () => {
     expect(summary.messageKind).toBe("continue");
   });
 
-  it("clears stale full collections while preserving partial progress", () => {
+  it("clears all stale routine collections unconditionally on a new day", () => {
     const emptyCompletedSets = Object.fromEntries(CATEGORY_IDS.map((id) => [id, new Set<string>()])) as Record<
       CategoryId,
       Set<string>
@@ -183,10 +183,11 @@ describe("quiet garden progress", () => {
       morning: fullProgress("morning"),
       evening: new Set(["e-hm-75a", "e-hm-75"]),
     };
-    const reset = resetStaleCompletedCollections(completed, [], new Date(2026, 6, 18, 12), 4);
+
+    const reset = resetStaleCompletedCollections(completed, [], new Date("2024-03-02T10:00:00Z"), 4);
 
     expect(reset.morning.size).toBe(0);
-    expect([...reset.evening]).toEqual(["e-hm-75a", "e-hm-75"]);
+    expect(reset.evening.size).toBe(0);
   });
 
   it("starts a new day with empty daily routines while preserving situational progress", () => {

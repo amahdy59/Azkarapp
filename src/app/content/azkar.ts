@@ -546,15 +546,15 @@ const MORNING_AZKAR: ZikrDraft[] = [
   },
   {
     id: "m-hm-98",
-      category: "morning",
-      orderIndex: 24,
+    category: "morning",
+    orderIndex: 24,
     arabicText:
       "\u0627\u0644\u0644\u0651\u064e\u0647\u064f\u0645\u0651\u064e \u0635\u064e\u0644\u0651\u0650 \u0648\u064e\u0633\u064e\u0644\u0651\u0650\u0645\u0652 \u0639\u064e\u0644\u064e\u0649 \u0646\u064e\u0628\u0650\u064a\u0651\u0650\u0646\u064e\u0627 \u0645\u064f\u062d\u064e\u0645\u0651\u064e\u062f\u064d.",
     transliteration: "All\u0101humma \u1e63alli wa sallim \u02bfal\u0101 nabiyyin\u0101 Mu\u1e25ammad.",
     translation: "O Allah, send prayers and peace upon our Prophet Muhammad.",
     benefit: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
     repetitionCount: 100,
-      countLabel: "100",
+    countLabel: "100",
     sourceReference: "At-Tabarani; Haythami Majma\u02bf az-Zawa\u2019id 10/120; Hisn al-Muslim 98.",
     preferredTiming: "Morning and evening.",
     hadithText:

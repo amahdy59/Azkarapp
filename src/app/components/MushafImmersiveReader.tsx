@@ -386,9 +386,21 @@ export function MushafImmersiveReader({
                   key={displayPage}
                   custom={slideDir}
                   variants={{
-                    enter: (dir: number) => reducedMotion ? { opacity: 0 } : { opacity: 0, x: dir > 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) },
+                    enter: (dir: number) =>
+                      reducedMotion
+                        ? { opacity: 0 }
+                        : {
+                            opacity: 0,
+                            x: dir > 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
+                          },
                     center: { opacity: 1, x: 0 },
-                    exit: (dir: number) => reducedMotion ? { opacity: 0 } : { opacity: 0, x: dir < 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) }
+                    exit: (dir: number) =>
+                      reducedMotion
+                        ? { opacity: 0 }
+                        : {
+                            opacity: 0,
+                            x: dir < 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
+                          },
                   }}
                   initial="enter"
                   animate="center"
