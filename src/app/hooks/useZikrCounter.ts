@@ -186,6 +186,21 @@ export function useZikrCounter({
     return () => window.removeEventListener("keydown", handleGlobalKeyDown);
   }, [z, handleTap]);
 
+  const restoreCount = useCallback(
+    (targetCount: number) => {
+      if (!z) return;
+      const restored = Math.max(0, Math.min(targetCount, z.repetitionCount));
+      setCount(restored);
+      const isNowComplete = restored >= z.repetitionCount;
+      setComplete(isNowComplete);
+      setJustCompleted(false);
+      setReaderAnnouncement(
+        isNowComplete ? t(language, "reader.counterReadyComplete") : `${formatNumerals(restored, language)}`,
+      );
+    },
+    [language, z],
+  );
+
   return {
     count,
     complete,
@@ -195,5 +210,6 @@ export function useZikrCounter({
     handleTap,
     handleSurfaceTap,
     handleReset,
+    restoreCount,
   };
 }

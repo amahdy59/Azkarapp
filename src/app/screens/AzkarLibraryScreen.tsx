@@ -59,6 +59,7 @@ export function AzkarLibraryScreen({
 }) {
   const [section, setSection] = useState<LibrarySection>(initialSection);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("all");
   const searchInputId = useId();
   const isArabic = language === "ar";
   const savedAzkar = useMemo(() => {
@@ -95,7 +96,13 @@ export function AzkarLibraryScreen({
       }),
     })).filter((entry) => entry.categories.length > 0);
   }, [deferredQuery]);
-  const visibleCollectionCount = visibleGroups.reduce((count, entry) => count + entry.categories.length, 0);
+
+  const filteredGroups = useMemo(() => {
+    if (selectedGroupId === "all" || deferredQuery) return visibleGroups;
+    return visibleGroups.filter((entry) => entry.group.id === selectedGroupId);
+  }, [deferredQuery, selectedGroupId, visibleGroups]);
+
+  const visibleCollectionCount = filteredGroups.reduce((count, entry) => count + entry.categories.length, 0);
   const filterStatusMessage = deferredQuery
     ? t(language, visibleCollectionCount === 1 ? "library.filterResultsSingular" : "library.filterResultsPlural", {
         count: formatNumerals(visibleCollectionCount, language),
@@ -187,13 +194,48 @@ export function AzkarLibraryScreen({
                 {filterStatusMessage}
               </p>
             </form>
+            {section === "collections" && !searchQuery.trim() && (
+              <div
+                role="group"
+                className="mt-3 flex items-center gap-2 overflow-x-auto no-scrollbar pb-1"
+                aria-label={t(language, "library.title")}
+              >
+                <button
+                  type="button"
+                  aria-pressed={selectedGroupId === "all"}
+                  onClick={() => setSelectedGroupId("all")}
+                  className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-[0.875rem] font-bold transition-colors cursor-pointer ${
+                    selectedGroupId === "all"
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                  }`}
+                >
+                  {t(language, "library.all")}
+                </button>
+                {CATEGORY_GROUPS.map((group) => (
+                  <button
+                    key={group.id}
+                    type="button"
+                    aria-pressed={selectedGroupId === group.id}
+                    onClick={() => setSelectedGroupId(group.id)}
+                    className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-[0.875rem] font-bold transition-colors cursor-pointer ${
+                      selectedGroupId === group.id
+                        ? "bg-primary text-primary-foreground shadow-sm"
+                        : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
+                    }`}
+                  >
+                    {t(language, `library.groups.${group.labelKey}`)}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </header>
 
         <div className="min-h-0 flex-1 overflow-y-auto px-5 pb-5 page-content-center outline-none focus-visible:ring-1 focus-visible:ring-ring/40">
           {section === "collections" ? (
             <>
-              {visibleGroups.map(({ group, categories }) => (
+              {filteredGroups.map(({ group, categories }) => (
                 <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
                   <h2
                     id={`library-group-${group.id}`}
@@ -278,7 +320,7 @@ export function AzkarLibraryScreen({
                   />
                 </div>
               )}
-              {onOpenCustomCounter && visibleGroups.length > 0 && (
+              {onOpenCustomCounter && filteredGroups.length > 0 && (
                 <div className="mt-4">
                   <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
                 </div>

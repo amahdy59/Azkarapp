@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-30f",
+  "release": "2026-08-30g",
   "ar": [
-    "استجابة لمسية واهتزاز خفيف عند الضغط على زر المسبحة لتأكيد التفاعل دون تشتيت.",
-    "تحسين سرعة بدء تشغيل المقاطع الصوتية عبر الاتصال المسبق بخوادم التلاوات.",
-    "الحفاظ على بطاقات وردك اليوم ومتابعة الصلوات والخلفيات الزمنية كما اعتدت عليها.",
-    "توافق كامل مع إعدادات تقليل الحركة والوصول السهل لجميع الأجهزة."
+    "إمكانية التراجع الفوري عند إعادة تعيين العداد بالخطأ لاستعادة تقدمك في القراءة.",
+    "أزرار تصنيف سريعة في مكتبة الأذكار للتنقل المباشر بين مجموعات الأذكار والأدعية.",
+    "تحسين حركة تقليب صفحات المصحف لتصبح أكثر سلاسة وانسيابية.",
+    "إبراز خط البسملة وتناسق حجمها في فواصل السور القرآنية."
   ],
   "en": [
-    "Tactile haptic pulse feedback when pressing the Masbaha counter button on mobile devices.",
-    "Faster audio startup latency with optimized preconnection to recitation CDN servers.",
-    "Preserved daily wird and prayer tracker card layouts and time-of-day backgrounds.",
-    "Full compatibility with reduce-motion preferences and mobile accessibility standards."
+    "Instant Undo option when resetting the counter to recover active reading progress.",
+    "Quick category group filter pills in the Azkar Library for focused browsing.",
+    "Smoother, more natural horizontal page-turn transitions in the Mushaf reader.",
+    "Enhanced Basmala typography and balanced proportions across Surah openings."
   ]
 }

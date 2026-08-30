@@ -214,37 +214,65 @@ export function ReaderScreen({
 
   useWakeLock(true);
 
-  const { count, complete, justCompleted, readerAnnouncement, suppressTap, handleTap, handleSurfaceTap, handleReset } =
-    useZikrCounter({
-      z,
-      idx,
-      isDone,
-      language,
-      azkarLength: azkar.length,
-      collectionCompletedCount,
-      hapticFeedback,
-      vibrate,
-      onCount: playClickFeedback,
-      onComplete,
-      onAdvance,
-    });
+  const [undoResetState, setUndoResetState] = useState<{ count: number; wasDone: boolean } | null>(null);
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const {
+    count,
+    complete,
+    justCompleted,
+    readerAnnouncement,
+    suppressTap,
+    handleTap,
+    handleSurfaceTap,
+    handleReset,
+    restoreCount,
+  } = useZikrCounter({
+    z,
+    idx,
+    isDone,
+    language,
+    azkarLength: azkar.length,
+    collectionCompletedCount,
+    hapticFeedback,
+    vibrate,
+    onCount: playClickFeedback,
+    onComplete,
+    onAdvance,
+  });
 
   /**
    * "Reset counter" also clears a recorded completion, so an accidental tap on
    * the reader canvas is recoverable. Without this the count could be zeroed
    * while the zikr stayed marked done, and `isDone` restored it on remount.
    *
-   * Reuses the same un-complete path the collection list already uses, which
-   * deliberately does not revoke a palm that was already earned.
+   * An Undo toast is shown temporarily to allow immediate recovery.
    */
   const handleResetCounter = useCallback(() => {
+    if (count > 0 || isDone) {
+      if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+      setUndoResetState({ count, wasDone: isDone });
+      undoTimerRef.current = setTimeout(() => {
+        setUndoResetState(null);
+      }, 5000);
+    }
     handleReset();
     if (isDone) {
       onUncomplete?.(idx);
     }
     // handleReset is stable for the life of the mounted zikr.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [idx, isDone, onUncomplete]);
+  }, [count, idx, isDone, onUncomplete]);
+
+  const handleUndoReset = useCallback(() => {
+    if (!undoResetState) return;
+    if (undoTimerRef.current) clearTimeout(undoTimerRef.current);
+    restoreCount(undoResetState.count);
+    if (undoResetState.wasDone) {
+      onComplete(idx);
+    }
+    setUndoResetState(null);
+  }, [idx, onComplete, restoreCount, undoResetState]);
 
   const {
     onTouchStart: baseTouchStart,
@@ -1153,6 +1181,23 @@ export function ReaderScreen({
             if (!isDone) onComplete(idx);
           }}
         />
+      )}
+      {undoResetState && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground transition-all duration-200"
+          dir={direction}
+        >
+          <span className="text-[0.875rem] font-medium">{t(language, "reader.resetCounter")}</span>
+          <button
+            type="button"
+            onClick={handleUndoReset}
+            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-[0.875rem] font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+          >
+            {t(language, "common.undo")}
+          </button>
+        </div>
       )}
     </ScreenContainer>
   );

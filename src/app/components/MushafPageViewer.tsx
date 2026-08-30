@@ -199,13 +199,16 @@ function HeaderRosette({ transform }: { transform: string }) {
   );
 }
 
-const BISMILLAH_FONT_SIZE = "clamp(16px, min(5.4cqi, 3.2cqh), 24px)";
+const BISMILLAH_FONT_SIZE = "clamp(13px, min(5.2cqi, 2.4cqh), 22px)";
 
 function BismillahText({ text }: { text: string }) {
   return (
     <p
-      className="leading-none tracking-[0.03em]"
-      style={{ fontFamily: "var(--font-mushaf)", fontSize: BISMILLAH_FONT_SIZE }}
+      className="leading-none tracking-[0.03em] select-none"
+      style={{
+        fontFamily: "var(--font-mushaf)",
+        fontSize: BISMILLAH_FONT_SIZE,
+      }}
       data-testid="mushaf-bismillah"
     >
       {text}
@@ -837,10 +840,10 @@ export function MushafPageViewer({
     }
     const animation = paper.animate(
       [
-        { opacity: 0.72, transform: `translateX(${pageTransitionDirection === "forward" ? "-6px" : "6px"})` },
+        { opacity: 0.8, transform: `translateX(${pageTransitionDirection === "forward" ? "-22px" : "22px"})` },
         { opacity: 1, transform: "translateX(0)" },
       ],
-      { duration: 150, easing: "cubic-bezier(0.22, 1, 0.36, 1)", fill: "both" },
+      { duration: 180, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" },
     );
     return () => animation.cancel();
   }, [facingPage?.pageNumber, pageNumber, pageTransitionDirection, paperRef, reduceMotion]);
