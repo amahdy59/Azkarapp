@@ -18,12 +18,12 @@ runs:
         node-version-file: ".nvmrc"
         cache: "pnpm"
 
-    - name: Verify pinned toolchain
-      run: pnpm run verify:toolchain
-      shell: bash
-
     - name: Install dependencies
       run: pnpm install --frozen-lockfile
+      shell: bash
+
+    - name: Verify pinned toolchain
+      run: pnpm run verify:toolchain
       shell: bash
 
     - name: Verify quality gates
