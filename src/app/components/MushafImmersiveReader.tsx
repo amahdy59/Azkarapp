@@ -385,9 +385,14 @@ export function MushafImmersiveReader({
                 <motion.div
                   key={displayPage}
                   custom={slideDir}
-                  initial={reducedMotion ? { opacity: 0 } : (dir: number) => ({ opacity: 0, x: dir > 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) })}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={reducedMotion ? { opacity: 0 } : (dir: number) => ({ opacity: 0, x: dir < 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) })}
+                  variants={{
+                    enter: (dir: number) => reducedMotion ? { opacity: 0 } : { opacity: 0, x: dir > 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) },
+                    center: { opacity: 1, x: 0 },
+                    exit: (dir: number) => reducedMotion ? { opacity: 0 } : { opacity: 0, x: dir < 0 ? (direction === "rtl" ? -100 : 100) : (direction === "rtl" ? 100 : -100) }
+                  }}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="absolute inset-0"
                 >
