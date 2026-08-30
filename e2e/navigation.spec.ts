@@ -61,6 +61,7 @@ test("saved zikr is visible from the first-class Saved library tab", async ({ pa
 });
 
 test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2024-01-01T12:00:00Z"));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -94,6 +95,7 @@ test("Continue Azkar resumes at the first incomplete zikr", async ({ page }) => 
 });
 
 test("collection keeps canonical order and reset stays inside the app canvas", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2024-01-01T12:00:00Z"));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
