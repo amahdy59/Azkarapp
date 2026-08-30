@@ -1,15 +1,15 @@
 {
-  "release": "2026-08-30",
+  "release": "2026-08-30b",
   "ar": [
-    "تتجدد الآن الأذكار اليومية والأوراد بشكل كامل تلقائيًا عند منتصف الليل.",
-    "تم تغيير العدد الافتراضي للصلاة على النبي في أذكار الصباح والمساء إلى 100 مرة.",
-    "إضافة حركة تمرير وانزلاق سلسة عند التنقل بين صفحات المصحف الشريف.",
-    "أصبح الاستماع لسورة الكهف بصوت القارئ محمد الشرع متاحاً الآن."
+    "يظهر الآن نص حديث النزول الإلهي كاملاً في بطاقة ثلث الليل الأخير.",
+    "تم إصلاح بطاقة مشاركة الإنجازات لتعمل بشكل صحيح مع الوضع الداكن واتجاه النص العربي.",
+    "صفحات بداية المصحف (الفاتحة والبقرة) أصبحت متمركزة بشكل صحيح بنفس حجم الخط.",
+    "تم تحسين حجم البسملة في صفحات المصحف لتكون أكثر وضوحاً."
   ],
   "en": [
-    "Daily Azkar and routines now fully reset automatically at midnight.",
-    "The default repetition count for sending blessings upon the Prophet in Morning and Evening Azkar is now 100.",
-    "Added a smooth sliding animation when navigating between pages in the Mushaf.",
-    "Surah Al-Kahf recitation by Muhammad Al-Shara is now available for listening."
+    "The full Hadith of the Divine Descent now appears in the Last Third of the Night card.",
+    "The progress sharing card now displays correctly in dark mode and right-to-left layouts.",
+    "Mushaf opening pages (Al-Fatihah and Al-Baqarah) are now centered on the 15-line grid.",
+    "Bismillah text size in the Mushaf has been increased for better readability."
   ]
 }
