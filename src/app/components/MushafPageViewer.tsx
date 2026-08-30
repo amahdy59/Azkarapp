@@ -605,11 +605,11 @@ function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
     if (!OPENING_PAGES.has(pageNumber)) return slots;
     const lastUsed = slots.reduce((last, slot, index) => (slot.type === "empty" ? last : index + 1), 0);
     if (lastUsed === 0) return slots;
-      
+
     const usedSlots = slots.slice(0, lastUsed);
     const topPadding = Math.floor((MUSHAF_LINES_PER_PAGE - lastUsed) / 2);
     const bottomPadding = MUSHAF_LINES_PER_PAGE - lastUsed - topPadding;
-      
+
     return [
       ...Array(topPadding).fill({ type: "empty" }),
       ...usedSlots,

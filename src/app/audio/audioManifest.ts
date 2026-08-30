@@ -49,7 +49,7 @@ export const AUDIO_ASSETS: Readonly<Record<string, AudioAsset>> = Object.freeze(
             id: "quran-018-voice-muhammad-alshara-v1",
             voiceId: "muhammad-alshara",
             voiceName: "Muhammad Al-Shara",
-            relativePath: "azkarapp/quran/friday-kahf/muhammad-alshara/v1/friday-kahf.mp3",
+            relativePath: "quran/friday-kahf/muhammad-alshara/v1/friday-kahf.mp3",
             mimeType: "audio/mpeg",
             durationMs: 1931376,
             byteSize: 77256100,

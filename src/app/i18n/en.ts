@@ -135,7 +135,8 @@ const en = {
     beforeSleepTitle: "Time for Before Sleep Azkar",
     beforeSleepDesc: "Before Sleep Azkar are read after Isha prayer and before sleep",
     lastThirdTitle: "Time for Dua",
-    lastThirdDesc: "Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?",
+    lastThirdDesc:
+      "Our Lord, the Blessed and the Exalted, descends every night to the lowest heaven when one-third of the latter part of the night is left, and says: Who supplicates Me so that I may answer him? Who asks Me so that I may give to him? Who asks Me forgiveness so that I may forgive him?",
     lastThirdAction: "Open Comprehensive Duas",
     completedTitle: "Completed {name} May Allah accept",
     completedSubtitle: "May Allah accept your worship and keep your heart steadfast in His remembrance",

@@ -38,7 +38,11 @@ describe("HomeScreen quick access", () => {
     );
 
     expect(screen.getByRole("heading", { name: "وقت الدعاء" })).toBeInTheDocument();
-    expect(screen.getByText("الثلث الأخير من الليل وقت للدعاء والسؤال والاستغفار")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "يَنْزِلُ رَبُّنَا تَبَارَكَ وَتَعَالَى كُلَّ لَيْلَةٍ إِلَى السَّمَاءِ الدُّنْيَا حِينَ يَبْقَى ثُلُثُ اللَّيْلِ الآخِرُ يَقُولُ: مَنْ يَدْعُونِي فَأَسْتَجِيبَ لَهُ؟ مَنْ يَسْأَلُنِي فَأُعْطِيَهُ؟ مَنْ يَسْتَغْفِرُنِي فَأَغْفِرَ لَهُ؟",
+      ),
+    ).toBeInTheDocument();
     expect(screen.queryByRole("radiogroup")).not.toBeInTheDocument();
     expect(screen.queryByText(/دقيقة/)).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: /افتح الأدعية الجامعة/ }));
