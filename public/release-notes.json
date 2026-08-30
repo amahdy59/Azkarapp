@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-29",
+  "release": "2026-08-30",
   "ar": [
-    "أضفنا أذكار المساء بصوت القارئ عبد الله محمد.",
-    "تم تحسين تصميم وتجاوب مشغل الصوت ليناسب جميع الشاشات (الجوال والتابلت والديسكتوب).",
-    "تظهر الآن أسماء القراء وأزرار التحكم باللغة العربية بشكل كامل."
+    "تتجدد الآن الأذكار اليومية والأوراد بشكل كامل تلقائيًا عند منتصف الليل.",
+    "تم تغيير العدد الافتراضي للصلاة على النبي في أذكار الصباح والمساء إلى 100 مرة.",
+    "إضافة حركة تمرير وانزلاق سلسة عند التنقل بين صفحات المصحف الشريف.",
+    "أصبح الاستماع لسورة الكهف بصوت القارئ محمد الشرع متاحاً الآن."
   ],
   "en": [
-    "Added Evening Azkar recitation by reciter Abdullah Muhammad.",
-    "Improved the audio player UI responsiveness across all screen sizes (mobile, tablet, and desktop).",
-    "Audio controls and reciter names are now fully localized."
+    "Daily Azkar and routines now fully reset automatically at midnight.",
+    "The default repetition count for sending blessings upon the Prophet in Morning and Evening Azkar is now 100.",
+    "Added a smooth sliding animation when navigating between pages in the Mushaf.",
+    "Surah Al-Kahf recitation by Muhammad Al-Shara is now available for listening."
   ]
 }
