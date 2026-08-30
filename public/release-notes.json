@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-30j",
+  "release": "2026-08-30k",
   "ar": [
-    "تحديث زخارف رؤوس السور بالنسخة المتجهة المحسنة (v2) بأبعاد متناسقة تمنع أي تشوه أو ضغط بصري.",
-    "تطبيق المواضع الدقيقة لرؤوس السور وفق مصحف المدينة (مثل رأس سورة النساء في نهاية صفحة ٧٦).",
-    "تنسيق متكامل لأوائل السور بإلغاء التكرار البصري وتوحيد مقاس وموضع البسملة في كافة الصفحات."
+    "محاذاة عنوان السورة بدقة متناهية في منتصف ومركز الزخرفة الإطارية (v2) دون أي إزاحة.",
+    "تثبيت طبقات الزخرفة كخلفية موضعية تضمن احتواء النص القرآني بشكل متوازن في كافة السمات.",
+    "تحسين التوافق البصري لخطوط العناوين والبسملة مع الحفاظ على الشبكة الكنسية لمصحف المدينة."
   ],
   "en": [
-    "Updated Surah header vector artwork (v2) with uncompressed, undistorted proportions across all themes.",
-    "Exact canonical Surah heading placements matching the Medina Mushaf (e.g. Surah An-Nisaa on page 76).",
-    "Streamlined opening page illumination and consistent Bismillah typography sizing across all Surahs."
+    "Perfect center and middle alignment of Surah titles inside the illuminated cartouche artwork (v2).",
+    "Layered vector backdrop architecture preventing text shifting or horizontal misplacement.",
+    "Refined visual harmony and font balance across all dark, midnight, and light themes."
   ]
 }

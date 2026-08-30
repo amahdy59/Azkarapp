@@ -122,12 +122,16 @@ function MushafSurahHeader({
 
   return (
     <div
-      className="relative flex h-full w-full min-w-0 items-center justify-center select-none px-4"
+      className="relative flex h-full w-full min-w-0 items-center justify-center select-none"
       dir="rtl"
       data-testid="mushaf-surah-heading"
       data-variant="pill"
     >
-      {!hideArtwork && <MushafSurahHeaderArt />}
+      {!hideArtwork && (
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
+          <MushafSurahHeaderArt className="h-full w-full max-w-full" />
+        </div>
+      )}
       <h2
         className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none text-foreground"
         style={{
