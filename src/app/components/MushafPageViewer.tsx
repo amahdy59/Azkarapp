@@ -18,6 +18,7 @@ import { getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
+import { MushafOpeningFrameArt } from "./MushafOpeningFrameArt";
 
 export interface MushafWordToken {
   verseKey: string;
@@ -125,7 +126,7 @@ function MushafSurahHeader({
     >
       <MushafSurahHeaderArt />
       <h2
-        className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none text-[#162420]"
+        className="arabic-ui relative z-10 shrink-0 whitespace-nowrap text-center font-bold leading-none text-foreground"
         style={{
           fontSize: compact ? "clamp(11px, min(3.8cqi, 2cqh), 15px)" : "clamp(13px, min(4.2cqi, 2.5cqh), 17px)",
         }}
@@ -623,13 +624,16 @@ function MushafPageCanvas({
   return (
     <div
       ref={canvasRef}
-      className={`${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2`}
+      className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2`}
       style={{ containerType: "size" }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
+      {OPENING_PAGES.has(pageNumber) && (
+        <MushafOpeningFrameArt className="absolute inset-0 h-full w-full pointer-events-none select-none opacity-85 z-0" />
+      )}
       <div
-        className={`flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
+        className={`relative z-10 flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
         style={{
           maxWidth: "var(--mushaf-measure, 100%)",
           fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
