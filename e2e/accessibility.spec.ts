@@ -153,7 +153,7 @@ test("initial flow has no automatically detectable WCAG A/AA violations", async 
   await page.goto("/");
   await expect(page.locator("#main-content")).toBeVisible();
   // Wait for the splash screen to finish by looking for the Language screen content
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
   await expectNoWcagViolations(page);
 });
 
@@ -167,7 +167,7 @@ test("skip link moves keyboard focus to the main content", async ({ page }) => {
 
 test("reduced motion reveals the skip link immediately when focused", async ({ page }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible({ timeout: 5000 });
+  await expect(page.getByRole("heading", { name: "Choose Your Language" })).toBeVisible();
   await page.locator("html").evaluate((element) => element.classList.add("reduce-motion"));
 
   const skipLink = page.locator(".skip-link");

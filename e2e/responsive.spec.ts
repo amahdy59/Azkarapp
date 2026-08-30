@@ -242,7 +242,7 @@ test("app navigation is hidden during onboarding at desktop width", async ({ pag
 test("desktop onboarding keeps related controls within the form measure and close together", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto("/");
-  await expect(page.getByTestId("language-option-en")).toBeVisible({ timeout: 5000 });
+  await expect(page.getByTestId("language-option-en")).toBeVisible();
 
   const expectFormMeasure = async () => {
     const content = page.getByTestId("pre-app-content");
@@ -305,7 +305,7 @@ test("desktop onboarding keeps related controls within the form measure and clos
 test("short desktop onboarding keeps Continue visible without a flexible-space gap", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 451 });
   await page.goto("/");
-  await expect(page.getByTestId("language-option-en")).toBeVisible({ timeout: 5000 });
+  await expect(page.getByTestId("language-option-en")).toBeVisible();
 
   const lastLanguage = page.getByTestId("language-option-ar");
   const continueButton = page.getByTestId("confirm-language");
