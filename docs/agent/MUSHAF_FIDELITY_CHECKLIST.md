@@ -213,7 +213,7 @@ ragged column. Numbering matches the review handed to the owner.
 - [x] **19.** Reading type size is a three-step reader choice that scales the ink allowance inside
       the slots (0.9 / 1.0 / 1.08, clamped at 0.94). It cannot add, remove, or re-break a line.
       (DEC-109)
-- [x] **20.** Supersedes 7–9 for landscape only: at 900px and wider in landscape the tools stand in
+- [x] **20.** Supersedes 7–9 for landscape only: on a landscape screen wide enough for a rail and tall enough to show all of it, the tools stand in
       a vertical rail beside the paper and the horizontal bars are not rendered. Nothing hides on a
       timer — focus mode is an explicit, reversible action, and portrait keeps the permanent bars.
       (DEC-109)

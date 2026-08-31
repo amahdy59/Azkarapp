@@ -503,3 +503,24 @@ describe("KhatmahReaderScreen quick menu", () => {
     expect(await screen.findByRole("tab", { name: /Bookmarks/, selected: true })).toBeInTheDocument();
   });
 });
+
+describe("KhatmahReaderScreen landscape phone", () => {
+  afterEach(() => setViewport(1024, 768));
+
+  it("keeps the bars on a phone held sideways, which cannot hold the rail without scrolling it", async () => {
+    setViewport(844, 390);
+    renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Page 42" });
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
+  });
+
+  it("takes the rail as soon as a landscape screen is tall enough to show all of it", async () => {
+    setViewport(900, 600);
+    renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Page 42" });
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "rail");
+    // Still one page: the spread gate is separate and this screen fails its
+    // 1024px width floor.
+    expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
+  });
+});

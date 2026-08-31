@@ -68,6 +68,10 @@ function fitsTwoPages(width: number, height: number) {
   return width >= 1024 && width / height >= 1.4;
 }
 
+/** The height the rail's controls occupy. Below this it would scroll, and a
+ *  toolbar you have to scroll to reach is worse than one that fits. */
+const RAIL_CONTENT_HEIGHT = 520;
+
 /**
  * Where the tools stand.
  *
@@ -75,9 +79,14 @@ function fitsTwoPages(width: number, height: number) {
  * chrome bars cost 112px of it and need no width at all. Standing them in a
  * rail beside the paper returns that height to the page. Portrait screens keep
  * the bars, because there width is what is short.
+ *
+ * The width floor is the tablet breakpoint rather than a desktop one, but the
+ * height floor is what actually decides it: a phone held sideways would need
+ * the rail most and can hold it least, so it keeps the bars, where every
+ * control is visible at once.
  */
 function fitsToolRail(width: number, height: number) {
-  return width >= 900 && width > height;
+  return width >= 768 && width > height && height >= RAIL_CONTENT_HEIGHT;
 }
 
 /** The right-hand page of a spread is the odd one: the Mushaf opens with page 1
@@ -290,14 +299,14 @@ export function KhatmahReaderScreen({
   const spreadRoom = autoSpreadRoom && mushafLayout !== "single";
   const useRail = shell.rail;
 
+  const paperRef = useRef<HTMLDivElement>(null);
+  const readerRootRef = useRef<HTMLDivElement>(null);
   /**
    * Focus mode lasts as long as the sitting, not as long as the account. It is
    * something you do when you settle in to read, and reopening the Mushaf
    * tomorrow to a page with no visible controls would be a puzzle, not a
    * preference honoured.
    */
-  const paperRef = useRef<HTMLDivElement>(null);
-  const readerRootRef = useRef<HTMLDivElement>(null);
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
@@ -814,7 +823,7 @@ export function KhatmahReaderScreen({
       data-testid="mushaf-focus-exit"
       aria-label={t(language, "mushaf.focusModeExit")}
       title={t(language, "mushaf.focusModeExit")}
-      className="group absolute inset-x-0 bottom-0 z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
     >
       <span
         aria-hidden="true"

@@ -372,8 +372,14 @@
    through `color-mix`, which would cost a duplicated `@supports` rule for every
    declaration that used it.
 --------------------------------------------------------------------------- */
+/* The frame is the paper, so it follows the type: it stops where the page's own
+   measure stops rather than spanning canvas the text never reaches. Facing
+   pages share a slot height and QCF cuts every full line on a page to the same
+   natural width, so the two halves land within a pixel of each other. */
 .mushaf-page-frame {
-  padding-inline: clamp(0.35rem, 1.6cqi, 0.9rem);
+  --mushaf-frame-pad: clamp(0.35rem, 1.6cqi, 0.9rem);
+  max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
+  padding-inline: var(--mushaf-frame-pad);
 }
 
 .mushaf-page-furniture {

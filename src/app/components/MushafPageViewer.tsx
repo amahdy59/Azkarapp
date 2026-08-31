@@ -778,7 +778,11 @@ function MushafPageCanvas({
           </div>
         </>
       ) : (
-        <div className="mushaf-page-frame relative z-10 flex h-full w-full flex-col">
+        <div
+          className={`mushaf-page-frame relative z-10 flex h-full w-full flex-col ${
+            spreadSide === "right" ? "mr-auto ml-0" : spreadSide === "left" ? "mr-0 ml-auto" : "mx-auto"
+          }`}
+        >
           {/* The manuscript rule, drawn in the page's own ink. */}
           <div className="pointer-events-none absolute inset-0 rounded-sm border opacity-20" aria-hidden="true" />
           {showPageIdentity && (
@@ -788,9 +792,8 @@ function MushafPageCanvas({
               geometry assertions that guard DEC-089. */}
           <div
             data-mushaf-column=""
-            className={`flex min-h-0 w-full flex-1 flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
+            className="flex min-h-0 w-full flex-1 flex-col"
             style={{
-              maxWidth: "var(--mushaf-measure, 100%)",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
                 ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
