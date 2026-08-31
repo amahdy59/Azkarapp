@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31a",
+  "release": "2026-08-31b",
   "ar": [
-    "إضافة الإطار الزخرفي الزمردي الأصيل لصفحتي البداية (الفاتحة وأول البقرة) بتطابق كامل مع مصحف المدينة.",
-    "محاذاة دقيقة لعنوان السورة داخل الإطار العلوي والآيات داخل القنديل المركزي بنفس حجم خط نصوص المصحف.",
-    "توافق لوني كامل مع كافة السمات الفاتحة والداكنة مع تحسين سلاسة التنقل والانتقال بين صفحات المصحف."
+    "شريط زخرفي متناظر بدقة وعالي الجودة لعناوين السور يتكيف لونيًا مع كافة السمات الفاتحة والداكنة.",
+    "رسم خطي أصيل عالي الدقة للبسملة الشريفة في مطلع السور متناسق مع حجم الصفحة والخط.",
+    "ضبط عداد الصلاة على النبي ﷺ إلى ١٠ في أذكار الصباح والمساء وفق السنة، مع تثبيت هدف ١٠٠ في رفيق الجمعة."
   ],
   "en": [
-    "Authentic emerald illuminated manuscript border for opening pages (Al-Fatihah and Al-Baqarah start).",
-    "Precise alignment of Surah cartouche headers and medallion verses matching standard Mushaf font sizes.",
-    "Full theme adaptation across dark and light modes with enhanced, high-performance page transitions."
+    "Symmetrical high-fidelity Surah header illumination band adapting dynamically across all themes.",
+    "Authentic Basmalah vector calligraphy rendered crisply across all Surah openings in the Mushaf.",
+    "Calibrated Salawat on the Prophet ﷺ counter to 10 in daily Azkar and 100 in the Friday companion."
   ]
 }

@@ -20,6 +20,7 @@ import { getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
+import { MushafBismillahArt } from "./MushafBismillahArt";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
 
 const MushafOpeningFrameArt = lazy(() => import("./MushafOpeningFrameArt"));
@@ -148,23 +149,6 @@ function MushafSurahHeader({
   );
 }
 
-const BISMILLAH_FONT_SIZE = "clamp(13px, min(5.2cqi, 2.4cqh), 22px)";
-
-function BismillahText({ text }: { text: string }) {
-  return (
-    <p
-      className="leading-none tracking-[0.03em] select-none"
-      style={{
-        fontFamily: "var(--font-mushaf)",
-        fontSize: BISMILLAH_FONT_SIZE,
-      }}
-      data-testid="mushaf-bismillah"
-    >
-      {text}
-    </p>
-  );
-}
-
 /**
  * Nineteen surahs begin on the second line of their page, leaving exactly one
  * slot where the heading and the basmalah both belong. The old inference put
@@ -198,7 +182,7 @@ function SurahOpeningBand({
       </div>
       {withBismillah && (
         <div className="flex h-full min-h-0 items-center justify-center">
-          <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
+          <MushafBismillahArt className="h-full max-h-[85%] max-w-[65%] w-auto object-contain select-none" />
         </div>
       )}
     </div>
@@ -208,7 +192,7 @@ function SurahOpeningBand({
 function BismillahLine() {
   return (
     <div className="flex h-full w-full items-center justify-center select-none" dir="rtl">
-      <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
+      <MushafBismillahArt className="h-full max-h-[75%] max-w-[65%] w-auto object-contain select-none" />
     </div>
   );
 }
@@ -682,8 +666,8 @@ function MushafPageCanvas({
               WebkitTextStrokeColor: "currentColor",
             }}
           >
-            <div className="w-full flex items-center justify-center">
-              <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
+            <div className="w-full flex items-center justify-center h-[14%]">
+              <MushafBismillahArt className="h-full max-h-[90%] max-w-[60%] w-auto object-contain select-none" />
             </div>
             {lineDetails
               .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")

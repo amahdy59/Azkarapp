@@ -210,10 +210,9 @@ describe("MushafPageViewer", () => {
     );
 
     expect(screen.getAllByText("سورة آل عمران").length).toBeGreaterThanOrEqual(1);
-    const bismillah = screen.getByText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
-    expect(bismillah).toHaveStyle({
-      fontFamily: "var(--font-mushaf)",
-    });
+    const bismillah = screen.getByLabelText("بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ");
+    expect(bismillah).toBeInTheDocument();
+    expect(bismillah).toHaveAttribute("role", "img");
     expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 2, name: "سورة آل عمران" })).toBeInTheDocument();
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();

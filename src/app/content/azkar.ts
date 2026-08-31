@@ -553,8 +553,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     transliteration: "All\u0101humma \u1e63alli wa sallim \u02bfal\u0101 nabiyyin\u0101 Mu\u1e25ammad.",
     translation: "O Allah, send prayers and peace upon our Prophet Muhammad.",
     benefit: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
-    repetitionCount: 100,
-    countLabel: "100",
+    repetitionCount: 10,
+    countLabel: "10",
     sourceReference: "At-Tabarani; Haythami Majma\u02bf az-Zawa\u2019id 10/120; Hisn al-Muslim 98.",
     preferredTiming: "Morning and evening.",
     hadithText:
