@@ -178,6 +178,8 @@ function AppContent() {
     setActiveSubCategory,
     activeIdx,
     setActiveIdx,
+    quranPage,
+    setQuranPage,
     searchQuery,
     setSearchQuery,
     librarySection,
@@ -248,7 +250,24 @@ function AppContent() {
   );
   const [dailyCompletions, setDailyCompletions] = useState(initialState.dailyCompletions);
   const [prayerTracking, setPrayerTracking] = useState(initialState.prayerTracking);
-  const [khatmahPage, setKhatmahPage] = useState(initialState.khatmahPage ?? 1);
+  const [khatmahPage, setKhatmahPage] = useState(() => quranPage ?? initialState.khatmahPage ?? 1);
+
+  useEffect(() => {
+    if (quranPage && quranPage !== khatmahPage) {
+      setKhatmahPage(quranPage);
+    }
+  }, [quranPage, khatmahPage]);
+
+  const handleKhatmahPageChange = useCallback(
+    (pageOrUpdater: number | ((prev: number) => number)) => {
+      setKhatmahPage((prev) => {
+        const next = typeof pageOrUpdater === "function" ? pageOrUpdater(prev) : pageOrUpdater;
+        setQuranPage(next);
+        return next;
+      });
+    },
+    [setQuranPage],
+  );
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
   const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
@@ -1474,7 +1493,7 @@ function AppContent() {
                   direction={layoutDirection}
                   onBack={pop}
                   khatmahPage={khatmahPage}
-                  setKhatmahPage={setKhatmahPage}
+                  setKhatmahPage={handleKhatmahPageChange}
                   progressDayStartHour={progressDayStartHour}
                   reduceMotion={reduceMotion}
                   mushafTheme={mushafTheme}

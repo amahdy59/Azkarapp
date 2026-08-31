@@ -51,6 +51,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   const [activeCat, setActiveCat] = useState<CategoryId>(initialRoute?.categoryId ?? "morning");
   const [activeSubCategory, setActiveSubCategory] = useState<string | undefined>(undefined);
   const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
+  const [quranPage, setQuranPage] = useState<number | undefined>(initialRoute?.page);
   const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
   const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
 
@@ -128,13 +129,19 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   }, [initialHistoryView]);
 
   useEffect(() => {
-    const hash = routeToHash({ view, categoryId: activeCat, index: activeIdx, query: searchQuery });
+    const hash = routeToHash({
+      view,
+      categoryId: activeCat,
+      index: activeIdx,
+      query: searchQuery,
+      page: quranPage,
+    });
     if (!hash) return;
     const target = `${window.location.pathname}${hash}`;
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
-  }, [view, activeCat, activeIdx, searchQuery]);
+  }, [view, activeCat, activeIdx, searchQuery, quranPage]);
 
   const applyRouteFromLocation = useCallback((): boolean => {
     const route = parseLocation(window.location.search, window.location.hash);
@@ -143,6 +150,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     startSafeViewTransition(() => {
       flushSync(() => {
         setView(route.view);
+        if (route.page !== undefined) setQuranPage(route.page);
         if (route.categoryId) {
           setActiveCat(route.categoryId);
           if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
@@ -286,6 +294,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     setActiveSubCategory,
     activeIdx,
     setActiveIdx,
+    quranPage,
+    setQuranPage,
     searchQuery,
     setSearchQuery,
     librarySection,

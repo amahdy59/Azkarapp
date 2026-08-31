@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31b",
+  "release": "2026-08-31c",
   "ar": [
-    "شريط زخرفي متناظر بدقة وعالي الجودة لعناوين السور يتكيف لونيًا مع كافة السمات الفاتحة والداكنة.",
-    "رسم خطي أصيل عالي الدقة للبسملة الشريفة في مطلع السور متناسق مع حجم الصفحة والخط.",
-    "ضبط عداد الصلاة على النبي ﷺ إلى ١٠ في أذكار الصباح والمساء وفق السنة، مع تثبيت هدف ١٠٠ في رفيق الجمعة."
+    "حفظ وتحديث رقم صفحة المصحف الشريف في عنوان الصفحة (#/quran/50) للاستئناف المباشر عند التحديث أو المشاركة.",
+    "إطار مخطوطة إسلامية مقوس وأصيل لصفحتي الفاتحة ومطلع البقرة بنسب هندسية وتناسق تام.",
+    "توزيع متوازن ومريح لعنوان السورة والبسملة الشريفة والآيات داخل الإطار المقوس عبر كافة السمات."
   ],
   "en": [
-    "Symmetrical high-fidelity Surah header illumination band adapting dynamically across all themes.",
-    "Authentic Basmalah vector calligraphy rendered crisply across all Surah openings in the Mushaf.",
-    "Calibrated Salawat on the Prophet ﷺ counter to 10 in daily Azkar and 100 in the Friday companion."
+    "Deep-linked URL hash routing for the Quran reader (#/quran/:page) preserving your exact page on refresh and sharing.",
+    "Authentic arched Islamic illuminated manuscript frame for Al-Fatihah and the opening of Al-Baqarah.",
+    "Balanced typography layout placing Surah title, Basmalah, and verses harmoniously within the manuscript arch."
   ]
 }

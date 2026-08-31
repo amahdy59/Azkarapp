@@ -632,68 +632,64 @@ function MushafPageCanvas({
               className="absolute inset-0 h-full w-full pointer-events-none select-none z-0"
             />
           </Suspense>
-          {/* Top Cartouche Pill */}
+          {/* Content Area within Arch */}
           <div
-            className="absolute z-10 flex items-center justify-center text-center pointer-events-none select-none"
+            className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "17.2%",
-              height: "6.5%",
-              left: pageNumber === 1 ? "28%" : "17%",
-              right: pageNumber === 1 ? "17%" : "28%",
-            }}
-          >
-            <h2
-              className="arabic-ui font-bold leading-none text-foreground"
-              style={{ fontSize: "clamp(12px, min(4.2cqi, 2.4cqh), 18px)" }}
-              data-testid="mushaf-surah-title"
-            >
-              {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
-            </h2>
-          </div>
-          {/* Central Circular Medallion */}
-          <div
-            className="absolute z-10 flex flex-col justify-evenly items-center text-center px-1"
-            style={{
-              top: "29.5%",
-              bottom: "27%",
-              left: pageNumber === 1 ? "23%" : "12%",
-              right: pageNumber === 1 ? "12%" : "23%",
+              top: "9%",
+              bottom: "14%",
+              left: "12%",
+              right: "12%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(4.2cqi, 4.2cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.4cqi, 3.8cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
           >
-            <div className="w-full flex items-center justify-center h-[14%]">
-              <MushafBismillahArt className="h-full max-h-[90%] max-w-[60%] w-auto object-contain select-none" />
+            {/* Top Surah Title */}
+            <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0">
+              <h2
+                className="arabic-ui font-bold leading-none text-foreground"
+                style={{ fontSize: "clamp(13px, min(4.2cqi, 2.4cqh), 19px)" }}
+                data-testid="mushaf-surah-title"
+              >
+                {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
+              </h2>
             </div>
-            {lineDetails
-              .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
-              .map((line, lineIdx) => (
-                <div key={lineIdx} className="w-full flex items-center justify-center">
-                  <MushafTextLine
-                    words={line.words}
-                    language={language}
-                    theme={theme}
-                    useQcfGlyphs={useQcfGlyphs}
-                    showWordMeanings={showWordMeanings}
-                    meanings={meanings}
-                    activeWord={
-                      activeWord &&
-                      line.words.some(
-                        (w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition,
-                      )
-                        ? activeWord
-                        : null
-                    }
-                    highlightedVerseKey={highlightedVerseKey}
-                    onActiveWordChange={handleActiveWordChange}
-                    onAyahAction={handleAyahAction}
-                  />
-                </div>
-              ))}
+            {/* Basmalah */}
+            <div className="w-full flex items-center justify-center shrink-0 h-[12%] min-h-0 my-0.5">
+              <MushafBismillahArt className="h-full max-h-[90%] max-w-[55%] w-auto object-contain select-none" />
+            </div>
+            {/* Verses */}
+            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0">
+              {lineDetails
+                .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
+                .map((line, lineIdx) => (
+                  <div key={lineIdx} className="w-full flex items-center justify-center min-h-0">
+                    <MushafTextLine
+                      words={line.words}
+                      language={language}
+                      theme={theme}
+                      useQcfGlyphs={useQcfGlyphs}
+                      showWordMeanings={showWordMeanings}
+                      meanings={meanings}
+                      activeWord={
+                        activeWord &&
+                        line.words.some(
+                          (w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition,
+                        )
+                          ? activeWord
+                          : null
+                      }
+                      highlightedVerseKey={highlightedVerseKey}
+                      onActiveWordChange={handleActiveWordChange}
+                      onAyahAction={handleAyahAction}
+                    />
+                  </div>
+                ))}
+            </div>
           </div>
         </>
       ) : (

@@ -23,11 +23,14 @@ export interface RouteState {
   /** Zero-based index into the collection; the URL shows it one-based. */
   index?: number;
   query?: string;
+  page?: number;
 }
 
 /** Views that map to a stable, linkable path. */
 const VIEW_PATHS = {
   khatmah_overview: "/quran-wird",
+  khatmah: "/quran",
+  wird_benefits: "/quran-wird/benefits",
   home: "/home",
   library: "/azkar",
   progress: "/progress",
@@ -55,7 +58,7 @@ function categoryFromSlug(slug: string): CategoryId | undefined {
  * URL at all (onboarding and auth steps).
  */
 export function routeToHash(route: RouteState): string | null {
-  const { view, categoryId, index, query } = route;
+  const { view, categoryId, index, query, page } = route;
 
   if (view === "category" && categoryId) {
     return `#/azkar/${categorySlug(categoryId)}`;
@@ -64,6 +67,18 @@ export function routeToHash(route: RouteState): string | null {
   if (view === "reader" && categoryId) {
     // One-based so the URL matches how the reader labels the zikr on screen.
     return `#/azkar/${categorySlug(categoryId)}/${(index ?? 0) + 1}`;
+  }
+
+  if (view === "khatmah") {
+    return page && page > 1 ? `#/quran/${page}` : "#/quran";
+  }
+
+  if (view === "khatmah_overview") {
+    return "#/quran-wird";
+  }
+
+  if (view === "wird_benefits") {
+    return "#/quran-wird/benefits";
   }
 
   if (view === "search") {
@@ -75,7 +90,7 @@ export function routeToHash(route: RouteState): string | null {
   return path ? `#${path}` : null;
 }
 
-/** Parses a hash such as `#/azkar/morning/5`. Returns null when unrecognised. */
+/** Parses a hash such as `#/azkar/morning/5` or `#/quran/50`. Returns null when unrecognised. */
 export function parseHash(hash: string): RouteState | null {
   const raw = hash.replace(/^#/, "");
   if (!raw || raw === "/") return null;
@@ -94,6 +109,22 @@ export function parseHash(hash: string): RouteState | null {
     const oneBased = Number(segments[2]);
     if (!Number.isInteger(oneBased) || oneBased < 1) return null;
     return { view: "reader", categoryId, index: oneBased - 1 };
+  }
+
+  if (segments[0] === "quran" || segments[0] === "mushaf") {
+    if (segments.length >= 2) {
+      if (segments[1] === "benefits") return { view: "wird_benefits" };
+      const pageNum = Number(segments[1]);
+      if (Number.isInteger(pageNum) && pageNum >= 1 && pageNum <= 604) {
+        return { view: "khatmah", page: pageNum };
+      }
+    }
+    return { view: "khatmah", page: 1 };
+  }
+
+  if (segments[0] === "quran-wird") {
+    if (segments[1] === "benefits") return { view: "wird_benefits" };
+    return { view: "khatmah_overview" };
   }
 
   if (segments[0] === "search") {
@@ -133,6 +164,9 @@ export function parseLocation(search: string, hash: string): RouteState | null {
   // `?view=friday_salawat` and friends predate the hash routes.
   if (legacyView === "custom_counter") return { view: "custom_counter" };
   if (legacyView === "friday") return { view: "friday" };
+  if (legacyView === "khatmah") return { view: "khatmah" };
+  if (legacyView === "khatmah_overview") return { view: "khatmah_overview" };
+  if (legacyView === "wird_benefits") return { view: "wird_benefits" };
 
   return null;
 }

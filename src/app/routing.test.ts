@@ -9,6 +9,10 @@ describe("routeToHash", () => {
     expect(routeToHash({ view: "settings" })).toBe("#/settings");
     expect(routeToHash({ view: "friday_salawat" })).toBe("#/friday/salawat");
     expect(routeToHash({ view: "custom_counter" })).toBe("#/counter");
+    expect(routeToHash({ view: "khatmah" })).toBe("#/quran");
+    expect(routeToHash({ view: "khatmah", page: 50 })).toBe("#/quran/50");
+    expect(routeToHash({ view: "khatmah_overview" })).toBe("#/quran-wird");
+    expect(routeToHash({ view: "wird_benefits" })).toBe("#/quran-wird/benefits");
   });
 
   it("includes the collection and a one-based zikr position", () => {
@@ -40,9 +44,16 @@ describe("parseHash", () => {
       { view: "friday" },
       { view: "friday_salawat" },
       { view: "custom_counter" },
+      { view: "khatmah_overview" },
+      { view: "wird_benefits" },
     ] as const) {
       expect(parseHash(routeToHash(route)!)).toEqual(route);
     }
+  });
+
+  it("round-trips Quran reader page numbers", () => {
+    expect(parseHash("#/quran/50")).toEqual({ view: "khatmah", page: 50 });
+    expect(parseHash("#/mushaf/100")).toEqual({ view: "khatmah", page: 100 });
   });
 
   it("reads a reader position back as a zero-based index", () => {
