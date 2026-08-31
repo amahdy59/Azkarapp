@@ -220,6 +220,7 @@ const MushafTextLine = memo(function MushafTextLine({
   meanings,
   activeWord,
   highlightedVerseKey,
+  justifyCenter = false,
   onActiveWordChange,
   onAyahAction,
 }: {
@@ -233,6 +234,7 @@ const MushafTextLine = memo(function MushafTextLine({
    *  re-rendered all fifteen lines every time a popover opened. */
   activeWord: ActiveWord | null;
   highlightedVerseKey?: string | null;
+  justifyCenter?: boolean;
   onActiveWordChange: (word: ActiveWord | null) => void;
   onAyahAction?: (verseKey: string) => void;
 }) {
@@ -241,16 +243,14 @@ const MushafTextLine = memo(function MushafTextLine({
     // line fits the page width, and Arabic diacritics reach into the space
     // between lines exactly as they do in print.
     <div data-mushaf-line="" className="flex h-full w-full min-w-0 items-center justify-center">
-      {/* The printed Mushaf justifies every line to both margins, so the words
-          are spread rather than centred. Lines whose natural width still
-          exceeds the page get scaled by the fitter above — never clipped. */}
+      {/* The printed Mushaf justifies ordinary lines to both margins.
+          Opening pages use natural center alignment without artificial wide gaps. */}
       <div
         data-mushaf-line-content=""
-        // No inter-word gap in QCF: the glyph advances already carry the
-        // spacing the page was cut with, and adding our own widened it. The
-        // Unicode fallback has no such spacing built in, so it keeps the gap.
-        className={`flex w-full shrink-0 flex-nowrap items-baseline justify-between whitespace-nowrap ${
-          useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"
+        className={`flex shrink-0 flex-nowrap items-baseline whitespace-nowrap ${
+          justifyCenter
+            ? `w-auto justify-center ${useQcfGlyphs ? "gap-x-1 min-[360px]:gap-x-1.5" : "gap-x-1.5 min-[360px]:gap-x-2"}`
+            : `w-full justify-between ${useQcfGlyphs ? "gap-x-0" : "gap-x-0.5"}`
         }`}
       >
         {words.map((w, wIdx) => {
@@ -636,36 +636,26 @@ function MushafPageCanvas({
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "7%",
-              bottom: "7%",
-              left: "15%",
-              right: "15%",
+              top: "8%",
+              bottom: "8%",
+              left: "14%",
+              right: "14%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(3.6cqi, 3.6cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(2.9cqi, 3.1cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(4.4cqi, 4.4cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.5cqi, 3.8cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
           >
-            {/* Top Surah Title */}
-            <div className="w-full flex items-center justify-center shrink-0 h-[8%] min-h-0">
-              <h2
-                className="arabic-ui font-bold leading-none text-foreground"
-                style={{ fontSize: "clamp(12px, min(3.6cqi, 2.0cqh), 16px)" }}
-                data-testid="mushaf-surah-title"
-              >
-                {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
-              </h2>
-            </div>
             {/* Basmalah: Al-Fatihah (page 1) has only one Basmalah which is Ayah 1 in its text lines */}
             {pageNumber !== 1 && (
-              <div className="w-full flex items-center justify-center shrink-0 h-[9%] min-h-0 my-0.5">
-                <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
+              <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0 mb-1">
+                <MushafBismillahArt className="h-full max-h-[85%] max-w-[38%] w-auto object-contain select-none" />
               </div>
             )}
             {/* Verses */}
-            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-1">
+            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-0.5">
               {lineDetails
                 .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
                 .map((line, lineIdx) => (
@@ -677,6 +667,7 @@ function MushafPageCanvas({
                       useQcfGlyphs={useQcfGlyphs}
                       showWordMeanings={showWordMeanings}
                       meanings={meanings}
+                      justifyCenter={true}
                       activeWord={
                         activeWord &&
                         line.words.some(

@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31g",
+  "release": "2026-08-31h",
   "ar": [
-    "إعادة صياغة إطار الفاتحة المتجهي ليحتوي كامل النصوص القرآنية والترويسة داخل التصميم بأناقة وتناسق.",
-    "تبسيط الإطار بإبراز القوس الهندسي والزخرفة المحيطية وإتاحة كامل المساحة الداخلية للقراءة المريحة.",
-    "ضبط هوامش ومقاييس الخطوط لمنع أي فيض نصي في كافة أوضاع العرض المفردة والمزدوجة."
+    "تكبير خط آيات المصحف في صفحات البداية لتطابق حجم المصحف الطبيعي مع تباعد مريح ومنع التبرير القسري للكلمات.",
+    "إزالة تكرار عنوان السورة داخل الإطار الزخرفي للاكتفاء بعنوان الترويسة العليا وإتاحة مساحة رحبة للآيات.",
+    "توسيع هوامش القوس الزخرفي لضمان احتواء كامل الكلمات الشريفة دون ملامسة الحواف المذهبة."
   ],
   "en": [
-    "Refined illuminated manuscript vector frame to contain all opening verses and titles completely inside the design.",
-    "Simplified outline frame geometry with generous interior canvas for optimal reading clarity.",
-    "Calibrated responsive margins and typography to ensure perfect containment across single and spread views."
+    "Increased Quranic font size on opening pages to match natural Mushaf measure with natural word spacing and zero forced justification.",
+    "Removed duplicate in-frame surah title to rely cleanly on header navigation and expand sacred text measure.",
+    "Calibrated ornamental arch padding to ensure all verses sit comfortably inside the illuminated frame."
   ]
 }
