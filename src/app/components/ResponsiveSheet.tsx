@@ -36,6 +36,15 @@ interface ModalProps {
   /** Defaults to the DEC-004 reading measure. */
   maxWidthClassName?: string;
   className?: string;
+  /**
+   * Overrides the scrim. A surface whose controls change what is behind it —
+   * the Mushaf's reading settings — wants the page legible while it is open,
+   * rather than choosing a theme against a grey field.
+   *
+   * Keep utility-shaped words out of this comment: Tailwind v4 scans comments
+   * for class candidates, and a bare one here compiles a rule nothing uses.
+   */
+  overlayClassName?: string;
 }
 
 /**
@@ -54,6 +63,7 @@ export function Modal({
   describedById,
   maxWidthClassName = "max-w-[var(--content-reading)]",
   className = "",
+  overlayClassName,
 }: ModalProps) {
   useRestoreFocusOnClose(open);
 
@@ -65,7 +75,13 @@ export function Modal({
       }}
     >
       <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-standard" />
+        <DialogPrimitive.Overlay
+          className={
+            overlayClassName
+              ? `fixed inset-0 z-[100] animate-in fade-in-0 duration-standard ${overlayClassName}`
+              : "fixed inset-0 z-[100] bg-black/60 backdrop-blur-md animate-in fade-in-0 duration-standard"
+          }
+        />
         <DialogPrimitive.Content
           data-testid={testId}
           data-prevent-count="true"
@@ -107,6 +123,7 @@ export function ResponsiveSheet({
   testId,
   describedById,
   maxWidthClassName,
+  overlayClassName,
   dialogClassName = "",
   drawerClassName = "",
 }: ResponsiveSheetProps) {
@@ -137,6 +154,7 @@ export function ResponsiveSheet({
         testId={testId}
         describedById={describedById}
         maxWidthClassName={maxWidthClassName}
+        overlayClassName={overlayClassName}
         className={dialogClassName}
       >
         {children}

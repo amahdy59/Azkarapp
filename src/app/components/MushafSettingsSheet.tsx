@@ -134,6 +134,9 @@ export function MushafSettingsSheet({
       direction={direction}
       testId="mushaf-settings-sheet"
       maxWidthClassName="max-w-md"
+      // Theme, type size, and layout all change the page behind this sheet.
+      // Blurring it out would mean choosing them blind.
+      overlayClassName="bg-black/50"
       dialogClassName={sheetSurfaceClass}
       drawerClassName={sheetSurfaceClass}
     >
