@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31c",
+  "release": "2026-08-31d",
   "ar": [
-    "حفظ وتحديث رقم صفحة المصحف الشريف في عنوان الصفحة (#/quran/50) للاستئناف المباشر عند التحديث أو المشاركة.",
-    "إطار مخطوطة إسلامية مقوس وأصيل لصفحتي الفاتحة ومطلع البقرة بنسب هندسية وتناسق تام.",
-    "توزيع متوازن ومريح لعنوان السورة والبسملة الشريفة والآيات داخل الإطار المقوس عبر كافة السمات."
+    "اعتماد الرسم المتجهي الأصيل (SVG) لإطار سورتي الفاتحة ومطلع البقرة بنقاء بصري وتناغم لوني تام.",
+    "توزيع دقيق ومحاذاة متناسقة لعنوان السورة والبسملة الشريفة والآيات داخل مساحة الإطار الزخرفي.",
+    "حفظ وتحديث رقم صفحة المصحف في عنوان URL للاستئناف الفوري عند التحديث أو المشاركة."
   ],
   "en": [
-    "Deep-linked URL hash routing for the Quran reader (#/quran/:page) preserving your exact page on refresh and sharing.",
-    "Authentic arched Islamic illuminated manuscript frame for Al-Fatihah and the opening of Al-Baqarah.",
-    "Balanced typography layout placing Surah title, Basmalah, and verses harmoniously within the manuscript arch."
+    "Native high-fidelity SVG vector illumination frame for Al-Fatihah and the opening of Al-Baqarah.",
+    "Harmonious alignment of the Surah title, Basmalah, and verses perfectly contained within the vector frame.",
+    "Deep-linked Quran page URL routing preserving reading position across page refreshes and links."
   ]
 }
