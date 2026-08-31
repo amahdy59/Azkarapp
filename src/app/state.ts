@@ -4,6 +4,7 @@ import type {
   CategoryId,
   ColorBlindSupport,
   LocationSettings,
+  MushafTextScale,
   MushafTheme,
   PrayerTrackingRecord,
   QuranReadingEvent,
@@ -121,6 +122,8 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   khatmahPage: 1,
   mushafTheme: "follow-app",
   mushafLayout: "auto",
+  mushafToolbarSide: "right",
+  mushafTextScale: "medium",
   mushafBookmarks: [],
   quranReadingBookmark: undefined,
   mushafVerseBookmarks: [],
@@ -145,6 +148,10 @@ function normalizeMushafTheme(value: unknown): MushafTheme {
   if (value === "parchment") return "follow-app";
   if (value === "white") return "light";
   return "follow-app";
+}
+
+function normalizeMushafTextScale(value: unknown): MushafTextScale {
+  return value === "small" || value === "large" ? value : "medium";
 }
 
 function normalizeQuranReadingPosition(value: unknown): QuranReadingPosition {
@@ -716,6 +723,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         : 1,
     mushafTheme: normalizeMushafTheme(parsed.mushafTheme),
     mushafLayout: parsed.mushafLayout === "single" || parsed.mushafLayout === "spread" ? parsed.mushafLayout : "auto",
+    mushafToolbarSide: parsed.mushafToolbarSide === "left" ? "left" : "right",
+    mushafTextScale: normalizeMushafTextScale(parsed.mushafTextScale),
     mushafBookmarks: Array.isArray(parsed.mushafBookmarks)
       ? Array.from(
           new Set(
@@ -1011,6 +1020,8 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       incoming.mushafLayout === "single" || incoming.mushafLayout === "spread"
         ? incoming.mushafLayout
         : (safeBase.mushafLayout ?? "auto"),
+    mushafToolbarSide: (incoming.mushafToolbarSide ?? safeBase.mushafToolbarSide) === "left" ? "left" : "right",
+    mushafTextScale: normalizeMushafTextScale(incoming.mushafTextScale ?? safeBase.mushafTextScale),
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
     quranReadingBookmark: normalizeOptionalQuranReadingPosition(
       incoming.quranReadingBookmark ?? safeBase.quranReadingBookmark,

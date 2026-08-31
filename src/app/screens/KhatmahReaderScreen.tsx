@@ -4,6 +4,8 @@ import { t } from "../i18n";
 import type {
   AppLanguage,
   MushafLayout,
+  MushafTextScale,
+  MushafToolbarSide,
   MushafTheme,
   QuranReadingPosition,
   QuranVerseBookmark,
@@ -21,13 +23,16 @@ import {
   ArrowLeft,
   BookOpen,
   ChevronDown,
+  MoreVertical,
   SlidersHorizontal,
 } from "../components/icons";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
-import { getSurahDisplayName, getJuzNumberForPage } from "../content/surahInfo";
+import { MushafToolRail } from "../components/MushafToolRail";
+import { MushafQuickMenu } from "../components/MushafQuickMenu";
+import { getSurahDisplayName, getSurahShortName, getJuzNumberForPage } from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
 import { formatNumerals } from "../formatting";
 import { getProgressDayKey } from "../progress";
@@ -61,6 +66,18 @@ const FONT_WAIT_MS = 1200;
  */
 function fitsTwoPages(width: number, height: number) {
   return width >= 1024 && width / height >= 1.4;
+}
+
+/**
+ * Where the tools stand.
+ *
+ * On a landscape screen the scarce dimension is height: the two horizontal
+ * chrome bars cost 112px of it and need no width at all. Standing them in a
+ * rail beside the paper returns that height to the page. Portrait screens keep
+ * the bars, because there width is what is short.
+ */
+function fitsToolRail(width: number, height: number) {
+  return width >= 900 && width > height;
 }
 
 /** The right-hand page of a spread is the odd one: the Mushaf opens with page 1
@@ -136,6 +153,10 @@ export function KhatmahReaderScreen({
   setMushafTheme: onUpdateTheme,
   mushafLayout = "auto",
   setMushafLayout,
+  mushafToolbarSide = "right",
+  setMushafToolbarSide,
+  mushafTextScale = "medium",
+  setMushafTextScale,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
   quranReadingBookmark,
@@ -159,6 +180,10 @@ export function KhatmahReaderScreen({
   setMushafTheme?: (theme: MushafTheme) => void;
   mushafLayout?: MushafLayout;
   setMushafLayout?: (layout: MushafLayout) => void;
+  mushafToolbarSide?: MushafToolbarSide;
+  setMushafToolbarSide?: (side: MushafToolbarSide) => void;
+  mushafTextScale?: MushafTextScale;
+  setMushafTextScale?: (scale: MushafTextScale) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
   quranReadingBookmark?: QuranReadingPosition;
@@ -222,21 +247,79 @@ export function KhatmahReaderScreen({
     return () => window.clearTimeout(timer);
   }, [highlightedVerseKey]);
 
-  const [autoSpreadRoom, setSpreadRoom] = useState(
-    () => typeof window !== "undefined" && fitsTwoPages(window.innerWidth, window.innerHeight),
+  /**
+   * One measurement drives both physical gates: whether two pages fit, and
+   * whether the tools stand beside the paper or across it. Measuring once keeps
+   * the two from disagreeing mid-resize.
+   */
+  const [shell, setShell] = useState(() =>
+    typeof window === "undefined"
+      ? { spreadRoom: false, rail: false, railCompact: false }
+      : {
+          spreadRoom: fitsTwoPages(window.innerWidth, window.innerHeight),
+          rail: fitsToolRail(window.innerWidth, window.innerHeight),
+          railCompact: window.innerWidth < 1200,
+        },
   );
 
   useEffect(() => {
-    const measure = () => setSpreadRoom(fitsTwoPages(window.innerWidth, window.innerHeight));
+    const measure = () =>
+      setShell((current) => {
+        const next = {
+          spreadRoom: fitsTwoPages(window.innerWidth, window.innerHeight),
+          rail: fitsToolRail(window.innerWidth, window.innerHeight),
+          railCompact: window.innerWidth < 1200,
+        };
+        return current.spreadRoom === next.spreadRoom &&
+          current.rail === next.rail &&
+          current.railCompact === next.railCompact
+          ? current
+          : next;
+      });
     measure();
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    window.addEventListener("orientationchange", measure);
+    return () => {
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("orientationchange", measure);
+    };
   }, []);
+  const autoSpreadRoom = shell.spreadRoom;
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
   const spreadRoom = autoSpreadRoom && mushafLayout !== "single";
+  const useRail = shell.rail;
+
+  /**
+   * Focus mode lasts as long as the sitting, not as long as the account. It is
+   * something you do when you settle in to read, and reopening the Mushaf
+   * tomorrow to a page with no visible controls would be a puzzle, not a
+   * preference honoured.
+   */
   const paperRef = useRef<HTMLDivElement>(null);
   const readerRootRef = useRef<HTMLDivElement>(null);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
+  const [indexTab, setIndexTab] = useState<"surahs" | "bookmarks">("surahs");
+
+  useEffect(() => {
+    const sync = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", sync);
+    sync();
+    return () => document.removeEventListener("fullscreenchange", sync);
+  }, []);
+
+  /** Browser chrome is the last thing between the reader and the page. Not
+   *  every browser grants this (iOS Safari has no Fullscreen API on the
+   *  element), so a refusal is reported and otherwise ignored. */
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen?.().catch((reason) => reportError(reason, "mushaf-exit-fullscreen"));
+      return;
+    }
+    void document.documentElement.requestFullscreen?.().catch((reason) => reportError(reason, "mushaf-fullscreen"));
+  }, []);
 
   // Sync internal theme with prop updates
   useEffect(() => {
@@ -409,11 +492,15 @@ export function KhatmahReaderScreen({
   const useQcfGlyphs = resolved?.qcf ?? false;
 
   // Compute Surah and Juz for the header
-  const { surahName, juzNumber } = useMemo(() => {
+  const { surahName, surahShortName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
-    if (!pageData || pageData.length === 0) return { surahName: "", juzNumber: juz };
+    if (!pageData || pageData.length === 0) return { surahName: "", surahShortName: "", juzNumber: juz };
     const [surah] = (pageData[0]?.k || "1:1").split(":");
-    return { surahName: getSurahDisplayName(surah || "1", language), juzNumber: juz };
+    return {
+      surahName: getSurahDisplayName(surah || "1", language),
+      surahShortName: getSurahShortName(surah || "1", language),
+      juzNumber: juz,
+    };
   }, [pageData, displayPage, language]);
 
   useEffect(() => {
@@ -461,7 +548,7 @@ export function KhatmahReaderScreen({
    *  Buttons, keys, and swipes all call the same signed paginator. */
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (isIndexOpen || isOptionsMenuOpen || activeAyah) return;
+      if (isIndexOpen || isOptionsMenuOpen || isQuickMenuOpen || activeAyah) return;
       const target = e.target as HTMLElement | null;
       const root = readerRootRef.current;
       if (target && target !== document.body && target.id !== "main-content" && !root?.contains(target)) return;
@@ -471,13 +558,18 @@ export function KhatmahReaderScreen({
       else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
-      else if (e.key === "Escape") onBack();
-      else handled = false;
+      // Escape gives the tools back before it gives up the reader: leaving the
+      // Mushaf entirely from a keypress meant to undo the last thing you did
+      // is a surprise you cannot take back without losing your place.
+      else if (e.key === "Escape") {
+        if (isFocusMode) setIsFocusMode(false);
+        else onBack();
+      } else handled = false;
       if (handled) e.preventDefault();
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isIndexOpen, isOptionsMenuOpen, onBack, paginate, setKhatmahPage]);
+  }, [activeAyah, isFocusMode, isIndexOpen, isOptionsMenuOpen, isQuickMenuOpen, onBack, paginate, setKhatmahPage]);
 
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
@@ -485,7 +577,7 @@ export function KhatmahReaderScreen({
   const drag = useRef({ pointerId: -1, startX: 0, engaged: false });
 
   const endDrag = useCallback(
-    (clientX: number | null) => {
+    (clientX: number | null, target?: EventTarget | null) => {
       const paper = paperRef.current;
       if (paper) {
         paper.style.transition = PAPER_SETTLE;
@@ -495,10 +587,18 @@ export function KhatmahReaderScreen({
         const offset = clientX - drag.current.startX;
         if (offset >= SWIPE_THRESHOLD) paginate(1);
         else if (offset <= -SWIPE_THRESHOLD) paginate(-1);
+      } else if (
+        !drag.current.engaged &&
+        isFocusMode &&
+        !(target instanceof Element && target.closest("button, a, [role='button'], [role='switch']"))
+      ) {
+        // A tap on the paper itself — not a swipe, and not on a word or an
+        // ayah marker, which have their own answer — brings the tools back.
+        setIsFocusMode(false);
       }
       drag.current = { pointerId: -1, startX: 0, engaged: false };
     },
-    [paginate],
+    [isFocusMode, paginate],
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -526,7 +626,7 @@ export function KhatmahReaderScreen({
 
   const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
-    endDrag(event.clientX);
+    endDrag(event.clientX, event.target);
   };
 
   const isArabic = language === "ar";
@@ -557,11 +657,25 @@ export function KhatmahReaderScreen({
         <ChevronDown size={16} className="hidden shrink-0 opacity-60 sm:block" aria-hidden="true" />
       </button>
 
+      {/* One overflow button carries the index, saved places, study mode,
+          focus, and settings. A phone has room for the page and about four
+          controls; the rest belongs one tap away rather than crowded into a
+          bar the reader looks past. */}
+      <button
+        type="button"
+        onClick={() => setIsQuickMenuOpen(true)}
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-current/15 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:hidden"
+        aria-label={t(language, "mushaf.moreActions")}
+        data-testid="mushaf-more-actions"
+      >
+        <MoreVertical size={18} aria-hidden="true" />
+      </button>
+
       {/* Reading Settings Trigger Button */}
       <button
         type="button"
         onClick={() => setIsOptionsMenuOpen(true)}
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-current/15 bg-current/5 px-2 text-xs font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring lg:w-auto lg:px-3"
+        className="hidden h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-current/15 bg-current/5 px-2 text-xs font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:inline-flex lg:w-auto lg:px-3"
         aria-label={t(language, "common.settings")}
         data-testid="mushaf-settings-trigger"
       >
@@ -596,7 +710,7 @@ export function KhatmahReaderScreen({
         ) : (
           <BookOpen size={19} aria-hidden="true" className="shrink-0" />
         )}
-        <span className="hidden max-w-[140px] truncate font-bold md:block">
+        <span className="hidden max-w-[11rem] truncate font-bold md:block">
           {t(language, "mushaf.difficultWordsInvite")}
         </span>
       </button>
@@ -623,7 +737,7 @@ export function KhatmahReaderScreen({
           <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
             {t(language, "mushaf.pageLabel", { page: formatNumerals(displayPage, language) })}
           </span>
-          <span className="hidden text-[0.625rem] font-semibold opacity-65 md:block">
+          <span className="hidden whitespace-nowrap text-[0.625rem] font-semibold opacity-65 lg:block">
             {t(language, "mushaf.keyboardNavigationHint")}
           </span>
         </div>
@@ -651,10 +765,64 @@ export function KhatmahReaderScreen({
         data-testid="mushaf-save-place"
       >
         <MapPin size={19} className={isCurrentBookmarked ? "fill-current shrink-0" : "shrink-0"} aria-hidden="true" />
-        <span className="hidden md:block font-bold truncate max-w-[140px]">{t(language, "mushaf.savePlace")}</span>
+        <span className="hidden max-w-[11rem] truncate font-bold md:block">{t(language, "mushaf.savePlace")}</span>
       </button>
     </nav>
   );
+  /**
+   * The same actions, stood on end. Where the rail is shown it is the only
+   * chrome, so every control the bars carry has to be here.
+   */
+  const toolRail = (
+    <MushafToolRail
+      language={language}
+      direction={direction}
+      side={mushafToolbarSide}
+      compact={shell.railCompact}
+      surahName={surahShortName}
+      juzNumber={juzNumber}
+      pageNumber={displayPage}
+      lastPage={LAST_PAGE}
+      atFirstPage={currentPage <= 1}
+      atLastPage={currentPage >= LAST_PAGE}
+      showWordMeanings={showWordMeanings}
+      isLoadingWordMeanings={isLoadingWordMeanings}
+      isPlaceSaved={isCurrentBookmarked}
+      isFullscreen={isFullscreen}
+      onBack={onBack}
+      onOpenIndex={() => {
+        setIndexTab("surahs");
+        setIsIndexOpen(true);
+      }}
+      onPrevious={() => paginate(-1)}
+      onNext={() => paginate(1)}
+      onToggleWordMeanings={() => void toggleWordMeanings()}
+      onToggleSavePlace={toggleReadingBookmark}
+      onToggleFullscreen={toggleFullscreen}
+      onEnterFocusMode={() => setIsFocusMode(true)}
+      onOpenSettings={() => setIsOptionsMenuOpen(true)}
+    />
+  );
+
+  /** The one thing left on screen in focus mode: a hairline handle at the foot
+   *  of the page, wide enough to hit and quiet enough to forget. It sits in the
+   *  same place whichever chrome it replaced, so there is one thing to learn. */
+  const focusHandle = (
+    <button
+      type="button"
+      onClick={() => setIsFocusMode(false)}
+      data-testid="mushaf-focus-exit"
+      aria-label={t(language, "mushaf.focusModeExit")}
+      title={t(language, "mushaf.focusModeExit")}
+      className="group absolute inset-x-0 bottom-0 z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+    >
+      <span
+        aria-hidden="true"
+        className="h-0.5 w-10 rounded-full bg-muted-foreground transition-colors group-hover:bg-primary"
+      />
+    </button>
+  );
+
   const wirdProgressBar =
     wirdGoal > 0 ? (
       <div
@@ -739,15 +907,24 @@ export function KhatmahReaderScreen({
                   ? { pageNumber: leftSide.page, lines: leftSide.lines, useQcfGlyphs: leftSide.qcf }
                   : undefined
               }
-              headerContent={pageHeader}
-              footerContent={pageFooter}
+              headerContent={isFocusMode || useRail ? undefined : pageHeader}
+              footerContent={isFocusMode || useRail ? undefined : pageFooter}
+              railContent={useRail && !isFocusMode ? toolRail : undefined}
+              railSide={mushafToolbarSide}
               progressBar={wirdProgressBar}
               paperRef={paperRef}
               pageTransitionDirection={pageTransitionDirection}
               reduceMotion={reduceMotion}
+              textScale={mushafTextScale}
               onAyahAction={handleAyahAction}
             />
+            {isFocusMode && focusHandle}
           </div>
+        )}
+        {isFocusMode && (
+          <p className="sr-only" role="status" aria-live="polite">
+            {t(language, "mushaf.focusModeActive")}
+          </p>
         )}
         {pageData && (
           <p className="sr-only" role="status" aria-live="polite">
@@ -826,6 +1003,15 @@ export function KhatmahReaderScreen({
         mushafLayout={mushafLayout}
         onSelectLayout={setMushafLayout}
         autoSpreadRoom={autoSpreadRoom}
+        textScale={mushafTextScale}
+        onSelectTextScale={setMushafTextScale}
+        toolbarSide={mushafToolbarSide}
+        onSelectToolbarSide={setMushafToolbarSide}
+        showToolbarSide={useRail}
+        onEnterFocusMode={() => {
+          setIsOptionsMenuOpen(false);
+          setIsFocusMode(true);
+        }}
         isBookmarked={initialBookmarks.includes(displayPage)}
         onToggleBookmark={() => {
           const isBookmarked = initialBookmarks.includes(displayPage);
@@ -838,11 +1024,46 @@ export function KhatmahReaderScreen({
         surahName={surahName}
       />
 
+      {/* Everything a phone has no room for, one tap behind the header. */}
+      <MushafQuickMenu
+        open={isQuickMenuOpen}
+        onClose={() => setIsQuickMenuOpen(false)}
+        language={language}
+        direction={direction}
+        surahName={surahName}
+        juzNumber={juzNumber}
+        pageNumber={displayPage}
+        showWordMeanings={showWordMeanings}
+        isLoadingWordMeanings={isLoadingWordMeanings}
+        isPlaceSaved={isCurrentBookmarked}
+        isPageBookmarked={initialBookmarks.includes(displayPage)}
+        onOpenIndex={() => {
+          setIndexTab("surahs");
+          setIsIndexOpen(true);
+        }}
+        onOpenBookmarks={() => {
+          setIndexTab("bookmarks");
+          setIsIndexOpen(true);
+        }}
+        onToggleWordMeanings={() => void toggleWordMeanings()}
+        onToggleSavePlace={toggleReadingBookmark}
+        onTogglePageBookmark={() => {
+          const isBookmarked = initialBookmarks.includes(displayPage);
+          const next = isBookmarked
+            ? initialBookmarks.filter((page) => page !== displayPage)
+            : Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b);
+          onUpdateBookmarks?.(next);
+        }}
+        onEnterFocusMode={() => setIsFocusMode(true)}
+        onOpenSettings={() => setIsOptionsMenuOpen(true)}
+      />
+
       {/* Index & Navigation Modal */}
       <MushafNavigationModal
         isOpen={isIndexOpen}
-        onClose={() => setIsIndexOpen(false)}
+        initialTab={indexTab}
         currentPage={currentPage}
+        onClose={() => setIsIndexOpen(false)}
         onSelectPage={setKhatmahPage}
         language={language}
         direction={direction}

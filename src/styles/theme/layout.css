@@ -359,3 +359,35 @@
 .mushaf-spread__page:last-child {
   padding-right: 0;
 }
+
+/* ---------------------------------------------------------------------------
+   Mushaf page furniture
+
+   A bound Mushaf names each page on the page itself. In a spread that is what
+   keeps the two halves legible: the chrome can only ever name one of them. The
+   bands live outside the fifteen line slots, so the canonical geometry is
+   untouched; only the height those slots divide changes.
+
+   The rules are drawn in the page's own ink at reduced opacity rather than
+   through `color-mix`, which would cost a duplicated `@supports` rule for every
+   declaration that used it.
+--------------------------------------------------------------------------- */
+.mushaf-page-frame {
+  padding-inline: clamp(0.35rem, 1.6cqi, 0.9rem);
+}
+
+.mushaf-page-furniture {
+  height: 5.2%;
+  min-height: 0;
+  font-size: clamp(8px, min(2.4cqi, 1.5cqh), 13px);
+  font-weight: 700;
+  line-height: 1;
+  opacity: 0.72;
+}
+
+.mushaf-page-furniture__cartouche,
+.mushaf-page-furniture__folio {
+  border: 1px solid;
+  border-radius: 999px;
+  padding: 0.3em 0.85em;
+}

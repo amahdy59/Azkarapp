@@ -19,6 +19,19 @@ function pageFixture(page: number) {
   ];
 }
 
+/**
+ * jsdom opens at 1024x768 — landscape, so the reader stands its tools in the
+ * rail. A test that means to exercise the horizontal bars has to say which
+ * shape of screen it is talking about.
+ */
+function setViewport(width: number, height: number) {
+  Object.defineProperty(window, "innerWidth", { configurable: true, value: width });
+  Object.defineProperty(window, "innerHeight", { configurable: true, value: height });
+  act(() => {
+    window.dispatchEvent(new Event("resize"));
+  });
+}
+
 function renderReader(overrides: Partial<Parameters<typeof KhatmahReaderScreen>[0]> = {}) {
   const setKhatmahPage = vi.fn();
   render(
@@ -48,6 +61,8 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  Object.defineProperty(window, "innerWidth", { configurable: true, value: 1024 });
+  Object.defineProperty(window, "innerHeight", { configurable: true, value: 768 });
 });
 
 describe("KhatmahReaderScreen navigation", () => {
@@ -82,11 +97,12 @@ describe("KhatmahReaderScreen navigation", () => {
     const article = await screen.findByRole("article", { name: "Page 42" });
 
     expect(article).toHaveAttribute("dir", "rtl");
-    const navigation = screen.getByRole("navigation", { name: "Mushaf page navigation" });
+    // The page-turn group stays a named navigation landmark in either chrome,
+    // and Previous always precedes Next in the document.
+    screen.getByRole("navigation", { name: "Mushaf page navigation" });
     const next = screen.getByRole("button", { name: "Next" });
     const previous = screen.getByRole("button", { name: "Previous" });
     expect(previous.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(navigation.querySelector('[dir="rtl"]')).toBeInTheDocument();
 
     await user.keyboard("{ArrowLeft}");
     expect(setKhatmahPage).toHaveBeenLastCalledWith(43);
@@ -186,9 +202,11 @@ describe("KhatmahReaderScreen wird progress", () => {
   });
 
   it("uses semantic dark Mushaf chrome and exposes the desktop key hint", async () => {
+    setViewport(820, 1180);
     renderReader({ mushafTheme: "dark" });
     const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
     expect(article).toHaveAttribute("data-theme", "dark");
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
     expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("bg-card", "text-card-foreground");
     expect(screen.getByText("← / → للتنقل بين الصفحات")).toBeInTheDocument();
     expect(screen.getByText("الإعدادات")).toHaveClass("hidden", "lg:inline");
@@ -377,5 +395,111 @@ describe("KhatmahReaderScreen settings menu", () => {
     const spreadOption = await screen.findByTestId("mushaf-layout-option-spread");
     await user.click(spreadOption);
     expect(setMushafLayout).toHaveBeenCalledWith("spread");
+  });
+});
+
+describe("KhatmahReaderScreen tool rail", () => {
+  afterEach(() => setViewport(1024, 768));
+
+  it("stands the tools beside the paper on a landscape screen instead of across it", async () => {
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Pages 41 and 42" });
+
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "rail");
+    expect(screen.getByTestId("mushaf-tool-rail")).toBeInTheDocument();
+    // The two horizontal bars are the whole point: they are gone, and the
+    // 112px of height they cost goes back to the page.
+    expect(article.querySelector('[data-mushaf-chrome="header"]')).toBeNull();
+    expect(article.querySelector('[data-mushaf-chrome="footer"]')).toBeNull();
+    // Every control the bars carried is still reachable, by the same name.
+    expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Word meanings" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Set as reading place" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
+  });
+
+  it("keeps the horizontal bars on a portrait tablet, where width is what is short", async () => {
+    setViewport(820, 1180);
+    renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Page 42" });
+
+    expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
+    expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
+    expect(article.querySelector('[data-mushaf-chrome="footer"]')).not.toBeNull();
+  });
+
+  it("pins the rail to the stored edge", async () => {
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr", mushafToolbarSide: "left" });
+    await screen.findByRole("article", { name: "Pages 41 and 42" });
+    expect(screen.getByTestId("mushaf-tool-rail")).toHaveAttribute("data-rail-side", "left");
+  });
+
+  it("gives the whole screen to the page in focus mode, and gives the tools back on Escape", async () => {
+    const user = userEvent.setup();
+    const onBack = vi.fn();
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr", onBack });
+    await screen.findByRole("article", { name: "Pages 41 and 42" });
+
+    await user.click(screen.getByTestId("mushaf-focus-enter"));
+    expect(screen.queryByTestId("mushaf-tool-rail")).not.toBeInTheDocument();
+    const handle = screen.getByTestId("mushaf-focus-exit");
+    expect(handle).toHaveAccessibleName("Show tools");
+
+    // Escape hands back the tools before it hands back the screen: leaving the
+    // Mushaf outright would lose the reader's place to a keypress meant to undo.
+    await user.keyboard("{Escape}");
+    expect(onBack).not.toHaveBeenCalled();
+    expect(screen.getByTestId("mushaf-tool-rail")).toBeInTheDocument();
+
+    await user.keyboard("{Escape}");
+    expect(onBack).toHaveBeenCalledOnce();
+  });
+
+  it("lets each half of a spread name itself, and does not repeat the chrome on a phone", async () => {
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr" });
+    const spread = await screen.findByRole("article", { name: "Pages 41 and 42" });
+    // The chrome can only ever name one of the two; the paper names both.
+    expect(spread.querySelectorAll(".mushaf-page-furniture__folio")).toHaveLength(2);
+  });
+
+  it("does not print a second copy of the surah the chrome already carries", async () => {
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr" });
+    const article = await screen.findByRole("article", { name: "Page 42" });
+    expect(article.querySelector(".mushaf-page-furniture__cartouche")).toBeNull();
+    expect(article.querySelector(".mushaf-page-frame")).not.toBeNull();
+  });
+});
+
+describe("KhatmahReaderScreen quick menu", () => {
+  afterEach(() => setViewport(1024, 768));
+
+  it("puts the phone's secondary actions one tap behind the header", async () => {
+    const user = userEvent.setup();
+    const setMushafBookmarks = vi.fn();
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr", setMushafBookmarks });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await screen.findByTestId("mushaf-quick-menu");
+    await user.click(screen.getByTestId("mushaf-quick-page-bookmark"));
+    expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
+  });
+
+  it("opens the index straight onto bookmarks when that is what was asked for", async () => {
+    const user = userEvent.setup();
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr", mushafBookmarks: [42] });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-bookmarks"));
+    expect(await screen.findByRole("tab", { name: /Bookmarks/, selected: true })).toBeInTheDocument();
   });
 });

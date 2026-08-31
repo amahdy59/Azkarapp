@@ -1,8 +1,8 @@
 import { ResponsiveSheet } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import type { AppLanguage, MushafLayout, MushafTheme, ThemeMode } from "../types";
-import { Bookmark, Check, SlidersHorizontal, X } from "./icons";
+import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
+import { Bookmark, Check, Eye, Minus, Plus, SlidersHorizontal, X } from "./icons";
 
 export interface MushafSettingsSheetProps {
   open: boolean;
@@ -15,6 +15,13 @@ export interface MushafSettingsSheetProps {
   mushafLayout: MushafLayout;
   onSelectLayout?: (layout: MushafLayout) => void;
   autoSpreadRoom?: boolean;
+  textScale: MushafTextScale;
+  onSelectTextScale?: (scale: MushafTextScale) => void;
+  toolbarSide: MushafToolbarSide;
+  onSelectToolbarSide?: (side: MushafToolbarSide) => void;
+  /** Only offered where a rail is actually shown. */
+  showToolbarSide?: boolean;
+  onEnterFocusMode?: () => void;
   isBookmarked: boolean;
   onToggleBookmark: () => void;
   pageNumber: number;
@@ -78,6 +85,12 @@ export function MushafSettingsSheet({
   mushafLayout,
   onSelectLayout,
   autoSpreadRoom = false,
+  textScale,
+  onSelectTextScale,
+  toolbarSide,
+  onSelectToolbarSide,
+  showToolbarSide = false,
+  onEnterFocusMode,
   isBookmarked,
   onToggleBookmark,
   pageNumber,
@@ -94,6 +107,24 @@ export function MushafSettingsSheet({
     ["single", t(language, "mushaf.layoutSingle")],
     ["spread", t(language, "mushaf.layoutSpread")],
   ] as const;
+
+  const textScaleOptions = [
+    ["small", t(language, "mushaf.textSizeSmall")],
+    ["medium", t(language, "mushaf.textSizeMedium")],
+    ["large", t(language, "mushaf.textSizeLarge")],
+  ] as const;
+
+  const toolbarSideOptions = [
+    ["right", t(language, "mushaf.toolbarSideRight")],
+    ["left", t(language, "mushaf.toolbarSideLeft")],
+  ] as const;
+
+  const segmentClass = (isSelected: boolean) =>
+    `flex min-h-[44px] items-center justify-center gap-1.5 rounded-lg px-2 text-center text-xs font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+      isSelected
+        ? "bg-card text-foreground shadow-xs ring-1 ring-border/80"
+        : "text-muted-foreground hover:text-foreground"
+    }`;
 
   return (
     <ResponsiveSheet
@@ -131,6 +162,51 @@ export function MushafSettingsSheet({
             <X size={18} aria-hidden="true" />
           </button>
         </div>
+
+        {/* Section 1: Reading type size. Scales the ink inside the fifteen
+            slots; it can never add, remove, or re-break a line. */}
+        {onSelectTextScale && (
+          <section aria-labelledby="mushaf-text-size-heading" className="flex flex-col gap-2.5">
+            <h3
+              id="mushaf-text-size-heading"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
+              {t(language, "mushaf.textSizeTitle")}
+            </h3>
+            <div
+              role="radiogroup"
+              aria-labelledby="mushaf-text-size-heading"
+              className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
+            >
+              {textScaleOptions.map(([id, label]) => {
+                const isSelected = textScale === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    data-testid={`mushaf-text-size-option-${id}`}
+                    onClick={() => onSelectTextScale(id)}
+                    className={segmentClass(isSelected)}
+                  >
+                    {id === "small" && <Minus size={13} aria-hidden="true" className="shrink-0" />}
+                    {id === "large" && <Plus size={13} aria-hidden="true" className="shrink-0" />}
+                    <span
+                      className="truncate"
+                      style={{ fontSize: id === "small" ? "0.6875rem" : id === "large" ? "0.875rem" : undefined }}
+                    >
+                      {label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
+              {t(language, "mushaf.textSizeHint")}
+            </p>
+          </section>
+        )}
 
         {/* Section 1: Themes (Modern 1-Tap Grid) */}
         <section aria-labelledby="mushaf-theme-heading" className="flex flex-col gap-2.5">
@@ -214,6 +290,66 @@ export function MushafSettingsSheet({
                 );
               })}
             </div>
+          </section>
+        )}
+
+        {/* Toolbar position — only meaningful where a rail is actually shown. */}
+        {showToolbarSide && onSelectToolbarSide && (
+          <section aria-labelledby="mushaf-toolbar-side-heading" className="flex flex-col gap-2.5">
+            <h3
+              id="mushaf-toolbar-side-heading"
+              className="text-xs font-bold uppercase tracking-wider text-muted-foreground"
+            >
+              {t(language, "mushaf.toolbarSideTitle")}
+            </h3>
+            <div
+              role="radiogroup"
+              aria-labelledby="mushaf-toolbar-side-heading"
+              className="grid grid-cols-2 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
+            >
+              {toolbarSideOptions.map(([id, label]) => {
+                const isSelected = toolbarSide === id;
+                return (
+                  <button
+                    key={id}
+                    type="button"
+                    role="radio"
+                    aria-checked={isSelected}
+                    data-testid={`mushaf-toolbar-side-option-${id}`}
+                    onClick={() => onSelectToolbarSide(id)}
+                    className={segmentClass(isSelected)}
+                  >
+                    <span className="truncate">{label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
+              {t(language, "mushaf.toolbarSideHint")}
+            </p>
+          </section>
+        )}
+
+        {/* Focus mode — an action, not a stored preference: it lasts as long as
+            the sitting does. */}
+        {onEnterFocusMode && (
+          <section aria-label={t(language, "mushaf.focusMode")}>
+            <button
+              type="button"
+              onClick={onEnterFocusMode}
+              data-testid="mushaf-focus-mode-action"
+              className="interactive-elem flex min-h-[52px] w-full items-center gap-3 rounded-2xl border border-border/60 bg-muted/30 p-3 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
+                <Eye size={18} aria-hidden="true" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-xs font-bold leading-snug">{t(language, "mushaf.focusMode")}</span>
+                <span className="mt-0.5 block truncate text-[0.6875rem] font-medium text-muted-foreground">
+                  {t(language, "mushaf.focusModeHint")}
+                </span>
+              </span>
+            </button>
           </section>
         )}
 

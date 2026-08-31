@@ -56,21 +56,25 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   expect(initialBox?.height ?? 0).toBeGreaterThanOrEqual(690);
   expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBe(0);
 
-  // The mobile menu stays contextual: theme and page bookmark only. Layout is
-  // desktop-only and the retired alternate text view cannot reappear here.
-  const optionsButton = page.getByRole("button", { name: /الإعدادات/ });
+  // On a phone the settings live one tap behind the overflow button rather than
+  // in the bar. The menu stays contextual: theme and page bookmark only. Layout
+  // is landscape-only and the retired alternate text view cannot reappear here.
   const savePlaceButton = page.getByRole("button", { name: "تعيين موضع المتابعة" });
   if (!(await savePlaceButton.isVisible())) {
     await mushafPage.click({ position: { x: 160, y: 350 } });
   }
   await expect(savePlaceButton).toBeVisible();
-  await optionsButton.focus();
-  await optionsButton.click();
+  const overflowButton = page.getByTestId("mushaf-more-actions");
+  await overflowButton.focus();
+  await overflowButton.click();
+  await page.getByTestId("mushaf-quick-settings").click();
+  await expect(page.getByTestId("mushaf-settings-sheet")).toBeVisible();
   await expect(page.getByText("تخطيط الصفحة")).toHaveCount(0);
+  await expect(page.getByText("مكان شريط الأدوات")).toHaveCount(0);
   await expect(page.getByText("قراءة مريحة")).toHaveCount(0);
   await page.keyboard.press("Escape");
   const lines = mushafPage.locator("[data-mushaf-line-content]");
-  await expect(mushafPage.locator("[data-mushaf-rendering] > div > div")).toHaveCount(15);
+  await expect(mushafPage.locator("[data-mushaf-column] > div")).toHaveCount(15);
   // No line may paint outside the slot it sits in — overlong lines are scaled
   // down to fit, never clipped at the page edge.
   const bleed = await lines.evaluateAll((elements) =>
@@ -209,18 +213,26 @@ test("offers clear RTL reading choices and free reading without progress trackin
   expect(stored.wirdHistory).toEqual({});
 });
 
-test("keeps Mushaf bars cohesive and activates meanings on an uncached Al-Baqarah page", async ({ page }) => {
+test("stands the tools beside the paper on a landscape screen and activates meanings on an uncached Al-Baqarah page", async ({
+  page,
+}) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
 
-  const settings = page.getByTestId("mushaf-settings-trigger");
-  await expect(settings).toContainText("الإعدادات");
-  await expect(settings.locator("span")).toBeVisible();
-  const chromeControls = page.locator('[data-mushaf-chrome="header"] button, [data-mushaf-chrome="footer"] button');
-  const heights = await chromeControls.evaluateAll((elements) =>
+  // Landscape: the rail is the whole chrome, and the two horizontal bars — and
+  // the 112px of reading height they cost — are gone.
+  const rail = page.getByTestId("mushaf-tool-rail");
+  await expect(rail).toBeVisible();
+  await expect(page.locator('[data-mushaf-chrome="header"]')).toHaveCount(0);
+  await expect(page.locator('[data-mushaf-chrome="footer"]')).toHaveCount(0);
+  const railWidth = await rail.evaluate((element) => element.getBoundingClientRect().width);
+  expect(railWidth).toBeGreaterThanOrEqual(56);
+  expect(railWidth).toBeLessThanOrEqual(80);
+  const railControls = rail.locator("button");
+  const heights = await railControls.evaluateAll((elements) =>
     elements.map((element) => element.getBoundingClientRect().height),
   );
-  expect(heights.every((height) => height >= 44 && height <= 46)).toBe(true);
+  expect(heights.every((height) => height >= 44)).toBe(true);
 
   await page.getByRole("button", { name: "فهرس المصحف الشريف" }).click();
   await page.getByRole("tab", { name: "صفحة" }).click();
@@ -237,8 +249,60 @@ test("keeps Mushaf bars cohesive and activates meanings on an uncached Al-Baqara
   await expect(page.getByRole("article", { name: /٢٣/ })).toBeVisible();
   await expect(page.locator('[data-page-transition="forward"]')).toBeVisible();
 
+  // Portrait: the bars come back, because there it is width that is short, and
+  // the labelled Settings control steps down to an icon.
   await page.setViewportSize({ width: 320, height: 700 });
-  await expect(settings.locator("span")).toBeHidden();
+  await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
+  await expect(page.locator('[data-mushaf-chrome="footer"]')).toBeVisible();
+  const barControls = page.locator('[data-mushaf-chrome="header"] button, [data-mushaf-chrome="footer"] button');
+  const barHeights = await barControls.evaluateAll((elements) =>
+    elements.filter((element) => element.checkVisibility()).map((element) => element.getBoundingClientRect().height),
+  );
+  expect(barHeights.every((height) => height >= 44 && height <= 46)).toBe(true);
+  await expect(page.getByTestId("mushaf-more-actions")).toBeVisible();
+  await expect(page.getByTestId("mushaf-settings-trigger")).toBeHidden();
+});
+
+test("keeps the landscape tool rail accessible", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
+
+  const accessibility = await new AxeBuilder({ page })
+    .include('[data-testid="mushaf-tool-rail"]')
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(accessibility.violations).toEqual([]);
+});
+
+test("gives the whole screen to the page in focus mode and hands the tools back", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  const article = page.getByRole("article", { name: /٤٢/ });
+  await expect(article).toBeVisible();
+
+  const withRail = await article
+    .locator("[data-mushaf-page]")
+    .first()
+    .evaluate((el) => el.clientHeight);
+  await page.getByTestId("mushaf-focus-enter").click();
+  await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
+  const handle = page.getByTestId("mushaf-focus-exit");
+  await expect(handle).toBeVisible();
+
+  // The page is no narrower for losing the rail; it is wider.
+  const focusedWidth = await article
+    .locator("[data-mushaf-page]")
+    .first()
+    .evaluate((el) => el.clientWidth);
+  await handle.click();
+  await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
+  const restoredWidth = await article
+    .locator("[data-mushaf-page]")
+    .first()
+    .evaluate((el) => el.clientWidth);
+  expect(focusedWidth).toBeGreaterThan(restoredWidth);
+  expect(withRail).toBeGreaterThan(0);
 });
 
 test("keeps the curved Surah header and Bismillah consistent without changing the page grid", async ({ page }) => {
@@ -260,9 +324,7 @@ test("keeps the curved Surah header and Bismillah consistent without changing th
   await expect(ornament).toHaveAttribute("aria-hidden", "true");
   await expect(ornament).toHaveAttribute("focusable", "false");
 
-  await expect(
-    page.getByRole("article", { name: "صفحة ٥٠" }).locator("[data-mushaf-rendering] > div > div"),
-  ).toHaveCount(15);
+  await expect(page.getByRole("article", { name: "صفحة ٥٠" }).locator("[data-mushaf-column] > div")).toHaveCount(15);
 
   const geometry = await page.evaluate(() => {
     const title = document.querySelector<HTMLElement>('[data-testid="mushaf-surah-title"]');

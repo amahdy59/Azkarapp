@@ -20,6 +20,7 @@ export function MushafNavigationModal({
   bookmarks = [],
   verseBookmarks = [],
   onSelectVerseBookmark,
+  initialTab = "surahs",
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -30,14 +31,22 @@ export function MushafNavigationModal({
   bookmarks?: number[];
   verseBookmarks?: QuranVerseBookmark[];
   onSelectVerseBookmark?: (bookmark: QuranVerseBookmark) => void;
+  /** Which tab an opening lands on, so "Bookmarks" opens bookmarks. */
+  initialTab?: NavigationTab;
 }) {
-  const [activeTab, setActiveTab] = useState<NavigationTab>("surahs");
+  const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputPage, setInputPage] = useState(currentPage.toString());
 
   useEffect(() => {
     if (isOpen) setInputPage(currentPage.toString());
   }, [currentPage, isOpen]);
+
+  // The caller names the tab when it opens the sheet; reopening from the same
+  // entry point must land there again, not on whatever was left showing.
+  useEffect(() => {
+    if (isOpen) setActiveTab(initialTab);
+  }, [initialTab, isOpen]);
 
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);

@@ -17,6 +17,8 @@ describe("MushafSettingsSheet", () => {
         direction="rtl"
         theme="midnight"
         onSelectTheme={onSelectTheme}
+        textScale="medium"
+        toolbarSide="right"
         mushafLayout="auto"
         onSelectLayout={onSelectLayout}
         autoSpreadRoom={true}
@@ -67,6 +69,8 @@ describe("MushafSettingsSheet", () => {
         direction="ltr"
         theme="oled"
         onSelectTheme={onSelectTheme}
+        textScale="medium"
+        toolbarSide="right"
         mushafLayout="single"
         autoSpreadRoom={false}
         isBookmarked={true}
@@ -79,5 +83,59 @@ describe("MushafSettingsSheet", () => {
     expect(screen.getByRole("heading", { name: "Reading Settings" })).toBeInTheDocument();
     expect(screen.getByTestId("mushaf-theme-option-oled")).toHaveAttribute("aria-checked", "true");
     expect(screen.getByTestId("mushaf-bookmark-toggle")).toHaveAttribute("aria-checked", "true");
+  });
+});
+
+describe("MushafSettingsSheet reading choices", () => {
+  function renderSheet(overrides: Partial<Parameters<typeof MushafSettingsSheet>[0]> = {}) {
+    const props = {
+      open: true,
+      onClose: vi.fn(),
+      language: "ar" as const,
+      direction: "rtl" as const,
+      theme: "midnight" as const,
+      onSelectTheme: vi.fn(),
+      mushafLayout: "auto" as const,
+      textScale: "medium" as const,
+      toolbarSide: "right" as const,
+      isBookmarked: false,
+      onToggleBookmark: vi.fn(),
+      pageNumber: 42,
+      surahName: "سورة البقرة",
+      ...overrides,
+    };
+    render(<MushafSettingsSheet {...props} />);
+    return props;
+  }
+
+  it("offers a reading type size and says what it does not change", () => {
+    const onSelectTextScale = vi.fn();
+    renderSheet({ onSelectTextScale });
+
+    expect(screen.getByTestId("mushaf-text-size-option-medium")).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByTestId("mushaf-text-size-option-large"));
+    expect(onSelectTextScale).toHaveBeenCalledWith("large");
+    expect(screen.getByText(/الخمسة عشر/)).toBeInTheDocument();
+  });
+
+  it("offers the toolbar edge only where a rail is actually shown", () => {
+    renderSheet({ onSelectToolbarSide: vi.fn(), showToolbarSide: false });
+    expect(screen.queryByTestId("mushaf-toolbar-side-option-left")).not.toBeInTheDocument();
+  });
+
+  it("stores the chosen toolbar edge", () => {
+    const onSelectToolbarSide = vi.fn();
+    renderSheet({ onSelectToolbarSide, showToolbarSide: true });
+
+    expect(screen.getByTestId("mushaf-toolbar-side-option-right")).toHaveAttribute("aria-checked", "true");
+    fireEvent.click(screen.getByTestId("mushaf-toolbar-side-option-left"));
+    expect(onSelectToolbarSide).toHaveBeenCalledWith("left");
+  });
+
+  it("offers focus mode as an action, not a stored preference", () => {
+    const onEnterFocusMode = vi.fn();
+    renderSheet({ onEnterFocusMode });
+    fireEvent.click(screen.getByTestId("mushaf-focus-mode-action"));
+    expect(onEnterFocusMode).toHaveBeenCalledTimes(1);
   });
 });

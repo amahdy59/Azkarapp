@@ -241,6 +241,23 @@ export type MushafTheme = "follow-app" | ThemeMode | "oled";
 export type MushafPageTheme = ThemeMode | "oled";
 export type MushafLayout = "auto" | "single" | "spread";
 
+/**
+ * Which edge of a wide reading surface carries the vertical tool rail.
+ *
+ * A rail is held with one hand; whether that hand is on the right or the left
+ * is the reader's, not the interface language's, so this is a stored choice
+ * rather than something derived from direction.
+ */
+export type MushafToolbarSide = "right" | "left";
+
+/**
+ * How much of each line slot the Quranic type is allowed to claim.
+ *
+ * This scales the ink inside the fifteen slots; it never changes the slot
+ * count, the line breaks, or the pagination, all of which are page data.
+ */
+export type MushafTextScale = "small" | "medium" | "large";
+
 export type QuranWirdPlanKind = "khatmah30" | "daily" | "custom" | "hijriMonth" | "gregorianMonth" | "free";
 
 /** The last verified page the reader opened, with enough context for a useful resume label. */
@@ -291,6 +308,10 @@ export interface AppStateSnapshot {
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */
   mushafTheme?: MushafTheme;
   mushafLayout?: MushafLayout;
+  /** Which edge of a wide reading surface carries the vertical tool rail. */
+  mushafToolbarSide?: MushafToolbarSide;
+  /** Reading type size inside the fixed fifteen-line geometry. */
+  mushafTextScale?: MushafTextScale;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
   /** One intentional place used by Continue reading. */

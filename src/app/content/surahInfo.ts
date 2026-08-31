@@ -979,6 +979,19 @@ export function getSurahDisplayName(surahNumber: number | string, language: AppL
   return language === "ar" ? `سورة ${surah.nameArabic}` : `Surah ${surah.nameEnglish}`;
 }
 
+/**
+ * The surah's name without the word "Surah".
+ *
+ * A 60px tool rail has room for the name or for the word that says it is a
+ * name, not both — and the name is the half that tells the reader anything.
+ */
+export function getSurahShortName(surahNumber: number | string, language: AppLanguage): string {
+  const num = typeof surahNumber === "string" ? parseInt(surahNumber, 10) : surahNumber;
+  const surah = SURAHS.find((s) => s.number === num);
+  if (!surah) return String(num);
+  return language === "ar" ? surah.nameArabic : surah.nameEnglish;
+}
+
 export function searchSurahs(query: string, _language?: AppLanguage): SurahMeta[] {
   const clean = query.trim().toLowerCase();
   if (!clean) return [...SURAHS];

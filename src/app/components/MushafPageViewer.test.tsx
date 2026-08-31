@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MushafPageViewer, AyahMarker } from "./MushafPageViewer";
+import { MushafPageViewer, AyahMarker, resolveInkAllowance } from "./MushafPageViewer";
 
 describe("AyahMarker", () => {
   it("renders the localized ayah numeral within the medallion badge", () => {
@@ -139,7 +139,7 @@ describe("MushafPageViewer", () => {
       />,
     );
 
-    expect(container.querySelectorAll("[data-mushaf-rendering] > div > div")).toHaveLength(15);
+    expect(container.querySelectorAll("[data-mushaf-column] > div")).toHaveLength(15);
     // The printed Mushaf justifies each line to both margins.
     expect(container.querySelector("[data-mushaf-line-content]")).toHaveClass("justify-between");
   });
@@ -216,5 +216,90 @@ describe("MushafPageViewer", () => {
     expect(screen.getAllByTestId("mushaf-surah-ornament")).toHaveLength(1);
     expect(screen.getByRole("heading", { level: 2, name: "سورة آل عمران" })).toBeInTheDocument();
     expect(screen.getByText("الٓمٓ")).toBeInTheDocument();
+  });
+});
+
+describe("MushafPageViewer reading type size", () => {
+  it("scales the ink inside the slots and never past the point where lines collide", () => {
+    expect(resolveInkAllowance(true, "small")).toBeLessThan(resolveInkAllowance(true, "medium"));
+    expect(resolveInkAllowance(true, "large")).toBeGreaterThan(resolveInkAllowance(true, "medium"));
+    // Large text is still text on a fifteen-line page: past this allowance one
+    // line's descenders reach the next line's marks.
+    expect(resolveInkAllowance(true, "large")).toBeLessThanOrEqual(0.94);
+    expect(resolveInkAllowance(false, "large")).toBeLessThanOrEqual(0.94);
+  });
+
+  it("keeps the fifteen slots whatever the type size", () => {
+    const { container } = render(
+      <MushafPageViewer
+        lines={[
+          [
+            { verseKey: "2:6", position: 1, isEnd: 0, text: "إِنَّ" },
+            { verseKey: "2:6", position: 2, isEnd: 1, text: "٦" },
+          ],
+        ]}
+        language="ar"
+        pageNumber={3}
+        surahName="سورة البقرة"
+        juzNumber={1}
+        direction="rtl"
+        textScale="large"
+      />,
+    );
+    expect(container.querySelectorAll("[data-mushaf-column] > div")).toHaveLength(15);
+  });
+});
+
+describe("MushafPageViewer spread measure", () => {
+  /**
+   * jsdom reports every box as zero, and the fitter bails on a zero measure.
+   * Giving it a plausible page geometry is what lets the write-target — the
+   * thing this test is about — actually be exercised.
+   */
+  function withLayout<T>(run: () => T): T {
+    const sized = ["clientWidth", "clientHeight", "offsetWidth", "offsetHeight", "scrollWidth"] as const;
+    const saved = sized.map((name) => [name, Object.getOwnPropertyDescriptor(HTMLElement.prototype, name)] as const);
+    for (const name of sized) {
+      Object.defineProperty(HTMLElement.prototype, name, { configurable: true, value: 400 });
+    }
+    try {
+      return run();
+    } finally {
+      for (const [name, descriptor] of saved) {
+        if (descriptor) Object.defineProperty(HTMLElement.prototype, name, descriptor);
+        else Reflect.deleteProperty(HTMLElement.prototype, name);
+      }
+    }
+  }
+
+  it("gives each half of a spread its own measure rather than one shared with its neighbour", () => {
+    const { container } = withLayout(() =>
+      render(
+        <MushafPageViewer
+          lines={[[{ verseKey: "2:6", position: 1, isEnd: 1, text: "٦" }]]}
+          language="ar"
+          pageNumber={3}
+          surahName="سورة البقرة"
+          juzNumber={1}
+          direction="rtl"
+          facingPage={{
+            pageNumber: 4,
+            lines: [[{ verseKey: "2:16", position: 1, isEnd: 1, text: "١٦" }]],
+            useQcfGlyphs: false,
+          }}
+        />,
+      ),
+    );
+
+    const canvases = [...container.querySelectorAll<HTMLElement>("[data-mushaf-page]")];
+    expect(canvases).toHaveLength(2);
+    // Both halves live under one parent. The fitter used to write the measure
+    // there, so whichever page settled last sized both of them.
+    expect(canvases[0]!.parentElement).toBe(canvases[1]!.parentElement);
+    expect(canvases[0]!.parentElement!.style.getPropertyValue("--mushaf-measure")).toBe("");
+    for (const canvas of canvases) {
+      expect(canvas.style.getPropertyValue("--mushaf-measure")).not.toBe("");
+      expect(canvas.querySelector("[data-mushaf-column]")).not.toBeNull();
+    }
   });
 });

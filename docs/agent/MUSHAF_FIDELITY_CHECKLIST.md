@@ -203,3 +203,17 @@ ragged column. Numbering matches the review handed to the owner.
 - [x] **15.** The two caches DEC-089 orphaned are deleted at startup. (DEC-092)
 - [x] **16.** The immersive reader adopts DEC-089's page-turn rule, so the app no longer carries two
       opposite conventions. (DEC-092)
+- [x] **17.** Each half of a spread owns its own measure. The fitter wrote `--mushaf-measure` and
+      `--mushaf-fit` to the two canvases' shared parent, so whichever page settled last sized both;
+      it now writes to its own canvas. (DEC-109)
+- [x] **18.** Every page carries a hairline manuscript frame, and — where the chrome is not already
+      naming the same surah forty pixels above the paper — its own surah cartouche, juz, and folio
+      number in bands outside the fifteen slots. A spread, a rail layout, and focus mode print the
+      identity; a phone or portrait tablet does not. (DEC-109)
+- [x] **19.** Reading type size is a three-step reader choice that scales the ink allowance inside
+      the slots (0.9 / 1.0 / 1.08, clamped at 0.94). It cannot add, remove, or re-break a line.
+      (DEC-109)
+- [x] **20.** Supersedes 7–9 for landscape only: at 900px and wider in landscape the tools stand in
+      a vertical rail beside the paper and the horizontal bars are not rendered. Nothing hides on a
+      timer — focus mode is an explicit, reversible action, and portrait keeps the permanent bars.
+      (DEC-109)

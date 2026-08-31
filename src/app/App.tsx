@@ -15,6 +15,8 @@ import type {
   ThemeMode,
   PrayerName,
   MushafLayout,
+  MushafTextScale,
+  MushafToolbarSide,
   MushafTheme,
   QuranReadingEvent,
   QuranReadingPosition,
@@ -270,6 +272,10 @@ function AppContent() {
   );
   const [mushafTheme, setMushafTheme] = useState<MushafTheme>(initialState.mushafTheme ?? "follow-app");
   const [mushafLayout, setMushafLayout] = useState<MushafLayout>(initialState.mushafLayout ?? "auto");
+  const [mushafToolbarSide, setMushafToolbarSide] = useState<MushafToolbarSide>(
+    initialState.mushafToolbarSide ?? "right",
+  );
+  const [mushafTextScale, setMushafTextScale] = useState<MushafTextScale>(initialState.mushafTextScale ?? "medium");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
   const [quranReadingBookmark, setQuranReadingBookmark] = useState<QuranReadingPosition | undefined>(
     initialState.quranReadingBookmark,
@@ -469,6 +475,8 @@ function AppContent() {
       khatmahPage,
       mushafTheme,
       mushafLayout,
+      mushafToolbarSide,
+      mushafTextScale,
       mushafBookmarks,
       quranReadingBookmark,
       mushafVerseBookmarks,
@@ -509,6 +517,8 @@ function AppContent() {
       khatmahPage,
       mushafTheme,
       mushafLayout,
+      mushafToolbarSide,
+      mushafTextScale,
       mushafBookmarks,
       quranReadingBookmark,
       mushafVerseBookmarks,
@@ -671,6 +681,8 @@ function AppContent() {
     setKhatmahPage(state.khatmahPage ?? 1);
     setMushafTheme(state.mushafTheme ?? "follow-app");
     setMushafLayout(state.mushafLayout ?? "auto");
+    setMushafToolbarSide(state.mushafToolbarSide ?? "right");
+    setMushafTextScale(state.mushafTextScale ?? "medium");
     setMushafBookmarks(state.mushafBookmarks ?? []);
     setQuranReadingBookmark(state.quranReadingBookmark);
     setMushafVerseBookmarks(state.mushafVerseBookmarks ?? []);
@@ -1501,6 +1513,10 @@ function AppContent() {
                   setMushafTheme={setMushafTheme}
                   mushafLayout={mushafLayout}
                   setMushafLayout={setMushafLayout}
+                  mushafToolbarSide={mushafToolbarSide}
+                  setMushafToolbarSide={setMushafToolbarSide}
+                  mushafTextScale={mushafTextScale}
+                  setMushafTextScale={setMushafTextScale}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
                   quranReadingBookmark={quranReadingBookmark}

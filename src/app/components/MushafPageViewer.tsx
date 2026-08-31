@@ -11,12 +11,12 @@ import {
   type ReactNode,
   type MutableRefObject,
 } from "react";
-import type { AppLanguage, MushafPageTheme } from "../types";
+import type { AppLanguage, MushafPageTheme, MushafTextScale } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
 import { t } from "../i18n";
 import { Bookmark } from "./icons";
 import { formatNumerals } from "../formatting";
-import { getSurahDisplayName } from "../content/surahInfo";
+import { getJuzNumberForPage, getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
@@ -396,6 +396,23 @@ const JUSTIFY_FILL_THRESHOLD = 0.82;
  */
 const SLOT_INK_ALLOWANCE = { "qcf-v2": 0.88, fallback: 0.68 } as const;
 
+/**
+ * The reader's type-size choice, as a multiplier on the ink allowance above.
+ *
+ * It scales the letters inside the fifteen slots. It cannot add, remove, or
+ * re-break a line, because those are page data — so "larger text" here means
+ * exactly what it means in print: the same page, set heavier.
+ */
+const TEXT_SCALE_FACTOR: Record<MushafTextScale, number> = { small: 0.9, medium: 1, large: 1.08 };
+
+/** Past this the descenders of one line reach the marks of the next. */
+const MAX_INK_ALLOWANCE = 0.94;
+
+export function resolveInkAllowance(useQcfGlyphs: boolean, textScale: MushafTextScale) {
+  const base = useQcfGlyphs ? SLOT_INK_ALLOWANCE["qcf-v2"] : SLOT_INK_ALLOWANCE.fallback;
+  return Math.min(base * TEXT_SCALE_FACTOR[textScale], MAX_INK_ALLOWANCE);
+}
+
 function useLineFitter(dependencyKey: string, inkAllowance: number) {
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
@@ -412,7 +429,11 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const first = contents[0];
       if (!column || !first) return;
 
-      const page = (canvas.parentElement as HTMLElement | null) ?? column;
+      /* The two halves of a spread share one parent, so writing the measure
+         there gave both pages whichever fitter happened to run last. Each page
+         owns its own measure: the vars are set on its canvas and inherited by
+         its column. */
+      const page = canvas;
 
       // Reset measure & fit to base before measuring
       page.style.setProperty("--mushaf-measure", "100%");
@@ -544,6 +565,52 @@ function useLineDetails(lines: MushafWordToken[][], pageNumber: number) {
 }
 
 /**
+ * The printed page's own header and footer.
+ *
+ * A bound Mushaf names every page on the page itself — surah at the head, juz
+ * at the outer corner, the number at the foot — and that is what makes a
+ * two-page spread legible: the chrome can only ever name one of the two pages,
+ * while the paper names both. The bands sit outside the fifteen line slots, so
+ * the canonical geometry is untouched; only the height the slots divide changes.
+ */
+function PageFurnitureHead({
+  surahNumber,
+  juzNumber,
+  language,
+}: {
+  surahNumber: number | null;
+  juzNumber: number;
+  language: AppLanguage;
+}) {
+  return (
+    <div className="mushaf-page-furniture flex shrink-0 items-center justify-between gap-2" dir="rtl">
+      <span className="mushaf-page-furniture__juz arabic-ui min-w-0 shrink truncate" aria-hidden="true">
+        {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+      </span>
+      {surahNumber !== null && (
+        <span className="mushaf-page-furniture__cartouche arabic-ui truncate" aria-hidden="true">
+          {getSurahDisplayName(surahNumber, language)}
+        </span>
+      )}
+      {/* Balances the juz label so the cartouche stays optically centred. */}
+      <span className="mushaf-page-furniture__juz invisible min-w-0 shrink truncate" aria-hidden="true">
+        {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
+      </span>
+    </div>
+  );
+}
+
+function PageFurnitureFoot({ pageNumber, language }: { pageNumber: number; language: AppLanguage }) {
+  return (
+    <div className="mushaf-page-furniture flex shrink-0 items-center justify-center" dir="rtl">
+      <span className="mushaf-page-furniture__folio tabular-nums" aria-hidden="true">
+        {formatNumerals(pageNumber, language)}
+      </span>
+    </div>
+  );
+}
+
+/**
  * One printed page: its glosses, its fifteen slots, its own fitter.
  *
  * Lifted out of the viewer so a wide screen can hold two side by side.
@@ -561,6 +628,8 @@ function MushafPageCanvas({
   showWordMeanings,
   inkStroke,
   spreadSide,
+  textScale,
+  showPageIdentity,
   onAyahAction,
   highlightedVerseKey,
 }: {
@@ -573,6 +642,16 @@ function MushafPageCanvas({
   showWordMeanings: boolean;
   inkStroke: string;
   spreadSide?: "right" | "left";
+  textScale: MushafTextScale;
+  /**
+   * Whether the page names itself.
+   *
+   * Where the chrome already carries the surah forty pixels above the paper —
+   * a phone, a portrait tablet — a second copy inside the frame buys nothing
+   * and costs a tenth of the reading height. In a spread, in a rail layout, or
+   * with the chrome hidden, the page is the only thing that can say where it is.
+   */
+  showPageIdentity: boolean;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
 }) {
@@ -602,9 +681,22 @@ function MushafPageCanvas({
 
   const lineDetails = useLineDetails(lines, pageNumber);
   const canvasRef = useLineFitter(
-    `${pageNumber}:${useQcfGlyphs}:${lines.length}`,
-    useQcfGlyphs ? SLOT_INK_ALLOWANCE["qcf-v2"] : SLOT_INK_ALLOWANCE.fallback,
+    `${pageNumber}:${useQcfGlyphs}:${lines.length}:${textScale}`,
+    resolveInkAllowance(useQcfGlyphs, textScale),
   );
+
+  /* Each page names itself, so a spread is not two anonymous columns under one
+     chrome label. Taken from the page's own first verse. */
+  const pageSurahNumber = useMemo(() => {
+    for (const line of lines) {
+      const first = line?.[0];
+      if (!first) continue;
+      const surah = Number(first.verseKey.split(":")[0]);
+      return Number.isFinite(surah) ? surah : null;
+    }
+    return null;
+  }, [lines]);
+  const pageJuzNumber = useMemo(() => getJuzNumberForPage(pageNumber), [pageNumber]);
   const handleActiveWordChange = useCallback((word: ActiveWord | null) => setActiveWord(word), []);
 
   const handleAyahAction = useCallback(
@@ -686,54 +778,67 @@ function MushafPageCanvas({
           </div>
         </>
       ) : (
-        <div
-          className={`relative z-10 flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
-          style={{
-            maxWidth: "var(--mushaf-measure, 100%)",
-            fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-            fontSize: useQcfGlyphs
-              ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
-              : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
-            WebkitTextStrokeWidth: inkStroke,
-            WebkitTextStrokeColor: "currentColor",
-          }}
-        >
-          {lineDetails.map((line, lineIdx) => (
-            <div key={lineIdx} className="min-h-0 w-full flex-1">
-              {line.type === "surah-header" ? (
-                <MushafSurahHeader surahNumber={line.surah} language={language} hideArtwork={false} />
-              ) : line.type === "surah-opening" ? (
-                <SurahOpeningBand
-                  surahNumber={line.surah}
-                  language={language}
-                  withBismillah={line.withBismillah}
-                  hideArtwork={false}
-                />
-              ) : line.type === "bismillah" ? (
-                <BismillahLine />
-              ) : line.type === "text" ? (
-                <MushafTextLine
-                  words={line.words}
-                  language={language}
-                  theme={theme}
-                  useQcfGlyphs={useQcfGlyphs}
-                  showWordMeanings={showWordMeanings}
-                  meanings={meanings}
-                  activeWord={
-                    activeWord &&
-                    line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
-                      ? activeWord
-                      : null
-                  }
-                  highlightedVerseKey={highlightedVerseKey}
-                  onActiveWordChange={handleActiveWordChange}
-                  onAyahAction={handleAyahAction}
-                />
-              ) : (
-                <div className="h-full" aria-hidden="true" />
-              )}
-            </div>
-          ))}
+        <div className="mushaf-page-frame relative z-10 flex h-full w-full flex-col">
+          {/* The manuscript rule, drawn in the page's own ink. */}
+          <div className="pointer-events-none absolute inset-0 rounded-sm border opacity-20" aria-hidden="true" />
+          {showPageIdentity && (
+            <PageFurnitureHead surahNumber={pageSurahNumber} juzNumber={pageJuzNumber} language={language} />
+          )}
+          {/* The fifteen slots, and nothing else: a stable hook for the
+              geometry assertions that guard DEC-089. */}
+          <div
+            data-mushaf-column=""
+            className={`flex min-h-0 w-full flex-1 flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
+            style={{
+              maxWidth: "var(--mushaf-measure, 100%)",
+              fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+              fontSize: useQcfGlyphs
+                ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
+              WebkitTextStrokeWidth: inkStroke,
+              WebkitTextStrokeColor: "currentColor",
+            }}
+          >
+            {lineDetails.map((line, lineIdx) => (
+              <div key={lineIdx} className="min-h-0 w-full flex-1">
+                {line.type === "surah-header" ? (
+                  <MushafSurahHeader surahNumber={line.surah} language={language} hideArtwork={false} />
+                ) : line.type === "surah-opening" ? (
+                  <SurahOpeningBand
+                    surahNumber={line.surah}
+                    language={language}
+                    withBismillah={line.withBismillah}
+                    hideArtwork={false}
+                  />
+                ) : line.type === "bismillah" ? (
+                  <BismillahLine />
+                ) : line.type === "text" ? (
+                  <MushafTextLine
+                    words={line.words}
+                    language={language}
+                    theme={theme}
+                    useQcfGlyphs={useQcfGlyphs}
+                    showWordMeanings={showWordMeanings}
+                    meanings={meanings}
+                    activeWord={
+                      activeWord &&
+                      line.words.some(
+                        (w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition,
+                      )
+                        ? activeWord
+                        : null
+                    }
+                    highlightedVerseKey={highlightedVerseKey}
+                    onActiveWordChange={handleActiveWordChange}
+                    onAyahAction={handleAyahAction}
+                  />
+                ) : (
+                  <div className="h-full" aria-hidden="true" />
+                )}
+              </div>
+            ))}
+          </div>
+          {showPageIdentity && <PageFurnitureFoot pageNumber={pageNumber} language={language} />}
         </div>
       )}
       <QuranWordPopover
@@ -802,10 +907,13 @@ export function MushafPageViewer({
   showWordMeanings = false,
   headerContent,
   footerContent,
+  railContent,
+  railSide = "right",
   progressBar,
   paperRef,
   pageTransitionDirection,
   reduceMotion = false,
+  textScale = "medium",
   facingPage,
   onAyahAction,
   highlightedVerseKey,
@@ -824,12 +932,21 @@ export function MushafPageViewer({
   showWordMeanings?: boolean;
   headerContent?: ReactNode;
   footerContent?: ReactNode;
+  /**
+   * A vertical tool rail beside the paper, used where the screen is wider than
+   * it is tall. It replaces the two horizontal bars rather than joining them:
+   * on a landscape screen height is the scarce dimension and width is not.
+   */
+  railContent?: ReactNode;
+  railSide?: "right" | "left";
   /** Always visible, whatever the chrome is doing. */
   progressBar?: ReactNode;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
   pageTransitionDirection?: "forward" | "backward";
   reduceMotion?: boolean;
+  /** Reading type size within the fixed fifteen-line geometry. */
+  textScale?: MushafTextScale;
   onAyahAction?: (verseKey: string, pageNumber: number) => void;
   highlightedVerseKey?: string | null;
 }) {
@@ -870,9 +987,15 @@ export function MushafPageViewer({
   const chromeBgClass =
     theme === "oled" ? "bg-black border-white/30 text-white" : "bg-card border-border text-card-foreground";
 
+  const useRail = Boolean(railContent);
+  /* A spread needs each half to name itself; so does any layout where the
+     chrome is not carrying the surah above the paper. */
+  const showPageIdentity = Boolean(facingPage) || useRail || !headerContent;
+
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full flex-col overflow-hidden transition-colors duration-200 ${themeClasses} ${theme === "oled" ? "" : `theme-${theme}`}`}
+      className={`relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "" : `theme-${theme}`}`}
+      data-mushaf-chrome-mode={useRail ? "rail" : "bars"}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
       aria-label={
@@ -889,7 +1012,9 @@ export function MushafPageViewer({
       </h1>
       {isBookmarked && (
         <div
-          className="pointer-events-none absolute top-14 end-4 z-20 flex items-center justify-center text-primary drop-shadow-md"
+          className={`pointer-events-none absolute end-4 z-20 flex items-center justify-center text-primary drop-shadow-md ${
+            headerContent && !useRail ? "top-14" : "top-2"
+          }`}
           role="img"
           aria-label={t(language, "mushaf.bookmarkSaved")}
         >
@@ -897,20 +1022,35 @@ export function MushafPageViewer({
         </div>
       )}
 
-      {/* The chrome occupies the physical Mushaf header/footer band permanently.
-          Its content is held to the same measure as the page, so on a wide
-          screen Previous and Next sit under the paper they turn rather than out
-          at the far corners of the display. */}
-      <div
-        data-mushaf-chrome="header"
-        className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
-      >
-        <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
-          {headerContent}
+      {/* On a landscape screen the tools stand beside the paper, because there
+          height is the scarce dimension and the two horizontal bars spent 112px
+          of it. Elsewhere the chrome keeps the physical Mushaf header/footer
+          band, its content held to the page's own measure so Previous and Next
+          sit under the paper they turn. */}
+      {useRail ? (
+        <div
+          data-mushaf-chrome="rail"
+          className={`relative flex shrink-0 flex-col ${railSide === "left" ? "border-s" : "border-e"} ${chromeBgClass}`}
+        >
+          {railContent}
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10">{progressBar}</div>
         </div>
-        {/* Progress bar positioned absolutely at the bottom of the top header */}
-        <div className="absolute bottom-0 left-0 right-0 translate-y-[1px] z-10">{progressBar}</div>
-      </div>
+      ) : headerContent ? (
+        <div
+          data-mushaf-chrome="header"
+          className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
+        >
+          <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
+            {headerContent}
+          </div>
+          {/* Progress bar positioned absolutely at the bottom of the top header */}
+          <div className="absolute bottom-0 left-0 right-0 translate-y-[1px] z-10">{progressBar}</div>
+        </div>
+      ) : (
+        /* Focus mode: no chrome at all, and the progress hairline is the last
+           thing to go — it is the only thing on screen that is not the page. */
+        <div className="pointer-events-none absolute inset-x-0 top-0 z-10">{progressBar}</div>
+      )}
 
       {/* One page, or two facing pages when the screen has room for both at a
           readable size. Ordered as the Mushaf is bound: the lower page number
@@ -918,7 +1058,7 @@ export function MushafPageViewer({
       <div
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
-        className={`flex min-h-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
+        className={`flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
       >
@@ -937,6 +1077,8 @@ export function MushafPageViewer({
             showWordMeanings={showWordMeanings}
             inkStroke={inkStroke}
             spreadSide={facingPage ? "right" : undefined}
+            textScale={textScale}
+            showPageIdentity={showPageIdentity}
             onAyahAction={onAyahAction}
             highlightedVerseKey={highlightedVerseKey}
           />
@@ -953,6 +1095,8 @@ export function MushafPageViewer({
                 showWordMeanings={showWordMeanings}
                 inkStroke={inkStroke}
                 spreadSide="left"
+                textScale={textScale}
+                showPageIdentity={showPageIdentity}
                 onAyahAction={onAyahAction}
                 highlightedVerseKey={highlightedVerseKey}
               />
@@ -971,14 +1115,16 @@ export function MushafPageViewer({
         )}
       </div>
 
-      <div
-        data-mushaf-chrome="footer"
-        className={`relative flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
-      >
-        <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
-          {footerContent}
+      {!useRail && footerContent && (
+        <div
+          data-mushaf-chrome="footer"
+          className={`relative flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
+        >
+          <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
+            {footerContent}
+          </div>
         </div>
-      </div>
+      )}
     </article>
   );
 }
