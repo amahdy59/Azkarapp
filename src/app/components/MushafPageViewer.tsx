@@ -636,34 +636,36 @@ function MushafPageCanvas({
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "11%",
-              bottom: "11%",
-              left: "20%",
-              right: "20%",
+              top: "14%",
+              bottom: "14%",
+              left: "22%",
+              right: "22%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(3.6cqi, 3.6cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(3.0cqi, 3.2cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(3.4cqi, 3.4cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(2.8cqi, 3.0cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
           >
             {/* Top Surah Title */}
-            <div className="w-full flex items-center justify-center shrink-0 h-[9%] min-h-0">
+            <div className="w-full flex items-center justify-center shrink-0 h-[8%] min-h-0">
               <h2
                 className="arabic-ui font-bold leading-none text-foreground"
-                style={{ fontSize: "clamp(12px, min(3.8cqi, 2.2cqh), 17px)" }}
+                style={{ fontSize: "clamp(12px, min(3.6cqi, 2.0cqh), 16px)" }}
                 data-testid="mushaf-surah-title"
               >
                 {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
               </h2>
             </div>
-            {/* Basmalah */}
-            <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0 my-0.5">
-              <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
-            </div>
+            {/* Basmalah: Al-Fatihah (page 1) has only one Basmalah which is Ayah 1 in its text lines */}
+            {pageNumber !== 1 && (
+              <div className="w-full flex items-center justify-center shrink-0 h-[9%] min-h-0 my-0.5">
+                <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
+              </div>
+            )}
             {/* Verses */}
-            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0">
+            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-1">
               {lineDetails
                 .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
                 .map((line, lineIdx) => (
