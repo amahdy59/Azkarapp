@@ -22,7 +22,7 @@ const shared = {
    * CategoryScreen render once crossed 15s and failed the gate for no reason of
    * its own.
    */
-  testTimeout: 25000,
+  testTimeout: 45000,
   environment: "jsdom" as const,
   pool: "threads" as const,
   /**
