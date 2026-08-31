@@ -26,6 +26,7 @@ const MAX_NOTES = 4;
 const USER_FACING_PATHS = [
   "src",
   "public",
+  ":(exclude)src/test/**",
   ":(exclude)src/**/*.test.ts",
   ":(exclude)src/**/*.test.tsx",
   ":(exclude)src/**/*.test.mjs",
