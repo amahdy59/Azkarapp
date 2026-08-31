@@ -636,26 +636,26 @@ function MushafPageCanvas({
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "7%",
-              bottom: "7%",
-              left: "11%",
-              right: "11%",
+              top: "4%",
+              bottom: "4%",
+              left: "6%",
+              right: "6%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(4.3cqi, 4.3cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(3.5cqi, 3.8cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(8.6cqi, 8.6cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(7cqi, 7.2cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
           >
             {/* Basmalah: Al-Fatihah (page 1) has only one Basmalah which is Ayah 1 in its text lines */}
             {pageNumber !== 1 && (
-              <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0 mb-1">
-                <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
+              <div className="w-full flex items-center justify-center shrink-0 h-[12%] min-h-0 mb-2">
+                <MushafBismillahArt className="h-full max-h-[90%] max-w-[70%] w-auto object-contain select-none" />
               </div>
             )}
             {/* Verses */}
-            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-0.5">
+            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-1">
               {lineDetails
                 .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
                 .map((line, lineIdx) => (

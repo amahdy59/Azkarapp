@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31i",
+  "release": "2026-08-31j",
   "ar": [
-    "تصميم إطار مستطيل إسلامي أنيق بأربعة خطوط مذهبة وزخارف ركنية محتوي داخل حدود الصفحة دون تجاوز.",
-    "عرض آيات الفاتحة ومطلع البقرة بحجم خط وافر ومحاذاة طبيعية مريحة للعين.",
-    "ضبط الهوامش الداخلية لمنع أي تداخل بين النصوص الشريفة وحدود الإطار المستطيل."
+    "تضخيم خط آيات الفاتحة ومطلع البقرة إلى ضعف الحجم الطبيعي لبروز قرآني أكثر وقاراً وإبهاجاً.",
+    "تخفيف الهوامش الداخلية لمنح الآيات أقصى مساحة ممكنة دون تجاوز حدود الإطار المستطيل.",
+    "تكبير خط بسم الله الرحمن الرحيم في صفحة البقرة ليتناسب مع الحجم المضخم للآيات."
   ],
   "en": [
-    "Refined opening pages with a majestic 4-stroke rectangular manuscript frame contained completely within the page bounds.",
-    "Prominent, legible Quranic font scale and natural optical centering with generous breathing room.",
-    "Calibrated rectangular margins to ensure no overflow past the screen across all device viewports."
+    "Doubled Quranic font size on opening pages (Al-Fatihah and start of Al-Baqarah) for a grand, immersive presence.",
+    "Reduced inset padding to maximise verse area while keeping all text safely within the ornamental rectangular frame.",
+    "Enlarged the Bismillah calligraphy on page 2 to match the new larger verse scale."
   ]
 }
