@@ -51,7 +51,7 @@ export const MushafOpeningFrameArt = memo(function MushafOpeningFrameArt({
 
   return (
     <div
-      className={className}
+      className={`${className} [&>svg]:h-full [&>svg]:w-full [&>svg]:block`}
       aria-hidden="true"
       role="presentation"
       data-testid="mushaf-opening-frame"

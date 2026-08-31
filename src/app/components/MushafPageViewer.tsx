@@ -636,14 +636,14 @@ function MushafPageCanvas({
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "14%",
-              bottom: "14%",
-              left: "22%",
-              right: "22%",
+              top: "10%",
+              bottom: "10%",
+              left: "17%",
+              right: "17%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(3.4cqi, 3.4cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(2.8cqi, 3.0cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(3.8cqi, 3.8cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.1cqi, 3.3cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}

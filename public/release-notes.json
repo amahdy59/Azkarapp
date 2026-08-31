@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31e",
+  "release": "2026-08-31f",
   "ar": [
+    "تصميم إطار متجهي إسلامي متناسق بنسب الصفحة المصحفية مع مساحات تنفس وهوامش واسعة.",
     "اعتماد البسملة الشريفة الواحدة لسورة الفاتحة باعتبارها الآية الأولى دون تكرار ترويسي.",
-    "توسيع الهوامش الداخلية وتوفير مساحات تنفس مريحة للنصوص القرآنية داخل إطار الفاتحة ومطلع البقرة.",
-    "عرض النصوص القرآنية بنسبها الطبيعية دون أي تمدد أو ضغط مع محاذاة مركزية متقنة."
+    "عرض النصوص القرآنية بنسبها الطبيعية دون أي تمدد أو ضغط مع محاذاة وتوسيط متقن."
   ],
   "en": [
-    "Ensure single Basmalah for Surah Al-Fatihah as its first verse with no duplicate header banner.",
-    "Generous inner padding and breathing room for devotional Quranic text inside the opening vector frame.",
-    "Natural text proportions and optical centering with zero text distortion or stretching."
+    "Harmonious Islamic manuscript vector frame proportioned for devotional pages with ample breathing room.",
+    "Single authentic Basmalah for Surah Al-Fatihah as its first verse with no duplicate banner.",
+    "Natural text metrics and optical centering with zero text distortion or stretching."
   ]
 }
