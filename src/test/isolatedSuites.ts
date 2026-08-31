@@ -13,6 +13,7 @@
 export const ISOLATED_SUITES = [
   "src/app/App.composition.test.tsx",
   "src/app/components/AppErrorBoundary.test.tsx",
+  "src/app/content/qcfMushaf.test.ts",
   "src/app/hooks/useAuthHandlers.test.ts",
   "src/app/hooks/usePwaLifecycle.test.ts",
   "src/app/hooks/useRemoteAccountSync.test.tsx",
