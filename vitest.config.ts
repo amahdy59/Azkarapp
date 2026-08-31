@@ -30,7 +30,7 @@ const shared = {
    * build and the type-checker; an unbounded pool took every core, and the
    * resulting contention stretched an ordinary test past its 15-second timeout.
    */
-  maxWorkers: Math.max(2, Math.floor(cpuCount / 2)),
+  maxWorkers: Math.min(4, Math.max(2, Math.floor(cpuCount / 4))),
   setupFiles: ["./src/test/setup.ts"],
 };
 
