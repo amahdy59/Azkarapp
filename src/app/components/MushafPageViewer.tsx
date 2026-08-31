@@ -632,35 +632,35 @@ function MushafPageCanvas({
               className="absolute inset-0 h-full w-full pointer-events-none select-none z-0"
             />
           </Suspense>
-          {/* Content Area within Arch */}
+          {/* Content Area within Cartouche */}
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "9%",
-              bottom: "14%",
-              left: "12%",
-              right: "12%",
+              top: "11%",
+              bottom: "11%",
+              left: "20%",
+              right: "20%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(4.2cqi, 4.2cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(3.4cqi, 3.8cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(3.6cqi, 3.6cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.0cqi, 3.2cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
           >
             {/* Top Surah Title */}
-            <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0">
+            <div className="w-full flex items-center justify-center shrink-0 h-[9%] min-h-0">
               <h2
                 className="arabic-ui font-bold leading-none text-foreground"
-                style={{ fontSize: "clamp(13px, min(4.2cqi, 2.4cqh), 19px)" }}
+                style={{ fontSize: "clamp(12px, min(3.8cqi, 2.2cqh), 17px)" }}
                 data-testid="mushaf-surah-title"
               >
                 {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
               </h2>
             </div>
             {/* Basmalah */}
-            <div className="w-full flex items-center justify-center shrink-0 h-[12%] min-h-0 my-0.5">
-              <MushafBismillahArt className="h-full max-h-[90%] max-w-[55%] w-auto object-contain select-none" />
+            <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0 my-0.5">
+              <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
             </div>
             {/* Verses */}
             <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0">

@@ -1,4 +1,23 @@
-import { memo } from "react";
+import { useEffect, useState, memo } from "react";
+
+let cachedSvgText: string | null = null;
+let fetchPromise: Promise<string> | null = null;
+
+function loadSvg(): Promise<string> {
+  if (cachedSvgText) return Promise.resolve(cachedSvgText);
+  if (!fetchPromise) {
+    const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
+    const url = `${base}/images/mushaf-fatiha-frame.svg`;
+    fetchPromise = fetch(url)
+      .then((res) => (res.ok ? res.text() : ""))
+      .then((text) => {
+        cachedSvgText = text;
+        return text;
+      })
+      .catch(() => "");
+  }
+  return fetchPromise;
+}
 
 export interface MushafOpeningFrameArtProps {
   pageNumber?: number;
@@ -6,24 +25,37 @@ export interface MushafOpeningFrameArtProps {
 }
 
 /**
- * Authentic Arched Islamic Manuscript Border for Opening Pages (Al-Fatihah & Al-Baqarah start).
- * Sourced from classical illuminated Mushaf opening arch geometry.
+ * Authentic Islamic Illuminated Manuscript Vector Frame for Opening Pages (Al-Fatihah & start of Al-Baqarah).
+ * Rendered from SVG vector art with theme-adaptive colors.
  */
 export const MushafOpeningFrameArt = memo(function MushafOpeningFrameArt({
   className = "absolute inset-0 h-full w-full pointer-events-none select-none",
 }: MushafOpeningFrameArtProps) {
-  const base = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");
-  const src = `${base}/images/mushaf-opening-arch.png`;
+  const [svgContent, setSvgContent] = useState<string>(cachedSvgText || "");
+
+  useEffect(() => {
+    if (!cachedSvgText) {
+      let isMounted = true;
+      loadSvg().then((text) => {
+        if (isMounted) setSvgContent(text);
+      });
+      return () => {
+        isMounted = false;
+      };
+    }
+  }, []);
+
+  if (!svgContent) {
+    return <div className={className} aria-hidden="true" role="presentation" data-testid="mushaf-opening-frame" />;
+  }
 
   return (
-    <img
-      src={src}
-      alt=""
+    <div
       className={className}
       aria-hidden="true"
       role="presentation"
       data-testid="mushaf-opening-frame"
-      style={{ objectFit: "fill" }}
+      dangerouslySetInnerHTML={{ __html: svgContent }}
     />
   );
 });
