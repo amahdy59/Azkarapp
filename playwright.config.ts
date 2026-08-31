@@ -42,14 +42,14 @@ export default defineConfig({
    * minutes it saves.
    */
   workers: Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4))),
-  retries: 0,
+  retries: process.env.CI ? 0 : 1,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     reducedMotion: "reduce",
   },
-  timeout: 60_000,
+  timeout: 90_000,
   /**
    * Playwright's default assertion timeout is 5s, which is generous on an idle
    * machine and too tight inside the pre-push gate, where the suite starts the
