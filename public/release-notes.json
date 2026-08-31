@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-30k",
+  "release": "2026-08-31a",
   "ar": [
-    "محاذاة عنوان السورة بدقة متناهية في منتصف ومركز الزخرفة الإطارية (v2) دون أي إزاحة.",
-    "تثبيت طبقات الزخرفة كخلفية موضعية تضمن احتواء النص القرآني بشكل متوازن في كافة السمات.",
-    "تحسين التوافق البصري لخطوط العناوين والبسملة مع الحفاظ على الشبكة الكنسية لمصحف المدينة."
+    "إضافة الإطار الزخرفي الزمردي الأصيل لصفحتي البداية (الفاتحة وأول البقرة) بتطابق كامل مع مصحف المدينة.",
+    "محاذاة دقيقة لعنوان السورة داخل الإطار العلوي والآيات داخل القنديل المركزي بنفس حجم خط نصوص المصحف.",
+    "توافق لوني كامل مع كافة السمات الفاتحة والداكنة مع تحسين سلاسة التنقل والانتقال بين صفحات المصحف."
   ],
   "en": [
-    "Perfect center and middle alignment of Surah titles inside the illuminated cartouche artwork (v2).",
-    "Layered vector backdrop architecture preventing text shifting or horizontal misplacement.",
-    "Refined visual harmony and font balance across all dark, midnight, and light themes."
+    "Authentic emerald illuminated manuscript border for opening pages (Al-Fatihah and Al-Baqarah start).",
+    "Precise alignment of Surah cartouche headers and medallion verses matching standard Mushaf font sizes.",
+    "Full theme adaptation across dark and light modes with enhanced, high-performance page transitions."
   ]
 }

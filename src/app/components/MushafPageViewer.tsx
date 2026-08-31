@@ -1,5 +1,7 @@
 import {
+  lazy,
   memo,
+  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -18,8 +20,9 @@ import { getSurahDisplayName } from "../content/surahInfo";
 import { QuranWordPopover } from "./QuranWordPopover";
 import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
-import { MushafOpeningFrameArt } from "./MushafOpeningFrameArt";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
+
+const MushafOpeningFrameArt = lazy(() => import("./MushafOpeningFrameArt"));
 
 export interface MushafWordToken {
   verseKey: string;
@@ -637,58 +640,129 @@ function MushafPageCanvas({
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
-      {isOpening && (
-        <MushafOpeningFrameArt className="absolute inset-0 h-full w-full pointer-events-none select-none opacity-85 z-0" />
-      )}
-      <div
-        className={`relative z-10 flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
-        style={{
-          maxWidth: "var(--mushaf-measure, 100%)",
-          fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-          fontSize: useQcfGlyphs
-            ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
-            : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
-          WebkitTextStrokeWidth: inkStroke,
-          WebkitTextStrokeColor: "currentColor",
-        }}
-      >
-        {lineDetails.map((line, lineIdx) => (
-          <div key={lineIdx} className="min-h-0 w-full flex-1">
-            {line.type === "surah-header" ? (
-              <MushafSurahHeader surahNumber={line.surah} language={language} hideArtwork={isOpening} />
-            ) : line.type === "surah-opening" ? (
-              <SurahOpeningBand
-                surahNumber={line.surah}
-                language={language}
-                withBismillah={line.withBismillah}
-                hideArtwork={isOpening}
-              />
-            ) : line.type === "bismillah" ? (
-              <BismillahLine />
-            ) : line.type === "text" ? (
-              <MushafTextLine
-                words={line.words}
-                language={language}
-                theme={theme}
-                useQcfGlyphs={useQcfGlyphs}
-                showWordMeanings={showWordMeanings}
-                meanings={meanings}
-                activeWord={
-                  activeWord &&
-                  line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
-                    ? activeWord
-                    : null
-                }
-                highlightedVerseKey={highlightedVerseKey}
-                onActiveWordChange={handleActiveWordChange}
-                onAyahAction={handleAyahAction}
-              />
-            ) : (
-              <div className="h-full" aria-hidden="true" />
-            )}
+      {isOpening ? (
+        <>
+          <Suspense fallback={null}>
+            <MushafOpeningFrameArt
+              pageNumber={pageNumber}
+              className="absolute inset-0 h-full w-full pointer-events-none select-none z-0"
+            />
+          </Suspense>
+          {/* Top Cartouche Pill */}
+          <div
+            className="absolute z-10 flex items-center justify-center text-center pointer-events-none select-none"
+            style={{
+              top: "17.2%",
+              height: "6.5%",
+              left: pageNumber === 1 ? "28%" : "17%",
+              right: pageNumber === 1 ? "17%" : "28%",
+            }}
+          >
+            <h2
+              className="arabic-ui font-bold leading-none text-foreground"
+              style={{ fontSize: "clamp(12px, min(4.2cqi, 2.4cqh), 18px)" }}
+              data-testid="mushaf-surah-title"
+            >
+              {getSurahDisplayName(pageNumber === 1 ? 1 : 2, language)}
+            </h2>
           </div>
-        ))}
-      </div>
+          {/* Central Circular Medallion */}
+          <div
+            className="absolute z-10 flex flex-col justify-evenly items-center text-center px-1"
+            style={{
+              top: "29.5%",
+              bottom: "27%",
+              left: pageNumber === 1 ? "23%" : "12%",
+              right: pageNumber === 1 ? "12%" : "23%",
+              fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+              fontSize: useQcfGlyphs
+                ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
+              WebkitTextStrokeWidth: inkStroke,
+              WebkitTextStrokeColor: "currentColor",
+            }}
+          >
+            <div className="w-full flex items-center justify-center">
+              <BismillahText text="بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ" />
+            </div>
+            {lineDetails
+              .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
+              .map((line, lineIdx) => (
+                <div key={lineIdx} className="w-full flex items-center justify-center">
+                  <MushafTextLine
+                    words={line.words}
+                    language={language}
+                    theme={theme}
+                    useQcfGlyphs={useQcfGlyphs}
+                    showWordMeanings={showWordMeanings}
+                    meanings={meanings}
+                    activeWord={
+                      activeWord &&
+                      line.words.some(
+                        (w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition,
+                      )
+                        ? activeWord
+                        : null
+                    }
+                    highlightedVerseKey={highlightedVerseKey}
+                    onActiveWordChange={handleActiveWordChange}
+                    onAyahAction={handleAyahAction}
+                  />
+                </div>
+              ))}
+          </div>
+        </>
+      ) : (
+        <div
+          className={`relative z-10 flex h-full w-full flex-col ${spreadSide === "right" ? "ml-0 mr-auto" : spreadSide === "left" ? "ml-auto mr-0" : "mx-auto"}`}
+          style={{
+            maxWidth: "var(--mushaf-measure, 100%)",
+            fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
+            fontSize: useQcfGlyphs
+              ? "calc(min(4.6cqi, 4.6cqh) * var(--mushaf-fit, 1))"
+              : "calc(min(3.6cqi, 4.1cqh) * var(--mushaf-fit, 1))",
+            WebkitTextStrokeWidth: inkStroke,
+            WebkitTextStrokeColor: "currentColor",
+          }}
+        >
+          {lineDetails.map((line, lineIdx) => (
+            <div key={lineIdx} className="min-h-0 w-full flex-1">
+              {line.type === "surah-header" ? (
+                <MushafSurahHeader surahNumber={line.surah} language={language} hideArtwork={false} />
+              ) : line.type === "surah-opening" ? (
+                <SurahOpeningBand
+                  surahNumber={line.surah}
+                  language={language}
+                  withBismillah={line.withBismillah}
+                  hideArtwork={false}
+                />
+              ) : line.type === "bismillah" ? (
+                <BismillahLine />
+              ) : line.type === "text" ? (
+                <MushafTextLine
+                  words={line.words}
+                  language={language}
+                  theme={theme}
+                  useQcfGlyphs={useQcfGlyphs}
+                  showWordMeanings={showWordMeanings}
+                  meanings={meanings}
+                  activeWord={
+                    activeWord &&
+                    line.words.some((w) => w.verseKey === activeWord.verseKey && w.position === activeWord.wordPosition)
+                      ? activeWord
+                      : null
+                  }
+                  highlightedVerseKey={highlightedVerseKey}
+                  onActiveWordChange={handleActiveWordChange}
+                  onAyahAction={handleAyahAction}
+                />
+              ) : (
+                <div className="h-full" aria-hidden="true" />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       <QuranWordPopover
         meanings={activeWord ? [activeWord.meaning] : null}
         anchorEl={activeWord?.anchor ?? null}

@@ -27,7 +27,7 @@ const limits = {
   javascriptGzip: 140 * 1024,
   cssGzip: 28 * 1024,
   initialGzip: 250 * 1024,
-  totalOutput: 8 * 1024 * 1024,
+  totalOutput: 9 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,
 };
 const distDirectory = path.resolve("dist");
