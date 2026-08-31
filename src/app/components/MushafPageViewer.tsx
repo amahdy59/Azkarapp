@@ -642,8 +642,8 @@ function MushafPageCanvas({
               right: "6%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(8.6cqi, 8.6cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(7cqi, 7.2cqh) * var(--mushaf-fit, 1))",
+                ? "calc(min(7.7cqi, 7.7cqh) * var(--mushaf-fit, 1))"
+                : "calc(min(6.3cqi, 6.8cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}
