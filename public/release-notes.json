@@ -1,13 +1,13 @@
 {
-  "release": "2026-08-31h",
+  "release": "2026-08-31i",
   "ar": [
-    "تكبير خط آيات المصحف في صفحات البداية لتطابق حجم المصحف الطبيعي مع تباعد مريح ومنع التبرير القسري للكلمات.",
-    "إزالة تكرار عنوان السورة داخل الإطار الزخرفي للاكتفاء بعنوان الترويسة العليا وإتاحة مساحة رحبة للآيات.",
-    "توسيع هوامش القوس الزخرفي لضمان احتواء كامل الكلمات الشريفة دون ملامسة الحواف المذهبة."
+    "تصميم إطار مستطيل إسلامي أنيق بأربعة خطوط مذهبة وزخارف ركنية محتوي داخل حدود الصفحة دون تجاوز.",
+    "عرض آيات الفاتحة ومطلع البقرة بحجم خط وافر ومحاذاة طبيعية مريحة للعين.",
+    "ضبط الهوامش الداخلية لمنع أي تداخل بين النصوص الشريفة وحدود الإطار المستطيل."
   ],
   "en": [
-    "Increased Quranic font size on opening pages to match natural Mushaf measure with natural word spacing and zero forced justification.",
-    "Removed duplicate in-frame surah title to rely cleanly on header navigation and expand sacred text measure.",
-    "Calibrated ornamental arch padding to ensure all verses sit comfortably inside the illuminated frame."
+    "Refined opening pages with a majestic 4-stroke rectangular manuscript frame contained completely within the page bounds.",
+    "Prominent, legible Quranic font scale and natural optical centering with generous breathing room.",
+    "Calibrated rectangular margins to ensure no overflow past the screen across all device viewports."
   ]
 }

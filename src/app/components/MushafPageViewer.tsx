@@ -636,13 +636,13 @@ function MushafPageCanvas({
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "8%",
-              bottom: "8%",
-              left: "14%",
-              right: "14%",
+              top: "7%",
+              bottom: "7%",
+              left: "11%",
+              right: "11%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               fontSize: useQcfGlyphs
-                ? "calc(min(4.4cqi, 4.4cqh) * var(--mushaf-fit, 1))"
+                ? "calc(min(4.3cqi, 4.3cqh) * var(--mushaf-fit, 1))"
                 : "calc(min(3.5cqi, 3.8cqh) * var(--mushaf-fit, 1))",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
@@ -651,7 +651,7 @@ function MushafPageCanvas({
             {/* Basmalah: Al-Fatihah (page 1) has only one Basmalah which is Ayah 1 in its text lines */}
             {pageNumber !== 1 && (
               <div className="w-full flex items-center justify-center shrink-0 h-[10%] min-h-0 mb-1">
-                <MushafBismillahArt className="h-full max-h-[85%] max-w-[38%] w-auto object-contain select-none" />
+                <MushafBismillahArt className="h-full max-h-[85%] max-w-[42%] w-auto object-contain select-none" />
               </div>
             )}
             {/* Verses */}
