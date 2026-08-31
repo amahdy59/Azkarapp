@@ -21,6 +21,8 @@ interface QuickMenuItem {
   onSelect: () => void;
   pressed?: boolean;
   disabled?: boolean;
+  /** A chevron promises another surface. Items that just act do not get one. */
+  opensSurface?: boolean;
   testId?: string;
 }
 
@@ -72,6 +74,7 @@ export function MushafQuickMenu({
       detail: `${surahName} · ${t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}`,
       icon: <List size={19} aria-hidden="true" />,
       onSelect: onOpenIndex,
+      opensSurface: true,
       testId: "mushaf-quick-index",
     },
     {
@@ -79,6 +82,7 @@ export function MushafQuickMenu({
       label: t(language, "mushaf.tabBookmarks"),
       icon: <Bookmark size={19} aria-hidden="true" />,
       onSelect: onOpenBookmarks,
+      opensSurface: true,
       testId: "mushaf-quick-bookmarks",
     },
     {
@@ -120,6 +124,7 @@ export function MushafQuickMenu({
       label: t(language, "mushaf.readingSettings"),
       icon: <SlidersHorizontal size={19} aria-hidden="true" />,
       onSelect: onOpenSettings,
+      opensSurface: true,
       testId: "mushaf-quick-settings",
     },
   ];
@@ -169,7 +174,7 @@ export function MushafQuickMenu({
                   <span className="mt-0.5 block truncate text-xs font-medium text-muted-foreground">{item.detail}</span>
                 )}
               </span>
-              {!isToggle && <Chevron size={16} className="shrink-0 opacity-40" aria-hidden="true" />}
+              {item.opensSurface && <Chevron size={16} className="shrink-0 opacity-40" aria-hidden="true" />}
             </button>
           );
         })}
