@@ -561,6 +561,10 @@ export function HomeScreen({
                       dailyCompletions={dailyCompletions}
                       onSelectCategory={onResume}
                       visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
+                      // The hero above is already offering this routine. Marking
+                      // its row keeps the day's checklist complete while stopping
+                      // the two from reading as two separate things to do.
+                      recommendedCategoryId={showRoutineCard ? reminderInfo.categoryId : undefined}
                       onOpenWirdBenefits={onOpenWirdBenefits}
                     />
                   </div>
@@ -573,7 +577,10 @@ export function HomeScreen({
             <section
               data-testid="after-prayer-trackers"
               dir={direction}
-              className="overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
+              // Matches the shared Card surface (border-border/40). This card sat
+              // beside two Card-based siblings wearing a full-strength border, so
+              // three visually identical surfaces carried three different rules.
+              className="overflow-hidden rounded-3xl border border-border/40 bg-card text-foreground shadow-raised"
             >
               {/* The header sits above a hairline in the brand gold, as in the
                   approved design: it separates chrome from the row of cards

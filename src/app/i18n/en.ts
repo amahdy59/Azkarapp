@@ -1174,6 +1174,7 @@ const en = {
     postPrayerShort: "Post-Prayer",
     completed: "Completed",
     notCompleted: "Not completed",
+    startNow: "Start now",
     done: "Done",
     notDone: "Not done",
     complete: "Complete",

@@ -40,6 +40,7 @@ export function TodayRoutineGarden({
   dailyCompletions = [],
   onSelectCategory,
   visibleCategoryIds,
+  recommendedCategoryId,
   onOpenWirdBenefits,
   onMedia = true,
   activeTab = "day",
@@ -52,6 +53,8 @@ export function TodayRoutineGarden({
   onMedia?: boolean;
   /** Passed through to the day view; see ProgressDayView for the contract. */
   visibleCategoryIds?: readonly CategoryId[];
+  /** The routine the surrounding screen is already offering to start. */
+  recommendedCategoryId?: CategoryId;
   onOpenShareModal?: () => void;
   calendarType?: "hijri" | "gregorian";
   dailyCompletions?: DailyCollectionCompletion[];
@@ -120,6 +123,10 @@ export function TodayRoutineGarden({
         {...(hideTabs ? {} : tabPanelProps("garden", activeTab))}
         className="outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
+        {/* Home places this card beside the routine card in the hero grid, not
+            inside it, so the two are siblings and both take an h2. It had been
+            an h3, which told assistive technology that today's wird was a
+            subsection of whichever routine the hero happened to recommend. */}
         {activeTab === "day" && (
           <ProgressDayView
             onMedia={onMedia}
@@ -128,7 +135,8 @@ export function TodayRoutineGarden({
             dynamicSubtitle={dynamicSubtitle}
             onSelectCategory={onSelectCategory}
             visibleCategoryIds={visibleCategoryIds}
-            headingLevel={hideTabs ? 3 : 2}
+            headingLevel={2}
+            recommendedCategoryId={recommendedCategoryId}
             onOpenWirdBenefits={onOpenWirdBenefits}
           />
         )}

@@ -52,6 +52,37 @@ describe("ProgressViews components", () => {
     expect(screen.getByRole("button", { name: "أذكار الصباح - مكتملة" })).toBeInTheDocument();
   });
 
+  it("adds the recommendation to a routine's name without displacing its status", () => {
+    render(
+      <ProgressDayView
+        summary={mockSummary}
+        language="en"
+        dynamicSubtitle="One of three routines complete"
+        recommendedCategoryId="evening"
+      />,
+    );
+
+    // Substituting the recommendation for the status left a screen-reader user
+    // knowing this routine was suggested but not whether they had done it, and
+    // it silently dropped the row out of every "- Not completed" query.
+    expect(screen.getByRole("button", { name: "Evening Azkar - Start now - Not completed" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Morning Azkar - Completed" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Sleep Azkar - Not completed" })).toBeInTheDocument();
+  });
+
+  it("does not recommend a routine the reader already completed today", () => {
+    render(
+      <ProgressDayView
+        summary={mockSummary}
+        language="en"
+        dynamicSubtitle="One of three routines complete"
+        recommendedCategoryId="morning"
+      />,
+    );
+
+    expect(screen.getByRole("button", { name: "Morning Azkar - Completed" })).toBeInTheDocument();
+  });
+
   it("reveals the palm explanation inside the card instead of an anchored overflow", () => {
     render(<ProgressDayView summary={mockSummary} language="en" dynamicSubtitle="One of three routines complete" />);
 

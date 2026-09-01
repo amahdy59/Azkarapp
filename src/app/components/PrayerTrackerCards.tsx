@@ -152,6 +152,9 @@ function PrayerCard({
 
   return (
     <article
+      // Five unnamed articles announce as "article, article, article…". Naming
+      // each from its own prayer heading makes the carousel navigable.
+      aria-labelledby={`prayer-card-heading-${prayer}`}
       data-testid={`prayer-card-${prayer}`}
       data-prayer={prayer}
       data-prayer-state={state}
@@ -182,7 +185,11 @@ function PrayerCard({
         >
           <Icon size={20} />
         </span>
-        <h3 className="mt-1.5 text-[0.9375rem] font-black text-foreground" dir="auto">
+        <h3
+          id={`prayer-card-heading-${prayer}`}
+          className="mt-1.5 text-[0.9375rem] font-black text-foreground"
+          dir="auto"
+        >
           {name}
         </h3>
         {/* The time is the strongest thing in the card: it is what the reader

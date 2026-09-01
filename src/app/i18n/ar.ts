@@ -1188,6 +1188,7 @@ const ar = {
     postPrayerShort: "بعد الصلاة",
     completed: "مكتملة",
     notCompleted: "غير مكتملة",
+    startNow: "ابدأ الآن",
     done: "مكتملة",
     notDone: "لم تبدأ",
     complete: "مكتمل",

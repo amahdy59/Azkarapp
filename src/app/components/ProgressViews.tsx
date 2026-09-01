@@ -60,6 +60,8 @@ function MainDhikrGroupCard({
   onPress,
   compact = false,
   onMedia = true,
+  isRecommendedNow = false,
+  recommendedLabel,
   subItems,
 }: {
   name: string;
@@ -76,10 +78,21 @@ function MainDhikrGroupCard({
    * active theme. `false` swaps them for ordinary theme surfaces.
    */
   onMedia?: boolean;
+  /**
+   * The routine the hero above is already offering to start.
+   *
+   * Home shows that routine twice within one screen — as the hero's call to
+   * action and again as a row here — and without a mark the two read as two
+   * separate things to do rather than one. The row keeps its place, because
+   * removing it would leave the day's checklist with a hole in it.
+   */
+  isRecommendedNow?: boolean;
+  recommendedLabel?: string;
   subItems?: { id: string; name: string; isCompleted: boolean }[];
 }) {
   const isCompleted = status === "completed";
   const statusLabel = isCompleted ? completedLabel : pendingLabel;
+  const showRecommended = isRecommendedNow && !isCompleted && Boolean(recommendedLabel);
 
   return (
     <button
@@ -98,7 +111,11 @@ function MainDhikrGroupCard({
             ? "border-white/10 bg-black/30 text-white shadow-raised hover:border-white/20 hover:bg-black/40"
             : "border-border bg-background text-foreground shadow-raised hover:border-primary/45 hover:bg-muted"
       }`}
-      aria-label={`${name} - ${statusLabel}`}
+      // The recommendation is added to the name, never substituted for the
+      // status: swapping them told a screen-reader user this routine was
+      // suggested while withholding whether they had already done it.
+      aria-label={showRecommended ? `${name} - ${recommendedLabel} - ${statusLabel}` : `${name} - ${statusLabel}`}
+      data-recommended-now={showRecommended ? "true" : undefined}
     >
       <div
         className={`flex shrink-0 items-center justify-center rounded-full border transition-colors ${
@@ -135,12 +152,14 @@ function MainDhikrGroupCard({
           className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
-              : compact && onMedia
-                ? "border border-white/5 bg-black/45 text-white/60"
-                : "bg-muted text-muted-foreground"
+              : showRecommended
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : compact && onMedia
+                  ? "border border-white/5 bg-black/45 text-white/60"
+                  : "bg-muted text-muted-foreground"
           }`}
         >
-          {statusLabel}
+          {showRecommended ? recommendedLabel : statusLabel}
         </span>
 
         {subItems && subItems.length > 0 && (
@@ -191,6 +210,7 @@ export function ProgressDayView({
   onSelectCategory,
   visibleCategoryIds,
   headingLevel = 2,
+  recommendedCategoryId,
   onOpenWirdBenefits,
   onMedia = true,
 }: {
@@ -207,6 +227,8 @@ export function ProgressDayView({
   visibleCategoryIds?: readonly CategoryId[];
   /** Home nests this card below its own section heading; Progress owns an h2. */
   headingLevel?: 2 | 3;
+  /** The routine the surrounding screen is already offering to start. */
+  recommendedCategoryId?: CategoryId;
   /** Opens the evidence for keeping a wird. Omitted where that route is unreachable. */
   onOpenWirdBenefits?: () => void;
   /**
@@ -392,6 +414,8 @@ export function ProgressDayView({
                 onPress={() => onSelectCategory?.(col.id)}
                 compact={Boolean(visibleCategoryIds)}
                 onMedia={onMedia}
+                isRecommendedNow={col.id === recommendedCategoryId}
+                recommendedLabel={t(language, "progress.startNow")}
                 subItems={subItems}
               />
             );

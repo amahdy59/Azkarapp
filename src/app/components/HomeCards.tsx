@@ -202,9 +202,9 @@ export function SavedZikrCard({
           <p className="text-[0.75rem] font-black uppercase tracking-wide text-primary">
             {t(language, "home.savedEyebrow")}
           </p>
-          <h2 id="home-saved-heading" className="mt-1 text-[1.125rem] font-black text-foreground">
+          <h3 id="home-saved-heading" className="mt-1 text-[1.125rem] font-black text-foreground">
             {t(language, "home.savedTitle")}
-          </h2>
+          </h3>
         </div>
         <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary">
           <span aria-hidden="true">{formatNumerals(count, language)}</span>
@@ -315,9 +315,9 @@ export function FridayHomeCard({
           <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
         </span>
         <div className="min-w-0 flex-1 text-start">
-          <h2 id="friday-card-heading" className="text-lg font-black text-foreground">
+          <h3 id="friday-card-heading" className="text-lg font-black text-foreground">
             {t(language, "friday.title")}
-          </h2>
+          </h3>
           <p className="mt-1 max-w-[65ch] text-sm font-medium leading-6 text-muted-foreground">
             {t(language, "home.fridayCompactBody")}
           </p>
@@ -349,9 +349,9 @@ export function FridayHomeCard({
           <p className="text-xs font-black uppercase tracking-wide text-primary">
             {t(language, "home.fridayWindowLabel")}
           </p>
-          <h2 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
+          <h3 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
             {t(language, "home.kahfMerit")}
-          </h2>
+          </h3>
           <p className="mt-3 max-w-[62ch] text-[0.875rem] font-medium leading-7 text-muted-foreground" dir="auto">
             {t(language, "friday.kahfHadith")}
           </p>

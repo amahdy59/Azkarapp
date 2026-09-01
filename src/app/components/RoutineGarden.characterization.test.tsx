@@ -103,7 +103,7 @@ describe("leaf and palm marks", () => {
 });
 
 describe("Home wird card", () => {
-  it("keeps the Home card nested at heading level three", () => {
+  it("takes heading level two on Home, beside the routine card rather than inside it", () => {
     render(
       <TodayRoutineGarden
         summary={makeSummary()}
@@ -113,7 +113,12 @@ describe("Home wird card", () => {
       />,
     );
 
-    expect(screen.getByRole("heading", { name: "Today's Wird", level: 3 })).toBeInTheDocument();
+    // This card had been pinned at level three on the premise that Home nested
+    // it under its own section heading. Home does not: it places this card and
+    // the routine card side by side in the hero grid, so an h3 told assistive
+    // technology that today's wird was a subsection of whichever routine the
+    // hero happened to be recommending. They are siblings, and both are h2.
+    expect(screen.getByRole("heading", { name: "Today's Wird", level: 2 })).toBeInTheDocument();
   });
 
   it("promotes the same card to heading level two on Progress", () => {

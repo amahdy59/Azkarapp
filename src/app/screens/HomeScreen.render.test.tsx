@@ -207,3 +207,49 @@ describe("HomeScreen quick access", () => {
     expect(screen.queryByTestId("home-primary-cta")).not.toBeInTheDocument();
   });
 });
+
+describe("HomeScreen document outline", () => {
+  afterEach(() => vi.useRealTimers());
+
+  it("nests each card under the group it belongs to, and names every prayer card", () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2026, 7, 7, 9, 5));
+
+    const { container } = render(
+      <HomeScreen
+        completed={emptyProgress()}
+        dailyCompletions={[]}
+        quietProgressEnabled
+        progressDayStartHour={4}
+        language="ar"
+        direction="rtl"
+        onResume={vi.fn()}
+        routineModes={routineModes}
+        savedZikrIds={new Set()}
+      />,
+    );
+
+    const outline = [...container.querySelectorAll("h1,h2,h3")].map((h) => `${h.tagName}:${h.textContent?.trim()}`);
+
+    // Today's wird sits beside the routine card in the hero, not inside it.
+    expect(outline).toContain("H2:وردك اليوم");
+    // A card inside a divider-labelled group is one level below that label.
+    const library = outline.indexOf("H2:مكتبتك");
+    expect(library).toBeGreaterThanOrEqual(0);
+    expect(outline.slice(library + 1)).toContain("H3:الأذكار المحفوظة");
+    // The hero offers one routine and the wird card lists all three. Without a
+    // mark, the same routine reads as two separate things to do within one
+    // screen; the row says it is the one already on offer above.
+    expect(screen.getByRole("button", { name: /أذكار الصباح - ابدأ الآن/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /أذكار المساء - غير مكتملة/ })).toBeInTheDocument();
+
+    // Five identical unnamed articles announced as "article" five times over.
+    const articles = [...container.querySelectorAll("article")];
+    expect(articles.length).toBeGreaterThan(0);
+    for (const article of articles) {
+      const labelledBy = article.getAttribute("aria-labelledby");
+      expect(labelledBy).toBeTruthy();
+      expect(container.querySelector(`#${labelledBy}`)?.textContent?.trim()).toBeTruthy();
+    }
+  });
+});
