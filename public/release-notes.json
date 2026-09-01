@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-01d",
+  "release": "2026-09-01e",
   "ar": [
-    "صار النقر للعدّ في المصحف والقراءة يعطي الإحساس نفسه في السبحة والصلاة على النبي، بعد أن كان أضعف وأبطأ في شاشة القراءة.",
-    "عدّاد الصلاة على النبي لم يعد يتوقف عند العدد الذي اخترته، فالعدد هدف تبلغه لا حدّ يمنعك.",
-    "إتمام أذكار ما بعد الصلاة صار يُعلّم خانة الأذكار في بطاقة الصلاة تلقائياً، بعد أن كانا سجلّين منفصلين.",
-    "حقول تحديد الموقع في الإشعارات صار لكل منها عنوان ظاهر، فلا يختفي اسم الحقل بمجرد أن تكتب فيه."
+    "الضغط في التطبيق صار محسوسًا: كل زر وبطاقة ينضغط بسرعة ثم يعود متمددًا كأنه سطح ينبض تحت إصبعك، بعد أن كان يذهب ويعود بالسرعة نفسها فلا يُحسّ. وعدّاد الذكر صار بحجم واحد في كل الشاشات.",
+    "التنقل بين آيات سورة الكهف صار يحرّك النص وحده، بعد أن كانت الشاشة كلها تنزلق مع إصبعك.",
+    "تقدّمك في يوم الجمعة صار يتبع حسابك بين أجهزتك، وعند تسجيل الدخول يُجمع ما فعلته على كل جهاز فلا يضيع عمل.",
+    "حقول الأرقام في الإعدادات لم تعد تتغيّر قيمتها بمجرد تمرير عجلة الفأرة فوقها، ورسالة الخطأ صارت على الحقل نفسه."
   ],
   "en": [
-    "Tapping to count feels the same everywhere. The reader now presses like the Masbaha and the salawat counter, instead of the weaker, slower response it had.",
-    "The salawat counter no longer stops at the number you chose — a target is something to reach, not a limit.",
-    "Finishing the after-prayer adhkar now ticks the adhkar box on that prayer's card, instead of the two keeping separate records.",
-    "Every location field in notification settings now has a visible title, so the name no longer disappears the moment you type."
+    "Pressing anything now feels like pressing something: controls give way quickly, then spring back and settle instead of returning at the speed they left. The dhikr counter is also one size on every screen now.",
+    "Moving through Al-Kahf now moves the text, rather than the whole screen sliding under your finger.",
+    "Your Friday progress follows your account between devices, and signing in combines what you did on each rather than replacing it.",
+    "Number fields in settings no longer change value when you scroll the mouse wheel over them, and an invalid entry is flagged on the field itself."
   ]
 }

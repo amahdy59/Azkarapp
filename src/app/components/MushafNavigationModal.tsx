@@ -330,6 +330,8 @@ export function MushafNavigationModal({
                       max={604}
                       value={inputPage}
                       onChange={(e) => setInputPage(e.target.value)}
+                      inputMode="numeric"
+                      onWheel={(event) => event.currentTarget.blur()}
                       className="flex-1 rounded-xl bg-input-background border border-border px-4 py-2.5 text-base font-bold text-foreground text-center focus:outline-none focus:ring-2 focus:ring-ring"
                     />
                     <button

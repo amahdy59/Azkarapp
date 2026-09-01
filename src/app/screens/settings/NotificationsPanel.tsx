@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FormField } from "../../components/FormField";
+import { FIELD_CONTROL_CLASS, FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
@@ -89,17 +89,17 @@ function ReminderScheduleRow({
         </button>
       </div>
       <label
-        className="mt-4 flex items-center justify-between gap-3 text-[0.875rem] font-semibold text-foreground"
+        className="mt-4 flex flex-col gap-1.5 text-[0.8125rem] font-bold text-foreground"
         htmlFor={`${kind}-reminder-time`}
       >
-        <span>{label}</span>
+        <span>{t(language, "notifications.timeLabel")}</span>
         <input
           id={`${kind}-reminder-time`}
           type="time"
           value={schedule.time}
           disabled={!schedule.enabled}
           onChange={(event) => onTimeChange(event.target.value)}
-          className="h-11 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] font-semibold text-foreground disabled:cursor-not-allowed disabled:opacity-50"
+          className={FIELD_CONTROL_CLASS}
           dir="ltr"
         />
       </label>
@@ -135,6 +135,9 @@ export function NotificationsPanel({
   const [cityDraft, setCityDraft] = useState(locationSettings?.cityName ?? "");
   const [timeZoneDraft, setTimeZoneDraft] = useState(locationSettings?.timeZone ?? "");
   const [citySearch, setCitySearch] = useState("");
+  // Which coordinate the last save attempt rejected, so the message can sit on
+  // that field rather than only in the status line under the form.
+  const [invalidCoordinates, setInvalidCoordinates] = useState({ latitude: false, longitude: false });
   const locationRequestId = useRef(0);
   const timeZoneStatus = getTimeZoneStatus(new Date(), locationSettings?.timeZone ?? DEFAULT_LOCATION.timeZone);
   const cityResults = searchPrayerLocations(citySearch);
@@ -227,14 +230,10 @@ export function NotificationsPanel({
   const handleManualLocationSave = () => {
     const latitude = Number(latitudeDraft);
     const longitude = Number(longitudeDraft);
-    if (
-      !Number.isFinite(latitude) ||
-      latitude < -90 ||
-      latitude > 90 ||
-      !Number.isFinite(longitude) ||
-      longitude < -180 ||
-      longitude > 180
-    ) {
+    const latitudeInvalid = !Number.isFinite(latitude) || latitude < -90 || latitude > 90;
+    const longitudeInvalid = !Number.isFinite(longitude) || longitude < -180 || longitude > 180;
+    setInvalidCoordinates({ latitude: latitudeInvalid, longitude: longitudeInvalid });
+    if (latitudeInvalid || longitudeInvalid) {
       setLocationStatus(t(language, "notifications.invalidCoordinates"));
       setLocationStatusIsError(true);
       return;
@@ -504,7 +503,12 @@ export function NotificationsPanel({
                   max="90"
                   step="0.0001"
                   value={latitudeDraft}
-                  onChange={(event) => setLatitudeDraft(event.target.value)}
+                  onChange={(event) => {
+                    setLatitudeDraft(event.target.value);
+                    setInvalidCoordinates((current) => ({ ...current, latitude: false }));
+                  }}
+                  error={invalidCoordinates.latitude ? t(language, "notifications.latitudeRange") : undefined}
+                  inputMode="decimal"
                   dir="ltr"
                 />
                 <FormField
@@ -514,7 +518,12 @@ export function NotificationsPanel({
                   max="180"
                   step="0.0001"
                   value={longitudeDraft}
-                  onChange={(event) => setLongitudeDraft(event.target.value)}
+                  onChange={(event) => {
+                    setLongitudeDraft(event.target.value);
+                    setInvalidCoordinates((current) => ({ ...current, longitude: false }));
+                  }}
+                  error={invalidCoordinates.longitude ? t(language, "notifications.longitudeRange") : undefined}
+                  inputMode="decimal"
                   dir="ltr"
                 />
               </div>
@@ -553,6 +562,8 @@ export function NotificationsPanel({
                       max="120"
                       value={locationSettings?.adjustments?.[prayer] ?? 0}
                       onChange={(event) => handleAdjustmentChange(prayer, Number(event.target.value))}
+                      inputMode="numeric"
+                      onWheel={(event) => event.currentTarget.blur()}
                       dir="ltr"
                       className="mt-1 h-10 w-full rounded-lg border border-border-control bg-background px-2 text-center text-[0.875rem] text-foreground"
                     />

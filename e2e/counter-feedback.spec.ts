@@ -14,7 +14,10 @@ async function openReturningGuest(page: Page, language: "ar" | "en" = "en") {
     );
   }, language);
   await page.goto("/");
-  await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 10_000 });
+  // No local override: the 10s cap this used to carry was shorter than the
+  // project's own 15s expect timeout, so under full-suite load the shell had
+  // not hydrated in time and three specs here reported as flaky.
+  await expect(page.getByRole("navigation").first()).toBeVisible();
 }
 
 test("the Home Wird keeps semantic order while mirroring Arabic placement and expanding on mobile", async ({
@@ -24,6 +27,10 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   await openReturningGuest(page, "en");
 
   const ltrCards = page.getByTestId("today-garden-card").getByRole("button", { name: / - (Completed|Not completed)$/ });
+  // Asserted before indexing: boundingBox() on a locator that never resolves
+  // waits out the whole 90s test timeout and reports as a timeout rather than
+  // as the missing card it actually is.
+  await expect(ltrCards).not.toHaveCount(0);
   const ltrBoxes = await Promise.all([0, 1, 2].map((index) => ltrCards.nth(index).boundingBox()));
   expect(ltrBoxes.every(Boolean)).toBe(true);
   if (ltrBoxes[0] && ltrBoxes[1] && ltrBoxes[2]) {

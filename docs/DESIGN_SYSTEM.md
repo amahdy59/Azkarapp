@@ -80,6 +80,10 @@ Every input carries a **visible** label. A placeholder is a hint, never a name: 
 - Two other associations remain correct and stay: a wrapping `<label>` around a control whose visible text sits beside it (the prayer-time adjustments), and an explicit `<label htmlFor>` where the label and control sit on one row (the reminder times). What is not allowed is a control whose only name is a placeholder or a bare `aria-label`.
 - A hint is tied to the control with `aria-describedby`, never left as loose text next to it.
 - Controls inherit the focus role from the geometry contract above: `focus-visible:ring-[3px] focus-visible:ring-ring`.
+- **Errors belong on the field.** An invalid value marks its control `aria-invalid` and attaches the message with `aria-describedby`. A message in a status line elsewhere tells a sighted user something failed while leaving a screen-reader user no way to find which field to fix.
+- **Labels sit above their control**, never beside it. Side-by-side is the one arrangement that breaks when a label wraps or a translation runs long, and it costs a column on a phone.
+- **A number input blurs on wheel.** A wheel over a focused `type="number"` changes its value, so scrolling a settings page with the pointer over a coordinate field would move it silently. `FormField` does this for its own; a raw number input must do it itself.
+- **`inputMode` matches the value**, not the type: `decimal` for coordinates, which need a point and a minus sign that `numeric` does not offer.
 
 ## Color roles
 
@@ -214,13 +218,14 @@ Motion supports comprehension and calm focus; it must never turn worship into a 
 
 ### Timing and easing
 
-| Role                    |       Duration | Use                                               |
-| ----------------------- | -------------: | ------------------------------------------------- |
-| Press feedback          |     120–150 ms | Buttons, cards, navigation                        |
-| Small state change      |     160–220 ms | Count change, menu, favorite, active tab          |
-| Screen/content entrance |     240–300 ms | New zikr, sheets, completion content              |
-| Emphasis                |     440–600 ms | Counter readiness and completion check            |
-| Auto-advance pause      | Exactly 500 ms | Preserve the completed check before the next zikr |
+| Role                    |       Duration | Use                                                                                        |
+| ----------------------- | -------------: | ------------------------------------------------------------------------------------------ |
+| Press feedback (down)   |          90 ms | Buttons, cards, navigation — `--motion-duration-press`                                     |
+| Press release (up)      |         420 ms | The same controls, returning — `--motion-duration-release`, overshooting before it settles |
+| Small state change      |     160–220 ms | Count change, menu, favorite, active tab                                                   |
+| Screen/content entrance |     240–300 ms | New zikr, sheets, completion content                                                       |
+| Emphasis                |     440–600 ms | Counter readiness and completion check                                                     |
+| Auto-advance pause      | Exactly 500 ms | Preserve the completed check before the next zikr                                          |
 
 Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease-out for opacity. Motion must use opacity/transform whenever possible. The existing `.reduce-motion` class and `prefers-reduced-motion` query collapse animations and transitions to 0.01 ms, but the semantic 500 ms completion pause remains.
 
@@ -230,8 +235,8 @@ Three screens count dhikr — the reader, the Masbaha and Friday's salawat. All 
 
 | Property       | Value                                                                                 |
 | -------------- | ------------------------------------------------------------------------------------- |
-| Press scale    | 0.97                                                                                  |
-| Press duration | 150 ms, `cubic-bezier(0.4, 0, 0.2, 1)` — the press-feedback role                      |
+| Press scale    | `--motion-scale-pressed` (0.97), shared with every control                            |
+| Press duration | 90 ms down, 420 ms back through an overshoot — see the table above                    |
 | Ripple         | `.tap-ripple` / `tap-ripple-expand`, 560 ms, from the point of contact, max 4 at once |
 
 The counter button itself is part of this surface, not an exception to it: it presses to the same depth over the same duration as the page around it, and leaves the same ripple. It previously pressed to 0.985 through a framer-motion `whileTap` while a CSS rule drove the same property with no transition — two mechanisms on one property, and a press half as deep as the page it sits on, so the gesture changed meaning depending on where the thumb landed. CSS owns the press; the ripple is the one `.tap-ripple`.

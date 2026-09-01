@@ -1857,3 +1857,103 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** the label is a real `<label>` element, two fields
   get distinct ids, a hint is tied with `aria-describedby`, and no
   manual-location field is named only by an `aria-label`.
+
+## DEC-116 — a press has two halves, and they are not symmetrical
+
+- **Decision:** pressing down runs at `--motion-duration-press` (90ms, standard
+  ease); coming back up runs at `--motion-duration-release` (420ms) through
+  `cubic-bezier(0.34, 1.56, 0.64, 1)`, which overshoots 1 before settling.
+- **What was wrong:** the global press rule in `surfaces.css` already scaled
+  every control on `:active`, and the base rule already transitioned `transform`
+  — but both halves ran at the same 90ms on the same curve. A press that returns
+  exactly as it left reads as an image resizing, not as a surface giving way.
+  That symmetry, not the absence of a press, is why the app felt inert.
+- **Where the transition lives:** a transition describes the change _into_ the
+  state it is declared on. The release therefore belongs on the base selector
+  and the press on `:active` — which is also why the effect cannot be expressed
+  as one declaration.
+- **Why not a new class:** 107 elements rely on `transition-colors`, and these
+  rules sit outside `@layer` specifically so they beat Tailwind utilities. A
+  fresh `transition` on a new selector would have replaced those hover
+  transitions wholesale. Extending the rule that already owned `transform` for
+  these elements changes one property and clobbers nothing.
+- **One depth:** `--motion-scale-pressed` moves to 0.97 and is the only source.
+  Thirteen components hardcoded `active:scale-[0.98]` or `[0.99]` beside it, and
+  **every one was dead code** — the global rule carries `!important` and won
+  regardless. They are removed rather than reconciled.
+- **Tests/evidence required:** the release outlasts the press by more than 2x,
+  the release curve overshoots, and the counter's CSS reads the token rather
+  than a number of its own.
+
+## DEC-117 — one counter, one size, everywhere
+
+- **Decision:** `.adaptive-counter-surface` is 220x76 on every screen and at
+  every viewport.
+- **What was wrong:** there were four sizes — 220x76 in the reader, 288x88 on
+  the Masbaha and salawat, 320x104 / 288x96 at 48rem, 448x144 at 64rem — plus a
+  number that grew to 3rem on the Masbaha alone. The same control read as a
+  different component depending on where you met it.
+- **Why it does not step with the viewport either:** the first attempt unified
+  across screens but kept a breakpoint step, and the reader's existing contract
+  test caught it. That test pins the shape across phone, tablet and desktop and
+  is right to: a counter that resizes as the window does is the same
+  inconsistency measured on the other axis. The surface is a readout, not the
+  tap target — every one of these screens counts on a tap anywhere — so it has
+  no reason to grow.
+- **Removed:** `PulseRings`, which was exported and styled at four breakpoints
+  and rendered by nothing, and the `salawat-counter-surface` hook that no longer
+  carried any rule.
+
+## DEC-118 — Friday progress belongs to the account
+
+- **Decision:** the current Friday cycle rides on `AppStateSnapshot` as
+  `fridayProgress`, and sign-in **merges** rather than replaces.
+- **What was wrong:** four `localStorage` key families were read and written
+  from six files, three of them reaching into storage inline. That is _why_ it
+  never synced — there was no single value to hand the account. Reading Al-Kahf
+  and 200 salawat on a phone left no trace on a tablet an hour later, while
+  every other routine followed the account across.
+- **The merge rule:** a deed done on either device was still done. Sets union,
+  the Kahf flag ORs, the count takes the higher, and the target follows whichever
+  side counted further. A merge can only ever move progress forward, and it is
+  order-independent, so which device syncs first cannot change the result.
+  Different cycles are never blended — last Friday's deeds are not this
+  Friday's.
+- **Only the current cycle:** older cycles are pruned locally and mean nothing
+  once the day has passed, so syncing them would be payload for nothing.
+- **One notifier:** every write announces itself, and `App` holds a single
+  subscription. The alternative was five write sites each remembering to push
+  state — the kind of obligation that gets forgotten when a sixth is added.
+
+## DEC-119 — a surface that owns a gesture says which axis it owns
+
+- **Decision:** the reader screen declares `touch-action: pan-y`.
+- **What was wrong:** the reader binds its swipe to the whole screen, and that
+  element declared no `touch-action`, so it computed `auto`. The browser claimed
+  the horizontal drag as a scroll or a back-navigation gesture and slid the view
+  under the finger; the page turn then fired on `touchend`, after the reader had
+  already watched the entire screen move. The text's own transition was correct
+  and scoped the whole time — nothing in the code was moving the screen.
+- **Same defect, second surface:** `.mushaf-paper` was given `pan-y` for exactly
+  this reason (DEC-111). Al-Kahf opens in the reader, not the Mushaf, so it
+  never got the fix.
+
+## DEC-120 — a field says what is wrong with itself
+
+- **Decision:** `FormField` takes an `error`, which marks the control
+  `aria-invalid` and ties the message to it with `aria-describedby`. Number
+  inputs blur on wheel.
+- **Why the error moves onto the field:** invalid coordinates set a message in a
+  status line under the form. That tells a sighted user something failed while
+  leaving a screen-reader user no way to find _which_ field to fix.
+- **The wheel:** a wheel over a focused number input changes its value. Not one
+  of the app's number inputs guarded against it, so scrolling the notification
+  settings with the pointer over latitude silently moved the user's location
+  with nothing on screen saying so. Blurring keeps the scroll and leaves the
+  value alone.
+- **Label position:** labels sit above their control. The reminder-time rows put
+  the label beside the input — the one arrangement that breaks when a label
+  wraps or a translation runs long.
+- **Tests/evidence required:** a wheel over a number field drops focus, a text
+  field is untouched, no raw number input in the app lacks the guard, and an
+  errored field is both `aria-invalid` and described by its message.

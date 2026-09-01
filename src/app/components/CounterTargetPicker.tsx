@@ -137,6 +137,7 @@ export function CounterTargetPicker({
                 value={customInputValue}
                 onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
                 inputMode="numeric"
+                onWheel={(event) => event.currentTarget.blur()}
                 className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
