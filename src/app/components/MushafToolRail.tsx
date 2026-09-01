@@ -10,7 +10,7 @@ import {
   ChevronDown,
   ChevronUp,
   Eye,
-  MapPin,
+  Bookmark,
   Maximize,
   Minimize,
   SlidersHorizontal,
@@ -33,6 +33,15 @@ export interface MushafToolRailAction {
   label: string;
   /** The caption printed under the icon, abbreviated to fit a 60px rail. */
   caption?: string;
+  /**
+   * Appended to the tooltip only, never to the accessible name.
+   *
+   * DEC-097 put the arrow-key behaviour in the footer as a static line. The
+   * rail replaced that footer and has no room for a sentence, so the hint moves
+   * to the control it describes, where a pointer user meets it on hover and a
+   * screen-reader user still hears the plain action name.
+   */
+  hint?: string;
   icon: ReactNode;
   onClick: () => void;
   /** Renders as a switch rather than a button, and lights when on. */
@@ -68,7 +77,7 @@ function RailButton({ action }: { action: MushafToolRailAction }) {
       disabled={action.disabled}
       aria-busy={action.busy}
       aria-label={action.label}
-      title={action.label}
+      title={action.hint ? `${action.label} — ${action.hint}` : action.label}
       data-testid={action.testId}
       {...(isToggle ? { role: "switch" as const, "aria-checked": action.pressed } : {})}
       className={`${RAIL_CELL} disabled:cursor-not-allowed disabled:opacity-40 ${
@@ -148,7 +157,7 @@ export function MushafToolRail({
       id: "save-place",
       label: t(language, "mushaf.savePlace"),
       caption: t(language, "mushaf.railSavePlace"),
-      icon: <MapPin size={iconSize} className={isPlaceSaved ? "fill-current" : undefined} />,
+      icon: <Bookmark size={iconSize} className={isPlaceSaved ? "fill-current" : undefined} />,
       onClick: onToggleSavePlace,
       pressed: isPlaceSaved,
       testId: "mushaf-save-place",
@@ -237,6 +246,7 @@ export function MushafToolRail({
           action={{
             id: "previous",
             label: t(language, "common.previous"),
+            hint: t(language, "mushaf.keyPrevious"),
             icon: <ChevronUp size={iconSize} />,
             onClick: onPrevious,
             disabled: atFirstPage,
@@ -264,6 +274,7 @@ export function MushafToolRail({
           action={{
             id: "next",
             label: t(language, "common.next"),
+            hint: t(language, "mushaf.keyNext"),
             icon: <ChevronDown size={iconSize} />,
             onClick: onNext,
             disabled: atLastPage,

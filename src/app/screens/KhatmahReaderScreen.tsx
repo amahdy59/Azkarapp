@@ -18,13 +18,12 @@ import {
   CheckCircle2,
   X,
   RotateCcw,
-  MapPin,
+  Bookmark,
   ArrowRight,
   ArrowLeft,
   BookOpen,
   ChevronDown,
   MoreVertical,
-  SlidersHorizontal,
 } from "../components/icons";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
@@ -71,6 +70,45 @@ function fitsTwoPages(width: number, height: number) {
 /** The height the rail's controls occupy. Below this it would scroll, and a
  *  toolbar you have to scroll to reach is worse than one that fits. */
 const RAIL_CONTENT_HEIGHT = 520;
+
+/**
+ * Roughly the proportion of a printed Mushaf page, width over height.
+ *
+ * It decides which dimension the type is fitted to, and therefore whether the
+ * reading type size can do anything at all. A reading area narrower than this
+ * is *width-bound*: the line already runs margin to margin, so the only way to
+ * set it larger would be fewer words per line — and the words on a line are
+ * page data. Wider than this and the fit is height-bound, where the size
+ * choice has room to act.
+ */
+const PAPER_ASPECT = 0.62;
+
+/** Height the two horizontal chrome bars take when they are the chrome. */
+const BARS_HEIGHT = 112;
+
+/**
+ * The shape of the reading surface, measured once so the gates that depend on
+ * it cannot disagree mid-resize.
+ */
+function measureShell() {
+  if (typeof window === "undefined") {
+    return { spreadRoom: false, rail: false, railCompact: false, pageAspect: 1 };
+  }
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+  const rail = fitsToolRail(width, height);
+  const spreadRoom = fitsTwoPages(width, height);
+  // What one page actually gets: the viewport less whichever chrome is showing,
+  // halved when two pages share the width.
+  const pageWidth = (width - (rail ? 72 : 0)) / (spreadRoom ? 2 : 1);
+  const pageHeight = Math.max(1, height - (rail ? 0 : BARS_HEIGHT));
+  return {
+    spreadRoom,
+    rail,
+    railCompact: width < 1200,
+    pageAspect: Number((pageWidth / pageHeight).toFixed(3)),
+  };
+}
 
 /**
  * Where the tools stand.
@@ -261,27 +299,16 @@ export function KhatmahReaderScreen({
    * whether the tools stand beside the paper or across it. Measuring once keeps
    * the two from disagreeing mid-resize.
    */
-  const [shell, setShell] = useState(() =>
-    typeof window === "undefined"
-      ? { spreadRoom: false, rail: false, railCompact: false }
-      : {
-          spreadRoom: fitsTwoPages(window.innerWidth, window.innerHeight),
-          rail: fitsToolRail(window.innerWidth, window.innerHeight),
-          railCompact: window.innerWidth < 1200,
-        },
-  );
+  const [shell, setShell] = useState(() => measureShell());
 
   useEffect(() => {
     const measure = () =>
       setShell((current) => {
-        const next = {
-          spreadRoom: fitsTwoPages(window.innerWidth, window.innerHeight),
-          rail: fitsToolRail(window.innerWidth, window.innerHeight),
-          railCompact: window.innerWidth < 1200,
-        };
+        const next = measureShell();
         return current.spreadRoom === next.spreadRoom &&
           current.rail === next.rail &&
-          current.railCompact === next.railCompact
+          current.railCompact === next.railCompact &&
+          current.pageAspect === next.pageAspect
           ? current
           : next;
       });
@@ -294,6 +321,14 @@ export function KhatmahReaderScreen({
     };
   }, []);
   const autoSpreadRoom = shell.spreadRoom;
+  /**
+   * Whether the reading type size can change anything here.
+   *
+   * On a phone the page is width-bound and the setting was inert — all three
+   * steps rendered the identical measure and the identical 22.4px type. A
+   * control that silently does nothing is worse than one that says it cannot.
+   */
+  const typeSizeApplies = shell.pageAspect >= PAPER_ASPECT;
   // A stored desktop preference never forces two pages onto a phone or tall
   // tablet. The physical fit gate is authoritative; settings only opt out.
   const spreadRoom = autoSpreadRoom && mushafLayout !== "single";
@@ -649,8 +684,14 @@ export function KhatmahReaderScreen({
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
     "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-current/15 bg-current/5 px-2 text-[0.6875rem] font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3";
+  /** The page turn carries the bar's weight: a bordered chip, like the rail's. */
   const footerActionClass =
-    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg px-1 text-[0.625rem] font-extrabold transition-colors hover:bg-current/5 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg border border-current/15 bg-current/5 px-1 text-[0.625rem] font-extrabold transition-colors enabled:hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+  /** The study toggles sit back until they are on, so they do not outrank it. */
+  const footerToggleClass = (active: boolean) =>
+    `inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 md:w-auto md:px-3 ${
+      active ? "border-primary/60 bg-primary/15 text-primary" : "border-transparent hover:bg-current/5"
+    }`;
 
   const pageHeader = (
     <div className="flex w-full min-w-0 items-center gap-1" dir={direction}>
@@ -674,29 +715,17 @@ export function KhatmahReaderScreen({
       </button>
 
       {/* One overflow button carries the index, saved places, study mode,
-          focus, and settings. A phone has room for the page and about four
-          controls; the rest belongs one tap away rather than crowded into a
-          bar the reader looks past. */}
+          focus, and settings. It shows wherever the bars do, not only on a
+          phone: a portrait tablet has the same bars and had been left with
+          focus mode two taps and a scroll deep inside Settings. */}
       <button
         type="button"
         onClick={() => setIsQuickMenuOpen(true)}
-        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-current/15 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:hidden"
+        className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-current/15 bg-current/5 transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         aria-label={t(language, "mushaf.moreActions")}
         data-testid="mushaf-more-actions"
       >
         <MoreVertical size={18} aria-hidden="true" />
-      </button>
-
-      {/* Reading Settings Trigger Button */}
-      <button
-        type="button"
-        onClick={() => setIsOptionsMenuOpen(true)}
-        className="hidden h-11 w-11 shrink-0 items-center justify-center gap-2 rounded-lg border border-current/15 bg-current/5 px-2 text-xs font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:inline-flex lg:w-auto lg:px-3"
-        aria-label={t(language, "common.settings")}
-        data-testid="mushaf-settings-trigger"
-      >
-        <SlidersHorizontal size={18} aria-hidden="true" />
-        <span className="hidden lg:inline">{t(language, "common.settings")}</span>
       </button>
     </div>
   );
@@ -715,9 +744,7 @@ export function KhatmahReaderScreen({
         aria-busy={isLoadingWordMeanings}
         disabled={isLoadingWordMeanings}
         onClick={() => void toggleWordMeanings()}
-        className={`inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 md:w-auto md:px-3 ${
-          showWordMeanings ? "border-primary/60 bg-primary/15 text-primary" : "border-current/15 bg-current/5"
-        }`}
+        className={footerToggleClass(showWordMeanings)}
         aria-label={t(language, "mushaf.difficultWordsInvite")}
         data-testid="mushaf-difficult-words-switch"
       >
@@ -749,14 +776,26 @@ export function KhatmahReaderScreen({
           <span className="truncate">{t(language, "common.previous")}</span>
         </button>
 
-        <div className="flex min-h-11 min-w-0 flex-col items-center justify-center px-1">
-          <span className="truncate text-[0.75rem] font-extrabold tabular-nums">
-            {t(language, "mushaf.pageLabel", { page: formatNumerals(displayPage, language) })}
+        {/* The same readout the rail carries on a wide screen: the numeral,
+            then the unit, with the total in the accessible name. One anatomy
+            for the page number wherever the reader meets it. */}
+        <p
+          className="flex min-h-11 min-w-0 flex-col items-center justify-center px-1"
+          data-testid="mushaf-page-readout"
+        >
+          <bdi className="text-[0.9375rem] leading-[1.4] font-extrabold tabular-nums">
+            {formatNumerals(displayPage, language)}
+          </bdi>
+          <span className="text-[0.625rem] leading-[1.4] font-bold opacity-70">
+            {t(language, "mushaf.railPageUnit")}
           </span>
-          <span className="hidden whitespace-nowrap text-[0.625rem] font-semibold opacity-65 lg:block">
-            {t(language, "mushaf.keyboardNavigationHint")}
+          <span className="sr-only">
+            {t(language, "mushaf.pageOfTotal", {
+              page: formatNumerals(displayPage, language),
+              total: formatNumerals(LAST_PAGE, language),
+            })}
           </span>
-        </div>
+        </p>
 
         <button
           type="button"
@@ -774,13 +813,11 @@ export function KhatmahReaderScreen({
         type="button"
         onClick={toggleReadingBookmark}
         aria-pressed={isCurrentBookmarked}
-        className={`inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:w-auto md:px-3 ${
-          isCurrentBookmarked ? "border-primary/60 bg-primary/15 text-primary" : "border-current/15 bg-current/5"
-        }`}
+        className={footerToggleClass(isCurrentBookmarked)}
         aria-label={t(language, "mushaf.savePlace")}
         data-testid="mushaf-save-place"
       >
-        <MapPin size={19} className={isCurrentBookmarked ? "fill-current shrink-0" : "shrink-0"} aria-hidden="true" />
+        <Bookmark size={19} className={isCurrentBookmarked ? "shrink-0 fill-current" : "shrink-0"} aria-hidden="true" />
         <span className="hidden max-w-[11rem] truncate font-bold md:block">{t(language, "mushaf.savePlace")}</span>
       </button>
     </nav>
@@ -1021,6 +1058,7 @@ export function KhatmahReaderScreen({
         autoSpreadRoom={autoSpreadRoom}
         textScale={mushafTextScale}
         onSelectTextScale={setMushafTextScale}
+        textScaleApplies={typeSizeApplies}
         toolbarSide={mushafToolbarSide}
         onSelectToolbarSide={setMushafToolbarSide}
         showToolbarSide={useRail}

@@ -397,3 +397,21 @@
   border-radius: 999px;
   padding: 0.3em 0.85em;
 }
+
+/* ---------------------------------------------------------------------------
+   Short viewports
+   Fifteen lines is page data, so a 278px-tall landscape phone can only honour
+   it by shrinking the type to nine pixels. Past this floor the paper keeps its
+   height and the viewport scrolls over it, the way a held page works.
+--------------------------------------------------------------------------- */
+.mushaf-paper {
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+/* The wrapper between the paper and its canvases is `display: contents`, so
+   the canvases are the real flex children and carry the floor themselves. */
+.mushaf-page-canvas,
+.mushaf-spread__gutter {
+  min-height: 32rem;
+}

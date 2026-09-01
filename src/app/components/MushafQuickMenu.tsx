@@ -3,7 +3,17 @@ import { ResponsiveSheet } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import { Bookmark, BookOpen, ChevronLeft, ChevronRight, Eye, List, MapPin, SlidersHorizontal } from "./icons";
+import {
+  Bookmark,
+  BookmarkAdd,
+  BookmarkCheck,
+  BookOpen,
+  ChevronLeft,
+  ChevronRight,
+  Eye,
+  List,
+  SlidersHorizontal,
+} from "./icons";
 
 /**
  * The Mushaf's secondary actions, off the page.
@@ -80,7 +90,7 @@ export function MushafQuickMenu({
     {
       id: "bookmarks",
       label: t(language, "mushaf.tabBookmarks"),
-      icon: <Bookmark size={19} aria-hidden="true" />,
+      icon: <BookmarkCheck size={19} aria-hidden="true" />,
       onSelect: onOpenBookmarks,
       opensSurface: true,
       testId: "mushaf-quick-bookmarks",
@@ -89,7 +99,7 @@ export function MushafQuickMenu({
       id: "page-bookmark",
       label: t(language, "mushaf.bookmarkCurrentPage"),
       detail: t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) }),
-      icon: <Bookmark size={19} aria-hidden="true" className={isPageBookmarked ? "fill-current" : undefined} />,
+      icon: <BookmarkAdd size={19} aria-hidden="true" />,
       onSelect: onTogglePageBookmark,
       pressed: isPageBookmarked,
       testId: "mushaf-quick-page-bookmark",
@@ -97,7 +107,7 @@ export function MushafQuickMenu({
     {
       id: "save-place",
       label: t(language, "mushaf.savePlace"),
-      icon: <MapPin size={19} aria-hidden="true" className={isPlaceSaved ? "fill-current" : undefined} />,
+      icon: <Bookmark size={19} aria-hidden="true" className={isPlaceSaved ? "fill-current" : undefined} />,
       onSelect: onToggleSavePlace,
       pressed: isPlaceSaved,
       testId: "mushaf-quick-save-place",

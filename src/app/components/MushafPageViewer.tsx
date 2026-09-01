@@ -1058,10 +1058,15 @@ export function MushafPageViewer({
       {/* One page, or two facing pages when the screen has room for both at a
           readable size. Ordered as the Mushaf is bound: the lower page number
           on the right, the reader moving leftwards. */}
+      {/* Below MIN_PAPER_HEIGHT the paper stops being squeezed into the
+          viewport and starts scrolling inside it. Fifteen lines is page data,
+          so a 278px-tall landscape phone can only honour it by shrinking the
+          type to 9px — which is not reading. The paper keeps a legible floor
+          and the window moves over it instead, exactly as a held page does. */}
       <div
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
-        className={`flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
+        className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"
       >

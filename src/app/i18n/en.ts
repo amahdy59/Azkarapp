@@ -882,6 +882,8 @@ const en = {
     textSizeMedium: "Medium",
     textSizeLarge: "Large",
     textSizeHint: "Changes the type size inside the page without changing its fifteen lines.",
+    textSizeAtPageWidth:
+      "The text is already as large as this page allows: the line fills the width, and its words are fixed as they are in print. Rotate the device or widen the window to choose a size.",
     textSizeDecrease: "Decrease text size",
     textSizeIncrease: "Increase text size",
     focusMode: "Focus mode",
@@ -896,6 +898,8 @@ const en = {
     railFullscreen: "Full screen",
     railSettings: "Settings",
     railPageUnit: "Page",
+    keyPrevious: "→ key",
+    keyNext: "← key",
     pageOfTotal: "{page} of {total}",
     enterFullscreen: "Full screen",
     exitFullscreen: "Exit full screen",

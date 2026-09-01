@@ -868,6 +868,8 @@ const ar = {
     textSizeMedium: "متوسط",
     textSizeLarge: "كبير",
     textSizeHint: "يغيّر حجم الخط داخل الصفحة دون تغيير أسطرها الخمسة عشر.",
+    textSizeAtPageWidth:
+      "النص هنا بأكبر حجم تسمح به الصفحة: السطر يملأ عرضها بالفعل، وكلماته ثابتة كما في المصحف. أدر الجهاز أو وسّع النافذة للتحكم في الحجم.",
     textSizeDecrease: "تصغير حجم النص",
     textSizeIncrease: "تكبير حجم النص",
     focusMode: "وضع التركيز",
@@ -882,6 +884,8 @@ const ar = {
     railFullscreen: "ملء الشاشة",
     railSettings: "إعدادات",
     railPageUnit: "صفحة",
+    keyPrevious: "المفتاح →",
+    keyNext: "المفتاح ←",
     pageOfTotal: "{page} من {total}",
     enterFullscreen: "ملء الشاشة",
     exitFullscreen: "إنهاء ملء الشاشة",

@@ -17,6 +17,11 @@ export interface MushafSettingsSheetProps {
   autoSpreadRoom?: boolean;
   textScale: MushafTextScale;
   onSelectTextScale?: (scale: MushafTextScale) => void;
+  /**
+   * False where the page is width-bound and the size choice cannot act — the
+   * line already runs margin to margin, and the words on a line are page data.
+   */
+  textScaleApplies?: boolean;
   toolbarSide: MushafToolbarSide;
   onSelectToolbarSide?: (side: MushafToolbarSide) => void;
   /** Only offered where a rail is actually shown. */
@@ -95,6 +100,7 @@ export function MushafSettingsSheet({
   autoSpreadRoom = false,
   textScale,
   onSelectTextScale,
+  textScaleApplies = true,
   toolbarSide,
   onSelectToolbarSide,
   showToolbarSide = false,
@@ -177,7 +183,11 @@ export function MushafSettingsSheet({
           <div
             role="radiogroup"
             aria-labelledby="mushaf-text-size-heading"
-            className="grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1"
+            aria-describedby="mushaf-text-size-hint"
+            data-testid="mushaf-text-size-group"
+            className={`grid grid-cols-3 gap-1.5 rounded-xl border border-border/60 bg-muted/40 p-1 ${
+              textScaleApplies ? "" : "opacity-50"
+            }`}
           >
             {textScaleOptions.map(([id, label]) => {
               const isSelected = textScale === id;
@@ -187,6 +197,7 @@ export function MushafSettingsSheet({
                   type="button"
                   role="radio"
                   aria-checked={isSelected}
+                  disabled={!textScaleApplies}
                   data-testid={`mushaf-text-size-option-${id}`}
                   onClick={() => onSelectTextScale(id)}
                   className={segmentClass(isSelected)}
@@ -203,8 +214,8 @@ export function MushafSettingsSheet({
               );
             })}
           </div>
-          <p className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
-            {t(language, "mushaf.textSizeHint")}
+          <p id="mushaf-text-size-hint" className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
+            {t(language, textScaleApplies ? "mushaf.textSizeHint" : "mushaf.textSizeAtPageWidth")}
           </p>
         </section>
       )}

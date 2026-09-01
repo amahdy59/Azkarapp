@@ -30,6 +30,8 @@ export {
   ChevronNext as ChevronRightIcon,
   ChevronPrevious,
   Bookmark,
+  BookmarkAdd,
+  BookmarkCheck,
   Brush01 as Brush,
   ChevronPrevious as ChevronLeftIcon,
   ChevronRight,

@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { KhatmahReaderScreen } from "./KhatmahReaderScreen";
@@ -201,15 +201,22 @@ describe("KhatmahReaderScreen wird progress", () => {
     expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
   });
 
-  it("uses semantic dark Mushaf chrome and exposes the desktop key hint", async () => {
+  it("uses semantic dark Mushaf chrome and one overflow entry beside the page turn", async () => {
     setViewport(820, 1180);
     renderReader({ mushafTheme: "dark" });
     const article = await screen.findByRole("article", { name: "صفحة ٤٢" });
     expect(article).toHaveAttribute("data-theme", "dark");
     expect(article).toHaveAttribute("data-mushaf-chrome-mode", "bars");
     expect(article.querySelector('[data-mushaf-chrome="header"]')).toHaveClass("bg-card", "text-card-foreground");
-    expect(screen.getByText("← / → للتنقل بين الصفحات")).toBeInTheDocument();
-    expect(screen.getByText("الإعدادات")).toHaveClass("hidden", "lg:inline");
+    // The page number reads the way the rail's does: numeral, then unit, with
+    // the total in the accessible name rather than crowding the bar.
+    const readout = screen.getByTestId("mushaf-page-readout");
+    expect(readout).toHaveTextContent("٤٢");
+    expect(readout).toHaveTextContent("صفحة");
+    expect(readout).toHaveTextContent("٤٢ من ٦٠٤");
+    // One way into the settings, not two pointing at the same sheet.
+    expect(screen.getByTestId("mushaf-more-actions")).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-settings-trigger")).not.toBeInTheDocument();
   });
 
   it("follows the app theme by default", async () => {
@@ -372,14 +379,17 @@ describe("KhatmahReaderScreen settings menu", () => {
 
     await screen.findByRole("article", { name: "Page 42" });
     expect(screen.getByRole("button", { name: "Set as reading place" })).toBeInTheDocument();
-    const settingsBtn = screen.getByRole("button", { name: "Settings" });
-    await user.click(settingsBtn);
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
+    // Scoped to the sheet: the quick menu that opened it names some of the same
+    // actions, and Vaul keeps its drawer mounted through the close animation.
+    const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
 
-    expect(screen.queryByText("Page Layout")).not.toBeInTheDocument();
-    expect(screen.queryByText("Comfort reading")).not.toBeInTheDocument();
-    expect(screen.queryByText("Keep controls visible")).not.toBeInTheDocument();
-    expect(screen.getByText("Add to page bookmarks")).toBeInTheDocument();
-    const pageBookmark = screen.getByTestId("mushaf-bookmark-toggle");
+    expect(sheet.queryByText("Page Layout")).not.toBeInTheDocument();
+    expect(sheet.queryByText("Comfort reading")).not.toBeInTheDocument();
+    expect(sheet.queryByText("Keep controls visible")).not.toBeInTheDocument();
+    expect(sheet.getByText("Add to page bookmarks")).toBeInTheDocument();
+    const pageBookmark = sheet.getByTestId("mushaf-bookmark-toggle");
     await user.click(pageBookmark);
     expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
   });
@@ -547,8 +557,45 @@ describe("KhatmahReaderScreen settings presentation", () => {
     renderReader({ language: "en", direction: "ltr" });
     await screen.findByRole("article", { name: "Page 42" });
 
-    await user.click(screen.getByTestId("mushaf-settings-trigger"));
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
     const sheet = await screen.findByTestId("mushaf-settings-sheet");
     expect(sheet).not.toHaveAttribute("data-side");
+  });
+});
+
+describe("KhatmahReaderScreen reading type size", () => {
+  afterEach(() => setViewport(1024, 768));
+
+  it("says the size cannot change where the line already fills the page width", async () => {
+    const user = userEvent.setup();
+    setViewport(390, 844);
+    renderReader({ language: "en", direction: "ltr", setMushafTextScale: vi.fn() });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
+    const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
+
+    // A phone page is width-bound: all three steps rendered the identical
+    // measure and the identical type, so the control said nothing while doing
+    // nothing. It is disabled and explains itself instead.
+    expect(sheet.getByTestId("mushaf-text-size-option-large")).toBeDisabled();
+    expect(sheet.getByTestId("mushaf-text-size-option-small")).toBeDisabled();
+    expect(sheet.getByText(/already as large as this page allows/i)).toBeInTheDocument();
+  });
+
+  it("offers the size where the page is fitted to its height instead", async () => {
+    const user = userEvent.setup();
+    setViewport(834, 1112);
+    renderReader({ language: "en", direction: "ltr", setMushafTextScale: vi.fn() });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-more-actions"));
+    await user.click(await screen.findByTestId("mushaf-quick-settings"));
+    const sheet = within(await screen.findByTestId("mushaf-settings-sheet"));
+
+    expect(sheet.getByTestId("mushaf-text-size-option-large")).toBeEnabled();
+    expect(sheet.getByText(/without changing its fifteen lines/i)).toBeInTheDocument();
   });
 });

@@ -259,8 +259,43 @@ test("stands the tools beside the paper on a landscape screen and activates mean
     elements.filter((element) => element.checkVisibility()).map((element) => element.getBoundingClientRect().height),
   );
   expect(barHeights.every((height) => height >= 44 && height <= 46)).toBe(true);
+  // One overflow button carries everything the bars cannot; there is no second
+  // control pointing at the same settings sheet.
   await expect(page.getByTestId("mushaf-more-actions")).toBeVisible();
-  await expect(page.getByTestId("mushaf-settings-trigger")).toBeHidden();
+  await expect(page.getByTestId("mushaf-settings-trigger")).toHaveCount(0);
+  await page.getByTestId("mushaf-more-actions").click();
+  await page.getByTestId("mushaf-quick-settings").click();
+  await expect(page.getByTestId("mushaf-settings-sheet")).toBeVisible();
+  await page.keyboard.press("Escape");
+});
+
+test("scrolls the paper on a short viewport instead of shrinking it to nine pixels", async ({ page }) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  await expect(page.getByRole("article", { name: /٤٢/ })).toBeVisible();
+
+  const geometry = await page.evaluate(() => {
+    const canvas = document.querySelector<HTMLElement>("[data-mushaf-page]")!;
+    const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
+    const line = document.querySelector<HTMLElement>("[data-mushaf-line-content]")!;
+    return {
+      canvasHeight: canvas.clientHeight,
+      paperHeight: paper.clientHeight,
+      scrollHeight: paper.scrollHeight,
+      fontPx: Number.parseFloat(getComputedStyle(line).fontSize),
+      slots: document.querySelectorAll("[data-mushaf-column] > div").length,
+      overflowX: document.documentElement.scrollWidth - window.innerWidth,
+    };
+  });
+
+  // Fifteen lines is page data. In 278px of paper the fitter could only honour
+  // it at 9px type, which is not reading — so the page keeps a legible floor
+  // and the viewport scrolls over it instead.
+  expect(geometry.slots).toBe(15);
+  expect(geometry.fontPx).toBeGreaterThan(15);
+  expect(geometry.canvasHeight).toBeGreaterThan(geometry.paperHeight);
+  expect(geometry.scrollHeight).toBeGreaterThan(geometry.paperHeight);
+  expect(geometry.overflowX).toBe(0);
 });
 
 test("keeps the landscape tool rail accessible", async ({ page }) => {

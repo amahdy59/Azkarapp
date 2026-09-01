@@ -222,3 +222,9 @@ ragged column. Numbering matches the review handed to the owner.
       back by the rail's width so the rail stays visible and a whole page of the spread stays
       uncovered. Choosing a theme no longer closes them. Elsewhere they remain a drawer or a
       centred sheet. (DEC-109)
+- [x] **22.** A viewport too short for fifteen legible lines scrolls the paper rather than shrinking
+      the type below reading size. The slots, the line breaks and the pagination are untouched;
+      only the window moves. (DEC-110)
+- [x] **23.** The reading type size is offered only where the page is height-bound. On a width-bound
+      page the line already fills the measure, so the control is disabled and says why instead of
+      silently doing nothing. (DEC-110)

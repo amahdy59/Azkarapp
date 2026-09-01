@@ -1714,3 +1714,21 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Not adopted from the proposal, and why:** verse-number and waqf-mark toggles would edit rendered Qur'anic text and remove the ayah markers' interaction affordance (AGENTS §8); an automatic hide-on-idle toolbar and its "tool lock" companion reintroduce the behaviour DEC-090 removed, and focus mode covers the same intent explicitly and reversibly; a configurable page-turn direction reopens DEC-094, which fixed the turn to the physical binding in both interface languages.
 - **Preserved:** Qur'an text, QCF glyphs, the fifteen-line geometry, pagination, the physical page-turn contract, offline-first chapter files, wird recording, both fit gates for facing pages, 44px targets, and 3px focus indicators.
 - **Tests/evidence required:** rail-versus-bars chrome selection by viewport, rail side, focus-mode enter/exit and `Escape` precedence, phone overflow menu and its bookmark tab entry, per-page identity in a spread and its absence on a phone, ink-allowance clamp, per-canvas measure (the assertion fails against the previous shared-parent write), an axe sweep over the rail, full local gates, and desktop/tablet/mobile browser review.
+
+## DEC-110 — the reader tells the truth about what it can do on a phone
+
+- **Date:** 2026-09-01
+- **Status:** Approved
+- **Owner:** User (asked what tablet and mobile still needed, then approved implementing it with desktop-consistent page numbering, a bookmark icon for the reading place, and a spacing pass)
+- **Related scope:** `KhatmahReaderScreen.tsx`, `MushafPageViewer.tsx`, `MushafSettingsSheet.tsx`, `MushafQuickMenu.tsx`, `MushafToolRail.tsx`, `icons.ts`, `layout.css`, i18n, unit and Playwright tests
+- **Decision:**
+  - **A viewport too short for fifteen legible lines scrolls the paper instead of crushing it.** At 844×390 the fitter could only honour the fifteen-line page by rendering 9.3px type in a 147px column on an 844px canvas. The paper now keeps a 32rem floor and the reading area scrolls over it: same fifteen slots, same line breaks, 18.2px type. Nothing above the floor changes.
+  - **The reading type size is disabled, with a reason, where it cannot act.** A page whose reading area is narrower than `PAPER_ASPECT` is width-bound — the line already runs margin to margin, and the words on a line are page data, so "larger" could only mean fewer words per line. On a phone all three steps had been producing an identical measure and identical 22.4px type. The control now says so rather than pretending.
+  - **One overflow button carries the secondary actions wherever the bars do.** It had been `sm:hidden`, so the whole 768–1024 portrait band lost it and reached focus mode two taps and a scroll deep inside Settings. The bar's separate Settings control is removed with it: two controls opening the same sheet is clutter, not a shortcut.
+  - **The page number reads the same everywhere.** The footer adopts the rail's anatomy — numeral, then unit, with "page X of 604" in the accessible name.
+  - **The reading place is a bookmark, not a map pin.** Page bookmarks keep their own identity through the add and check variants.
+  - **The page turn carries the bar's weight.** It had been the lightest control in the footer while the two study toggles wore bordered pills; the chip treatment moves to Previous and Next, and the toggles sit back until they are on.
+- **Why:** Each of these was the interface claiming something it did not do — a control that changed nothing, a menu that was not there, a page rendered at a size no one can read.
+- **Consequences:** DEC-097's static arrow-key hint loses its footer, which the rail replaced. The hint moves onto the Previous and Next tooltips, where a pointer user meets it on the control it describes and the accessible name stays the plain action.
+- **Preserved:** Qur'an text, QCF glyphs, the fifteen-line geometry, pagination, the physical page-turn contract, 44px targets, and 3px focus indicators.
+- **Tests/evidence required:** short-viewport slot count, type floor and scroll geometry; type-size disabled-with-reason on a phone and enabled on a portrait tablet; overflow reachable and the duplicate Settings control gone; footer readout content; full local gates and browser review at phone, phone-landscape, tablet-portrait, and desktop.
