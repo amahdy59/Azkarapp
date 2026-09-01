@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-01",
+  "release": "2026-09-01b",
   "ar": [
-    "على الشاشات العريضة انتقلت أدوات المصحف إلى شريط رأسي جانبي، فاتسعت مساحة القراءة، ويمكنك اختيار جهته يميناً أو يساراً.",
-    "وضع التركيز يخفي الأدوات ويترك الصفحة وحدها، وتعود الأدوات بلمسة على الصفحة.",
-    "إطار مخطوطة رقيق حول كل صفحة، ومع عرض الصفحتين تحمل كل صفحة اسم سورتها وجزئها ورقمها.",
-    "إعدادات القراءة صارت بجانب الصفحة لا فوقها، وأضيف إليها اختيار حجم النص، فترى أثر اختيارك لحظة اختياره."
+    "الهاتف أفقياً صار يعرض الصفحة بخط مقروء وتتحرك الصفحة تحت النافذة، بعد أن كان الخط يصغر حتى يتعذر قراءته.",
+    "زر واحد في الأعلى يجمع الفهرس والعلامات ومعاني الكلمات ووضع التركيز والإعدادات، وصار متاحاً على اللوحي أيضاً.",
+    "اختيار حجم النص يوضّح الآن متى لا يمكنه العمل: في وضع يملأ فيه السطر عرض الصفحة، ويرشدك إلى إدارة الجهاز.",
+    "رقم الصفحة صار يُقرأ بالشكل نفسه في كل المقاسات، وأيقونة موضع المتابعة صارت علامة كتاب، وأزرار تصفّح الصفحات صارت أوضح."
   ],
   "en": [
-    "On wide screens the Mushaf tools now stand in a slim vertical bar beside the page, giving the reading area far more room — and you can put that bar on either side.",
-    "Focus mode hides every control and leaves only the page; a tap on the page brings them back.",
-    "Every page now carries a fine manuscript frame, and in the two-page view each page names its own surah, juz, and page number.",
-    "Reading settings sit beside the page instead of over it, and now include a text-size choice, so you can see each change as you make it."
+    "A phone held sideways now shows the page at a readable size and scrolls it under the window, instead of shrinking the text until it could not be read.",
+    "One button at the top gathers the index, bookmarks, word meanings, focus mode and settings — and it is now on tablets too.",
+    "The text-size choice now says when it cannot apply, on a page whose line already fills the width, and points you to rotating the device.",
+    "The page number reads the same at every size, the reading-place icon is now a bookmark, and the page-turn buttons stand out more clearly."
   ]
 }
