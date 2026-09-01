@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-01b",
+  "release": "2026-09-01c",
   "ar": [
-    "الهاتف أفقياً صار يعرض الصفحة بخط مقروء وتتحرك الصفحة تحت النافذة، بعد أن كان الخط يصغر حتى يتعذر قراءته.",
-    "زر واحد في الأعلى يجمع الفهرس والعلامات ومعاني الكلمات ووضع التركيز والإعدادات، وصار متاحاً على اللوحي أيضاً.",
-    "اختيار حجم النص يوضّح الآن متى لا يمكنه العمل: في وضع يملأ فيه السطر عرض الصفحة، ويرشدك إلى إدارة الجهاز.",
-    "رقم الصفحة صار يُقرأ بالشكل نفسه في كل المقاسات، وأيقونة موضع المتابعة صارت علامة كتاب، وأزرار تصفّح الصفحات صارت أوضح."
+    "عاد التنقل بالسحب بين الصفحات وهو يعمل في وضع التركيز، ولم يعد السحب غير الدقيق يخرجك من الوضع.",
+    "بشارة إتمام الورد تظهر مرة واحدة في اليوم، بعد أن كانت تتكرر مع كل عودة إلى المصحف.",
+    "صفحتا الفاتحة ومطلع البقرة صارتا بحجم خط واحد متساوٍ كما تُطبعان معاً في المصحف.",
+    "يعمل التنقل بلوحة المفاتيح فور فتح المصحف، وأصبحت الاختصارات مذكورة في الإعدادات."
   ],
   "en": [
-    "A phone held sideways now shows the page at a readable size and scrolls it under the window, instead of shrinking the text until it could not be read.",
-    "One button at the top gathers the index, bookmarks, word meanings, focus mode and settings — and it is now on tablets too.",
-    "The text-size choice now says when it cannot apply, on a page whose line already fills the width, and points you to rotating the device.",
-    "The page number reads the same at every size, the reading-place icon is now a bookmark, and the page-turn buttons stand out more clearly."
+    "Swiping between pages works again, including inside focus mode, and an imprecise swipe no longer drops you out of it.",
+    "The wird completion message now appears once a day instead of every time you reopen the Mushaf.",
+    "Al-Fatihah and the opening of Al-Baqarah are now set at one matching type size, as they are printed together.",
+    "Keyboard paging works the moment the Mushaf opens, and the shortcuts are listed in the reading settings."
   ]
 }
