@@ -218,3 +218,7 @@ ragged column. Numbering matches the review handed to the owner.
       tall enough to show all of it, the tools stand in a vertical rail beside the paper and the
       horizontal bars are not rendered. Nothing hides on a timer — focus mode is an explicit,
       reversible action, and portrait keeps the permanent bars. (DEC-109)
+- [x] **21.** The reading settings dock beside the paper wherever the tool rail is showing, held
+      back by the rail's width so the rail stays visible and a whole page of the spread stays
+      uncovered. Choosing a theme no longer closes them. Elsewhere they remain a drawer or a
+      centred sheet. (DEC-109)

@@ -275,6 +275,45 @@ test("keeps the landscape tool rail accessible", async ({ page }) => {
   expect(accessibility.violations).toEqual([]);
 });
 
+test("docks the reading settings beside the page instead of over it", async ({ page }) => {
+  await page.setViewportSize({ width: 1280, height: 720 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  const rail = page.getByTestId("mushaf-tool-rail");
+  await expect(rail).toBeVisible();
+
+  await page.getByTestId("mushaf-settings-trigger").click();
+  const panel = page.getByTestId("mushaf-settings-sheet");
+  await expect(panel).toBeVisible();
+
+  const [panelBox, railBox, farPageBox] = await Promise.all([
+    panel.boundingBox(),
+    rail.boundingBox(),
+    // The far half of the spread — the one the panel docks away from.
+    page.locator("[data-mushaf-page]").last().boundingBox(),
+  ]);
+  // The rail it came out of stays on screen beside it, not underneath it.
+  expect(panelBox!.x + panelBox!.width).toBeLessThanOrEqual(railBox!.x + 1);
+  // The panel is an overlay, so it does cover the near half of the spread —
+  // but a whole page stays clear, which is what makes a theme or type-size
+  // choice something you can watch rather than guess at.
+  expect(farPageBox!.x + farPageBox!.width).toBeLessThanOrEqual(panelBox!.x + 1);
+  expect(farPageBox!.height).toBeGreaterThan(400);
+
+  // Choosing a theme is visible immediately, and the settings stay open so the
+  // next choice can be compared against it. Queried by selector, not by role:
+  // the modal marks everything behind it aria-hidden.
+  await page.getByTestId("mushaf-theme-option-light").click();
+  await expect(page.locator("article[data-theme]")).toHaveAttribute("data-theme", "light");
+  await expect(panel).toBeVisible();
+  await page.getByTestId("mushaf-theme-option-midnight").click();
+  await expect(page.locator("article[data-theme]")).toHaveAttribute("data-theme", "midnight");
+
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  // Escape closed the panel, not the reader.
+  await expect(page.getByRole("article", { name: /٤٢/ })).toBeVisible();
+});
+
 test("gives the whole screen to the page in focus mode and hands the tools back", async ({ page }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
   await page.getByRole("button", { name: "متابعة القراءة" }).click();

@@ -102,6 +102,74 @@ export function Modal({
   );
 }
 
+export interface SidePanelProps extends Omit<ModalProps, "maxWidthClassName"> {
+  /** The physical edge the panel docks to. */
+  side: "right" | "left";
+  /**
+   * Pixels to hold back from that edge, so the panel can dock against a tool
+   * rail rather than over it. The rail stays visible as the thing the panel
+   * came out of, even while the modal makes it inert.
+   */
+  inset?: number;
+}
+
+/**
+ * A panel docked to one edge of the screen, full height.
+ *
+ * The Mushaf's reading settings act on the page behind them — theme, type size,
+ * how many pages are showing. A centred dialog sits on top of the thing it is
+ * changing; a docked panel sits beside it, so the reader can watch the page
+ * respond while they choose. It is only worth the width where there is width to
+ * spare, which is the same landscape screen that carries the tool rail.
+ *
+ * Modality, focus containment, Escape, and focus restore all come from Radix,
+ * exactly as {@link Modal} does — the scrim is lighter, not absent (DEC-025).
+ */
+export function SidePanel({
+  open,
+  onClose,
+  title,
+  direction,
+  children,
+  testId,
+  describedById,
+  side,
+  inset = 0,
+  className = "",
+}: SidePanelProps) {
+  useRestoreFocusOnClose(open);
+
+  return (
+    <DialogPrimitive.Root
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
+    >
+      <DialogPrimitive.Portal>
+        <DialogPrimitive.Overlay className="animate-in fade-in-0 fixed inset-0 z-[100] bg-black/25 duration-standard" />
+        <DialogPrimitive.Content
+          data-testid={testId}
+          data-prevent-count="true"
+          data-side={side}
+          aria-describedby={describedById}
+          dir={direction}
+          // See Modal: a modal consumes Escape so it never also reaches the
+          // reader's own shortcut handlers underneath.
+          onEscapeKeyDown={(event) => event.stopPropagation()}
+          style={inset > 0 ? { [side]: `${inset}px` } : undefined}
+          className={`animate-in fixed inset-y-0 z-[100] flex w-[22rem] max-w-[calc(100%-3rem)] flex-col overflow-y-auto bg-card shadow-overlay duration-standard outline-none ${
+            side === "right" ? "right-0 border-l slide-in-from-right" : "left-0 border-r slide-in-from-left"
+          } border-border/60 ${className}`.trim()}
+        >
+          <DialogPrimitive.Title className="sr-only">{title}</DialogPrimitive.Title>
+          {children}
+        </DialogPrimitive.Content>
+      </DialogPrimitive.Portal>
+    </DialogPrimitive.Root>
+  );
+}
+
 export interface ResponsiveSheetProps extends Omit<ModalProps, "className"> {
   /** Extra classes for the desktop dialog surface only. */
   dialogClassName?: string;

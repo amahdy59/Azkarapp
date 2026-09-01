@@ -43,6 +43,15 @@ export interface MushafToolRailAction {
   testId?: string;
 }
 
+/**
+ * The rail's own width, in pixels.
+ *
+ * Kept alongside the `w-15` / `w-18` classes below because a surface that docks
+ * against the rail — the reading settings panel — has to know how far in to
+ * start, and a Tailwind class cannot tell it. Change both together.
+ */
+export const MUSHAF_RAIL_WIDTH = { regular: 72, compact: 60 } as const;
+
 /** Rail controls share one anatomy; only the label's size steps down. */
 const RAIL_CELL =
   "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";

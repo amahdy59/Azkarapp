@@ -524,3 +524,31 @@ describe("KhatmahReaderScreen landscape phone", () => {
     expect(article.querySelectorAll("[data-mushaf-rendering]")).toHaveLength(1);
   });
 });
+
+describe("KhatmahReaderScreen settings presentation", () => {
+  afterEach(() => setViewport(1024, 768));
+
+  it("docks the reading settings beside the paper where the rail is showing", async () => {
+    const user = userEvent.setup();
+    setViewport(1440, 900);
+    renderReader({ language: "en", direction: "ltr" });
+    await screen.findByRole("article", { name: "Pages 41 and 42" });
+
+    await user.click(screen.getByTestId("mushaf-settings-trigger"));
+    const panel = await screen.findByTestId("mushaf-settings-sheet");
+    // Docked to the rail's own edge, held back far enough to leave it visible.
+    expect(panel).toHaveAttribute("data-side", "right");
+    expect(panel.style.right).toBe("72px");
+  });
+
+  it("keeps the centred sheet where there is no width to dock into", async () => {
+    const user = userEvent.setup();
+    setViewport(820, 1180);
+    renderReader({ language: "en", direction: "ltr" });
+    await screen.findByRole("article", { name: "Page 42" });
+
+    await user.click(screen.getByTestId("mushaf-settings-trigger"));
+    const sheet = await screen.findByTestId("mushaf-settings-sheet");
+    expect(sheet).not.toHaveAttribute("data-side");
+  });
+});

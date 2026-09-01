@@ -10,6 +10,15 @@ import { gzipSync } from "node:zlib";
  * The new numbers leave roughly the same proportional headroom over the
  * corrected build as the old ones did over the broken one. Do not raise them
  * again to make a build pass; reduce the CSS instead.
+ *
+ * Raised once more in DEC-109, from 160 kB to 164 kB raw, on an explicit user
+ * decision. The 160 kB ceiling had drifted to roughly 1 kB of headroom, which
+ * is less than one component's worth of styling: it had stopped separating
+ * "this feature costs a little CSS" from "the purge broke again", and was
+ * failing the first while a 15 kB regression of the second is what it exists to
+ * catch. 164 kB restores ~3.7 kB of room without weakening that. The gzip
+ * ceiling is deliberately unchanged — it is the number that reflects what is
+ * actually shipped over the wire, and it still holds 1.4 kB of headroom.
  */
 /**
  * `totalOutput` and `largestFile` walk the whole of dist/, not just dist/assets.
@@ -22,7 +31,7 @@ import { gzipSync } from "node:zlib";
  */
 const limits = {
   javascript: 480 * 1024,
-  css: 160 * 1024,
+  css: 164 * 1024,
   asset: 1024 * 1024,
   javascriptGzip: 140 * 1024,
   cssGzip: 28 * 1024,

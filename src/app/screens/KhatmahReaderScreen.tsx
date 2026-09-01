@@ -30,7 +30,7 @@ import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
 import { MushafSettingsSheet } from "../components/MushafSettingsSheet";
-import { MushafToolRail } from "../components/MushafToolRail";
+import { MUSHAF_RAIL_WIDTH, MushafToolRail } from "../components/MushafToolRail";
 import { MushafQuickMenu } from "../components/MushafQuickMenu";
 import { getSurahDisplayName, getSurahShortName, getJuzNumberForPage } from "../content/surahInfo";
 import { loadSurahWordMeanings } from "../content/quranWordMeanings";
@@ -335,10 +335,17 @@ export function KhatmahReaderScreen({
     if (initialTheme) setTheme(initialTheme);
   }, [initialTheme]);
 
+  /**
+   * Choosing a theme leaves the settings open.
+   *
+   * It used to close them, which made the one control whose whole point is
+   * comparison the only one you could not try twice — and every other control
+   * on the same surface stays put. With the settings docked beside the page,
+   * closing them also took away the view of what the choice had just done.
+   */
   const handleSelectTheme = (newTheme: MushafTheme) => {
     setTheme(newTheme);
     onUpdateTheme?.(newTheme);
-    setIsOptionsMenuOpen(false);
   };
 
   const now = useNow();
@@ -1017,6 +1024,8 @@ export function KhatmahReaderScreen({
         toolbarSide={mushafToolbarSide}
         onSelectToolbarSide={setMushafToolbarSide}
         showToolbarSide={useRail}
+        presentation={useRail ? "side-panel" : "sheet"}
+        panelInset={useRail ? (shell.railCompact ? MUSHAF_RAIL_WIDTH.compact : MUSHAF_RAIL_WIDTH.regular) : 0}
         onEnterFocusMode={() => {
           setIsOptionsMenuOpen(false);
           setIsFocusMode(true);

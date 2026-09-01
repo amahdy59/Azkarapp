@@ -889,7 +889,7 @@ const ar = {
     juzLabel: "الجزء {juz}",
     layoutAuto: "تلقائي",
     layoutSingle: "صفحة واحدة",
-    layoutSpread: "صفحتان متقابلتان",
+    layoutSpread: "صفحتان",
     wirdTitle: "ورد القرآن",
     wirdProgress: "{read} من {goal} صفحات",
     wirdGoalReached: "اكتمل ورد اليوم بحمد الله",

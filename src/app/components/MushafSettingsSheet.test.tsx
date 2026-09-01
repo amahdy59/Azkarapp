@@ -139,3 +139,48 @@ describe("MushafSettingsSheet reading choices", () => {
     expect(onEnterFocusMode).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("MushafSettingsSheet docked panel", () => {
+  function renderPanel(overrides: Partial<Parameters<typeof MushafSettingsSheet>[0]> = {}) {
+    render(
+      <MushafSettingsSheet
+        open
+        onClose={vi.fn()}
+        language="ar"
+        direction="rtl"
+        theme="midnight"
+        onSelectTheme={vi.fn()}
+        mushafLayout="auto"
+        textScale="medium"
+        toolbarSide="right"
+        presentation="side-panel"
+        isBookmarked={false}
+        onToggleBookmark={vi.fn()}
+        pageNumber={42}
+        surahName="سورة البقرة"
+        {...overrides}
+      />,
+    );
+    return screen.getByTestId("mushaf-settings-sheet");
+  }
+
+  it("docks to the same edge as the rail it came out of, holding back to clear it", () => {
+    const panel = renderPanel({ toolbarSide: "right", panelInset: 72 });
+    expect(panel).toHaveAttribute("data-side", "right");
+    expect(panel.style.right).toBe("72px");
+  });
+
+  it("follows the rail to the other edge", () => {
+    const panel = renderPanel({ toolbarSide: "left", panelInset: 60 });
+    expect(panel).toHaveAttribute("data-side", "left");
+    expect(panel.style.left).toBe("60px");
+  });
+
+  it("keeps every reading control it has as a sheet, and still names itself", () => {
+    renderPanel({ onSelectTextScale: vi.fn() });
+    expect(screen.getByTestId("mushaf-text-size-option-medium")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-bookmark-toggle")).toBeInTheDocument();
+    expect(screen.getByRole("dialog", { name: "إعدادات القراءة" })).toBeInTheDocument();
+  });
+});
