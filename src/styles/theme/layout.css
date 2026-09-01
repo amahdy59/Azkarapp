@@ -404,6 +404,25 @@
    it by shrinking the type to nine pixels. Past this floor the paper keeps its
    height and the viewport scrolls over it, the way a held page works.
 --------------------------------------------------------------------------- */
+/* The reader turns pages by swiping the whole screen, so the whole screen has
+   to say which axis it owns. Without this the container computes
+   `touch-action: auto`, the browser treats a horizontal drag as a scroll or a
+   back-navigation gesture, and the view slides under the finger — the page turn
+   then fires on touchend, after the reader has already watched the entire
+   screen move. Vertical panning stays the browser's, so long surahs still
+   scroll; horizontal belongs to the page turn. Same reasoning as
+   `.mushaf-paper` below, on the surface Al-Kahf actually opens in. */
+.reader-swipe-surface {
+  touch-action: pan-y;
+  overscroll-behavior: contain;
+}
+
+/* An element inside the reader that genuinely scrolls sideways has to take its
+   axis back, or `pan-y` above would leave it unscrollable on touch. */
+.reader-swipe-surface [data-allows-horizontal-pan="true"] {
+  touch-action: pan-x;
+}
+
 .mushaf-paper {
   overflow-y: auto;
   overscroll-behavior-y: contain;

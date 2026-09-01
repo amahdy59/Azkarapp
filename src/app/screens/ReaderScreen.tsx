@@ -760,7 +760,7 @@ export function ReaderScreen({
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
-      className="relative !pb-0"
+      className="reader-swipe-surface relative !pb-0"
       data-testid="reader-screen"
       data-zikr-index={idx}
       data-zikr-id={z.id}
