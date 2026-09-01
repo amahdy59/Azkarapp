@@ -413,7 +413,7 @@ export function resolveInkAllowance(useQcfGlyphs: boolean, textScale: MushafText
   return Math.min(base * TEXT_SCALE_FACTOR[textScale], MAX_INK_ALLOWANCE);
 }
 
-function useLineFitter(dependencyKey: string, inkAllowance: number) {
+function useLineFitter(dependencyKey: string, inkAllowance: number, isOpening: boolean) {
   const canvasRef = useRef<HTMLDivElement | null>(null);
 
   useLayoutEffect(() => {
@@ -447,6 +447,30 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       const available = first.clientWidth;
       const slotHeight = (first.parentElement as HTMLElement | null)?.clientHeight ?? 0;
       if (available <= 0 || slotHeight <= 0) return;
+
+      /**
+       * The two opening pages are set as a matched pair in print.
+       *
+       * They do not share the fifteen-line grid, so their "slot" is however
+       * tall a line of theirs happens to be — and Al-Fatihah's seven lines make
+       * a shorter slot than Al-Baqarah's six. Sizing each page to its own slot
+       * therefore set one at 29px and its facing page at 37px, and pinned
+       * Al-Fatihah against the fitter's lower clamp so three of its lines had
+       * to be squeezed on top of that. The pair takes one size from the CSS
+       * clamp instead, and only overlong lines are corrected below.
+       */
+      if (isOpening) {
+        for (let i = 0; i < contents.length; i++) {
+          const content = contents[i]!;
+          // An opening line is `w-auto`, so its own clientWidth is its content,
+          // not its room. The room is what its wrapper gives it.
+          const room = (content.parentElement as HTMLElement | null)?.clientWidth ?? 0;
+          const natural = content.scrollWidth;
+          const overrun = room > 0 && natural > room ? room / natural : 1;
+          content.style.transform = overrun < 1 ? `scale(${overrun.toFixed(4)})` : "";
+        }
+        return;
+      }
 
       // Single read pass: measure natural width of all lines in one loop without style mutation in between
       const lineCount = contents.length;
@@ -510,7 +534,7 @@ function useLineFitter(dependencyKey: string, inkAllowance: number) {
       cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [dependencyKey, inkAllowance]);
+  }, [dependencyKey, inkAllowance, isOpening]);
 
   return canvasRef;
 }
@@ -680,9 +704,11 @@ function MushafPageCanvas({
   }, [lines, showWordMeanings]);
 
   const lineDetails = useLineDetails(lines, pageNumber);
+  const isOpening = OPENING_PAGES.has(pageNumber);
   const canvasRef = useLineFitter(
     `${pageNumber}:${useQcfGlyphs}:${lines.length}:${textScale}`,
     resolveInkAllowance(useQcfGlyphs, textScale),
+    isOpening,
   );
 
   /* Each page names itself, so a spread is not two anonymous columns under one
@@ -705,8 +731,6 @@ function MushafPageCanvas({
     },
     [onAyahAction, pageNumber],
   );
-
-  const isOpening = OPENING_PAGES.has(pageNumber);
 
   return (
     <div
@@ -733,9 +757,8 @@ function MushafPageCanvas({
               left: "6%",
               right: "6%",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
-              fontSize: useQcfGlyphs
-                ? "calc(min(7.7cqi, 7.7cqh) * var(--mushaf-fit, 1))"
-                : "calc(min(6.3cqi, 6.8cqh) * var(--mushaf-fit, 1))",
+              // No --mushaf-fit here: the pair shares one size (see useLineFitter).
+              fontSize: useQcfGlyphs ? "min(6.1cqi, 6.1cqh)" : "min(5.0cqi, 5.4cqh)",
               WebkitTextStrokeWidth: inkStroke,
               WebkitTextStrokeColor: "currentColor",
             }}

@@ -1732,3 +1732,54 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Consequences:** DEC-097's static arrow-key hint loses its footer, which the rail replaced. The hint moves onto the Previous and Next tooltips, where a pointer user meets it on the control it describes and the accessible name stays the plain action.
 - **Preserved:** Qur'an text, QCF glyphs, the fifteen-line geometry, pagination, the physical page-turn contract, 44px targets, and 3px focus indicators.
 - **Tests/evidence required:** short-viewport slot count, type floor and scroll geometry; type-size disabled-with-reason on a phone and enabled on a portrait tablet; overflow reachable and the duplicate Settings control gone; footer readout content; full local gates and browser review at phone, phone-landscape, tablet-portrait, and desktop.
+
+## DEC-111 — the reader's gestures, its keys, and its opening pair
+
+- **Date:** 2026-09-01
+- **Status:** Approved
+- **Owner:** User (reported the rail's page-turn icons and its repeated page number, a swipe that no longer turned pages in focus mode, a completion notice that returned on every visit, keyboard use on desktop, redundant options, and inconsistent type on the opening pages)
+- **Related scope:** `KhatmahReaderScreen.tsx`, `MushafPageViewer.tsx`, `MushafToolRail.tsx`, `MushafSettingsSheet.tsx`, `types.ts`, `state.ts`, `App.tsx`, `layout.css`, i18n, unit and Playwright tests
+- **Decision:**
+  - **The paper declares `touch-action: pan-y`.** Making it scrollable (DEC-110) let it compute `auto`, claim both axes, and swallow every horizontal swipe before the page-turn handler saw it. Vertical panning is the browser's; horizontal is the page turn's.
+  - **A cancelled pointer aborts rather than commits.** The browser cancels the gesture when it takes over for scrolling, and the handler was reading that as a completed swipe.
+  - **Leaving focus mode requires a real tap** — under 400ms and under 8px of travel — so a slow or imprecise swipe turns the page instead of dismissing the mode.
+  - **The wird completion notice is announced once a day, not once a visit.** The day it was shown is persisted as `quranWirdCompletionAnnounced`; it had lived in component state, and every return to the Mushaf was a fresh mount that congratulated the reader again.
+  - **The rail's page turn uses right and left chevrons.** Up and down gave one action two directional languages and contradicted the key hint in the tooltip beside them. The turn is horizontal wherever it is triggered.
+  - **The rail no longer prints a page number.** Every page carries its own folio inside its frame, so the rail repeated it — and beside a spread it named only one of the two. The count stays in the accessible name.
+  - **The rail is a `group`, not a `toolbar`.** `toolbar` promises roving arrow-key focus, and in this reader the arrow keys turn the page. It asks for nothing it does not implement.
+  - **The settings sheet holds settings.** Focus mode had three homes and page bookmarking two; the actions move to the rail and the quick menu, and the sheet keeps type size, theme, layout, and toolbar side.
+  - **The reader takes focus on arrival** so the page keys work without clicking the paper first, `F` toggles focus mode, and the desktop panel lists the keys — the home DEC-097's footer hint lost when the rail replaced it.
+  - **The two opening pages are set as a matched pair.** They do not share the fifteen-line grid, so each was sized to its own slot height: Al-Fatihah's seven lines made a shorter slot than Al-Baqarah's six, which set one at 29px beside the other at 37px and pinned Al-Fatihah against the fitter's lower clamp so three of its lines were squeezed as well. The pair now takes one size from the CSS clamp, and only a genuinely overlong line is corrected — measured at 38px on both, with no corrective scaling on either.
+- **Preserved:** Qur'an text, QCF glyphs, the fifteen-line geometry, pagination, the physical page-turn contract, 44px targets, and 3px focus indicators.
+- **Tests/evidence required:** paper touch-action; swipe turning a page inside focus mode without leaving it; completion announced once and quiet on a later visit that day; rail role, icons, and absent numeral; settings sheet free of actions; opening-pair type equality and absence of per-line squeezing; full local gates.
+
+## DEC-112 — one place the reader is, and pages they chose to mark
+
+- **Date:** 2026-09-01
+- **Status:** Approved
+- **Owner:** User (asked which options were redundant, then authorised removing one and discarding its stored data)
+- **Related scope:** `types.ts`, `state.ts`, `App.tsx`, `KhatmahReaderScreen.tsx`, `MushafToolRail.tsx`, `MushafQuickMenu.tsx`, `HomeScreen` inputs, i18n, tests
+- **Decision:** **`quranReadingBookmark` is removed, and any stored value is discarded on load.**
+  The Mushaf carried four ways to mark a place: the automatic position, a manual
+  "reading place", page bookmarks, and verse bookmarks. The manual place was not
+  merely a fourth — it silently and permanently overrode the automatic one for
+  Continue reading (`quranReadingBookmark ?? quranReadingPosition`). Measured: pin
+  page 3, read on to page 200, and Continue reading still opens page 3. Nothing in
+  the interface said the pin was still in force, and nothing expired it.
+  Three concepts remain, each meaning one thing: **where the reader is**, kept
+  automatically and always current; **pages they marked**, kept by hand; and
+  **verses they saved**, kept by hand at finer grain.
+- **Why the data goes rather than migrates:** the stored value's only meaning was
+  "override Continue reading", which no longer exists. Migrating it into page
+  bookmarks would silently invent a bookmark the reader never made; keeping it
+  would preserve a field nothing reads.
+- **Consequences:** the "set as reading place" control leaves the rail, the footer,
+  and the quick menu, and `mushaf.savePlace` / `mushaf.railSavePlace` are removed.
+  The footer control becomes the page bookmark it now is, the rail sheds a slot,
+  and the plain bookmark icon means exactly one thing again. Continue reading now
+  always opens the last page actually read — for readers who had a stale pin, that
+  is the fix arriving, not a loss.
+- **Preserved:** page bookmarks, verse bookmarks, the automatic reading position,
+  wird history, and every other stored field.
+- **Tests/evidence required:** a stored `quranReadingBookmark` is absent after
+  normalisation; the footer control toggles the page bookmark; full local gates.

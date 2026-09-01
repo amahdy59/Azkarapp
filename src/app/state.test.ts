@@ -170,7 +170,9 @@ describe("app state persistence", () => {
       { verseKey: "2:255", page: 42 },
       { verseKey: "18:10", page: 293 },
     ]);
-    expect(state.quranReadingBookmark?.page).toBe(293);
+    // DEC-112 retired the manual reading place: it silently and permanently
+    // overrode the automatic position, so a stored one is dropped on load.
+    expect("quranReadingBookmark" in state).toBe(false);
   });
 
   it("normalizes calendar-month and free-reading plans", () => {

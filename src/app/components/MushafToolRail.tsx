@@ -7,8 +7,8 @@ import {
   ArrowRight,
   BookOpen,
   CheckCircle2,
-  ChevronDown,
-  ChevronUp,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   Bookmark,
   Maximize,
@@ -109,14 +109,14 @@ export interface MushafToolRailProps {
   atLastPage: boolean;
   showWordMeanings: boolean;
   isLoadingWordMeanings: boolean;
-  isPlaceSaved: boolean;
+  isPageBookmarked: boolean;
   isFullscreen: boolean;
   onBack: () => void;
   onOpenIndex: () => void;
   onPrevious: () => void;
   onNext: () => void;
   onToggleWordMeanings: () => void;
-  onToggleSavePlace: () => void;
+  onTogglePageBookmark: () => void;
   onToggleFullscreen: () => void;
   onEnterFocusMode: () => void;
   onOpenSettings: () => void;
@@ -135,14 +135,14 @@ export function MushafToolRail({
   atLastPage,
   showWordMeanings,
   isLoadingWordMeanings,
-  isPlaceSaved,
+  isPageBookmarked,
   isFullscreen,
   onBack,
   onOpenIndex,
   onPrevious,
   onNext,
   onToggleWordMeanings,
-  onToggleSavePlace,
+  onTogglePageBookmark,
   onToggleFullscreen,
   onEnterFocusMode,
   onOpenSettings,
@@ -154,13 +154,13 @@ export function MushafToolRail({
 
   const tools: MushafToolRailAction[] = [
     {
-      id: "save-place",
-      label: t(language, "mushaf.savePlace"),
-      caption: t(language, "mushaf.railSavePlace"),
-      icon: <Bookmark size={iconSize} className={isPlaceSaved ? "fill-current" : undefined} />,
-      onClick: onToggleSavePlace,
-      pressed: isPlaceSaved,
-      testId: "mushaf-save-place",
+      id: "page-bookmark",
+      label: t(language, "mushaf.bookmarkCurrentPage"),
+      caption: t(language, "mushaf.railPageBookmark"),
+      icon: <Bookmark size={iconSize} className={isPageBookmarked ? "fill-current" : undefined} />,
+      onClick: onTogglePageBookmark,
+      pressed: isPageBookmarked,
+      testId: "mushaf-rail-page-bookmark",
     },
     {
       id: "word-meanings",
@@ -207,8 +207,11 @@ export function MushafToolRail({
       className={`flex shrink-0 flex-col items-stretch gap-1 overflow-y-auto overscroll-contain px-1.5 py-2 ${
         compact ? "w-15" : "w-18"
       }`}
-      role="toolbar"
-      aria-orientation="vertical"
+      // Deliberately a group, not a toolbar: `toolbar` promises roving arrow-key
+      // focus between its controls, and in this reader the arrow keys turn the
+      // page. Claiming the role and then not honouring it is the worse of the
+      // two, so the rail asks for nothing it does not implement.
+      role="group"
       aria-label={t(language, "mushaf.toolbar")}
     >
       <RailButton
@@ -239,43 +242,40 @@ export function MushafToolRail({
         </span>
       </button>
 
-      {/* Up is back towards page one, down is onward — the vertical reading of
-          the same physical rule the horizontal chrome follows (DEC-094). */}
+      {/* The rail stands on end; the book does not. A page turn is horizontal —
+          right goes back towards page one, left goes onward (DEC-094) — and it
+          is the same motion whether it comes from this button, the arrow keys,
+          the swipe, or the footer on a phone. Up and down chevrons here gave
+          one action two directional languages, and contradicted the key hint
+          printed in the tooltip beside them. */}
       <nav className="flex flex-col items-stretch gap-0.5" aria-label={t(language, "mushaf.pageNavigation")}>
         <RailButton
           action={{
             id: "previous",
             label: t(language, "common.previous"),
             hint: t(language, "mushaf.keyPrevious"),
-            icon: <ChevronUp size={iconSize} />,
+            icon: <ChevronRight size={iconSize} />,
             onClick: onPrevious,
             disabled: atFirstPage,
             testId: "mushaf-rail-previous",
           }}
         />
-        {/* A readout, not a control — the numeral and its unit are the visible
-            text, and the full "page X of 604" is carried in the same element
-            rather than in an aria-label a <p> is not allowed to have. */}
-        <p className="flex min-h-9 flex-col items-center justify-center" data-testid="mushaf-rail-page">
-          <bdi className="text-sm font-extrabold leading-[1.6] tabular-nums" aria-hidden="true">
-            {formatNumerals(pageNumber, language)}
-          </bdi>
-          <span className="text-[0.625rem] font-bold leading-[1.6] opacity-70" aria-hidden="true">
-            {t(language, "mushaf.railPageUnit")}
-          </span>
-          <span className="sr-only">
-            {t(language, "mushaf.pageOfTotal", {
-              page: formatNumerals(pageNumber, language),
-              total: formatNumerals(lastPage, language),
-            })}
-          </span>
+        {/* No numeral here. Every page prints its own folio inside its frame,
+            so repeating one in the rail said the same thing twice — and beside
+            a two-page spread it named only one of them, which is worse than
+            saying nothing. The count stays available to assistive tech. */}
+        <p className="sr-only" data-testid="mushaf-rail-page">
+          {t(language, "mushaf.pageOfTotal", {
+            page: formatNumerals(pageNumber, language),
+            total: formatNumerals(lastPage, language),
+          })}
         </p>
         <RailButton
           action={{
             id: "next",
             label: t(language, "common.next"),
             hint: t(language, "mushaf.keyNext"),
-            icon: <ChevronDown size={iconSize} />,
+            icon: <ChevronLeft size={iconSize} />,
             onClick: onNext,
             disabled: atLastPage,
             testId: "mushaf-rail-next",

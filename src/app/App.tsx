@@ -277,14 +277,14 @@ function AppContent() {
   );
   const [mushafTextScale, setMushafTextScale] = useState<MushafTextScale>(initialState.mushafTextScale ?? "medium");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
-  const [quranReadingBookmark, setQuranReadingBookmark] = useState<QuranReadingPosition | undefined>(
-    initialState.quranReadingBookmark,
-  );
   const [mushafVerseBookmarks, setMushafVerseBookmarks] = useState<QuranVerseBookmark[]>(
     initialState.mushafVerseBookmarks ?? [],
   );
   const [dailyWirdGoal, setDailyWirdGoal] = useState<number>(initialState.dailyWirdGoal ?? 4);
   const [wirdHistory, setWirdHistory] = useState<Record<string, number[]>>(initialState.wirdHistory ?? {});
+  const [quranWirdCompletionAnnounced, setQuranWirdCompletionAnnounced] = useState<string | undefined>(
+    initialState.quranWirdCompletionAnnounced,
+  );
   const [quranWirdDailyGoals, setQuranWirdDailyGoals] = useState<Record<string, number>>(
     initialState.quranWirdDailyGoals ?? {},
   );
@@ -478,11 +478,11 @@ function AppContent() {
       mushafToolbarSide,
       mushafTextScale,
       mushafBookmarks,
-      quranReadingBookmark,
       mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
       quranWirdDailyGoals,
+      quranWirdCompletionAnnounced,
       quranLastReadingEvent,
       quranReadingPosition,
       quranWirdPlan,
@@ -520,11 +520,11 @@ function AppContent() {
       mushafToolbarSide,
       mushafTextScale,
       mushafBookmarks,
-      quranReadingBookmark,
       mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
       quranWirdDailyGoals,
+      quranWirdCompletionAnnounced,
       quranLastReadingEvent,
       quranReadingPosition,
       quranWirdPlan,
@@ -684,11 +684,11 @@ function AppContent() {
     setMushafToolbarSide(state.mushafToolbarSide ?? "right");
     setMushafTextScale(state.mushafTextScale ?? "medium");
     setMushafBookmarks(state.mushafBookmarks ?? []);
-    setQuranReadingBookmark(state.quranReadingBookmark);
     setMushafVerseBookmarks(state.mushafVerseBookmarks ?? []);
     setDailyWirdGoal(state.dailyWirdGoal ?? 4);
     setWirdHistory(state.wirdHistory ?? {});
     setQuranWirdDailyGoals(state.quranWirdDailyGoals ?? {});
+    setQuranWirdCompletionAnnounced(state.quranWirdCompletionAnnounced);
     setQuranLastReadingEvent(state.quranLastReadingEvent);
     setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
     setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
@@ -1057,11 +1057,11 @@ function AppContent() {
                   quietProgressEnabled={true}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
-                  quranReadingPosition={quranReadingBookmark ?? quranReadingPosition}
+                  quranReadingPosition={quranReadingPosition}
                   quranWirdPlan={quranWirdPlan}
                   wirdHistory={wirdHistory}
                   onContinueKhatmah={() => {
-                    setKhatmahPage((quranReadingBookmark ?? quranReadingPosition).page);
+                    setKhatmahPage(quranReadingPosition.page);
                     push("khatmah");
                   }}
                   onResume={(categoryId) => {
@@ -1519,8 +1519,6 @@ function AppContent() {
                   setMushafTextScale={setMushafTextScale}
                   mushafBookmarks={mushafBookmarks}
                   setMushafBookmarks={setMushafBookmarks}
-                  quranReadingBookmark={quranReadingBookmark}
-                  onReadingBookmarkChange={setQuranReadingBookmark}
                   mushafVerseBookmarks={mushafVerseBookmarks}
                   setMushafVerseBookmarks={setMushafVerseBookmarks}
                   wirdHistory={wirdHistory}
@@ -1540,6 +1538,8 @@ function AppContent() {
                     }
                   }}
                   quranWirdPlan={quranWirdPlan}
+                  wirdCompletionAnnouncedDayKey={quranWirdCompletionAnnounced}
+                  onWirdCompletionAnnounced={setQuranWirdCompletionAnnounced}
                   onReadingPositionChange={setQuranReadingPosition}
                 />
               )}

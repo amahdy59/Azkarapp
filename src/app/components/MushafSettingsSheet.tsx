@@ -2,7 +2,7 @@ import { ResponsiveSheet, SidePanel } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
-import { Bookmark, Check, Eye, Minus, Plus, SlidersHorizontal, X } from "./icons";
+import { Check, Minus, Plus, SlidersHorizontal, X } from "./icons";
 
 export interface MushafSettingsSheetProps {
   open: boolean;
@@ -26,7 +26,8 @@ export interface MushafSettingsSheetProps {
   onSelectToolbarSide?: (side: MushafToolbarSide) => void;
   /** Only offered where a rail is actually shown. */
   showToolbarSide?: boolean;
-  onEnterFocusMode?: () => void;
+  /** Lists the page keys. Shown where there is a keyboard to use them. */
+  showKeyboardHelp?: boolean;
   /**
    * Where a tool rail is showing there is width to spare, so the settings dock
    * beside the paper instead of covering it — the reader watches the page
@@ -35,8 +36,6 @@ export interface MushafSettingsSheetProps {
   presentation?: "sheet" | "side-panel";
   /** How far the docked panel holds back from its edge, to clear the rail. */
   panelInset?: number;
-  isBookmarked: boolean;
-  onToggleBookmark: () => void;
   pageNumber: number;
   surahName: string;
 }
@@ -104,11 +103,9 @@ export function MushafSettingsSheet({
   toolbarSide,
   onSelectToolbarSide,
   showToolbarSide = false,
-  onEnterFocusMode,
+  showKeyboardHelp = false,
   presentation = "sheet",
   panelInset = 0,
-  isBookmarked,
-  onToggleBookmark,
   pageNumber,
   surahName,
 }: MushafSettingsSheetProps) {
@@ -342,75 +339,37 @@ export function MushafSettingsSheet({
           </p>
         </section>
       )}
-
-      {/* Focus mode — an action, not a stored preference: it lasts as long as
-            the sitting does. */}
-      {onEnterFocusMode && (
-        <section aria-label={t(language, "mushaf.focusMode")}>
-          <button
-            type="button"
-            onClick={onEnterFocusMode}
-            data-testid="mushaf-focus-mode-action"
-            className="interactive-elem flex min-h-[52px] w-full items-center gap-3 rounded-2xl border border-border/60 bg-muted/30 p-3 text-start transition-colors hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-              <Eye size={18} aria-hidden="true" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-xs font-bold leading-snug">{t(language, "mushaf.focusMode")}</span>
-              <span className="mt-0.5 block truncate text-[0.6875rem] font-medium text-muted-foreground">
-                {t(language, "mushaf.focusModeHint")}
-              </span>
-            </span>
-          </button>
+      {/* DEC-097 put the arrow-key behaviour in the footer; the rail replaced
+          that footer and has no room for a list. It belongs where a desktop
+          reader goes looking for it. */}
+      {showKeyboardHelp && (
+        <section aria-labelledby="mushaf-keys-heading" className="flex flex-col gap-2 border-t border-border/40 pt-4">
+          <h3 id="mushaf-keys-heading" className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
+            {t(language, "mushaf.keyboardTitle")}
+          </h3>
+          <dl className="flex flex-col gap-1.5 text-[0.75rem]">
+            {(
+              [
+                ["→", "common.previous"],
+                ["←", "common.next"],
+                ["Home", "mushaf.keyFirstPage"],
+                ["End", "mushaf.keyLastPage"],
+                ["F", "mushaf.focusMode"],
+              ] as const
+            ).map(([key, labelKey]) => (
+              <div key={key} className="flex items-center justify-between gap-3">
+                <dt className="min-w-0 truncate font-medium text-muted-foreground">{t(language, labelKey)}</dt>
+                <dd
+                  dir="ltr"
+                  className="shrink-0 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-bold tabular-nums"
+                >
+                  {key}
+                </dd>
+              </div>
+            ))}
+          </dl>
         </section>
       )}
-
-      {/* Section 3: Bookmark Toggle Switch */}
-      <section aria-label={t(language, "mushaf.tabBookmarks")} className="border-t border-border/40 pt-4">
-        <button
-          type="button"
-          role="switch"
-          aria-checked={isBookmarked}
-          data-testid="mushaf-bookmark-toggle"
-          onClick={onToggleBookmark}
-          className={`interactive-elem flex min-h-[52px] w-full items-center justify-between gap-3 rounded-2xl border p-3 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-            isBookmarked ? "border-primary/50 bg-primary/10" : "border-border/60 bg-muted/30 hover:bg-muted/60"
-          }`}
-        >
-          <div className="flex items-center gap-3 min-w-0">
-            <div
-              className={`flex size-10 shrink-0 items-center justify-center rounded-xl transition-colors ${
-                isBookmarked ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
-              }`}
-            >
-              <Bookmark size={18} aria-hidden="true" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <span className="block text-xs font-bold leading-snug">{t(language, "mushaf.bookmarkCurrentPage")}</span>
-              {/* A hint that truncates has told the reader nothing; it wraps. */}
-              <span className="mt-0.5 block text-[0.6875rem] leading-snug font-medium text-muted-foreground">
-                {t(language, "mushaf.bookmarkHint")}
-              </span>
-            </div>
-          </div>
-
-          {/* Switch pill */}
-          <div
-            dir="ltr"
-            className={`relative flex h-6 w-11 shrink-0 items-center rounded-full p-0.5 transition-colors ${
-              isBookmarked ? "bg-primary" : "bg-muted-foreground/30"
-            }`}
-            aria-hidden="true"
-          >
-            <div
-              className={`size-5 rounded-full bg-white shadow-xs transition-transform duration-200 ${
-                isBookmarked ? "translate-x-5" : "translate-x-0"
-              }`}
-            />
-          </div>
-        </button>
-      </section>
     </div>
   );
 

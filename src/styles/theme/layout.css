@@ -407,6 +407,11 @@
 .mushaf-paper {
   overflow-y: auto;
   overscroll-behavior-y: contain;
+  /* Vertical panning is the browser's, horizontal is the page turn's. Without
+     this the scroll container computes `auto`, claims both axes, and eats every
+     swipe — which is what stopped page turns working once the paper could
+     scroll at all. */
+  touch-action: pan-y;
 }
 
 /* The wrapper between the paper and its canvases is `display: contents`, so

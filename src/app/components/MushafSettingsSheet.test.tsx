@@ -6,7 +6,6 @@ describe("MushafSettingsSheet", () => {
   it("renders theme options, layout options and bookmark toggle", () => {
     const onSelectTheme = vi.fn();
     const onSelectLayout = vi.fn();
-    const onToggleBookmark = vi.fn();
     const onClose = vi.fn();
 
     render(
@@ -22,8 +21,6 @@ describe("MushafSettingsSheet", () => {
         mushafLayout="auto"
         onSelectLayout={onSelectLayout}
         autoSpreadRoom={true}
-        isBookmarked={false}
-        onToggleBookmark={onToggleBookmark}
         pageNumber={42}
         surahName="سورة البقرة"
       />,
@@ -46,11 +43,10 @@ describe("MushafSettingsSheet", () => {
     fireEvent.click(screen.getByTestId("mushaf-layout-option-spread"));
     expect(onSelectLayout).toHaveBeenCalledWith("spread");
 
-    // Bookmark toggle
-    const bookmarkSwitch = screen.getByTestId("mushaf-bookmark-toggle");
-    expect(bookmarkSwitch).toHaveAttribute("aria-checked", "false");
-    fireEvent.click(bookmarkSwitch);
-    expect(onToggleBookmark).toHaveBeenCalledTimes(1);
+    // The sheet holds reading settings only: bookmarking a page and entering
+    // focus mode are actions, and live in the rail and the quick menu.
+    expect(screen.queryByTestId("mushaf-bookmark-toggle")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-focus-mode-action")).not.toBeInTheDocument();
 
     // Close button
     fireEvent.click(screen.getByRole("button", { name: "إغلاق" }));
@@ -73,8 +69,6 @@ describe("MushafSettingsSheet", () => {
         toolbarSide="right"
         mushafLayout="single"
         autoSpreadRoom={false}
-        isBookmarked={true}
-        onToggleBookmark={vi.fn()}
         pageNumber={1}
         surahName="Al-Fatihah"
       />,
@@ -82,7 +76,7 @@ describe("MushafSettingsSheet", () => {
 
     expect(screen.getByRole("heading", { name: "Reading Settings" })).toBeInTheDocument();
     expect(screen.getByTestId("mushaf-theme-option-oled")).toHaveAttribute("aria-checked", "true");
-    expect(screen.getByTestId("mushaf-bookmark-toggle")).toHaveAttribute("aria-checked", "true");
+    expect(screen.getByTestId("mushaf-theme-option-light")).toBeInTheDocument();
   });
 });
 
@@ -98,8 +92,6 @@ describe("MushafSettingsSheet reading choices", () => {
       mushafLayout: "auto" as const,
       textScale: "medium" as const,
       toolbarSide: "right" as const,
-      isBookmarked: false,
-      onToggleBookmark: vi.fn(),
       pageNumber: 42,
       surahName: "سورة البقرة",
       ...overrides,
@@ -132,11 +124,9 @@ describe("MushafSettingsSheet reading choices", () => {
     expect(onSelectToolbarSide).toHaveBeenCalledWith("left");
   });
 
-  it("offers focus mode as an action, not a stored preference", () => {
-    const onEnterFocusMode = vi.fn();
-    renderSheet({ onEnterFocusMode });
-    fireEvent.click(screen.getByTestId("mushaf-focus-mode-action"));
-    expect(onEnterFocusMode).toHaveBeenCalledTimes(1);
+  it("lists the page keys only where there is a keyboard using them", () => {
+    renderSheet({ showKeyboardHelp: true });
+    expect(screen.getByText(/اختصارات لوحة المفاتيح/)).toBeInTheDocument();
   });
 });
 
@@ -154,8 +144,6 @@ describe("MushafSettingsSheet docked panel", () => {
         textScale="medium"
         toolbarSide="right"
         presentation="side-panel"
-        isBookmarked={false}
-        onToggleBookmark={vi.fn()}
         pageNumber={42}
         surahName="سورة البقرة"
         {...overrides}
@@ -180,7 +168,7 @@ describe("MushafSettingsSheet docked panel", () => {
     renderPanel({ onSelectTextScale: vi.fn() });
     expect(screen.getByTestId("mushaf-text-size-option-medium")).toBeInTheDocument();
     expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
-    expect(screen.getByTestId("mushaf-bookmark-toggle")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-theme-option-midnight")).toBeInTheDocument();
     expect(screen.getByRole("dialog", { name: "إعدادات القراءة" })).toBeInTheDocument();
   });
 });

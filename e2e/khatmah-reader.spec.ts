@@ -59,11 +59,11 @@ test("keeps progress in the Wird overview and turns one semantic page by swipe, 
   // On a phone the settings live one tap behind the overflow button rather than
   // in the bar. The menu stays contextual: theme and page bookmark only. Layout
   // is landscape-only and the retired alternate text view cannot reappear here.
-  const savePlaceButton = page.getByRole("button", { name: "تعيين موضع المتابعة" });
-  if (!(await savePlaceButton.isVisible())) {
+  const pageBookmarkSwitch = page.getByRole("switch", { name: "إضافة إلى علامات الصفحات" });
+  if (!(await pageBookmarkSwitch.isVisible())) {
     await mushafPage.click({ position: { x: 160, y: 350 } });
   }
-  await expect(savePlaceButton).toBeVisible();
+  await expect(pageBookmarkSwitch).toBeVisible();
   const overflowButton = page.getByTestId("mushaf-more-actions");
   await overflowButton.focus();
   await overflowButton.click();
@@ -274,6 +274,18 @@ test("scrolls the paper on a short viewport instead of shrinking it to nine pixe
   await page.getByRole("button", { name: "متابعة القراءة" }).click();
   await expect(page.getByRole("article", { name: /٤٢/ })).toBeVisible();
 
+  // The page takes its floor rather than the viewport's height — that is the
+  // mechanism, and unlike a pixel size it does not vary with the engine's font
+  // metrics (desktop settles at 18px here, the tablet project at 13px).
+  await expect
+    .poll(async () =>
+      page
+        .locator("[data-mushaf-page]")
+        .first()
+        .evaluate((element) => element.clientHeight),
+    )
+    .toBeGreaterThanOrEqual(512);
+
   const geometry = await page.evaluate(() => {
     const canvas = document.querySelector<HTMLElement>("[data-mushaf-page]")!;
     const paper = document.querySelector<HTMLElement>(".mushaf-paper")!;
@@ -292,10 +304,42 @@ test("scrolls the paper on a short viewport instead of shrinking it to nine pixe
   // it at 9px type, which is not reading — so the page keeps a legible floor
   // and the viewport scrolls over it instead.
   expect(geometry.slots).toBe(15);
-  expect(geometry.fontPx).toBeGreaterThan(15);
+  // Comfortably clear of the 9.3px this rendered at before the floor existed.
+  expect(geometry.fontPx).toBeGreaterThan(12);
   expect(geometry.canvasHeight).toBeGreaterThan(geometry.paperHeight);
   expect(geometry.scrollHeight).toBeGreaterThan(geometry.paperHeight);
   expect(geometry.overflowX).toBe(0);
+});
+
+test("turns pages by swipe inside focus mode without leaving it", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole("button", { name: "متابعة القراءة" }).click();
+  await expect(page.getByRole("article", { name: "صفحة ٤٢" })).toBeVisible();
+
+  // The paper became a scroll container to keep short viewports legible, which
+  // let it compute `touch-action: auto` and claim both axes — every swipe was
+  // eaten before the page-turn handler saw it.
+  const paperTouchAction = await page
+    .locator(".mushaf-paper")
+    .evaluate((element) => getComputedStyle(element).touchAction);
+  expect(paperTouchAction).toBe("pan-y");
+
+  await page.getByTestId("mushaf-more-actions").click();
+  await page.getByTestId("mushaf-quick-focus").click();
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
+
+  const paper = await page.locator(".mushaf-paper").boundingBox();
+  const midY = paper!.y + paper!.height / 2;
+  await page.mouse.move(paper!.x + 80, midY);
+  await page.mouse.down();
+  await page.mouse.move(paper!.x + 150, midY + 2, { steps: 6 });
+  await page.mouse.move(paper!.x + 260, midY + 3, { steps: 6 });
+  await page.mouse.up();
+
+  await expect(page.getByRole("article", { name: "صفحة ٤٣" })).toBeVisible();
+  // A swipe is not a tap: it turns the page and leaves focus mode alone.
+  await expect(page.getByTestId("mushaf-focus-exit")).toBeVisible();
+  await expect(page.locator('[data-mushaf-chrome="header"]')).toHaveCount(0);
 });
 
 test("keeps the landscape tool rail accessible", async ({ page }) => {

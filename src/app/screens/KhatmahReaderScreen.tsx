@@ -69,7 +69,7 @@ function fitsTwoPages(width: number, height: number) {
 
 /** The height the rail's controls occupy. Below this it would scroll, and a
  *  toolbar you have to scroll to reach is worse than one that fits. */
-const RAIL_CONTENT_HEIGHT = 520;
+const RAIL_CONTENT_HEIGHT = 530;
 
 /**
  * Roughly the proportion of a printed Mushaf page, width over height.
@@ -206,13 +206,13 @@ export function KhatmahReaderScreen({
   setMushafTextScale,
   mushafBookmarks: initialBookmarks = [],
   setMushafBookmarks: onUpdateBookmarks,
-  quranReadingBookmark,
-  onReadingBookmarkChange,
   mushafVerseBookmarks: initialVerseBookmarks = [],
   setMushafVerseBookmarks: onUpdateVerseBookmarks,
   wirdHistory = {},
   onRecordPages,
   quranWirdPlan,
+  wirdCompletionAnnouncedDayKey,
+  onWirdCompletionAnnounced,
   onReadingPositionChange,
   progressDayStartHour,
   reduceMotion = false,
@@ -233,13 +233,14 @@ export function KhatmahReaderScreen({
   setMushafTextScale?: (scale: MushafTextScale) => void;
   mushafBookmarks?: number[];
   setMushafBookmarks?: (bookmarks: number[]) => void;
-  quranReadingBookmark?: QuranReadingPosition;
-  onReadingBookmarkChange?: (bookmark: QuranReadingPosition | undefined) => void;
   mushafVerseBookmarks?: QuranVerseBookmark[];
   setMushafVerseBookmarks?: (bookmarks: QuranVerseBookmark[]) => void;
   wirdHistory?: Record<string, number[]>;
   onRecordPages?: (dayKey: string, pages: number[], dailyGoal: number) => void;
   quranWirdPlan?: QuranWirdPlan;
+  /** The day whose completion has already been announced, from stored state. */
+  wirdCompletionAnnouncedDayKey?: string;
+  onWirdCompletionAnnounced?: (dayKey: string) => void;
   onReadingPositionChange?: (position: QuranReadingPosition) => void;
   progressDayStartHour: number;
   reduceMotion?: boolean;
@@ -383,6 +384,12 @@ export function KhatmahReaderScreen({
     onUpdateTheme?.(newTheme);
   };
 
+  useEffect(() => {
+    const root = readerRootRef.current;
+    if (!root || root.contains(document.activeElement)) return;
+    root.focus({ preventScroll: true });
+  }, []);
+
   const now = useNow();
   const todayKey = getProgressDayKey(now, progressDayStartHour);
   const todayPagesRead = useMemo(() => wirdHistory[todayKey] ?? [], [todayKey, wirdHistory]);
@@ -459,21 +466,42 @@ export function KhatmahReaderScreen({
    * filling is easy to miss when your eyes are on the text. It is a notice, not
    * a dialog: nothing to dismiss before carrying on reading, because reading
    * past the goal is a perfectly good thing to do.
+   *
+   * Once a day, not once a visit. This used to live only in component state, so
+   * every return to the Mushaf was a fresh mount and congratulated the reader
+   * again for the same day's reading. The day it was said is stored, and the
+   * ref stops a second announcement inside one mount before that store lands.
    */
+  const announcedThisMount = useRef(false);
   useEffect(() => {
-    if (!wirdComplete) return;
-    setCompletionSeen((seen) => (seen === todayKey ? seen : todayKey));
-  }, [todayKey, wirdComplete]);
+    announcedThisMount.current = false;
+  }, [todayKey]);
 
   useEffect(() => {
-    if (completionSeen !== todayKey) return;
+    if (!wirdComplete) return;
+    if (announcedThisMount.current) return;
+    if (wirdCompletionAnnouncedDayKey === todayKey) return;
+    announcedThisMount.current = true;
+    setCompletionSeen(todayKey);
+    onWirdCompletionAnnounced?.(todayKey);
+  }, [onWirdCompletionAnnounced, todayKey, wirdComplete, wirdCompletionAnnouncedDayKey]);
+
+  useEffect(() => {
+    if (completionSeen === null) return;
     const timer = window.setTimeout(() => setCompletionSeen(null), COMPLETION_NOTICE_MS);
     return () => window.clearTimeout(timer);
-  }, [completionSeen, todayKey]);
+  }, [completionSeen]);
 
   const displayPage = resolved?.page ?? currentPage;
   const pageData = resolved?.data ?? null;
-  const isCurrentBookmarked = quranReadingBookmark?.page === displayPage;
+
+  const isPageBookmarked = initialBookmarks.includes(displayPage);
+  const togglePageBookmark = useCallback(() => {
+    const next = initialBookmarks.includes(displayPage)
+      ? initialBookmarks.filter((page) => page !== displayPage)
+      : Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b);
+    onUpdateBookmarks?.(next);
+  }, [displayPage, initialBookmarks, onUpdateBookmarks]);
 
   /**
    * The other half of the spread.
@@ -560,15 +588,6 @@ export function KhatmahReaderScreen({
     onReadingPositionChange?.({ page: displayPage, surahNumber, juzNumber });
   }, [displayPage, juzNumber, onReadingPositionChange, pageData]);
 
-  const toggleReadingBookmark = useCallback(() => {
-    if (isCurrentBookmarked) {
-      onReadingBookmarkChange?.(undefined);
-      return;
-    }
-    const [surahNumber] = (pageData?.[0]?.k ?? "1:1").split(":").map(Number);
-    onReadingBookmarkChange?.({ page: displayPage, surahNumber, juzNumber });
-  }, [displayPage, isCurrentBookmarked, juzNumber, onReadingBookmarkChange, pageData]);
-
   const toggleWordMeanings = useCallback(async () => {
     if (showWordMeanings) {
       setShowWordMeanings(false);
@@ -604,11 +623,14 @@ export function KhatmahReaderScreen({
       const root = readerRootRef.current;
       if (target && target !== document.body && target.id !== "main-content" && !root?.contains(target)) return;
       if (target?.closest("input, textarea, select, [contenteditable='true']")) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
       let handled = true;
       if (e.key === "ArrowLeft" || e.key === "PageDown") paginate(1);
       else if (e.key === "ArrowRight" || e.key === "PageUp") paginate(-1);
       else if (e.key === "Home") setKhatmahPage(1);
       else if (e.key === "End") setKhatmahPage(LAST_PAGE);
+      // Focus mode is otherwise two taps away; on a keyboard it is one key.
+      else if (e.key === "f" || e.key === "F") setIsFocusMode((on) => !on);
       // Escape gives the tools back before it gives up the reader: leaving the
       // Mushaf entirely from a keypress meant to undo the last thing you did
       // is a surprise you cannot take back without losing your place.
@@ -625,29 +647,43 @@ export function KhatmahReaderScreen({
   // Pointer-driven page turn. The transform is written straight to the node, so
   // dragging costs no React render at all — the previous implementation ran a
   // spring through component state on every frame.
-  const drag = useRef({ pointerId: -1, startX: 0, engaged: false });
+  const drag = useRef({ pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false });
+
+  /** A tap is short and still. Anything slower or further is a gesture the
+   *  reader was making, and must not be read as one they were not. */
+  const TAP_MS = 400;
+  const TAP_SLOP = 8;
 
   const endDrag = useCallback(
-    (clientX: number | null, target?: EventTarget | null) => {
+    (clientX: number | null, clientY: number | null, target?: EventTarget | null, cancelled = false) => {
       const paper = paperRef.current;
       if (paper) {
         paper.style.transition = PAPER_SETTLE;
         paper.style.transform = "";
       }
-      if (drag.current.engaged && clientX !== null) {
-        const offset = clientX - drag.current.startX;
+      const { engaged, startX, startY, startedAt } = drag.current;
+      drag.current = { pointerId: -1, startX: 0, startY: 0, startedAt: 0, engaged: false };
+      // The browser cancels the pointer when it takes the gesture over for
+      // scrolling. Committing a page turn on that would turn a scroll into a
+      // page the reader never asked for.
+      if (cancelled) return;
+
+      if (engaged && clientX !== null) {
+        const offset = clientX - startX;
         if (offset >= SWIPE_THRESHOLD) paginate(1);
         else if (offset <= -SWIPE_THRESHOLD) paginate(-1);
-      } else if (
-        !drag.current.engaged &&
-        isFocusMode &&
-        !(target instanceof Element && target.closest("button, a, [role='button'], [role='switch']"))
-      ) {
-        // A tap on the paper itself — not a swipe, and not on a word or an
-        // ayah marker, which have their own answer — brings the tools back.
-        setIsFocusMode(false);
+        return;
       }
-      drag.current = { pointerId: -1, startX: 0, engaged: false };
+
+      if (!isFocusMode || clientX === null || clientY === null) return;
+      const moved = Math.hypot(clientX - startX, clientY - startY);
+      const heldFor = performance.now() - startedAt;
+      if (moved > TAP_SLOP || heldFor > TAP_MS) return;
+      if (target instanceof Element && target.closest("button, a, [role='button'], [role='switch']")) return;
+      // A deliberate tap on the paper — not a swipe, not a scroll, and not on a
+      // word or an ayah marker, which have their own answer — brings the tools
+      // back.
+      setIsFocusMode(false);
     },
     [isFocusMode, paginate],
   );
@@ -655,7 +691,13 @@ export function KhatmahReaderScreen({
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
     if (event.button !== 0) return;
     if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
-    drag.current = { pointerId: event.pointerId, startX: event.clientX, engaged: false };
+    drag.current = {
+      pointerId: event.pointerId,
+      startX: event.clientX,
+      startY: event.clientY,
+      startedAt: performance.now(),
+      engaged: false,
+    };
   };
 
   const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
@@ -677,7 +719,12 @@ export function KhatmahReaderScreen({
 
   const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
     if (drag.current.pointerId !== event.pointerId) return;
-    endDrag(event.clientX, event.target);
+    endDrag(event.clientX, event.clientY, event.target);
+  };
+
+  const onPointerCancel = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (drag.current.pointerId !== event.pointerId) return;
+    endDrag(null, null, null, true);
   };
 
   const isArabic = language === "ar";
@@ -811,14 +858,17 @@ export function KhatmahReaderScreen({
 
       <button
         type="button"
-        onClick={toggleReadingBookmark}
-        aria-pressed={isCurrentBookmarked}
-        className={footerToggleClass(isCurrentBookmarked)}
-        aria-label={t(language, "mushaf.savePlace")}
-        data-testid="mushaf-save-place"
+        role="switch"
+        aria-checked={isPageBookmarked}
+        onClick={togglePageBookmark}
+        className={footerToggleClass(isPageBookmarked)}
+        aria-label={t(language, "mushaf.bookmarkCurrentPage")}
+        data-testid="mushaf-page-bookmark"
       >
-        <Bookmark size={19} className={isCurrentBookmarked ? "shrink-0 fill-current" : "shrink-0"} aria-hidden="true" />
-        <span className="hidden max-w-[11rem] truncate font-bold md:block">{t(language, "mushaf.savePlace")}</span>
+        <Bookmark size={19} className={isPageBookmarked ? "shrink-0 fill-current" : "shrink-0"} aria-hidden="true" />
+        <span className="hidden max-w-[11rem] truncate font-bold md:block">
+          {t(language, "mushaf.bookmarkCurrentPage")}
+        </span>
       </button>
     </nav>
   );
@@ -840,7 +890,7 @@ export function KhatmahReaderScreen({
       atLastPage={currentPage >= LAST_PAGE}
       showWordMeanings={showWordMeanings}
       isLoadingWordMeanings={isLoadingWordMeanings}
-      isPlaceSaved={isCurrentBookmarked}
+      isPageBookmarked={isPageBookmarked}
       isFullscreen={isFullscreen}
       onBack={onBack}
       onOpenIndex={() => {
@@ -850,7 +900,7 @@ export function KhatmahReaderScreen({
       onPrevious={() => paginate(-1)}
       onNext={() => paginate(1)}
       onToggleWordMeanings={() => void toggleWordMeanings()}
-      onToggleSavePlace={toggleReadingBookmark}
+      onTogglePageBookmark={togglePageBookmark}
       onToggleFullscreen={toggleFullscreen}
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsOptionsMenuOpen(true)}
@@ -904,13 +954,17 @@ export function KhatmahReaderScreen({
       className="relative flex h-full select-none flex-col overflow-hidden bg-background"
     >
       {/* The Mushaf page is the screen: no card, no gutter, no letterbox. */}
+      {/* Focusable and focused on arrival, so the page keys work without asking
+          the reader to click the paper first. `useViewFocus` skips the initial
+          view, which is exactly the deep link or reload case. */}
       <div
         ref={readerRootRef}
-        className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+        tabIndex={-1}
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden outline-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerEnd}
-        onPointerCancel={onPointerEnd}
+        onPointerCancel={onPointerCancel}
         style={{ touchAction: "pan-y" }}
       >
         {!pageData && !error && (
@@ -951,7 +1005,7 @@ export function KhatmahReaderScreen({
               juzNumber={juzNumber}
               direction={direction}
               theme={resolvedTheme}
-              isBookmarked={isCurrentBookmarked}
+              isBookmarked={isPageBookmarked}
               useQcfGlyphs={spreadReady && rightSide ? rightSide.qcf : useQcfGlyphs}
               showWordMeanings={showWordMeanings}
               highlightedVerseKey={highlightedVerseKey}
@@ -1062,20 +1116,9 @@ export function KhatmahReaderScreen({
         toolbarSide={mushafToolbarSide}
         onSelectToolbarSide={setMushafToolbarSide}
         showToolbarSide={useRail}
+        showKeyboardHelp={useRail}
         presentation={useRail ? "side-panel" : "sheet"}
         panelInset={useRail ? (shell.railCompact ? MUSHAF_RAIL_WIDTH.compact : MUSHAF_RAIL_WIDTH.regular) : 0}
-        onEnterFocusMode={() => {
-          setIsOptionsMenuOpen(false);
-          setIsFocusMode(true);
-        }}
-        isBookmarked={initialBookmarks.includes(displayPage)}
-        onToggleBookmark={() => {
-          const isBookmarked = initialBookmarks.includes(displayPage);
-          const next = isBookmarked
-            ? initialBookmarks.filter((page) => page !== displayPage)
-            : Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b);
-          onUpdateBookmarks?.(next);
-        }}
         pageNumber={displayPage}
         surahName={surahName}
       />
@@ -1091,8 +1134,7 @@ export function KhatmahReaderScreen({
         pageNumber={displayPage}
         showWordMeanings={showWordMeanings}
         isLoadingWordMeanings={isLoadingWordMeanings}
-        isPlaceSaved={isCurrentBookmarked}
-        isPageBookmarked={initialBookmarks.includes(displayPage)}
+        isPageBookmarked={isPageBookmarked}
         onOpenIndex={() => {
           setIndexTab("surahs");
           setIsIndexOpen(true);
@@ -1102,14 +1144,7 @@ export function KhatmahReaderScreen({
           setIsIndexOpen(true);
         }}
         onToggleWordMeanings={() => void toggleWordMeanings()}
-        onToggleSavePlace={toggleReadingBookmark}
-        onTogglePageBookmark={() => {
-          const isBookmarked = initialBookmarks.includes(displayPage);
-          const next = isBookmarked
-            ? initialBookmarks.filter((page) => page !== displayPage)
-            : Array.from(new Set([...initialBookmarks, displayPage])).sort((a, b) => a - b);
-          onUpdateBookmarks?.(next);
-        }}
+        onTogglePageBookmark={togglePageBookmark}
         onEnterFocusMode={() => setIsFocusMode(true)}
         onOpenSettings={() => setIsOptionsMenuOpen(true)}
       />

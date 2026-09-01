@@ -314,8 +314,6 @@ export interface AppStateSnapshot {
   mushafTextScale?: MushafTextScale;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
-  /** One intentional place used by Continue reading. */
-  quranReadingBookmark?: QuranReadingPosition;
   /** User-curated verse bookmarks, distinct from the continue-reading place. */
   mushafVerseBookmarks?: QuranVerseBookmark[];
   /** Daily Quran reading goal in pages (default: 4). */
@@ -324,6 +322,15 @@ export interface AppStateSnapshot {
   wirdHistory?: Record<string, number[]>;
   /** Snapshot of the goal shown on each reading day for truthful weekly history. */
   quranWirdDailyGoals?: Record<string, number>;
+  /**
+   * The day whose wird completion has already been announced.
+   *
+   * The notice congratulated the reader once per visit rather than once per
+   * day, because it lived in component state and every return to the Mushaf
+   * was a fresh mount. Congratulating someone repeatedly for the same thing
+   * stops reading as congratulation.
+   */
+  quranWirdCompletionAnnounced?: string;
   /** Most recent forward page-turn event, used by spread-aware Undo. */
   quranLastReadingEvent?: QuranReadingEvent;
   /** Context shown before opening the Mushaf. */

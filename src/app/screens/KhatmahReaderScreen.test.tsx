@@ -369,16 +369,12 @@ describe("KhatmahReaderScreen settings menu", () => {
 
   it("keeps mobile settings contextual and free of the alternate reader", async () => {
     const user = userEvent.setup();
-    const setMushafBookmarks = vi.fn();
     resize(390, 844);
 
-    renderReader({
-      language: "en",
-      setMushafBookmarks,
-    });
+    renderReader({ language: "en" });
 
     await screen.findByRole("article", { name: "Page 42" });
-    expect(screen.getByRole("button", { name: "Set as reading place" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Add to page bookmarks" })).toBeInTheDocument();
     await user.click(screen.getByTestId("mushaf-more-actions"));
     await user.click(await screen.findByTestId("mushaf-quick-settings"));
     // Scoped to the sheet: the quick menu that opened it names some of the same
@@ -388,10 +384,10 @@ describe("KhatmahReaderScreen settings menu", () => {
     expect(sheet.queryByText("Page Layout")).not.toBeInTheDocument();
     expect(sheet.queryByText("Comfort reading")).not.toBeInTheDocument();
     expect(sheet.queryByText("Keep controls visible")).not.toBeInTheDocument();
-    expect(sheet.getByText("Add to page bookmarks")).toBeInTheDocument();
-    const pageBookmark = sheet.getByTestId("mushaf-bookmark-toggle");
-    await user.click(pageBookmark);
-    expect(setMushafBookmarks).toHaveBeenCalledWith([42]);
+    // Reading settings only. Bookmarking a page is an action and lives in the
+    // quick menu that opened this sheet — exercised by the quick-menu test.
+    expect(sheet.queryByTestId("mushaf-bookmark-toggle")).not.toBeInTheDocument();
+    expect(sheet.queryByTestId("mushaf-focus-mode-action")).not.toBeInTheDocument();
   });
 
   it("offers facing-page layout only when the desktop can fit it", async () => {
@@ -426,7 +422,7 @@ describe("KhatmahReaderScreen tool rail", () => {
     expect(screen.getByRole("button", { name: "Next" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Previous" })).toBeInTheDocument();
     expect(screen.getByRole("switch", { name: "Word meanings" })).toBeInTheDocument();
-    expect(screen.getByRole("switch", { name: "Set as reading place" })).toBeInTheDocument();
+    expect(screen.getByRole("switch", { name: "Add to page bookmarks" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Settings" })).toBeInTheDocument();
   });
 
@@ -597,5 +593,36 @@ describe("KhatmahReaderScreen reading type size", () => {
 
     expect(sheet.getByTestId("mushaf-text-size-option-large")).toBeEnabled();
     expect(sheet.getByText(/without changing its fifteen lines/i)).toBeInTheDocument();
+  });
+});
+
+describe("KhatmahReaderScreen wird completion notice", () => {
+  const day = getProgressDayKey(new Date(), 4);
+
+  function completedReader(overrides: Partial<Parameters<typeof KhatmahReaderScreen>[0]> = {}) {
+    return renderReader({
+      language: "en",
+      direction: "ltr",
+      quranWirdPlan: { kind: "daily", dailyPages: 2 },
+      wirdHistory: { [day]: [40, 41] },
+      ...overrides,
+    });
+  }
+
+  it("congratulates the reader once, and records the day so a later visit does not repeat it", async () => {
+    const onWirdCompletionAnnounced = vi.fn();
+    completedReader({ onWirdCompletionAnnounced });
+
+    expect(await screen.findByTestId("mushaf-wird-complete")).toBeInTheDocument();
+    expect(onWirdCompletionAnnounced).toHaveBeenCalledWith(day);
+    expect(onWirdCompletionAnnounced).toHaveBeenCalledTimes(1);
+  });
+
+  it("stays quiet on a later visit in the same day", async () => {
+    // The notice used to live only in component state, so every return to the
+    // Mushaf was a fresh mount that congratulated the reader all over again.
+    completedReader({ wirdCompletionAnnouncedDayKey: day });
+    await screen.findByRole("article", { name: /Page 42/ });
+    expect(screen.queryByTestId("mushaf-wird-complete")).not.toBeInTheDocument();
   });
 });

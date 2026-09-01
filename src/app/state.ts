@@ -125,11 +125,11 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   mushafToolbarSide: "right",
   mushafTextScale: "medium",
   mushafBookmarks: [],
-  quranReadingBookmark: undefined,
   mushafVerseBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
   quranWirdDailyGoals: {},
+  quranWirdCompletionAnnounced: undefined,
   quranLastReadingEvent: undefined,
   quranReadingPosition: { page: 1, surahNumber: 1, ayahNumber: 1, juzNumber: 1 },
   quranWirdPlan: { kind: "daily", dailyPages: 4 },
@@ -169,13 +169,15 @@ function normalizeQuranReadingPosition(value: unknown): QuranReadingPosition {
   };
 }
 
-function normalizeOptionalQuranReadingPosition(value: unknown): QuranReadingPosition | undefined {
-  if (!value || typeof value !== "object") return undefined;
-  const page = (value as Partial<QuranReadingPosition>).page;
-  return typeof page === "number" && Number.isInteger(page) && page >= 1 && page <= 604
-    ? normalizeQuranReadingPosition(value)
-    : undefined;
-}
+/**
+ * `quranReadingBookmark` was removed in DEC-112 and is dropped on load.
+ *
+ * It was a manual "reading place" that overrode the automatic position for
+ * Continue reading — permanently, and with no sign it was doing so. A reader
+ * who pinned page 3 and then read to page 200 was still sent back to page 3.
+ * Where the reader is is now one fact, kept automatically; a page worth
+ * returning to is a page bookmark.
+ */
 
 function normalizeQuranVerseBookmarks(value: unknown): QuranVerseBookmark[] {
   if (!Array.isArray(value)) return [];
@@ -734,7 +736,6 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ),
         )
       : [],
-    quranReadingBookmark: normalizeOptionalQuranReadingPosition(parsed.quranReadingBookmark),
     mushafVerseBookmarks: normalizeQuranVerseBookmarks(parsed.mushafVerseBookmarks),
     dailyWirdGoal:
       typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
@@ -742,6 +743,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
         : 4,
     wirdHistory: normalizeWirdHistory(parsed.wirdHistory),
     quranWirdDailyGoals: normalizeQuranWirdDailyGoals(parsed.quranWirdDailyGoals),
+    quranWirdCompletionAnnounced:
+      typeof parsed.quranWirdCompletionAnnounced === "string" ? parsed.quranWirdCompletionAnnounced : undefined,
     quranLastReadingEvent: normalizeQuranReadingEvent(parsed.quranLastReadingEvent),
     quranReadingPosition: normalizeQuranReadingPosition(parsed.quranReadingPosition),
     quranWirdPlan: normalizeQuranWirdPlan(
@@ -1023,15 +1026,13 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     mushafToolbarSide: (incoming.mushafToolbarSide ?? safeBase.mushafToolbarSide) === "left" ? "left" : "right",
     mushafTextScale: normalizeMushafTextScale(incoming.mushafTextScale ?? safeBase.mushafTextScale),
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
-    quranReadingBookmark: normalizeOptionalQuranReadingPosition(
-      incoming.quranReadingBookmark ?? safeBase.quranReadingBookmark,
-    ),
     mushafVerseBookmarks: normalizeQuranVerseBookmarks([
       ...(safeBase.mushafVerseBookmarks ?? []),
       ...(incoming.mushafVerseBookmarks ?? []),
     ]),
     dailyWirdGoal: incoming.dailyWirdGoal ?? safeBase.dailyWirdGoal ?? 4,
     wirdHistory: mergeWirdHistories(safeBase.wirdHistory, incoming.wirdHistory),
+    quranWirdCompletionAnnounced: incoming.quranWirdCompletionAnnounced ?? safeBase.quranWirdCompletionAnnounced,
     quranWirdDailyGoals: {
       ...(safeBase.quranWirdDailyGoals ?? {}),
       ...normalizeQuranWirdDailyGoals(incoming.quranWirdDailyGoals),
@@ -1057,10 +1058,10 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     savedZikrIds: [],
     khatmahPage: 1,
     mushafBookmarks: [],
-    quranReadingBookmark: undefined,
     mushafVerseBookmarks: [],
     wirdHistory: {},
     quranWirdDailyGoals: {},
+    quranWirdCompletionAnnounced: undefined,
     quranLastReadingEvent: undefined,
     quranReadingPosition: DEFAULT_APP_STATE.quranReadingPosition,
   };

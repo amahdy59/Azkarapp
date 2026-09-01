@@ -3,17 +3,7 @@ import { ResponsiveSheet } from "./ResponsiveSheet";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage } from "../types";
-import {
-  Bookmark,
-  BookmarkAdd,
-  BookmarkCheck,
-  BookOpen,
-  ChevronLeft,
-  ChevronRight,
-  Eye,
-  List,
-  SlidersHorizontal,
-} from "./icons";
+import { Bookmark, BookmarkCheck, BookOpen, ChevronLeft, ChevronRight, Eye, List, SlidersHorizontal } from "./icons";
 
 /**
  * The Mushaf's secondary actions, off the page.
@@ -46,12 +36,10 @@ export interface MushafQuickMenuProps {
   pageNumber: number;
   showWordMeanings: boolean;
   isLoadingWordMeanings: boolean;
-  isPlaceSaved: boolean;
   isPageBookmarked: boolean;
   onOpenIndex: () => void;
   onOpenBookmarks: () => void;
   onToggleWordMeanings: () => void;
-  onToggleSavePlace: () => void;
   onTogglePageBookmark: () => void;
   onEnterFocusMode: () => void;
   onOpenSettings: () => void;
@@ -67,12 +55,10 @@ export function MushafQuickMenu({
   pageNumber,
   showWordMeanings,
   isLoadingWordMeanings,
-  isPlaceSaved,
   isPageBookmarked,
   onOpenIndex,
   onOpenBookmarks,
   onToggleWordMeanings,
-  onToggleSavePlace,
   onTogglePageBookmark,
   onEnterFocusMode,
   onOpenSettings,
@@ -99,18 +85,10 @@ export function MushafQuickMenu({
       id: "page-bookmark",
       label: t(language, "mushaf.bookmarkCurrentPage"),
       detail: t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) }),
-      icon: <BookmarkAdd size={19} aria-hidden="true" />,
+      icon: <Bookmark size={19} aria-hidden="true" className={isPageBookmarked ? "fill-current" : undefined} />,
       onSelect: onTogglePageBookmark,
       pressed: isPageBookmarked,
       testId: "mushaf-quick-page-bookmark",
-    },
-    {
-      id: "save-place",
-      label: t(language, "mushaf.savePlace"),
-      icon: <Bookmark size={19} aria-hidden="true" className={isPlaceSaved ? "fill-current" : undefined} />,
-      onSelect: onToggleSavePlace,
-      pressed: isPlaceSaved,
-      testId: "mushaf-quick-save-place",
     },
     {
       id: "word-meanings",
