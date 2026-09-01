@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-01c",
+  "release": "2026-09-01d",
   "ar": [
-    "عاد التنقل بالسحب بين الصفحات وهو يعمل في وضع التركيز، ولم يعد السحب غير الدقيق يخرجك من الوضع.",
-    "بشارة إتمام الورد تظهر مرة واحدة في اليوم، بعد أن كانت تتكرر مع كل عودة إلى المصحف.",
-    "صفحتا الفاتحة ومطلع البقرة صارتا بحجم خط واحد متساوٍ كما تُطبعان معاً في المصحف.",
-    "يعمل التنقل بلوحة المفاتيح فور فتح المصحف، وأصبحت الاختصارات مذكورة في الإعدادات."
+    "صار النقر للعدّ في المصحف والقراءة يعطي الإحساس نفسه في السبحة والصلاة على النبي، بعد أن كان أضعف وأبطأ في شاشة القراءة.",
+    "عدّاد الصلاة على النبي لم يعد يتوقف عند العدد الذي اخترته، فالعدد هدف تبلغه لا حدّ يمنعك.",
+    "إتمام أذكار ما بعد الصلاة صار يُعلّم خانة الأذكار في بطاقة الصلاة تلقائياً، بعد أن كانا سجلّين منفصلين.",
+    "حقول تحديد الموقع في الإشعارات صار لكل منها عنوان ظاهر، فلا يختفي اسم الحقل بمجرد أن تكتب فيه."
   ],
   "en": [
-    "Swiping between pages works again, including inside focus mode, and an imprecise swipe no longer drops you out of it.",
-    "The wird completion message now appears once a day instead of every time you reopen the Mushaf.",
-    "Al-Fatihah and the opening of Al-Baqarah are now set at one matching type size, as they are printed together.",
-    "Keyboard paging works the moment the Mushaf opens, and the shortcuts are listed in the reading settings."
+    "Tapping to count feels the same everywhere. The reader now presses like the Masbaha and the salawat counter, instead of the weaker, slower response it had.",
+    "The salawat counter no longer stops at the number you chose — a target is something to reach, not a limit.",
+    "Finishing the after-prayer adhkar now ticks the adhkar box on that prayer's card, instead of the two keeping separate records.",
+    "Every location field in notification settings now has a visible title, so the name no longer disappears the moment you type."
   ]
 }

@@ -72,6 +72,15 @@ Rules:
   - **Scroll regions** (non-control containers that are focusable only so keyboard users can scroll them) use `focus-visible:ring-1 focus-visible:ring-ring/40` — deliberately subtle, because a full 3 px ring around a page-sized region is visually overwhelming and the region is not an actionable control.
 - The global `:focus-visible` outline rule in `src/styles/theme/surfaces.css` remains the automatic fallback, so an element that opts out of both treatments still gets a visible token-driven indicator rather than none.
 
+## Form field contract
+
+Every input carries a **visible** label. A placeholder is a hint, never a name: it disappears the moment there is a value, which is exactly when someone checking what they typed needs it, and an `aria-label` behind a placeholder names the field for a screen reader while leaving it unnamed for everyone else.
+
+- `FormField` (`src/app/components/FormField.tsx`) is the one anatomy — label, control, optional hint — and it generates the `id`/`htmlFor` pair so two instances cannot collide. `FIELD_CONTROL_CLASS` holds the control styling, so height, radius, border, focus ring and disabled treatment live in one place rather than at each call site.
+- Two other associations remain correct and stay: a wrapping `<label>` around a control whose visible text sits beside it (the prayer-time adjustments), and an explicit `<label htmlFor>` where the label and control sit on one row (the reminder times). What is not allowed is a control whose only name is a placeholder or a bare `aria-label`.
+- A hint is tied to the control with `aria-describedby`, never left as loose text next to it.
+- Controls inherit the focus role from the geometry contract above: `focus-visible:ring-[3px] focus-visible:ring-ring`.
+
 ## Color roles
 
 Gold should primarily indicate:
@@ -214,6 +223,20 @@ Motion supports comprehension and calm focus; it must never turn worship into a 
 | Auto-advance pause      | Exactly 500 ms | Preserve the completed check before the next zikr |
 
 Use `cubic-bezier(0.22, 1, 0.36, 1)` for spring-like entrances and standard ease-out for opacity. Motion must use opacity/transform whenever possible. The existing `.reduce-motion` class and `prefers-reduced-motion` query collapse animations and transitions to 0.01 ms, but the semantic 500 ms completion pause remains.
+
+### Counting surface
+
+Three screens count dhikr — the reader, the Masbaha and Friday's salawat. All three take the gesture from `useCountingSurface` (`src/app/components/countingSurface.tsx`); none defines its own. They had drifted, and the reader — the surface people actually tap hundreds of times — had ended up with half the travel over twice the duration, which reads as no press at all.
+
+| Property       | Value                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------- |
+| Press scale    | 0.97                                                                                  |
+| Press duration | 150 ms, `cubic-bezier(0.4, 0, 0.2, 1)` — the press-feedback role                      |
+| Ripple         | `.tap-ripple` / `tap-ripple-expand`, 560 ms, from the point of contact, max 4 at once |
+
+The counter button itself is part of this surface, not an exception to it: it presses to the same depth over the same duration as the page around it, and leaves the same ripple. It previously pressed to 0.985 through a framer-motion `whileTap` while a CSS rule drove the same property with no transition — two mechanisms on one property, and a press half as deep as the page it sits on, so the gesture changed meaning depending on where the thumb landed. CSS owns the press; the ripple is the one `.tap-ripple`.
+
+The press is separate from any entrance animation on the same element: a 300 ms content settle must not become the press duration. Interactive descendants opt out centrally through the selector in that module rather than each screen keeping its own list, so a tap on a button counts once, as a button press, and not also as a dhikr.
 
 ### Screen audit
 

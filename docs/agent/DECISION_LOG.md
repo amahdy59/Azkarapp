@@ -1783,3 +1783,77 @@ Record user-approved product, design and architectural decisions here. Do not er
   wird history, and every other stored field.
 - **Tests/evidence required:** a stored `quranReadingBookmark` is absent after
   normalisation; the footer control toggles the page bookmark; full local gates.
+
+## DEC-113 — one definition of what counting feels like
+
+- **Decision:** the tap-to-count gesture is defined once, in
+  `src/app/components/countingSurface.tsx`, and the three screens that count
+  dhikr — the reader, the Masbaha, and Friday's salawat — take it from there.
+- **What was wrong:** the three had each grown a copy and the copies had drifted.
+  The Masbaha and the salawat pressed to 0.97 over 150 ms; the reader pressed to
+  0.985 over 300 ms. Half the travel over twice the duration reads as no press at
+  all, so the one surface the whole app is built around — the one people tap
+  hundreds of times a session — was the one that felt dead under the thumb. The
+  reader's press had been folded into the same 300 ms transition as its content
+  entrance, which is why it was slow: a screen-entrance duration had become a
+  press duration.
+- **The values:** scale 0.97 over 150 ms on `cubic-bezier(0.4, 0, 0.2, 1)`,
+  matching the press-feedback role in the motion contract; a 150 px ripple over
+  600 ms from the point of contact, capped at four concurrent so a fast count
+  cannot pile up nodes.
+- **Why a hook and not a copied constant:** a shared constant would have kept the
+  numbers together and let the wiring drift instead. The pointer handling is the
+  part that was subtly different per screen — which pointer events release the
+  press, and which descendants own their own tap.
+- **Opting out is central:** a tap on a button, link, field, dialog, menu or
+  switch is that control's, not a count. The selector lives in the module, so a
+  new control anywhere is excluded everywhere rather than each screen maintaining
+  a list it will forget to update. `data-prevent-count="true"` is the escape hatch
+  for anything the roles miss.
+- **A target is a goal, not a ceiling:** the salawat screen stopped counting at
+  its target. A chosen number of salawat is something to reach, not a limit the
+  app enforces — it now counts past, and the completion haptic fires on reaching
+  the target rather than on every tap beyond it. The reader is different and stays
+  different: a zikr's repetition count is prescribed, so the reader stops and
+  advances. The Masbaha keeps its lap dialog, which is the right model for a
+  target the user chose with an explicit affordance to continue.
+- **Tests/evidence required:** a guard test asserts that no counting screen
+  re-declares a press of its own (no local `scale(0.9…)` or `transform 150ms`),
+  which is what would let them drift again.
+
+## DEC-114 — reading the after-prayer adhkar ticks the tracker; ticking the box does not claim the reading
+
+- **Decision:** completing an after-prayer collection marks that prayer's adhkar
+  as done in the prayer tracker. The reverse does not hold.
+- **What was wrong:** the two surfaces kept separate records of the same fact.
+  Seeding a completed Fajr after-prayer read left the Fajr card's adhkar checkbox
+  `false`, so the app showed the work as both done and not done, and the tracker
+  under-reported someone who had actually read.
+- **Why one direction only:** finishing the collection is evidence the reading
+  happened — the app watched it happen. Ticking a checkbox is a self-report about
+  one's own day; treating it as a claim that the collection was read would write a
+  completion the user never performed and would corrupt wird history.
+- **Consequences:** `useSessionHandlers` gained `onAfterPrayerCompleted`, called at
+  both completion write sites, and `App` routes it to the tracker.
+
+## DEC-115 — every field carries a visible title
+
+- **Decision:** form inputs use `FormField` (`src/app/components/FormField.tsx`),
+  which pairs a visible label with the control and generates the association.
+- **What was wrong:** three labelling patterns coexisted. Two were fine — a
+  wrapping `<label>`, and an explicit `<label htmlFor>`. The third, on the manual
+  location fields, used the placeholder as the label with an `aria-label` behind
+  it. That names the field for a screen reader and leaves it unnamed on screen for
+  everyone else, and the placeholder vanishes at the exact moment it is wanted:
+  when you are checking what you typed. Nothing on screen then said which of two
+  adjacent number fields was latitude.
+- **Why a component and not a lint rule:** the control styling was duplicated at
+  twenty-one call sites, so height, radius, border, focus ring and disabled
+  treatment had no single place to change and had begun to drift. A rule would
+  have caught the missing labels and left the duplication.
+- **Scope:** the manual-location block adopts it now. The wrapping-label and
+  `htmlFor` sites elsewhere are already correct and are not churned; new fields
+  use `FormField`.
+- **Tests/evidence required:** the label is a real `<label>` element, two fields
+  get distinct ids, a hint is tied with `aria-describedby`, and no
+  manual-location field is named only by an `aria-label`.

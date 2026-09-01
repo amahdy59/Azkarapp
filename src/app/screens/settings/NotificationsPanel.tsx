@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
@@ -481,47 +482,40 @@ export function NotificationsPanel({
               <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
                 {t(language, "notifications.manualLocation")}
               </legend>
-              <input
+              <FormField
+                label={t(language, "notifications.cityName")}
                 type="text"
                 value={cityDraft}
                 onChange={(event) => setCityDraft(event.target.value)}
-                placeholder={t(language, "notifications.cityName")}
-                aria-label={t(language, "notifications.cityName")}
-                className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
               />
-              <input
+              <FormField
+                label={t(language, "notifications.timeZoneLabel")}
                 type="text"
                 value={timeZoneDraft}
                 onChange={(event) => setTimeZoneDraft(event.target.value)}
                 placeholder={t(language, "notifications.timeZonePlaceholder")}
-                aria-label={t(language, "notifications.timeZoneLabel")}
                 dir="ltr"
-                className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
               />
               <div className="grid grid-cols-2 gap-2">
-                <input
+                <FormField
+                  label={t(language, "notifications.latitude")}
                   type="number"
                   min="-90"
                   max="90"
                   step="0.0001"
                   value={latitudeDraft}
                   onChange={(event) => setLatitudeDraft(event.target.value)}
-                  placeholder={t(language, "notifications.latitude")}
-                  aria-label={t(language, "notifications.latitude")}
                   dir="ltr"
-                  className="h-11 min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
                 />
-                <input
+                <FormField
+                  label={t(language, "notifications.longitude")}
                   type="number"
                   min="-180"
                   max="180"
                   step="0.0001"
                   value={longitudeDraft}
                   onChange={(event) => setLongitudeDraft(event.target.value)}
-                  placeholder={t(language, "notifications.longitude")}
-                  aria-label={t(language, "notifications.longitude")}
                   dir="ltr"
-                  className="h-11 min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
                 />
               </div>
               <Button
