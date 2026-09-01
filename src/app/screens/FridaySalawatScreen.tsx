@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState, type MouseEvent } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CounterTargetPicker } from "../components/CounterTargetPicker";
 import { BookOpen, ExternalLink, MoreVertical, RotateCcw, Sparkles, Volume2, VolumeX, X } from "../components/icons";
 import { ReadingScreenChrome } from "../components/ReadingScreenChrome";
 import { Modal } from "../components/ResponsiveSheet";
+import { CountingRipples, useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import {
   DropdownMenu,
@@ -109,7 +110,11 @@ export function FridaySalawatScreen({
   const { soundEnabled, toggleSound, playClickFeedback } = useCounterClickFeedback();
 
   const increment = useCallback(() => {
-    if (complete) return;
+    /* No ceiling. Reaching the target used to stop the counter dead while the
+       screen still read "tap anywhere to count", so the one action this screen
+       exists for silently stopped working at the moment of success. A target is
+       something to reach, not a limit on how much salawat may be sent — the
+       Mushaf takes the same view of reading past the day's wird. */
     playClickFeedback();
     /* The reader and the Masbaha both answer a count with a short pulse, and
        reaching the target with a distinct pattern. This counter played the
@@ -117,9 +122,10 @@ export function FridaySalawatScreen({
        was the one that felt like nothing was happening. Same durations, so the
        three do not develop separate vocabularies. */
     const next = progress.count + 1;
-    vibrateIfEnabled(hapticFeedback, next >= progress.target ? [30, 50, 30, 50, 50] : 15);
+    // The distinct pattern marks arriving at the target, not every tap after it.
+    vibrateIfEnabled(hapticFeedback, next === progress.target ? [30, 50, 30, 50, 50] : 15);
     persist(next, progress.target);
-  }, [complete, hapticFeedback, persist, playClickFeedback, progress.count, progress.target]);
+  }, [hapticFeedback, persist, playClickFeedback, progress.count, progress.target]);
 
   const reset = useCallback(() => persist(0, progress.target), [persist, progress.target]);
 
@@ -150,73 +156,22 @@ export function FridaySalawatScreen({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [increment, onBack, reset, showBenefits]);
 
-  const [isCanvasPressed, setIsCanvasPressed] = useState(false);
-  const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
-
-  const handlePointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reduceMotion) return;
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest(
-        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-prevent-count='true']",
-      )
-    ) {
-      return;
-    }
-    setIsCanvasPressed(true);
-    const rect = event.currentTarget.getBoundingClientRect();
-    setCanvasRipples((current) => [
-      ...current.slice(-3),
-      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
-    ]);
-  };
-
-  const handlePointerUp = () => setIsCanvasPressed(false);
-
-  const handleCanvasClick = (event: MouseEvent<HTMLDivElement>) => {
-    const element = event.target;
-    if (
-      element instanceof Element &&
-      element.closest(
-        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [data-prevent-count='true']",
-      )
-    )
-      return;
-    increment();
-  };
+  const {
+    ripples: canvasRipples,
+    dismissRipple,
+    pressStyle,
+    surfaceProps,
+  } = useCountingSurface({ onCount: increment, reduceMotion });
 
   return (
     <ScreenContainer
       dir={direction}
       className="relative flex flex-col overflow-y-auto page-content-center"
       screenName={copy.title}
-      onClick={handleCanvasClick}
-      onPointerDown={handlePointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      {...surfaceProps}
     >
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
-        {canvasRipples.map((ripple) => (
-          <span
-            key={ripple.id}
-            className="tap-ripple"
-            style={{
-              position: "absolute",
-              width: 150,
-              height: 150,
-              transform: "translate(-50%, -50%) scale(0)",
-              borderRadius: "50%",
-              backgroundColor: "currentColor",
-              opacity: 0.1,
-              animation: "ripple 600ms linear",
-              left: ripple.x,
-              top: ripple.y,
-            }}
-            onAnimationEnd={() => setCanvasRipples((current) => current.filter((item) => item.id !== ripple.id))}
-          />
-        ))}
+        <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
       </div>
 
       <div className="relative z-10 flex min-h-0 flex-1 flex-col">
@@ -284,17 +239,14 @@ export function FridaySalawatScreen({
           {complete ? copy.completed : ""}
         </p>
 
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
           className="relative z-10 mx-auto flex min-h-0 w-full max-w-[44rem] flex-1 flex-col overflow-y-auto px-4 pb-6 pt-2 sm:px-5"
           data-counting-mode="canvas"
-          onClick={handleCanvasClick}
         >
           <div
             className="flex-1 flex flex-col justify-center items-center py-6 sm:py-10 origin-center"
             style={{
-              transform: isCanvasPressed && !reduceMotion ? "scale(0.97)" : "scale(1)",
-              transition: "transform 150ms cubic-bezier(0.4, 0, 0.2, 1)",
+              ...pressStyle,
             }}
           >
             <p

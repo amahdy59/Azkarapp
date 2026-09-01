@@ -29,12 +29,13 @@ import { isLongSurah } from "../content/mushafPages";
 import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
-import { CounterShortcutHints, tapRippleStyle, ZikrCounterSurface } from "../components/ZikrComponents";
+import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
 import { ToggleTrack } from "../components/SettingsRow";
 import { ReaderReferenceSheet } from "../components/ReaderReferenceSheet";
 import { IconButton } from "../components/LayoutShells";
 import { getLocalizedSourceReference, getLocalizedZikrBenefit } from "../content/localizedZikr";
 import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } from "../share/zikrShareCard";
+import { CountingRipples, useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude } from "../components/QuranChrome";
@@ -187,7 +188,6 @@ export function ReaderScreen({
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
-  const [isCanvasPressed, setIsCanvasPressed] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(true);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
@@ -204,7 +204,6 @@ export function ReaderScreen({
   const shareTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readerMainRef = useRef<HTMLDivElement | null>(null);
   const readingScrollRef = useRef<HTMLDivElement | null>(null);
-  const [canvasRipples, setCanvasRipples] = useState<{ id: number; x: number; y: number }[]>([]);
 
   // The hero band + card treatment now starts at the tablet breakpoint
   // (>=768px) rather than at the shell's "large" tier: tablets have the width
@@ -239,6 +238,22 @@ export function ReaderScreen({
     onCount: playClickFeedback,
     onComplete,
     onAdvance,
+  });
+
+  /* The press, the ripple and the tap all come from one shared definition, so
+     counting a zikr feels the same here as it does in the Masbaha and on
+     Friday. This screen had drifted to half the travel over twice the time,
+     which on the surface people tap most read as nothing happening at all. */
+  const {
+    ripples: canvasRipples,
+    dismissRipple,
+    pressStyle,
+    surfaceProps,
+  } = useCountingSurface({
+    onCount: handleSurfaceTap,
+    // A long surah is read and scrolled rather than tapped, so its canvas must
+    // not answer a tap it is not going to count.
+    reduceMotion: reducedMotion || longSurah,
   });
 
   /**
@@ -742,27 +757,6 @@ export function ReaderScreen({
     </>
   );
 
-  const handleReaderPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reducedMotion || longSurah || complete) return;
-    const target = event.target;
-    if (
-      target instanceof Element &&
-      target.closest(
-        "button, a, input, textarea, select, summary, [contenteditable='true'], [role='dialog'], [role='menu'], [role='menuitem'], [role='listbox'], [role='option'], [role='switch'], [data-prevent-count='true']",
-      )
-    ) {
-      return;
-    }
-    setIsCanvasPressed(true);
-    const rect = event.currentTarget.getBoundingClientRect();
-    setCanvasRipples((current) => [
-      ...current.slice(-3),
-      { id: Date.now() + Math.random(), x: event.clientX - rect.left, y: event.clientY - rect.top },
-    ]);
-  };
-
-  const handlePointerUp = () => setIsCanvasPressed(false);
-
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
@@ -774,11 +768,7 @@ export function ReaderScreen({
       dir={direction}
       data-reader-category={catId}
       screenName={displayCategoryName}
-      onClick={handleSurfaceTap}
-      onPointerDown={handleReaderPointerDown}
-      onPointerUp={handlePointerUp}
-      onPointerCancel={handlePointerUp}
-      onPointerLeave={handlePointerUp}
+      {...surfaceProps}
       onTouchStart={onTouchStart}
       onTouchMove={onTouchMove}
       onTouchEnd={onTouchEnd}
@@ -787,18 +777,7 @@ export function ReaderScreen({
         {shareMessage}
       </div>
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
-        {canvasRipples.map((ripple) => (
-          <span
-            key={ripple.id}
-            className="tap-ripple"
-            style={{
-              ...tapRippleStyle,
-              left: ripple.x,
-              top: ripple.y,
-            }}
-            onAnimationEnd={() => setCanvasRipples((current) => current.filter((item) => item.id !== ripple.id))}
-          />
-        ))}
+        <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
       </div>
       {/* Polite, not assertive: this region carries counting progress (every
           tenth repetition, the halfway mark) and the completion message. None
@@ -966,14 +945,16 @@ export function ReaderScreen({
                     <motion.div
                       key={z.id}
                       initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                      animate={
-                        reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0, scale: isCanvasPressed ? 0.985 : 1 }
-                      }
+                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
                       exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
                       transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
                       className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
                     >
+                      {/* The press is its own transform, not a value folded
+                          into the card's 300ms slide. Sharing that transition
+                          is what made the count feel slow and shallow. */}
                       <div
+                        style={pressStyle}
                         className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                       >
                         {renderReadingContent()}

@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { motion } from "motion/react";
 import "./ZikrComponents.css";
 import { Check } from "./icons";
 import { counterNumeralFontFamily, formatNumerals } from "../formatting";
@@ -184,7 +183,7 @@ export function ZikrCounterSurface({
   };
 
   return (
-    <motion.button
+    <button
       type="button"
       data-testid={testId}
       data-counter-shape="rectangle"
@@ -203,8 +202,6 @@ export function ZikrCounterSurface({
       aria-disabled={disabled || complete}
       aria-label={accessibleName}
       className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
-      initial={false}
-      whileTap={complete || reducedMotion ? undefined : { scale: 0.985 }}
     >
       {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of
@@ -252,7 +249,7 @@ export function ZikrCounterSurface({
         )}
       </div>
       <CounterOutlineProgress count={count} total={total} />
-    </motion.button>
+    </button>
   );
 }
 
