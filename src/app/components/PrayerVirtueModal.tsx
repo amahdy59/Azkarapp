@@ -87,7 +87,7 @@ export function PrayerVirtueModal({
             type="button"
             onClick={onClose}
             data-testid="prayer-virtue-close"
-            className="flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-[0.875rem] font-black text-primary-foreground transition-[background-color,transform] duration-press ease-standard hover:brightness-110 active:scale-[var(--motion-scale-pressed,0.98)] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-[0.875rem] font-black text-primary-foreground transition-[background-color,transform] duration-press ease-standard hover:brightness-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t(language, "common.close")}
           </button>

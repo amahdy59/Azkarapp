@@ -270,7 +270,6 @@ export function FridaySalawatScreen({
                   instructionText={t(language, "reader.tapAnywhere")}
                   testId="salawat-counter"
                   reduceMotion={reduceMotion}
-                  className="salawat-counter-surface"
                 />
               </div>
             </div>

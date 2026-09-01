@@ -15,13 +15,22 @@ import { tapRippleStyle } from "./ZikrComponents";
  * Everything about the gesture now comes from here, so the three cannot drift
  * again and a change to the feel is a change in one place.
  */
+/**
+ * Read from the same custom properties the global press rule uses, so the page
+ * and every control on it press to one depth on one pair of curves. Hardcoding
+ * the numbers here is what let the reader drift to 0.985/300ms in the first
+ * place, and a second copy would drift again.
+ */
+function motionToken(name: string, fallback: string): string {
+  if (typeof window === "undefined") return fallback;
+  const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return value || fallback;
+}
+
 export const COUNTING_PRESS = {
-  /** Deep enough to read as a press on a large surface. */
+  /** Matches --motion-scale-pressed. */
   scale: 0.97,
-  /** Short enough to keep up with a fast count. */
-  durationMs: 150,
-  easing: "cubic-bezier(0.4, 0, 0.2, 1)",
-  /** Matches the `tap-ripple-expand` keyframes in `ZikrComponents.css`. */
+  /** Matches the tap-ripple-expand keyframes in ZikrComponents.css. */
   rippleMs: 560,
 } as const;
 
@@ -95,8 +104,12 @@ export function useCountingSurface({ onCount, reduceMotion = false }: UseCountin
   }, []);
 
   const pressStyle: CSSProperties = {
-    transform: isPressed && !reduceMotion ? `scale(${COUNTING_PRESS.scale})` : "scale(1)",
-    transition: `transform ${COUNTING_PRESS.durationMs}ms ${COUNTING_PRESS.easing}`,
+    transform: isPressed && !reduceMotion ? `scale(var(--motion-scale-pressed, ${COUNTING_PRESS.scale}))` : "scale(1)",
+    // Down fast, back slowly through an overshoot — the asymmetry is what makes
+    // the surface feel sprung rather than resized. Same tokens as every button.
+    transition: isPressed
+      ? `transform ${motionToken("--motion-duration-press", "90ms")} ${motionToken("--motion-ease-standard", "cubic-bezier(0.2, 0, 0, 1)")}`
+      : `transform ${motionToken("--motion-duration-release", "420ms")} ${motionToken("--motion-ease-release", "cubic-bezier(0.34, 1.56, 0.64, 1)")}`,
   };
 
   return {

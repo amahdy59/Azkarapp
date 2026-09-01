@@ -27,7 +27,7 @@ export function EnglishOnboarding1Screen({ onNext, onSkip }: { onNext: () => voi
         <button
           data-testid="onboarding-get-started"
           onClick={onNext}
-          className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[1.0625rem] font-bold text-primary-foreground shadow-[inset_0_-2px_0_rgba(10,13,18,0.12)] transition-transform active:scale-[0.98]"
+          className="h-[52px] w-full rounded-2xl border-2 border-white/10 bg-primary text-[1.0625rem] font-bold text-primary-foreground shadow-[inset_0_-2px_0_rgba(10,13,18,0.12)] transition-transform"
         >
           {t("en", "onboarding.getStarted")}
         </button>

@@ -69,7 +69,7 @@ export function FridayProgressCard({
             onClick={onOpen}
             disabled={!onOpen}
             data-testid={`progress-friday-${row.id}`}
-            className={`stagger-content group flex min-h-[4.5rem] w-full items-center gap-3 rounded-2xl border px-3 py-3 text-start transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 enabled:active:scale-[0.99] disabled:cursor-default ${
+            className={`stagger-content group flex min-h-[4.5rem] w-full items-center gap-3 rounded-2xl border px-3 py-3 text-start transition-[background-color,border-color,box-shadow] duration-standard focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 enabled: disabled:cursor-default ${
               row.done
                 ? "border-primary/55 bg-primary/10 enabled:hover:border-primary/70"
                 : "border-border bg-background enabled:hover:border-primary/45 enabled:hover:bg-muted"

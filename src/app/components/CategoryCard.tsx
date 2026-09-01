@@ -43,7 +43,7 @@ export function CategoryCard({
       dir={direction}
       onClick={onClick}
       style={index !== undefined ? { animationDelay: `${index * 45}ms` } : undefined}
-      className={`interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`}
+      className={`interactive-elem flex min-h-[82px] w-full items-center gap-4 rounded-3xl border border-border/40 bg-card p-4.5 text-start shadow-raised hover:border-primary/40 hover:shadow-overlay transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${index !== undefined ? "stagger-enter" : ""}`}
       aria-label={ariaLabel}
     >
       <span

@@ -294,8 +294,14 @@ button:not(:disabled):not(.no-press),
 a[href]:not(.no-press),
 .interactive-elem {
   touch-action: manipulation;
+  /* This is the *release*. A transition describes the change into the state it
+     is declared on, so leaving :active is governed here and entering it is
+     governed by the rule further down. Both halves used to run at
+     --motion-duration-press on the same standard ease, and a press that returns
+     exactly as it left reads as an image resizing rather than a surface giving
+     way. The release now runs longer and overshoots before it settles. */
   transition:
-    transform var(--motion-duration-press) var(--motion-ease-standard),
+    transform var(--motion-duration-release) var(--motion-ease-release),
     filter var(--motion-duration-fast) var(--motion-ease-standard),
     opacity var(--motion-duration-press) var(--motion-ease-standard);
 }
@@ -324,6 +330,13 @@ button:not(:disabled):not(.no-press):active,
 a[href]:not(.no-press):active,
 .interactive-elem:active {
   transform: scale(var(--motion-scale-pressed)) !important;
+  /* Going down is fast, the way a key gives under a finger. Only the transform
+     half differs from the rule above; filter and opacity keep their timings so
+     the hover lift does not lurch when a press begins. */
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    filter var(--motion-duration-fast) var(--motion-ease-standard),
+    opacity var(--motion-duration-press) var(--motion-ease-standard);
   opacity: 0.88;
 }
 

@@ -201,7 +201,7 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={onContinue}
-                className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <BookOpen size={18} aria-hidden="true" />
                 {t(language, "mushaf.continueReading")}
@@ -267,7 +267,7 @@ export function QuranWirdScreen({
               <button
                 type="button"
                 onClick={onContinue}
-                className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-btn bg-primary px-4 text-sm font-extrabold text-primary-foreground transition-[background-color,transform] hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               >
                 <BookOpen size={18} aria-hidden="true" />
                 {t(language, "mushaf.continueReading")}
@@ -418,6 +418,8 @@ export function QuranWirdScreen({
                           startedDayKey: todayKey,
                         })
                       }
+                      inputMode="numeric"
+                      onWheel={(event) => event.currentTarget.blur()}
                       className="h-12 w-full rounded-xl border border-border bg-background px-3 text-center text-lg font-bold text-foreground focus:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     />
                     <button

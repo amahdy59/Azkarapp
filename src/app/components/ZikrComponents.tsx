@@ -30,39 +30,6 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
   );
 }
 
-export function PulseRings({
-  trigger,
-  size = 200,
-  height = 76,
-  count = 0,
-  total = 1,
-}: {
-  trigger: number;
-  size?: number;
-  height?: number;
-  count?: number;
-  total?: number;
-}) {
-  const isComplete = total > 0 && count >= total;
-  const isHighProgress = total > 0 && count / total >= 0.8;
-  const ringColor = isComplete ? "border-success" : isHighProgress ? "border-warning" : "border-primary/60";
-
-  return (
-    <div key={trigger} className="pointer-events-none absolute inset-0 flex items-center justify-center">
-      <div
-        className={`absolute rounded-2xl border ${ringColor} pulse-ring`}
-        // Only the measured geometry is inline; timing belongs to the
-        // .pulse-ring class so the animation is defined in one place.
-        style={{
-          width: `${size - 8}px`,
-          height: `${height - 8}px`,
-          opacity: 0,
-        }}
-      />
-    </div>
-  );
-}
-
 export function CounterRing({ count, total, size = 160 }: { count: number; total: number; size?: number }) {
   const r = size / 2 - 10;
   const circ = 2 * Math.PI * r;

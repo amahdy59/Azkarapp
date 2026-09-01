@@ -27,7 +27,10 @@ describe("counting surface", () => {
 
     expect(pressed).toHaveStyle({ transform: "scale(1)" });
     fireEvent.pointerDown(screen.getByTestId("page"), { clientX: 10, clientY: 10 });
-    expect(pressed).toHaveStyle({ transform: `scale(${COUNTING_PRESS.scale})` });
+    // The depth comes from the token every other control presses to, with the
+    // constant only as an SSR fallback — asserting the literal would let the
+    // counter drift away from the app again the moment the token moved.
+    expect(pressed.style.transform).toBe(`scale(var(--motion-scale-pressed, ${COUNTING_PRESS.scale}))`);
     fireEvent.pointerUp(screen.getByTestId("surface"));
     expect(pressed).toHaveStyle({ transform: "scale(1)" });
   });
@@ -79,15 +82,31 @@ describe("counting surface", () => {
     }
   });
 
-  it("presses the counter button to the same depth as the page around it", () => {
+  it("presses the counter button to the same depth as every other control", () => {
     const css = readFileSync("src/app/components/ZikrComponents.css", "utf8");
-    const press = css.match(/\.adaptive-counter-surface\.is-pressed,[^}]*transform: scale\(([\d.]+)\)/);
+    const press = css.match(/\.adaptive-counter-surface\.is-pressed,[^}]*transform: scale\(([^)]*\)?)\)/);
     expect(press).not.toBeNull();
-    expect(Number(press![1])).toBe(COUNTING_PRESS.scale);
+    // Not a number of its own: the counter reads the same custom property the
+    // global press rule uses, so it cannot press to a different depth.
+    expect(press![1]).toBe("var(--motion-scale-pressed)");
+
+    const tokens = readFileSync("src/styles/theme/tokens.css", "utf8");
+    const value = tokens.match(/--motion-scale-pressed:\s*([\d.]+)/);
+    expect(Number(value![1])).toBe(COUNTING_PRESS.scale);
+
     // The button used to spring this property through framer-motion while the
     // rule above set it too. One property, one mechanism.
-    const widget = readFileSync("src/app/components/ZikrComponents.tsx", "utf8");
-    expect(widget).not.toMatch(/whileTap/);
+    expect(readFileSync("src/app/components/ZikrComponents.tsx", "utf8")).not.toMatch(/whileTap/);
+  });
+
+  it("comes back up more slowly than it goes down", () => {
+    const tokens = readFileSync("src/styles/theme/tokens.css", "utf8");
+    const press = Number(tokens.match(/--motion-duration-press:\s*(\d+)ms/)![1]);
+    const release = Number(tokens.match(/--motion-duration-release:\s*(\d+)ms/)![1]);
+    // Equal halves are what made a press read as an image resizing. Down fast,
+    // back slowly through a curve that overshoots 1 before settling.
+    expect(release).toBeGreaterThan(press * 2);
+    expect(tokens).toMatch(/--motion-ease-release:\s*cubic-bezier\(0\.34,\s*1\.56,/);
   });
 
   it("leaves the ripple animation to the stylesheet that defines it", () => {

@@ -21,7 +21,17 @@
   --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --motion-ease-enter: cubic-bezier(0.22, 1, 0.36, 1);
   --motion-ease-exit: cubic-bezier(0.4, 0, 1, 1);
-  --motion-scale-pressed: 0.98;
+  /* Coming back up is not the press played backwards. The release runs longer
+     and overshoots 1 before settling, which is what reads as a surface springing
+     back rather than an image returning to its old size. Pressing down stays on
+     --motion-duration-press: fast, so the control feels like it gives way the
+     instant the thumb lands. */
+  --motion-duration-release: 420ms;
+  --motion-ease-release: cubic-bezier(0.34, 1.56, 0.64, 1);
+  /* One press depth for the whole app. Thirteen components hardcoded their own
+     0.98 or 0.99 beside this, and every one of them was dead code: the global
+     press rule in surfaces.css carries !important and won regardless. */
+  --motion-scale-pressed: 0.97;
   --font-size: 16px;
   --font-ui-latin: "Noto Sans Arabic Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-arabic:

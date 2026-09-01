@@ -1,14 +1,3 @@
-@keyframes pulse-ring {
-  0% {
-    transform: scale(0.98);
-    opacity: 0.18;
-  }
-  100% {
-    transform: scale(1.08);
-    opacity: 0;
-  }
-}
-
 @keyframes counter-ready-glow {
   0% {
     opacity: 0;
@@ -108,24 +97,16 @@
 
 /* Timing lives here rather than in an inline style on the element, so the class
    is self-contained (DEC-067 / F22). The values are carried over unchanged —
-   Phase 20 owns motion timings, not this phase. The width/height overrides in
-   the breakpoint blocks below still need `!important` because ZikrComponents.tsx
-   sets those two properties inline from the measured counter size, and inline
-   styles outrank a class; that is why the `!important` there is not removable. */
-.pulse-ring {
-  animation-name: pulse-ring;
-  animation-duration: 260ms;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-  animation-fill-mode: forwards;
-}
-
+   Phase 20 owns motion timings, not this phase.
+   This used to go on to explain why the breakpoint size overrides needed
+   `!important`: that ZikrComponents.tsx set width and height inline from a
+   measured size. It does not, and there are no breakpoint overrides left — the
+   counter is one size everywhere. */
 .adaptive-counter-surface {
   position: relative;
   display: flex;
   flex: none;
-  width: 220px;
   max-width: 100%;
-  height: 76px;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -140,8 +121,10 @@
   box-shadow:
     0 10px 40px -10px color-mix(in srgb, var(--foreground) 15%, transparent),
     0 0 0 1px color-mix(in srgb, var(--foreground) 2%, transparent);
+  /* The release. Same tokens as every other control, so the counter is part of
+     the app's press rather than an exception with its own timing. */
   transition:
-    transform 150ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform var(--motion-duration-release) var(--motion-ease-release),
     border-color 200ms ease,
     box-shadow 200ms ease,
     background-color 200ms ease;
@@ -158,7 +141,12 @@
 
 .adaptive-counter-surface.is-pressed,
 .adaptive-counter-surface:active:not(:disabled) {
-  transform: scale(0.97);
+  transform: scale(var(--motion-scale-pressed));
+  transition:
+    transform var(--motion-duration-press) var(--motion-ease-standard),
+    border-color 200ms ease,
+    box-shadow 200ms ease,
+    background-color 200ms ease;
   background: color-mix(in srgb, var(--primary) 6%, var(--card));
   box-shadow: 0 2px 8px color-mix(in srgb, var(--foreground) 4%, transparent);
 }
@@ -174,54 +162,20 @@
   cursor: default;
 }
 
-.custom-counter-stage .adaptive-counter-surface,
-.salawat-counter-surface {
-  width: min(18rem, 78vw);
-  height: 5.5rem;
-  border-radius: 24px;
-}
-
-.custom-counter-stage .pulse-ring {
-  width: min(17.5rem, 75vw) !important;
-  height: 5rem !important;
-  border-radius: 24px;
-}
-
-@media (min-width: 48rem) {
-  .salawat-counter-surface {
-    width: 20rem;
-    height: 6.5rem;
-    border-radius: 24px;
-  }
-  .custom-counter-stage .adaptive-counter-surface {
-    width: 18rem;
-    height: 6rem;
-    border-radius: 24px;
-  }
-  .custom-counter-stage .pulse-ring {
-    width: 17.5rem !important;
-    height: 5.5rem !important;
-    border-radius: 24px;
-  }
-  .custom-counter-stage .counter-number {
-    font-size: 2.25rem;
-  }
-}
-
-@media (min-width: 64rem) {
-  .custom-counter-stage .adaptive-counter-surface {
-    width: 28rem;
-    height: 9rem;
-    border-radius: 24px;
-  }
-  .custom-counter-stage .pulse-ring {
-    width: 27.5rem !important;
-    height: 8.5rem !important;
-    border-radius: 24px;
-  }
-  .custom-counter-stage .counter-number {
-    font-size: 3rem;
-  }
+/* One counter, at one size, on every screen and every viewport.
+   There were four sizes: 220x76 in the reader, 288x88 on the Masbaha and
+   salawat, 320x104 / 288x96 at 48rem and 448x144 at 64rem — plus a number that
+   grew to 3rem on the Masbaha alone. The same control read as a different
+   component depending on where you met it.
+   It does not step with the viewport either. The reader's own contract test
+   pins this shape across phone, tablet and desktop, and it is right to: a
+   counter that resizes as the window does is the same inconsistency measured
+   on the other axis. The surface is a readout, not the tap target — on every
+   one of these screens the whole page counts — so it has no reason to grow. */
+.adaptive-counter-surface {
+  width: 220px;
+  max-width: 100%;
+  height: 76px;
 }
 
 .counter-outline-progress {
