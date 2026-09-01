@@ -1,13 +1,15 @@
 {
-  "release": "2026-08-31k",
+  "release": "2026-09-01",
   "ar": [
-    "تضخيم خط آيات الفاتحة ومطلع البقرة إلى 1.8 ضعف الحجم الطبيعي لبروز قرآني أكثر وقاراً وإبهاجاً.",
-    "تخفيف الهوامش الداخلية لمنح الآيات أقصى مساحة ممكنة دون تجاوز حدود الإطار المستطيل.",
-    "تكبير خط بسم الله الرحمن الرحيم في صفحة البقرة ليتناسب مع الحجم المضخم للآيات."
+    "على الشاشات العريضة انتقلت أدوات المصحف إلى شريط رأسي جانبي، فاتسعت مساحة القراءة، ويمكنك اختيار جهته يميناً أو يساراً.",
+    "وضع التركيز يخفي الأدوات ويترك الصفحة وحدها، وتعود الأدوات بلمسة على الصفحة.",
+    "إطار مخطوطة رقيق حول كل صفحة، ومع عرض الصفحتين تحمل كل صفحة اسم سورتها وجزئها ورقمها.",
+    "إعدادات القراءة صارت بجانب الصفحة لا فوقها، وأضيف إليها اختيار حجم النص، فترى أثر اختيارك لحظة اختياره."
   ],
   "en": [
-    "Scaled Quranic font to 1.8× on opening pages (Al-Fatihah and start of Al-Baqarah) for a grand, immersive presence.",
-    "Reduced inset padding to maximise verse area while keeping all text safely within the ornamental rectangular frame.",
-    "Enlarged the Bismillah calligraphy on page 2 to match the new larger verse scale."
+    "On wide screens the Mushaf tools now stand in a slim vertical bar beside the page, giving the reading area far more room — and you can put that bar on either side.",
+    "Focus mode hides every control and leaves only the page; a tap on the page brings them back.",
+    "Every page now carries a fine manuscript frame, and in the two-page view each page names its own surah, juz, and page number.",
+    "Reading settings sit beside the page instead of over it, and now include a text-size choice, so you can see each change as you make it."
   ]
 }
