@@ -22,15 +22,22 @@ import {
   Star,
 } from "../components/icons";
 import { t } from "../i18n";
-import { fridayChecklistKey, fridayKahfOpenedKey, readFridaySalawatProgress } from "../fridayProgress";
+import {
+  FRIDAY_PRACTICE_IDS,
+  FRIDAY_TOTAL_DEEDS,
+  fridayChecklistKey,
+  fridayKahfOpenedKey,
+  readFridaySalawatProgress,
+  type FridayPracticeId,
+} from "../fridayProgress";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
 import { registerLazyCollection } from "../content/azkar";
 
 registerLazyCollection("friday_kahf", FRIDAY_KAHF);
 
-type PracticeId = "ghusl" | "siwak" | "perfume" | "best_clothes" | "early" | "walking" | "listen";
+type PracticeId = FridayPracticeId;
 
-const PRACTICE_IDS: PracticeId[] = ["ghusl", "siwak", "perfume", "best_clothes", "early", "walking", "listen"];
+const PRACTICE_IDS: readonly PracticeId[] = FRIDAY_PRACTICE_IDS;
 
 function loadChecklist(): Set<PracticeId> {
   try {
@@ -156,7 +163,9 @@ export function FridayModeScreen({
   const duasComplete = duasTotalCount > 0 && duasCompletedCount >= duasTotalCount;
   const completedCount =
     checkedPractices.size + (kahfComplete ? 1 : 0) + (salawatComplete ? 1 : 0) + (duasComplete ? 1 : 0);
-  const totalPractices = 10;
+  // Derived, not a literal: the bar counts the sunan plus Al-Kahf, the salawat
+  // target and the duas, so adding a sunnah moves the denominator with it.
+  const totalPractices = FRIDAY_TOTAL_DEEDS;
 
   const persistChecklist = (next: Set<PracticeId>) => {
     setCheckedPractices(next);

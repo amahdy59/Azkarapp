@@ -32,6 +32,7 @@ export function useSessionHandlers({
   setCompleted,
   dailyCompletions,
   setDailyCompletions,
+  onAfterPrayerCompleted,
   setLastGrowthEvent,
   setSessions,
   setSavedZikrIds,
@@ -55,6 +56,18 @@ export function useSessionHandlers({
   setCompleted: React.Dispatch<React.SetStateAction<Record<CategoryId, Set<string>>>>;
   dailyCompletions: DailyCollectionCompletion[];
   setDailyCompletions: (records: DailyCollectionCompletion[]) => void;
+  /**
+   * Reading a prayer's azkar to the end is the strongest possible evidence
+   * that they were read, so it records the tracking too.
+   *
+   * The two lived apart: the prayer card's "adhkar" checkbox came from
+   * `prayerTracking` while the after-prayer dots came from `dailyCompletions`,
+   * and neither wrote the other. A reader who opened Fajr's azkar from the card
+   * and finished them came back to an unticked box and had to say so a second
+   * time by hand. Only this direction is inferred — ticking the box is a
+   * self-report and does not claim the collection was read.
+   */
+  onAfterPrayerCompleted?: (prayer: string) => void;
   setLastGrowthEvent: (event: GrowthEvent | null) => void;
   setSessions: React.Dispatch<React.SetStateAction<StoredSession[]>>;
   setSavedZikrIds: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -209,6 +222,7 @@ export function useSessionHandlers({
       activeSubCategory,
     );
     setDailyCompletions(growth.records);
+    if (activeCat === "after_prayer" && activeSubCategory) onAfterPrayerCompleted?.(activeSubCategory);
     setLastGrowthEvent(growth.event);
     setSessions((prev) =>
       [
@@ -269,6 +283,7 @@ export function useSessionHandlers({
         activeSubCategory,
       );
       setDailyCompletions(growth.records);
+      if (catId === "after_prayer" && activeSubCategory) onAfterPrayerCompleted?.(activeSubCategory);
       setLastGrowthEvent(growth.event);
     }
   };

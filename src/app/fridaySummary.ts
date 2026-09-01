@@ -1,7 +1,12 @@
-import { fridayChecklistKey, fridayKahfOpenedKey, readFridaySalawatProgress } from "./fridayProgress";
+import {
+  FRIDAY_PRACTICE_IDS,
+  fridayChecklistKey,
+  fridayKahfOpenedKey,
+  readFridaySalawatProgress,
+} from "./fridayProgress";
 
-/** The seven sunan the Friday companion tracks. Mirrors PRACTICE_IDS there. */
-export const FRIDAY_PRACTICE_COUNT = 7;
+/** The sunan the Friday companion tracks, counted from the canonical list. */
+export const FRIDAY_PRACTICE_COUNT = FRIDAY_PRACTICE_IDS.length;
 
 export interface FridaySummary {
   kahfOpened: boolean;

@@ -1,4 +1,25 @@
 export const FRIDAY_KAHF_WEEK_KEY = "azkarapp.friday-kahf-week.v1";
+
+/**
+ * The sunan the Friday companion tracks, in the order its rows are numbered.
+ *
+ * Kept here rather than in the screen because the summary Home and Progress
+ * read needs the same list. The two used to hold separate copies — a literal
+ * seven in one file and a literal array in the other — so adding a sunnah
+ * would have silently left the summary counting the old number.
+ */
+export const FRIDAY_PRACTICE_IDS = ["ghusl", "siwak", "perfume", "best_clothes", "early", "walking", "listen"] as const;
+
+export type FridayPracticeId = (typeof FRIDAY_PRACTICE_IDS)[number];
+
+/**
+ * The three deeds the companion counts alongside the sunan above: reading
+ * Al-Kahf, the salawat target, and the Friday duas.
+ */
+export const FRIDAY_EXTRA_DEEDS = 3;
+
+/** Everything the Friday progress bar counts. */
+export const FRIDAY_TOTAL_DEEDS = FRIDAY_PRACTICE_IDS.length + FRIDAY_EXTRA_DEEDS;
 export type FridaySalawatTarget = number;
 
 export interface FridaySalawatProgress {

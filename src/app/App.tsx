@@ -562,6 +562,9 @@ function AppContent() {
     setCompleted,
     dailyCompletions,
     setDailyCompletions,
+    onAfterPrayerCompleted: (prayer) => {
+      if (isPrayerName(prayer)) handleTogglePrayerTracking(prayer, "adhkar", true);
+    },
     setLastGrowthEvent,
     setSessions,
     setSavedZikrIds,
