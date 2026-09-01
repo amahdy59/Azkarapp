@@ -25,7 +25,8 @@ import { t } from "../i18n";
 import {
   FRIDAY_PRACTICE_IDS,
   FRIDAY_TOTAL_DEEDS,
-  fridayChecklistKey,
+  readFridayPractices,
+  writeFridayPractices,
   fridayKahfOpenedKey,
   readFridaySalawatProgress,
   type FridayPracticeId,
@@ -40,12 +41,7 @@ type PracticeId = FridayPracticeId;
 const PRACTICE_IDS: readonly PracticeId[] = FRIDAY_PRACTICE_IDS;
 
 function loadChecklist(): Set<PracticeId> {
-  try {
-    const stored = JSON.parse(localStorage.getItem(fridayChecklistKey()) ?? "[]");
-    return new Set(Array.isArray(stored) ? stored.filter((id): id is PracticeId => PRACTICE_IDS.includes(id)) : []);
-  } catch {
-    return new Set();
-  }
+  return new Set(readFridayPractices().filter((id): id is PracticeId => PRACTICE_IDS.includes(id as PracticeId)));
 }
 
 /**
@@ -169,11 +165,7 @@ export function FridayModeScreen({
 
   const persistChecklist = (next: Set<PracticeId>) => {
     setCheckedPractices(next);
-    try {
-      localStorage.setItem(fridayChecklistKey(), JSON.stringify([...next]));
-    } catch {
-      // Local progress remains usable for this session when storage is unavailable.
-    }
+    writeFridayPractices(next);
   };
 
   const togglePractice = (id: PracticeId) => {
@@ -335,7 +327,7 @@ export function FridayModeScreen({
           <button
             type="button"
             onClick={onStartKahf}
-            className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-[0.9375rem] font-black text-white shadow-sm transition-transform active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:bg-primary dark:text-primary-foreground"
+            className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-[0.9375rem] font-black text-white shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:bg-primary dark:text-primary-foreground"
           >
             <BookOpen size={19} />
             {t(language, kahfStarted && !kahfComplete ? "friday.kahfContinue" : "friday.kahfStart")}

@@ -27,7 +27,12 @@ import { DEFAULT_LOCATION } from "./content/prayerCalculation";
 import { authProviderFlags, isSupabaseConfigured } from "../lib/supabase";
 import {
   FRIDAY_KAHF_WEEK_KEY,
-  fridayKahfOpenedKey,
+  markFridayKahfOpened,
+  mergeFridayCycles,
+  onFridayProgressChange,
+  readFridayCycle,
+  writeFridayCycle,
+  type FridayCycleProgress,
   getFridayCycleKey,
   readFridayDuaProgress,
   writeFridayDuaProgress,
@@ -277,6 +282,13 @@ function AppContent() {
   );
   const [mushafTextScale, setMushafTextScale] = useState<MushafTextScale>(initialState.mushafTextScale ?? "medium");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
+  // Seeded from both sides: the local keys are what the Friday screens actually
+  // read, while the snapshot is what a previous session synced. Neither is
+  // reliably ahead of the other, and merging can only move progress forward.
+  const [fridayProgress, setFridayProgress] = useState<FridayCycleProgress>(() => {
+    const local = readFridayCycle();
+    return initialState.fridayProgress ? mergeFridayCycles(local, initialState.fridayProgress) : local;
+  });
   const [mushafVerseBookmarks, setMushafVerseBookmarks] = useState<QuranVerseBookmark[]>(
     initialState.mushafVerseBookmarks ?? [],
   );
@@ -356,6 +368,11 @@ function AppContent() {
     setFridayDuaCompletedIds(new Set());
     return false;
   }, []);
+
+  // Every Friday write announces itself, so this one subscription keeps the
+  // synced snapshot current no matter which screen did the writing — rather
+  // than each of the five write sites remembering to push state itself.
+  useEffect(() => onFridayProgressChange(() => setFridayProgress(readFridayCycle())), []);
 
   const hydrateFridayDuaProgress = useCallback(async () => {
     try {
@@ -486,6 +503,7 @@ function AppContent() {
       quranLastReadingEvent,
       quranReadingPosition,
       quranWirdPlan,
+      fridayProgress,
     }),
     [
       boldText,
@@ -532,6 +550,7 @@ function AppContent() {
       showTransliteration,
       textSize,
       themeMode,
+      fridayProgress,
     ],
   );
 
@@ -695,6 +714,14 @@ function AppContent() {
     setQuranLastReadingEvent(state.quranLastReadingEvent);
     setQuranReadingPosition(state.quranReadingPosition ?? { page: state.khatmahPage ?? 1 });
     setQuranWirdPlan(state.quranWirdPlan ?? { kind: "daily", dailyPages: state.dailyWirdGoal ?? 4 });
+    // Friday is merged rather than replaced. Restoring an account should never
+    // erase a deed done on this device before it signed in, and the remote copy
+    // is not automatically the newer one.
+    if (state.fridayProgress) {
+      const merged = mergeFridayCycles(readFridayCycle(), state.fridayProgress);
+      if (merged.cycle === getFridayCycleKey()) writeFridayCycle(merged);
+      setFridayProgress(merged);
+    }
   }, []);
 
   const {
@@ -1184,11 +1211,7 @@ function AppContent() {
                   onBack={pop}
                   onStartKahf={() => {
                     void (async () => {
-                      try {
-                        window.localStorage.setItem(fridayKahfOpenedKey(), "true");
-                      } catch {
-                        // Opening the reader does not depend on storage.
-                      }
+                      markFridayKahfOpened();
                       const sameWeek = ensureCurrentFridayWeek();
                       if (!(await hydrateRouteCategory("friday_kahf", "reader", 0))) {
                         setActiveCat("friday_kahf");

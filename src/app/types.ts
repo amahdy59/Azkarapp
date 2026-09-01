@@ -1,3 +1,5 @@
+import type { FridayCycleProgress } from "./fridayProgress";
+
 export type AppLanguage = "en" | "ar";
 
 /** The five daily prayers. Canonical here so persisted records and the prayer
@@ -303,6 +305,17 @@ export interface AppStateSnapshot {
   savedZikrIds: string[];
   /** Day key for the last active progress day to auto-reset routine sessions on a new day. */
   lastActiveDayKey?: string;
+  /**
+   * The Friday companion's progress for the current cycle.
+   *
+   * Only the current Friday is carried: older cycles are pruned locally and
+   * have no meaning once the day has passed, so syncing them would be payload
+   * for nothing. Before this existed, Friday was the one progress surface that
+   * lived purely in `localStorage`, which meant reading Al-Kahf on a phone left
+   * no trace on a tablet an hour later while every other routine followed the
+   * account across.
+   */
+  fridayProgress?: FridayCycleProgress;
   /** User's current reading position in the Quran Khatmah (page number 1-604). */
   khatmahPage?: number;
   /** Mushaf color preference; follows the app theme unless explicitly overridden. */

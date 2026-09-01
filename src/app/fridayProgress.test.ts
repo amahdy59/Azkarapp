@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   fridayChecklistKey,
   fridayDuasKey,
@@ -12,6 +12,12 @@ import {
   readFridayDuaProgress,
   writeFridayDuaProgress,
   writeFridaySalawatProgress,
+  readFridayCycle,
+  writeFridayCycle,
+  mergeFridayCycles,
+  onFridayProgressChange,
+  writeFridayPractices,
+  markFridayKahfOpened,
 } from "./fridayProgress";
 
 describe("Friday cycle boundary", () => {
@@ -104,5 +110,95 @@ describe("Friday weekly progress", () => {
     localStorage.setItem(fridayDuasKey("2026-W31"), JSON.stringify(["friday-dua-01", "fake-dua", 47]));
 
     expect([...readFridayDuaProgress(["friday-dua-01"], "2026-W31")]).toEqual(["friday-dua-01"]);
+  });
+});
+
+describe("cycle progress and account merge", () => {
+  const cycle = "2026-09-04";
+
+  it("reads back everything the companion recorded for one cycle", () => {
+    writeFridayCycle({
+      cycle,
+      practices: ["ghusl", "siwak"],
+      kahfOpened: true,
+      duas: ["dua-1"],
+      salawat: { count: 40, target: 100 },
+    });
+
+    expect(readFridayCycle(cycle)).toEqual({
+      cycle,
+      practices: ["ghusl", "siwak"],
+      kahfOpened: true,
+      duas: ["dua-1"],
+      salawat: { count: 40, target: 100 },
+    });
+  });
+
+  it("moves progress forward when two devices recorded the same Friday", () => {
+    const phone = {
+      cycle,
+      practices: ["ghusl"],
+      kahfOpened: true,
+      duas: ["dua-1"],
+      salawat: { count: 30, target: 100 },
+    };
+    const tablet = {
+      cycle,
+      practices: ["siwak"],
+      kahfOpened: false,
+      duas: ["dua-2"],
+      salawat: { count: 80, target: 300 },
+    };
+
+    // A deed done on either device was still done, so nothing is dropped and
+    // the count never goes backwards. The target follows the device that
+    // counted further, because that is the one being used.
+    expect(mergeFridayCycles(phone, tablet)).toEqual({
+      cycle,
+      practices: ["ghusl", "siwak"],
+      kahfOpened: true,
+      duas: ["dua-1", "dua-2"],
+      salawat: { count: 80, target: 300 },
+    });
+  });
+
+  it("is order-independent, so which device syncs first cannot change the result", () => {
+    const a = { cycle, practices: ["ghusl"], kahfOpened: false, duas: [], salawat: { count: 10, target: 100 } };
+    const b = { cycle, practices: ["early"], kahfOpened: true, duas: ["d"], salawat: { count: 50, target: 100 } };
+    expect(mergeFridayCycles(a, b)).toEqual(mergeFridayCycles(b, a));
+  });
+
+  it("keeps the later Friday rather than blending two different weeks", () => {
+    const thisWeek = {
+      cycle: "2026-09-11",
+      practices: [],
+      kahfOpened: false,
+      duas: [],
+      salawat: { count: 0, target: 100 },
+    };
+    const lastWeek = {
+      cycle,
+      practices: ["ghusl"],
+      kahfOpened: true,
+      duas: ["d"],
+      salawat: { count: 99, target: 100 },
+    };
+    // Last Friday's deeds are not this Friday's; merging them would show work
+    // the reader has not done yet.
+    expect(mergeFridayCycles(thisWeek, lastWeek)).toBe(thisWeek);
+    expect(mergeFridayCycles(lastWeek, thisWeek)).toBe(thisWeek);
+  });
+
+  it("tells subscribers about a write from any of the screens that make them", () => {
+    const seen = vi.fn();
+    const stop = onFridayProgressChange(seen);
+    writeFridayPractices(["ghusl"], cycle);
+    markFridayKahfOpened(cycle);
+    writeFridaySalawatProgress({ count: 1, target: 100 }, cycle);
+    stop();
+    writeFridayPractices(["siwak"], cycle);
+
+    // Three writes while subscribed, none after unsubscribing.
+    expect(seen).toHaveBeenCalledTimes(3);
   });
 });

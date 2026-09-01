@@ -115,6 +115,7 @@ export function writeFridayDuaProgress(ids: Iterable<string>, cycle = getFridayC
   } catch {
     // Weekly progress remains usable in memory when storage is unavailable.
   }
+  notifyFridayProgressChange();
 }
 
 export function readFridaySalawatProgress(cycle = getFridayCycleKey()): FridaySalawatProgress {
@@ -138,4 +139,134 @@ export function writeFridaySalawatProgress(progress: FridaySalawatProgress, cycl
   } catch {
     // Counting remains usable in memory when storage is unavailable.
   }
+  notifyFridayProgressChange();
+}
+
+/**
+ * Anything that changes Friday progress announces it here.
+ *
+ * The alternative was for every screen that writes to also remember to push the
+ * result into app state, which is exactly the kind of obligation that gets
+ * forgotten when a fifth write site is added. One subscription in `App` now
+ * catches all of them.
+ */
+type FridayProgressListener = () => void;
+const fridayProgressListeners = new Set<FridayProgressListener>();
+
+export function onFridayProgressChange(listener: FridayProgressListener): () => void {
+  fridayProgressListeners.add(listener);
+  return () => fridayProgressListeners.delete(listener);
+}
+
+function notifyFridayProgressChange(): void {
+  for (const listener of fridayProgressListeners) listener();
+}
+
+/** Completed sunan for a cycle. Replaces raw writes to the checklist key. */
+export function writeFridayPractices(ids: Iterable<string>, cycle = getFridayCycleKey()): void {
+  try {
+    localStorage.setItem(fridayChecklistKey(cycle), JSON.stringify([...new Set(ids)].sort()));
+  } catch {
+    // Progress stays usable in memory when storage is unavailable.
+  }
+  notifyFridayProgressChange();
+}
+
+/** Records that Al-Kahf was opened this cycle. Replaces raw writes to that key. */
+export function markFridayKahfOpened(cycle = getFridayCycleKey()): void {
+  try {
+    localStorage.setItem(fridayKahfOpenedKey(cycle), "true");
+  } catch {
+    // Progress stays usable in memory when storage is unavailable.
+  }
+  notifyFridayProgressChange();
+}
+
+/** Everything the Friday companion records for one cycle. */
+export interface FridayCycleProgress {
+  /** The Friday this belongs to, as `YYYY-MM-DD`. */
+  cycle: string;
+  /** Completed sunan, from {@link FRIDAY_PRACTICE_IDS}. */
+  practices: string[];
+  kahfOpened: boolean;
+  duas: string[];
+  salawat: FridaySalawatProgress;
+}
+
+/**
+ * The stored dua ids without an allow-list.
+ *
+ * {@link readFridayDuaProgress} filters against the duas currently in the
+ * content, which is right when rendering but wrong here: this value is handed
+ * to the account, and filtering at write time would drop a dua that exists on
+ * the other device but not on this build.
+ */
+function readStoredDuaIds(cycle: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(fridayDuasKey(cycle)) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+export function readFridayPractices(cycle = getFridayCycleKey()): string[] {
+  try {
+    const parsed: unknown = JSON.parse(localStorage.getItem(fridayChecklistKey(cycle)) ?? "[]");
+    const allowed = new Set<string>(FRIDAY_PRACTICE_IDS);
+    return Array.isArray(parsed) ? parsed.filter((id): id is string => typeof id === "string" && allowed.has(id)) : [];
+  } catch {
+    return [];
+  }
+}
+
+/**
+ * The whole cycle in one value.
+ *
+ * The four key families were read and written directly from six different
+ * files, three of them reaching into `localStorage` inline. That is why none of
+ * it ever reached the account: there was no single value to hand the sync.
+ */
+export function readFridayCycle(cycle = getFridayCycleKey()): FridayCycleProgress {
+  let kahfOpened: boolean;
+  try {
+    kahfOpened = localStorage.getItem(fridayKahfOpenedKey(cycle)) === "true";
+  } catch {
+    kahfOpened = false;
+  }
+  return {
+    cycle,
+    practices: readFridayPractices(cycle),
+    kahfOpened,
+    duas: readStoredDuaIds(cycle),
+    salawat: readFridaySalawatProgress(cycle),
+  };
+}
+
+export function writeFridayCycle(progress: FridayCycleProgress): void {
+  const { cycle } = progress;
+  writeFridayPractices(progress.practices, cycle);
+  if (progress.kahfOpened) markFridayKahfOpened(cycle);
+  writeFridayDuaProgress(progress.duas, cycle);
+  writeFridaySalawatProgress(progress.salawat, cycle);
+}
+
+/**
+ * Combines the same Friday as recorded on two devices.
+ *
+ * A deed done on either device was still done, so sets union, the Kahf flag
+ * ORs, and the count takes the higher of the two — a merge can only ever move
+ * progress forward. The target follows whichever side counted further, because
+ * that is the device the reader was actually using.
+ */
+export function mergeFridayCycles(a: FridayCycleProgress, b: FridayCycleProgress): FridayCycleProgress {
+  if (a.cycle !== b.cycle) return a.cycle > b.cycle ? a : b;
+  const ahead = b.salawat.count > a.salawat.count ? b : a;
+  return {
+    cycle: a.cycle,
+    practices: [...new Set([...a.practices, ...b.practices])].sort(),
+    kahfOpened: a.kahfOpened || b.kahfOpened,
+    duas: [...new Set([...a.duas, ...b.duas])].sort(),
+    salawat: { count: Math.max(a.salawat.count, b.salawat.count), target: ahead.salawat.target },
+  };
 }
