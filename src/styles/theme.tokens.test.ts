@@ -74,6 +74,13 @@ describe("theme token contracts (Phase 02 delta)", () => {
   it("keeps Arabic UI and devotional reading typography as separate contracts", () => {
     expect(themeCss).not.toMatch(/\.font-arabic\s*,\s*\n\s*\.zikr-text/);
     expect(themeBlock(".arabic-ui,")).toContain("font-family: var(--font-ui-arabic)");
-    expect(themeBlock(".zikr-text,")).toContain("font-family: var(--font-reading-arabic)");
+    // The zikr face now goes through --font-zikr so the reader can choose it,
+    // but the separation this test exists to protect is unchanged: whatever the
+    // choice, the devotional face is never the UI face.
+    expect(themeBlock(".zikr-text,")).toContain("font-family: var(--font-zikr)");
+    expect(themeCss).toContain("--font-zikr: var(--font-reading-arabic)");
+    for (const match of themeCss.matchAll(/--font-zikr:\s*([^;]+);/g)) {
+      expect(match[1]).not.toContain("--font-ui-arabic");
+    }
   });
 });

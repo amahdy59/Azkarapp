@@ -1,4 +1,4 @@
-import type { AppLanguage, ColorBlindSupport, TextSizeOption, ThemeMode } from "./types";
+import type { AppLanguage, ColorBlindSupport, TextSizeOption, ZikrFontOption, ThemeMode } from "./types";
 import { t } from "./i18n";
 
 const PRODUCT_THEME_CLASSES = ["theme-midnight", "theme-light", "theme-dark"] as const;
@@ -18,6 +18,7 @@ export interface AppAppearancePreferences {
   reduceMotion?: boolean;
   forceRtl?: boolean;
   colorBlindSupport?: ColorBlindSupport;
+  zikrFont?: ZikrFontOption;
 }
 
 /** Applies the complete root appearance contract atomically to prevent stale theme classes and startup flashes. */
@@ -30,6 +31,7 @@ export function applyAppAppearance({
   reduceMotion = false,
   forceRtl = false,
   colorBlindSupport = "none",
+  zikrFont = "humanist",
 }: AppAppearancePreferences) {
   if (typeof document === "undefined") {
     return;
@@ -50,6 +52,10 @@ export function applyAppAppearance({
   root.style.setProperty("--font-weight-medium", boldText ? "700" : "500");
   root.style.setProperty("--font-weight-normal", boldText ? "500" : "400");
   root.dataset.colorBlindSupport = colorBlindSupport;
+  // "humanist" is the token's own default, so it carries no attribute — the
+  // stylesheet then has nothing to override and the default costs no rule.
+  if (zikrFont === "humanist") delete root.dataset.zikrFont;
+  else root.dataset.zikrFont = zikrFont;
   root.style.colorScheme = themeMode === "light" && !highContrast ? "light" : "dark";
   const skipLink = document.querySelector<HTMLAnchorElement>(".skip-link");
   if (skipLink) skipLink.textContent = t(language, "common.skipToMain");

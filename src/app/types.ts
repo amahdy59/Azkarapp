@@ -27,6 +27,18 @@ export const CATEGORY_IDS = [
 ] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
 export type TextSizeOption = "small" | "medium" | "large";
+
+/**
+ * The face the zikr text is set in.
+ *
+ * All three families already ship with the app — `humanist` is what every
+ * reader has been reading in, `clear` is the UI face, and `naskh` is the
+ * Mushaf's. Nothing new is downloaded and nothing new enters the precache,
+ * which is why the choice can be offered at all: an Arabic face is a large
+ * asset, and a fourth would cost every reader bytes to serve a preference most
+ * of them will not change.
+ */
+export type ZikrFontOption = "humanist" | "clear" | "naskh";
 export type ColorBlindSupport = "none" | "deuteranopia" | "protanopia" | "tritanopia";
 export type ThemeMode = "midnight" | "light" | "dark";
 export type RoutineCategoryId = "morning" | "evening" | "before_sleep" | "after_prayer";
@@ -195,6 +207,8 @@ export interface UserSettingsState {
   showTransliteration: boolean;
   showTranslation: boolean;
   textSize: TextSizeOption;
+  /** Which family the zikr text itself is set in. Defaults to `humanist`. */
+  zikrFont?: ZikrFontOption;
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;

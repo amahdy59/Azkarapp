@@ -39,6 +39,12 @@
     sans-serif;
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
   --font-mushaf: "Amiri Quran", "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", serif;
+  /* The zikr face follows the reader's choice. The default is the value above,
+     so a reader who never opens the setting sees exactly what they always saw.
+     Each stack falls back to the other two: all three are already loaded, so a
+     face that fails to decode still lands on a real Arabic family rather than a
+     system fallback that may not have the letterforms at all. */
+  --font-zikr: var(--font-reading-arabic);
   --background: #080808;
   --foreground: #f2f2ea;
   --card: #0c0c0c;
@@ -333,7 +339,15 @@ body {
 
 .zikr-text,
 [lang="ar"] .zikr-text {
-  font-family: var(--font-reading-arabic);
+  font-family: var(--font-zikr);
+}
+
+:root[data-zikr-font="clear"] {
+  --font-zikr: "Noto Sans Arabic Variable", "IBM Plex Sans Arabic", sans-serif;
+}
+
+:root[data-zikr-font="naskh"] {
+  --font-zikr: "Amiri Quran", "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", serif;
 }
 
 button,

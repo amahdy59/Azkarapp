@@ -238,7 +238,7 @@
 /* .element-pop is declared with .favorite-pop above, on the motion tokens. */
 
 .zikr-text {
-  font-family: var(--font-reading-arabic);
+  font-family: var(--font-zikr);
 }
 
 /* ─── Universal Press Micro-interactions ─────────────────────────────

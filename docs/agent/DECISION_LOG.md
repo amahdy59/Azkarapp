@@ -1957,3 +1957,53 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** a wheel over a number field drops focus, a text
   field is untouched, no raw number input in the app lacks the guard, and an
   errored field is both `aria-invalid` and described by its message.
+
+## DEC-121 — every field carries a title the eye can read, not only a name a reader can hear
+
+- **Decision:** each text-entry control has a visible `<label>` above it, styled
+  from one `FIELD_LABEL_CLASS`.
+- **What the earlier pass missed:** DEC-115 checked _accessible names_ and found
+  none missing, so forms were reported clean. Four fields — the sign-in email,
+  the display name, the surah search and the city search — carried an
+  `aria-label` behind a placeholder. That passes an accessible-name audit and
+  still leaves the field unnamed on screen, and unnamed entirely once there is a
+  value to check. A heading above a form says what the screen is for; it is not
+  the field's name.
+- **One style:** the labels that did exist used three
+  (`text-[0.75rem] font-semibold text-muted-foreground` on the search screens,
+  `text-sm font-bold text-foreground` on the page-jump dialog, and FormField's).
+  A label is the same thing wherever it appears.
+- **Tests/evidence required:** every `<input>` in the form-bearing screens is
+  bound by `htmlFor` (literal or expression id), a wrapping `<label>`, or
+  `aria-labelledby`; and those screens all take the shared label class.
+
+## DEC-122 — the reader chooses the zikr face, from the families already shipped
+
+- **Decision:** `--font-zikr` carries the devotional face, overridden by
+  `:root[data-zikr-font]`, with three choices: `humanist` (IBM Plex Sans Arabic,
+  the existing default), `clear` (Noto Sans Arabic) and `naskh` (Amiri Quran).
+- **Why only these three:** all three are already installed and precached. An
+  Arabic face is a large asset and the service worker precaches everything, so a
+  fourth family would cost every reader bytes on first load to serve a
+  preference most will never change. Three real choices at zero cost beat four
+  at a cost paid by everyone.
+- **The default carries no attribute:** `humanist` is what the token already
+  resolves to, so choosing it removes the attribute rather than writing one. A
+  reader who never opens the setting is on exactly the same code path as before.
+- **Only the zikr moves:** the UI face and the Mushaf face are separate tokens
+  and no override touches them. The picker previews each face in itself, because
+  naming three families without showing them asks the reader to choose from
+  memory of what a name looks like.
+- **Two defects this shipped with, found only in a browser:**
+  - The reader writes the face as an **inline style**, which outranks every
+    stylesheet rule. While that inline value named the fixed token, the setting
+    updated `--font-zikr` correctly and the text never moved. Every unit test
+    passed; the feature was inert.
+  - `state.ts` **whitelists** settings keys, so `zikrFont` was dropped on save.
+    The picker worked, the root updated, and the choice vanished on reload.
+    Both are the same lesson: a setting is not implemented until the value has
+    been followed from the control to the pixel and back through a reload.
+- **Tests/evidence required:** the default writes no attribute and switching
+  back clears it; no consumer still names `--font-reading-arabic` except the
+  default itself; an unknown stored value falls back; the choice survives
+  `normalizeAppState` and an account merge.

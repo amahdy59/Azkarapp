@@ -13,6 +13,7 @@ import type {
   ReminderSettings,
   StoredSession,
   TextSizeOption,
+  ZikrFontOption,
   ThemeMode,
 } from "../../types";
 import {
@@ -60,7 +61,9 @@ interface SettingsScreenProps {
   onLanguageChange: (value: AppLanguage) => void;
   onThemeModeChange: (value: ThemeMode) => void;
   onCalendarTypeChange?: (value: "hijri" | "gregorian") => void;
+  zikrFont?: ZikrFontOption;
   onTextSizeChange: (value: TextSizeOption) => void;
+  onZikrFontChange: (value: ZikrFontOption) => void;
   onShowTranslationChange: (value: boolean) => void;
   onShowTransliterationChange: (value: boolean) => void;
   onHighContrastChange: (value: boolean) => void;
@@ -112,6 +115,8 @@ export function SettingsScreen({
   onThemeModeChange,
   onCalendarTypeChange,
   onTextSizeChange,
+  zikrFont,
+  onZikrFontChange,
   onShowTranslationChange,
   onShowTransliterationChange,
   onHighContrastChange,
@@ -279,6 +284,7 @@ export function SettingsScreen({
             language={language}
             direction={direction}
             textSize={textSize}
+            zikrFont={zikrFont}
             showTranslation={showTranslation}
             showTransliteration={showTransliteration}
             highContrast={highContrast}
@@ -288,6 +294,7 @@ export function SettingsScreen({
             forceRtl={forceRtl}
             colorBlindSupport={colorBlindSupport}
             onTextSizeChange={onTextSizeChange}
+            onZikrFontChange={onZikrFontChange}
             onShowTranslationChange={onShowTranslationChange}
             onShowTransliterationChange={onShowTransliterationChange}
             onHighContrastChange={onHighContrastChange}

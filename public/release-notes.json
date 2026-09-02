@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-01e",
+  "release": "2026-09-02a",
   "ar": [
-    "الضغط في التطبيق صار محسوسًا: كل زر وبطاقة ينضغط بسرعة ثم يعود متمددًا كأنه سطح ينبض تحت إصبعك، بعد أن كان يذهب ويعود بالسرعة نفسها فلا يُحسّ. وعدّاد الذكر صار بحجم واحد في كل الشاشات.",
-    "التنقل بين آيات سورة الكهف صار يحرّك النص وحده، بعد أن كانت الشاشة كلها تنزلق مع إصبعك.",
-    "تقدّمك في يوم الجمعة صار يتبع حسابك بين أجهزتك، وعند تسجيل الدخول يُجمع ما فعلته على كل جهاز فلا يضيع عمل.",
-    "حقول الأرقام في الإعدادات لم تعد تتغيّر قيمتها بمجرد تمرير عجلة الفأرة فوقها، ورسالة الخطأ صارت على الحقل نفسه."
+    "صار بإمكانك اختيار خط الذكر من الإعدادات: إنساني أو واضح أو نسخ، ويظهر كل خط بنفسه قبل أن تختاره. الخطوط الثلاثة موجودة في التطبيق أصلاً فلا تحميل إضافي.",
+    "كل حقل إدخال صار له عنوان ظاهر فوقه، بما فيها البريد والاسم وحقول البحث، فلا يختفي اسم الحقل بمجرد أن تكتب فيه.",
+    "الصفحة صارت تتبع إصبعك أثناء التنقل بين الأذكار ثم تستقر، بعد أن كانت لا تتحرك حتى ترفع يدك.",
+    "الضغط على الذكر في الهاتف صار محسوسًا؛ كان أثر الضغط مفقودًا في شاشة القراءة على الهواتف وحدها."
   ],
   "en": [
-    "Pressing anything now feels like pressing something: controls give way quickly, then spring back and settle instead of returning at the speed they left. The dhikr counter is also one size on every screen now.",
-    "Moving through Al-Kahf now moves the text, rather than the whole screen sliding under your finger.",
-    "Your Friday progress follows your account between devices, and signing in combines what you did on each rather than replacing it.",
-    "Number fields in settings no longer change value when you scroll the mouse wheel over them, and an invalid entry is flagged on the field itself."
+    "You can now choose the zikr font in Settings — Humanist, Clear, or Naskh — and each one is shown in its own face before you pick it. All three already ship with the app, so nothing extra is downloaded.",
+    "Every input now has a visible title above it, including email, name, and the search fields, so the field's name no longer disappears the moment you type.",
+    "The page follows your finger as you move between azkar and then settles, instead of staying still until you lift your thumb.",
+    "Tapping a zikr on a phone now presses; that feedback was missing in the reader on phones only."
   ]
 }

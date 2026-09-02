@@ -49,6 +49,16 @@ Rules:
 - Mixed-direction controls must use logical CSS properties (`start`, `end`, `ms`, `me`) or a deliberately isolated `dir="ltr"` physical layout. Arabic text inside that layout gets its own `dir="rtl"` or `dir="auto"`.
 - Do not encode direction by reversing arrays. Keep semantic DOM/tab order stable and mirror only directional icons.
 
+## Zikr typography
+
+The devotional face is the reader's to choose; the interface's is not.
+
+- `--font-zikr` carries the zikr face and nothing else. `--font-ui-arabic` and `--font-mushaf` are separate and no font choice touches them.
+- Three options, all already installed and precached: **humanist** (IBM Plex Sans Arabic, the default), **clear** (Noto Sans Arabic), **naskh** (Amiri Quran). A fourth family would cost every reader bytes on first load — the service worker precaches fonts — to serve a preference most will never change.
+- The default writes no `data-zikr-font` attribute, so a reader who never opens the setting is on the same path as before, and choosing it again removes the attribute rather than leaving a dead override.
+- A face picker previews each option **in that face**. Naming families without showing them asks the reader to choose from memory.
+- Anything that sets the zikr face inline must use `var(--font-zikr)`: an inline style outranks every stylesheet rule, so a hardcoded token there silently disables the whole setting.
+
 ## Iconography contract
 
 - Every product interface icon comes from the official `@untitledui/icons` package and is imported through `src/app/components/icons.ts`. Do not import another icon library directly or add a hand-drawn SVG for an interface action.
@@ -83,6 +93,7 @@ Every input carries a **visible** label. A placeholder is a hint, never a name: 
 - **Errors belong on the field.** An invalid value marks its control `aria-invalid` and attaches the message with `aria-describedby`. A message in a status line elsewhere tells a sighted user something failed while leaving a screen-reader user no way to find which field to fix.
 - **Labels sit above their control**, never beside it. Side-by-side is the one arrangement that breaks when a label wraps or a translation runs long, and it costs a column on a phone.
 - **A number input blurs on wheel.** A wheel over a focused `type="number"` changes its value, so scrolling a settings page with the pointer over a coordinate field would move it silently. `FormField` does this for its own; a raw number input must do it itself.
+- **A visible label, above the control, on every field.** An `aria-label` behind a placeholder passes an accessible-name audit and still leaves the field unnamed on screen — and unnamed entirely once there is a value to check. A heading above a form says what the screen is for; it is not the field's name. One style for all of them: `FIELD_LABEL_CLASS`.
 - **`inputMode` matches the value**, not the type: `decimal` for coordinates, which need a point and a minus sign that `numeric` does not offer.
 
 ## Color roles

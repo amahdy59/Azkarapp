@@ -81,6 +81,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     showTransliteration: false,
     showTranslation: false,
     textSize: "medium",
+    zikrFont: "humanist",
     highContrast: false,
     boldText: false,
     reduceMotion: false,
@@ -310,6 +311,10 @@ function normalizeQuranWirdPlan(value: unknown, fallbackGoal: number): QuranWird
 
 function isTextSize(value: string): value is AppStateSnapshot["settings"]["textSize"] {
   return ["small", "medium", "large"].includes(value);
+}
+
+function isZikrFont(value: string): value is NonNullable<AppStateSnapshot["settings"]["zikrFont"]> {
+  return ["humanist", "clear", "naskh"].includes(value);
 }
 
 function isWeeklyGoalDays(value: unknown): value is number {
@@ -659,6 +664,8 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           : DEFAULT_APP_STATE.settings.showTranslation,
       textSize:
         settings?.textSize && isTextSize(settings.textSize) ? settings.textSize : DEFAULT_APP_STATE.settings.textSize,
+      zikrFont:
+        settings?.zikrFont && isZikrFont(settings.zikrFont) ? settings.zikrFont : DEFAULT_APP_STATE.settings.zikrFont,
       highContrast:
         typeof settings?.highContrast === "boolean" ? settings.highContrast : DEFAULT_APP_STATE.settings.highContrast,
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
@@ -953,6 +960,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         incoming.settings?.textSize && isTextSize(incoming.settings.textSize)
           ? incoming.settings.textSize
           : safeBase.settings.textSize,
+      zikrFont:
+        incoming.settings?.zikrFont && isZikrFont(incoming.settings.zikrFont)
+          ? incoming.settings.zikrFont
+          : safeBase.settings.zikrFont,
       highContrast:
         typeof incoming.settings?.highContrast === "boolean"
           ? incoming.settings.highContrast

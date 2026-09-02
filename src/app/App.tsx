@@ -12,6 +12,7 @@ import type {
   ReminderSettings,
   RoutineMode,
   TextSizeOption,
+  ZikrFontOption,
   ThemeMode,
   PrayerName,
   MushafLayout,
@@ -232,6 +233,7 @@ function AppContent() {
   const [showTransliteration, setShowTransliteration] = useState(initialState.settings.showTransliteration);
   const [showTranslation, setShowTranslation] = useState(initialState.settings.showTranslation);
   const [textSize, setTextSize] = useState<TextSizeOption>(initialState.settings.textSize);
+  const [zikrFont, setZikrFont] = useState<ZikrFontOption>(initialState.settings.zikrFont ?? "humanist");
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
@@ -469,6 +471,7 @@ function AppContent() {
         showTransliteration,
         showTranslation,
         textSize,
+        zikrFont,
         highContrast,
         boldText,
         reduceMotion,
@@ -549,6 +552,7 @@ function AppContent() {
       showTranslation,
       showTransliteration,
       textSize,
+      zikrFont,
       themeMode,
       fridayProgress,
     ],
@@ -667,6 +671,7 @@ function AppContent() {
     setShowTransliteration(state.settings.showTransliteration);
     setShowTranslation(state.settings.showTranslation);
     setTextSize(state.settings.textSize);
+    setZikrFont(state.settings.zikrFont ?? "humanist");
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
@@ -827,13 +832,14 @@ function AppContent() {
       themeMode,
       language: selectedLang,
       textSize,
+      zikrFont,
       highContrast,
       boldText,
       reduceMotion,
       forceRtl,
       colorBlindSupport,
     });
-  }, [boldText, colorBlindSupport, forceRtl, themeMode, highContrast, reduceMotion, selectedLang, textSize]);
+  }, [boldText, colorBlindSupport, forceRtl, themeMode, highContrast, reduceMotion, selectedLang, textSize, zikrFont]);
 
   useEffect(() => {
     const saved = saveAppState(appStateSnapshot);
@@ -1437,6 +1443,8 @@ function AppContent() {
                 <SettingsScreen
                   themeMode={themeMode}
                   language={selectedLang}
+                  zikrFont={zikrFont}
+                  onZikrFontChange={setZikrFont}
                   isGuest={isGuest}
                   isSyncing={isSyncingRemote}
                   syncError={syncError}
