@@ -101,4 +101,37 @@ describe("the three surah readings", () => {
     // the one that never shows it.
     expect(screen.queryByText("Translation")).not.toBeNull();
   });
+
+  it("gives a short surah its identity, not just a Basmalah", () => {
+    // Al-Ikhlas rendered as a Basmalah line above a paragraph of Arabic:
+    // indistinguishable from a dua, when it is Qur'an. QuranSurahHeader was
+    // built for exactly this and was imported nowhere.
+    renderReader("before_sleep", indexOf("before_sleep", "s-hm-99-ikhlas"));
+    expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();
+    expect(document.querySelector(".quran-passage")).not.toBeNull();
+  });
+
+  it("does not frame a surah that opens in the Mushaf instead", () => {
+    // As-Sajdah is multi-page and has the real page frame there; a second rule
+    // around the reader's copy would be two different frames for one surah.
+    renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
+    expect(document.querySelector(".quran-passage")).toBeNull();
+  });
+
+  it("offers a phrase to press when the count can only ever be one", () => {
+    renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
+    const counter = screen.getByTestId("counter-surface");
+    // "٠ / ١" is a completion button drawn as a score, in the tallest control
+    // on screen, on exactly the readings that need the room for their text.
+    expect(counter).toHaveAttribute("data-counter-variant", "action");
+    expect(counter.textContent).not.toMatch(/[٠-٩]\s*\/\s*[٠-٩]/);
+  });
+
+  it("keeps the tally where the count is real", () => {
+    const list = getAzkarByCategory("before_sleep");
+    const repeated = list.findIndex((zikr) => (zikr.repetitionCount ?? 1) > 1);
+    expect(repeated).toBeGreaterThanOrEqual(0);
+    renderReader("before_sleep", repeated);
+    expect(screen.getByTestId("counter-surface")).toHaveAttribute("data-counter-variant", "tally");
+  });
 });

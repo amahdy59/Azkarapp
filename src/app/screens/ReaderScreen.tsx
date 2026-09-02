@@ -38,7 +38,7 @@ import { prepareZikrShareCardFonts, shareZikrCard, type ZikrShareCardStatus } fr
 import { CountingRipples, useCountingSurface } from "../components/countingSurface";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
-import { QuranPrelude } from "../components/QuranChrome";
+import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
 import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
@@ -188,6 +188,8 @@ export function ReaderScreen({
   }`;
   const reducedMotion = shouldReduceMotion(reduceMotion);
   const longSurah = isLongSurah(z);
+  /** A surah short enough to be read here rather than in the Mushaf view. */
+  const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
@@ -499,28 +501,36 @@ export function ReaderScreen({
     <article
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
-      {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
+      {/* A short surah gets its identity back: which surah, where it was
+          revealed, how many ayat — and the Mushaf's rule around the passage, so
+          it stops reading as a paragraph of dua. Long surahs are excluded
+          because they open the Mushaf view, which has the real page frame. */}
+      {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
 
-      {wordMeanings.length > 0 ? (
-        <QuranWordText
-          text={displayArabicText}
-          meanings={wordMeanings}
-          language={language}
-          style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-          onSelectMeanings={setWordMeaningSelection}
-          activeWordId={activeWordId}
-        />
-      ) : (
-        <p
-          className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
-          data-testid="zikr-text"
-          dir="rtl"
-          lang="ar"
-          style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
-        >
-          {displayArabicText}
-        </p>
-      )}
+      <div className={showSurahChrome ? "quran-passage w-full" : "contents"}>
+        {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
+
+        {wordMeanings.length > 0 ? (
+          <QuranWordText
+            text={displayArabicText}
+            meanings={wordMeanings}
+            language={language}
+            style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+            onSelectMeanings={setWordMeaningSelection}
+            activeWordId={activeWordId}
+          />
+        ) : (
+          <p
+            className="zikr-text pointer-events-none text-center font-medium leading-[2.1] text-foreground"
+            data-testid="zikr-text"
+            dir="rtl"
+            lang="ar"
+            style={{ fontFamily: readingFontFamily, fontSize: readingFontSize }}
+          >
+            {displayArabicText}
+          </p>
+        )}
+      </div>
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
@@ -628,7 +638,9 @@ export function ReaderScreen({
         </div>
         <div className="md:hidden">{renderNavigationButton("next")}</div>
       </div>
-      <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{counterInstruction}</p>
+      {z.repetitionCount !== 1 && (
+        <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{counterInstruction}</p>
+      )}
     </div>
   );
 
@@ -654,7 +666,9 @@ export function ReaderScreen({
   const renderCounterStack = () => (
     <div data-testid="reader-counter-stack">
       {renderCounterPanel()}
-      {renderKeyboardShortcutsHint()}
+      {/* A phone has no keys to show shortcuts for, and the row cost every
+          reader 35px of the screen to serve the ones holding a keyboard. */}
+      <div className="hidden md:block">{renderKeyboardShortcutsHint()}</div>
     </div>
   );
 

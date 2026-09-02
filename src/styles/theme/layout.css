@@ -391,6 +391,39 @@
 
 /* Both rules take the page's own ink through `currentColor`, so a change of
    Mushaf theme carries them with it and no rule needs a colour of its own. */
+/* A short surah read inside the azkar reader — Al-Ikhlas, Al-Falaq, An-Nas,
+   Al-Kafirun. They were a Basmalah line above a paragraph of Arabic with inline
+   ayah markers: indistinguishable from a dua, when they are Qur'an. This is the
+   Mushaf's two-stroke rule at passage scale, drawn with pseudo-elements so the
+   reading text keeps its own markup.
+   Multi-page surahs do not use this — they open the Mushaf view, which has the
+   real page frame. */
+.quran-passage {
+  position: relative;
+  padding: clamp(1rem, 4vw, 1.75rem) clamp(0.9rem, 3.5vw, 1.5rem);
+}
+
+.quran-passage::before,
+.quran-passage::after {
+  content: "";
+  position: absolute;
+  border: 1.5px solid var(--mushaf-rule-ink);
+  border-radius: 0.75rem;
+  opacity: 0.42;
+  pointer-events: none;
+}
+
+.quran-passage::after {
+  inset: clamp(3px, 0.9vw, 7px);
+  border-width: 1px;
+  border-radius: 0.55rem;
+  opacity: 0.26;
+}
+
+.quran-passage::before {
+  inset: 0;
+}
+
 .mushaf-page-rule {
   position: absolute;
   inset: 0;
