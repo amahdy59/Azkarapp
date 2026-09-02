@@ -118,4 +118,23 @@ describe("counting surface", () => {
     // `animationend` never fired its nodes were never released.
     expect(ripple.style.animation).toBe("");
   });
+
+  it("presses a compact control deep enough to be seen at all", () => {
+    const tokens = readFileSync("src/styles/theme/tokens.css", "utf8");
+    const base = Number(tokens.match(/--motion-scale-pressed:\s*([\d.]+)/)![1]);
+    const compact = Number(tokens.match(/--motion-scale-pressed-compact:\s*([\d.]+)/)![1]);
+    // 0.97 moves a 44px icon button 0.66px per edge — sub-pixel on a 1x
+    // display, which is not a faint press but no press. A constant scale is not
+    // a constant feel.
+    expect(compact).toBeLessThan(base);
+    expect((44 * (1 - compact)) / 2).toBeGreaterThan(1.5);
+
+    const surfaces = readFileSync("src/styles/theme/surfaces.css", "utf8");
+    // It has to out-specify the global press rule, which is !important. The
+    // obvious home for it, `.ui-icon-button` in tailwind-bridge.css, sits inside
+    // `@layer components`, where layered-vs-unlayered !important inverts the
+    // usual order — so it lives here, beside the rule it refines.
+    expect(surfaces).toContain("button.ui-icon-button:not(:disabled):not(.no-press):active");
+    expect(surfaces).toContain("scale(var(--motion-scale-pressed-compact)) !important");
+  });
 });

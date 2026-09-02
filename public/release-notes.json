@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-02a",
+  "release": "2026-09-02b",
   "ar": [
-    "صار بإمكانك اختيار خط الذكر من الإعدادات: إنساني أو واضح أو نسخ، ويظهر كل خط بنفسه قبل أن تختاره. الخطوط الثلاثة موجودة في التطبيق أصلاً فلا تحميل إضافي.",
-    "كل حقل إدخال صار له عنوان ظاهر فوقه، بما فيها البريد والاسم وحقول البحث، فلا يختفي اسم الحقل بمجرد أن تكتب فيه.",
-    "الصفحة صارت تتبع إصبعك أثناء التنقل بين الأذكار ثم تستقر، بعد أن كانت لا تتحرك حتى ترفع يدك.",
-    "الضغط على الذكر في الهاتف صار محسوسًا؛ كان أثر الضغط مفقودًا في شاشة القراءة على الهواتف وحدها."
+    "ترجمة السور صارت تظهر عند تفعيل الترجمة: الكهف والسجدة والملك والسور القصيرة. كانت الترجمة موجودة كاملة لكنها مخفية، بينما يظهر النطق بالإنجليزية تحتها.",
+    "الأزرار الصغيرة صار الضغط عليها محسوسًا؛ كان مقدار انكماشها أقل من نقطة واحدة على الشاشة، أي غير مرئي عمليًا.",
+    "تحسينات داخلية على مزامنة تقدّم يوم الجمعة بين الأجهزة."
   ],
   "en": [
-    "You can now choose the zikr font in Settings — Humanist, Clear, or Naskh — and each one is shown in its own face before you pick it. All three already ship with the app, so nothing extra is downloaded.",
-    "Every input now has a visible title above it, including email, name, and the search fields, so the field's name no longer disappears the moment you type.",
-    "The page follows your finger as you move between azkar and then settles, instead of staying still until you lift your thumb.",
-    "Tapping a zikr on a phone now presses; that feedback was missing in the reader on phones only."
+    "Surah translations now appear when you turn on Show translation — Al-Kahf, As-Sajdah, Al-Mulk and the short surahs. The translations were complete all along but hidden, while the English pronunciation showed underneath them.",
+    "Small icon buttons now visibly press. Their travel was under one screen pixel, which meant no press at all rather than a subtle one.",
+    "Internal hardening for how Friday progress merges between your devices."
   ]
 }

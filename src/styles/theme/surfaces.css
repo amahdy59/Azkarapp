@@ -340,6 +340,19 @@ a[href]:not(.no-press):active,
   opacity: 0.88;
 }
 
+/* Compact controls press deeper, so that they press at all.
+   A constant scale is not a constant feel: 0.97 moves the 220px counter 6.6px
+   but a 44px icon button 1.32px — 0.66px per edge, sub-pixel on a 1x display.
+   That is not a faint press, it is none. This sits here rather than beside
+   `.ui-icon-button` in tailwind-bridge.css because that file is inside
+   `@layer components`, and layered vs unlayered `!important` inverts the usual
+   cascade order — too subtle a thing to rest a visible behaviour on. Same file,
+   same layer, one more specificity point than the rule above. */
+button.ui-icon-button:not(:disabled):not(.no-press):active,
+.ui-icon-button[role="button"]:not([aria-disabled="true"]):not(.no-press):active {
+  transform: scale(var(--motion-scale-pressed-compact)) !important;
+}
+
 /* Elastic Overscroll & Container Boundaries */
 .scroll-container,
 [data-radix-scroll-area-viewport] {

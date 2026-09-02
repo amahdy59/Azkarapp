@@ -2007,3 +2007,49 @@ Record user-approved product, design and architectural decisions here. Do not er
   back clears it; no consumer still names `--font-reading-arabic` except the
   default itself; an unknown stored value falls back; the choice survives
   `normalizeAppState` and an account merge.
+
+## DEC-123 — a surah's meaning is shown, like every other zikr's
+
+- **Decision:** the reader's translation section renders whenever the reader has
+  asked for it, with no exception for surahs.
+- **What was wrong:** the condition was `showTranslation && !z.surahNameArabic`,
+  so Al-Kahf, As-Sajdah, Al-Mulk and the short surahs never showed a translation
+  — while the _transliteration_ of the same verses rendered immediately below
+  it. A non-Arabic reader who turned both preferences on got the pronunciation
+  of a surah and never its meaning. The translations were present, complete and
+  already in the bundle: 18,336 characters for Al-Kahf, 3,996 for As-Sajdah,
+  3,601 for Al-Mulk.
+- **Why it is safe to remove:** the guard arrived in an unrelated commit
+  (garden-view work), no decision records it, and DEC-108 states the opposite —
+  that translation and transliteration belong in the reader under the reading
+  preferences, which is why they were removed from the reference sheet.
+- **On length:** each translation runs about 1.2x its Arabic, so the section is
+  proportionate to what is already on screen rather than a wall of text, and the
+  transliteration of the same length was already rendering without complaint.
+- **A correction to the investigation:** a first pass audited `azkar.ts`
+  statically and reported these translations as one-line stubs ending in "...".
+  That was wrong — `applyContentReview` replaces them at runtime with the full
+  text. The source draft is not what ships, and the finding only became sound
+  once the runtime objects were measured.
+- **Tests/evidence required:** with both preferences on, a sleep surah and
+  Al-Kahf each render both the translation and the pronunciation section.
+
+## DEC-124 — a constant press scale is not a constant press
+
+- **Decision:** compact controls press to `--motion-scale-pressed-compact`
+  (0.92) rather than the app-wide 0.97.
+- **Why:** 0.97 moves the 220px counter 6.6px and a 44px icon button 1.32px —
+  0.66px per edge, which is sub-pixel on a 1x display. That is not a faint press
+  but no press at all, on the smallest and most numerous controls in the app.
+  0.92 lands a 44px button near 3.5px of travel: visible, and not cartoonish on
+  a small circle. Uniformity means uniform perceived movement, not one number.
+- **Where the rule lives, and why not beside the component:** the obvious home
+  is `.ui-icon-button` in `tailwind-bridge.css`, but that file is inside
+  `@layer components`, and for `!important` declarations layered styles beat
+  unlayered ones — the reverse of the normal order. Resting a visible behaviour
+  on that inversion is a trap for the next reader. The override sits beside the
+  global press rule in `surfaces.css`, same file and same layer, carrying one
+  more specificity point.
+- **Tests/evidence required:** the compact scale is deeper than the base, a 44px
+  control clears 1.5px of travel per edge, and the override keeps the selector
+  that out-specifies the global rule.

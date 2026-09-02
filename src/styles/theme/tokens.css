@@ -32,6 +32,13 @@
      0.98 or 0.99 beside this, and every one of them was dead code: the global
      press rule in surfaces.css carries !important and won regardless. */
   --motion-scale-pressed: 0.97;
+  /* A constant scale is not a constant feel. 0.97 moves a 220px counter 6.6px
+     but a 44px icon button only 1.32px — 0.66px per edge, which is sub-pixel on
+     a 1x display and so is not a faint press but no press at all. Compact
+     controls take a deeper scale to land near 3.5px of travel, which is visible
+     without looking cartoonish on a small circle. Uniformity here means uniform
+     perceived movement, not a uniform number. */
+  --motion-scale-pressed-compact: 0.92;
   --font-size: 16px;
   --font-ui-latin: "Noto Sans Arabic Variable", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-ui-arabic:
