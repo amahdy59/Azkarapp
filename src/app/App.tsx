@@ -1414,6 +1414,24 @@ function AppContent() {
                   onToggleSaved={toggleSavedZikr}
                   audioAvailable={activeZikrHasAudio}
                   mushafTextScale={mushafTextScale}
+                  mushafBookmarks={mushafBookmarks}
+                  mushafSettings={{
+                    theme: mushafTheme,
+                    appTheme: themeMode,
+                    onSelectTheme: setMushafTheme,
+                    layout: mushafLayout,
+                    onSelectLayout: setMushafLayout,
+                    onSelectTextScale: setMushafTextScale,
+                    toolbarSide: mushafToolbarSide,
+                    onSelectToolbarSide: setMushafToolbarSide,
+                  }}
+                  onToggleMushafBookmark={(page) =>
+                    setMushafBookmarks((previous) =>
+                      previous.includes(page)
+                        ? previous.filter((p) => p !== page)
+                        : [...previous, page].sort((a, b) => a - b),
+                    )
+                  }
                   onPlayAudio={
                     activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
                   }

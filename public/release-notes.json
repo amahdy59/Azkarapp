@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-02e",
+  "release": "2026-09-02f",
   "ar": [
-    "درجات الأحاديث وفوائدها ومصادرها صارت بالعربية في التطبيق كله، بعد أن كانت بالإنجليزية وحدها رغم أن التطبيق عربي أولاً.",
-    "بطاقة حديث اليوم صارت عربية بالكامل: الحديث ودرجته وفائدته ومصدره.",
-    "أرقام المصادر تُعرض بالأرقام العربية، وأسماء الكتب بأسمائها المعروفة: صحيح البخاري، سنن أبي داود، حصن المسلم."
+    "سور الكهف والسجدة والملك صارت تُفتح في وضع المصحف مباشرة، بشريط أدوات المصحف نفسه: الفهرس والعلامة والمعاني والتركيز وملء الشاشة والإعدادات.",
+    "تُعرض صفحتان متقابلتان على الشاشات العريضة، مع اسم السورة والجزء ورقم الصفحة، دون أن يتجاوز ذلك صفحات السورة نفسها.",
+    "وضع المصحف صار جزءاً من شاشة القراءة لا نافذة فوقها، فإذا خرجت منه ثم عدت وجدت الصفحة التي كنت عندها.",
+    "إعدادات القراءة صارت واحدة بين المصحف وقراءة السور، والفهرس محصور بصفحات السورة التي تقرؤها."
   ],
   "en": [
-    "Hadith gradings, benefits and sources now appear in Arabic throughout the app; they had existed only in English despite the app being Arabic-first.",
-    "The narration of the day card is now fully Arabic — the hadith, its grading, its benefit and its source.",
-    "Citations show Arabic-Indic numerals and the collections' Arabic names: صحيح البخاري, سنن أبي داود, حصن المسلم."
+    "Al-Kahf, As-Sajdah and Al-Mulk now open in Mushaf view with the Mushaf's own toolbar — index, bookmark, word meanings, focus, full screen and settings.",
+    "Wide screens show two facing pages with the surah name, juz and page number, without ever reaching past the surah you are reading.",
+    "Mushaf view is now part of the reading screen rather than a window over it, so stepping out and back returns you to the page you were on.",
+    "Reading settings are shared with the Mushaf, and the index is limited to the pages of the surah you are in."
   ]
 }

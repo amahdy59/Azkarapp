@@ -62,6 +62,22 @@ async function openFirstMorningZikr(page: Page) {
   await page.getByRole("button", { name: "Start Session", exact: true }).click();
 }
 
+/**
+ * Al-Kahf now opens in the Mushaf view, which covers the reader.
+ *
+ * This covers the reader's own counter and word help, so it steps back to it.
+ * The control differs by width: the rail carries it on a landscape screen and
+ * the header bar on a narrow one.
+ */
+async function leaveMushaf(page: Page) {
+  const mushaf = page.getByTestId("mushaf-immersive");
+  if ((await mushaf.count()) === 0) return;
+  const railBack = page.getByTestId("mushaf-rail-back");
+  if ((await railBack.count()) > 0) await railBack.click();
+  else await page.getByTestId("mushaf-immersive-close").click();
+  await expect(mushaf).toHaveCount(0);
+}
+
 async function openFridayKahf(page: Page) {
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
@@ -338,6 +354,7 @@ test("the full reader canvas counts taps while controls and the reference sheet 
 
 test("full surahs count only from the counter and expose sourced difficult-word help", async ({ page }) => {
   await openFridayKahf(page);
+  await leaveMushaf(page);
 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
@@ -742,6 +759,7 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {
   await openFridayKahf(page);
+  await leaveMushaf(page);
 
   const paragraph = page.getByTestId("zikr-text").first();
   await expect(paragraph).toBeVisible();

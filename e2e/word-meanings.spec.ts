@@ -21,6 +21,23 @@ async function openKahf(page: Page) {
   });
   await page.goto("/#/azkar/friday-kahf/1");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
+  await leaveMushaf(page);
+}
+
+/**
+ * Al-Kahf now opens in the Mushaf view, which covers the reader.
+ *
+ * These cover the reader's own word-meaning surface, so they step back to it.
+ * The control differs by width: the rail carries it on a landscape screen and
+ * the header bar on a narrow one.
+ */
+async function leaveMushaf(page: Page) {
+  const mushaf = page.getByTestId("mushaf-immersive");
+  if ((await mushaf.count()) === 0) return;
+  const railBack = page.getByTestId("mushaf-rail-back");
+  if ((await railBack.count()) > 0) await railBack.click();
+  else await page.getByTestId("mushaf-immersive-close").click();
+  await expect(mushaf).toHaveCount(0);
 }
 
 test.describe("Quran word meanings", () => {

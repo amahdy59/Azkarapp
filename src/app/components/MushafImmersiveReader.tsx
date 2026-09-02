@@ -1,11 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
+import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
+import { MushafToolRail, MUSHAF_RAIL_WIDTH } from "./MushafToolRail";
+import { MushafNavigationModal } from "./MushafNavigationModal";
+import { MushafSettingsSheet } from "./MushafSettingsSheet";
 import { t } from "../i18n";
-import type { AppLanguage, MushafPageTheme, MushafTextScale, Zikr } from "../types";
+import type {
+  AppLanguage,
+  MushafLayout,
+  MushafPageTheme,
+  MushafTextScale,
+  MushafTheme,
+  MushafToolbarSide,
+  ThemeMode,
+  Zikr,
+} from "../types";
 import {
   getCachedMushafPage,
   isQcfFontReady,
@@ -67,18 +79,43 @@ async function resolveMushafPage(page: number, waitForMeanings: boolean): Promis
   return { page, data, qcf };
 }
 
+/**
+ * The Mushaf-wide reading preferences, handed in so the surah view changes the
+ * same settings the Mushaf does rather than keeping a second set of its own.
+ */
+export interface MushafSurahSettings {
+  theme: MushafTheme;
+  appTheme: ThemeMode;
+  onSelectTheme: (theme: MushafTheme) => void;
+  layout: MushafLayout;
+  onSelectLayout: (layout: MushafLayout) => void;
+  onSelectTextScale: (scale: MushafTextScale) => void;
+  toolbarSide: MushafToolbarSide;
+  onSelectToolbarSide: (side: MushafToolbarSide) => void;
+}
+
 export function MushafImmersiveReader({
   zikr,
+  pageTuple,
+  setPageTuple,
   language,
   direction,
   title,
   theme = "midnight",
   reducedMotion = false,
   textScale = "medium",
+  bookmarkedPages = [],
+  onTogglePageBookmark,
+  mushafSettings,
   onClose,
   onComplete,
 }: {
   zikr: Zikr;
+  /** The page position, held above so it survives closing this view. */
+  pageTuple: readonly [number, number];
+  setPageTuple: (
+    next: readonly [number, number] | ((prev: readonly [number, number]) => readonly [number, number]),
+  ) => void;
   arabicText?: string;
   meanings?: readonly QuranWordMeaning[];
   language: AppLanguage;
@@ -88,6 +125,11 @@ export function MushafImmersiveReader({
   reducedMotion?: boolean;
   /** The Mushaf reading size, so this view matches the Mushaf proper. */
   textScale?: MushafTextScale;
+  /** Pages the reader has marked, so the rail can show and toggle the state. */
+  bookmarkedPages?: readonly number[];
+  onTogglePageBookmark?: (page: number) => void;
+  /** The Mushaf-wide reading preferences, so this view can change them too. */
+  mushafSettings?: MushafSurahSettings;
   textStyle?: CSSProperties;
   onSelectMeanings?: (selection: WordMeaningSelection) => void;
   activeWordId?: string | null;
@@ -101,8 +143,20 @@ export function MushafImmersiveReader({
     return [1];
   }, [zikr.mushafPages]);
 
-  const [[pageIndex, slideDir], setPageTuple] = useState([0, 1]);
+  /**
+   * Where the reader is in the surah, owned by the screen above.
+   *
+   * It used to live here, and this view is mounted only while it is open — so
+   * closing it on page four of Al-Kahf and opening it again put the reader back
+   * on page one. Position is the thing a reader would notice losing, so it
+   * belongs to something that outlives the view.
+   */
+  const [pageIndex, slideDir] = pageTuple;
   const [showWordMeanings, setShowWordMeanings] = useState(false);
+  const [isFocusMode, setIsFocusMode] = useState(false);
+  const [isIndexOpen, setIsIndexOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
@@ -111,6 +165,25 @@ export function MushafImmersiveReader({
 
   const currentPage = pageNumbers[pageIndex] ?? pageNumbers[0]!;
   const pageCount = pageNumbers.length;
+
+  const shell = useMushafShell();
+
+  /**
+   * The facing page, when there is room and when it belongs to this surah.
+   *
+   * A Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4). The
+   * surah is the difference from the Khatmah reader: a spread may not reach
+   * past the span being read, so the pair is dropped rather than showing a page
+   * from the surah after this one.
+   */
+  const facingNumber = useMemo(() => {
+    if (!shell.spreadRoom) return null;
+    const right = spreadStart(currentPage);
+    const candidate = currentPage === right ? right + 1 : right;
+    return pageNumbers.includes(candidate) ? candidate : null;
+  }, [currentPage, pageNumbers, shell.spreadRoom]);
+
+  const [facing, setFacing] = useState<ResolvedPage | null>(null);
 
   const [resolved, setResolved] = useState<ResolvedPage | null>(() => {
     const cached = getCachedMushafPage(currentPage);
@@ -127,10 +200,15 @@ export function MushafImmersiveReader({
     let active = true;
     void (async () => {
       try {
-        const next = await resolveMushafPage(currentPage, showWordMeanings);
-        if (active && next) {
-          setResolved(next);
-        }
+        // Both halves settle together, so a spread never shows one page of a
+        // pair while the other is still resolving.
+        const [next, other] = await Promise.all([
+          resolveMushafPage(currentPage, showWordMeanings),
+          facingNumber === null ? Promise.resolve(null) : resolveMushafPage(facingNumber, showWordMeanings),
+        ]);
+        if (!active) return;
+        if (next) setResolved(next);
+        setFacing(other);
       } catch (err) {
         reportError(err, "mushaf-immersive-load");
       }
@@ -139,7 +217,7 @@ export function MushafImmersiveReader({
     return () => {
       active = false;
     };
-  }, [currentPage, showWordMeanings]);
+  }, [currentPage, facingNumber, showWordMeanings]);
 
   // Aggressive prefetching of adjacent pages
   useEffect(() => {
@@ -154,11 +232,14 @@ export function MushafImmersiveReader({
   const paginate = useCallback(
     (delta: number) => {
       setPageTuple((prev) => {
-        const nextIndex = Math.max(0, Math.min(pageCount - 1, prev[0] + delta));
+        // A spread shows two leaves, so a turn moves by two: stepping one would
+        // re-show the page the reader just finished, on the other half.
+        const step = facingNumber === null ? delta : delta * 2;
+        const nextIndex = Math.max(0, Math.min(pageCount - 1, prev[0] + step));
         return nextIndex !== prev[0] ? [nextIndex, delta] : prev;
       });
     },
-    [pageCount],
+    [facingNumber, pageCount, setPageTuple],
   );
 
   // Keyboard navigation: physical direction (ArrowLeft = next page, ArrowRight = previous).
@@ -167,7 +248,17 @@ export function MushafImmersiveReader({
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeAyah) return;
       const target = e.target as HTMLElement | null;
-      if (target?.closest("button, input, textarea, select, [contenteditable='true']")) return;
+      // Text entry and composite widgets own the arrow keys; a plain button
+      // does not. Excluding buttons made the page keys dead from the moment
+      // this view opened, because it now autofocuses a control on the rail.
+      // The Mushaf's own guard has always been this one.
+      if (target?.closest("input, textarea, select, [contenteditable='true'], [role='menu'], [role='listbox']")) return;
+      if (e.key === "Escape") {
+        // Radix owned this while it was a dialog.
+        e.preventDefault();
+        onClose();
+        return;
+      }
       if (e.key === "ArrowLeft" || e.key === "PageDown") {
         e.preventDefault();
         paginate(1);
@@ -178,7 +269,7 @@ export function MushafImmersiveReader({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, paginate]);
+  }, [activeAyah, onClose, paginate]);
 
   /**
    * One gesture, shared with the reader.
@@ -208,6 +299,23 @@ export function MushafImmersiveReader({
         reportError(error, "mushaf-immersive-ayah-text");
         if (ayahRequestId.current === requestId) setActiveAyah(null);
       });
+  }, []);
+
+  const toggleFullscreen = useCallback(() => {
+    if (document.fullscreenElement) {
+      void document.exitFullscreen?.().catch((reason) => reportError(reason, "surah-exit-fullscreen"));
+      return;
+    }
+    void document.documentElement.requestFullscreen?.().catch((reason) => reportError(reason, "surah-fullscreen"));
+  }, []);
+
+  useEffect(() => {
+    // The browser owns this state — Escape and the F11 key both change it
+    // without going through the button.
+    const sync = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    sync();
+    document.addEventListener("fullscreenchange", sync);
+    return () => document.removeEventListener("fullscreenchange", sync);
   }, []);
 
   const lines = useMemo(() => toMushafLines(pageData), [pageData]);
@@ -266,6 +374,43 @@ export function MushafImmersiveReader({
         </button>
       </div>
     </header>
+  );
+
+  /**
+   * The Mushaf's own toolbar, standing beside the paper.
+   *
+   * The same component the Khatmah reader uses, so the buttons, their order and
+   * their behaviour are the Mushaf's rather than this view's own invention. The
+   * difference is the span: previous and next stop at the ends of the surah
+   * rather than at the ends of the Mushaf, and the page shown as "last" is the
+   * surah's last, not 604.
+   */
+  const toolRail = (
+    <MushafToolRail
+      language={language}
+      direction={direction}
+      side="right"
+      compact={shell.railCompact}
+      surahName={surahName}
+      juzNumber={juzNumber}
+      pageNumber={displayPage}
+      lastPage={pageNumbers[pageNumbers.length - 1] ?? displayPage}
+      atFirstPage={atStart}
+      atLastPage={atEnd}
+      showWordMeanings={showWordMeanings}
+      isLoadingWordMeanings={false}
+      isPageBookmarked={bookmarkedPages.includes(displayPage)}
+      isFullscreen={isFullscreen}
+      onBack={onClose}
+      onOpenIndex={() => setIsIndexOpen(true)}
+      onPrevious={() => paginate(-1)}
+      onNext={() => paginate(1)}
+      onToggleWordMeanings={() => setShowWordMeanings((value) => !value)}
+      onTogglePageBookmark={() => onTogglePageBookmark?.(displayPage)}
+      onToggleFullscreen={toggleFullscreen}
+      onEnterFocusMode={() => setIsFocusMode(true)}
+      onOpenSettings={() => setIsSettingsOpen(true)}
+    />
   );
 
   const pageFooter = (
@@ -339,90 +484,146 @@ export function MushafImmersiveReader({
   );
 
   return (
-    <Dialog.Root open onOpenChange={(open) => !open && onClose()}>
-      <Dialog.Portal>
-        <Dialog.Content
-          data-testid="mushaf-immersive"
-          dir={direction}
-          aria-describedby={undefined}
-          className="fixed inset-0 z-50 flex flex-col bg-background text-foreground outline-none select-none"
-        >
-          <Dialog.Title className="sr-only">{t(language, "reader.immersiveTitle")}</Dialog.Title>
-          <div
-            data-testid="mushaf-immersive-track"
-            className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-            {...pointerProps}
-            style={{ touchAction: "pan-y" }}
-          >
-            <div className="relative h-full w-full">
-              <AnimatePresence initial={false} custom={slideDir} mode="popLayout">
-                <motion.div
-                  key={displayPage}
-                  custom={slideDir}
-                  variants={{
-                    enter: (dir: number) =>
-                      reducedMotion
-                        ? { opacity: 0 }
-                        : {
-                            opacity: 0,
-                            x: dir > 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
-                          },
-                    center: { opacity: 1, x: 0 },
-                    exit: (dir: number) =>
-                      reducedMotion
-                        ? { opacity: 0 }
-                        : {
-                            opacity: 0,
-                            x: dir < 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
-                          },
-                  }}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                  className="absolute inset-0"
-                >
-                  {/* Its own layer: the turn animates the element above and the
+    /**
+     * A mode of the reader, not a dialog over it.
+     *
+     * This was a modal covering the screen, which is why it had a header and a
+     * footer of its own duplicating the reader's, why leaving it read as a
+     * dismissal rather than a switch, and why its state died with it. It is now
+     * the reader's body while the surah is being read as pages, so there is one
+     * screen with two ways of rendering what is on it.
+     */
+    <section
+      data-testid="mushaf-immersive"
+      dir={direction}
+      aria-label={t(language, "reader.immersiveTitle")}
+      className="flex min-h-0 flex-1 flex-col bg-background text-foreground outline-none select-none"
+    >
+      <div
+        data-testid="mushaf-immersive-track"
+        className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
+        {...pointerProps}
+        style={{ touchAction: "pan-y" }}
+      >
+        <div className="relative h-full w-full">
+          <AnimatePresence initial={false} custom={slideDir} mode="popLayout">
+            <motion.div
+              key={displayPage}
+              custom={slideDir}
+              variants={{
+                enter: (dir: number) =>
+                  reducedMotion
+                    ? { opacity: 0 }
+                    : {
+                        opacity: 0,
+                        x: dir > 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
+                      },
+                center: { opacity: 1, x: 0 },
+                exit: (dir: number) =>
+                  reducedMotion
+                    ? { opacity: 0 }
+                    : {
+                        opacity: 0,
+                        x: dir < 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
+                      },
+              }}
+              initial="enter"
+              animate="center"
+              exit="exit"
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              className="absolute inset-0"
+            >
+              {/* Its own layer: the turn animates the element above and the
                       drag this one, so neither overwrites the other's transform. */}
-                  <div style={dragStyle} className="h-full w-full">
-                    <MushafPageViewer
-                      lines={lines}
-                      language={language}
-                      pageNumber={displayPage}
-                      surahName={surahName}
-                      juzNumber={juzNumber}
-                      direction={direction}
-                      theme={theme}
-                      useQcfGlyphs={useQcfGlyphs}
-                      showWordMeanings={showWordMeanings}
-                      headerContent={pageHeader}
-                      footerContent={pageFooter}
-                      progressBar={progressBar}
-                      paperRef={paperRef}
-                      reduceMotion={reducedMotion}
-                      textScale={textScale}
-                      onAyahAction={handleAyahAction}
-                    />
-                  </div>
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </div>
+              <div style={dragStyle} className="h-full w-full">
+                <MushafPageViewer
+                  lines={lines}
+                  language={language}
+                  pageNumber={displayPage}
+                  surahName={surahName}
+                  juzNumber={juzNumber}
+                  direction={direction}
+                  theme={theme}
+                  useQcfGlyphs={useQcfGlyphs}
+                  showWordMeanings={showWordMeanings}
+                  {...(shell.rail && !isFocusMode
+                    ? { railContent: toolRail, railSide: "right" as const }
+                    : {
+                        headerContent: isFocusMode ? undefined : pageHeader,
+                        footerContent: isFocusMode ? undefined : pageFooter,
+                      })}
+                  progressBar={progressBar}
+                  paperRef={paperRef}
+                  reduceMotion={reducedMotion}
+                  textScale={textScale}
+                  facingPage={
+                    facing && facingNumber !== null
+                      ? { pageNumber: facing.page, lines: toMushafLines(facing.data), useQcfGlyphs: facing.qcf }
+                      : undefined
+                  }
+                  onAyahAction={handleAyahAction}
+                />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </div>
 
-          <AyahInteractionSheet
-            isOpen={activeAyah !== null}
-            onClose={() => {
-              ayahRequestId.current += 1;
-              setActiveAyah(null);
-            }}
-            verseKey={activeAyah?.verseKey ?? null}
-            text={activeAyah?.text ?? null}
-            language={language}
-            isBookmarked={false}
-            onBookmark={() => undefined}
-          />
-        </Dialog.Content>
-      </Dialog.Portal>
-    </Dialog.Root>
+      <MushafNavigationModal
+        isOpen={isIndexOpen}
+        onClose={() => setIsIndexOpen(false)}
+        currentPage={displayPage}
+        onSelectPage={(page) => {
+          const index = pageNumbers.indexOf(page);
+          if (index >= 0) setPageTuple([index, index >= pageIndex ? 1 : -1]);
+          setIsIndexOpen(false);
+        }}
+        language={language}
+        direction={direction}
+        bookmarks={[...bookmarkedPages]}
+        initialTab="jump"
+        // The span is the whole difference from the Mushaf's own index.
+        pageRange={{ first: pageNumbers[0]!, last: pageNumbers[pageNumbers.length - 1]! }}
+      />
+
+      {mushafSettings && (
+        <MushafSettingsSheet
+          open={isSettingsOpen}
+          onClose={() => setIsSettingsOpen(false)}
+          language={language}
+          direction={direction}
+          theme={mushafSettings.theme}
+          appTheme={mushafSettings.appTheme}
+          onSelectTheme={mushafSettings.onSelectTheme}
+          mushafLayout={mushafSettings.layout}
+          onSelectLayout={mushafSettings.onSelectLayout}
+          autoSpreadRoom={shell.spreadRoom}
+          textScale={textScale}
+          onSelectTextScale={mushafSettings.onSelectTextScale}
+          textScaleApplies={shell.pageAspect >= PAPER_ASPECT}
+          toolbarSide={mushafSettings.toolbarSide}
+          onSelectToolbarSide={mushafSettings.onSelectToolbarSide}
+          showToolbarSide={shell.rail}
+          showKeyboardHelp={shell.rail}
+          presentation={shell.rail ? "side-panel" : "sheet"}
+          panelInset={shell.rail ? (shell.railCompact ? MUSHAF_RAIL_WIDTH.compact : MUSHAF_RAIL_WIDTH.regular) : 0}
+          pageNumber={displayPage}
+          surahName={surahName}
+        />
+      )}
+
+      <AyahInteractionSheet
+        isOpen={activeAyah !== null}
+        onClose={() => {
+          ayahRequestId.current += 1;
+          setActiveAyah(null);
+        }}
+        verseKey={activeAyah?.verseKey ?? null}
+        text={activeAyah?.text ?? null}
+        language={language}
+        isBookmarked={false}
+        onBookmark={() => undefined}
+      />
+    </section>
   );
 }

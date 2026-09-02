@@ -18,10 +18,11 @@ export function MushafNavigationModal({
   onSelectPage,
   language,
   direction,
-  bookmarks = [],
-  verseBookmarks = [],
+  bookmarks: allBookmarks = [],
+  verseBookmarks: allVerseBookmarks = [],
   onSelectVerseBookmark,
   initialTab = "surahs",
+  pageRange,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -34,6 +35,15 @@ export function MushafNavigationModal({
   onSelectVerseBookmark?: (bookmark: QuranVerseBookmark) => void;
   /** Which tab an opening lands on, so "Bookmarks" opens bookmarks. */
   initialTab?: NavigationTab;
+  /**
+   * Limits the index to one span of the Mushaf.
+   *
+   * A surah reading is still the Mushaf, but its index is not: the surah and
+   * juz tabs would carry the reader out of the surah they opened, and a page
+   * number outside the span has nothing to show. With a range the index offers
+   * the pages of that span and the bookmarks inside it, and nothing that leaves.
+   */
+  pageRange?: { first: number; last: number };
 }) {
   const [activeTab, setActiveTab] = useState<NavigationTab>(initialTab);
   const [searchQuery, setSearchQuery] = useState("");
@@ -46,8 +56,8 @@ export function MushafNavigationModal({
   // The caller names the tab when it opens the sheet; reopening from the same
   // entry point must land there again, not on whatever was left showing.
   useEffect(() => {
-    if (isOpen) setActiveTab(initialTab);
-  }, [initialTab, isOpen]);
+    if (isOpen) setActiveTab(pageRange && initialTab !== "bookmarks" ? "jump" : initialTab);
+  }, [initialTab, isOpen, pageRange]);
 
   const filteredSurahs = useMemo(() => {
     return searchSurahs(searchQuery, language);
@@ -70,48 +80,67 @@ export function MushafNavigationModal({
   const handleInputSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const num = parseInt(inputPage, 10);
-    if (!isNaN(num) && num >= 1 && num <= 604) {
+    if (!isNaN(num) && inRange(num)) {
       handleJump(num);
     }
   };
 
   const isArabic = language === "ar";
   const chevron = isArabic ? <ChevronLeft size={18} /> : <ChevronRight size={18} />;
-  const tabs: ReadonlyArray<TabDefinition<NavigationTab>> = [
-    {
-      value: "surahs",
-      label: (
-        <>
-          <span>{t(language, "mushaf.tabSurahs")}</span>
-          <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(114, language)})</span>
-        </>
-      ),
-    },
-    {
-      value: "juzs",
-      label: (
-        <>
-          <span>{t(language, "mushaf.tabJuzs")}</span>
-          <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(30, language)})</span>
-        </>
-      ),
-    },
-    { value: "jump", label: <span>{t(language, "mushaf.tabJump")}</span> },
-    {
-      value: "bookmarks",
-      label: (
-        <>
-          <Bookmark size={15} aria-hidden="true" />
-          <span>{t(language, "mushaf.tabBookmarks")}</span>
-          {(bookmarks.length > 0 || verseBookmarks.length > 0) && (
-            <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs">
-              {formatNumerals(bookmarks.length + verseBookmarks.length, language)}
-            </span>
-          )}
-        </>
-      ),
-    },
-  ];
+  const firstPage = pageRange?.first ?? 1;
+  const lastPage = pageRange?.last ?? 604;
+  const inRange = (page: number) => page >= firstPage && page <= lastPage;
+
+  // A bookmark on page 300 is not reachable from inside Al-Mulk, so a scoped
+  // index does not offer it.
+  const bookmarks = pageRange ? allBookmarks.filter(inRange) : allBookmarks;
+  const verseBookmarks = pageRange ? allVerseBookmarks.filter((b) => inRange(b.page)) : allVerseBookmarks;
+
+  const tabs: ReadonlyArray<TabDefinition<NavigationTab>> = (
+    pageRange
+      ? [
+          { value: "jump" as const, label: <span>{t(language, "mushaf.tabJump")}</span> },
+          {
+            value: "bookmarks" as const,
+            label: <span>{t(language, "mushaf.tabBookmarks")}</span>,
+          },
+        ]
+      : [
+          {
+            value: "surahs",
+            label: (
+              <>
+                <span>{t(language, "mushaf.tabSurahs")}</span>
+                <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(114, language)})</span>
+              </>
+            ),
+          },
+          {
+            value: "juzs",
+            label: (
+              <>
+                <span>{t(language, "mushaf.tabJuzs")}</span>
+                <span className="hidden text-xs opacity-70 sm:inline">({formatNumerals(30, language)})</span>
+              </>
+            ),
+          },
+          { value: "jump", label: <span>{t(language, "mushaf.tabJump")}</span> },
+          {
+            value: "bookmarks",
+            label: (
+              <>
+                <Bookmark size={15} aria-hidden="true" />
+                <span>{t(language, "mushaf.tabBookmarks")}</span>
+                {(bookmarks.length > 0 || verseBookmarks.length > 0) && (
+                  <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-xs">
+                    {formatNumerals(bookmarks.length + verseBookmarks.length, language)}
+                  </span>
+                )}
+              </>
+            ),
+          },
+        ]
+  ) as ReadonlyArray<TabDefinition<NavigationTab>>;
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -324,14 +353,22 @@ export function MushafNavigationModal({
               <div className="flex flex-col gap-6 py-2">
                 <form onSubmit={handleInputSubmit} className="flex flex-col gap-3">
                   <label htmlFor="page-jump-input" className={FIELD_LABEL_CLASS}>
-                    {t(language, "mushaf.enterPageNumber")}
+                    {pageRange
+                      ? t(language, "mushaf.enterPageNumberInRange", {
+                          first: formatNumerals(firstPage, language),
+                          last: formatNumerals(lastPage, language),
+                        })
+                      : t(language, "mushaf.enterPageNumber")}
                   </label>
                   <div className="flex gap-2">
                     <input
                       id="page-jump-input"
                       type="number"
-                      min={1}
-                      max={604}
+                      // The control states the span it accepts. Leaving 1-604
+                      // here while the handler refused anything outside the
+                      // surah meant the field invited a number it would ignore.
+                      min={firstPage}
+                      max={lastPage}
                       value={inputPage}
                       onChange={(e) => setInputPage(e.target.value)}
                       inputMode="numeric"

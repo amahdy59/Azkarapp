@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
@@ -53,9 +53,20 @@ function indexOf(catId: "before_sleep", zikrId: string) {
   return getAzkarByCategory(catId).findIndex((zikr) => zikr.id === zikrId);
 }
 
+/**
+ * A multi-page surah now opens as Mushaf pages, so the reader's own body — its
+ * translation, its pronunciation and its counter — sits one step behind. These
+ * cover that body, so they step back to it.
+ */
+function leaveMushaf() {
+  const back = screen.queryByTestId("mushaf-rail-back") ?? screen.queryByTestId("mushaf-immersive-close");
+  if (back) fireEvent.click(back);
+}
+
 describe("the three surah readings", () => {
   it("shows the reading aids the reader asked for, on the surahs too", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
+    leaveMushaf();
     const zikr = screen.getByTestId("reader-screen");
     expect(zikr).toHaveAttribute("data-zikr-id", "s-hm-110a");
 
@@ -95,6 +106,7 @@ describe("the three surah readings", () => {
         audioAvailable={false}
       />,
     );
+    leaveMushaf();
     // The translation is built by joining all 110 verses with their numbers and
     // shipped in the bundle. `!z.surahNameArabic` then hides it for anything
     // flagged as a surah, so the one collection with a complete translation is
@@ -120,6 +132,7 @@ describe("the three surah readings", () => {
 
   it("offers a phrase to press when the count can only ever be one", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
+    leaveMushaf();
     const counter = screen.getByTestId("counter-surface");
     // "٠ / ١" is a completion button drawn as a score, in the tallest control
     // on screen, on exactly the readings that need the room for their text.

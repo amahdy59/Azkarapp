@@ -1,8 +1,12 @@
 import { expect, test, type Page } from "@playwright/test";
 
 /**
- * Immersive Mushaf mode: one canonical page per screen with physical
- * right-to-advance navigation shared by buttons, keys, and pointer gestures.
+ * The Mushaf view a multi-page surah opens in.
+ *
+ * It no longer has a presentation of its own: it carries the Mushaf's rail, its
+ * spread and its page furniture, differing only in the span it may show. It
+ * also opens without being asked, so these no longer reach for a menu item —
+ * the surah is already showing its pages.
  */
 
 /** Reduce motion is on so pages jump rather than glide — the landing position
@@ -23,61 +27,84 @@ async function openReaderAt(page: Page, route: string) {
   await page.goto(route);
 }
 
-async function openImmersive(page: Page) {
-  await page.getByRole("button", { name: "خيارات القارئ" }).click();
-  await page.getByRole("menuitem", { name: "وضع المصحف" }).click();
+/** A multi-page surah arrives in the Mushaf; nothing has to open it. */
+async function expectMushafShowing(page: Page) {
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 }
 
+/** The page the reader is on, which the rail no longer states in text. */
+function currentPages(page: Page) {
+  return page.locator("[data-mushaf-page]");
+}
+
 test.describe("immersive mushaf mode", () => {
-  test("shows one page per screen and pages forward in RTL", async ({ page }) => {
+  test("carries the Mushaf's own toolbar and pages within the surah", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("reader-screen")).toBeVisible();
-    await openImmersive(page);
+    await expectMushafShowing(page);
 
-    const meaningToggle = page.getByRole("switch", { name: "معاني الكلمات" });
-    const closeButton = page.getByTestId("mushaf-immersive-close");
-    for (const control of [meaningToggle, closeButton]) {
+    // Every control still clears the 44px target the bars had to.
+    for (const control of [
+      page.getByTestId("mushaf-rail-back"),
+      page.getByTestId("mushaf-difficult-words-switch"),
+      page.getByTestId("mushaf-rail-next"),
+    ]) {
       const box = await control.boundingBox();
       expect(box?.width ?? 0).toBeGreaterThanOrEqual(44);
       expect(box?.height ?? 0).toBeGreaterThanOrEqual(44);
     }
 
-    await closeButton.focus();
-    for (let index = 0; index < 8; index += 1) await page.keyboard.press("Tab");
-    expect(
-      await page.evaluate(() => document.activeElement?.closest('[data-testid="mushaf-immersive"]') !== null),
-    ).toBe(true);
+    // Focus is deliberately not trapped any more. This was a modal, and a modal
+    // must hold focus; it is now a mode of the reader, and trapping a keyboard
+    // user inside a region of the page — away from the app's own navigation —
+    // would be a defect rather than a feature. What matters is that every rail
+    // control is reachable in order.
+    await page.getByTestId("mushaf-rail-back").focus();
+    const reached: string[] = [];
+    for (let index = 0; index < 9; index += 1) {
+      reached.push(await page.evaluate(() => document.activeElement?.getAttribute("data-testid") ?? ""));
+      await page.keyboard.press("Tab");
+    }
+    for (const id of [
+      "mushaf-rail-back",
+      "mushaf-rail-index",
+      "mushaf-rail-next",
+      "mushaf-rail-page-bookmark",
+      "mushaf-settings-trigger",
+    ]) {
+      expect(reached, id).toContain(id);
+    }
+    // Previous is absent from that list on purpose: the surah opens on its
+    // first page, where it is disabled and therefore not focusable.
+    expect(reached).not.toContain("mushaf-rail-previous");
 
-    await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
+    // Al-Kahf opens on 293, the first page of its span.
+    await expect(page.getByTestId("mushaf-rail-previous")).toBeDisabled();
+    await expect(currentPages(page).first()).toHaveAttribute("data-mushaf-page", "293");
 
-    await page.getByTestId("mushaf-immersive-next").click();
-    // Wait for AnimatePresence to finish: only one indicator should remain visible.
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
-    await expect(page.getByTestId("mushaf-immersive-previous")).toBeEnabled();
+    await page.getByTestId("mushaf-rail-next").click();
+    await expect(currentPages(page).first()).not.toHaveAttribute("data-mushaf-page", "293");
+    await expect(page.getByTestId("mushaf-rail-previous")).toBeEnabled();
 
-    await page.getByTestId("mushaf-immersive-previous").click();
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
-    await expect(page.getByTestId("mushaf-immersive-previous")).toBeDisabled();
+    await page.getByTestId("mushaf-rail-previous").click();
+    await expect(currentPages(page).first()).toHaveAttribute("data-mushaf-page", "293");
+    await expect(page.getByTestId("mushaf-rail-previous")).toBeDisabled();
   });
 
   test("ArrowLeft advances the page and ArrowRight goes back, and Escape closes", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/friday-kahf/1");
     await expect(page.getByTestId("reader-screen")).toBeVisible();
-    await openImmersive(page);
+    await expectMushafShowing(page);
 
+    const firstPage = currentPages(page).first();
     // Physical direction stays consistent across both Mushaf readers.
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "293");
     await page.keyboard.press("ArrowLeft");
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
+    await expect(firstPage).not.toHaveAttribute("data-mushaf-page", "293");
     await page.keyboard.press("ArrowRight");
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("١");
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "293");
     await page.keyboard.press("ArrowLeft");
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toHaveCount(1);
-    await expect(page.getByTestId("mushaf-immersive-indicator")).toContainText("٢");
+    await expect(firstPage).not.toHaveAttribute("data-mushaf-page", "293");
 
     await page.keyboard.press("Escape");
     await expect(page.getByTestId("mushaf-immersive")).toBeHidden();
@@ -85,6 +112,10 @@ test.describe("immersive mushaf mode", () => {
 
   test("is offered only for surahs that span multiple mushaf pages", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/morning/1");
+    // A zikr that fits on one screen has no Mushaf pages to show, so it neither
+    // opens in that view nor offers it.
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    await expect(page.getByTestId("mushaf-immersive")).toHaveCount(0);
     await page.getByRole("button", { name: "خيارات القارئ" }).click();
     await expect(page.getByRole("menuitem").first()).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "وضع المصحف" })).toHaveCount(0);

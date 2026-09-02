@@ -2176,3 +2176,74 @@ Record user-approved product, design and architectural decisions here. Do not er
   word of two letters or more survives in a citation; the Arabic-Indic digits of
   each citation match the English digits in the same order; a disputed grading
   keeps both verdicts; and the English card stays English.
+
+## DEC-131 — a surah opens in the Mushaf, with the Mushaf's own tools
+
+- **Decision:** a multi-page surah (Al-Kahf, As-Sajdah, Al-Mulk) opens as Mushaf
+  pages by default and carries `MushafToolRail` — the same nine controls, in the
+  same order, as the Mushaf itself.
+- **What was wrong:** the surah view was a plainer imitation of the Mushaf
+  reached through a menu item most readers never found. It had two horizontal
+  bars instead of the rail, no spread, no page furniture, and no bookmark, focus,
+  fullscreen, index or settings.
+- **Why the furniture had vanished:** `showPageIdentity` is
+  `Boolean(facingPage) || useRail || !headerContent`, and this view passed
+  `headerContent`. Supplying the rail turns the cartouche, juz label and folio
+  back on as a consequence rather than as a special case.
+- **The span is the only difference.** The spread never reaches past the surah:
+  Al-Mulk begins on 562, whose bound pair is (561, 562), so it opens as a single
+  page rather than showing a page of the surah before it. The index offers that
+  surah's pages and the bookmarks inside them; the surah and juz tabs are hidden
+  because from inside a surah they only lead out of it.
+- **The settings are the Mushaf's, not a second set.** Theme, layout, text size
+  and toolbar side are the same preferences, so changing one here changes it
+  there.
+- **One shell, not two:** `fitsTwoPages`, `fitsToolRail`, `measureShell` and
+  `spreadStart` move to `mushafShell.ts`. Two copies were two Mushafs that could
+  disagree about when a spread fits, which is how these views drifted apart.
+- **Two defects this introduced and fixed:**
+  - The view is no longer torn down between azkar, so the previous surah's
+    resolved page carried into the next: As-Sajdah's page 415 rendered on top of
+    Al-Mulk's 562, both fully visible. Each surah now gets its own instance.
+  - The scoped index constrained its input and its handler but not its label,
+    which still read "(١-٦٠٤)" — inviting a page number the field would refuse.
+- **Tests/evidence required:** a multi-page surah opens in the Mushaf view
+  unasked; all eight rail controls plus the index are present; the settings
+  sheet is absent before the control is pressed and present after; and the index
+  is bounded by the surah with the surah and juz tabs gone.
+
+## DEC-132 — the surah reader is a mode of the reader, not a modal over it
+
+- **Supersedes:** DEC-102's clause that "the long-surah immersive reader keeps
+  its separate fit/comfort presentation". The owner asked for the opposite: the
+  same design, layout, buttons, behaviour and functionality as the Mushaf,
+  differing only in the span of the surah. Recording it here so two approved
+  decisions do not stand in contradiction.
+- **Decision:** the Mushaf view is rendered as the reader's body while a
+  multi-page surah is being read as pages. It is no longer a Radix dialog, no
+  longer `fixed inset-0`, and the reader no longer renders its own header,
+  counter and text underneath it.
+- **What was wrong:** it was a modal covering a screen that was still there. So
+  it had a header and footer duplicating the reader's, leaving it read as a
+  dismissal rather than a switch, and its state died with it — closing on page
+  four of Al-Kahf and reopening put the reader back on page one. Position now
+  lives in the reader, which outlives the view.
+- **Focus is deliberately no longer trapped.** A modal must hold focus; a mode
+  must not. Trapping a keyboard user inside a region of the page, away from the
+  app's own navigation, would be a defect rather than a feature. The spec now
+  asserts every enabled rail control is reachable in tab order instead — and
+  that Previous is _not_, because a surah opens on its first page where that
+  control is disabled and therefore unfocusable.
+- **Escape moved with it.** Radix owned that key while this was a dialog; the
+  view now handles it beside the page keys.
+- **Known consequences, both deliberate:**
+  - For Al-Kahf, As-Sajdah and Al-Mulk the translation restored in DEC-123 is
+    now one step behind the Mushaf rather than on screen. A Mushaf page carries
+    no translation; that is what the facsimile is. The zikr view still has it.
+  - The app's navigation is now visible beside the Mushaf, where the dialog used
+    to cover it. The Mushaf's own route hides it, so this remains a difference
+    from full parity; hiding it would mean lifting the open state to `App`.
+- **Tests/evidence required:** the view is not a dialog and carries no overlay
+  positioning; the reader's body is not rendered beneath it; page position
+  survives leaving and returning; and the reader-body specs step back to it
+  rather than asserting against the Mushaf.

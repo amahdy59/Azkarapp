@@ -90,6 +90,15 @@ describe("ReaderScreen audio identity", () => {
 
     expect(screen.getByTestId("reader-screen")).toHaveAttribute("data-counting-mode", "counter-only");
 
+    // A multi-page surah is page data, so it now opens as Mushaf pages rather
+    // than hiding that view behind a menu item most readers never found. The
+    // reader's own long-surah behaviour is behind it and still has to work, so
+    // this closes the Mushaf and goes on to assert it.
+    expect(screen.getByTestId("mushaf-immersive-track")).toBeInTheDocument();
+    // The surah view now carries the Mushaf's own toolbar, so leaving it is the
+    // rail's back control rather than a close button of its own.
+    fireEvent.click(screen.getByRole("button", { name: "رجوع" }));
+
     const scrollRegion = screen.getByRole("region", { name: "نص الذكر" });
     expect(screen.getByTestId("counter-surface")).toHaveAccessibleName(/اضغط العداد عند الإتمام/);
     expect(screen.getByTestId("reader-mushaf-button")).toBeInTheDocument();

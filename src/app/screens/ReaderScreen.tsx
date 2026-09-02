@@ -40,7 +40,7 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
-import { MushafImmersiveReader } from "../components/MushafImmersiveReader";
+import { MushafImmersiveReader, type MushafSurahSettings } from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
@@ -145,6 +145,9 @@ export function ReaderScreen({
   onToggleSaved,
   audioAvailable,
   mushafTextScale = "medium",
+  mushafBookmarks = [],
+  onToggleMushafBookmark,
+  mushafSettings,
   onPlayAudio,
   onRepeatAudio,
 }: {
@@ -176,6 +179,9 @@ export function ReaderScreen({
   audioAvailable: boolean;
   /** Passed to the immersive Mushaf so it matches the Mushaf proper. */
   mushafTextScale?: MushafTextScale;
+  mushafBookmarks?: readonly number[];
+  onToggleMushafBookmark?: (page: number) => void;
+  mushafSettings?: MushafSurahSettings;
   onPlayAudio?: () => void;
   onRepeatAudio?: () => void;
 }) {
@@ -191,6 +197,26 @@ export function ReaderScreen({
   /** A surah short enough to be read here rather than in the Mushaf view. */
   const showSurahChrome = Boolean(z?.isSurah) && !longSurah;
   const [immersiveOpen, setImmersiveOpen] = useState(false);
+  /**
+   * Which zikr the Mushaf view was opened for, so closing it stays closed.
+   *
+   * A multi-page surah is page data — Al-Kahf, As-Sajdah and Al-Mulk are laid
+   * out as Mushaf pages and read as Mushaf pages. Opening them as a scroll of
+   * running text and hiding the real view behind a menu item meant most readers
+   * never saw it. It now opens that way by default, and a reader who leaves it
+   * gets their choice honoured until they move to a different zikr.
+   */
+  const autoOpenedFor = useRef<string | null>(null);
+  /**
+   * The Mushaf position, held here rather than inside the view.
+   *
+   * That view is mounted only while it is open, so closing it on page four and
+   * reopening put the reader back on page one — the clearest symptom of the two
+   * being separate screens rather than one screen in two modes.
+   */
+  const [mushafPageTuple, setMushafPageTuple] = useState<readonly [number, number]>([0, 1]);
+  /** The surah is being read as Mushaf pages, so the Mushaf is the body. */
+  const showMushaf = immersiveOpen && longSurah;
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(true);
@@ -322,6 +348,23 @@ export function ReaderScreen({
   useEffect(() => {
     setWordMeaningSelection(null);
   }, [z?.id]);
+
+  useEffect(() => {
+    const id = z?.id;
+    if (!id) return;
+    if (!longSurah) {
+      autoOpenedFor.current = null;
+      setImmersiveOpen(false);
+      setMushafPageTuple([0, 1]);
+      return;
+    }
+    // Once per zikr: reopening on every render would make the close button
+    // useless, and reopening on a re-render would fight the reader.
+    if (autoOpenedFor.current === id) return;
+    autoOpenedFor.current = id;
+    setMushafPageTuple([0, 1]);
+    setImmersiveOpen(true);
+  }, [longSurah, z?.id]);
 
   useLayoutEffect(() => {
     if (readingScrollRef.current) {
@@ -803,6 +846,37 @@ export function ReaderScreen({
       <div className="sr-only" aria-live="polite">
         {shareMessage}
       </div>
+      {/* While a surah is read as pages, the Mushaf is the reader's body — one
+          screen rendering what is on it a second way, rather than a modal over
+          a screen that is still there underneath. Its rail carries the chrome,
+          so the reader does not also show a header of its own. */}
+      {showMushaf && (
+        <MushafImmersiveReader
+          /* A surah gets its own instance. The view used to be torn down between
+             zikr because it only opened from a menu; now that it stays open as
+             the reader moves, the previous surah's resolved page and page index
+             would carry into the next one — which showed As-Sajdah's page 415
+             stacked on top of Al-Mulk's 562. */
+          key={z.id}
+          zikr={z}
+          pageTuple={mushafPageTuple}
+          setPageTuple={setMushafPageTuple}
+          language={language}
+          direction={direction}
+          title={readerZikrTitle ?? displayCategoryName}
+          theme={themeMode === "light" ? "light" : "midnight"}
+          reducedMotion={reducedMotion}
+          textScale={mushafTextScale}
+          bookmarkedPages={mushafBookmarks}
+          onTogglePageBookmark={onToggleMushafBookmark}
+          mushafSettings={mushafSettings}
+          onClose={() => setImmersiveOpen(false)}
+          onComplete={() => {
+            if (!isDone) onComplete(idx);
+          }}
+        />
+      )}
+
       <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden" aria-hidden="true">
         <CountingRipples ripples={canvasRipples} onDismiss={dismissRipple} />
       </div>
@@ -815,30 +889,34 @@ export function ReaderScreen({
         {readerAnnouncement}
       </div>
 
-      {isDesktopReader ? (
-        <>
-          {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
+      {/* One body at a time. While the surah is showing its pages, the reader
+          does not also render its own header, counter and text underneath —
+          that duplication is what made the two feel like separate screens. */}
+      {!showMushaf &&
+        (isDesktopReader ? (
+          <>
+            {/* Wide-desktop hero band (>=1200px). Fixed navy brand surface,
               independent of the active theme — mirrors the Home screen's
               .azkar-hero background (src/app/components/azkar-hero-background.css)
               rather than following light/dark/midnight tokens, since it plays
               the same "always-dark brand band" role. */}
-          <div
-            data-testid="reader-desktop-hero"
-            className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
-            style={{
-              background:
-                "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
-            }}
-          >
-            <IconButton
-              onClick={onBack}
-              label={t(language, "common.back")}
-              className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+            <div
+              data-testid="reader-desktop-hero"
+              className="relative mx-4 mt-3 flex shrink-0 flex-col items-center gap-2 overflow-hidden rounded-3xl px-6 py-3 text-center"
+              style={{
+                background:
+                  "radial-gradient(120% 140% at 50% 10%, rgba(232,180,32,0.18), transparent 60%), var(--brand-hero)",
+              }}
             >
-              <ArrowPrevious size={20} />
-            </IconButton>
+              <IconButton
+                onClick={onBack}
+                label={t(language, "common.back")}
+                className="absolute start-4 top-4 border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
+              >
+                <ArrowPrevious size={20} />
+              </IconButton>
 
-            {/* Two actions, the same two as on phones: Benefit, then the
+              {/* Two actions, the same two as on phones: Benefit, then the
                 overflow menu. Save, share and sound used to sit out here as
                 three more icons — five ghost circles competing with the
                 collection name for the top of the reading screen. They are one
@@ -846,45 +924,216 @@ export function ReaderScreen({
                 rather than a strip. Icon-only throughout; the Benefit tooltip
                 previews the actual benefit text rather than repeating the
                 button's own name. */}
-            <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
-              <IconButton
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setHasOpenedBenefit(true);
-                  setBenefitOpen(true);
-                }}
-                label={t(language, "reader.referencesButton")}
-                title={getLocalizedZikrBenefit(z, language)}
-                className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
-              >
-                <BookOpen size={18} />
-              </IconButton>
-
-              <DropdownMenu dir={direction}>
-                <DropdownMenuTrigger
-                  aria-label={t(language, "reader.menu")}
-                  onPointerEnter={() => void prepareZikrShareCardFonts()}
-                  onFocus={() => void prepareZikrShareCardFonts()}
-                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              <div className="absolute end-4 top-4 flex items-center gap-2" data-testid="reader-hero-actions">
+                <IconButton
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    setHasOpenedBenefit(true);
+                    setBenefitOpen(true);
+                  }}
+                  label={t(language, "reader.referencesButton")}
+                  title={getLocalizedZikrBenefit(z, language)}
+                  className="border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] hover:bg-[color:var(--on-media)]/20"
                 >
-                  <MoreVertical size={18} />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="min-w-[210px]">
-                  {renderReaderMenuItems("desktop")}
-                </DropdownMenuContent>
-              </DropdownMenu>
+                  <BookOpen size={18} />
+                </IconButton>
+
+                <DropdownMenu dir={direction}>
+                  <DropdownMenuTrigger
+                    aria-label={t(language, "reader.menu")}
+                    onPointerEnter={() => void prepareZikrShareCardFonts()}
+                    onFocus={() => void prepareZikrShareCardFonts()}
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--on-media-accent)]/25 bg-[color:var(--on-media)]/10 text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    <MoreVertical size={18} />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="min-w-[210px]">
+                    {renderReaderMenuItems("desktop")}
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+
+              <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+                {displayCategoryName}
+              </h1>
+
+              <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
+                <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
+                  <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
+                    {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
+                  </span>
+                  <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
+                    {t(language, "reader.collectionCount", {
+                      done: formatNumerals(readingProgressValue, language),
+                      total: formatNumerals(azkar.length, language),
+                    })}
+                  </span>
+                </div>
+                <ProgressBar
+                  value={readingProgressValue}
+                  max={azkar.length}
+                  height={8}
+                  trackColor="rgba(255,255,255,0.2)"
+                  fillColor="var(--on-media-accent)"
+                  direction={direction}
+                  aria-label={t(language, "reader.groupProgress")}
+                />
+                {/* Only surah names reach here. This margin adds to the column's
+                  gap-2 for 14px under the bar — comfortably past the 4px
+                  minimum, which Arabic needs because harakat sit well above
+                  the cap line and would otherwise crowd the track. */}
+                {/* The way into Mushaf mode sits on the title's own line rather
+                  than only inside the overflow menu: it belongs to this
+                  passage, so it reads as part of naming it. */}
+                {readerZikrTitle && (
+                  <div className="mt-1.5 flex w-full items-center justify-between gap-3">
+                    <h2
+                      className="min-w-0 truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                      dir="auto"
+                      title={readerZikrTitle}
+                      data-testid="reader-zikr-title"
+                    >
+                      {readerZikrTitle}
+                    </h2>
+                    <div className="flex shrink-0 items-center gap-3">
+                      {z.isSurah && allWordMeanings.length > 0 && (
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={showDifficultWords}
+                          onClick={() => setShowDifficultWords((v) => !v)}
+                          className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
+                          aria-label={t(language, "settings.showDifficultWords")}
+                          title={t(language, "settings.showDifficultWords")}
+                        >
+                          <span className="text-[0.75rem] font-bold text-[color:var(--on-media)] hidden sm:inline">
+                            {t(language, "settings.showDifficultWords")}
+                          </span>
+                          <ToggleTrack checked={showDifficultWords} />
+                        </button>
+                      )}
+                      {longSurah && (
+                        <button
+                          type="button"
+                          onClick={() => setImmersiveOpen(true)}
+                          data-testid="reader-mushaf-button"
+                          className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        >
+                          <BookOpen size={14} aria-hidden="true" />
+                          {t(language, "reader.immersiveOpen")}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
-            <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
-              {displayCategoryName}
-            </h1>
+            {/* Wide-desktop card: reading content, side navigation, counter,
+              and keyboard guidance. Page-level actions stay in the hero. */}
+            <div
+              className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden bg-transparent"
+              data-testid="reader-card"
+            >
+              <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
+                <div className="relative flex min-h-0 flex-1">
+                  <div
+                    ref={readingScrollRef}
+                    role="region"
+                    tabIndex={0}
+                    aria-label={t(language, "reader.readingText")}
+                    className={`h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
+                      justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                    }`}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={z.id}
+                        initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
+                        animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
+                        exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
+                        transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
+                        className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
+                      >
+                        {/* Three transforms, three layers. The entrance slide is
+                          framer's on the element above, the drag follows the
+                          thumb here, and the press scales below — all animating
+                          `transform`, so sharing an element would mean one
+                          silently overwriting another. */}
+                        <div style={dragStyle} className="flex w-full flex-1 flex-col">
+                          <div
+                            style={pressStyle}
+                            className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                          >
+                            {renderReadingContent()}
+                          </div>
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+                  {renderSideNavigation()}
+                </div>
 
-            <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
-              <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
-                  {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
-                </span>
-                <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
+                <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div>
+              <Header
+                title={displayCategoryName}
+                onBack={onBack}
+                language={language}
+                right={
+                  // Two actions at most: Benefit, then the overflow control.
+                  // Share used to sit between them; at 320-390px a third 44px
+                  // target was the difference between the collection name
+                  // fitting and being truncated to "أذكار ال…", and share is not
+                  // a per-zikr primary. Both share the header's ghost
+                  // icon-button treatment so the row reads as one set.
+                  <div className="flex items-center gap-1" data-testid="reader-actions">
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setHasOpenedBenefit(true);
+                        setBenefitOpen(true);
+                      }}
+                      aria-haspopup="dialog"
+                      className={READER_HEADER_ACTION_CLASS}
+                      aria-label={t(language, "reader.referencesButton")}
+                      title={t(language, "reader.referencesButton")}
+                    >
+                      <BookOpen size={20} />
+                    </button>
+
+                    <DropdownMenu dir={direction}>
+                      {/* The share-card fonts used to be prefetched on the share
+                        button's own hover/focus. That button is in the menu
+                        now, so the trigger warms them instead — still ahead of
+                        the click, one step earlier in the same gesture. */}
+                      <DropdownMenuTrigger
+                        aria-label={t(language, "reader.menu")}
+                        className={READER_HEADER_ACTION_CLASS}
+                        onPointerEnter={() => void prepareZikrShareCardFonts()}
+                        onFocus={() => void prepareZikrShareCardFonts()}
+                      >
+                        <MoreVertical size={20} />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="min-w-[210px]">
+                        {renderReaderMenuItems("mobile")}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                }
+              />
+            </div>
+
+            <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
+              <div className="mb-2 flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
+                <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
+                <span>
                   {t(language, "reader.collectionCount", {
                     done: formatNumerals(readingProgressValue, language),
                     total: formatNumerals(azkar.length, language),
@@ -894,23 +1143,18 @@ export function ReaderScreen({
               <ProgressBar
                 value={readingProgressValue}
                 max={azkar.length}
-                height={8}
-                trackColor="rgba(255,255,255,0.2)"
-                fillColor="var(--on-media-accent)"
+                height={6}
+                trackColor="var(--card)"
+                fillColor="var(--primary)"
                 direction={direction}
                 aria-label={t(language, "reader.groupProgress")}
               />
-              {/* Only surah names reach here. This margin adds to the column's
-                  gap-2 for 14px under the bar — comfortably past the 4px
-                  minimum, which Arabic needs because harakat sit well above
-                  the cap line and would otherwise crowd the track. */}
-              {/* The way into Mushaf mode sits on the title's own line rather
-                  than only inside the overflow menu: it belongs to this
-                  passage, so it reads as part of naming it. */}
+              {/* See the desktop heading: only surah names render, and the 10px
+                margin keeps harakat clear of the progress track. */}
               {readerZikrTitle && (
-                <div className="mt-1.5 flex w-full items-center justify-between gap-3">
+                <div className="mt-2.5 flex w-full items-center justify-between gap-3">
                   <h2
-                    className="min-w-0 truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                    className="min-w-0 truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
                     dir="auto"
                     title={readerZikrTitle}
                     data-testid="reader-zikr-title"
@@ -924,11 +1168,11 @@ export function ReaderScreen({
                         role="switch"
                         aria-checked={showDifficultWords}
                         onClick={() => setShowDifficultWords((v) => !v)}
-                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-[color:var(--on-media)] rounded-full"
+                        className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full"
                         aria-label={t(language, "settings.showDifficultWords")}
                         title={t(language, "settings.showDifficultWords")}
                       >
-                        <span className="text-[0.75rem] font-bold text-[color:var(--on-media)] hidden sm:inline">
+                        <span className="text-[0.75rem] font-bold text-muted-foreground hidden sm:inline">
                           {t(language, "settings.showDifficultWords")}
                         </span>
                         <ToggleTrack checked={showDifficultWords} />
@@ -939,7 +1183,7 @@ export function ReaderScreen({
                         type="button"
                         onClick={() => setImmersiveOpen(true)}
                         data-testid="reader-mushaf-button"
-                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <BookOpen size={14} aria-hidden="true" />
                         {t(language, "reader.immersiveOpen")}
@@ -949,211 +1193,45 @@ export function ReaderScreen({
                 </div>
               )}
             </div>
-          </div>
 
-          {/* Wide-desktop card: reading content, side navigation, counter,
-              and keyboard guidance. Page-level actions stay in the hero. */}
-          <div
-            className="relative mx-4 mb-4 mt-4 flex flex-1 min-h-0 flex-col overflow-hidden bg-transparent"
-            data-testid="reader-card"
-          >
-            <div ref={readerMainRef} className="flex flex-1 min-h-0 flex-col justify-between select-none">
-              <div className="relative flex min-h-0 flex-1">
-                <div
-                  ref={readingScrollRef}
-                  role="region"
-                  tabIndex={0}
-                  aria-label={t(language, "reader.readingText")}
-                  className={`h-full min-h-0 w-full overflow-y-auto ps-6 pe-7 py-4 outline-none focus-visible:outline-none focus:ring-0 [scrollbar-gutter:stable] ${
-                    justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-                  }`}
-                >
-                  <AnimatePresence mode="wait">
-                    <motion.div
-                      key={z.id}
-                      initial={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? -20 : 20 }}
-                      animate={reducedMotion ? { opacity: 1 } : { opacity: 1, x: 0 }}
-                      exit={reducedMotion ? { opacity: 0 } : { opacity: 0, x: direction === "rtl" ? 20 : -20 }}
-                      transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
-                      className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
-                    >
-                      {/* Three transforms, three layers. The entrance slide is
-                          framer's on the element above, the drag follows the
-                          thumb here, and the press scales below — all animating
-                          `transform`, so sharing an element would mean one
-                          silently overwriting another. */}
-                      <div style={dragStyle} className="flex w-full flex-1 flex-col">
-                        <div
-                          style={pressStyle}
-                          className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                        >
-                          {renderReadingContent()}
-                        </div>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-                {renderSideNavigation()}
-              </div>
-
-              <footer className="shrink-0 pb-3 pt-2">{renderCounterStack()}</footer>
-            </div>
-          </div>
-        </>
-      ) : (
-        <>
-          <div>
-            <Header
-              title={displayCategoryName}
-              onBack={onBack}
-              language={language}
-              right={
-                // Two actions at most: Benefit, then the overflow control.
-                // Share used to sit between them; at 320-390px a third 44px
-                // target was the difference between the collection name
-                // fitting and being truncated to "أذكار ال…", and share is not
-                // a per-zikr primary. Both share the header's ghost
-                // icon-button treatment so the row reads as one set.
-                <div className="flex items-center gap-1" data-testid="reader-actions">
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation();
-                      setHasOpenedBenefit(true);
-                      setBenefitOpen(true);
-                    }}
-                    aria-haspopup="dialog"
-                    className={READER_HEADER_ACTION_CLASS}
-                    aria-label={t(language, "reader.referencesButton")}
-                    title={t(language, "reader.referencesButton")}
-                  >
-                    <BookOpen size={20} />
-                  </button>
-
-                  <DropdownMenu dir={direction}>
-                    {/* The share-card fonts used to be prefetched on the share
-                        button's own hover/focus. That button is in the menu
-                        now, so the trigger warms them instead — still ahead of
-                        the click, one step earlier in the same gesture. */}
-                    <DropdownMenuTrigger
-                      aria-label={t(language, "reader.menu")}
-                      className={READER_HEADER_ACTION_CLASS}
-                      onPointerEnter={() => void prepareZikrShareCardFonts()}
-                      onFocus={() => void prepareZikrShareCardFonts()}
-                    >
-                      <MoreVertical size={20} />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="min-w-[210px]">
-                      {renderReaderMenuItems("mobile")}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </div>
-              }
-            />
-          </div>
-
-          <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
-            <div className="mb-2 flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
-              <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
-              <span>
-                {t(language, "reader.collectionCount", {
-                  done: formatNumerals(readingProgressValue, language),
-                  total: formatNumerals(azkar.length, language),
-                })}
-              </span>
-            </div>
-            <ProgressBar
-              value={readingProgressValue}
-              max={azkar.length}
-              height={6}
-              trackColor="var(--card)"
-              fillColor="var(--primary)"
-              direction={direction}
-              aria-label={t(language, "reader.groupProgress")}
-            />
-            {/* See the desktop heading: only surah names render, and the 10px
-                margin keeps harakat clear of the progress track. */}
-            {readerZikrTitle && (
-              <div className="mt-2.5 flex w-full items-center justify-between gap-3">
-                <h2
-                  className="min-w-0 truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
-                  dir="auto"
-                  title={readerZikrTitle}
-                  data-testid="reader-zikr-title"
-                >
-                  {readerZikrTitle}
-                </h2>
-                <div className="flex shrink-0 items-center gap-3">
-                  {z.isSurah && allWordMeanings.length > 0 && (
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-checked={showDifficultWords}
-                      onClick={() => setShowDifficultWords((v) => !v)}
-                      className="flex items-center gap-2 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring rounded-full"
-                      aria-label={t(language, "settings.showDifficultWords")}
-                      title={t(language, "settings.showDifficultWords")}
-                    >
-                      <span className="text-[0.75rem] font-bold text-muted-foreground hidden sm:inline">
-                        {t(language, "settings.showDifficultWords")}
-                      </span>
-                      <ToggleTrack checked={showDifficultWords} />
-                    </button>
-                  )}
-                  {longSurah && (
-                    <button
-                      type="button"
-                      onClick={() => setImmersiveOpen(true)}
-                      data-testid="reader-mushaf-button"
-                      className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                    >
-                      <BookOpen size={14} aria-hidden="true" />
-                      {t(language, "reader.immersiveOpen")}
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Main Layout Area */}
-          <div
-            ref={readerMainRef}
-            className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
-            data-testid="reader-card"
-          >
+            {/* Main Layout Area */}
             <div
-              ref={readingScrollRef}
-              role="region"
-              tabIndex={0}
-              aria-label={t(language, "reader.readingText")}
-              className={`flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
-                justCompleted ? "zikr-step-exit" : "zikr-step-enter"
-              }`}
+              ref={readerMainRef}
+              className="flex-1 flex flex-col min-h-0 justify-between select-none relative reader-column"
+              data-testid="reader-card"
             >
-              {/* Inner wrapper vertically centers short/medium Zikrs safely via my-auto; long Surahs start at top to scroll naturally */}
-              {/* The drag and the press apply here too. They used to hang off
+              <div
+                ref={readingScrollRef}
+                role="region"
+                tabIndex={0}
+                aria-label={t(language, "reader.readingText")}
+                className={`flex-1 overflow-y-auto min-h-0 w-full outline-none focus:outline-none focus-visible:outline-none focus:ring-0 ${
+                  justCompleted ? "zikr-step-exit" : "zikr-step-enter"
+                }`}
+              >
+                {/* Inner wrapper vertically centers short/medium Zikrs safely via my-auto; long Surahs start at top to scroll naturally */}
+                {/* The drag and the press apply here too. They used to hang off
                   the wide branch alone, so on a phone — where the swipe and the
                   tap are the only ways to drive the reader — the page followed
                   nothing and a tap to count moved nothing at all. */}
-              <div style={dragStyle} className="flex min-h-full w-full flex-col py-4">
-                <div
-                  key={z.id}
-                  style={pressStyle}
-                  className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                >
-                  {renderReadingContent()}
+                <div style={dragStyle} className="flex min-h-full w-full flex-col py-4">
+                  <div
+                    key={z.id}
+                    style={pressStyle}
+                    className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                  >
+                    {renderReadingContent()}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* The screen sets !pb-0 and the tab bar is hidden here, so the
+              {/* The screen sets !pb-0 and the tab bar is hidden here, so the
                 counter itself owns the bottom inset — otherwise it would sit
                 flush against the home indicator. */}
-            <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
-          </div>
-        </>
-      )}
+              <div className="shrink-0 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2">{renderCounterStack()}</div>
+            </div>
+          </>
+        ))}
 
       {hasOpenedBenefit && (
         <ReaderReferenceSheet
@@ -1185,21 +1263,6 @@ export function ReaderScreen({
           setWordMeaningSelection(null);
         }}
       />
-      {immersiveOpen && longSurah && (
-        <MushafImmersiveReader
-          zikr={z}
-          language={language}
-          direction={direction}
-          title={readerZikrTitle ?? displayCategoryName}
-          theme={themeMode === "light" ? "light" : "midnight"}
-          reducedMotion={reducedMotion}
-          textScale={mushafTextScale}
-          onClose={() => setImmersiveOpen(false)}
-          onComplete={() => {
-            if (!isDone) onComplete(idx);
-          }}
-        />
-      )}
       {undoResetState && (
         <div
           role="status"

@@ -851,6 +851,7 @@ const ar = {
     spreadLabel: "صفحتا {first} و{second}",
     pageLabel: "صفحة {page}",
     enterPageNumber: "أدخل رقم الصفحة (١-٦٠٤)",
+    enterPageNumberInRange: "أدخل رقم الصفحة ({first}-{last})",
     jumpButton: "انتقال",
     noBookmarks: "لا توجد علامات مرجعية محفوظة حتى الآن.",
     bookmarkSaved: "تم حفظ العلامة المرجعية",

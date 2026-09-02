@@ -865,6 +865,7 @@ const en = {
     spreadLabel: "Pages {first} and {second}",
     pageLabel: "Page {page}",
     enterPageNumber: "Enter page number (1-604)",
+    enterPageNumberInRange: "Enter page number ({first}-{last})",
     jumpButton: "Go",
     noBookmarks: "No saved bookmarks yet.",
     bookmarkSaved: "Bookmark saved",

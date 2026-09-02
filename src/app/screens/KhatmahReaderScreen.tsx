@@ -25,6 +25,7 @@ import {
   ChevronDown,
   MoreVertical,
 } from "../components/icons";
+import { PAPER_ASPECT, spreadStart, useMushafShell } from "../components/mushafShell";
 import { MushafPageViewer } from "../components/MushafPageViewer";
 import { MushafNavigationModal } from "../components/MushafNavigationModal";
 import { AyahInteractionSheet } from "../components/AyahInteractionSheet";
@@ -56,82 +57,6 @@ const SWIPE_THRESHOLD = 60;
 const PAPER_SETTLE = "transform 160ms ease-out";
 const FONT_WAIT_MS = 1200;
 
-/**
- * A spread is only worth showing when both pages still read comfortably.
- *
- * A Mushaf page is about two thirds as wide as it is tall, so two of them plus
- * a gutter need roughly 1.4x the height in width. Below that the pair would be
- * narrower than a single page is now, which trades legibility for novelty.
- */
-function fitsTwoPages(width: number, height: number) {
-  return width >= 1024 && width / height >= 1.4;
-}
-
-/** The height the rail's controls occupy. Below this it would scroll, and a
- *  toolbar you have to scroll to reach is worse than one that fits. */
-const RAIL_CONTENT_HEIGHT = 530;
-
-/**
- * Roughly the proportion of a printed Mushaf page, width over height.
- *
- * It decides which dimension the type is fitted to, and therefore whether the
- * reading type size can do anything at all. A reading area narrower than this
- * is *width-bound*: the line already runs margin to margin, so the only way to
- * set it larger would be fewer words per line — and the words on a line are
- * page data. Wider than this and the fit is height-bound, where the size
- * choice has room to act.
- */
-const PAPER_ASPECT = 0.62;
-
-/** Height the two horizontal chrome bars take when they are the chrome. */
-const BARS_HEIGHT = 112;
-
-/**
- * The shape of the reading surface, measured once so the gates that depend on
- * it cannot disagree mid-resize.
- */
-function measureShell() {
-  if (typeof window === "undefined") {
-    return { spreadRoom: false, rail: false, railCompact: false, pageAspect: 1 };
-  }
-  const width = window.innerWidth;
-  const height = window.innerHeight;
-  const rail = fitsToolRail(width, height);
-  const spreadRoom = fitsTwoPages(width, height);
-  // What one page actually gets: the viewport less whichever chrome is showing,
-  // halved when two pages share the width.
-  const pageWidth = (width - (rail ? 72 : 0)) / (spreadRoom ? 2 : 1);
-  const pageHeight = Math.max(1, height - (rail ? 0 : BARS_HEIGHT));
-  return {
-    spreadRoom,
-    rail,
-    railCompact: width < 1200,
-    pageAspect: Number((pageWidth / pageHeight).toFixed(3)),
-  };
-}
-
-/**
- * Where the tools stand.
- *
- * On a landscape screen the scarce dimension is height: the two horizontal
- * chrome bars cost 112px of it and need no width at all. Standing them in a
- * rail beside the paper returns that height to the page. Portrait screens keep
- * the bars, because there width is what is short.
- *
- * The width floor is the tablet breakpoint rather than a desktop one, but the
- * height floor is what actually decides it: a phone held sideways would need
- * the rail most and can hold it least, so it keeps the bars, where every
- * control is visible at once.
- */
-function fitsToolRail(width: number, height: number) {
-  return width >= 768 && width > height && height >= RAIL_CONTENT_HEIGHT;
-}
-
-/** The right-hand page of a spread is the odd one: the Mushaf opens with page 1
- *  on the right, so pairs run (1,2), (3,4) and so on. */
-function spreadStart(page: number) {
-  return page % 2 === 1 ? page : page - 1;
-}
 const COMPLETION_NOTICE_MS = 4000;
 
 /** A page's words, bucketed into the reference's fifteen line slots. */
@@ -295,32 +220,8 @@ export function KhatmahReaderScreen({
     return () => window.clearTimeout(timer);
   }, [highlightedVerseKey]);
 
-  /**
-   * One measurement drives both physical gates: whether two pages fit, and
-   * whether the tools stand beside the paper or across it. Measuring once keeps
-   * the two from disagreeing mid-resize.
-   */
-  const [shell, setShell] = useState(() => measureShell());
+  const shell = useMushafShell();
 
-  useEffect(() => {
-    const measure = () =>
-      setShell((current) => {
-        const next = measureShell();
-        return current.spreadRoom === next.spreadRoom &&
-          current.rail === next.rail &&
-          current.railCompact === next.railCompact &&
-          current.pageAspect === next.pageAspect
-          ? current
-          : next;
-      });
-    measure();
-    window.addEventListener("resize", measure);
-    window.addEventListener("orientationchange", measure);
-    return () => {
-      window.removeEventListener("resize", measure);
-      window.removeEventListener("orientationchange", measure);
-    };
-  }, []);
   const autoSpreadRoom = shell.spreadRoom;
   /**
    * Whether the reading type size can change anything here.

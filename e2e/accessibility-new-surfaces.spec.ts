@@ -36,7 +36,7 @@ test("immersive Mushaf mode has no automatically detectable WCAG A/AA violations
   await seed(page, "/#/azkar/friday-kahf/1");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
 
-  await page.getByTestId("reader-mushaf-button").click();
+  // A multi-page surah arrives in the Mushaf; nothing has to open it.
   await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
 
   expect(await scan(page, '[data-testid="mushaf-immersive"]')).toEqual([]);
@@ -47,6 +47,14 @@ test("the interactive word-meaning card is named, reachable, and has no automati
 }) => {
   await seed(page, "/#/azkar/friday-kahf/1");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
+
+  // The word-meaning card belongs to the reader, which this surah now opens
+  // past. The control that steps back differs by width: the rail carries it on
+  // a landscape screen, the header bar on a narrow one.
+  const railBack = page.getByTestId("mushaf-rail-back");
+  if ((await railBack.count()) > 0) await railBack.click();
+  else await page.getByTestId("mushaf-immersive-close").click();
+  await expect(page.getByTestId("mushaf-immersive")).toHaveCount(0);
 
   await page.getByTestId("quran-word-help").first().click();
   const card = page.getByTestId("quran-word-popover");

@@ -90,6 +90,12 @@ test("Friday mode keyboard navigation through surahs", async ({ page }) => {
 
   // Reader opens
   await expect(page.getByTestId("reader-screen")).toBeVisible();
+  // Al-Kahf opens in the Mushaf view; this covers the reader's own back path.
+  const railBack = page.getByTestId("mushaf-rail-back");
+  if ((await railBack.count()) > 0) {
+    await railBack.click();
+    await expect(page.getByTestId("mushaf-immersive")).toHaveCount(0);
+  }
 
   // Keyboard nav in reader
   const closeBtn = page.getByRole("button", { name: /Back/i });
