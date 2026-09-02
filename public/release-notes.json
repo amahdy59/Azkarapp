@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-02d",
+  "release": "2026-09-02e",
   "ar": [
-    "صار في الرئيسية حديث اليوم: رواية واحدة كل يوم مع درجتها ومصدرها وفائدة العمل بها، مأخوذة من الأحاديث المراجَعة الموجودة في التطبيق أصلاً.",
-    "السور القصيرة صار لها اسمها ومكان نزولها وعدد آياتها داخل إطار المصحف، بعد أن كانت تظهر كفقرة دعاء.",
-    "الذكر الذي يُقال مرة واحدة صار له شريط \"تم\" بدل عدّاد ٠/١، فاتّسعت مساحة النص، واختفى السطر المكرر تحته.",
-    "قراءة سورة الكهف لم تعد تُمحى صباح السبت؛ صارت تتبع دورة الجمعة وحدها بدل ساعتين مختلفتين."
+    "درجات الأحاديث وفوائدها ومصادرها صارت بالعربية في التطبيق كله، بعد أن كانت بالإنجليزية وحدها رغم أن التطبيق عربي أولاً.",
+    "بطاقة حديث اليوم صارت عربية بالكامل: الحديث ودرجته وفائدته ومصدره.",
+    "أرقام المصادر تُعرض بالأرقام العربية، وأسماء الكتب بأسمائها المعروفة: صحيح البخاري، سنن أبي داود، حصن المسلم."
   ],
   "en": [
-    "Home now shows a narration of the day — one hadith with its grading, its source, and what the practice is for — drawn from the reviewed narrations already in the app.",
-    "Short surahs now show their name, where they were revealed, and their verse count inside the Mushaf's frame, instead of appearing as a paragraph of dua.",
-    "A zikr said once now has a \"done\" bar instead of a 0/1 counter, giving the text more room, and the repeated line beneath it is gone.",
-    "Reading Al-Kahf is no longer wiped on Saturday morning — it follows the Friday cycle alone instead of two different clocks."
+    "Hadith gradings, benefits and sources now appear in Arabic throughout the app; they had existed only in English despite the app being Arabic-first.",
+    "The narration of the day card is now fully Arabic — the hadith, its grading, its benefit and its source.",
+    "Citations show Arabic-Indic numerals and the collections' Arabic names: صحيح البخاري, سنن أبي داود, حصن المسلم."
   ]
 }

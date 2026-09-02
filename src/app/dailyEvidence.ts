@@ -1,4 +1,5 @@
 import { ALL_AZKAR } from "./content/azkar";
+import { toArabicAttribution, toArabicBenefit, toArabicSourceReference } from "./content/attributionArabic";
 import type { AppLanguage, Zikr } from "./types";
 
 /**
@@ -59,12 +60,15 @@ export function getDailyEvidence(dayKey: string, language: AppLanguage): DailyEv
   return {
     zikrId: zikr.id,
     hadith: zikr.hadithText!,
-    authenticity: zikr.authenticityNote!,
-    // Arabic benefits exist for a minority of entries; the English one is shown
-    // rather than nothing, because the benefit is what makes the narration
-    // mean something to a reader who cannot yet read the Arabic.
-    benefit: (language === "ar" && zikr.benefitArabic) || zikr.benefit!,
-    sourceReference: (language === "ar" && zikr.sourceReferenceArabic) || zikr.sourceReference,
+    // The gradings and most benefits were authored in English only, so an
+    // Arabic reader met an Arabic narration under an English citation. The
+    // lookup falls back to the reviewed English wherever no rendering exists.
+    authenticity: (language === "ar" ? toArabicAttribution(zikr.authenticityNote) : zikr.authenticityNote)!,
+    benefit: (language === "ar" ? zikr.benefitArabic || toArabicBenefit(zikr.benefit) : zikr.benefit)!,
+    sourceReference:
+      language === "ar"
+        ? zikr.sourceReferenceArabic || toArabicSourceReference(zikr.sourceReference)
+        : zikr.sourceReference,
     categoryId: zikr.category,
   };
 }

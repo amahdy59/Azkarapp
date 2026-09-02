@@ -50,4 +50,24 @@ describe("the daily narration", () => {
     expect(arabic?.zikrId).toBe(english?.zikrId);
     expect(arabic?.hadith).toBe(english?.hadith);
   });
+
+  it("gives an Arabic reader an Arabic card, attribution included", () => {
+    // The card previously showed an Arabic narration under an English grading
+    // and, for most entries, an English benefit — the one screen where the
+    // app's Arabic-first premise visibly broke.
+    const arabicScript = /[؀-ۿ]/;
+    for (const dayKey of ["2026-09-02", "2026-05-14", "2027-02-08", "2026-11-30", "2026-01-03"]) {
+      const card = getDailyEvidence(dayKey, "ar")!;
+      expect(arabicScript.test(card.hadith), dayKey).toBe(true);
+      expect(arabicScript.test(card.authenticity), `${dayKey} grading`).toBe(true);
+      expect(arabicScript.test(card.benefit), `${dayKey} benefit`).toBe(true);
+    }
+  });
+
+  it("leaves the English card in English", () => {
+    const card = getDailyEvidence("2026-09-02", "en")!;
+    // The reviewed English stays the authority; only the reader's language
+    // decides which rendering is shown.
+    expect(/[؀-ۿ]/.test(card.authenticity)).toBe(false);
+  });
 });
