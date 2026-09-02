@@ -97,4 +97,51 @@ describe("FormField", () => {
     expect(screen.getByText("Out of range")).toBeInTheDocument();
     expect(screen.queryByText("Such as 21.42")).toBeNull();
   });
+
+  it("gives every text-entry field in the app a title the eye can read", () => {
+    // An accessible name is not the same test. These all had `aria-label` plus a
+    // placeholder, which passes a screen-reader audit and still leaves the field
+    // unnamed on screen — and unnamed entirely once there is a value to check.
+    const files = [
+      "src/app/screens/auth/RevampedAuthScreens.tsx",
+      "src/app/components/MushafNavigationModal.tsx",
+      "src/app/screens/settings/NotificationsPanel.tsx",
+      "src/app/screens/SearchScreen.tsx",
+      "src/app/screens/AzkarLibraryScreen.tsx",
+    ];
+    for (const file of files) {
+      const source = readFileSync(file, "utf8");
+      let cursor = 0;
+      for (const chunk of source.split("<input").slice(1)) {
+        const at = source.indexOf("<input", cursor);
+        cursor = at + 1;
+        const tag = chunk.slice(0, chunk.indexOf("/>"));
+        if (/type="(hidden|checkbox|radio|range)"/.test(tag)) continue;
+        const id = tag.match(/id=[{"]([^}"\s]+)/)?.[1];
+        const before = source.slice(0, at);
+        // A wrapping <label> names its control too, and the prayer-time
+        // adjustments use one — visible text, no id needed.
+        const wrapped = before.split("<label").length > before.split("</label").length;
+        // The id may be a literal or a JSX expression; both bind a label.
+        const byId =
+          Boolean(id) &&
+          (source.includes(`htmlFor="${id}"`) || source.includes(`htmlFor={${id}}`) || source.includes("htmlFor={`"));
+        expect(byId || wrapped || /aria-labelledby/.test(tag), `unlabelled input in ${file}: ${tag.slice(0, 80)}`).toBe(
+          true,
+        );
+      }
+    }
+  });
+
+  it("uses one label style, not three", () => {
+    for (const file of [
+      "src/app/screens/SearchScreen.tsx",
+      "src/app/screens/AzkarLibraryScreen.tsx",
+      "src/app/components/MushafNavigationModal.tsx",
+      "src/app/screens/auth/RevampedAuthScreens.tsx",
+    ]) {
+      const source = readFileSync(file, "utf8");
+      expect(source, `${file} should take the shared label class`).toContain("FIELD_LABEL_CLASS");
+    }
+  });
 });

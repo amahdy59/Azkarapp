@@ -6,6 +6,7 @@ import { CATEGORIES } from "../content/categories";
 import type { AppLanguage, CategoryId } from "../types";
 import { StatePanel } from "../components/StatePanel";
 import { IconButton } from "../components/LayoutShells";
+import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 
 import { normalizeSearchText } from "../content/searchNormalization";
@@ -139,7 +140,7 @@ export function SearchScreen({
         </IconButton>
 
         <div className="min-w-0 flex-1">
-          <label htmlFor={searchInputId} className="mb-1.5 block text-[0.75rem] font-semibold text-muted-foreground">
+          <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
             {t(language, "search.inputAriaLabel")}
           </label>
           <div className="field-shell flex h-12 items-center gap-3 rounded-full border border-border-control bg-card px-4">

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FIELD_CONTROL_CLASS, FormField } from "../../components/FormField";
+import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../components/FormField";
 import { Button } from "../../components/ui/button";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
@@ -433,14 +433,19 @@ export function NotificationsPanel({
               <p className="text-[0.75rem] leading-5 text-muted-foreground">
                 {t(language, "notifications.citySearchHint")}
               </p>
-              <input
-                type="search"
-                value={citySearch}
-                onChange={(event) => setCitySearch(event.target.value)}
-                placeholder={t(language, "notifications.citySearchPlaceholder")}
-                aria-label={t(language, "notifications.citySearchLabel")}
-                className="h-11 w-full rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground"
-              />
+              <div className="flex flex-col gap-1.5">
+                <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
+                  {t(language, "notifications.citySearchLabel")}
+                </label>
+                <input
+                  id="city-search"
+                  type="search"
+                  value={citySearch}
+                  onChange={(event) => setCitySearch(event.target.value)}
+                  placeholder={t(language, "notifications.citySearchPlaceholder")}
+                  className={FIELD_CONTROL_CLASS}
+                />
+              </div>
               <p className="text-[0.75rem] font-semibold text-muted-foreground">
                 {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
               </p>

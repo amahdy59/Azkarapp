@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
+import { FIELD_LABEL_CLASS } from "./FormField";
 import type { AppLanguage, QuranVerseBookmark } from "../types";
 import { t } from "../i18n";
 import { formatNumerals } from "../formatting";
@@ -165,12 +166,15 @@ export function MushafNavigationModal({
               because nothing scrolls under it. */}
           {activeTab === "surahs" && (
             <div className="shrink-0 border-b border-border/60 bg-card px-4 py-3">
+              <label htmlFor="surah-search" className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
+                {t(language, "mushaf.searchSurahs")}
+              </label>
               <div className="relative flex items-center">
                 <span className="absolute start-3 text-muted-foreground pointer-events-none">
                   <Search size={18} />
                 </span>
                 <input
-                  aria-label={t(language, "mushaf.searchSurahs")}
+                  id="surah-search"
                   type="search"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -319,7 +323,7 @@ export function MushafNavigationModal({
             {activeTab === "jump" && (
               <div className="flex flex-col gap-6 py-2">
                 <form onSubmit={handleInputSubmit} className="flex flex-col gap-3">
-                  <label htmlFor="page-jump-input" className="text-sm font-bold text-foreground">
+                  <label htmlFor="page-jump-input" className={FIELD_LABEL_CLASS}>
                     {t(language, "mushaf.enterPageNumber")}
                   </label>
                   <div className="flex gap-2">

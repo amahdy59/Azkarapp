@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { FIELD_LABEL_CLASS } from "../../components/FormField";
 import { ArrowPrevious, Clock } from "../../components/icons";
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../components/ui/input-otp";
 import { t } from "../../i18n";
@@ -160,20 +161,28 @@ export function EmailInputScreen({
           </h1>
           <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">{t(language, "auth.enterEmailHint")}</p>
         </div>
-        <input
-          id="email-input"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@example.com"
-          className="h-[60px] rounded-2xl border-[1.5px] border-primary bg-card px-4 text-[1rem] font-semibold text-foreground outline-none focus:ring-[3px] focus:ring-ring"
-          inputMode="email"
-          autoComplete="email"
-          dir="ltr"
-          aria-label={t(language, "auth.emailLabel")}
-          aria-describedby={errorMessage ? "email-error" : undefined}
-          aria-invalid={errorMessage ? "true" : undefined}
-        />
+        {/* The heading above says what the screen is for; it is not this
+            field's name. The name was carried by an `aria-label` behind a
+            placeholder, which left the field unlabelled on screen and unlabelled
+            entirely the moment there was a value to check. */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="email-input" className={FIELD_LABEL_CLASS}>
+            {t(language, "auth.emailLabel")}
+          </label>
+          <input
+            id="email-input"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@example.com"
+            className="h-[60px] rounded-2xl border-[1.5px] border-primary bg-card px-4 text-[1rem] font-semibold text-foreground outline-none focus:ring-[3px] focus:ring-ring"
+            inputMode="email"
+            autoComplete="email"
+            dir="ltr"
+            aria-describedby={errorMessage ? "email-error" : undefined}
+            aria-invalid={errorMessage ? "true" : undefined}
+          />
+        </div>
         {errorMessage && (
           <p id="email-error" className="text-[0.75rem] text-destructive" role="alert">
             {errorMessage}
@@ -350,15 +359,20 @@ export function ProfileCompletionScreen({
       <BrandLockup compact />
       <h1 className="mt-8 text-2xl font-extrabold text-foreground">{t(language, "auth.profileTitle")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">{t(language, "auth.profileHint")}</p>
-      <input
-        className="mt-8 h-12 rounded-xl border border-border-control bg-card px-4 text-foreground"
-        value={displayName}
-        onChange={(event) => setDisplayName(event.target.value)}
-        autoComplete="name"
-        aria-label={t(language, "auth.displayNameLabel")}
-        aria-describedby={errorMessage ? "profile-error" : undefined}
-        aria-invalid={errorMessage ? "true" : undefined}
-      />
+      <div className="mt-8 flex flex-col gap-1.5">
+        <label htmlFor="display-name-input" className={FIELD_LABEL_CLASS}>
+          {t(language, "auth.displayNameLabel")}
+        </label>
+        <input
+          id="display-name-input"
+          className="h-12 rounded-xl border border-border-control bg-card px-4 text-foreground"
+          value={displayName}
+          onChange={(event) => setDisplayName(event.target.value)}
+          autoComplete="name"
+          aria-describedby={errorMessage ? "profile-error" : undefined}
+          aria-invalid={errorMessage ? "true" : undefined}
+        />
+      </div>
       {errorMessage && (
         <p id="profile-error" className="mt-2 text-sm text-destructive" role="alert">
           {errorMessage}

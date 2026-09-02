@@ -15,6 +15,17 @@ import { useId, type InputHTMLAttributes, type ReactNode, type WheelEvent } from
  * The control styling lived at twenty-one call sites, so a change to focus
  * treatment or height meant twenty-one edits and, in practice, drift.
  */
+/**
+ * One look for a field's title, for the labels that cannot use {@link FormField}
+ * because their control is styled for its own screen.
+ *
+ * There were three: `text-[0.75rem] font-semibold text-muted-foreground` on the
+ * two search screens, `text-sm font-bold text-foreground` on the page-jump
+ * dialog, and this one. A label is the same thing everywhere it appears, so it
+ * had no reason to look like three different things.
+ */
+export const FIELD_LABEL_CLASS = "text-[0.8125rem] font-bold text-foreground";
+
 export const FIELD_CONTROL_CLASS =
   "h-11 w-full min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 
@@ -54,7 +65,7 @@ export function FormField({ label, hint, error, controlClassName = "", className
 
   return (
     <div className={`flex min-w-0 flex-col gap-1.5 ${className}`.trim()}>
-      <label htmlFor={id} className="text-[0.8125rem] font-bold text-foreground">
+      <label htmlFor={id} className={FIELD_LABEL_CLASS}>
         {label}
       </label>
       <input

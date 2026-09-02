@@ -24,6 +24,7 @@ import { CATEGORIES, CATEGORY_GROUPS, isOccasionalCategory } from "../content/ca
 import { COMPREHENSIVE_DUAS } from "../content/comprehensiveDuas";
 import { formatNumerals } from "../formatting";
 import { matchesSearch, normalizeSearchText } from "../content/searchNormalization";
+import { FIELD_LABEL_CLASS } from "../components/FormField";
 import { t } from "../i18n";
 import type { AppLanguage, CategoryId, RoutineCategoryId, RoutineMode, Zikr } from "../types";
 
@@ -126,10 +127,7 @@ export function AzkarLibraryScreen({
                 if (query) onSearch(query);
               }}
             >
-              <label
-                htmlFor={searchInputId}
-                className="mb-1.5 block text-[0.75rem] font-semibold text-muted-foreground"
-              >
+              <label htmlFor={searchInputId} className={`mb-1.5 block ${FIELD_LABEL_CLASS}`}>
                 {t(language, "library.search")}
               </label>
               <div className="flex items-center gap-2">
