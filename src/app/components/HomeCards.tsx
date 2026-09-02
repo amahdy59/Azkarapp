@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { t } from "../i18n";
+import type { DailyEvidence } from "../dailyEvidence";
 import type { AppLanguage, RoutineMode } from "../types";
 import { formatNumerals } from "../formatting";
 import { Card } from "./Card";
@@ -378,6 +379,86 @@ export function FridayHomeCard({
           </div>
         </div>
       </div>
+    </Card>
+  );
+}
+
+/**
+ * One reviewed narration a day, with its grading and what the practice is for.
+ *
+ * The evidence already existed on every zikr and was only reachable by opening
+ * one and then its reference sheet. The grading is not decoration here: a card
+ * that showed a narration without saying who recorded and graded it would be
+ * the only place in the app making a claim it could not support, so
+ * {@link getDailyEvidence} will not return an entry that lacks one.
+ */
+export function DailyEvidenceCard({
+  language,
+  direction,
+  evidence,
+  onOpenZikr,
+}: {
+  language: AppLanguage;
+  direction: "ltr" | "rtl";
+  evidence: DailyEvidence;
+  onOpenZikr?: (categoryId: DailyEvidence["categoryId"], zikrId: string) => void;
+}) {
+  return (
+    <Card
+      as="section"
+      elevation="flat"
+      aria-labelledby="home-evidence-heading"
+      className="flex h-full flex-col gap-3"
+      data-testid="home-daily-evidence"
+      dir={direction}
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+          aria-hidden="true"
+        >
+          <BookOpen size={18} />
+        </span>
+        <h2 id="home-evidence-heading" className="text-[0.9375rem] font-bold text-foreground">
+          {t(language, "home.dailyEvidence")}
+        </h2>
+      </div>
+
+      {/* The narration leads, in the language it was said in. */}
+      <blockquote
+        className="zikr-text text-[1.0625rem] font-medium leading-[2] text-foreground"
+        dir="rtl"
+        lang="ar"
+        data-testid="daily-evidence-hadith"
+      >
+        {evidence.hadith}
+      </blockquote>
+
+      <p className="text-[0.8125rem] leading-relaxed text-muted-foreground" dir="auto">
+        {evidence.benefit}
+      </p>
+
+      <footer className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/40 pt-3">
+        <span className="text-[0.75rem] font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
+          {evidence.authenticity}
+        </span>
+        {evidence.sourceReference && (
+          <span className="text-[0.75rem] text-muted-foreground" dir="auto">
+            {evidence.sourceReference}
+          </span>
+        )}
+      </footer>
+
+      {onOpenZikr && (
+        <button
+          type="button"
+          onClick={() => onOpenZikr(evidence.categoryId, evidence.zikrId)}
+          className="min-h-11 rounded-full border border-primary/50 px-4 text-[0.8125rem] font-bold text-primary hover:bg-primary/5"
+          data-testid="daily-evidence-open"
+        >
+          {t(language, "home.dailyEvidenceOpen")}
+        </button>
+      )}
     </Card>
   );
 }

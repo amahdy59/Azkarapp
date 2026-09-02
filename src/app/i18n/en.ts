@@ -75,6 +75,8 @@ const en = {
     retry: "Retry saving",
   },
   home: {
+    dailyEvidence: "Today's narration",
+    dailyEvidenceOpen: "Open the zikr",
     estimatedMinutes: "~{count} mins",
     headerStatsAria: "Palms: {palms}, today's leaves: {leaves} of {total}, daily streak: {streak} days",
     timeFor: "Time for",

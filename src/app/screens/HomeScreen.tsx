@@ -5,7 +5,8 @@ import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
+import { getDailyEvidence } from "../dailyEvidence";
+import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import {
   ALL_AZKAR,
@@ -236,6 +237,7 @@ export function HomeScreen({
   dailyCompletions,
   quietProgressEnabled,
   progressDayStartHour,
+  onOpenEvidenceZikr,
   language,
   direction,
   calendarType = "hijri",
@@ -270,6 +272,7 @@ export function HomeScreen({
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
+  onOpenEvidenceZikr?: (categoryId: CategoryId, zikrId: string) => void;
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
@@ -320,6 +323,9 @@ export function HomeScreen({
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
 
   const todayKey = getProgressDayKey(now, progressDayStartHour);
+  // Keyed to the progress day, so the narration turns over on the same boundary
+  // the routines do rather than at civil midnight.
+  const dailyEvidence = useMemo(() => getDailyEvidence(todayKey, language), [todayKey, language]);
 
   const reminderInfo = useMemo(
     () => getTimeOfDayZikr(now, language, locationSettings),
@@ -630,6 +636,14 @@ export function HomeScreen({
           </div>
 
           <div className="px-page grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
+            {dailyEvidence && (
+              <DailyEvidenceCard
+                language={language}
+                direction={direction}
+                evidence={dailyEvidence}
+                onOpenZikr={onOpenEvidenceZikr}
+              />
+            )}
             <SavedZikrCard
               language={language}
               direction={direction}

@@ -75,6 +75,8 @@ const ar = {
     retry: "إعادة محاولة الحفظ",
   },
   home: {
+    dailyEvidence: "حديث اليوم",
+    dailyEvidenceOpen: "افتح الذكر",
     estimatedMinutes: "{count} دقائق تقريباً",
     headerStatsAria: "أشجار النخيل: {palms}، أوراق اليوم: {leaves} من {total}، السلسلة اليومية: {streak} أيام",
     timeFor: "حان وقت",
