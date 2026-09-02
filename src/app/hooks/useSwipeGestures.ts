@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState, type CSSProperties, type TouchEvent } from "react";
+import { useCallback, useRef, useState, type CSSProperties, type PointerEvent, type TouchEvent } from "react";
 
 /** How far the page has to travel before releasing turns it. */
 const TURN_THRESHOLD = 60;
@@ -122,6 +122,55 @@ export function useSwipeGestures({
   );
 
   /**
+   * The same gesture, for a surface driven by pointer events rather than touch.
+   *
+   * The Mushaf view had its own copy: a 1:1 unbounded translation with no cap,
+   * no axis lock, and a settle that ran against the page-turn animation. Two
+   * implementations of one gesture is why moving between the reader and the
+   * Mushaf felt like moving between two apps.
+   */
+  const pointer = useRef({ id: -1, x: 0, y: 0 });
+
+  const onPointerDown = useCallback((event: PointerEvent<HTMLElement>) => {
+    if (event.button !== 0) return;
+    if ((event.target as HTMLElement).closest("button, a, input, [role='switch'], [role='dialog']")) return;
+    pointer.current = { id: event.pointerId, x: event.clientX, y: event.clientY };
+    axis.current = "undecided";
+  }, []);
+
+  const onPointerMove = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      if (pointer.current.id !== event.pointerId) return;
+      const dx = event.clientX - pointer.current.x;
+      const dy = event.clientY - pointer.current.y;
+
+      if (axis.current === "undecided") {
+        if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+        axis.current = Math.abs(dx) > Math.abs(dy) ? "horizontal" : "vertical";
+        if (axis.current === "horizontal") event.currentTarget.setPointerCapture?.(event.pointerId);
+      }
+
+      if (axis.current !== "horizontal") return;
+      if (!reduceMotion) setDragOffset(damp(dx));
+    },
+    [reduceMotion],
+  );
+
+  const onPointerEnd = useCallback(
+    (event: PointerEvent<HTMLElement>) => {
+      if (pointer.current.id !== event.pointerId) return;
+      const start = pointer.current;
+      const lockedAxis = axis.current;
+      setDragOffset(0);
+      pointer.current = { id: -1, x: 0, y: 0 };
+      axis.current = "undecided";
+      if (lockedAxis === "vertical") return;
+      handleSwipe(event.clientX - start.x);
+    },
+    [handleSwipe],
+  );
+
+  /**
    * Applied to whatever should follow the finger.
    *
    * While the thumb is down the page tracks it with no transition; on release
@@ -133,5 +182,13 @@ export function useSwipeGestures({
     transition: dragOffset === 0 ? "transform var(--motion-duration-release) var(--motion-ease-release)" : "none",
   };
 
-  return { onTouchStart, onTouchMove, onTouchEnd, dragOffset, dragStyle };
+  return {
+    onTouchStart,
+    onTouchMove,
+    onTouchEnd,
+    dragOffset,
+    dragStyle,
+    /** Spread onto a surface that should be draggable by pointer as well. */
+    pointerProps: { onPointerDown, onPointerMove, onPointerUp: onPointerEnd, onPointerCancel: onPointerEnd },
+  };
 }

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
+import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { t } from "../i18n";
 import type { AppLanguage, MushafPageTheme, MushafTextScale, Zikr } from "../types";
 import {
@@ -21,8 +22,6 @@ import { MushafPageViewer } from "./MushafPageViewer";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
 
-const SWIPE_THRESHOLD = 50;
-const PAPER_SETTLE = "transform 160ms ease-out";
 const FONT_WAIT_MS = 1200;
 
 function toMushafLines(pageData: MushafVerseData[] | null) {
@@ -181,53 +180,22 @@ export function MushafImmersiveReader({
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [activeAyah, paginate]);
 
-  // Drag / swipe navigation
-  const drag = useRef({ pointerId: -1, startX: 0, engaged: false });
-
-  const endDrag = useCallback(
-    (clientX: number | null) => {
-      const paper = paperRef.current;
-      if (paper) {
-        paper.style.transition = reducedMotion ? "none" : PAPER_SETTLE;
-        paper.style.transform = "";
-      }
-      if (drag.current.engaged && clientX !== null) {
-        const offset = clientX - drag.current.startX;
-        if (offset >= SWIPE_THRESHOLD) paginate(1);
-        else if (offset <= -SWIPE_THRESHOLD) paginate(-1);
-      }
-      drag.current = { pointerId: -1, startX: 0, engaged: false };
-    },
-    [paginate, reducedMotion],
-  );
-
-  const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (event.button !== 0) return;
-    if ((event.target as HTMLElement).closest("button, a, [role='switch']")) return;
-    drag.current = { pointerId: event.pointerId, startX: event.clientX, engaged: false };
-  };
-
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current.pointerId !== event.pointerId) return;
-    const offset = event.clientX - drag.current.startX;
-    if (!drag.current.engaged) {
-      if (Math.abs(offset) < 12) return;
-      drag.current.engaged = true;
-      if (event.currentTarget.hasPointerCapture?.(event.pointerId) === false) {
-        event.currentTarget.setPointerCapture(event.pointerId);
-      }
-    }
-    const paper = paperRef.current;
-    if (paper) {
-      paper.style.transition = "none";
-      paper.style.transform = `translateX(${offset.toFixed(1)}px)`;
-    }
-  };
-
-  const onPointerEnd = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (drag.current.pointerId !== event.pointerId) return;
-    endDrag(event.clientX);
-  };
+  /**
+   * One gesture, shared with the reader.
+   *
+   * This view had its own: a 1:1 unbounded translation that let a page be
+   * dragged clean off the screen, no axis lock so a drifting vertical scroll
+   * engaged it, and a 160ms settle that ran at the same time as the page-turn
+   * spring — two curves on one property, which is what made the swipe feel
+   * unnatural. Moving between the reader and the Mushaf now feels like one app
+   * because it is one implementation.
+   */
+  const { dragStyle, pointerProps } = useSwipeGestures({
+    direction,
+    onNext: () => paginate(1),
+    onPrev: () => paginate(-1),
+    reduceMotion: reducedMotion,
+  });
 
   const handleAyahAction = useCallback((verseKey: string, pageNum: number) => {
     const requestId = ++ayahRequestId.current;
@@ -265,8 +233,14 @@ export function MushafImmersiveReader({
           data-testid="mushaf-immersive-indicator"
           className="text-xs font-bold text-muted-foreground hidden min-[360px]:inline"
         >
-          {t(language, "reader.mushafPage", { page: formatNumerals(displayPage, language) })} ·{" "}
-          {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
+          {/* Each run gets its own isolate. In one <bdi> the middot sat between
+              two numeric runs and the bidi algorithm reordered them into a
+              single number: "page 295 · 12/30" rendered as ١٢/٣٠٢٩٥. */}
+          <bdi>{t(language, "reader.mushafPage", { page: formatNumerals(displayPage, language) })}</bdi>
+          <span aria-hidden="true"> · </span>
+          <bdi>
+            {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
+          </bdi>
         </bdi>
         <button
           type="button"
@@ -377,10 +351,7 @@ export function MushafImmersiveReader({
           <div
             data-testid="mushaf-immersive-track"
             className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerEnd}
-            onPointerCancel={onPointerEnd}
+            {...pointerProps}
             style={{ touchAction: "pan-y" }}
           >
             <div className="relative h-full w-full">
@@ -411,24 +382,28 @@ export function MushafImmersiveReader({
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   className="absolute inset-0"
                 >
-                  <MushafPageViewer
-                    lines={lines}
-                    language={language}
-                    pageNumber={displayPage}
-                    surahName={surahName}
-                    juzNumber={juzNumber}
-                    direction={direction}
-                    theme={theme}
-                    useQcfGlyphs={useQcfGlyphs}
-                    showWordMeanings={showWordMeanings}
-                    headerContent={pageHeader}
-                    footerContent={pageFooter}
-                    progressBar={progressBar}
-                    paperRef={paperRef}
-                    reduceMotion={reducedMotion}
-                    textScale={textScale}
-                    onAyahAction={handleAyahAction}
-                  />
+                  {/* Its own layer: the turn animates the element above and the
+                      drag this one, so neither overwrites the other's transform. */}
+                  <div style={dragStyle} className="h-full w-full">
+                    <MushafPageViewer
+                      lines={lines}
+                      language={language}
+                      pageNumber={displayPage}
+                      surahName={surahName}
+                      juzNumber={juzNumber}
+                      direction={direction}
+                      theme={theme}
+                      useQcfGlyphs={useQcfGlyphs}
+                      showWordMeanings={showWordMeanings}
+                      headerContent={pageHeader}
+                      footerContent={pageFooter}
+                      progressBar={progressBar}
+                      paperRef={paperRef}
+                      reduceMotion={reducedMotion}
+                      textScale={textScale}
+                      onAyahAction={handleAyahAction}
+                    />
+                  </div>
                 </motion.div>
               </AnimatePresence>
             </div>

@@ -132,3 +132,54 @@ describe("the reader applies the gesture on every layout", () => {
     expect(reader.match(/renderReadingContent\(\)/g)).toHaveLength(2);
   });
 });
+
+describe("one gesture across both reading surfaces", () => {
+  it("leaves the Mushaf view no drag physics of its own", () => {
+    const immersive = readFileSync("src/app/components/MushafImmersiveReader.tsx", "utf8");
+    // It had a 1:1 unbounded translation with no cap and no axis lock, settled
+    // by a 160ms ease that ran against the page-turn spring. Two curves on one
+    // property is what made the swipe feel unnatural, and two implementations
+    // of one gesture is why moving between the reader and the Mushaf felt like
+    // moving between two apps.
+    expect(immersive).toContain("useSwipeGestures");
+    expect(immersive).not.toMatch(/translateX\(\$\{offset/);
+    expect(immersive).not.toContain("PAPER_SETTLE");
+    expect(immersive).not.toContain("SWIPE_THRESHOLD");
+  });
+
+  it("damps and caps a pointer drag exactly as it does a touch drag", () => {
+    function PointerSurface({ onNext = vi.fn() }: { onNext?: () => void }) {
+      const { pointerProps, dragStyle } = useSwipeGestures({ direction: "rtl", onNext, onPrev: vi.fn() });
+      return (
+        <div data-testid="surface" {...pointerProps}>
+          <div data-testid="page" style={dragStyle} />
+        </div>
+      );
+    }
+    render(<PointerSurface />);
+    const surface = screen.getByTestId("surface");
+    fireEvent.pointerDown(surface, { pointerId: 1, button: 0, clientX: 300, clientY: 400 });
+    fireEvent.pointerMove(surface, { pointerId: 1, clientX: 260, clientY: 400 });
+    expect(screen.getByTestId("page").style.transform).toBe("translateX(-22px)");
+    fireEvent.pointerMove(surface, { pointerId: 1, clientX: -600, clientY: 400 });
+    expect(screen.getByTestId("page").style.transform).toBe("translateX(-72px)");
+  });
+
+  it("ignores a pointer drag the axis lock called vertical", () => {
+    const onNext = vi.fn();
+    const onPrev = vi.fn();
+    function PointerSurface() {
+      const { pointerProps } = useSwipeGestures({ direction: "rtl", onNext, onPrev });
+      return <div data-testid="surface" {...pointerProps} />;
+    }
+    render(<PointerSurface />);
+    const surface = screen.getByTestId("surface");
+    fireEvent.pointerDown(surface, { pointerId: 1, button: 0, clientX: 300, clientY: 400 });
+    // A scroll that drifts sideways used to engage the drag at 12px of drift.
+    fireEvent.pointerMove(surface, { pointerId: 1, clientX: 305, clientY: 300 });
+    fireEvent.pointerMove(surface, { pointerId: 1, clientX: 380, clientY: 260 });
+    fireEvent.pointerUp(surface, { pointerId: 1, clientX: 380, clientY: 260 });
+    expect(onNext).not.toHaveBeenCalled();
+    expect(onPrev).not.toHaveBeenCalled();
+  });
+});
