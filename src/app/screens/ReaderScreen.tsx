@@ -293,11 +293,13 @@ export function ReaderScreen({
     onTouchStart: baseTouchStart,
     onTouchMove: baseTouchMove,
     onTouchEnd: baseTouchEnd,
+    dragStyle,
   } = useSwipeGestures({
     direction,
     onNext,
     onPrev,
     suppressTap,
+    reduceMotion: reducedMotion,
   });
 
   const onTouchStart = immersiveOpen ? undefined : baseTouchStart;
@@ -435,7 +437,7 @@ export function ReaderScreen({
     arabicLength: z.arabicText.length,
     longSurah,
   });
-  const readingFontFamily = "var(--font-reading-arabic)";
+  const readingFontFamily = "var(--font-zikr)";
   const readingPercent = azkar.length > 0 ? Math.round((readingProgressValue / azkar.length) * 100) : 0;
   const readerZikrTitle = getReaderZikrTitle(z, language);
   const localizedReadingPercent = formatNumerals(readingPercent, language);
@@ -950,14 +952,18 @@ export function ReaderScreen({
                       transition={{ duration: reducedMotion ? 0.1 : 0.3, ease: "easeOut" }}
                       className="reading-measure mx-auto flex min-h-full w-full flex-col py-4"
                     >
-                      {/* The press is its own transform, not a value folded
-                          into the card's 300ms slide. Sharing that transition
-                          is what made the count feel slow and shallow. */}
-                      <div
-                        style={pressStyle}
-                        className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
-                      >
-                        {renderReadingContent()}
+                      {/* Three transforms, three layers. The entrance slide is
+                          framer's on the element above, the drag follows the
+                          thumb here, and the press scales below — all animating
+                          `transform`, so sharing an element would mean one
+                          silently overwriting another. */}
+                      <div style={dragStyle} className="flex w-full flex-1 flex-col">
+                        <div
+                          style={pressStyle}
+                          className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
+                        >
+                          {renderReadingContent()}
+                        </div>
                       </div>
                     </motion.div>
                   </AnimatePresence>
@@ -1101,9 +1107,14 @@ export function ReaderScreen({
               }`}
             >
               {/* Inner wrapper vertically centers short/medium Zikrs safely via my-auto; long Surahs start at top to scroll naturally */}
-              <div className="flex min-h-full w-full flex-col py-4">
+              {/* The drag and the press apply here too. They used to hang off
+                  the wide branch alone, so on a phone — where the swipe and the
+                  tap are the only ways to drive the reader — the page followed
+                  nothing and a tap to count moved nothing at all. */}
+              <div style={dragStyle} className="flex min-h-full w-full flex-col py-4">
                 <div
                   key={z.id}
+                  style={pressStyle}
                   className={`my-auto w-full flex flex-col items-center justify-center ${justCompleted ? "zikr-step-exit" : "zikr-step-enter"}`}
                 >
                   {renderReadingContent()}
