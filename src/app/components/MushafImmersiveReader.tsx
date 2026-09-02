@@ -4,7 +4,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
-import type { AppLanguage, MushafPageTheme, Zikr } from "../types";
+import type { AppLanguage, MushafPageTheme, MushafTextScale, Zikr } from "../types";
 import {
   getCachedMushafPage,
   isQcfFontReady,
@@ -75,6 +75,7 @@ export function MushafImmersiveReader({
   title,
   theme = "midnight",
   reducedMotion = false,
+  textScale = "medium",
   onClose,
   onComplete,
 }: {
@@ -86,6 +87,8 @@ export function MushafImmersiveReader({
   title: string;
   theme?: MushafPageTheme;
   reducedMotion?: boolean;
+  /** The Mushaf reading size, so this view matches the Mushaf proper. */
+  textScale?: MushafTextScale;
   textStyle?: CSSProperties;
   onSelectMeanings?: (selection: WordMeaningSelection) => void;
   activeWordId?: string | null;
@@ -422,6 +425,8 @@ export function MushafImmersiveReader({
                     footerContent={pageFooter}
                     progressBar={progressBar}
                     paperRef={paperRef}
+                    reduceMotion={reducedMotion}
+                    textScale={textScale}
                     onAyahAction={handleAyahAction}
                   />
                 </motion.div>

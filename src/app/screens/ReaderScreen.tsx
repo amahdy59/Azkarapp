@@ -26,7 +26,7 @@ import { shouldReduceMotion } from "../motionPreferences";
 import { CATEGORIES } from "../content/categories";
 import { getAzkarForMode } from "../content/azkar";
 import { isLongSurah } from "../content/mushafPages";
-import type { AppLanguage, CategoryId, RoutineMode, TextSizeOption, ThemeMode, Zikr } from "../types";
+import type { AppLanguage, CategoryId, RoutineMode, MushafTextScale, TextSizeOption, ThemeMode, Zikr } from "../types";
 import { isPrayerName } from "../content/prayerTimes";
 import { ProgressBar } from "../components/ProgressBar";
 import { CounterShortcutHints, ZikrCounterSurface } from "../components/ZikrComponents";
@@ -144,6 +144,7 @@ export function ReaderScreen({
   onPrev,
   onToggleSaved,
   audioAvailable,
+  mushafTextScale = "medium",
   onPlayAudio,
   onRepeatAudio,
 }: {
@@ -173,6 +174,8 @@ export function ReaderScreen({
   onPrev: () => void;
   onToggleSaved: (zikrId: string) => void;
   audioAvailable: boolean;
+  /** Passed to the immersive Mushaf so it matches the Mushaf proper. */
+  mushafTextScale?: MushafTextScale;
   onPlayAudio?: () => void;
   onRepeatAudio?: () => void;
 }) {
@@ -1176,6 +1179,7 @@ export function ReaderScreen({
           title={readerZikrTitle ?? displayCategoryName}
           theme={themeMode === "light" ? "light" : "midnight"}
           reducedMotion={reducedMotion}
+          textScale={mushafTextScale}
           onClose={() => setImmersiveOpen(false)}
           onComplete={() => {
             if (!isDone) onComplete(idx);

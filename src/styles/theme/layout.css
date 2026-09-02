@@ -377,9 +377,36 @@
    pages share a slot height and QCF cuts every full line on a page to the same
    natural width, so the two halves land within a pixel of each other. */
 .mushaf-page-frame {
-  --mushaf-frame-pad: clamp(0.35rem, 1.6cqi, 0.9rem);
+  /* The type needs room to sit inside the rule rather than against it. The
+     frame's max-width grows with this padding, so widening it moves the rule
+     outward instead of squeezing the measure — the fifteen-line geometry of
+     DEC-089 is untouched. */
+  --mushaf-frame-pad: clamp(0.75rem, 2.6cqi, 1.6rem);
+  /* The gap between the two strokes, and the room the outer one needs. */
+  --mushaf-rule-gap: clamp(3px, 0.9cqi, 7px);
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
+  padding-block: clamp(0.3rem, 1cqh, 0.7rem);
+}
+
+/* Both rules take the page's own ink through `currentColor`, so a change of
+   Mushaf theme carries them with it and no rule needs a colour of its own. */
+.mushaf-page-rule {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--mushaf-rule-ink);
+  border-radius: 0.5rem;
+  opacity: 0.85;
+  pointer-events: none;
+}
+
+/* The lighter companion stroke, set in from the first. Two weights at two
+   opacities is what separates a printed frame from a box. */
+.mushaf-page-rule--inner {
+  inset: var(--mushaf-rule-gap);
+  border-width: 1px;
+  border-radius: 0.3rem;
+  opacity: 0.45;
 }
 
 .mushaf-page-furniture {

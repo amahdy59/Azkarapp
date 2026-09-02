@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-02b",
+  "release": "2026-09-02c",
   "ar": [
-    "ترجمة السور صارت تظهر عند تفعيل الترجمة: الكهف والسجدة والملك والسور القصيرة. كانت الترجمة موجودة كاملة لكنها مخفية، بينما يظهر النطق بالإنجليزية تحتها.",
-    "الأزرار الصغيرة صار الضغط عليها محسوسًا؛ كان مقدار انكماشها أقل من نقطة واحدة على الشاشة، أي غير مرئي عمليًا.",
-    "تحسينات داخلية على مزامنة تقدّم يوم الجمعة بين الأجهزة."
+    "صار لكل صفحة في المصحف إطار من خطين ذهبيين، بنفس ذهب صفحتَي الفاتحة المزخرفتين، مع مسافة مريحة بين النص والإطار. كان الإطار خطًا واحدًا باهتًا يكاد لا يُرى.",
+    "عرض المصحف لسور الكهف والسجدة والملك صار مطابقًا لتصميم المصحف نفسه، بعد أن كان أبسط منه.",
+    "هذا العرض صار يتبع حجم خط المصحف الذي اخترته وإعداد تقليل الحركة، وكان يتجاهلهما."
   ],
   "en": [
-    "Surah translations now appear when you turn on Show translation — Al-Kahf, As-Sajdah, Al-Mulk and the short surahs. The translations were complete all along but hidden, while the English pronunciation showed underneath them.",
-    "Small icon buttons now visibly press. Their travel was under one screen pixel, which meant no press at all rather than a subtle one.",
-    "Internal hardening for how Friday progress merges between your devices."
+    "Every Mushaf page now has a two-stroke gold frame, in the same gold as the illuminated Fatihah pages, with proper room between the text and the rule. It was a single faint hairline before.",
+    "The Mushaf view for Al-Kahf, As-Sajdah and Al-Mulk now matches the design of the Mushaf itself instead of a plainer version of it.",
+    "That view now follows your chosen Mushaf text size and your reduced-motion setting, which it previously ignored."
   ]
 }

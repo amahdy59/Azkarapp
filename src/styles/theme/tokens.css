@@ -45,6 +45,12 @@
     "Noto Sans Arabic Variable", "Noto Sans Arabic", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
+  /* The rule around a Mushaf page, in the same gold as the illuminated opening
+     frame (#d4b47c in mushaf-fatiha-frame.svg). Print sets the jadwal in gold
+     and the text in black; this is the frame, not an inline marker, so it does
+     not fall under the rule that keeps ayah medallions in the page's own ink —
+     a border at the edge cannot pull the eye out of a line. */
+  --mushaf-rule-ink: #d4b47c;
   --font-mushaf: "Amiri Quran", "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", serif;
   /* The zikr face follows the reader's choice. The default is the value above,
      so a reader who never opens the setting sees exactly what they always saw.
@@ -152,6 +158,8 @@
 
 .light-mode,
 .theme-light {
+  /* Deeper, so the rule reads against light paper. */
+  --mushaf-rule-ink: #a97f36;
   color-scheme: light;
   --background: #f8f5f0;
   --foreground: #171717;

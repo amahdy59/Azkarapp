@@ -1404,6 +1404,7 @@ function AppContent() {
                   }}
                   onToggleSaved={toggleSavedZikr}
                   audioAvailable={activeZikrHasAudio}
+                  mushafTextScale={mushafTextScale}
                   onPlayAudio={
                     activeZikrHasAudio && activeZikr ? () => void startAudio([activeZikr], "single") : undefined
                   }

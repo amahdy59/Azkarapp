@@ -806,8 +806,13 @@ function MushafPageCanvas({
             spreadSide === "right" ? "mr-auto ml-0" : spreadSide === "left" ? "mr-0 ml-auto" : "mx-auto"
           }`}
         >
-          {/* The manuscript rule, drawn in the page's own ink. */}
-          <div className="pointer-events-none absolute inset-0 rounded-sm border opacity-20" aria-hidden="true" />
+          {/* The manuscript rule, drawn in the page's own ink.
+              Two strokes, as a printed Mushaf has: a heavier outer rule that
+              gives the page an edge, and a lighter inner one set in from it.
+              A single hairline at 20% opacity read as a faint box around
+              crowded type rather than as the frame of a page. */}
+          <div className="mushaf-page-rule" aria-hidden="true" />
+          <div className="mushaf-page-rule mushaf-page-rule--inner" aria-hidden="true" />
           {showPageIdentity && (
             <PageFurnitureHead surahNumber={pageSurahNumber} juzNumber={pageJuzNumber} language={language} />
           )}

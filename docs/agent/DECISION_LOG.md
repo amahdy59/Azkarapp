@@ -2053,3 +2053,36 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** the compact scale is deeper than the base, a 44px
   control clears 1.5px of travel per edge, and the override keeps the selector
   that out-specifies the global rule.
+
+## DEC-125 — every Mushaf page is framed, not just the illuminated opening
+
+- **Decision:** the page rule is two strokes in the Mushaf's gold — an outer
+  1.5px at 0.85 opacity and an inner 1px at 0.45, separated by
+  `clamp(3px, 0.9cqi, 7px)` — with `clamp(0.75rem, 2.6cqi, 1.6rem)` of inline
+  padding and block padding to match.
+- **What was wrong:** pages 1-2 render through `MushafOpeningFrameArt`, the
+  illuminated frame a printed Mushaf gives its opening. Every other page — all
+  of Al-Kahf, As-Sajdah and Al-Mulk among them — got a single hairline at 20%
+  opacity with barely a third of a rem of padding. The two surfaces did not look
+  like the same book, and the plain one read as a faint box around crowded type
+  rather than as the frame of a page.
+- **Why gold, next to a decision that says ink:** ayah medallions are
+  deliberately drawn in the page's own ink, because a coloured medallion every
+  few words pulls the eye out of the line. A frame is the other case: it sits at
+  the edge, cannot interrupt a line, and print sets the _jadwal_ in gold with the
+  text in black. The value is `#d4b47c`, taken from
+  `public/images/mushaf-fatiha-frame.svg`, so the plain pages and the opening
+  share one accent. Light themes take a deeper `#a97f36` to hold against paper.
+- **Why the padding is safe:** the frame's `max-width` is
+  `--mushaf-measure + 2 * --mushaf-frame-pad`, so widening the padding moves the
+  rule outward rather than squeezing the measure. DEC-089's fifteen-line
+  geometry is page data and does not shift; the short-viewport geometry spec was
+  run three times in isolation to confirm it.
+- **Also fixed:** the immersive Mushaf inside the reader took neither
+  `textScale` nor `reduceMotion`, so opening a surah discarded the reader's
+  Mushaf text size and their reduced-motion preference. Both are threaded from
+  `App` now.
+- **Tests/evidence required:** two rules exist with the outer heavier and more
+  opaque than the inner; the token matches the gold in the opening SVG; the
+  frame's max-width still grows with its padding; and the immersive view
+  forwards both settings.
