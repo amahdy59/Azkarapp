@@ -101,6 +101,15 @@ export function ZikrCounterSurface({
   testId = "counter-surface",
   reduceMotion = false,
 }: ZikrCounterSurfaceProps) {
+  /**
+   * A zikr said once has nothing to tally.
+   *
+   * "٠ / ١" is a counter that can only ever reach one — a completion button
+   * drawn as a score, taking the tallest control on the screen to say something
+   * a line could say. The long surahs are all like this, and they are exactly
+   * the readings that need the room for their text.
+   */
+  const isSingleAction = total === 1;
   const isArabic = language === "ar";
   const [isPressed, setIsPressed] = useState(false);
   const [ripples, setRipples] = useState<{ id: number; x: number; y: number }[]>([]);
@@ -168,7 +177,8 @@ export function ZikrCounterSurface({
       }}
       aria-disabled={disabled || complete}
       aria-label={accessibleName}
-      className={`adaptive-counter-surface ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
+      data-counter-variant={isSingleAction ? "action" : "tally"}
+      className={`adaptive-counter-surface ${isSingleAction ? "adaptive-counter-surface--action" : ""} ${count === 0 && !complete ? "counter-ring-ready" : ""} ${isPressed ? "is-pressed" : ""} ${complete ? "is-complete" : ""} ${justCompleted ? "just-completed" : ""} ${className}`}
     >
       {/* Keyed on the face it shows so React swaps the node — the number face
           and the completed face each play a 180ms fade/rise instead of
@@ -199,6 +209,10 @@ export function ZikrCounterSurface({
               {t(language, "counter.done")}
             </span>
           </div>
+        ) : isSingleAction ? (
+          <span className="text-[1.0625rem] font-bold leading-none text-foreground" dir="auto">
+            {activeInstruction}
+          </span>
         ) : (
           <p
             className="text-[1.75rem] font-black leading-none text-foreground"

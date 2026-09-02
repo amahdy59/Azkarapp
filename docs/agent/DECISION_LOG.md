@@ -2086,3 +2086,65 @@ Record user-approved product, design and architectural decisions here. Do not er
   opaque than the inner; the token matches the gold in the opening SVG; the
   frame's max-width still grows with its padding; and the immersive view
   forwards both settings.
+
+## DEC-126 — one clock per collection
+
+- **Decision:** `friday_kahf` is excluded from the daily reset through
+  `CYCLE_GOVERNED_CATEGORY_IDS`; the Friday cycle that owns it resets it.
+- **What was wrong:** three mechanisms reset it on two clocks —
+  `ensureCurrentFridayWeek` on the Friday cycle, `resetStaleCompletedCollections`
+  on the daily boundary, and `pruneStaleFridayProgress` on the cycle keys. Read
+  Al-Kahf on Friday and Saturday's boundary cleared `completed.friday_kahf`
+  while `FRIDAY_KAHF_WEEK_KEY` still held Friday's cycle: the app said the Kahf
+  was unread while the Friday progress said it had been opened. One act, two
+  answers.
+
+## DEC-127 — a short surah is Qur'an, and looks it
+
+- **Decision:** surahs read inside the azkar reader carry `QuranSurahHeader` —
+  name, revelation place, verse count — inside the Mushaf's two-stroke rule at
+  passage scale.
+- **What was wrong:** Al-Ikhlas, Al-Falaq, An-Nas and Al-Kafirun rendered as a
+  Basmalah line above a paragraph of Arabic, indistinguishable from a dua.
+  `QuranSurahHeader` had been written for exactly this and was imported nowhere.
+- **Not applied to multi-page surahs:** they open the Mushaf view, which has the
+  real page frame. Two different frames for one surah would be worse than none.
+
+## DEC-128 — one reviewed narration a day, from the corpus already shipped
+
+- **Decision:** Home shows a daily narration chosen deterministically by
+  `hash(dayKey) % pool.length` from the azkar that carry a `hadithText`, an
+  `authenticityNote` and a `benefit` — 146 of them.
+- **Why nothing new is authored:** every zikr already carries reviewed evidence
+  that was only reachable by opening the zikr and then its reference sheet. The
+  card surfaces existing reviewed content rather than introducing text that
+  would need reviewing on its own terms.
+- **Why deterministic:** random selection would show a different narration on a
+  phone and a tablet on the same day, could repeat one twice in a week while
+  skipping others, and would need storage and sync to avoid it. The hash walks
+  the whole pool, needs nothing stored, and is testable.
+- **A grading is not optional:** `getDailyEvidence` returns nothing for an entry
+  without one. A card showing a narration with no attribution would be the only
+  place in the app making a claim it could not support.
+- **Known gap:** 0 of 146 authenticity notes and 122 of 146 benefits are English
+  only, so an Arabic reader sees Arabic narration under an English attribution.
+  Translating those is a reviewer's task; the card is honest about what exists.
+
+## DEC-129 — a zikr said once gets a phrase, not a score
+
+- **Decision:** when `repetitionCount` is 1 the counter renders as an action bar
+  carrying the instruction, not a tally.
+- **Why:** "٠ / ١" is a counter that can only ever reach one — a completion
+  button drawn as a score, in the tallest control on the screen, on exactly the
+  readings (the long surahs) that need the room for their text. Measured on a
+  1440x900 desktop before the change: chrome 34.6% of the viewport, the zikr
+  text itself 26.3%.
+- **Also:** the instruction line beneath the counter repeated what the bar now
+  says, and the keyboard-shortcut row was shown on phones that have no keys to
+  press. Together about 90px returned to the reading.
+- **The tally stays** where the count is real; `data-counter-variant` says which
+  face is showing.
+- **A test that could not fail:** `offline-core` asserted the counter contained
+  "1" after a click, but the unclicked counter read "0 / 1" in English, which
+  contains "1" — it passed regardless of whether the count registered. It now
+  asserts the accessible name reaches "Completed 1 / 1".

@@ -172,6 +172,13 @@
    counter that resizes as the window does is the same inconsistency measured
    on the other axis. The surface is a readout, not the tap target — on every
    one of these screens the whole page counts — so it has no reason to grow. */
+/* The single-action face is a bar, not a box: it carries a phrase rather than a
+   score, and it gives back the height the tally did not need. */
+.adaptive-counter-surface--action {
+  width: min(20rem, 100%);
+  height: 56px;
+}
+
 .adaptive-counter-surface {
   width: 220px;
   max-width: 100%;

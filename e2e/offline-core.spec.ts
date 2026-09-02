@@ -36,7 +36,10 @@ test("core Reader and Settings are available on a first offline visit after inst
     const counter = page.getByTestId("counter-surface");
     await expect(counter).toBeVisible();
     await counter.click();
-    await expect(counter).toContainText("1");
+    // The accessible name, not the visible digits. `toContainText("1")` passed
+    // on the unclicked "0 / 1" too, so it could not fail for the reason it was
+    // written; this asserts the count actually registered offline.
+    await expect(counter).toHaveAccessibleName(/Completed\s*1\s*\/\s*1/);
 
     await page.goto("/");
     await page.getByTestId("nav-settings").click();

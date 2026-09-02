@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-02c",
+  "release": "2026-09-02d",
   "ar": [
-    "صار لكل صفحة في المصحف إطار من خطين ذهبيين، بنفس ذهب صفحتَي الفاتحة المزخرفتين، مع مسافة مريحة بين النص والإطار. كان الإطار خطًا واحدًا باهتًا يكاد لا يُرى.",
-    "عرض المصحف لسور الكهف والسجدة والملك صار مطابقًا لتصميم المصحف نفسه، بعد أن كان أبسط منه.",
-    "هذا العرض صار يتبع حجم خط المصحف الذي اخترته وإعداد تقليل الحركة، وكان يتجاهلهما."
+    "صار في الرئيسية حديث اليوم: رواية واحدة كل يوم مع درجتها ومصدرها وفائدة العمل بها، مأخوذة من الأحاديث المراجَعة الموجودة في التطبيق أصلاً.",
+    "السور القصيرة صار لها اسمها ومكان نزولها وعدد آياتها داخل إطار المصحف، بعد أن كانت تظهر كفقرة دعاء.",
+    "الذكر الذي يُقال مرة واحدة صار له شريط \"تم\" بدل عدّاد ٠/١، فاتّسعت مساحة النص، واختفى السطر المكرر تحته.",
+    "قراءة سورة الكهف لم تعد تُمحى صباح السبت؛ صارت تتبع دورة الجمعة وحدها بدل ساعتين مختلفتين."
   ],
   "en": [
-    "Every Mushaf page now has a two-stroke gold frame, in the same gold as the illuminated Fatihah pages, with proper room between the text and the rule. It was a single faint hairline before.",
-    "The Mushaf view for Al-Kahf, As-Sajdah and Al-Mulk now matches the design of the Mushaf itself instead of a plainer version of it.",
-    "That view now follows your chosen Mushaf text size and your reduced-motion setting, which it previously ignored."
+    "Home now shows a narration of the day — one hadith with its grading, its source, and what the practice is for — drawn from the reviewed narrations already in the app.",
+    "Short surahs now show their name, where they were revealed, and their verse count inside the Mushaf's frame, instead of appearing as a paragraph of dua.",
+    "A zikr said once now has a \"done\" bar instead of a 0/1 counter, giving the text more room, and the repeated line beneath it is gone.",
+    "Reading Al-Kahf is no longer wiped on Saturday morning — it follows the Friday cycle alone instead of two different clocks."
   ]
 }
