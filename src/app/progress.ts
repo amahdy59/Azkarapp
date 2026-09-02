@@ -3,6 +3,18 @@ import { CATEGORY_IDS, type CategoryId, type DailyCollectionCompletion, type Sto
 
 export { CATEGORY_IDS } from "./types";
 export const MAIN_CATEGORY_IDS: CategoryId[] = ["morning", "evening", "before_sleep"];
+/**
+ * Collections whose reset is governed by their own cycle, not the day boundary.
+ *
+ * Al-Kahf belongs to the Friday cycle (Thursday maghrib to Friday maghrib), and
+ * that cycle already resets it through `ensureCurrentFridayWeek`. Letting the
+ * daily reset touch it too gave one act two clocks: reading it on Friday left
+ * the collection full, then Saturday's boundary cleared `completed.friday_kahf`
+ * while `FRIDAY_KAHF_WEEK_KEY` still held Friday's cycle — so the app said the
+ * Kahf was unread while the Friday progress said it had been opened.
+ */
+export const CYCLE_GOVERNED_CATEGORY_IDS: readonly CategoryId[] = ["friday_kahf"];
+
 export const DAILY_ROUTINE_CATEGORY_IDS: readonly CategoryId[] = [
   "morning",
   "evening",
@@ -477,6 +489,10 @@ export function resetStaleCompletedCollections(
 
   return Object.fromEntries(
     CATEGORY_IDS.map((category) => {
+      // Its own cycle owns it; the day boundary must not also clear it.
+      if (CYCLE_GOVERNED_CATEGORY_IDS.includes(category)) {
+        return [category, new Set(completed[category] ?? [])];
+      }
       const catDayKey = getProgressDayKey(now, boundaryHour, category);
       const isCompletedToday = normalized.some((r) => r.dayKey === catDayKey && r.category === category);
       const categoryProgress = completed[category] ?? new Set<string>();
