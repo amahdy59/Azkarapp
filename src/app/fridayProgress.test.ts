@@ -202,3 +202,66 @@ describe("cycle progress and account merge", () => {
     expect(seen).toHaveBeenCalledTimes(3);
   });
 });
+
+describe("signing in on a second device", () => {
+  const cycle = "2026-09-04";
+
+  it("keeps what each device did, in the sequence the app actually performs", () => {
+    // The merge rule has its own tests; this exercises the composition App runs
+    // on remote hydration — read what is on this device, merge the account's
+    // copy into it, write the result back to the keys the screens read.
+    // Nothing had covered that sequence, only its middle step.
+    writeFridayCycle({
+      cycle,
+      practices: ["ghusl", "siwak"],
+      kahfOpened: true,
+      duas: ["dua-1"],
+      salawat: { count: 120, target: 300 },
+    });
+
+    const fromAccount = {
+      cycle,
+      practices: ["early", "walking"],
+      kahfOpened: false,
+      duas: ["dua-2"],
+      salawat: { count: 40, target: 100 },
+    };
+
+    const merged = mergeFridayCycles(readFridayCycle(cycle), fromAccount);
+    writeFridayCycle(merged);
+
+    expect(readFridayCycle(cycle)).toEqual({
+      cycle,
+      practices: ["early", "ghusl", "siwak", "walking"],
+      kahfOpened: true,
+      duas: ["dua-1", "dua-2"],
+      // This device had read further, so its count and its target both stand.
+      salawat: { count: 120, target: 300 },
+    });
+  });
+
+  it("does not let an empty account erase a device that has been used", () => {
+    writeFridayCycle({
+      cycle,
+      practices: ["ghusl"],
+      kahfOpened: true,
+      duas: ["dua-1"],
+      salawat: { count: 90, target: 100 },
+    });
+    // A fresh sign-in carries an empty cycle. Replacing rather than merging
+    // would wipe a Friday already half-done on this phone.
+    const merged = mergeFridayCycles(readFridayCycle(cycle), {
+      cycle,
+      practices: [],
+      kahfOpened: false,
+      duas: [],
+      salawat: { count: 0, target: 100 },
+    });
+    writeFridayCycle(merged);
+
+    const after = readFridayCycle(cycle);
+    expect(after.practices).toEqual(["ghusl"]);
+    expect(after.kahfOpened).toBe(true);
+    expect(after.salawat.count).toBe(90);
+  });
+});

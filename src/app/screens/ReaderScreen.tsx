@@ -521,7 +521,15 @@ export function ReaderScreen({
 
       {!isArabic && (showTranslation || showTransliteration) && (
         <div className="mt-5 space-y-4 border-t border-border pt-4 text-center">
-          {showTranslation && !z.surahNameArabic && z.translation && (
+          {/* No surah exception. `!z.surahNameArabic` hid the translation for
+              every surah — Al-Kahf, As-Sajdah, Al-Mulk and the short ones —
+              while the transliteration of the same verses rendered right below
+              it. A reader who turned both on got the pronunciation of a surah
+              and never its meaning, and the meaning was present and complete
+              the whole time. The guard arrived in an unrelated commit and no
+              decision records it; DEC-108 says the opposite, that the reader is
+              where translation and transliteration live. */}
+          {showTranslation && z.translation && (
             <section aria-labelledby="reader-translation-title">
               <h2
                 id="reader-translation-title"
