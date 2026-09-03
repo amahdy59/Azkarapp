@@ -148,6 +148,7 @@ export function ReaderScreen({
   mushafBookmarks = [],
   onToggleMushafBookmark,
   mushafSettings,
+  onMushafModeChange,
   onPlayAudio,
   onRepeatAudio,
 }: {
@@ -182,6 +183,8 @@ export function ReaderScreen({
   mushafBookmarks?: readonly number[];
   onToggleMushafBookmark?: (page: number) => void;
   mushafSettings?: MushafSurahSettings;
+  /** Announces when the Mushaf is the reader's body, so the shell can stand aside. */
+  onMushafModeChange?: (showing: boolean) => void;
   onPlayAudio?: () => void;
   onRepeatAudio?: () => void;
 }) {
@@ -217,6 +220,13 @@ export function ReaderScreen({
   const [mushafPageTuple, setMushafPageTuple] = useState<readonly [number, number]>([0, 1]);
   /** The surah is being read as Mushaf pages, so the Mushaf is the body. */
   const showMushaf = immersiveOpen && longSurah;
+
+  useEffect(() => {
+    onMushafModeChange?.(showMushaf);
+    // Leaving the reader gives the shell its navigation back, however the
+    // reader was left.
+    return () => onMushafModeChange?.(false);
+  }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
   const [showDifficultWords, setShowDifficultWords] = useState(true);

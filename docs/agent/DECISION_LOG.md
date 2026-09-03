@@ -2281,3 +2281,28 @@ Record user-approved product, design and architectural decisions here. Do not er
   records and advances exactly once; one set of tools survives a turn; focus
   mode can be left by handle and by Escape without leaving the surah; and the
   drag reaches the paper rather than a wrapper.
+
+## DEC-134 — the Mushaf gets the whole surface
+
+- **Decision:** while a surah is showing as Mushaf pages, the app's navigation
+  is hidden at every tier — tab bar, rail and sidebar alike. Leaving the Mushaf
+  restores it immediately.
+- **What was wrong:** DEC-132 turned this view from a modal into the reader's
+  body. As a modal it covered the shell, so the navigation beside it was never
+  visible; as a body it sat next to the tab bar on tablets and the rail on
+  desktop. The Mushaf's own route has never carried app navigation, so the same
+  surah looked like two different places depending on how it was opened.
+- **How:** `ReaderScreen` announces the Mushaf through `onMushafModeChange`, and
+  `App` gates `showBottomNav` on it. Gating there rather than adding a case to
+  the view whitelist means the rail and sidebar are covered by the same
+  condition, and `app-shell--navigation-hidden` reclaims the space instead of
+  leaving a gap. The callback clears on unmount, so no exit route can strand a
+  reader without navigation.
+- **Not changed:** the page frame (DEC-131). The paper has no background of its
+  own — it is transparent against the shell — so the rule is the only thing
+  marking where a page begins and ends, and on a two-page spread the only thing
+  dividing them. Removing it would need the paper to become a surface first.
+- **Tests/evidence required:** the app's navigation landmark is present in the
+  reader for a non-surah zikr, absent while the Mushaf shows, and back once the
+  surah is left. Counted by label, since the Mushaf carries a page-navigation
+  landmark of its own.

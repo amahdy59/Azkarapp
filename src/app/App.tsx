@@ -284,6 +284,8 @@ function AppContent() {
   );
   const [mushafTextScale, setMushafTextScale] = useState<MushafTextScale>(initialState.mushafTextScale ?? "medium");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
+  /** Whether the reader is currently showing a surah as Mushaf pages. */
+  const [readerInMushafMode, setReaderInMushafMode] = useState(false);
   // Seeded from both sides: the local keys are what the Friday screens actually
   // read, while the snapshot is what a previous session synced. Neither is
   // reliably ahead of the other, and merging can only move progress forward.
@@ -847,21 +849,30 @@ function AppContent() {
     if (saved) setPersistenceNoticeDismissed(false);
   }, [appStateSnapshot]);
 
-  const showBottomNav = [
-    "home",
-    "library",
-    "benefits",
-    "wird_benefits",
-    "category",
-    "reader",
-    "settings",
-    "search",
-    "progress",
-    "friday",
-    "friday_salawat",
-    "custom_counter",
-    "khatmah_overview",
-  ].includes(view);
+  /**
+   * The Mushaf is a reading surface, not a screen with a menu bar.
+   *
+   * Its own route carries no app navigation, and the surah view now renders as
+   * the reader's body rather than a modal over it — so without this the nav
+   * that the modal used to cover would sit beside the page.
+   */
+  const showBottomNav =
+    !readerInMushafMode &&
+    [
+      "home",
+      "library",
+      "benefits",
+      "wird_benefits",
+      "category",
+      "reader",
+      "settings",
+      "search",
+      "progress",
+      "friday",
+      "friday_salawat",
+      "custom_counter",
+      "khatmah_overview",
+    ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
   const activeZikrHasAudio = activeZikr ? getAudioCoverage([activeZikr]).available === 1 : false;
@@ -1415,6 +1426,7 @@ function AppContent() {
                   audioAvailable={activeZikrHasAudio}
                   mushafTextScale={mushafTextScale}
                   mushafBookmarks={mushafBookmarks}
+                  onMushafModeChange={setReaderInMushafMode}
                   mushafSettings={{
                     theme: mushafTheme,
                     appTheme: themeMode,

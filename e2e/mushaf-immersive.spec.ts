@@ -120,4 +120,28 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByRole("menuitem").first()).toBeVisible();
     await expect(page.getByRole("menuitem", { name: "وضع المصحف" })).toHaveCount(0);
   });
+
+  test("stands alone: the app navigation steps aside while the Mushaf is the body", async ({ page }) => {
+    // The Mushaf keeps a page-navigation landmark of its own, so this counts the
+    // app's navigation by its label rather than counting landmarks.
+    const appNav = page.getByRole("navigation", { name: /التنقل (السفلي|الرئيسي)/ });
+
+    // Tablet width, where the reader normally keeps its navigation — on a phone
+    // the reader hides it anyway, so this tier is the one that proves the rule.
+    await page.setViewportSize({ width: 834, height: 1112 });
+    await openReaderAt(page, "/#/azkar/morning/1");
+    // A zikr that is not a Mushaf surah still gets its navigation here.
+    await expect(page.getByTestId("reader-screen")).toBeVisible();
+    await expect(appNav).toHaveCount(1);
+
+    await openReaderAt(page, "/#/azkar/friday-kahf/1");
+    await expectMushafShowing(page);
+    // The page is the whole surface: no tab bar, rail or sidebar beside it.
+    await expect(appNav).toHaveCount(0);
+
+    // Leaving gives it straight back, so the Mushaf cannot strand a reader.
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("mushaf-immersive")).toBeHidden();
+    await expect(appNav).toHaveCount(1);
+  });
 });
