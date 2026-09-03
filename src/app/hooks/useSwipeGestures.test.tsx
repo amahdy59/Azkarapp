@@ -183,3 +183,18 @@ describe("one gesture across both reading surfaces", () => {
     expect(onPrev).not.toHaveBeenCalled();
   });
 });
+
+describe("what a page turn is allowed to move", () => {
+  it("hands the drag to the paper, not to the chrome around it", () => {
+    const viewer = readFileSync("src/app/components/MushafPageViewer.tsx", "utf8");
+    const surah = readFileSync("src/app/components/MushafImmersiveReader.tsx", "utf8");
+
+    // The drag briefly wrapped the whole viewer, which holds the header, the
+    // footer and the rail — so a swipe slid the entire screen sideways instead
+    // of the page. MushafPageViewer's own contract says the paper is what a
+    // page turn drags, "never the chrome around it".
+    expect(viewer).toContain("paperStyle");
+    expect(surah).toContain("paperStyle={dragStyle}");
+    expect(surah).not.toMatch(/<div style=\{dragStyle\}[^>]*>\s*<MushafPageViewer/);
+  });
+});

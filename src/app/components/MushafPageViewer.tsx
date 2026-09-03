@@ -10,6 +10,7 @@ import {
   useState,
   type ReactNode,
   type MutableRefObject,
+  type CSSProperties,
 } from "react";
 import type { AppLanguage, MushafPageTheme, MushafTextScale } from "../types";
 import { getQuranWordMeaningEntry, type QuranWordMeaning } from "../content/quranWordMeanings";
@@ -934,6 +935,7 @@ export function MushafPageViewer({
   direction,
   theme = "light",
   isBookmarked = false,
+  paperStyle,
   useQcfGlyphs = false,
   showWordMeanings = false,
   headerContent,
@@ -974,6 +976,14 @@ export function MushafPageViewer({
   progressBar?: ReactNode;
   /** The paper itself. A page turn drags this, never the chrome around it. */
   paperRef?: MutableRefObject<HTMLDivElement | null>;
+  /**
+   * Applied to the paper, for a caller that moves it under the thumb.
+   *
+   * It belongs here rather than on a wrapper because a wrapper would also hold
+   * the header, the footer and the rail — and dragging those is what makes the
+   * whole screen appear to slide rather than the page.
+   */
+  paperStyle?: CSSProperties;
   pageTransitionDirection?: "forward" | "backward";
   reduceMotion?: boolean;
   /** Reading type size within the fixed fifteen-line geometry. */
@@ -1094,6 +1104,7 @@ export function MushafPageViewer({
       <div
         key={`${pageNumber}:${facingPage?.pageNumber ?? "single"}`}
         ref={paperRef}
+        style={paperStyle}
         className={`mushaf-paper flex min-h-0 min-w-0 flex-1 ${facingPage ? "mushaf-spread" : ""}`}
         data-page-transition={pageTransitionDirection}
         dir="rtl"

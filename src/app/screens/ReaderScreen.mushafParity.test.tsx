@@ -115,4 +115,69 @@ describe("the surah view is the Mushaf", () => {
     // anything outside the surah, inviting a number it would ignore.
     expect(input.labels?.[0]?.textContent).toContain("٢٩٣");
   });
+
+  it("lets the reader out of focus mode", () => {
+    renderKahf();
+    // Focus mode hides the rail that turned it on. Without a way back the only
+    // exit was leaving the surah altogether — and on a phone, with no keyboard,
+    // there was no exit at all.
+    expect(screen.queryByTestId("mushaf-focus-exit")).toBeNull();
+    fireEvent.click(screen.getByTestId("mushaf-focus-enter"));
+    expect(screen.getByTestId("mushaf-focus-exit")).toBeInTheDocument();
+    expect(screen.queryByTestId("mushaf-rail-back")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("mushaf-focus-exit"));
+    expect(screen.getByTestId("mushaf-rail-back")).toBeInTheDocument();
+  });
+
+  it("gives the tools back before it gives up the surah", () => {
+    renderKahf();
+    fireEvent.click(screen.getByTestId("mushaf-focus-enter"));
+    // Escape leaves focus mode first, as it does in the Mushaf: one keypress
+    // meant to undo the last thing should not cost the reader their place.
+    // Fired on an element, as a real keypress is: the handler inspects the
+    // target, and window has no element to inspect.
+    fireEvent.keyDown(document.body, { key: "Escape" });
+    expect(screen.getByTestId("mushaf-rail-back")).toBeInTheDocument();
+    expect(screen.getByTestId("mushaf-immersive")).toBeInTheDocument();
+  });
+
+  it("offers no way to finish until the surah has been read", () => {
+    renderKahf();
+    // The completion belongs to the end of the surah, not to the start of it.
+    expect(screen.queryByTestId("mushaf-immersive-return")).toBeNull();
+  });
+
+  it("finishes the surah once, and moves on", () => {
+    const onComplete = vi.fn();
+    const onAdvance = vi.fn();
+    renderKahf({ onComplete, onAdvance });
+
+    // Al-Kahf spans twelve pages; reach the last one.
+    for (let turn = 0; turn < 12; turn += 1) {
+      const next = screen.queryByTestId("mushaf-rail-next");
+      if (!next || (next as HTMLButtonElement).disabled) break;
+      fireEvent.click(next);
+    }
+
+    const finish = screen.getByTestId("mushaf-immersive-return");
+    fireEvent.click(finish);
+
+    // Recorded and moved on in one act. This used to record the reading and
+    // then hand the reader back a counter for the surah they had just read —
+    // and on a desktop, where the rail replaced the bars, the completion was
+    // not reachable from the Mushaf at all.
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(onAdvance).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps one set of tools through a page turn", () => {
+    renderKahf();
+    // The viewer sat inside AnimatePresence, so a turn mounted a second copy of
+    // the whole thing — two rails on screen, sliding with the page. The Mushaf
+    // animates its paper instead and leaves the tools standing still.
+    fireEvent.click(screen.getByTestId("mushaf-rail-next"));
+    expect(screen.getAllByTestId("mushaf-rail-next")).toHaveLength(1);
+    expect(screen.getAllByTestId("mushaf-rail-back")).toHaveLength(1);
+  });
 });

@@ -872,7 +872,17 @@ export function ReaderScreen({
           mushafSettings={mushafSettings}
           onClose={() => setImmersiveOpen(false)}
           onComplete={() => {
+            /**
+             * Finishing the surah is the whole act: it records the reading and
+             * moves to the next zikr, exactly as completing a count does.
+             *
+             * It used to close the Mushaf instead, which left the reader looking
+             * at a counter for the surah they had just finished — a second
+             * thing to press for something already done. There is one
+             * completion for a surah, and it is reaching the end of it.
+             */
             if (!isDone) onComplete(idx);
+            onAdvance(idx);
           }}
         />
       )}

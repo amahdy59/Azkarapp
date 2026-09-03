@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-02f",
+  "release": "2026-09-03a",
   "ar": [
-    "سور الكهف والسجدة والملك صارت تُفتح في وضع المصحف مباشرة، بشريط أدوات المصحف نفسه: الفهرس والعلامة والمعاني والتركيز وملء الشاشة والإعدادات.",
-    "تُعرض صفحتان متقابلتان على الشاشات العريضة، مع اسم السورة والجزء ورقم الصفحة، دون أن يتجاوز ذلك صفحات السورة نفسها.",
-    "وضع المصحف صار جزءاً من شاشة القراءة لا نافذة فوقها، فإذا خرجت منه ثم عدت وجدت الصفحة التي كنت عندها.",
-    "إعدادات القراءة صارت واحدة بين المصحف وقراءة السور، والفهرس محصور بصفحات السورة التي تقرؤها."
+    "عند إتمام قراءة سورة الكهف أو السجدة أو الملك، يُسجَّل التقدّم وتنتقل تلقائياً إلى الذكر التالي، دون العودة إلى عدّاد للضغط على \"تم\" مرة أخرى.",
+    "زر الإتمام صار يظهر في نهاية السورة مهما كان حجم الشاشة؛ كان مفقوداً تماماً على الشاشات العريضة فلا سبيل لإنهاء السورة من المصحف.",
+    "السحب صار يحرّك الصفحة وحدها، بعد أن كان يحرّك الشريط العلوي والسفلي معها — وهو أوضح ما يكون على الهاتف.",
+    "وضع التركيز صار له مخرج: مقبض في أسفل الصفحة، ومفتاح Esc يعيد الأدوات قبل أن يترك السورة."
   ],
   "en": [
-    "Al-Kahf, As-Sajdah and Al-Mulk now open in Mushaf view with the Mushaf's own toolbar — index, bookmark, word meanings, focus, full screen and settings.",
-    "Wide screens show two facing pages with the surah name, juz and page number, without ever reaching past the surah you are reading.",
-    "Mushaf view is now part of the reading screen rather than a window over it, so stepping out and back returns you to the page you were on.",
-    "Reading settings are shared with the Mushaf, and the index is limited to the pages of the surah you are in."
+    "Finishing Al-Kahf, As-Sajdah or Al-Mulk now records your progress and moves you to the next zikr, instead of returning you to a counter to press done a second time.",
+    "The finish button now appears at the end of the surah on every screen size; on wide screens it was missing entirely, so the surah could not be completed from the Mushaf at all.",
+    "Swiping now moves the page alone. It used to carry the top and bottom bars with it, which was most obvious on a phone.",
+    "Focus mode now has a way out — a handle at the bottom of the page, and Escape returns the tools before it leaves the surah."
   ]
 }

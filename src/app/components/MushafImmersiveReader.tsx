@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
@@ -254,9 +253,13 @@ export function MushafImmersiveReader({
       // The Mushaf's own guard has always been this one.
       if (target?.closest("input, textarea, select, [contenteditable='true'], [role='menu'], [role='listbox']")) return;
       if (e.key === "Escape") {
-        // Radix owned this while it was a dialog.
+        // Radix owned this while it was a dialog. Layered as the Mushaf layers
+        // it: giving up the surah entirely from a keypress meant to undo the
+        // last thing you did is a surprise you cannot take back without losing
+        // your place.
         e.preventDefault();
-        onClose();
+        if (isFocusMode) setIsFocusMode(false);
+        else onClose();
         return;
       }
       if (e.key === "ArrowLeft" || e.key === "PageDown") {
@@ -269,7 +272,7 @@ export function MushafImmersiveReader({
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, onClose, paginate]);
+  }, [activeAyah, isFocusMode, onClose, paginate]);
 
   /**
    * One gesture, shared with the reader.
@@ -438,31 +441,17 @@ export function MushafImmersiveReader({
         {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
       </bdi>
 
-      {atEnd ? (
-        <button
-          type="button"
-          onClick={() => {
-            onComplete?.();
-            onClose();
-          }}
-          data-testid="mushaf-immersive-return"
-          className="flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-4 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          {t(language, "reader.immersiveComplete")}
-        </button>
-      ) : (
-        <button
-          type="button"
-          onClick={() => paginate(1)}
-          disabled={atEnd}
-          data-testid="mushaf-immersive-next"
-          className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          aria-label={t(language, "common.next")}
-        >
-          <span className="hidden sm:inline">{t(language, "common.next")}</span>
-          <ChevronLeft size={18} />
-        </button>
-      )}
+      <button
+        type="button"
+        onClick={() => paginate(1)}
+        disabled={atEnd}
+        data-testid="mushaf-immersive-next"
+        className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        aria-label={t(language, "common.next")}
+      >
+        <span className="hidden sm:inline">{t(language, "common.next")}</span>
+        <ChevronLeft size={18} />
+      </button>
     </nav>
   );
 
@@ -497,7 +486,7 @@ export function MushafImmersiveReader({
       data-testid="mushaf-immersive"
       dir={direction}
       aria-label={t(language, "reader.immersiveTitle")}
-      className="flex min-h-0 flex-1 flex-col bg-background text-foreground outline-none select-none"
+      className="relative flex min-h-0 flex-1 flex-col bg-background text-foreground outline-none select-none"
     >
       <div
         data-testid="mushaf-immersive-track"
@@ -505,69 +494,82 @@ export function MushafImmersiveReader({
         {...pointerProps}
         style={{ touchAction: "pan-y" }}
       >
+        {/* The page turn animates the paper, not the chrome.
+            This wrapped the whole viewer in AnimatePresence, so every turn
+            mounted a second copy of the rail and slid it with the page — two
+            rails on screen mid-turn. MushafPageViewer already animates its own
+            paper from `pageTransitionDirection`, which is what the Mushaf uses
+            and what leaves the tools standing still. */}
         <div className="relative h-full w-full">
-          <AnimatePresence initial={false} custom={slideDir} mode="popLayout">
-            <motion.div
-              key={displayPage}
-              custom={slideDir}
-              variants={{
-                enter: (dir: number) =>
-                  reducedMotion
-                    ? { opacity: 0 }
-                    : {
-                        opacity: 0,
-                        x: dir > 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
-                      },
-                center: { opacity: 1, x: 0 },
-                exit: (dir: number) =>
-                  reducedMotion
-                    ? { opacity: 0 }
-                    : {
-                        opacity: 0,
-                        x: dir < 0 ? (direction === "rtl" ? -100 : 100) : direction === "rtl" ? 100 : -100,
-                      },
-              }}
-              initial="enter"
-              animate="center"
-              exit="exit"
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="absolute inset-0"
-            >
-              {/* Its own layer: the turn animates the element above and the
-                      drag this one, so neither overwrites the other's transform. */}
-              <div style={dragStyle} className="h-full w-full">
-                <MushafPageViewer
-                  lines={lines}
-                  language={language}
-                  pageNumber={displayPage}
-                  surahName={surahName}
-                  juzNumber={juzNumber}
-                  direction={direction}
-                  theme={theme}
-                  useQcfGlyphs={useQcfGlyphs}
-                  showWordMeanings={showWordMeanings}
-                  {...(shell.rail && !isFocusMode
-                    ? { railContent: toolRail, railSide: "right" as const }
-                    : {
-                        headerContent: isFocusMode ? undefined : pageHeader,
-                        footerContent: isFocusMode ? undefined : pageFooter,
-                      })}
-                  progressBar={progressBar}
-                  paperRef={paperRef}
-                  reduceMotion={reducedMotion}
-                  textScale={textScale}
-                  facingPage={
-                    facing && facingNumber !== null
-                      ? { pageNumber: facing.page, lines: toMushafLines(facing.data), useQcfGlyphs: facing.qcf }
-                      : undefined
-                  }
-                  onAyahAction={handleAyahAction}
-                />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+          <MushafPageViewer
+            lines={lines}
+            language={language}
+            pageNumber={displayPage}
+            pageTransitionDirection={slideDir > 0 ? "forward" : "backward"}
+            surahName={surahName}
+            juzNumber={juzNumber}
+            direction={direction}
+            theme={theme}
+            useQcfGlyphs={useQcfGlyphs}
+            showWordMeanings={showWordMeanings}
+            {...(shell.rail && !isFocusMode
+              ? { railContent: toolRail, railSide: "right" as const }
+              : {
+                  headerContent: isFocusMode ? undefined : pageHeader,
+                  footerContent: isFocusMode ? undefined : pageFooter,
+                })}
+            progressBar={progressBar}
+            paperRef={paperRef}
+            reduceMotion={reducedMotion}
+            textScale={textScale}
+            facingPage={
+              facing && facingNumber !== null
+                ? { pageNumber: facing.page, lines: toMushafLines(facing.data), useQcfGlyphs: facing.qcf }
+                : undefined
+            }
+            onAyahAction={handleAyahAction}
+            paperStyle={dragStyle}
+          />
         </div>
       </div>
+
+      {atEnd && !isFocusMode && (
+        /* Reaching the end is the completion. It used to live in the bars
+           footer, so a desktop reader — who gets the rail — had no way to
+           finish a surah and had to leave for the counter behind it. Pressing
+           this records the reading and moves to the next zikr, the same as the
+           counter does, rather than handing the reader back a second thing to
+           press for the same act. */
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-4">
+          <button
+            type="button"
+            onClick={onComplete}
+            data-testid="mushaf-immersive-return"
+            className="pointer-events-auto flex min-h-12 items-center gap-2 rounded-full border border-primary bg-primary px-6 text-[0.9375rem] font-bold text-primary-foreground shadow-raised transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          >
+            {t(language, "reader.immersiveComplete")}
+          </button>
+        </div>
+      )}
+
+      {isFocusMode && (
+        /* Focus mode hides the rail that turned it on, so without this the only
+           way out was leaving the surah altogether — and on a phone, with no
+           keyboard, there was no way out at all. The Mushaf's own handle. */
+        <button
+          type="button"
+          onClick={() => setIsFocusMode(false)}
+          data-testid="mushaf-focus-exit"
+          aria-label={t(language, "mushaf.focusModeExit")}
+          title={t(language, "mushaf.focusModeExit")}
+          className="group absolute inset-x-0 bottom-[env(safe-area-inset-bottom)] z-20 flex h-5 items-center justify-center focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <span
+            aria-hidden="true"
+            className="h-0.5 w-10 rounded-full bg-muted-foreground transition-colors group-hover:bg-primary"
+          />
+        </button>
+      )}
 
       <MushafNavigationModal
         isOpen={isIndexOpen}

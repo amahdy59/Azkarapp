@@ -2247,3 +2247,37 @@ Record user-approved product, design and architectural decisions here. Do not er
   positioning; the reader's body is not rendered beneath it; page position
   survives leaving and returning; and the reader-body specs step back to it
   rather than asserting against the Mushaf.
+
+## DEC-133 — reaching the end of a surah is the completion
+
+- **Decision:** finishing a multi-page surah records the reading and advances to
+  the next zikr in one act. The completion appears when the last page is
+  reached, in whichever chrome the screen fits.
+- **What was wrong:** two things tracked one act. The Mushaf completed and
+  closed, leaving the reader looking at a counter for the surah they had just
+  finished — a second thing to press for something already done. And the
+  completion lived in the bars footer only, so on a screen wide enough for the
+  rail there was no way to finish a surah from the Mushaf at all: going back to
+  the counter was not redundant there, it was the only route.
+- **One completion, one advance:** the same sequence a counted zikr uses, so a
+  surah behaves like every other item in its group.
+- **The page turn animates the paper, not the chrome.** `MushafPageViewer` sat
+  inside `AnimatePresence`, and that component contains the rail — so every turn
+  mounted a second copy of the whole toolbar and slid it with the page. Two
+  rails stood on screen mid-turn. The viewer now renders once and animates its
+  own paper from `pageTransitionDirection`, as the Mushaf does; framer-motion
+  leaves this view entirely.
+- **Focus mode has a way out.** The rail could enter it, and focus mode hides
+  the rail — including the control that turned it on. Escape closed the whole
+  surah instead, and on a phone there was no exit at all. The Mushaf's handle
+  now sits at the bottom, and Escape gives the tools back before it gives up the
+  surah, as DEC-102 established for the Mushaf itself.
+- **The drag belongs to the paper.** It briefly wrapped the whole viewer, so a
+  swipe slid the header, the footer and the rail with the page — most visible on
+  a phone, where the bars sit at the screen edges. `MushafPageViewer` takes a
+  `paperStyle` for this; its own contract already said a page turn drags the
+  paper, "never the chrome around it".
+- **Tests/evidence required:** no completion before the last page; completion
+  records and advances exactly once; one set of tools survives a turn; focus
+  mode can be left by handle and by Escape without leaving the surah; and the
+  drag reaches the paper rather than a wrapper.
