@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { FridayHomeCard, PrayerRoutineCard, SavedZikrCard, type HomeSavedCardItem } from "./HomeCards";
+import {
+  DailyEvidenceCard,
+  FridayHomeCard,
+  PrayerRoutineCard,
+  SavedZikrCard,
+  type HomeSavedCardItem,
+} from "./HomeCards";
 
 const savedItem: HomeSavedCardItem = {
   id: "saved-1",
@@ -102,5 +108,25 @@ describe("HomeCards", () => {
     expect(screen.getByRole("button", { name: "Continue Friday companion" })).toBeInTheDocument();
     expect(screen.queryByText("More Friday virtues and reading source")).not.toBeInTheDocument();
     expect(screen.getByText("Virtues of Friday")).toBeInTheDocument();
+  });
+
+  it("renders DailyEvidenceCard without excessive whitespace or open button", () => {
+    render(
+      <DailyEvidenceCard
+        language="ar"
+        direction="rtl"
+        evidence={{
+          hadith: "عَنْ عُبَادَةَ بْنِ الصَّامِتِ...",
+          benefit: "من قال ذلك غفر له",
+          authenticity: "صحيح البخاري",
+          sourceReference: "البخاري 3/39",
+          categoryId: "night",
+          zikrId: "night-1",
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId("home-daily-evidence")).not.toHaveClass("h-full");
+    expect(screen.queryByTestId("daily-evidence-open")).toBeNull();
   });
 });

@@ -237,7 +237,6 @@ export function HomeScreen({
   dailyCompletions,
   quietProgressEnabled,
   progressDayStartHour,
-  onOpenEvidenceZikr,
   language,
   direction,
   calendarType = "hijri",
@@ -272,7 +271,6 @@ export function HomeScreen({
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
-  onOpenEvidenceZikr?: (categoryId: CategoryId, zikrId: string) => void;
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
@@ -635,15 +633,8 @@ export function HomeScreen({
             <SectionDivider label={t(language, "home.yourLibrary")} />
           </div>
 
-          <div className="px-page grid grid-cols-1 items-stretch gap-3.5 lg:grid-cols-2">
-            {dailyEvidence && (
-              <DailyEvidenceCard
-                language={language}
-                direction={direction}
-                evidence={dailyEvidence}
-                onOpenZikr={onOpenEvidenceZikr}
-              />
-            )}
+          <div className="px-page grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2">
+            {dailyEvidence && <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} />}
             <SavedZikrCard
               language={language}
               direction={direction}

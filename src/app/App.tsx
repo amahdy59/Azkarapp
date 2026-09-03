@@ -1138,15 +1138,6 @@ function AppContent() {
                   onOpenCustomCounter={() => push("custom_counter")}
                   savedZikrIds={savedZikrIds}
                   onOpenSavedZikr={(categoryId, index) => openReader(categoryId, index, "complete")}
-                  onOpenEvidenceZikr={(categoryId, zikrId) => {
-                    // The card names a zikr, not a position; the index has to be
-                    // resolved against the same list the reader will show.
-                    const index = getAzkarForMode(
-                      categoryId,
-                      isRoutineCategory(categoryId) ? routineModes[categoryId] : "complete",
-                    ).findIndex((z) => z.id === zikrId);
-                    openReader(categoryId, Math.max(0, index), "complete");
-                  }}
                   onOpenSavedLibrary={() => {
                     setActiveTab("azkar");
                     setLibrarySection(savedZikrIds.size > 0 ? "saved" : "collections");

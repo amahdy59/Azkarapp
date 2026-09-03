@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ChevronLeft, ChevronRight, BookOpen, X } from "./icons";
+import { ChevronLeft, ChevronRight, BookOpen, CheckCircle2, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
@@ -171,16 +171,15 @@ export function MushafImmersiveReader({
    * The facing page, when there is room and when it belongs to this surah.
    *
    * A Mushaf opens with page 1 on the right, so pairs run (1,2), (3,4). The
-   * surah is the difference from the Khatmah reader: a spread may not reach
-   * past the span being read, so the pair is dropped rather than showing a page
-   * from the surah after this one.
+   * odd page is always on the right and the even page on the left.
    */
-  const facingNumber = useMemo(() => {
-    if (!shell.spreadRoom) return null;
-    const right = spreadStart(currentPage);
-    const candidate = currentPage === right ? right + 1 : right;
-    return pageNumbers.includes(candidate) ? candidate : null;
-  }, [currentPage, pageNumbers, shell.spreadRoom]);
+  const rightNumber = shell.spreadRoom ? spreadStart(currentPage) : currentPage;
+  const leftNumber =
+    shell.spreadRoom && pageNumbers.includes(rightNumber) && pageNumbers.includes(rightNumber + 1)
+      ? rightNumber + 1
+      : null;
+  const hasSpread = leftNumber !== null;
+  const facingNumber = hasSpread ? (currentPage === rightNumber ? leftNumber : rightNumber) : null;
 
   const [facing, setFacing] = useState<ResolvedPage | null>(null);
 
@@ -192,8 +191,12 @@ export function MushafImmersiveReader({
     return { page: currentPage, data: cached, qcf: hasQcfGlyphs };
   });
 
-  const displayPage = resolved?.page ?? currentPage;
-  const pageData = resolved?.data ?? null;
+  const rightResolved = resolved?.page === rightNumber ? resolved : facing?.page === rightNumber ? facing : null;
+  const leftResolved = resolved?.page === leftNumber ? resolved : facing?.page === leftNumber ? facing : null;
+
+  const displayPage = rightResolved?.page ?? (hasSpread ? rightNumber : (resolved?.page ?? currentPage));
+  const pageData = rightResolved?.data ?? resolved?.data ?? null;
+  const useQcfGlyphs = rightResolved?.qcf ?? resolved?.qcf ?? false;
 
   useEffect(() => {
     let active = true;
@@ -233,12 +236,12 @@ export function MushafImmersiveReader({
       setPageTuple((prev) => {
         // A spread shows two leaves, so a turn moves by two: stepping one would
         // re-show the page the reader just finished, on the other half.
-        const step = facingNumber === null ? delta : delta * 2;
+        const step = hasSpread ? delta * 2 : delta;
         const nextIndex = Math.max(0, Math.min(pageCount - 1, prev[0] + step));
         return nextIndex !== prev[0] ? [nextIndex, delta] : prev;
       });
     },
-    [facingNumber, pageCount, setPageTuple],
+    [hasSpread, pageCount, setPageTuple],
   );
 
   // Keyboard navigation: physical direction (ArrowLeft = next page, ArrowRight = previous).
@@ -322,7 +325,6 @@ export function MushafImmersiveReader({
   }, []);
 
   const lines = useMemo(() => toMushafLines(pageData), [pageData]);
-  const useQcfGlyphs = resolved?.qcf ?? false;
 
   const { surahName, juzNumber } = useMemo(() => {
     const juz = getJuzNumberForPage(displayPage);
@@ -331,8 +333,8 @@ export function MushafImmersiveReader({
     return { surahName: getSurahDisplayName(surah || "1", language), juzNumber: juz };
   }, [displayPage, language, pageData, title]);
 
-  const atStart = pageIndex <= 0;
-  const atEnd = pageIndex >= pageCount - 1;
+  const atStart = hasSpread ? rightNumber <= pageNumbers[0]! : pageIndex <= 0;
+  const atEnd = hasSpread ? leftNumber >= pageNumbers[pageNumbers.length - 1]! : pageIndex >= pageCount - 1;
 
   const pageHeader = (
     <header className="flex w-full min-w-0 items-center justify-between gap-2" dir={direction}>
@@ -413,6 +415,7 @@ export function MushafImmersiveReader({
       onToggleFullscreen={toggleFullscreen}
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsSettingsOpen(true)}
+      onComplete={onComplete}
     />
   );
 
@@ -441,17 +444,30 @@ export function MushafImmersiveReader({
         {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
       </bdi>
 
-      <button
-        type="button"
-        onClick={() => paginate(1)}
-        disabled={atEnd}
-        data-testid="mushaf-immersive-next"
-        className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        aria-label={t(language, "common.next")}
-      >
-        <span className="hidden sm:inline">{t(language, "common.next")}</span>
-        <ChevronLeft size={18} />
-      </button>
+      {atEnd && onComplete ? (
+        <button
+          type="button"
+          onClick={onComplete}
+          data-testid="mushaf-immersive-return"
+          className="flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={t(language, "reader.immersiveComplete")}
+        >
+          <span>{t(language, "reader.immersiveComplete")}</span>
+          <CheckCircle2 size={16} />
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={() => paginate(1)}
+          disabled={atEnd}
+          data-testid="mushaf-immersive-next"
+          className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          aria-label={t(language, "common.next")}
+        >
+          <span className="hidden sm:inline">{t(language, "common.next")}</span>
+          <ChevronLeft size={18} />
+        </button>
+      )}
     </nav>
   );
 
@@ -523,8 +539,12 @@ export function MushafImmersiveReader({
             reduceMotion={reducedMotion}
             textScale={textScale}
             facingPage={
-              facing && facingNumber !== null
-                ? { pageNumber: facing.page, lines: toMushafLines(facing.data), useQcfGlyphs: facing.qcf }
+              hasSpread && leftResolved && leftNumber !== null
+                ? {
+                    pageNumber: leftResolved.page,
+                    lines: toMushafLines(leftResolved.data),
+                    useQcfGlyphs: leftResolved.qcf,
+                  }
                 : undefined
             }
             onAyahAction={handleAyahAction}
@@ -532,25 +552,6 @@ export function MushafImmersiveReader({
           />
         </div>
       </div>
-
-      {atEnd && !isFocusMode && (
-        /* Reaching the end is the completion. It used to live in the bars
-           footer, so a desktop reader — who gets the rail — had no way to
-           finish a surah and had to leave for the counter behind it. Pressing
-           this records the reading and moves to the next zikr, the same as the
-           counter does, rather than handing the reader back a second thing to
-           press for the same act. */
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 flex justify-center p-4">
-          <button
-            type="button"
-            onClick={onComplete}
-            data-testid="mushaf-immersive-return"
-            className="pointer-events-auto flex min-h-12 items-center gap-2 rounded-full border border-primary bg-primary px-6 text-[0.9375rem] font-bold text-primary-foreground shadow-raised transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-          >
-            {t(language, "reader.immersiveComplete")}
-          </button>
-        </div>
-      )}
 
       {isFocusMode && (
         /* Focus mode hides the rail that turned it on, so without this the only

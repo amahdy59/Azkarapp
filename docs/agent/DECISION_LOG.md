@@ -2334,3 +2334,16 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **Tests/evidence required:** the page's background differs from the shell's in
   every theme, reading contrast holds, and OLED stays pure black regardless of
   app theme.
+
+## DEC-136 — spreads keep odd pages on the right, and the paper stays unoccluded
+
+- **Decision:** two-page spreads in the immersive reader strictly map `rightNumber = spreadStart(currentPage)` and `leftNumber = rightNumber + 1`, ensuring the right-hand page is always the odd page and the left-hand page is the even page. Completion actions live in the tool rail on desktop and the footer navigation on mobile, never floating over the sacred reading paper. `DailyEvidenceCard` removes artificial stretching and its unneeded open button.
+- **What was wrong:**
+  1. On wide screens, reaching the last page of Surah Al-Kahf (page 304) computed candidate 303, but passed page 304 to the right slot and 303 to the left slot, inverting the book's reading order backwards.
+  2. A floating button ("أتممت القراءة") rendered at `bottom-0 inset-x-0` directly on top of line 15 of Page 304, covering Ayah 110 (`رَبِّهِۦٓ أَحَدَۢا ﴿١١٠﴾`) and making the surah appear truncated.
+  3. `DailyEvidenceCard` on Home stretched to `h-full` and pushed its footer down via `mt-auto`, creating an awkward empty white gap, and displayed an unused "Open the zikr" button.
+- **Resolution:**
+  - `MushafImmersiveReader` resolves `rightNumber` and `leftNumber` so the spread orientation is fixed and immutable.
+  - The completion button is integrated into `MushafToolRail` (`mushaf-immersive-return`) when reaching the end of the surah on desktop, and into the standard footer bar on mobile. The reading paper canvas is 100% unobstructed.
+  - `DailyEvidenceCard` flows naturally without `h-full` or `mt-auto`, and the open button is eliminated.
+- **Tests/evidence required:** Unit tests assert `mushaf-immersive-return` renders on the rail rather than over the canvas, spreads maintain correct orientation, and `DailyEvidenceCard` renders compactly without an open button.

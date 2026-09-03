@@ -68,7 +68,7 @@ const RAIL_CELL =
  *  crop its own descenders. */
 const RAIL_LABEL = "line-clamp-2 max-w-full text-center text-[0.625rem] font-extrabold leading-[1.6]";
 
-function RailButton({ action }: { action: MushafToolRailAction }) {
+function RailButton({ action, highlight }: { action: MushafToolRailAction; highlight?: boolean }) {
   const isToggle = action.pressed !== undefined;
   return (
     <button
@@ -81,7 +81,11 @@ function RailButton({ action }: { action: MushafToolRailAction }) {
       data-testid={action.testId}
       {...(isToggle ? { role: "switch" as const, "aria-checked": action.pressed } : {})}
       className={`${RAIL_CELL} disabled:cursor-not-allowed disabled:opacity-40 ${
-        action.pressed ? "bg-primary/15 text-primary" : "hover:bg-current/10"
+        highlight
+          ? "bg-primary text-primary-foreground hover:bg-primary/90 font-bold shadow-sm"
+          : action.pressed
+            ? "bg-primary/15 text-primary"
+            : "hover:bg-current/10"
       }`}
     >
       <span className="flex items-center justify-center" aria-hidden="true">
@@ -120,6 +124,7 @@ export interface MushafToolRailProps {
   onToggleFullscreen: () => void;
   onEnterFocusMode: () => void;
   onOpenSettings: () => void;
+  onComplete?: () => void;
 }
 
 export function MushafToolRail({
@@ -146,6 +151,7 @@ export function MushafToolRail({
   onToggleFullscreen,
   onEnterFocusMode,
   onOpenSettings,
+  onComplete,
 }: MushafToolRailProps) {
   const iconSize = compact ? 18 : 20;
   // The back arrow points away from the reading surface, which depends on the
@@ -270,17 +276,32 @@ export function MushafToolRail({
             total: formatNumerals(lastPage, language),
           })}
         </p>
-        <RailButton
-          action={{
-            id: "next",
-            label: t(language, "common.next"),
-            hint: t(language, "mushaf.keyNext"),
-            icon: <ChevronLeft size={iconSize} />,
-            onClick: onNext,
-            disabled: atLastPage,
-            testId: "mushaf-rail-next",
-          }}
-        />
+        {atLastPage && onComplete ? (
+          <RailButton
+            highlight
+            action={{
+              id: "complete",
+              label: t(language, "reader.immersiveComplete"),
+              caption: t(language, "reader.immersiveComplete"),
+              hint: t(language, "mushaf.keyNext"),
+              icon: <CheckCircle2 size={iconSize} />,
+              onClick: onComplete,
+              testId: "mushaf-immersive-return",
+            }}
+          />
+        ) : (
+          <RailButton
+            action={{
+              id: "next",
+              label: t(language, "common.next"),
+              hint: t(language, "mushaf.keyNext"),
+              icon: <ChevronLeft size={iconSize} />,
+              onClick: onNext,
+              disabled: atLastPage,
+              testId: "mushaf-rail-next",
+            }}
+          />
+        )}
       </nav>
 
       <div className="mx-1 my-1 h-px flex-none bg-current/15" aria-hidden="true" />

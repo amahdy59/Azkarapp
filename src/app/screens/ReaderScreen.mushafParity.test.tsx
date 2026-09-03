@@ -180,4 +180,17 @@ describe("the surah view is the Mushaf", () => {
     expect(screen.getAllByTestId("mushaf-rail-next")).toHaveLength(1);
     expect(screen.getAllByTestId("mushaf-rail-back")).toHaveLength(1);
   });
+
+  it("places the completion action on the rail when at the end of the surah", () => {
+    renderKahf();
+
+    for (let turn = 0; turn < 12; turn += 1) {
+      const next = screen.queryByTestId("mushaf-rail-next");
+      if (!next || (next as HTMLButtonElement).disabled) break;
+      fireEvent.click(next);
+    }
+
+    const finish = screen.getByTestId("mushaf-immersive-return");
+    expect(finish.closest("[data-testid='mushaf-tool-rail']")).not.toBeNull();
+  });
 });

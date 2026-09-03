@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-03b",
+  "release": "2026-09-03c",
   "ar": [
-    "صفحات السور في وضع المصحف باتت تستغل كامل الشاشة على الأجهزة اللوحية والمكتبية، وتتنحى أشرطة التنقل جانباً لتمنحك تركيزاً تاماً أثناء التلاوة.",
-    "أوراق المصحف أصبحت تحمل خلفية ورقية مخصصة لكل مظهر (الفاتح، الداكن، الليلي، وOLED)، مما يمنحها عمقاً مريحاً للعين ووضوحاً فائقاً للنص القرآني.",
-    "وضع التباين العالي (OLED) بات يحافظ على سواد تام وخالص للصفحة بأكملها، لتوفير أقصى درجات الراحة للعين وتوفير طاقة البطارية في الظلام."
+    "صفحات سور المصحف على الشاشات العريضة أصبحت تعرض الصفحات المتقابلة بترتيبها القرآني الصحيح دوماً (الصفحة اليمنى ثم اليسرى) دون أي انعكاس.",
+    "نص الآيات القرآنية بات حراً بالكامل من أي أزرار عائمة تحجبه، مع انتقال إجراء إتمام القراءة إلى شريط الأدوات الجانبي لتظهر أواخر السور بوضوح تام.",
+    "بطاقة حديث اليوم في الصفحة الرئيسية أصبحت مدمجة ومريحة للعين دون مساحات بيضاء زائدة، مع التركيز المباشر على نص الحديث وفائدته."
   ],
   "en": [
-    "Surah pages in Mushaf mode now use the whole screen on tablets and desktops, stepping aside surrounding navigation bars so reading gets the uninterrupted focus of the full surface.",
-    "Mushaf pages now rest on an authentic paper surface tailored to every theme (Light, Dark, Midnight, and OLED), bringing comfortable visual depth and pristine reading contrast.",
-    "The high-contrast OLED mode now preserves pure black across the entire page, maximizing dark-room reading comfort and battery efficiency."
+    "Two-page Mushaf spreads on wide screens now always display in correct reading order with odd pages on the right and even pages on the left.",
+    "The holy text is completely clear of floating buttons, with the completion action moving to the navigation rail so the final ayahs are always fully visible.",
+    "Today's Hadith card on Home now rests compactly without excess empty space, keeping the narration and its benefit front and center."
   ]
 }

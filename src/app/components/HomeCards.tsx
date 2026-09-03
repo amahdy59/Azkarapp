@@ -396,19 +396,17 @@ export function DailyEvidenceCard({
   language,
   direction,
   evidence,
-  onOpenZikr,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   evidence: DailyEvidence;
-  onOpenZikr?: (categoryId: DailyEvidence["categoryId"], zikrId: string) => void;
 }) {
   return (
     <Card
       as="section"
       elevation="flat"
       aria-labelledby="home-evidence-heading"
-      className="flex h-full flex-col gap-3"
+      className="flex flex-col gap-3"
       data-testid="home-daily-evidence"
       dir={direction}
     >
@@ -438,7 +436,7 @@ export function DailyEvidenceCard({
         {evidence.benefit}
       </p>
 
-      <footer className="mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/40 pt-3">
+      <footer className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/40 pt-3">
         <span className="text-[0.75rem] font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
           {evidence.authenticity}
         </span>
@@ -448,17 +446,6 @@ export function DailyEvidenceCard({
           </span>
         )}
       </footer>
-
-      {onOpenZikr && (
-        <button
-          type="button"
-          onClick={() => onOpenZikr(evidence.categoryId, evidence.zikrId)}
-          className="min-h-11 rounded-full border border-primary/50 px-4 text-[0.8125rem] font-bold text-primary hover:bg-primary/5"
-          data-testid="daily-evidence-open"
-        >
-          {t(language, "home.dailyEvidenceOpen")}
-        </button>
-      )}
     </Card>
   );
 }
