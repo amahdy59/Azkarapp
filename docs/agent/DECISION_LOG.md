@@ -2306,3 +2306,31 @@ Record user-approved product, design and architectural decisions here. Do not er
   reader for a non-surah zikr, absent while the Mushaf shows, and back once the
   surah is left. Counted by label, since the Mushaf carries a page-navigation
   landmark of its own.
+
+## DEC-135 — the page is paper, not a rectangle drawn on the shell
+
+- **Decision:** the Mushaf page carries a ground of its own, `--mushaf-paper`,
+  lifted from each theme's background and matched to the outer rule's radius,
+  with a soft cast beneath it.
+- **What was wrong:** the page was transparent. `.mushaf-page-frame` painted no
+  background, so the "page" was the app shell with a gold rectangle drawn on it.
+  That made the rule load-bearing: it was the only thing marking where a page
+  began and ended, and on a spread the only thing dividing two facing pages.
+  DEC-131 added a second stroke to make that boundary clearer, which treated the
+  symptom — the page had no surface for a frame to sit on.
+- **Why it matters beyond looks:** it decides whether the frame is a choice. A
+  printed Mushaf's paper differs from whatever it rests on, and the rule is
+  ornament on top of that. Until the paper existed, removing the rule was not
+  available: it would have left the Qur'an text floating on chrome.
+- **Contrast:** each theme lifts by roughly a card's worth, so reading contrast
+  is unharmed — in light it improves, since `#fffdf8` paper is brighter than the
+  `#f8f5f0` ground it replaced (text 17.64:1). `high-contrast` and `theme-oled`
+  take no lift: they keep pure black (`#000000` / `#02050d`) without shadow,
+  preserving true black reading surface and battery economy while isolating the
+  paper ground from the ambient app theme.
+- **Still open:** the frame treatment on top of the paper — two strokes as
+  today, a single hairline, or none. That is now a design preference rather than
+  a structural need.
+- **Tests/evidence required:** the page's background differs from the shell's in
+  every theme, reading contrast holds, and OLED stays pure black regardless of
+  app theme.

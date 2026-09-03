@@ -387,6 +387,17 @@
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
   padding-block: clamp(0.3rem, 1cqh, 0.7rem);
+  /* The paper itself. Matching the outer rule's radius so the ground stops
+     exactly where the frame draws, and a soft cast so the sheet sits above the
+     shell rather than being cut out of it. */
+  background: var(--mushaf-paper);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 12px rgb(0 0 0 / 0.18);
+}
+
+.high-contrast .mushaf-page-frame,
+.theme-oled .mushaf-page-frame {
+  box-shadow: none;
 }
 
 /* Both rules take the page's own ink through `currentColor`, so a change of

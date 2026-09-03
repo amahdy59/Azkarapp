@@ -46,4 +46,28 @@ describe("the Mushaf page frame", () => {
     expect(immersive).toContain("reduceMotion={reducedMotion}");
     expect(immersive).toContain("textScale={textScale}");
   });
+
+  it("gives the page a paper surface of its own, distinct from the app background", () => {
+    // DEC-135: The page is paper, not a transparent rectangle drawn on the shell.
+    const frame = layout.slice(layout.indexOf(".mushaf-page-frame {"), layout.indexOf(".mushaf-page-rule {"));
+    expect(frame).toContain("background: var(--mushaf-paper)");
+    expect(frame).toContain("border-radius: 0.5rem");
+
+    expect(tokens).toContain("--mushaf-paper: #101010"); // root fallback
+    expect(tokens).toContain("--mushaf-paper: #141312"); // dark
+    expect(tokens).toContain("--mushaf-paper: #fffdf8"); // light
+    expect(tokens).toContain("--mushaf-paper: #101b3a"); // midnight
+    expect(tokens).toContain("--mushaf-paper: #02050d"); // high-contrast
+    expect(tokens).toContain("--mushaf-paper: #000000"); // oled
+  });
+
+  it("isolates OLED mode so it does not inherit a lighter ground from the app theme", () => {
+    // When the app is in light theme, selecting OLED in Mushaf settings must
+    // still keep the page pure black rather than inheriting #fffdf8.
+    expect(viewer).toContain('theme === "oled" ? "theme-oled"');
+    expect(tokens).toMatch(/\.theme-oled\s*\{[^}]*--mushaf-paper:\s*#000000/);
+
+    // High contrast and OLED omit drop shadow to preserve contrast purity
+    expect(layout).toMatch(/\.theme-oled \.mushaf-page-frame\s*\{[^}]*box-shadow:\s*none/);
+  });
 });

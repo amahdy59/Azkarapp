@@ -83,4 +83,11 @@ describe("theme token contracts (Phase 02 delta)", () => {
       expect(match[1]).not.toContain("--font-ui-arabic");
     }
   });
+
+  it("defines --mushaf-paper across all named themes", () => {
+    for (const selector of namedThemeSelectors) {
+      const block = themeBlock(selector);
+      expect(block).toMatch(/--mushaf-paper:\s*#[0-9a-f]{6}/i);
+    }
+  });
 });

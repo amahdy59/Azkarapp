@@ -1035,7 +1035,7 @@ export function MushafPageViewer({
 
   return (
     <article
-      className={`relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "" : `theme-${theme}`}`}
+      className={`relative flex h-full min-h-0 w-full overflow-hidden transition-colors duration-200 ${useRail ? (railSide === "left" ? "flex-row-reverse" : "") : "flex-col"} ${themeClasses} ${theme === "oled" ? "theme-oled" : `theme-${theme}`}`}
       data-mushaf-chrome-mode={useRail ? "rail" : "bars"}
       data-theme={theme === "oled" ? undefined : theme}
       dir="rtl"
