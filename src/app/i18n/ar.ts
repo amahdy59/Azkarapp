@@ -886,6 +886,15 @@ const ar = {
     railPageBookmark: "علامة",
     railMeanings: "المعاني",
     railFocus: "تركيز",
+    railShortcuts: "الاختصارات",
+    groupAudio: "التلاوة",
+    groupReading: "أدوات القراءة",
+    groupDisplay: "العرض",
+    groupSettings: "الإعدادات والمساعدة",
+    railListen: "استماع",
+    listenSurah: "الاستماع إلى السورة",
+    pauseRecitation: "إيقاف التلاوة مؤقتاً",
+    keyListen: "المفتاح Space",
     railFullscreen: "ملء الشاشة",
     railSettings: "إعدادات",
     railPageUnit: "صفحة",
@@ -1060,6 +1069,7 @@ const ar = {
     transliterationLabel:
       "\u0643\u064a\u0641\u064a\u0629 \u0627\u0644\u0646\u0637\u0642 \u0628\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629",
     hadithLabel: "\u0646\u0635 \u0627\u0644\u062d\u062f\u064a\u062b",
+    hadithGradeWeak: "\u0636\u0639\u064a\u0641",
     copyTranslation: "\u0646\u0633\u062e \u0627\u0644\u062a\u0631\u062c\u0645\u0629",
     copyTransliteration:
       "\u0646\u0633\u062e \u0627\u0644\u0646\u0637\u0642 \u0628\u0627\u0644\u0625\u0646\u062c\u0644\u064a\u0632\u064a\u0629",

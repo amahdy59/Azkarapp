@@ -7,6 +7,7 @@ import { Card } from "./Card";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
 import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles } from "./icons";
+import { HadithWeakChainBadge } from "./ZikrComponents";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
 
@@ -440,6 +441,7 @@ export function DailyEvidenceCard({
         <span className="text-[0.75rem] font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
           {evidence.authenticity}
         </span>
+        {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceReference && (
           <span className="text-[0.75rem] text-muted-foreground" dir="auto">
             {evidence.sourceReference}

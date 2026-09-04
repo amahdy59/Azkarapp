@@ -21,6 +21,7 @@ export interface DailyEvidence {
   /** What the practice is for, in the reader's language where available. */
   benefit: string;
   sourceReference?: string;
+  authenticityLevel?: Zikr["authenticityLevel"];
   /** The zikr this came from, so the card can offer to open it. */
   categoryId: Zikr["category"];
 }
@@ -69,6 +70,7 @@ export function getDailyEvidence(dayKey: string, language: AppLanguage): DailyEv
       language === "ar"
         ? zikr.sourceReferenceArabic || toArabicSourceReference(zikr.sourceReference)
         : zikr.sourceReference,
+    authenticityLevel: zikr.authenticityLevel,
     categoryId: zikr.category,
   };
 }

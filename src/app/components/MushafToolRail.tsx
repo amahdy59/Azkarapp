@@ -11,10 +11,31 @@ import {
   ChevronRight,
   Eye,
   Bookmark,
+  HelpCircle,
   Maximize,
   Minimize,
+  Pause,
+  Play,
   SlidersHorizontal,
 } from "./icons";
+import type { AudioStatus } from "../audio/audioTypes";
+
+/**
+ * The surah's recitation, as the Mushaf needs to see it.
+ *
+ * Deliberately not a player: the app already has one audio controller and one
+ * floating player carrying transport and seek. This is the reading surface's
+ * view of that — whether a recitation exists, what it is doing, and one way to
+ * start or interrupt it — so the Mushaf can offer listening without owning any
+ * playback logic of its own.
+ */
+export interface SurahAudioControl {
+  /** False when no reviewed recitation is assigned to this surah. */
+  available: boolean;
+  /** "idle" whenever the player is carrying something other than this surah. */
+  status: AudioStatus;
+  onToggle: () => void;
+}
 
 /**
  * The Mushaf's tools, stood on end beside the paper.
@@ -124,6 +145,10 @@ export interface MushafToolRailProps {
   onToggleFullscreen: () => void;
   onEnterFocusMode: () => void;
   onOpenSettings: () => void;
+  /** Omitted where the surah has no reviewed recitation to offer. */
+  surahAudio?: SurahAudioControl;
+  /** Omitted on surfaces with no keyboard to describe, which is every phone. */
+  onOpenShortcuts?: () => void;
   onComplete?: () => void;
 }
 
@@ -151,6 +176,8 @@ export function MushafToolRail({
   onToggleFullscreen,
   onEnterFocusMode,
   onOpenSettings,
+  surahAudio,
+  onOpenShortcuts,
   onComplete,
 }: MushafToolRailProps) {
   const iconSize = compact ? 18 : 20;
@@ -158,7 +185,36 @@ export function MushafToolRail({
   // edge the rail is pinned to rather than on the interface language.
   const backIcon = side === "right" ? <ArrowRight size={iconSize} /> : <ArrowLeft size={iconSize} />;
 
-  const tools: MushafToolRailAction[] = [
+  const isReciting = surahAudio?.status === "playing" || surahAudio?.status === "buffering";
+  const isPreparingRecitation = surahAudio?.status === "loading" || surahAudio?.status === "buffering";
+
+  const audioTools: MushafToolRailAction[] = [
+    ...(surahAudio
+      ? [
+          {
+            id: "listen",
+            label: t(
+              language,
+              !surahAudio.available
+                ? "reader.audioUnavailable"
+                : isReciting
+                  ? "mushaf.pauseRecitation"
+                  : "mushaf.listenSurah",
+            ),
+            caption: t(language, "mushaf.railListen"),
+            hint: t(language, "mushaf.keyListen"),
+            icon: isReciting ? <Pause size={iconSize} /> : <Play size={iconSize} />,
+            onClick: surahAudio.onToggle,
+            disabled: !surahAudio.available,
+            busy: isPreparingRecitation,
+            testId: "mushaf-rail-listen",
+          },
+        ]
+      : []),
+  ];
+
+  /** What the reader marks or looks up while reading the page in front of them. */
+  const readingTools: MushafToolRailAction[] = [
     {
       id: "page-bookmark",
       label: t(language, "mushaf.bookmarkCurrentPage"),
@@ -179,6 +235,10 @@ export function MushafToolRail({
       busy: isLoadingWordMeanings,
       testId: "mushaf-difficult-words-switch",
     },
+  ];
+
+  /** How much of the screen the page gets — the view, not the reading. */
+  const displayTools: MushafToolRailAction[] = [
     {
       id: "focus",
       label: t(language, "mushaf.focusModeEnter"),
@@ -195,6 +255,10 @@ export function MushafToolRail({
       onClick: onToggleFullscreen,
       testId: "mushaf-fullscreen-toggle",
     },
+  ];
+
+  /** Preferences, and the list of what the keys do. */
+  const helpTools: MushafToolRailAction[] = [
     {
       id: "settings",
       label: t(language, "common.settings"),
@@ -203,7 +267,44 @@ export function MushafToolRail({
       onClick: onOpenSettings,
       testId: "mushaf-settings-trigger",
     },
+    // Last, and only where a keyboard exists to describe. The keys were
+    // discoverable only by opening the reading settings and scrolling past
+    // them, which is not where a reader looks for "what can I press".
+    ...(onOpenShortcuts
+      ? [
+          {
+            id: "shortcuts",
+            label: t(language, "mushaf.keyboardTitle"),
+            caption: t(language, "mushaf.railShortcuts"),
+            icon: <HelpCircle size={iconSize} />,
+            onClick: onOpenShortcuts,
+            testId: "mushaf-rail-shortcuts",
+          },
+        ]
+      : []),
   ];
+
+  /**
+   * The tools below the page navigation, in bands.
+   *
+   * The rail had grown to ten controls in one undifferentiated column, where
+   * "bookmark this page" sat between "listen" and "word meanings" with nothing
+   * saying they answer different questions. Banding them — the recitation,
+   * what you mark or look up, how much screen the page gets, then preferences
+   * and the keys — gives the column a structure to scan instead of a list to
+   * read end to end.
+   *
+   * Grouped rather than folded into an overflow menu: the rail runs the full
+   * height of a landscape screen and is nowhere near running out of room, so
+   * hiding half of it behind a further press would cost a click to save space
+   * that is not scarce. An empty band renders nothing.
+   */
+  const toolGroups: { id: string; label: string; actions: MushafToolRailAction[] }[] = [
+    { id: "audio", label: t(language, "mushaf.groupAudio"), actions: audioTools },
+    { id: "reading", label: t(language, "mushaf.groupReading"), actions: readingTools },
+    { id: "display", label: t(language, "mushaf.groupDisplay"), actions: displayTools },
+    { id: "help", label: t(language, "mushaf.groupSettings"), actions: helpTools },
+  ].filter((group) => group.actions.length > 0);
 
   return (
     <div
@@ -304,13 +405,19 @@ export function MushafToolRail({
         )}
       </nav>
 
-      <div className="mx-1 my-1 h-px flex-none bg-current/15" aria-hidden="true" />
-
-      <div className="flex flex-col gap-0.5">
-        {tools.map((action) => (
-          <RailButton key={action.id} action={action} />
-        ))}
-      </div>
+      {toolGroups.map((group) => (
+        <div key={group.id} className="contents">
+          {/* The rule is the band's only visible boundary; the label is for
+              assistive tech, which otherwise meets ten sibling buttons with no
+              structure. A 60px rail has no room to print four headings. */}
+          <div className="mx-1 my-1 h-px flex-none bg-current/15" aria-hidden="true" />
+          <div className="flex flex-col gap-0.5" role="group" aria-label={group.label}>
+            {group.actions.map((action) => (
+              <RailButton key={action.id} action={action} />
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

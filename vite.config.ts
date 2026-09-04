@@ -132,15 +132,31 @@ export default defineConfig(({ mode }) => {
     assetsInclude: ["**/*.svg", "**/*.csv"],
     build: {
       manifest: true,
+      modulePreload: {
+        // Vite's default preloads every async chunk it can see from the
+        // entry, including ones only ever reached through `loadAudioModule()`
+        // — a deliberately deferred, on-demand load (see src/app/audio/lazyAudio.ts).
+        // Left alone, the browser fetches its ~480KB before a reader has
+        // asked for audio at all, defeating the point of deferring it.
+        resolveDependencies: (_filename, deps) => deps.filter((dep) => !dep.includes("/audio-")),
+      },
       rollupOptions: {
         output: {
-          manualChunks: {
-            vendor: ["react", "react-dom"],
-            motion: ["motion"],
-            audio: [
-              path.resolve(__dirname, "src/app/audio/AudioProvider.tsx"),
-              path.resolve(__dirname, "src/app/audio/buildPlaybackPlan.ts"),
-            ],
+          // A function, not the `{ name: [files] }` shorthand: that form
+          // forces every dependency those files pull in — including ones
+          // shared with unrelated code, like React/Radix internals — into
+          // the named chunk too, which then makes other, otherwise-unrelated
+          // chunks import from it just to reach that shared code. Naming
+          // only the two audio entry points here lets Rollup's own
+          // shared-chunk logic place their exclusive dependencies (the
+          // manifest, the reducer) alongside them and keep genuinely shared
+          // code out.
+          manualChunks(id) {
+            if (id.includes("node_modules/react-dom") || id.includes("node_modules/react/")) return "vendor";
+            if (id.includes("node_modules/motion")) return "motion";
+            if (id.endsWith("/src/app/audio/AudioProvider.tsx") || id.endsWith("/src/app/audio/buildPlaybackPlan.ts")) {
+              return "audio";
+            }
           },
         },
       },

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ChevronLeft, ChevronRight, BookOpen, CheckCircle2, X } from "./icons";
+import { ChevronLeft, ChevronRight, BookOpen, CheckCircle2, Pause, Play, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
-import { MushafToolRail, MUSHAF_RAIL_WIDTH } from "./MushafToolRail";
+import { MushafToolRail, MUSHAF_RAIL_WIDTH, type SurahAudioControl } from "./MushafToolRail";
 import { MushafNavigationModal } from "./MushafNavigationModal";
 import { MushafSettingsSheet } from "./MushafSettingsSheet";
+import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
+import { ResponsiveSheet } from "./ResponsiveSheet";
 import { t } from "../i18n";
 import type {
   AppLanguage,
@@ -32,6 +34,7 @@ import { loadSurahWordMeanings, type QuranWordMeaning, type WordMeaningSelection
 import { MushafPageViewer } from "./MushafPageViewer";
 import { AyahInteractionSheet } from "./AyahInteractionSheet";
 import { reportError } from "../../lib/observability";
+export type { SurahAudioControl } from "./MushafToolRail";
 
 const FONT_WAIT_MS = 1200;
 
@@ -106,6 +109,7 @@ export function MushafImmersiveReader({
   bookmarkedPages = [],
   onTogglePageBookmark,
   mushafSettings,
+  surahAudio,
   onClose,
   onComplete,
 }: {
@@ -129,6 +133,8 @@ export function MushafImmersiveReader({
   onTogglePageBookmark?: (page: number) => void;
   /** The Mushaf-wide reading preferences, so this view can change them too. */
   mushafSettings?: MushafSurahSettings;
+  /** The surah's recitation, driven by the app's one audio controller. */
+  surahAudio?: SurahAudioControl;
   textStyle?: CSSProperties;
   onSelectMeanings?: (selection: WordMeaningSelection) => void;
   activeWordId?: string | null;
@@ -155,12 +161,23 @@ export function MushafImmersiveReader({
   const [isFocusMode, setIsFocusMode] = useState(false);
   const [isIndexOpen, setIsIndexOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [activeAyah, setActiveAyah] = useState<{ verseKey: string; text: string | null; pageNumber: number } | null>(
     null,
   );
   const ayahRequestId = useRef(0);
   const paperRef = useRef<HTMLDivElement>(null);
+  /**
+   * Read by the key handler instead of closing over the prop.
+   *
+   * `surahAudio` is rebuilt on every render of the screen above, and playback
+   * re-renders it several times a second while the recitation runs. In the
+   * effect's dependencies that tore the window listener down and rebuilt it on
+   * every tick; the ref keeps the listener installed once and still current.
+   */
+  const surahAudioRef = useRef(surahAudio);
+  surahAudioRef.current = surahAudio;
 
   const currentPage = pageNumbers[pageIndex] ?? pageNumbers[0]!;
   const pageCount = pageNumbers.length;
@@ -244,8 +261,10 @@ export function MushafImmersiveReader({
     [hasSpread, pageCount, setPageTuple],
   );
 
-  // Keyboard navigation: physical direction (ArrowLeft = next page, ArrowRight = previous).
-  // Escape is owned by the dialog so nested ayah sheets close in the right order.
+  // Keyboard navigation: physical direction (ArrowLeft/PageDown = next page,
+  // ArrowRight/PageUp = previous), Home/End jump to the surah's first and last
+  // page, F toggles focus mode, and Escape steps back one layer at a time
+  // (focus mode first, then the surah) so nested ayah sheets close in order.
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (activeAyah) return;
@@ -271,11 +290,32 @@ export function MushafImmersiveReader({
       } else if (e.key === "ArrowRight" || e.key === "PageUp") {
         e.preventDefault();
         paginate(-1);
+      } else if (e.key === "Home") {
+        e.preventDefault();
+        setPageTuple((prev) => (prev[0] === 0 ? prev : [0, -1]));
+      } else if (e.key === "End") {
+        e.preventDefault();
+        setPageTuple((prev) => (prev[0] === pageCount - 1 ? prev : [pageCount - 1, 1]));
+      } else if (e.key === "f" || e.key === "F") {
+        e.preventDefault();
+        setIsFocusMode((prev) => !prev);
+      } else if (e.key === " " || e.code === "Space") {
+        // Safe to claim here in a way it is not in the counting reader: the
+        // Mushaf spread does not scroll, so Space has no default to displace.
+        // It only does anything when there is a recitation to start.
+        const audio = surahAudioRef.current;
+        if (!audio?.available) return;
+        // A focused button already answers Space by activating itself; taking
+        // it here as well would start the recitation and stop it again in the
+        // same keystroke.
+        if (target?.closest("button, [role='button']")) return;
+        e.preventDefault();
+        audio.onToggle();
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [activeAyah, isFocusMode, onClose, paginate]);
+  }, [activeAyah, isFocusMode, onClose, paginate, pageCount, setPageTuple]);
 
   /**
    * One gesture, shared with the reader.
@@ -335,6 +375,8 @@ export function MushafImmersiveReader({
 
   const atStart = hasSpread ? rightNumber <= pageNumbers[0]! : pageIndex <= 0;
   const atEnd = hasSpread ? leftNumber >= pageNumbers[pageNumbers.length - 1]! : pageIndex >= pageCount - 1;
+  /** Buffering counts as playing: the recitation is running, just starved. */
+  const isRecitationPlaying = surahAudio?.status === "playing" || surahAudio?.status === "buffering";
 
   const pageHeader = (
     <header className="flex w-full min-w-0 items-center justify-between gap-2" dir={direction}>
@@ -355,6 +397,31 @@ export function MushafImmersiveReader({
             {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
           </bdi>
         </bdi>
+        {/* The rail carries this on a landscape screen, and the rail is not
+            rendered here. Without it a phone — where listening to a surah is
+            most of the point — had no way to start the recitation at all. */}
+        {surahAudio && (
+          <button
+            type="button"
+            onClick={surahAudio.onToggle}
+            disabled={!surahAudio.available}
+            aria-busy={surahAudio.status === "loading" || surahAudio.status === "buffering"}
+            data-testid="mushaf-immersive-listen"
+            aria-label={t(
+              language,
+              !surahAudio.available
+                ? "reader.audioUnavailable"
+                : isRecitationPlaying
+                  ? "mushaf.pauseRecitation"
+                  : "mushaf.listenSurah",
+            )}
+            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 ${
+              isRecitationPlaying ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
+            }`}
+          >
+            {isRecitationPlaying ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
+          </button>
+        )}
         <button
           type="button"
           role="switch"
@@ -415,6 +482,11 @@ export function MushafImmersiveReader({
       onToggleFullscreen={toggleFullscreen}
       onEnterFocusMode={() => setIsFocusMode(true)}
       onOpenSettings={() => setIsSettingsOpen(true)}
+      surahAudio={surahAudio}
+      /* Only where the rail itself is shown: that gate is a landscape screen
+         with room for it, which is also where a keyboard is likely to exist.
+         A phone has no keys for this list to describe. */
+      onOpenShortcuts={() => setIsShortcutsOpen(true)}
       onComplete={onComplete}
     />
   );
@@ -614,6 +686,30 @@ export function MushafImmersiveReader({
           surahName={surahName}
         />
       )}
+
+      {/* The keys, on their own, reachable from the rail rather than only from
+          the foot of the reading settings. Radix supplies focus containment,
+          focus restore and Escape — and consumes that Escape, so dismissing
+          this never also gives up the surah. */}
+      <ResponsiveSheet
+        open={isShortcutsOpen}
+        onClose={() => setIsShortcutsOpen(false)}
+        title={t(language, "mushaf.keyboardTitle")}
+        direction={direction}
+        testId="mushaf-shortcuts-sheet"
+        maxWidthClassName="sm:max-w-sm"
+      >
+        {/* ResponsiveSheet's own title is `sr-only` in this presentation, so a
+            sighted reader would otherwise get a bare list with nothing naming
+            it. Matches the heading the reading settings print above the same
+            list. */}
+        <div className="flex flex-col gap-2 px-5 pb-5">
+          <h3 className="text-xs font-bold tracking-wider text-muted-foreground uppercase" aria-hidden="true">
+            {t(language, "mushaf.keyboardTitle")}
+          </h3>
+          <MushafKeyboardShortcutList language={language} />
+        </div>
+      </ResponsiveSheet>
 
       <AyahInteractionSheet
         isOpen={activeAyah !== null}

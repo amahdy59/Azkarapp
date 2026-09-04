@@ -110,6 +110,38 @@ test.describe("immersive mushaf mode", () => {
     await expect(page.getByTestId("mushaf-immersive")).toBeHidden();
   });
 
+  test("PageUp/PageDown page the same way as the arrow keys, and Home/End jump to the ends", async ({ page }) => {
+    await openReaderAt(page, "/#/azkar/friday-kahf/1");
+    await expectMushafShowing(page);
+
+    const firstPage = currentPages(page).first();
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "293");
+
+    await page.keyboard.press("PageDown");
+    await expect(firstPage).not.toHaveAttribute("data-mushaf-page", "293");
+    await page.keyboard.press("PageUp");
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "293");
+
+    await page.keyboard.press("End");
+    // The rail swaps its next-page button for the completion button once the
+    // last page is reached — the surest sign End actually landed there.
+    await expect(page.getByTestId("mushaf-immersive-return")).toBeVisible();
+    await page.keyboard.press("Home");
+    await expect(firstPage).toHaveAttribute("data-mushaf-page", "293");
+    await expect(page.getByTestId("mushaf-rail-previous")).toBeDisabled();
+  });
+
+  test("F toggles focus mode, and Escape leaves focus mode before leaving the surah", async ({ page }) => {
+    await openReaderAt(page, "/#/azkar/friday-kahf/1");
+    await expectMushafShowing(page);
+
+    await page.keyboard.press("f");
+    await expect(page.getByTestId("mushaf-tool-rail")).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("mushaf-tool-rail")).toBeVisible();
+    await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
+  });
+
   test("is offered only for surahs that span multiple mushaf pages", async ({ page }) => {
     await openReaderAt(page, "/#/azkar/morning/1");
     // A zikr that fits on one screen has no Mushaf pages to show, so it neither

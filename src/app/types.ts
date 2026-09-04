@@ -147,6 +147,8 @@ export interface Zikr {
   preferredTiming?: string;
   hadithText?: string;
   authenticityNote?: string;
+  /** Set only when a hadith's chain is graded weak/disputed despite being kept for its content — never inferred from `authenticityNote` text, which is freeform scholarly commentary. */
+  authenticityLevel?: "weak";
   attributionType?: ZikrAttributionType;
   notes?: string;
   sourceUrl?: string;

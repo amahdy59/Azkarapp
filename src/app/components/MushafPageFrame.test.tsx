@@ -7,36 +7,35 @@ const layout = readFileSync("src/styles/theme/layout.css", "utf8");
 const tokens = readFileSync("src/styles/theme/tokens.css", "utf8");
 
 describe("the Mushaf page frame", () => {
-  it("draws two strokes, not one hairline", () => {
-    // A single rule at 20% opacity read as a faint box around crowded type
-    // rather than as the frame of a page.
-    expect(viewer).toContain('className="mushaf-page-rule"');
-    expect(viewer).toContain("mushaf-page-rule mushaf-page-rule--inner");
-    expect(viewer).not.toContain("absolute inset-0 rounded-sm border opacity-20");
-
-    const outer = layout.slice(layout.indexOf(".mushaf-page-rule {"), layout.indexOf(".mushaf-page-rule--inner"));
-    const inner = layout.slice(layout.indexOf(".mushaf-page-rule--inner"));
-    // Two weights at two opacities is what separates a printed frame from a box.
-    expect(outer).toContain("border: 1.5px solid var(--mushaf-rule-ink)");
-    expect(inner).toContain("border-width: 1px");
-    expect(Number(outer.match(/opacity: ([\d.]+)/)![1])).toBeGreaterThan(Number(inner.match(/opacity: ([\d.]+)/)![1]));
+  it("draws no rule around the page — the paper alone marks its edge", () => {
+    // DEC-135 made the rule optional once the page had a paper ground of its
+    // own; the page background task dropped it in favour of that ground plus
+    // wider padding, rather than drawing a box on top of it.
+    expect(viewer).not.toContain("mushaf-page-rule");
+    expect(layout).not.toContain(".mushaf-page-rule");
   });
 
   it("uses the same gold as the illuminated opening frame", () => {
-    // #d4b47c is the accent in public/images/mushaf-fatiha-frame.svg, so the
-    // plain pages and the opening read as one book.
+    // #d4b47c is the accent in public/images/mushaf-fatiha-frame.svg — the
+    // token stays defined (the short-surah passage frame still uses it) even
+    // though the multi-page view no longer draws a rule with it.
     expect(tokens).toContain("--mushaf-rule-ink: #d4b47c");
     const svg = readFileSync("public/images/mushaf-fatiha-frame.svg", "utf8");
     expect(svg).toContain("#d4b47c");
   });
 
-  it("gives the type room to sit inside the rule", () => {
-    const frame = layout.slice(layout.indexOf(".mushaf-page-frame {"), layout.indexOf(".mushaf-page-rule {"));
+  it("gives the type generous room to sit inside the paper's edge", () => {
+    const frame = layout.slice(
+      layout.indexOf(".mushaf-page-frame {"),
+      layout.indexOf(".high-contrast .mushaf-page-frame"),
+    );
     // The frame's max-width grows with this padding, so widening it moves the
-    // rule outward rather than squeezing the measure — DEC-089's fifteen-line
+    // edge outward rather than squeezing the measure — DEC-089's fifteen-line
     // geometry is page data and must not shift.
     expect(frame).toContain("max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)))");
-    expect(frame).toMatch(/--mushaf-frame-pad: clamp\(0\.75rem/);
+    // Widened past the old 0.75rem floor now that the rule no longer needs a
+    // share of the edge for itself.
+    expect(frame).toMatch(/--mushaf-frame-pad: clamp\(1\.25rem/);
     expect(frame).toContain("padding-block:");
   });
 
@@ -49,7 +48,10 @@ describe("the Mushaf page frame", () => {
 
   it("gives the page a paper surface of its own, distinct from the app background", () => {
     // DEC-135: The page is paper, not a transparent rectangle drawn on the shell.
-    const frame = layout.slice(layout.indexOf(".mushaf-page-frame {"), layout.indexOf(".mushaf-page-rule {"));
+    const frame = layout.slice(
+      layout.indexOf(".mushaf-page-frame {"),
+      layout.indexOf(".high-contrast .mushaf-page-frame"),
+    );
     expect(frame).toContain("background: var(--mushaf-paper)");
     expect(frame).toContain("border-radius: 0.5rem");
 

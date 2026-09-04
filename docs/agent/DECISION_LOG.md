@@ -2347,3 +2347,83 @@ Record user-approved product, design and architectural decisions here. Do not er
   - The completion button is integrated into `MushafToolRail` (`mushaf-immersive-return`) when reaching the end of the surah on desktop, and into the standard footer bar on mobile. The reading paper canvas is 100% unobstructed.
   - `DailyEvidenceCard` flows naturally without `h-full` or `mt-auto`, and the open button is eliminated.
 - **Tests/evidence required:** Unit tests assert `mushaf-immersive-return` renders on the rail rather than over the canvas, spreads maintain correct orientation, and `DailyEvidenceCard` renders compactly without an open button.
+
+## DEC-137 — the Mushaf offers the surah's recitation, and the audio chunk stops loading itself
+
+- **Decision:** the Mushaf's rail carries a listen control that starts, pauses
+  and resumes the surah's recitation, driven by the app's one audio controller.
+  Space does the same from the keyboard. The audio subsystem is no longer part
+  of the initial route.
+- **What the reader gets:** Al-Kahf plays from the page it is read on, with the
+  existing floating player supplying transport, progress and seek. The rail
+  states what the recitation is doing, so it and the player cannot disagree.
+- **What is not there, and why:** As-Sajdah and Al-Mulk show the control
+  disabled and named "audio unavailable". `APPROVED_AUDIO_ASSIGNMENTS` carries
+  one Quran asset, `quran-018` (Al-Kahf); the manifest's entries are reviewed
+  recordings with hashes, durations and verified transcripts. There is no
+  approved recitation for the other two surahs, and inventing manifest entries
+  would claim a reviewed asset that does not exist. A disabled control is the
+  honest report; adding the audio is a content task, not a code one.
+- **No second player.** The reader holds no playback state. `SurahAudioControl`
+  is the reading surface's view of the one controller — whether a recitation
+  exists, its status, and a single toggle — so the Mushaf can offer listening
+  without owning playback.
+- **Why the page-progress bar was left alone:** it reports which page of the
+  surah is open (`aria-valuenow` of `pageCount`). Driving audio position
+  through it would give one bar two meanings that disagree whenever a reader
+  pages ahead of the recitation.
+- **The chunk that loaded itself:** `AudioProvider` wrapped `AppContent`, so
+  ~480KB of mostly manifest data sat in the initial route and first paint
+  waited on it. The provider is now a sibling that reports its controller
+  through a callback rather than an ancestor supplying Context, so the app
+  renders immediately and is never remounted when the chunk lands. Two build
+  causes went with it: Vite preloaded the chunk it could see from the entry,
+  and `manualChunks`' `{name: [files]}` form pulled shared React/Radix code
+  into the audio chunk, which made unrelated chunks import from it.
+- **Tests/evidence required:** the control reaches the one controller rather
+  than starting playback itself; it reports playing state; it is disabled and
+  named "audio unavailable" with no reviewed recitation; Space toggles, does
+  nothing when there is no recitation, and defers to a focused control instead
+  of firing twice. The bundle budget passes without its limits being moved.
+
+## DEC-138 — the recitation reaches the phone, the keys get a control, and the rail is banded
+
+- **Decision:** the Mushaf's listen control exists on both layouts, the keyboard
+  shortcuts get a control of their own on the rail, and the rail's tools are
+  banded by the question they answer rather than listed flat.
+- **The phone had no way to listen.** DEC-137 put the control on the rail, and
+  `fitsToolRail` renders no rail on a portrait screen — so the surface where
+  listening to a surah is most of the point had no control at all. The page
+  header now carries it beside the word-meanings toggle. At 320px the header's
+  existing rules absorb it: the page indicator yields to the footer's compact
+  one, and nothing overflows.
+- **The keys were filed where nobody looks.** They printed at the foot of the
+  reading settings, past everything else in them. A `HelpCircle` control on the
+  rail now opens them on their own. `ResponsiveSheet` supplies focus
+  containment, focus restore and Escape — and consumes that Escape, so
+  dismissing the list never also gives up the surah. Rail-only: a phone has no
+  keys for the list to describe.
+- **One definition of the keys.** `MUSHAF_SHORTCUTS` backs both the settings
+  panel and the new sheet. Two copies drift, and a printed shortcut that is
+  wrong is worse than none.
+- **Banded, not folded away.** Ten controls in one column had "bookmark this
+  page" sitting between "listen" and "word meanings" with nothing saying they
+  answer different questions. They are now four bands — recitation, reading
+  tools, display, settings and help — each a labelled `role="group"` behind a
+  rule, since a 60px rail cannot print four headings. An empty band renders
+  nothing, which is how the Khatmah reader (no `surahAudio`, no
+  `onOpenShortcuts`) keeps the rail it had.
+- **Why not an overflow menu**, which the brief suggested: the rail runs the
+  full height of a landscape screen and is nowhere near short of room. Folding
+  half of it behind a further press would spend a click to save space that is
+  not scarce. Grouping buys the hierarchy; hiding would only buy height.
+- **The listener stopped churning.** `surahAudio` is rebuilt by the screen above
+  on every render, and playback re-renders several times a second. In the key
+  effect's dependencies that tore the window listener down and rebuilt it on
+  every tick; it is read through a ref instead.
+- **Tests/evidence required:** the phone carries the control where no rail is
+  rendered, and it drives the same controller; the shortcuts sheet opens from
+  the rail, names itself, lists every key in `MUSHAF_SHORTCUTS`, and dismisses
+  without closing the surah; the bands are named and ordered, an empty band is
+  dropped, and every control stays one press away. WCAG A/AA on the Mushaf, and
+  the Khatmah reader's rail, both unchanged.

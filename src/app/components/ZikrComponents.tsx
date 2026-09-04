@@ -30,6 +30,16 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
   );
 }
 
+/** Flags a hadith whose chain is graded weak/disputed. Set only via
+ *  `Zikr.authenticityLevel`, never inferred from `authenticityNote`. */
+export function HadithWeakChainBadge({ language }: { language: AppLanguage }) {
+  return (
+    <span className="shrink-0 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[0.6875rem] font-bold">
+      {t(language, "reader.hadithGradeWeak")}
+    </span>
+  );
+}
+
 export function CounterRing({ count, total, size = 160 }: { count: number; total: number; size?: number }) {
   const r = size / 2 - 10;
   const circ = 2 * Math.PI * r;

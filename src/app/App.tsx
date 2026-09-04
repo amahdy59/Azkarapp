@@ -54,9 +54,9 @@ import { ScreenFallback } from "./components/ScreenFallback";
 import { StatePanel } from "./components/StatePanel";
 import { retryableScreen } from "./components/RetryableScreen";
 import { PwaNotice } from "./components/PwaNotice";
-import { useAudioController } from "./audio/useAudioController";
-import { AudioProvider } from "./audio/AudioProvider";
-import { buildPlaybackPlan, getAudioCoverage } from "./audio/buildPlaybackPlan";
+import type { AudioController } from "./audio/AudioProvider";
+import type { AudioStatus } from "./audio/audioTypes";
+import { loadAudioModule, EMPTY_AUDIO_COVERAGE, type AudioModule } from "./audio/lazyAudio";
 import { t } from "./i18n";
 import { reportError } from "../lib/observability";
 import { useRemoteAccountSync } from "./hooks/useRemoteAccountSync";
@@ -160,7 +160,16 @@ const AudioContentReviewScreen = lazy(() =>
 );
 
 // ─── Root App ─────────────────────────────────────────────────────────────────
-function AppContent() {
+function AppContent({
+  audioController,
+  buildPlaybackPlan,
+  getAudioCoverage,
+}: {
+  /** `null` until the lazily-loaded audio chunk reports its controller. */
+  audioController: AudioController | null;
+  buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
+  getAudioCoverage: AudioModule["getAudioCoverage"] | null;
+}) {
   const initialState = useRef(loadAppState()).current;
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(() => {
     try {
@@ -209,8 +218,10 @@ function AppContent() {
   const layoutMode = useLayoutMode();
   useViewFocus(view);
 
-  const audioController = useAudioController();
-  const audioCoverage = useMemo(() => getAudioCoverage(activeAzkarList), [activeAzkarList]);
+  const audioCoverage = useMemo(
+    () => (getAudioCoverage ? getAudioCoverage(activeAzkarList) : EMPTY_AUDIO_COVERAGE),
+    [getAudioCoverage, activeAzkarList],
+  );
   const [themeMode, setThemeMode] = useState<ThemeMode>(initialState.settings.themeMode);
   const darkMode = themeMode !== "light";
   const [selectedLang, setSelectedLang] = useState<AppLanguage>(initialState.settings.language);
@@ -643,20 +654,13 @@ function AppContent() {
   }, [view, setRouteContentError]);
 
   useEffect(() => {
+    if (!audioController) return;
     const plan = audioController.state.plan;
     const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
     if (view !== "reader" || !plan || plan.context.category !== activeCat || !playingZikrId) return;
     const matchingIndex = activeAzkarList.findIndex((zikr) => zikr.id === playingZikrId);
     if (matchingIndex >= 0 && matchingIndex !== activeIdx) setActiveIdx(matchingIndex);
-  }, [
-    activeAzkarList,
-    activeCat,
-    activeIdx,
-    audioController.state.entryIndex,
-    audioController.state.plan,
-    view,
-    setActiveIdx,
-  ]);
+  }, [activeAzkarList, activeCat, activeIdx, audioController, view, setActiveIdx]);
 
   const markOnboardingComplete = useCallback(() => {
     setHasCompletedOnboarding(true);
@@ -875,9 +879,23 @@ function AppContent() {
     ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
-  const activeZikrHasAudio = activeZikr ? getAudioCoverage([activeZikr]).available === 1 : false;
+  const activeZikrHasAudio = activeZikr && getAudioCoverage ? getAudioCoverage([activeZikr]).available === 1 : false;
+
+  /**
+   * The active zikr's own playback status, or "idle" when the player is
+   * carrying something else. Read from the one controller rather than kept
+   * as separate state, so the Mushaf's listen control and the floating
+   * player can never disagree about what is playing.
+   */
+  const activeZikrAudioStatus: AudioStatus = (() => {
+    if (!audioController || !activeZikr) return "idle";
+    const plan = audioController.state.plan;
+    const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
+    return playingZikrId === activeZikr.id ? audioController.state.status : "idle";
+  })();
 
   const startAudio = (items: typeof azkar, source: "single" | "full-session", repeatPrescribed = false) => {
+    if (!audioController || !buildPlaybackPlan) return false;
     const plan = buildPlaybackPlan({
       zikrs: items,
       context: { category: activeCat, routineMode: activeRoutineMode, source },
@@ -887,7 +905,27 @@ function AppContent() {
     return audioController.startPlan(plan);
   };
 
+  /**
+   * One control for the whole listen cycle: start the surah the first time,
+   * then pause and resume the same playback rather than restarting it from
+   * the beginning — the Mushaf's rail and the floating player drive the same
+   * controller, so either can pick up where the other left off.
+   */
+  const toggleActiveZikrAudio = () => {
+    if (!activeZikr || !audioController) return;
+    if (activeZikrAudioStatus === "playing" || activeZikrAudioStatus === "buffering") {
+      audioController.pause();
+      return;
+    }
+    if (activeZikrAudioStatus === "paused" || activeZikrAudioStatus === "ready") {
+      audioController.play();
+      return;
+    }
+    void startAudio([activeZikr], "single");
+  };
+
   const startPlayAllAudio = () => {
+    if (!audioController || !buildPlaybackPlan) return;
     const playAvailable = () => {
       const plan = buildPlaybackPlan({
         zikrs: azkar,
@@ -1415,6 +1453,11 @@ function AppContent() {
                   }}
                   onToggleSaved={toggleSavedZikr}
                   audioAvailable={activeZikrHasAudio}
+                  surahAudio={{
+                    available: activeZikrHasAudio,
+                    status: activeZikrAudioStatus,
+                    onToggle: toggleActiveZikrAudio,
+                  }}
                   mushafTextScale={mushafTextScale}
                   mushafBookmarks={mushafBookmarks}
                   onMushafModeChange={setReaderInMushafMode}
@@ -1636,7 +1679,7 @@ function AppContent() {
           <Suspense fallback={<ScreenFallback language={selectedLang} />}>
             <AudioContentReviewScreen
               onClose={() => {
-                audioController.stop();
+                audioController?.stop();
                 setShowAudioReview(false);
               }}
             />
@@ -1644,7 +1687,7 @@ function AppContent() {
         )}
 
         {/* Floating Audio Player */}
-        {audioController.state.plan && (
+        {audioController?.state.plan && (
           <Suspense fallback={null}>
             <FloatingAudioPlayer controller={audioController} language={selectedLang} />
           </Suspense>
@@ -1756,9 +1799,32 @@ function AppContent() {
 }
 
 export default function App() {
+  const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
+  const [audioController, setAudioController] = useState<AudioController | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAudioModule().then((loaded) => {
+      if (!cancelled) setAudioModule(loaded);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
-    <AudioProvider>
-      <AppContent />
-    </AudioProvider>
+    <>
+      <AppContent
+        audioController={audioController}
+        buildPlaybackPlan={audioModule?.buildPlaybackPlan ?? null}
+        getAudioCoverage={audioModule?.getAudioCoverage ?? null}
+      />
+      {/* A sibling of AppContent, not an ancestor: the audio chunk loads in
+          the background and reports its controller through this callback
+          rather than through Context, so the rest of the app never waits on
+          it to reach first paint, and AppContent never gets remounted (and
+          its state lost) once the chunk arrives. */}
+      {audioModule && <audioModule.AudioProvider onControllerReady={setAudioController} />}
+    </>
   );
 }

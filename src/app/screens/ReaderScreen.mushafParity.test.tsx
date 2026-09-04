@@ -1,8 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ReaderScreen } from "./ReaderScreen";
 import { registerLazyCollection } from "../content/azkar";
 import { FRIDAY_KAHF } from "../content/fridayKahf";
+import { MUSHAF_SHORTCUTS } from "../components/MushafKeyboardShortcuts";
+import { t } from "../i18n";
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -192,5 +194,199 @@ describe("the surah view is the Mushaf", () => {
 
     const finish = screen.getByTestId("mushaf-immersive-return");
     expect(finish.closest("[data-testid='mushaf-tool-rail']")).not.toBeNull();
+  });
+});
+
+/**
+ * Listening to the surah, from the surface the surah is read on.
+ *
+ * The reader holds no playback state: it reports what the app's one audio
+ * controller is doing and offers one way to interrupt it. These cover the
+ * seam between the two rather than the player itself, which has its own.
+ */
+describe("the Mushaf offers the surah's recitation", () => {
+  const audio = (overrides: Partial<{ available: boolean; status: string; onToggle: () => void }> = {}) => ({
+    available: true,
+    status: "idle" as const,
+    onToggle: () => undefined,
+    ...overrides,
+  });
+
+  it("puts the listen control on the rail, beside the surah it plays", () => {
+    renderKahf({ surahAudio: audio() });
+    const listen = screen.getByTestId("mushaf-rail-listen");
+    expect(listen.closest("[data-testid='mushaf-tool-rail']")).not.toBeNull();
+    expect(listen).toHaveAccessibleName("الاستماع إلى السورة");
+    expect(listen).toBeEnabled();
+  });
+
+  it("hands the press to the one controller rather than starting playback itself", () => {
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: audio({ onToggle }) });
+    fireEvent.click(screen.getByTestId("mushaf-rail-listen"));
+    expect(onToggle).toHaveBeenCalledOnce();
+  });
+
+  it("says what the recitation is doing, so the rail and the player cannot disagree", () => {
+    renderKahf({ surahAudio: audio({ status: "playing" }) });
+    expect(screen.getByTestId("mushaf-rail-listen")).toHaveAccessibleName("إيقاف التلاوة مؤقتاً");
+  });
+
+  it("offers nothing to press on a surah with no reviewed recitation", () => {
+    // As-Sajdah and Al-Mulk carry no approved audio asset. A control that
+    // looked live and then did nothing would be worse than a plain absence.
+    renderKahf({ surahAudio: audio({ available: false }) });
+    const listen = screen.getByTestId("mushaf-rail-listen");
+    expect(listen).toBeDisabled();
+    expect(listen).toHaveAccessibleName("الصوت غير متاح");
+  });
+
+  it("takes Space for the recitation, which the counting reader never could", () => {
+    // The spread does not scroll, so Space has no default here to displace.
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: audio({ onToggle }) });
+    fireEvent.keyDown(document.body, { key: " ", code: "Space" });
+    expect(onToggle).toHaveBeenCalledOnce();
+  });
+
+  it("leaves Space alone when there is no recitation to start", () => {
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: audio({ available: false, onToggle }) });
+    fireEvent.keyDown(document.body, { key: " ", code: "Space" });
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+
+  it("lets a focused control answer Space itself, rather than toggling twice", () => {
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: audio({ onToggle }) });
+    fireEvent.keyDown(screen.getByTestId("mushaf-rail-listen"), { key: " ", code: "Space" });
+    expect(onToggle).not.toHaveBeenCalled();
+  });
+});
+
+/**
+ * The phone carries no rail — `fitsToolRail` keeps the horizontal bars there,
+ * because width is what is short on a portrait screen. Every control the rail
+ * holds has to have a home in those bars, or it does not exist on a phone.
+ */
+describe("the recitation is reachable without a rail", () => {
+  const setViewport = (width: number, height: number) => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+    Object.defineProperty(window, "innerHeight", { configurable: true, writable: true, value: height });
+  };
+
+  afterEach(() => setViewport(1024, 768));
+
+  it("puts the listen control in the header when the rail is not shown", () => {
+    setViewport(390, 844);
+    renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
+
+    // The premise: no rail on this screen, so the rail's copy cannot be what
+    // this assertion is finding.
+    expect(screen.queryByTestId("mushaf-tool-rail")).toBeNull();
+    expect(screen.getByTestId("mushaf-immersive-listen")).toHaveAccessibleName("الاستماع إلى السورة");
+  });
+
+  it("drives the same controller from the phone's control", () => {
+    setViewport(390, 844);
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle } });
+    fireEvent.click(screen.getByTestId("mushaf-immersive-listen"));
+    expect(onToggle).toHaveBeenCalledOnce();
+  });
+
+  it("reports playing state on the phone too", () => {
+    setViewport(390, 844);
+    renderKahf({ surahAudio: { available: true, status: "playing" as const, onToggle: () => undefined } });
+    expect(screen.getByTestId("mushaf-immersive-listen")).toHaveAccessibleName("إيقاف التلاوة مؤقتاً");
+  });
+
+  it("disables it on a surah with no reviewed recitation", () => {
+    setViewport(390, 844);
+    renderKahf({ surahAudio: { available: false, status: "idle" as const, onToggle: () => undefined } });
+    expect(screen.getByTestId("mushaf-immersive-listen")).toBeDisabled();
+  });
+});
+
+/**
+ * The keys were reachable only by opening the reading settings and scrolling
+ * past everything else in them, which is not where a reader looks for "what
+ * can I press". They now have a control of their own on the rail.
+ */
+describe("the Mushaf says which keys it answers", () => {
+  it("offers the shortcuts from the rail, not only from the settings panel", () => {
+    renderKahf();
+    expect(screen.getByTestId("mushaf-rail-shortcuts")).toBeInTheDocument();
+  });
+
+  it("opens a dismissible list naming the keys, Space among them", () => {
+    renderKahf();
+    // Absent first, so this cannot pass on a sheet that was always rendered.
+    expect(screen.queryByTestId("mushaf-shortcuts-sheet")).toBeNull();
+
+    fireEvent.click(screen.getByTestId("mushaf-rail-shortcuts"));
+    const sheet = screen.getByTestId("mushaf-shortcuts-sheet");
+    expect(sheet).toBeInTheDocument();
+    // The keys themselves, not just the heading.
+    expect(sheet.textContent).toContain("Space");
+    expect(sheet.textContent).toContain("Esc");
+    expect(sheet.textContent).toContain("Home");
+  });
+
+  it("names the list for a screen reader rather than leaving a bare dialog", () => {
+    renderKahf();
+    fireEvent.click(screen.getByTestId("mushaf-rail-shortcuts"));
+    expect(screen.getByRole("dialog")).toHaveAccessibleName(t("ar", "mushaf.keyboardTitle"));
+  });
+
+  it("keeps one definition of the keys behind both places that show them", () => {
+    // Two copies drift, and a printed shortcut that is wrong is worse than
+    // none. Both surfaces render MUSHAF_SHORTCUTS.
+    const listed = MUSHAF_SHORTCUTS.map(([key]) => key);
+    renderKahf();
+    fireEvent.click(screen.getByTestId("mushaf-rail-shortcuts"));
+    const sheetText = screen.getByTestId("mushaf-shortcuts-sheet").textContent ?? "";
+    for (const key of listed) expect(sheetText, key).toContain(key);
+  });
+});
+
+/**
+ * Ten controls in one undifferentiated column is a list to read, not a rail to
+ * scan. These assert the bands exist and that nothing was hidden to make them.
+ */
+describe("the rail is banded rather than flat", () => {
+  const groupNames = () =>
+    within(screen.getByTestId("mushaf-tool-rail"))
+      .getAllByRole("group")
+      .map((g) => g.getAttribute("aria-label"));
+
+  it("bands the tools by the question they answer", () => {
+    renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
+    expect(groupNames()).toEqual(["التلاوة", "أدوات القراءة", "العرض", "الإعدادات والمساعدة"]);
+  });
+
+  it("drops a band rather than printing an empty one", () => {
+    // No recitation control at all on a surface that passes no surahAudio —
+    // the Khatmah reader is exactly that case.
+    renderKahf();
+    expect(screen.queryByTestId("mushaf-rail-listen")).toBeNull();
+    expect(groupNames()).not.toContain("التلاوة");
+  });
+
+  it("groups without hiding: every control is still one press away", () => {
+    // Banding is presentational. Folding half the rail behind an overflow
+    // press would cost a click to save height the rail is not short of.
+    renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
+    for (const id of [
+      "mushaf-rail-listen",
+      "mushaf-rail-page-bookmark",
+      "mushaf-difficult-words-switch",
+      "mushaf-focus-enter",
+      "mushaf-fullscreen-toggle",
+      "mushaf-settings-trigger",
+      "mushaf-rail-shortcuts",
+    ]) {
+      expect(screen.getByTestId(id), id).toBeVisible();
+    }
   });
 });

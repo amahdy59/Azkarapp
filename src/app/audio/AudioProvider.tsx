@@ -41,7 +41,20 @@ export interface AudioController {
 
 const AudioControllerContext = createContext<AudioController | null>(null);
 
-export function AudioProvider({ children }: { children: ReactNode }) {
+export function AudioProvider({
+  children,
+  onControllerReady,
+}: {
+  children?: ReactNode;
+  /**
+   * Reports the memoized controller outside React Context. `App` renders this
+   * provider as a sibling of the rest of the app (not an ancestor) so that
+   * the audio module can load lazily without delaying first paint or forcing
+   * a remount of the app once it arrives — the controller instead flows in
+   * as a prop, sourced from state this callback populates.
+   */
+  onControllerReady?: (controller: AudioController) => void;
+}) {
   const [preferences, setPreferences] = useState(loadAudioPreferences);
   const preferencesRef = useRef(preferences);
   const [state, rawDispatch] = useReducer(audioReducer, preferences.playbackRate, createInitialAudioState);
@@ -457,11 +470,19 @@ export function AudioProvider({ children }: { children: ReactNode }) {
     ],
   );
 
+  useEffect(() => {
+    onControllerReady?.(controller);
+  }, [controller, onControllerReady]);
+
   return <AudioControllerContext.Provider value={controller}>{children}</AudioControllerContext.Provider>;
 }
 
-export function useAudioController() {
-  const controller = useContext(AudioControllerContext);
-  if (!controller) throw new Error("useAudioController must be used inside AudioProvider.");
-  return controller;
+/**
+ * `null` while the audio module chunk has not loaded yet (`AudioProvider` is
+ * mounted lazily so it does not block the app's first paint) — every caller
+ * outside this module must handle that window rather than assume a provider
+ * is always present.
+ */
+export function useAudioController(): AudioController | null {
+  return useContext(AudioControllerContext);
 }

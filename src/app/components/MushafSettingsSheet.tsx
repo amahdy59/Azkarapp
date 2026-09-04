@@ -3,6 +3,7 @@ import { formatNumerals } from "../formatting";
 import { t } from "../i18n";
 import type { AppLanguage, MushafLayout, MushafTextScale, MushafToolbarSide, MushafTheme, ThemeMode } from "../types";
 import { Check, Minus, Plus, SlidersHorizontal, X } from "./icons";
+import { MushafKeyboardShortcutList } from "./MushafKeyboardShortcuts";
 
 export interface MushafSettingsSheetProps {
   open: boolean;
@@ -347,27 +348,7 @@ export function MushafSettingsSheet({
           <h3 id="mushaf-keys-heading" className="text-xs font-bold tracking-wider text-muted-foreground uppercase">
             {t(language, "mushaf.keyboardTitle")}
           </h3>
-          <dl className="flex flex-col gap-1.5 text-[0.75rem]">
-            {(
-              [
-                ["→", "common.previous"],
-                ["←", "common.next"],
-                ["Home", "mushaf.keyFirstPage"],
-                ["End", "mushaf.keyLastPage"],
-                ["F", "mushaf.focusMode"],
-              ] as const
-            ).map(([key, labelKey]) => (
-              <div key={key} className="flex items-center justify-between gap-3">
-                <dt className="min-w-0 truncate font-medium text-muted-foreground">{t(language, labelKey)}</dt>
-                <dd
-                  dir="ltr"
-                  className="shrink-0 rounded-md border border-border/60 bg-muted/40 px-2 py-0.5 font-bold tabular-nums"
-                >
-                  {key}
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <MushafKeyboardShortcutList language={language} />
         </section>
       )}
     </div>

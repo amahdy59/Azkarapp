@@ -5,6 +5,7 @@ import { t } from "../i18n";
 import type { AppLanguage, Zikr } from "../types";
 import { getLocalizedSourceReference } from "../content/localizedZikr";
 import { ResponsiveSheet } from "./ResponsiveSheet";
+import { HadithWeakChainBadge } from "./ZikrComponents";
 
 /**
  * The hadith is the only copyable value here. Everything else in this sheet is
@@ -104,8 +105,12 @@ function ReferenceContent({
           {zikr.hadithText && (
             <section aria-labelledby="reference-evidence-heading">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <h3 id="reference-evidence-heading" className="text-[0.9375rem] font-extrabold text-primary">
+                <h3
+                  id="reference-evidence-heading"
+                  className="flex items-center gap-2 text-[0.9375rem] font-extrabold text-primary"
+                >
                   {t(language, "reader.hadithLabel")}
+                  {zikr.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
                 </h3>
                 {renderCopyButton("hadith", zikr.hadithText, t(language, "reader.copyHadith"))}
               </div>

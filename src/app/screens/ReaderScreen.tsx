@@ -40,7 +40,11 @@ import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { QuranPrelude, QuranSurahHeader } from "../components/QuranChrome";
 import { QuranWordText } from "../components/QuranWordText";
-import { MushafImmersiveReader, type MushafSurahSettings } from "../components/MushafImmersiveReader";
+import {
+  MushafImmersiveReader,
+  type MushafSurahSettings,
+  type SurahAudioControl,
+} from "../components/MushafImmersiveReader";
 import { QuranWordMeaningSheet } from "../components/QuranWordMeaningSheet";
 import { QuranWordPopover } from "../components/QuranWordPopover";
 import { getQuranWordMeanings, type WordMeaningSelection } from "../content/quranWordMeanings";
@@ -144,6 +148,7 @@ export function ReaderScreen({
   onPrev,
   onToggleSaved,
   audioAvailable,
+  surahAudio,
   mushafTextScale = "medium",
   mushafBookmarks = [],
   onToggleMushafBookmark,
@@ -178,6 +183,12 @@ export function ReaderScreen({
   onPrev: () => void;
   onToggleSaved: (zikrId: string) => void;
   audioAvailable: boolean;
+  /**
+   * The surah's own recitation, for the Mushaf's listen control. The reader
+   * holds no playback state of its own — this reports the one controller's
+   * status and toggles it, so the rail and the floating player stay in step.
+   */
+  surahAudio?: SurahAudioControl;
   /** Passed to the immersive Mushaf so it matches the Mushaf proper. */
   mushafTextScale?: MushafTextScale;
   mushafBookmarks?: readonly number[];
@@ -880,6 +891,7 @@ export function ReaderScreen({
           bookmarkedPages={mushafBookmarks}
           onTogglePageBookmark={onToggleMushafBookmark}
           mushafSettings={mushafSettings}
+          surahAudio={surahAudio}
           onClose={() => setImmersiveOpen(false)}
           onComplete={() => {
             /**

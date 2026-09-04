@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-03c",
+  "release": "2026-09-04",
   "ar": [
-    "صفحات سور المصحف على الشاشات العريضة أصبحت تعرض الصفحات المتقابلة بترتيبها القرآني الصحيح دوماً (الصفحة اليمنى ثم اليسرى) دون أي انعكاس.",
-    "نص الآيات القرآنية بات حراً بالكامل من أي أزرار عائمة تحجبه، مع انتقال إجراء إتمام القراءة إلى شريط الأدوات الجانبي لتظهر أواخر السور بوضوح تام.",
-    "بطاقة حديث اليوم في الصفحة الرئيسية أصبحت مدمجة ومريحة للعين دون مساحات بيضاء زائدة، مع التركيز المباشر على نص الحديث وفائدته."
+    "أصبح بإمكانك الاستماع إلى تلاوة سورة الكهف من داخل وضع المصحف مباشرة، بزر «استماع» في شريط الأدوات وفي أعلى الشاشة على الهاتف، مع إمكانية الإيقاف والمتابعة من حيث توقفت.",
+    "صفحات المصحف صارت أهدأ للعين: أُزيل الإطار المرسوم حول النص وبقيت أرضية الورق، مع مساحة جانبية أوسع تمنح الآيات متنفساً أكبر.",
+    "اكتملت نصوص الأحاديث التي كانت تنتهي بعلامة حذف، بعد مراجعتها على مصادرها الأصلية، مع وسم واضح للحديث الذي اختُلف في تصحيح إسناده.",
+    "شريط أدوات المصحف صار مرتباً في مجموعات واضحة، وأُضيف زر يعرض اختصارات لوحة المفاتيح، كما صار فتح التطبيق أسرع لأن ملفات الصوت لم تعد تُحمَّل قبل طلبها."
   ],
   "en": [
-    "Two-page Mushaf spreads on wide screens now always display in correct reading order with odd pages on the right and even pages on the left.",
-    "The holy text is completely clear of floating buttons, with the completion action moving to the navigation rail so the final ayahs are always fully visible.",
-    "Today's Hadith card on Home now rests compactly without excess empty space, keeping the narration and its benefit front and center."
+    "You can now listen to Surah Al-Kahf from inside Mushaf mode, with a Listen control on the toolbar and in the header on phones, plus pause and resume from where you stopped.",
+    "Mushaf pages read more calmly: the drawn frame around the text is gone while the paper surface stays, and wider side margins give the ayahs more room to breathe.",
+    "Hadith texts that used to trail off mid-narration are now complete, checked against their primary sources, with a clear label on a narration whose chain scholars grade differently.",
+    "The Mushaf toolbar is now sorted into clear groups with a new keyboard-shortcuts button, and the app starts faster because audio files are no longer loaded before you ask for them."
   ]
 }
