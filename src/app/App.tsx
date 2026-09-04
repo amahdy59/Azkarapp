@@ -1701,7 +1701,11 @@ function AppContent({
         {/* Floating Audio Player */}
         {audioController?.state.plan && (
           <Suspense fallback={null}>
-            <FloatingAudioPlayer controller={audioController} language={selectedLang} />
+            <FloatingAudioPlayer
+              controller={audioController}
+              language={selectedLang}
+              overReadingSurface={readerInMushafMode}
+            />
           </Suspense>
         )}
 

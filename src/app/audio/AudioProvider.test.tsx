@@ -79,12 +79,29 @@ const plan: PlaybackPlan = {
   createdAt: 1,
 };
 
+/** The same recitation, prescribed three times, so the repeat control exists. */
+const repeatPlan: PlaybackPlan = {
+  ...plan,
+  id: "repeat-plan",
+  entries: [
+    {
+      ...plan.entries[0]!,
+      repetitions: 3,
+      prescribedRepetitions: 3,
+      supportedModes: ["play-once", "repeat-prescribed-count"],
+    },
+  ],
+};
+
 function Harness() {
   const controller = useAudioController();
   return (
     <>
       <button type="button" onClick={() => controller.startPlan(plan)}>
         Start
+      </button>
+      <button type="button" onClick={() => controller.startPlan(repeatPlan)}>
+        Start repeat
       </button>
       <output>{controller.state.status}</output>
       {controller.state.plan && <FloatingAudioPlayer controller={controller} language="en" />}
@@ -151,5 +168,33 @@ describe("AudioProvider integration", () => {
     expect(screen.getByRole("button", { name: "Minimize player" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Forward 10 seconds" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Rewind 10 seconds" })).toBeInTheDocument();
+  });
+
+  it("puts speed, replay and repeat on the surface rather than behind a disclosure", async () => {
+    vi.stubGlobal("Audio", FakeAudio);
+    render(
+      <AudioProvider>
+        <Harness />
+      </AudioProvider>,
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Start repeat" }));
+    expect(await screen.findByRole("region", { name: "Audio player" })).toBeInTheDocument();
+
+    // Where the reader is in a prescribed repetition, said once.
+    expect(screen.getByText("Repetition 1 / 3")).toBeInTheDocument();
+
+    // The pill shows the rate it is on and steps to the next one; the old
+    // control was a five-option select two taps inside a collapsed panel.
+    const speed = screen.getByRole("button", { name: /Speed/ });
+    expect(speed).toHaveTextContent("1×");
+    fireEvent.click(speed);
+    expect(screen.getByRole("button", { name: /Speed/ })).toHaveTextContent("1.25×");
+
+    const repeat = screen.getByRole("button", { name: "Repeat" });
+    expect(repeat).toHaveAttribute("aria-pressed", "true");
+    fireEvent.click(repeat);
+    expect(screen.getByRole("button", { name: "Repeat" })).toHaveAttribute("aria-pressed", "false");
+
+    expect(screen.getByRole("button", { name: "Replay this surah" })).toBeInTheDocument();
   });
 });
