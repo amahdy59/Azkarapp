@@ -2467,3 +2467,47 @@ Record user-approved product, design and architectural decisions here. Do not er
   merge. Verified in the browser at 375px: counter top identical for a
   single-action and a tallying zikr.
 - **Files/contracts to update:** `docs/DESIGN_SYSTEM.md` reader contract.
+
+## DEC-140 — the player is shaped for reading along, and the audio chunk finally stops loading itself
+
+- **Decision:** the floating player is composed around what is playing rather
+  than around its controls, its real options sit on the surface, and it opens
+  compact over a reading surface on a phone. The azkar corpus becomes its own
+  chunk so the audio chunk leaves the initial route.
+- **What the player shows.** Expanded, it reads down the middle — cue, title,
+  reciter, position chip, timeline, transport — with stop in the corner and a
+  centred grabber for collapsing, which is the action someone reaches for
+  mid-recitation. Transport is five slots around a circular gold primary and
+  every secondary control names itself under its icon; the visible label is
+  contained in the accessible name, so "Rewind" and "Rewind 10 seconds" cannot
+  disagree. Replay, repeat, speed and reciter moved out of a collapsed
+  disclosure onto one pill row, and the attribution is permanently visible
+  because it is an attribution, not a setting.
+- **Only controls the controller can perform.** The approved design showed a
+  volume slider, a sleep timer and an ayah counter. `AudioController` has no
+  volume and no timer, and Al-Kahf ships as one 33-minute segment, so all three
+  would have been decoration. The position chip states the track within a queue
+  or the prescribed repetition and is absent when there is nothing true to say;
+  it becomes an ayah counter for free once the recitation is segmented.
+- **Compact over the Mushaf.** The expanded card took a large share of a 375px
+  screen, hiding the pages on the one flow it exists for. It opens compact
+  there and folds itself away if the Mushaf opens during playback, but never
+  re-expands itself: a reader who expanded it is left alone.
+- **The chunk DEC-137 thought it had unloaded.** That entry moved the provider
+  out of the tree and stopped Vite preloading the chunk, and the audio chunk was
+  still a static import of the entry: Rollup had folded `content/azkar.ts` into
+  it, and `state.ts` — which the entry loads to read the stored appearance —
+  imports the corpus to validate saved ids. Every visitor fetched the audio
+  manifest before the first screen while both deferral mechanisms worked
+  perfectly. Naming the corpus as its own chunk separates what the entry truly
+  needs from what it does not and takes the initial route from 249.6 kB gzip,
+  0.4 kB under its ceiling, to 195.9 kB. `check-bundle-budget.mjs` now fails
+  outright if the audio chunk reappears in the initial route, because under the
+  gzip ceiling alone it cost 121 kB quietly.
+- **Tests/evidence required:** the options row exposes speed cycling, the repeat
+  toggle and replay without a disclosure, and the repetition chip reads; the
+  bundle budget fails on the previous chunking and passes on this one, with no
+  limit moved. Verified in the built bundle: the app loads, the reader works,
+  the recitation plays, and the audio chunk is fetched after first paint.
+- **Supersedes:** completes DEC-137's "the audio subsystem is no longer part of
+  the initial route", which was true of the provider but not of the chunk.

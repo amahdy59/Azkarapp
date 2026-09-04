@@ -95,6 +95,20 @@ if (!entryKey) {
   };
   visitManifestEntry(entryKey);
 
+  /*
+   * The audio chunk is deferred on purpose (src/app/audio/lazyAudio.ts loads it
+   * in the background after first paint, and vite.config.ts keeps it out of the
+   * module preload). It had nonetheless become a static import of the entry:
+   * the azkar corpus, which state.ts needs at startup, had been folded into it,
+   * so every visitor fetched the audio manifest before the first screen and the
+   * deferral was decorative. Under the gzip ceiling alone that cost 121 kB
+   * quietly; named here it fails loudly instead.
+   */
+  const eagerAudio = [...initialFiles].filter((file) => file.split("/").pop().startsWith("audio-"));
+  if (eagerAudio.length > 0) {
+    failures.push(`Initial route statically imports the deferred audio chunk: ${eagerAudio.join(", ")}`);
+  }
+
   let initialGzipSize = gzipSync(await readFile(path.resolve("dist/index.html"))).byteLength;
   for (const file of initialFiles) {
     initialGzipSize += gzipSync(await readFile(path.resolve("dist", file))).byteLength;

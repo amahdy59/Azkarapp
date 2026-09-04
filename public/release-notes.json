@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-04",
+  "release": "2026-09-04.2",
   "ar": [
-    "أصبح بإمكانك الاستماع إلى تلاوة سورة الكهف من داخل وضع المصحف مباشرة، بزر «استماع» في شريط الأدوات وفي أعلى الشاشة على الهاتف، مع إمكانية الإيقاف والمتابعة من حيث توقفت.",
-    "صفحات المصحف صارت أهدأ للعين: أُزيل الإطار المرسوم حول النص وبقيت أرضية الورق، مع مساحة جانبية أوسع تمنح الآيات متنفساً أكبر.",
-    "اكتملت نصوص الأحاديث التي كانت تنتهي بعلامة حذف، بعد مراجعتها على مصادرها الأصلية، مع وسم واضح للحديث الذي اختُلف في تصحيح إسناده.",
-    "شريط أدوات المصحف صار مرتباً في مجموعات واضحة، وأُضيف زر يعرض اختصارات لوحة المفاتيح، كما صار فتح التطبيق أسرع لأن ملفات الصوت لم تعد تُحمَّل قبل طلبها."
+    "لم يعد العدّاد يبدأ من الصفر إذا انتقلت إلى ذكر آخر ثم عدت إليه: يبقى ما عددته محفوظاً طوال الجلسة، وصار سطر «اضغط أي مكان للعد» ثابتاً تحت العدّاد في كل الأذكار، فلا يتغير موضع العدّاد بينها.",
+    "يفتح وضع المصحف سورة الكهف وأخواتها على الصفحة التي تركتها عندها، حتى بعد إغلاق التطبيق، ويعود إلى أول السورة بعد إتمام قراءتها.",
+    "أُعيد تصميم مشغّل الصوت: اسم السورة والقارئ في المنتصف، وأزرار التشغيل صار لكل منها اسم مكتوب، وخيارات السرعة والتكرار والإعادة ظاهرة مباشرة. وعلى الهاتف يفتح المشغّل في صورته المصغّرة فوق المصحف حتى تقرأ وتستمع معاً.",
+    "صار فتح التطبيق أسرع فعلاً: ملفات الصوت لم تعد تُحمَّل قبل طلبها، فخفّت أول صفحة تُحمَّل بنحو الخُمس."
   ],
   "en": [
-    "You can now listen to Surah Al-Kahf from inside Mushaf mode, with a Listen control on the toolbar and in the header on phones, plus pause and resume from where you stopped.",
-    "Mushaf pages read more calmly: the drawn frame around the text is gone while the paper surface stays, and wider side margins give the ayahs more room to breathe.",
-    "Hadith texts that used to trail off mid-narration are now complete, checked against their primary sources, with a clear label on a narration whose chain scholars grade differently.",
-    "The Mushaf toolbar is now sorted into clear groups with a new keyboard-shortcuts button, and the app starts faster because audio files are no longer loaded before you ask for them."
+    "The counter no longer restarts when you move to another zikr and come back — your count is kept for the whole session — and the “Tap anywhere to count” line now sits under every counter, so the counter itself stays in one place.",
+    "Al-Kahf and the other multi-page surahs reopen on the page you left them on, even after closing the app, and start again from the first page once you have completed the surah.",
+    "The audio player has been redesigned: the surah and reciter read down the middle, every transport button carries its name, and speed, repeat and replay are on the surface. On a phone it opens in its compact form over the Mushaf so you can read along while listening.",
+    "The app starts faster: audio files really are no longer downloaded before you ask for them, which makes the first page about a fifth lighter."
   ]
 }
