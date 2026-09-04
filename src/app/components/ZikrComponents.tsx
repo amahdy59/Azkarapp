@@ -92,6 +92,13 @@ export interface ZikrCounterSurfaceProps {
   onTap: () => void;
   language: AppLanguage;
   instructionText?: string;
+  /**
+   * Face for a single-action counter. The tally face has a number to show; a
+   * one-off zikr has only words, and those words used to be the very same
+   * guidance sentence printed under the counter — the phrase twice, once as a
+   * button. Callers that print the guidance below pass the short action here.
+   */
+  actionLabel?: string;
   className?: string;
   disabled?: boolean;
   testId?: string;
@@ -106,6 +113,7 @@ export function ZikrCounterSurface({
   onTap,
   language,
   instructionText,
+  actionLabel,
   className = "",
   disabled = false,
   testId = "counter-surface",
@@ -221,7 +229,7 @@ export function ZikrCounterSurface({
           </div>
         ) : isSingleAction ? (
           <span className="text-[1.0625rem] font-bold leading-none text-foreground" dir="auto">
-            {activeInstruction}
+            {actionLabel || activeInstruction}
           </span>
         ) : (
           <p

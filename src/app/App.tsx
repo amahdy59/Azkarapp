@@ -295,6 +295,13 @@ function AppContent({
   );
   const [mushafTextScale, setMushafTextScale] = useState<MushafTextScale>(initialState.mushafTextScale ?? "medium");
   const [mushafBookmarks, setMushafBookmarks] = useState<number[]>(initialState.mushafBookmarks ?? []);
+  /** Where each multi-page surah was last left, so reopening resumes it. */
+  const [surahReadingPages, setSurahReadingPages] = useState<Record<string, number>>(
+    initialState.surahReadingPages ?? {},
+  );
+  const rememberSurahPage = useCallback((zikrId: string, page: number) => {
+    setSurahReadingPages((previous) => (previous[zikrId] === page ? previous : { ...previous, [zikrId]: page }));
+  }, []);
   /** Whether the reader is currently showing a surah as Mushaf pages. */
   const [readerInMushafMode, setReaderInMushafMode] = useState(false);
   // Seeded from both sides: the local keys are what the Friday screens actually
@@ -511,6 +518,7 @@ function AppContent({
       mushafToolbarSide,
       mushafTextScale,
       mushafBookmarks,
+      surahReadingPages,
       mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
@@ -554,6 +562,7 @@ function AppContent({
       mushafToolbarSide,
       mushafTextScale,
       mushafBookmarks,
+      surahReadingPages,
       mushafVerseBookmarks,
       dailyWirdGoal,
       wirdHistory,
@@ -717,6 +726,7 @@ function AppContent({
     setMushafToolbarSide(state.mushafToolbarSide ?? "right");
     setMushafTextScale(state.mushafTextScale ?? "medium");
     setMushafBookmarks(state.mushafBookmarks ?? []);
+    setSurahReadingPages(state.surahReadingPages ?? {});
     setMushafVerseBookmarks(state.mushafVerseBookmarks ?? []);
     setDailyWirdGoal(state.dailyWirdGoal ?? 4);
     setWirdHistory(state.wirdHistory ?? {});
@@ -1460,6 +1470,8 @@ function AppContent({
                   }}
                   mushafTextScale={mushafTextScale}
                   mushafBookmarks={mushafBookmarks}
+                  surahReadingPages={surahReadingPages}
+                  onSurahPageChange={rememberSurahPage}
                   onMushafModeChange={setReaderInMushafMode}
                   mushafSettings={{
                     theme: mushafTheme,

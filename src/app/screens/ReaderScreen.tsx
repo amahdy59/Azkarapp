@@ -151,6 +151,8 @@ export function ReaderScreen({
   surahAudio,
   mushafTextScale = "medium",
   mushafBookmarks = [],
+  surahReadingPages,
+  onSurahPageChange,
   onToggleMushafBookmark,
   mushafSettings,
   onMushafModeChange,
@@ -192,6 +194,10 @@ export function ReaderScreen({
   /** Passed to the immersive Mushaf so it matches the Mushaf proper. */
   mushafTextScale?: MushafTextScale;
   mushafBookmarks?: readonly number[];
+  /** The Mushaf page each multi-page surah was last left on, keyed by zikr id. */
+  surahReadingPages?: Record<string, number>;
+  /** Reports the page a surah is being read at, so it survives a restart. */
+  onSurahPageChange?: (zikrId: string, page: number) => void;
   onToggleMushafBookmark?: (page: number) => void;
   mushafSettings?: MushafSurahSettings;
   /** Announces when the Mushaf is the reader's body, so the shell can stand aside. */
@@ -229,6 +235,15 @@ export function ReaderScreen({
    * being separate screens rather than one screen in two modes.
    */
   const [mushafPageTuple, setMushafPageTuple] = useState<readonly [number, number]>([0, 1]);
+  /**
+   * Read when a surah opens rather than depended on.
+   *
+   * The remembered page only decides where a surah is opened; taking it as an
+   * effect dependency would make every page turn — each one writes the map
+   * back — re-run the effect that opens the view.
+   */
+  const surahReadingPagesRef = useRef(surahReadingPages);
+  surahReadingPagesRef.current = surahReadingPages;
   /** The surah is being read as Mushaf pages, so the Mushaf is the body. */
   const showMushaf = immersiveOpen && longSurah;
 
@@ -268,6 +283,22 @@ export function ReaderScreen({
   const [undoResetState, setUndoResetState] = useState<{ count: number; wasDone: boolean } | null>(null);
   const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  /**
+   * A finished surah starts again at its first page.
+   *
+   * The remembered place is where reading stopped mid-surah; once it is
+   * complete that page is history, and being dropped at the last page of
+   * Al-Kahf the next time it is opened would be worse than starting over.
+   */
+  const handleZikrCompletion = useCallback(
+    (completedIdx: number) => {
+      const firstPage = z?.mushafPages?.[0]?.page;
+      if (longSurah && z && firstPage) onSurahPageChange?.(z.id, firstPage);
+      onComplete(completedIdx);
+    },
+    [longSurah, onComplete, onSurahPageChange, z],
+  );
+
   const {
     count,
     complete,
@@ -288,7 +319,7 @@ export function ReaderScreen({
     hapticFeedback,
     vibrate,
     onCount: playClickFeedback,
-    onComplete,
+    onComplete: handleZikrCompletion,
     onAdvance,
   });
 
@@ -383,9 +414,23 @@ export function ReaderScreen({
     // useless, and reopening on a re-render would fight the reader.
     if (autoOpenedFor.current === id) return;
     autoOpenedFor.current = id;
-    setMushafPageTuple([0, 1]);
+    // Resume where this surah was left. Al-Kahf is twelve pages, so being
+    // handed page one again after closing the app is half an hour of reading
+    // repeated.
+    const rememberedPage = surahReadingPagesRef.current?.[id];
+    const rememberedIndex = rememberedPage
+      ? (z?.mushafPages?.findIndex((entry) => entry.page === rememberedPage) ?? -1)
+      : -1;
+    setMushafPageTuple([rememberedIndex > 0 ? rememberedIndex : 0, 1]);
     setImmersiveOpen(true);
-  }, [longSurah, z?.id]);
+  }, [longSurah, z?.id, z?.mushafPages]);
+
+  /** Records the page being read, so closing the app does not lose the place. */
+  useEffect(() => {
+    if (!longSurah || !z) return;
+    const page = z.mushafPages?.[mushafPageTuple[0]]?.page;
+    if (page) onSurahPageChange?.(z.id, page);
+  }, [longSurah, mushafPageTuple, onSurahPageChange, z]);
 
   useLayoutEffect(() => {
     if (readingScrollRef.current) {
@@ -696,15 +741,26 @@ export function ReaderScreen({
             onTap={handleTap}
             language={language}
             instructionText={counterInstruction}
+            /* A full surah is counted only on this control, so its own face
+               carries the mode instruction; anything else counts from the
+               canvas, and the face states the action while the line beneath
+               says where to tap. */
+            actionLabel={longSurah ? counterInstruction : t(language, "reader.tapWhenFinished")}
             testId="counter-surface"
             reduceMotion={reduceMotion}
           />
         </div>
         <div className="md:hidden">{renderNavigationButton("next")}</div>
       </div>
-      {z.repetitionCount !== 1 && (
-        <p className="mt-3 text-center text-sm font-medium text-muted-foreground">{counterInstruction}</p>
-      )}
+      {/* Every counter carries its guidance, whatever the repetition count.
+          Hiding the line for a one-off zikr also removed its height, so the
+          counter itself sat at a different place on the screen from one zikr
+          to the next — the control people aim at moved under their thumb.
+          A surah, whose counter already states the instruction on its face,
+          keeps the height without printing the same sentence twice. */}
+      <p className="mt-3 min-h-5 text-center text-sm font-medium text-muted-foreground">
+        {longSurah ? "" : counterInstruction}
+      </p>
     </div>
   );
 

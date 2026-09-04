@@ -49,6 +49,39 @@ function renderReader(catId: Parameters<typeof getAzkarByCategory>[0], idx: numb
   );
 }
 
+/** Al-Kahf: the twelve-page surah every Mushaf-position behaviour is about. */
+const KAHF = FRIDAY_KAHF[0]!;
+
+function renderKahf(extra: Partial<React.ComponentProps<typeof ReaderScreen>> = {}) {
+  registerLazyCollection("friday_kahf", FRIDAY_KAHF);
+  render(
+    <ReaderScreen
+      catId="friday_kahf"
+      idx={0}
+      routineMode="complete"
+      isArabic={false}
+      direction="ltr"
+      themeMode="light"
+      isDone={false}
+      collectionCompletedCount={0}
+      hapticFeedback={false}
+      showTranslation
+      showTransliteration
+      textSize="medium"
+      onTextSizeChange={() => undefined}
+      savedZikrIds={new Set()}
+      onBack={() => undefined}
+      onComplete={() => undefined}
+      onAdvance={() => undefined}
+      onNext={() => undefined}
+      onPrev={() => undefined}
+      onToggleSaved={() => undefined}
+      audioAvailable={false}
+      {...extra}
+    />,
+  );
+}
+
 function indexOf(catId: "before_sleep", zikrId: string) {
   return getAzkarByCategory(catId).findIndex((zikr) => zikr.id === zikrId);
 }
@@ -80,38 +113,37 @@ describe("the three surah readings", () => {
   });
 
   it("shows Al-Kahf's translation, which it has in full for every verse", () => {
-    registerLazyCollection("friday_kahf", FRIDAY_KAHF);
-    render(
-      <ReaderScreen
-        catId="friday_kahf"
-        idx={0}
-        routineMode="complete"
-        isArabic={false}
-        direction="ltr"
-        themeMode="light"
-        isDone={false}
-        collectionCompletedCount={0}
-        hapticFeedback={false}
-        showTranslation
-        showTransliteration
-        textSize="medium"
-        onTextSizeChange={() => undefined}
-        savedZikrIds={new Set()}
-        onBack={() => undefined}
-        onComplete={() => undefined}
-        onAdvance={() => undefined}
-        onNext={() => undefined}
-        onPrev={() => undefined}
-        onToggleSaved={() => undefined}
-        audioAvailable={false}
-      />,
-    );
+    renderKahf();
     leaveMushaf();
     // The translation is built by joining all 110 verses with their numbers and
     // shipped in the bundle. `!z.surahNameArabic` then hides it for anything
     // flagged as a surah, so the one collection with a complete translation is
     // the one that never shows it.
     expect(screen.queryByText("Translation")).not.toBeNull();
+  });
+
+  it("reopens a surah on the page it was left, not on its first", () => {
+    // Al-Kahf is twelve pages and half an hour of recitation. Every Mushaf
+    // preference already survived a restart while the place in the surah did
+    // not, so closing on page four meant reading the first three again.
+    renderKahf({ surahReadingPages: { [KAHF.id]: KAHF.mushafPages![3].page } });
+
+    expect(screen.getByTestId("mushaf-immersive-progress")).toHaveAttribute("aria-valuenow", "4");
+  });
+
+  it("reports the page being read, and starts the surah over once it is finished", () => {
+    const onSurahPageChange = vi.fn();
+    renderKahf({ onSurahPageChange });
+
+    expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
+
+    onSurahPageChange.mockClear();
+    leaveMushaf();
+    fireEvent.click(screen.getByTestId("counter-surface"));
+
+    // Finishing is not a place to resume from: the next reading starts at the
+    // first page, not at the last one that was open.
+    expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
   });
 
   it("gives a short surah its identity, not just a Basmalah", () => {

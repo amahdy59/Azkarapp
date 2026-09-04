@@ -36,6 +36,18 @@ export function useZikrCounter({
   const [readerAnnouncement, setReaderAnnouncement] = useState("");
 
   const activeZikrId = useRef<string | null>(null);
+  /**
+   * Partial tallies for every zikr visited in this reading session, keyed by
+   * zikr id.
+   *
+   * Counting is per-zikr state, but moving to the next or previous zikr does
+   * not leave the reader — the screen stays mounted and only `idx` changes.
+   * Without this the switch effect below zeroed the counter, so anyone who
+   * said 30 of 100 istighfars, glanced at the next zikr and came back found
+   * their tally gone and no way to recover it. A completed or reset zikr drops
+   * its entry, so only work still in progress is remembered.
+   */
+  const partialCounts = useRef(new Map<string, number>());
   const advanceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const tapSuppressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const suppressTap = useRef(false);
@@ -50,14 +62,18 @@ export function useZikrCounter({
       clearTimeout(advanceTimer.current);
       advanceTimer.current = null;
     }
-    const initialCount = isDone && z ? z.repetitionCount : 0;
+    const remembered = Math.max(0, Math.min(partialCounts.current.get(z.id) ?? 0, z.repetitionCount));
+    const initialCount = isDone ? z.repetitionCount : remembered;
+    const initialComplete = initialCount >= z.repetitionCount;
     setCount(initialCount);
-    setComplete(initialCount >= (z?.repetitionCount ?? 1));
+    setComplete(initialComplete);
     setJustCompleted(false);
     setReaderAnnouncement(
-      initialCount > 0
+      initialComplete
         ? t(language, "reader.counterReadyComplete")
-        : t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"),
+        : initialCount > 0
+          ? formatNumerals(initialCount, language)
+          : t(language, isLongSurah(z) ? "reader.tapCounterWhenFinished" : "reader.tapAnywhere"),
     );
   }, [idx, isDone, language, z]);
 
@@ -82,6 +98,7 @@ export function useZikrCounter({
     }
 
     if (next >= z.repetitionCount) {
+      partialCounts.current.delete(z.id);
       setComplete(true);
       setJustCompleted(true);
       const announcedCompletedCount = Math.min(collectionCompletedCount + (isDone ? 0 : 1), azkarLength);
@@ -101,6 +118,7 @@ export function useZikrCounter({
         onAdvance(idx);
       }, COUNTER_ADVANCE_DELAY_MS);
     } else {
+      partialCounts.current.set(z.id, next);
       if (next % 10 === 0 || next === Math.floor(z.repetitionCount / 2)) {
         setReaderAnnouncement(`${formatNumerals(next, language)}`);
       }
@@ -152,6 +170,7 @@ export function useZikrCounter({
   };
 
   const handleReset = () => {
+    if (z) partialCounts.current.delete(z.id);
     setCount(0);
     setComplete(false);
     setJustCompleted(false);
@@ -192,6 +211,11 @@ export function useZikrCounter({
       const restored = Math.max(0, Math.min(targetCount, z.repetitionCount));
       setCount(restored);
       const isNowComplete = restored >= z.repetitionCount;
+      if (isNowComplete || restored === 0) {
+        partialCounts.current.delete(z.id);
+      } else {
+        partialCounts.current.set(z.id, restored);
+      }
       setComplete(isNowComplete);
       setJustCompleted(false);
       setReaderAnnouncement(

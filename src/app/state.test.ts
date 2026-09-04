@@ -151,6 +151,23 @@ describe("app state persistence", () => {
     expect(legacy).not.toHaveProperty("mushafKeepControlsVisible");
   });
 
+  it("keeps a place in each multi-page surah and drops impossible pages", () => {
+    const state = normalizeAppState({
+      surahReadingPages: { "friday-kahf": 297, "q-mulk": 0, "q-sajdah": 605, "": 300, "q-yaseen": "440" },
+    });
+
+    expect(state.surahReadingPages).toEqual({ "friday-kahf": 297 });
+  });
+
+  it("takes the newer place in a surah rather than merging two of them", () => {
+    // Two devices cannot both be right about where reading stopped, and the
+    // incoming snapshot is the one that just reported it.
+    const base = normalizeAppState({ surahReadingPages: { "friday-kahf": 294, "q-mulk": 562 } });
+    const incoming = normalizeAppState({ surahReadingPages: { "friday-kahf": 299 } });
+
+    expect(mergeAppStates(base, incoming).surahReadingPages).toEqual({ "friday-kahf": 299, "q-mulk": 562 });
+  });
+
   it("normalizes resilient Quran bookmarks and preserves an adaptive plan range", () => {
     const state = normalizeAppState({
       quranWirdPlan: {

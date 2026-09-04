@@ -126,6 +126,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
   mushafToolbarSide: "right",
   mushafTextScale: "medium",
   mushafBookmarks: [],
+  surahReadingPages: {},
   mushafVerseBookmarks: [],
   dailyWirdGoal: 4,
   wirdHistory: {},
@@ -210,6 +211,16 @@ function normalizeQuranWirdDailyGoals(value: unknown): Record<string, number> {
     Object.entries(value).filter(
       ([dayKey, goal]) =>
         /^\d{4}-\d{2}-\d{2}$/.test(dayKey) && Number.isInteger(goal) && Number(goal) >= 1 && Number(goal) <= 604,
+    ),
+  ) as Record<string, number>;
+}
+
+/** Zikr id to Mushaf page, dropping anything that is not a real page number. */
+function normalizeSurahReadingPages(value: unknown): Record<string, number> {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  return Object.fromEntries(
+    Object.entries(value).filter(
+      ([zikrId, page]) => zikrId.length > 0 && Number.isInteger(page) && Number(page) >= 1 && Number(page) <= 604,
     ),
   ) as Record<string, number>;
 }
@@ -743,6 +754,7 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
           ),
         )
       : [],
+    surahReadingPages: normalizeSurahReadingPages(parsed.surahReadingPages),
     mushafVerseBookmarks: normalizeQuranVerseBookmarks(parsed.mushafVerseBookmarks),
     dailyWirdGoal:
       typeof parsed.dailyWirdGoal === "number" && parsed.dailyWirdGoal >= 1 && parsed.dailyWirdGoal <= 604
@@ -1037,6 +1049,12 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
     mushafToolbarSide: (incoming.mushafToolbarSide ?? safeBase.mushafToolbarSide) === "left" ? "left" : "right",
     mushafTextScale: normalizeMushafTextScale(incoming.mushafTextScale ?? safeBase.mushafTextScale),
     mushafBookmarks: Array.from(new Set([...(safeBase.mushafBookmarks ?? []), ...(incoming.mushafBookmarks ?? [])])),
+    // A place in a surah is a single value per surah, not a set to union:
+    // the newer snapshot is the one that knows where the reader stopped.
+    surahReadingPages: {
+      ...normalizeSurahReadingPages(safeBase.surahReadingPages),
+      ...normalizeSurahReadingPages(incoming.surahReadingPages),
+    },
     mushafVerseBookmarks: normalizeQuranVerseBookmarks([
       ...(safeBase.mushafVerseBookmarks ?? []),
       ...(incoming.mushafVerseBookmarks ?? []),
@@ -1069,6 +1087,7 @@ export function clearPrivateAppData(state: AppStateSnapshot): AppStateSnapshot {
     savedZikrIds: [],
     khatmahPage: 1,
     mushafBookmarks: [],
+    surahReadingPages: {},
     mushafVerseBookmarks: [],
     wirdHistory: {},
     quranWirdDailyGoals: {},

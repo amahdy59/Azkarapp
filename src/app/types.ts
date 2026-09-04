@@ -343,6 +343,15 @@ export interface AppStateSnapshot {
   mushafTextScale?: MushafTextScale;
   /** Bookmarked Mushaf pages (1-604). */
   mushafBookmarks?: number[];
+  /**
+   * The Mushaf page each multi-page surah was last left on, keyed by zikr id.
+   *
+   * Every other Mushaf setting already survived a restart while the one thing
+   * a reader would notice losing did not: Al-Kahf is twelve pages and half an
+   * hour of recitation, so closing the app on page seven and being handed
+   * page one again on Friday means reading it twice.
+   */
+  surahReadingPages?: Record<string, number>;
   /** User-curated verse bookmarks, distinct from the continue-reading place. */
   mushafVerseBookmarks?: QuranVerseBookmark[];
   /** Daily Quran reading goal in pages (default: 4). */

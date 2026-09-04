@@ -156,6 +156,66 @@ describe("useZikrCounter", () => {
     expect(haptic.vibrate).toHaveBeenCalled();
   });
 
+  it("keeps a partial tally when the reader moves away and comes back", () => {
+    const istighfar = makeZikr({ id: "z-istighfar", repetitionCount: 100 });
+    const next = makeZikr({ id: "z-next", repetitionCount: 3 });
+    const base = {
+      idx: 0,
+      isDone: false,
+      language: "en" as const,
+      azkarLength: 5,
+      collectionCompletedCount: 0,
+      hapticFeedback: false,
+      vibrate: vi.fn(),
+      onComplete: vi.fn(),
+      onAdvance: vi.fn(),
+    };
+    const { result, rerender } = renderHook(
+      (props: { z: Zikr; idx: number }) =>
+        useZikrCounter({ ...base, ...props } as Parameters<typeof useZikrCounter>[0]),
+      { initialProps: { z: istighfar, idx: 0 } },
+    );
+
+    act(() => result.current.handleTap());
+    act(() => result.current.handleTap());
+    expect(result.current.count).toBe(2);
+
+    rerender({ z: next, idx: 1 });
+    expect(result.current.count).toBe(0);
+
+    rerender({ z: istighfar, idx: 0 });
+    expect(result.current.count).toBe(2);
+    expect(result.current.complete).toBe(false);
+  });
+
+  it("forgets a tally that was reset before leaving the zikr", () => {
+    const istighfar = makeZikr({ id: "z-istighfar-reset", repetitionCount: 100 });
+    const next = makeZikr({ id: "z-next-reset", repetitionCount: 3 });
+    const base = {
+      idx: 0,
+      isDone: false,
+      language: "en" as const,
+      azkarLength: 5,
+      collectionCompletedCount: 0,
+      hapticFeedback: false,
+      vibrate: vi.fn(),
+      onComplete: vi.fn(),
+      onAdvance: vi.fn(),
+    };
+    const { result, rerender } = renderHook(
+      (props: { z: Zikr; idx: number }) =>
+        useZikrCounter({ ...base, ...props } as Parameters<typeof useZikrCounter>[0]),
+      { initialProps: { z: istighfar, idx: 0 } },
+    );
+
+    act(() => result.current.handleTap());
+    act(() => result.current.handleReset());
+
+    rerender({ z: next, idx: 1 });
+    rerender({ z: istighfar, idx: 0 });
+    expect(result.current.count).toBe(0);
+  });
+
   it("starts already complete when the zikr was done in a previous session", () => {
     const { result } = setup({ isDone: true, z: makeZikr({ repetitionCount: 3 }) });
     expect(result.current.count).toBe(3);

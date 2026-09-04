@@ -2427,3 +2427,43 @@ Record user-approved product, design and architectural decisions here. Do not er
   without closing the surah; the bands are named and ordered, an empty band is
   dropped, and every control stays one press away. WCAG A/AA on the Mushaf, and
   the Khatmah reader's rail, both unchanged.
+
+## DEC-139 — the count and the place in a surah are kept, and the guidance line stops moving the counter
+
+- **Decision:** an incomplete tally survives moving between azkar, a multi-page
+  surah reopens on the page it was left, and the counter's guidance line is
+  always on screen so the counter itself never changes position.
+- **The tally that was thrown away.** Counting is per-zikr state, but moving to
+  the next or previous zikr does not leave the reader — the screen stays
+  mounted and only the index changes — and the effect that switched zikr zeroed
+  the count. Saying thirty of a hundred istighfars, glancing at the next zikr
+  and coming back lost all thirty, with no way to recover them. Incomplete
+  counts are now held against the zikr's id for the life of the reading
+  session; completing or resetting one drops its entry, so only work in
+  progress is remembered. Deliberately not persisted: a tally is a session's
+  work, and restoring a half-finished count from yesterday would assert
+  something about a reader's day that the app does not know.
+- **The place in a surah, which every other Mushaf preference already kept.**
+  Theme, layout, text scale and bookmarks all survived a restart while the page
+  being read did not: Al-Kahf is twelve pages and roughly half an hour of
+  recitation, so closing the app on page seven meant reading it again on
+  Friday. `surahReadingPages` stores the Mushaf page per zikr id through the
+  existing normalization and merge boundaries, and the reader restores it when
+  the Mushaf opens. Merged newest-wins rather than unioned: two devices cannot
+  both be right about where reading stopped, and the incoming snapshot is the
+  one that just reported it. Completing the surah resets it to the first page,
+  because a finished reading has no place to resume from.
+- **The line that moved the counter.** The guidance line under the counter was
+  rendered only when the repetition count was more than one, which also removed
+  its height — so the counter sat at a different place on the screen for a zikr
+  said once than for one said a hundred times, and the control people aim at
+  moved under their thumb between azkar. It is now always rendered. A counter
+  whose total can only ever be one carries the short action "Tap when finished"
+  on its own face rather than printing the same sentence twice.
+- **Tests/evidence required:** a partial tally is restored after moving away and
+  back and is dropped after a reset; a surah opens on its remembered page and
+  reports the page being read; completing it stores the first page again;
+  `surahReadingPages` drops impossible pages and takes the newer place on
+  merge. Verified in the browser at 375px: counter top identical for a
+  single-action and a tallying zikr.
+- **Files/contracts to update:** `docs/DESIGN_SYSTEM.md` reader contract.
