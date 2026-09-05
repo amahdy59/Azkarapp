@@ -8,6 +8,7 @@ import { reportError, startPerformanceMonitoring } from "./lib/observability.ts"
 import "./styles/index.css";
 
 import { registerSW } from "virtual:pwa-register";
+import { applyServiceWorkerUpdate } from "./app/pwaUpdate";
 
 const App = lazy(() => import("./app/App.tsx"));
 const MarketingLanding = lazy(() => import("./app/screens/MarketingLanding.tsx"));
@@ -93,43 +94,19 @@ if (!isMarketingLanding && "caches" in window) {
     });
 }
 
-/**
- * Applying an update has to work from a cold prompt, not only from one the
- * service worker itself raised.
- *
- * `updateServiceWorker(true)` skips the waiting worker and reloads when the new
- * controller takes over — but if no worker is waiting yet it resolves having
- * done nothing, and the reader who just pressed "update" is left on the version
- * they pressed it to leave. That is the common case now that the prompt can
- * also come from the deployed release notes disagreeing with this bundle's own
- * stamp: the app knows an update exists before the worker has looked for it.
- *
- * So: ask the registration to look first, hand over if something is waiting,
- * and otherwise reload — by then the caches hold the new build either way.
- */
-async function applyServiceWorkerUpdate(): Promise<void> {
-  const registration = await navigator.serviceWorker?.getRegistration?.();
-
-  if (registration) {
-    await registration.update().catch(() => {
-      // A failed check is not a failed update: fall through to the reload,
-      // which is what the reader asked for.
-    });
-    if (registration.waiting || registration.installing) {
-      await updateServiceWorker(true);
-      return;
-    }
-  }
-
-  window.location.reload();
-}
-
 window.addEventListener("azkar-apply-update", () => {
   let timeoutId = 0;
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = window.setTimeout(() => reject(new Error("Service worker update timed out")), 15_000);
   });
-  void Promise.race([applyServiceWorkerUpdate(), timeout])
+  void Promise.race([
+    applyServiceWorkerUpdate({
+      getRegistration: () => navigator.serviceWorker.getRegistration(),
+      updateServiceWorker,
+      reload: () => window.location.reload(),
+    }),
+    timeout,
+  ])
     .catch((error) => {
       reportError(error, "pwa-update");
       window.dispatchEvent(new Event("azkar-update-failed"));

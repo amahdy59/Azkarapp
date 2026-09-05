@@ -188,6 +188,15 @@ test("Home populated cards stay inside the content boundary at every responsive 
         regionOverflow: region.scrollWidth - region.clientWidth,
         offenders: [...region.querySelectorAll<HTMLElement>("*")]
           .filter((element) => !element.closest(".overflow-x-auto"))
+          /* Decorative paint inside a frame that clips it. The prayer scene's
+             halo is a 9rem circle centred on the moon, so on a 320px card it
+             reaches past the edge and is cut off there — which is what a sky
+             seen through a window does. It is aria-hidden and its container
+             hides its overflow, so it cannot push the layout, scroll the page,
+             or be read out. Content is still held to the boundary: this
+             exempts only what is both hidden from assistive tech and clipped,
+             in the same spirit as the horizontally scrolling rows above. */
+          .filter((element) => !element.closest('[aria-hidden="true"].overflow-hidden'))
           .map((element) => {
             const bounds = element.getBoundingClientRect();
             return {

@@ -8,6 +8,8 @@ import { TranquilityCompletionCard } from "../components/TranquilityCompletionCa
 import { getDailyEvidence } from "../dailyEvidence";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
+import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
+import { getLeadingPrayerMoment } from "../prayerMoment";
 import {
   ALL_AZKAR,
   estimateCompletionMinutes,
@@ -25,7 +27,7 @@ import {
   type PrayerName,
 } from "../content/prayerTimes";
 import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
-import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
+import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
 import { formatDisplayDate, formatNumerals } from "../formatting";
@@ -243,6 +245,7 @@ export function HomeScreen({
   locationSettings,
   onResume,
   onPrayerResume,
+  onOpenPrayerAdhkar,
   onOpenFridayMode,
   onOpenProgress: _onOpenProgress,
   routineModes,
@@ -275,6 +278,8 @@ export function HomeScreen({
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
+  /** Opens that prayer's own adhkar, as the prayer screen's card does. */
+  onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
   onOpenFridayMode: () => void;
   onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
@@ -287,7 +292,14 @@ export function HomeScreen({
   onOpenWirdBenefits?: () => void;
   onOpenKhatmah?: () => void;
   prayerTracking?: readonly PrayerTrackingRecord[];
-  onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
+  /* Widened to PrayerTrackingWrite because the prayer panel records where a
+     prayer was prayed, not only that it was. The tracker cards below still
+     pass the narrower field set, which this signature accepts. */
+  onTogglePrayerTracking?: (
+    prayer: PrayerName,
+    field: PrayerTrackingWrite,
+    next: boolean | "mosque" | "home" | null,
+  ) => void;
 }) {
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
   const isArabic = language === "ar";
@@ -319,6 +331,20 @@ export function HomeScreen({
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
 
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
+
+  /* The prayer worth leading with, if any. Home shows the whole card while one
+     is live so that recording a prayer happening right now costs no
+     navigation; outside those windows it stays the compact five below. */
+  const leadingPrayer = useMemo(
+    () =>
+      getLeadingPrayerMoment({
+        now,
+        dayKey: getProgressDayKey(now, progressDayStartHour),
+        records: prayerTracking,
+        location: locationSettings,
+      }),
+    [locationSettings, now, prayerTracking, progressDayStartHour],
+  );
 
   const todayKey = getProgressDayKey(now, progressDayStartHour);
   // Keyed to the progress day, so the narration turns over on the same boundary
@@ -576,6 +602,35 @@ export function HomeScreen({
               </div>
             )}
           </div>
+
+          {/* The prayer at hand, in full, while it is live. Same component as
+              the prayer screen, so the two cannot drift; the screen keeps the
+              day strip because Home already has the tracker cards below. */}
+          {leadingPrayer && (
+            <div className="px-page">
+              <section
+                data-testid="home-prayer-moment"
+                data-prayer={leadingPrayer.prayer}
+                dir={direction}
+                aria-label={t(language, "prayerMoment.homeTitle")}
+                className="grid gap-3 md:grid-cols-2 md:gap-4"
+              >
+                <PrayerMomentPanel
+                  prayer={leadingPrayer.prayer}
+                  language={language}
+                  direction={direction}
+                  records={prayerTracking}
+                  dayKey={getProgressDayKey(now, progressDayStartHour)}
+                  locationSettings={locationSettings}
+                  now={now}
+                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                  onOpenAdhkar={(prayer) =>
+                    onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                  }
+                />
+              </section>
+            </div>
+          )}
 
           <div className="px-page">
             <section

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-05.4",
+  "release": "2026-09-05.5",
   "ar": [
-    "أُضيف خيار «تقليل الشفافية» إلى إعدادات إمكانية الوصول: يجعل الأسطح الضبابية صلبة — لوحات الإعدادات وشريط القارئ ومشغّل الصوت العائم — فيصير النص فوقها أوضح.",
-    "صُحّح لون نص الأزرار الأساسية: كان يُكتب بلون فاتح على أرضية ذهبية فيصعب تمييزه، في شاشات الإعدادات وقوائم القارئ وفي زرّي إشعار التحديث.",
-    "صارت الحبيبات الخفيفة خلف الشاشات تتبع إعداد «تقليل الشفافية» في نظامك، فإن كنت قد فعّلته هناك لن تظهر دون أن تضبطه هنا من جديد."
+    "صارت الصلاة الحالية تظهر كاملة في الرئيسية: سماؤها واسمها ووقتها، وفضلها، وتسجيل مكان الصلاة وأذكارها وسنّتها الراتبة — دون فتح صفحة أخرى. تظهر قبل الأذان بعشرين دقيقة وتبقى تسعين دقيقة بعده، وفي غير ذلك تبقى الرئيسية على شريط الصلوات الخمس المختصر.",
+    "زرّ «تحديث» صار يُحدّث فعلاً. كان إذا ضُغط أثناء تجهيز النسخة الجديدة لا يفعل شيئاً، فيعود الإشعار كما هو مهما تكرّر الضغط.",
+    "إشعار التحديث صار له عرض محدد في وسط الشاشة: كان يمتد بعرض الشاشة كلها على الشاشات الكبيرة، فيبتعد زرّاه عن النص الذي يجيبان عنه."
   ],
   "en": [
-    "A Reduce transparency setting joins the accessibility options. It makes blurred surfaces solid — the settings panels, the reader chrome and the floating player — so the text over them is easier to read.",
-    "Primary buttons are readable again. Their label was being drawn in a pale colour on the gold ground, on the settings screens, in the reader menus, and on both buttons of the update notice.",
-    "The faint grain behind every screen now follows your device’s reduced-transparency setting, so if you have already turned that on system-wide it no longer appears here either."
+    "The prayer at hand now appears in full on Home — its sky, name and time, its virtue, and the places to record where you prayed it, its adhkar and its rawatib — without opening another screen. It arrives twenty minutes before the adhan and stays for ninety after; outside that, Home keeps the compact five-prayer strip.",
+    "The Update button now actually updates. Pressed while the new version was still being prepared it did nothing at all, so the notice came back however many times you pressed it.",
+    "The update notice keeps to a readable width in the middle of the screen. It used to stretch the full width of a large display, leaving its buttons stranded far from the text they answer."
   ]
 }

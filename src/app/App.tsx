@@ -1220,6 +1220,7 @@ function AppContent({
                     }
                   }}
                   onPrayerResume={(prayer) => openPrayerMoment(prayer)}
+                  onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");

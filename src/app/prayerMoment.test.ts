@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getPrayerMoment, trackedLocation } from "./prayerMoment";
+import { getLeadingPrayerMoment, getPrayerMoment, trackedLocation } from "./prayerMoment";
 import { getEstimatedPrayerTimes } from "./content/prayerTimes";
 import { CONFIRMED_RAKAH_TOTAL } from "./content/prayerSunnah";
 import type { PrayerName, PrayerTrackingRecord } from "./types";
@@ -114,5 +114,60 @@ describe("what a record says about where a prayer was prayed", () => {
     expect(trackedLocation({ dayKey: DAY, prayer: "fajr", mosque: false, adhkar: false, location: "home" })).toBe(
       "home",
     );
+  });
+});
+
+describe("which prayer leads a screen", () => {
+  const lead = (now: Date, records: PrayerTrackingRecord[] = []) =>
+    getLeadingPrayerMoment({ now, dayKey: DAY, records });
+
+  it("names nobody in the long gap between prayers", () => {
+    // Well after Fajr and long before Dhuhr: nothing to record, nothing due.
+    const gap = at(shift(timeOf("fajr"), 90));
+    expect(lead(gap)).toBeNull();
+  });
+
+  it("leads with the prayer whose time is in and unrecorded", () => {
+    const dhuhr = at(shift(timeOf("dhuhr"), 20));
+    expect(lead(dhuhr)?.prayer).toBe("dhuhr");
+    expect(lead(dhuhr)?.phase).toBe("now");
+  });
+
+  it("drops a prayer once its window is well past, rather than carrying it all day", () => {
+    /* Fajr stays in the `now` phase until Dhuhr. Without a bound on how long
+       ago the adhan was, Home would show a prayer card for seven hours. */
+    const midMorning = at(shift(timeOf("fajr"), 120));
+    expect(moment("fajr", midMorning).phase).toBe("now");
+    expect(lead(midMorning)).toBeNull();
+  });
+
+  it("keeps an unrecorded prayer ahead of the next one approaching", () => {
+    /* Maghrib and Isha sit close enough that both are live at once: Maghrib is
+       in and unrecorded while Isha is already approaching. The unanswered one
+       comes first — burying it under the next prayer's countdown is how a
+       prayer goes unrecorded. */
+    const beforeIsha = at(shift(timeOf("isha"), -10));
+    expect(moment("maghrib", beforeIsha).phase).toBe("now");
+    expect(moment("isha", beforeIsha).phase).toBe("approaching");
+    expect(lead(beforeIsha)?.prayer).toBe("maghrib");
+  });
+
+  it("hands the screen to the prayer ahead once the current one is recorded", () => {
+    const beforeIsha = at(shift(timeOf("isha"), -10));
+    const records: PrayerTrackingRecord[] = [
+      { dayKey: DAY, prayer: "maghrib", mosque: true, adhkar: false, location: "mosque" },
+    ];
+    expect(lead(beforeIsha, records)?.prayer).toBe("isha");
+    expect(lead(beforeIsha, records)?.phase).toBe("approaching");
+  });
+
+  it("stays with a prayer just recorded, because its adhkar and rawatib follow", () => {
+    const afterIsha = at(shift(timeOf("isha"), 15));
+    const records: PrayerTrackingRecord[] = [
+      { dayKey: DAY, prayer: "isha", mosque: true, adhkar: false, location: "mosque" },
+    ];
+    const led = lead(afterIsha, records);
+    expect(led?.prayer).toBe("isha");
+    expect(led?.location).toBe("mosque");
   });
 });

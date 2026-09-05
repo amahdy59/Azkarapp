@@ -155,3 +155,61 @@ export function getPrayerMoment({
     sunnahDone: record?.sunnah ?? false,
   };
 }
+
+/**
+ * The prayer worth leading a screen with, or null when none is.
+ *
+ * Two prayers can be live at once: for the twenty minutes before Maghrib, Asr
+ * is still `now` — its window has not closed — while Maghrib is already
+ * `approaching`. Picking between them is a product question, not a clock one,
+ * so it is answered here once rather than in each screen that asks.
+ *
+ * An unrecorded prayer whose time is in comes first: it is the one thing the
+ * reader still has to answer, and burying it under the next prayer's countdown
+ * is how a prayer goes unrecorded. Only once it is answered does the prayer
+ * ahead take the screen, which is the point of the approach window — the
+ * rak'ahs before Fajr and Dhuhr need preparing for.
+ *
+ * Returns null outside those windows. Home then keeps its compact five-prayer
+ * strip: a prayer nine hours away has nothing to record and does not deserve a
+ * third of the screen.
+ */
+/**
+ * How long after the adhan a prayer still leads.
+ *
+ * The `now` phase cannot answer this on its own: it lasts until the next
+ * prayer, so Fajr is `now` for the seven hours until Dhuhr, and a screen led by
+ * the phase alone would carry a prayer card all day — which is the opposite of
+ * showing it when it matters. Ninety minutes covers praying, the adhkar that
+ * follow and the rawatib, and it leaves the gaps between prayers to the compact
+ * five.
+ */
+export const LEADING_WINDOW_MINUTES = 90;
+
+export function getLeadingPrayerMoment(input: {
+  now: Date;
+  dayKey: string;
+  records: readonly PrayerTrackingRecord[];
+  location?: LocationSettings;
+}): PrayerMoment | null {
+  const moments = PRAYER_NAMES.map((prayer) => getPrayerMoment({ ...input, prayer }));
+  const live = moments.filter(
+    (moment) =>
+      (moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded") &&
+      moment.minutesUntil > -LEADING_WINDOW_MINUTES,
+  );
+  if (live.length === 0) return null;
+
+  const unanswered = live.find((moment) => moment.phase === "now" && moment.location === null);
+  if (unanswered) return unanswered;
+
+  const approaching = live.find((moment) => moment.phase === "approaching");
+  if (approaching) return approaching;
+
+  const current = live.find((moment) => moment.phase === "now");
+  if (current) return current;
+
+  /* Whatever was recorded most recently — the reader has just answered it, and
+     the adhkar and rawātib that follow it are still the useful thing to offer. */
+  return live.reduce((latest, moment) => (moment.minutesUntil > latest.minutesUntil ? moment : latest));
+}

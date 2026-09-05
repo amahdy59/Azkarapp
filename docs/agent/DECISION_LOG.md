@@ -3005,3 +3005,63 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   back; a panel test toggling the row; a theme test asserting the class is added
   and cleared; the guard failing when a token is unregistered; `pnpm check`
   green across all ten stages and the full suite green.
+
+## DEC-151 — the prayer at hand is on Home, and the update button applies the update
+
+- **Decision:** while a prayer is live, Home carries the whole prayer card
+  rather than a link to it; the card and the prayer screen are one component;
+  and the service-worker handover no longer ends in a button that does nothing.
+- **Contextual, and the owner chose it.** Offered always-on, contextual, or
+  replacing the tracker cards, the answer was contextual: recording a prayer
+  that is happening now should cost no navigation, but a prayer nine hours away
+  has nothing to record and should not hold a third of Home. Reference designs
+  supplied by the owner led with the prayer because they come from a
+  prayer-first app; this one opens on the azkar routine, and stacking two
+  full-bleed heroes is what made the desk layout poor once already.
+- **The phase cannot bound it.** `now` runs until the next adhan, so Fajr is
+  `now` for the seven hours until Dhuhr and a card keyed on the phase alone
+  would sit on Home all day — the always-on option, arrived at by accident.
+  `getLeadingPrayerMoment` bounds it to ninety minutes after the adhan, which
+  covers the prayer, its adhkar and the rawatib.
+- **An unrecorded prayer outranks the next one approaching.** In the twenty
+  minutes before Isha, Maghrib is still in and Isha is already approaching.
+  The unanswered one leads, because burying it under the next prayer's
+  countdown is how a prayer goes unrecorded; once recorded, the prayer ahead
+  takes over. That is a product question, so it is answered once in the pure
+  module with tests, not in each screen that asks.
+- **One component, so the two cannot drift.** `PrayerMomentPanel` is the body
+  of the prayer screen and what Home renders; the screen keeps only the day
+  strip, because Home already has the tracker cards.
+- **What the suite caught that review did not.** Two regressions, both from
+  this change. The card overflowed the 320px content boundary — decorative
+  paint, `aria-hidden` and clipped by its own frame, so the guard now exempts
+  what is both hidden from assistive tech and clipped, an exemption confirmed
+  to cover twelve elements, all of them decorative. And the hero drew white
+  text at **1.08:1** in light mode: the scene is an absolutely positioned
+  sibling at `-z-10`, so nothing in the ancestor chain described what that text
+  sat on, and one failed paint would have left it invisible. It now carries
+  `bg-on-media-surface`, as the Home hero does under its photograph. The same
+  defect was latent on the prayer screen, which the contrast checklist does not
+  cover.
+- **A comment that described behaviour the code did not have.** The action row
+  said "auto-fit rather than three fixed columns … a fixed third column left a
+  card-shaped hole" while the class said two fixed columns, and it left exactly
+  that hole. It is auto-fit now.
+- **The update button was dead, and this is the second bug in those lines.**
+  `updateServiceWorker(true)` messages a _waiting_ worker; a worker still
+  installing has none, so the call did nothing and the function returned before
+  the reload. Precaching 4 MB makes that the common path, not the rare one. It
+  now waits out the install and reloads on every path that does not hand over,
+  because a button reporting success while changing nothing is worse than one
+  that reloads to the same place. Moved out of `main.tsx` into a module a test
+  can reach, and the test was confirmed to fail against the old code.
+- **The notice had no measure.** Fixed to the bottom of the viewport with
+  `mx-4` alone, it stretched the full width of a desk screen: notes against one
+  edge, buttons against the other, a metre of empty card between the question
+  and the button answering it.
+- **Tests/evidence required:** five unit tests for which prayer leads; five for
+  the update handover, verified to fail against the previous code; three e2e
+  for the card in window, out of window, and recording without leaving Home;
+  the contrast analyser passing on Home in all five themes; screenshots at
+  390/820/1440 reviewed against the supplied references; `pnpm check` green and
+  the full suite green.

@@ -198,6 +198,7 @@ const en = {
     rakahTwo: "Two rak'ahs",
     rakahFour: "Four rak'ahs",
     dayTitle: "Today's prayers",
+    homeTitle: "The prayer at hand",
   },
   prayerTracking: {
     mosque: "Prayed at the mosque",

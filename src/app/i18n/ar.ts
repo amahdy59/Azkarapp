@@ -199,6 +199,7 @@ const ar = {
     rakahTwo: "ركعتان",
     rakahFour: "أربع ركعات",
     dayTitle: "صلوات اليوم",
+    homeTitle: "الصلاة الحالية",
   },
   prayerTracking: {
     mosque: "صليت في المسجد",

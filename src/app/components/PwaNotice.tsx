@@ -28,7 +28,12 @@ export function PwaNotice({
 
   return (
     <aside
-      className="mx-4 rounded-2xl border border-primary/30 bg-card p-4 shadow-raised"
+      /* A measure, not the whole width. This is fixed to the bottom of the
+         viewport, so on a desk screen it stretched the full 1900px: the notes
+         hugged one edge, the buttons the other, and a metre of empty card sat
+         between the thing being read and the button answering it. Centred and
+         held to a readable width, the answer stays next to the question. */
+      className="mx-auto w-[calc(100%-2rem)] max-w-[40rem] rounded-2xl border border-primary/30 bg-card p-4 shadow-raised"
       aria-busy={isActionLoading || undefined}
       aria-labelledby={titleId}
     >
