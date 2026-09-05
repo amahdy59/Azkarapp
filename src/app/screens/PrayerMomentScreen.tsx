@@ -189,18 +189,30 @@ export function PrayerMomentScreen({
           is, because clipping the scene to its corners means `overflow: hidden`,
           which switches off the automatic minimum size. It collapsed from 150px
           to 37px with the sky and half the type cropped inside it. */}
-      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-4 [&>*]:shrink-0 lg:grid lg:grid-cols-2 lg:items-start">
+      {/* A scrolling column, so its children keep their own height and the
+          column scrolls past them. Without `shrink-0` the flex algorithm takes
+          the overflow out of whichever child is allowed to give — and the hero
+          is, because clipping the scene to its corners means `overflow: hidden`,
+          which switches off the automatic minimum size. It collapsed from 150px
+          to 37px with the sky and half the type cropped inside it.
+
+          From the tablet tier it becomes a two-column grid inside the shared
+          content measure. `auto-rows-min` and `content-start` are what keep it
+          a page rather than a poster: a grid whose rows may stretch will spread
+          three rows of content down a 900px desk screen, leaving 150px of empty
+          card between every band. */}
+      <div className="page-content-center flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-4 pb-6 [&>*]:shrink-0 md:grid md:content-start md:grid-cols-2 md:gap-4">
         {/* The prayer, its time, and the sky it is called in. */}
         <section
-          className="relative isolate overflow-hidden rounded-2xl border border-border lg:order-1"
+          className="relative isolate overflow-hidden rounded-2xl border border-border"
           data-testid="prayer-moment-hero"
         >
           <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10 h-full w-full" />
           {/* Fixed light-on-dark, because the scene is its own ground in every
               theme — the same rule the Home hero follows over its photograph. */}
-          <div className="flex min-h-[8.5rem] flex-col justify-between gap-3 p-4 text-white">
+          <div className="flex flex-col justify-between gap-3 p-4 text-white">
             <div className="flex items-start justify-between gap-3">
-              <h2 className="text-[1.5rem] font-black leading-tight" dir="auto">
+              <h2 className="text-2xl font-black leading-tight md:text-3xl" dir="auto">
                 {name}
               </h2>
               <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/70 text-primary">
@@ -208,7 +220,7 @@ export function PrayerMomentScreen({
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-2.5">
-              <p className="text-[1.75rem] font-black leading-none tabular-nums" dir="auto">
+              <p className="text-3xl font-black leading-none tabular-nums" dir="auto">
                 {formatPrayerTimeLabel(moment.time, isArabic)}
               </p>
               {isLive && (
@@ -228,7 +240,7 @@ export function PrayerMomentScreen({
             still be an invitation rather than a reward for one. */}
         {virtue && isLive && (
           <section
-            className="rounded-2xl border border-border bg-card p-4 text-center lg:order-2"
+            className="flex flex-col justify-center rounded-2xl border border-border bg-card p-4 text-center"
             data-testid="prayer-moment-virtue"
           >
             <h3 className="text-[0.9375rem] font-black text-primary" dir="auto">
@@ -237,7 +249,7 @@ export function PrayerMomentScreen({
             <p className="mt-2 text-[0.75rem] font-bold text-muted-foreground" dir="auto">
               {t(language, "prayerMoment.virtueAttribution")}
             </p>
-            <p className="zikr-text mt-1.5 text-[1rem] font-bold leading-loose text-foreground" dir="rtl" lang="ar">
+            <p className="zikr-text mt-2 text-[1.0625rem] font-bold leading-loose text-foreground" dir="rtl" lang="ar">
               {virtue.textArabic}
             </p>
             <p className="mt-2 text-[0.75rem] font-semibold text-muted-foreground" dir="auto">
@@ -246,7 +258,10 @@ export function PrayerMomentScreen({
           </section>
         )}
 
-        <div className="flex flex-col gap-3 lg:order-3 lg:col-span-2 lg:grid lg:grid-cols-3">
+        {/* Auto-fit rather than three fixed columns: Fajr has nothing after it
+            and Asr nothing before, so the row is often two cards, and a fixed
+            third column left a card-shaped hole beside them. */}
+        <div className="grid gap-3 md:col-span-2 md:grid-cols-2">
           {/* Where it was prayed. Two choices rather than one tick, so "at
               home" is a recorded answer instead of the absence of one. */}
           <div
@@ -410,7 +425,7 @@ export function PrayerMomentScreen({
 
         {/* The day's five, so this screen is never a dead end. */}
         <nav
-          className="mt-1 flex items-stretch justify-between gap-1 rounded-2xl border border-border bg-card p-1.5 lg:order-4 lg:col-span-2"
+          className="mt-1 flex items-stretch justify-between gap-1 rounded-2xl border border-border bg-card p-1.5 md:col-span-2"
           aria-label={t(language, "prayerMoment.dayTitle")}
           data-testid="prayer-moment-strip"
         >

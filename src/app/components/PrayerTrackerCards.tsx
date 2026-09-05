@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check } from "./icons";
+import { Sunrise, Sun, CloudSun, Sunset, MoonStar, Check, ChevronNext } from "./icons";
 import { t } from "../i18n";
 import { PrayerVirtueModal } from "./PrayerVirtueModal";
 import type { AppLanguage, PrayerName, PrayerTrackingRecord } from "../types";
 import type { PrayerTimes } from "../content/prayerTimes";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
+import { trackedLocation } from "../prayerMoment";
 
 /**
  * The five after-prayer cards.
@@ -99,12 +100,15 @@ export function TrackingCheckMark({ checked }: { checked: boolean }) {
 function TrackingCheckbox({
   id,
   label,
+  hint,
   checked,
   disabled,
   onChange,
 }: {
   id: string;
   label: string;
+  /** Names the answer where there is more to say than ticked or not. */
+  hint?: string;
   checked: boolean;
   disabled: boolean;
   onChange: (next: boolean) => void;
@@ -130,7 +134,10 @@ function TrackingCheckbox({
         onChange={(event) => onChange(event.currentTarget.checked)}
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
-      <span className="pointer-events-none min-w-0 truncate text-[0.8125rem] font-bold text-foreground">{label}</span>
+      <span className="pointer-events-none flex min-w-0 flex-col text-start">
+        <span className="truncate text-[0.8125rem] font-bold text-foreground">{label}</span>
+        {hint && <span className="truncate text-[0.6875rem] font-semibold text-muted-foreground">{hint}</span>}
+      </span>
       {/* No focus ring here: the input covers the row and is the element
           that actually receives focus, so the global :focus-visible outline
           already draws one around the whole 48px target. A ring on this
@@ -160,7 +167,7 @@ function PrayerCard({
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
-  tracking: { mosque: boolean; adhkar: boolean };
+  tracking: { mosque: boolean; adhkar: boolean; location: "mosque" | "home" | null };
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
 }) {
@@ -196,9 +203,20 @@ function PrayerCard({
         type="button"
         onClick={() => onOpen?.(prayer)}
         disabled={!onOpen}
-        aria-label={t(language, "prayerTracking.openAdhkar", { prayer: name })}
-        className="flex flex-col items-center rounded-2xl outline-none transition-colors duration-fast focus-visible:ring-[3px] focus-visible:ring-ring enabled:cursor-pointer disabled:cursor-default"
+        /* It opens the prayer, not its adhkar — those are now one card
+           inside it. The old name told a screen-reader user the wrong
+           destination from the moment the card started opening this screen. */
+        aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
+        className="relative flex flex-col items-center rounded-2xl outline-none transition-colors duration-fast focus-visible:ring-[3px] focus-visible:ring-ring enabled:cursor-pointer disabled:cursor-default"
       >
+        {/* The card has two interaction models now — this block opens the
+            prayer, the rows below record it — and nothing distinguished them:
+            the identity block was a button that looked like text. The chevron
+            is the smallest thing that says "this leads somewhere", and it sits
+            in the corner rather than beside the time: on the line it took
+            enough width to wrap "12:54 PM" and drop that card out of step with
+            the other four. */}
+
         <span
           aria-hidden="true"
           // The chip is the only place the per-prayer hue appears. Tinting the
@@ -207,20 +225,25 @@ function PrayerCard({
         >
           <Icon size={20} />
         </span>
-        <h3
-          id={`prayer-card-heading-${prayer}`}
-          className="mt-1.5 text-[0.9375rem] font-black text-foreground"
-          dir="auto"
-        >
-          {name}
-        </h3>
+        {/* The chevron sits with the name rather than on the time's line,
+            where it took enough width to wrap "12:54 PM" and drop that card out
+            of step with the other four, and rather than in the corner, where it
+            cost a positioning rule against a CSS cap with 151 bytes to spare. */}
+        <span className="mt-1.5 flex items-center gap-1">
+          <h3 id={`prayer-card-heading-${prayer}`} className="text-[0.9375rem] font-black text-foreground" dir="auto">
+            {name}
+          </h3>
+          {onOpen && (
+            <ChevronNext size={14} aria-hidden="true" data-rtl-flip className="shrink-0 text-muted-foreground" />
+          )}
+        </span>
         {/* The time is the strongest thing in the card: it is what the reader
             is scanning for. */}
         <p
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-0.5 text-[1.375rem] font-black leading-none tracking-tight text-foreground"
+          className="mt-0.5 whitespace-nowrap text-[1.375rem] font-black leading-none tracking-tight text-foreground"
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -252,10 +275,23 @@ function PrayerCard({
           otherwise repeats the same two labels with no context. */}
       <fieldset className="mt-1.5 flex flex-col border-0 p-0">
         <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
+        {/* "Prayed", not "prayed at the mosque".
+            The prayer screen records where — mosque or home — while this row
+            only knew the mosque, so a prayer recorded at home showed here as an
+            empty box: the two surfaces disagreed about the same fact, and the
+            empty box read as "not recorded", which is the ambiguity the place
+            model exists to end. This ticks for either answer and names the
+            place beside it; ticking it here still means the mosque, because
+            that is the only answer a single box can give. */}
         <TrackingCheckbox
           id={`prayer-${prayer}-mosque`}
-          label={t(language, "prayerTracking.mosque")}
-          checked={tracking.mosque}
+          label={t(language, "prayerTracking.prayed")}
+          hint={
+            tracking.location
+              ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
+              : undefined
+          }
+          checked={tracking.location !== null}
           disabled={disabled}
           onChange={(next) => onToggle(prayer, "mosque", next)}
         />
@@ -336,7 +372,11 @@ export function PrayerTrackerCards({
               key={model.prayer}
               model={model}
               language={language}
-              tracking={{ mosque: record?.mosque ?? false, adhkar: record?.adhkar ?? false }}
+              tracking={{
+                mosque: record?.mosque ?? false,
+                adhkar: record?.adhkar ?? false,
+                location: trackedLocation(record),
+              }}
               onToggle={(prayer, field, next) => {
                 onToggle(prayer, field, next);
                 if (field === "mosque" && next) setVirtuePrayer(prayer);

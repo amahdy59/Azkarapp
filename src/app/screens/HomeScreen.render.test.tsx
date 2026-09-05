@@ -146,8 +146,10 @@ describe("HomeScreen quick access", () => {
     expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
     expect(screen.getByText(/today'?s wird/i)).toBeInTheDocument();
 
-    // The identity block keeps the route into that prayer's adhkar.
-    fireEvent.click(screen.getByRole("button", { name: /Fajr prayer adhkar/i }));
+    // The identity block opens the prayer, and says so: it used to be named
+    // for the adhkar, which stopped being where it led the moment the prayer
+    // screen took that place.
+    fireEvent.click(screen.getByRole("button", { name: /Open Fajr/i }));
     expect(onPrayerResume).toHaveBeenCalledWith("fajr");
     fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
     expect(onOpenCustomCounter).toHaveBeenCalledOnce();

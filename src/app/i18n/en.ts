@@ -210,6 +210,10 @@ const en = {
     showUpcoming: "Show {count} upcoming",
     hideUpcoming: "Hide upcoming",
     openAdhkar: "Open {prayer} prayer adhkar",
+    openPrayer: "Open {prayer}",
+    prayed: "Prayed",
+    atMosque: "At the mosque",
+    atHome: "At home",
     upcoming: "Not yet due",
   },
   wirdBenefits: {

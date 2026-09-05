@@ -211,6 +211,10 @@ const ar = {
     showUpcoming: "عرض {count} من الصلوات القادمة",
     hideUpcoming: "إخفاء الصلوات القادمة",
     openAdhkar: "فتح أذكار صلاة {prayer}",
+    openPrayer: "فتح صلاة {prayer}",
+    prayed: "صليتها",
+    atMosque: "في المسجد",
+    atHome: "في المنزل",
     upcoming: "لم يحن وقتها",
   },
   wirdBenefits: {

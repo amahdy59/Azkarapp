@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-05.2",
+  "release": "2026-09-05.3",
   "ar": [
-    "صار لكل صلاة شاشتها: اضغط على أي صلاة لتجد وقتها وسماءها، وفضل صلاتها في جماعة، وتسجيل مكان صلاتك — في المسجد أو في المنزل — وسننها، وأذكار ما بعدها في مكان واحد.",
-    "بجانب كل سنة زرٌّ يفتح الحديث الذي وردت به: أربع ركعات قبل العصر وركعتان قبل المغرب صارتا معروضتين بوصفهما سنة مستحبة لا من الرواتب، مع ذكر درجة الحديث إن كان خارج الصحيحين.",
-    "صار إشعار التحديث يُحدّث التطبيق فعلاً عند الضغط عليه. كان يخبرك بتحديث لم يصلك بعد ولا يمنحك سوى زر الإغلاق، لأن التطبيق يُقرأ من ذاكرة الجهاز بينما تُقرأ أخبار التحديث من الشبكة.",
-    "صار وضع المصحف يملأ الشاشة على الهاتف واتّسع خطه، ورُتّب شريطا السورة، وأُعيد رسم الإطار المذهّب حول الفاتحة وأول البقرة فلم يعد يتشوّه باختلاف الشاشات."
+    "صُحّح رسم سماء كل صلاة: كانت الصورة تُمدّ لتملأ البطاقة فتتضخّم القباب وتملأها، وصارت الآن تُرسم بمقاسها الصحيح على أي شاشة، مع إبقاء الهلال أو الشمس بعيداً عن اسم الصلاة ووقتها.",
+    "رُتّبت صفحة الصلاة على الشاشات الكبيرة: صار لها عرض محدد في وسط الشاشة بدل أن تمتد بعرض الشاشة كلها، ولم تعد المسافات الفارغة تتباعد بين أقسامها.",
+    "بطاقات الصلوات في الرئيسية صار عليها سهم يدل على أنها تفتح صفحة الصلاة، وصار سطر التتبع «صليتها» يُحتسب سواء صليتها في المسجد أو في المنزل ويكتب المكان تحته — فلم تعد صلاة سجّلتها في المنزل تبدو غير مسجّلة."
   ],
   "en": [
-    "Every prayer now has a screen of its own: tap a prayer to find its time and its sky, the virtue of praying it in congregation, where you prayed it — mosque or home — its sunnah rak‘ahs, and the adhkar that follow.",
-    "Each sunnah now carries a control that opens the narration it rests on. The four before Asr and the two before Maghrib are offered as encouraged sunnah rather than as rawatib, with the grading named wherever the narration sits outside the two Sahihs.",
-    "The update notice now actually updates the app when you press it. It used to announce an update you had not received and offer only a Close button, because the app is served from your device while the update news comes from the network.",
-    "Mushaf mode fills a phone screen with larger type, the surah’s bars are reorganised, and the gilded frame around Al-Fatihah and the start of Al-Baqarah no longer distorts with the shape of the screen."
+    "Each prayer’s sky is drawn at its true proportions now. It used to be stretched to fill the card, which blew the domes up until they filled it; the crescent or sun also keeps clear of the prayer’s name and time.",
+    "The prayer page is laid out for larger screens: it keeps to a measure in the middle of the display instead of stretching across it, and its sections no longer drift apart down the page.",
+    "The prayer cards on Home carry an arrow showing they open the prayer, and their tracking row now reads “Prayed” — it counts whether you prayed at the mosque or at home and names the place underneath, so a prayer recorded at home no longer looks unrecorded."
   ]
 }

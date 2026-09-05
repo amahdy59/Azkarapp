@@ -2746,3 +2746,51 @@ Record user-approved product, design and architectural decisions here. Do not er
   grading where there is one and the note that it is outside the twelve; a
   narration from Muslim shows no grading line; the confirmed rak'ahs total
   twelve.
+
+## DEC-146 — the prayer page is laid out for a desk, and the card that opens it says so
+
+- **Decision:** the prayer screen keeps to the shared content measure with rows
+  sized to their content, its scene is composed from parts that cannot distort,
+  and the Home card that opens it carries a chevron and one recorded state
+  rather than two that disagree.
+- **A page stretched to the glass.** On a 2000px screen the prayer surface had
+  no measure, so the hero, the narration and the cards were pulled the full
+  width of the display; and because the grid's rows could stretch, three bands
+  of content were spread down a 900px viewport with 150px of empty card between
+  them. It now sits inside `.page-content-center`, with `auto-rows-min` and
+  `content-start`, which is the difference between a page and a poster.
+- **A picture has an aspect ratio; this box does not.** The scene was one
+  400×200 drawing scaled to cover a hero that is 343×150 on a phone and 700×217
+  on a desk. Covering means the larger scale wins, so at desktop width the
+  skyline was blown up two and a half times and the domes filled the card as
+  brown smears with no sky above them. Each part is now placed in the thing it
+  cannot distort in: the sky is a CSS gradient, the sun or crescent is a
+  fixed-size element at a percentage, the stars are dots, and the skyline is the
+  only SVG — fitted to the card's width and anchored to its bottom edge, so the
+  city always spans the card at its own proportion. Fitting rather than covering
+  is the whole rule: `slice` on a band shows a fragment of it, which is how one
+  dome came to be the entire drawing.
+- **The light keeps out of the type's way.** Every scene puts its sun or
+  crescent in the trailing band of the card, because the prayer and its time are
+  set against the leading edge and a crescent behind a numeral is decoration
+  fighting the one thing the card exists to say. The hour is carried by how high
+  the light sits instead.
+- **The card is a door and now looks like one.** Tapping a prayer on Home opens
+  the prayer screen, but the identity block was a button that looked like static
+  text, so nothing separated "tap to open" from "tap to tick" on a card that now
+  has both. A chevron sits in its corner — on the time's line it took enough
+  width to wrap "12:54 PM" and drop that card out of step with the other four.
+  Its accessible name also said "open the adhkar", which stopped being true the
+  moment the prayer screen took that place.
+- **One recorded state, not two models.** Home rendered `mosque: boolean` while
+  the prayer screen writes `location`, so a prayer recorded at home showed on
+  Home as an empty box — the two surfaces disagreeing about the same fact, and
+  the empty box reading as "not recorded", which is the ambiguity the place
+  model exists to end. The row now reads "Prayed", ticks for either answer, and
+  names the place underneath. Ticking it on Home still means the mosque, because
+  that is the only answer a single box can give.
+- **Tests/evidence required:** the card names the prayer it opens and calls
+  `onOpen`; a home record ticks as prayed and names the place; a legacy
+  `mosque: true` record still reads as the mosque; an unrecorded prayer stays
+  unticked and unnamed. Looked at, not only measured: the redesigned page at
+  800×450 and the Home row at the same size, with all five cards at one height.
