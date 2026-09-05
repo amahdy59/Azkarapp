@@ -138,8 +138,8 @@ function MainDhikrGroupCard({
       >
         <span
           dir="auto"
-          className={`text-[1rem] font-black leading-relaxed text-inherit sm:text-[1.0625rem] ${
-            compact ? "lg:text-[0.9375rem]" : ""
+          className={`text-base font-black leading-relaxed text-inherit sm:text-title ${
+            compact ? "lg:text-subtitle" : ""
           }`}
         >
           {name}
@@ -149,7 +149,7 @@ function MainDhikrGroupCard({
           /* 32px clear of the name. The column used to space every child
              equally, so this gap could not grow without shoving the
              after-prayer dots down with it. */
-          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-[0.75rem] font-bold ${compact ? "lg:px-2 lg:text-[0.6875rem] xl:px-3" : ""} ${
+          className={`mt-8 inline-flex items-center justify-center whitespace-nowrap rounded-full px-3 py-1 text-xs font-bold ${compact ? "lg:px-2 lg:text-micro xl:px-3" : ""} ${
             isCompleted
               ? "bg-success text-success-foreground shadow-sm"
               : showRecommended
@@ -302,7 +302,7 @@ export function ProgressDayView({
             <div className="flex items-center gap-2">
               <Heading
                 data-testid="progress-primary-heading"
-                className={`block max-w-full truncate whitespace-nowrap text-[1.25rem] font-black tracking-tight sm:text-[1.375rem] md:text-[1.5rem] ${
+                className={`block max-w-full truncate whitespace-nowrap text-xl font-black tracking-tight sm:text-headline md:text-2xl ${
                   onGlass
                     ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]"
                     : isHomeSubset
@@ -331,14 +331,14 @@ export function ProgressDayView({
               </div>
             </div>
             {!onGlass && (
-              <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground sm:text-[0.875rem]" dir="auto">
+              <p className="mt-1 text-label font-semibold text-muted-foreground sm:text-sm" dir="auto">
                 {dynamicSubtitle}
               </p>
             )}
           </div>
 
           <div
-            className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-[0.8125rem] font-black ${
+            className={`flex shrink-0 items-center gap-2 rounded-full border px-3 py-1.5 text-label font-black ${
               onGlass
                 ? "border-on-media/16 bg-black/45 text-on-media"
                 : "border-border-control bg-muted text-foreground"
@@ -353,7 +353,7 @@ export function ProgressDayView({
         {isWirdInfoOpen && (
           <div
             role="tooltip"
-            className={`mt-3 w-full rounded-2xl border p-3 text-[0.8125rem] font-semibold leading-6 shadow-xs ${
+            className={`mt-3 w-full rounded-2xl border p-3 text-label font-semibold leading-6 shadow-xs ${
               onGlass
                 ? "border-on-media/20 bg-on-media-surface/95 text-on-media"
                 : "border-border bg-popover text-popover-foreground"
@@ -431,7 +431,7 @@ export function ProgressDayView({
             type="button"
             onClick={onOpenWirdBenefits}
             data-testid="open-wird-benefits"
-            className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-2xl border px-4 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               onGlass
                 ? "border-on-media/20 bg-black/35 text-on-media hover:bg-black/50"
                 : "border-primary/35 bg-primary/10 text-primary hover:bg-primary/15"
@@ -525,19 +525,15 @@ export function ProgressWeekView({
         {/* Most Missed Routine Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Moon size={20} className="text-primary mb-1" />
-          <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.mostMissed")}
-          </span>
-          <span className="text-[0.875rem] font-black text-foreground truncate max-w-full">{mostMissedName}</span>
+          <span className="text-xs font-bold text-muted-foreground mb-0.5">{t(language, "progress.mostMissed")}</span>
+          <span className="text-sm font-black text-foreground truncate max-w-full">{mostMissedName}</span>
         </div>
 
         {/* Best Streak Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.bestStreak")}
-          </span>
-          <span className="text-[0.9375rem] font-black text-foreground">
+          <span className="text-xs font-bold text-muted-foreground mb-0.5">{t(language, "progress.bestStreak")}</span>
+          <span className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.bestStreakDays, language)} {t(language, "progress.days")}
           </span>
         </div>
@@ -545,10 +541,10 @@ export function ProgressWeekView({
         {/* Completed Days Card */}
         <div className="flex flex-col items-center justify-center p-3.5 sm:p-4 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <CheckCircle2 size={20} className="text-success mb-1" />
-          <span className="text-[0.75rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-xs font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completedDays")}
           </span>
-          <span className="text-[0.9375rem] font-black text-foreground">
+          <span className="text-subtitle font-black text-foreground">
             {formatNumerals(weekStats.completedDaysCount, language)} {t(language, "progress.ofSeven")}
           </span>
         </div>
@@ -558,7 +554,7 @@ export function ProgressWeekView({
       <div className="w-full rounded-3xl bg-card border border-border/40 p-5 md:p-6 shadow-raised">
         <h2
           data-testid="progress-primary-heading"
-          className="mb-4 block max-w-full truncate whitespace-nowrap text-start text-[1rem] font-black text-foreground sm:text-[1.125rem] md:text-[1.25rem]"
+          className="mb-4 block max-w-full truncate whitespace-nowrap text-start text-base font-black text-foreground sm:text-lg md:text-xl"
         >
           {t(language, "progress.weekCommitment")}
         </h2>
@@ -568,25 +564,25 @@ export function ProgressWeekView({
           <table className="w-full border-collapse text-center">
             <thead>
               <tr className="border-b border-white/30 dark:border-white/10">
-                <th scope="col" className="py-2.5 px-2 text-start text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-start text-label font-bold text-muted-foreground">
                   <div className="flex items-center gap-1.5">
                     <Calendar size={15} />
                     <span>{t(language, "progress.day")}</span>
                   </div>
                 </th>
-                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sunrise size={15} className="text-success" />
                     <span>{t(language, "progress.morningShort")}</span>
                   </div>
                 </th>
-                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <Sunset size={15} className="text-primary" />
                     <span>{t(language, "progress.eveningShort")}</span>
                   </div>
                 </th>
-                <th scope="col" className="py-2.5 px-2 text-[0.8125rem] font-bold text-muted-foreground">
+                <th scope="col" className="py-2.5 px-2 text-label font-bold text-muted-foreground">
                   <div className="flex items-center justify-center gap-1">
                     <MoonStar size={15} className="text-sleep" />
                     <span>{t(language, "progress.sleepShort")}</span>
@@ -599,9 +595,7 @@ export function ProgressWeekView({
                 <tr key={day.dayKey} className="hover:bg-white/20 dark:hover:bg-white/5 transition-colors">
                   <td className="py-3 px-2 text-start">
                     <span
-                      className={`text-[0.875rem] ${
-                        day.isToday ? "font-black text-primary" : "font-bold text-foreground"
-                      }`}
+                      className={`text-sm ${day.isToday ? "font-black text-primary" : "font-bold text-foreground"}`}
                     >
                       {day.weekdayName}
                     </span>
@@ -631,7 +625,7 @@ export function ProgressWeekView({
         </div>
 
         {/* Legend */}
-        <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-6 text-[0.75rem] font-bold text-muted-foreground">
+        <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-6 text-xs font-bold text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-success/20 border border-success text-success">
               <Check size={12} strokeWidth={3} />
@@ -640,7 +634,7 @@ export function ProgressWeekView({
           </div>
           <div className="flex items-center gap-1.5">
             <div className="flex items-center justify-center w-5 h-5 rounded-full bg-info/20 border border-info text-info">
-              <span className="text-[0.625rem] font-black">-</span>
+              <span className="text-micro font-black">-</span>
             </div>
             <span>{t(language, "progress.partial")}</span>
           </div>
@@ -659,12 +653,12 @@ export function ProgressWeekView({
             <Sparkles size={24} />
           </div>
           <div>
-            <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black leading-snug text-foreground">
+            <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-subtitle font-black leading-snug text-foreground">
               {t(language, "garden.weekCompletedDays", {
                 count: formatNumerals(weekStats.completedDaysCount, language),
               })}
             </h3>
-            <p className="text-[0.8125rem] font-semibold text-muted-foreground">
+            <p className="text-label font-semibold text-muted-foreground">
               {weekStats.bestRoutine
                 ? t(language, "garden.weekBestRoutine", {
                     routine: getCategoryName(weekStats.bestRoutine, language),
@@ -676,12 +670,12 @@ export function ProgressWeekView({
 
         {/* Routine Summary Progress Bars Card */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-center gap-3">
-          <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
+          <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
             {t(language, "progress.weeklySummary")}
           </h3>
 
           {/* Morning Bar */}
-          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
+          <div className="flex items-center justify-between gap-3 text-xs font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.morningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
@@ -698,7 +692,7 @@ export function ProgressWeekView({
           </div>
 
           {/* Evening Bar */}
-          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
+          <div className="flex items-center justify-between gap-3 text-xs font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.eveningCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
@@ -715,7 +709,7 @@ export function ProgressWeekView({
           </div>
 
           {/* Sleep Bar */}
-          <div className="flex items-center justify-between gap-3 text-[0.75rem] font-bold">
+          <div className="flex items-center justify-between gap-3 text-xs font-bold">
             <span className="text-muted-foreground w-14 shrink-0">
               {formatNumerals(weekStats.sleepCompletedCount, language)} {t(language, "progress.ofSeven")}
             </span>
@@ -824,10 +818,10 @@ export function ProgressMonthView({
         {/* Best Routine */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sun size={20} className="text-primary mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.bestRoutine")}
           </span>
-          <span className="text-[0.8125rem] font-black text-foreground truncate max-w-full">
+          <span className="text-label font-black text-foreground truncate max-w-full">
             {getCategoryName(monthStats.bestRoutine, language)}
           </span>
         </div>
@@ -835,10 +829,10 @@ export function ProgressMonthView({
         {/* Longest Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.longestStreak")}
           </span>
-          <span className="text-[0.875rem] font-black text-foreground">
+          <span className="text-sm font-black text-foreground">
             {formatNumerals(monthStats.longestStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
@@ -846,10 +840,8 @@ export function ProgressMonthView({
         {/* Full Days */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Calendar size={20} className="text-success mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
-            {t(language, "progress.fullDays")}
-          </span>
-          <span className="text-[0.875rem] font-black text-foreground">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">{t(language, "progress.fullDays")}</span>
+          <span className="text-sm font-black text-foreground">
             {formatNumerals(monthStats.fullDaysCount, language)}
           </span>
         </div>
@@ -857,10 +849,10 @@ export function ProgressMonthView({
         {/* Completion Rate */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sprout size={20} className="text-success mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completionRate")}
           </span>
-          <span className="text-[0.875rem] font-black text-primary">
+          <span className="text-sm font-black text-primary">
             %{formatNumerals(monthStats.completionRate, language)}
           </span>
         </div>
@@ -880,10 +872,7 @@ export function ProgressMonthView({
                  open: the longest Arabic weekday needs 44px in a 40px cell, and
                  Intl's "short" form for Arabic is the full word, so there is no
                  shorter label to fall back on. */
-              <div
-                key={day}
-                className="truncate text-[0.6875rem] font-bold text-muted-foreground py-1 sm:text-[0.75rem]"
-              >
+              <div key={day} className="truncate text-micro font-bold text-muted-foreground py-1 sm:text-xs">
                 {day}
               </div>
             ))}
@@ -924,9 +913,7 @@ export function ProgressMonthView({
                           : "bg-white/30 dark:bg-white/5 border-white/20 dark:border-white/10 text-muted-foreground/60"
                   }`}
                 >
-                  <span className="text-[0.6875rem] sm:text-[0.75rem] font-bold">
-                    {formatNumerals(day.dayNum, language)}
-                  </span>
+                  <span className="text-micro sm:text-xs font-bold">{formatNumerals(day.dayNum, language)}</span>
                   <div className="flex h-4 items-center justify-center mt-0.5">
                     {isPalm ? (
                       <Check size={12} strokeWidth={3} className="text-success" />
@@ -935,7 +922,7 @@ export function ProgressMonthView({
                         {formatRatio(count, 4, language)}
                       </span>
                     ) : (
-                      <span className="text-[0.625rem] text-muted-foreground/40">-</span>
+                      <span className="text-micro text-muted-foreground/40">-</span>
                     )}
                   </div>
                 </button>
@@ -944,7 +931,7 @@ export function ProgressMonthView({
           </div>
 
           {/* Bottom Grid Legend */}
-          <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-[0.6875rem] font-bold text-muted-foreground flex-wrap">
+          <div className="mt-4 pt-3 border-t border-white/20 dark:border-white/10 flex items-center justify-center gap-4 text-micro font-bold text-muted-foreground flex-wrap">
             <div className="flex items-center gap-1">
               <Check size={12} strokeWidth={3} className="text-success" />
               <span>{t(language, "progress.complete")}</span>
@@ -971,15 +958,13 @@ export function ProgressMonthView({
               <div className="min-w-0 flex-1">
                 <h2
                   data-testid="progress-primary-heading"
-                  className="block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black text-foreground"
+                  className="block max-w-full truncate whitespace-nowrap text-subtitle font-black text-foreground"
                 >
                   {t(language, "progress.selectedDayDetails", {
                     day: formatNumerals(selectedDayNum, language),
                   })}
                 </h2>
-                <span className="text-[0.6875rem] font-semibold text-muted-foreground">
-                  {selectedDayRecord?.dayKey}
-                </span>
+                <span className="text-micro font-semibold text-muted-foreground">{selectedDayRecord?.dayKey}</span>
               </div>
               <Calendar size={18} className="text-primary" />
             </div>
@@ -988,12 +973,12 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <Sunrise size={16} className="text-primary" />
-                <span className="text-[0.8125rem] font-bold">{t(language, "progress.morningAzkar")}</span>
+                <span className="text-label font-bold">{t(language, "progress.morningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("morning") ? (
-                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
+                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
+                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -1001,12 +986,12 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <Sunset size={16} className="text-evening" />
-                <span className="text-[0.8125rem] font-bold">{t(language, "progress.eveningAzkar")}</span>
+                <span className="text-label font-bold">{t(language, "progress.eveningAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("evening") ? (
-                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
+                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
+                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -1014,12 +999,12 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <MoonStar size={16} className="text-sleep" />
-                <span className="text-[0.8125rem] font-bold">{t(language, "progress.sleepAzkar")}</span>
+                <span className="text-label font-bold">{t(language, "progress.sleepAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("before_sleep") ? (
-                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
+                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
+                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
 
@@ -1027,12 +1012,12 @@ export function ProgressMonthView({
             <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-success" />
-                <span className="text-[0.8125rem] font-bold">{t(language, "progress.postPrayerAzkar")}</span>
+                <span className="text-label font-bold">{t(language, "progress.postPrayerAzkar")}</span>
               </div>
               {selectedDayRecord?.categories.includes("after_prayer") ? (
-                <span className="text-[0.75rem] font-bold text-success">{t(language, "progress.done")}</span>
+                <span className="text-xs font-bold text-success">{t(language, "progress.done")}</span>
               ) : (
-                <span className="text-[0.75rem] font-bold text-primary">{t(language, "progress.notDone")}</span>
+                <span className="text-xs font-bold text-primary">{t(language, "progress.notDone")}</span>
               )}
             </div>
           </div>
@@ -1041,10 +1026,10 @@ export function ProgressMonthView({
           <div className="p-4 rounded-3xl bg-card border border-success shadow-raised flex items-start gap-3">
             <Sprout size={20} className="text-success shrink-0 mt-0.5" />
             <div>
-              <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-[0.875rem] font-black text-foreground">
+              <h3 className="mb-1 block max-w-full truncate whitespace-nowrap text-sm font-black text-foreground">
                 {t(language, "garden.monthRecordTitle")}
               </h3>
-              <p className="text-[0.75rem] font-semibold text-muted-foreground">
+              <p className="text-xs font-semibold text-muted-foreground">
                 {t(language, "garden.monthFullDays", {
                   count: formatNumerals(monthStats.fullDaysCount, language),
                 })}
@@ -1111,10 +1096,10 @@ export function ProgressYearView({
         {/* Completion Rate */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Sprout size={20} className="text-success mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.completionRate")}
           </span>
-          <span className="text-[0.9375rem] font-black text-primary">
+          <span className="text-subtitle font-black text-primary">
             %{formatNumerals(yearStats.overallCompletionRate, language)}
           </span>
         </div>
@@ -1122,10 +1107,10 @@ export function ProgressYearView({
         {/* Longest Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Star size={20} className="text-primary mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.longestStreak")}
           </span>
-          <span className="text-[0.875rem] font-black text-foreground">
+          <span className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.longestStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
@@ -1133,10 +1118,10 @@ export function ProgressYearView({
         {/* Current Streak */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Zap className="h-5 w-5 text-primary fill-primary/20 mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.currentStreak")}
           </span>
-          <span className="text-[0.875rem] font-black text-foreground">
+          <span className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.currentStreak, language)} {t(language, "progress.days")}
           </span>
         </div>
@@ -1144,10 +1129,10 @@ export function ProgressYearView({
         {/* Active Days */}
         <div className="flex flex-col items-center justify-center p-3.5 rounded-3xl bg-card border border-border/40 shadow-raised text-center">
           <Calendar size={20} className="text-success mb-1" />
-          <span className="text-[0.6875rem] font-bold text-muted-foreground mb-0.5">
+          <span className="text-micro font-bold text-muted-foreground mb-0.5">
             {t(language, "progress.activeDays")}
           </span>
-          <span className="text-[0.875rem] font-black text-foreground">
+          <span className="text-sm font-black text-foreground">
             {formatNumerals(yearStats.activeDays, language)} {t(language, "progress.activeSuffix")}
           </span>
         </div>
@@ -1160,14 +1145,12 @@ export function ProgressYearView({
           <div className="flex items-center justify-between mb-1">
             <h2
               data-testid="progress-primary-heading"
-              className="block max-w-full truncate whitespace-nowrap text-[0.9375rem] font-black text-foreground"
+              className="block max-w-full truncate whitespace-nowrap text-subtitle font-black text-foreground"
             >
               {t(language, "progress.monthlyCompletionRate")}
             </h2>
           </div>
-          <p className="text-[0.75rem] font-semibold text-muted-foreground mb-4">
-            {t(language, "garden.yearChartHint")}
-          </p>
+          <p className="text-xs font-semibold text-muted-foreground mb-4">{t(language, "garden.yearChartHint")}</p>
 
           {/* Bar Chart */}
           <div className="flex-1 flex items-end justify-between gap-1 sm:gap-1.5 pt-6 pb-2 min-h-[140px]">
@@ -1182,7 +1165,7 @@ export function ProgressYearView({
                    overflow up through four ancestors. The label already truncates. */
                 <div key={idx} className="flex-1 min-w-0 flex flex-col items-center h-full justify-end group">
                   <span
-                    className={`text-[0.625rem] font-black mb-1 opacity-0 group-hover:opacity-100 transition-opacity ${
+                    className={`text-micro font-black mb-1 opacity-0 group-hover:opacity-100 transition-opacity ${
                       isBest ? "opacity-100 text-primary" : "text-muted-foreground"
                     }`}
                   >
@@ -1209,17 +1192,17 @@ export function ProgressYearView({
 
         {/* Quick Glance Card (1 Column on desktop) */}
         <div className="p-5 rounded-3xl bg-card border border-border/40 shadow-raised flex flex-col justify-between gap-3">
-          <h2 className="block max-w-full truncate whitespace-nowrap border-b border-white/20 pb-2 text-[0.9375rem] font-black text-foreground dark:border-white/10">
+          <h2 className="block max-w-full truncate whitespace-nowrap border-b border-white/20 pb-2 text-subtitle font-black text-foreground dark:border-white/10">
             {t(language, "progress.quickGlance")}
           </h2>
 
           {/* Best Month */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
-              <span className="block text-[0.6875rem] font-bold text-muted-foreground">
+              <span className="block text-micro font-bold text-muted-foreground">
                 {t(language, "progress.bestMonth")}
               </span>
-              <span className="text-[0.875rem] font-black text-foreground">{bestMonthName}</span>
+              <span className="text-sm font-black text-foreground">{bestMonthName}</span>
             </div>
             <Star size={18} className="text-primary" />
           </div>
@@ -1227,10 +1210,10 @@ export function ProgressYearView({
           {/* Most Consistent Routine */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
-              <span className="block text-[0.6875rem] font-bold text-muted-foreground">
+              <span className="block text-micro font-bold text-muted-foreground">
                 {t(language, "progress.mostConsistent")}
               </span>
-              <span className="text-[0.875rem] font-black text-foreground">
+              <span className="text-sm font-black text-foreground">
                 {getCategoryName(yearStats.mostConsistentRoutine, language)}
               </span>
             </div>
@@ -1240,10 +1223,10 @@ export function ProgressYearView({
           {/* Total Azkar Completed */}
           <div className="flex items-center justify-between p-2.5 rounded-xl bg-muted border border-border">
             <div>
-              <span className="block text-[0.6875rem] font-bold text-muted-foreground">
+              <span className="block text-micro font-bold text-muted-foreground">
                 {t(language, "progress.totalCompleted")}
               </span>
-              <span className="text-[0.875rem] font-black text-foreground">
+              <span className="text-sm font-black text-foreground">
                 {formatNumerals(yearStats.totalCollections, language)}
               </span>
             </div>
@@ -1265,9 +1248,9 @@ export function ProgressYearView({
                 isBest ? "border-success/60 ring-1 ring-success/40 bg-success/5 shadow-md" : "border-border/40"
               }`}
             >
-              <div className="flex items-center justify-between mb-1.5 text-[0.75rem] font-extrabold">
+              <div className="flex items-center justify-between mb-1.5 text-xs font-extrabold">
                 <span className="text-foreground truncate">{monthNames[idx]}</span>
-                <span className="text-muted-foreground text-[0.6875rem]">%{formatNumerals(rate, language)}</span>
+                <span className="text-muted-foreground text-micro">%{formatNumerals(rate, language)}</span>
               </div>
 
               {/* Mini day grid */}
@@ -1292,7 +1275,7 @@ export function ProgressYearView({
 
       {/* Motivational Quote / Closing Prayer Card */}
       <div className="p-4 rounded-3xl bg-muted border border-border shadow-raised flex items-center justify-center text-center">
-        <p className="text-[0.875rem] font-bold text-foreground">
+        <p className="text-sm font-bold text-foreground">
           {yearStats.totalCollections > 0
             ? t(language, "garden.yearActivitySummary", {
                 count: formatNumerals(yearStats.totalCollections, language),

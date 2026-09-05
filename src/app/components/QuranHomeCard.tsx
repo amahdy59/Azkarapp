@@ -43,12 +43,12 @@ export function QuranHomeCard({
               <BookOpen size={20} />
             </div>
             <div className={`flex-1 ${textAlignment}`}>
-              <div className="text-[1.05rem] font-bold text-foreground" dir={direction}>
+              <div className="text-title font-bold text-foreground" dir={direction}>
                 {t(language, "home.khatmahTitle")}
               </div>
             </div>
           </div>
-          <div className="text-[0.875rem] font-medium text-muted-foreground mb-4" dir={direction}>
+          <div className="text-sm font-medium text-muted-foreground mb-4" dir={direction}>
             {t(language, "mushaf.wirdIntro")}
           </div>
           <button
@@ -83,24 +83,21 @@ export function QuranHomeCard({
               <BookOpen size={20} />
             </div>
             <div className="flex-1">
-              <div
-                className="text-[0.8125rem] font-medium text-primary mb-0.5 uppercase tracking-wider"
-                dir={direction}
-              >
+              <div className="text-label font-medium text-primary mb-0.5 uppercase tracking-wider" dir={direction}>
                 {t(language, "common.mushaf")}
               </div>
-              <div className="text-[1.05rem] font-bold text-foreground" dir={direction}>
+              <div className="text-title font-bold text-foreground" dir={direction}>
                 {surahName} · {t(language, "mushaf.pageLabel", { page: formatNumerals(pageNumber, language) })}
               </div>
             </div>
           </div>
 
           {goalResult.expired ? (
-            <div className="mb-3 rounded-xl border border-warning/40 bg-warning/10 px-3 py-2 text-[0.8125rem] font-semibold text-foreground">
+            <div className="mb-3 rounded-xl border border-warning/40 bg-warning/10 px-3 py-2 text-label font-semibold text-foreground">
               {t(language, "mushaf.planExpired")}
             </div>
           ) : isComplete ? (
-            <div className="flex items-center gap-1.5 text-[0.8125rem] font-semibold text-success bg-success/15 px-2.5 py-1 rounded-full mb-3 shrink-0">
+            <div className="flex items-center gap-1.5 text-label font-semibold text-success bg-success/15 px-2.5 py-1 rounded-full mb-3 shrink-0">
               <CheckCircle2 size={14} className="shrink-0" />
               <span>{t(language, "mushaf.wirdCompleteShort")}</span>
             </div>
@@ -108,7 +105,7 @@ export function QuranHomeCard({
 
           {goal > 0 && !isComplete && (
             <div className="mb-3 w-full">
-              <div className="flex justify-between items-center mb-1.5 text-[0.8125rem] font-semibold text-foreground">
+              <div className="flex justify-between items-center mb-1.5 text-label font-semibold text-foreground">
                 <span>{t(language, "mushaf.wirdToday")}</span>
                 <span className="text-muted-foreground">
                   {formatNumerals(read, language)} /{" "}
@@ -135,7 +132,7 @@ export function QuranHomeCard({
           <button
             type="button"
             onClick={onContinue}
-            className="mt-3 flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-[0.875rem] font-bold text-primary hover:bg-muted hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="mt-3 flex min-h-11 items-center gap-1.5 rounded-xl px-3 text-sm font-bold text-primary hover:bg-muted hover:underline focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <span>{t(language, "mushaf.continueReading")}</span>
             <ArrowNext size={16} data-rtl-flip aria-hidden="true" />
@@ -147,7 +144,7 @@ export function QuranHomeCard({
         <button
           type="button"
           onClick={onOverview}
-          className="flex min-h-11 w-full items-center justify-between p-4 text-[0.875rem] font-semibold text-foreground hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+          className="flex min-h-11 w-full items-center justify-between p-4 text-sm font-semibold text-foreground hover:bg-muted/50 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
         >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Calendar size={16} />

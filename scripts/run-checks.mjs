@@ -37,6 +37,7 @@ const CONCURRENT = [
   { name: "lint", command: "eslint . --max-warnings 0" },
   { name: "format", command: "prettier --check ." },
   { name: "audio manifest", command: "node scripts/validate-audio-manifest.mjs" },
+  { name: "type scale", command: "node scripts/check-type-scale.mjs" },
 ];
 
 // These read dist/, so they cannot start until the build has finished.

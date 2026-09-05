@@ -173,7 +173,7 @@ export function CustomCounterScreen({
               <div className="relative z-20 grid grid-cols-2 gap-2 sm:gap-3" data-prevent-count="true">
                 <div className="min-w-0">
                   <DropdownMenu dir={direction}>
-                    <DropdownMenuTrigger className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-[0.8125rem] sm:text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring overflow-hidden">
+                    <DropdownMenuTrigger className="interactive-elem flex min-h-[44px] w-full items-center justify-between gap-2 rounded-2xl border border-border-control bg-card px-3 sm:px-4 text-label sm:text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring overflow-hidden">
                       <span className="truncate text-start flex-1 whitespace-nowrap">
                         {isArabic ? selectedAuthentic.categoryNameAr : selectedAuthentic.categoryNameEn}
                       </span>
@@ -194,7 +194,7 @@ export function CustomCounterScreen({
                           <DropdownMenuRadioItem
                             key={item.id}
                             value={item.id}
-                            className="text-[0.875rem] font-bold whitespace-nowrap"
+                            className="text-sm font-bold whitespace-nowrap"
                           >
                             {isArabic ? item.categoryNameAr : item.categoryNameEn}
                           </DropdownMenuRadioItem>
@@ -264,7 +264,7 @@ export function CustomCounterScreen({
             }}
           >
             <p
-              className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
+              className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
               dir="rtl"
               lang="ar"
             >
@@ -317,8 +317,8 @@ export function CustomCounterScreen({
             <div className="mx-auto mb-3 flex size-14 items-center justify-center rounded-full bg-success/20 text-success">
               <Check size={32} strokeWidth={3} aria-hidden="true" />
             </div>
-            <h3 className="mb-1 text-[1.25rem] font-extrabold text-foreground">{t(language, "counter.goalReached")}</h3>
-            <p className="mb-5 text-[0.875rem] text-muted-foreground">
+            <h3 className="mb-1 text-xl font-extrabold text-foreground">{t(language, "counter.goalReached")}</h3>
+            <p className="mb-5 text-sm text-muted-foreground">
               {t(language, "counter.goalReachedDetail", { target: formatNumerals(target, language), zikr: activeText })}
             </p>
             <div className="space-y-2.5">
@@ -354,7 +354,7 @@ export function CustomCounterScreen({
         >
           <div className="text-start">
             <div className="mb-5 flex items-center justify-between gap-3">
-              <h2 className="text-[1.125rem] font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
+              <h2 className="text-lg font-black text-foreground">{t(language, "counter.virtueReference")}</h2>
               <button
                 type="button"
                 onClick={() => setShowReference(false)}
@@ -367,10 +367,10 @@ export function CustomCounterScreen({
             <span className="flex size-11 items-center justify-center rounded-2xl bg-primary/10 text-primary">
               <Sparkles size={20} aria-hidden="true" />
             </span>
-            <p className="mt-4 text-[0.9375rem] font-semibold leading-7 text-foreground" dir="auto">
+            <p className="mt-4 text-subtitle font-semibold leading-7 text-foreground" dir="auto">
               {isArabic ? selectedAuthentic.virtueAr : selectedAuthentic.virtueEn}
             </p>
-            <p className="mt-4 text-[0.8125rem] font-bold leading-6 text-muted-foreground" dir="auto">
+            <p className="mt-4 text-label font-bold leading-6 text-muted-foreground" dir="auto">
               {isArabic ? selectedAuthentic.sourceRefAr : selectedAuthentic.sourceRefEn} ·{" "}
               {isArabic ? selectedAuthentic.hadithGradeAr : selectedAuthentic.hadithGradeEn}
             </p>

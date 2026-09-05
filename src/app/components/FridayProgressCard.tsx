@@ -56,7 +56,7 @@ export function FridayProgressCard({
       className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
     >
       <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
-        <h2 className="text-[1.125rem] font-black leading-tight text-foreground" dir="auto">
+        <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
           {t(language, "friday.weeklyProgress")}
         </h2>
       </div>
@@ -83,11 +83,11 @@ export function FridayProgressCard({
               {row.icon}
             </span>
             <span className="flex min-w-0 flex-col">
-              <span dir="auto" className="truncate text-[0.9375rem] font-black leading-snug text-foreground">
+              <span dir="auto" className="truncate text-subtitle font-black leading-snug text-foreground">
                 {row.label}
               </span>
               {/* Isolated so a Latin "3 / 7" cannot reorder against Arabic around it. */}
-              <bdi className="mt-1 text-[0.8125rem] font-bold text-muted-foreground">{row.value}</bdi>
+              <bdi className="mt-1 text-label font-bold text-muted-foreground">{row.value}</bdi>
             </span>
           </button>
         ))}

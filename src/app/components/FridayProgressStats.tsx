@@ -63,14 +63,14 @@ export function FridayProgressStats({
       dir={direction}
     >
       <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
-        <h2 className="text-[1.125rem] font-black leading-tight text-foreground" dir="auto">
+        <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
           {t(language, "friday.progressTitle", { count: stats.fridaysCount })}
         </h2>
       </div>
 
       <div className="p-4 sm:p-6 flex flex-col gap-4">
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center text-[0.875rem] font-bold">
+          <div className="flex justify-between items-center text-sm font-bold">
             <div className="flex items-center gap-2">
               <CheckCircle2 size={16} className="text-primary" />
               <span>{t(language, "friday.practicesDone")}</span>
@@ -90,7 +90,7 @@ export function FridayProgressStats({
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center text-[0.875rem] font-bold">
+          <div className="flex justify-between items-center text-sm font-bold">
             <div className="flex items-center gap-2">
               <BookOpen size={16} className="text-success" />
               <span>{t(language, "friday.kahfOpened")}</span>
@@ -110,7 +110,7 @@ export function FridayProgressStats({
         </div>
 
         <div className="flex flex-col gap-2">
-          <div className="flex justify-between items-center text-[0.875rem] font-bold">
+          <div className="flex justify-between items-center text-sm font-bold">
             <span>{t(language, "friday.salawatCount")}</span>
             <span className="text-primary">{stats.salawatCount}</span>
           </div>

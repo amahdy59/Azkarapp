@@ -247,10 +247,6 @@
     opacity 160ms ease;
 }
 
-.adaptive-counter-nav.is-compact {
-  height: 76px;
-  border-radius: 24px;
-}
 .adaptive-counter-nav:hover:not(:disabled) {
   background: var(--muted);
   border-color: color-mix(in srgb, var(--primary) 40%, var(--border-control));

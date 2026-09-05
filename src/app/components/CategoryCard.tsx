@@ -54,10 +54,10 @@ export function CategoryCard({
         <CatIcon type={icon} size={24} color="var(--primary)" />
       </span>
       <span data-slot="category-copy" className="min-w-0 flex-1">
-        <span className="block text-[1rem] font-bold text-foreground">{title}</span>
+        <span className="block text-base font-bold text-foreground">{title}</span>
         {isOccasional ? (
           <div className="mt-1 flex items-center gap-1.5">
-            <span className="text-[0.8125rem] font-semibold text-muted-foreground">{occasionalSubtitle}</span>
+            <span className="text-label font-semibold text-muted-foreground">{occasionalSubtitle}</span>
           </div>
         ) : (
           <div className="mt-2 flex flex-col gap-1">
@@ -72,7 +72,7 @@ export function CategoryCard({
                 aria-label={progressText || ""}
               />
             )}
-            <span className="flex items-center gap-1.5 text-[0.8125rem] text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-label text-muted-foreground">
               {/* A shape, not just the chevron's hue, marks a finished
                   collection — colour alone is not a sufficient cue. */}
               {isComplete && <Check size={15} className="shrink-0 text-primary" aria-hidden="true" />}

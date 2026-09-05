@@ -115,7 +115,7 @@ export function AzkarLibraryScreen({
     <ScreenContainer dir={direction} className="relative" screenName={t(language, "library.title")}>
       <div className="relative z-10 mx-auto flex w-full max-w-[80rem] flex-col min-h-screen">
         <header className="shrink-0 px-5 pb-4 pt-3">
-          <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-[1.5rem]">
+          <h1 className="block max-w-full truncate whitespace-nowrap text-xl font-extrabold text-foreground sm:text-2xl">
             {t(language, "library.title")}
           </h1>
           <div className="mt-4">
@@ -142,14 +142,14 @@ export function AzkarLibraryScreen({
                     lang={language}
                     autoComplete="off"
                     onChange={(event) => setSearchQuery(event.currentTarget.value)}
-                    className="h-11 min-w-0 flex-1 bg-transparent text-start text-[0.875rem] text-foreground placeholder:text-muted-foreground focus:outline-none"
+                    className="h-11 min-w-0 flex-1 bg-transparent text-start text-sm text-foreground placeholder:text-muted-foreground focus:outline-none"
                   />
                 </div>
                 <DropdownMenu dir={direction}>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="interactive-elem flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border border-border-control bg-card px-3.5 text-[0.8125rem] font-extrabold text-foreground shadow-raised transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                      className="interactive-elem flex h-12 shrink-0 items-center justify-center gap-2 rounded-2xl border border-border-control bg-card px-3.5 text-label font-extrabold text-foreground shadow-raised transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       aria-label={`${t(language, "library.title")}: ${t(language, `library.${section}`)}`}
                       data-testid="library-section-filter"
                     >
@@ -159,7 +159,7 @@ export function AzkarLibraryScreen({
                     </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="min-w-[13rem]">
-                    <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
+                    <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
                       {t(language, "library.title")}
                     </DropdownMenuLabel>
                     <DropdownMenuRadioGroup
@@ -180,7 +180,7 @@ export function AzkarLibraryScreen({
                 </DropdownMenu>
               </div>
               {searchQuery.trim() && (
-                <p className="mt-1.5 px-1 text-[0.75rem] text-muted-foreground">{t(language, "library.searchHint")}</p>
+                <p className="mt-1.5 px-1 text-xs text-muted-foreground">{t(language, "library.searchHint")}</p>
               )}
               <p
                 data-testid="library-filter-status"
@@ -202,7 +202,7 @@ export function AzkarLibraryScreen({
                   type="button"
                   aria-pressed={selectedGroupId === "all"}
                   onClick={() => setSelectedGroupId("all")}
-                  className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-[0.875rem] font-bold transition-colors cursor-pointer ${
+                  className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors cursor-pointer ${
                     selectedGroupId === "all"
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -216,7 +216,7 @@ export function AzkarLibraryScreen({
                     type="button"
                     aria-pressed={selectedGroupId === group.id}
                     onClick={() => setSelectedGroupId(group.id)}
-                    className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-[0.875rem] font-bold transition-colors cursor-pointer ${
+                    className={`interactive-elem shrink-0 flex min-h-[44px] items-center justify-center rounded-2xl px-4 py-2 text-sm font-bold transition-colors cursor-pointer ${
                       selectedGroupId === group.id
                         ? "bg-primary text-primary-foreground shadow-sm"
                         : "bg-card border border-border-control/50 text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -237,7 +237,7 @@ export function AzkarLibraryScreen({
                 <section key={group.id} aria-labelledby={`library-group-${group.id}`} className="mb-6 last:mb-0">
                   <h2
                     id={`library-group-${group.id}`}
-                    className="mb-2.5 text-[0.8125rem] font-bold uppercase tracking-wide text-muted-foreground"
+                    className="mb-2.5 text-label font-bold uppercase tracking-wide text-muted-foreground"
                     dir="auto"
                   >
                     {t(language, `library.groups.${group.labelKey}`)}
@@ -326,7 +326,7 @@ export function AzkarLibraryScreen({
             </>
           ) : savedAzkar.length > 0 ? (
             <section aria-labelledby="saved-zikr-heading">
-              <h2 id="saved-zikr-heading" className="mb-3 text-[0.9375rem] font-bold text-foreground">
+              <h2 id="saved-zikr-heading" className="mb-3 text-subtitle font-bold text-foreground">
                 {t(language, "library.savedTitle")}
               </h2>
               <div className="space-y-3">
@@ -365,12 +365,12 @@ export function AzkarLibraryScreen({
                         <Bookmark size={19} className="fill-current" />
                       </span>
                       <span className="min-w-0 flex-1">
-                        <span className="block text-[0.75rem] font-semibold text-primary">
+                        <span className="block text-xs font-semibold text-primary">
                           {isArabic ? category.nameArabic : category.name}
                         </span>
                         {isArabic ? (
                           <span
-                            className="zikr-text mt-1 line-clamp-3 block text-start text-[0.9375rem] font-semibold leading-7 text-foreground"
+                            className="zikr-text mt-1 line-clamp-3 block text-start text-subtitle font-semibold leading-7 text-foreground"
                             dir="rtl"
                             lang="ar"
                           >
@@ -379,14 +379,14 @@ export function AzkarLibraryScreen({
                         ) : (
                           <>
                             <span
-                              className="mt-1 line-clamp-2 block text-start text-[0.9375rem] font-semibold leading-6 text-foreground"
+                              className="mt-1 line-clamp-2 block text-start text-subtitle font-semibold leading-6 text-foreground"
                               dir="ltr"
                               lang="en"
                             >
                               {zikr.translation}
                             </span>
                             <span
-                              className="mt-1 line-clamp-2 block text-start text-[0.8125rem] leading-5 text-muted-foreground"
+                              className="mt-1 line-clamp-2 block text-start text-label leading-5 text-muted-foreground"
                               dir="ltr"
                               lang="en"
                             >

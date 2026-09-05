@@ -114,7 +114,7 @@ export function ProgressScreen({
             aria-label={t(language, "garden.viewMode")}
             className="mb-4 flex rounded-full border border-border bg-muted p-1"
             itemClassName={(selected) =>
-              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-[0.875rem] font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
+              `flex flex-1 min-h-[44px] items-center justify-center rounded-full py-2 text-sm font-extrabold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2 ${
                 selected
                   ? "bg-primary text-primary-foreground shadow-md"
                   : "text-muted-foreground hover:text-foreground"
@@ -151,7 +151,7 @@ export function ProgressScreen({
 
             <span
               data-testid="garden-view-date"
-              className="px-2 text-center text-[0.9375rem] font-black tracking-wide text-foreground"
+              className="px-2 text-center text-subtitle font-black tracking-wide text-foreground"
               dir="auto"
               aria-live="polite"
               aria-atomic="true"
@@ -202,7 +202,7 @@ export function ProgressScreen({
             className="mt-4 w-full overflow-hidden rounded-3xl border border-border bg-card text-foreground shadow-raised"
           >
             <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-4 text-start sm:px-6">
-              <h2 className="text-[1.125rem] font-black leading-tight text-foreground" dir="auto">
+              <h2 className="text-lg font-black leading-tight text-foreground" dir="auto">
                 {t(language, "progress.postPrayerAzkar")}
               </h2>
             </div>

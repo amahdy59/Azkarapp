@@ -35,17 +35,6 @@
   }
 }
 
-.azkar-hero__content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  min-height: inherit;
-  max-width: 44rem;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(1.25rem, 3vw, 2.5rem);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .azkar-hero__media img {
     transition: none;

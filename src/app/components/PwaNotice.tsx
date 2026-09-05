@@ -32,12 +32,12 @@ export function PwaNotice({
       aria-busy={isActionLoading || undefined}
       aria-labelledby={titleId}
     >
-      <p id={titleId} className="text-[0.9375rem] font-bold text-foreground">
+      <p id={titleId} className="text-subtitle font-bold text-foreground">
         {title}
       </p>
-      {body && <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>}
+      {body && <p className="mt-1 text-label leading-5 text-muted-foreground">{body}</p>}
       {items && (
-        <ul className="mt-2 list-disc space-y-1 ps-5 text-[0.8125rem] leading-5 text-muted-foreground">
+        <ul className="mt-2 list-disc space-y-1 ps-5 text-label leading-5 text-muted-foreground">
           {items.map((item, index) => (
             // The list is static and never reorders, so the position is the
             // stable identity here; two identical notes would collide on text.
@@ -46,12 +46,12 @@ export function PwaNotice({
         </ul>
       )}
       {statusMessage && !errorMessage && (
-        <p className="mt-2 text-[0.8125rem] font-semibold text-primary" role="status" aria-live="polite">
+        <p className="mt-2 text-label font-semibold text-primary" role="status" aria-live="polite">
           {statusMessage}
         </p>
       )}
       {errorMessage && (
-        <p className="mt-2 text-[0.8125rem] font-semibold text-destructive" role="alert">
+        <p className="mt-2 text-label font-semibold text-destructive" role="alert">
           {errorMessage}
         </p>
       )}
@@ -62,7 +62,7 @@ export function PwaNotice({
           size="sm"
           onClick={onDismiss}
           disabled={isActionLoading}
-          className="text-[0.8125rem]"
+          className="text-label"
         >
           {dismissLabel}
         </Button>
@@ -71,7 +71,7 @@ export function PwaNotice({
             type="button"
             onClick={onAction}
             disabled={isActionLoading}
-            className="text-[0.8125rem] disabled:cursor-not-allowed"
+            className="text-label disabled:cursor-not-allowed"
           >
             {isActionLoading && (
               <div

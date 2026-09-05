@@ -35,11 +35,11 @@ export function LanguageScreen({
             </svg>
           </div>
         </div>
-        <p className="text-[0.9375rem] font-semibold text-foreground font-sans">Azkar</p>
-        <h1 className="text-[1.125rem] font-semibold text-foreground font-sans leading-[24px] text-center">
+        <p className="text-subtitle font-semibold text-foreground font-sans">Azkar</p>
+        <h1 className="text-lg font-semibold text-foreground font-sans leading-[24px] text-center">
           {t(language, "onboarding.chooseLanguage")}
         </h1>
-        <p className="text-[0.75rem] text-muted-foreground font-sans leading-[16px]">
+        <p className="text-xs text-muted-foreground font-sans leading-[16px]">
           {t(language, "onboarding.changeLater")}
         </p>
       </div>
@@ -71,13 +71,10 @@ export function LanguageScreen({
                   </div>
                 )}
 
-                <span
-                  className="text-[0.75rem] font-bold text-muted-foreground uppercase tracking-wider"
-                  aria-hidden="true"
-                >
+                <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider" aria-hidden="true">
                   {lang.code}
                 </span>
-                <span className="text-[1.0625rem] font-semibold text-foreground">{lang.native}</span>
+                <span className="text-title font-semibold text-foreground">{lang.native}</span>
               </div>
             </RadioGroupPrimitive.Item>
           );
@@ -88,7 +85,7 @@ export function LanguageScreen({
         <button
           data-testid="confirm-language"
           onClick={() => onContinue(selected)}
-          className="w-full flex items-center justify-center rounded-2xl transition-[color,background-color,border-color,box-shadow,transform] active:scale-95 h-[56px] bg-primary text-[1.0625rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="w-full flex items-center justify-center rounded-2xl transition-[color,background-color,border-color,box-shadow,transform] active:scale-95 h-[56px] bg-primary text-title font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {t(language, "common.continue")}
         </button>

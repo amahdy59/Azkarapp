@@ -49,12 +49,10 @@ function WordMeaningContent({
             <BookOpen size={20} aria-hidden="true" />
           </div>
           <div>
-            <h2 className="text-[1.125rem] font-extrabold text-foreground leading-snug">
+            <h2 className="text-lg font-extrabold text-foreground leading-snug">
               {t(language, "reader.wordMeaningTitle")}
             </h2>
-            <p className="text-[0.75rem] font-medium text-muted-foreground">
-              {t(language, "reader.wordMeaningsTitle")}
-            </p>
+            <p className="text-xs font-medium text-muted-foreground">{t(language, "reader.wordMeaningsTitle")}</p>
           </div>
         </div>
         <button
@@ -88,27 +86,27 @@ function WordMeaningContent({
             >
               <div className="flex items-baseline justify-between gap-3 border-b border-border/50 bg-primary/10 px-4 py-3">
                 <p
-                  className="zikr-text min-w-0 text-[1.25rem] font-extrabold leading-relaxed text-primary"
+                  className="zikr-text min-w-0 text-xl font-extrabold leading-relaxed text-primary"
                   lang="ar"
                   dir="rtl"
                 >
                   {meaning.word}
                 </p>
                 {/* Isolated so the ayah number cannot reorder against the word. */}
-                <bdi className="shrink-0 text-[0.75rem] font-bold text-muted-foreground">
+                <bdi className="shrink-0 text-xs font-bold text-muted-foreground">
                   {t(language, "reader.ayahLabel", {
                     ayah: formatNumerals(meaning.ayahNumber, language),
                   })}
                 </bdi>
               </div>
-              <p className="px-4 py-3 text-[1rem] font-medium leading-7 text-foreground" lang="ar" dir="rtl">
+              <p className="px-4 py-3 text-base font-medium leading-7 text-foreground" lang="ar" dir="rtl">
                 {meaning.explanationArabic}
               </p>
             </div>
           ))}
 
           {/* Reviewed Source Note */}
-          <div className="flex items-start gap-2.5 px-1 py-1 text-[0.75rem] leading-5 text-muted-foreground">
+          <div className="flex items-start gap-2.5 px-1 py-1 text-xs leading-5 text-muted-foreground">
             <Info size={15} className="mt-0.5 shrink-0 text-muted-foreground/80" aria-hidden="true" />
             <span id="quran-word-meaning-description">{t(language, "reader.wordMeaningArabicNote")}</span>
           </div>
@@ -121,10 +119,10 @@ function WordMeaningContent({
             className="group flex min-h-12 items-center justify-between gap-3 rounded-2xl border border-border/60 bg-card p-3.5 shadow-xs transition-[color,background-color,border-color,box-shadow] hover:border-primary/50 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="min-w-0 flex-1 text-start">
-              <span className="block text-[0.6875rem] font-bold uppercase tracking-wider text-muted-foreground/80">
+              <span className="block text-micro font-bold uppercase tracking-wider text-muted-foreground/80">
                 {t(language, "reader.sourceLabel")}
               </span>
-              <span className="mt-0.5 block truncate text-[0.8125rem] font-semibold text-foreground leading-snug">
+              <span className="mt-0.5 block truncate text-label font-semibold text-foreground leading-snug">
                 {sourceName}
               </span>
             </div>
@@ -149,7 +147,7 @@ function WordMeaningContent({
             testId="word-meaning-previous"
             back
           />
-          <bdi data-testid="word-meaning-position" className="text-[0.75rem] font-bold text-muted-foreground">
+          <bdi data-testid="word-meaning-position" className="text-xs font-bold text-muted-foreground">
             {formatNumerals(position.index, language)} / {formatNumerals(position.total, language)}
           </bdi>
           <StepButton
@@ -189,7 +187,7 @@ function StepButton({
       disabled={disabled}
       data-testid={testId}
       aria-label={label}
-      className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-[0.8125rem] font-bold text-foreground transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+      className="flex min-h-11 items-center gap-2 rounded-full border border-border bg-card px-4 text-label font-bold text-foreground transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
     >
       <Icon size={16} aria-hidden="true" />
       <span className="hidden sm:inline">{label}</span>

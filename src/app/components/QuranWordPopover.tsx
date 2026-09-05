@@ -158,7 +158,7 @@ export function QuranWordPopover({
         <div className="flex min-w-0 flex-col justify-center gap-1" lang="ar" dir="rtl">
           <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
             <span className="font-mushaf text-xl font-bold leading-tight text-primary">{primary.word}</span>
-            <span className="font-ui-arabic text-[0.625rem] font-bold text-primary/80">
+            <span className="font-ui-arabic text-micro font-bold text-primary/80">
               {t(language, "reader.wordMeaningLabel")}
             </span>
           </div>
@@ -169,11 +169,11 @@ export function QuranWordPopover({
 
         <div className="flex min-w-0 items-center justify-between gap-2 border-t border-border/40 pt-2 sm:w-40 sm:flex-col sm:items-stretch sm:justify-center sm:border-s sm:border-t-0 sm:ps-4 sm:pt-0">
           <div className="flex min-w-0 flex-col items-start gap-1">
-            <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-[0.625rem] font-bold text-muted-foreground">
+            <bdi className="inline-flex items-center rounded-md bg-muted/60 px-1.5 py-0.5 text-micro font-bold text-muted-foreground">
               {t(language, "reader.ayahLabel", { ayah: formatNumerals(primary.ayahNumber, language) })}
             </bdi>
             {showSource && (
-              <span className="max-w-full text-[0.625rem] font-semibold leading-snug text-muted-foreground">
+              <span className="max-w-full text-micro font-semibold leading-snug text-muted-foreground">
                 {language === "ar" ? QURAN_WORD_MEANING_SOURCE.nameArabic : QURAN_WORD_MEANING_SOURCE.nameEnglish}
               </span>
             )}
@@ -183,7 +183,7 @@ export function QuranWordPopover({
               type="button"
               onClick={onShowAll}
               data-testid="quran-word-popover-all"
-              className="-my-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 text-[0.6875rem] font-bold text-primary transition-[background-color,transform] hover:bg-primary/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:my-0 sm:self-start"
+              className="-my-2 inline-flex min-h-11 shrink-0 items-center justify-center gap-1 rounded-full px-2 text-micro font-bold text-primary transition-[background-color,transform] hover:bg-primary/10 active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:my-0 sm:self-start"
             >
               {extra > 0
                 ? t(language, "reader.wordMeaningMore", { count: formatNumerals(extra, language) })

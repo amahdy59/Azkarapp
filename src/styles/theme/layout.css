@@ -189,27 +189,10 @@
   outline: var(--ds-focus-width) solid var(--ring);
   outline-offset: 2px;
 }
-.nav-sidebar-divider {
-  height: 1px;
-  background: var(--border-subtle);
-  margin-block: 0.5rem;
-  margin-inline: 0.75rem;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .app-rail,
   .app-sidebar {
     transition: none !important;
-  }
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .card-interactive:hover {
-    box-shadow: 0 4px 20px color-mix(in srgb, var(--primary) 10%, transparent);
-    border-color: color-mix(in srgb, var(--primary) 30%, var(--border));
-    transition:
-      box-shadow 180ms ease,
-      border-color 180ms ease;
   }
 }
 
@@ -219,10 +202,6 @@
   grid-template-columns: 1fr;
   gap: 1rem;
   width: 100%;
-}
-
-.home-grid-full {
-  grid-column: 1 / -1;
 }
 
 @media (min-width: 48rem) {

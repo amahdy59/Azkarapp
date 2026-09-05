@@ -53,7 +53,7 @@ export function CategoryBadge({ catId, language }: { catId: CategoryId; language
 
   return (
     <div className={`flex items-center justify-center rounded-full px-2 py-1 shrink-0 ${className}`}>
-      <p className="text-[0.75rem] font-medium font-sans leading-[16px] whitespace-nowrap">{label}</p>
+      <p className="text-xs font-medium font-sans leading-[16px] whitespace-nowrap">{label}</p>
     </div>
   );
 }
@@ -155,7 +155,7 @@ export function SearchScreen({
               autoComplete="off"
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSubmit(q)}
-              className="min-w-0 flex-1 bg-transparent text-start font-sans text-[0.875rem] leading-[22px] text-foreground focus:outline-none"
+              className="min-w-0 flex-1 bg-transparent text-start font-sans text-sm leading-[22px] text-foreground focus:outline-none"
             />
             {q && (
               <button
@@ -180,7 +180,7 @@ export function SearchScreen({
         {/* Recent searches — shown when input is empty and there is history */}
         {!q && recents.length > 0 && (
           <div className="mb-6">
-            <p className="mb-3 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]">
+            <p className="mb-3 text-label text-muted-foreground font-semibold font-sans leading-[18px]">
               {t(language, "search.recentTitle")}
             </p>
             <div className="flex flex-wrap gap-2">
@@ -189,7 +189,7 @@ export function SearchScreen({
                   <button
                     type="button"
                     onClick={() => setQ(term)}
-                    className="min-h-11 px-4 text-[0.8125rem] font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95"
+                    className="min-h-11 px-4 text-label font-medium font-sans leading-[20px] text-start transition-[color,background-color,border-color,transform] active:scale-95"
                   >
                     {term}
                   </button>
@@ -214,7 +214,7 @@ export function SearchScreen({
               role="status"
               aria-live="polite"
               aria-atomic="true"
-              className="mb-1 text-[0.8125rem] text-muted-foreground font-semibold font-sans leading-[18px]"
+              className="mb-1 text-label text-muted-foreground font-semibold font-sans leading-[18px]"
             >
               {results.length > 0 ? resultCountLabel : t(language, "search.emptyTitle")}
             </p>
@@ -252,7 +252,7 @@ export function SearchScreen({
                   >
                     <div className="flex min-w-0 flex-1 flex-col items-start gap-1">
                       <p
-                        className="w-full truncate text-start font-sans text-[1.0625rem] font-semibold leading-[24px] text-foreground"
+                        className="w-full truncate text-start font-sans text-title font-semibold leading-[24px] text-foreground"
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
@@ -261,7 +261,7 @@ export function SearchScreen({
                       <p
                         // Two lines rather than one: Arabic previews lose their
                         // sense far earlier than Latin text when clipped mid-phrase.
-                        className="line-clamp-2 w-full text-start font-sans text-[0.875rem] leading-[22px] text-muted-foreground"
+                        className="line-clamp-2 w-full text-start font-sans text-sm leading-[22px] text-muted-foreground"
                         dir={isArabic ? "rtl" : "ltr"}
                         lang={isArabic ? "ar" : "en"}
                       >
@@ -282,7 +282,7 @@ export function SearchScreen({
         {!q && (
           <div className="py-6 flex flex-col items-center gap-3">
             <div className="w-full h-px opacity-15 bg-muted-foreground" />
-            <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px] text-center">
+            <p className="text-xs text-muted-foreground font-sans leading-[18px] text-center">
               {t(language, "search.hint")}
             </p>
           </div>

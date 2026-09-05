@@ -87,11 +87,11 @@ export function StatePanel({
       <h2
         ref={headingRef}
         tabIndex={focusOnMount ? -1 : undefined}
-        className="mt-3 text-[1.0625rem] font-semibold text-foreground"
+        className="mt-3 text-title font-semibold text-foreground"
       >
         {title ?? t(language, copy.title)}
       </h2>
-      <p className="mt-1 max-w-sm text-[0.875rem] leading-[22px] text-muted-foreground">
+      <p className="mt-1 max-w-sm text-sm leading-[22px] text-muted-foreground">
         {description ?? t(language, copy.description)}
       </p>
       {(actionLabel || secondaryActionLabel) && (

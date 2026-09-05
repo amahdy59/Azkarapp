@@ -83,8 +83,8 @@ export function ConfirmDialog({
         className="rounded-2xl border border-border bg-background p-6 shadow-overlay"
       >
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-[1.0625rem] font-bold text-foreground">{title}</AlertDialogTitle>
-          <AlertDialogDescription className="mt-2 text-[0.875rem] leading-relaxed text-muted-foreground">
+          <AlertDialogTitle className="text-title font-bold text-foreground">{title}</AlertDialogTitle>
+          <AlertDialogDescription className="mt-2 text-sm leading-relaxed text-muted-foreground">
             {description}
           </AlertDialogDescription>
         </AlertDialogHeader>
@@ -101,7 +101,7 @@ export function ConfirmDialog({
           <AlertDialogCancel
             onClick={onCancel}
             disabled={isConfirming}
-            className="h-11 rounded-xl border border-border-control bg-background px-5 text-[0.9375rem] font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="h-11 rounded-xl border border-border-control bg-background px-5 text-subtitle font-semibold text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             {cancelLabel}
           </AlertDialogCancel>
@@ -110,7 +110,7 @@ export function ConfirmDialog({
               type="button"
               onClick={onSecondary}
               disabled={isConfirming}
-              className="h-11 rounded-xl border border-border-control bg-muted px-5 text-[0.9375rem] font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="h-11 rounded-xl border border-border-control bg-muted px-5 text-subtitle font-semibold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               {secondaryLabel}
             </button>
@@ -122,7 +122,7 @@ export function ConfirmDialog({
             }}
             disabled={isConfirming}
             aria-busy={isConfirming || undefined}
-            className={`h-11 rounded-xl px-5 text-[0.9375rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            className={`h-11 rounded-xl px-5 text-subtitle font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               destructive
                 ? "bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive"
                 : "bg-primary text-primary-foreground hover:bg-primary/90"

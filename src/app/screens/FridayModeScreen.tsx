@@ -91,11 +91,11 @@ function PracticeRow({
       </span>
       <span
         aria-hidden="true"
-        className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-[0.6875rem] font-black tabular-nums text-muted-foreground"
+        className="flex size-5 shrink-0 items-center justify-center rounded-md bg-muted text-micro font-black tabular-nums text-muted-foreground"
       >
         {formatNumerals(index, language)}
       </span>
-      <span className="min-w-0 flex-1 text-[0.875rem] font-extrabold text-foreground">{label}</span>
+      <span className="min-w-0 flex-1 text-sm font-extrabold text-foreground">{label}</span>
       <span className="text-primary" aria-hidden="true">
         {icon}
       </span>
@@ -216,13 +216,13 @@ export function FridayModeScreen({
         <section className="shrink-0 overflow-hidden rounded-3xl border border-primary/30 bg-gradient-to-br from-primary/15 to-card p-5 shadow-raised lg:col-span-2">
           <div className="flex items-start justify-between gap-4">
             <div className="text-start">
-              <h2 className="mt-1 text-[1.5rem] font-black text-foreground">{t(language, "friday.blessedFriday")}</h2>
+              <h2 className="mt-1 text-2xl font-black text-foreground">{t(language, "friday.blessedFriday")}</h2>
             </div>
             <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-primary text-primary-foreground shadow-sm">
               <Sparkles size={25} />
             </div>
           </div>
-          <div className="mt-5 flex items-center justify-between text-[0.75rem] font-extrabold text-muted-foreground">
+          <div className="mt-5 flex items-center justify-between text-xs font-extrabold text-muted-foreground">
             <span>{t(language, "friday.weeklyProgress")}</span>
             <span>
               {formatNumerals(completedCount, language)} / {formatNumerals(totalPractices, language)}
@@ -235,13 +235,11 @@ export function FridayModeScreen({
             />
           </div>
           {completedCount >= totalPractices ? (
-            <p role="status" className="mt-3 text-[0.75rem] font-semibold text-success">
+            <p role="status" className="mt-3 text-xs font-semibold text-success">
               {t(language, "friday.progressComplete")}
             </p>
           ) : completedCount > 0 ? (
-            <p className="mt-3 text-[0.75rem] font-semibold text-muted-foreground">
-              {t(language, "friday.progressContinue")}
-            </p>
+            <p className="mt-3 text-xs font-semibold text-muted-foreground">{t(language, "friday.progressContinue")}</p>
           ) : null}
           {/* The two evidence tiles are worth reading once and then getting out
               of the way — they are the same text every week, above the actions
@@ -259,7 +257,7 @@ export function FridayModeScreen({
               data-testid="friday-virtues-toggle"
               className="flex min-h-11 w-full items-center justify-between gap-3 rounded-2xl px-1 text-start transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
-              <span className="text-[0.8125rem] font-black text-foreground">{t(language, "home.fridayVirtues")}</span>
+              <span className="text-label font-black text-foreground">{t(language, "home.fridayVirtues")}</span>
               <ChevronDown
                 size={18}
                 aria-hidden="true"
@@ -271,7 +269,7 @@ export function FridayModeScreen({
             {virtuesOpen && (
               <div id="friday-virtues" className="mt-2 grid gap-3 sm:grid-cols-2">
                 <div className="rounded-2xl bg-background/55 p-3 text-start">
-                  <h3 className="text-[0.8125rem] font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
+                  <h3 className="text-label font-black text-foreground">{t(language, "friday.kahfHeading")}</h3>
                   <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
                     {t(language, "friday.kahfHadith")}
                   </p>
@@ -289,7 +287,7 @@ export function FridayModeScreen({
 
         {sections.map((section) => (
           <section key={section.title} aria-labelledby={`friday-${section.items[0]?.id}`} className="shrink-0">
-            <h2 id={`friday-${section.items[0]?.id}`} className="mb-2 px-1 text-[0.9375rem] font-black text-foreground">
+            <h2 id={`friday-${section.items[0]?.id}`} className="mb-2 px-1 text-subtitle font-black text-foreground">
               {section.title}
             </h2>
             <div className="overflow-hidden rounded-3xl border border-border/40 bg-card shadow-raised">
@@ -317,17 +315,17 @@ export function FridayModeScreen({
               <BookOpen size={29} />
             </div>
             <div className="min-w-0 flex-1 text-start">
-              <h2 id="kahf-heading" className="text-[1.125rem] font-black text-foreground">
+              <h2 id="kahf-heading" className="text-lg font-black text-foreground">
                 {t(language, "friday.kahfHeading")}
               </h2>
-              <p className="mt-1 text-[0.8125rem] font-semibold text-muted-foreground">{t(language, kahfStatusKey)}</p>
+              <p className="mt-1 text-label font-semibold text-muted-foreground">{t(language, kahfStatusKey)}</p>
             </div>
             {kahfComplete && <CheckCircle2 size={22} className="shrink-0 text-success" aria-hidden="true" />}
           </div>
           <button
             type="button"
             onClick={onStartKahf}
-            className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-[0.9375rem] font-black text-white shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:bg-primary dark:text-primary-foreground"
+            className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 text-subtitle font-black text-white shadow-sm transition-transform focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:bg-primary dark:text-primary-foreground"
           >
             <BookOpen size={19} />
             {t(language, kahfStarted && !kahfComplete ? "friday.kahfContinue" : "friday.kahfStart")}
@@ -344,10 +342,10 @@ export function FridayModeScreen({
             <MoonStar size={24} className="fill-current/15" aria-hidden="true" />
           </span>
           <span className="min-w-0 flex-1">
-            <span id="salawat-heading" className="block text-[1rem] font-black text-foreground">
+            <span id="salawat-heading" className="block text-base font-black text-foreground">
               {t(language, "friday.salawatHeading")}
             </span>
-            <span className="mt-1 block text-[0.8125rem] font-semibold text-muted-foreground">
+            <span className="mt-1 block text-label font-semibold text-muted-foreground">
               {formatRatio(salawatProgress.count, salawatProgress.target, language)}
             </span>
           </span>
@@ -371,8 +369,8 @@ export function FridayModeScreen({
             <Clock size={23} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-[0.875rem] font-black text-foreground">{t(language, "friday.responseHourHeading")}</p>
-            <p className="mt-1 text-[0.75rem] font-black text-primary">
+            <p className="text-sm font-black text-foreground">{t(language, "friday.responseHourHeading")}</p>
+            <p className="mt-1 text-xs font-black text-primary">
               {t(language, "friday.duasHeading")} · {formatRatio(duasCompletedCount, duasTotalCount, language)}
             </p>
           </div>
@@ -386,14 +384,14 @@ export function FridayModeScreen({
         </button>
         {duasLoadError && (
           <div className="rounded-2xl bg-destructive/10 p-4 text-start lg:col-span-2" role="alert">
-            <p className="text-[0.8125rem] font-semibold text-destructive">
+            <p className="text-label font-semibold text-destructive">
               {t(language, "common.contentLoadErrorDescription")}
             </p>
             {onRetryDuas && (
               <button
                 type="button"
                 onClick={onRetryDuas}
-                className="mt-2 min-h-11 rounded-xl border border-destructive/40 px-4 text-[0.8125rem] font-bold text-destructive"
+                className="mt-2 min-h-11 rounded-xl border border-destructive/40 px-4 text-label font-bold text-destructive"
               >
                 {t(language, "common.tryAgain")}
               </button>

@@ -50,22 +50,22 @@ function WirdEvidenceCard({ item, language }: { item: WirdEvidence; language: Ap
   return (
     <article className="flex flex-col rounded-3xl border border-border bg-card p-5 text-start shadow-raised sm:p-6">
       {item.kind !== "quran" && (
-        <h2 className="text-[1rem] font-black leading-7 text-foreground" dir="auto">
+        <h2 className="text-base font-black leading-7 text-foreground" dir="auto">
           {title}
         </h2>
       )}
       <p
         className={`font-semibold text-foreground ${
-          item.kind === "quran" ? "zikr-text text-[1.125rem] leading-[2.05]" : "mt-3 text-[0.9375rem] leading-7"
+          item.kind === "quran" ? "zikr-text text-lg leading-[2.05]" : "mt-3 text-subtitle leading-7"
         }`}
         dir={item.kind === "quran" ? "rtl" : "auto"}
         lang={item.kind === "quran" ? "ar" : undefined}
       >
         {text}
       </p>
-      {meaning && <p className="mt-3 text-[0.875rem] font-semibold leading-7 text-muted-foreground">{meaning}</p>}
+      {meaning && <p className="mt-3 text-sm font-semibold leading-7 text-muted-foreground">{meaning}</p>}
       {attribution && (
-        <p className="mt-3 text-[0.8125rem] font-black text-primary" dir="auto">
+        <p className="mt-3 text-label font-black text-primary" dir="auto">
           {attribution}
         </p>
       )}
@@ -74,7 +74,7 @@ function WirdEvidenceCard({ item, language }: { item: WirdEvidence; language: Ap
           href={item.sourceUrl}
           target="_blank"
           rel="noreferrer"
-          className="min-w-0 rounded text-[0.75rem] font-bold leading-5 text-muted-foreground underline decoration-primary/45 underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="min-w-0 rounded text-xs font-bold leading-5 text-muted-foreground underline decoration-primary/45 underline-offset-4 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           dir="auto"
         >
           {source}
@@ -140,7 +140,7 @@ export function WirdBenefitsScreen({
           aria-label={t(language, "wirdBenefits.sectionsLabel")}
           className="grid grid-cols-3 gap-2 rounded-3xl border border-border bg-card p-2"
           itemClassName={(selected) =>
-            `min-h-11 rounded-2xl px-2 py-2 text-[0.8125rem] font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+            `min-h-11 rounded-2xl px-2 py-2 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
               selected ? "bg-primary text-primary-foreground shadow-sm" : "text-muted-foreground hover:bg-muted"
             }`
           }
@@ -165,7 +165,7 @@ export function WirdBenefitsScreen({
             ))}
           </div>
 
-          <p className="mt-4 text-center text-[0.75rem] font-semibold text-muted-foreground" aria-live="polite">
+          <p className="mt-4 text-center text-xs font-semibold text-muted-foreground" aria-live="polite">
             {t(language, "benefits.showing", {
               visible: formatNumerals(Math.min(visibleCount, total), language),
               total: formatNumerals(total, language),
@@ -176,7 +176,7 @@ export function WirdBenefitsScreen({
             <button
               type="button"
               onClick={() => setVisibleCount((current) => Math.min(current + WIRD_BATCH_SIZE, total))}
-              className="mx-auto mt-3 flex min-h-11 items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-5 text-[0.875rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="mx-auto mt-3 flex min-h-11 items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-5 text-sm font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
               data-testid="wird-benefits-load-more"
             >
               {t(language, "benefits.loadMore", {

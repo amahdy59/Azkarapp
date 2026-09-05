@@ -86,7 +86,7 @@ export function Header({
         >
           {title}
         </h1>
-        {subtitle && <p className="text-[0.75rem] text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
+        {subtitle && <p className="text-xs text-muted-foreground font-sans leading-[18px]">{subtitle}</p>}
       </div>
       {right}
     </div>
@@ -124,7 +124,7 @@ export function BottomNav({ active, onChange, isArabic = false }: NavProps) {
                 <Icon size={24} style={{ color: on ? "var(--primary)" : "var(--card-foreground)" }} />
               </span>
               <span
-                className={`whitespace-nowrap font-sans text-[0.625rem] leading-6 min-[360px]:text-[0.6875rem] ${
+                className={`whitespace-nowrap font-sans text-micro leading-6 min-[360px]:text-micro ${
                   on ? "font-extrabold text-primary" : "font-semibold text-muted-foreground"
                 }`}
                 dir="auto"
@@ -229,10 +229,8 @@ export function NavSidebar({
         <div className="nav-sidebar-brand flex items-center gap-3 px-3 py-4 mb-2 border-b border-border/40">
           <PalmTreeMark size={32} className="text-primary shrink-0" />
           <div className="flex flex-col leading-tight">
-            <span className="text-[1.125rem] font-extrabold text-foreground font-sans">
-              {t(language, "common.appName")}
-            </span>
-            <span className="text-[0.75rem] font-semibold text-muted-foreground font-sans">
+            <span className="text-lg font-extrabold text-foreground font-sans">{t(language, "common.appName")}</span>
+            <span className="text-xs font-semibold text-muted-foreground font-sans">
               {t(language, "common.appTagline")}
             </span>
           </div>
@@ -272,7 +270,7 @@ export function NavSidebar({
             // announced in two different formats. The explicit focus ring
             // matches the theme button too, which had one while this did not.
             aria-label={`${t(language, "settings.language")}: ${LANGUAGE_LABELS[language]}`}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="flex items-center gap-2.5">
               <Globe size={18} className="text-primary" />
@@ -283,7 +281,7 @@ export function NavSidebar({
                 It previously labelled itself with the *target* language
                 ("English") beside a badge showing the current one ("AR"), which
                 is two opposite mental models in one control. */}
-            <span className="text-[0.6875rem] font-bold text-muted-foreground">{LANGUAGE_LABELS[language]}</span>
+            <span className="text-micro font-bold text-muted-foreground">{LANGUAGE_LABELS[language]}</span>
           </button>
         )}
 
@@ -292,15 +290,13 @@ export function NavSidebar({
             type="button"
             onClick={cycleTheme}
             aria-label={`${t(language, "common.theme")}: ${t(language, themeLabelKeys[themeMode])}`}
-            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-[0.875rem] font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="flex items-center justify-between min-h-11 px-3 rounded-xl border border-border/60 bg-card hover:bg-muted text-sm font-medium text-foreground transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           >
             <div className="flex items-center gap-2.5">
               <ThemeIcon size={18} className="text-primary" />
               <span>{t(language, "common.theme")}</span>
             </div>
-            <span className="text-[0.6875rem] font-bold text-muted-foreground">
-              {t(language, themeLabelKeys[themeMode])}
-            </span>
+            <span className="text-micro font-bold text-muted-foreground">{t(language, themeLabelKeys[themeMode])}</span>
           </button>
         )}
       </div>

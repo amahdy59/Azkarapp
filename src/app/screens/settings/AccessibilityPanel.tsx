@@ -28,7 +28,7 @@ function PanelRadioOption({ value, active, label }: { value: string; active: boo
   return (
     <RadioGroupPrimitive.Item
       value={value}
-      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-[0.8125rem] font-semibold transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+      className={`min-h-11 flex-1 rounded-2xl border px-3 py-3 text-label font-semibold transition-[color,background-color,border-color,box-shadow,transform] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
         active ? "border-primary bg-primary text-primary-foreground" : "border-border/40 bg-card text-foreground"
       }`}
     >
@@ -116,7 +116,7 @@ export function AccessibilityPanel({
             and now lives beside Language in Settings → Preferences. */}
 
         <section className="mx-4 mb-6 mt-2" aria-labelledby="text-size-title">
-          <h3 id="text-size-title" className="mb-3 text-[0.875rem] font-semibold text-foreground">
+          <h3 id="text-size-title" className="mb-3 text-sm font-semibold text-foreground">
             {t(language, "settings.textSize")}
           </h3>
           <RadioGroupPrimitive.Root
@@ -128,9 +128,9 @@ export function AccessibilityPanel({
           >
             {(
               [
-                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-[0.9375rem]" },
-                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-[1.125rem]" },
-                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-[1.375rem]" },
+                { value: "small", label: t(language, "settings.textSmall"), sampleSize: "text-subtitle" },
+                { value: "medium", label: t(language, "settings.medium"), sampleSize: "text-lg" },
+                { value: "large", label: t(language, "settings.textLarge"), sampleSize: "text-headline" },
               ] as const
             ).map((option) => {
               const selected = textSize === option.value;
@@ -148,7 +148,7 @@ export function AccessibilityPanel({
                   <span className={`font-bold leading-none ${option.sampleSize}`} aria-hidden="true">
                     Aa
                   </span>
-                  <span className="text-[0.75rem] font-semibold leading-4">{option.label}</span>
+                  <span className="text-xs font-semibold leading-4">{option.label}</span>
                   {selected && (
                     <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                       <Check size={14} strokeWidth={2.5} />
@@ -161,12 +161,10 @@ export function AccessibilityPanel({
         </section>
 
         <section className="mx-4 mb-6" aria-labelledby="zikr-font-title">
-          <h3 id="zikr-font-title" className="mb-1 text-[0.875rem] font-semibold text-foreground">
+          <h3 id="zikr-font-title" className="mb-1 text-sm font-semibold text-foreground">
             {t(language, "settings.zikrFont")}
           </h3>
-          <p className="mb-3 text-[0.75rem] leading-snug text-muted-foreground">
-            {t(language, "settings.zikrFontHint")}
-          </p>
+          <p className="mb-3 text-xs leading-snug text-muted-foreground">{t(language, "settings.zikrFontHint")}</p>
           <RadioGroupPrimitive.Root
             dir={direction}
             value={zikrFont}
@@ -200,12 +198,12 @@ export function AccessibilityPanel({
                     aria-hidden="true"
                     dir="rtl"
                     lang="ar"
-                    className="text-[1.375rem] leading-tight text-foreground"
+                    className="text-headline leading-tight text-foreground"
                     style={{ fontFamily: ZIKR_FONT_STACKS[option.value] }}
                   >
                     {ZIKR_FONT_SAMPLE}
                   </span>
-                  <span className="text-[0.75rem] font-semibold leading-4">{option.label}</span>
+                  <span className="text-xs font-semibold leading-4">{option.label}</span>
                   {selected && (
                     <span className="absolute end-1.5 top-1.5 text-primary" aria-hidden="true">
                       <Check size={14} strokeWidth={2.5} />
@@ -241,7 +239,7 @@ export function AccessibilityPanel({
               >
                 <Eye size={20} className="text-primary" />
               </span>
-              <h3 id="color-blind-title" className="text-[1rem] font-semibold text-foreground">
+              <h3 id="color-blind-title" className="text-base font-semibold text-foreground">
                 {t(language, "settings.colorBlindSupport")}
               </h3>
             </div>
@@ -313,7 +311,7 @@ export function AccessibilityPanel({
             so presenting it with the same anatomy as the working toggles above
             gave it a control's affordance without a control's behaviour. It is
             reassurance, so it reads as help text. */}
-        <p className="mx-4 mt-2 flex items-start gap-2 px-1 text-[0.75rem] leading-5 text-muted-foreground">
+        <p className="mx-4 mt-2 flex items-start gap-2 px-1 text-xs leading-5 text-muted-foreground">
           <Info size={16} className="mt-0.5 shrink-0 text-muted-foreground" aria-hidden="true" />
           <span>{t(language, "settings.screenReaderNote")}</span>
         </p>

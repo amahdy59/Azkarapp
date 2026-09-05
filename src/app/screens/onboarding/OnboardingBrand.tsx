@@ -15,7 +15,7 @@ export function BrandLockup({ compact = false }: { compact?: boolean }) {
       <BrandCrescent size={compact ? 44 : 96} />
       <p
         className={`arabic-ui ${
-          compact ? "-mt-1 text-[1.25rem] font-bold leading-7" : "-mt-1 text-[2.625rem] font-bold leading-[56px]"
+          compact ? "-mt-1 text-xl font-bold leading-7" : "-mt-1 text-[2.625rem] font-bold leading-[56px]"
         }`}
         lang="ar"
         dir="rtl"
@@ -26,7 +26,7 @@ export function BrandLockup({ compact = false }: { compact?: boolean }) {
         className={
           compact
             ? "text-[0.5625rem] font-bold tracking-[0.72px] text-foreground"
-            : "text-[1.0625rem] font-bold tracking-[1.4px] text-foreground"
+            : "text-title font-bold tracking-[1.4px] text-foreground"
         }
       >
         {compact ? "AZKAR" : "Azkar"}
@@ -53,7 +53,7 @@ export function WelcomeArtwork({ arabic = false }: { arabic?: boolean }) {
         <p className="arabic-ui text-[2.375rem] font-bold leading-[44px]" lang="ar">
           أذكار
         </p>
-        <p className="text-[0.6875rem] font-bold tracking-[1.2px]">AZKAR</p>
+        <p className="text-micro font-bold tracking-[1.2px]">AZKAR</p>
       </div>
     </div>
   );
@@ -65,7 +65,7 @@ export function FeatureCheck({ children }: { children: React.ReactNode }) {
       <span className="flex size-5 shrink-0 items-center justify-center rounded-full border border-primary text-primary">
         <Check size={13} strokeWidth={2.2} />
       </span>
-      <p className="flex-1 text-start text-[0.875rem] font-medium leading-[22px] text-foreground">{children}</p>
+      <p className="flex-1 text-start text-sm font-medium leading-[22px] text-foreground">{children}</p>
     </div>
   );
 }

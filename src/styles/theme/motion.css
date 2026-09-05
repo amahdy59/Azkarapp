@@ -51,16 +51,6 @@
     transform: scaleY(1);
   }
 }
-@keyframes hint-fade-out {
-  0% {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  100% {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
 @keyframes menu-pop {
   from {
     opacity: 0;
@@ -88,10 +78,6 @@
   animation: fade-in var(--motion-duration-entrance) var(--motion-ease-enter) both;
 }
 
-.slide-up {
-  animation: slide-up var(--motion-duration-entrance) var(--motion-ease-enter) both;
-}
-
 /* Both class names are in use for the same intent; they resolve to one
    animation so the behaviour cannot diverge. */
 .favorite-pop,
@@ -115,10 +101,6 @@
    accelerate away, which is why these use different easings. Elements used to
    simply unmount, so a collapsing group vanished on one frame while the layout
    reflowed underneath — read as a stutter rather than as movement. */
-.collapse-out > * {
-  animation: slide-down-out var(--motion-duration-fast) var(--motion-ease-exit) both;
-}
-
 /* Staggered entrance for a group of siblings.
    Put .stagger-in on the container; each child enters on the same slide-up
    curve, a beat after the one before it. The delay is capped at the sixth
@@ -246,22 +228,6 @@
 
 .waveform-bar {
   animation: waveform 1s ease-in-out infinite;
-}
-
-.tap-anywhere-hint {
-  /* Reserve height so layout never reflows when hint disappears */
-  min-height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition:
-    opacity 200ms ease,
-    transform 200ms ease;
-}
-
-.tap-anywhere-hint.hint-hidden {
-  animation: hint-fade-out 180ms cubic-bezier(0.4, 0, 0.6, 1) both;
-  pointer-events: none;
 }
 
 /* The counter surface, its states, the tap ripple and its keyframes used to be

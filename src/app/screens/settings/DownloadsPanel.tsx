@@ -192,12 +192,12 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         />
 
         <Card as="section" padding="lg" aria-labelledby="audio-reciter-title">
-          <h2 id="audio-reciter-title" className="text-[0.9375rem] font-extrabold text-foreground">
+          <h2 id="audio-reciter-title" className="text-subtitle font-extrabold text-foreground">
             {t(language, "downloads.reciterTitle")}
           </h2>
-          <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">{t(language, "downloads.reciterHint")}</p>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "downloads.reciterHint")}</p>
           <label
-            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-[0.8125rem] font-semibold text-foreground"
+            className="mt-3 flex min-h-11 items-center justify-between gap-3 text-label font-semibold text-foreground"
             htmlFor="audio-reciter"
           >
             <span>{t(language, "downloads.reciterLabel")}</span>
@@ -205,7 +205,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               id="audio-reciter"
               value={audioPreferences.duaVoiceId}
               onChange={(event) => handleVoiceChange(event.target.value)}
-              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-[0.8125rem] font-bold text-foreground"
+              className="h-11 max-w-[60%] rounded-xl border border-border-control bg-background px-3 text-label font-bold text-foreground"
               dir={language === "ar" ? "rtl" : "ltr"}
             >
               {voices.map((voice) => (
@@ -230,15 +230,15 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="offline-status-title" className="text-[1.0625rem] font-semibold text-foreground">
+              <h2 id="offline-status-title" className="text-title font-semibold text-foreground">
                 {t(language, "downloads.statusTitle")}
               </h2>
               {isLoading ? (
-                <p className="mt-1 text-[0.875rem] text-muted-foreground" role="status">
+                <p className="mt-1 text-sm text-muted-foreground" role="status">
                   {t(language, "downloads.checking")}
                 </p>
               ) : status ? (
-                <dl className="mt-2 space-y-2 text-[0.875rem]">
+                <dl className="mt-2 space-y-2 text-sm">
                   <div className="flex justify-between gap-3">
                     <dt className="text-muted-foreground">{t(language, "downloads.serviceWorker")}</dt>
                     <dd className="font-medium text-foreground">
@@ -286,19 +286,17 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
           </Button>
 
           {errorMessage && (
-            <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
+            <p className="mt-3 text-sm text-destructive" role="alert">
               {errorMessage}
             </p>
           )}
         </Card>
 
         <Card as="section" padding="lg" aria-labelledby="mushaf-download-title">
-          <h2 id="mushaf-download-title" className="text-[1.0625rem] font-semibold text-foreground">
+          <h2 id="mushaf-download-title" className="text-title font-semibold text-foreground">
             {t(language, "downloads.mushafTitle")}
           </h2>
-          <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-            {t(language, "downloads.mushafBody")}
-          </p>
+          <p className="mt-1 text-sm leading-[22px] text-muted-foreground">{t(language, "downloads.mushafBody")}</p>
           <Button
             type="button"
             onClick={() => void downloadCompleteMushaf()}
@@ -316,7 +314,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                 value={mushafProgress.completed}
                 aria-label={t(language, "downloads.mushafProgressLabel")}
               />
-              <p className="mt-1 text-center text-[0.75rem] font-semibold text-muted-foreground" role="status">
+              <p className="mt-1 text-center text-xs font-semibold text-muted-foreground" role="status">
                 {t(language, "downloads.mushafProgressValue", {
                   completed: formatNumerals(mushafProgress.completed, language),
                   total: formatNumerals(mushafProgress.total, language),
@@ -347,12 +345,10 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
         </Card>
 
         <Card as="section" padding="lg" aria-labelledby="audio-downloads-title">
-          <h2 id="audio-downloads-title" className="text-[1.0625rem] font-semibold text-foreground">
+          <h2 id="audio-downloads-title" className="text-title font-semibold text-foreground">
             {t(language, "downloads.optionalAudioDownloads")}
           </h2>
-          <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
-            {t(language, "downloads.approvedOnly")}
-          </p>
+          <p className="mt-1 text-sm leading-[22px] text-muted-foreground">{t(language, "downloads.approvedOnly")}</p>
 
           <div className="mt-4 grid gap-2">
             {audioCollections.map((collection) => {
@@ -376,7 +372,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
                     <Download size={18} aria-hidden="true" />
                     {label}
                   </span>
-                  <span className="text-[0.75rem] text-muted-foreground">
+                  <span className="text-xs text-muted-foreground">
                     {collection.byteSize > 0
                       ? formatMegabytes(collection.byteSize, language)
                       : t(language, "downloads.unavailable")}
@@ -397,7 +393,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
               />
               <p
                 id="audio-download-progress-value"
-                className="mt-1 text-center text-[0.75rem] font-semibold text-muted-foreground"
+                className="mt-1 text-center text-xs font-semibold text-muted-foreground"
                 role="status"
                 aria-live="polite"
               >
@@ -430,11 +426,7 @@ export function DownloadsPanel({ language, onBack }: { language: AppLanguage; on
             {t(language, "downloads.removeDownloadedAudio")}
           </Button>
           {successMessage && (
-            <p
-              className="mt-3 text-center text-[0.8125rem] font-semibold text-primary"
-              role="status"
-              aria-live="polite"
-            >
+            <p className="mt-3 text-center text-label font-semibold text-primary" role="status" aria-live="polite">
               {successMessage}
             </p>
           )}

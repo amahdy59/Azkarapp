@@ -18,7 +18,7 @@ export const tapRippleStyle: React.CSSProperties = {
 export function RepBadge({ label, done, language }: { label: string; done: boolean; language: AppLanguage }) {
   return (
     <span
-      className={`shrink-0 rounded-full border px-2.5 py-1 text-center text-[0.75rem] font-bold leading-[14px] ${
+      className={`shrink-0 rounded-full border px-2.5 py-1 text-center text-xs font-bold leading-[14px] ${
         done
           ? "border-primary/40 bg-primary/20 text-primary"
           : "border-secondary/50 bg-secondary/25 text-secondary-foreground"
@@ -34,7 +34,7 @@ export function RepBadge({ label, done, language }: { label: string; done: boole
  *  `Zikr.authenticityLevel`, never inferred from `authenticityNote`. */
 export function HadithWeakChainBadge({ language }: { language: AppLanguage }) {
   return (
-    <span className="shrink-0 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-[0.6875rem] font-bold">
+    <span className="shrink-0 rounded-full border border-warning/40 bg-warning/10 px-2 py-0.5 text-micro font-bold">
       {t(language, "reader.hadithGradeWeak")}
     </span>
   );
@@ -228,12 +228,12 @@ export function ZikrCounterSurface({
             </span>
           </div>
         ) : isSingleAction ? (
-          <span className="text-[1.0625rem] font-bold leading-none text-foreground" dir="auto">
+          <span className="text-title font-bold leading-none text-foreground" dir="auto">
             {actionLabel || activeInstruction}
           </span>
         ) : (
           <p
-            className="text-[1.75rem] font-black leading-none text-foreground"
+            className="text-display font-black leading-none text-foreground"
             dir="ltr"
             style={{
               fontFamily: counterNumeralFontFamily(language),
@@ -313,7 +313,7 @@ export function CounterShortcutHints({
       data-testid={testId}
       dir="ltr"
       lang={language}
-      className="mx-auto mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-[0.75rem] font-medium text-muted-foreground md:flex"
+      className="mx-auto mt-5 hidden w-fit max-w-full flex-wrap items-center justify-center gap-3 rounded-full border border-border/40 bg-muted/60 px-4 py-1.5 text-xs font-medium text-muted-foreground md:flex"
     >
       {shortcuts.map((shortcut, index) => (
         <React.Fragment key={shortcut.label}>
@@ -322,7 +322,7 @@ export function CounterShortcutHints({
             {shortcut.keys.map((key) => (
               <kbd
                 key={key}
-                className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-[0.6875rem] font-bold text-foreground shadow-2xs"
+                className="rounded border border-border bg-card px-1.5 py-0.5 font-mono text-micro font-bold text-foreground shadow-2xs"
               >
                 {key}
               </kbd>

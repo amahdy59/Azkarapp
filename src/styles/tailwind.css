@@ -13,6 +13,22 @@
 
 @theme {
   --spacing-page: 1rem;
+
+  /* The interface type scale.
+     The app had twenty-five distinct font sizes expressed as arbitrary values —
+     a one-pixel ramp from 9px to 18px, which is a continuum rather than a
+     scale, and one rule of generated CSS per value. Seven of them were already
+     exactly Tailwind steps (xs 12, sm 14, base 16, lg 18, xl 20, 2xl 24,
+     4xl 36); these six are the ones in between that the app genuinely uses, so
+     naming them changes no pixels and makes the scale something a reviewer can
+     hold a diff to. Sizes outside both sets belong to brand and celebration
+     art, where the value is the artwork, not interface typography. */
+  --text-micro: 0.6875rem;
+  --text-label: 0.8125rem;
+  --text-subtitle: 0.9375rem;
+  --text-title: 1.0625rem;
+  --text-headline: 1.375rem;
+  --text-display: 1.75rem;
 }
 
 @theme inline {

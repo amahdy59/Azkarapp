@@ -41,8 +41,8 @@ export function PrayerVirtueModal({
     >
       <div className="flex min-h-0 flex-col">
         <header className="shrink-0 border-b border-border/50 bg-gradient-to-b from-primary/12 to-transparent px-5 py-4 text-center">
-          <p className="text-[0.75rem] font-bold text-muted-foreground">{t(language, "prayerTracking.mosque")}</p>
-          <h2 className="mt-0.5 text-[1.125rem] font-black text-foreground" dir="auto">
+          <p className="text-xs font-bold text-muted-foreground">{t(language, "prayerTracking.mosque")}</p>
+          <h2 className="mt-0.5 text-lg font-black text-foreground" dir="auto">
             {t(language, "prayerTracking.virtueTitle", { prayer: name })}
           </h2>
         </header>
@@ -60,12 +60,12 @@ export function PrayerVirtueModal({
                 data-testid="prayer-virtue-item"
                 className="rounded-2xl border border-border/60 bg-background px-4 py-3"
               >
-                <p className="zikr-text text-[1rem] font-bold leading-[1.9] text-foreground" lang="ar" dir="rtl">
+                <p className="zikr-text text-base font-bold leading-[1.9] text-foreground" lang="ar" dir="rtl">
                   {virtue.textArabic}
                 </p>
                 {/* Isolated so the collection number cannot reorder against the
                     Arabic name of the collection beside it. */}
-                <bdi className="mt-2 block text-[0.75rem] font-bold text-muted-foreground">
+                <bdi className="mt-2 block text-xs font-bold text-muted-foreground">
                   {language === "ar" ? virtue.referenceArabic : virtue.referenceEnglish}
                 </bdi>
               </li>
@@ -74,7 +74,7 @@ export function PrayerVirtueModal({
 
           <p
             data-testid="prayer-virtue-closing"
-            className="zikr-text mt-4 rounded-2xl bg-primary/10 px-4 py-3 text-center text-[0.9375rem] font-black leading-[1.9] text-primary"
+            className="zikr-text mt-4 rounded-2xl bg-primary/10 px-4 py-3 text-center text-subtitle font-black leading-[1.9] text-primary"
             lang="ar"
             dir="rtl"
           >
@@ -87,7 +87,7 @@ export function PrayerVirtueModal({
             type="button"
             onClick={onClose}
             data-testid="prayer-virtue-close"
-            className="flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-[0.875rem] font-black text-primary-foreground transition-[background-color,transform] duration-press ease-standard hover:brightness-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+            className="flex min-h-11 w-full items-center justify-center rounded-2xl bg-primary px-4 text-sm font-black text-primary-foreground transition-[background-color,transform] duration-press ease-standard hover:brightness-110 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
           >
             {t(language, "common.close")}
           </button>

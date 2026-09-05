@@ -64,19 +64,19 @@ export function AccountDataPanel({
               {isGuest ? <User size={22} aria-hidden="true" /> : <Wifi size={22} aria-hidden="true" />}
             </span>
             <div className="min-w-0 flex-1">
-              <h2 className="text-[1rem] font-semibold text-foreground">
+              <h2 className="text-base font-semibold text-foreground">
                 {t(language, isGuest ? "accountData.guestTitle" : "accountData.signedInTitle")}
               </h2>
-              <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
+              <p className="mt-1 text-label leading-5 text-muted-foreground">
                 {t(language, isGuest ? "accountData.guestBody" : "accountData.signedInBody")}
               </p>
               {!isGuest && (
-                <p className="mt-2 text-[0.75rem] font-semibold text-foreground">
+                <p className="mt-2 text-xs font-semibold text-foreground">
                   {t(language, "accountData.syncStatus")}: {syncStatusLabel}
                 </p>
               )}
               {!isGuest && lastSyncLabel && (
-                <p className="mt-1 text-[0.75rem] text-muted-foreground">
+                <p className="mt-1 text-xs text-muted-foreground">
                   {t(language, "settings.lastSuccessfulSync")}: {lastSyncLabel}
                 </p>
               )}
@@ -86,7 +86,7 @@ export function AccountDataPanel({
             type="button"
             variant={isGuest ? "default" : "outline"}
             onClick={isGuest ? onActivateAccount : onSignOut}
-            className={`mt-4 w-full text-[0.875rem] ${isGuest ? "" : "border-destructive/60 text-destructive"}`}
+            className={`mt-4 w-full text-sm ${isGuest ? "" : "border-destructive/60 text-destructive"}`}
           >
             {t(language, isGuest ? "accountData.signIn" : "accountData.signOut")}
           </Button>
@@ -95,7 +95,7 @@ export function AccountDataPanel({
         <div>
           <SectionLabel label={t(language, "accountData.yourData")} />
           <Card as="section" padding="lg">
-            <p className="text-[0.8125rem] leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
+            <p className="text-label leading-5 text-muted-foreground">{t(language, "accountData.dataSummary")}</p>
             <dl className="mt-4 grid grid-cols-2 gap-3">
               <DataCount label={t(language, "accountData.sessions")} value={sessionCount} />
               <DataCount label={t(language, "accountData.savedItems")} value={savedCount} />
@@ -145,8 +145,8 @@ export function AccountDataPanel({
 function DataCount({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-xl bg-muted/60 p-3 border border-border/50">
-      <dt className="text-[0.75rem] text-muted-foreground">{label}</dt>
-      <dd className="mt-1 text-[1.375rem] font-bold text-foreground">{value}</dd>
+      <dt className="text-xs text-muted-foreground">{label}</dt>
+      <dd className="mt-1 text-headline font-bold text-foreground">{value}</dd>
     </div>
   );
 }
@@ -177,15 +177,15 @@ function DataAction({
           {destructive ? <LogOut size={20} aria-hidden="true" /> : icon}
         </span>
         <div className="min-w-0 flex-1">
-          <h2 className="text-[0.9375rem] font-semibold text-foreground">{title}</h2>
-          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
+          <h2 className="text-subtitle font-semibold text-foreground">{title}</h2>
+          <p className="mt-1 text-label leading-5 text-muted-foreground">{body}</p>
         </div>
       </div>
       <Button
         type="button"
         variant="outline"
         onClick={onPress}
-        className={`mt-3 w-full text-[0.8125rem] ${destructive ? "border-destructive/60 text-destructive" : "border-border bg-card"}`}
+        className={`mt-3 w-full text-label ${destructive ? "border-destructive/60 text-destructive" : "border-border bg-card"}`}
       >
         {action}
       </Button>

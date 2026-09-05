@@ -10,7 +10,7 @@ export default function MarketingLanding() {
       dir="ltr"
     >
       <header className="mx-auto flex max-w-[1200px] items-center justify-between px-6 py-6">
-        <a href="./" className="flex items-center gap-2 text-[1.25rem] font-extrabold">
+        <a href="./" className="flex items-center gap-2 text-xl font-extrabold">
           <MoonStar className="text-primary" /> Azkar
         </a>
         <a href="./" className="min-h-11 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground">
@@ -20,7 +20,7 @@ export default function MarketingLanding() {
       <main id="main-content" tabIndex={-1}>
         <section className="mx-auto grid max-w-[1200px] items-center gap-12 px-6 py-16 lg:grid-cols-2 lg:py-24">
           <div>
-            <p className="text-[0.6875rem] font-bold uppercase tracking-[0.08em] text-primary">
+            <p className="text-micro font-bold uppercase tracking-[0.08em] text-primary">
               Daily remembrance, made peaceful
             </p>
             <h1 className="mt-4 text-5xl font-extrabold leading-tight tracking-[-0.01em] lg:text-6xl">

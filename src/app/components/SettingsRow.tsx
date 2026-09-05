@@ -31,7 +31,7 @@ export function SettingsRowItem({
         {icon}
       </div>
       <p
-        className="min-w-0 flex-1 break-normal text-start font-sans text-[0.9375rem] md:text-[1rem] font-semibold leading-snug"
+        className="min-w-0 flex-1 break-normal text-start font-sans text-subtitle md:text-base font-semibold leading-snug"
         style={{ color: labelColor === "text-foreground" ? "var(--foreground)" : undefined }}
       >
         {label}
@@ -105,14 +105,14 @@ export function SettingsSelectRow({
         </span>
         <span
           id={labelId}
-          className="min-w-0 flex-1 text-start font-sans text-[1rem] font-semibold"
+          className="min-w-0 flex-1 text-start font-sans text-base font-semibold"
           style={{ color: "var(--foreground)" }}
         >
           {label}
         </span>
         <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
           <p
-            className="truncate font-sans text-[0.9375rem]"
+            className="truncate font-sans text-subtitle"
             style={{ color: "var(--foreground)", opacity: 0.9 }}
             title={value}
           >
@@ -167,7 +167,7 @@ export function RowValue({ value, withChevron = true }: { value: string; withChe
   return (
     <div className="flex min-w-0 max-w-[50%] shrink items-center gap-1.5">
       <p
-        className="truncate text-[0.9375rem] font-sans"
+        className="truncate text-subtitle font-sans"
         style={{ color: "var(--foreground)", opacity: 0.9 }}
         title={value}
       >
@@ -235,10 +235,8 @@ export function SettingsToggleRow({
           {icon}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block font-sans text-[1rem] font-semibold text-foreground">{label}</span>
-          {description && (
-            <span className="mt-1 block text-[0.75rem] leading-5 text-muted-foreground">{description}</span>
-          )}
+          <span className="block font-sans text-base font-semibold text-foreground">{label}</span>
+          {description && <span className="mt-1 block text-xs leading-5 text-muted-foreground">{description}</span>}
         </span>
         <ToggleTrack checked={checked} />
       </button>

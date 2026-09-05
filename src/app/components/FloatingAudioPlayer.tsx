@@ -245,14 +245,14 @@ function TransportButton({
       className="flex w-[4.25rem] shrink-0 flex-col items-center gap-1 rounded-2xl px-1 py-2 text-muted-foreground transition-[transform,background-color,color] duration-fast hover:bg-muted hover:text-foreground active:scale-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-30 disabled:active:scale-100"
     >
       {children}
-      <span className="text-[0.6875rem] font-semibold leading-4">{label}</span>
+      <span className="text-micro font-semibold leading-4">{label}</span>
     </button>
   );
 }
 
 /** One shape for every option control under the transport row. */
 const PILL_CLASS =
-  "flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 text-[0.8125rem] font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
+  "flex min-h-11 items-center justify-center gap-2 rounded-full border px-4 text-label font-bold transition-colors duration-fast focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 const PILL_IDLE = "border-border text-foreground hover:bg-muted";
 const PILL_ACTIVE = "border-primary bg-primary/15 text-primary";
 
@@ -408,8 +408,8 @@ export function FloatingAudioPlayer({
           >
             <WaveBars playing={isPlaying} />
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[0.8125rem] font-black text-foreground">{title}</span>
-              <span className="block truncate text-[0.6875rem] font-semibold text-muted-foreground">
+              <span className="block truncate text-label font-black text-foreground">{title}</span>
+              <span className="block truncate text-micro font-semibold text-muted-foreground">
                 {reciterDisplayName}
                 {" · "}
                 {/* The clock is Latin-ordered whatever the interface language,
@@ -479,15 +479,15 @@ export function FloatingAudioPlayer({
       {/* What is playing, read down the middle: cue, surah, reciter, place. */}
       <div className="flex flex-col items-center text-center">
         <WaveBars playing={isPlaying} />
-        <h3 className="mt-2 line-clamp-2 text-[1.25rem] font-black leading-tight text-foreground">{title}</h3>
-        <p className="mt-1 truncate text-[0.8125rem] font-semibold text-muted-foreground">{reciterDisplayName}</p>
+        <h3 className="mt-2 line-clamp-2 text-xl font-black leading-tight text-foreground">{title}</h3>
+        <p className="mt-1 truncate text-label font-semibold text-muted-foreground">{reciterDisplayName}</p>
         {positionChip && (
-          <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-[0.75rem] font-bold text-muted-foreground">
+          <p className="mt-2.5 rounded-full border border-border px-3 py-1 text-xs font-bold text-muted-foreground">
             {positionChip}
           </p>
         )}
         {isBusy && (
-          <p className="mt-2 text-[0.75rem] font-semibold text-primary" role="status">
+          <p className="mt-2 text-xs font-semibold text-primary" role="status">
             {state.status === "buffering" ? copy.buffering : copy.loading}
           </p>
         )}
@@ -495,7 +495,7 @@ export function FloatingAudioPlayer({
 
       {/* Timeline / Scrub Bar with Generous 44px Hit Target */}
       <div className="mt-4 flex items-center gap-3" dir="ltr">
-        <span className="w-11 text-center text-[0.75rem] font-bold tabular-nums text-muted-foreground">
+        <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.currentTime, language)}
         </span>
         <div className="relative flex min-w-0 flex-1 items-center h-11">
@@ -518,7 +518,7 @@ export function FloatingAudioPlayer({
             className="w-full h-2 rounded-full accent-primary appearance-none cursor-pointer focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
           />
         </div>
-        <span className="w-11 text-center text-[0.75rem] font-bold tabular-nums text-muted-foreground">
+        <span className="w-11 text-center text-xs font-bold tabular-nums text-muted-foreground">
           {formatTime(state.duration, language)}
         </span>
       </div>
@@ -578,7 +578,7 @@ export function FloatingAudioPlayer({
       {/* Error state */}
       {state.status === "error" && (
         <div className="mt-3 rounded-2xl border border-destructive/30 bg-destructive/10 p-3.5" role="alert">
-          <p className="text-[0.8125rem] font-semibold text-destructive">{state.error?.message}</p>
+          <p className="text-label font-semibold text-destructive">{state.error?.message}</p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             <button
               type="button"
@@ -655,7 +655,7 @@ export function FloatingAudioPlayer({
       </div>
 
       {showOptions && currentEntry.availableVoiceIds.length > 1 && (
-        <label className="mt-3 grid gap-1 text-[0.75rem] font-bold text-muted-foreground">
+        <label className="mt-3 grid gap-1 text-xs font-bold text-muted-foreground">
           {copy.voice}
           <select
             value={state.currentVoiceId ?? currentEntry.defaultVoiceId}
@@ -673,9 +673,7 @@ export function FloatingAudioPlayer({
 
       {/* Whose recitation this is, always on screen rather than behind a
           disclosure — it is an attribution, not a setting. */}
-      <p className="mt-3 text-center text-[0.6875rem] font-semibold leading-5 text-muted-foreground/80">
-        {attributionText}
-      </p>
+      <p className="mt-3 text-center text-micro font-semibold leading-5 text-muted-foreground/80">{attributionText}</p>
     </section>
   );
 }

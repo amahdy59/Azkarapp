@@ -105,14 +105,14 @@ export function FormattedBenefit({ text, isArabic = true, direction = "rtl", cla
           <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/20 text-xs font-bold text-primary">
             ✨
           </span>
-          <h4 className="text-[0.9375rem] font-bold leading-6 text-primary">{title}</h4>
+          <h4 className="text-subtitle font-bold leading-6 text-primary">{title}</h4>
         </div>
       )}
 
       {bullets.length > 0 && (
         <ul className="flex flex-col gap-2.5">
           {bullets.map((item) => (
-            <li key={item.id} className="flex items-start gap-2.5 text-[0.9375rem] leading-7">
+            <li key={item.id} className="flex items-start gap-2.5 text-subtitle leading-7">
               <span className="mt-2.5 flex h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
               <div className="flex-1 text-foreground">
                 {item.term ? (

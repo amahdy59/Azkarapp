@@ -47,7 +47,7 @@ export function SubHeader({
       <h1
         data-settings-subheading
         tabIndex={-1}
-        className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-sans text-[1.25rem] font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-[1.5rem]"
+        className="block min-w-0 flex-1 truncate whitespace-nowrap text-center font-sans text-xl font-extrabold leading-tight text-foreground outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-2xl"
       >
         {title}
       </h1>
@@ -61,10 +61,7 @@ export function SubHeader({
 export function SectionLabel({ label }: { label: string }) {
   return (
     <div className="px-4 pt-6 pb-2">
-      <h2
-        className="text-[0.8125rem] font-semibold font-sans leading-[18px]"
-        style={{ color: "var(--muted-foreground)" }}
-      >
+      <h2 className="text-label font-semibold font-sans leading-[18px]" style={{ color: "var(--muted-foreground)" }}>
         {label}
       </h2>
     </div>

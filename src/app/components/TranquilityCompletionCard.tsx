@@ -32,13 +32,13 @@ export function TranquilityCompletionCard({ categoryId, language, isExiting = fa
 
           <div className="flex flex-col items-center gap-2">
             <h2
-              className="tranquility-completion-title text-[1.75rem] font-black tracking-tight text-on-media sm:text-[1.95rem]"
+              className="tranquility-completion-title text-display font-black tracking-tight text-on-media sm:text-[1.95rem]"
               dir="auto"
             >
               {completedTitle}
             </h2>
             <p
-              className="tranquility-completion-subtitle max-w-[34ch] text-[0.9375rem] font-medium leading-7 text-on-media-muted sm:text-[1rem]"
+              className="tranquility-completion-subtitle max-w-[34ch] text-subtitle font-medium leading-7 text-on-media-muted sm:text-base"
               dir="auto"
             >
               {completedSubtitle}

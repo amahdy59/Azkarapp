@@ -14,13 +14,13 @@ const privacyUrl = (import.meta.env.VITE_PRIVACY_URL as string | undefined)?.tri
 function LegalConsent({ language, compact = false }: { language: AppLanguage; compact?: boolean }) {
   if (!termsUrl || !privacyUrl) {
     return (
-      <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
+      <p className={`text-center text-muted-foreground ${compact ? "text-micro" : "text-micro leading-4"}`}>
         {t(language, "auth.legalUnavailable")}
       </p>
     );
   }
   return (
-    <p className={`text-center text-muted-foreground ${compact ? "text-[0.625rem]" : "text-[0.6875rem] leading-4"}`}>
+    <p className={`text-center text-muted-foreground ${compact ? "text-micro" : "text-micro leading-4"}`}>
       {t(language, "auth.legalPrefix")}
       <a className="font-semibold text-primary underline" href={termsUrl} target="_blank" rel="noreferrer">
         {t(language, "auth.terms")}
@@ -39,7 +39,7 @@ function ProviderButton({ label, onClick, disabled }: { label: string; onClick: 
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className="min-h-12 w-full rounded-xl border border-border-control bg-card px-4 text-[0.9375rem] font-semibold text-foreground hover:bg-muted disabled:cursor-wait disabled:opacity-55"
+      className="min-h-12 w-full rounded-xl border border-border-control bg-card px-4 text-subtitle font-semibold text-foreground hover:bg-muted disabled:cursor-wait disabled:opacity-55"
     >
       {label}
     </button>
@@ -77,10 +77,8 @@ export function LoginScreen({
       <div className="flex flex-col items-center gap-7" data-testid="auth-intro">
         <BrandLockup compact />
         <div className="text-center">
-          <h1 className="text-[1.75rem] font-extrabold leading-9 text-foreground">{t(language, "auth.welcome")}</h1>
-          <p className="mt-2 text-[0.875rem] leading-[22px] text-muted-foreground">
-            {t(language, "auth.syncSubtitle")}
-          </p>
+          <h1 className="text-display font-extrabold leading-9 text-foreground">{t(language, "auth.welcome")}</h1>
+          <p className="mt-2 text-sm leading-[22px] text-muted-foreground">{t(language, "auth.syncSubtitle")}</p>
         </div>
         <div className="flex w-full flex-col gap-2">
           {providerFlags.google && legalReady && (
@@ -93,13 +91,13 @@ export function LoginScreen({
             <ProviderButton label={t(language, "auth.continueApple")} onClick={onApple} disabled={isAuthenticating} />
           )}
           {!accountAuthEnabled && (
-            <p className="text-center text-[0.6875rem] leading-4 text-muted-foreground">
+            <p className="text-center text-micro leading-4 text-muted-foreground">
               {t(language, "auth.signInUnavailable")}
             </p>
           )}
           {errorMessage && (
             <p
-              className="rounded-xl bg-destructive/10 px-3 py-2 text-center text-[0.8125rem] font-semibold text-destructive"
+              className="rounded-xl bg-destructive/10 px-3 py-2 text-center text-label font-semibold text-destructive"
               role="alert"
             >
               {errorMessage}
@@ -113,7 +111,7 @@ export function LoginScreen({
           data-testid="continue-as-guest"
           type="button"
           onClick={onGuest}
-          className="h-12 w-full rounded-xl bg-secondary text-[0.9375rem] font-semibold text-secondary-foreground"
+          className="h-12 w-full rounded-xl bg-secondary text-subtitle font-semibold text-secondary-foreground"
         >
           {t(language, "auth.continueAsGuest")}
         </button>
@@ -149,17 +147,15 @@ export function EmailInputScreen({
         <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
         </IconButton>
-        <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.signIn")}</p>
+        <p className="text-title font-semibold text-foreground">{t(language, "auth.signIn")}</p>
         <button type="button" onClick={onSkip} className="min-h-11 justify-self-end px-2 text-muted-foreground">
           {t(language, "auth.skip")}
         </button>
       </header>
       <div className="flex flex-col gap-8 px-6 pt-6">
         <div>
-          <h1 className="text-[1.5rem] font-extrabold leading-8 text-foreground">
-            {t(language, "auth.enterEmailTitle")}
-          </h1>
-          <p className="mt-2 text-[0.875rem] leading-5 text-muted-foreground">{t(language, "auth.enterEmailHint")}</p>
+          <h1 className="text-2xl font-extrabold leading-8 text-foreground">{t(language, "auth.enterEmailTitle")}</h1>
+          <p className="mt-2 text-sm leading-5 text-muted-foreground">{t(language, "auth.enterEmailHint")}</p>
         </div>
         {/* The heading above says what the screen is for; it is not this
             field's name. The name was carried by an `aria-label` behind a
@@ -175,7 +171,7 @@ export function EmailInputScreen({
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             placeholder="you@example.com"
-            className="h-[60px] rounded-2xl border-[1.5px] border-primary bg-card px-4 text-[1rem] font-semibold text-foreground outline-none focus:ring-[3px] focus:ring-ring"
+            className="h-[60px] rounded-2xl border-[1.5px] border-primary bg-card px-4 text-base font-semibold text-foreground outline-none focus:ring-[3px] focus:ring-ring"
             inputMode="email"
             autoComplete="email"
             dir="ltr"
@@ -184,7 +180,7 @@ export function EmailInputScreen({
           />
         </div>
         {errorMessage && (
-          <p id="email-error" className="text-[0.75rem] text-destructive" role="alert">
+          <p id="email-error" className="text-xs text-destructive" role="alert">
             {errorMessage}
           </p>
         )}
@@ -195,7 +191,7 @@ export function EmailInputScreen({
           type="button"
           onClick={canSend && !isSending ? () => onSend(email.trim()) : undefined}
           disabled={!canSend || isSending}
-          className="h-[52px] w-full rounded-2xl bg-primary text-[1rem] font-bold text-primary-foreground disabled:opacity-45"
+          className="h-[52px] w-full rounded-2xl bg-primary text-base font-bold text-primary-foreground disabled:opacity-45"
         >
           {isSending ? t(language, "common.sending") : t(language, "auth.sendVerificationCode")}
         </button>
@@ -239,12 +235,12 @@ export function OTPScreen({
         <IconButton onClick={onBack} label={t(language, "common.back")} className="justify-self-start">
           <ArrowPrevious size={24} className="text-foreground" />
         </IconButton>
-        <p className="text-[1.0625rem] font-semibold text-foreground">{t(language, "auth.verifyEmailTitle")}</p>
+        <p className="text-title font-semibold text-foreground">{t(language, "auth.verifyEmailTitle")}</p>
         <span />
       </header>
       <div className="flex flex-col gap-8 px-6 pt-5">
         <div className="flex flex-col gap-3">
-          <p className="text-[0.875rem] text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             {t(language, "auth.sentCodeTo")}{" "}
             <strong className="text-foreground" dir="ltr">
               {maskedEmail}
@@ -252,7 +248,7 @@ export function OTPScreen({
           </p>
           <div className="flex items-center gap-1.5 text-primary">
             <Clock size={15} />
-            <p className="text-[0.875rem] font-semibold">
+            <p className="text-sm font-semibold">
               {Math.floor(countdown / 60)}:{String(countdown % 60).padStart(2, "0")}
             </p>
           </div>
@@ -271,13 +267,13 @@ export function OTPScreen({
               <InputOTPSlot
                 key={index}
                 index={index}
-                className="h-[60px] min-w-10 max-w-[50px] flex-1 rounded-xl border border-border-control bg-card text-[1.375rem] font-semibold"
+                className="h-[60px] min-w-10 max-w-[50px] flex-1 rounded-xl border border-border-control bg-card text-headline font-semibold"
               />
             ))}
           </InputOTPGroup>
         </InputOTP>
         {errorMessage && (
-          <p className="text-center text-[0.75rem] text-destructive" role="alert">
+          <p className="text-center text-xs text-destructive" role="alert">
             {errorMessage}
           </p>
         )}

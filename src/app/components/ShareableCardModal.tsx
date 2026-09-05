@@ -82,7 +82,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
           dir={direction}
         >
           {/* Logo Badge */}
-          <div className="flex items-center gap-2 text-[0.875rem] font-black tracking-wider text-primary">
+          <div className="flex items-center gap-2 text-sm font-black tracking-wider text-primary">
             <PalmTreeMark
               size={20}
               filled={palms > 0}
@@ -92,11 +92,11 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
             <span>{t(language, "common.azkar")}</span>
           </div>
 
-          <p className="mt-4 text-[1.125rem] font-black leading-snug text-foreground">
+          <p className="mt-4 text-lg font-black leading-snug text-foreground">
             {t(language, "shareModal.mayAllahAccept")}
           </p>
 
-          <p className="mt-1.5 text-[0.8125rem] font-semibold text-muted-foreground">
+          <p className="mt-1.5 text-label font-semibold text-muted-foreground">
             {t(language, "shareModal.completedSubtitle")}
           </p>
 
@@ -112,29 +112,29 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
                 className={palms > 0 ? "text-primary" : "text-muted-foreground/40"}
                 aria-hidden="true"
               />
-              <dd className={`text-[0.9375rem] font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
+              <dd className={`text-subtitle font-black ${palms > 0 ? "text-primary" : "text-muted-foreground/60"}`}>
                 {formatNumerals(palms, language)}
               </dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.palms")}</dt>
+              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.palms")}</dt>
             </div>
             <div className="flex min-w-0 flex-1 flex-col items-center gap-1 border-e border-border p-3">
-              <span className="text-[1.25rem]" aria-hidden="true">
+              <span className="text-xl" aria-hidden="true">
                 🍂
               </span>
-              <dd className="text-[0.9375rem] font-black text-primary">{formatNumerals(golden, language)}</dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.golden")}</dt>
+              <dd className="text-subtitle font-black text-primary">{formatNumerals(golden, language)}</dd>
+              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.golden")}</dt>
             </div>
             <div className="flex min-w-0 flex-1 flex-col items-center gap-1 p-3">
-              <span className="text-[1.25rem]" aria-hidden="true">
+              <span className="text-xl" aria-hidden="true">
                 🌿
               </span>
-              <dd className="text-[0.9375rem] font-black text-success">{formatNumerals(green, language)}</dd>
-              <dt className="text-[0.6875rem] font-bold text-muted-foreground">{t(language, "shareModal.green")}</dt>
+              <dd className="text-subtitle font-black text-success">{formatNumerals(green, language)}</dd>
+              <dt className="text-micro font-bold text-muted-foreground">{t(language, "shareModal.green")}</dt>
             </div>
           </dl>
 
           {/* Date Label */}
-          <span className="text-[0.75rem] font-extrabold text-muted-foreground" dir={direction}>
+          <span className="text-xs font-extrabold text-muted-foreground" dir={direction}>
             {dateStr}
           </span>
         </div>
@@ -146,7 +146,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
             onClick={() => void handleShare()}
             disabled={isSharing}
             aria-busy={isSharing || undefined}
-            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-[0.9375rem] font-black text-primary-foreground shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
+            className="flex min-h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-primary py-3 text-subtitle font-black text-primary-foreground shadow-md transition-[color,background-color,border-color,box-shadow,opacity,transform] hover:bg-primary active:scale-95 disabled:cursor-wait disabled:opacity-60"
           >
             <Share2 size={18} />
             <span>{t(language, "shareModal.shareMilestone")}</span>
@@ -154,7 +154,7 @@ export function ShareableCardModal({ palms, golden, green, dateStr, language, on
         </div>
         {shareStatus && (
           <p
-            className={`mt-3 text-center text-[0.8125rem] font-semibold ${shareStatus.error ? "text-destructive" : "text-primary"}`}
+            className={`mt-3 text-center text-label font-semibold ${shareStatus.error ? "text-destructive" : "text-primary"}`}
             role={shareStatus.error ? "alert" : "status"}
             aria-live={shareStatus.error ? undefined : "polite"}
           >

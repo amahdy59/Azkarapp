@@ -135,8 +135,8 @@ function TrackingCheckbox({
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
       <span className="pointer-events-none flex min-w-0 flex-col text-start">
-        <span className="truncate text-[0.8125rem] font-bold text-foreground">{label}</span>
-        {hint && <span className="truncate text-[0.6875rem] font-semibold text-muted-foreground">{hint}</span>}
+        <span className="truncate text-label font-bold text-foreground">{label}</span>
+        {hint && <span className="truncate text-micro font-semibold text-muted-foreground">{hint}</span>}
       </span>
       {/* No focus ring here: the input covers the row and is the element
           that actually receives focus, so the global :focus-visible outline
@@ -230,7 +230,7 @@ function PrayerCard({
             of step with the other four, and rather than in the corner, where it
             cost a positioning rule against a CSS cap with 151 bytes to spare. */}
         <span className="mt-1.5 flex items-center gap-1">
-          <h3 id={`prayer-card-heading-${prayer}`} className="text-[0.9375rem] font-black text-foreground" dir="auto">
+          <h3 id={`prayer-card-heading-${prayer}`} className="text-subtitle font-black text-foreground" dir="auto">
             {name}
           </h3>
           {onOpen && (
@@ -243,7 +243,7 @@ function PrayerCard({
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-0.5 whitespace-nowrap text-[1.375rem] font-black leading-none tracking-tight text-foreground"
+          className="mt-0.5 whitespace-nowrap text-headline font-black leading-none tracking-tight text-foreground"
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -255,14 +255,14 @@ function PrayerCard({
       <div className="mt-1.5 flex h-[2.5rem] flex-col items-center justify-start gap-0.5">
         <span
           data-testid={`prayer-status-${prayer}`}
-          className={`inline-flex items-center rounded-full px-3 py-1 text-[0.75rem] font-black ${
+          className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black ${
             state === "current" || state === "next" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
           }`}
         >
           {statusLabel(language, state)}
         </span>
         {countdown && state === "next" && (
-          <span data-testid="next-prayer" className="text-[0.75rem] font-bold text-primary" dir="auto">
+          <span data-testid="next-prayer" className="text-xs font-bold text-primary" dir="auto">
             {countdown}
           </span>
         )}

@@ -47,7 +47,7 @@ export function WhatsNewPanel({ language, onBack }: { language: AppLanguage; onB
               {items.map((item, index) => (
                 <li key={index} className="flex items-start gap-3 border-b border-border px-4 py-3.5 last:border-b-0">
                   <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" aria-hidden="true" />
-                  <p className="text-[0.875rem] leading-6 text-foreground">{item}</p>
+                  <p className="text-sm leading-6 text-foreground">{item}</p>
                 </li>
               ))}
             </ul>

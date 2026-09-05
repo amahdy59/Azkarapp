@@ -59,11 +59,11 @@ export function PrayerTrackerStats({
 
         return (
           <div key={prayer} className="flex flex-col gap-1 rounded-2xl border border-border/40 bg-card p-3 shadow-sm">
-            <div className="font-bold text-[0.9375rem] text-foreground">{prayerName}</div>
+            <div className="font-bold text-subtitle text-foreground">{prayerName}</div>
 
             <div className="grid grid-cols-2 gap-3 mt-1">
               <div className="flex flex-col gap-1">
-                <div className="flex justify-between text-[0.75rem] font-medium text-muted-foreground">
+                <div className="flex justify-between text-xs font-medium text-muted-foreground">
                   <span>{t(language, "prayerTracking.mosque")}</span>
                   <span>
                     {mosque} / {stats.daysInPeriod}
@@ -78,7 +78,7 @@ export function PrayerTrackerStats({
               </div>
 
               <div className="flex flex-col gap-1">
-                <div className="flex justify-between text-[0.75rem] font-medium text-muted-foreground">
+                <div className="flex justify-between text-xs font-medium text-muted-foreground">
                   <span>{t(language, "prayerTracking.adhkar")}</span>
                   <span>
                     {adhkar} / {stats.daysInPeriod}

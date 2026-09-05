@@ -29,7 +29,7 @@ export const MUSHAF_SHORTCUTS = [
  */
 export function MushafKeyboardShortcutList({ language }: { language: AppLanguage }) {
   return (
-    <dl className="flex flex-col gap-1.5 text-[0.75rem]">
+    <dl className="flex flex-col gap-1.5 text-xs">
       {MUSHAF_SHORTCUTS.map(([key, labelKey]) => (
         <div key={key} className="flex items-center justify-between gap-3">
           <dt className="min-w-0 truncate font-medium text-muted-foreground">{t(language, labelKey)}</dt>

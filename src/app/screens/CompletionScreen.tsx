@@ -178,13 +178,13 @@ export function CompletionScreen({
           <Check size={38} className="text-primary-foreground" strokeWidth={2.25} />
         </div>
 
-        <h1 className="mt-5 text-[1.75rem] font-extrabold leading-9 text-primary">
+        <h1 className="mt-5 text-display font-extrabold leading-9 text-primary">
           {t(language, "completion.mashaAllah")}
         </h1>
-        <p className="mt-1 text-[1.125rem] font-bold text-card-foreground">
+        <p className="mt-1 text-lg font-bold text-card-foreground">
           {t(language, "completion.completed", { category: categoryName })}
         </p>
-        <p className="mt-3 text-[0.875rem] leading-6 text-foreground/80">
+        <p className="mt-3 text-sm leading-6 text-foreground/80">
           {quietProgressEnabled ? streakMessage : t(language, "completion.reflection")}
         </p>
 
@@ -208,13 +208,13 @@ export function CompletionScreen({
               >
                 {formatNumerals(value, language)}
               </p>
-              <p className="mt-1 text-[0.8125rem] text-foreground/75">{label}</p>
+              <p className="mt-1 text-label text-foreground/75">{label}</p>
             </article>
           ))}
         </section>
 
         <div className="mt-auto pt-7">
-          <p className="text-[0.75rem] text-foreground/70" dir="auto">
+          <p className="text-xs text-foreground/70" dir="auto">
             {formatHijriDate(new Date(), language)}
           </p>
           <div className="mt-3 grid gap-3">
@@ -250,7 +250,7 @@ export function CompletionScreen({
             </button>
             {shareStatus && (
               <p
-                className={`text-[0.75rem] font-semibold ${shareError ? "text-destructive" : "text-muted-foreground"}`}
+                className={`text-xs font-semibold ${shareError ? "text-destructive" : "text-muted-foreground"}`}
                 role={shareError ? "alert" : "status"}
                 aria-live={shareError ? undefined : "polite"}
               >

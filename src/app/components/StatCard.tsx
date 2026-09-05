@@ -12,14 +12,14 @@ export function StatCard({ title, icon, value, subtitle }: StatCardProps) {
   return (
     <Card className="flex flex-col justify-between transition-colors">
       <div className="flex items-center justify-between">
-        <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
+        <span className="text-label font-extrabold text-foreground">{title}</span>
         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
       </div>
       <div className="mt-3 text-start">
         {/* No dir="auto" here: a digits-only string resolves to LTR, which would
             left-align the value against its own right-aligned subtitle in Arabic. */}
         <p className="text-2xl md:text-3xl font-black text-foreground">{value}</p>
-        <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
+        <p className="text-xs font-semibold text-muted-foreground mt-0.5" dir="auto">
           {subtitle}
         </p>
       </div>
@@ -47,15 +47,15 @@ export function CompactActionCard({
   return (
     <Card className="flex flex-col justify-between transition-colors">
       <div className="flex items-center justify-between">
-        <span className="text-[0.8125rem] font-extrabold text-foreground">{title}</span>
+        <span className="text-label font-extrabold text-foreground">{title}</span>
         <span className="flex size-8 items-center justify-center rounded-xl bg-primary/15 text-primary">{icon}</span>
       </div>
       <div className="mt-3 text-start flex items-end justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <p className="text-[0.9375rem] font-black text-foreground truncate" dir="auto">
+          <p className="text-subtitle font-black text-foreground truncate" dir="auto">
             {contentTitle}
           </p>
-          <p className="text-[0.75rem] font-semibold text-muted-foreground mt-0.5" dir="auto">
+          <p className="text-xs font-semibold text-muted-foreground mt-0.5" dir="auto">
             {contentSubtitle}
           </p>
         </div>

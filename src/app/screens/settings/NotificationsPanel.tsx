@@ -64,8 +64,8 @@ function ReminderScheduleRow({
           <Bell size={19} />
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-[0.9375rem] font-bold text-foreground">{label}</span>
-          <span className="mt-0.5 block text-[0.8125rem] text-muted-foreground">
+          <span className="block text-subtitle font-bold text-foreground">{label}</span>
+          <span className="mt-0.5 block text-label text-muted-foreground">
             {schedule.enabled ? t(language, "notifications.enabled") : t(language, "notifications.disabled")}
           </span>
         </span>
@@ -89,7 +89,7 @@ function ReminderScheduleRow({
         </button>
       </div>
       <label
-        className="mt-4 flex flex-col gap-1.5 text-[0.8125rem] font-bold text-foreground"
+        className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground"
         htmlFor={`${kind}-reminder-time`}
       >
         <span>{t(language, "notifications.timeLabel")}</span>
@@ -347,10 +347,10 @@ export function NotificationsPanel({
               <MapPin size={22} />
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="prayer-location-title" className="text-[1.0625rem] font-semibold text-foreground">
+              <h2 id="prayer-location-title" className="text-title font-semibold text-foreground">
                 {t(language, "notifications.locationPrayerTimes")}
               </h2>
-              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
+              <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
                 {t(language, "notifications.prayerCalculationDescription")}
               </p>
             </div>
@@ -362,14 +362,14 @@ export function NotificationsPanel({
             aria-live="polite"
           >
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <strong className="text-[0.8125rem] text-foreground" dir="ltr">
+              <strong className="text-label text-foreground" dir="ltr">
                 {timeZoneStatus.timeZone}
               </strong>
-              <span className="rounded-full bg-primary/10 px-2 py-1 text-[0.75rem] font-bold text-primary" dir="ltr">
+              <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-bold text-primary" dir="ltr">
                 {formatUtcOffset(timeZoneStatus.currentOffsetHours)}
               </span>
             </div>
-            <p className="mt-2 text-[0.8125rem] font-semibold text-foreground">
+            <p className="mt-2 text-label font-semibold text-foreground">
               {t(
                 language,
                 timeZoneStatus.daylightSavingActive
@@ -379,7 +379,7 @@ export function NotificationsPanel({
                     : "notifications.noSeasonalTimeChange",
               )}
             </p>
-            <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">
               {t(
                 language,
                 locationSettings?.autoDetect
@@ -398,7 +398,7 @@ export function NotificationsPanel({
 
             {locationStatus && (
               <p
-                className={`rounded-lg p-2.5 text-[0.8125rem] font-medium ${locationStatusIsError ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"}`}
+                className={`rounded-lg p-2.5 text-label font-medium ${locationStatusIsError ? "bg-destructive/10 text-destructive" : "bg-muted text-foreground"}`}
                 role={locationStatusIsError ? "alert" : "status"}
               >
                 {locationStatus}
@@ -406,17 +406,14 @@ export function NotificationsPanel({
             )}
 
             <div className="pt-2">
-              <label
-                htmlFor="calculation-method-select"
-                className="block text-[0.875rem] font-bold text-foreground mb-1.5"
-              >
+              <label htmlFor="calculation-method-select" className="block text-sm font-bold text-foreground mb-1.5">
                 {t(language, "notifications.calculationMethod")}
               </label>
               <select
                 id="calculation-method-select"
                 value={locationSettings?.calculationMethod ?? 5}
                 onChange={(e) => void handleMethodChange(Number(e.target.value))}
-                className="w-full h-11 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] font-semibold text-foreground"
+                className="w-full h-11 rounded-xl border border-border-control bg-background px-3 text-sm font-semibold text-foreground"
               >
                 {Object.values(CALCULATION_METHODS).map((m) => (
                   <option key={m.id} value={m.id}>
@@ -427,12 +424,10 @@ export function NotificationsPanel({
             </div>
 
             <fieldset className="space-y-2 border-t border-border pt-4">
-              <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
+              <legend className="mb-2 text-sm font-bold text-foreground">
                 {t(language, "notifications.chooseCity")}
               </legend>
-              <p className="text-[0.75rem] leading-5 text-muted-foreground">
-                {t(language, "notifications.citySearchHint")}
-              </p>
+              <p className="text-xs leading-5 text-muted-foreground">{t(language, "notifications.citySearchHint")}</p>
               <div className="flex flex-col gap-1.5">
                 <label htmlFor="city-search" className={FIELD_LABEL_CLASS}>
                   {t(language, "notifications.citySearchLabel")}
@@ -446,7 +441,7 @@ export function NotificationsPanel({
                   className={FIELD_CONTROL_CLASS}
                 />
               </div>
-              <p className="text-[0.75rem] font-semibold text-muted-foreground">
+              <p className="text-xs font-semibold text-muted-foreground">
                 {t(language, citySearch.trim() ? "notifications.cityResults" : "notifications.popularCities")}
               </p>
               {cityResults.length > 0 ? (
@@ -467,8 +462,8 @@ export function NotificationsPanel({
                         >
                           <MapPin size={17} className="shrink-0 text-primary" aria-hidden="true" />
                           <span className="min-w-0">
-                            <span className="block text-[0.8125rem] font-bold">{cityName}</span>
-                            <span className="block text-[0.75rem] text-muted-foreground">{countryName}</span>
+                            <span className="block text-label font-bold">{cityName}</span>
+                            <span className="block text-xs text-muted-foreground">{countryName}</span>
                           </span>
                         </button>
                       </li>
@@ -476,14 +471,14 @@ export function NotificationsPanel({
                   })}
                 </ul>
               ) : (
-                <p className="rounded-xl bg-muted p-3 text-[0.8125rem] text-muted-foreground" role="status">
+                <p className="rounded-xl bg-muted p-3 text-label text-muted-foreground" role="status">
                   {t(language, "notifications.noCitiesFound")}
                 </p>
               )}
             </fieldset>
 
             <fieldset className="space-y-2 border-t border-border pt-4">
-              <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
+              <legend className="mb-2 text-sm font-bold text-foreground">
                 {t(language, "notifications.manualLocation")}
               </legend>
               <FormField
@@ -543,10 +538,10 @@ export function NotificationsPanel({
             </fieldset>
 
             <fieldset className="border-t border-border pt-4">
-              <legend className="mb-2 text-[0.875rem] font-bold text-foreground">
+              <legend className="mb-2 text-sm font-bold text-foreground">
                 {t(language, "notifications.manualMinuteAdjustments")}
               </legend>
-              <p className="mb-3 text-[0.75rem] leading-5 text-muted-foreground">
+              <p className="mb-3 text-xs leading-5 text-muted-foreground">
                 {t(language, "notifications.minuteAdjustmentHint")}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -559,7 +554,7 @@ export function NotificationsPanel({
                     ["isha", t(language, "notifications.isha")],
                   ] as const
                 ).map(([prayer, label]) => (
-                  <label key={prayer} className="text-[0.75rem] font-semibold text-muted-foreground">
+                  <label key={prayer} className="text-xs font-semibold text-muted-foreground">
                     {label}
                     <input
                       type="number"
@@ -570,7 +565,7 @@ export function NotificationsPanel({
                       inputMode="numeric"
                       onWheel={(event) => event.currentTarget.blur()}
                       dir="ltr"
-                      className="mt-1 h-10 w-full rounded-lg border border-border-control bg-background px-2 text-center text-[0.875rem] text-foreground"
+                      className="mt-1 h-10 w-full rounded-lg border border-border-control bg-background px-2 text-center text-sm text-foreground"
                     />
                   </label>
                 ))}
@@ -601,10 +596,10 @@ export function NotificationsPanel({
               )}
             </span>
             <div className="min-w-0 flex-1">
-              <h2 id="notification-permission" className="text-[1.0625rem] font-semibold text-foreground">
+              <h2 id="notification-permission" className="text-title font-semibold text-foreground">
                 {t(language, "notifications.permission")}
               </h2>
-              <p className="mt-1 text-[0.875rem] leading-[22px] text-muted-foreground">
+              <p className="mt-1 text-sm leading-[22px] text-muted-foreground">
                 {permissionCopy(permission, language)}
               </p>
             </div>
@@ -624,17 +619,17 @@ export function NotificationsPanel({
           )}
 
           {hasRequestError && (
-            <p className="mt-3 text-[0.875rem] text-destructive" role="alert">
+            <p className="mt-3 text-sm text-destructive" role="alert">
               {t(language, "notifications.permissionError")}
             </p>
           )}
           {(permission === "denied" || permission === "unsupported") && (
-            <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-[0.8125rem] leading-5 text-foreground">
+            <p className="mt-3 rounded-xl bg-muted px-3 py-2 text-label leading-5 text-foreground">
               {t(language, "notifications.permissionBlockedAction")}
             </p>
           )}
           {permissionAttemptBlocked && (
-            <p className="mt-3 text-[0.875rem] font-semibold text-destructive" role="alert">
+            <p className="mt-3 text-sm font-semibold text-destructive" role="alert">
               {t(language, "notifications.permissionRequired")}
             </p>
           )}
@@ -642,10 +637,10 @@ export function NotificationsPanel({
 
         <section aria-labelledby="gentle-reminders-title">
           <div className="mb-3 px-1">
-            <h2 id="gentle-reminders-title" className="text-[1.0625rem] font-bold text-foreground">
+            <h2 id="gentle-reminders-title" className="text-title font-bold text-foreground">
               {t(language, "notifications.scheduleTitle")}
             </h2>
-            <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">
+            <p className="mt-1 text-label leading-5 text-muted-foreground">
               {t(language, "notifications.scheduleHint")}
             </p>
           </div>
@@ -674,19 +669,16 @@ export function NotificationsPanel({
               className="mt-0.5 size-5 accent-primary"
             />
             <span>
-              <span className="block text-[0.875rem] font-bold text-foreground">
+              <span className="block text-sm font-bold text-foreground">
                 {t(language, "notifications.onlyIfIncomplete")}
               </span>
-              <span className="mt-1 block text-[0.8125rem] leading-5 text-muted-foreground">
+              <span className="mt-1 block text-label leading-5 text-muted-foreground">
                 {t(language, "notifications.onlyIfIncompleteHint")}
               </span>
             </span>
           </label>
           {anyReminderEnabled && permission === "granted" && (
-            <p
-              className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-[0.8125rem] leading-5 text-foreground"
-              role="status"
-            >
+            <p className="mt-3 rounded-xl bg-primary/10 px-4 py-3 text-label leading-5 text-foreground" role="status">
               {t(language, "notifications.activeNotice")}
             </p>
           )}

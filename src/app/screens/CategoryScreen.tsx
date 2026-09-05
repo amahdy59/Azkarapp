@@ -164,9 +164,9 @@ export function CategoryScreen({
 
         <div className="shrink-0 border-b border-border px-5 py-4">
           <div className="mb-2 flex items-center justify-between">
-            <p className="text-[0.8125rem] font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
+            <p className="text-label font-bold text-muted-foreground">{t(language, "category.dailyProgress")}</p>
             <p
-              className="text-[0.8125rem] font-bold text-muted-foreground"
+              className="text-label font-bold text-muted-foreground"
               dir="auto"
               style={{ fontFamily: numeralFontFamily(language), fontVariantNumeric: "tabular-nums lining-nums" }}
             >
@@ -193,7 +193,7 @@ export function CategoryScreen({
               className="mt-4 flex min-h-12 w-full items-center justify-between rounded-2xl border border-success/30 bg-success/10 px-4 text-start text-success focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring dark:text-success"
             >
               <span className="font-extrabold">{t(language, "category.coreCompleted")}</span>
-              <span className="text-[0.75rem] font-bold">
+              <span className="text-xs font-bold">
                 {t(language, "category.continueAdditional", {
                   count: formatNumerals(allAzkar.filter((zikr) => !zikr.includedInCore).length, language),
                 })}
@@ -208,7 +208,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     data-testid="routine-mode-filter"
-                    className="interactive-elem order-2 flex h-11 shrink-0 items-center justify-center gap-2 rounded-btn border border-border bg-card px-3 text-[0.8125rem] font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="interactive-elem order-2 flex h-11 shrink-0 items-center justify-center gap-2 rounded-btn border border-border bg-card px-3 text-label font-extrabold text-foreground shadow-xs focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                     aria-label={`${t(language, "category.routineLength")}: ${t(language, routineMode === "core" ? "category.core" : "category.complete")}`}
                   >
                     <SlidersHorizontal size={17} aria-hidden="true" />
@@ -217,7 +217,7 @@ export function CategoryScreen({
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="min-w-[14rem]">
-                  <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
+                  <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
                     {t(language, "category.routineLength")}
                   </DropdownMenuLabel>
                   <DropdownMenuRadioGroup
@@ -245,12 +245,12 @@ export function CategoryScreen({
                   type="button"
                   data-testid="start-session-button"
                   onClick={() => onZikr(Math.max(0, resumeIdx))}
-                  className="interactive-elem order-1 flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-[0.9375rem] font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  className="interactive-elem order-1 flex h-11 flex-1 min-w-[140px] items-center justify-center gap-2 rounded-btn bg-primary text-subtitle font-bold text-primary-foreground shadow-sm focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 >
                   <span className="leading-none">
                     {completedItemCount === 0 ? t(language, "category.startSession") : t(language, "common.continue")}
                   </span>
-                  <span className="text-[1.125rem] leading-none" aria-hidden="true">
+                  <span className="text-lg leading-none" aria-hidden="true">
                     {direction === "rtl" ? "←" : "→"}
                   </span>
                 </button>
@@ -258,7 +258,7 @@ export function CategoryScreen({
                   <button
                     type="button"
                     onClick={onPlayAllAudio}
-                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-[0.8125rem] font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
+                    className="order-4 flex h-11 items-center justify-center gap-1.5 rounded-btn border border-primary/30 bg-primary/10 px-3.5 text-label font-bold text-primary shadow-xs transition-[color,background-color,border-color,box-shadow,transform] hover:bg-primary/20 active:scale-95 dark:text-primary"
                     aria-label={t(language, "category.playAllAudio")}
                     title={
                       audioCoverage
@@ -295,17 +295,13 @@ export function CategoryScreen({
                 >
                   {isArabic ? (
                     <>
-                      <span className="text-[0.9375rem] font-bold leading-none">
-                        {t(language, "category.readAgain")}
-                      </span>
+                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
                       <RotateCcw size={18} className="shrink-0" />
                     </>
                   ) : (
                     <>
                       <RotateCcw size={18} className="shrink-0" />
-                      <span className="text-[0.9375rem] font-bold leading-none">
-                        {t(language, "category.readAgain")}
-                      </span>
+                      <span className="text-subtitle font-bold leading-none">{t(language, "category.readAgain")}</span>
                     </>
                   )}
                 </button>
@@ -331,15 +327,13 @@ export function CategoryScreen({
           {introduction && (
             <aside className="mb-4 rounded-2xl border border-primary/30 bg-primary/10 p-4">
               <div className="mb-2 flex items-center justify-between gap-3">
-                <h2 className="text-[0.8125rem] font-extrabold text-primary">
-                  {t(language, "category.introductionLabel")}
-                </h2>
-                <span className="rounded-full bg-card/80 px-2.5 py-1 text-[0.6875rem] font-bold text-muted-foreground">
+                <h2 className="text-label font-extrabold text-primary">{t(language, "category.introductionLabel")}</h2>
+                <span className="rounded-full bg-card/80 px-2.5 py-1 text-micro font-bold text-muted-foreground">
                   {t(language, "category.optional")}
                 </span>
               </div>
               <p
-                className={`${isArabic ? "zikr-text" : "font-sans"} text-start text-[0.9375rem] font-semibold leading-7 text-foreground`}
+                className={`${isArabic ? "zikr-text" : "font-sans"} text-start text-subtitle font-semibold leading-7 text-foreground`}
                 dir={isArabic ? "rtl" : "ltr"}
                 lang={isArabic ? "ar" : "en"}
               >
@@ -354,10 +348,10 @@ export function CategoryScreen({
               aria-labelledby="sleep-prepare-title"
             >
               <div className="flex items-center justify-between gap-3">
-                <h2 id="sleep-prepare-title" className="text-[0.875rem] font-extrabold text-foreground">
+                <h2 id="sleep-prepare-title" className="text-sm font-extrabold text-foreground">
                   {t(language, "category.prepareTitle")}
                 </h2>
-                <span className="text-[0.75rem] font-black text-primary" data-testid="sleep-preparation-count">
+                <span className="text-xs font-black text-primary" data-testid="sleep-preparation-count">
                   {formatNumerals(preparationSteps.size, language)} / {formatNumerals(3, language)}
                 </span>
               </div>
@@ -409,9 +403,7 @@ export function CategoryScreen({
                     >
                       <Check size={16} strokeWidth={3} />
                     </span>
-                    <span className="min-w-0 flex-1 text-[0.8125rem] font-bold text-foreground">
-                      {t(language, labelKey)}
-                    </span>
+                    <span className="min-w-0 flex-1 text-label font-bold text-foreground">{t(language, labelKey)}</span>
                   </label>
                 ))}
               </div>
@@ -425,10 +417,10 @@ export function CategoryScreen({
                     <Check size={19} strokeWidth={3} aria-hidden="true" />
                   </span>
                   <span>
-                    <span className="block text-[0.8125rem] font-black text-foreground">
+                    <span className="block text-label font-black text-foreground">
                       {t(language, "category.prepareCompleteTitle")}
                     </span>
-                    <span className="mt-0.5 block text-[0.75rem] font-semibold leading-5 text-muted-foreground">
+                    <span className="mt-0.5 block text-xs font-semibold leading-5 text-muted-foreground">
                       {t(language, "category.prepareCompleteBody")}
                     </span>
                   </span>
@@ -448,11 +440,11 @@ export function CategoryScreen({
                 return (
                   <section key={group.groupId} aria-labelledby={`group-${group.groupId}`}>
                     <div className="mb-3 flex items-center justify-between gap-3 px-1">
-                      <h2 id={`group-${group.groupId}`} className="text-[0.875rem] font-extrabold text-foreground">
+                      <h2 id={`group-${group.groupId}`} className="text-sm font-extrabold text-foreground">
                         {groupLabel(group.groupId)}
                       </h2>
                       <span
-                        className="text-[0.75rem] font-bold text-muted-foreground"
+                        className="text-xs font-bold text-muted-foreground"
                         style={{ fontFamily: numeralFontFamily(language) }}
                       >
                         {t(language, "category.groupProgress", {
@@ -471,7 +463,7 @@ export function CategoryScreen({
                             data-ritual-group={chunk.ritualGroupId}
                           >
                             <div className={`mb-3 px-1 ${routineMode === "core" ? "p-3 pb-0" : ""}`}>
-                              <h3 className="text-[0.8125rem] font-extrabold text-primary">
+                              <h3 className="text-label font-extrabold text-primary">
                                 {t(
                                   language,
                                   chunk.ritualGroupId === "three_quls"
@@ -479,7 +471,7 @@ export function CategoryScreen({
                                     : "category.ritualTasbih",
                                 )}
                               </h3>
-                              <p className="mt-1 text-[0.75rem] font-semibold leading-5 text-muted-foreground">
+                              <p className="mt-1 text-xs font-semibold leading-5 text-muted-foreground">
                                 {t(
                                   language,
                                   chunk.ritualGroupId === "three_quls" && catId === "before_sleep"
@@ -564,19 +556,19 @@ function ZikrAccordion({
         dir={direction}
       >
         {/* Index */}
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-[0.875rem] font-extrabold text-primary-foreground shadow-xs">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-primary bg-primary text-sm font-extrabold text-primary-foreground shadow-xs">
           {formatNumerals(index + 1, language)}
         </div>
 
         {/* Text */}
         <div className="flex-1 text-start min-w-0" dir={direction}>
           <p
-            className={`${isArabic ? "zikr-text" : "font-sans"} text-[1.0625rem] font-bold text-foreground line-clamp-1`}
+            className={`${isArabic ? "zikr-text" : "font-sans"} text-title font-bold text-foreground line-clamp-1`}
             lang={isArabic ? "ar" : "en"}
           >
             {isArabic ? z.arabicText : z.translation}
           </p>
-          <p className="mt-1 text-[0.75rem] font-semibold text-muted-foreground">
+          <p className="mt-1 text-xs font-semibold text-muted-foreground">
             {t(language, "category.repetitionInstruction", { count: formatNumerals(targetCount, language) })}
           </p>
         </div>
@@ -618,20 +610,20 @@ function ZikrAccordion({
           <div className="min-h-[44px] min-w-0 w-full flex flex-col items-center text-center mt-3">
             {isArabic && z.hasSeekRefuge && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="zikr-text text-[1rem] font-bold text-primary/90 tracking-wide">
+                <p className="zikr-text text-base font-bold text-primary/90 tracking-wide">
                   أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ
                 </p>
               </div>
             )}
             {isArabic && (z.hasBasmalah || z.isSurah) && (
               <div className="mb-2 text-center pointer-events-none">
-                <p className="zikr-text text-[1.05rem] font-bold text-primary/90 tracking-wide">
+                <p className="zikr-text text-title font-bold text-primary/90 tracking-wide">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
                 </p>
               </div>
             )}
             <p
-              className={`${isArabic ? "zikr-text" : "font-sans"} text-center text-[1.0625rem] font-bold leading-[1.85] text-foreground whitespace-pre-line`}
+              className={`${isArabic ? "zikr-text" : "font-sans"} text-center text-title font-bold leading-[1.85] text-foreground whitespace-pre-line`}
               dir={isArabic ? "rtl" : "ltr"}
               lang={isArabic ? "ar" : "en"}
             >
@@ -641,7 +633,7 @@ function ZikrAccordion({
 
           {showTiming && timingText && (
             <div
-              className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-[0.8125rem] font-extrabold text-primary"
+              className="flex items-center gap-2 rounded-xl border border-primary/30 bg-primary/10 px-3.5 py-2 text-label font-extrabold text-primary"
               dir={isArabic ? "rtl" : "ltr"}
             >
               <span aria-hidden="true" className="shrink-0">

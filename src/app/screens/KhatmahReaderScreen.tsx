@@ -631,10 +631,10 @@ export function KhatmahReaderScreen({
   const isArabic = language === "ar";
   const backIcon = isArabic ? <ArrowRight size={20} /> : <ArrowLeft size={20} />;
   const headerActionClass =
-    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-current/15 bg-current/5 px-2 text-[0.6875rem] font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3";
+    "inline-flex min-h-11 min-w-0 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-current/15 bg-current/5 px-2 text-micro font-extrabold transition-colors hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:px-3";
   /** The page turn carries the bar's weight: a bordered chip, like the rail's. */
   const footerActionClass =
-    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg border border-current/15 bg-current/5 px-1 text-[0.625rem] font-extrabold transition-colors enabled:hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
+    "flex min-h-11 min-w-0 flex-1 flex-col items-center justify-center gap-0 rounded-lg border border-current/15 bg-current/5 px-1 text-micro font-extrabold transition-colors enabled:hover:bg-current/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-40";
   /** The study toggles sit back until they are on, so they do not outrank it. */
   const footerToggleClass = (active: boolean) =>
     `inline-flex h-11 w-11 items-center justify-center gap-2 rounded-lg border px-2 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:opacity-60 md:w-auto md:px-3 ${
@@ -731,12 +731,10 @@ export function KhatmahReaderScreen({
           className="flex min-h-11 min-w-0 flex-col items-center justify-center px-1"
           data-testid="mushaf-page-readout"
         >
-          <bdi className="text-[0.9375rem] leading-[1.4] font-extrabold tabular-nums">
+          <bdi className="text-subtitle leading-[1.4] font-extrabold tabular-nums">
             {formatNumerals(displayPage, language)}
           </bdi>
-          <span className="text-[0.625rem] leading-[1.4] font-bold opacity-70">
-            {t(language, "mushaf.railPageUnit")}
-          </span>
+          <span className="text-micro leading-[1.4] font-bold opacity-70">{t(language, "mushaf.railPageUnit")}</span>
           <span className="sr-only">
             {t(language, "mushaf.pageOfTotal", {
               page: formatNumerals(displayPage, language),
@@ -884,11 +882,11 @@ export function KhatmahReaderScreen({
 
         {error && !pageData && (
           <div className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center">
-            <p className="text-[0.9375rem] font-bold text-destructive">{error}</p>
+            <p className="text-subtitle font-bold text-destructive">{error}</p>
             <button
               type="button"
               onClick={() => setReloadToken((token) => token + 1)}
-              className="flex items-center gap-2 rounded-btn bg-primary px-4 py-2 text-[0.875rem] font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              className="flex items-center gap-2 rounded-btn bg-primary px-4 py-2 text-sm font-bold text-primary-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             >
               <RotateCcw size={16} />
               <span>{t(language, "mushaf.retry")}</span>
@@ -982,8 +980,8 @@ export function KhatmahReaderScreen({
               <CheckCircle2 size={16} strokeWidth={2.5} aria-hidden="true" />
             </div>
             <div className="flex flex-col text-start whitespace-nowrap" dir={direction}>
-              <p className="text-[0.8125rem] font-extrabold leading-tight">{t(language, "mushaf.wirdComplete")}</p>
-              <p className="text-[0.6875rem] font-medium leading-tight opacity-80">
+              <p className="text-label font-extrabold leading-tight">{t(language, "mushaf.wirdComplete")}</p>
+              <p className="text-micro font-medium leading-tight opacity-80">
                 {t(language, "mushaf.wirdCompleteBody", { goal: formatNumerals(wirdGoal, language) })}
               </p>
             </div>

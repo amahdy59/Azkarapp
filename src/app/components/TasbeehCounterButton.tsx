@@ -71,7 +71,7 @@ export function TasbeehCounterButton({
         <div className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/30 bg-primary/15 text-primary backdrop-blur-md transition-transform duration-standard group-hover:scale-105 sm:size-11 sm:rounded-2xl">
           <TasbeehIcon size={24} className="shrink-0" />
         </div>
-        <span className="text-[1rem] md:text-[1.0625rem] font-black tracking-tight text-foreground truncate">
+        <span className="text-base md:text-title font-black tracking-tight text-foreground truncate">
           {t(language, "counter.tasbeehTitle")}
         </span>
       </div>

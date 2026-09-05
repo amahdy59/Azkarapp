@@ -212,7 +212,7 @@ export function MushafSettingsSheet({
               );
             })}
           </div>
-          <p id="mushaf-text-size-hint" className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
+          <p id="mushaf-text-size-hint" className="text-micro font-medium leading-snug text-muted-foreground">
             {t(language, textScaleApplies ? "mushaf.textSizeHint" : "mushaf.textSizeAtPageWidth")}
           </p>
         </section>
@@ -335,7 +335,7 @@ export function MushafSettingsSheet({
               );
             })}
           </div>
-          <p className="text-[0.6875rem] font-medium leading-snug text-muted-foreground">
+          <p className="text-micro font-medium leading-snug text-muted-foreground">
             {t(language, "mushaf.toolbarSideHint")}
           </p>
         </section>

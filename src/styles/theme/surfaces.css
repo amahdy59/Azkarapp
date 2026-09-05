@@ -423,17 +423,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   --nav-sidebar-width: 16rem;
 }
 
-/* Responsive Typography */
-.screen-title {
-  font-size: clamp(1.375rem, 1.2rem + 0.5vw, 1.875rem);
-}
-.arabic-zikr {
-  font-size: clamp(1.75rem, 1.55rem + 0.75vw, 2.5rem);
-}
-.body-text {
-  font-size: clamp(1rem, 0.96rem + 0.15vw, 1.125rem);
-}
-
 /* .app-main compact base */
 .app-main {
   flex: 1;
@@ -457,7 +446,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   mix-blend-mode: overlay;
 }
 
-.reduce-transparency .app-shell::after,
 .high-contrast .app-shell::after {
   display: none !important;
 }

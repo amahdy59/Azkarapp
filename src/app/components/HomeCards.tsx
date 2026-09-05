@@ -77,13 +77,13 @@ export function PrayerRoutineCard({
           <div className="flex w-full flex-col items-start gap-3 px-1">
             <h2
               id="current-zikr-heading"
-              className="block max-w-full truncate whitespace-nowrap text-[clamp(1.5rem,4.5vw,1.875rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-[2.25rem]"
+              className="block max-w-full truncate whitespace-nowrap text-[clamp(1.5rem,4.5vw,1.875rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-4xl"
               dir="auto"
               style={{ lineHeight: "1.25" }}
             >
               {categoryName}
             </h2>
-            <p className="max-w-[52ch] text-[0.875rem] font-semibold leading-6 text-on-media-muted" dir="auto">
+            <p className="max-w-[52ch] text-sm font-semibold leading-6 text-on-media-muted" dir="auto">
               {description}
             </p>
           </div>
@@ -97,7 +97,7 @@ export function PrayerRoutineCard({
                 aria-label={t(language, "home.routineMode")}
                 className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
                 itemClassName={(selected) =>
-                  `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-[0.875rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
                   }`
                 }
@@ -113,7 +113,7 @@ export function PrayerRoutineCard({
             <div className="flex w-full flex-col gap-2">
               <div
                 id={progressId}
-                className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-[0.8125rem] font-bold text-on-media"
+                className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-label font-bold text-on-media"
                 dir="auto"
               >
                 <span>
@@ -146,7 +146,7 @@ export function PrayerRoutineCard({
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-[1.0625rem] font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
           <DirectionArrow
@@ -201,14 +201,12 @@ export function SavedZikrCard({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="text-start">
-          <p className="text-[0.75rem] font-black uppercase tracking-wide text-primary">
-            {t(language, "home.savedEyebrow")}
-          </p>
-          <h3 id="home-saved-heading" className="mt-1 text-[1.125rem] font-black text-foreground">
+          <p className="text-xs font-black uppercase tracking-wide text-primary">{t(language, "home.savedEyebrow")}</p>
+          <h3 id="home-saved-heading" className="mt-1 text-lg font-black text-foreground">
             {t(language, "home.savedTitle")}
           </h3>
         </div>
-        <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-[0.875rem] font-black text-primary">
+        <span className="flex min-h-11 min-w-11 items-center justify-center rounded-2xl bg-primary/10 px-3 text-sm font-black text-primary">
           <span aria-hidden="true">{formatNumerals(count, language)}</span>
           <span className="sr-only">{t(language, "home.savedCount", { count: formatNumerals(count, language) })}</span>
         </span>
@@ -239,12 +237,12 @@ export function SavedZikrCard({
                     <SavedSourceIcon source={item.source} />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[0.6875rem] font-bold text-primary">
+                    <span className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-micro font-bold text-primary">
                       <span>{item.categoryLabel}</span>
-                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-[0.625rem]">{sourceLabel}</span>
+                      <span className="rounded-full bg-primary/10 px-1.5 py-0.5 text-micro">{sourceLabel}</span>
                     </span>
                     <span
-                      className={`mt-0.5 block truncate text-[0.875rem] font-bold text-foreground ${
+                      className={`mt-0.5 block truncate text-sm font-bold text-foreground ${
                         language === "ar" ? "zikr-text" : ""
                       }`}
                       dir="auto"
@@ -270,7 +268,7 @@ export function SavedZikrCard({
           })}
         </div>
       ) : (
-        <p className="mt-4 text-start text-[0.8125rem] font-semibold leading-6 text-muted-foreground">
+        <p className="mt-4 text-start text-label font-semibold leading-6 text-muted-foreground">
           {t(language, "home.savedEmpty")}
         </p>
       )}
@@ -279,7 +277,7 @@ export function SavedZikrCard({
         <button
           type="button"
           onClick={onOpenLibrary}
-          className="mt-auto flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 py-3 text-[0.875rem] font-black text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+          className="mt-auto flex min-h-11 w-full items-center justify-center rounded-2xl border border-primary/35 bg-primary/10 px-4 py-3 text-sm font-black text-primary transition-colors hover:bg-primary/20 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
         >
           {count > 0
             ? t(language, "home.openSavedCount", { count: formatNumerals(count, language) })
@@ -354,14 +352,14 @@ export function FridayHomeCard({
           <h3 id="friday-card-heading" className="mt-1 text-xl font-black text-foreground md:text-2xl" dir="auto">
             {t(language, "home.kahfMerit")}
           </h3>
-          <p className="mt-3 max-w-[62ch] text-[0.875rem] font-medium leading-7 text-muted-foreground" dir="auto">
+          <p className="mt-3 max-w-[62ch] text-sm font-medium leading-7 text-muted-foreground" dir="auto">
             {t(language, "friday.kahfHadith")}
           </p>
           {onOpen && (
             <button
               type="button"
               onClick={onOpen}
-              className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-[0.9375rem] font-black text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-fit"
+              className="mt-4 flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl bg-primary px-6 text-subtitle font-black text-primary-foreground shadow-xs transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:w-fit"
             >
               {actionLabel}
               <DirectionArrow direction={direction} />
@@ -418,14 +416,14 @@ export function DailyEvidenceCard({
         >
           <BookOpen size={18} />
         </span>
-        <h2 id="home-evidence-heading" className="text-[0.9375rem] font-bold text-foreground">
+        <h2 id="home-evidence-heading" className="text-subtitle font-bold text-foreground">
           {t(language, "home.dailyEvidence")}
         </h2>
       </div>
 
       {/* The narration leads, in the language it was said in. */}
       <blockquote
-        className="zikr-text text-[1.0625rem] font-medium leading-[2] text-foreground"
+        className="zikr-text text-title font-medium leading-[2] text-foreground"
         dir="rtl"
         lang="ar"
         data-testid="daily-evidence-hadith"
@@ -433,17 +431,17 @@ export function DailyEvidenceCard({
         {evidence.hadith}
       </blockquote>
 
-      <p className="text-[0.8125rem] leading-relaxed text-muted-foreground" dir="auto">
+      <p className="text-label leading-relaxed text-muted-foreground" dir="auto">
         {evidence.benefit}
       </p>
 
       <footer className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/40 pt-3">
-        <span className="text-[0.75rem] font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
+        <span className="text-xs font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
           {evidence.authenticity}
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceReference && (
-          <span className="text-[0.75rem] text-muted-foreground" dir="auto">
+          <span className="text-xs text-muted-foreground" dir="auto">
             {evidence.sourceReference}
           </span>
         )}

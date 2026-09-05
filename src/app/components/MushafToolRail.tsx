@@ -87,7 +87,7 @@ const RAIL_CELL =
   "flex min-h-11 flex-col items-center justify-center gap-0.5 rounded-lg px-0.5 py-1.5 transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring";
 /** Arabic ink reaches well past a 1.15 line box, so a clamped caption would
  *  crop its own descenders. */
-const RAIL_LABEL = "line-clamp-2 max-w-full text-center text-[0.625rem] font-extrabold leading-[1.6]";
+const RAIL_LABEL = "line-clamp-2 max-w-full text-center text-micro font-extrabold leading-[1.6]";
 
 function RailButton({ action, highlight }: { action: MushafToolRailAction; highlight?: boolean }) {
   const isToggle = action.pressed !== undefined;
@@ -347,7 +347,7 @@ export function MushafToolRail({
         <span className={RAIL_LABEL} dir="auto">
           {surahName}
         </span>
-        <span className="text-[0.625rem] font-bold leading-[1.6] opacity-70">
+        <span className="text-micro font-bold leading-[1.6] opacity-70">
           {t(language, "mushaf.juzLabel", { juz: formatNumerals(juzNumber, language) })}
         </span>
       </button>

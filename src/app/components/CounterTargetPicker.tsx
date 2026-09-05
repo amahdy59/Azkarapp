@@ -65,7 +65,7 @@ export function CounterTargetPicker({
           <button
             type="button"
             data-testid="counter-target-filter"
-            className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-border-control bg-card px-4 text-[0.875rem] font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            className="interactive-elem flex min-h-[48px] w-full items-center justify-between gap-3 rounded-2xl border border-border-control bg-card px-4 text-sm font-bold text-foreground shadow-xs transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
             aria-label={`${t(language, "counter.targetLabel")} ${activeLabel}`}
           >
             <div className="flex items-center gap-2 truncate">
@@ -78,7 +78,7 @@ export function CounterTargetPicker({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="min-w-[var(--radix-dropdown-menu-trigger-width)]">
-          <DropdownMenuLabel className="px-3 py-2 text-[0.75rem] font-black text-muted-foreground">
+          <DropdownMenuLabel className="px-3 py-2 text-xs font-black text-muted-foreground">
             {t(language, "counter.targetLabel")}
           </DropdownMenuLabel>
           <DropdownMenuRadioGroup
@@ -121,11 +121,11 @@ export function CounterTargetPicker({
           className="p-6"
         >
           <div>
-            <h3 className="mb-3 text-[1.125rem] font-bold text-foreground">{t(language, "counter.setCustomTarget")}</h3>
-            <p className="mb-4 text-[0.8125rem] text-muted-foreground">{t(language, "counter.customTargetHint")}</p>
+            <h3 className="mb-3 text-lg font-bold text-foreground">{t(language, "counter.setCustomTarget")}</h3>
+            <p className="mb-4 text-label text-muted-foreground">{t(language, "counter.customTargetHint")}</p>
 
             <form onSubmit={handleCustomSubmit} className="space-y-4">
-              <label htmlFor="custom-counter-target" className="block text-[0.8125rem] font-bold text-foreground">
+              <label htmlFor="custom-counter-target" className="block text-label font-bold text-foreground">
                 {t(language, "counter.targetLabel")}
               </label>
               <input
@@ -138,7 +138,7 @@ export function CounterTargetPicker({
                 onChange={(e) => setCustomInputValue(Math.max(1, parseInt(e.target.value) || 1))}
                 inputMode="numeric"
                 onWheel={(event) => event.currentTarget.blur()}
-                className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-[1.25rem] font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="h-12 w-full rounded-[var(--ds-radius-control)] border border-border-control bg-background px-4 text-xl font-extrabold text-foreground focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 // eslint-disable-next-line jsx-a11y/no-autofocus
                 autoFocus
               />

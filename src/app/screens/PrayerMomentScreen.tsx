@@ -100,10 +100,10 @@ function ActionCard({
       />
       <TrackingCheckMark checked={checked} />
       <span className="pointer-events-none min-w-0 flex-1">
-        <span id={`${id}-title`} className="block truncate text-[0.9375rem] font-black text-foreground">
+        <span id={`${id}-title`} className="block truncate text-subtitle font-black text-foreground">
           {title}
         </span>
-        <span id={`${id}-detail`} className="mt-0.5 block text-[0.8125rem] font-semibold text-muted-foreground">
+        <span id={`${id}-detail`} className="mt-0.5 block text-label font-semibold text-muted-foreground">
           {detail}
         </span>
         {footer}
@@ -224,12 +224,12 @@ export function PrayerMomentScreen({
                 {formatPrayerTimeLabel(moment.time, isArabic)}
               </p>
               {isLive && (
-                <span className="rounded-full bg-primary px-3 py-1 text-[0.75rem] font-black text-primary-foreground">
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
                   {t(language, "prayerMoment.badgeNow")}
                 </span>
               )}
             </div>
-            <p className="flex items-center gap-2 text-[0.8125rem] font-bold text-white/80">
+            <p className="flex items-center gap-2 text-label font-bold text-white/80">
               <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
               {t(language, statusKey)}
             </p>
@@ -243,16 +243,16 @@ export function PrayerMomentScreen({
             className="flex flex-col justify-center rounded-2xl border border-border bg-card p-4 text-center"
             data-testid="prayer-moment-virtue"
           >
-            <h3 className="text-[0.9375rem] font-black text-primary" dir="auto">
+            <h3 className="text-subtitle font-black text-primary" dir="auto">
               {t(language, "prayerMoment.virtueTitle", { prayer: name })}
             </h3>
-            <p className="mt-2 text-[0.75rem] font-bold text-muted-foreground" dir="auto">
+            <p className="mt-2 text-xs font-bold text-muted-foreground" dir="auto">
               {t(language, "prayerMoment.virtueAttribution")}
             </p>
-            <p className="zikr-text mt-2 text-[1.0625rem] font-bold leading-loose text-foreground" dir="rtl" lang="ar">
+            <p className="zikr-text mt-2 text-title font-bold leading-loose text-foreground" dir="rtl" lang="ar">
               {virtue.textArabic}
             </p>
-            <p className="mt-2 text-[0.75rem] font-semibold text-muted-foreground" dir="auto">
+            <p className="mt-2 text-xs font-semibold text-muted-foreground" dir="auto">
               {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
             </p>
           </section>
@@ -273,10 +273,10 @@ export function PrayerMomentScreen({
             <div className="flex w-full items-start gap-3">
               <TrackingCheckMark checked={moment.location !== null} />
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[0.9375rem] font-black text-foreground">
+                <p className="truncate text-subtitle font-black text-foreground">
                   {t(language, "prayerMoment.locationTitle")}
                 </p>
-                <p className="mt-0.5 text-[0.8125rem] font-semibold text-muted-foreground">
+                <p className="mt-0.5 text-label font-semibold text-muted-foreground">
                   {t(language, "prayerMoment.locationDetail")}
                 </p>
               </div>
@@ -301,7 +301,7 @@ export function PrayerMomentScreen({
                     aria-checked={selected}
                     data-testid={`prayer-location-${place}`}
                     onClick={() => onToggle(prayer, "location", selected ? null : place)}
-                    className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-3 text-[0.8125rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-3 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                       selected
                         ? "border-primary bg-primary/15 text-primary"
                         : "border-border text-foreground hover:bg-muted"
@@ -327,7 +327,7 @@ export function PrayerMomentScreen({
             onChange={(next) => onToggle(prayer, "adhkar", next)}
             icon={<Translate size={20} aria-hidden="true" />}
             footer={
-              <span className="mt-2 flex items-center gap-1.5 text-[0.75rem] font-bold text-muted-foreground">
+              <span className="mt-2 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
                 {moment.location ? (
                   <button
                     type="button"
@@ -374,7 +374,7 @@ export function PrayerMomentScreen({
                     type="button"
                     onClick={() => setEvidenceOpen(true)}
                     data-testid="prayer-sunnah-evidence"
-                    className="pointer-events-auto relative z-10 flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-bold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                    className="pointer-events-auto relative z-10 flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                   >
                     <Info size={15} aria-hidden="true" />
                     {t(language, "prayerMoment.evidenceOpen")}
@@ -398,24 +398,24 @@ export function PrayerMomentScreen({
             maxWidthClassName="max-w-[32rem]"
           >
             <div className="flex flex-col gap-3 px-5 py-4 text-center">
-              <p className="text-[0.9375rem] font-black text-primary" dir="auto">
+              <p className="text-subtitle font-black text-primary" dir="auto">
                 {sunnahDetail}
               </p>
-              <p className="zikr-text text-[1rem] font-bold leading-loose text-foreground" dir="rtl" lang="ar">
+              <p className="zikr-text text-base font-bold leading-loose text-foreground" dir="rtl" lang="ar">
                 {sunnah.evidence.textArabic}
               </p>
-              <p className="text-[0.8125rem] font-semibold text-muted-foreground" dir="auto">
+              <p className="text-label font-semibold text-muted-foreground" dir="auto">
                 {isArabic ? sunnah.evidence.referenceArabic : sunnah.evidence.referenceEnglish}
               </p>
               {/* Named only where the narration sits outside the two Sahihs,
                   which is exactly where a reader needs to be told. */}
               {(isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish) && (
-                <p className="text-[0.75rem] font-bold text-muted-foreground/80" dir="auto">
+                <p className="text-xs font-bold text-muted-foreground/80" dir="auto">
                   {isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish}
                 </p>
               )}
               {sunnah.rank === "optional" && (
-                <p className="text-[0.75rem] font-semibold leading-6 text-muted-foreground" dir="auto">
+                <p className="text-xs font-semibold leading-6 text-muted-foreground" dir="auto">
                   {t(language, "prayerMoment.optionalNote")}
                 </p>
               )}
@@ -444,8 +444,8 @@ export function PrayerMomentScreen({
                 }`}
               >
                 <ItemIcon size={18} aria-hidden="true" />
-                <span className="text-[0.6875rem] font-black">{t(language, `notifications.${item}`)}</span>
-                <span className="text-[0.6875rem] font-semibold tabular-nums" dir="auto">
+                <span className="text-micro font-black">{t(language, `notifications.${item}`)}</span>
+                <span className="text-micro font-semibold tabular-nums" dir="auto">
                   {formatPrayerTimeLabel(times[item], isArabic)}
                 </span>
               </button>

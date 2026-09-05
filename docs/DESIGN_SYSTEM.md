@@ -27,6 +27,30 @@ The app uses offline system-family stacks so first render, installed-PWA use, an
 | Zikr, du'a, Qur'anic, and Arabic evidence text            | Native Arabic reading stack            | Add the `zikr-text` class and `lang="ar"`                                              | RTL                          |
 | Numeric counters                                          | Existing numeral formatter/font helper | `counterNumeralFontFamily` or `numeralFontFamily`                                      | LTR inside the numeric group |
 
+### Interface type scale
+
+Interface text uses named steps, never an arbitrary size. The scale is declared in `src/styles/tailwind.css` and `scripts/check-type-scale.mjs` fails the build when a new arbitrary size appears.
+
+| Step            | Size           | Where it belongs                                |
+| --------------- | -------------- | ----------------------------------------------- |
+| `text-micro`    | 11 px / 0.6875 | Keycaps, chips, the smallest metadata           |
+| `text-xs`       | 12 px          | Captions, hints, status lines                   |
+| `text-label`    | 13 px / 0.8125 | Control labels, tracking rows, secondary detail |
+| `text-sm`       | 14 px          | Body copy                                       |
+| `text-subtitle` | 15 px / 0.9375 | Card titles, list headings                      |
+| `text-base`     | 16 px          | Emphasised body, short Arabic evidence          |
+| `text-title`    | 17 px / 1.0625 | Section titles, single-action counter faces     |
+| `text-lg`       | 18 px          | Sheet and dialog titles                         |
+| `text-xl`       | 20 px          | Screen headings                                 |
+| `text-headline` | 22 px / 1.375  | Prayer times, the largest number on a card      |
+| `text-2xl`      | 24 px          | Hero titles                                     |
+| `text-display`  | 28 px / 1.75   | The prayer's own time, completion numerals      |
+| `text-4xl`      | 36 px          | The display-title ceiling described above       |
+
+Seven of these are Tailwind's own steps and six are the in-between sizes this app genuinely uses; naming them moved no pixels. Before this, twenty-five distinct sizes were written as arbitrary values — a one-pixel ramp from 9 px to 18 px, which is a continuum rather than a scale, and one rule of generated CSS for each.
+
+What stays arbitrary, and why: brand and celebration lettering (`OnboardingBrand`, the completion cards) sizes its own artwork, and `text-[color:…]`, `text-[length:…]` and the display-title `clamp()` are not sizes on this scale. The guard counts what remains rather than keeping a list of blessed files, so removing one and lowering the number is always welcome and adding one is a conversation.
+
 ### Display title role
 
 The largest in-app heading — the category name on Home's routine card, and any future card

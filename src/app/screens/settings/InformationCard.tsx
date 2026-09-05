@@ -28,12 +28,12 @@ export function InformationCard({
           {icon}
         </span>
         <div className="min-w-0 flex-1">
-          <Heading className="text-[0.9375rem] font-semibold text-foreground">{title}</Heading>
-          <p className="mt-1 text-[0.8125rem] leading-5 text-muted-foreground">{body}</p>
+          <Heading className="text-subtitle font-semibold text-foreground">{title}</Heading>
+          <p className="mt-1 text-label leading-5 text-muted-foreground">{body}</p>
         </div>
       </div>
       {actionLabel && onAction && (
-        <Button type="button" onClick={onAction} className="mt-3 w-full text-[0.8125rem]">
+        <Button type="button" onClick={onAction} className="mt-3 w-full text-label">
           {actionLabel}
           {actionIcon}
         </Button>

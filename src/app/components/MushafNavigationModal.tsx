@@ -180,7 +180,7 @@ export function MushafNavigationModal({
             aria-label={t(language, "mushaf.indexTitle")}
             className="flex border-b border-border bg-muted/20 px-1 pt-2 sm:px-3"
             itemClassName={(selected) =>
-              `flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-[0.8125rem] font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:gap-1.5 sm:px-3 sm:text-sm ${
+              `flex min-h-11 min-w-0 flex-1 items-center justify-center gap-1 border-b-2 px-1 py-2 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:gap-1.5 sm:px-3 sm:text-sm ${
                 selected
                   ? "border-primary text-primary"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -258,7 +258,7 @@ export function MushafNavigationModal({
                             {formatNumerals(surah.number, language)}
                           </span>
                           <div>
-                            <div className="arabic-ui text-[1.05rem] font-bold text-foreground transition-colors group-hover:text-primary">
+                            <div className="arabic-ui text-title font-bold text-foreground transition-colors group-hover:text-primary">
                               {surah.nameArabic}
                             </div>
                             <div className="text-xs text-muted-foreground flex items-center gap-2 mt-0.5">

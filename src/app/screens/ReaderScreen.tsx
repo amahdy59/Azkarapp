@@ -72,9 +72,9 @@ const READER_TEXT_SIZE_OPTIONS: ReadonlyArray<{
   labelKey: string;
   sampleClass: string;
 }> = [
-  { value: "small", labelKey: "settings.textSmall", sampleClass: "text-[0.75rem]" },
-  { value: "medium", labelKey: "settings.medium", sampleClass: "text-[0.9375rem]" },
-  { value: "large", labelKey: "settings.textLarge", sampleClass: "text-[1.125rem]" },
+  { value: "small", labelKey: "settings.textSmall", sampleClass: "text-xs" },
+  { value: "medium", labelKey: "settings.medium", sampleClass: "text-subtitle" },
+  { value: "large", labelKey: "settings.textLarge", sampleClass: "text-lg" },
 ];
 
 /** Shared ghost icon-button treatment for every control in the phone header row. */
@@ -653,26 +653,20 @@ export function ReaderScreen({
               where translation and transliteration live. */}
           {showTranslation && z.translation && (
             <section aria-labelledby="reader-translation-title">
-              <h2
-                id="reader-translation-title"
-                className="text-[0.8125rem] font-bold text-muted-foreground text-center"
-              >
+              <h2 id="reader-translation-title" className="text-label font-bold text-muted-foreground text-center">
                 {t(language, "reader.translationLabel")}
               </h2>
-              <p className="mt-1 text-[1rem] leading-7 text-foreground text-center" lang="en" dir="ltr">
+              <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
                 {z.translation}
               </p>
             </section>
           )}
           {showTransliteration && z.transliteration && (
             <section aria-labelledby="reader-transliteration-title">
-              <h2
-                id="reader-transliteration-title"
-                className="text-[0.8125rem] font-bold text-muted-foreground text-center"
-              >
+              <h2 id="reader-transliteration-title" className="text-label font-bold text-muted-foreground text-center">
                 {t(language, "reader.transliterationLabel")}
               </h2>
-              <p className="mt-1 text-[1rem] leading-7 text-foreground text-center" lang="en" dir="ltr">
+              <p className="mt-1 text-base leading-7 text-foreground text-center" lang="en" dir="ltr">
                 {z.transliteration}
               </p>
             </section>
@@ -799,7 +793,7 @@ export function ReaderScreen({
       {longSurah && (
         <DropdownMenuItem
           onClick={() => setImmersiveOpen(true)}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
         >
           <BookOpen size={18} />
           {t(language, "reader.immersiveOpen")}
@@ -809,7 +803,7 @@ export function ReaderScreen({
       <DropdownMenuItem
         disabled={!audioAvailable}
         onClick={onPlayAudio}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
       >
         <Volume2 size={18} />
         {audioAvailable ? t(language, "reader.playAudioOnce") : t(language, "reader.audioUnavailable")}
@@ -818,7 +812,7 @@ export function ReaderScreen({
       {onRepeatAudio && (
         <DropdownMenuItem
           onClick={onRepeatAudio}
-          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+          className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
         >
           <RotateCcw size={18} />
           {t(language, "reader.repeatPrescribed")}
@@ -832,7 +826,7 @@ export function ReaderScreen({
           when the text in front of them is the thing that is too small. It
           drives the same app-wide setting Settings does, so the two can never
           disagree; changing it here also resizes the app's chrome. */}
-      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-[0.75rem] font-bold uppercase tracking-wide text-muted-foreground">
+      <DropdownMenuLabel className="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-wide text-muted-foreground">
         {t(language, "settings.textSize")}
       </DropdownMenuLabel>
       <DropdownMenuRadioGroup value={textSize} onValueChange={(value) => onTextSizeChange(value as TextSizeOption)}>
@@ -841,7 +835,7 @@ export function ReaderScreen({
             key={value}
             value={value}
             data-testid={`reader-text-size-${value}`}
-            className="cursor-pointer rounded-xl py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+            className="cursor-pointer rounded-xl py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
           >
             <span className="flex items-center gap-3">
               {/* The glyph previews the step; the word carries the meaning,
@@ -862,7 +856,7 @@ export function ReaderScreen({
           off the desktop hero toolbar into the same menu. */}
       <DropdownMenuItem
         onClick={handleToggleSaved}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
       >
         <Bookmark key={String(isSaved)} size={18} className={isSaved ? "favorite-pop fill-current" : ""} />
         {isSaved ? t(language, "reader.unsave") : t(language, "reader.save")}
@@ -870,7 +864,7 @@ export function ReaderScreen({
       <DropdownMenuItem
         onClick={() => void handleShare()}
         disabled={isSharing}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted data-[disabled]:cursor-not-allowed data-[disabled]:opacity-40"
       >
         <Share2 size={18} />
         {t(language, "reader.share")}
@@ -878,7 +872,7 @@ export function ReaderScreen({
       <DropdownMenuItem
         onClick={toggleSound}
         data-testid={`reader-counter-sound-toggle-${layout}`}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
       >
         {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
         {t(language, soundEnabled ? "counter.muteSound" : "counter.enableSound")}
@@ -886,7 +880,7 @@ export function ReaderScreen({
 
       <DropdownMenuItem
         onClick={handleResetCounter}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
       >
         <RotateCcw size={18} />
         {t(language, "reader.resetCounter")}
@@ -896,7 +890,7 @@ export function ReaderScreen({
 
       <DropdownMenuItem
         onClick={onBack}
-        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-[0.9375rem] font-medium transition-colors hover:bg-muted"
+        className="flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-subtitle font-medium transition-colors hover:bg-muted"
       >
         <List size={18} />
         {t(language, "reader.viewAllAzkar")}
@@ -1046,16 +1040,16 @@ export function ReaderScreen({
                 </DropdownMenu>
               </div>
 
-              <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+              <h1 className="text-display font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
                 {displayCategoryName}
               </h1>
 
               <div className="flex w-full max-w-[520px] flex-col items-center gap-2">
                 <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                  <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
+                  <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
                     {t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}
                   </span>
-                  <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
+                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]">
                     {t(language, "reader.collectionCount", {
                       done: formatNumerals(readingProgressValue, language),
                       total: formatNumerals(azkar.length, language),
@@ -1081,7 +1075,7 @@ export function ReaderScreen({
                 {readerZikrTitle && (
                   <div className="mt-1.5 flex w-full items-center justify-between gap-3">
                     <h2
-                      className="min-w-0 truncate text-start text-[0.875rem] font-extrabold leading-relaxed text-[color:var(--on-media)]"
+                      className="min-w-0 truncate text-start text-sm font-extrabold leading-relaxed text-[color:var(--on-media)]"
                       dir="auto"
                       title={readerZikrTitle}
                       data-testid="reader-zikr-title"
@@ -1099,7 +1093,7 @@ export function ReaderScreen({
                           aria-label={t(language, "settings.showDifficultWords")}
                           title={t(language, "settings.showDifficultWords")}
                         >
-                          <span className="text-[0.75rem] font-bold text-[color:var(--on-media)] hidden sm:inline">
+                          <span className="text-xs font-bold text-[color:var(--on-media)] hidden sm:inline">
                             {t(language, "settings.showDifficultWords")}
                           </span>
                           <ToggleTrack checked={showDifficultWords} />
@@ -1110,7 +1104,7 @@ export function ReaderScreen({
                           type="button"
                           onClick={() => setImmersiveOpen(true)}
                           data-testid="reader-mushaf-button"
-                          className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-[0.75rem] font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                          className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-[color:var(--on-media)]/25 px-3 text-xs font-black text-[color:var(--on-media)] transition-colors hover:bg-[color:var(--on-media)]/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                         >
                           <BookOpen size={14} aria-hidden="true" />
                           {t(language, "reader.immersiveOpen")}
@@ -1224,7 +1218,7 @@ export function ReaderScreen({
             </div>
 
             <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid="reader-session-chrome">
-              <div className="mb-2 flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
+              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{t(language, "reader.collectionPercentComplete", { percent: localizedReadingPercent })}</span>
                 <span>
                   {t(language, "reader.collectionCount", {
@@ -1247,7 +1241,7 @@ export function ReaderScreen({
               {readerZikrTitle && (
                 <div className="mt-2.5 flex w-full items-center justify-between gap-3">
                   <h2
-                    className="min-w-0 truncate whitespace-nowrap text-start text-[0.875rem] font-extrabold leading-relaxed text-foreground"
+                    className="min-w-0 truncate whitespace-nowrap text-start text-sm font-extrabold leading-relaxed text-foreground"
                     dir="auto"
                     title={readerZikrTitle}
                     data-testid="reader-zikr-title"
@@ -1265,7 +1259,7 @@ export function ReaderScreen({
                         aria-label={t(language, "settings.showDifficultWords")}
                         title={t(language, "settings.showDifficultWords")}
                       >
-                        <span className="text-[0.75rem] font-bold text-muted-foreground hidden sm:inline">
+                        <span className="text-xs font-bold text-muted-foreground hidden sm:inline">
                           {t(language, "settings.showDifficultWords")}
                         </span>
                         <ToggleTrack checked={showDifficultWords} />
@@ -1276,7 +1270,7 @@ export function ReaderScreen({
                         type="button"
                         onClick={() => setImmersiveOpen(true)}
                         data-testid="reader-mushaf-button"
-                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                        className="flex min-h-9 shrink-0 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-black text-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                       >
                         <BookOpen size={14} aria-hidden="true" />
                         {t(language, "reader.immersiveOpen")}
@@ -1363,11 +1357,11 @@ export function ReaderScreen({
           className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 rounded-2xl border border-primary/40 bg-card/95 px-4 py-2.5 shadow-lg backdrop-blur-md text-foreground transition-all duration-200"
           dir={direction}
         >
-          <span className="text-[0.875rem] font-medium">{t(language, "reader.resetCounter")}</span>
+          <span className="text-sm font-medium">{t(language, "reader.resetCounter")}</span>
           <button
             type="button"
             onClick={handleUndoReset}
-            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-[0.875rem] font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
+            className="interactive-elem flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl bg-primary/20 hover:bg-primary/30 px-3.5 py-2 text-sm font-bold text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring cursor-pointer"
           >
             {t(language, "common.undo")}
           </button>

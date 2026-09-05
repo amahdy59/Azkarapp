@@ -86,18 +86,14 @@ export function SettingsRootPanel({
           >
             <Moon size={20} className="text-primary" />
           </span>
-          <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.displayTheme")}</h3>
+          <h3 className="text-base font-semibold text-foreground">{t(language, "settings.displayTheme")}</h3>
         </div>
         <ThemeModeSelector language={language} direction={direction} value={themeMode} onChange={onThemeModeChange} />
         {highContrast && (
           <aside className="mt-3 rounded-2xl border border-primary/40 bg-primary/10 p-3" aria-live="polite">
-            <h4 className="text-[0.875rem] font-semibold text-foreground">
-              {t(language, "appearance.highContrastTitle")}
-            </h4>
-            <p className="mt-1 text-[0.75rem] leading-5 text-muted-foreground">
-              {t(language, "appearance.highContrastBody")}
-            </p>
-            <Button type="button" size="sm" onClick={onDisableHighContrast} className="mt-2 text-[0.75rem]">
+            <h4 className="text-sm font-semibold text-foreground">{t(language, "appearance.highContrastTitle")}</h4>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{t(language, "appearance.highContrastBody")}</p>
+            <Button type="button" size="sm" onClick={onDisableHighContrast} className="mt-2 text-xs">
               {t(language, "appearance.disableHighContrast")}
             </Button>
           </aside>
@@ -114,7 +110,7 @@ export function SettingsRootPanel({
             >
               <Globe size={20} className="text-primary" />
             </span>
-            <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.language")}</h3>
+            <h3 className="text-base font-semibold text-foreground">{t(language, "settings.language")}</h3>
           </div>
           <SegmentedControl
             value={language}
@@ -151,7 +147,7 @@ export function SettingsRootPanel({
               >
                 <Calendar size={20} className="text-primary" />
               </span>
-              <h3 className="text-[1rem] font-semibold text-foreground">{t(language, "settings.calendarSystem")}</h3>
+              <h3 className="text-base font-semibold text-foreground">{t(language, "settings.calendarSystem")}</h3>
             </div>
             <SegmentedControl
               value={calendarType}

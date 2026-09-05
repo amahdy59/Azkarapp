@@ -161,7 +161,7 @@ function SectionDivider({ label }: { label: string }) {
   return (
     <div className="flex items-center gap-4 py-1">
       <span className="h-px flex-1 bg-border" aria-hidden="true" />
-      <h2 className="text-[0.9375rem] font-bold text-primary" dir="auto">
+      <h2 className="text-subtitle font-bold text-primary" dir="auto">
         {label}
       </h2>
       <span className="h-px flex-1 bg-border" aria-hidden="true" />
@@ -473,7 +473,7 @@ export function HomeScreen({
           >
             <div
               data-testid="hijri-date"
-              className="min-w-0 text-[0.8125rem] font-bold text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-[0.9375rem]"
+              className="min-w-0 text-label font-bold text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-subtitle"
             >
               <time className="block truncate" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
@@ -481,7 +481,7 @@ export function HomeScreen({
             </div>
             <div
               data-testid="home-header-routine-summary"
-              className="flex shrink-0 items-center gap-2 text-[0.8125rem] font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-[0.9375rem]"
+              className="flex shrink-0 items-center gap-2 text-label font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-subtitle"
             >
               <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
                 <Zap className="size-4 sm:size-[1.125rem]" strokeWidth={2.5} aria-hidden="true" />
@@ -590,10 +590,10 @@ export function HomeScreen({
                   approved design: it separates chrome from the row of cards
                   without adding another filled band. */}
               <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-5 text-start sm:px-6">
-                <h2 className="text-[1.375rem] font-black leading-tight text-foreground" dir="auto">
+                <h2 className="text-headline font-black leading-tight text-foreground" dir="auto">
                   {t(language, "progress.postPrayerAzkar")}
                 </h2>
-                <p className="mt-2 text-[0.8125rem] font-semibold leading-5 text-muted-foreground" dir="auto">
+                <p className="mt-2 text-label font-semibold leading-5 text-muted-foreground" dir="auto">
                   {t(language, "home.prayerTrackerHint")}
                 </p>
               </div>
@@ -669,13 +669,13 @@ export function HomeScreen({
                 </div>
                 <div className="relative z-10 m-3 rounded-2xl bg-on-media-surface/90 p-4 shadow-raised sm:m-4 sm:p-5">
                   <span className="block">
-                    <span className="block text-[1.25rem] font-black text-on-media drop-shadow-md">
+                    <span className="block text-xl font-black text-on-media drop-shadow-md">
                       {t(language, "benefits.title")}
                     </span>
-                    <span className="mt-2 block max-w-[34rem] text-[0.8125rem] font-semibold leading-6 text-on-media-muted sm:text-[0.875rem]">
+                    <span className="mt-2 block max-w-[34rem] text-label font-semibold leading-6 text-on-media-muted sm:text-sm">
                       {t(language, "benefits.homeDescription")}
                     </span>
-                    <span className="mt-4 flex items-center gap-2 text-[0.875rem] font-black text-primary drop-shadow-sm">
+                    <span className="mt-4 flex items-center gap-2 text-sm font-black text-primary drop-shadow-sm">
                       {t(language, "benefits.open")}
                       {direction === "rtl" ? (
                         <ArrowLeft size={18} className="transition-transform group-hover:-translate-x-1" />

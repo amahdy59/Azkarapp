@@ -98,7 +98,7 @@ export function TodayRoutineGarden({
               aria-hidden="true"
             />
             <span
-              className={`text-[0.875rem] font-black leading-tight ${streak > 0 ? "text-primary" : "text-muted-foreground/60"}`}
+              className={`text-sm font-black leading-tight ${streak > 0 ? "text-primary" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(streak, language)} {t(language, "progress.days")}
             </span>
@@ -111,7 +111,7 @@ export function TodayRoutineGarden({
               className={totalPalms > 0 ? "text-primary" : "text-muted-foreground/40"}
             />
             <span
-              className={`text-[0.875rem] font-black leading-tight ${totalPalms > 0 ? "text-primary" : "text-muted-foreground/60"}`}
+              className={`text-sm font-black leading-tight ${totalPalms > 0 ? "text-primary" : "text-muted-foreground/60"}`}
             >
               {formatNumerals(totalPalms, language)} {t(language, "progress.palmsUnit")}
             </span>
@@ -186,7 +186,7 @@ export function SevenDayGarden({ summary, language }: { summary: GardenSummary; 
             data-testid={`garden-day-${day.dayKey}`}
             className="flex items-center justify-between rounded-xl border border-border/70 bg-background/80 px-4 py-2.5"
           >
-            <span className="text-[0.875rem] font-bold text-foreground">{weekday}</span>
+            <span className="text-sm font-bold text-foreground">{weekday}</span>
             <div className="flex items-center gap-2">
               {day.isPalm ? (
                 <div
@@ -236,7 +236,7 @@ const MILESTONE_KEYS: Record<GardenMilestoneId, { title: string; body: string }>
 export function GardenMilestones({ summary, language }: { summary: GardenSummary; language: AppLanguage }) {
   return (
     <section aria-labelledby="garden-milestones-title">
-      <h2 id="garden-milestones-title" className="mb-3 text-[0.9375rem] font-bold text-foreground">
+      <h2 id="garden-milestones-title" className="mb-3 text-subtitle font-bold text-foreground">
         {t(language, "garden.milestonesTitle")}
       </h2>
       <div className="grid grid-cols-2 gap-2">
@@ -261,9 +261,9 @@ export function GardenMilestones({ summary, language }: { summary: GardenSummary
                   <PalmTreeMark size={24} />
                 )}
               </span>
-              <h3 className="mt-3 text-[0.8125rem] font-bold leading-5 text-foreground">{t(language, keys.title)}</h3>
-              <p className="mt-1 text-[0.6875rem] leading-4 text-muted-foreground">{t(language, keys.body)}</p>
-              <p className="mt-3 text-[0.6875rem] font-bold text-foreground">
+              <h3 className="mt-3 text-label font-bold leading-5 text-foreground">{t(language, keys.title)}</h3>
+              <p className="mt-1 text-micro leading-4 text-muted-foreground">{t(language, keys.body)}</p>
+              <p className="mt-3 text-micro font-bold text-foreground">
                 {milestone.complete
                   ? t(language, "garden.milestoneComplete")
                   : t(language, "garden.milestoneProgress", {
@@ -318,10 +318,8 @@ export function GrowthEventStatus({ event, language }: { event: GrowthEvent; lan
         )}
       </span>
       <span>
-        <span className={`block font-bold text-foreground ${isCore ? "text-[0.875rem]" : "text-[0.8125rem]"}`}>
-          {text}
-        </span>
-        <span className="mt-1 block text-[0.75rem] leading-5 text-muted-foreground">
+        <span className={`block font-bold text-foreground ${isCore ? "text-sm" : "text-label"}`}>{text}</span>
+        <span className="mt-1 block text-xs leading-5 text-muted-foreground">
           {t(language, "garden.eventHint", {
             count: formatNumerals(event.leafCount, language),
             total: formatNumerals(CATEGORIES.filter((category) => category.id !== "friday_kahf").length, language),

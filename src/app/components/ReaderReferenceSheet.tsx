@@ -77,7 +77,7 @@ function ReferenceContent({
           <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
             <BookOpen size={20} aria-hidden="true" />
           </div>
-          <div aria-hidden="true" className="text-[1.125rem] font-extrabold leading-snug text-foreground">
+          <div aria-hidden="true" className="text-lg font-extrabold leading-snug text-foreground">
             {t(language, "reader.referencesButton")}
           </div>
           <p id="reader-reference-description" className="sr-only">
@@ -107,7 +107,7 @@ function ReferenceContent({
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3
                   id="reference-evidence-heading"
-                  className="flex items-center gap-2 text-[0.9375rem] font-extrabold text-primary"
+                  className="flex items-center gap-2 text-subtitle font-extrabold text-primary"
                 >
                   {t(language, "reader.hadithLabel")}
                   {zikr.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
@@ -121,7 +121,7 @@ function ReferenceContent({
                   voice. */}
               <p
                 data-testid="reference-hadith"
-                className="zikr-text text-start text-[1rem] font-medium leading-8 text-foreground"
+                className="zikr-text text-start text-base font-medium leading-8 text-foreground"
                 lang="ar"
                 dir="rtl"
               >
@@ -130,12 +130,12 @@ function ReferenceContent({
             </section>
           )}
           <section className="mt-4 border-t border-border/50 pt-3" aria-labelledby="reference-source-heading">
-            <h3 id="reference-source-heading" className="mb-2 text-[0.9375rem] font-extrabold text-primary">
+            <h3 id="reference-source-heading" className="mb-2 text-subtitle font-extrabold text-primary">
               {t(language, "reader.sourceLabel")}
             </h3>
             <p
               data-testid="reference-source"
-              className="text-start text-[0.875rem] font-semibold leading-relaxed text-muted-foreground"
+              className="text-start text-sm font-semibold leading-relaxed text-muted-foreground"
               lang={isArabic ? "ar" : "en"}
               dir={direction}
             >

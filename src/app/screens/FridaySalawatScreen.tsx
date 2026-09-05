@@ -52,14 +52,14 @@ const COPY = {
 function ReferenceLink({ text, source, href }: { text: string; source: string; href: string }) {
   return (
     <article className="rounded-3xl border border-border bg-card p-4 text-start">
-      <p className="text-[0.9375rem] font-semibold leading-7 text-foreground" dir="auto">
+      <p className="text-subtitle font-semibold leading-7 text-foreground" dir="auto">
         {text}
       </p>
       <a
         href={href}
         target="_blank"
         rel="noreferrer"
-        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl text-[0.8125rem] font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-xl text-label font-black text-primary focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
       >
         {source}
         <ExternalLink size={16} aria-hidden="true" />
@@ -250,7 +250,7 @@ export function FridaySalawatScreen({
             }}
           >
             <p
-              className="zikr-text max-w-[34rem] text-center text-[1.25rem] font-extrabold leading-[2] text-foreground sm:text-[1.5rem]"
+              className="zikr-text max-w-[34rem] text-center text-xl font-extrabold leading-[2] text-foreground sm:text-2xl"
               dir="rtl"
               lang="ar"
             >
@@ -301,7 +301,7 @@ export function FridaySalawatScreen({
         >
           <div className="space-y-3">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-[1.125rem] font-black text-foreground">{copy.benefits}</h2>
+              <h2 className="text-lg font-black text-foreground">{copy.benefits}</h2>
               <button
                 type="button"
                 onClick={() => setShowBenefits(false)}

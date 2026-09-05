@@ -2839,3 +2839,53 @@ Record user-approved product, design and architectural decisions here. Do not er
   braces; the delta guard fails a 5% regression with an actionable message and
   passes at baseline; the full e2e suite passes against a production build,
   which is what actually exercises the transformed CSS.
+
+## DEC-148 — the interface has a type scale, and the stylesheet stops carrying what nothing uses
+
+- **Decision:** interface font sizes come from a named scale, enforced by a
+  check; hand-written CSS that nothing references is deleted, and a report
+  exists so the next round does not need archaeology.
+- **Twenty-five sizes is not a scale.** The app wrote every font size as an
+  arbitrary value: a one-pixel ramp from 9px to 18px, 624 uses across 68 files,
+  one rule of generated CSS for each, and no way for a reviewer to tell a
+  considered size from a typo. Seven of those values were already exactly
+  Tailwind's steps; six more are the in-between sizes the app genuinely uses and
+  are now named — `micro`, `label`, `subtitle`, `title`, `headline`, `display`.
+  599 utilities were rewritten and **no pixels moved**, except two interface
+  values a pixel off a step which were snapped to it.
+- **What stays arbitrary, and why.** Brand and celebration lettering
+  (`OnboardingBrand`, the completion cards) sizes its own artwork rather than
+  interface text, and `text-[color:…]`, `text-[length:…]` and the display-title
+  `clamp()` are not sizes on this scale at all. `check-type-scale.mjs` counts
+  what remains — eight — rather than keeping a list of blessed files, so
+  removing one and lowering the number is welcome and adding one is a
+  conversation. The guard runs in `pnpm check`.
+- **The scale costs bytes and is worth them.** Naming a size does not remove its
+  rule, and referencing a token is longer than a literal: the stylesheet grew 86
+  bytes. This was never a size change — it is the change that stops the size
+  problem regenerating, because the next feature reaches for a step instead of
+  minting a twenty-sixth value.
+- **Dead CSS, found statically.** Runtime coverage marks a rule unused when its
+  screen was not visited, and the screens most likely to be missed are the ones
+  whose CSS is most likely to have rotted. A class that appears in no source
+  file is dead whatever the run did. Fourteen candidates, of which one was a
+  false positive worth recording: `www.w3.org` inside an inline SVG data-URI
+  reads as a class selector unless `url()` payloads are stripped first. Twelve
+  were removed — among them a "Responsive Typography" block of three classes
+  that was an earlier attempt at exactly the scale this change finally landed —
+  along with the keyframes they orphaned. `.ui-surface` stays: it is declared in
+  `@layer components` as part of the stylesheet's API.
+- **A report, not a gate.** `pnpm report:unused-css` prints and exits zero,
+  because deciding whether an unreferenced class is dead or an intentional API
+  needs a person.
+- **Where the sequence landed.** 167,922 bytes at the start of the day against a
+  167,936 ceiling — fourteen bytes of room. After unwrapping Tailwind's
+  `color-mix` guards (DEC-147), naming the scale and deleting what nothing uses:
+  **157,293 bytes and 27,274 gzip**, 10,643 bytes of headroom, with the ceiling
+  never moved.
+- **Tests/evidence required:** the full e2e suite against a production build
+  after the 599-utility rewrite (338 passed, including the geometry and overlay
+  specs that would catch a shifted size); the type-scale guard failing on a new
+  arbitrary size and passing at eight; the unused-CSS report finding only the
+  deliberate `@layer components` class; brace balance verified per stylesheet
+  after each deletion.

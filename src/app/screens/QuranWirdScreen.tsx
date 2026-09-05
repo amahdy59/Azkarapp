@@ -501,7 +501,7 @@ export function QuranWirdScreen({
                     className={`flex items-center justify-between rounded-xl p-3 ${dayKey === todayKey ? "bg-muted" : ""}`}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-12 text-[0.875rem] font-bold text-foreground">{dayLabel}</span>
+                      <span className="w-12 text-sm font-bold text-foreground">{dayLabel}</span>
                       {complete ? (
                         <span className="flex size-5 items-center justify-center rounded-full bg-success text-success-foreground">
                           <Check size={12} strokeWidth={3} aria-hidden="true" />
@@ -510,7 +510,7 @@ export function QuranWirdScreen({
                         <span className="size-5" aria-hidden="true" />
                       )}
                     </div>
-                    <bdi dir="ltr" className="text-[0.875rem] font-bold text-muted-foreground">
+                    <bdi dir="ltr" className="text-sm font-bold text-muted-foreground">
                       {dayEligible && dayKey <= todayKey && dayGoal > 0
                         ? `${formatNumerals(count, language)} / ${formatNumerals(dayGoal, language)}`
                         : t(language, "mushaf.noReading")}

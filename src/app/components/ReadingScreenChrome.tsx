@@ -87,7 +87,7 @@ export function ReadingScreenChrome({
           {actions("wide")}
         </div>
 
-        <h1 className="text-[1.75rem] font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
+        <h1 className="text-display font-extrabold text-[color:var(--on-media-accent)]" dir="auto">
           {title}
         </h1>
 
@@ -96,12 +96,10 @@ export function ReadingScreenChrome({
             {progress && (
               <>
                 <div className="flex w-full items-center justify-between px-1" aria-hidden="true">
-                  <span className="text-[0.8125rem] font-semibold text-[color:var(--on-media-accent)]">
+                  <span className="text-label font-semibold text-[color:var(--on-media-accent)]">
                     {progress.percentLabel ?? ""}
                   </span>
-                  <span className="text-[0.75rem] font-bold text-[color:var(--on-media-accent)]">
-                    {progress.countLabel}
-                  </span>
+                  <span className="text-xs font-bold text-[color:var(--on-media-accent)]">{progress.countLabel}</span>
                 </div>
                 {progress.max !== undefined && (
                   <ProgressBar
@@ -133,7 +131,7 @@ export function ReadingScreenChrome({
         <div className="shrink-0 px-5 pb-3 pt-2 reader-column" data-testid={`${testId}-session-chrome`}>
           {progress && (
             <>
-              <div className="mb-2 flex items-center justify-between gap-3 text-[0.75rem] font-bold text-muted-foreground">
+              <div className="mb-2 flex items-center justify-between gap-3 text-xs font-bold text-muted-foreground">
                 <span>{progress.percentLabel ?? ""}</span>
                 <span>{progress.countLabel}</span>
               </div>

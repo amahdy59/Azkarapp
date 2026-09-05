@@ -34,7 +34,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
               <details className="group border-b border-border last:border-b-0" key={question}>
                 <summary className="flex min-h-14 cursor-pointer list-none items-center gap-3 px-4 py-3 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring">
                   <Icon size={19} className="shrink-0 text-primary" aria-hidden="true" />
-                  <span className="flex-1 text-start text-[0.875rem] font-semibold leading-5 text-foreground">
+                  <span className="flex-1 text-start text-sm font-semibold leading-5 text-foreground">
                     {t(language, question)}
                   </span>
                   <span
@@ -44,10 +44,7 @@ export function HelpPanel({ language, onBack }: { language: AppLanguage; onBack:
                     +
                   </span>
                 </summary>
-                <p
-                  className="px-4 pb-4 text-[0.8125rem] leading-6 text-muted-foreground"
-                  style={{ paddingInlineStart: 50 }}
-                >
+                <p className="px-4 pb-4 text-label leading-6 text-muted-foreground" style={{ paddingInlineStart: 50 }}>
                   {t(language, answer)}
                 </p>
               </details>

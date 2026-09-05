@@ -19,15 +19,15 @@ import { useId, type InputHTMLAttributes, type ReactNode, type WheelEvent } from
  * One look for a field's title, for the labels that cannot use {@link FormField}
  * because their control is styled for its own screen.
  *
- * There were three: `text-[0.75rem] font-semibold text-muted-foreground` on the
+ * There were three: `text-xs font-semibold text-muted-foreground` on the
  * two search screens, `text-sm font-bold text-foreground` on the page-jump
  * dialog, and this one. A label is the same thing everywhere it appears, so it
  * had no reason to look like three different things.
  */
-export const FIELD_LABEL_CLASS = "text-[0.8125rem] font-bold text-foreground";
+export const FIELD_LABEL_CLASS = "text-label font-bold text-foreground";
 
 export const FIELD_CONTROL_CLASS =
-  "h-11 w-full min-w-0 rounded-xl border border-border-control bg-background px-3 text-[0.875rem] text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
+  "h-11 w-full min-w-0 rounded-xl border border-border-control bg-background px-3 text-sm text-foreground focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50";
 
 export interface FormFieldProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "id" | "className"> {
   /** Always visible. A field without one is a field the reader has to guess. */
@@ -81,7 +81,7 @@ export function FormField({ label, hint, error, controlClassName = "", className
       {message && (
         <p
           id={messageId}
-          className={`text-[0.75rem] font-medium leading-snug ${error ? "text-destructive" : "text-muted-foreground"}`}
+          className={`text-xs font-medium leading-snug ${error ? "text-destructive" : "text-muted-foreground"}`}
         >
           {message}
         </p>
