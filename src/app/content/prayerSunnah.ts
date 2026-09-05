@@ -1,7 +1,11 @@
 import type { PrayerName } from "../types";
 
 /**
- * DRAFTED FOR REVIEW — awaiting sign-off from a qualified reviewer.
+ * REVIEWED — the counts, narrations, references and gradings below were read
+ * and approved by the product owner on 2026-09-05. That is a product sign-off,
+ * not a scholarly one: it records who accepted the content, so a later reviewer
+ * knows what was accepted and by whom rather than finding an unsourced table.
+ * `prayerVirtues.ts` beside it is still awaiting its own.
  *
  * The voluntary rak'ahs attached to each obligatory prayer, in two ranks.
  *

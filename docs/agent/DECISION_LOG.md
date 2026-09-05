@@ -2736,8 +2736,11 @@ Record user-approved product, design and architectural decisions here. Do not er
 - **The confirmed set is held to its own claim.** `CONFIRMED_RAKAH_TOTAL` is
   derived from the table and asserted to be twelve, so an edit that breaks the
   sum breaks the suite rather than quietly contradicting the narration it cites.
-- **Still DRAFTED FOR REVIEW.** Every narration, reference and grading in
-  `prayerSunnah.ts` awaits sign-off, as `prayerVirtues.ts` does beside it.
+- **Reviewed and accepted.** The product owner read and approved the counts,
+  narrations, references and gradings in `prayerSunnah.ts` on 2026-09-05, and
+  the file records that rather than a bare marker: a later reviewer can see what
+  was accepted and by whom. It is a product sign-off, not a scholarly one, and
+  `prayerVirtues.ts` beside it is still awaiting its own.
 - **Tests/evidence required:** Asr offers the four before it and nothing after;
   the card names the rank; the sheet shows the narration, the reference, the
   grading where there is one and the note that it is outside the twelve; a
