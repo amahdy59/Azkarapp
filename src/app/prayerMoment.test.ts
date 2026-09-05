@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { getPrayerMoment, trackedLocation } from "./prayerMoment";
 import { getEstimatedPrayerTimes } from "./content/prayerTimes";
+import { CONFIRMED_RAKAH_TOTAL } from "./content/prayerSunnah";
 import type { PrayerName, PrayerTrackingRecord } from "./types";
 
 const DAY = "2026-09-04";
@@ -72,12 +73,28 @@ describe("where a prayer stands", () => {
     expect(moment("dhuhr", at(shift(timeOf("dhuhr"), 10))).sunnahFocus).toBe("after");
   });
 
-  it("offers Asr no rawātib at all", () => {
-    // The four before Asr are not among the confirmed twelve, and presenting
-    // them on the same line as the rest would present them as the same ruling.
+  it("offers Asr the four before it, and nothing after", () => {
+    // They are not among the confirmed twelve, so the card names them as
+    // encouraged rather than as rawātib — but leaving them out altogether left
+    // the one prayer with a narration of its own saying nothing at all.
     const asr = timeOf("asr");
-    expect(moment("asr", at(shift(asr, -10))).sunnahFocus).toBeNull();
+    expect(moment("asr", at(shift(asr, -10))).sunnahFocus).toBe("before");
     expect(moment("asr", at(shift(asr, 10))).sunnahFocus).toBeNull();
+  });
+
+  it("offers the two before Maghrib, which are encouraged rather than confirmed", () => {
+    const maghrib = timeOf("maghrib");
+    expect(moment("maghrib", at(shift(maghrib, -10))).sunnahFocus).toBe("before");
+    expect(moment("maghrib", at(shift(maghrib, 10))).sunnahFocus).toBe("after");
+  });
+});
+
+describe("the sunnah table", () => {
+  it("adds to the twelve the narration it rests on names", () => {
+    // Two before Fajr, four before Dhuhr and two after, two after Maghrib, two
+    // after Isha. If an edit breaks that sum, the content no longer matches the
+    // narration it cites.
+    expect(CONFIRMED_RAKAH_TOTAL).toBe(12);
   });
 });
 

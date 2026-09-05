@@ -106,9 +106,38 @@ describe("the prayer as one surface", () => {
     expect(screen.getByTestId("prayer-action-prayer-sunnah")).toHaveTextContent("أربع ركعات قبل الظهر");
   });
 
-  it("shows no rawātib card for a prayer that has none", () => {
+  it("names an encouraged sunnah as encouraged, not as one of the twelve", () => {
+    // The four before Asr rest on their own narration and are not among the
+    // confirmed rawātib. The card has to say which it is.
+    renderScreen({ prayer: "asr", now: at(shift(times.asr, -10)) });
+    const card = screen.getByTestId("prayer-action-prayer-sunnah");
+    expect(card).toHaveTextContent("سنة مستحبة");
+    expect(card).toHaveTextContent("أربع ركعات قبل العصر");
+  });
+
+  it("shows no sunnah card where the prayer has nothing in that position", () => {
+    // Asr has nothing after it, and once it is in there is nothing to name.
     renderScreen({ prayer: "asr", now: at(shift(times.asr, 5)) });
     expect(screen.queryByTestId("prayer-action-prayer-sunnah")).toBeNull();
+  });
+
+  it("offers the narration a sunnah rests on, without recording anything", () => {
+    renderScreen({ prayer: "asr", now: at(shift(times.asr, -10)) });
+    fireEvent.click(screen.getByTestId("prayer-sunnah-evidence"));
+    const sheet = screen.getByTestId("prayer-sunnah-evidence-sheet");
+    expect(sheet).toHaveTextContent("رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا");
+    // Outside the two Sahihs, so the grading is named rather than assumed.
+    expect(sheet).toHaveTextContent("حسّنه الألباني");
+    expect(sheet).toHaveTextContent("ليست من الرواتب الاثنتي عشرة");
+  });
+
+  it("names the grading only where it is needed", () => {
+    // Muslim needs no grading line beside it.
+    renderScreen({ prayer: "fajr", now: at(shift(times.fajr, -10)) });
+    fireEvent.click(screen.getByTestId("prayer-sunnah-evidence"));
+    const sheet = screen.getByTestId("prayer-sunnah-evidence-sheet");
+    expect(sheet).toHaveTextContent("صحيح مسلم ٧٢٥");
+    expect(sheet).not.toHaveTextContent("الألباني");
   });
 
   it("keeps the day's five within reach", () => {

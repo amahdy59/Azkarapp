@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-05",
+  "release": "2026-09-05.2",
   "ar": [
-    "صار لكل صلاة شاشتها: اضغط على أي صلاة لتجد وقتها وسماءها، وفضل صلاتها في جماعة، وتسجيل مكان صلاتك — في المسجد أو في المنزل — ورواتبها، وأذكار ما بعدها في مكان واحد. وتُفتح أذكار ما بعد الصلاة فور تسجيلك لها، وتبقى في مكانها المعتاد ضمن الأذكار.",
-    "صار وضع المصحف يملأ الشاشة على الهاتف: أُزيلت الحواف والخلفية المرسومة حول الصفحة، فاتّسع الخط نحو عُشر حجمه، ولم يعد السحب لتقليب الصفحات يُحرّك الشاشة قليلاً.",
-    "رُتّب شريطا السورة: الأعلى لاسم السورة التي تقرؤها وزر الخروج، وانتقلت أزرار الاستماع ومعاني الكلمات وموضعك في السورة إلى الشريط السفلي. وصار لمعاني الكلمات أيقونة خاصة بها، وأُعيد رسم الإطار المذهّب حول الفاتحة وأول البقرة فلم يعد يتشوّه باختلاف الشاشات.",
-    "لم يعد العدّاد يبدأ من الصفر إذا انتقلت إلى ذكر آخر ثم عدت، وصارت السور الطويلة تُفتح على الصفحة التي تركتها، وأُعيد تصميم مشغّل الصوت ليُقرأ ويُسمع معاً، وصار فتح التطبيق أسرع لأن ملفات الصوت لم تعد تُحمَّل قبل طلبها."
+    "صار لكل صلاة شاشتها: اضغط على أي صلاة لتجد وقتها وسماءها، وفضل صلاتها في جماعة، وتسجيل مكان صلاتك — في المسجد أو في المنزل — وسننها، وأذكار ما بعدها في مكان واحد.",
+    "بجانب كل سنة زرٌّ يفتح الحديث الذي وردت به: أربع ركعات قبل العصر وركعتان قبل المغرب صارتا معروضتين بوصفهما سنة مستحبة لا من الرواتب، مع ذكر درجة الحديث إن كان خارج الصحيحين.",
+    "صار إشعار التحديث يُحدّث التطبيق فعلاً عند الضغط عليه. كان يخبرك بتحديث لم يصلك بعد ولا يمنحك سوى زر الإغلاق، لأن التطبيق يُقرأ من ذاكرة الجهاز بينما تُقرأ أخبار التحديث من الشبكة.",
+    "صار وضع المصحف يملأ الشاشة على الهاتف واتّسع خطه، ورُتّب شريطا السورة، وأُعيد رسم الإطار المذهّب حول الفاتحة وأول البقرة فلم يعد يتشوّه باختلاف الشاشات."
   ],
   "en": [
-    "Every prayer now has a screen of its own: tap a prayer to find its time and its sky, the virtue of praying it in congregation, where you prayed it — mosque or home — its rawatib, and the adhkar that follow. Those adhkar open as soon as you record the prayer, and stay where they have always been in the Azkar library.",
-    "Mushaf mode now fills a phone screen: the drawn edge and background around the page are gone, the type grew by about a tenth, and dragging to turn pages no longer shifts the screen slightly.",
-    "The surah’s two bars now divide the work — the header for the surah you are reading and the way out, the footer for listening, word meanings and your place in it. Word meanings has an icon of its own, and the gilded frame around Al-Fatihah and the start of Al-Baqarah no longer distorts with the shape of the screen.",
-    "Counters keep your count when you step to another zikr and come back, long surahs reopen on the page you left, the audio player is reshaped for listening while you read, and the app starts faster because audio files are no longer loaded before you ask for them."
+    "Every prayer now has a screen of its own: tap a prayer to find its time and its sky, the virtue of praying it in congregation, where you prayed it — mosque or home — its sunnah rak‘ahs, and the adhkar that follow.",
+    "Each sunnah now carries a control that opens the narration it rests on. The four before Asr and the two before Maghrib are offered as encouraged sunnah rather than as rawatib, with the grading named wherever the narration sits outside the two Sahihs.",
+    "The update notice now actually updates the app when you press it. It used to announce an update you had not received and offer only a Close button, because the app is served from your device while the update news comes from the network.",
+    "Mushaf mode fills a phone screen with larger type, the surah’s bars are reorganised, and the gilded frame around Al-Fatihah and the start of Al-Baqarah no longer distorts with the shape of the screen."
   ]
 }

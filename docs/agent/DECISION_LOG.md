@@ -2716,3 +2716,30 @@ Record user-approved product, design and architectural decisions here. Do not er
   stamp raises the update prompt and not the recap; equal stamps recap once and
   then stop; a first run records the stamp silently; apply reloads when nothing
   is waiting.
+
+## DEC-145 — a sunnah names its rank and the narration it rests on
+
+- **Decision:** the voluntary rak'ahs are carried in two ranks rather than one
+  list, and every entry carries the narration it rests on, reachable from an
+  information control on the card without recording anything.
+- **Leaving them out said less than naming them.** DEC-143 carried only the
+  confirmed twelve, so Asr — the one prayer with a narration of its own about
+  the rak'ahs before it — showed nothing at all. It now carries them as
+  `optional`: encouraged, outside the twelve, and labelled `سنة مستحبة` on the
+  card rather than `صلاة الرواتب`, because a layout that cannot tell the two
+  apart tells the reader something untrue. The two before Maghrib join it.
+- **The evidence is the point, not decoration.** Each entry holds its narration,
+  its collection and number, and — only where it sits outside Bukhari and Muslim
+  — its grading, which is exactly where a reader needs to be told. The
+  information control opens them in the shared `Modal`, above the input that
+  covers the card, so reading why never records a prayer nobody has prayed.
+- **The confirmed set is held to its own claim.** `CONFIRMED_RAKAH_TOTAL` is
+  derived from the table and asserted to be twelve, so an edit that breaks the
+  sum breaks the suite rather than quietly contradicting the narration it cites.
+- **Still DRAFTED FOR REVIEW.** Every narration, reference and grading in
+  `prayerSunnah.ts` awaits sign-off, as `prayerVirtues.ts` does beside it.
+- **Tests/evidence required:** Asr offers the four before it and nothing after;
+  the card names the rank; the sheet shows the narration, the reference, the
+  grading where there is one and the note that it is outside the twelve; a
+  narration from Muslim shows no grading line; the confirmed rak'ahs total
+  twelve.

@@ -120,7 +120,6 @@ export function getPrayerMoment({
 
   const record = recordFor(records, dayKey, prayer);
   const place = trackedLocation(record);
-  const sunnah = getPrayerSunnah(prayer);
 
   const lead = Math.min(APPROACH_LEAD_MINUTES, Math.max(1, Math.floor(gapFromPrevious(index, minutes) / 2)));
   const nextAdhan = index === PRAYER_NAMES.length - 1 ? 24 * 60 : minutes[index + 1]!;
@@ -139,9 +138,11 @@ export function getPrayerMoment({
   }
 
   /* Before the fard while it is still ahead; after it once it is in or done.
-     A prayer with no confirmed rawātib — Asr — names neither. */
-  const wantsBefore = (phase === "upcoming" || phase === "approaching") && (sunnah?.before ?? 0) > 0;
-  const wantsAfter = phase !== "upcoming" && phase !== "approaching" && (sunnah?.after ?? 0) > 0;
+     A prayer with nothing in that position names neither — Isha has no sunnah
+     before it, Fajr none after. */
+  const ahead = phase === "upcoming" || phase === "approaching";
+  const wantsBefore = ahead && Boolean(getPrayerSunnah(prayer, "before"));
+  const wantsAfter = !ahead && Boolean(getPrayerSunnah(prayer, "after"));
 
   return {
     prayer,

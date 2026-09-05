@@ -1,12 +1,25 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { Header } from "../components/LayoutShells";
 import { TrackingCheckMark } from "../components/PrayerTrackerCards";
 import { PrayerSceneArt } from "../components/PrayerSceneArt";
-import { Building, Clock, CloudSun, Home, Lock, MoonStar, Sun, Sunrise, Sunset, Translate } from "../components/icons";
+import {
+  Building,
+  Clock,
+  CloudSun,
+  Home,
+  Info,
+  Lock,
+  MoonStar,
+  Sun,
+  Sunrise,
+  Sunset,
+  Translate,
+} from "../components/icons";
 import { t } from "../i18n";
 import { PRAYER_NAMES, formatPrayerTimeLabel, getEstimatedPrayerTimes } from "../content/prayerTimes";
 import { getPrayerSunnah } from "../content/prayerSunnah";
+import { Modal } from "../components/ResponsiveSheet";
 import { getPrayerVirtues } from "../content/prayerVirtues";
 import { getPrayerMoment, type PrayerMoment } from "../prayerMoment";
 import type { AppLanguage, LocationSettings, PrayerName, PrayerTrackingRecord } from "../types";
@@ -135,7 +148,8 @@ export function PrayerMomentScreen({
   const isArabic = language === "ar";
   const name = t(language, `notifications.${prayer}`);
   const Icon = PRAYER_ICON[prayer];
-  const sunnah = getPrayerSunnah(prayer);
+  const sunnah = moment.sunnahFocus ? getPrayerSunnah(prayer, moment.sunnahFocus) : null;
+  const [evidenceOpen, setEvidenceOpen] = useState(false);
   const virtue = getPrayerVirtues(prayer)[0];
 
   /* The prayer leads the screen from twenty minutes before its adhan until the
@@ -156,7 +170,7 @@ export function PrayerMomentScreen({
   /* Arabic counts its rak'ahs, it does not number them: two is a dual noun and
      four takes the plural, so a "{count} rak'ahs" template would read as
      broken Arabic at both of the counts the confirmed rawātib actually use. */
-  const rakahCount = moment.sunnahFocus === "before" ? (sunnah?.before ?? 0) : (sunnah?.after ?? 0);
+  const rakahCount = (sunnah?.before ?? 0) + (sunnah?.after ?? 0);
   const rakahs = t(language, rakahCount === 4 ? "prayerMoment.rakahFour" : "prayerMoment.rakahTwo");
   const sunnahDetail = moment.sunnahFocus
     ? t(language, moment.sunnahFocus === "before" ? "prayerMoment.sunnahBefore" : "prayerMoment.sunnahAfter", {
@@ -325,14 +339,74 @@ export function PrayerMomentScreen({
           {sunnah && moment.sunnahFocus && (
             <ActionCard
               id="prayer-sunnah"
-              title={t(language, "prayerMoment.sunnahTitle")}
+              /* The rank is on the card, not implied by its position: the four
+                 before Asr are encouraged without being among the twelve, and a
+                 layout that cannot tell the two apart tells the reader
+                 something untrue. */
+              title={t(
+                language,
+                sunnah.rank === "confirmed" ? "prayerMoment.sunnahTitle" : "prayerMoment.sunnahTitleOptional",
+              )}
               detail={sunnahDetail}
               checked={moment.sunnahDone}
               onChange={(next) => onToggle(prayer, "sunnah", next)}
               icon={<Clock size={20} aria-hidden="true" />}
+              footer={
+                <span className="mt-2 flex">
+                  {/* Above the input that covers the card, so the narration can
+                      be read without recording a prayer nobody has prayed. */}
+                  <button
+                    type="button"
+                    onClick={() => setEvidenceOpen(true)}
+                    data-testid="prayer-sunnah-evidence"
+                    className="pointer-events-auto relative z-10 flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 text-[0.75rem] font-bold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                  >
+                    <Info size={15} aria-hidden="true" />
+                    {t(language, "prayerMoment.evidenceOpen")}
+                  </button>
+                </span>
+              }
             />
           )}
         </div>
+
+        {/* The narration this sunnah rests on, one press from the card that
+            asks for it — so a reader can check the claim rather than take the
+            app's word for it. */}
+        {sunnah && evidenceOpen && (
+          <Modal
+            open
+            onClose={() => setEvidenceOpen(false)}
+            title={t(language, "prayerMoment.evidenceTitle")}
+            direction={direction}
+            testId="prayer-sunnah-evidence-sheet"
+            maxWidthClassName="max-w-[32rem]"
+          >
+            <div className="flex flex-col gap-3 px-5 py-4 text-center">
+              <p className="text-[0.9375rem] font-black text-primary" dir="auto">
+                {sunnahDetail}
+              </p>
+              <p className="zikr-text text-[1rem] font-bold leading-loose text-foreground" dir="rtl" lang="ar">
+                {sunnah.evidence.textArabic}
+              </p>
+              <p className="text-[0.8125rem] font-semibold text-muted-foreground" dir="auto">
+                {isArabic ? sunnah.evidence.referenceArabic : sunnah.evidence.referenceEnglish}
+              </p>
+              {/* Named only where the narration sits outside the two Sahihs,
+                  which is exactly where a reader needs to be told. */}
+              {(isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish) && (
+                <p className="text-[0.75rem] font-bold text-muted-foreground/80" dir="auto">
+                  {isArabic ? sunnah.evidence.gradingArabic : sunnah.evidence.gradingEnglish}
+                </p>
+              )}
+              {sunnah.rank === "optional" && (
+                <p className="text-[0.75rem] font-semibold leading-6 text-muted-foreground" dir="auto">
+                  {t(language, "prayerMoment.optionalNote")}
+                </p>
+              )}
+            </div>
+          </Modal>
+        )}
 
         {/* The day's five, so this screen is never a dead end. */}
         <nav
