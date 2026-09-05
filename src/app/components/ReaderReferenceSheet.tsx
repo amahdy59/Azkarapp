@@ -33,6 +33,16 @@ function ReferenceContent({
   const isArabic = language === "ar";
   const sourceReference = getLocalizedSourceReference(zikr, language);
 
+  /**
+   * The narration to show, and the language it is actually in.
+   *
+   * These are one decision, not two: the fallback means an English reader can
+   * still be looking at Arabic, and `lang`/`dir` have to describe the text on
+   * screen rather than the interface around it.
+   */
+  const narration = isArabic ? zikr.hadithText : (zikr.hadithTextEnglish ?? zikr.hadithText);
+  const inArabic = isArabic || !zikr.hadithTextEnglish;
+
   useEffect(() => {
     return () => {
       if (copyFeedbackTimer.current) {
@@ -102,7 +112,7 @@ function ReferenceContent({
         dir={direction}
       >
         <div className="reference-sheet-content flex flex-col pb-4">
-          {zikr.hadithText && (
+          {narration && (
             <section aria-labelledby="reference-evidence-heading">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <h3
@@ -112,20 +122,21 @@ function ReferenceContent({
                   {t(language, "reader.hadithLabel")}
                   {zikr.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
                 </h3>
-                {renderCopyButton("hadith", zikr.hadithText, t(language, "reader.copyHadith"))}
+                {renderCopyButton("hadith", narration, t(language, "reader.copyHadith"))}
               </div>
-              {/* The hadith is Arabic in both interface languages — it is the
-                  narration itself, not supporting copy — so it is always marked
-                  `lang="ar"` and laid out right-to-left. Leaving it unmarked in
-                  English had screen readers pronouncing Arabic with an English
-                  voice. */}
+              {/* The English app reads the narration in English where one has
+                  been reviewed, and falls back to the Arabic where none has yet.
+                  `lang` and `dir` follow whichever is actually rendered rather
+                  than the interface language: marking English prose `lang="ar"`
+                  had screen readers pronouncing it with an Arabic voice, and the
+                  reverse is just as wrong. */}
               <p
                 data-testid="reference-hadith"
-                className="zikr-text text-start text-base font-medium leading-8 text-foreground"
-                lang="ar"
-                dir="rtl"
+                className={`text-start text-base font-medium leading-8 text-foreground ${inArabic ? "zikr-text" : ""}`}
+                lang={inArabic ? "ar" : "en"}
+                dir={inArabic ? "rtl" : "ltr"}
               >
-                {zikr.hadithText}
+                {narration}
               </p>
             </section>
           )}

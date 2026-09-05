@@ -147,6 +147,17 @@ export interface Zikr {
   sourceReferenceArabic?: string;
   preferredTiming?: string;
   hadithText?: string;
+  /**
+   * The narration in English, for the English app.
+   *
+   * Optional because it is being filled in reviewed batches, not because
+   * it is discretionary: an English reader met an Arabic narration under an
+   * English heading everywhere this appeared. Until an entry has one, the
+   * Arabic still shows — a narration a reader cannot read is better than a
+   * narration that is not there, and `pnpm report:english-coverage` says how
+   * many are left.
+   */
+  hadithTextEnglish?: string;
   authenticityNote?: string;
   /** Set only when a hadith's chain is graded weak/disputed despite being kept for its content — never inferred from `authenticityNote` text, which is freeform scholarly commentary. */
   authenticityLevel?: "weak";

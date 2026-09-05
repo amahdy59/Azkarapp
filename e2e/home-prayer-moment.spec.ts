@@ -93,3 +93,22 @@ test("each control on the card owns its own centre", async ({ page }) => {
 
   expect(obscured).toEqual([]);
 });
+
+/**
+ * The English app reads its narrations in English.
+ *
+ * Everything else was already English — the zikr translation, the benefit, the
+ * grading, the reference — while the narration itself stayed Arabic, so an
+ * English reader met an Arabic paragraph under an English heading in the one
+ * place the app quotes its evidence.
+ */
+test("the virtue is in English for an English reader, and marked as English", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:30:00");
+  const virtue = page.getByTestId("home-prayer-moment").getByTestId("prayer-moment-virtue");
+  await expect(virtue).toBeVisible();
+
+  const narration = virtue.locator("p[lang]").last();
+  await expect(narration).toHaveAttribute("lang", "en");
+  await expect(narration).toHaveAttribute("dir", "ltr");
+  await expect(narration).toContainText(/congregation|prayers|mosque|Paradise/i);
+});

@@ -254,8 +254,16 @@ export function PrayerMomentPanel({
           <p className="mt-2 text-xs font-bold text-muted-foreground" dir="auto">
             {t(language, "prayerMoment.virtueAttribution")}
           </p>
-          <p className="zikr-text mt-2 text-title font-bold leading-loose text-foreground" dir="rtl" lang="ar">
-            {virtue.textArabic}
+          {/* The narration itself, in the reader's language where a reviewed
+              rendering exists. `lang` and `dir` describe the text that is drawn,
+              not the interface around it — English prose marked `lang="ar"` is
+              read aloud with an Arabic voice. */}
+          <p
+            className={`mt-2 text-title font-bold leading-loose text-foreground ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
+            dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
+            lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
+          >
+            {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
           </p>
           <p className="mt-2 text-xs font-semibold text-muted-foreground" dir="auto">
             {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
