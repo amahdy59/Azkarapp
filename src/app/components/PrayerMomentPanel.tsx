@@ -51,6 +51,7 @@ function ActionCard({
   onChange,
   icon,
   footer,
+  headerAction,
   emphasis = false,
 }: {
   id: string;
@@ -61,6 +62,17 @@ function ActionCard({
   onChange: (next: boolean) => void;
   icon: React.ReactNode;
   footer?: React.ReactNode;
+  /**
+   * A secondary control, placed in the top row rather than under the text.
+   *
+   * The card's own checkbox covers its whole surface, so anything inside it
+   * that must stay clickable has to sit above that input — and a control in the
+   * footer of a short card lands almost exactly on the card's centre, which is
+   * the one point a reader aims at to tick it. `elementFromPoint` at the middle
+   * of the rawatib card returned the evidence button, not the checkbox: the
+   * card could not be ticked by clicking the middle of itself.
+   */
+  headerAction?: React.ReactNode;
   emphasis?: boolean;
 }) {
   return (
@@ -94,7 +106,10 @@ function ActionCard({
         </span>
         {footer}
       </span>
-      <CardIcon active={checked || emphasis}>{icon}</CardIcon>
+      <span className="flex shrink-0 items-center gap-1.5">
+        {headerAction}
+        <CardIcon active={checked || emphasis}>{icon}</CardIcon>
+      </span>
     </div>
   );
 }
@@ -359,20 +374,21 @@ export function PrayerMomentPanel({
             checked={moment.sunnahDone}
             onChange={(next) => onToggle(prayer, "sunnah", next)}
             icon={<Clock size={20} aria-hidden="true" />}
-            footer={
-              <span className="mt-2 flex">
-                {/* Above the input that covers the card, so the narration can
-                    be read without recording a prayer nobody has prayed. */}
-                <button
-                  type="button"
-                  onClick={() => setEvidenceOpen(true)}
-                  data-testid="prayer-sunnah-evidence"
-                  className="pointer-events-auto relative z-10 flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 text-xs font-bold text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  <Info size={15} aria-hidden="true" />
-                  {t(language, "prayerMoment.evidenceOpen")}
-                </button>
-              </span>
+            headerAction={
+              /* Above the input that covers the card, so the narration can be
+                 read without recording a prayer nobody has prayed. An icon in
+                 the top row rather than a pill under the text: it is what was
+                 asked for, it keeps the card's middle belonging to the card,
+                 and it costs a line of height on every one of these cards. */
+              <button
+                type="button"
+                onClick={() => setEvidenceOpen(true)}
+                data-testid="prayer-sunnah-evidence"
+                aria-label={t(language, "prayerMoment.evidenceOpen")}
+                className="pointer-events-auto relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+              >
+                <Info size={17} aria-hidden="true" />
+              </button>
             }
           />
         )}

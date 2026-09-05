@@ -59,3 +59,37 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
   // The day's five are still there, as they always are.
   await expect(page.getByTestId("after-prayer-trackers")).toBeVisible();
 });
+
+/**
+ * Every control on the card owns the point a reader aims at.
+ *
+ * The rawatib card's evidence trigger used to sit in its footer, which on a
+ * card that short is the card's own centre — so `elementFromPoint` in the
+ * middle of the card returned the button rather than the checkbox that covers
+ * the surface, and clicking the middle of the card did not tick it. The
+ * keyboard checklist caught it, but only at hours when a prayer happened to be
+ * live: Home's content varies with the clock, so the suite's verdict varied
+ * with the hour it ran. This holds the case at every hour.
+ */
+test("each control on the card owns its own centre", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:30:00");
+  const card = page.getByTestId("home-prayer-moment");
+  await expect(card).toBeVisible();
+
+  const obscured = await card.evaluate((root) => {
+    const controls = [...root.querySelectorAll<HTMLElement>("input, button, [role='radio']")];
+    return controls
+      .map((element) => {
+        // elementFromPoint reads viewport coordinates, so a control still below
+        // the fold would be reported obscured however correct it is.
+        element.scrollIntoView({ block: "center", inline: "nearest", behavior: "instant" });
+        const rect = element.getBoundingClientRect();
+        const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        const owned = Boolean(top && (element.contains(top) || top.contains(element)));
+        return owned ? null : `${element.tagName}#${element.id || element.dataset.testid || "?"}`;
+      })
+      .filter(Boolean);
+  });
+
+  expect(obscured).toEqual([]);
+});
