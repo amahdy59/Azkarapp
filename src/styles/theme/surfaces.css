@@ -446,6 +446,17 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   mix-blend-mode: overlay;
 }
 
+.reduce-transparency .app-shell::after,
 .high-contrast .app-shell::after {
   display: none !important;
+}
+
+/* The texture is decoration, so it goes when the reader asks for less of it.
+   .reduce-transparency is the hook for the in-app setting; the media query is
+   the same intent read from the OS, so someone who has already answered this
+   question system-wide does not have to answer it again here. */
+@media (prefers-reduced-transparency: reduce) {
+  .app-shell::after {
+    display: none !important;
+  }
 }

@@ -2889,3 +2889,72 @@ Record user-approved product, design and architectural decisions here. Do not er
   arbitrary size and passing at eight; the unused-CSS report finding only the
   deliberate `@layer components` class; brace balance verified per stylesheet
   after each deletion.
+
+## DEC-149 — a class the app never sets is not the same as a class nothing uses
+
+- **Decision:** the unused-CSS report separates what no code references from
+  what only tests reference; the reduced-transparency rule DEC-148 deleted comes
+  back and is wired to the OS preference; a touch-target assertion stops being
+  decided by the emulated device scale factor.
+- **Correcting DEC-148's evidence.** That entry claims the full e2e suite passed
+  at 338. It did not: the run finished 337 passed, 2 failed, and the exit code
+  read as zero because the command was piped through `tail`, which reports its
+  own status. Both failures came from that change. The entry stands as written;
+  this is the correction.
+- **What the deletion cost.** `.reduce-transparency .app-shell::after` hid the
+  shell's noise texture. No app code sets that class — no setting, no media
+  query, nothing — so a scan of `src/` called it dead, correctly as far as it
+  looked. An e2e test set the class by hand and asserted the texture went, and
+  deleting the rule turned that test red. The class was not dead code; it was a
+  half-built setting whose CSS shipped ahead of the control that turns it on.
+- **The report now says which.** Tests are scanned separately from the app, and
+  a class only tests mention is reported under its own heading rather than
+  alongside genuinely unreferenced ones. Two scanning bugs surfaced with it: the
+  `e2e/**/*.ts` pathspec matched nothing, because git's `*` already spans `/` so
+  a `**/` segment demands a subdirectory that e2e does not have; and class names
+  written in comments counted as uses, which is how a rule named in the prose
+  above itself reads as one two rules compose with.
+- **The hook now has something behind it.** `prefers-reduced-transparency:
+reduce` hides the texture for a reader who has already answered this
+  system-wide, so the behaviour is real rather than waiting on a settings
+  toggle that does not exist yet. The class stays as that toggle's hook, and the
+  report names it as unwired rather than as dead.
+- **A touch target measured in the wrong pixels.** `every menu presents the same
+surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
+  one part in 65,536 short. The item's `min-h-11` is exactly 44px and its
+  `offsetHeight` says so; the shortfall is in the composited box, which the
+  Pixel 7 profile's 2.625 device scale factor returns fractionally under.
+  Nothing about the layout changed: shifting the menu by a fraction of a pixel,
+  which the type scale did, moved it from one side of that rounding to the
+  other. The assertion now reads `offsetHeight`. Six other touch-target
+  assertions measure the same fragile way and pass comfortably; they were left
+  alone rather than rewritten while green.
+- **The rename that changed a colour.** A third failure surfaced only on the
+  full run: a primary button on two settings screens drawing cream on gold at
+  2.09:1, well under the 4.5:1 the suite enforces. `cn()` merges classes with
+  tailwind-merge, and `text-…` names both a size and a colour — it tells them
+  apart by recognising the value. It knows `text-sm`, and it can parse the
+  length in `text-[0.8125rem]`, but `text-label` is neither, so it read the name
+  as a colour and dropped the `text-primary-foreground` it believed was being
+  overridden. DEC-148 claimed the rewrite moved no pixels. It moved no sizes;
+  what it moved was a colour, on eleven call sites where a scale name reaches a
+  component whose variant sets a foreground — the two settings buttons axe
+  caught, seven reader menu items, and both buttons of the update notice.
+- **Registering the scale is the fix, not renaming around it.** `cn()` now
+  extends tailwind-merge with the six names in the `font-size` group, so the
+  scale is safe to pass anywhere, and a unit test holds each name to keeping its
+  colour while overriding its size. A scale that is invisible to the merger is
+  not a scale — it is six words that silently delete colours, and the next token
+  added to `@theme` has to be added here too.
+- **What that says about the evidence.** Nothing in `pnpm check` catches this:
+  the class list still looks plausible, the sizes are right, and only rendering
+  the button and measuring its contrast shows the defect. The full e2e suite
+  found it because axe runs over real screens — which is the argument for
+  running it before a push rather than after.
+- **Tests/evidence required:** all three specs failing before and passing after,
+  run against a production build; each failure reproduced on the pre-DEC-147
+  tree, which is what established which were mine; the unused-CSS report showing
+  `.reduce-transparency` under the test-only heading; an axe pass over all four
+  settings destinations reporting no violations; the `cn` unit test failing
+  without the tailwind-merge extension; the full suite green with its own exit
+  code read directly rather than through a pipe.

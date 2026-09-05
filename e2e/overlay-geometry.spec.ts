@@ -238,8 +238,17 @@ test("every menu presents the same surface and 44px items", async ({ page }) => 
   const count = await items.count();
   expect(count).toBeGreaterThan(0);
   for (let index = 0; index < count; index += 1) {
-    const box = await items.nth(index).boundingBox();
-    expect(box).not.toBeNull();
-    if (box) expect(box.height).toBeGreaterThanOrEqual(44);
+    // offsetHeight — the laid-out border box — rather than a measured rectangle.
+    // The Pixel 7 profile emulates a 2.625 device scale factor, and both
+    // boundingBox and getBoundingClientRect report the composited box, which
+    // comes back as 43.99998474121094 for an item whose min-height is exactly
+    // 44px: one part in 65,536 short, from the scale factor rather than from
+    // anything the layout did. Which side of that it lands on moves when
+    // unrelated type sizes shift the menu by a fraction of a pixel, so the
+    // rectangle cannot decide a touch-target floor. offsetHeight is integral
+    // and unscaled: the half-pixel it rounds away is far below the pixel a real
+    // regression would cost.
+    const height = await items.nth(index).evaluate((element) => (element as HTMLElement).offsetHeight);
+    expect(height).toBeGreaterThanOrEqual(44);
   }
 });
