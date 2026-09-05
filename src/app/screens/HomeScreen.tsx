@@ -274,7 +274,7 @@ export function HomeScreen({
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
-  onPrayerResume?: (prayer: string) => void;
+  onPrayerResume?: (prayer: PrayerName) => void;
   onOpenFridayMode: () => void;
   onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;

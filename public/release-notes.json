@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-04.2",
+  "release": "2026-09-05",
   "ar": [
-    "لم يعد العدّاد يبدأ من الصفر إذا انتقلت إلى ذكر آخر ثم عدت إليه: يبقى ما عددته محفوظاً طوال الجلسة، وصار سطر «اضغط أي مكان للعد» ثابتاً تحت العدّاد في كل الأذكار، فلا يتغير موضع العدّاد بينها.",
-    "يفتح وضع المصحف سورة الكهف وأخواتها على الصفحة التي تركتها عندها، حتى بعد إغلاق التطبيق، ويعود إلى أول السورة بعد إتمام قراءتها.",
-    "أُعيد تصميم مشغّل الصوت: اسم السورة والقارئ في المنتصف، وأزرار التشغيل صار لكل منها اسم مكتوب، وخيارات السرعة والتكرار والإعادة ظاهرة مباشرة. وعلى الهاتف يفتح المشغّل في صورته المصغّرة فوق المصحف حتى تقرأ وتستمع معاً.",
-    "صار فتح التطبيق أسرع فعلاً: ملفات الصوت لم تعد تُحمَّل قبل طلبها، فخفّت أول صفحة تُحمَّل بنحو الخُمس."
+    "صار لكل صلاة شاشتها: اضغط على أي صلاة لتجد وقتها وسماءها، وفضل صلاتها في جماعة، وتسجيل مكان صلاتك — في المسجد أو في المنزل — ورواتبها، وأذكار ما بعدها في مكان واحد. وتُفتح أذكار ما بعد الصلاة فور تسجيلك لها، وتبقى في مكانها المعتاد ضمن الأذكار.",
+    "صار وضع المصحف يملأ الشاشة على الهاتف: أُزيلت الحواف والخلفية المرسومة حول الصفحة، فاتّسع الخط نحو عُشر حجمه، ولم يعد السحب لتقليب الصفحات يُحرّك الشاشة قليلاً.",
+    "رُتّب شريطا السورة: الأعلى لاسم السورة التي تقرؤها وزر الخروج، وانتقلت أزرار الاستماع ومعاني الكلمات وموضعك في السورة إلى الشريط السفلي. وصار لمعاني الكلمات أيقونة خاصة بها، وأُعيد رسم الإطار المذهّب حول الفاتحة وأول البقرة فلم يعد يتشوّه باختلاف الشاشات.",
+    "لم يعد العدّاد يبدأ من الصفر إذا انتقلت إلى ذكر آخر ثم عدت، وصارت السور الطويلة تُفتح على الصفحة التي تركتها، وأُعيد تصميم مشغّل الصوت ليُقرأ ويُسمع معاً، وصار فتح التطبيق أسرع لأن ملفات الصوت لم تعد تُحمَّل قبل طلبها."
   ],
   "en": [
-    "The counter no longer restarts when you move to another zikr and come back — your count is kept for the whole session — and the “Tap anywhere to count” line now sits under every counter, so the counter itself stays in one place.",
-    "Al-Kahf and the other multi-page surahs reopen on the page you left them on, even after closing the app, and start again from the first page once you have completed the surah.",
-    "The audio player has been redesigned: the surah and reciter read down the middle, every transport button carries its name, and speed, repeat and replay are on the surface. On a phone it opens in its compact form over the Mushaf so you can read along while listening.",
-    "The app starts faster: audio files really are no longer downloaded before you ask for them, which makes the first page about a fifth lighter."
+    "Every prayer now has a screen of its own: tap a prayer to find its time and its sky, the virtue of praying it in congregation, where you prayed it — mosque or home — its rawatib, and the adhkar that follow. Those adhkar open as soon as you record the prayer, and stay where they have always been in the Azkar library.",
+    "Mushaf mode now fills a phone screen: the drawn edge and background around the page are gone, the type grew by about a tenth, and dragging to turn pages no longer shifts the screen slightly.",
+    "The surah’s two bars now divide the work — the header for the surah you are reading and the way out, the footer for listening, word meanings and your place in it. Word meanings has an icon of its own, and the gilded frame around Al-Fatihah and the start of Al-Baqarah no longer distorts with the shape of the screen.",
+    "Counters keep your count when you step to another zikr and come back, long surahs reopen on the page you left, the audio player is reshaped for listening while you read, and the app starts faster because audio files are no longer loaded before you ask for them."
   ]
 }

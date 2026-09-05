@@ -212,6 +212,17 @@ One floating player serves every recitation (`src/app/components/FloatingAudioPl
 - The Friday Home feature is expanded only from the selected location's Thursday Maghrib through (but not including) Friday Maghrib. It is compact at other times. The expanded card keeps a concise reviewed virtue on mobile and shows its existing reviewed virtues plus reading source directly at tablet and desktop. Development preview controls do not ship in the Home UI; tests seed the relevant time state directly.
 - Saved quick access preserves deterministic catalogue order and does not add a separate persisted sort preference. Its count has a complete accessible name, each row names its source and category, lazy content announces loading or failure locally, and an empty state routes to Collections rather than an empty Saved view.
 
+## Prayer contract
+
+A prayer is one surface (`src/app/screens/PrayerMomentScreen.tsx`), reached by tapping any prayer card and linkable at `#/prayer/<name>`. It carries the prayer and its time over its own scene, the narration about praying it in congregation, where it was prayed, its rawātib, and the adhkar that follow — with the day’s five along the foot so the screen is never a dead end.
+
+- **What it offers follows the reader’s record first and the clock second.** A prayer marked as prayed is prayed, whatever the hour; the hour only decides what to show someone who has recorded nothing. The phases are `upcoming`, `approaching` (twenty minutes before the adhan, capped at half the gap from the previous prayer), `now`, `passed` and `recorded`, and they come from one pure function of `(now, times, records)` — never from a clock read inside a component.
+- **The clock never gates an act of worship.** The after-prayer adhkar are offered once the reader records the prayer, not on a timer: the app cannot know when someone prayed, and a timer would stand between them and worship on a predictable schedule. The collection also stays reachable in the Azkar library, so this screen is a shortcut to it and never the only door.
+- **Where, not whether.** Tracking records `location: "mosque" | "home"`, writing the older `mosque` boolean alongside it. Absent means unrecorded; `false` is never read as “at home”. Home is not a lesser answer and must never be styled as the failing branch of the choice.
+- **The narration is an invitation, not a reward.** It appears while the prayer is approaching, in, or just recorded, and never once its window has passed, when it could only congratulate.
+- **The rawātib name what is due now** — before the fard while it is ahead, after it once it is in — and a prayer with no confirmed rawātib renders no card at all rather than an empty one. Arabic counts rak‘ahs rather than numbering them, so the copy is composed per count (ركعتان, أربع ركعات) and never from a number in one template.
+- **Each prayer has its own drawn sky**, in `PrayerSceneArt`: vector rather than photography, so there is no request to wait for, the hue holds in every theme, and the precache gains nothing. Text over a scene uses fixed light-on-dark, as the Home hero does over its photograph.
+
 ## Benefit sheet contract
 
 - Sheets and dialogs are portaled to `document.body` by their Radix/Vaul primitives, so they are positioned against the browser viewport, not the app canvas. On compact viewports the sheet still rises from and stays attached to the bottom edge.

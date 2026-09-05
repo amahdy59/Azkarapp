@@ -2614,3 +2614,69 @@ Record user-approved product, design and architectural decisions here. Do not er
   and the widest line never exceeds the text box.
 - **Supersedes:** the opening-frame half of DEC-133's illumination work; the
   gold itself is unchanged.
+
+## DEC-143 — a prayer is one surface, and the clock never gates worship
+
+- **Decision:** tapping a prayer opens the prayer itself rather than its
+  adhkar: one screen carrying what it is and when, why it is worth walking to,
+  where it was prayed, its rawātib, and the adhkar that follow it. What it
+  offers follows the reader's own record first and the hour only where there is
+  no record.
+- **Four things, one of which had a home.** Tapping a prayer used to jump
+  straight into the after-prayer collection. Everything else about a prayer —
+  where it was prayed, its confirmed rawātib, the narration about praying it in
+  congregation — lived in a checkbox row on Home or behind a dialog that opened
+  on a tick. They are one moment in a reader's day and they are now one screen,
+  reachable at `#/prayer/<name>` so it survives a reload.
+- **Where, not whether.** `mosque: boolean` could not tell praying at home from
+  not having recorded anything: `false` meant both, which is why nothing in the
+  app could distinguish a missed prayer from one whose time had not come. The
+  screen writes `location: "mosque" | "home"`, and writes the old boolean
+  alongside it so a client that only knows that field still reads the record
+  correctly. Absent means unrecorded. `false` is never read as "at home".
+- **The clock does not gate an act of worship.** The approved design locked the
+  after-prayer adhkar behind a padlock until "after the prayer". The app cannot
+  know when someone prayed — Isha at eleven, at the masjid at the adhan, or made
+  up the next morning — and prayer times are computed while iqamah is guesswork.
+  A timer would therefore stand between a reader and an act of worship on a
+  predictable schedule. The gate is the reader's own record instead: mark where
+  you prayed and the adhkar open. Nothing is ever unreachable — the collection
+  stays exactly where it has always been in the Azkar library, and this screen
+  is a shortcut to it, never the only door.
+- **The narration arrives before the deed.** It is shown while the prayer is
+  approaching, in, or just recorded, and not once its window has gone: before
+  the prayer those words can still change what someone does, and afterwards
+  they can only congratulate — which is what the dialog they replace did, every
+  single time, until it was a thing to dismiss.
+- **The rawātib name what is due now.** The rak'ahs before the fard while it is
+  still ahead, the ones after it once it is in — the two before Fajr and the
+  four before Dhuhr are the whole reason the approach window exists, and they
+  are useless once the prayer is prayed. Asr has no confirmed rawātib, so its
+  card does not render rather than rendering empty. The unconfirmed rak'ahs are
+  deliberately absent: they are a different ruling and would read as the same
+  one on the same line. `prayerSunnah.ts` is DRAFTED FOR REVIEW, like the
+  virtues it sits beside.
+- **Twenty minutes, capped at half the gap.** The brief asked for fifteen. The
+  rak'ahs this window exists to offer take longer than that to prepare, walk and
+  pray, so it is twenty — and capped at half the gap from the previous prayer,
+  so Maghrib never starts leading while Asr is still the prayer someone is
+  standing in.
+- **Five skies, drawn.** Each prayer carries its own scene rather than one
+  shared image: Fajr's warming horizon under a still-dark sky, Dhuhr's high sun,
+  Asr's amber afternoon, Maghrib's disc on the skyline, Isha's crescent. They
+  are vector, not photography — five responsive asset sets would be five more
+  entries in the precache for decoration, a drawn sky holds its hue in every
+  theme, and there is no request to wait for, so the scene is in the card's
+  first paint. `AzkarHeroBackground` still owns the photography on Home.
+- **A phase model, not a clock read in a component.** `getPrayerMoment` is a
+  pure function of `(now, times, records)`, so every state can be held to a
+  fixed timestamp in a test — this repo has been bitten before by time-driven
+  behaviour that only fails between midnight and 4am.
+- **Tests/evidence required:** the phases at fixed times, including a prayer
+  recorded after its window; the rawātib focus per phase and none for Asr; the
+  virtue present while live and gone once passed; the location choice writing
+  both fields and clearing; the adhkar gated on the record and opening from it;
+  `mosque: true` read as a mosque record and `mosque: false` never read as
+  home. Measured at 375×812 and 1024×900: no horizontal overflow, the hero at
+  its full height, and the prayer, the narration and the three cards laid out
+  as the approved design has them.

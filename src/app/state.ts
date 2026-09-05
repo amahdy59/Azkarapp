@@ -51,14 +51,20 @@ function normalizePrayerTracking(value: unknown): PrayerTrackingRecord[] {
     const record = entry as Partial<PrayerTrackingRecord>;
     if (typeof record.dayKey !== "string" || !record.dayKey) continue;
     if (typeof record.prayer !== "string" || !PRAYER_TRACKING_NAMES.has(record.prayer)) continue;
-    const mosque = record.mosque === true;
+    const location = record.location === "mosque" || record.location === "home" ? record.location : undefined;
+    /* A record that names the mosque is a mosque record however it was
+       written, so the two fields can never disagree on the way in. */
+    const mosque = record.mosque === true || location === "mosque";
     const adhkar = record.adhkar === true;
-    if (!mosque && !adhkar) continue;
+    const sunnah = record.sunnah === true;
+    if (!mosque && !adhkar && !sunnah && !location) continue;
     byKey.set(`${record.dayKey}:${record.prayer}`, {
       dayKey: record.dayKey,
       prayer: record.prayer as PrayerTrackingRecord["prayer"],
       mosque,
       adhkar,
+      ...(location ? { location } : {}),
+      ...(sunnah ? { sunnah } : {}),
     });
   }
   return [...byKey.values()];

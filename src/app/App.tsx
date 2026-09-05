@@ -15,6 +15,7 @@ import type {
   ZikrFontOption,
   ThemeMode,
   PrayerName,
+  PrayerTrackingRecord,
   MushafLayout,
   MushafTextScale,
   MushafToolbarSide,
@@ -53,6 +54,7 @@ import { ConfirmDialog } from "./components/ConfirmDialog";
 import { ScreenFallback } from "./components/ScreenFallback";
 import { StatePanel } from "./components/StatePanel";
 import { retryableScreen } from "./components/RetryableScreen";
+import type { PrayerTrackingWrite } from "./components/PrayerTrackerCards";
 import { PwaNotice } from "./components/PwaNotice";
 import type { AudioController } from "./audio/AudioProvider";
 import type { AudioStatus } from "./audio/audioTypes";
@@ -91,6 +93,9 @@ const ReaderScreen = retryableScreen(() =>
 );
 const FloatingAudioPlayer = lazy(() =>
   import("./components/FloatingAudioPlayer").then((module) => ({ default: module.FloatingAudioPlayer })),
+);
+const PrayerMomentScreen = retryableScreen(() =>
+  import("./screens/PrayerMomentScreen").then((module) => ({ default: module.PrayerMomentScreen })),
 );
 const CompletionScreen = retryableScreen(() =>
   import("./screens/CompletionScreen").then((module) => ({ default: module.CompletionScreen })),
@@ -193,6 +198,8 @@ function AppContent({
     setActiveCat,
     activeSubCategory,
     setActiveSubCategory,
+    activePrayer,
+    setActivePrayer,
     activeIdx,
     setActiveIdx,
     quranPage,
@@ -333,14 +340,14 @@ function AppContent({
   );
 
   /**
-   * Upserts one of the two flags for a prayer on the current progress day.
+   * Upserts what is recorded about a prayer on the current progress day.
    *
    * Keyed by (dayKey, prayer) so a record always names the prayer it belongs
    * to; nothing here consults the clock, which keeps tracking independent of
    * which prayer happens to be current when the tick is made.
    */
   const handleTogglePrayerTracking = useCallback(
-    (prayer: PrayerName, field: "mosque" | "adhkar", next: boolean) => {
+    (prayer: PrayerName, field: PrayerTrackingWrite, next: boolean | "mosque" | "home" | null) => {
       const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
       setPrayerTracking((current) => {
         // Guarded rather than trusted: this reducer is the one place a bad
@@ -348,7 +355,20 @@ function AppContent({
         const records = current ?? [];
         const index = records.findIndex((record) => record.dayKey === dayKey && record.prayer === prayer);
         const existing = index >= 0 ? records[index]! : { dayKey, prayer, mosque: false, adhkar: false };
-        const updated = { ...existing, [field]: next };
+        /* Where it was prayed is one answer, not two flags: writing it keeps
+           the older `mosque` boolean in step so a client that only knows that
+           field still reads the record correctly, and clearing it removes the
+           answer rather than recording "at home". */
+        const updated: PrayerTrackingRecord =
+          field === "location"
+            ? {
+                ...existing,
+                mosque: next === "mosque",
+                ...(next === "mosque" || next === "home"
+                  ? { location: next as "mosque" | "home" }
+                  : { location: undefined }),
+              }
+            : { ...existing, [field]: next === true };
         if (index >= 0) {
           const copy = records.slice();
           copy[index] = updated;
@@ -359,6 +379,23 @@ function AppContent({
     },
     [progressDayStartHour],
   );
+  /**
+   * Opens the prayer itself rather than its adhkar.
+   *
+   * Tapping a prayer used to jump straight into the after-prayer collection,
+   * which answered one of the four things someone does at a prayer and left
+   * the rest — where they prayed it, its rawātib, why it is worth walking to —
+   * to a checkbox row on Home. The collection is one press further in, from a
+   * screen that holds all of them.
+   */
+  const openPrayerMoment = useCallback(
+    (prayer: PrayerName) => {
+      setActivePrayer(prayer);
+      push("prayer");
+    },
+    [push, setActivePrayer],
+  );
+
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
@@ -1166,7 +1203,7 @@ function AppContent({
                       resumeCategory(categoryId);
                     }
                   }}
-                  onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");
@@ -1232,7 +1269,7 @@ function AppContent({
                   locationSettings={locationSettings}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
-                  onPrayerResume={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenFriday={() => push("friday")}
                 />
               )}
@@ -1498,6 +1535,22 @@ function AppContent({
                       ? () => void startAudio([activeZikr], "single", true)
                       : undefined
                   }
+                />
+              )}
+              {view === "prayer" && (
+                <PrayerMomentScreen
+                  prayer={activePrayer}
+                  language={selectedLang}
+                  direction={layoutDirection}
+                  records={prayerTracking}
+                  dayKey={getProgressDayKey(new Date(), progressDayStartHour)}
+                  locationSettings={locationSettings}
+                  onBack={pop}
+                  onToggle={(prayer, field, value) =>
+                    handleTogglePrayerTracking(prayer, field, value as boolean | "mosque" | "home" | null)
+                  }
+                  onOpenAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onSelectPrayer={(prayer) => setActivePrayer(prayer)}
                 />
               )}
               {view === "completion" && (

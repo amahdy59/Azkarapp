@@ -559,6 +559,36 @@ describe("prayer tracking persistence", () => {
     expect(normalized.prayerTracking).toEqual([{ dayKey: "2026-08-17", prayer: "fajr", mosque: true, adhkar: false }]);
   });
 
+  it("keeps where a prayer was prayed, and the rawātib, alongside the old booleans", () => {
+    const state = normalizeAppState({
+      prayerTracking: [
+        { dayKey: "2026-09-04", prayer: "isha", location: "mosque", adhkar: false },
+        { dayKey: "2026-09-04", prayer: "fajr", location: "home", sunnah: true, mosque: false, adhkar: false },
+        { dayKey: "2026-09-04", prayer: "asr", location: "elsewhere", mosque: false, adhkar: false },
+      ],
+    });
+
+    // A record naming the mosque is a mosque record however it was written, so
+    // a client that only knows the boolean still reads it correctly.
+    expect(state.prayerTracking).toContainEqual({
+      dayKey: "2026-09-04",
+      prayer: "isha",
+      mosque: true,
+      adhkar: false,
+      location: "mosque",
+    });
+    expect(state.prayerTracking).toContainEqual({
+      dayKey: "2026-09-04",
+      prayer: "fajr",
+      mosque: false,
+      adhkar: false,
+      location: "home",
+      sunnah: true,
+    });
+    // An unknown place is not a place: the record carries nothing to record.
+    expect(state.prayerTracking.some((record) => record.prayer === "asr")).toBe(false);
+  });
+
   it("merges by (day, prayer) so two devices cannot duplicate a prayer", () => {
     const base = normalizeAppState({
       ...DEFAULT_APP_STATE,

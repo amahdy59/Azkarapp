@@ -4,7 +4,7 @@ import { parseLocation, routeToHash } from "../routing";
 import { getAzkarForMode, isRoutineCategory, registerLazyCollection } from "../content/azkar";
 import { reportError } from "../../lib/observability";
 import { startSafeViewTransition } from "../utils/viewTransitions";
-import type { CategoryId, RoutineMode, View, RoutineCategoryId } from "../types";
+import type { CategoryId, PrayerName, RoutineMode, View, RoutineCategoryId } from "../types";
 import type { LibrarySection } from "../screens/AzkarLibraryScreen";
 
 function categoryFromShortcutUrl(): CategoryId | null {
@@ -52,6 +52,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
   const [activeSubCategory, setActiveSubCategory] = useState<string | undefined>(undefined);
   const [activeIdx, setActiveIdx] = useState(initialRoute?.index ?? 0);
   const [quranPage, setQuranPage] = useState<number | undefined>(initialRoute?.page);
+  /** Which prayer the prayer screen is showing, so `#/prayer/asr` survives a reload. */
+  const [activePrayer, setActivePrayer] = useState<PrayerName>(initialRoute?.prayer ?? "fajr");
   const [searchQuery, setSearchQuery] = useState(initialRoute?.query ?? "");
   const [librarySection, setLibrarySection] = useState<LibrarySection>("collections");
 
@@ -135,13 +137,14 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       index: activeIdx,
       query: searchQuery,
       page: quranPage,
+      prayer: activePrayer,
     });
     if (!hash) return;
     const target = `${window.location.pathname}${hash}`;
     if (`${window.location.pathname}${window.location.hash}` !== target) {
       window.history.replaceState({ view }, "", target);
     }
-  }, [view, activeCat, activeIdx, searchQuery, quranPage]);
+  }, [view, activeCat, activeIdx, searchQuery, quranPage, activePrayer]);
 
   const applyRouteFromLocation = useCallback((): boolean => {
     const route = parseLocation(window.location.search, window.location.hash);
@@ -151,6 +154,7 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
       flushSync(() => {
         setView(route.view);
         if (route.page !== undefined) setQuranPage(route.page);
+        if (route.prayer) setActivePrayer(route.prayer);
         if (route.categoryId) {
           setActiveCat(route.categoryId);
           if (route.view === "reader" || isLazyRouteCategory(route.categoryId)) {
@@ -292,6 +296,8 @@ export function useAppRouting({ routineModes, hasCompletedOnboarding }: UseAppRo
     setActiveCat,
     activeSubCategory,
     setActiveSubCategory,
+    activePrayer,
+    setActivePrayer,
     activeIdx,
     setActiveIdx,
     quranPage,

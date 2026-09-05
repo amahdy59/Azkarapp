@@ -48,6 +48,14 @@ export interface PrayerCardModel {
 /** The two independent booleans a card tracks. */
 export type PrayerTrackingField = "mosque" | "adhkar";
 
+/**
+ * Everything the prayer surfaces may record. The cards here still write the
+ * two booleans; the prayer screen also writes where the prayer was prayed and
+ * whether its rawātib were, which is why the write type is wider than the
+ * field type above.
+ */
+export type PrayerTrackingWrite = PrayerTrackingField | "location" | "sunnah";
+
 function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
   if (state === "current") return t(language, "prayerTracking.now");
   if (state === "next") return t(language, "prayerTracking.next");
@@ -64,6 +72,30 @@ function statusLabel(language: AppLanguage, state: PrayerTemporalState) {
  * row so the 48px target and the label come free, and `peer` drives the visual
  * circle from real checked/focus/disabled state rather than from React.
  */
+/**
+ * The tick itself, shared with the prayer screen so a recorded deed looks the
+ * same wherever it is recorded. It draws from the `checked` prop rather than a
+ * `peer-checked:` variant — the sibling selector matched and even drove the pop
+ * animation, yet the colour declarations never landed, leaving a ticked box
+ * with a transparent fill and a grey ring. It still reads `peer-*` for hover
+ * and active, which have no such problem.
+ */
+export function TrackingCheckMark({ checked }: { checked: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      data-checked={checked ? "true" : undefined}
+      className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
+        checked
+          ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
+          : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
+      }`}
+    >
+      <Check size={14} strokeWidth={3} />
+    </span>
+  );
+}
+
 function TrackingCheckbox({
   id,
   label,
@@ -114,17 +146,7 @@ function TrackingCheckbox({
           colour declarations never landed, so a ticked box kept a transparent
           fill and a grey ring — the state was announced correctly but invisible.
           Reading the prop we already hold removes the indirection entirely. */}
-      <span
-        aria-hidden="true"
-        data-checked={checked ? "true" : undefined}
-        className={`tracking-check pointer-events-none flex size-6 shrink-0 items-center justify-center rounded-full border-2 transition-[background-color,border-color,transform,box-shadow] duration-standard ease-standard peer-enabled:peer-active:scale-90 ${
-          checked
-            ? "border-primary bg-primary text-primary-foreground shadow-[0_2px_8px_-2px_var(--primary)]"
-            : "border-border-control text-transparent peer-enabled:peer-hover:border-primary peer-enabled:peer-hover:bg-primary/10"
-        }`}
-      >
-        <Check size={14} strokeWidth={3} />
-      </span>
+      <TrackingCheckMark checked={checked} />
     </label>
   );
 }

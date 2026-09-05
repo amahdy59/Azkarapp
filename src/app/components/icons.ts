@@ -60,6 +60,7 @@ export {
   Globe01 as Globe,
   LayoutLeft as PanelLeftIcon,
   LinkExternal01 as ExternalLink,
+  Lock01 as Lock,
   List,
   LogOut01 as LogOut,
   MarkerPin01 as MapPin,

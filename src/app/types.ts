@@ -73,6 +73,7 @@ export type View =
   | "friday_salawat"
   | "category"
   | "reader"
+  | "prayer"
   | "completion"
   // Phase 2 — English onboarding
   | "splash"
@@ -251,6 +252,19 @@ export interface PrayerTrackingRecord {
   mosque: boolean;
   /** Completed the adhkar that follow the prayer. */
   adhkar: boolean;
+  /**
+   * Where it was prayed.
+   *
+   * `mosque` above is the same fact as `location: "mosque"` and both are written
+   * together, so a record made here still reads correctly on a client that
+   * only knows the boolean. What the boolean could never say is the difference
+   * between praying at home and not having recorded anything: `false` meant
+   * both, which is why nothing could tell a missed prayer from an unrecorded
+   * one. Absent here means unrecorded.
+   */
+  location?: "mosque" | "home";
+  /** Prayed the confirmed rawātib attached to this prayer. */
+  sunnah?: boolean;
 }
 
 /** The Mushaf follows the app by default, while OLED remains an explicit

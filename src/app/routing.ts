@@ -15,10 +15,13 @@
  */
 
 import { CATEGORIES } from "./content/categories";
-import type { CategoryId, View } from "./types";
+import { isPrayerName } from "./content/prayerTimes";
+import type { CategoryId, PrayerName, View } from "./types";
 
 export interface RouteState {
   view: View;
+  /** The prayer a `prayer` route names. */
+  prayer?: PrayerName;
   categoryId?: CategoryId;
   /** Zero-based index into the collection; the URL shows it one-based. */
   index?: number;
@@ -58,7 +61,7 @@ function categoryFromSlug(slug: string): CategoryId | undefined {
  * URL at all (onboarding and auth steps).
  */
 export function routeToHash(route: RouteState): string | null {
-  const { view, categoryId, index, query, page } = route;
+  const { view, categoryId, index, query, page, prayer } = route;
 
   if (view === "category" && categoryId) {
     return `#/azkar/${categorySlug(categoryId)}`;
@@ -67,6 +70,10 @@ export function routeToHash(route: RouteState): string | null {
   if (view === "reader" && categoryId) {
     // One-based so the URL matches how the reader labels the zikr on screen.
     return `#/azkar/${categorySlug(categoryId)}/${(index ?? 0) + 1}`;
+  }
+
+  if (view === "prayer" && prayer) {
+    return `#/prayer/${prayer}`;
   }
 
   if (view === "khatmah") {
@@ -109,6 +116,11 @@ export function parseHash(hash: string): RouteState | null {
     const oneBased = Number(segments[2]);
     if (!Number.isInteger(oneBased) || oneBased < 1) return null;
     return { view: "reader", categoryId, index: oneBased - 1 };
+  }
+
+  if (segments[0] === "prayer" && segments.length >= 2) {
+    const name = segments[1]!;
+    return isPrayerName(name) ? { view: "prayer", prayer: name } : null;
   }
 
   if (segments[0] === "quran" || segments[0] === "mushaf") {
