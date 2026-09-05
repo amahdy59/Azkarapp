@@ -29,6 +29,31 @@ vi.mock("./state", async (importOriginal) => {
 });
 
 // Avoid actually registering SW in tests
+/**
+ * The audio chunk loads itself in the background after first paint, so its
+ * dynamic import routinely resolves *after* a test has finished and Vitest has
+ * torn the environment down. Vitest counts that as an unhandled rejection and
+ * fails the entire run — naming no test, because it belongs to none.
+ *
+ * That is what made `pnpm check` report `FAIL unit tests` while the same suite
+ * passed standalone, intermittently, across several pushes. It read as
+ * contention and was not: nothing was slow, something was still in flight.
+ *
+ * Stubbed so nothing is pending when the test ends. The real loader is covered
+ * where the audio subsystem itself is tested.
+ */
+vi.mock("./audio/lazyAudio", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("./audio/lazyAudio")>();
+  return {
+    ...actual,
+    loadAudioModule: vi.fn(async () => ({
+      AudioProvider: ({ children }: { children: React.ReactNode }) => children,
+      buildPlaybackPlan: () => null,
+      getAudioCoverage: () => actual.EMPTY_AUDIO_COVERAGE,
+    })),
+  };
+});
+
 vi.mock("virtual:pwa-register", () => ({
   useRegisterSW: () => ({
     offlineReady: [false, vi.fn()],
