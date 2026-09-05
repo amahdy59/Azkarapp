@@ -39,6 +39,52 @@ const limits = {
   totalOutput: 9 * 1024 * 1024,
   largestFile: 2 * 1024 * 1024,
 };
+/**
+ * The ceilings above are backstops; this is the guard that does the work.
+ *
+ * A fixed ceiling answers one question — "has the purge broken?" — and answers
+ * everything else by accident. It spent months at 14 bytes of headroom, where a
+ * 200-byte layout fix and a 15 kB regression failed identically, and the only
+ * available response to either was to argue about the ceiling. Neither outcome
+ * is what the ceiling was for.
+ *
+ * So growth is measured against a recorded baseline instead. Creep fails; a
+ * deliberate increase is accepted by updating `bundle-baseline.json` in the
+ * same change, which puts the number in the diff where a reviewer can see it
+ * and ask why. The ceilings stay where they are and are not raised — they still
+ * catch the catastrophic case this file was written for.
+ */
+const TOLERANCE = 0.02;
+/** Below this, percentage growth is noise rather than creep. */
+const TOLERANCE_FLOOR = 512;
+
+const baselinePath = path.resolve("scripts/bundle-baseline.json");
+const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
+
+function checkAgainstBaseline(name, actual) {
+  const recorded = baseline.metrics?.[name];
+  if (typeof recorded !== "number") {
+    failures.push(`No baseline recorded for "${name}". Add it to scripts/bundle-baseline.json.`);
+    return;
+  }
+  const allowance = Math.max(recorded * TOLERANCE, TOLERANCE_FLOOR);
+  if (actual > recorded + allowance) {
+    const growth = (((actual - recorded) / recorded) * 100).toFixed(1);
+    failures.push(
+      `${name}: ${actual} bytes is ${growth}% above the recorded ${recorded}.\n` +
+        `      If that growth is intended, update scripts/bundle-baseline.json in this change so the number is reviewed.`,
+    );
+    return;
+  }
+  // A baseline that has drifted far above reality stops guarding anything.
+  if (actual < recorded * 0.9) {
+    console.log(
+      `Note: ${name} is ${(((recorded - actual) / recorded) * 100).toFixed(1)}% below its baseline (${recorded} → ${actual}).\n` +
+        "      Re-baselining keeps the guard tight.",
+    );
+  }
+}
+
 const distDirectory = path.resolve("dist");
 const assetsDirectory = path.resolve("dist/assets");
 const entries = await readdir(assetsDirectory);
@@ -76,6 +122,12 @@ for (const entry of entries) {
     const compressedLimit = entry.endsWith(".js") ? limits.javascriptGzip : limits.cssGzip;
     if (compressedSize > compressedLimit) {
       failures.push(`${entry}: ${compressedSize} gzip bytes exceeds ${compressedLimit} bytes`);
+    }
+    /* The one stylesheet every visitor loads, tracked by name-independent
+       role rather than by its hashed filename. */
+    if (entry.startsWith("index-") && entry.endsWith(".css")) {
+      checkAgainstBaseline("stylesheetBytes", size);
+      checkAgainstBaseline("stylesheetGzip", compressedSize);
     }
   }
 }
@@ -116,6 +168,7 @@ if (!entryKey) {
   if (initialGzipSize > limits.initialGzip) {
     failures.push(`Initial route: ${initialGzipSize} gzip bytes exceeds ${limits.initialGzip} bytes`);
   }
+  checkAgainstBaseline("initialRouteGzip", initialGzipSize);
 }
 
 if (failures.length) {

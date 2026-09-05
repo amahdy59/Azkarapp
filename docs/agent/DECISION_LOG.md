@@ -2794,3 +2794,48 @@ Record user-approved product, design and architectural decisions here. Do not er
   `mosque: true` record still reads as the mosque; an unrecorded prayer stays
   unticked and unnamed. Looked at, not only measured: the redesigned page at
   800×450 and the Home row at the same size, with all five cards at one height.
+
+## DEC-147 — the stylesheet stops paying for braces, and the budget starts measuring growth
+
+- **Decision:** Tailwind's `color-mix` guards are unwrapped at build time, and
+  the bundle budget gains a baseline it measures growth against. The ceilings
+  are unchanged and were not raised.
+- **A fifth of the stylesheet was wrapper syntax.** Tailwind v4 emits every
+  colour carrying an opacity modifier twice: a plain fallback, then the same
+  selector inside `@supports (color: color-mix(in lab, red, red))` with the
+  mixed value. This bundle had 207 of those guards — 9,315 bytes of braces
+  around 19,894 bytes of declarations. A build-time transform unwraps them:
+  158,490 bytes where there were 167,922, and gzip 27,506 where there were
+  27,980.
+- **Why that is safe without choosing a support matrix.** A browser that cannot
+  parse `color-mix` drops that one declaration and keeps the fallback emitted
+  above it — which is exactly what the guard achieved. A browser that can
+  applies the later rule, as it did inside the guard. The cascade outcome is
+  identical either way. The transform matches braces rather than assuming top
+  level, so a guard nested inside another at-rule keeps its contents there.
+- **What was investigated and rejected:** narrowing `browserslist`. Tailwind
+  4.1 emits these guards unconditionally rather than from browser targets, and
+  the repository declares no `browserslist` at all — so there was nothing to
+  tune and tuning it would have changed nothing. Worth recording because the
+  19% figure invites exactly that assumption. (For the record, the app's own
+  hand-written CSS already uses `color-mix` in eleven files, container query
+  units in three and `dvh` in nine, so its real floor is around Safari 16.4 —
+  the guards were protecting browsers this app never supported.)
+- **A ceiling answers one question and everything else by accident.** The CSS
+  cap exists to catch a purge regression, and it did that job once. It had also
+  drifted to 14 bytes of headroom, where a 200-byte layout fix and a 15 kB
+  regression failed identically and the only response available to either was
+  to argue about the ceiling. `scripts/bundle-baseline.json` now records the
+  stylesheet's raw and gzip size and the initial route's gzip size; growth
+  beyond 2% (or 512 bytes, whichever is larger) fails, and a deliberate
+  increase is accepted by updating that file in the same change — which puts
+  the number in the diff for a reviewer to question. The ceilings remain as
+  backstops for the catastrophic case.
+- **The guard also protects the transform.** If a future Tailwind changes the
+  guard's shape, the unwrap silently stops matching — and the baseline check
+  fails on the 9 kB that comes back, which is how a silent no-op gets found.
+- **Tests/evidence required:** the built stylesheet contains no remaining
+  `color-mix` guards, keeps its 193 `color-mix` declarations, and balances its
+  braces; the delta guard fails a 5% regression with an actionable message and
+  passes at baseline; the full e2e suite passes against a production build,
+  which is what actually exercises the transformed CSS.

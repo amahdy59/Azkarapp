@@ -6,17 +6,17 @@ This document makes the project checklist auditable. A recommendation is **met**
 
 Every pull request must pass the pinned-toolchain check, `pnpm install --frozen-lockfile`, `pnpm check`, `pnpm test:e2e`, `pnpm build:pages`, and `pnpm audit:prod`.
 
-| Concern               | Evidence                                                                                                     |
-| --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Type safety           | Strict TypeScript and `tsc --noEmit`                                                                         |
-| Code hygiene          | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                                             |
-| Critical data logic   | Unit tests and enforced coverage thresholds for persistence, merging, progress, prayer calculation, and auth |
-| Accessibility         | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks                  |
-| Browser compatibility | Full Chromium viewport matrix plus Firefox desktop and WebKit mobile core-flow smoke tests                   |
-| Performance           | Screen lazy loading, Vite tree shaking, and per-asset bundle budgets                                         |
-| Supply chain          | Exact pnpm pin, frozen lockfile, seven-day quarantine, and `pnpm audit:prod` on PRs and `main` pushes        |
-| Secrets               | Runtime environment variables; `.env*` excluded except `.env.example`                                        |
-| Deployment            | The Pages workflow runs all non-browser quality gates before building                                        |
+| Concern               | Evidence                                                                                                              |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Type safety           | Strict TypeScript and `tsc --noEmit`                                                                                  |
+| Code hygiene          | ESLint, React Hooks rules, JSX accessibility rules, and Prettier                                                      |
+| Critical data logic   | Unit tests and enforced coverage thresholds for persistence, merging, progress, prayer calculation, and auth          |
+| Accessibility         | Axe WCAG A/AA scans across onboarding, home, and settings; keyboard and touch-target checks                           |
+| Browser compatibility | Full Chromium viewport matrix plus Firefox desktop and WebKit mobile core-flow smoke tests                            |
+| Performance           | Screen lazy loading, Vite tree shaking, per-asset bundle ceilings, and a recorded baseline growth is measured against |
+| Supply chain          | Exact pnpm pin, frozen lockfile, seven-day quarantine, and `pnpm audit:prod` on PRs and `main` pushes                 |
+| Secrets               | Runtime environment variables; `.env*` excluded except `.env.example`                                                 |
+| Deployment            | The Pages workflow runs all non-browser quality gates before building                                                 |
 
 Dependency updates must be resolved with the pnpm release declared by `packageManager`. A package that is younger than `minimumReleaseAge` must not enter the lockfile through a local-policy bypass. Select an eligible reviewed release, wait for the quarantine to expire, or record an explicit security exception before changing `minimumReleaseAgeExclude`.
 

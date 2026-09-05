@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from "vite";
+import { defineConfig, loadEnv, type Plugin } from "vite";
 import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
@@ -25,6 +25,71 @@ function currentRelease(): string {
   }
 }
 
+/**
+ * Unwraps Tailwind's `color-mix` progressive-enhancement guards.
+ *
+ * Tailwind v4 emits every colour with an opacity modifier twice: a plain
+ * fallback, then the same selector inside
+ * `@supports (color: color-mix(in lab, red, red))` carrying the mixed value.
+ * In this bundle that is 207 guards — 9.3 kB of pure wrapper syntax around
+ * 19.9 kB of declarations, a fifth of the stylesheet spent on braces.
+ *
+ * Removing the wrapper changes nothing about which rule applies. A browser
+ * that cannot parse `color-mix` drops that one declaration and keeps the
+ * fallback emitted above it, which is exactly what the guard achieved; a
+ * browser that can parse it applies the later rule, as it did inside the
+ * guard. No support matrix has to be chosen for this to be safe — and that
+ * matters, because the app's own hand-written CSS already uses `color-mix`
+ * in eleven files, so the guards were protecting browsers that were never
+ * going to render this app correctly anyway.
+ *
+ * Nested at-rules are preserved: the unwrapped rules stay inside whatever
+ * media or supports block contained the guard, because the scan matches
+ * braces rather than assuming top level.
+ */
+function unwrapColorMixGuards(): Plugin {
+  const GUARD = /@supports\s*\(color:\s*color-mix\(in lab,\s*red,\s*red\)\)\s*\{/g;
+
+  function unwrap(css: string) {
+    let out = "";
+    let index = 0;
+    let removed = 0;
+    GUARD.lastIndex = 0;
+
+    for (let match = GUARD.exec(css); match; match = GUARD.exec(css)) {
+      const bodyStart = match.index + match[0].length;
+      let depth = 1;
+      let cursor = bodyStart;
+      for (; cursor < css.length && depth > 0; cursor++) {
+        if (css[cursor] === "{") depth += 1;
+        else if (css[cursor] === "}") depth -= 1;
+      }
+      // An unbalanced guard means the format changed under us; leave it alone.
+      if (depth !== 0) continue;
+
+      out += css.slice(index, match.index) + css.slice(bodyStart, cursor - 1);
+      index = cursor;
+      removed += 1;
+      GUARD.lastIndex = index;
+    }
+
+    return { css: out + css.slice(index), removed };
+  }
+
+  return {
+    name: "azkar:unwrap-color-mix-guards",
+    apply: "build",
+    generateBundle(_options, bundle) {
+      for (const asset of Object.values(bundle)) {
+        if (asset.type !== "asset" || !asset.fileName.endsWith(".css")) continue;
+        const source = typeof asset.source === "string" ? asset.source : Buffer.from(asset.source).toString("utf8");
+        const { css, removed } = unwrap(source);
+        if (removed > 0) asset.source = css;
+      }
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
@@ -43,6 +108,7 @@ export default defineConfig(({ mode }) => {
       // actively misleading. DEC-070 / F36.)
       react(),
       tailwindcss(),
+      unwrapColorMixGuards(),
       VitePWA({
         registerType: "prompt",
         includeAssets: ["**/*.svg"],

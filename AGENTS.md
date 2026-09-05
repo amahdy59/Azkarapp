@@ -123,7 +123,7 @@ pnpm check
 pnpm test:e2e
 ```
 
-Do not hide failures, weaken assertions, reduce coverage thresholds, skip tests, or increase bundle budgets merely to obtain a passing result.
+Do not hide failures, weaken assertions, reduce coverage thresholds, skip tests, or increase bundle budgets merely to obtain a passing result. The bundle ceilings are backstops and are not raised; `scripts/bundle-baseline.json` records the sizes growth is measured against, and updating it is how a deliberate increase is accepted — in the same change, so a reviewer sees the number.
 
 ## 10. Diff discipline
 
