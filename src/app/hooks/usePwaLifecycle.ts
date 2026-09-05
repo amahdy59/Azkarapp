@@ -3,6 +3,7 @@ import { reportError } from "../../lib/observability";
 import { t } from "../i18n";
 import { APP_RELEASE } from "../releaseStamp";
 import { loadReleaseNotes, markReleaseSeen, readSeenRelease, type ReleaseNotes } from "../releaseNotes";
+import { escapeStaleServiceWorker, rememberUpdateAttempt } from "../pwaUpdate";
 import type { AppLanguage, BeforeInstallPromptEvent } from "../types";
 
 const INSTALL_DISMISSED_KEY = "azkarapp.install-dismissed";
@@ -77,8 +78,20 @@ export function usePwaLifecycle(language: AppLanguage) {
       if (cancelled || !notes?.release) return;
 
       if (APP_RELEASE && notes.release !== APP_RELEASE) {
-        setReleaseNotes(notes);
-        setUpdateAvailable(true);
+        /* Still on the old build after asking for the new one. The worker
+           serving it has had its chance, so it is discarded rather than asked
+           again — see escapeStaleServiceWorker. This reloads when it fires, so
+           there is nothing to show. */
+        void escapeStaleServiceWorker({
+          deployedRelease: notes.release,
+          runningRelease: APP_RELEASE,
+          getRegistration: () => navigator.serviceWorker?.getRegistration?.() ?? Promise.resolve(undefined),
+          reload: () => window.location.reload(),
+        }).then((escalated) => {
+          if (escalated) return;
+          setReleaseNotes(notes);
+          setUpdateAvailable(true);
+        });
         return;
       }
 
@@ -102,7 +115,12 @@ export function usePwaLifecycle(language: AppLanguage) {
     setIsUpdating(true);
     // The notes were on screen when this was tapped, so the recap after the
     // reload would only repeat what the reader has just read.
-    if (releaseNotes?.release) markReleaseSeen(releaseNotes.release);
+    if (releaseNotes?.release) {
+      markReleaseSeen(releaseNotes.release);
+      // What the next load checks against: if this build is still running then,
+      // the handover did not take and the worker gets discarded instead.
+      rememberUpdateAttempt(releaseNotes.release);
+    }
     window.dispatchEvent(new Event("azkar-apply-update"));
   }, [releaseNotes]);
 

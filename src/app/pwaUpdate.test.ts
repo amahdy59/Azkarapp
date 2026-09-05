@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { applyServiceWorkerUpdate } from "./pwaUpdate";
+import { applyServiceWorkerUpdate, escapeStaleServiceWorker } from "./pwaUpdate";
 
 /** A worker whose state can be driven, as the browser drives a real one. */
 function fakeWorker(state: ServiceWorker["state"]) {
@@ -105,6 +105,70 @@ describe("applying a service worker update", () => {
 
     await applyServiceWorkerUpdate(args);
 
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe("escaping a worker that would not replace itself", () => {
+  const KEY = "azkarapp.update-attempted-for";
+
+  function harness(attempted: string | null) {
+    window.sessionStorage.clear();
+    if (attempted) window.sessionStorage.setItem(KEY, attempted);
+    const unregister = vi.fn(async () => true);
+    const reload = vi.fn();
+    return {
+      unregister,
+      reload,
+      args: {
+        deployedRelease: "2026-09-05.6",
+        runningRelease: "2026-09-05.5",
+        getRegistration: async () => ({ unregister }) as unknown as ServiceWorkerRegistration,
+        reload,
+      },
+    };
+  }
+
+  it("does nothing when no update was asked for", async () => {
+    const { args, unregister, reload } = harness(null);
+    expect(await escapeStaleServiceWorker(args)).toBe(false);
+    expect(unregister).not.toHaveBeenCalled();
+    expect(reload).not.toHaveBeenCalled();
+  });
+
+  it("does nothing when the running build is already the deployed one", async () => {
+    const { args, unregister } = harness("2026-09-05.6");
+    expect(await escapeStaleServiceWorker({ ...args, runningRelease: "2026-09-05.6" })).toBe(false);
+    expect(unregister).not.toHaveBeenCalled();
+  });
+
+  it("discards the worker when an update was asked for and did not take", async () => {
+    const { args, unregister, reload } = harness("2026-09-05.6");
+    expect(await escapeStaleServiceWorker(args)).toBe(true);
+    expect(unregister).toHaveBeenCalledTimes(1);
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("escalates only once, so a stuck client cannot reload forever", async () => {
+    const { args, reload } = harness("2026-09-05.6");
+    expect(await escapeStaleServiceWorker(args)).toBe(true);
+    // The marker is cleared before the reload, so the load it causes is quiet.
+    expect(await escapeStaleServiceWorker(args)).toBe(false);
+    expect(reload).toHaveBeenCalledTimes(1);
+  });
+
+  it("still reloads when the worker refuses to unregister", async () => {
+    const { args, reload } = harness("2026-09-05.6");
+    const failing = {
+      ...args,
+      getRegistration: async () =>
+        ({
+          unregister: async () => {
+            throw new Error("denied");
+          },
+        }) as unknown as ServiceWorkerRegistration,
+    };
+    expect(await escapeStaleServiceWorker(failing)).toBe(true);
     expect(reload).toHaveBeenCalledTimes(1);
   });
 });

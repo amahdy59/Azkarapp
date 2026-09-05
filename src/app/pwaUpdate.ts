@@ -77,3 +77,86 @@ export async function applyServiceWorkerUpdate({
 
   reload();
 }
+
+/** Remembers, for this tab only, which release an update was asked for. */
+const UPDATE_ATTEMPT_KEY = "azkarapp.update-attempted-for";
+
+export function rememberUpdateAttempt(release: string) {
+  try {
+    window.sessionStorage.setItem(UPDATE_ATTEMPT_KEY, release);
+  } catch {
+    // A tab that cannot remember simply does not escalate. Not worth failing on.
+  }
+}
+
+function readUpdateAttempt(): string | null {
+  try {
+    return window.sessionStorage.getItem(UPDATE_ATTEMPT_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function clearUpdateAttempt() {
+  try {
+    window.sessionStorage.removeItem(UPDATE_ATTEMPT_KEY);
+  } catch {
+    // Nothing to clear if storage is unavailable.
+  }
+}
+
+/**
+ * The last resort: throw the worker away and reload.
+ *
+ * Handing over to a waiting worker is the ordinary path and it is the one that
+ * should run. This exists for the state where that has already been asked for
+ * and did not take — the reader pressed update, the page reloaded, and the
+ * build they are running is still the one they pressed it to leave. Whatever
+ * the cause, the worker serving that build cannot be trusted to replace itself,
+ * so it is unregistered and its caches dropped: the next load comes from the
+ * network.
+ *
+ * It runs at most once per tab per release, because it is keyed on the release
+ * that was asked for and clears the key before reloading. Without that a stuck
+ * client would reload forever, which is worse than the state it is escaping.
+ *
+ * Returns whether it escalated, so a caller can leave the notice up rather than
+ * silently doing nothing.
+ */
+export async function escapeStaleServiceWorker({
+  deployedRelease,
+  runningRelease,
+  getRegistration,
+  reload,
+}: {
+  deployedRelease: string;
+  runningRelease: string;
+  getRegistration: () => Promise<ServiceWorkerRegistration | undefined>;
+  reload: () => void;
+}): Promise<boolean> {
+  if (!runningRelease || runningRelease === deployedRelease) return false;
+  if (readUpdateAttempt() !== deployedRelease) return false;
+
+  // Cleared first: an escalation that fails partway must not run again on the
+  // reload it triggers.
+  clearUpdateAttempt();
+
+  const registration = await getRegistration();
+  await registration?.unregister().catch(() => {
+    // Even a failed unregister is followed by the reload, which is the part the
+    // reader actually asked for.
+  });
+
+  if (typeof caches !== "undefined") {
+    await caches
+      .keys()
+      .then((keys) => Promise.all(keys.map((key) => caches.delete(key))))
+      .catch(() => {
+        // The precache is the likely culprit, but a browser that refuses to
+        // enumerate it still gets the reload.
+      });
+  }
+
+  reload();
+  return true;
+}
