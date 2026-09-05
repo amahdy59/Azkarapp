@@ -3,7 +3,27 @@ import path from "path";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { readFileSync } from "node:fs";
 import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
+
+/**
+ * The release this build is, stamped in at build time.
+ *
+ * The app fetches `release-notes.json` from the network while its own code comes
+ * from the service-worker precache, so without this it could only ever compare
+ * the deployed release against the last one a reader had dismissed — and a
+ * reader still running last week's bundle was told "the app has been
+ * updated" about a version they had not received. Knowing its own stamp lets
+ * it tell "here is what you just got" from "here is what is waiting for you".
+ */
+function currentRelease(): string {
+  try {
+    const notes = JSON.parse(readFileSync("public/release-notes.json", "utf8")) as { release?: string };
+    return typeof notes.release === "string" ? notes.release : "";
+  } catch {
+    return "";
+  }
+}
 
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
@@ -15,6 +35,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: appBase,
+    define: { __APP_RELEASE__: JSON.stringify(currentRelease()) },
     plugins: [
       // Both plugins are load-bearing: the app is React, and Tailwind compiles
       // the entire design system. (This previously claimed Tailwind "is not

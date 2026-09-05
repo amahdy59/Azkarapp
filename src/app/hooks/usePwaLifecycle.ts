@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { reportError } from "../../lib/observability";
 import { t } from "../i18n";
+import { APP_RELEASE } from "../releaseStamp";
 import { loadReleaseNotes, markReleaseSeen, readSeenRelease, type ReleaseNotes } from "../releaseNotes";
 import type { AppLanguage, BeforeInstallPromptEvent } from "../types";
 
@@ -53,14 +54,20 @@ export function usePwaLifecycle(language: AppLanguage) {
   }, [language]);
 
   /**
-   * Recap the notes for a release the reader never got to read.
+   * Tell "here is what you just got" from "here is what is waiting for you".
    *
-   * The update prompt shows the notes *before* the update, and applying it
-   * reloads the app — so anyone who tapped Refresh without reading, or who
-   * chose Later and updated on a subsequent launch, lost them for good. This
-   * compares the deployed stamp against the last one shown and recaps only
-   * when they differ. A first run stores the stamp silently: someone opening
-   * Azkar for the first time should not be met with a changelog.
+   * The notes are fetched from the network; the app is served from the
+   * service-worker precache, and that worker waits for the reader before it
+   * takes over. So a deployed release that differs from the last one seen means
+   * one of two entirely different things, and this used to read as the first in
+   * both cases: a reader still running last week's bundle was told the app
+   * had been updated, shown notes for features they did not have, and given a
+   * Close button as the only way out. Comparing against the release this bundle
+   * was actually built from separates them — a match is a recap, a mismatch is
+   * an update waiting, and the prompt for it can offer to apply it.
+   *
+   * A first run stores the stamp silently: someone opening Azkar for the first
+   * time should not be met with a changelog.
    */
   useEffect(() => {
     if (typeof navigator !== "undefined" && !navigator.onLine) return;
@@ -68,6 +75,12 @@ export function usePwaLifecycle(language: AppLanguage) {
     let cancelled = false;
     void loadReleaseNotes().then((notes) => {
       if (cancelled || !notes?.release) return;
+
+      if (APP_RELEASE && notes.release !== APP_RELEASE) {
+        setReleaseNotes(notes);
+        setUpdateAvailable(true);
+        return;
+      }
 
       const seen = readSeenRelease();
       if (seen === null) {

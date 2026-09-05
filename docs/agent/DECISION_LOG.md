@@ -2680,3 +2680,39 @@ Record user-approved product, design and architectural decisions here. Do not er
   home. Measured at 375×812 and 1024×900: no horizontal overflow, the hero at
   its full height, and the prayer, the narration and the three cards laid out
   as the approved design has them.
+
+## DEC-144 — the update notice updates the app
+
+- **Decision:** the app knows which release it is running, not only which is
+  deployed; a newer deployed release is offered as an update with an action
+  that applies it, and applying works whether or not the service worker has
+  noticed the new build yet.
+- **It told readers they had an update they had not received.** The release
+  notes are fetched from the network, while the app itself is served from the
+  service-worker precache — and that worker deliberately waits for the reader
+  before it takes over. The recap compared the deployed stamp against the last
+  one dismissed, so a reader still running last week's bundle was shown "the app
+  has been updated", given notes for features they did not have, and offered a
+  Close button as the only way out. Refreshing could not help them: a hard
+  refresh bypasses the HTTP cache and not the worker, so it faithfully reloads
+  the old app.
+- **The build now carries its own stamp.** `vite.config.ts` defines
+  `__APP_RELEASE__` from `public/release-notes.json`, and `releaseStamp.ts`
+  exposes it. A deployed release equal to it is a recap of what the reader just
+  received; a different one is an update waiting, which raises the update prompt
+  — notes and an apply action — instead of a congratulation. An empty stamp (a
+  unit test, where the define is not applied) suppresses both rather than
+  guessing.
+- **Apply now applies from a cold prompt.** `updateServiceWorker(true)` skips a
+  _waiting_ worker and reloads when the new one takes over, but resolves having
+  done nothing when none is waiting — which is the common case now that the
+  prompt can be raised by the notes rather than by the worker. The handler asks
+  the registration to look first, hands over if something is waiting, and
+  otherwise reloads.
+- **What is deliberately unchanged:** the worker still waits rather than taking
+  over mid-session. Reading and counting are not interrupted by a deploy; the
+  reader still chooses the moment. The change is that choosing it now works.
+- **Tests/evidence required:** a deployed release different from the build's
+  stamp raises the update prompt and not the recap; equal stamps recap once and
+  then stop; a first run records the stamp silently; apply reloads when nothing
+  is waiting.
