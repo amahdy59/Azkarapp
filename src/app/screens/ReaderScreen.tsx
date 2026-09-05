@@ -907,6 +907,11 @@ export function ReaderScreen({
   return (
     // The canvas delegates pointer clicks while its explicit reading and counter surfaces own keyboard activation.
     <ScreenContainer
+      /* The Mushaf is the whole screen: no gutter above the paper and none
+         below it. The reader kept the screen's own 8px top inset in Mushaf mode,
+         which pushed the page down and left a strip of shell above a surface
+         that is supposed to be the page itself. */
+      edgeToEdge={showMushaf}
       className="reader-swipe-surface relative !pb-0"
       data-testid="reader-screen"
       data-zikr-index={idx}

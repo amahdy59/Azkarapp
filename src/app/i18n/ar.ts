@@ -834,6 +834,7 @@ const ar = {
   mushaf: {
     wordMeaning: "معنى كلمة {word}",
     pageNavigation: "التنقل بين صفحات المصحف",
+    pagePosition: "الصفحة {position} — اختيار صفحة أخرى",
     keyboardNavigationHint: "\u2190 / \u2192 للتنقل بين الصفحات",
     loadFailed: "تعذر تحميل صفحة المصحف. يرجى المحاولة مجدداً.",
     retry: "إعادة المحاولة",

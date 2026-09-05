@@ -736,27 +736,30 @@ function MushafPageCanvas({
   return (
     <div
       ref={canvasRef}
-      className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 px-2 py-1.5 min-[360px]:px-3 sm:px-5 sm:py-2`}
+      className={`relative ${spreadSide ? "mushaf-spread__page" : "flex-1"} mushaf-page-canvas min-h-0 min-w-0 py-1 sm:px-5 sm:py-2`}
       style={{ containerType: "size" }}
       data-mushaf-rendering={useQcfGlyphs ? "qcf-v2" : "unicode-fallback"}
       data-mushaf-page={pageNumber}
     >
       {isOpening ? (
-        <>
+        /* The frame and the verses are one object: the wrapper carries the
+           inset both of them measure from, and sits inside the canvas so the
+           container units in it resolve against the page. */
+        <div className="mushaf-opening absolute inset-0">
           <Suspense fallback={null}>
             <MushafOpeningFrameArt
               pageNumber={pageNumber}
               className="absolute inset-0 h-full w-full pointer-events-none select-none z-0"
             />
           </Suspense>
-          {/* Content Area within Cartouche */}
+          {/* The verses sit inside the panel the frame draws, against the same
+              inset it uses, plus a margin of its own — the old 4%/6% box was a
+              guess at where the drawing ended and crossed the gilt on a narrow
+              page. */}
           <div
             className="absolute z-10 flex flex-col items-center justify-between text-center"
             style={{
-              top: "4%",
-              bottom: "4%",
-              left: "6%",
-              right: "6%",
+              inset: "calc(var(--mushaf-opening-inset, 1rem) * 3.1)",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               // No --mushaf-fit here: the pair shares one size (see useLineFitter).
               fontSize: useQcfGlyphs ? "min(6.1cqi, 6.1cqh)" : "min(5.0cqi, 5.4cqh)",
@@ -800,7 +803,7 @@ function MushafPageCanvas({
                 ))}
             </div>
           </div>
-        </>
+        </div>
       ) : (
         <div
           className={`mushaf-page-frame relative z-10 flex h-full w-full flex-col ${
@@ -1072,7 +1075,10 @@ export function MushafPageViewer({
       ) : headerContent ? (
         <div
           data-mushaf-chrome="header"
-          className={`relative flex h-14 shrink-0 items-center border-b px-2 sm:px-3 ${chromeBgClass}`}
+          /* The screen runs to the physical edges, so the inset lives on the bar
+             rather than outside the paper. */
+          className={`relative flex h-14 shrink-0 items-center border-b px-2 pt-[env(safe-area-inset-top)] sm:px-3 ${chromeBgClass}`}
+          style={{ height: `calc(3.5rem + env(safe-area-inset-top))` }}
         >
           <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
             {headerContent}
@@ -1158,7 +1164,8 @@ export function MushafPageViewer({
       {!useRail && footerContent && (
         <div
           data-mushaf-chrome="footer"
-          className={`relative flex h-14 shrink-0 items-center border-t px-2 sm:px-3 ${chromeBgClass}`}
+          className={`relative flex h-14 shrink-0 items-center border-t px-2 pb-[env(safe-area-inset-bottom)] sm:px-3 ${chromeBgClass}`}
+          style={{ height: `calc(3.5rem + env(safe-area-inset-bottom))` }}
         >
           <div className="mx-auto flex w-full items-center" style={{ maxWidth: CHROME_MEASURE }}>
             {footerContent}

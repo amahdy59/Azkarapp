@@ -5,8 +5,8 @@ import type { AppLanguage } from "../types";
 import {
   ArrowLeft,
   ArrowRight,
-  BookOpen,
   CheckCircle2,
+  Translate,
   ChevronLeft,
   ChevronRight,
   Eye,
@@ -228,7 +228,10 @@ export function MushafToolRail({
       id: "word-meanings",
       label: t(language, "mushaf.difficultWordsInvite"),
       caption: t(language, "mushaf.railMeanings"),
-      icon: showWordMeanings ? <CheckCircle2 size={iconSize} /> : <BookOpen size={iconSize} />,
+      /* One control, one glyph: the pressed state is carried by the rail
+         button itself, so the icon does not have to become a checkmark — a
+         third meaning for a control that only has two. */
+      icon: <Translate size={iconSize} />,
       onClick: onToggleWordMeanings,
       pressed: showWordMeanings,
       disabled: isLoadingWordMeanings,

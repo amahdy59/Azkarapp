@@ -269,6 +269,86 @@ describe("the Mushaf offers the surah's recitation", () => {
  * because width is what is short on a portrait screen. Every control the rail
  * holds has to have a home in those bars, or it does not exist on a phone.
  */
+/**
+ * The bars a phone reads a surah through.
+ *
+ * Everything used to be at the top: the surah, the Mushaf page number, the
+ * position in the surah, listen, word meanings and close — six things beside a
+ * title on a 375px screen, two of them already printed on the page itself. The
+ * header is now the name and the way out; the footer turns pages and carries
+ * the tools.
+ */
+describe("the surah bars divide the work between them", () => {
+  const setViewport = (width: number, height: number) => {
+    Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
+    Object.defineProperty(window, "innerHeight", { configurable: true, writable: true, value: height });
+  };
+
+  afterEach(() => setViewport(1024, 768));
+
+  function phoneChrome() {
+    setViewport(390, 844);
+    renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
+    const header = document.querySelector('[data-mushaf-chrome="header"]');
+    const footer = document.querySelector('[data-mushaf-chrome="footer"]');
+    if (!header || !footer) throw new Error("the phone layout renders both bars");
+    return { header: header as HTMLElement, footer: footer as HTMLElement };
+  }
+
+  it("keeps the header to the surah and the way out", () => {
+    const { header } = phoneChrome();
+
+    expect(within(header).getByRole("heading", { level: 2 })).toHaveTextContent("الكَهْف");
+    // One action beside the title, not four.
+    expect(within(header).getAllByRole("button")).toHaveLength(1);
+    expect(within(header).getByTestId("mushaf-immersive-close")).toBeInTheDocument();
+  });
+
+  it("names the surah being read, not the one the page happens to open with", () => {
+    // Page 293 opens with the tail of Al-Isra, so a header derived from the
+    // page named Al-Isra on a screen opened to read Al-Kahf.
+    const { header } = phoneChrome();
+    expect(header.textContent).not.toMatch(/الإسراء/);
+  });
+
+  it("does not repeat what the page already prints", () => {
+    const { header } = phoneChrome();
+    // The Mushaf page number and the juz are page furniture; the page prints
+    // both on itself, as a bound Mushaf does.
+    expect(header.textContent).not.toMatch(/٢٩٣/);
+    expect(header.textContent).not.toMatch(/الجزء/);
+  });
+
+  it("gives the footer the turning and the tools", () => {
+    const { footer } = phoneChrome();
+
+    expect(within(footer).getByTestId("mushaf-immersive-previous")).toBeInTheDocument();
+    expect(within(footer).getByTestId("mushaf-immersive-next")).toBeInTheDocument();
+    expect(within(footer).getByTestId("mushaf-immersive-word-meanings")).toBeInTheDocument();
+    expect(within(footer).getByTestId("mushaf-immersive-listen")).toBeInTheDocument();
+    expect(within(footer).getByTestId("mushaf-immersive-jump")).toBeInTheDocument();
+  });
+
+  it("makes the place in the surah the way to move within it", () => {
+    const { footer } = phoneChrome();
+    const jump = within(footer).getByTestId("mushaf-immersive-jump");
+
+    // The label a reader hears has to contain what they can see on it.
+    expect(jump).toHaveAccessibleName(expect.stringContaining("١ / ١٢"));
+    fireEvent.click(jump);
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+  });
+
+  it("runs the page to the edges of the screen", () => {
+    // The reader kept its own 8px top inset in Mushaf mode, which left a strip
+    // of shell above a surface that is supposed to be the page.
+    setViewport(390, 844);
+    renderKahf();
+    const surface = screen.getByTestId("reader-screen");
+    expect(surface.className).not.toMatch(/pt-\[max\(0\.5rem/);
+  });
+});
+
 describe("the recitation is reachable without a rail", () => {
   const setViewport = (width: number, height: number) => {
     Object.defineProperty(window, "innerWidth", { configurable: true, writable: true, value: width });
@@ -277,7 +357,7 @@ describe("the recitation is reachable without a rail", () => {
 
   afterEach(() => setViewport(1024, 768));
 
-  it("puts the listen control in the header when the rail is not shown", () => {
+  it("puts the listen control in the bars when the rail is not shown", () => {
     setViewport(390, 844);
     renderKahf({ surahAudio: { available: true, status: "idle" as const, onToggle: () => undefined } });
 

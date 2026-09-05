@@ -361,6 +361,95 @@
 }
 
 /* ---------------------------------------------------------------------------
+   The illuminated opening
+
+   Al-Fatihah and the start of Al-Baqarah are the one place in the book where
+   the page carries a drawn panel. The rules are boxes rather than a stretched
+   drawing, so a rule is the same weight on a 320px phone and a 1600px desk,
+   and only the leaves are art — each square, sized against the page's shorter
+   side, so nothing is ever squeezed out of shape.
+
+   `--mushaf-opening-inset` is the one number the panel and the type share: the
+   text block is placed against it in MushafPageViewer, so the type sits inside
+   the gilt with its own margin instead of being positioned at an inset that
+   happens to look close.
+--------------------------------------------------------------------------- */
+.mushaf-opening {
+  --mushaf-opening-inset: clamp(0.5rem, 3.2cqmin, 2rem);
+  --mushaf-opening-gilt: var(--mushaf-rule-ink, #d4b47c);
+
+  /* The illumination is page-shaped, not viewport-shaped.
+     Stretched to the canvas it became a 900x445 letterbox on a landscape
+     screen, with Al-Fatihah's short lines floating in the middle of a panel
+     twice as wide as they were. It keeps the proportions of the page it is
+     printed on and centres itself in whatever is left; on a phone, where the
+     canvas is already taller than it is wide, `max-width` gives it the full
+     screen and nothing is lost. */
+  aspect-ratio: 2 / 3;
+  height: 100%;
+  width: auto;
+  max-width: 100%;
+  margin: auto;
+
+  /* Its own container, so the inset, the leaves and the type all measure the
+     panel rather than the page around it. */
+  container-type: size;
+}
+
+.mushaf-opening-frame > span {
+  position: absolute;
+  border-radius: 0.35rem;
+}
+
+/* The outermost hairline: the edge of the illumination, not of the page. */
+.mushaf-opening-frame__hairline {
+  inset: calc(var(--mushaf-opening-inset) * 0.45);
+  border: 1px solid var(--mushaf-opening-gilt);
+  opacity: 0.4;
+}
+
+/* The gilded band the whole panel is read as. */
+.mushaf-opening-frame__gilt {
+  inset: var(--mushaf-opening-inset);
+  border: clamp(2px, 0.5cqmin, 4px) solid var(--mushaf-opening-gilt);
+}
+
+/* A dashed rule inside the band, in the same gilt at half strength: the old
+   drawing used `--secondary`, which is a teal in one theme and a yellow in
+   another, and disappeared into the paper in both. */
+.mushaf-opening-frame__dash {
+  inset: calc(var(--mushaf-opening-inset) * 1.55);
+  border: 1px dashed var(--mushaf-opening-gilt);
+  opacity: 0.55;
+}
+
+/* The field the verses are set on. */
+.mushaf-opening-frame__panel {
+  inset: calc(var(--mushaf-opening-inset) * 2.1);
+  background: var(--mushaf-paper);
+  border: 1px solid var(--mushaf-opening-gilt);
+  color: var(--mushaf-opening-gilt);
+}
+
+.mushaf-opening-frame__leaf {
+  position: absolute;
+  width: clamp(0.75rem, 4.5cqmin, 2.75rem);
+  height: clamp(0.75rem, 4.5cqmin, 2.75rem);
+  overflow: visible;
+}
+
+/* The leaves are drawn from the panel's corners outward, so the rotation that
+   places each one turns it about its own corner. */
+.mushaf-opening-frame__leaf {
+  transform-origin: center;
+}
+
+.high-contrast .mushaf-opening-frame__dash,
+.theme-oled .mushaf-opening-frame__dash {
+  opacity: 0.8;
+}
+
+/* ---------------------------------------------------------------------------
    Mushaf page furniture
 
    A bound Mushaf names each page on the page itself. In a spread that is what
@@ -381,22 +470,40 @@
      it. The frame's max-width grows with this padding, so widening it moves
      the edge outward instead of squeezing the measure — the fifteen-line
      geometry of DEC-089 is untouched. DEC-135 left the rule optional once the
-     paper existed; this drops it and gives the freed edge to the padding. */
-  --mushaf-frame-pad: clamp(1.25rem, 4.5cqi, 2.75rem);
+     paper existed; this drops it and gives the freed edge to the padding.
+
+     The phone gets the smaller end of that clamp: at 375px the old floor of
+     20px each side was 11% of the screen spent on margin beside a measure
+     that cannot use it. */
+  --mushaf-frame-pad: clamp(0.5rem, 4.5cqi, 2.75rem);
   max-width: min(100%, calc(var(--mushaf-measure, 100%) + 2 * var(--mushaf-frame-pad)));
   padding-inline: var(--mushaf-frame-pad);
   padding-block: clamp(0.3rem, 1cqh, 0.7rem);
-  /* The paper itself. Matching the outer rule's radius so the ground stops
-     exactly where the frame draws, and a soft cast so the sheet sits above the
-     shell rather than being cut out of it. */
-  background: var(--mushaf-paper);
-  border-radius: 0.5rem;
-  box-shadow: 0 1px 12px rgb(0 0 0 / 0.18);
 }
 
-.high-contrast .mushaf-page-frame,
-.theme-oled .mushaf-page-frame {
-  box-shadow: none;
+/* The page is the screen, so the page has no edge to draw.
+   The frame used to paint `--mushaf-paper` behind the type, round its corners
+   and cast a shadow — a sheet of paper laid on the shell. On a phone, where
+   the sheet is the whole viewport anyway, that reads as a panel floating on a
+   background of almost the same colour: two tones of navy a few percent apart,
+   a rounded edge with nothing beside it, and a shadow with nothing to cast
+   onto. High contrast already dropped the lift for its own reasons; this makes
+   that the rule rather than the exception, and the reading ground is simply
+   the app's. A spread keeps its gutter rule, which is what separates two
+   facing pages once there are two.
+   Wider screens keep the sheet: there the page really is a page on a desk,
+   with shell either side of it to be a page against. */
+@media (min-width: 640px) {
+  .mushaf-page-frame {
+    background: var(--mushaf-paper);
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 12px rgb(0 0 0 / 0.18);
+  }
+
+  .high-contrast .mushaf-page-frame,
+  .theme-oled .mushaf-page-frame {
+    box-shadow: none;
+  }
 }
 
 /* A short surah read inside the azkar reader — Al-Ikhlas, Al-Falaq, An-Nas,
@@ -475,7 +582,13 @@
 
 .mushaf-paper {
   overflow-y: auto;
-  overscroll-behavior-y: contain;
+  /* `none`, not `contain`: contain stops the gesture reaching the document
+     but still lets this box bounce, and on a phone the paper usually has
+     nothing to scroll — so a page-turn drag that drifted a few degrees off
+     horizontal moved the whole reading surface a little and dropped it back.
+     Nothing above this element scrolls either, so there is no chaining to
+     preserve. */
+  overscroll-behavior: none;
   /* Vertical panning is the browser's, horizontal is the page turn's. Without
      this the scroll container computes `auto`, claims both axes, and eats every
      swipe — which is what stopped page turns working once the paper could

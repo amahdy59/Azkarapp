@@ -46,7 +46,7 @@
     sans-serif;
   --font-reading-arabic: "IBM Plex Sans Arabic", "Noto Sans Arabic Variable", sans-serif;
   /* The rule around a Mushaf page, in the same gold as the illuminated opening
-     frame (#d4b47c in mushaf-fatiha-frame.svg). Print sets the jadwal in gold
+     frame, which draws in this token. Print sets the jadwal in gold
      and the text in black; this is the frame, not an inline marker, so it does
      not fall under the rule that keeps ayah medallions in the page's own ink —
      a border at the edge cannot pull the eye out of a line. */

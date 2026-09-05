@@ -2070,9 +2070,9 @@ Record user-approved product, design and architectural decisions here. Do not er
   deliberately drawn in the page's own ink, because a coloured medallion every
   few words pulls the eye out of the line. A frame is the other case: it sits at
   the edge, cannot interrupt a line, and print sets the _jadwal_ in gold with the
-  text in black. The value is `#d4b47c`, taken from
-  `public/images/mushaf-fatiha-frame.svg`, so the plain pages and the opening
-  share one accent. Light themes take a deeper `#a97f36` to hold against paper.
+  text in black. The value is `#d4b47c`, which the opening
+  panel also draws in (DEC-142), so the plain pages and the opening share one
+  accent. Light themes take a deeper `#a97f36` to hold against paper.
 - **Why the padding is safe:** the frame's `max-width` is
   `--mushaf-measure + 2 * --mushaf-frame-pad`, so widening the padding moves the
   rule outward rather than squeezing the measure. DEC-089's fifteen-line
@@ -2511,3 +2511,106 @@ Record user-approved product, design and architectural decisions here. Do not er
   the recitation plays, and the audio chunk is fetched after first paint.
 - **Supersedes:** completes DEC-137's "the audio subsystem is no longer part of
   the initial route", which was true of the provider but not of the chunk.
+
+## DEC-141 — the surah page is the page: two bars, one glyph per action, and no sheet on a phone
+
+- **Decision:** the Mushaf's bars split the work — the header names the reading
+  and offers the way out, the footer turns pages and carries the tools — word
+  meanings gets an icon of its own, and below the tablet tier the page is read
+  directly on the app's ground rather than on a drawn sheet.
+- **Six things beside a title.** The header carried the surah, the Mushaf page
+  number, the place in the surah, listen, word meanings and close. On a 375px
+  screen that is four 44px targets and two pieces of metadata competing with
+  the one thing the screen is for, and two of them — the page number and the
+  juz — are printed on the page itself, in the furniture a bound Mushaf uses.
+  The header is now the title and close; the footer took listen, word meanings
+  and the place in the surah, alongside the Previous and Next it already had.
+- **The header named the wrong surah.** `surahName` is derived from the first
+  ayah printed on the page, so page 293 — which opens with the tail of Al-Isra
+  — put "Surah Al-Isra" above a screen opened to read Al-Kahf. Harmless in a
+  crowded strip, wrong once the title is the header. The header names the
+  reading; the page names itself.
+- **The place is the navigation.** Rather than a label beside a button, the
+  footer carries one control that shows page _n_ of _m_ within the surah and
+  opens the jump index on press. Its accessible name contains what is written
+  on it, so speech input and screen reader agree with the screen. The index
+  stays scoped to the surah's own page range: this is a reading of Al-Kahf,
+  not a way into the whole Mushaf.
+- **One glyph, one action.** Word meanings and the zikr benefit sheet both drew
+  `BookOpen`, so the two controls a reader meets most often in the same screen
+  were indistinguishable until opened. Word meanings is `Translate`; the
+  benefit keeps `BookOpen`. The rail's version also stopped swapping itself for
+  a checkmark when active — a third glyph for a two-state control.
+- **No sheet where there is no desk.** The paper ground, radius and shadow of
+  DEC-135 assume shell either side of the page to be a sheet against. At 375px
+  the page is the whole viewport, so they drew a panel of nearly the background
+  colour with a rounded edge against nothing and a shadow with nothing to cast
+  onto. Below 640px the ground, radius and shadow are dropped and the frame's
+  padding floor falls from 20px to 8px — with the clamp's middle term still
+  giving ~17px on a real phone. The type gained about 10% of its measure.
+  High contrast had already dropped the lift for its own reasons; this makes
+  that the rule below the breakpoint rather than the exception.
+- **The strip of shell above the paper.** The reader kept the screen's own 8px
+  top inset while the Mushaf was its body, so a surface documented as "no
+  screen padding above or below it" had a band of shell above it. It is now
+  edge-to-edge, and the safe-area insets moved onto the chrome bars where the
+  standalone Mushaf already puts them.
+- **The surface that moved under the thumb.** `overscroll-behavior: contain`
+  stops a gesture reaching the document but still lets the box bounce, and on a
+  phone the paper usually has nothing to scroll — so a page-turn drag a few
+  degrees off horizontal moved the reading surface and dropped it back. Both
+  the paper and the swipe surface use `none`. Nothing above them scrolls, so
+  there is no chaining to preserve.
+- **Tests/evidence required:** the header holds the reading's name and one
+  control and repeats neither the page number nor the juz; the footer holds
+  turning, word meanings, listen and the place; the place opens the index and
+  its name contains what is on it; the screen runs edge to edge in Mushaf mode;
+  the frame paints no ground below 640px and keeps it above. Verified at 375px
+  and 768px in Arabic midnight, and on the standalone Mushaf, which shares the
+  page frame.
+- **Supersedes:** DEC-135 for viewports below 640px only; the paper ground
+  stands from the tablet tier up.
+
+## DEC-142 — the illuminated opening is drawn, not stretched
+
+- **Decision:** the panel around Al-Fatihah and the start of Al-Baqarah is built
+  from CSS rules and four square leaves, painted in the Mushaf's own tokens, and
+  keeps the proportions of a page rather than of the viewport.
+- **One drawing, every shape.** It was a 1200×1800 SVG fetched at runtime and
+  stretched with `preserveAspectRatio="none"`. At 375×700 that squeezed the art
+  by a fifth: the corner leaves flattened into smears, and the vertical rules
+  drew visibly thinner than the horizontal ones — on the two pages in the book
+  that are supposed to be the most carefully made. The rules are boxes now, so
+  a rule is the same weight on a 320px phone and a 1600px desk, and the leaves
+  are the only drawn art, each square and sized against the panel's shorter
+  side.
+- **It was painted in interface colours.** The gilt came from `--accent` and the
+  second rule from `--secondary`. Those are interface tokens: the gilt rendered
+  as the interface yellow rather than the manuscript gold, and in the
+  colour-blind themes as blue or violet. The field came from `--card` and the
+  outer ground from `--background`, so the one page in the book that paints its
+  own field painted it a different colour from every other page's paper. All
+  four are Mushaf tokens now — `--mushaf-rule-ink` on `--mushaf-paper`.
+- **Page-shaped, not viewport-shaped.** Filling the canvas made the panel a
+  900×445 letterbox on a landscape screen, with Al-Fatihah's short lines
+  floating in the middle of a field twice as wide as they were. The opening
+  holds `aspect-ratio: 2 / 3` and centres itself in what is left; `max-width`
+  gives it the whole screen on a phone, where the canvas is already taller than
+  it is wide, so nothing is lost there. It is also its own size container, so
+  the inset, the leaves and the type all measure the panel rather than the page
+  around it.
+- **The type was placed by guess.** The verse block sat at a hard-coded 4%/6%
+  inset while the drawing's inner rule sat at 5.1%/7.7%, so on a narrow page the
+  text crossed the gilt. Both now measure from one `--mushaf-opening-inset`.
+- **No runtime fetch.** The art was `fetch`ed and injected with
+  `dangerouslySetInnerHTML`, which meant the opening could appear unframed while
+  the request was in flight, and put a duplicate `clipPath` id on the page in a
+  spread. `public/images/mushaf-fatiha-frame.svg` is deleted with it.
+- **Tests/evidence required:** the opening declares the Mushaf tokens and none
+  of `--accent`, `--secondary` or `--card`; it keeps `aspect-ratio: 2 / 3` and
+  sizes its leaves in container units; the component neither fetches nor injects
+  markup and renders one leaf per physical corner. Measured at 320×640, 375×812,
+  768×1024 and 1280×800 (a spread): the leaves stay square, the panel centres,
+  and the widest line never exceeds the text box.
+- **Supersedes:** the opening-frame half of DEC-133's illumination work; the
+  gold itself is unchanged.

@@ -95,6 +95,9 @@ export {
   Sunrise,
   Sunset,
   SwitchHorizontal01 as SwitchHorizontal,
+  // Word meanings, which used to borrow BookOpen from the benefit sheet: two
+  // different actions cannot share one glyph and stay legible.
+  Translate01 as Translate,
   TrendUp01 as Sprout,
   Type01 as TypeIcon,
   Type01 as Type,

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, startTransition, type CSSProperties } from "react";
-import { ChevronLeft, ChevronRight, BookOpen, CheckCircle2, Pause, Play, X } from "./icons";
+import { ChevronLeft, ChevronRight, CheckCircle2, Pause, Play, Translate, X } from "./icons";
 import { formatNumerals } from "../formatting";
 import { useSwipeGestures } from "../hooks/useSwipeGestures";
 import { PAPER_ASPECT, spreadStart, useMushafShell } from "./mushafShell";
@@ -378,73 +378,35 @@ export function MushafImmersiveReader({
   /** Buffering counts as playing: the recitation is running, just starved. */
   const isRecitationPlaying = surahAudio?.status === "playing" || surahAudio?.status === "buffering";
 
+  /**
+   * The bar above the paper: the surah, and the way out.
+   *
+   * It used to carry the surah name, the Mushaf page number, the reader's
+   * position in the surah, the listen control, the word-meanings switch and
+   * the close button — six things competing with the title on a 375px screen,
+   * two of which the page itself already prints in its own furniture. The
+   * secondary controls moved to the footer, where the page-turn controls
+   * already live, so the header holds the name and one action.
+   */
   const pageHeader = (
-    <header className="flex w-full min-w-0 items-center justify-between gap-2" dir={direction}>
-      <span className="min-w-0 truncate text-sm font-extrabold" dir="auto">
-        {surahName}
-      </span>
-      <div className="flex items-center gap-2 shrink-0">
-        <bdi
-          data-testid="mushaf-immersive-indicator"
-          className="text-xs font-bold text-muted-foreground hidden min-[360px]:inline"
-        >
-          {/* Each run gets its own isolate. In one <bdi> the middot sat between
-              two numeric runs and the bidi algorithm reordered them into a
-              single number: "page 295 · 12/30" rendered as ١٢/٣٠٢٩٥. */}
-          <bdi>{t(language, "reader.mushafPage", { page: formatNumerals(displayPage, language) })}</bdi>
-          <span aria-hidden="true"> · </span>
-          <bdi>
-            {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
-          </bdi>
-        </bdi>
-        {/* The rail carries this on a landscape screen, and the rail is not
-            rendered here. Without it a phone — where listening to a surah is
-            most of the point — had no way to start the recitation at all. */}
-        {surahAudio && (
-          <button
-            type="button"
-            onClick={surahAudio.onToggle}
-            disabled={!surahAudio.available}
-            aria-busy={surahAudio.status === "loading" || surahAudio.status === "buffering"}
-            data-testid="mushaf-immersive-listen"
-            aria-label={t(
-              language,
-              !surahAudio.available
-                ? "reader.audioUnavailable"
-                : isRecitationPlaying
-                  ? "mushaf.pauseRecitation"
-                  : "mushaf.listenSurah",
-            )}
-            className={`inline-flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40 ${
-              isRecitationPlaying ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
-            }`}
-          >
-            {isRecitationPlaying ? <Pause size={17} aria-hidden="true" /> : <Play size={17} aria-hidden="true" />}
-          </button>
-        )}
-        <button
-          type="button"
-          role="switch"
-          aria-checked={showWordMeanings}
-          onClick={() => startTransition(() => setShowWordMeanings((v) => !v))}
-          className={`inline-flex size-11 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-            showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
-          }`}
-          aria-label={t(language, "mushaf.difficultWordsInvite")}
-          title={t(language, "mushaf.difficultWordsInvite")}
-        >
-          <BookOpen size={17} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={onClose}
-          data-testid="mushaf-immersive-close"
-          aria-label={t(language, "reader.immersiveClose")}
-          className="flex size-11 shrink-0 items-center justify-center rounded-full border border-border bg-card transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-        >
-          <X size={17} />
-        </button>
-      </div>
+    <header className="relative flex w-full min-w-0 items-center justify-center" dir={direction}>
+      <button
+        type="button"
+        onClick={onClose}
+        data-testid="mushaf-immersive-close"
+        aria-label={t(language, "reader.immersiveClose")}
+        className="absolute start-0 flex size-11 shrink-0 items-center justify-center rounded-full text-foreground/70 transition-colors hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <X size={19} />
+      </button>
+      {/* The reading, not the page. `surahName` is derived from the first ayah
+          printed on the page, so page 293 — which opens with the tail of
+          Al-Isra — named Al-Isra on a screen the reader had opened to read
+          Al-Kahf. The page still names itself in its own furniture, which is
+          where a bound Mushaf puts it. */}
+      <h2 className="min-w-0 max-w-[calc(100%-6rem)] truncate text-base font-black" dir="auto">
+        {title}
+      </h2>
     </header>
   );
 
@@ -491,10 +453,23 @@ export function MushafImmersiveReader({
     />
   );
 
+  /** One shape for every secondary control in the footer group. */
+  const footerActionClass =
+    "flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-40";
+
+  /**
+   * The bar under the paper: turning, and everything secondary.
+   *
+   * Page turning sits at the outer edges, under the paper it turns. The
+   * middle carries the tools the header used to: word meanings, the place in
+   * the surah — which is also the way to jump within it — and the recitation.
+   * The Mushaf page number is not repeated here; the page prints its own folio
+   * and juz in its furniture, which is where a bound Mushaf puts them.
+   */
   const pageFooter = (
     <nav
       dir="rtl"
-      className="flex w-full min-w-0 items-center justify-between gap-2"
+      className="flex w-full min-w-0 items-center justify-between gap-1"
       aria-label={t(language, "mushaf.pageNavigation")}
     >
       <button
@@ -502,30 +477,78 @@ export function MushafImmersiveReader({
         onClick={() => paginate(-1)}
         disabled={atStart}
         data-testid="mushaf-immersive-previous"
-        className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        className={`${footerActionClass} border-border bg-card enabled:hover:bg-muted`}
         aria-label={t(language, "common.previous")}
       >
-        <ChevronRight size={18} />
-        <span className="hidden sm:inline">{t(language, "common.previous")}</span>
+        <ChevronRight size={20} />
       </button>
 
-      <bdi
-        data-testid="mushaf-immersive-indicator-mobile"
-        className="min-[360px]:hidden text-xs font-bold text-muted-foreground"
-      >
-        {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
-      </bdi>
+      <div className="flex min-w-0 items-center justify-center gap-1">
+        <button
+          type="button"
+          role="switch"
+          aria-checked={showWordMeanings}
+          onClick={() => startTransition(() => setShowWordMeanings((v) => !v))}
+          data-testid="mushaf-immersive-word-meanings"
+          className={`${footerActionClass} ${
+            showWordMeanings ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
+          }`}
+          aria-label={t(language, "mushaf.difficultWordsInvite")}
+          title={t(language, "mushaf.difficultWordsInvite")}
+        >
+          <Translate size={18} aria-hidden="true" />
+        </button>
+
+        {/* Where you are, and the way to move: one control rather than a label
+            beside a button. The surah's own span, not the Mushaf's 604. */}
+        <button
+          type="button"
+          onClick={() => setIsIndexOpen(true)}
+          data-testid="mushaf-immersive-jump"
+          aria-label={t(language, "mushaf.pagePosition", {
+            position: `${formatNumerals(pageIndex + 1, language)} / ${formatNumerals(pageCount, language)}`,
+          })}
+          className="flex h-11 min-w-11 shrink-0 items-center justify-center rounded-full border border-border bg-card px-3 text-xs font-bold tabular-nums transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          <bdi data-testid="mushaf-immersive-indicator-mobile">
+            {formatNumerals(pageIndex + 1, language)} / {formatNumerals(pageCount, language)}
+          </bdi>
+        </button>
+
+        {surahAudio && (
+          <button
+            type="button"
+            onClick={surahAudio.onToggle}
+            disabled={!surahAudio.available}
+            aria-busy={surahAudio.status === "loading" || surahAudio.status === "buffering"}
+            data-testid="mushaf-immersive-listen"
+            aria-label={t(
+              language,
+              !surahAudio.available
+                ? "reader.audioUnavailable"
+                : isRecitationPlaying
+                  ? "mushaf.pauseRecitation"
+                  : "mushaf.listenSurah",
+            )}
+            className={`${footerActionClass} ${
+              isRecitationPlaying ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
+            }`}
+          >
+            {isRecitationPlaying ? <Pause size={18} aria-hidden="true" /> : <Play size={18} aria-hidden="true" />}
+          </button>
+        )}
+      </div>
 
       {atEnd && onComplete ? (
         <button
           type="button"
           onClick={onComplete}
           data-testid="mushaf-immersive-return"
-          className="flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary px-3 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className="flex h-11 min-w-11 shrink items-center justify-center gap-1.5 truncate rounded-full border border-primary bg-primary px-3 text-xs font-bold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           aria-label={t(language, "reader.immersiveComplete")}
         >
-          <span>{t(language, "reader.immersiveComplete")}</span>
-          <CheckCircle2 size={16} />
+          <CheckCircle2 size={18} aria-hidden="true" />
+          <span className="hidden truncate min-[400px]:inline">{t(language, "reader.immersiveComplete")}</span>
         </button>
       ) : (
         <button
@@ -533,11 +556,10 @@ export function MushafImmersiveReader({
           onClick={() => paginate(1)}
           disabled={atEnd}
           data-testid="mushaf-immersive-next"
-          className="flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-card px-3 text-xs font-bold transition-colors enabled:hover:bg-muted disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          className={`${footerActionClass} border-border bg-card enabled:hover:bg-muted`}
           aria-label={t(language, "common.next")}
         >
-          <span className="hidden sm:inline">{t(language, "common.next")}</span>
-          <ChevronLeft size={18} />
+          <ChevronLeft size={20} />
         </button>
       )}
     </nav>
@@ -580,7 +602,10 @@ export function MushafImmersiveReader({
         data-testid="mushaf-immersive-track"
         className="relative flex min-h-0 flex-1 flex-col overflow-hidden"
         {...pointerProps}
-        style={{ touchAction: "pan-y" }}
+        /* The surface itself never scrolls: the paper inside it does when a
+           short screen makes it taller than the viewport. Leaving the browser
+           a vertical axis to claim here is what let a drag move the page. */
+        style={{ touchAction: "pan-y", overscrollBehavior: "none" }}
       >
         {/* The page turn animates the paper, not the chrome.
             This wrapped the whole viewer in AnimatePresence, so every turn

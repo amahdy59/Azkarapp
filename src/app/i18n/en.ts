@@ -848,6 +848,7 @@ const en = {
   mushaf: {
     wordMeaning: "Meaning of {word}",
     pageNavigation: "Mushaf page navigation",
+    pagePosition: "Page {position} — choose another page",
     keyboardNavigationHint: "\u2190 / \u2192 Navigate pages",
     loadFailed: "Failed to load Mushaf page. Please try again.",
     retry: "Try again",
