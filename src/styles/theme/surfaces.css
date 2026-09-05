@@ -451,12 +451,49 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   display: none !important;
 }
 
-/* The texture is decoration, so it goes when the reader asks for less of it.
-   .reduce-transparency is the hook for the in-app setting; the media query is
-   the same intent read from the OS, so someone who has already answered this
-   question system-wide does not have to answer it again here. */
+/* Reduced transparency means blurred materials go solid — the behaviour the
+   OS setting has on the platforms that offer it — not just that the grain over
+   them disappears. The blur is the part that costs legibility: text on the
+   floating player, the reader chrome and every settings panel sits over a
+   sampled backdrop, and .hero-glass is a dark wash over a photograph.
+
+   Declared for the class and repeated under the media query, the way the
+   reduce-motion setting above mirrors its own. The duplication is deliberate:
+   a reader coming to this file sees both accessibility settings expressed the
+   same way, rather than one of them reaching through a mechanism the other
+   does not use. */
+/* The standard property only. Writing the -webkit- alias beside it let the
+   minifier collapse the pair down to the alias alone, which left Tailwind's own
+   `backdrop-filter` unopposed and the blur intact — the rule looked right in the
+   source and did nothing in the build. Lightning CSS adds whatever prefix the
+   targets need. */
+.reduce-transparency *,
+.reduce-transparency *::before,
+.reduce-transparency *::after {
+  backdrop-filter: none !important;
+}
+
+.reduce-transparency .hero-glass {
+  background-color: var(--card);
+}
+
+.reduce-transparency .glass-panel::after {
+  display: none;
+}
+
 @media (prefers-reduced-transparency: reduce) {
-  .app-shell::after {
+  .app-shell::after,
+  .glass-panel::after {
     display: none !important;
+  }
+
+  *,
+  *::before,
+  *::after {
+    backdrop-filter: none !important;
+  }
+
+  .hero-glass {
+    background-color: var(--card);
   }
 }

@@ -48,6 +48,7 @@ interface SettingsScreenProps {
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
+  reduceTransparency: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
@@ -69,6 +70,7 @@ interface SettingsScreenProps {
   onHighContrastChange: (value: boolean) => void;
   onBoldTextChange: (value: boolean) => void;
   onReduceMotionChange: (value: boolean) => void;
+  onReduceTransparencyChange: (value: boolean) => void;
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
@@ -101,6 +103,7 @@ export function SettingsScreen({
   highContrast,
   boldText,
   reduceMotion,
+  reduceTransparency,
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
@@ -122,6 +125,7 @@ export function SettingsScreen({
   onHighContrastChange,
   onBoldTextChange,
   onReduceMotionChange,
+  onReduceTransparencyChange,
   onHapticFeedbackChange,
   onForceRtlChange,
   onColorBlindSupportChange,
@@ -290,6 +294,7 @@ export function SettingsScreen({
             highContrast={highContrast}
             boldText={boldText}
             reduceMotion={reduceMotion}
+            reduceTransparency={reduceTransparency}
             hapticFeedback={hapticFeedback}
             forceRtl={forceRtl}
             colorBlindSupport={colorBlindSupport}
@@ -300,6 +305,7 @@ export function SettingsScreen({
             onHighContrastChange={onHighContrastChange}
             onBoldTextChange={onBoldTextChange}
             onReduceMotionChange={onReduceMotionChange}
+            onReduceTransparencyChange={onReduceTransparencyChange}
             onHapticFeedbackChange={onHapticFeedbackChange}
             onForceRtlChange={onForceRtlChange}
             onColorBlindSupportChange={onColorBlindSupportChange}

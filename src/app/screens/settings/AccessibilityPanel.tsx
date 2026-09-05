@@ -1,5 +1,5 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group";
-import { AlignRight, Check, Contrast, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
+import { AlignRight, Check, Contrast, Droplets, Eye, Info, Pause, Smartphone, TypeIcon } from "../../components/icons";
 import { t } from "../../i18n";
 import type { AppLanguage, ColorBlindSupport, TextSizeOption, ZikrFontOption } from "../../types";
 import { SectionLabel, SettingsToggleRow, SubHeader } from "./SettingsPrimitives";
@@ -64,6 +64,7 @@ export function AccessibilityPanel({
   highContrast,
   boldText,
   reduceMotion,
+  reduceTransparency,
   hapticFeedback,
   forceRtl,
   colorBlindSupport,
@@ -74,6 +75,7 @@ export function AccessibilityPanel({
   onHighContrastChange,
   onBoldTextChange,
   onReduceMotionChange,
+  onReduceTransparencyChange,
   onHapticFeedbackChange,
   onForceRtlChange,
   onColorBlindSupportChange,
@@ -87,6 +89,7 @@ export function AccessibilityPanel({
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
+  reduceTransparency: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;
@@ -98,6 +101,7 @@ export function AccessibilityPanel({
   onHighContrastChange: (value: boolean) => void;
   onBoldTextChange: (value: boolean) => void;
   onReduceMotionChange: (value: boolean) => void;
+  onReduceTransparencyChange: (value: boolean) => void;
   onHapticFeedbackChange: (value: boolean) => void;
   onForceRtlChange: (value: boolean) => void;
   onColorBlindSupportChange: (value: ColorBlindSupport) => void;
@@ -229,6 +233,16 @@ export function AccessibilityPanel({
             label={t(language, "settings.boldText")}
             checked={boldText}
             onChange={() => onBoldTextChange(!boldText)}
+          />
+          {/* Sits with contrast and bold text rather than with motion: it is a
+              legibility setting, and someone who turned those on is looking for
+              this one. */}
+          <SettingsToggleRow
+            iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
+            icon={<Droplets size={20} className="text-primary" />}
+            label={t(language, "settings.reduceTransparency")}
+            checked={reduceTransparency}
+            onChange={() => onReduceTransparencyChange(!reduceTransparency)}
           />
           <div className="p-4">
             <div className="mb-3 flex items-center gap-3">

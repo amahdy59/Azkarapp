@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { cn, TYPE_SCALE_NAMES } from "./utils";
+import { cn, SHADOW_NAMES, TYPE_SCALE_NAMES } from "./utils";
 
 /**
  * The type scale's names have to reach tailwind-merge, or it reads them as
@@ -10,14 +10,23 @@ import { cn, TYPE_SCALE_NAMES } from "./utils";
  */
 const SCALE = TYPE_SCALE_NAMES.map((name) => `text-${name}`);
 
+/** Names the theme declares under a prefix tailwind-merge splits two ways. */
+function declaredIn(file: string, prefix: string) {
+  const theme = readFileSync(file, "utf8");
+  return [...theme.matchAll(new RegExp(`^\\s*--${prefix}-([a-z-]+):`, "gm"))].map((match) => match[1]).sort();
+}
+
 describe("cn", () => {
-  it("registers every size the theme declares", () => {
-    const theme = readFileSync("src/styles/tailwind.css", "utf8");
-    const declared = [...theme.matchAll(/^\s*--text-([a-z-]+):/gm)].map((match) => match[1]);
+  it.each([
+    ["text", "src/styles/tailwind.css", TYPE_SCALE_NAMES],
+    ["shadow", "src/styles/theme/tailwind-bridge.css", SHADOW_NAMES],
+  ])("registers every %s token the theme declares", (prefix, file, registered) => {
+    const declared = declaredIn(file, prefix);
     expect(declared.length).toBeGreaterThan(0);
-    // A token declared in @theme but unknown to tailwind-merge reads as a
-    // colour, and silently removes the colour it appears to override.
-    expect([...declared].sort()).toEqual([...TYPE_SCALE_NAMES].sort());
+    // A token declared in @theme but unknown to tailwind-merge is read as a
+    // colour: it stops overriding the size it names, and silently removes the
+    // colour it appears to override.
+    expect(declared).toEqual([...registered].sort());
   });
 
   it.each(SCALE)("keeps a text colour when %s sets the size", (size) => {
@@ -34,5 +43,13 @@ describe("cn", () => {
 
   it("still resolves a genuine text-colour conflict", () => {
     expect(cn("text-primary-foreground", "text-muted-foreground").split(" ")).toEqual(["text-muted-foreground"]);
+  });
+
+  it.each(SHADOW_NAMES)("lets shadow-%s replace a component's shadow", (name) => {
+    expect(cn("shadow-lg", `shadow-${name}`).split(" ")).toEqual([`shadow-${name}`]);
+  });
+
+  it.each(SHADOW_NAMES)("lets a call site remove shadow-%s", (name) => {
+    expect(cn(`shadow-${name}`, "shadow-none").split(" ")).toEqual(["shadow-none"]);
   });
 });

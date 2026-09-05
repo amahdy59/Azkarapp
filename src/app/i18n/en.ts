@@ -1388,6 +1388,7 @@ const en = {
     colorBlindProtanopia: "Protanopia",
     colorBlindTritanopia: "Tritanopia",
     reduceMotion: "Reduce motion",
+    reduceTransparency: "Reduce transparency",
     hapticFeedback: "Haptic feedback",
     rtlLayout: "Right-to-left layout",
     screenReader: "Screen-reader support",

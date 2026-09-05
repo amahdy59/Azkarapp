@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-05.3",
+  "release": "2026-09-05.4",
   "ar": [
-    "صُحّح رسم سماء كل صلاة: كانت الصورة تُمدّ لتملأ البطاقة فتتضخّم القباب وتملأها، وصارت الآن تُرسم بمقاسها الصحيح على أي شاشة، مع إبقاء الهلال أو الشمس بعيداً عن اسم الصلاة ووقتها.",
-    "رُتّبت صفحة الصلاة على الشاشات الكبيرة: صار لها عرض محدد في وسط الشاشة بدل أن تمتد بعرض الشاشة كلها، ولم تعد المسافات الفارغة تتباعد بين أقسامها.",
-    "بطاقات الصلوات في الرئيسية صار عليها سهم يدل على أنها تفتح صفحة الصلاة، وصار سطر التتبع «صليتها» يُحتسب سواء صليتها في المسجد أو في المنزل ويكتب المكان تحته — فلم تعد صلاة سجّلتها في المنزل تبدو غير مسجّلة."
+    "أُضيف خيار «تقليل الشفافية» إلى إعدادات إمكانية الوصول: يجعل الأسطح الضبابية صلبة — لوحات الإعدادات وشريط القارئ ومشغّل الصوت العائم — فيصير النص فوقها أوضح.",
+    "صُحّح لون نص الأزرار الأساسية: كان يُكتب بلون فاتح على أرضية ذهبية فيصعب تمييزه، في شاشات الإعدادات وقوائم القارئ وفي زرّي إشعار التحديث.",
+    "صارت الحبيبات الخفيفة خلف الشاشات تتبع إعداد «تقليل الشفافية» في نظامك، فإن كنت قد فعّلته هناك لن تظهر دون أن تضبطه هنا من جديد."
   ],
   "en": [
-    "Each prayer’s sky is drawn at its true proportions now. It used to be stretched to fill the card, which blew the domes up until they filled it; the crescent or sun also keeps clear of the prayer’s name and time.",
-    "The prayer page is laid out for larger screens: it keeps to a measure in the middle of the display instead of stretching across it, and its sections no longer drift apart down the page.",
-    "The prayer cards on Home carry an arrow showing they open the prayer, and their tracking row now reads “Prayed” — it counts whether you prayed at the mosque or at home and names the place underneath, so a prayer recorded at home no longer looks unrecorded."
+    "A Reduce transparency setting joins the accessibility options. It makes blurred surfaces solid — the settings panels, the reader chrome and the floating player — so the text over them is easier to read.",
+    "Primary buttons are readable again. Their label was being drawn in a pale colour on the gold ground, on the settings screens, in the reader menus, and on both buttons of the update notice.",
+    "The faint grain behind every screen now follows your device’s reduced-transparency setting, so if you have already turned that on system-wide it no longer appears here either."
   ]
 }

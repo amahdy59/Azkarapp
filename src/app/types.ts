@@ -215,6 +215,8 @@ export interface UserSettingsState {
   highContrast: boolean;
   boldText: boolean;
   reduceMotion: boolean;
+  /** Blurred materials go solid. See the .reduce-transparency rules. */
+  reduceTransparency: boolean;
   hapticFeedback: boolean;
   forceRtl: boolean;
   colorBlindSupport: ColorBlindSupport;

@@ -2958,3 +2958,50 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   settings destinations reporting no violations; the `cn` unit test failing
   without the tailwind-merge extension; the full suite green with its own exit
   code read directly rather than through a pipe.
+
+## DEC-150 — the reduce transparency setting ships, and the merger learns the rest of the theme
+
+- **Decision:** Reduce transparency becomes a real accessibility setting, doing
+  what the OS setting does rather than only hiding a texture; the named shadows
+  are registered with tailwind-merge alongside the type scale.
+- **Finishing what DEC-149 found.** The CSS and the product docs had described
+  this setting for some time and nothing turned it on. It is now wired end to
+  end — persisted, hydrated, synced, and applied as a class on the root the way
+  reduce motion is — and it sits with contrast and bold text rather than with
+  motion, because it is a legibility setting and someone who turned those on is
+  looking for this one.
+- **The blur is the part that matters.** Hiding the grain would have been a
+  setting that undersold its own name. Reduced transparency on the platforms
+  that offer it makes blurred materials solid, so this does: `backdrop-filter`
+  off everywhere, `.hero-glass` opaque against the photograph it floats over,
+  and the grain over glass panels gone. That is the settings panels, the reader
+  chrome, the floating player and the sheets.
+- **A rule that read correctly and did nothing.** Writing
+  `-webkit-backdrop-filter` beside the standard property let the minifier
+  collapse the pair down to the alias alone, which left Tailwind's own
+  `backdrop-filter` unopposed: the source looked right, the build shipped
+  `*{-webkit-backdrop-filter:none!important}`, and one panel kept its blur.
+  Author the standard property only and let Lightning CSS add whatever prefix
+  the targets need.
+- **The test environment already had the preference on.** Headless Chromium
+  reports `prefers-reduced-transparency: reduce` by default, so the media query
+  is satisfied in every run and a naive test would have passed while the class
+  did nothing whatsoever. The spec forces the preference back to
+  `no-preference` over CDP, which is what a real browser reports, so what it
+  measures is the setting itself. It was confirmed to fail with the minifier bug
+  reintroduced.
+- **The same ambiguity, found before it bit.** `shadow-…` splits into a size and
+  a colour exactly as `text-…` does, so `shadow-raised` read as a colour sits
+  beside a component's `shadow-lg` instead of replacing it, and `shadow-none`
+  cannot remove a named shadow at all. No call site depends on that today —
+  which is the moment to register the names rather than after one does. The
+  guard now reads both `@theme` blocks, so a token added to either and
+  forgotten fails the suite.
+- **Cost:** 758 bytes raw and 61 gzip, to 158,174 and 27,355, leaving 9,762
+  bytes under a ceiling that has still not moved. Baseline updated in the same
+  change so the increase is reviewed rather than absorbed.
+- **Tests/evidence required:** the e2e spec measuring blur before and after the
+  class with the OS preference forced off, and failing when the alias is written
+  back; a panel test toggling the row; a theme test asserting the class is added
+  and cleared; the guard failing when a token is unregistered; `pnpm check`
+  green across all ten stages and the full suite green.

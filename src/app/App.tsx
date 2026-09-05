@@ -255,6 +255,7 @@ function AppContent({
   const [highContrast, setHighContrast] = useState(initialState.settings.highContrast);
   const [boldText, setBoldText] = useState(initialState.settings.boldText);
   const [reduceMotion, setReduceMotion] = useState(initialState.settings.reduceMotion);
+  const [reduceTransparency, setReduceTransparency] = useState(initialState.settings.reduceTransparency);
   const [hapticFeedback, setHapticFeedback] = useState(initialState.settings.hapticFeedback);
   const [forceRtl, setForceRtl] = useState(initialState.settings.forceRtl);
   const [colorBlindSupport, setColorBlindSupport] = useState<ColorBlindSupport>(
@@ -532,6 +533,7 @@ function AppContent({
         highContrast,
         boldText,
         reduceMotion,
+        reduceTransparency,
         hapticFeedback,
         forceRtl,
         colorBlindSupport,
@@ -582,6 +584,7 @@ function AppContent({
       phone,
       avatarUrl,
       reduceMotion,
+      reduceTransparency,
       reminders,
       locationSettings,
       weeklyGoalDays,
@@ -727,6 +730,7 @@ function AppContent({
     setHighContrast(state.settings.highContrast);
     setBoldText(state.settings.boldText);
     setReduceMotion(state.settings.reduceMotion);
+    setReduceTransparency(state.settings.reduceTransparency);
     setHapticFeedback(state.settings.hapticFeedback);
     setForceRtl(state.settings.forceRtl);
     setColorBlindSupport(state.settings.colorBlindSupport);
@@ -889,10 +893,22 @@ function AppContent({
       highContrast,
       boldText,
       reduceMotion,
+      reduceTransparency,
       forceRtl,
       colorBlindSupport,
     });
-  }, [boldText, colorBlindSupport, forceRtl, themeMode, highContrast, reduceMotion, selectedLang, textSize, zikrFont]);
+  }, [
+    boldText,
+    colorBlindSupport,
+    forceRtl,
+    themeMode,
+    highContrast,
+    reduceMotion,
+    reduceTransparency,
+    selectedLang,
+    textSize,
+    zikrFont,
+  ]);
 
   useEffect(() => {
     const saved = saveAppState(appStateSnapshot);
@@ -1598,6 +1614,7 @@ function AppContent({
                   highContrast={highContrast}
                   boldText={boldText}
                   reduceMotion={reduceMotion}
+                  reduceTransparency={reduceTransparency}
                   hapticFeedback={hapticFeedback}
                   forceRtl={forceRtl}
                   colorBlindSupport={colorBlindSupport}
@@ -1617,6 +1634,7 @@ function AppContent({
                   onHighContrastChange={setHighContrast}
                   onBoldTextChange={setBoldText}
                   onReduceMotionChange={setReduceMotion}
+                  onReduceTransparencyChange={setReduceTransparency}
                   onHapticFeedbackChange={setHapticFeedback}
                   onForceRtlChange={setForceRtl}
                   onColorBlindSupportChange={setColorBlindSupport}

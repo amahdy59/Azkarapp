@@ -91,6 +91,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     highContrast: false,
     boldText: false,
     reduceMotion: false,
+    reduceTransparency: false,
     hapticFeedback: true,
     forceRtl: false,
     colorBlindSupport: "none",
@@ -688,6 +689,10 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       boldText: typeof settings?.boldText === "boolean" ? settings.boldText : DEFAULT_APP_STATE.settings.boldText,
       reduceMotion:
         typeof settings?.reduceMotion === "boolean" ? settings.reduceMotion : DEFAULT_APP_STATE.settings.reduceMotion,
+      reduceTransparency:
+        typeof settings?.reduceTransparency === "boolean"
+          ? settings.reduceTransparency
+          : DEFAULT_APP_STATE.settings.reduceTransparency,
       hapticFeedback:
         typeof settings?.hapticFeedback === "boolean"
           ? settings.hapticFeedback
@@ -992,6 +997,10 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
         typeof incoming.settings?.reduceMotion === "boolean"
           ? incoming.settings.reduceMotion
           : safeBase.settings.reduceMotion,
+      reduceTransparency:
+        typeof incoming.settings?.reduceTransparency === "boolean"
+          ? incoming.settings.reduceTransparency
+          : safeBase.settings.reduceTransparency,
       hapticFeedback:
         typeof incoming.settings?.hapticFeedback === "boolean"
           ? incoming.settings.hapticFeedback

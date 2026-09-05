@@ -16,6 +16,7 @@ export interface AppAppearancePreferences {
   highContrast?: boolean;
   boldText?: boolean;
   reduceMotion?: boolean;
+  reduceTransparency?: boolean;
   forceRtl?: boolean;
   colorBlindSupport?: ColorBlindSupport;
   zikrFont?: ZikrFontOption;
@@ -29,6 +30,7 @@ export function applyAppAppearance({
   highContrast = false,
   boldText = false,
   reduceMotion = false,
+  reduceTransparency = false,
   forceRtl = false,
   colorBlindSupport = "none",
   zikrFont = "humanist",
@@ -38,12 +40,20 @@ export function applyAppAppearance({
   }
 
   const root = document.documentElement;
-  root.classList.remove(...PRODUCT_THEME_CLASSES, "dark", "high-contrast", "bold-text", "reduce-motion");
+  root.classList.remove(
+    ...PRODUCT_THEME_CLASSES,
+    "dark",
+    "high-contrast",
+    "bold-text",
+    "reduce-motion",
+    "reduce-transparency",
+  );
   root.classList.add(`theme-${themeMode}`);
   if (themeMode !== "light") root.classList.add("dark");
   if (highContrast) root.classList.add("high-contrast");
   if (boldText) root.classList.add("bold-text");
   if (reduceMotion) root.classList.add("reduce-motion");
+  if (reduceTransparency) root.classList.add("reduce-transparency");
 
   const fontSizes: Record<TextSizeOption, string> = { small: "14px", medium: "16px", large: "18px" };
   root.lang = language;

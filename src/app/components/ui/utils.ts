@@ -21,10 +21,23 @@ import { extendTailwindMerge } from "tailwind-merge";
  */
 export const TYPE_SCALE_NAMES = ["micro", "label", "subtitle", "title", "headline", "display"];
 
+/**
+ * The named shadows, for the same reason.
+ *
+ * `shadow-…` splits the same way `text-…` does — a size or a colour — so
+ * `shadow-raised` read as a colour sits alongside a component's `shadow-lg`
+ * instead of replacing it, and `shadow-none` fails to remove a named shadow at
+ * all: both classes survive and the order rules happen to be written in decides
+ * which one draws. No call site relies on that today, which is the moment to
+ * register them rather than after one does.
+ */
+export const SHADOW_NAMES = ["raised", "overlay"];
+
 const twMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       "font-size": [{ text: TYPE_SCALE_NAMES }],
+      shadow: [{ shadow: SHADOW_NAMES }],
     },
   },
 });

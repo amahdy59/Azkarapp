@@ -1409,6 +1409,7 @@ const ar = {
     colorBlindProtanopia: "عمى اللون الأحمر",
     colorBlindTritanopia: "عمى اللون الأزرق",
     reduceMotion: "تقليل الحركة",
+    reduceTransparency: "تقليل الشفافية",
     hapticFeedback: "استجابة لمسية",
     rtlLayout: "تخطيط من اليمين إلى اليسار",
     screenReader: "دعم قارئ الشاشة",

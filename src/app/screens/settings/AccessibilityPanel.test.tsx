@@ -12,6 +12,7 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
     highContrast: false,
     boldText: false,
     reduceMotion: false,
+    reduceTransparency: false,
     hapticFeedback: true,
     forceRtl: false,
     colorBlindSupport: "none" as const,
@@ -21,6 +22,7 @@ function renderPanel(overrides: Partial<Parameters<typeof AccessibilityPanel>[0]
     onHighContrastChange: vi.fn(),
     onBoldTextChange: vi.fn(),
     onReduceMotionChange: vi.fn(),
+    onReduceTransparencyChange: vi.fn(),
     onHapticFeedbackChange: vi.fn(),
     onForceRtlChange: vi.fn(),
     onColorBlindSupportChange: vi.fn(),
@@ -71,5 +73,15 @@ describe("AccessibilityPanel", () => {
     // It used to render with the same row anatomy as the working toggles above
     // it, which gave it a control's affordance without a control's behaviour.
     expect(note.closest("button")).toBeNull();
+  });
+
+  it("offers reduce transparency beside the other legibility settings", () => {
+    const props = renderPanel({ reduceTransparency: true });
+
+    const toggle = screen.getByRole("switch", { name: /Reduce transparency/i });
+    expect(toggle).toBeChecked();
+
+    fireEvent.click(toggle);
+    expect(props.onReduceTransparencyChange).toHaveBeenCalledWith(false);
   });
 });

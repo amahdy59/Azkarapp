@@ -20,6 +20,16 @@ describe("app appearance", () => {
     expect(document.documentElement.style.colorScheme).toBe(colorScheme);
   });
 
+  it("applies and clears reduce transparency independently of the theme", () => {
+    applyAppAppearance({ themeMode: "midnight", reduceTransparency: true, language: "en", textSize: "medium" });
+    expect(document.documentElement).toHaveClass("reduce-transparency");
+
+    // The class is removed on the next apply, not left behind: every appearance
+    // class is cleared and re-added, so a setting turned off has to go.
+    applyAppAppearance({ themeMode: "midnight", reduceTransparency: false, language: "en", textSize: "medium" });
+    expect(document.documentElement).not.toHaveClass("reduce-transparency");
+  });
+
   it("keeps the selected theme while making the high-contrast override explicit", () => {
     applyAppAppearance({ themeMode: "light", highContrast: true, language: "ar", textSize: "large" });
 
