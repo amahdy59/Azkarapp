@@ -113,8 +113,8 @@ export default defineConfig(({ mode }) => {
         registerType: "prompt",
         includeAssets: ["**/*.svg"],
         manifest: {
-          name: "Azkar",
-          short_name: "Azkar",
+          name: "wa-ziker",
+          short_name: "wa-ziker",
           description:
             "A daily Islamic remembrance app for reading, counting, and tracking morning, evening, and before-sleep azkar.",
           theme_color: "#0a1228",
