@@ -23,14 +23,8 @@ import {
   registerLazyCollection,
 } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
-import {
-  getCurrentPrayerPeriod,
-  getEstimatedPrayerTimes,
-  timeToMinutes,
-  type PrayerName,
-} from "../content/prayerTimes";
-import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
-import { buildPrayerCardModels } from "../prayerCardModels";
+import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../content/prayerTimes";
+import type { PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { useNow } from "../hooks/useNow";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -56,7 +50,6 @@ import type {
  * all four main collections toward leaves and palms.
  */
 const HOME_WIRD_CATEGORY_IDS = ["morning", "evening", "before_sleep"] as const satisfies readonly CategoryId[];
-const AFTER_PRAYER_TRACKER_ORDER = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const satisfies readonly PrayerName[];
 type HomeActionKind = "resume" | "start" | "again";
 
 export type HomeAction = {
@@ -246,8 +239,8 @@ export function HomeScreen({
   calendarType = "hijri",
   locationSettings,
   onResume,
-  onPrayerResume,
   onOpenPrayerAdhkar,
+  onPrayerResume,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onMosquePrayerGoalChange,
@@ -285,9 +278,10 @@ export function HomeScreen({
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
   onResume: (category: CategoryId) => void;
-  onPrayerResume?: (prayer: PrayerName) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
+  /** Opens the prayer screen, which is where the whole day is tracked. */
+  onPrayerResume?: (prayer: PrayerName) => void;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
   onMosquePrayerGoalChange?: (goal: number | undefined) => void;
@@ -353,10 +347,6 @@ export function HomeScreen({
     () => getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay),
     [dailyCompletions, judgeDay, now, progressDayStartHour],
   );
-  const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
-  const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
-
-  const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
 
   const [pathSheetOpen, setPathSheetOpen] = useState(false);
   /* Derived, not stored: every fact here is already a completion, a page or a
@@ -798,6 +788,16 @@ export function HomeScreen({
                       }
                       onGlass
                     />
+                    {onPrayerResume && (
+                      <button
+                        type="button"
+                        onClick={() => onPrayerResume(leadingPrayer.prayer)}
+                        data-testid="home-open-prayer-screen"
+                        className="hero-glass flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:col-span-2"
+                      >
+                        {t(language, "prayerMoment.dayTitle")}
+                      </button>
+                    )}
                   </section>
                 )}
               </div>
@@ -814,64 +814,23 @@ export function HomeScreen({
             onClose={() => setPathSheetOpen(false)}
           />
 
-          <div className="px-page">
-            <section
-              data-testid="after-prayer-trackers"
-              dir={direction}
-              // Matches the shared Card surface (border-border/40). This card sat
-              // beside two Card-based siblings wearing a full-strength border, so
-              // three visually identical surfaces carried three different rules.
-              className="overflow-hidden rounded-3xl border border-border/40 bg-card text-foreground shadow-raised"
-            >
-              {/* The header sits above a hairline in the brand gold, as in the
-                  approved design: it separates chrome from the row of cards
-                  without adding another filled band. */}
-              {/* The band runs the full width; the words inside it do not.
-                  At 1440px this subtitle measured 1060px, which is roughly
-                  twice a comfortable line — the eye loses the start of the next
-                  line on the way back. 44rem is the bound the rest of the app
-                  already reads at. */}
-              <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-5 text-start sm:px-6">
-                <div className="max-w-[44rem]">
-                  <h2 className="text-headline font-black leading-tight text-foreground" dir="auto">
-                    {t(language, "progress.postPrayerAzkar")}
-                  </h2>
-                  <p className="mt-2 text-label font-semibold leading-5 text-muted-foreground" dir="auto">
-                    {t(language, "home.prayerTrackerHint")}
-                  </p>
-                </div>
-              </div>
-
-              <div className="mx-4 mt-5 h-2 overflow-hidden rounded-full bg-muted sm:mx-6" aria-hidden="true">
-                <div
-                  className={`h-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
-                    direction === "rtl" ? "origin-right" : "origin-left"
-                  }`}
-                  style={{
-                    transform: `scaleX(${(activePrayerIndex + 1) / AFTER_PRAYER_TRACKER_ORDER.length})`,
-                  }}
-                />
-              </div>
-
-              <div className="mb-6 mt-5">
-                <PrayerTrackerCards
-                  models={prayerCardModels}
-                  language={language}
-                  direction={direction}
-                  records={prayerTracking}
-                  dayKey={todayKey}
-                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpen={(prayer) => (onPrayerResume ? onPrayerResume(prayer) : onResume("after_prayer"))}
-                />
-              </div>
-            </section>
-          </div>
-
           {onOpenCustomCounter && (
             <div className="px-page" data-testid="home-masbaha-entry">
               <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
             </div>
           )}
+
+          <QuranHomeCard
+            language={language}
+            direction={direction}
+            position={quranReadingPosition}
+            plan={quranWirdPlan}
+            wirdHistory={wirdHistory ?? {}}
+            progressDayStartHour={progressDayStartHour}
+            now={now}
+            onContinue={onContinueKhatmah ?? (() => {})}
+            onOverview={onOpenKhatmah ?? (() => {})}
+          />
 
           <div className="px-page">
             <SectionDivider label={t(language, "home.yourLibrary")} />
@@ -934,18 +893,6 @@ export function HomeScreen({
               </button>
             )}
           </div>
-
-          <QuranHomeCard
-            language={language}
-            direction={direction}
-            position={quranReadingPosition}
-            plan={quranWirdPlan}
-            wirdHistory={wirdHistory ?? {}}
-            progressDayStartHour={progressDayStartHour}
-            now={now}
-            onContinue={onContinueKhatmah ?? (() => {})}
-            onOverview={onOpenKhatmah ?? (() => {})}
-          />
 
           <div className="px-page">
             <SectionDivider label={t(language, "home.fridayAzkar")} />

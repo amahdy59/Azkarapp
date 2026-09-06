@@ -1251,8 +1251,8 @@ function AppContent({
                       resumeCategory(categoryId);
                     }
                   }}
-                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
+                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
                   onMosquePrayerGoalChange={setMosquePrayerGoal}
@@ -1322,7 +1322,6 @@ function AppContent({
                   locationSettings={locationSettings}
                   prayerTracking={prayerTracking}
                   onTogglePrayerTracking={handleTogglePrayerTracking}
-                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenFriday={() => push("friday")}
                   wirdHistory={wirdHistory}
                   quranWirdPlan={quranWirdPlan}

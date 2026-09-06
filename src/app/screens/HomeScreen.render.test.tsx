@@ -87,7 +87,7 @@ describe("HomeScreen quick access", () => {
     expect(onOpenBenefits).toHaveBeenCalledOnce();
   });
 
-  it("renders the theme-aware after-prayer tracker rail with the next prayer while keeping the compact wird card", () => {
+  it("leaves the five-prayer rail to Progress and keeps a way into the prayer screen", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     const onPrayerResume = vi.fn();
@@ -112,45 +112,14 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    expect(screen.getByTestId("after-prayer-trackers")).toBeInTheDocument();
+    /* The rail is not on Home any more. Post-prayer adhkar were offered twice
+       — once by the journey card for the prayer at hand, and again by a rail of
+       all five directly beneath it. The rail keeps its place on Progress, where
+       the whole day belongs, and the prayer screen reaches any single prayer. */
+    expect(screen.queryByTestId("after-prayer-trackers")).toBeNull();
+    expect(screen.queryByTestId("prayer-tracker-cards")).toBeNull();
+    expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
-    const grid = screen.getByTestId("prayer-tracker-cards");
-    const shownStates = [...grid.querySelectorAll("article[data-prayer-state]")].map(
-      (card) => (card as HTMLElement).dataset.prayerState,
-    );
-    expect(shownStates).toContain("upcoming");
-    expect(shownStates).toContain("next");
-    expect(shownStates.filter((state) => state === "current")).toHaveLength(1);
-    expect(grid.querySelectorAll("article[data-prayer-state]")).toHaveLength(5);
-
-    // Which prayer is next depends on the mocked clock, so find it.
-    const nextCard = grid.querySelector('article[data-prayer-state="next"]')!;
-    expect(nextCard.querySelector('[data-testid^="prayer-status-"]')).toHaveTextContent("Next prayer");
-
-    // Tracking is two independent native checkboxes per card, inside a
-    // fieldset that names the prayer.
-    for (const card of grid.querySelectorAll("article[data-prayer-state]")) {
-      expect(card.querySelectorAll('input[type="checkbox"]')).toHaveLength(2);
-      expect(card.querySelector("fieldset legend")).toHaveTextContent(/prayer tracking/i);
-    }
-    // A prayer that has not arrived keeps its controls visible but inert.
-    const nextBoxes = nextCard.querySelectorAll('input[type="checkbox"]');
-    expect([...nextBoxes].every((box) => (box as HTMLInputElement).disabled)).toBe(true);
-    const currentCard = grid.querySelector('article[data-prayer-state="current"]')!;
-    const currentBoxes = currentCard.querySelectorAll('input[type="checkbox"]');
-    expect([...currentBoxes].some((box) => (box as HTMLInputElement).disabled)).toBe(false);
-
-    expect(
-      screen.getByTestId("after-prayer-trackers").compareDocumentPosition(screen.getByTestId("home-masbaha-entry")),
-    ).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
-    expect(screen.getByText("After Prayer Azkar")).toBeInTheDocument();
-    expect(screen.getByText(/today'?s wird/i)).toBeInTheDocument();
-
-    // The identity block opens the prayer, and says so: it used to be named
-    // for the adhkar, which stopped being where it led the moment the prayer
-    // screen took that place.
-    fireEvent.click(screen.getByRole("button", { name: /Open Fajr/i }));
-    expect(onPrayerResume).toHaveBeenCalledWith("fajr");
     fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));
     expect(onOpenCustomCounter).toHaveBeenCalledOnce();
   });
@@ -205,7 +174,9 @@ describe("HomeScreen quick access", () => {
 
     act(() => vi.advanceTimersByTime(4_200));
     expect(screen.queryByRole("status", { name: /completed/i })).not.toBeInTheDocument();
-    expect(screen.getByTestId("prayer-tracker-cards")).toBeInTheDocument();
+    // The rail moved to Progress; what returns here is the ordinary hero.
+    expect(screen.queryByTestId("prayer-tracker-cards")).toBeNull();
+    expect(screen.getByTestId("home-hero")).toBeInTheDocument();
     expect(screen.queryByTestId("home-primary-cta")).not.toBeInTheDocument();
   });
 });
@@ -246,8 +217,10 @@ describe("HomeScreen document outline", () => {
     expect(screen.getByRole("button", { name: /أذكار المساء - غير مكتملة/ })).toBeInTheDocument();
 
     // Five identical unnamed articles announced as "article" five times over.
+    /* The five prayer cards were the articles here. They are on Progress now,
+       so Home may legitimately have none — what still has to hold is that any
+       article it does render is named, which is what this was protecting. */
     const articles = [...container.querySelectorAll("article")];
-    expect(articles.length).toBeGreaterThan(0);
     for (const article of articles) {
       const labelledBy = article.getAttribute("aria-labelledby");
       expect(labelledBy).toBeTruthy();
