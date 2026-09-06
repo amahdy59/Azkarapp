@@ -1,6 +1,6 @@
 # Prayer times, location, timezone, and DST
 
-This document is the source of truth for Azkarapp's prayer-time pipeline. It explains how online and offline results are selected, how daylight saving is applied, and how maintainers can verify or extend the feature safely.
+This document is the source of truth for Azkarapp's prayer-time pipeline. It explains how times are calculated on the device, how daylight saving is applied, and how maintainers can verify or extend the feature safely.
 
 ## User-visible behavior
 
@@ -22,29 +22,17 @@ Home also uses the same calculated boundaries for its featured collection: Morni
 
 ```mermaid
 flowchart TD
-  Request["Date + location settings"] --> Cache{"Daily cache hit?"}
-  Cache -- Yes --> Adjust["Apply manual minute adjustments"]
-  Cache -- No --> API{"Aladhan available?"}
-  API -- Yes --> Metadata["Parse timings + coordinate timezone"]
-  Metadata --> Save["Cache daily timings and timezone"]
-  Save --> Adjust
-  API -- No --> Offline["Astronomical offline calculation"]
+  Request["Date + location settings"] --> Offline["Astronomical offline calculation"]
   Offline --> TZ["Resolve UTC offset from IANA timezone for requested date"]
-  TZ --> Adjust
+  TZ --> Adjust["Apply manual minute adjustments"]
   Adjust --> Result["PrayerTimes HH:MM"]
 ```
 
-`getPrayerTimes()` is synchronous so Home always has an immediate value. It uses cached online data when present and otherwise calculates locally. `triggerBackgroundPrayerTimesRefresh()` updates the daily cache without blocking rendering.
+`getPrayerTimes()` is synchronous so Home always has an immediate value, and it is calculated on the device every time.
+
+There is no network path and no daily cache. Prayer times were once fetched from `api.aladhan.com`, with the device calculation as a fallback; DEC-152 removed that call because it sent untruncated coordinates to a third party while the privacy page read as a promise that they never leave the device. The cached timings and the cached coordinate timezone went with it, and their storage keys are cleared on startup.
 
 ## How automatic DST works
-
-### Online
-
-Aladhan receives latitude, longitude, date, and calculation method. Its response contains local prayer times and `data.meta.timezone`. The app stores that IANA timezone (for example, `Africa/Cairo`) for the coordinates.
-
-The online times are already expressed in the location's local clock, including the applicable offset for that date.
-
-### Offline
 
 The offline engine does not hard-code a `+2` or `+3` offset. It calls `getTimeZoneOffsetHours(date, timeZone)`, which uses `Intl.DateTimeFormat` and the IANA timezone database provided by the browser/runtime. The same timezone therefore returns different offsets on standard-time and DST dates when local law requires it.
 
@@ -62,9 +50,8 @@ For Cairo in 2026:
 When the user selects **Detect My Location**:
 
 1. The browser Geolocation API returns latitude and longitude after permission.
-2. Aladhan returns the timezone associated with those coordinates.
-3. If the network request fails, `Intl.DateTimeFormat().resolvedOptions().timeZone` supplies the device timezone.
-4. The selected timezone is persisted in `UserSettingsState.location`.
+2. `Intl.DateTimeFormat().resolvedOptions().timeZone` supplies the device timezone. Nothing is asked of the network, and the coordinates do not leave the device.
+3. The selected timezone is persisted in `UserSettingsState.location`.
 
 The Settings status card makes the effective timezone and UTC offset auditable. If a device is configured with the wrong timezone and the app is offline during detection, the user can correct the IANA timezone manually.
 
@@ -80,7 +67,7 @@ The built-in city selector is a convenience catalogue, not an online geocoder. S
 |   2 | Islamic Society of North America        |   15° |                      15° |
 |   1 | University of Islamic Sciences, Karachi |   18° |                      18° |
 
-Method definitions live in `CALCULATION_METHODS`. IDs and parameters must remain compatible with Aladhan. Adding a method requires Arabic/English names, offline parameters, UI coverage, and parsing/calculation tests.
+Method definitions live in `CALCULATION_METHODS`. IDs follow the numbering Aladhan established, which is the convention users recognise from other apps, but nothing is sent there. Adding a method requires Arabic/English names, offline parameters, UI coverage, and parsing/calculation tests.
 
 ## Offline calculation
 
@@ -97,37 +84,33 @@ High-latitude cases where the sun reaches sunset but not the selected Fajr or Is
 
 ## Manual adjustments
 
-Each prayer accepts an integer adjustment from -120 to +120 minutes. Adjustments are applied after either the cached online result or offline calculation, so behavior is consistent across network states. Values wrap safely across midnight.
+Each prayer accepts an integer adjustment from -120 to +120 minutes. Adjustments are applied after the calculation. Values wrap safely across midnight.
 
 Manual adjustments do not change the calculation-method parameters or timezone.
 
 ## Caching
 
-Daily timings are cached in `localStorage` with:
+There is none, and there is nothing to cache: the calculation is local, synchronous and cheap, so a cached copy could only ever be a slower way to get the same answer.
+
+Two key families were written by the removed network path and are now swept on startup by `pruneExpiredPrayerTimes`:
 
 ```text
 azkarapp.prayer_times_cache.<local-date>_<lat>_<lng>_<method>
-```
-
-Coordinate timezone metadata uses:
-
-```text
 azkarapp.prayer_time_zone.<lat>_<lng>
 ```
 
-Coordinates are rounded to three decimal places in cache keys. A date, method, or meaningful location change naturally produces another key. Invalid JSON, unavailable storage, or quota failures are ignored and fall back to local calculation.
+They are cleared rather than left to expire because their key names embed the coordinates of whoever last used the device.
 
 ## Failure and privacy behavior
 
 Geolocation failure is classified as unsupported, permission denied, unavailable, timeout, or unknown. Settings gives reason-specific recovery guidance and keeps the previously saved location and prayer settings unchanged. Permission denial points to the browser's site settings; unsupported detection keeps manual latitude, longitude, city, and IANA timezone entry available.
 
-Changing the calculation method remains local-first. If Aladhan verification is unavailable, the selected method is saved and the astronomical local calculation stays active; Settings reports that fallback without interrupting Home.
+Changing the calculation method is a local operation: the selected method is saved and the astronomical calculation uses it immediately.
 
 | Condition                         | Behavior                                                      |
 | --------------------------------- | ------------------------------------------------------------- |
 | Geolocation denied/unavailable    | Keep existing/default location and show an actionable message |
-| Aladhan timeout/error             | Use cached or offline astronomical times                      |
-| Invalid cache                     | Ignore it and calculate offline                               |
+| No network at all                 | Unaffected — every time is calculated on the device           |
 | Invalid manual coordinates        | Reject the save and retain the previous settings              |
 | Invalid/unavailable IANA timezone | Fall back to the device offset                                |
 | `localStorage` unavailable        | Continue without caching                                      |
@@ -136,17 +119,17 @@ The API timeout is bounded. Geolocation is user-initiated and requires HTTPS or 
 
 ## Code map
 
-| File                                              | Responsibility                                                                                 |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `src/app/content/prayerCalculation.ts`            | Aladhan boundary, parsing, caches, timezone/DST, offline calculation, adjustments, geolocation |
-| `src/app/content/prayerTimes.ts`                  | Current/next prayer selection and countdown formatting                                         |
-| `src/app/screens/HomeScreen.tsx`                  | Immediate fallback rendering and background refresh                                            |
-| `src/app/screens/settings/NotificationsPanel.tsx` | Location, timezone status, methods, and adjustments UI                                         |
-| `src/app/types.ts`                                | `LocationSettings` persistence contract                                                        |
-| `src/app/state.ts`                                | Defaults, validation, merge, and persistence                                                   |
-| `src/app/content/prayerCalculation.test.ts`       | Parser, timezone/DST, offline, adjustment, and fallback unit tests                             |
-| `e2e/narrow-layout.spec.ts`                       | Narrow prayer-header overflow regression                                                       |
-| `e2e/responsive.spec.ts`                          | Arabic RTL prayer-header fit                                                                   |
+| File                                              | Responsibility                                                     |
+| ------------------------------------------------- | ------------------------------------------------------------------ |
+| `src/app/content/prayerCalculation.ts`            | Timezone/DST, astronomical calculation, adjustments, geolocation   |
+| `src/app/content/prayerTimes.ts`                  | Current/next prayer selection and countdown formatting             |
+| `src/app/screens/HomeScreen.tsx`                  | Immediate fallback rendering and background refresh                |
+| `src/app/screens/settings/NotificationsPanel.tsx` | Location, timezone status, methods, and adjustments UI             |
+| `src/app/types.ts`                                | `LocationSettings` persistence contract                            |
+| `src/app/state.ts`                                | Defaults, validation, merge, and persistence                       |
+| `src/app/content/prayerCalculation.test.ts`       | Parser, timezone/DST, offline, adjustment, and fallback unit tests |
+| `e2e/narrow-layout.spec.ts`                       | Narrow prayer-header overflow regression                           |
+| `e2e/responsive.spec.ts`                          | Arabic RTL prayer-header fit                                       |
 
 ## Verification
 
@@ -167,7 +150,7 @@ For a manual location verification:
 4. Confirm the displayed UTC offset matches the current civil time.
 5. Check whether Settings reports DST or standard time.
 6. Compare the five times with a trusted local authority using the same calculation method.
-7. Disable the network, reload, and confirm the countdown still renders from cache/offline calculation.
+7. Disable the network, reload, and confirm the countdown is unchanged — it never depended on the network.
 8. Test a date on each side of a known DST transition through unit tests rather than changing the device clock.
 
 When local authorities differ by a few minutes, confirm the selected calculation method first, then use manual adjustments only when required.

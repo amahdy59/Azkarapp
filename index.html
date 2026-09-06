@@ -10,6 +10,11 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <link rel="icon" type="image/svg+xml" href="/azkar-icon.svg" />
     <link rel="apple-touch-icon" href="/192.png" />
+    <!-- The first two serve the QCF page fonts, which the Mushaf fetches and
+         then injects as @font-face. The third is the audio CDN: it appears in
+         no source file because it arrives through VITE_AUDIO_BASE_URL, which is
+         also why the build-time CSP reads that variable rather than hardcoding
+         a host. -->
     <link rel="preconnect" href="https://verses.quran.foundation" crossorigin />
     <link rel="preconnect" href="https://quran.com" crossorigin />
     <link rel="preconnect" href="https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev" crossorigin />

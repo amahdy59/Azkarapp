@@ -3242,3 +3242,41 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   ordering rules, stability within a day, and the language of each kind of
   source; `pnpm check` green with the bundle budget unchanged; the card verified
   in the browser selecting a Qur'an source for the morning context.
+
+## DEC-156 — a Content-Security-Policy, injected at build time
+
+- **Decision:** the app ships a CSP as a meta tag injected into `index.html`
+  during the build, not written into the source file; the audit checklist is
+  reconciled with what has actually shipped, and `docs/PRAYER_TIMES.md` no
+  longer documents a network path that was removed in DEC-152.
+- **Build-time, because the dev server serves the same file.** Vite's React
+  Refresh preamble is an inline script, so a static tag restricting scripts to
+  the app's own origin would have broken `pnpm dev` for everyone while
+  protecting nothing that runs there. A small plugin with `apply: "build"` injects it instead, so
+  the policy covers exactly the artefact that reaches a browser.
+- **The hosts were read from the source, not copied from the audit.** The note
+  proposed allowing `api.aladhan.com`, which no longer exists, and named none of
+  the hosts the app does contact. The QCF page fonts are fetched and then
+  injected as `@font-face`, so they need `connect-src` and `font-src` both. The
+  audio CDN appears in no source file — it arrives through
+  `VITE_AUDIO_BASE_URL` — so the plugin reads that variable and allows its
+  origin only when one is configured. A grep for the host found nothing and
+  nearly cost the audio path; the build output is what revealed it.
+- **`frame-ancestors` is deliberately absent.** It is ignored when delivered in
+  a meta tag and only warns, so it would add console noise for no protection.
+  Clickjacking cover needs a real header, which GitHub Pages cannot send.
+- **The service worker was verified, not assumed.** `offline-core.spec.ts` waits
+  on `serviceWorker.ready` and asserts a live controller, and it passes with the
+  policy in place. Registration fails inside the in-app browser used for manual
+  checks, which disables service workers — an artefact of that environment, and
+  the reason the e2e result rather than the manual one is the evidence here.
+- **The checklist was wrong, which mattered more than any single item.** It read
+  72 open and 0 done while about a dozen items had shipped, so it would have led
+  us to re-do finished work — including re-adding an Aladhan disclosure for a
+  call that no longer exists. It now carries a reconciliation block, ten ticked
+  boxes, and the two findings that came out of checking it: `authenticAzkar.ts`
+  is in use and must not be deleted, and `AladhanPrayerData` was dead and is
+  removed here.
+- **Tests/evidence required:** `pnpm check` green; the full Playwright suite
+  green with the policy in place, including the offline and PWA-update specs;
+  no CSP violation in the console against the built output.

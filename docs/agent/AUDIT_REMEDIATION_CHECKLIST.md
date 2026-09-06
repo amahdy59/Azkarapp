@@ -16,15 +16,52 @@ Next free decision number when this file was written: **DEC-087**.
 
 ---
 
+## Status reconciliation — 2026-09-06
+
+This file was written against `652a19d` and never ticked as work landed, so it read
+72 open / 0 done while roughly a dozen items had already shipped. Planning from it
+in that state meant re-doing finished work. Corrected here; line references from the
+original audit are older than the current tree and should be re-checked before use.
+
+**Shipped since the audit**
+
+- **1.2 GPS egress — Path B taken.** `fetchAladhanPrayerTimes` and its call sites are
+  gone; prayer times are calculated on the device. Recorded as **DEC-152**. Every
+  Path A item is therefore moot: there is no recipient to disclose, no attribution to
+  add, and no coordinate precision to truncate.
+- **1.3 Content-Security-Policy.** Added, verified, and narrower than the audit
+  proposed — Aladhan is absent because the call is gone.
+- **Prayer-time caches.** Both key families are swept on startup, and
+  `docs/PRAYER_TIMES.md` no longer documents a network path that does not exist.
+
+**Answered by the owner, inline, and acted on**
+
+- Aladhan: recommended option (drop the call). Shipped.
+- Audio: no licensed sourcing; recordings to be supplied. Item 3.1 is the gate.
+
+**Verified rather than assumed**
+
+- `content/authenticAzkar.ts` is **in use** by `CustomCounterScreen` — item 4.2's
+  question is answered, and it must not be deleted.
+- `AladhanPrayerData` in `prayerCalculation.ts` **is** dead and still exported: a
+  loose end of DEC-152, and the one real remainder of item 1.2's second box.
+
+**Still blocked on the owner**
+
+- The **governing jurisdiction** for the legal pages. Owner name and support email
+  were supplied inline; jurisdiction was not, and all of section 1.1 waits on it.
+
+---
+
 ## 0. Blocked on the owner — unblock these first
 
 These gate a third of the list. Nothing else in section 1 or 2 can complete without them.
 
 - [ ] **[needs you]** Decide and supply the three legal values: **app owner / controller name**,
       **support email address**, and **governing jurisdiction**. name Ahmed Mahdy - email: amahdy59@yahoo.com
-- [ ] **[needs you]** Decide the Aladhan question: keep the network call and disclose it, or drop it
+- [x] **[needs you]** Decide the Aladhan question: keep the network call and disclose it, or drop it
       and rely on the offline calculation only. See item 1.2 for the trade-off. - select recommended option
-- [ ] **[needs you]** Decide the audio question: gate the reciter UI until recordings exist (item
+- [x] **[needs you]** Decide the audio question: gate the reciter UI until recordings exist (item
       3.1), or commit to sourcing licensed recordings. - don't use sourcing licensed recordings yet, I'll provide you with the recordings in 2 weeks
 
 ---
@@ -75,15 +112,16 @@ Pick **one** path.
 
 **Path B — drop the network path**
 
-- [ ] Remove `fetchAladhanPrayerTimes` and its call sites; rely on `calculateOfflinePrayerTimes`,
+- [x] Remove `fetchAladhanPrayerTimes` and its call sites; rely on `calculateOfflinePrayerTimes`,
       which `81996a3` already hardened for the high-latitude case
 - [ ] Remove the now-dead exports flagged in item 4.2
 
 **Either path**
 
-- [ ] Record the outcome as **DEC-087**. Offline-first is a constitutional rule in `AGENTS.md` §1
+- [x] Recorded as **DEC-152**, not DEC-087 — the number had been taken by then.
+      Original wording: Offline-first is a constitutional rule in `AGENTS.md` §1
       and no existing decision covers this egress.
-- [ ] Update `docs/PRAYER_TIMES.md` to match whichever path shipped
+- [x] Update `docs/PRAYER_TIMES.md` to match whichever path shipped
 
 **Acceptance:** either no coordinate leaves the device, or every user-facing legal surface names the
 recipient and the transmitted precision is reduced.
@@ -97,13 +135,14 @@ recipient and the transmitted precision is reduced.
 GitHub Pages cannot set response headers, so a `<meta>` tag in `index.html` is the only mechanism.
 This matters more once section 2 ships tokens into localStorage.
 
-- [ ] Add `<meta http-equiv="Content-Security-Policy">` to `index.html`
-- [ ] Start from: `default-src 'self'`; `connect-src 'self' https://*.supabase.co https://api.aladhan.com`;
+- [x] Add `<meta http-equiv="Content-Security-Policy">` — injected at build time by a Vite
+      plugin rather than written into `index.html`, which would break `pnpm dev`
+- [x] Start from: `default-src 'self'`; `connect-src 'self' https://*.supabase.co https://api.aladhan.com`;
       `img-src 'self' data:`; `font-src 'self'`; `object-src 'none'`; `base-uri 'self'`;
       `frame-ancestors 'none'`
-- [ ] Add `style-src 'self' 'unsafe-inline'` — Tailwind 4 needs it unless styles are hashed
-- [ ] Drop `https://api.aladhan.com` from `connect-src` if item 1.2 took Path B
-- [ ] **Verify the PWA still works under the policy** before shipping: service-worker registration,
+- [x] Add `style-src 'self' 'unsafe-inline'` — Tailwind 4 needs it unless styles are hashed
+- [x] Drop `https://api.aladhan.com` from `connect-src` — Path B shipped, so it never appeared
+- [x] **Verify the PWA still works under the policy** before shipping: service-worker registration,
       Workbox precache, the `/data/mushaf/*.json` runtime route, and the release-notes fetch. A CSP
       that breaks the service worker is worse than no CSP.
 

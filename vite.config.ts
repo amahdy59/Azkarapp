@@ -90,6 +90,64 @@ function unwrapColorMixGuards(): Plugin {
   };
 }
 
+/**
+ * Injects the Content-Security-Policy into the built `index.html`.
+ *
+ * GitHub Pages cannot set response headers, so a meta tag is the only mechanism
+ * available. It is injected at build time rather than written into
+ * `index.html`, because the dev server serves that same file and Vite's React
+ * Refresh preamble is an inline script: a static tag with `script-src 'self'`
+ * would break `pnpm dev` for everyone while protecting nothing that runs there.
+ *
+ * `frame-ancestors` is deliberately absent. It is ignored when delivered in a
+ * meta tag and only warns in the console, so it would cost noise for no
+ * protection; clickjacking cover needs a real header and a host that can send
+ * one.
+ *
+ * The hosts here are the ones the app actually contacts, verified against the
+ * source rather than copied from the audit note: the QCF page fonts are
+ * fetched and then injected as `@font-face`, so they need `connect-src` and
+ * `font-src` both. Audio is added only when a base URL is configured — with no
+ * recordings published there is no host to allow, and allowing one anyway would
+ * be a permission granted for nothing.
+ */
+function contentSecurityPolicy(audioBaseUrl?: string) {
+  const audioOrigin = audioBaseUrl ? new URL(audioBaseUrl).origin : undefined;
+  const quranFonts = ["https://verses.quran.foundation", "https://quran.com"];
+  const directives = [
+    ["default-src", ["'self'"]],
+    ["base-uri", ["'self'"]],
+    ["object-src", ["'none'"]],
+    ["form-action", ["'self'"]],
+    ["script-src", ["'self'"]],
+    // Tailwind 4 and the inline critical styles in index.html both need this.
+    ["style-src", ["'self'", "'unsafe-inline'"]],
+    // `blob:` covers the generated share card; `data:` the inlined icons.
+    ["img-src", ["'self'", "data:", "blob:"]],
+    ["font-src", ["'self'", ...quranFonts]],
+    ["connect-src", ["'self'", ...quranFonts, "https://*.supabase.co", ...(audioOrigin ? [audioOrigin] : [])]],
+    ["media-src", ["'self'", "blob:", ...(audioOrigin ? [audioOrigin] : [])]],
+    ["worker-src", ["'self'"]],
+    ["manifest-src", ["'self'"]],
+  ] as const;
+
+  const policy = directives.map(([name, values]) => `${name} ${values.join(" ")}`).join("; ");
+
+  return {
+    name: "azkar:content-security-policy",
+    apply: "build" as const,
+    transformIndexHtml() {
+      return [
+        {
+          tag: "meta",
+          attrs: { "http-equiv": "Content-Security-Policy", content: policy },
+          injectTo: "head-prepend" as const,
+        },
+      ];
+    },
+  };
+}
+
 export default defineConfig(({ mode }) => {
   const isGithubPages = mode === "github-pages";
   const appBase = isGithubPages ? "/Azkarapp/" : "/";
@@ -109,6 +167,7 @@ export default defineConfig(({ mode }) => {
       react(),
       tailwindcss(),
       unwrapColorMixGuards(),
+      contentSecurityPolicy(audioBaseUrl),
       VitePWA({
         registerType: "prompt",
         includeAssets: ["**/*.svg"],

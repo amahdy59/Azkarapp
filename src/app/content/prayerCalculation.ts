@@ -281,11 +281,6 @@ export function calculateOfflinePrayerTimes(
   };
 }
 
-export interface AladhanPrayerData {
-  times: PrayerTimes;
-  timeZone?: string;
-}
-
 export function getPrayerTimes(date: Date = new Date(), location?: LocationSettings): PrayerTimes {
   const latitude = location?.latitude ?? DEFAULT_LOCATION.latitude ?? 30.0444;
   const longitude = location?.longitude ?? DEFAULT_LOCATION.longitude ?? 31.2357;
