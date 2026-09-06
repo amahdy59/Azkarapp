@@ -1,6 +1,6 @@
 import type { Session, SupabaseClient } from "@supabase/supabase-js";
 import type { AppStateSnapshot, AppLanguage, StoredSession } from "../app/state";
-import type { UserProfileState } from "../app/types";
+import type { PrayerTrackingRecord, UserProfileState } from "../app/types";
 import { DEFAULT_APP_STATE, fromCompletedSets, mergeAppStates, toCompletedSets } from "../app/state";
 import {
   DEFAULT_PROGRESS_DAY_START_HOUR,
@@ -9,6 +9,7 @@ import {
   normalizeDailyCompletions,
   resetDailyRoutineProgress,
 } from "../app/progress";
+import { mergePrayerTracking, mergeQuranWirdDailyGoals, mergeWirdHistory, recentDayKeys } from "../app/syncMerge";
 import { getAuthCallbackUrl, getSupabaseClient, isSupabaseConfigured } from "./supabase";
 
 export const REMOTE_SESSION_PAGE_SIZE = 100;
@@ -145,6 +146,16 @@ type RemoteProfileRow = {
 type RemoteSettingsJson = Partial<AppStateSnapshot["settings"]> & {
   savedZikrIds?: AppStateSnapshot["savedZikrIds"];
   dailyCompletions?: AppStateSnapshot["dailyCompletions"];
+  /**
+   * State, not settings, and optional because rows written before this shipped
+   * do not carry it. Reading one of those is the ordinary case for a while: the
+   * merge treats a missing field as "this device knows nothing about that",
+   * which is true, rather than as "there is nothing", which would delete.
+   */
+  prayerTracking?: AppStateSnapshot["prayerTracking"];
+  wirdHistory?: AppStateSnapshot["wirdHistory"];
+  dailyWirdGoal?: AppStateSnapshot["dailyWirdGoal"];
+  quranWirdDailyGoals?: AppStateSnapshot["quranWirdDailyGoals"];
   lastActiveDayKey?: string;
 };
 
@@ -169,8 +180,33 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     routineModes: state.settings.routineModes,
     savedZikrIds: state.savedZikrIds,
     dailyCompletions: state.dailyCompletions,
+    /* Prayer tracking and the wird were device-local until now, so two of the
+       three things a day is derived from stopped at whichever device recorded
+       them. They ride in settings_json rather than in tables of their own: it
+       is a JSON column, so this needs no migration, and the merge rules live in
+       syncMerge.ts where they can be tested.
+
+       Trimmed to a recent window. All of it is small and none of it is
+       bounded, and an unbounded blob in one column is a problem that arrives
+       quietly and years late. */
+    prayerTracking: recentTracking(state.prayerTracking),
+    wirdHistory: recentHistory(state.wirdHistory),
+    dailyWirdGoal: state.dailyWirdGoal,
+    quranWirdDailyGoals: state.quranWirdDailyGoals,
     lastActiveDayKey: getProgressDayKey(new Date(), DEFAULT_PROGRESS_DAY_START_HOUR),
   };
+}
+
+/** The recent slice of prayer records, so the payload stays bounded. */
+function recentTracking(records: PrayerTrackingRecord[] = []): PrayerTrackingRecord[] {
+  const keep = new Set(recentDayKeys([...new Set(records.map((record) => record.dayKey))]));
+  return records.filter((record) => keep.has(record.dayKey));
+}
+
+/** The same window over the wird. */
+function recentHistory(history: Record<string, number[]> = {}): Record<string, number[]> {
+  const keep = new Set(recentDayKeys(Object.keys(history)));
+  return Object.fromEntries(Object.entries(history).filter(([dayKey]) => keep.has(dayKey)));
 }
 
 type RemoteSettingsRow = {
@@ -390,6 +426,16 @@ export async function loadRemoteState(
     savedZikrIds: savedZikrTableMissing
       ? (settings?.settings_json?.savedZikrIds ?? localState.savedZikrIds)
       : (savedZikrResult.data ?? []).map((row) => row.zikr_id),
+    /* Merged rather than chosen between: a prayer recorded on the phone and a
+       page read on the laptop are both true, and whichever device happens to be
+       merging has to reach the same answer. See syncMerge.ts. */
+    prayerTracking: mergePrayerTracking(localState.prayerTracking, settings?.settings_json?.prayerTracking ?? []),
+    wirdHistory: mergeWirdHistory(localState.wirdHistory, settings?.settings_json?.wirdHistory ?? {}),
+    quranWirdDailyGoals: mergeQuranWirdDailyGoals(
+      localState.quranWirdDailyGoals,
+      settings?.settings_json?.quranWirdDailyGoals ?? {},
+    ),
+    dailyWirdGoal: localState.dailyWirdGoal ?? settings?.settings_json?.dailyWirdGoal,
   };
 
   return mergeAppStates(localState, remoteState);

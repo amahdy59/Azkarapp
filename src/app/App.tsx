@@ -360,16 +360,23 @@ function AppContent({
            the older `mosque` boolean in step so a client that only knows that
            field still reads the record correctly, and clearing it removes the
            answer rather than recording "at home". */
+        /* Stamped on every write, because two devices that both recorded this
+           prayer have to agree on one answer without knowing which of them is
+           merging — and without a time, the only deterministic rule is an
+           ordering on the values, under which correcting "at the mosque" to
+           "at home" never survives a sync. See syncMerge.ts. */
+        const updatedAt = new Date().toISOString();
         const updated: PrayerTrackingRecord =
           field === "location"
             ? {
                 ...existing,
+                updatedAt,
                 mosque: next === "mosque",
                 ...(next === "mosque" || next === "home"
                   ? { location: next as "mosque" | "home" }
                   : { location: undefined }),
               }
-            : { ...existing, [field]: next === true };
+            : { ...existing, updatedAt, [field]: next === true };
         if (index >= 0) {
           const copy = records.slice();
           copy[index] = updated;

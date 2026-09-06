@@ -278,6 +278,19 @@ export interface PrayerTrackingRecord {
   location?: "mosque" | "home";
   /** Prayed the confirmed rawātib attached to this prayer. */
   sunnah?: boolean;
+  /**
+   * When this record was last written, ISO.
+   *
+   * Only a merge reads it. Two devices that both recorded the same prayer have
+   * to agree on one answer without knowing which of them is merging, and
+   * without this the only deterministic rule is an ordering on the values —
+   * under which correcting "at the mosque" to "at home" is impossible, because
+   * the stale, higher-ranked answer wins on every sync forever.
+   *
+   * Optional: records written before it existed merge by that ordering, which
+   * keeps the more specific answer and never a blank.
+   */
+  updatedAt?: string;
 }
 
 /** The Mushaf follows the app by default, while OLED remains an explicit

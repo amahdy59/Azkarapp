@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-05.6",
+  "release": "2026-09-06.1",
   "ar": [
-    "صار اسم التطبيق «وَذَكِّرْ»، و«wa-ziker» في الواجهة الإنجليزية. تجده على شاشة البداية وفي أعلى التطبيق وفي اسمه على جهازك.",
-    "النسخة الإنجليزية صارت تقرأ الأحاديث بالإنجليزية بدل عرضها بالعربية تحت عنوان إنجليزي. بدأنا بفضائل الصلوات الإحدى عشرة التي تظهر في الرئيسية، وما لم يُترجم بعد يبقى ظاهراً بالعربية حتى تكتمل مراجعته.",
-    "إذا ضغطت «تحديث» ولم تتغيّر النسخة فعلاً، صار التطبيق يتخلّص من النسخة القديمة العالقة ويعيد التحميل من جديد بدل أن يعود الإشعار كما هو."
+    "صار تتبّع الصلاة وورد القرآن ينتقلان بين أجهزتك عند تسجيل الدخول. كانا محفوظين على الجهاز نفسه فقط، فتسجيل صلاة الفجر في المسجد على الهاتف لا يظهر على الحاسوب — وصارا الآن يُدمجان: ما سُجِّل على أيّ جهاز يبقى، ولا يُلغى شيء سجّلته.",
+    "إن صحّحت مكان صلاة على جهاز — من المسجد إلى المنزل مثلاً — صار التصحيح هو ما يبقى بعد المزامنة بدل أن يعود القديم.",
+    "صار اسم التطبيق «وَذَكِّرْ»، و«wa-ziker» في الواجهة الإنجليزية، والنسخة الإنجليزية تقرأ الأحاديث بالإنجليزية بدل عرضها بالعربية تحت عنوان إنجليزي."
   ],
   "en": [
-    "The app is now called wa-ziker, and وَذَكِّرْ in Arabic. You will see it on the opening screen, at the top of the app, and in its name on your device.",
-    "The English app reads its narrations in English, instead of showing Arabic under an English heading. The eleven prayer virtues on Home are done; anything not yet translated still shows its Arabic until its review is finished.",
-    "If you press Update and the version does not actually change, the app now discards the stale copy of itself and reloads from scratch, rather than showing you the same notice again."
+    "Prayer tracking and your Qur'an wird now travel between your devices when you sign in. They were saved only on the device that recorded them, so marking Fajr at the mosque on your phone never reached your laptop. They are merged rather than replaced: whatever either device recorded is kept, and nothing you recorded is dropped.",
+    "If you correct where a prayer was prayed on one device — from the mosque to at home, say — the correction is what survives the sync, instead of the older answer coming back.",
+    "The app is now called wa-ziker, and وَذَكِّرْ in Arabic, and the English app reads its narrations in English instead of showing Arabic under an English heading."
   ]
 }
