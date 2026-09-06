@@ -3111,3 +3111,54 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   others succeed; the garden proven to keep pre-migration palms, to grant a V2
   palm when the whole path is walked, and to behave exactly as before when no
   verdict is supplied; `pnpm check` green and the full suite green.
+
+## DEC-153 — the English app reads in English, and the narrations that could not be read were repaired
+
+- **Decision:** every narration in the app now carries `hadithTextEnglish` —
+  211 of 211, `azkar.ts` and `comprehensiveDuas.ts` included, which closes the
+  work begun in DEC-152; five entries whose stored Arabic was corrupt were
+  repaired against their cited sources rather than left permanently
+  untranslatable; the recorded `initialRouteGzip` baseline is raised to hold the
+  added text.
+- **Why three could not simply be translated.** They were found by translating
+  the rest: `e-hm-86` held the ‘Uthman narration with a stretch of a different
+  report spliced into its middle and its own middle clause missing; `misc-ref-8`
+  opened with a partial run of Sayyid al-Istighfar and then repeated it in full,
+  and stuttered on "whoever says it"; `ne-ref-3` had lost the "as for the one
+  who said…" pairing that the report turns on. Each renders — a reader sees
+  Arabic that does not parse, and has seen it all along. Translating around a
+  defect would have hidden it; skipping them would have left three permanent
+  gaps in a file that is otherwise complete.
+- **The repairs invent nothing.** `e-hm-86` is the evening twin of `m-hm-86`,
+  whose text was already clean and already translated, so its Arabic and English
+  were copied across rather than re-edited by hand — the twins now agree, which
+  they always should have. `misc-ref-8` was restored to Bukhari 6306 and
+  `ne-ref-3` to Bukhari 846, both already cited by the entries themselves.
+- **One narration was never in the id-keyed pass.** The after-prayer suras are
+  built by `createAfterPrayerSurah`, so no `id: "…"` literal precedes their
+  shared `hadithText` and the translation tooling could not see it. It is
+  translated in the factory.
+- **Two words in the duas were repaired as well.** `friday-dua-19` read
+  "أتأهد" for "أتشهد" and `friday-dua-34` "رهاربًا" for "رَهَّابًا". Both are
+  single-word slips rather than spliced reports, and both were found the same
+  way: a word that cannot be translated is a word that does not exist.
+- **The budget was raised once, for the azkar corpus only.** English narrations
+  there are content the initial route carries: `azkar.ts` is a static import of
+  the entry because `state.ts` needs it at startup, so `initialRouteGzip` grew
+  6.2% (201,399 → 213,792) and the recorded baseline moves with it. The 250 kB
+  ceiling is untouched and still holds ~36 kB. The 48 dua narrations cost the
+  initial route nothing — `comprehensiveDuas.ts` is already fetched lazily — so
+  the budget passed unchanged after them. The structural answer, if this grows
+  again, is that narration text belongs in a chunk the reader fetches when a
+  reference sheet is opened; that split is not needed yet and was not made.
+- **Two tests said an English reader still sees Arabic.** Both were correct until
+  this change and are now wrong. The language test asserted exactly one
+  `lang="ar"` element in the sheet — the narration — and now asserts none, with
+  the hadith carrying `lang="en"`. The short-screen test asserted the narration
+  fits a 560px screen without scrolling, which held only because the Arabic is
+  shorter; it now asserts the sheet stays inside the viewport and that the
+  scroll area reaches the end of the text, which is what "usable on a short
+  screen" actually means and holds either way.
+- **Tests/evidence required:** `pnpm report:english-coverage` at 211/211;
+  `pnpm check` green including the raised baseline; the full Playwright suite
+  green with the two rewritten assertions.

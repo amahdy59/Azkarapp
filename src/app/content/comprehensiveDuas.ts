@@ -22,6 +22,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReference: "Editorial guidance for the reviewed comprehensive dua collection.",
     sourceReferenceArabic: "ضوابط تحريرية للمجموعة المراجعة من الأدعية الجامعة.",
     hadithText: "هذه الأدعية ليست مخصوصة بيوم الجمعة، وترتيبها ليس ترتيبًا تعبديًا ثابتًا.",
+    hadithTextEnglish:
+      "These supplications are not particular to Friday, and their order here is not a fixed devotional sequence.",
     category: "comprehensive_duas",
     orderIndex: 0,
     isCollectionIntroduction: true,
@@ -43,6 +45,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "علّمها النبي ﷺ للصحابة حين سألوه كيف يصلون عليه، كما أمر بالإكثار من الصلاة عليه يوم الجمعة. صحيح البخاري 3370، وسنن أبي داود 1047.",
     hadithText:
       "عن كعب بن عجرة رضي الله عنه قال: قيل: يا رسول الله، أما السلام عليك فقد عرفناه، فكيف الصلاة عليك؟ قال: «قولوا: اللهم صلِّ على محمد وعلى آل محمد، كما صليت على إبراهيم وعلى آل إبراهيم، إنك حميد مجيد، وبارك على محمد وعلى آل محمد، كما باركت على إبراهيم وعلى آل إبراهيم، إنك حميد مجيد». (أخرجه البخاري 3370، ومسلم 406). وعن أوس بن أوس رضي الله عنه قال: قال رسول الله ﷺ: «إن من أفضل أيامكم يوم الجمعة، فِيهِ خُلِقَ آدَمُ، وَفِيهِ قُبِضَ، وَفِيهِ النَّفْخَةُ، وَفِيهِ الصَّعْقَةُ، فأكثروا عليّ من الصلاة فيه فإن صلاتكم معروضة عليّ». (أخرجه أبو داود 1047 وصححه الألباني).",
+    hadithTextEnglish:
+      "Ka‘b ibn ‘Ujrah (may Allah be pleased with him) said: It was asked: Messenger of Allah, we know how to greet you with peace, but how are we to send blessings upon you? He said: “Say: O Allah, send blessings upon Muhammad and upon the family of Muhammad, as You sent blessings upon Ibrahim and upon the family of Ibrahim; You are Praiseworthy, Glorious. And bless Muhammad and the family of Muhammad, as You blessed Ibrahim and the family of Ibrahim; You are Praiseworthy, Glorious.” (al-Bukhari 3370; Muslim 406.) And Aws ibn Aws (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Among the best of your days is Friday. On it Adam was created, on it he died, on it is the blast of the horn, and on it is the swoon. So send blessings upon me abundantly on that day, for your blessings are presented to me.” (Abu Dawud 1047, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 1,
     includedInCore: true,
@@ -63,6 +67,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "سماه النبي ﷺ أفضل صيغ الاستغفار، وبيّن فضله لمن يقوله صباحًا أو مساءً موقنًا به. صحيح البخاري 6306.",
     hadithText:
       "عن شداد بن أوس رضي الله عنه، عن النبي ﷺ قال: «سيد الاستغفار أن تقول: اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك عليّ، وأبوء بذنبي فاغفر لي؛ فإنه لا يغفر الذنوب إلا أنت». قال: «ومن قالها من النهار موقنًا بها، فمات من يومه قبل أن يمسي، فهو من أهل الجنة، ومن قالها من الليل وهو موقن بها، فمات قبل أن يصبح، فهو من أهل الجنة». (أخرجه البخاري 6306).",
+    hadithTextEnglish:
+      "Shaddad ibn Aws (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “The master supplication for forgiveness is that you say: O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge before You Your favour upon me, and I acknowledge my sin, so forgive me — for none forgives sins but You.” He said: “Whoever says it during the day, certain of it, and dies that day before evening, is among the people of Paradise; and whoever says it at night, certain of it, and dies before morning, is among the people of Paradise.” (al-Bukhari 6306.)",
     category: "comprehensive_duas",
     orderIndex: 2,
     includedInCore: true,
@@ -83,6 +89,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "طلب أبو بكر رضي الله عنه من النبي ﷺ دعاءً يقوله في صلاته، فعلّمه هذا الدعاء. صحيح البخاري 834.",
     hadithText:
       "عن أبي بكر الصديق رضي الله عنه أنه قال لرسول الله ﷺ: علّمني دعاءً أدعو به في صلاتي، قال: «قل: اللهم إني ظلمت نفسي ظلمًا كثيرًا، ولا يغفر الذنوب إلا أنت، فاغفر لي مغفرةً من عندك، وارحمني إنك أنت الغفور الرحيم». (أخرجه البخاري 834، ومسلم 2705).",
+    hadithTextEnglish:
+      "Abu Bakr al-Siddiq (may Allah be pleased with him) said to the Messenger of Allah ﷺ: Teach me a supplication to say in my prayer. He said: “Say: O Allah, I have wronged myself greatly, and none forgives sins but You, so grant me forgiveness from Yourself and have mercy on me. You are the Most Forgiving, the Most Merciful.” (al-Bukhari 834; Muslim 2705.)",
     category: "comprehensive_duas",
     orderIndex: 3,
     includedInCore: true,
@@ -101,6 +109,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان من أكثر أدعية النبي ﷺ. صحيح البخاري 6389 وصحيح مسلم 2690.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه قال: كان أكثر دعاء النبي ﷺ: «اللهم ربنا آتنا في الدنيا حسنة وفي الآخرة حسنة وقنا عذاب النار». وكان أنس إذا أراد أن يدعو بدعوة دعا بها، فإذا أراد أن يدعو بدعاء دعا بها فيه. (أخرجه البخاري 6389، ومسلم 2690).",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: The Prophet’s ﷺ most frequent supplication was: “O Allah, our Lord, give us good in this world and good in the hereafter, and protect us from the punishment of the Fire.” And whenever Anas wished to make a supplication, he would supplicate with it, and when he wished to make some other supplication, he would include it within that one. (al-Bukhari 6389; Muslim 2690.)",
     category: "comprehensive_duas",
     orderIndex: 4,
     includedInCore: true,
@@ -119,6 +129,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء النبي ﷺ الجامع. صحيح مسلم 2721.",
     hadithText:
       "عن عبد الله بن مسعود رضي الله عنه، عن النبي ﷺ أنه كان يقول: «اللهم إني أسألك الهدى والتقى والعفاف والغنى». (أخرجه مسلم 2721).",
+    hadithTextEnglish:
+      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) reported that the Prophet ﷺ used to say: “O Allah, I ask You for guidance, mindfulness of You, chastity and sufficiency.” (Muslim 2721.)",
     category: "comprehensive_duas",
     orderIndex: 5,
     includedInCore: true,
@@ -136,6 +148,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "أخذ النبي ﷺ بيد معاذ رضي الله عنه وأوصاه ألا يترك هذا الدعاء في دبر كل صلاة. سنن أبي داود 1522، صحيح.",
     hadithText:
       "عن معاذ بن جبل رضي الله عنه أن رسول الله ﷺ أخذ بيده وقال: «يا معاذ، والله إني لأحبك، والله إني لأحبك»، فقال: «أوصيك يا معاذ لا تدعنّ في دبر كل صلاة تقول: اللهم أعني على ذكرك وشكرك وحسن عبادتك». (أخرجه أبو داود 1522، والنسائي 1303، وصححه الألباني).",
+    hadithTextEnglish:
+      "Mu‘adh ibn Jabal (may Allah be pleased with him) reported that the Messenger of Allah ﷺ took him by the hand and said: “Mu‘adh, by Allah I love you; by Allah I love you.” Then he said: “I counsel you, Mu‘adh: never leave off saying at the end of every prayer: O Allah, help me to remember You, to thank You, and to worship You well.” (Abu Dawud 1522; al-Nasa’i 1303, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 6,
     includedInCore: true,
@@ -153,6 +167,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يكثر من هذا الدعاء. جامع الترمذي 2140، وقال الترمذي: حديث حسن.",
     hadithText:
       "عن أنس رضي الله عنه قال: كان رسول الله ﷺ يكثر أن يقول: «يا مقلب القلوب ثبت قلبي على دينك»، فقلت: يا رسول الله، آمنا بك وبما جئت به فهل تخاف علينا؟ قال: «نعم، إن القلوب بين إصبعين من أصابع الله يقلبها كيف يشاء». (أخرجه الترمذي 2140، وأحمد 12107، وصححه الألباني).",
+    hadithTextEnglish:
+      "Anas (may Allah be pleased with him) said: The Messenger of Allah ﷺ used to say often: “O Turner of hearts, make my heart firm upon Your religion.” I said: Messenger of Allah, we have believed in you and in what you brought — do you fear for us? He said: “Yes. Hearts are between two of the fingers of Allah; He turns them as He wills.” (al-Tirmidhi 2140; Ahmad 12107, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 7,
     includedInCore: true,
@@ -170,6 +186,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء النبي ﷺ، رواه عبد الله بن عمرو رضي الله عنهما. صحيح مسلم 2655.",
     hadithText:
       "عن عبد الله بن عمرو بن العاص رضي الله عنهما أنه سمع رسول الله ﷺ يقول: «إن قلوب بني آدم كلها بين إصبعين من أصابع الرحمن، كقلب واحد، يصرفه حيث يشاء»، ثم قال رسول الله ﷺ: «اللهم مصرف القلوب صرف قلوبنا على طاعتك». (أخرجه مسلم 2655).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Amr ibn al-‘As (may Allah be pleased with them both) heard the Messenger of Allah ﷺ say: “The hearts of the children of Adam are all between two of the fingers of the Most Merciful, as one heart; He directs them as He wills.” Then the Messenger of Allah ﷺ said: “O Allah, Director of hearts, direct our hearts to Your obedience.” (Muslim 2655.)",
     category: "comprehensive_duas",
     orderIndex: 8,
     includedInCore: true,
@@ -190,6 +208,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من الأدعية النبوية الجامعة. صحيح مسلم 2722.",
     hadithText:
       "عن زيد بن أرقم رضي الله عنه قال: لا أقول لكم إلا كما كان رسول الله ﷺ يقول؛ كان يقول: «اللهم إني أعوذ بك من العجز والكسل، والجبن والبخل، والهرم وعذاب القبر، اللهم آت نفسي تقواها، وزكها أنت خير من زكاها، أنت وليها ومولاها، اللهم إني أعوذ بك من علم لا ينفع، ومن قلب لا يخشع، ومن نفس لا تشبع، ومن دعوة لا يستجاب لها». (أخرجه مسلم 2722).",
+    hadithTextEnglish:
+      "Zayd ibn Arqam (may Allah be pleased with him) said: I will say to you only what the Messenger of Allah ﷺ used to say. He would say: “O Allah, I seek refuge in You from incapacity and idleness, from cowardice and miserliness, from decrepitude and the punishment of the grave. O Allah, give my soul its mindfulness of You and purify it — You are the best of those who purify it; You are its Guardian and its Protector. O Allah, I seek refuge in You from knowledge that does not benefit, from a heart that is not humbled, from a soul that is never satisfied, and from a supplication that is not answered.” (Muslim 2722.)",
     category: "comprehensive_duas",
     orderIndex: 9,
     includedInCore: true,
@@ -209,6 +229,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء النبي ﷺ. صحيح مسلم 2720.",
     hadithText:
       "عن أبي هريرة رضي الله عنه قال: كان رسول الله ﷺ يقول: «اللهم أصلح لي ديني الذي هو عصمة أمري، وأصلح لي دنياي التي فيها معاشي، وأصلح لي آخرتي التي فيها معادي، واجعل الحياة زيادة لي في كل خير، واجعل الموت راحة لي من كل شر». (أخرجه مسلم 2720).",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Messenger of Allah ﷺ used to say: “O Allah, set right for me my religion, which is the safeguard of my affairs; set right for me my worldly life, in which is my living; set right for me my hereafter, to which is my return. Make life an increase for me in every good, and make death a rest for me from every evil.” (Muslim 2720.)",
     category: "comprehensive_duas",
     orderIndex: 10,
     includedInCore: true,
@@ -228,6 +250,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "لم يكن النبي ﷺ يترك هذا الدعاء صباحًا ولا مساءً. سنن أبي داود 5074، صحيح.",
     hadithText:
       "عن عبد الله بن عمر رضي الله عنهما قال: لم يكن رسول الله ﷺ يدع هؤلاء الدعوات حين يمسي وحين يصبح: «اللهم إني أسألك العافية في الدنيا والآخرة، اللهم إني أسألك العفو والعافية في ديني ودنياي وأهلي ومالي، اللهم استر عوراتي وآمن روعاتي، اللهم احفظني من بين يدي ومن خلفي وعن يميني وعن شمالي ومن فوقي، وأعوذ بعظمتك أن أغتال من تحتي». (أخرجه أبو داود 5074، وابن ماجه 3871، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: The Messenger of Allah ﷺ never left these supplications, evening and morning: “O Allah, I ask You for wellbeing in this world and the next. O Allah, I ask You for pardon and wellbeing in my religion, my worldly life, my family and my property. O Allah, conceal my faults and calm my fears. O Allah, guard me from before me and behind me, from my right and my left and from above me; and I seek refuge in Your greatness from being taken unawares from beneath me.” (Abu Dawud 5074; Ibn Majah 3871, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 11,
     includedInCore: true,
@@ -247,6 +271,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "وصف في الرواية بأنه من أدعية المكروب. سنن أبي داود 5090، وإسناده حسن في تقييم الألباني المعروض بالمصدر.",
     hadithText:
       "عن أبي بكرة نفيع بن الحارث رضي الله عنه، أن رسول الله ﷺ قال: «دعوات المكروب: اللهم رحمتك أرجو فلا تكلني إلى نفسي طرفة عين، وأصلح لي شأني كله لا إله إلا أنت». (أخرجه أبو داود 5090، وأحمد 20430، وحسنه الألباني).",
+    hadithTextEnglish:
+      "Abu Bakrah Nufay‘ ibn al-Harith (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “The supplications of one in distress: O Allah, it is Your mercy I hope for, so do not entrust me to myself for the blink of an eye; set right all my affairs. There is no god but You.” (Abu Dawud 5090; Ahmad 20430, graded hasan by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 12,
     includedInCore: true,
@@ -265,6 +291,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يدعو به، وعلّمه لمن أثقلته الهموم والديون. صحيح البخاري 6369.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه قال: كنت أخدم رسول الله ﷺ إذا نزل، فكنت أسمعه يكثر أن يقول: «اللهم إني أعوذ بك من الهم والحزن، والعجز والكسل، والبخل والجبن، وضلع الدين، وغلبة الرجال». (أخرجه البخاري 6369).",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: I used to serve the Messenger of Allah ﷺ when he halted, and I would hear him say often: “O Allah, I seek refuge in You from anxiety and grief, from incapacity and idleness, from miserliness and cowardice, from the burden of debt and from being overpowered by men.” (al-Bukhari 6369.)",
     category: "comprehensive_duas",
     orderIndex: 13,
     includedInCore: true,
@@ -283,6 +311,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء النبي ﷺ. صحيح مسلم 2739.",
     hadithText:
       "عن عبد الله بن عمر رضي الله عنهما قال: كان من دعاء رسول الله ﷺ: «اللهم إني أعوذ بك من زوال نعمتك، وتحول عافيتك، وفجاءة نقمتك، وجميع سخطك». (أخرجه مسلم 2739).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: Among the supplications of the Messenger of Allah ﷺ was: “O Allah, I seek refuge in You from the passing away of Your favour, from the turning away of the wellbeing You grant, from the suddenness of Your retribution, and from all that brings Your displeasure.” (Muslim 2739.)",
     category: "comprehensive_duas",
     orderIndex: 14,
     includedInCore: true,
@@ -301,6 +331,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يتعوذ من هذه الأربع. صحيح البخاري 6347.",
     hadithText:
       "عن أبي هريرة رضي الله عنه قال: كان رسول الله ﷺ يتعوذ من جهد البلاء، ودرك الشقاء، وسوء القضاء، وشماتة الأعداء. (أخرجه البخاري 6347، ومسلم 2707).",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Messenger of Allah ﷺ used to seek refuge from the strain of affliction, from being overtaken by misery, from an evil decree, and from the gloating of enemies. (al-Bukhari 6347; Muslim 2707.)",
     category: "comprehensive_duas",
     orderIndex: 15,
     includedInCore: true,
@@ -320,6 +352,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "علّمه النبي ﷺ لعائشة رضي الله عنها. سنن ابن ماجه 3846، مصنف صحيح في المصدر.",
     hadithText:
       "عن عائشة رضي الله عنها، أن رسول الله ﷺ علمها هذا الدعاء: «اللهم إني أسألك من الخير كله عاجله وآجله ما علمت منه وما لم أعلم، وأعوذ بك من الشر كله عاجله وآجله ما علمت منه وما لم أعلم، اللهم إني أسألك من خير ما سألك عبدك ونبيك، وأعوذ بك من شر ما عاذ به عبدك ونبيك، اللهم إني أسألك الجنة وما قرب إليها من قول أو عمل، وأعوذ بك من النار وما قرب إليها من قول أو عمل، وأسألك أن تجعل كل قضاء قضيته لي خيرا». (أخرجه ابن ماجه 3846، وأحمد 25019، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that the Messenger of Allah ﷺ taught her this supplication: “O Allah, I ask You for all good, its near and its distant, what I know of it and what I do not know; and I seek refuge in You from all evil, its near and its distant, what I know of it and what I do not know. O Allah, I ask You for the good that Your servant and Your Prophet asked You for, and I seek refuge in You from the evil that Your servant and Your Prophet sought refuge from. O Allah, I ask You for Paradise and for what brings one near to it in word or deed, and I seek refuge in You from the Fire and from what brings one near to it in word or deed. And I ask You to make every decree You decree for me good.” (Ibn Majah 3846; Ahmad 25019, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 16,
     includedInCore: true,
@@ -340,6 +374,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء سمعه عمار بن ياسر رضي الله عنه من النبي ﷺ في الصلاة. سنن النسائي 1305، حسن.",
     hadithText:
       "عن عمار بن ياسر رضي الله عنه أنه صلى صلاة فأوجز فيها، فقالوا له: خففت أو أوجزت الصلاة؟ فقال: أما إنه على ذلك قد دعوت فيها بدعوات سمعتهن من رسول الله ﷺ، فلما قام تبعه رجل فسأله عن الدعاء ثم جاء فأخبر القوم به: «اللهم بعلمك الغيب وقدرتك على الخلق أحيني ما علمت الحياة خيرا لي وتوفني إذا علمت الوفاة خيرا لي، اللهم وأسألك خشيتك في الغيب والشهادة، وكلمة الحق في الرضا والغضب، والقصد في الفقر والغنى، ونعيما لا ينفد، وقرة عين لا تنقطع، والرضا بعد القضاء، وبرد العيش بعد الموت، ولذة النظر إلى وجهك والشوق إلى لقائك في غير ضراء مضرة ولا فتنة مضلة، اللهم زينا بزينة الإيمان واجعلنا هداة مهتدين». (أخرجه النسائي 1305، وأحمد 18325، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘Ammar ibn Yasir (may Allah be pleased with him) prayed a prayer and kept it brief. They said to him: You made the prayer light, or brief. He said: Even so, I supplicated in it with supplications I heard from the Messenger of Allah ﷺ. When he rose, a man followed him and asked him about the supplication, then came and told the people of it: “O Allah, by Your knowledge of the unseen and Your power over creation, keep me alive as long as You know life is better for me, and take me when You know death is better for me. O Allah, I ask You for awe of You in private and in public, for a word of truth in contentment and in anger, for moderation in poverty and in wealth, for a delight that does not end, for a comfort of the eye that is not cut off, for contentment after the decree, for coolness of life after death, for the sweetness of looking upon Your face and the longing to meet You — without any harm that injures or trial that leads astray. O Allah, adorn us with the adornment of faith, and make us guides who are guided.” (al-Nasa’i 1305; Ahmad 18325, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 17,
     includedInCore: true,
@@ -360,6 +396,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "حديث شداد بن أوس رضي الله عنه في السلسلة الصحيحة برقم 3228 وموقع الدرر السنية.",
     hadithText:
       "عن شداد بن أوس رضي الله عنه قال: قال لي رسول الله ﷺ: «يا شداد بن أوس، إذا رأيت الناس قد اكتنزوا الذهب والفضة، فاكنز هؤلاء الكلمات: اللهم إني أسألك الثبات في الأمر، والعزيمة على الرشد، وأسألك شكر نعمتك، وحسن عبادتك، وأسألك لسانًا صادقًا، وقلبًا سليمًا، وأسألك من خير ما تعلم، وأعوذ بك من شر ما تعلم، وأستغفرك لما تعلم، إنك أنت علام الغيوب». (أخرجه النسائي 1304، وأحمد 17114، والطبراني في الكبير 7135، وصححه الألباني في السلسلة الصحيحة 3228).",
+    hadithTextEnglish:
+      "Shaddad ibn Aws (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “Shaddad ibn Aws, when you see people hoarding gold and silver, hoard these words: O Allah, I ask You for steadfastness in my affair and resolve upon right guidance. I ask You for gratitude for Your favour and for the good worship of You. I ask You for a truthful tongue and a sound heart. I ask You for the good of what You know, I seek refuge in You from the evil of what You know, and I seek Your forgiveness for what You know — You are the Knower of all that is hidden.” (al-Nasa’i 1304; Ahmad 17114; al-Tabarani in al-Kabir 7135, graded sahih by al-Albani in al-Silsilah al-Sahihah 3228.)",
     category: "comprehensive_duas",
     orderIndex: 18,
     includedInCore: true,
@@ -376,7 +414,9 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic:
       "قالها رجل في صلاته، فأقرّه النبي ﷺ وقال إن أدعيته وأدعية معاذ تدور حول طلب الجنة والنجاة من النار. سنن أبي داود 792، صحيح.",
     hadithText:
-      "عن بعض أصحاب النبي ﷺ أن النبي ﷺ قال لرجل: «كيف تقول في الصلاة؟»، قال: أتأهد وأقول: اللهم إني أسألك الجنة، وأعوذ بك من النار، أما إني لا أحسن دندنتك ولا دندنة معاذ، فقال النبي ﷺ: «حولها ندندن». (أخرجه أبو داود 792، وابن ماجه 910، وصححه الألباني).",
+      "عن بعض أصحاب النبي ﷺ أن النبي ﷺ قال لرجل: «كيف تقول في الصلاة؟»، قال: أتشهد وأقول: اللهم إني أسألك الجنة، وأعوذ بك من النار، أما إني لا أحسن دندنتك ولا دندنة معاذ، فقال النبي ﷺ: «حولها ندندن». (أخرجه أبو داود 792، وابن ماجه 910، وصححه الألباني).",
+    hadithTextEnglish:
+      "One of the Companions of the Prophet ﷺ reported that the Prophet ﷺ said to a man: “What do you say in the prayer?” He said: I recite the testification and then say: O Allah, I ask You for Paradise and seek refuge in You from the Fire. I cannot murmur as well as you or as Mu‘adh. The Prophet ﷺ said: “It is around those two that we murmur.” (Abu Dawud 792; Ibn Majah 910, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 19,
     includedInCore: true,
@@ -397,6 +437,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "هو دعاء يونس عليه السلام في بطن الحوت، وأخبر النبي ﷺ أن المسلم لا يدعو به في حاجة إلا استجاب الله له. جامع الترمذي 3505، صحيح.",
     hadithText:
       "عن سعد بن أبي وقاص رضي الله عنه قال: قال رسول الله ﷺ: «دعوة ذي النون إذ دعا وهو في بطن الحوت: لا إله إلا أنت سبحانك إني كنت من الظالمين، إنه لم يدعُ بها رجل مسلم في شيء قط إلا استجاب الله له». (أخرجه الترمذي 3505، وأحمد 1465، وصححه الألباني).",
+    hadithTextEnglish:
+      "Sa‘d ibn Abi Waqqas (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “The supplication of Dhu al-Nun when he called upon Allah from within the belly of the whale: There is no god but You; glory be to You; I was indeed among the wrongdoers. No Muslim man ever supplicates with it for anything but that Allah answers him.” (al-Tirmidhi 3505; Ahmad 1465, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 20,
     includedInCore: true,
@@ -416,6 +458,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من أدعية النبي ﷺ الجامعة في الاستغفار. صحيح البخاري 6398.",
     hadithText:
       "عن أبي موسى الأشعري رضي الله عنه، عن النبي ﷺ أنه كان يدعو بهذا الدعاء: «اللهم اغفر لي خطيئتي وجهلي، وإسرافي في أمري، وما أنت أعلم به مني، اللهم اغفر لي جدي وهزلي، وخطئي وعمدي، وكل ذلك عندي، اللهم اغفر لي ما قدمت وما أخرت، وما أسررت وما أعلنت، وما أنت أعلم به مني، أنت المقدم وأنت المؤخر، وأنت على كل شيء قدير». (أخرجه البخاري 6398، ومسلم 2719).",
+    hadithTextEnglish:
+      "Abu Musa al-Ash‘ari (may Allah be pleased with him) reported that the Prophet ﷺ used to make this supplication: “O Allah, forgive me my error and my ignorance, my excess in my affairs, and what You know better than I. O Allah, forgive me what I did in earnest and in jest, by mistake and deliberately — and all of that is in me. O Allah, forgive me what I have sent ahead and what I have left behind, what I concealed and what I made known, and what You know better than I. You are the One who brings forward and the One who puts back, and You are capable of all things.” (al-Bukhari 6398; Muslim 2719.)",
     category: "comprehensive_duas",
     orderIndex: 21,
     includedInCore: false,
@@ -433,6 +477,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يقوله في السجود. صحيح مسلم 483.",
     hadithText:
       "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ كان يقول في سجوده: «اللهم اغفر لي ذنبي كله، دقه وجله، وأوله وآخره، وعلانيته وسره». (أخرجه مسلم 483).",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ used to say in his prostration: “O Allah, forgive me all my sin — the small of it and the great, the first of it and the last, the open of it and the hidden.” (Muslim 483.)",
     category: "comprehensive_duas",
     orderIndex: 22,
     includedInCore: false,
@@ -452,6 +498,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من الدعاء الذي كان النبي ﷺ يقوله. صحيح البخاري 6365.",
     hadithText:
       "عن مصعب بن سعد بن أبي وقاص رضي الله عنه قال: كان سعد يعلم بنيه هؤلاء الكلمات كما يعلم المعلم الغلمان الكتاب، ويقول: إن رسول الله ﷺ كان يتعوذ بهن دبر الصلاة: «اللهم إني أعوذ بك من البخل، وأعوذ بك من الجبن، وأعوذ بك أن أرد إلى أرذل العمر، وأعوذ بك من فتنة الدنيا، وأعوذ بك من عذاب القبر». (أخرجه البخاري 6365).",
+    hadithTextEnglish:
+      "Mus‘ab ibn Sa‘d ibn Abi Waqqas (may Allah be pleased with him) said: Sa‘d used to teach his sons these words as a teacher teaches boys to write, and he would say: The Messenger of Allah ﷺ used to seek refuge with them at the end of the prayer: “O Allah, I seek refuge in You from miserliness; I seek refuge in You from cowardice; I seek refuge in You from being returned to the feeblest age; I seek refuge in You from the trial of this world; and I seek refuge in You from the punishment of the grave.” (al-Bukhari 6365.)",
     category: "comprehensive_duas",
     orderIndex: 23,
     includedInCore: false,
@@ -472,6 +520,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "النص الكامل من دعاء النبي ﷺ الوارد في صحيح البخاري 6368.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان يدعو بهؤلاء الكلمات: «اللهم إني أعوذ بك من الكسل والهرم، والمأثم والمغرم، ومن فتنة القبر وعذاب القبر، ومن فتنة النار وعذاب النار، ومن شر فتنة الغنى، وأعوذ بك من فتنة الفقر، وأعوذ بك من فتنة المسيح الدجال، اللهم اغسل عني خطاياي بماء الثلج والبرد، ونق قلبي من الخطايا كما نقيت الثوب الأبيض من الدنس، وباعد بيني وبين خطاياي كما باعدت بين المشرق والمغرب». (أخرجه البخاري 6368، ومسلم 589).",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that the Prophet ﷺ used to supplicate with these words: “O Allah, I seek refuge in You from idleness and decrepitude, from sin and debt, from the trial of the grave and the punishment of the grave, from the trial of the Fire and the punishment of the Fire, and from the evil of the trial of wealth; and I seek refuge in You from the trial of poverty; and I seek refuge in You from the trial of the false messiah. O Allah, wash away my sins with the water of snow and hail, cleanse my heart of sins as a white garment is cleansed of filth, and put between me and my sins the distance You have put between the east and the west.” (al-Bukhari 6368; Muslim 589.)",
     category: "comprehensive_duas",
     orderIndex: 24,
     includedInCore: false,
@@ -490,6 +540,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يقوله بعد تكبيرة الإحرام وقبل القراءة في الصلاة. صحيح البخاري 744.",
     hadithText:
       "عن أبي هريرة رضي الله عنه قال: كان رسول الله ﷺ يسكت بين التكبير وبين القراءة إسكاتة، فقلت: بأبي أنت وأمي يا رسول الله، أرأيت سكوتك بين التكبير والقراءة ما تقول؟ قال: «أقول: اللهم باعد بيني وبين خطاياي كما باعدت بين المشرق والمغرب، اللهم نقني من الخطايا كما ينقى الثوب الأبيض من الدنس، اللهم اغسل خطاياي بالماء والثلج والبرد». (أخرجه البخاري 744، ومسلم 598).",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Messenger of Allah ﷺ would pause briefly between the opening magnification and the recitation. I said: May my father and mother be your ransom, Messenger of Allah — what do you say in your pause between the magnification and the recitation? He said: “I say: O Allah, put between me and my sins the distance You have put between the east and the west. O Allah, cleanse me of sins as a white garment is cleansed of filth. O Allah, wash away my sins with water, snow and hail.” (al-Bukhari 744; Muslim 598.)",
     category: "comprehensive_duas",
     orderIndex: 25,
     includedInCore: false,
@@ -508,6 +560,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "من دعاء النبي ﷺ. صحيح مسلم 2716.",
     hadithText:
       "عن فروة بن نوفل الأشجعي قال: سألت عائشة رضي الله عنها عما كان رسول الله ﷺ يدعو به الله، فقالت: كان يقول: «اللهم إني أعوذ بك من شر ما عملت، ومن شر ما لم أعمل». (أخرجه مسلم 2716).",
+    hadithTextEnglish:
+      "Farwah ibn Nawfal al-Ashja‘i said: I asked ‘A’ishah (may Allah be pleased with her) what the Messenger of Allah ﷺ used to supplicate to Allah with. She said: He used to say: “O Allah, I seek refuge in You from the evil of what I have done and from the evil of what I have not done.” (Muslim 2716.)",
     category: "comprehensive_duas",
     orderIndex: 26,
     includedInCore: false,
@@ -528,6 +582,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "دعاء ثابت عن النبي ﷺ. صحيح مسلم 2717.",
     hadithText:
       "عن عبد الله بن عباس رضي الله عنهما، أن رسول الله ﷺ كان يقول: «اللهم لك أسلمت، وبك آمنت، وعليك توكلت، وإليك أنبت، وبك خاصمت، اللهم إني أعوذ بعزتك، لا إله إلا أنت، أن تضلني، أنت الحي الذي لا يموت، والجن والإنس يموتون». (أخرجه البخاري 7383، ومسلم 2717).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Abbas (may Allah be pleased with them both) reported that the Messenger of Allah ﷺ used to say: “O Allah, to You I have submitted, in You I have believed, upon You I have relied, to You I have turned, and by You I have contended. O Allah, I seek refuge in Your might — there is no god but You — that You let me go astray. You are the Ever-Living who does not die, while the jinn and mankind die.” (al-Bukhari 7383; Muslim 2717.)",
     category: "comprehensive_duas",
     orderIndex: 27,
     includedInCore: false,
@@ -547,6 +603,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "كان النبي ﷺ يفتتح به صلاة الليل. صحيح مسلم 770.",
     hadithText:
       "عن عائشة أم المؤمنين رضي الله عنها أنها سئلت: بأي شيء كان نبي الله ﷺ يفتتح صلاته إذا قام من الليل؟ قالت: كان إذا قام من الليل افتتح صلاته: «اللهم رب جبرائيل وميكائيل وإسرافيل، فاطر السماوات والأرض، عالم الغيب والشهادة، أنت تحكم بين عبادك فيما كانوا فيه يختلفون، اهدني لما اختلف فيه من الحق بإذنك، إنك تهدي من تشاء إلى صراط مستقيم». (أخرجه مسلم 770).",
+    hadithTextEnglish:
+      "‘A’ishah, the Mother of the Believers (may Allah be pleased with her), was asked: With what did the Prophet of Allah ﷺ open his prayer when he rose at night? She said: When he rose at night he would open his prayer with: “O Allah, Lord of Jibril, Mika’il and Israfil, Originator of the heavens and the earth, Knower of the unseen and the seen — You judge between Your servants concerning that in which they differ. Guide me by Your leave to the truth in what is disputed; You guide whom You will to a straight path.” (Muslim 770.)",
     category: "comprehensive_duas",
     orderIndex: 28,
     includedInCore: false,
@@ -567,6 +625,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "قاله النبي ﷺ في سجوده ليلًا. صحيح مسلم 486.",
     hadithText:
       "عن عائشة رضي الله عنها قالت: فقدت رسول الله ﷺ ليلة من الفراش فالتمسته فوقعت يدي على أخمص قدميه وهو في المسجد وهما منصوبتان وهو يقول: «اللهم إني أعوذ برضاك من سخطك، وبمعافاتك من عقوبتك، وأعوذ بك منك لا أحصي ثناء عليك أنت كما أثنيت على نفسك». (أخرجه مسلم 486).",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: One night I missed the Messenger of Allah ﷺ from the bed and searched for him, and my hand fell upon the soles of his feet as he was in the place of prayer, with them upright, saying: “O Allah, I seek refuge in Your pleasure from Your displeasure, and in Your pardon from Your punishment, and I seek refuge in You from You. I cannot count Your praise; You are as You have praised Yourself.” (Muslim 486.)",
     category: "comprehensive_duas",
     orderIndex: 29,
     includedInCore: false,
@@ -586,6 +646,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "ورد ضمن دعاء النبي ﷺ في قيام الليل وعند توجهه إلى صلاة الفجر. صحيح مسلم 763.",
     hadithText:
       "عن عبد الله بن عباس رضي الله عنهما قال: بت عند خالتي ميمونة، فقام النبي ﷺ من الليل فأتى طهوره ثم قام فصلى، فقام إلى جنبه الأيسر فأخذ بأذني فجعلني عن يمينه، فصلى ثلاث عشرة ركعة، ثم نام حتى نفخ، وكان إذا نام نفخ، فآذنه بلال بالصلاة فصلى ولم يتوضأ، وكان في دعائه: «اللهم اجعل في قلبي نورا، وفي لساني نورا، وفي سمعي نورا، وفي بصري نورا، ومن فوقي نورا، ومن تحتي نورا، وعن يميني نورا، وعن شمالي نورا، ومن أمامي نورا، ومن خلفي نورا، واجعل في نفسي نورا، وأعظم لي نورا». (أخرجه البخاري 6316، ومسلم 763).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Abbas (may Allah be pleased with them both) said: I spent a night at the house of my aunt Maymunah. The Prophet ﷺ rose in the night, went to his water for purification, then stood and prayed. I stood at his left side, so he took me by my ear and placed me on his right. He prayed thirteen cycles, then slept until he breathed audibly — and he used to breathe audibly when he slept — then Bilal called him to the prayer, and he prayed without renewing his ablution. Among his supplications was: “O Allah, place light in my heart, light in my tongue, light in my hearing, light in my sight, light above me, light below me, light on my right, light on my left, light before me, light behind me; place light in my soul, and make my light great.” (al-Bukhari 6316; Muslim 763.)",
     category: "comprehensive_duas",
     orderIndex: 30,
     includedInCore: false,
@@ -606,6 +668,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "علّمه النبي ﷺ لأبي بكر رضي الله عنه ليقوله صباحًا ومساءً وعند النوم.",
     hadithText:
       "عن أبي بكر الصديق رضي الله عنه أنه قال: يا رسول الله مرني بشيء أقوله إذا أصبحت وإذا أمسيت، قال: «قل: اللهم فاطر السماوات والأرض عالم الغيب والشهادة رب كل شيء ومليكه، أشهد أن لا إله إلا أنت، أعوذ بك من شر نفسي ومن شر الشيطان وشِركه، وأن أقترف على نفسي سوءًا أو أجرَّه إلى مسلم»، قال: «قلها إذا أصبحت، وإذا أمسيت، وإذا أخذت مضجعك». (أخرجه الترمذي 3529، وأبو داود 5067، وصححه الألباني).",
+    hadithTextEnglish:
+      "Abu Bakr al-Siddiq (may Allah be pleased with him) said: Messenger of Allah, instruct me with something to say when I rise in the morning and when I reach the evening. He said: “Say: O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord of everything and its Sovereign — I bear witness that there is no god but You. I seek refuge in You from the evil of my own self, from the evil of Satan and his associating, and from bringing evil upon myself or drawing it upon a Muslim.” He said: “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.” (al-Tirmidhi 3529; Abu Dawud 5067, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 31,
     includedInCore: false,
@@ -626,6 +690,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "ورد أنه يقال ثلاث مرات صباحًا وثلاثًا مساءً. سنن أبي داود 5090، إسناده حسن بحسب الحكم المعروض في المصدر.",
     hadithText:
       "عن عبد الرحمن بن أبي بكرة أنه قال لأبيه: يا أبت، إني أسمعك تدعو كل غداة: اللهم عافني في بدني، اللهم عافني في سمعي، اللهم عافني في بصري، لا إله إلا أنت، تعيدها ثلاثًا حين تصبح، وثلاثًا حين تمسي، فقال: إني سمعت رسول الله ﷺ يدعو بهن فأنا أحب أن أستن بسنته. (أخرجه أبو داود 5090، وأحمد 20430، وحسنه الألباني).",
+    hadithTextEnglish:
+      "‘Abd al-Rahman ibn Abi Bakrah said to his father: Father, I hear you supplicate every morning: O Allah, grant me wellbeing in my body; O Allah, grant me wellbeing in my hearing; O Allah, grant me wellbeing in my sight; there is no god but You — repeating it three times in the morning and three times in the evening. He said: I heard the Messenger of Allah ﷺ supplicate with them, and I love to follow his way. (Abu Dawud 5090; Ahmad 20430, graded hasan by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 32,
     includedInCore: false,
@@ -645,6 +711,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "علّمه علي رضي الله عنه لرجل أثقله الدَّين، وقال إن النبي ﷺ علّمه إياه. جامع الترمذي 3563، حسن.",
     hadithText:
       "عن علي بن أبي طالب رضي الله عنه أن مكاتبًا جاءه فقال: إني قد عجزت عن كتابتي فأعني، قال: ألا أعلمك كلمات علمنيهن رسول الله ﷺ لو كان عليك مثل جبل صبير دينًا أداه الله عنك؟ قال: «قل: اللهم اكفني بحلالك عن حرامك، وأغنني بفضلك عمن سواك». (أخرجه الترمذي 3563، وأحمد 1319، وحسنه الألباني).",
+    hadithTextEnglish:
+      "‘Ali ibn Abi Talib (may Allah be pleased with him) was approached by a man under a contract of manumission who said: I am unable to meet my payment, so help me. He said: Shall I not teach you words the Messenger of Allah ﷺ taught me, by which Allah would settle your debt for you even were it like the mountain of Sabir? “Say: O Allah, suffice me with what You have made lawful against what You have forbidden, and enrich me by Your bounty so that I need none besides You.” (al-Tirmidhi 3563; Ahmad 1319, graded hasan by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 33,
     includedInCore: false,
@@ -665,7 +733,9 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic:
       "كان النبي ﷺ يدعو به. جامع الترمذي 3551، ووصفه الترمذي بأنه حسن صحيح، وصنّف صحيحًا في المصدر.",
     hadithText:
-      "عن عبد الله بن عباس رضي الله عنهما قال: كان النبي ﷺ يدعو يقول: «رب أعني ولا تعن علي، وانصرني ولا تنصر علي، وامكر لي ولا تمكر علي، واهدني ويسر الهدى إلي، وانصرني على من بغى علي، رب اجعلني لك شكارًا، لك ذكارًا، لك رهاربًا، لك مطواعًا، لك مخبتًا، إليك أوّاهًا منيبًا، رب تقبل توبتي، واغسل حوبتي، وأجب دعوتي، وثبت حجتي، واهد قلبي، وسدد لساني، واسلل سخيمة صدري». (أخرجه الترمذي 3551، وأبو داود 1510، وصححه الألباني).",
+      "عن عبد الله بن عباس رضي الله عنهما قال: كان النبي ﷺ يدعو يقول: «رب أعني ولا تعن علي، وانصرني ولا تنصر علي، وامكر لي ولا تمكر علي، واهدني ويسر الهدى إلي، وانصرني على من بغى علي، رب اجعلني لك شكارًا، لك ذكارًا، لك رَهَّابًا، لك مطواعًا، لك مخبتًا، إليك أوّاهًا منيبًا، رب تقبل توبتي، واغسل حوبتي، وأجب دعوتي، وثبت حجتي، واهد قلبي، وسدد لساني، واسلل سخيمة صدري». (أخرجه الترمذي 3551، وأبو داود 1510، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Abbas (may Allah be pleased with them both) said: The Prophet ﷺ used to supplicate: “My Lord, help me and do not help against me; grant me victory and do not grant victory over me; plan for me and do not plan against me; guide me and make guidance easy for me; and help me against whoever transgresses against me. My Lord, make me much-thanking of You, much-remembering of You, much-fearing of You, much-obedient to You, humble before You, turning to You in penitence. My Lord, accept my repentance, wash away my sin, answer my supplication, make my proof firm, guide my heart, make my tongue true, and draw out the rancour of my breast.” (al-Tirmidhi 3551; Abu Dawud 1510, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 34,
     includedInCore: false,
@@ -684,6 +754,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
       "علّمه النبي ﷺ لعائشة رضي الله عنها لتقوله في ليلة القدر. وهو دعاء صحيح عام المعنى، يجوز الدعاء به في الجمعة وغيرها، لكنه ليس مخصوصًا بيوم الجمعة. جامع الترمذي 3513، صحيح.",
     hadithText:
       "عن عائشة رضي الله عنها أنها قالت: يا رسول الله أرأيت إن علمت أي ليلة ليلة القدر ما أقول فيها؟ قال: «قولي: اللهم إنك عفو تحب العفو فاعف عني». (أخرجه الترمذي 3513، وابن ماجه 3850، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: Messenger of Allah, if I knew which night was the Night of Decree, what should I say in it? He said: “Say: O Allah, You are Pardoning and You love to pardon, so pardon me.” (al-Tirmidhi 3513; Ibn Majah 3850, graded sahih by al-Albani.)",
     category: "comprehensive_duas",
     orderIndex: 35,
     includedInCore: false,
@@ -702,6 +774,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "صحيح مسلم 2697ب.",
     hadithText:
       "عن طارق بن أشيم الأشجعي رضي الله عنه قال: كان الرجل إذا أسلم علّمه النبي ﷺ الصلاة، ثم أمره أن يدعو بهذه الكلمات: «اللهم اغفر لي، وارحمني، واهدني، وعافني، وارزقني». (أخرجه مسلم 2697).",
+    hadithTextEnglish:
+      "Tariq ibn Ashyam al-Ashja‘i (may Allah be pleased with him) said: When a man accepted Islam, the Prophet ﷺ would teach him the prayer, then instruct him to supplicate with these words: “O Allah, forgive me, have mercy on me, guide me, grant me wellbeing, and provide for me.” (Muslim 2697.)",
     sourceUrl: "https://sunnah.com/muslim%3A2697b",
     attributionType: "taught_by_prophet",
     category: "comprehensive_duas",
@@ -724,6 +798,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "سنن ابن ماجه 3857؛ صحيح بحسب تصنيف دار السلام.",
     hadithText:
       "عن بريدة بن الحصيب رضي الله عنه، أن رسول الله ﷺ سمع رجلًا يقول: اللهم إني أسألك بأني أشهد أنك أنت الله لا إله إلا أنت الأحد الصمد الذي لم يلد ولم يولد ولم يكن له كفوًا أحد، فقال رسول الله ﷺ: «لقد سأل الله باسمه الأعظم الذي إذا سئل به أعطى، وإذا دعي به أجاب». (أخرجه أبو داود 1493، والترمذي 3475، وابن ماجه 3857، وصححه الألباني).",
+    hadithTextEnglish:
+      "Buraydah ibn al-Husayb (may Allah be pleased with him) reported that the Messenger of Allah ﷺ heard a man say: O Allah, I ask You by my bearing witness that You are Allah, there is no god but You, the One, the Eternal Refuge, who neither begets nor is begotten, and to whom none is equal. The Messenger of Allah ﷺ said: “He has asked Allah by His greatest name, by which when He is asked He gives, and when He is called upon He answers.” (Abu Dawud 1493; al-Tirmidhi 3475; Ibn Majah 3857, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/ibnmajah%3A3857",
     attributionType: "approved_by_prophet",
     category: "comprehensive_duas",
@@ -746,6 +822,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "سنن ابن ماجه 3858؛ حسن بحسب تصنيف دار السلام.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه أنه كان مع رسول الله ﷺ جالسًا ورجل يصلي ثم دعا: اللهم إني أسألك بأن لك الحمد لا إله إلا أنت المنان بديع السماوات والأرض يا ذا الجلال والإكرام يا حي يا قيوم، فقال النبي ﷺ: «لقد دعا الله باسمه العظيم الذي إذا دعي به أجاب، وإذا سئل به أعطى». (أخرجه أبو داود 1495، والترمذي 3544، وابن ماجه 3858، وصححه الألباني).",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) was sitting with the Messenger of Allah ﷺ while a man prayed and then supplicated: O Allah, I ask You, as Yours is all praise, there is no god but You, the Bestower, Originator of the heavens and the earth, O Possessor of majesty and honour, O Ever-Living, O Sustainer. The Prophet ﷺ said: “He has called upon Allah by His mighty name, by which when He is called upon He answers, and when He is asked He gives.” (Abu Dawud 1495; al-Tirmidhi 3544; Ibn Majah 3858, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/ibnmajah%3A3858",
     attributionType: "approved_by_prophet",
     category: "comprehensive_duas",
@@ -765,6 +843,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "صحيح مسلم 2725أ.",
     hadithText:
       "عن علي بن أبي طالب رضي الله عنه قال: قال لي رسول الله ﷺ: «قل: اللهم اهدني وسددني، واذكر بالهدى هدايتك الطريق، والسداد سداد السهم». (أخرجه مسلم 2725).",
+    hadithTextEnglish:
+      "‘Ali ibn Abi Talib (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “Say: O Allah, guide me and set me straight — and by guidance call to mind being guided on a road, and by straightness the straightness of an arrow.” (Muslim 2725.)",
     sourceUrl: "https://sunnah.com/muslim%3A2725a",
     attributionType: "taught_by_prophet",
     category: "comprehensive_duas",
@@ -786,6 +866,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "جامع الترمذي 3483؛ وصفه الترمذي بالحسن الغريب، بينما يظهر تصنيف دار السلام: ضعيف.",
     hadithText:
       "عن عمران بن حصين رضي الله عنهما، أن النبي ﷺ قال لأبيه حصين: «يا حصين كم تعبد اليوم إلهًا؟»، قال: سبعة: ستا في الأرض وواحدا في السماء، قال: «فأيهم تعد لرغبتك ورهبتك؟»، قال: الذي في السماء، قال: «يا حصين أما إنك لو أسلمت علمتك كلمتين تنفعانك»، فلما أسلم حصين قال: يا رسول الله علمني الكلمتين اللتين وعدتني، فقال: «قل: اللهم ألهمك رشدي، وأعذني من شر نفسي». (أخرجه الترمذي 3483، وقال: حديث حسن غريب).",
+    hadithTextEnglish:
+      "‘Imran ibn Husayn (may Allah be pleased with them both) reported that the Prophet ﷺ said to his father Husayn: “Husayn, how many gods do you worship today?” He said: Seven — six on earth and one in heaven. He said: “Which of them do you keep for your hope and your fear?” He said: The one in heaven. He said: “Husayn, were you to accept Islam I would teach you two words that would benefit you.” When Husayn accepted Islam he said: Messenger of Allah, teach me the two words you promised me. He said: “Say: O Allah, inspire me with right guidance, and protect me from the evil of my own self.” (al-Tirmidhi 3483, who said: a hasan gharib hadith.)",
     authenticityNote:
       "Grading differs on the cited page: Tirmidhi says Hasan Gharib; the displayed Darussalam classification is Da'if.",
     sourceUrl: "https://sunnah.com/tirmidhi%3A3483",
@@ -810,6 +892,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "جامع الترمذي 3490؛ حسن بحسب تصنيف دار السلام.",
     hadithText:
       "عن أبي الدرداء رضي الله عنه قال: قال رسول الله ﷺ: «كان من دعاء داود يقول: اللهم إني أسألك حبك، وحب من يحبك، والعمل الذي يبلغني حبك، اللهم اجعل حبك أحب إلي من نفسي وأهلي، ومن الماء البارد». (أخرجه الترمذي 3490، وقال: حديث حسن غريب).",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Among the supplications of Dawud was: O Allah, I ask You for Your love, for the love of those who love You, and for the deed that will bring me to Your love. O Allah, make Your love dearer to me than myself, than my family, and than cold water.” (al-Tirmidhi 3490, who said: a hasan gharib hadith.)",
     sourceUrl: "https://sunnah.com/tirmidhi%3A3490",
     attributionType: "reported_by_prophet_from_another_prophet",
     category: "comprehensive_duas",
@@ -831,6 +915,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "سنن أبي داود 1516؛ صحيح بحسب تصنيف الألباني.",
     hadithText:
       "عن عبد الله بن عمر رضي الله عنهما قال: إن كنا لنعد لرسول الله ﷺ في المجلس الواحد مائة مرة يقول: «رب اغفر لي وتب علي إنك أنت التواب الرحيم». (أخرجه أبو داود 1516، والترمذي 3434، وصححه الألباني).",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: We would count for the Messenger of Allah ﷺ in a single sitting a hundred times that he said: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Most Merciful.” (Abu Dawud 1516; al-Tirmidhi 3434, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/abudawud%3A1516",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",
@@ -853,6 +939,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "جامع الترمذي 3235؛ حسن بحسب تصنيف دار السلام.",
     hadithText:
       "عن معاذ بن جبل رضي الله عنه أن النبي ﷺ رأى ربه في المنام فقال له: يا محمد إذا صليت فقل: «اللهم إني أسألك فعل الخيرات، وترك المنكرات، وحب المساكين، وأن تغفر لي وترحمني، وإذا أردت فتنة قوم فتوفني غير مفتون، وأسألك حبك، وحب من يحبك، وحب عمل يقربني إلى حبك»، وقال رسول الله ﷺ: «إنها حق فادرسوها ثم تعلموها». (أخرجه الترمذي 3235، وأحمد 22109، وصححه الألباني).",
+    hadithTextEnglish:
+      "Mu‘adh ibn Jabal (may Allah be pleased with him) reported that the Prophet ﷺ saw his Lord in a dream, and He said to him: Muhammad, when you pray, say: “O Allah, I ask You for the doing of good deeds, the leaving of what is disliked, and the love of the poor; and that You forgive me and have mercy on me. And when You intend a trial for a people, take me to You untried. And I ask You for Your love, the love of those who love You, and the love of a deed that draws me near to Your love.” And the Messenger of Allah ﷺ said: “It is true, so study it and then learn it.” (al-Tirmidhi 3235; Ahmad 22109, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/tirmidhi%3A3235",
     attributionType: "taught_by_prophet",
     category: "comprehensive_duas",
@@ -875,6 +963,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     preferredTiming: "Recited after Fajr prayer.",
     hadithText:
       "عن أم سلمة رضي الله عنها، أن النبي ﷺ كان يقول إذا صلى الصبح حين يسلم: «اللهم إني أسألك علمًا نافعًا، ورزقًا طيبًا، وعملًا متقبلًا». (أخرجه ابن ماجه 925، وأحمد 26521، وصححه الألباني).",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) reported that when the Prophet ﷺ had prayed the dawn prayer, upon giving the closing greeting he would say: “O Allah, I ask You for beneficial knowledge, wholesome provision, and deeds that are accepted.” (Ibn Majah 925; Ahmad 26521, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/ibnmajah%3A925",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",
@@ -895,6 +985,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "جامع الترمذي 3591؛ صحيح بحسب تصنيف دار السلام.",
     hadithText:
       "عن زياد بن علاقة، عن عمه قطبة بن مالك رضي الله عنه قال: كان النبي ﷺ يقول: «اللهم إني أعوذ بك من منكرات الأخلاق، والأعمال، والأهواء». (أخرجه الترمذي 3591، وصححه الألباني).",
+    hadithTextEnglish:
+      "Ziyad ibn ‘Ilaqah reported from his uncle Qutbah ibn Malik (may Allah be pleased with him) that the Prophet ﷺ used to say: “O Allah, I seek refuge in You from reprehensible character, deeds and desires.” (al-Tirmidhi 3591, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/tirmidhi%3A3591",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",
@@ -916,6 +1008,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "سنن أبي داود 1554؛ صحيح بحسب تصنيف الألباني.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه أن النبي ﷺ كان يقول: «اللهم إني أعوذ بك من البرص، والجنون، والجذام، ومن سيئ الأسقام». (أخرجه أبو داود 1554، والنسائي 5493، وصححه الألباني).",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) reported that the Prophet ﷺ used to say: “O Allah, I seek refuge in You from leprosy, insanity, disfiguring disease, and from grievous illnesses.” (Abu Dawud 1554; al-Nasa’i 5493, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/abudawud%3A1554",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",
@@ -938,6 +1032,8 @@ const COMPREHENSIVE_DUA_DRAFTS: ZikrDraft[] = [
     sourceReferenceArabic: "سنن أبي داود 1544؛ صحيح بحسب تصنيف دار السلام.",
     hadithText:
       "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ كان يقول: «اللهم إني أعوذ بك من الفقر، والقلة، والذلة، وأعوذ بك من أن أظلم أو أظلم». (أخرجه أبو داود 1544، والنسائي 5460، وصححه الألباني).",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ used to say: “O Allah, I seek refuge in You from poverty, want and humiliation; and I seek refuge in You from wronging others or being wronged.” (Abu Dawud 1544; al-Nasa’i 5460, graded sahih by al-Albani.)",
     sourceUrl: "https://sunnah.com/abudawud%3A1544",
     attributionType: "said_by_prophet",
     category: "comprehensive_duas",

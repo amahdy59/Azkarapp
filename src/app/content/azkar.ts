@@ -983,7 +983,9 @@ const EVENING_AZKAR: ZikrDraft[] = [
     sourceReference: "Abu Dawud 4/323; At-Tirmidhi 5/465; Ibn Majah; Ahmad; Hisn al-Muslim 86.",
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
-      "\u0642\u0627\u0644 \ufdfa: \u00ab\u0645\u064e\u0627 \u0645\u0650\u0646\u0652 \u0639\u064e\u0628\u0652\u062f\u064d \u064a\u064e\u0642\u064f\u0648\u0644\u064f \u0641\u0650\u064a \u0635\u064e\u0628\u064e\u0627\u062d\u0650 \u0643\u064f\u0644\u0651\u0650 \u064a\u064e\u0648\u0652\u0645\u064d \u0648\u064e\u0645\u064e\u0633\u064e\u0627\u0621\u0650 \u0643\u064f\u0644\u0651\u0650 \u0644\u064e\u064a\u0652\u0644\u064e\u0629\u064d: \u0628\u0650\u0633\u0652\u0645\u0650 \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0627\u0644\u0651\u064e\u0630\u0650\u064a \u0644\u0627\u064e \u064a\u064e\u0636\u064f\u0631\u0651\u064f, لَمْ تُصِبْهُ فَجْأَةُ بَلَاءٍ حَتَّى يُصْبِحَ، وَمَنْ قَالَهَا حِينَ يُصْبِحُ ثَلَاثَ مَرَّاتٍ، لَمْ تُصِبْهُ فَجْأَةُ بَلَاءٍ حَتَّى يُمْسِيَ \u062b\u064e\u0644\u0627\u064e\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d \u0641\u064e\u064a\u064e\u0636\u064f\u0631\u0651\u064e\u0647\u064f \u0634\u064e\u064a\u0652\u0621\u064c\u00bb.",
+      "عَنْ عُثْمَانَ بْنِ عَفَّانَ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَا مِنْ عَبْدٍ يَقُولُ فِي صَبَاحِ كُلِّ يَوْمٍ وَمَسَاءِ كُلِّ لَيْلَةٍ: بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ، ثَلَاثَ مَرَّاتٍ، فَيَضُرَّهُ شَيْءٌ».",
+    hadithTextEnglish:
+      "‘Uthman ibn ‘Affan (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No servant says, on the morning of every day and the evening of every night: In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing — three times — and anything then harms him.”",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A86",
@@ -1626,6 +1628,8 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
     sourceReference: "Al-Bukhari 11/113; Muslim 4/2083; Hisn al-Muslim 1.",
     hadithText:
       "عَنْ حُذَيْفَةَ، وَأَبِي ذَرٍّ، رضى الله عنهما قَالاَ كَانَ رَسُولُ اللَّهِ صلى الله عليه وسلم إِذَا أَوَى إِلَى فِرَاشِهِ قَالَ: «بِاسْمِكَ اللَّهُمَّ أَحْيَا وَأَمُوتُ» وَإِذَا اسْتَيْقَظَ قَالَ: «الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ».",
+    hadithTextEnglish:
+      "Hudhayfah and Abu Dharr (may Allah be pleased with them both) said: When the Messenger of Allah ﷺ took to his bed he would say: “In Your name, O Allah, I die and I live”; and when he awoke he would say: “Praise be to Allah, who has given us life after causing us to die, and to Him is the resurrection.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1645,6 +1649,8 @@ const WAKING_UP_AZKAR: ZikrDraft[] = [
     sourceReference: "Al-Bukhari 3/39; Hisn al-Muslim 2.",
     hadithText:
       "عَنْ عُبَادَةَ بْنِ الصَّامِتِ رضي الله عنه عَنِ النَّبِيِّ ﷺ قَالَ: «مَنْ تَعَارَّ مِنَ اللَّيْلِ فَقَالَ: لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، الْحَمْدُ لِلَّهِ، وَسُبْحَانَ اللَّهِ، وَلَا إِلَهَ إِلَّا اللَّهُ، وَاللَّهُ أَكْبَرُ، وَلَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللَّهِ، ثُمَّ قَالَ: اللَّهُمَّ اغْفِرْ لِي أَوْ دَعَا، اسْتُجِيبَ لَهُ، فَإِنْ تَوَضَّأَ وَصَلَّى قُبِلَتْ صَلاَتُهُ».",
+    hadithTextEnglish:
+      "‘Ubadah ibn al-Samit (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “Whoever wakes in the night and says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. Praise be to Allah; glory be to Allah; there is no god but Allah; Allah is greatest; and there is no power and no strength except with Allah — then says: O Allah, forgive me, or makes some other supplication, he is answered. And if he performs ablution and prays, his prayer is accepted.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
 ];
@@ -1665,6 +1671,8 @@ const HOME_AZKAR: ZikrDraft[] = [
     sourceReference: "Abu Dawud 4/325; At-Tirmidhi 5/490; Hisn al-Muslim 15.",
     hadithText:
       "عَنْ أَنَسِ بْنِ مَالِكٍ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ قَالَ -يَعْنِي إِذَا خَرَجَ مِنْ بَيْتِهِ-: بِسْمِ اللَّهِ تَوَكَّلْتُ عَلَى اللَّهِ لاَ حَوْلَ وَلاَ قُوَّةَ إِلاَّ بِاللَّهِ، يُقَالُ لَهُ: كُفِيتَ وَوُقِيتَ وَهُدِيتَ، وَتَنَحَّى عَنْهُ الشَّيْطَانُ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Whoever says — meaning when he leaves his house — In the name of Allah, I rely upon Allah; there is no power and no strength except with Allah, it is said to him: You are sufficed, protected and guided; and Satan turns away from him.”",
     authenticityNote: "Sahih according to Al-Albani.",
   },
   {
@@ -1680,6 +1688,8 @@ const HOME_AZKAR: ZikrDraft[] = [
     sourceReference: "Abu Dawud 4/325; Hisn al-Muslim 16.",
     hadithText:
       "عَنْ أَبِي مَالِكٍ الأَشْعَرِيِّ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «إِذَا وَلَجَ الرَّجُلُ بَيْتَهُ فَلْيَقُلْ: اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَ الْمَوْلَجِ وَخَيْرَ الْمَخْرَجِ، بِسْمِ اللَّهِ وَلَجْنَا، وَبِسْمِ اللَّهِ خَرَجْنَا، وَعَلَى اللَّهِ رَبِّنَا تَوَكَّلْنَا، ثُمَّ لْيُسَلِّمْ عَلَى أَهْلِهِ».",
+    hadithTextEnglish:
+      "Abu Malik al-Ash‘ari (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “When a man enters his house, let him say: O Allah, I ask You for the best of entrances and the best of exits. In the name of Allah we enter, and in the name of Allah we leave, and upon Allah our Lord we rely. Then let him greet his family with peace.”",
     authenticityNote: "Hasan according to Al-Albani.",
     /** Kept for its content, but flagged: Shurayh ibn Ubayd's narration from Abu
      *  Malik has a documented chain gap noted by hadith critics (Abu Hatim), and
@@ -1706,6 +1716,8 @@ const MOSQUE_AZKAR: ZikrDraft[] = [
     sourceReference: "Abu Dawud; Muslim 1/494; Hisn al-Muslim 20.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ عَمْرِو بْنِ الْعَاصِ رضي الله عنه عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ إِذَا دَخَلَ الْمَسْجِدَ قَالَ: «أَعُوذُ بِاللَّهِ الْعَظِيمِ، وَبِوَجْهِهِ الْكَرِيمِ، وَسُلْطَانِهِ الْقَدِيمِ، مِنَ الشَّيْطَانِ الرَّجِيمِ». قَالَ: فَإِذَا قَالَ ذَلِكَ، قَالَ الشَّيْطَانُ: حُفِظَ مِنِّي سَائِرَ الْيَوْمِ.",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Amr ibn al-‘As (may Allah be pleased with him) reported from the Prophet ﷺ that when he entered the mosque he would say: “I seek refuge in Allah the Immense, in His noble face and His eternal authority, from Satan the accursed.” He said: When he says that, Satan says: He is guarded from me for the rest of the day.",
     authenticityNote: "Sahih Muslim and Abu Dawud (Sahih Al-Albani).",
   },
   {
@@ -1724,6 +1736,8 @@ const MOSQUE_AZKAR: ZikrDraft[] = [
     sourceReference: "Muslim 1/494; Ibn Majah; Hisn al-Muslim 21.",
     hadithText:
       "عَنْ أَبِي أُسَيْدٍ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «إِذَا دَخَلَ أَحَدُكُمُ الْمَسْجِدَ فَلْيَقُلْ: اللَّهُمَّ افْتَحْ لِي أَبْوَابَ رَحْمَتِكَ، وَإِذَا خَرَجَ فَلْيَقُلْ: اللَّهُمَّ إِنِّي أَسْأَلُكَ مِنْ فَضْلِكَ».",
+    hadithTextEnglish:
+      "Abu Usayd (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “When one of you enters the mosque, let him say: O Allah, open for me the gates of Your mercy. And when he leaves, let him say: O Allah, I ask You of Your bounty.”",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -1746,6 +1760,8 @@ function createAfterPrayerSurah(sourceId: string, id: string, orderIndex: number
     sourceReferenceArabic: "سنن أبي داود ١٥٢٣ (صحيح).",
     hadithText:
       "عَنْ عُقْبَةَ بْنِ عَامِرٍ قَالَ: أَمَرَنِي رَسُولُ اللَّهِ ﷺ أَنْ أَقْرَأَ بِالْمُعَوِّذَاتِ دُبُرَ كُلِّ صَلَاةٍ.",
+    hadithTextEnglish:
+      "‘Uqbah ibn ‘Amir (may Allah be pleased with him) said: The Messenger of Allah ﷺ commanded me to recite the suras of refuge after every prayer.",
     authenticityNote: "Sahih (al-Albani).",
     sourceUrl: "https://sunnah.com/abudawud%3A1523",
     notes: "Recited once here; the morning and evening collections retain their own prescribed counts.",
@@ -2035,6 +2051,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 101; Sunan Ibn Majah 399; Hisn al-Muslim 8.",
     hadithText:
       "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «لا صلاة لمن لا وضوء له، ولا وضوء لمن لم يذكر اسم الله عليه».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “There is no prayer for one who has no ablution, and no ablution for one who does not mention the name of Allah over it.”",
     authenticityNote: "Hasan (Abu Dawud & Ibn Majah).",
   },
   {
@@ -2050,6 +2068,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 299.",
     hadithText:
       "عن أبي موسى الأشعري رضي الله عنه قال: أتيت النبي ﷺ بوضوء فتوضأ فسمعته يدعو يقول: «اللَّهُمَّ اغفِر لِي ذَنبِي وَوَسِّع لِي فِي دَارِي وَبَارِك لِي فِي رِزقِي».",
+    hadithTextEnglish:
+      "Abu Musa al-Ash‘ari (may Allah be pleased with him) said: I brought the Prophet ﷺ water for ablution and he performed it, and I heard him supplicating: “O Allah, forgive me my sin, make my dwelling spacious for me, and bless me in my provision.”",
     authenticityNote: "Hasan by al-Albani.",
   },
   {
@@ -2065,6 +2085,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 142; Sahih Muslim 375; Hisn al-Muslim 6.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه قال: كان النبي ﷺ إذا دخل الخلاء قال: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الخُبُثِ وَالخَبَائِثِ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: When the Prophet ﷺ entered the privy he would say: “O Allah, I seek refuge in You from male and female devils.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2079,6 +2101,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 30; Jami' at-Tirmidhi 7; Hisn al-Muslim 7.",
     hadithText: "عن عائشة رضي الله عنها قَالَت: كَانَ النَّبِيُّ ﷺ إِذَا خَرَجَ مِنَ الخَلَاءِ قَالَ: «غُفرَانَكَ».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: When the Prophet ﷺ came out of the privy he would say: “I seek Your forgiveness.”",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2097,6 +2121,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 234; Hisn al-Muslim 9.",
     hadithText:
       "عن عمر بن الخطاب رضي الله عنه قال: قال رسول الله ﷺ: «ما منكم من أحد يتوضأ فيسبغ الوضوء ثم يقول: أشهد أن لا إله إلا الله وحده لا شريك له، وَأَشْهَدُ أَنَّ مُحَمَّدًا عَبْدُهُ وَرَسُولُهُ، إلا فتحت له أبواب الجنة الثمانية».",
+    hadithTextEnglish:
+      "‘Umar ibn al-Khattab (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “There is not one of you who performs ablution and does it thoroughly, then says: I bear witness that there is no god but Allah alone, with no partner, and I bear witness that Muhammad is His servant and His Messenger — except that the eight gates of Paradise are opened for him.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2113,6 +2139,8 @@ const RESTROOM_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 3/153; Sunan an-Nasa'i; Hisn al-Muslim 10.",
     hadithText:
       "عن أبي سعيد الخدري رضي الله عنه عن النبي ﷺ قال: «من توضأ فقال: سبحانك اللهم وبحمدك أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَسْتَغْفِرُكَ وَأَتُوبُ إِلَيْكَ، كُتب في رق ثم طُبع بطابع فلم يُكسر إلى يوم القيامة».",
+    hadithTextEnglish:
+      "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “Whoever performs ablution and then says: Glory be to You, O Allah, and praise be to You; I bear witness that there is no god but You; I seek Your forgiveness and turn to You in repentance — it is written on a parchment, then sealed with a seal, and it is not broken until the Day of Resurrection.”",
     authenticityNote: "Authenticated by al-Albani.",
   },
 ];
@@ -2131,6 +2159,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 3/347; Jami' at-Tirmidhi 4/288; Hisn al-Muslim 178.",
     hadithText:
       "عن عائشة رضي الله عنها أن رسول الله ﷺ قال: «إذا أكل أحدكم فليذكر اسم الله تعالى، فَإِنْ نَسِيَ أَنْ يَذْكُرَ اسْمَ اللَّهِ تَعَالَى فِي أَوَّلِهِ فَلْيَقُلْ: بِسْمِ اللَّهِ أَوَّلَهُ وَآخِرَهُ».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that the Messenger of Allah ﷺ said: “When one of you eats, let him mention the name of Allah, exalted is He. If he forgets to mention the name of Allah at the beginning, let him say: In the name of Allah, at its beginning and at its end.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2145,6 +2175,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sunan Abu Dawud 3767; Jami' at-Tirmidhi 1858; Hisn al-Muslim 178.",
     hadithText: "عن عائشة رضي الله عنها أن رسول الله ﷺ قال: «فإن نسي في أوله فليقل: بسم الله في أوله وآخره».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that the Messenger of Allah ﷺ said: “If he forgets at the beginning, let him say: In the name of Allah, at its beginning and at its end.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2160,6 +2192,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 3850; Jami' at-Tirmidhi 3457; Hisn al-Muslim 179.",
     hadithText:
       "عن أبي سعيد الخدري رضي الله عنه أن النبي ﷺ كان إذا فرغ من طعامه قال: «الحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَجَعَلَنَا مُسْلِمِينَ».",
+    hadithTextEnglish:
+      "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported that when the Prophet ﷺ finished his food he would say: “Praise be to Allah, who has fed us and given us drink and made us Muslims.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2178,6 +2212,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 7/84; Hisn al-Muslim 180.",
     hadithText:
       "عن أبي أمامة رضي الله عنه أن النبي ﷺ كان إذا رفع مائدته قال: «الحَمدُ لِلَّهِ حَمدًا كَثِيرًا طَيِّبًا مُبَارَكًا فِيهِ غَيرَ مَكفِيٍّ وَلَا مُوَدَّعٍ وَلَا مُستَغنًى عَنهُ رَبَّنَا».",
+    hadithTextEnglish:
+      "Abu Umamah (may Allah be pleased with him) reported that when the Prophet ﷺ had his table cleared he would say: “Praise be to Allah, abundant, good and blessed praise; a praise never enough, never bidden farewell, never dispensed with — our Lord.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2193,6 +2229,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 5/506; Hisn al-Muslim 181.",
     hadithText:
       "عن ابن عباس رضي الله عنهما قال: قال رسول الله ﷺ: «من أطعمه الله طعاماً فليقل: اللهم بارك لنا فيه وأطعمنا خيراً منه».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) said: The Messenger of Allah ﷺ said: “Whoever Allah has fed with food, let him say: O Allah, bless it for us and feed us better than it.”",
     authenticityNote: "Sahih by al-Albani.",
   },
   {
@@ -2208,6 +2246,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2055; Hisn al-Muslim 182.",
     hadithText:
       "عن المقداد رضي الله عنه في حديثه الطويل عن النبي ﷺ أنه دعا فقال: «اللَّهُمَّ أَطعِم مَن أَطعَمَنِي وَاسقِ مَن سَقَانِي».",
+    hadithTextEnglish:
+      "Al-Miqdad (may Allah be pleased with him), in his long report from the Prophet ﷺ, said that he supplicated: “O Allah, feed whoever has fed me, and give drink to whoever has given me drink.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2224,6 +2264,8 @@ const FOOD_DRINK_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 3854; Sunan Ibn Majah 1747; Hisn al-Muslim 183.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه أن النبي ﷺ جاء إلى سعد بن عبادة فجاء بخبز وزيت فأكل، ثم قال النبي ﷺ: «أَفطَرَ عِندَكُمُ الصَّائِمُونَ وَأَكَلَ طَعَامَكُمُ الأَبرَارُ وَصَلَّت عَلَيكُمُ المَلَائِكَةُ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) reported that the Prophet ﷺ came to Sa‘d ibn ‘Ubadah, who brought bread and oil, and he ate. Then the Prophet ﷺ said: “May the fasting break their fast with you, may the righteous eat your food, and may the angels send blessings upon you.”",
     authenticityNote: "Sahih (Abu Dawud).",
   },
 ];
@@ -2243,6 +2285,8 @@ const CLOTHING_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 4023; Jami' at-Tirmidhi 3458; Hisn al-Muslim 2.",
     hadithText:
       "عن معاذ بن أنس رضي الله عنه أن رسول الله ﷺ قال: «من لبس ثوباً فقال: الحمد لله الذي كساني هذا ورزقنيه من غير حول مني ولا قوة غُفر له ما تقدم من ذنبه».",
+    hadithTextEnglish:
+      "Mu‘adh ibn Anas (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever puts on a garment and says: Praise be to Allah, who has clothed me with this and provided it for me with no power or strength of my own — is forgiven what has gone before of his sin.”",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2261,6 +2305,8 @@ const CLOTHING_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 4020; Jami' at-Tirmidhi 1767; Hisn al-Muslim 3.",
     hadithText:
       "عن أبي سعيد الخدري رضي الله عنه قال: كان رسول الله ﷺ إذا استجد ثوباً سماه باسمه ثم يقول: «اللَّهُمَّ لَكَ الحَمدُ أَنتَ كَسَوتَنِيهِ أَسْأَلُكَ خَيْرَهُ وَخَيْرَ مَا صُنِعَ لَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّهِ وَشَرِّ مَا صُنِعَ لَهُ».",
+    hadithTextEnglish:
+      "Abu Sa‘id al-Khudri (may Allah be pleased with him) said: When the Messenger of Allah ﷺ put on a new garment, he would name it by its name and then say: “O Allah, Yours is the praise. You have clothed me with it. I ask You for its good and the good of what it was made for, and I seek refuge in You from its evil and the evil of what it was made for.”",
     authenticityNote: "Hasan (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2276,6 +2322,8 @@ const CLOTHING_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 4020; Hisn al-Muslim 4.",
     hadithText:
       "عن أم خالد بنت خالد بن سعيد رضي الله عنها قَالَت: أُتِيَ النَّبِيُّ ﷺ بِثِيَابٍ فِيهَا خَمِيصَةٌ سَوْدَاءُ صَغِيرَةٌ فَكَسَاهَا إِيَّاهَا وَقَالَ: «تُبْلِي وَيُخْلِفُ اللَّهُ تَعَالَى».",
+    hadithTextEnglish:
+      "Umm Khalid bint Khalid ibn Sa‘id (may Allah be pleased with her) said: Some garments were brought to the Prophet ﷺ, among them a small black cloak, and he clothed her in it and said: “Wear it until it is worn out, and may Allah, exalted is He, give a replacement.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2291,6 +2339,8 @@ const CLOTHING_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 297; Jami' at-Tirmidhi; Hisn al-Muslim 5.",
     hadithText:
       "عن علي بن أبي طالب رضي الله عنه أن رسول الله ﷺ قال: «ستر ما بين أعين الجن وعورات بني آدم إذا وضع أحدهم ثوبه أن يقول: بسم الله».",
+    hadithTextEnglish:
+      "‘Ali ibn Abi Talib (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “The screen between the eyes of the jinn and the nakedness of the children of Adam is that, when one of them takes off his garment, he says: In the name of Allah.”",
     authenticityNote: "Authenticated.",
   },
 ];
@@ -2312,6 +2362,8 @@ const TRAVEL_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 1342; Sunan Abu Dawud 2599; Hisn al-Muslim 75–76.",
     hadithText:
       "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا اسْتَوَى عَلَى بَعِيرِهِ خَارِجًا إِلَى سَفَرٍ، كَبَّرَ ثَلاَثًا، ثُمَّ قَالَ: «سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ، وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ، اللَّهُمَّ إِنَّا نَسْأَلُكَ فِي سَفَرِنَا هَذَا الْبِرَّ وَالتَّقْوَى، وَمِنَ الْعَمَلِ مَا تَرْضَى، اللَّهُمَّ هَوِّنْ عَلَيْنَا سَفَرَنَا هَذَا، وَاطْوِ عَنَّا بُعْدَهُ، اللَّهُمَّ أَنْتَ الصَّاحِبُ فِي السَّفَرِ، وَالْخَلِيفَةُ فِي الْأَهْلِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ وَعْثَاءِ السَّفَرِ، وَكَآبَةِ الْمَنْظَرِ، وَسُوءِ الْمُنْقَلَبِ فِي الْمَالِ وَالْأَهْلِ وَالْوَلَدِ» إِلَى آخِرِ الدُّعَاءِ.",
+    hadithTextEnglish:
+      "Ibn ‘Umar (may Allah be pleased with them both) reported that when the Messenger of Allah ﷺ had settled upon his camel setting out on a journey, he would say “Allah is greatest” three times, then say: “Glory be to Him who has subjected this to us, and we could never have brought it under control; and to our Lord we are surely returning. O Allah, we ask You on this journey of ours for righteousness and mindfulness of You, and for deeds that please You. O Allah, make this journey of ours easy for us and fold up its distance for us. O Allah, You are the Companion on the journey and the Guardian over the family. O Allah, I seek refuge in You from the hardship of travel, from a sight that brings sorrow, and from an ill return in property, family and children” — to the end of the supplication.",
     authenticityNote: "Sahih Muslim.",
     notes: "sourceUrl: https://sunnah.com/muslim:1342a",
   },
@@ -2331,6 +2383,8 @@ const TRAVEL_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 1343; Sahih al-Bukhari 3084; Hisn al-Muslim 77–78.",
     hadithText:
       "عَنِ ابْنِ عُمَرَ رضي الله عنهما أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا قَفَلَ مِنْ حَجٍّ أَوْ عُمْرَةٍ أَوْ غَزْوٍ كُلَّمَا أَوْفَى عَلَى ثَنِيَّةٍ أَوْ فَدْفَدٍ يُكَبِّرُ، ثُمَّ يَقُولُ: «لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، آيِبُونَ تَائِبُونَ عَابِدُونَ لِرَبِّنَا حَامِدُونَ صَدَقَ اللَّهُ وَعْدَهُ، وَنَصَرَ عَبْدَهُ، وَهَزَمَ الْأَحْزَابَ وَحْدَهُ».",
+    hadithTextEnglish:
+      "Ibn ‘Umar (may Allah be pleased with them both) reported that when the Messenger of Allah ﷺ returned from Hajj, ‘Umrah or an expedition, each time he came up over a rise or a high piece of ground he would say “Allah is greatest”, then say: “There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. We return, repenting, worshipping, praising our Lord. Allah kept His promise, gave victory to His servant, and defeated the confederates alone.”",
     authenticityNote: "Sahih Muslim and Sahih al-Bukhari.",
     notes: "sourceUrl: https://sunnah.com/muslim:1343b",
   },
@@ -2350,6 +2404,8 @@ const TRAVEL_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Ibn Hibban 2697; Al-Hakim 1/442; Hisn al-Muslim 80.",
     hadithText:
       "عَنْ صُهَيْبٍ رضي الله عنه أَنَّ النَّبِيَّ ﷺ لَمْ يَرَ قَرْيَةً يُرِيدُ دُخُولَهَا إِلاَّ قَالَ حِينَ يَرَاهَا: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَمَا أَظْلَلْنَ، وَرَبَّ الأَرَضِينَ السَّبْعِ وَمَا أَقْلَلْنَ، وَرَبَّ الشَّيَاطِينِ وَمَا أَضْلَلْنَ، وَرَبَّ الرِّيَاحِ وَمَا ذَرَيْنَ، فَإِنَّا نَسْأَلُكَ خَيْرَ هَذِهِ الْقَرْيَةِ وَخَيْرَ أَهْلِهَا، وَنَعُوذُ بِكَ مِنْ شَرِّهَا وَشَرِّ أَهْلِهَا وَشَرِّ مَا فِيهَا» الدُّعَاءَ.",
+    hadithTextEnglish:
+      "Suhayb (may Allah be pleased with him) reported that the Prophet ﷺ never saw a town he meant to enter without saying, on seeing it: “O Allah, Lord of the seven heavens and all they overshadow, Lord of the seven earths and all they carry, Lord of the devils and all they lead astray, Lord of the winds and all they scatter — we ask You for the good of this town and the good of its people, and we seek refuge in You from its evil, the evil of its people and the evil of what is in it” — the supplication.",
     authenticityNote: "Graded Hasan by Al-Albani; Sahih Ibn Hibban.",
     notes: "sourceUrl: https://sunnah.com/hisn%3A80",
   },
@@ -2372,6 +2428,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 6363; Sunan Abu Dawud 1555; Hisn al-Muslim 120.",
     hadithText:
       "عن أنس بن مالك رضي الله عنه قال: كنت أخدم رسول الله ﷺ فكنت أسمعه يكثر أن يقول: «اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الهَمِّ وَالحَزَنِ، وَالْعَجْزِ وَالْكَسَلِ، وَالْجُبْنِ وَالْبُخْلِ، وَضَلَعِ الدَّيْنِ، وَغَلَبَةِ الرِّجَالِ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: I used to serve the Messenger of Allah ﷺ, and I would often hear him say: “O Allah, I seek refuge in You from anxiety and grief, from incapacity and idleness, from cowardice and miserliness, from the burden of debt and from being overpowered by men.”",
     authenticityNote: "Sahih al-Bukhari and Sunan Abu Dawud.",
   },
   {
@@ -2388,6 +2446,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 3505; Quran 21:87; Hisn al-Muslim 121.",
     hadithText:
       "عن سعد بن أبي وقاص رضي الله عنه قال: قال رسول الله ﷺ: «دعوة ذي النون إذ دعا وهو في بطن الحوت: لا إله إلا أنت سبحانك إني كنت من الظالمين، فإنه لم يدع بها رجل مسلم في شيء قط إلا استجاب الله له».",
+    hadithTextEnglish:
+      "Sa‘d ibn Abi Waqqas (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “The supplication of Dhu al-Nun when he called upon Allah from within the belly of the whale: There is no god but You; glory be to You; I was indeed among the wrongdoers. No Muslim man ever supplicates with it for anything but that Allah answers him.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2403,6 +2463,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 1525; Hisn al-Muslim 122.",
     hadithText:
       "عن أسماء بنت عميس رضي الله عنها قالت: قال لي رسول الله ﷺ: «ألا أعلمك كلمات تقولينهن عند الكرب: الله الله ربي لا أشرك به شيئاً».",
+    hadithTextEnglish:
+      "Asma’ bint ‘Umays (may Allah be pleased with her) said: The Messenger of Allah ﷺ said to me: “Shall I not teach you words to say at a time of distress: Allah, Allah is my Lord; I associate nothing with Him.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2421,6 +2483,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 5090; Hisn al-Muslim 123.",
     hadithText:
       "عن أبي بكرة رضي الله عنه أن رسول الله ﷺ قال: «دعوات المكروب: اللَّهُمَّ رَحمَتَكَ أَرجُو فَلَا تَكِلنِي إِلَى نَفسِي طَرفَةَ عَينٍ وَأَصلِح لِي شَأنِي كُلَّهُ لَا إِلَهَ إِلَّا أَنتَ».",
+    hadithTextEnglish:
+      "Abu Bakrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “The supplications of one in distress: O Allah, it is Your mercy I hope for, so do not entrust me to myself for the blink of an eye; set right all my affairs. There is no god but You.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2437,6 +2501,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 5081; Ibn al-Sunni; Hisn al-Muslim 124.",
     hadithText:
       "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: مَنْ قَالَ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ» سَبْعَ مَرَّاتٍ كَفَاهُ اللَّهُ مَا أَهَمَّهُ.",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: Whoever says in the morning and in the evening: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne” seven times, Allah will suffice him in whatever troubles him.",
     authenticityNote: "Hasan by al-Albani.",
   },
   {
@@ -2455,6 +2521,8 @@ const DISTRESS_ANXIETY_AZKAR: ZikrDraft[] = [
     sourceReference: "Musnad Ahmad 1/391; Ibn Hibban; Hisn al-Muslim 125.",
     hadithText:
       "عن عبد الله بن مسعود رضي الله عنه قال: قال رسول الله ﷺ: «ما أصاب أحداً قط هم ولا حزن فقال: اللهم إني عبدك وابن عبدك وابن أمتك، نَاصِيَتِي بِيَدِكَ، مَاضٍ فِيَّ حُكْمُكَ، عَدْلٌ فِيَّ قَضَاؤُكَ، أَسْأَلُكَ بِكُلِّ اسْمٍ هُوَ لَكَ سَمَّيْتَ بِهِ نَفْسَكَ، أَوْ عَلَّمْتَهُ أَحَدًا مِنْ خَلْقِكَ، أَوْ أَنْزَلْتَهُ فِي كِتَابِكَ، أَوِ اسْتَأْثَرْتَ بِهِ فِي عِلْمِ الْغَيْبِ عِنْدَكَ، أَنْ تَجْعَلَ الْقُرْآنَ رَبِيعَ قَلْبِي، وَنُورَ صَدْرِي، وَجَلَاءَ حُزْنِي، وَذَهَابَ هَمِّي، إلا أذهب الله همه وأبدله مكانه فرجاً».",
+    hadithTextEnglish:
+      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No one is ever struck by anxiety or grief and says: O Allah, I am Your servant, son of Your servant, son of Your maidservant. My forelock is in Your hand. Your judgement upon me is carried out, Your decree concerning me is just. I ask You by every name that is Yours, by which You have named Yourself, or taught to any of Your creation, or sent down in Your Book, or kept to Yourself in the knowledge of the unseen — that You make the Qur’an the springtime of my heart, the light of my breast, the lifting of my sorrow and the passing of my anxiety — except that Allah takes away his anxiety and gives him relief in its place.”",
     authenticityNote: "Authenticated by Ibn Hibban and al-Albani.",
   },
 ];
@@ -2473,6 +2541,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2202; Hisn al-Muslim 131.",
     hadithText:
       "عن عثمان بن أبي العاص رضي الله عنه أنه شكى إلى رسول الله ﷺ وجعاً، فقال له رسول الله ﷺ: «ضع يدك على الذي يلمس من جسدك وقل: باسم الله ثلاثاً، وقل سبع مرات: أَعُوذُ بِعِزَّةِ اللَّهِ وَقُدرَتِهِ مِن شَرِّ مَا أَجِدُ وَأُحَاذِرُ».",
+    hadithTextEnglish:
+      "‘Uthman ibn Abi al-‘As (may Allah be pleased with him) complained to the Messenger of Allah ﷺ of a pain, and the Messenger of Allah ﷺ said to him: “Place your hand on the part of your body that hurts and say: In the name of Allah — three times; and say seven times: I seek refuge in the might of Allah and His power from the evil of what I find and what I fear.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2491,6 +2561,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 7/131; Sahih Muslim 2191; Hisn al-Muslim 129.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان يعوذ بعض أهله يمسح بيمينه ويقول: «اللَّهُمَّ رَبَّ النَّاسِ أَذهِبِ البَأسَ اشفِهِ وَأَنتَ الشَّافِي، لَا شَافِيَ إِلَّا أَنْتَ، شِفَاءً لَا يُغَادِرُ سَقَمًا».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that the Prophet ﷺ would seek protection for some of his family, wiping with his right hand and saying: “O Allah, Lord of mankind, remove the harm; heal him, for You are the Healer. There is no healer but You — a healing that leaves no illness behind.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2509,6 +2581,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 130.",
     hadithText:
       "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا اشتكى رقاه جبريل عليه السلام فقال: «بِاسمِ اللَّهِ يُبرِيكَ وَمِن كُلِّ دَاءٍ يَشفِيكَ، مِنْ شَرِّ حَاسِدٍ إِذَا حَسَدَ، وَشَرِّ كُلِّ ذِي عَيْنٍ».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Messenger of Allah ﷺ fell ill, Jibril (peace be upon him) would recite over him: “In the name of Allah, may He cure you and heal you from every disease; from the evil of an envier when he envies, and the evil of every evil eye.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2524,6 +2598,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 3106; Jami' at-Tirmidhi 2083; Hisn al-Muslim 128.",
     hadithText:
       "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال: «من عاد مريضاً لم يحضر أجله فقال عنده سبع مرار: أسأل الله العظيم رب العرش العظيم أن يشفيك إلا عافاه الله من ذلك المرض».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) reported from the Prophet ﷺ that he said: “No one visits a sick person whose time has not yet come and says beside him seven times: I ask Allah the Immense, Lord of the Mighty Throne, to heal you — except that Allah restores him to health from that illness.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2539,6 +2615,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 5017; Sahih Muslim 2192; Hisn al-Muslim 132.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أوى إلى فراشه كل ليلة جمع كفيه ثم نفث فيهما فقرأ فيهما: قل هو الله أحد وقل أعوذ برب الفلق وقل أعوذ برب الناس، ثم يمسح بهما ما استطاع من جسده، يبدأ بهما على رأسه ووجهه وما أقبل من جسده، يفعل ذلك ثلاث مرات.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, and recite into them: “Say: He is Allah, One”, “Say: I seek refuge in the Lord of daybreak”, and “Say: I seek refuge in the Lord of mankind”. Then he would wipe with them as much of his body as he could, beginning with his head, his face and the front of his body, doing that three times.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2557,6 +2635,8 @@ const ILLNESS_RUQYAH_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2186; Hisn al-Muslim 133.",
     hadithText:
       "عن أبي سعيد الخدري رضي الله عنه أن جبريل أتى النبي ﷺ فقال: يا محمد اشتكيت؟ فقال: نعم، قال: «بِسمِ اللَّهِ أَرقِيكَ مِن كُلِّ شَيءٍ يُؤذِيكَ، مِنْ شَرِّ كُلِّ نَفْسٍ أَوْ عَيْنِ حَاسِدٍ، اللَّهُ يَشْفِيكَ، بِاسْمِ اللَّهِ أَرْقِيكَ».",
+    hadithTextEnglish:
+      "Abu Sa‘id al-Khudri (may Allah be pleased with him) reported that Jibril came to the Prophet ﷺ and said: Muhammad, are you ill? He said: Yes. He said: “In the name of Allah I recite over you, from everything that harms you, from the evil of every soul or envious eye. May Allah heal you. In the name of Allah I recite over you.”",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -2575,6 +2655,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
     hadithText:
       "عن عمران بن حصين رضي الله عنهما قال: جاء رجل إلى النبي ﷺ فقال: السلام عليكم، فرد عليه وقال: «عشر»، ثم جاء آخر فقال: السلام عليكم ورحمة الله، فرد عليه وقال: «عشرون»، ثم جاء آخر فقال: السلام عليكم ورحمة الله وبركاته، فرد عليه وقال: «ثلاثون».",
+    hadithTextEnglish:
+      "‘Imran ibn Husayn (may Allah be pleased with them both) said: A man came to the Prophet ﷺ and said: Peace be upon you. He returned the greeting and said: “Ten.” Then another came and said: Peace be upon you and the mercy of Allah. He returned it and said: “Twenty.” Then another came and said: Peace be upon you and the mercy of Allah and His blessings. He returned it and said: “Thirty.”",
     authenticityNote: "Sahih (Abu Dawud).",
   },
   {
@@ -2590,6 +2672,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 5195; Hisn al-Muslim 72.",
     hadithText:
       "عن عائشة رضي الله عنها قالت: قال لي رسول الله ﷺ: «هذا جبريل يقرأ عليك السلام»، فقلت: «وعليه السلام ورحمة الله وبركاته».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: The Messenger of Allah ﷺ said to me: “This is Jibril, sending you greetings of peace.” I said: “And upon him be peace, and the mercy of Allah and His blessings.”",
     authenticityNote: "Sahih (Abu Dawud).",
   },
   {
@@ -2605,6 +2689,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
     hadithText:
       "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «إذا عطس أحدكم فليقل: الحمد لله، وليقل له أخوه أو صاحبه: يرحمك الله، فَإِذَا قَالَ لَهُ: يَرْحَمُكَ اللَّهُ، فَلْيَقُلْ: يَهْدِيكُمُ اللَّهُ وَيُصْلِحُ بَالَكُمْ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “When one of you sneezes, let him say: Praise be to Allah; and let his brother or companion say to him: May Allah have mercy on you. And when he says to him: May Allah have mercy on you, let him reply: May Allah guide you and set your affairs right.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2619,6 +2705,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 7/125; Hisn al-Muslim 188.",
     hadithText: "عن أبي هريرة رضي الله عنه عن النبي ﷺ قال: «فإذا قال له يرحمك الله، فليقل: يهديكم الله ويصلح بالكم».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “And when he says to him: May Allah have mercy on you, let him reply: May Allah guide you and set your affairs right.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2634,6 +2722,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 2035.",
     hadithText:
       "عن أسامة بن زيد رضي الله عنهما قال: قال رسول الله ﷺ: «من صُنع إليه معروف فقال لفاعله: جزاك الله خيراً فقد أبلغ في الثناء».",
+    hadithTextEnglish:
+      "Usamah ibn Zayd (may Allah be pleased with them both) said: The Messenger of Allah ﷺ said: “Whoever has a kindness done for him and says to the one who did it: May Allah reward you with good — has given praise in full.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2649,6 +2739,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Various Sahih narrations.",
     hadithText:
       "عن عائشة رضي الله عنها أن النبي ﷺ كان إذا أُهديت له شاة قال: «ما فعلوا؟» فتقول عائشة: يدعون لهم، فيقول النبي ﷺ: «وبارك الله فيهم، نرد عليهم مثل ما قالوا ويبقى لنا أجرنا».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when a sheep was given to the Prophet ﷺ as a gift, he would ask: “What did they do?” ‘A’ishah would say: They are praying for them. The Prophet ﷺ would say: “And may Allah bless them. We return to them the like of what they said, and our own reward remains for us.”",
     authenticityNote: "Sahih.",
   },
   {
@@ -2664,6 +2756,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 2130; Jami' at-Tirmidhi 1091; Hisn al-Muslim 98.",
     hadithText:
       "عن أبي هريرة رضي الله عنه أن النبي ﷺ كان إذا رفأ الإنسان إذا تزوج قال: «بَارَكَ اللَّهُ لَكَ وَبَارَكَ عَلَيكَ وَجَمَعَ بَينَكُمَا فِي خَيرٍ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that when the Prophet ﷺ congratulated a person on marrying, he would say: “May Allah bless you, and send blessings upon you, and join you both in good.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
   {
@@ -2681,6 +2775,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 918; Hisn al-Muslim 134.",
     hadithText:
       "عن أم سلمة رضي الله عنها قالت: سمعت رسول الله ﷺ يقول: «ما من مسلم تصيبه مصيبة فيقول ما أمره الله: إنا لله وإنا إليه راجعون، اللَّهُمَّ أْجُرْنِي فِي مُصِيبَتِي وَأَخْلِفْ لِي خَيْرًا مِنْهَا، إلا أخلف الله له خيراً منها».",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) said: I heard the Messenger of Allah ﷺ say: “There is no Muslim struck by an affliction who says what Allah has commanded him — We belong to Allah and to Him we return; O Allah, reward me in my affliction and give me something better than it in its place — except that Allah gives him something better than it in its place.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2697,6 +2793,8 @@ const SOCIAL_COMMUNITY_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 920; Hisn al-Muslim 135.",
     hadithText:
       "عن أم سلمة رضي الله عنها قالت: دخل رسول الله ﷺ على أبي سلمة وقد شق بصره فأغمضه ثم قال: «اللَّهُمَّ اغفِر لِأَبِي سَلَمَةَ وَارفَع دَرَجَتَهُ فِي المَهدِيِّينَ، وَاخْلُفْهُ فِي عَقِبِهِ فِي الْغَابِرِينَ، وَاغْفِرْ لَنَا وَلَهُ يَا رَبَّ الْعَالَمِينَ، وَافْسَحْ لَهُ فِي قَبْرِهِ، وَنَوِّرْ لَهُ فِيهِ».",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) said: The Messenger of Allah ﷺ came in upon Abu Salamah when his eyes were fixed in death, and he closed them. Then he said: “O Allah, forgive Abu Salamah, raise his rank among those who are guided, be a successor to what he left behind among those who remain, forgive us and him, Lord of the worlds, make his grave spacious for him, and give him light within it.”",
     authenticityNote: "Sahih Muslim.",
   },
 ];
@@ -2716,6 +2814,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 899; Hisn al-Muslim 170.",
     hadithText:
       "عن عائشة رضي الله عنها قالت: كان النبي ﷺ إذا عصفت الريح قال: «اللَّهُمَّ إِنِّي أَسأَلُكَ خَيرَهَا وَخَيرَ مَا فِيهَا، وَخَيْرَ مَا أُرْسِلَتْ بِهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا، وَشَرِّ مَا فِيهَا، وَشَرِّ مَا أُرْسِلَتْ بِهِ».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: When the wind blew hard, the Prophet ﷺ would say: “O Allah, I ask You for its good, the good that is in it, and the good it was sent with; and I seek refuge in You from its evil, the evil that is in it, and the evil it was sent with.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2730,6 +2830,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 2/518; Hisn al-Muslim 171.",
     hadithText: "عن عائشة رضي الله عنها أن رسول الله ﷺ كان إذا رأى المطر قال: «اللَّهُمَّ صَيِّبًا نَافِعًا».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Messenger of Allah ﷺ saw rain he would say: “O Allah, a downpour of benefit.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2744,7 +2846,9 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 846; Sahih Muslim 71; Hisn al-Muslim 172.",
     hadithText:
-      "عن زيد بن خالد الجهني رضي الله عنه قال: صلى لنا رسول الله ﷺ صلاة الصبح بالحديبية على إثر سماء كانت من الليلة فَلَمَّا انْصَرَفَ أَقْبَلَ عَلَى النَّاسِ فَقَالَ: هَلْ تَدْرُونَ مَاذَا قَالَ رَبُّكُمْ؟ قَالُوا: اللَّهُ وَرَسُولُهُ أَعْلَمُ، قَالَ: وقال: «أصبح من عبادي مؤمن بي وكافر فَذَلِكَ قال مطرنا بفضل الله ورحمته فذلك مؤمن بي وكافر بالكوكب».",
+      "عن زيد بن خالد الجهني رضي الله عنه قال: صَلَّى لَنَا رَسُولُ اللَّهِ ﷺ صَلَاةَ الصُّبْحِ بِالْحُدَيْبِيَةِ عَلَى إِثْرِ سَمَاءٍ كَانَتْ مِنَ اللَّيْلِ، فَلَمَّا انْصَرَفَ أَقْبَلَ عَلَى النَّاسِ فَقَالَ: «هَلْ تَدْرُونَ مَاذَا قَالَ رَبُّكُمْ؟» قَالُوا: اللَّهُ وَرَسُولُهُ أَعْلَمُ. قَالَ: «قَالَ: أَصْبَحَ مِنْ عِبَادِي مُؤْمِنٌ بِي وَكَافِرٌ؛ فَأَمَّا مَنْ قَالَ: مُطِرْنَا بِفَضْلِ اللَّهِ وَرَحْمَتِهِ، فَذَلِكَ مُؤْمِنٌ بِي كَافِرٌ بِالْكَوْكَبِ، وَأَمَّا مَنْ قَالَ: مُطِرْنَا بِنَوْءِ كَذَا وَكَذَا، فَذَلِكَ كَافِرٌ بِي مُؤْمِنٌ بِالْكَوْكَبِ».",
+    hadithTextEnglish:
+      "Zayd ibn Khalid al-Juhani (may Allah be pleased with him) said: The Messenger of Allah ﷺ led us in the dawn prayer at al-Hudaybiyah after rain had fallen in the night. When he finished he turned to the people and said: “Do you know what your Lord has said?” They said: Allah and His Messenger know best. He said: “He said: This morning some of My servants believe in Me and some disbelieve. As for the one who said: We have been given rain by the grace of Allah and His mercy — he believes in Me and disbelieves in the stars. And as for the one who said: We have been given rain by such and such a star — he disbelieves in Me and believes in the stars.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2760,6 +2864,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     sourceReference: "Muwatta Imam Malik 2/992; Hisn al-Muslim 173.",
     hadithText:
       "عن عبد الله بن الزبير رضي الله عنهما أنه كان إذا سمع الرعد ترك الحديث وقال: «سُبحَانَ الَّذِي يُسَبِّحُ الرَّعدُ بِحَمدِهِ وَالمَلَائِكَةُ مِن خِيفَتِهِ» ثم يقول: إن هذا لوعيد شديد لأهل الأرض.",
+    hadithTextEnglish:
+      "‘Abdullah ibn al-Zubayr (may Allah be pleased with them both) would stop speaking when he heard thunder and say: “Glory be to Him whom the thunder glorifies with praise, and the angels too, out of awe of Him.” Then he would say: This is a severe warning to the people of the earth.",
     authenticityNote: "Authenticated by al-Albani.",
   },
   {
@@ -2777,6 +2883,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 3451; Hisn al-Muslim 168.",
     hadithText:
       "عن طلحة بن عبيد الله رضي الله عنه أن النبي ﷺ كان إذا رأى الهلال قال: «اللَّهُمَّ أَهِلَّهُ عَلَينَا بِالأَمنِ وَالإِيمَانِ وَالسَّلَامَةِ وَالإِسلَامِ رَبِّي وَرَبُّكَ اللَّهُ».",
+    hadithTextEnglish:
+      "Talhah ibn ‘Ubaydullah (may Allah be pleased with him) reported that when the Prophet ﷺ saw the new moon he would say: “O Allah, bring it over us with security and faith, with safety and Islam. My Lord and your Lord is Allah.”",
     authenticityNote: "Authenticated.",
   },
   {
@@ -2793,6 +2901,8 @@ const NATURAL_EVENTS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 1194; Sunan Ibn Majah 1264.",
     hadithText:
       "عَنْ عَائِشَةَ رضي الله عنها قَالَتْ: خَسَفَتِ الشَّمْسُ فِي عَهْدِ رَسُولِ اللَّهِ ﷺ فَصَلَّى رَسُولُ اللَّهِ ﷺ بِالنَّاسِ، فَقَامَ فَأَطَالَ الْقِيَامَ، ثُمَّ رَكَعَ فَأَطَالَ الرُّكُوعَ، ثُمَّ قَامَ فَأَطَالَ الْقِيَامَ وَهُوَ دُونَ الْقِيَامِ الْأَوَّلِ، ثُمَّ رَكَعَ فَأَطَالَ الرُّكُوعَ وَهُوَ دُونَ الرُّكُوعِ الْأَوَّلِ، ثُمَّ سَجَدَ فَأَطَالَ السُّجُودَ، ثُمَّ فَعَلَ فِي الرَّكْعَةِ الثَّانِيَةِ مِثْلَ مَا فَعَلَ فِي الْأُولَى، ثُمَّ انْصَرَفَ وَقَدِ انْجَلَتِ الشَّمْسُ، فَخَطَبَ النَّاسَ، فَحَمِدَ اللَّهَ وَأَثْنَى عَلَيْهِ، ثُمَّ قَالَ: «إِنَّ الشَّمْسَ وَالْقَمَرَ آيَتَانِ مِنْ آيَاتِ اللَّهِ لَا يَنْخَسِفَانِ لِمَوْتِ أَحَدٍ وَلَا لِحَيَاتِهِ، فَإِذَا رَأَيْتُمْ ذَلِكَ فَادْعُوا اللَّهَ وَكَبِّرُوا، وَصَلُّوا وَتَصَدَّقُوا».",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) said: The sun was eclipsed in the time of the Messenger of Allah ﷺ, and he led the people in prayer. He stood and made the standing long, then bowed and made the bowing long, then stood again and made the standing long, though shorter than the first, then bowed and made the bowing long, though shorter than the first, then prostrated and made the prostration long; and he did in the second cycle as he had done in the first. Then he finished, and the sun had cleared. He addressed the people, praised Allah and extolled Him, then said: “The sun and the moon are two signs among the signs of Allah. They are not eclipsed for the death of anyone, nor for his life. So when you see that, call upon Allah, magnify Him, pray, and give in charity.”",
     authenticityNote: "Sahih.",
   },
 ];
@@ -2811,6 +2921,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2725; Hisn al-Muslim 127.",
     hadithText:
       "عن علي بن أبي طالب رضي الله عنه قال: قال لي رسول الله ﷺ: «قل: اللهم اهدني وسددني، واذكر بالهدى هدايتك الطريق، وبالسداد سداد السهم».",
+    hadithTextEnglish:
+      "‘Ali ibn Abi Talib (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “Say: O Allah, guide me and set me straight — and by guidance call to mind being guided on a road, and by straightness the straightness of an arrow.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2830,6 +2942,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 3293; Sahih Muslim 2691; Hisn al-Muslim 152.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، كَانَتْ لَهُ عَدْلَ عَشْرِ رِقَابٍ، وَكُتِبَتْ لَهُ مِائَةُ حَسَنَةٍ، وَمُحِيَتْ عَنْهُ مِائَةُ سَيِّئَةٍ، وَكَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ يَوْمَهُ ذَلِكَ حَتَّى يُمْسِيَ، وَلَمْ يَأْتِ أَحَدٌ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلَّا أَحَدٌ عَمِلَ أَكْثَرَ مِنْ ذَلِكَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — a hundred times in a day, it is for him the equal of freeing ten slaves, a hundred good deeds are written for him, a hundred sins are erased from him, and it is a protection for him from Satan for that day until evening; and no one brings anything better than what he brought, except one who does more than that.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2845,6 +2959,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 6042; Sahih Muslim 2691; Hisn al-Muslim 153.",
     hadithText:
       "عن أبي هريرة رضي الله عنه أن رسول الله ﷺ قال: «من قال سبحان الله وبحمده في يوم مائة مرة حُطت خطاياه وإن كانت مثل زبد البحر».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: Glory be to Allah and praise be to Him — a hundred times in a day, his sins are wiped away, even were they like the foam of the sea.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2860,6 +2976,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 7563; Sahih Muslim 2694; Hisn al-Muslim 154.",
     hadithText:
       "عن أبي هريرة رضي الله عنه قال: قال رسول الله ﷺ: «كلمتان خفيفتان على اللسان، ثقيلتان في الميزان، حبيبتان إلى الرحمن: سبحان الله وبحمده، سبحان الله العظيم».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Two words are light upon the tongue, heavy in the scale, beloved to the Most Merciful: Glory be to Allah and praise be to Him; glory be to Allah the Immense.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2875,6 +2993,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 3871; Hisn al-Muslim 126.",
     hadithText:
       "عن ابن عمر رضي الله عنهما قال: لم يكن رسول الله ﷺ يدع هؤلاء الدعوات حين يمسي وحين يصبح: «اللَّهُمَّ إِنِّي أَسأَلُكَ العَفوَ وَالعَافِيَةَ فِي الدُّنيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي».",
+    hadithTextEnglish:
+      "Ibn ‘Umar (may Allah be pleased with them both) said: The Messenger of Allah ﷺ never left these supplications, evening and morning: “O Allah, I ask You for pardon and wellbeing in this world and the next. O Allah, I ask You for pardon and wellbeing in my religion, my worldly life, my family and my property. O Allah, conceal my faults and calm my fears. O Allah, guard me from before me and behind me, from my right and my left and from above me, and I seek refuge in Your greatness from being taken unawares from beneath me.”",
     authenticityNote: "Sahih by al-Albani.",
   },
   {
@@ -2890,6 +3010,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 4409; Sahih Muslim 2704; Hisn al-Muslim 155.",
     hadithText:
       "عن أبا موسى الأشعري رضي الله عنه قال: قال لي رسول الله ﷺ: «ألا أدلك على كنز من كنوز الجنة؟ قلت: بلى يا رسول الله، قال: لا حول ولا قوة إلا بالله».",
+    hadithTextEnglish:
+      "Abu Musa al-Ash‘ari (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “Shall I not direct you to a treasure from the treasures of Paradise?” I said: Yes, Messenger of Allah. He said: “There is no power and no strength except with Allah.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -2905,6 +3027,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 2696; Hisn al-Muslim 156.",
     hadithText:
       "عن طارق بن أشيم رضي الله عنه قال: كان الرجل إذا أسلم علمه النبي ﷺ الصلاة ثم أمره أن يدعو بهؤلاء الكلمات: «اللَّهُمَّ اغفِر لِي وَارحَمنِي وَاهدِني وَارزُقنِي».",
+    hadithTextEnglish:
+      "Tariq ibn Ashyam (may Allah be pleased with him) said: When a man accepted Islam, the Prophet ﷺ would teach him the prayer, then instruct him to supplicate with these words: “O Allah, forgive me, have mercy on me, guide me, and provide for me.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -2923,7 +3047,9 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     countLabel: "1",
     sourceReference: "Sahih al-Bukhari 6306; Hisn al-Muslim 69.",
     hadithText:
-      "عن شداد بن أوس رضي الله عنه عن النبي ﷺ قال: «سيد الاستغفار أن تقول: اللهم أنت ربي لا إله إلا أنت خلقتني وأنا عبدك أَنْ تَقُولَ: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ. قَالَ: وَمَنْ قَالَهَا من قالها من النهار موقنا بها فمات من يومه قبل أن يمسي فهو من أهل الجنة، وَمَنْ قَالَهَا مِنَ اللَّيْلِ وَهُوَ مُوقِنٌ بِهَا، فَمَاتَ قَبْلَ أَنْ يُصْبِحَ، فَهُوَ مِنْ أَهْلِ الْجَنَّةِ».",
+      "عن شداد بن أوس رضي الله عنه عن النبي ﷺ قال: «سَيِّدُ الِاسْتِغْفَارِ أَنْ تَقُولَ: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ». قَالَ: «وَمَنْ قَالَهَا مِنَ النَّهَارِ مُوقِنًا بِهَا فَمَاتَ مِنْ يَوْمِهِ قَبْلَ أَنْ يُمْسِيَ فَهُوَ مِنْ أَهْلِ الْجَنَّةِ، وَمَنْ قَالَهَا مِنَ اللَّيْلِ وَهُوَ مُوقِنٌ بِهَا فَمَاتَ قَبْلَ أَنْ يُصْبِحَ فَهُوَ مِنْ أَهْلِ الْجَنَّةِ».",
+    hadithTextEnglish:
+      "Shaddad ibn Aws (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “The master supplication for forgiveness is that you say: O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge before You Your favour upon me, and I acknowledge before You my sin, so forgive me — for none forgives sins but You.” He said: “Whoever says it during the day, certain of it, and dies that day before evening, is among the people of Paradise; and whoever says it at night, certain of it, and dies before morning, is among the people of Paradise.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -2941,6 +3067,8 @@ const MISCELLANEOUS_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Abu Dawud 5088; Jami' at-Tirmidhi 3388; Hisn al-Muslim 70.",
     hadithText:
       "عن عثمان بن عفان رضي الله عنه قال: قال رسول الله ﷺ: «ما من عبد يقول في صباح كل يوم ومساء كل ليلة: بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم ثلاث مرات لم يضره شيء».",
+    hadithTextEnglish:
+      "‘Uthman ibn ‘Affan (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No servant says, on the morning of every day and the evening of every night: In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing — three times — and anything then harms him.”",
     authenticityNote: "Sahih (Abu Dawud & At-Tirmidhi).",
   },
 ];

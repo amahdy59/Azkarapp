@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-06.3",
+  "release": "2026-09-06.4",
   "ar": [
-    "لم يعد التطبيق يرسل موقعك إلى أي جهة. كانت مواقيت الصلاة تُجلب من خدمة خارجية بإحداثياتك؛ صارت تُحسب على جهازك، وحُذف ما كان محفوظاً من تلك الخدمة عند أول تشغيل.",
-    "«مسح البيانات المحلية» صار يمسحها فعلاً: كان يترك صفحات المصحف والخطوط المحمّلة — وهي مئات الميغابايت — على الجهاز.",
-    "صارت ⚡ و🌴 تُحسبان من طريق اليوم: الأذكار وورد القرآن والصلاة في جماعة. أيامك السابقة تحتفظ بنخيلها كما كانت تماماً؛ القاعدة الجديدة تسري من اليوم فصاعداً.",
-    "صار «تذكير لك الآن» يختار ما يناسب وقتك من الأذكار المراجَعة، ويقرأ الأحاديث بالإنجليزية في النسخة الإنجليزية كلما توفّرت الترجمة."
+    "صارت النسخة الإنجليزية إنجليزية بالكامل: أذكار الصباح والمساء والنوم وأدبار الصلوات، وأذكار المواقف، ومجموعة الأدعية الجامعة — كلها صار لها نص إنجليزي مراجَع. النسخة العربية كما هي، والمصحف يبقى بالعربية في الحالتين.",
+    "يشمل ذلك الدليل نفسه: الحديث الذي تراه تحت «الدليل» صار يُقرأ بالإنجليزية إن كنت تقرأ بالإنجليزية، بعد أن كان النص العربي يظهر وحده تحت عنوان إنجليزي.",
+    "صُحّحت خمسة نصوص عربية كان فيها خلل: ثلاثة اختلطت فيها الروايات أو تكرّرت جملها أو سقط منها ما يدور عليه المعنى، وكلمتان محرَّفتان في دعاءين. وقد ظهرت جميعها أثناء الترجمة: ما لا يُترجم لا يستقيم قراءةً أصلاً."
   ],
   "en": [
-    "The app no longer sends your location anywhere. Prayer times used to be fetched from an outside service using your coordinates; they are calculated on your device now, and whatever that service left stored is deleted on first launch.",
-    "“Erase local data” now actually erases it. It used to leave your downloaded mushaf pages and fonts — hundreds of megabytes — on the device.",
-    "⚡ and 🌴 are now counted from today's path: your dhikr, your Qur'an wird and prayers in congregation. Your past days keep exactly the palms they already had; the new rule applies from today onward.",
-    "“Relevant now” picks a reviewed reminder that suits the time of day, and the English app reads its narrations in English wherever a translation is ready."
+    "The English app is now English throughout: the morning, evening, bedtime and after-prayer azkar, the situational duas, and the comprehensive supplication collection all have a reviewed English text. The Arabic app is unchanged, and the Mushaf stays in Arabic in both.",
+    "That includes the evidence itself. The hadith under “Reference” now reads in English when you are reading in English, instead of an Arabic paragraph under an English heading.",
+    "Five damaged Arabic texts were corrected: three had reports spliced together, clauses repeated, or had lost the phrase the whole account turns on, and two supplications carried a garbled word. All five surfaced while translating — a sentence that cannot be rendered is usually one that does not read in the first place."
   ]
 }
