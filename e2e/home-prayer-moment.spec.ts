@@ -58,8 +58,8 @@ test("recording the prayer as congregational works without leaving Home", async 
 });
 
 test("a quiet stretch between prayers keeps Home to the compact five", async ({ page }) => {
-  // Mid-morning: Fajr is hours past and Dhuhr is not close.
-  await openHomeAt(page, "2026-09-05T09:30:00");
+  // Late evening: Isha is hours past and Fajr is not close.
+  await openHomeAt(page, "2026-09-05T22:30:00");
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
   // The day's five are still there, as they always are.
   await expect(page.getByTestId("after-prayer-trackers")).toBeVisible();

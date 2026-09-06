@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 async function enterEnglishGuestMode(page: Page) {
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
   await page.goto("/");
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();

@@ -106,6 +106,7 @@ test("@cross-browser typography assigns UI and zikr text to their approved famil
 });
 
 test("Arabic Home keeps group controls in the approved RTL order and loads the scheduled scene", async ({ page }) => {
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
   await page.addInitScript(() => {
     window.localStorage.setItem(
       "azkarapp.state.v1",
@@ -172,6 +173,7 @@ test("Arabic Home keeps group controls in the approved RTL order and loads the s
 });
 
 async function enterEnglishGuestMode(page: import("@playwright/test").Page) {
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
   await page.goto("/");
   await page.getByTestId("language-option-en").click();
   await page.getByTestId("confirm-language").click();

@@ -2,6 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 /** Fresh guest at Home, Arabic, with the prayer tracker on screen. */
 async function openHome(page: Page) {
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
