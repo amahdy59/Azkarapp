@@ -3197,3 +3197,48 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
 - **Tests/evidence required:** `pnpm check` green; the narration verified in the
   browser as lang="en" with the Arabic face dropped, and the Arabic app verified
   unchanged; the title checked in both languages.
+
+## DEC-155 — the reminder gains a reviewed source library, loaded after first paint
+
+- **Decision:** the contextual reminder draws on a curated library of 41
+  sources — 18 Qur'an passages and 23 Sahih narrations — in addition to the
+  azkar corpus, selected by the moment of the day rather than only by the
+  collection the hour belongs to.
+- **This reverses a decision made in DEC-152, deliberately.** That module argued
+  against a second content library: a parallel module would mean a second pool
+  to review and a second card on Home. The user has since reviewed and signed
+  off the 41 sources, so the premise no longer holds. What the original
+  reasoning protected is kept — the library is an additional pool feeding the
+  same card, never a second card — and the module comment was rewritten rather
+  than left contradicting the code.
+- **Qur'anic Arabic is generated, never typed.** A new script fetches the 18
+  verse ranges from the same service and the same editions the app already uses
+  for its Qur'an text, and writes them to a generated file that the curation
+  imports by id. The fetched Ayat al-Kursi is byte-identical to the copy the app
+  already ships, which is how the pipeline was verified rather than trusted. The
+  generator formats its own output, because generated code that is not
+  Prettier-shaped fails the gate for whoever regenerates it next.
+- **Four narrations are delegated, not copied.** H08, H16, H17 and H18 already
+  exist as reviewed azkar, so they carry a zikr id and resolve through the
+  corpus. A second copy would be a second thing to correct.
+- **The library is never in the first chunk.** It is passed into the selection
+  function rather than imported by it, and Home fetches it with a dynamic import
+  after first paint, showing the corpus-derived reminder until it resolves. The
+  bundle budget confirms the initial route is unchanged — this is the growth
+  DEC-153 had to re-baseline, and it does not repeat.
+- **The library only wins where it is at least as specific.** Both pools return
+  the context they matched, and the library replaces the corpus answer only when
+  its context ranks no lower in the ordered list. Otherwise a Friday source would
+  displace the Asr one the reader is actually in the window for.
+- **Two curation gaps were found by wiring it up.** Q02 is listed in no pool by
+  the source spec and was placed in the general pool, matching its stated
+  context of any obligatory prayer. H09 was curated for the forenoon alone, and
+  the forenoon is not derived — sunrise is computed inside the prayer maths and
+  never reported, and guessing it from the leading prayer would be a second
+  clock disagreeing with the first. H09 was given the morning context so it is
+  reachable, and a test now fails if any source is reachable only through an
+  underived context.
+- **Tests/evidence required:** 15 tests covering the shape of the library, the
+  ordering rules, stability within a day, and the language of each kind of
+  source; `pnpm check` green with the bundle budget unchanged; the card verified
+  in the browser selecting a Qur'an source for the morning context.

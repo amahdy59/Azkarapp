@@ -26,6 +26,27 @@ export const CATEGORY_IDS = [
   "miscellaneous",
 ] as const;
 export type CategoryId = (typeof CATEGORY_IDS)[number];
+
+/**
+ * A moment in the day the contextual reminder can speak to.
+ *
+ * Deliberately not `CategoryId`: the categories are collections of azkar, and
+ * there is no category for "Asr" or "the last third of the night". These name
+ * the moment rather than a collection, which is what the reminder selects on.
+ */
+export type PrayerMomentContext =
+  "before_fajr" | "fajr" | "dhuha" | "dhuhr" | "asr" | "maghrib" | "isha" | "last_third";
+
+/** A day, or a window within one, that carries its own reviewed evidence. */
+export type DayMomentContext = "friday" | "friday_after_asr" | "monday" | "thursday";
+
+/**
+ * What the reminder can be about, narrowest first when they are ordered.
+ *
+ * `general` is the floor rather than a competitor — it is what remains when no
+ * more specific pool has anything in it.
+ */
+export type ReminderContext = CategoryId | PrayerMomentContext | DayMomentContext | "general";
 export type TextSizeOption = "small" | "medium" | "large";
 
 /**

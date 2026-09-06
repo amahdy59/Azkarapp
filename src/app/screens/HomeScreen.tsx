@@ -5,7 +5,8 @@ import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getContextualEvidence, getReminderContexts } from "../dailyEvidence";
+import { getContextualEvidence, getReminderContexts, selectLibraryEvidence } from "../dailyEvidence";
+import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../types";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
@@ -415,15 +416,88 @@ export function HomeScreen({
      been recorded and its adhkar are what follows — so this adds no second
      clock and no second content library. Stable for the day within a context,
      so returning to Home does not re-roll it. */
-  const contextualEvidence = useMemo(() => {
-    const contexts = getReminderContexts({
+  const reminderContexts = useMemo(() => {
+    /* Every one of these is read from a clock the app already keeps. The
+       weekday comes from `now`; the prayer window from the leading moment; the
+       last third from the collection the hour already resolves to, which is
+       what "comprehensive_duas" means late at night. `dhuha` is deliberately
+       not derived: sunrise is computed inside the prayer maths and not
+       reported, and guessing the forenoon from the leading prayer would be a
+       second clock disagreeing with the first. */
+    const weekday = now.getDay();
+    const dayMoments: DayMomentContext[] = [];
+    if (weekday === 5 && leadingPrayer?.prayer === "asr") dayMoments.push("friday_after_asr");
+    if (weekday === 5) dayMoments.push("friday");
+    if (weekday === 1) dayMoments.push("monday");
+    if (weekday === 4) dayMoments.push("thursday");
+
+    const prayerMoment: PrayerMomentContext | undefined =
+      reminderInfo.categoryId === "comprehensive_duas"
+        ? "last_third"
+        : leadingPrayer?.prayer === "fajr" && leadingPrayer.phase === "approaching"
+          ? "before_fajr"
+          : leadingPrayer?.prayer;
+
+    return getReminderContexts({
       afterPrayer: leadingPrayer?.phase === "recorded" && !leadingPrayer.adhkarDone,
       activePrayer: leadingPrayer ? "after_prayer" : undefined,
       timedCollection: reminderInfo.categoryId,
+      prayerMoment,
+      dayMoments,
     });
-    return getContextualEvidence(todayKey, language, contexts);
-  }, [language, leadingPrayer, reminderInfo.categoryId, todayKey]);
-  const dailyEvidence = contextualEvidence?.evidence ?? null;
+  }, [leadingPrayer, now, reminderInfo.categoryId]);
+
+  const contextualEvidence = useMemo(
+    () => getContextualEvidence(todayKey, language, reminderContexts),
+    [language, reminderContexts, todayKey],
+  );
+
+  /* The reviewed source library is fetched after first paint and never before.
+     It is 41 sources of Arabic and English, and a static import would put them
+     in the chunk that paints this screen — the growth DEC-153 had to
+     re-baseline. Until it resolves the card shows the corpus-derived reminder,
+     so nothing is blocked and nothing is empty. */
+  const [libraryEvidence, setLibraryEvidence] = useState<ReturnType<typeof getContextualEvidence>>(null);
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      const [{ RELEVANT_NOW_LIBRARY }, { RELEVANT_NOW_VERSES }] = await Promise.all([
+        import("../content/relevantNowLibrary"),
+        import("../content/relevantNowVerses"),
+      ]);
+      if (cancelled) return;
+      setLibraryEvidence(
+        selectLibraryEvidence(RELEVANT_NOW_LIBRARY, RELEVANT_NOW_VERSES, todayKey, language, reminderContexts),
+      );
+    };
+
+    /* Waited for idle rather than fired on mount. An effect runs while the
+       screen is still loading its own collections, so "after first paint" was
+       not what this did — it competed with them, and the first thing to suffer
+       is the load the reader is actually waiting on. The timeout keeps it from
+       being postponed indefinitely on a busy tab. */
+    const idle =
+      typeof window.requestIdleCallback === "function"
+        ? window.requestIdleCallback(() => void load(), { timeout: 2000 })
+        : window.setTimeout(() => void load(), 200);
+    return () => {
+      cancelled = true;
+      if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idle);
+      else window.clearTimeout(idle);
+    };
+  }, [language, reminderContexts, todayKey]);
+
+  /* The library wins only where it is at least as specific as what the corpus
+     found. Otherwise a Friday source would displace the Asr one the reader is
+     actually in the window for. */
+  const dailyEvidence = useMemo(() => {
+    if (!libraryEvidence) return contextualEvidence?.evidence ?? null;
+    if (!contextualEvidence) return libraryEvidence.evidence;
+    const rank = (context: ReminderContext) => reminderContexts.indexOf(context);
+    return rank(libraryEvidence.context) <= rank(contextualEvidence.context)
+      ? libraryEvidence.evidence
+      : contextualEvidence.evidence;
+  }, [contextualEvidence, libraryEvidence, reminderContexts]);
   const isLastThirdDua = reminderInfo.categoryId === "comprehensive_duas";
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 

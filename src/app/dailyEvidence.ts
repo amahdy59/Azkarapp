@@ -1,6 +1,13 @@
 import { ALL_AZKAR } from "./content/azkar";
 import { toArabicAttribution, toArabicBenefit, toArabicSourceReference } from "./content/attributionArabic";
-import type { AppLanguage, CategoryId, Zikr } from "./types";
+import type { AppLanguage, CategoryId, DayMomentContext, PrayerMomentContext, ReminderContext, Zikr } from "./types";
+import type { RelevantNowSource } from "./content/relevantNowLibrary";
+import type { RelevantNowVerse } from "./content/relevantNowVerses";
+
+/* Re-exported so callers keep importing the reminder vocabulary from the module
+   that uses it. The types themselves live in types.ts because the library
+   content declares its own contexts and must not import this module back. */
+export type { DayMomentContext, PrayerMomentContext, ReminderContext };
 
 /**
  * One piece of reviewed evidence a day: the narration behind a zikr, its
@@ -13,7 +20,13 @@ import type { AppLanguage, CategoryId, Zikr } from "./types";
  * there rather than introducing text that would need reviewing on its own.
  */
 export interface DailyEvidence {
-  zikrId: string;
+  /**
+   * The zikr this came from, when it came from one.
+   *
+   * Absent for the reviewed source library, whose Qur'an passages and
+   * narrations are not azkar and have no collection to open.
+   */
+  zikrId?: string;
   /** The narration, in the reader's language where a rendering exists. */
   hadith: string;
   /**
@@ -30,8 +43,8 @@ export interface DailyEvidence {
   benefit: string;
   sourceReference?: string;
   authenticityLevel?: Zikr["authenticityLevel"];
-  /** The zikr this came from, so the card can offer to open it. */
-  categoryId: Zikr["category"];
+  /** The collection the zikr belongs to, when this came from one. */
+  categoryId?: Zikr["category"];
 }
 
 /**
@@ -104,14 +117,15 @@ export const DAILY_EVIDENCE_CYCLE_DAYS = POOL.length;
  * it. Same reviewed content, same deterministic rotation — only the pool
  * changes.
  *
- * It is deliberately not a second content library. Every item here already
- * carries a narration, a grading and a benefit that a reviewer signed off, and
- * the corpus is already organised by exactly the contexts this needs: 26
- * morning, 24 evening, 18 before sleep, 15 after prayer. A parallel module
- * would have meant a second pool to review and a second card on Home showing a
- * hadith beside the first.
+ * This began as the azkar corpus alone, on the reasoning that a parallel module
+ * would mean a second pool to review. A reviewed library of 41 sources — 18
+ * Qur'an passages and 23 Sahih narrations, curated per moment — has since been
+ * signed off, so that reasoning no longer holds and the decision is reversed.
+ * What it bought is still the point: the library is an additional pool feeding
+ * this same card, never a second card, and it arrives through
+ * {@link selectLibraryEvidence} rather than an import, so it cannot be pulled
+ * into the chunk that paints the first screen.
  */
-export type ReminderContext = CategoryId | "general";
 
 /**
  * The contexts that fit this moment, most specific first.
@@ -120,6 +134,10 @@ export type ReminderContext = CategoryId | "general";
  * bedtime reminder outranks a generic one, and the general pool is the floor
  * rather than a competitor. The caller supplies the moment; this file does not
  * own a second clock.
+ *
+ * The day contexts sit below the moment ones deliberately: on a Friday
+ * afternoon the reminder should still be about Asr, and Friday's own evidence
+ * surfaces in the hours that belong to nothing narrower.
  */
 export function getReminderContexts(input: {
   /** The prayer whose window is open, when one is. */
@@ -128,11 +146,22 @@ export function getReminderContexts(input: {
   timedCollection?: CategoryId;
   /** True when the reader has recorded the prayer and its adhkar are next. */
   afterPrayer?: boolean;
+  /** The prayer window or night watch the clock is in, when it is in one. */
+  prayerMoment?: PrayerMomentContext;
+  /** Windows the weekday opens, narrowest first. */
+  dayMoments?: readonly DayMomentContext[];
 }): ReminderContext[] {
   const contexts: ReminderContext[] = [];
+  /* Friday's response hour is the narrowest window in the week and outranks
+     everything, including the prayer whose window it sits inside. */
+  if (input.dayMoments?.includes("friday_after_asr")) contexts.push("friday_after_asr");
   if (input.afterPrayer) contexts.push("after_prayer");
+  if (input.prayerMoment) contexts.push(input.prayerMoment);
   if (input.activePrayer) contexts.push(input.activePrayer);
   if (input.timedCollection) contexts.push(input.timedCollection);
+  for (const day of input.dayMoments ?? []) {
+    if (day !== "friday_after_asr") contexts.push(day);
+  }
   contexts.push("general");
   return contexts;
 }
@@ -159,4 +188,78 @@ export function getContextualEvidence(
     return { evidence: shapeEvidence(zikr, language), context };
   }
   return null;
+}
+
+/**
+ * The same choice, made over the reviewed source library instead of the corpus.
+ *
+ * The library is passed in rather than imported. `dailyEvidence.ts` is reached
+ * from Home, which is the initial route, and 41 sources of Arabic and English
+ * would land in the chunk that paints the first screen — the growth DEC-153
+ * had to re-baseline. The caller loads it with `import()` after first paint and
+ * hands it here.
+ *
+ * Selection is the same deterministic hash over the day and the context, so a
+ * source is stable for the day and the two pools cannot disagree about what
+ * "stable" means.
+ */
+export function selectLibraryEvidence(
+  library: readonly RelevantNowSource[],
+  verses: readonly RelevantNowVerse[],
+  dayKey: string,
+  language: AppLanguage,
+  contexts: readonly ReminderContext[],
+): { evidence: DailyEvidence; context: ReminderContext } | null {
+  for (const context of contexts) {
+    const pool = library.filter((source) => source.contexts.includes(context));
+    if (pool.length === 0) continue;
+    const source = pool[hashDayKey(`${dayKey}|${context}`) % pool.length]!;
+    const evidence = shapeLibrarySource(source, verses, language);
+    if (evidence) return { evidence, context };
+  }
+  return null;
+}
+
+/** One library source in the shape the card already renders. */
+function shapeLibrarySource(
+  source: RelevantNowSource,
+  verses: readonly RelevantNowVerse[],
+  language: AppLanguage,
+): DailyEvidence | null {
+  const isArabic = language === "ar";
+  const benefit = isArabic ? source.messageArabic : source.message;
+
+  if (source.type === "quran") {
+    const verse = verses.find((entry) => entry.id === source.id);
+    if (!verse) return null;
+    return {
+      /* The Qur'an is quoted in Arabic to every reader. A translation is a
+         translation, and the card says so by carrying the Pickthall rendering
+         as the line underneath rather than in place of the verse. */
+      hadith: verse.arabic,
+      hadithInArabic: true,
+      authenticity: isArabic
+        ? `${verse.referenceArabic} — ${verse.surahArabic}`
+        : `${verse.reference} — ${verse.surahEnglish}`,
+      benefit: isArabic ? benefit : `${verse.english} — ${benefit}`,
+    };
+  }
+
+  /* A narration the corpus already carries is looked up rather than copied, so
+     a correction to it cannot leave two versions disagreeing. */
+  if (source.zikrId) {
+    const zikr =
+      POOL.find((entry) => entry.id === source.zikrId) ?? ALL_AZKAR.find((entry) => entry.id === source.zikrId);
+    if (!zikr) return null;
+    return { ...shapeEvidence(zikr, language), benefit };
+  }
+
+  const inArabic = isArabic || !source.english;
+  if (!source.arabic) return null;
+  return {
+    hadith: inArabic ? source.arabic : source.english!,
+    hadithInArabic: inArabic,
+    authenticity: (isArabic ? source.referenceArabic : source.reference) ?? "",
+    benefit,
+  };
 }

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.4",
+  "release": "2026-09-06.5",
   "ar": [
-    "صارت النسخة الإنجليزية إنجليزية بالكامل: أذكار الصباح والمساء والنوم وأدبار الصلوات، وأذكار المواقف، ومجموعة الأدعية الجامعة — كلها صار لها نص إنجليزي مراجَع. النسخة العربية كما هي، والمصحف يبقى بالعربية في الحالتين.",
-    "يشمل ذلك الدليل نفسه: الحديث الذي تراه تحت «الدليل» صار يُقرأ بالإنجليزية إن كنت تقرأ بالإنجليزية، بعد أن كان النص العربي يظهر وحده تحت عنوان إنجليزي.",
-    "صُحّحت خمسة نصوص عربية كان فيها خلل: ثلاثة اختلطت فيها الروايات أو تكرّرت جملها أو سقط منها ما يدور عليه المعنى، وكلمتان محرَّفتان في دعاءين. وقد ظهرت جميعها أثناء الترجمة: ما لا يُترجم لا يستقيم قراءةً أصلاً."
+    "صار «تذكير لك الآن» يختار من مكتبة مراجَعة من ٤١ مصدراً: ثمانية عشر موضعاً من القرآن وثلاثاً وعشرين رواية صحيحة، منسوبة كل واحدة إلى وقتها — ما قبل الفجر، والعصر، وآخر الليل، والجمعة بعد العصر، والاثنين والخميس.",
+    "بطاقة التذكير في الصفحة الرئيسية صارت تقرأ بالإنجليزية في النسخة الإنجليزية. كانت تعرض النص العربي تحت عنوان إنجليزي، وهو آخر موضع بقي كذلك بعد تعريب الترجمة كاملة.",
+    "اسم التطبيق صار يظهر في عنوان المتصفح: «وَذَكِّرْ» في العربية و«wa-ziker» في الإنجليزية، بعد أن كان الاسم القديم باقياً في كل تبويب وكل إشارة مرجعية."
   ],
   "en": [
-    "The English app is now English throughout: the morning, evening, bedtime and after-prayer azkar, the situational duas, and the comprehensive supplication collection all have a reviewed English text. The Arabic app is unchanged, and the Mushaf stays in Arabic in both.",
-    "That includes the evidence itself. The hadith under “Reference” now reads in English when you are reading in English, instead of an Arabic paragraph under an English heading.",
-    "Five damaged Arabic texts were corrected: three had reports spliced together, clauses repeated, or had lost the phrase the whole account turns on, and two supplications carried a garbled word. All five surfaced while translating — a sentence that cannot be rendered is usually one that does not read in the first place."
+    "“Relevant now” chooses from a reviewed library of 41 sources — 18 Qur'an passages and 23 authentic narrations — each curated for a moment: before Fajr, Asr, the last third of the night, Friday after Asr, Monday and Thursday.",
+    "The reminder card on Home now reads in English in the English app. It had been showing the Arabic under an English heading — the last place that was still true after the translation work.",
+    "The app's name now appears in the browser tab: “وَذَكِّرْ” in Arabic and “wa-ziker” in English. The old name had been left in every tab and bookmark by the rename."
   ]
 }
