@@ -22,6 +22,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
       "Morning: after Fajr until sunrise. Evening: after \u2018Asr until sunset as a strong recommended dhikr sitting.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0644\u064e\u0623\u064e\u0646\u0652 \u0623\u064e\u0642\u0652\u0639\u064f\u062f\u064e \u0645\u064e\u0639\u064e \u0642\u064e\u0648\u0652\u0645\u064d \u064a\u064e\u0630\u0652\u0643\u064f\u0631\u064f\u0648\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064e \u0645\u0650\u0646\u0652 \u0635\u064e\u0644\u0627\u064e\u0629\u0650 \u0627\u0644\u0652\u063a\u064e\u062f\u064e\u0627\u0629\u0650 \u062d\u064e\u062a\u0651\u064e\u0649 \u062a\u064e\u0637\u0652\u0644\u064f\u0639\u064e \u0627\u0644\u0634\u0651\u064e\u0645\u0652\u0633\u064f \u0623\u064e\u062d\u064e\u0628\u0651\u064f \u0625\u0650\u0644\u064e\u064a\u0651\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0646\u0652 \u0623\u064f\u0639\u0652\u062a\u0650\u0642\u064e \u0623\u064e\u0631\u0652\u0628\u064e\u0639\u064e\u0629\u064b \u0645\u0650\u0646\u0652 \u0648\u064e\u0644\u064e\u062f\u0650 \u0625\u0650\u0633\u0652\u0645\u064e\u0627\u0639\u0650\u064a\u0644\u064e، وَلِأَنْ أَقْعُدَ مَعَ قَوْمٍ يَذْكُرُونَ اللَّهَ \u0648\u0645\u0646 \u0635\u0644\u0627\u0629 \u0627\u0644\u0639\u0635\u0631 \u0625\u0644\u0649 \u0623\u0646 \u062a\u063a\u0631\u0628 \u0627\u0644\u0634\u0645\u0633\u00bb \u0628\u0645\u0639\u0646\u0627\u0647.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “That I should sit with a people remembering Allah from the dawn prayer until the sun rises is dearer to me than freeing four of the descendants of Isma‘il; and that I should sit with a people remembering Allah from the afternoon prayer until the sun sets…” — reported to this effect.",
     authenticityNote: "Hasan according to al-Albani as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Included as the opening item of the morning/evening chapter.",
     sourceUrl: "https://sunnah.com/hisn%3A75a",
@@ -46,6 +48,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0623\u064f\u062c\u064a\u0631 \u0645\u0646 \u0627\u0644\u062c\u0646 \u062d\u062a\u0649 \u064a\u0645\u0633\u064a\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0623\u064f\u062c\u064a\u0631 \u0645\u0646\u0647\u0645 \u062d\u062a\u0649 \u064a\u0635\u0628\u062d.",
+    hadithTextEnglish:
+      "It is reported that whoever says it in the morning is protected from the jinn until the evening, and whoever says it in the evening is protected from them until the morning.",
     authenticityNote:
       "Authenticated by al-Albani in Sahih al-Targhib wa al-Tarhib as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
@@ -75,6 +79,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa \u0644\u0645\u0646 \u0633\u0623\u0644\u0647 \u0645\u0627 \u064a\u0642\u0648\u0644 \u0625\u0630\u0627 \u0623\u0635\u0628\u062d \u0648\u0625\u0630\u0627 \u0623\u0645\u0633\u0649: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said to the one who asked him what to say morning and evening: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Falaq and an-Nas three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -103,6 +109,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Ikhlas and an-Nas three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -131,6 +139,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Ikhlas and al-Falaq three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -154,6 +164,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0625\u0630\u0627 \u0623\u0635\u0628\u062d \u0642\u0627\u0644 \u0647\u0630\u0627 \u0627\u0644\u0630\u0643\u0631\u060c \u0648\u0641\u064a \u0631\u0648\u0627\u064a\u0629 \u0645\u0633\u0644\u0645: \u00ab\u0648\u0625\u0630\u0627 \u0623\u0645\u0633\u0649 \u0642\u0627\u0644: \u0623\u0645\u0633\u064a\u0646\u0627 \u0648\u0623\u0645\u0633\u0649 \u0627\u0644\u0645\u0644\u0643 \u0644\u0644\u0647، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ\u00bb \u0645\u0639 \u062a\u063a\u064a\u064a\u0631 \u0627\u0644\u064a\u0648\u0645 \u0625\u0644\u0649 \u0627\u0644\u0644\u064a\u0644\u0629.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said this remembrance when he rose in the morning. In Muslim's narration: “and when evening came he said: We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave” — with the day changed to the night.",
     authenticityNote: "Sahih Muslim.",
     notes: "Use the evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A77",
@@ -176,6 +188,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: كَانَ النَّبِيُّ ﷺ يُعَلِّمُ أَصْحَابَهُ يَقُولُ: إِذَا أَصْبَحَ أَحَدُكُمْ فَلْيَقُلْ: «اللَّهُمَّ بِكَ أَصْبَحْنَا، وَبِكَ أَمْسَيْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ النُّشُورُ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Prophet ﷺ used to teach his companions, saying: When one of you rises in the morning, let him say: “O Allah, by You we have reached the morning and by You we have reached the evening; by You we live and by You we die, and to You is the resurrection.”",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "Use the evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A78",
@@ -197,6 +211,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0633\u064e\u064a\u0651\u0650\u062f\u064f \u0627\u0644\u0650\u0627\u0633\u0652\u062a\u0650\u063a\u0652\u0641\u064e\u0627\u0631\u0650 أَنْ تَقُولَ: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ\u00bb \u062b\u0645 \u0630\u0643\u0631\u0647\u060c \u0648\u0642\u0627\u0644: \u00ab\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e\u0647\u064e\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0646\u0651\u064e\u0647\u064e\u0627\u0631\u0650 \u0645\u064f\u0648\u0642\u0650\u0646\u064b\u0627 \u0628\u0650\u0647\u064e\u0627 \u0641\u064e\u0645\u064e\u0627\u062a\u064e \u0645\u0650\u0646\u0652 \u064a\u064e\u0648\u0652\u0645\u0650\u0647\u0650 قَبْلَ أَنْ يُمْسِيَ، \u0641\u064e\u0647\u064f\u0648\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0647\u0652\u0644\u0650 \u0627\u0644\u0652\u062c\u064e\u0646\u0651\u064e\u0629\u0650\u060c \u0648\u064e\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e\u0647\u064e\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u064a\u0652\u0644\u0650 وَهُوَ مُوقِنٌ بِهَا، فَمَاتَ قَبْلَ أَنْ يُصْبِحَ، \u0641\u064e\u0647\u064f\u0648\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0647\u0652\u0644\u0650 \u0627\u0644\u0652\u062c\u064e\u0646\u0651\u064e\u0629\u0650\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “The best manner of seeking forgiveness is to say: O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for none forgives sins but You.” Then he said: “Whoever says it during the day with certainty in it and dies that day before evening is among the people of Paradise; and whoever says it at night with certainty in it and dies before morning is among the people of Paradise.”",
     authenticityNote: "Sahih al-Bukhari.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A79",
@@ -220,6 +236,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0623\u0648 \u064a\u0645\u0633\u064a \u0645\u0631\u0629 \u0623\u0639\u062a\u0642 \u0627\u0644\u0644\u0647 \u0631\u0628\u0639\u064e\u0647 \u0645\u0646 \u0627\u0644\u0646\u0627\u0631\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u0645\u0631\u062a\u064a\u0646 \u0623\u0639\u062a\u0642 \u0646\u0635\u0641\u0647\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u0623\u0639\u062a\u0642 \u062b\u0644\u0627\u062b\u0629 \u0623\u0631\u0628\u0627\u0639\u0647\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u0623\u0631\u0628\u0639\u064b\u0627 \u0623\u0639\u062a\u0642\u0647 \u0627\u0644\u0644\u0647 \u0645\u0646 \u0627\u0644\u0646\u0627\u0631.",
+    hadithTextEnglish:
+      "It is reported that whoever says it once in the morning or the evening, Allah frees a quarter of him from the Fire; whoever says it twice, a half; whoever says it three times, three quarters; and whoever says it four times, Allah frees him from the Fire.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Use evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A80",
@@ -243,6 +261,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0641\u0642\u062f \u0623\u062f\u0651\u0649 \u0634\u0643\u0631 \u064a\u0648\u0645\u0647\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0641\u0642\u062f \u0623\u062f\u0651\u0649 \u0634\u0643\u0631 \u0644\u064a\u0644\u062a\u0647.",
+    hadithTextEnglish:
+      "It is reported that whoever says it in the morning has fulfilled the thanks owed for his day, and whoever says it in the evening has fulfilled the thanks owed for his night.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Use evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A81",
@@ -264,6 +284,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0639\u0644\u0651\u0645 \u0623\u0646 \u064a\u0642\u0627\u0644 \u0647\u0630\u0627 \u0627\u0644\u062f\u0639\u0627\u0621 \u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0648\u062d\u064a\u0646 \u064a\u0645\u0633\u064a.",
+    hadithTextEnglish:
+      "The Prophet ﷺ taught that this supplication be said three times in the morning and three times in the evening.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A82",
@@ -285,6 +307,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: مَنْ قَالَ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ» سَبْعَ مَرَّاتٍ كَفَاهُ اللَّهُ مَا أَهَمَّهُ.",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: Whoever says in the morning and in the evening: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne” seven times, Allah will suffice him in whatever troubles him.",
     authenticityNote: "Reported as accepted/authentic in cited sources; grading noted by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A83",
@@ -306,6 +330,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ رضي الله عنهما قَالَ: لَمْ يَكُنْ رَسُولُ اللَّهِ ﷺ يَدَعُ هَؤُلاَءِ الدَّعَوَاتِ حِينَ يُمْسِي وَحِينَ يُصْبِحُ: «اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي».",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: The Messenger of Allah ﷺ never left these supplications, evening and morning: “O Allah, I ask You for wellbeing in this world and the next. O Allah, I ask You for pardon and wellbeing in my religion, my worldly life, my family and my property. O Allah, conceal my faults and calm my fears. O Allah, guard me from before me and behind me, from my right and my left and from above me, and I seek refuge in Your greatness from being taken unawares from beneath me.”",
     authenticityNote: "Authentic/Hasan as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A84",
@@ -328,6 +354,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa \u0644\u0623\u0628\u064a \u0628\u0643\u0631 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u00ab\u0642\u064f\u0644\u0652\u0647\u064f \u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062e\u064e\u0630\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said to Abu Bakr (may Allah be pleased with him): “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Also appears in before-sleep adhkar.",
     sourceUrl: "https://sunnah.com/hisn%3A85",
@@ -349,6 +377,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after ‘Asr/sunset window.",
     hadithText:
       "عَنْ عُثْمَانَ بْنِ عَفَّانَ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَا مِنْ عَبْدٍ يَقُولُ فِي صَبَاحِ كُلِّ يَوْمٍ وَمَسَاءِ كُلِّ لَيْلَةٍ: بِسْمِ اللَّهِ الَّذِي لَا يَضُرُّ مَعَ اسْمِهِ شَيْءٌ فِي الْأَرْضِ وَلَا فِي السَّمَاءِ وَهُوَ السَّمِيعُ الْعَلِيمُ، ثَلَاثَ مَرَّاتٍ، فَيَضُرَّهُ شَيْءٌ».",
+    hadithTextEnglish:
+      "‘Uthman ibn ‘Affan (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “No servant says, on the morning of every day and the evening of every night: In the name of Allah, with whose name nothing on earth or in heaven can cause harm, and He is the All-Hearing, the All-Knowing — three times — and anything then harms him.”",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A86",
@@ -370,6 +400,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0648\u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0643\u0627\u0646 \u062d\u0642\u064b\u0627 \u0639\u0644\u0649 \u0627\u0644\u0644\u0647 \u0623\u0646 \u064a\u0631\u0636\u064a\u0647 \u064a\u0648\u0645 \u0627\u0644\u0642\u064a\u0627\u0645\u0629.",
+    hadithTextEnglish:
+      "It is reported that whoever says it three times in the morning and three times in the evening, it is a right upon Allah to please him on the Day of Resurrection.",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A87",
@@ -391,6 +423,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after ‘Asr/sunset window.",
     hadithText:
       "عَنْ أَنَسِ بْنِ مَالِكٍ رضي الله عنه قَالَ: قَالَ النَّبِيُّ ﷺ لِفَاطِمَةَ رَضِيَ اللَّهُ عَنْهَا: «مَا يَمْنَعُكِ أَنْ تَسْمَعِي مَا أُوصِيكِ بِهِ؟ أَنْ تَقُولِي إِذَا أَصْبَحْتِ وَإِذَا أَمْسَيْتِ: يَا حَيُّ يَا قَيُّومُ بِرَحْمَتِكَ أَسْتَغِيثُ، أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ».",
+    hadithTextEnglish:
+      "Anas ibn Malik (may Allah be pleased with him) said: The Prophet ﷺ said to Fatimah (may Allah be pleased with her): “What keeps you from hearing what I counsel you with? Say, when you rise in the morning and when you reach the evening: O Ever-Living, O Sustainer, by Your mercy I seek help. Set right all my affairs, and do not entrust me to myself for the blink of an eye.”",
     authenticityNote: "Hasan according to al-Albani as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A88",
@@ -413,6 +447,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ رضي الله عنه قَالَ: كَانَ نَبِيُّ اللَّهِ ﷺ إِذَا أَمْسَى قَالَ: «أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ»، وَإِذَا أَصْبَحَ قَالَ ذَلِكَ أَيْضًا: «أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ، وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ، وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ».",
+    hadithTextEnglish:
+      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: When evening came, the Prophet of Allah ﷺ would say: “We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.” And when morning came he would say the same, with the night changed to the day.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Use evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A89",
@@ -437,6 +473,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr.",
     hadithText:
       "عَنْ عَبْدِ الرَّحْمَنِ بْنِ أَبْزَى رضي الله عنه عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ يَقُولُ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «أَصْبَحْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا، وَمَا كَانَ مِنَ الْمُشْرِكِينَ».",
+    hadithTextEnglish:
+      "‘Abd al-Rahman ibn Abza (may Allah be pleased with him) reported from the Prophet ﷺ that he used to say, morning and evening: “We have risen upon the natural way of Islam, upon the word of sincerity, upon the religion of our Prophet Muhammad ﷺ, and upon the creed of our father Ibrahim, upright and submitting; and he was not among those who associate others with Allah.”",
     authenticityNote: "Included in Hisn al-Muslim; grading not displayed on the Sunnah.com page.",
     notes: "Use evening wording in the evening row.",
     sourceUrl: "https://sunnah.com/hisn%3A90",
@@ -456,6 +494,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e \u0633\u064f\u0628\u0652\u062d\u064e\u0627\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0648\u064e\u0628\u0650\u062d\u064e\u0645\u0652\u062f\u0650\u0647\u0650 \u0641\u0650\u064a \u064a\u064e\u0648\u0652\u0645\u064d \u0645\u0650\u0627\u0626\u064e\u0629\u064e \u0645\u064e\u0631\u0651\u064e\u0629\u064d \u062d\u064f\u0637\u0651\u064e\u062a\u0652 \u062e\u064e\u0637\u064e\u0627\u064a\u064e\u0627\u0647\u064f \u0648\u064e\u0625\u0650\u0646\u0652 \u0643\u064e\u0627\u0646\u064e\u062a\u0652 \u0645\u0650\u062b\u0652\u0644\u064e \u0632\u064e\u0628\u064e\u062f\u0650 \u0627\u0644\u0652\u0628\u064e\u062d\u0652\u0631\u0650\u00bb\u060c \u0648\u0648\u0631\u062f \u0641\u0636\u0644\u0647\u0627 \u0635\u0628\u0627\u062d\u064b\u0627 \u0648\u0645\u0633\u0627\u0621\u064b.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Whoever says: Glory be to Allah and praise be to Him — a hundred times in a day, his sins are wiped away, even were they like the foam of the sea.” Its merit is likewise reported morning and evening.",
     authenticityNote: "Sahih al-Bukhari.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A91",
@@ -480,6 +520,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Upon rising in the morning; can be recited any time during the day.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، فِي يَوْمٍ مِائَةَ مَرَّةٍ، كَانَتْ لَهُ عَدْلَ عَشْرِ رِقَابٍ، وَكَانَتْ لَهُ حِرْزًا مِنَ الشَّيْطَانِ يَوْمَهُ ذَلِكَ حَتَّى يُمْسِيَ، وَلَمْ يَأْتِ أَحَدٌ بِأَفْضَلَ مِمَّا جَاءَ بِهِ إِلَّا أَحَدٌ عَمِلَ أَكْثَرَ مِنْ ذَلِكَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — a hundred times in a day, it is for him the equal of freeing ten slaves, and it is a protection for him from Satan for that day until evening; and no one brings anything better than what he brought, except one who does more than that.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     notes: "Same wording as HM-92 but with 100 count.",
     sourceUrl: "https://sunnah.com/hisn%3A93",
@@ -501,6 +543,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Upon rising in the morning.",
     hadithText:
       "عَنْ جُوَيْرِيَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ خَرَجَ مِنْ عِنْدِهَا بُكْرَةً حِينَ صَلَّى الصُّبْحَ وَهِيَ فِي مَسْجِدِهَا ثُمَّ رَجَعَ بَعْدَ أَنْ أَضْحَى وَهِيَ جَالِسَةٌ فَقَالَ: «لَقَدْ قُلْتُ بَعْدَكِ أَرْبَعَ كَلِمَاتٍ ثَلاَثَ مَرَّاتٍ لَوْ وُزِنَتْ بِمَا قُلْتِ مُنْذُ الْيَوْمِ لَوَزَنَتْهُنَّ: سُبْحَانَ اللَّهِ وَبِحَمْدِهِ عَدَدَ خَلْقِهِ وَرِضَا نَفْسِهِ وَزِنَةَ عَرْشِهِ وَمِدَادَ كَلِمَاتِهِ».",
+    hadithTextEnglish:
+      "Juwayriyah (may Allah be pleased with her) reported that the Prophet ﷺ left her early, after he had prayed the dawn prayer, while she was in her place of prayer; then he returned after the forenoon and she was still sitting. He said: “I have said four words three times since I left you which, if weighed against what you have said since the day began, would outweigh them: Glory be to Allah and praise be to Him, as many as His creation, as pleases Him, as the weight of His Throne, and as the ink of His words.”",
     authenticityNote: "Sahih Muslim.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A94",
@@ -521,6 +565,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After Fajr / upon rising in the morning.",
     hadithText:
       "عَنْ أُمِّ سَلَمَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ كَانَ يَقُولُ إِذَا صَلَّى الصُّبْحَ حِينَ يُسَلِّمُ: «اللَّهُمَّ إِنِّي أَسْأَلُكَ عِلْمًا نَافِعًا، وَرِزْقًا طَيِّبًا، وَعَمَلاً مُتَقَبَّلاً».",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) reported that the Prophet ﷺ used to say after the dawn prayer, when he gave the salam: “O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”",
     authenticityNote: "Hasan chain according to Ibn al-Qayyim as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A95",
@@ -540,6 +586,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "During the day; suitable to include in morning/evening routine.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0642\u0648\u0644 \u0641\u064a \u0627\u0644\u0645\u062c\u0644\u0633 \u0627\u0644\u0648\u0627\u062d\u062f: \u00ab\u0631\u064e\u0628\u0651\u0650 \u0627\u063a\u0652\u0641\u0650\u0631\u0652 \u0644\u0650\u064a \u0648\u064e\u062a\u064f\u0628\u0652 \u0639\u064e\u0644\u064e\u064a\u0651\u064e \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0651\u064e\u0627\u0628\u064f \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u064f\u00bb \u0645\u0631\u0627\u062a \u0643\u062b\u064a\u0631\u0629\u060c \u0648\u0648\u0631\u062f \u0639\u0646\u0647 \u0627\u0644\u0627\u0633\u062a\u063a\u0641\u0627\u0631 \u0645\u0627\u0626\u0629 \u0645\u0631\u0629 \u0641\u064a \u0627\u0644\u064a\u0648\u0645.",
+    hadithTextEnglish:
+      "The Prophet ﷺ would say in a single sitting: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Merciful” many times over; and it is reported of him that he sought forgiveness a hundred times a day.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     notes: "Hisn notes: recite 100 times during the day.",
     sourceUrl: "https://sunnah.com/hisn%3A96",
@@ -559,6 +607,8 @@ const MORNING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning and evening.",
     hadithText:
       "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ صَلَّى عَلَيَّ حِينَ يُصْبِحُ عَشْرًا، وَحِينَ يُمْسِي عَشْرًا، أَدْرَكَتْهُ شَفَاعَتِي يَوْمَ الْقِيَامَةِ».",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Whoever sends blessings upon me ten times in the morning and ten times in the evening, my intercession will reach him on the Day of Resurrection.”",
     authenticityNote: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A98",
@@ -584,6 +634,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
       "Morning: after Fajr until sunrise. Evening: after \u2018Asr until sunset as a strong recommended dhikr sitting.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0644\u064e\u0623\u064e\u0646\u0652 \u0623\u064e\u0642\u0652\u0639\u064f\u062f\u064e \u0645\u064e\u0639\u064e \u0642\u064e\u0648\u0652\u0645\u064d \u064a\u064e\u0630\u0652\u0643\u064f\u0631\u064f\u0648\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064e \u0645\u0650\u0646\u0652 \u0635\u064e\u0644\u0627\u064e\u0629\u0650 \u0627\u0644\u0652\u063a\u064e\u062f\u064e\u0627\u0629\u0650 \u062d\u064e\u062a\u0651\u064e\u0649 \u062a\u064e\u0637\u0652\u0644\u064f\u0639\u064e \u0627\u0644\u0634\u0651\u064e\u0645\u0652\u0633\u064f \u0623\u064e\u062d\u064e\u0628\u0651\u064f \u0625\u0650\u0644\u064e\u064a\u0651\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0646\u0652 \u0623\u064f\u0639\u0652\u062a\u0650\u0642\u064e \u0623\u064e\u0631\u0652\u0628\u064e\u0639\u064e\u0629\u064b \u0645\u0650\u0646\u0652 \u0648\u064e\u0644\u064e\u062f\u0650 \u0625\u0650\u0633\u0652\u0645\u064e\u0627\u0639\u0650\u064a\u0644\u064e، وَلِأَنْ أَقْعُدَ مَعَ قَوْمٍ يَذْكُرُونَ اللَّهَ \u0648\u0645\u0646 \u0635\u0644\u0627\u0629 \u0627\u0644\u0639\u0635\u0631 \u0625\u0644\u0649 \u0623\u0646 \u062a\u063a\u0631\u0628 \u0627\u0644\u0634\u0645\u0633\u00bb \u0628\u0645\u0639\u0646\u0627\u0647.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “That I should sit with a people remembering Allah from the dawn prayer until the sun rises is dearer to me than freeing four of the descendants of Isma‘il; and that I should sit with a people remembering Allah from the afternoon prayer until the sun sets…” — reported to this effect.",
     authenticityNote: "Hasan according to al-Albani as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Included as the opening item of the morning/evening chapter.",
     sourceUrl: "https://sunnah.com/hisn%3A75a",
@@ -608,6 +660,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0623\u064f\u062c\u064a\u0631 \u0645\u0646 \u0627\u0644\u062c\u0646 \u062d\u062a\u0649 \u064a\u0645\u0633\u064a\u060c \u0648\u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0623\u064f\u062c\u064a\u0631 \u0645\u0646\u0647\u0645 \u062d\u062a\u0649 \u064a\u0635\u0628\u062d.",
+    hadithTextEnglish:
+      "It is reported that whoever says it in the morning is protected from the jinn until the evening, and whoever says it in the evening is protected from them until the morning.",
     authenticityNote:
       "Authenticated by al-Albani in Sahih al-Targhib wa al-Tarhib as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
@@ -637,6 +691,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa \u0644\u0645\u0646 \u0633\u0623\u0644\u0647 \u0645\u0627 \u064a\u0642\u0648\u0644 \u0625\u0630\u0627 \u0623\u0635\u0628\u062d \u0648\u0625\u0630\u0627 \u0623\u0645\u0633\u0649: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said to the one who asked him what to say morning and evening: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Falaq and an-Nas three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -665,6 +721,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Ikhlas and an-Nas three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -693,6 +751,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0642\u064f\u0644\u0652 \u0647\u064f\u0648\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0623\u064e\u062d\u064e\u062f\u064c\u060c \u0648\u064e\u0627\u0644\u0652\u0645\u064f\u0639\u064e\u0648\u0651\u0650\u0630\u064e\u062a\u064e\u064a\u0652\u0646\u0650\u060c \u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0645\u0652\u0633\u0650\u064a \u0648\u064e\u062d\u0650\u064a\u0646\u064e \u062a\u064f\u0635\u0652\u0628\u0650\u062d\u064f\u060c \u062b\u064e\u0644\u064e\u0627\u062b\u064e \u0645\u064e\u0631\u0651\u064e\u0627\u062a\u064d\u061b \u062a\u064e\u0643\u0652\u0641\u0650\u064a\u0643\u064e \u0645\u0650\u0646\u0652 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Say: ‘Say: He is Allah, One’ and the two suras of refuge, evening and morning, three times; they will suffice you against everything.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Recited together with al-Ikhlas and al-Falaq three times each.",
     sourceUrl: "https://sunnah.com/hisn%3A76",
@@ -714,6 +774,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0625\u0630\u0627 \u0623\u0645\u0633\u0649 \u0642\u0627\u0644 \u0635\u064a\u063a\u0629 \u0627\u0644\u0645\u0633\u0627\u0621: \u00ab\u0623\u0645\u0633\u064a\u0646\u0627 \u0648\u0623\u0645\u0633\u0649 \u0627\u0644\u0645\u0644\u0643 \u0644\u0644\u0647، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ\u00bb \u0643\u0645\u0627 \u0641\u064a \u0635\u062d\u064a\u062d \u0645\u0633\u0644\u0645.",
+    hadithTextEnglish:
+      "When evening came the Prophet ﷺ would say the evening form: “We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave” — as in Sahih Muslim.",
     authenticityNote: "Sahih Muslim.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A77",
@@ -735,6 +797,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: كَانَ النَّبِيُّ ﷺ يُعَلِّمُ أَصْحَابَهُ يَقُولُ: وَإِذَا أَمْسَى فَلْيَقُلْ: «اللَّهُمَّ بِكَ أَمْسَيْنَا، وَبِكَ أَصْبَحْنَا، وَبِكَ نَحْيَا، وَبِكَ نَمُوتُ، وَإِلَيْكَ الْمَصِيرُ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Prophet ﷺ used to teach his companions, saying: And when evening comes, let him say: “O Allah, by You we have reached the evening and by You we have reached the morning; by You we live and by You we die, and to You is the return.”",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A78",
@@ -756,6 +820,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0633\u064e\u064a\u0651\u0650\u062f\u064f \u0627\u0644\u0650\u0627\u0633\u0652\u062a\u0650\u063a\u0652\u0641\u064e\u0627\u0631\u0650 أَنْ تَقُولَ: اللَّهُمَّ أَنْتَ رَبِّي لَا إِلَهَ إِلَّا أَنْتَ، خَلَقْتَنِي وَأَنَا عَبْدُكَ، وَأَنَا عَلَى عَهْدِكَ وَوَعْدِكَ مَا اسْتَطَعْتُ، أَعُوذُ بِكَ مِنْ شَرِّ مَا صَنَعْتُ، أَبُوءُ لَكَ بِنِعْمَتِكَ عَلَيَّ، وَأَبُوءُ لَكَ بِذَنْبِي فَاغْفِرْ لِي، فَإِنَّهُ لَا يَغْفِرُ الذُّنُوبَ إِلَّا أَنْتَ\u00bb \u062b\u0645 \u0630\u0643\u0631\u0647\u060c \u0648\u0642\u0627\u0644: \u00ab\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e\u0647\u064e\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0646\u0651\u064e\u0647\u064e\u0627\u0631\u0650 \u0645\u064f\u0648\u0642\u0650\u0646\u064b\u0627 \u0628\u0650\u0647\u064e\u0627 \u0641\u064e\u0645\u064e\u0627\u062a\u064e \u0645\u0650\u0646\u0652 \u064a\u064e\u0648\u0652\u0645\u0650\u0647\u0650 قَبْلَ أَنْ يُمْسِيَ، \u0641\u064e\u0647\u064f\u0648\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0647\u0652\u0644\u0650 \u0627\u0644\u0652\u062c\u064e\u0646\u0651\u064e\u0629\u0650\u060c \u0648\u064e\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e\u0647\u064e\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u064a\u0652\u0644\u0650 وَهُوَ مُوقِنٌ بِهَا، فَمَاتَ قَبْلَ أَنْ يُصْبِحَ، \u0641\u064e\u0647\u064f\u0648\u064e \u0645\u0650\u0646\u0652 \u0623\u064e\u0647\u0652\u0644\u0650 \u0627\u0644\u0652\u062c\u064e\u0646\u0651\u064e\u0629\u0650\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “The best manner of seeking forgiveness is to say: O Allah, You are my Lord; there is no god but You. You created me and I am Your servant, and I hold to Your covenant and Your promise as much as I am able. I seek refuge in You from the evil of what I have done. I acknowledge Your favour upon me and I acknowledge my sin, so forgive me, for none forgives sins but You.” Then he said: “Whoever says it during the day with certainty in it and dies that day before evening is among the people of Paradise; and whoever says it at night with certainty in it and dies before morning is among the people of Paradise.”",
     authenticityNote: "Sahih al-Bukhari.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A79",
@@ -778,6 +844,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f \u0641\u064a \u0641\u0636\u0644\u0647\u0627 \u0641\u064a \u0627\u0644\u0635\u0628\u0627\u062d \u0648\u0627\u0644\u0645\u0633\u0627\u0621: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u0623\u0631\u0628\u0639 \u0645\u0631\u0627\u062a \u0623\u0639\u062a\u0642\u0647 \u0627\u0644\u0644\u0647 \u0645\u0646 \u0627\u0644\u0646\u0627\u0631.",
+    hadithTextEnglish:
+      "Its merit is reported morning and evening: whoever says it four times, Allah frees him from the Fire.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A80",
@@ -800,6 +868,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0641\u0642\u062f \u0623\u062f\u0651\u0649 \u0634\u0643\u0631 \u0644\u064a\u0644\u062a\u0647.",
+    hadithTextEnglish:
+      "It is reported that whoever says it in the evening has fulfilled the thanks owed for his night.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A81",
@@ -821,6 +891,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0639\u0644\u0651\u0645 \u0623\u0646 \u064a\u0642\u0627\u0644 \u0647\u0630\u0627 \u0627\u0644\u062f\u0639\u0627\u0621 \u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0648\u062d\u064a\u0646 \u064a\u0645\u0633\u064a.",
+    hadithTextEnglish:
+      "The Prophet ﷺ taught that this supplication be said three times in the morning and three times in the evening.",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A82",
@@ -842,6 +914,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: مَنْ قَالَ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «حَسْبِيَ اللَّهُ لاَ إِلَهَ إِلاَّ هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ» سَبْعَ مَرَّاتٍ كَفَاهُ اللَّهُ مَا أَهَمَّهُ.",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: Whoever says in the morning and in the evening: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne” seven times, Allah will suffice him in whatever troubles him.",
     authenticityNote: "Reported as accepted/authentic in cited sources; grading noted by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A83",
@@ -863,6 +937,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ عُمَرَ رضي الله عنهما قَالَ: لَمْ يَكُنْ رَسُولُ اللَّهِ ﷺ يَدَعُ هَؤُلاَءِ الدَّعَوَاتِ حِينَ يُمْسِي وَحِينَ يُصْبِحُ: «اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالآخِرَةِ، اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَفْوَ وَالْعَافِيَةَ فِي دِينِي وَدُنْيَايَ وَأَهْلِي وَمَالِي، اللَّهُمَّ اسْتُرْ عَوْرَاتِي وَآمِنْ رَوْعَاتِي، اللَّهُمَّ احْفَظْنِي مِنْ بَيْنِ يَدَيَّ وَمِنْ خَلْفِي وَعَنْ يَمِينِي وَعَنْ شِمَالِي وَمِنْ فَوْقِي، وَأَعُوذُ بِعَظَمَتِكَ أَنْ أُغْتَالَ مِنْ تَحْتِي».",
+    hadithTextEnglish:
+      "‘Abdullah ibn ‘Umar (may Allah be pleased with them both) said: The Messenger of Allah ﷺ never left these supplications, evening and morning: “O Allah, I ask You for wellbeing in this world and the next. O Allah, I ask You for pardon and wellbeing in my religion, my worldly life, my family and my property. O Allah, conceal my faults and calm my fears. O Allah, guard me from before me and behind me, from my right and my left and from above me, and I seek refuge in Your greatness from being taken unawares from beneath me.”",
     authenticityNote: "Authentic/Hasan as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A84",
@@ -885,6 +961,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa \u0644\u0623\u0628\u064a \u0628\u0643\u0631 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647: \u00ab\u0642\u064f\u0644\u0652\u0647\u064f \u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0635\u0652\u0628\u064e\u062d\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u0645\u0652\u0633\u064e\u064a\u0652\u062a\u064e\u060c \u0648\u064e\u0625\u0650\u0630\u064e\u0627 \u0623\u064e\u062e\u064e\u0630\u0652\u062a\u064e \u0645\u064e\u0636\u0652\u062c\u064e\u0639\u064e\u0643\u064e\u00bb.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said to Abu Bakr (may Allah be pleased with him): “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
     authenticityNote: "Authenticated by al-Albani in Sahih al-Tirmidhi as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "Also appears in before-sleep adhkar.",
     sourceUrl: "https://sunnah.com/hisn%3A85",
@@ -927,6 +1005,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f: \u0645\u0646 \u0642\u0627\u0644\u0647\u0627 \u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0635\u0628\u062d \u0648\u062b\u0644\u0627\u062b\u064b\u0627 \u062d\u064a\u0646 \u064a\u0645\u0633\u064a \u0643\u0627\u0646 \u062d\u0642\u064b\u0627 \u0639\u0644\u0649 \u0627\u0644\u0644\u0647 \u0623\u0646 \u064a\u0631\u0636\u064a\u0647 \u064a\u0648\u0645 \u0627\u0644\u0642\u064a\u0627\u0645\u0629.",
+    hadithTextEnglish:
+      "It is reported that whoever says it three times in the morning and three times in the evening, it is a right upon Allah to please him on the Day of Resurrection.",
     authenticityNote: "Hasan/Sahih as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A87",
@@ -948,6 +1028,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0648\u0631\u062f \u0623\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u0623\u0648\u0635\u0649 \u0641\u0627\u0637\u0645\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647\u0627 \u0623\u0646 \u062a\u0642\u0648\u0644 \u0625\u0630\u0627 \u0623\u0635\u0628\u062d\u062a \u0648\u0625\u0630\u0627 \u0623\u0645\u0633\u064a\u062a: \u00ab\u064a\u0627 \u062d\u064a \u064a\u0627 \u0642\u064a\u0648\u0645 \u0628\u0631\u062d\u0645\u062a\u0643 \u0623\u0633\u062a\u063a\u064a\u062b أَصْلِحْ لِي شَأْنِي كُلَّهُ، وَلَا تَكِلْنِي إِلَى نَفْسِي طَرْفَةَ عَيْنٍ\u00bb",
+    hadithTextEnglish:
+      "It is reported that the Prophet ﷺ counselled Fatimah (may Allah be pleased with her) to say, when she rose in the morning and when she reached the evening: “O Ever-Living, O Sustainer, by Your mercy I seek help. Set right all my affairs, and do not entrust me to myself for the blink of an eye.”",
     authenticityNote: "Hasan according to al-Albani as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A88",
@@ -969,6 +1051,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "عَنْ عَبْدِ اللَّهِ بْنِ مَسْعُودٍ رضي الله عنه قَالَ: كَانَ نَبِيُّ اللَّهِ ﷺ إِذَا أَمْسَى قَالَ: «أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذِهِ اللَّيْلَةِ، وَخَيْرَ مَا بَعْدَهَا، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذِهِ اللَّيْلَةِ، وَشَرِّ مَا بَعْدَهَا، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ، وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ، وَعَذَابٍ فِي الْقَبْرِ».",
+    hadithTextEnglish:
+      "‘Abdullah ibn Mas‘ud (may Allah be pleased with him) said: When evening came, the Prophet of Allah ﷺ would say: “We have reached the evening, and the dominion has reached the evening belonging to Allah. Praise be to Allah. There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things. My Lord, I ask You for the good of this night and the good that follows it, and I seek refuge in You from the evil of this night and the evil that follows it. My Lord, I seek refuge in You from idleness and the misery of old age. My Lord, I seek refuge in You from punishment in the Fire and punishment in the grave.”",
     authenticityNote: "Hasan according to Ibn Baz as cited in Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A89",
@@ -991,6 +1075,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "After \u2018Asr/sunset window.",
     hadithText:
       "عَنْ عَبْدِ الرَّحْمَنِ بْنِ أَبْزَى رضي الله عنه عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ يَقُولُ إِذَا أَصْبَحَ وَإِذَا أَمْسَى: «أَمْسَيْنَا عَلَى فِطْرَةِ الْإِسْلَامِ، وَعَلَى كَلِمَةِ الْإِخْلَاصِ، وَعَلَى دِينِ نَبِيِّنَا مُحَمَّدٍ ﷺ، وَعَلَى مِلَّةِ أَبِينَا إِبْرَاهِيمَ حَنِيفًا مُسْلِمًا، وَمَا كَانَ مِنَ الْمُشْرِكِينَ».",
+    hadithTextEnglish:
+      "‘Abd al-Rahman ibn Abza (may Allah be pleased with him) reported from the Prophet ﷺ that he used to say, morning and evening: “We have reached the evening upon the natural way of Islam, upon the word of sincerity, upon the religion of our Prophet Muhammad ﷺ, and upon the creed of our father Ibrahim, upright and submitting; and he was not among those who associate others with Allah.”",
     authenticityNote: "Included in Hisn al-Muslim; grading not displayed on the Sunnah.com page.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A90",
@@ -1010,6 +1096,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0642\u0627\u0644 \ufdfa: \u00ab\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e \u0633\u064f\u0628\u0652\u062d\u064e\u0627\u0646\u064e \u0627\u0644\u0644\u0651\u064e\u0647\u0650 \u0648\u064e\u0628\u0650\u062d\u064e\u0645\u0652\u062f\u0650\u0647\u0650 \u0641\u0650\u064a \u064a\u064e\u0648\u0652\u0645\u064d \u0645\u0650\u0627\u0626\u064e\u0629\u064e \u0645\u064e\u0631\u0651\u064e\u0629\u064d \u062d\u064f\u0637\u0651\u064e\u062a\u0652 \u062e\u064e\u0637\u064e\u0627\u064a\u064e\u0627\u0647\u064f \u0648\u064e\u0625\u0650\u0646\u0652 \u0643\u064e\u0627\u0646\u064e\u062a\u0652 \u0645\u0650\u062b\u0652\u0644\u064e \u0632\u064e\u0628\u064e\u062f\u0650 \u0627\u0644\u0652\u0628\u064e\u062d\u0652\u0631\u0650\u00bb\u060c \u0648\u0648\u0631\u062f \u0641\u0636\u0644\u0647\u0627 \u0635\u0628\u0627\u062d\u064b\u0627 \u0648\u0645\u0633\u0627\u0621\u064b.",
+    hadithTextEnglish:
+      "The Prophet ﷺ said: “Whoever says: Glory be to Allah and praise be to Him — a hundred times in a day, his sins are wiped away, even were they like the foam of the sea.” Its merit is likewise reported morning and evening.",
     authenticityNote: "Sahih al-Bukhari.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A91",
@@ -1034,6 +1122,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning after Fajr; evening after \u2018Asr/sunset window.",
     hadithText:
       "\u0639\u0646 \u0623\u0628\u064a \u0647\u0631\u064a\u0631\u0629 \u0631\u0636\u064a \u0627\u0644\u0644\u0647 \u0639\u0646\u0647 \u0623\u0646 \u0631\u0633\u0648\u0644 \u0627\u0644\u0644\u0647 \ufdfa \u0642\u0627\u0644: \u00ab\u0645\u064e\u0646\u0652 \u0642\u064e\u0627\u0644\u064e: \u0644\u064e\u0627 \u0625\u0650\u0644\u064e\u0647\u064e \u0625\u0650\u0644\u0651\u064e\u0627 \u0627\u0644\u0644\u0651\u064e\u0647\u064f \u0648\u064e\u062d\u0652\u062f\u064e\u0647\u064f \u0644\u064e\u0627 \u0634\u064e\u0631\u0650\u064a\u0643\u064e \u0644\u064e\u0647\u064f\u060c \u0644\u064e\u0647\u064f \u0627\u0644\u0652\u0645\u064f\u0644\u0652\u0643\u064f \u0648\u064e\u0644\u064e\u0647\u064f \u0627\u0644\u0652\u062d\u064e\u0645\u0652\u062f\u064f \u0648\u064e\u0647\u064f\u0648\u064e \u0639\u064e\u0644\u064e\u0649 \u0643\u064f\u0644\u0651\u0650 \u0634\u064e\u064a\u0652\u0621\u064d \u0642\u064e\u062f\u0650\u064a\u0631\u064c\u060c \u0641\u0650\u064a \u064a\u064e\u0648\u0652\u0645\u064d \u0645\u0650\u0627\u0626\u064e\u0629\u064e \u0645\u064e\u0631\u0651\u064e\u0629\u064d\u060c \u0643\u064e\u0627\u0646\u064e\u062a\u0652 \u0644\u064e\u0647\u064f \u0639\u064e\u062f\u0652\u0644\u064e \u0639\u064e\u0634\u0652\u0631\u0650 \u0631\u0650\u0642\u064e\u0627\u0628\u064d\u060c \u0648\u064e\u0643\u064f\u062a\u0650\u0628\u064e\u062a\u0652 \u0644\u064e\u0647\u064f \u0645\u0650\u0627\u0626\u064e\u0629\u064f \u062d\u064e\u0633\u064e\u0646\u064e\u0629\u064d\u060c \u0648\u064e\u0645\u064f\u062d\u0650\u064a\u064e\u062a\u0652 \u0639\u064e\u0646\u0652\u0647\u064f \u0645\u0650\u0627\u0626\u064e\u0629\u064f \u0633\u064e\u064a\u0651\u0650\u0626\u064e\u0629\u064d\u060c \u0648\u064e\u0643\u064e\u0627\u0646\u064e\u062a\u0652 \u0644\u064e\u0647\u064f \u062d\u0650\u0631\u0652\u0632\u064b\u0627 \u0645\u0650\u0646\u064e \u0627\u0644\u0634\u0651\u064e\u064a\u0652\u0637\u064e\u0627\u0646\u0650 \u064a\u064e\u0648\u0652\u0645\u064e\u0647\u064f \u0630\u064e\u0644\u0650\u0643\u064e \u062d\u064e\u062a\u0651\u064e\u0649 \u064a\u064f\u0645\u0652\u0633\u0650\u064a\u064e\u060c \u0648\u064e\u0644\u064e\u0645\u0652 \u064a\u064e\u0623\u0652\u062a\u0650 \u0623\u064e\u062d\u064e\u062f\u064c \u0628\u0650\u0623\u064e\u0641\u0652\u0636\u064e\u0644\u064e \u0645\u0650\u0645\u0651\u064e\u0627 \u062c\u064e\u0627\u0621\u064e \u0628\u0650\u0647\u0650 \u0625\u0650\u0644\u0651\u064e\u0627 \u0623\u064e\u062d\u064e\u062f\u064c \u0639\u064e\u0645\u0650\u0644\u064e \u0623\u064e\u0643\u0652\u062b\u064e\u0631\u064e \u0645\u0650\u0646\u0652 \u0630\u064e\u0644\u0650\u0643\u064e\u00bb.",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — a hundred times in a day, it is for him the equal of freeing ten slaves, a hundred good deeds are written for him, a hundred sins are erased from him, and it is a protection for him from Satan for that day until evening; and no one brings anything better than what he brought, except one who does more than that.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     notes: "Same wording as HM-93 but different count and virtue.",
     sourceUrl: "https://sunnah.com/hisn%3A92",
@@ -1053,6 +1143,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "During the day; suitable to include in morning/evening routine.",
     hadithText:
       "\u0643\u0627\u0646 \u0627\u0644\u0646\u0628\u064a \ufdfa \u064a\u0642\u0648\u0644 \u0641\u064a \u0627\u0644\u0645\u062c\u0644\u0633 \u0627\u0644\u0648\u0627\u062d\u062f: \u00ab\u0631\u064e\u0628\u0651\u0650 \u0627\u063a\u0652\u0641\u0650\u0631\u0652 \u0644\u0650\u064a \u0648\u064e\u062a\u064f\u0628\u0652 \u0639\u064e\u0644\u064e\u064a\u0651\u064e \u0625\u0650\u0646\u0651\u064e\u0643\u064e \u0623\u064e\u0646\u0652\u062a\u064e \u0627\u0644\u062a\u0651\u064e\u0648\u0651\u064e\u0627\u0628\u064f \u0627\u0644\u0631\u0651\u064e\u062d\u0650\u064a\u0645\u064f\u00bb \u0645\u0631\u0627\u062a \u0643\u062b\u064a\u0631\u0629\u060c \u0648\u0648\u0631\u062f \u0639\u0646\u0647 \u0627\u0644\u0627\u0633\u062a\u063a\u0641\u0627\u0631 \u0645\u0627\u0626\u0629 \u0645\u0631\u0629 \u0641\u064a \u0627\u0644\u064a\u0648\u0645.",
+    hadithTextEnglish:
+      "The Prophet ﷺ would say in a single sitting: “My Lord, forgive me and accept my repentance; You are the Ever-Relenting, the Merciful” many times over; and it is reported of him that he sought forgiveness a hundred times a day.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
     notes: "Hisn notes: recite 100 times during the day.",
     sourceUrl: "https://sunnah.com/hisn%3A96",
@@ -1072,6 +1164,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "In the evening.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ رَجُلاً جَاءَ إِلَى النَّبِيِّ ﷺ فَقَالَ: يَا رَسُولَ اللَّهِ مَا لَقِيتُ مِنْ عَقْرَبٍ لَدَغَتْنِي الْبَارِحَةَ، قَالَ: «أَمَا لَوْ قُلْتَ حِينَ أَمْسَيْتَ: أَعُوذُ بِكَلِمَاتِ اللَّهِ التَّامَّاتِ مِنْ شَرِّ مَا خَلَقَ، لَمْ تَضُرَّكَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that a man came to the Prophet ﷺ and said: Messenger of Allah, what I suffered last night from a scorpion that stung me! He said: “Had you said, when you reached the evening: I seek refuge in the perfect words of Allah from the evil of what He has created — it would not have harmed you.”",
     authenticityNote: "Sahih/Hasan as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A97",
@@ -1091,6 +1185,8 @@ const EVENING_AZKAR: ZikrDraft[] = [
     preferredTiming: "Morning and evening.",
     hadithText:
       "عَنْ أَبِي الدَّرْدَاءِ رضي الله عنه قَالَ: قَالَ رَسُولُ اللَّهِ ﷺ: «مَنْ صَلَّى عَلَيَّ حِينَ يُصْبِحُ عَشْرًا، وَحِينَ يُمْسِي عَشْرًا، أَدْرَكَتْهُ شَفَاعَتِي يَوْمَ الْقِيَامَةِ».",
+    hadithTextEnglish:
+      "Abu al-Darda’ (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Whoever sends blessings upon me ten times in the morning and ten times in the evening, my intercession will reach him on the Day of Resurrection.”",
     authenticityNote: "One chain reliable (Jayyid) as cited by Hisn al-Muslim/Sunnah.com.",
     notes: "",
     sourceUrl: "https://sunnah.com/hisn%3A98",
@@ -1121,6 +1217,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping, after lying down.",
     hadithText:
       "عَنْ عَائِشَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا: «قُلْ هُوَ اللَّهُ أَحَدٌ» وَ«قُلْ أَعُوذُ بِرَبِّ الْفَلَقِ» وَ«قُلْ أَعُوذُ بِرَبِّ النَّاسِ» يَبْدَأُ بِهِمَا عَلَى رَأْسِهِ وَوَجْهِهِ وَمَا أَقْبَلَ مِنْ جَسَدِهِ، يَفْعَلُ ذَلِكَ ثَلَاثَ مَرَّاتٍ، ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, and recite into them: “Say: He is Allah, One”, “Say: I seek refuge in the Lord of daybreak”, and “Say: I seek refuge in the Lord of mankind”. Then he would begin with them over his head and his face and the front of his body, doing that three times, and wiping with them as much of his body as he could.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1148,6 +1246,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping, after lying down.",
     hadithText:
       "عَنْ عَائِشَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا الْمُعَوِّذَاتِ، ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, recite the suras of refuge into them, and then wipe with them as much of his body as he could.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1175,6 +1275,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping, after lying down.",
     hadithText:
       "عَنْ عَائِشَةَ رضي الله عنها أَنَّ النَّبِيَّ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ كُلَّ لَيْلَةٍ جَمَعَ كَفَّيْهِ ثُمَّ نَفَثَ فِيهِمَا فَقَرَأَ فِيهِمَا الْمُعَوِّذَاتِ، ثُمَّ يَمْسَحُ بِهِمَا مَا اسْتَطَاعَ مِنْ جَسَدِهِ.",
+    hadithTextEnglish:
+      "‘A’ishah (may Allah be pleased with her) reported that when the Prophet ﷺ went to his bed each night, he would cup his hands together, breathe into them, recite the suras of refuge into them, and then wipe with them as much of his body as he could.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1198,6 +1300,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "When lying down to sleep.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه فِي قِصَّةِ الصَّدَقَةِ: دَعْنِي أُعَلِّمْكَ كَلِمَاتٍ يَنْفَعُكَ اللَّهُ بِهَا، قُلْتُ: مَا هِيَ؟ قَالَ: إِذَا أَوَيْتَ إِلَى فِرَاشِكَ فَاقْرَأْ آيَةَ الْكُرْسِيِّ -اللَّهُ لَا إِلَهَ إِلَّا هُوَ الْحَيُّ الْقَيُّومُ- حَتَّى تَخْتِمَ الْآيَةَ، فَإِنَّهُ لَنْ يَزَالَ عَلَيْكَ مِنَ اللَّهِ حَافِظٌ وَلاَ يَقْرَبُكَ شَيْطَانٌ حَتَّى تُصْبِحَ. فَقَالَ النَّبِيُّ ﷺ: «صَدَقَكَ وَهُوَ كَذُوبٌ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported, in the account of the charity: “Let me teach you words by which Allah will benefit you.” I said: What are they? He said: When you go to your bed, recite Ayat al-Kursi — “Allah, there is no god but He, the Ever-Living, the Sustainer” — to the end of the verse; a guardian from Allah will remain over you and no devil will come near you until morning. The Prophet ﷺ said: “He told you the truth, though he is a liar.”",
     authenticityNote: "Sahih al-Bukhari.",
   },
   {
@@ -1219,6 +1323,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "At night before sleeping.",
     hadithText:
       "عَنْ أَبِي مَسْعُودٍ رضي الله عنه قَالَ: قَالَ النَّبِيُّ ﷺ: «مَنْ قَرَأَ بِالآيَتَيْنِ مِنْ آخِرِ سُورَةِ الْبَقَرَةِ فِي لَيْلَةٍ كَفَتَاهُ».",
+    hadithTextEnglish:
+      "Abu Mas‘ud (may Allah be pleased with him) said: The Prophet ﷺ said: “Whoever recites the two verses from the end of Surat al-Baqarah at night, they will suffice him.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1244,6 +1350,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عن نَوْفَلٍ الأَشْجَعِيِّ رضي الله عنه أن النبي ﷺ قال له: «اقْرَأْ: ﴿قُلْ يَا أَيُّهَا الْكَافِرُونَ﴾ ثُمَّ نَمْ عَلَى خَاتِمَتِهَا، فَإِنَّهَا بَرَاءَةٌ مِنَ الشِّرْكِ».",
+    hadithTextEnglish:
+      "Nawfal al-Ashja‘i (may Allah be pleased with him) reported that the Prophet ﷺ said to him: “Recite: ‘Say: O you who disbelieve’, then sleep upon its ending, for it is a declaration of freedom from associating others with Allah.”",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1272,6 +1380,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عن جابر رضي الله عنه أَنَّ النَّبِيَّ ﷺ كَانَ لَا يَنَامُ حَتَّى يَقْرَأَ ﴿الم * تَنْزِيلُ﴾ السَّجْدَةَ، وَ ﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ﴾.",
+    hadithTextEnglish:
+      "Jabir (may Allah be pleased with him) reported that the Prophet ﷺ would not sleep until he had recited “Alif Lam Mim — The revelation” (as-Sajdah) and “Blessed is He in whose hand is the dominion” (al-Mulk).",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1301,6 +1411,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping every night.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه عَنِ النَّبِيِّ ﷺ قَالَ: «إِنَّ سُورَةً مِنَ الْقُرْآنِ ثَلَاثُونَ آيَةً شَفَعَتْ لِرَجُلٍ حَتَّى غُفِرَ لَهُ، وَهِيَ سُورَةُ ﴿تَبَارَكَ الَّذِي بِيَدِهِ الْمُلْكُ﴾».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he said: “There is a sura of the Qur’an of thirty verses that interceded for a man until he was forgiven: it is the sura ‘Blessed is He in whose hand is the dominion’.”",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1317,6 +1429,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ عَلِيٍّ رضي الله عنه أَنَّ فَاطِمَةَ شَكَتْ مَا تَلْقَى فِي يَدِهَا مِنَ الرَّحَى، فَقَالَ ﷺ: «أَلَا أَدُلُّكُمَا عَلَى خَيْرٍ مِمَّا سَأَلْتُمَا؟ إِذَا أَوَيْتُمَا إِلَى فِرَاشِكُمَا فَكَبِّرَا أَرْبَعًا وَثَلَاثِينَ، وَسَبِّحَا ثَلَاثًا وَثَلَاثِينَ، وَاحْمَدَا ثَلَاثًا وَثَلَاثِينَ، فَهُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ».",
+    hadithTextEnglish:
+      "‘Ali (may Allah be pleased with him) reported that Fatimah complained of what she suffered in her hand from the hand-mill, and the Prophet ﷺ said: “Shall I not direct you both to what is better than what you asked for? When you go to your bed, magnify Allah thirty-four times, glorify Him thirty-three times, and praise Him thirty-three times; that is better for you than a servant.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1333,6 +1447,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ عَلِيٍّ رضي الله عنه أَنَّ فَاطِمَةَ شَكَتْ مَا تَلْقَى فِي يَدِهَا مِنَ الرَّحَى، فَقَالَ ﷺ: «أَلَا أَدُلُّكُمَا عَلَى خَيْرٍ مِمَّا سَأَلْتُمَا؟ إِذَا أَوَيْتُمَا إِلَى فِرَاشِكُمَا فَكَبِّرَا أَرْبَعًا وَثَلَاثِينَ، وَسَبِّحَا ثَلَاثًا وَثَلَاثِينَ، وَاحْمَدَا ثَلَاثًا وَثَلَاثِينَ، فَهُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ».",
+    hadithTextEnglish:
+      "‘Ali (may Allah be pleased with him) reported that Fatimah complained of what she suffered in her hand from the hand-mill, and the Prophet ﷺ said: “Shall I not direct you both to what is better than what you asked for? When you go to your bed, magnify Allah thirty-four times, glorify Him thirty-three times, and praise Him thirty-three times; that is better for you than a servant.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1349,6 +1465,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ عَلِيٍّ رضي الله عنه أَنَّ فَاطِمَةَ شَكَتْ مَا تَلْقَى فِي يَدِهَا مِنَ الرَّحَى، فَقَالَ ﷺ: «أَلَا أَدُلُّكُمَا عَلَى خَيْرٍ مِمَّا سَأَلْتُمَا؟ إِذَا أَوَيْتُمَا إِلَى فِرَاشِكُمَا فَكَبِّرَا أَرْبَعًا وَثَلَاثِينَ، وَسَبِّحَا ثَلَاثًا وَثَلَاثِينَ، وَاحْمَدَا ثَلَاثًا وَثَلَاثِينَ، فَهُوَ خَيْرٌ لَكُمَا مِنْ خَادِمٍ».",
+    hadithTextEnglish:
+      "‘Ali (may Allah be pleased with him) reported that Fatimah complained of what she suffered in her hand from the hand-mill, and the Prophet ﷺ said: “Shall I not direct you both to what is better than what you asked for? When you go to your bed, magnify Allah thirty-four times, glorify Him thirty-three times, and praise Him thirty-three times; that is better for you than a servant.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1368,6 +1486,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "When lying down after dusting off the bed.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه قَالَ: قَالَ النَّبِيُّ ﷺ: «إِذَا أَوَى أَحَدُكُمْ إِلَى فِرَاشِهِ فَلْيَنْفُضْ فِرَاشَهُ بِدَاخِلَةِ إِزَارِهِ، فَإِنَّهُ لَا يَدْرِي مَا خَلَفَهُ عَلَيْهِ، ثُمَّ لِيَقُلْ: بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي وَبِكَ أَرْفَعُهُ، إِنْ أَمْسَكْتَ نَفْسِي فَارْحَمْهَا، وَإِنْ أَرْسَلْتَهَا فَاحْفَظْهَا بِمَا تَحْفَظُ بِهِ عِبَادَكَ الصَّالِحِينَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) said: The Prophet ﷺ said: “When one of you goes to his bed, let him dust it down with the inner part of his garment, for he does not know what came upon it after him. Then let him say: In Your name, my Lord, I lay down my side and by You I raise it. If You take my soul, have mercy on it; and if You send it back, guard it with that by which You guard Your righteous servants.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1384,6 +1504,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ حُذَيْفَةَ رضي الله عنه قَالَ: كَانَ النَّبِيُّ ﷺ إِذَا أَخَذَ مَضْجَعَهُ مِنَ اللَّيْلِ وَضَعَ يَدَهُ تَحْتَ خَدِّهِ ثُمَّ يَقُولُ: «اللَّهُمَّ بِاسْمِكَ أَمُوتُ وَأَحْيَا».",
+    hadithTextEnglish:
+      "Hudhayfah (may Allah be pleased with him) said: When the Prophet ﷺ took to his bed at night, he would place his hand under his cheek and say: “O Allah, in Your name I die and I live.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1400,6 +1522,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "When lying down, placing the right hand under the cheek.",
     hadithText:
       "عَنْ حَفْصَةَ رضي الله عنها أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا أَرَادَ أَنْ يَرْقُدَ وَضَعَ يَدَهُ الْيُمْنَى تَحْتَ خَدِّهِ ثُمَّ يَقُولُ: «اللَّهُمَّ قِنِي عَذَابَكَ يَوْمَ تَبْعَثُ عِبَادَكَ» ثَلاَثَ مِرَارٍ.",
+    hadithTextEnglish:
+      "Hafsah (may Allah be pleased with her) reported that when the Messenger of Allah ﷺ wished to sleep, he would place his right hand under his cheek and then say three times: “O Allah, protect me from Your punishment on the Day You raise Your servants.”",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1419,6 +1543,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ أَنَسٍ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ كَانَ إِذَا أَوَى إِلَى فِرَاشِهِ قَالَ: «الْحَمْدُ لِلَّهِ الَّذِي أَطْعَمَنَا وَسَقَانَا وَكَفَانَا وَآوَانَا، فَكَمْ مِمَّنْ لاَ كَافِيَ لَهُ وَلاَ مُؤْوِيَ».",
+    hadithTextEnglish:
+      "Anas (may Allah be pleased with him) reported that when the Messenger of Allah ﷺ went to his bed he would say: “Praise be to Allah, who has fed us and given us drink, sufficed us and sheltered us; how many are there who have none to suffice them and none to shelter them.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1438,6 +1564,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رَضِيَ اللَّهُ عَنْهُ عَنِ النَّبِيِّ ﷺ أَنَّهُ كَانَ يَدْعُو عِنْدَ النَّوْمِ: «اللَّهُمَّ رَبَّ السَّمَاوَاتِ السَّبْعِ وَرَبَّ الْعَرْشِ الْعَظِيمِ، رَبَّنَا وَرَبَّ كُلِّ شَيْءٍ، فَالِقَ الْحَبِّ وَالنَّوَى، وَمُنْزِلَ التَّوْرَاةِ وَالْإِنْجِيلِ وَالْفُرْقَانِ، أَعُوذُ بِكَ مِنْ شَرِّ كُلِّ شَيْءٍ أَنْتَ آخِذٌ بِنَاصِيَتِهِ، اللَّهُمَّ أَنْتَ الْأَوَّلُ فَلَيْسَ قَبْلَكَ شَيْءٌ، وَأَنْتَ الْآخِرُ فَلَيْسَ بَعْدَكَ شَيْءٌ، وَأَنْتَ الظَّاهِرُ فَلَيْسَ فَوْقَكَ شَيْءٌ، وَأَنْتَ الْبَاطِنُ فَلَيْسَ دُونَكَ شَيْءٌ، اقْضِ عَنَّا الدَّيْنَ، وَأَغْنِنَا مِنَ الْفَقْرِ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported from the Prophet ﷺ that he used to supplicate at bedtime: “O Allah, Lord of the seven heavens and Lord of the Mighty Throne, our Lord and the Lord of everything, Splitter of the grain and the date-stone, Revealer of the Torah, the Gospel and the Criterion — I seek refuge in You from the evil of every thing You hold by its forelock. O Allah, You are the First, so there is nothing before You; You are the Last, so there is nothing after You; You are the Manifest, so there is nothing above You; You are the Hidden, so there is nothing beyond You. Settle our debt for us, and free us from poverty.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1455,6 +1583,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه أَنَّ أَبَا بَكْرٍ قَالَ: يَا رَسُولَ اللَّهِ، مُرْنِي بِكَلِمَاتٍ أَقُولُهُنَّ إِذَا أَصْبَحْتُ وَإِذَا أَمْسَيْتُ: «اللَّهُمَّ فَاطِرَ السَّمَاوَاتِ وَالْأَرْضِ، عَالِمَ الْغَيْبِ وَالشَّهَادَةِ، رَبَّ كُلِّ شَيْءٍ وَمَلِيكَهُ، أَشْهَدُ أَنْ لَا إِلَهَ إِلَّا أَنْتَ، أَعُوذُ بِكَ مِنْ شَرِّ نَفْسِي وَشَرِّ الشَّيْطَانِ وَشِرْكِهِ». قَالَ: «قُلْهُ إِذَا أَصْبَحْتَ وَإِذَا أَمْسَيْتَ وَإِذَا أَخَذْتَ مَضْجَعَكَ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that Abu Bakr said: Messenger of Allah, instruct me with words to say when I rise in the morning and when I reach the evening. He said: “O Allah, Originator of the heavens and the earth, Knower of the unseen and the seen, Lord of everything and its Sovereign — I bear witness that there is no god but You. I seek refuge in You from the evil of my own self, and from the evil of Satan and his associating.” He said: “Say it when you rise in the morning, when you reach the evening, and when you take to your bed.”",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1475,6 +1605,8 @@ const SLEEP_AZKAR: ZikrDraft[] = [
     preferredTiming: "Before sleeping; perform wudu, lie on the right side, and make this the final words.",
     hadithText:
       "عَنِ الْبَرَاءِ بْنِ عَازِبٍ رضي الله عنه قَالَ: قَالَ النَّبِيُّ ﷺ: «إِذَا أَتَيْتَ مَضْجَعَكَ فَتَوَضَّأْ وَضُوءَكَ لِلصَّلاَةِ ثُمَّ اضْطَجِعْ عَلَى شِقِّكَ الْأَيْمَنِ، ثُمَّ قُلْ: اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ وَوَجَّهْتُ وَجْهِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ، وَاجْعَلْهُنَّ آخِرَ مَا تَقُولُ».",
+    hadithTextEnglish:
+      "Al-Bara’ ibn ‘Azib (may Allah be pleased with him) said: The Prophet ﷺ said: “When you come to your bed, perform ablution as you would for prayer, then lie down on your right side and say: O Allah, I have submitted myself to You, turned my face to You, entrusted my affair to You, and laid my back to You, in hope of You and in fear of You. There is no refuge and no escape from You except to You. I believe in Your Book which You sent down, and in Your Prophet whom You sent.” And make them the last thing you say.",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
 ];
@@ -1640,6 +1772,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 591; Hisn al-Muslim 66.",
     hadithText:
       "عن ثوبان رضي الله عنه قال: «كان رسول الله ﷺ إذا انصرف من صلاته استغفر ثلاثاً، وقال: اللهم أنت السلام، ومنك السلام، تباركت يا ذا الجلال والإكرام»",
+    hadithTextEnglish:
+      "Thawban (may Allah be pleased with him) said: When the Messenger of Allah ﷺ finished his prayer, he would seek forgiveness three times and say: “O Allah, You are Peace, and from You comes peace. Blessed are You, Owner of majesty and honour.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1655,6 +1789,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 592; Hisn al-Muslim 66.",
     hadithText:
       "عن ثوبان رضي الله عنه قال: كان رسول الله ﷺ إذا انصرف من صلاته استغفر ثلاثاً وقال: «اللَّهُمَّ أَنْتَ السَّلَامُ وَمِنْكَ السَّلَامُ تَبَارَكْتَ يَا ذَا الْجَلَالِ وَالْإِكْرَامِ».",
+    hadithTextEnglish:
+      "Thawban (may Allah be pleased with him) said: When the Messenger of Allah ﷺ finished his prayer, he would seek forgiveness three times and say: “O Allah, You are Peace, and from You comes peace. Blessed are You, Owner of majesty and honour.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1674,6 +1810,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan an-Nasa'i 9928; Ibn Hibban 2004; Hisn al-Muslim 31.",
     hadithText:
       "عن أبي أمامة رضي الله عنه قال: قال رسول الله ﷺ: «من قرأ آية الكرسي دبر كل صلاة مكتوبة لم يمنعه من دخول الجنة إلا أن يموت».",
+    hadithTextEnglish:
+      "Abu Umamah (may Allah be pleased with him) said: The Messenger of Allah ﷺ said: “Whoever recites Ayat al-Kursi after every obligatory prayer, nothing keeps him from entering Paradise except that he dies.”",
     authenticityNote: "Graded Sahih by al-Albani.",
   },
   {
@@ -1692,6 +1830,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 6329; Sahih Muslim 595; Hisn al-Muslim 25.",
     hadithText:
       "عن المغيرة بن شعبة رضي الله عنه أن النبي ﷺ كان يقول في دبر كل صلاة مكتوبة: «لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ، وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ».",
+    hadithTextEnglish:
+      "Al-Mughirah ibn Shu‘bah (may Allah be pleased with him) reported that the Prophet ﷺ used to say after every obligatory prayer: “There is no god but Allah alone, with no partner. His is the dominion and His is the praise, and He is capable of all things.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1709,6 +1849,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih al-Bukhari 844; Sahih Muslim 593; Hisn al-Muslim 26.",
     hadithText:
       "عن المغيرة بن شعبة رضي الله عنه قال: سمعت النبي ﷺ يقول حين يسلم: «اللَّهُمَّ لَا مَانِعَ لِمَا أَعطَيتَ وَلَا مُعطِيَ لِمَا مَنَعتَ وَلَا يَنفَعُ ذَا الجَدِّ مِنكَ الجَدُّ».",
+    hadithTextEnglish:
+      "Al-Mughirah ibn Shu‘bah (may Allah be pleased with him) said: I heard the Prophet ﷺ say when he gave the salam: “O Allah, none can withhold what You have given, and none can give what You have withheld, and no fortune can avail its owner against You.”",
     authenticityNote: "Sahih al-Bukhari and Sahih Muslim.",
   },
   {
@@ -1724,6 +1866,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
     hadithText:
       "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «من سبح الله في دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين، وكبر الله ثلاثاً وثلاثين، فتلك تسعة وتسعون، وقال تمام المائة: لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير، غُفرت خطاياه وإن كانت مثل زبد البحر».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever glorifies Allah thirty-three times after every prayer, praises Allah thirty-three times, and magnifies Allah thirty-three times — that is ninety-nine — and completes the hundred with: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — his sins are forgiven, even were they like the foam of the sea.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1739,6 +1883,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
     hadithText:
       "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «من سبح الله في دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين، وكبر الله ثلاثاً وثلاثين، فتلك تسعة وتسعون، وقال تمام المائة: لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير، غُفرت خطاياه وإن كانت مثل زبد البحر».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever glorifies Allah thirty-three times after every prayer, praises Allah thirty-three times, and magnifies Allah thirty-three times — that is ninety-nine — and completes the hundred with: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — his sins are forgiven, even were they like the foam of the sea.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1754,6 +1900,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
     hadithText:
       "عَنْ أَبِي هُرَيْرَةَ رضي الله عنه عَنْ رَسُولِ اللَّهِ ﷺ قَالَ: «مَنْ سَبَّحَ اللَّهَ فِي دُبُرِ كُلِّ صَلَاةٍ ثَلَاثًا وَثَلَاثِينَ، وَحَمِدَ اللَّهَ ثَلَاثًا وَثَلَاثِينَ، وَكَبَّرَ اللَّهَ ثَلَاثًا وَثَلَاثِينَ، فَتِلْكَ تِسْعٌ وَتِسْعُونَ، وَقَالَ تَمَامَ الْمِائَةِ: لَا إِلَهَ إِلَّا اللَّهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، غُفِرَتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever glorifies Allah thirty-three times after every prayer, praises Allah thirty-three times, and magnifies Allah thirty-three times — that is ninety-nine — and completes the hundred with: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — his sins are forgiven, even were they like the foam of the sea.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1772,6 +1920,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sahih Muslim 597; Hisn al-Muslim 27.",
     hadithText:
       "عن أبي هريرة رضي الله عنه عن رسول الله ﷺ قال: «من سبح الله في دبر كل صلاة ثلاثاً وثلاثين، وحمد الله ثلاثاً وثلاثين، وكبر الله ثلاثاً وثلاثين، فتلك تسعة وتسعون، وقال تمام المائة: لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير، غُفرت خطاياه وإن كانت مثل زبد البحر».",
+    hadithTextEnglish:
+      "Abu Hurayrah (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever glorifies Allah thirty-three times after every prayer, praises Allah thirty-three times, and magnifies Allah thirty-three times — that is ninety-nine — and completes the hundred with: There is no god but Allah alone, with no partner; His is the dominion and His is the praise, and He is capable of all things — his sins are forgiven, even were they like the foam of the sea.”",
     authenticityNote: "Sahih Muslim.",
   },
   {
@@ -1787,6 +1937,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan an-Nasa'i al-Kubra 1226; Mustadrak al-Hakim 1/273; Hisn al-Muslim 28.",
     hadithText:
       "عن معاذ بن جبل رضي الله عنه أن رسول الله ﷺ أخذ بيده وقال: «يا معاذ، والله إني لأحبك، أوصيك يا معاذ لا تدعن في دبر كل صلاة تقول: اللَّهُمَّ أَعِنِّي عَلَى ذِكرِكَ وَشُكرِكَ وَحُسنِ عِبَادَتِكَ».",
+    hadithTextEnglish:
+      "Mu‘adh ibn Jabal (may Allah be pleased with him) reported that the Messenger of Allah ﷺ took him by the hand and said: “O Mu‘adh, by Allah I love you. I counsel you, Mu‘adh, never to leave saying at the end of every prayer: O Allah, help me to remember You, to thank You, and to worship You well.”",
     authenticityNote: "Sahih (Abu Dawud & An-Nasa'i).",
   },
   {
@@ -1807,6 +1959,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 3474; Sunan an-Nasa'i 10234; Hisn al-Muslim 29.",
     hadithText:
       "عَنْ أَبِي ذَرٍّ رضي الله عنه أَنَّ رَسُولَ اللَّهِ ﷺ قَالَ: «مَنْ قَالَ فِي دُبُرِ صَلاَةِ الْفَجْرِ وَهُوَ ثَانٍ رِجْلَيْهِ قَبْلَ أَنْ يَتَكَلَّمَ: لاَ إِلَهَ إِلاَّ اللَّهُ وَحْدَهُ لاَ شَرِيكَ لَهُ، لَهُ الْمُلْكُ، وَلَهُ الْحَمْدُ، يُحْيِي وَيُمِيتُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ، عَشْرَ مَرَّاتٍ كُتِبَتْ لَهُ عَشْرُ حَسَنَاتٍ، وَمُحِيَ عَنْهُ عَشْرُ سَيِّئَاتٍ، وَرُفِعَ لَهُ عَشْرُ دَرَجَاتٍ وَكَانَ لَهُ حِرْزًا مِنْ كُلِّ مَكْرُوهٍ، وَحَرَسًا مِنَ الشَّيْطَانِ».",
+    hadithTextEnglish:
+      "Abu Dharr (may Allah be pleased with him) reported that the Messenger of Allah ﷺ said: “Whoever says after the dawn prayer, while his legs are still folded and before he speaks: There is no god but Allah alone, with no partner; His is the dominion and His is the praise; He gives life and causes death, and He is capable of all things — ten times, ten good deeds are written for him, ten sins are erased from him, he is raised ten degrees, and it is a protection for him from all that is disliked and a guard against Satan.”",
     authenticityNote: "Graded Sahih/Hasan by al-Albani.",
   },
   {
@@ -1824,6 +1978,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     preferredTiming: "Recited 7 times after Fajr and 7 times after Maghrib.",
     hadithText:
       "عَنْ الْحَارِثِ بْنِ مُسْلِمٍ التَّمِيمِيِّ رَضِيَ اللَّهُ عَنْهُ قَالَ: قَالَ لِي رَسُولُ اللَّهِ ﷺ: «إِذَا صَلَّيْتَ الصُّبْحَ فَقُلْ قَبْلَ أَنْ تَتَكَلَّمَ: اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ سَبْعَ مَرَّاتٍ، فَإِنَّكَ إِنْ مُتَّ مِنْ يَوْمِكَ ذَلِكَ كَتَبَ اللَّهُ لَكَ جِوَارًا مِنْهَا، وَإِذَا صَلَّيْتَ الْمَغْرِبَ فَقُلْ قَبْلَ أَنْ تَتَكَلَّمَ: اللَّهُمَّ أَجِرْنِي مِنَ النَّارِ سَبْعَ مَرَّاتٍ، فَإِنَّكَ إِنْ مُتَّ مِنْ لَيْلَتِكَ كَتَبَ اللَّهُ لَكَ جِوَارًا مِنْهَا».",
+    hadithTextEnglish:
+      "Al-Harith ibn Muslim at-Tamimi (may Allah be pleased with him) said: The Messenger of Allah ﷺ said to me: “When you have prayed the dawn prayer, say before you speak: O Allah, protect me from the Fire — seven times; for if you die that day, Allah will write for you protection from it. And when you have prayed Maghrib, say before you speak: O Allah, protect me from the Fire — seven times; for if you die that night, Allah will write for you protection from it.”",
     authenticityNote: "Reported by Abu Dawud and Ahmad.",
   },
   {
@@ -1840,6 +1996,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Jami' at-Tirmidhi 3233; Hisn al-Muslim 30.",
     hadithText:
       "عن ابن عباس رضي الله عنهما عن النبي ﷺ قال الله تعالى: «يا محمد، إذا صليت فقل: اللهم إني أسألك فعل الخيرات وترك المنكرات وحب المساكين، وَأَنْ تَغْفِرَ لِي وَتَرْحَمَنِي، وَتَتُوبَ عَلَيَّ، وَإِذَا أَرَدْتَ بِعِبَادِكَ فِتْنَةً فَاقْبِضْنِي إِلَيْكَ غَيْرَ مَفْتُونٍ».",
+    hadithTextEnglish:
+      "Ibn ‘Abbas (may Allah be pleased with them both) reported from the Prophet ﷺ that Allah, exalted is He, said: “O Muhammad, when you pray, say: O Allah, I ask You for the doing of good deeds, the leaving of wrongs, and the love of the poor; and that You forgive me, have mercy on me, and accept my repentance. And when You intend a trial for Your servants, take me to You untried.”",
     authenticityNote: "Sahih at-Tirmidhi.",
   },
   {
@@ -1856,6 +2014,8 @@ const AFTER_PRAYER_AZKAR: ZikrDraft[] = [
     sourceReference: "Sunan Ibn Majah 925; Hisn al-Muslim 32.",
     hadithText:
       "عن أم سلمة رضي الله عنها أن النبي ﷺ كان يقول إذا صلى الصبح حين يسلم: «اللَّهُمَّ إِنِّي أَسأَلُكَ عِلمًا نَافِعًا وَرِزقًا طَيِّبًا وَعَمَلًا مُتَقَبَّلًا».",
+    hadithTextEnglish:
+      "Umm Salamah (may Allah be pleased with her) reported that the Prophet ﷺ used to say after the dawn prayer, when he gave the salam: “O Allah, I ask You for beneficial knowledge, good provision, and accepted deeds.”",
     authenticityNote: "Authenticated by al-Albani.",
   },
   ...AFTER_PRAYER_SURAH_AZKAR,
