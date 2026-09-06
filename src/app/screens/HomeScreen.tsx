@@ -643,7 +643,11 @@ export function HomeScreen({
               data-testid="hijri-date"
               className="min-w-0 text-label font-bold text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-subtitle"
             >
-              <time className="block truncate" dateTime={now.toISOString()}>
+              {/* Wraps rather than truncates. At 320px "Sunday, Rabiʻ I 24,
+                  1448 AH" was clipped to "…14", which drops the year and reads
+                  as broken rather than as abbreviated. The date is secondary,
+                  so a second line costs less than a mangled one. */}
+              <time className="block leading-tight" dateTime={now.toISOString()}>
                 {formatDisplayDate(now, language, calendarType)}
               </time>
             </div>
@@ -822,13 +826,20 @@ export function HomeScreen({
               {/* The header sits above a hairline in the brand gold, as in the
                   approved design: it separates chrome from the row of cards
                   without adding another filled band. */}
+              {/* The band runs the full width; the words inside it do not.
+                  At 1440px this subtitle measured 1060px, which is roughly
+                  twice a comfortable line — the eye loses the start of the next
+                  line on the way back. 44rem is the bound the rest of the app
+                  already reads at. */}
               <div className="border-b border-primary/40 bg-gradient-to-b from-muted/45 to-transparent px-4 py-5 text-start sm:px-6">
-                <h2 className="text-headline font-black leading-tight text-foreground" dir="auto">
-                  {t(language, "progress.postPrayerAzkar")}
-                </h2>
-                <p className="mt-2 text-label font-semibold leading-5 text-muted-foreground" dir="auto">
-                  {t(language, "home.prayerTrackerHint")}
-                </p>
+                <div className="max-w-[44rem]">
+                  <h2 className="text-headline font-black leading-tight text-foreground" dir="auto">
+                    {t(language, "progress.postPrayerAzkar")}
+                  </h2>
+                  <p className="mt-2 text-label font-semibold leading-5 text-muted-foreground" dir="auto">
+                    {t(language, "home.prayerTrackerHint")}
+                  </p>
+                </div>
               </div>
 
               <div className="mx-4 mt-5 h-2 overflow-hidden rounded-full bg-muted sm:mx-6" aria-hidden="true">
