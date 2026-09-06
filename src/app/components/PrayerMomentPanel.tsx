@@ -4,6 +4,7 @@ import { PrayerSceneArt } from "./PrayerSceneArt";
 import { Building, Clock, CloudSun, Home, Info, Lock, MoonStar, Sun, Sunrise, Sunset, Translate } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
+import { formatNumerals } from "../formatting";
 import { getPrayerSunnah } from "../content/prayerSunnah";
 import { Modal } from "./ResponsiveSheet";
 import { getPrayerVirtues } from "../content/prayerVirtues";
@@ -171,6 +172,20 @@ export function PrayerMomentPanel({
      and the moment it is recorded. Everywhere else this is a reference for a
      prayer that is not the one at hand. */
   const isLive = moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded";
+
+  /* Only while the prayer is still ahead. Once it is in, "in 0 min" is worse
+     than silence, and once recorded the wait is no longer the point. */
+  const countdown =
+    moment.phase === "approaching" || moment.phase === "upcoming"
+      ? moment.minutesUntil <= 1
+        ? t(language, "prayerMoment.countdownSoon")
+        : t(language, "prayerMoment.countdownMinutes", { minutes: formatNumerals(moment.minutesUntil, language) })
+      : null;
+
+  const approachFraction =
+    moment.phase === "approaching" && moment.leadMinutes > 0
+      ? Math.min(1, Math.max(0, (moment.leadMinutes - moment.minutesUntil) / moment.leadMinutes))
+      : null;
   const statusKey =
     moment.phase === "recorded"
       ? "prayerMoment.statusRecorded"
@@ -224,14 +239,50 @@ export function PrayerMomentPanel({
               <Icon size={22} aria-hidden="true" />
             </span>
           </div>
-          <div className="flex flex-wrap items-center gap-2.5">
-            <p className="text-3xl font-black leading-none tabular-nums" dir="auto">
-              {formatPrayerTimeLabel(moment.time, isArabic)}
-            </p>
-            {isLive && (
-              <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
-                {t(language, "prayerMoment.badgeNow")}
-              </span>
+          <div className="flex flex-col gap-2">
+            {/* The wait, before the time itself: "in 15 min" is what a reader
+                checking the card actually wants, and the clock time is the
+                detail that answers "when exactly". */}
+            {countdown && (
+              <p className="text-label font-bold text-white/85" dir="auto">
+                {countdown}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center gap-2.5">
+              <p className="text-3xl font-black leading-none tabular-nums" dir="auto">
+                {formatPrayerTimeLabel(moment.time, isArabic)}
+              </p>
+              {/* Only when the prayer is actually in.  also covers the
+                  approach and the moments after recording, so the badge read
+                  "Now" beside a countdown saying the prayer was thirteen minutes
+                  away — a contradiction that only became visible once the
+                  countdown was there to contradict. */}
+              {moment.phase === "now" && (
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-black text-primary-foreground">
+                  {t(language, "prayerMoment.badgeNow")}
+                </span>
+              )}
+            </div>
+            {/* How much of the approach has run. A meter rather than a
+                progressbar: this reports a quantity within a known range, and
+                it is measured against this prayer's own lead — which is capped
+                by half the gap from the previous prayer, so a bar drawn against
+                the uncapped constant would start part-filled for exactly the
+                prayers whose window is shortest. */}
+            {approachFraction !== null && (
+              <div
+                role="meter"
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-valuenow={Math.round(approachFraction * 100)}
+                aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
+                className="h-1.5 w-full overflow-hidden rounded-full bg-white/20"
+              >
+                <div
+                  className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
+                  style={{ width: `${Math.round(approachFraction * 100)}%` }}
+                />
+              </div>
             )}
           </div>
           <p className="flex items-center gap-2 text-label font-bold text-white/80">

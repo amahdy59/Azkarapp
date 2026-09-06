@@ -741,8 +741,18 @@ export function HomeScreen({
 
                 {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
               renders exactly this card; a second bespoke one would duplicate it. */}
+                {/* The day's routines and the evidence behind them share the
+                    hero's second column: the checklist says what is left to
+                    read, and the narration underneath says why it is worth
+                    reading. The reminder used to sit far below, under "Your
+                    library", where it read as a fact of the day rather than as
+                    the reason for the list directly above it. */}
                 {quietProgressEnabled && (
-                  <div className={`flex h-full w-full ${isComplete && !showCompletionCard ? "lg:col-span-2" : ""}`}>
+                  <div
+                    className={`flex h-full w-full flex-col gap-4 ${
+                      isComplete && !showCompletionCard ? "lg:col-span-2" : ""
+                    }`}
+                  >
                     <TodayRoutineGarden
                       summary={gardenSummary}
                       language={language}
@@ -757,6 +767,9 @@ export function HomeScreen({
                       recommendedCategoryId={showRoutineCard ? reminderInfo.categoryId : undefined}
                       onOpenWirdBenefits={onOpenWirdBenefits}
                     />
+                    {dailyEvidence && (
+                      <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} onGlass />
+                    )}
                   </div>
                 )}
               </div>
@@ -858,8 +871,10 @@ export function HomeScreen({
             <SectionDivider label={t(language, "home.yourLibrary")} />
           </div>
 
+          {/* The reminder moved into the hero, beside the routines it explains.
+              Leaving a second copy here would have put the same narration on
+              the screen twice. */}
           <div className="px-page grid grid-cols-1 items-start gap-3.5 lg:grid-cols-2">
-            {dailyEvidence && <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} />}
             <SavedZikrCard
               language={language}
               direction={direction}

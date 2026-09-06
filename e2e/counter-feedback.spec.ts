@@ -84,13 +84,29 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
 
   const routine = page.getByTestId("home-routine-card");
   const wird = page.getByTestId("today-garden-card");
-  const [routineBox, wirdBox] = await Promise.all([routine.boundingBox(), wird.boundingBox()]);
+  const evidence = page.getByTestId("home-daily-evidence");
+  const [routineBox, wirdBox, evidenceBox] = await Promise.all([
+    routine.boundingBox(),
+    wird.boundingBox(),
+    evidence.boundingBox(),
+  ]);
 
   expect(routineBox).not.toBeNull();
   expect(wirdBox).not.toBeNull();
   if (routineBox && wirdBox) {
     expect(Math.abs(routineBox.y - wirdBox.y)).toBeLessThanOrEqual(1);
-    expect(Math.abs(routineBox.height - wirdBox.height)).toBeLessThanOrEqual(1);
+
+    /* The two cards no longer match each other's height, and should not: the
+       second column now carries the day's routines with the narration that
+       explains them stacked underneath, so what has to align is the pair of
+       columns, not the pair of cards. Asserted as the column bottom rather
+       than the card bottom — the earlier assertion would now only be
+       satisfiable by leaving a gap under one of them. */
+    if (evidenceBox) {
+      const columnBottom = evidenceBox.y + evidenceBox.height;
+      const routineBottom = routineBox.y + routineBox.height;
+      expect(Math.abs(columnBottom - routineBottom)).toBeLessThanOrEqual(2);
+    }
   }
 });
 

@@ -30,6 +30,16 @@ export interface PrayerMoment {
   /** Minutes until the adhan; negative once it has passed. */
   minutesUntil: number;
   /**
+   * How long before the adhan this prayer starts leading the screen.
+   *
+   * Not a constant: it is the lead capped by half the gap from the previous
+   * prayer, so Maghrib does not start announcing itself during Asr. Exposed
+   * because a countdown that fills a bar needs to know what the bar measures —
+   * approximating with the uncapped constant would make it start part-filled
+   * for exactly the prayers whose window is shortest.
+   */
+  leadMinutes: number;
+  /**
    * Which rawātib is worth naming. Before the fard while the prayer is still
    * ahead, after it once it is in or done — the two before Fajr and the four
    * before Dhuhr are the whole reason the approach window exists, and they are
@@ -149,6 +159,7 @@ export function getPrayerMoment({
     phase,
     time: times[prayer],
     minutesUntil,
+    leadMinutes: lead,
     sunnahFocus: wantsBefore ? "before" : wantsAfter ? "after" : null,
     location: place,
     adhkarDone: record?.adhkar ?? false,

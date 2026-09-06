@@ -395,28 +395,48 @@ export function DailyEvidenceCard({
   language,
   direction,
   evidence,
+  onGlass = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   evidence: DailyEvidence;
+  /**
+   * Rendered over the hero photograph rather than on the page ground.
+   *
+   * Two things change together and must not drift apart: the surface becomes
+   * `hero-glass`, which already carries the blur, the wash and the opaque
+   * fallback for a reader who has asked for less transparency; and the text
+   * moves to the `on-media` tokens, which are light in every theme because
+   * the ground is a photograph rather than a theme colour. Glass without the
+   * second half is the version that fails contrast.
+   */
+  onGlass?: boolean;
 }) {
+  const Surface = onGlass ? "section" : Card;
+  const surfaceProps = onGlass
+    ? { className: "hero-glass flex min-h-0 flex-1 flex-col gap-3 rounded-3xl p-5" }
+    : { as: "section" as const, elevation: "flat" as const, className: "flex flex-col gap-3" };
+
   return (
-    <Card
-      as="section"
-      elevation="flat"
+    <Surface
       aria-labelledby="home-evidence-heading"
-      className="flex flex-col gap-3"
       data-testid="home-daily-evidence"
       dir={direction}
+      {...surfaceProps}
     >
       <div className="flex items-center gap-2">
         <span
-          className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+          className={`flex size-9 shrink-0 items-center justify-center rounded-xl ${
+            onGlass ? "bg-white/15 text-on-media-accent" : "bg-primary/10 text-primary"
+          }`}
           aria-hidden="true"
         >
           <BookOpen size={18} />
         </span>
-        <h2 id="home-evidence-heading" className="text-subtitle font-bold text-foreground">
+        <h2
+          id="home-evidence-heading"
+          className={`text-subtitle font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
+        >
           {t(language, "home.dailyEvidence")}
         </h2>
       </div>
@@ -427,7 +447,9 @@ export function DailyEvidenceCard({
           `lang` and `dir` follow the text that is actually rendered, and the
           Arabic face is only applied when the text is Arabic. */}
       <blockquote
-        className={`text-title font-medium leading-[2] text-foreground ${evidence.hadithInArabic ? "zikr-text" : ""}`}
+        className={`text-title font-medium leading-[2] ${onGlass ? "text-on-media" : "text-foreground"} ${
+          evidence.hadithInArabic ? "zikr-text" : ""
+        }`}
         dir={evidence.hadithInArabic ? "rtl" : "ltr"}
         lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"
@@ -435,21 +457,32 @@ export function DailyEvidenceCard({
         {evidence.hadith}
       </blockquote>
 
-      <p className="text-label leading-relaxed text-muted-foreground" dir="auto">
+      <p
+        className={`text-label leading-relaxed ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+        dir="auto"
+      >
         {evidence.benefit}
       </p>
 
-      <footer className="flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-border/40 pt-3">
-        <span className="text-xs font-semibold text-primary/90" dir="auto" data-testid="daily-evidence-grading">
+      <footer
+        className={`mt-auto flex flex-wrap items-center gap-x-2 gap-y-1 border-t pt-3 ${
+          onGlass ? "border-white/15" : "border-border/40"
+        }`}
+      >
+        <span
+          className={`text-xs font-semibold ${onGlass ? "text-on-media-accent" : "text-primary/90"}`}
+          dir="auto"
+          data-testid="daily-evidence-grading"
+        >
           {evidence.authenticity}
         </span>
         {evidence.authenticityLevel === "weak" && <HadithWeakChainBadge language={language} />}
         {evidence.sourceReference && (
-          <span className="text-xs text-muted-foreground" dir="auto">
+          <span className={`text-xs ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`} dir="auto">
             {evidence.sourceReference}
           </span>
         )}
       </footer>
-    </Card>
+    </Surface>
   );
 }

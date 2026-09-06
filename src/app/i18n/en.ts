@@ -216,6 +216,9 @@ const en = {
     rakahFour: "Four rak'ahs",
     dayTitle: "Today's prayers",
     homeTitle: "The prayer at hand",
+    countdownMinutes: "In {minutes} min",
+    countdownSoon: "Any moment now",
+    countdownProgress: "Time remaining until {prayer}",
   },
   prayerTracking: {
     mosque: "Prayed at the mosque",

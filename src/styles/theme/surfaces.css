@@ -473,8 +473,14 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   backdrop-filter: none !important;
 }
 
+/* `!important`, for the same reason the blur above needs it.
+   `.hero-glass` declares its translucent wash in layout.css, at the same
+   specificity as this rule and later in the built stylesheet — so this lost the
+   cascade and the surface stayed see-through. The blur was still correctly
+   removed, which left the worst of both: no blur to separate the text from the
+   photograph, and a background you can still see it through. */
 .reduce-transparency .hero-glass {
-  background-color: var(--card);
+  background-color: var(--on-media-surface) !important;
 }
 
 .reduce-transparency .glass-panel::after {
@@ -494,6 +500,6 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
   }
 
   .hero-glass {
-    background-color: var(--card);
+    background-color: var(--on-media-surface) !important;
   }
 }

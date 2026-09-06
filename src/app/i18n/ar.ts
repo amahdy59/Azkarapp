@@ -216,6 +216,9 @@ const ar = {
     rakahFour: "أربع ركعات",
     dayTitle: "صلوات اليوم",
     homeTitle: "الصلاة الحالية",
+    countdownMinutes: "بعد {minutes} دقيقة",
+    countdownSoon: "بعد قليل",
+    countdownProgress: "الوقت المتبقي حتى {prayer}",
   },
   prayerTracking: {
     mosque: "صليت في المسجد",
