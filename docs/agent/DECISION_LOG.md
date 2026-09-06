@@ -3065,3 +3065,49 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   the contrast analyser passing on Home in all five themes; screenshots at
   390/820/1440 reviewed against the supplied references; `pnpm check` green and
   the full suite green.
+
+## DEC-152 — the app stops sending coordinates, and erase means erase
+
+- **Decision:** the prayer-times network path is removed rather than disclosed;
+  clearing local data clears the downloaded mushaf as well as storage and audio;
+  the streak and the palm are counted by the daily path, with history keeping
+  the rules it was lived under.
+- **Path B, as chosen.** Prayer times were fetched from `api.aladhan.com` with
+  untruncated coordinates, on location grant and on uncached Home and Progress
+  mounts, while `public/privacy.html` read as a promise that coordinates never
+  leave the device. Disclosing it would have meant maintaining that disclosure
+  forever; removing it makes the existing claim true. `calculateOfflinePrayerTimes`
+  was already the fallback and was hardened for high latitudes in `81996a3`.
+- **What the API was actually being asked for.** Both settings call sites wanted
+  one thing from the response: the time zone in its metadata. The device already
+  knows it — `detectUserCoordinates` reads it from `Intl.DateTimeFormat` — so
+  the request bought nothing and cost the reader's coordinates.
+- **The cache is cleared, not expired.** It held prayer times keyed by where
+  someone was, for a service the app no longer uses, so it is removed on startup
+  rather than left to age out. The prefixes were read from the keys the old code
+  actually wrote: a first attempt guessed a plausible name, would have matched
+  nothing, and would have reported success.
+- **Erase reached a third of what it claimed.** `clearStoredAppData` empties
+  localStorage, and audio was removed alongside it, but the downloaded mushaf —
+  page images and QCF fonts, hundreds of megabytes — stayed. Removals now run
+  under `Promise.allSettled`, so a browser that blocks one Cache API bucket
+  cannot stop the others.
+- **The palm changes meaning, and history does not.** `getGardenSummary` takes a
+  verdict function instead of importing the daily path, because the daily path
+  already imports `MAIN_CATEGORY_IDS` from progress.ts and a cycle between them
+  would be worse than a parameter. Days before the reader's start marker keep
+  the legacy rules, which is the whole migration: those days have no Qur'an or
+  prayer record to judge, and re-judging them would delete palms people earned.
+- **Home and Progress judge identically.** The verdict was wired into Home
+  first, which would have shipped two screens disagreeing about the same day —
+  worse than either rule alone.
+- **Narrations, in reviewable batches.** Four of the six content files now read
+  in English; `azkar.ts` and `comprehensiveDuas.ts` hold the remaining 192.
+  Those are not being translated in one pass: 192 renderings of hadith in a
+  single diff is not something a reviewer can meaningfully check, and the
+  fallback means every untranslated entry still shows its Arabic.
+- **Tests/evidence required:** the cache-clearing test written against the real
+  key prefixes; erase covered for the mushaf and for one bucket failing while
+  others succeed; the garden proven to keep pre-migration palms, to grant a V2
+  palm when the whole path is walked, and to behave exactly as before when no
+  verdict is supplied; `pnpm check` green and the full suite green.

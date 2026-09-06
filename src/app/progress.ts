@@ -320,29 +320,7 @@ export function getUsageStreakSummary(
     .map(([dayKey]) => dayKey)
     .sort();
 
-  let longestUsageStreak = 0;
-  let run = 0;
-  for (let index = 0; index < activeKeys.length; index += 1) {
-    const current = activeKeys[index];
-    const previous = activeKeys[index - 1];
-    run = previous && current && dayOrdinal(current) - dayOrdinal(previous) === 1 ? run + 1 : 1;
-    longestUsageStreak = Math.max(longestUsageStreak, run);
-  }
-
-  let currentUsageStreak = 0;
-  const latest = activeKeys.at(-1);
-  if (latest && dayOrdinal(todayKey) - dayOrdinal(latest) <= 1) {
-    currentUsageStreak = 1;
-    for (let index = activeKeys.length - 1; index > 0; index -= 1) {
-      const current = activeKeys[index];
-      const previous = activeKeys[index - 1];
-      if (!current || !previous || dayOrdinal(current) - dayOrdinal(previous) !== 1) {
-        break;
-      }
-      currentUsageStreak += 1;
-    }
-  }
-
+  const { current: currentUsageStreak, longest: longestUsageStreak } = streaksOverDays(activeKeys, todayKey);
   return { currentUsageStreak, longestUsageStreak };
 }
 
@@ -376,6 +354,40 @@ export function getCategoryStreak(
   return streak;
 }
 
+/**
+ * Current and longest runs of consecutive days in a sorted list of day keys.
+ *
+ * The palm rhythm and the usage streak counted the same thing over different
+ * lists, in two copies of the same loop. One of them is now the other's caller.
+ *
+ * A current run tolerates today being absent — the day is not over — but not a
+ * gap before it.
+ */
+function streaksOverDays(sortedKeys: readonly string[], todayKey: string) {
+  let longest = 0;
+  let run = 0;
+  for (let index = 0; index < sortedKeys.length; index += 1) {
+    const current = sortedKeys[index];
+    const previous = sortedKeys[index - 1];
+    run = previous && current && dayOrdinal(current) - dayOrdinal(previous) === 1 ? run + 1 : 1;
+    longest = Math.max(longest, run);
+  }
+
+  let current = 0;
+  const latest = sortedKeys.at(-1);
+  if (latest && dayOrdinal(todayKey) - dayOrdinal(latest) <= 1) {
+    current = 1;
+    for (let index = sortedKeys.length - 1; index > 0; index -= 1) {
+      const day = sortedKeys[index];
+      const previous = sortedKeys[index - 1];
+      if (!day || !previous || dayOrdinal(day) - dayOrdinal(previous) !== 1) break;
+      current += 1;
+    }
+  }
+
+  return { current, longest };
+}
+
 export function getPalmStreakSummary(
   records: DailyCollectionCompletion[],
   now = new Date(),
@@ -387,43 +399,35 @@ export function getPalmStreakSummary(
     .map(([dayKey]) => dayKey)
     .sort();
 
-  let longestPalmRhythm = 0;
-  let run = 0;
-  for (let index = 0; index < palmKeys.length; index += 1) {
-    const current = palmKeys[index];
-    const previous = palmKeys[index - 1];
-    run = previous && current && dayOrdinal(current) - dayOrdinal(previous) === 1 ? run + 1 : 1;
-    longestPalmRhythm = Math.max(longestPalmRhythm, run);
-  }
-
-  let currentPalmRhythm = 0;
-  const latest = palmKeys.at(-1);
-  if (latest && dayOrdinal(todayKey) - dayOrdinal(latest) <= 1) {
-    currentPalmRhythm = 1;
-    for (let index = palmKeys.length - 1; index > 0; index -= 1) {
-      const current = palmKeys[index];
-      const previous = palmKeys[index - 1];
-      if (!current || !previous || dayOrdinal(current) - dayOrdinal(previous) !== 1) {
-        break;
-      }
-      currentPalmRhythm += 1;
-    }
-  }
-
+  const { current: currentPalmRhythm, longest: longestPalmRhythm } = streaksOverDays(palmKeys, todayKey);
   return { currentPalmRhythm, longestPalmRhythm };
 }
+
+/**
+ * How a single day is judged.
+ *
+ * Passed in rather than imported, because the daily path already imports
+ * `MAIN_CATEGORY_IDS` from here and a module cycle between the two would be
+ * worse than a parameter. It also keeps this file what it has always been: the
+ * garden's arithmetic, with no opinion about prayers or pages.
+ *
+ * Omitted, everything is judged the way it always was.
+ */
+export type DayVerdict = (dayKey: string) => { palm: boolean; qualifies: boolean };
 
 export function getGardenSummary(
   records: DailyCollectionCompletion[],
   now = new Date(),
   boundaryHour = DEFAULT_PROGRESS_DAY_START_HOUR,
+  judgeDay?: DayVerdict,
 ): GardenSummary {
   const todayKey = getProgressDayKey(now, boundaryHour);
   const normalized = normalizeDailyCompletions(records).filter((record) => record.dayKey <= todayKey);
   const byDay = categoryMap(normalized);
   const days = Array.from({ length: 7 }, (_, index) => {
     const key = shiftProgressDayKey(todayKey, index - 6);
-    return gardenDay(key, todayKey, byDay.get(key));
+    const day = gardenDay(key, todayKey, byDay.get(key));
+    return judgeDay ? { ...day, isPalm: judgeDay(key).palm } : day;
   });
   const today = days.at(-1) ?? gardenDay(todayKey, todayKey, byDay.get(todayKey));
   const yesterday = days.at(-2);
@@ -432,11 +436,28 @@ export function getGardenSummary(
   const lifetimeGoldenLeaves = normalized.filter((record) => MAIN_CATEGORY_IDS.includes(record.category)).length;
   const lifetimeGreenLeaves = normalized.filter((record) => !MAIN_CATEGORY_IDS.includes(record.category)).length;
   const lifetimeLeaves = normalized.length;
-  const lifetimePalms = [...byDay.values()].filter((entry) =>
-    MAIN_CATEGORY_IDS.every((cat) => entry.categories.has(cat)),
-  ).length;
-  const { currentPalmRhythm, longestPalmRhythm } = getPalmStreakSummary(normalized, now, boundaryHour);
-  const { currentUsageStreak, longestUsageStreak } = getUsageStreakSummary(normalized, now, boundaryHour);
+  /* Every day the reader has any record for, judged once. A day nobody
+     recorded anything on cannot earn a palm under either policy, so the keys of
+     `byDay` are the whole search space — and the verdict function decides which
+     policy each day is held to, since old days keep the rules they were lived
+     under. */
+  const judgedKeys = judgeDay ? [...byDay.keys()].filter((dayKey) => dayKey <= todayKey).sort() : [];
+  const palmKeys = judgeDay ? judgedKeys.filter((dayKey) => judgeDay(dayKey).palm) : [];
+  const qualifyingKeys = judgeDay ? judgedKeys.filter((dayKey) => judgeDay(dayKey).qualifies) : [];
+
+  const lifetimePalms = judgeDay
+    ? palmKeys.length
+    : [...byDay.values()].filter((entry) => MAIN_CATEGORY_IDS.every((cat) => entry.categories.has(cat))).length;
+  const { currentPalmRhythm, longestPalmRhythm } = judgeDay
+    ? (({ current, longest }) => ({ currentPalmRhythm: current, longestPalmRhythm: longest }))(
+        streaksOverDays(palmKeys, todayKey),
+      )
+    : getPalmStreakSummary(normalized, now, boundaryHour);
+  const { currentUsageStreak, longestUsageStreak } = judgeDay
+    ? (({ current, longest }) => ({ currentUsageStreak: current, longestUsageStreak: longest }))(
+        streaksOverDays(qualifyingKeys, todayKey),
+      )
+    : getUsageStreakSummary(normalized, now, boundaryHour);
 
   let messageKind: GardenMessageKind;
   if (today.isPalm) {

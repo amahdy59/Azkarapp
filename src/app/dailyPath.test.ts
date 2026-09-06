@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getDailyPathStatus, wasPrayedAtMosque, type DailyPathInput } from "./dailyPath";
+import { getGardenSummary } from "./progress";
 import type { CategoryId, DailyCollectionCompletion, PrayerName, PrayerTrackingRecord } from "./types";
 
 const DAY = "2026-09-06";
@@ -231,5 +232,72 @@ describe("days lived under the old rules", () => {
     });
     expect(result.policyVersion).toBe(1);
     expect(result.palmEarned).toBe(true);
+  });
+});
+
+describe("the garden judged by the daily path", () => {
+  const dayKeys = ["2026-08-30", "2026-08-31", "2026-09-01"];
+  const START = "2026-09-01";
+
+  /** The verdict Home and Progress hand to getGardenSummary. */
+  const judge = (input: Omit<DailyPathInput, "dayKey">) => (dayKey: string) => {
+    const status = getDailyPathStatus({ ...input, dayKey });
+    return { palm: status.palmEarned, qualifies: status.streakQualified };
+  };
+
+  it("keeps palms earned before the daily path started", () => {
+    /* The migration requirement, end to end: those days have no Qur'an or
+       mosque record to judge — the data did not sync then — so judging them by
+       the new rules would delete palms people earned. */
+    const completions = dayKeys.flatMap((dayKey) =>
+      (["morning", "evening", "before_sleep"] as CategoryId[]).map((category) => completion(category, dayKey)),
+    );
+    const summary = getGardenSummary(
+      completions,
+      new Date(2026, 8, 1, 12),
+      0,
+      judge({
+        dailyCompletions: completions,
+        wirdHistory: {},
+        prayerTracking: [],
+        mosquePrayerGoal: 5,
+        dailyPathStartDayKey: START,
+      }),
+    );
+
+    // The two legacy days keep their palms; the V2 day does not earn one,
+    // because its mosque goal went unmet.
+    expect(summary.lifetimePalms).toBe(2);
+  });
+
+  it("earns a palm on a V2 day when the whole path is walked", () => {
+    const completions = (["morning", "evening", "before_sleep"] as CategoryId[]).map((c) => completion(c, START));
+    const summary = getGardenSummary(
+      completions,
+      new Date(2026, 8, 1, 12),
+      0,
+      judge({
+        dailyCompletions: completions,
+        wirdHistory: { [START]: [1, 2] },
+        quranWirdPlan: { kind: "daily", dailyPages: 2 },
+        prayerTracking: [
+          { dayKey: START, prayer: "fajr", mosque: true, adhkar: false, location: "mosque" },
+          { dayKey: START, prayer: "asr", mosque: true, adhkar: false, location: "mosque" },
+        ],
+        mosquePrayerGoal: 2,
+        dailyPathStartDayKey: START,
+      }),
+    );
+
+    expect(summary.lifetimePalms).toBe(1);
+  });
+
+  it("counts nothing differently when no verdict is supplied", () => {
+    // An existing reader's first launch, before the marker is stamped.
+    const completions = dayKeys.flatMap((dayKey) =>
+      (["morning", "evening", "before_sleep"] as CategoryId[]).map((category) => completion(category, dayKey)),
+    );
+    const legacy = getGardenSummary(completions, new Date(2026, 8, 1, 12), 0);
+    expect(legacy.lifetimePalms).toBe(3);
   });
 });

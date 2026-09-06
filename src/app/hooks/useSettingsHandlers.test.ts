@@ -2,8 +2,10 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { clearAllLocalData } from "./useSettingsHandlers";
 
 const removeDownloadedAudio = vi.hoisted(() => vi.fn(async () => undefined));
+const removeDownloadedMushaf = vi.hoisted(() => vi.fn(async () => undefined));
 
 vi.mock("../audio/audioOfflineCache", () => ({ removeDownloadedAudio }));
+vi.mock("../content/mushafOfflineCache", () => ({ removeDownloadedMushaf }));
 
 describe("clearAllLocalData", () => {
   afterEach(() => {
@@ -42,5 +44,25 @@ describe("clearAllLocalData", () => {
 
     expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
     expect(window.localStorage.getItem("unrelated.product.key")).toBe("keep");
+  });
+
+  it("removes the downloaded mushaf, which is the largest thing on the device", async () => {
+    /* Page images and QCF fonts run to hundreds of megabytes. Clearing
+       localStorage alone left all of it behind, so someone who asked the app to
+       erase their data kept most of it. */
+    await clearAllLocalData();
+
+    expect(removeDownloadedMushaf).toHaveBeenCalledOnce();
+  });
+
+  it("clears the rest when one cache refuses to be removed", async () => {
+    // A browser that blocks one bucket must not stop the others from going.
+    removeDownloadedAudio.mockRejectedValueOnce(new Error("Cache API unavailable"));
+    window.localStorage.setItem("azkarapp.state.v1", "{}");
+
+    await expect(clearAllLocalData()).resolves.toBeUndefined();
+
+    expect(removeDownloadedMushaf).toHaveBeenCalledOnce();
+    expect(window.localStorage.getItem("azkarapp.state.v1")).toBeNull();
   });
 });

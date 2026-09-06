@@ -1324,6 +1324,11 @@ function AppContent({
                   onTogglePrayerTracking={handleTogglePrayerTracking}
                   onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenFriday={() => push("friday")}
+                  wirdHistory={wirdHistory}
+                  quranWirdPlan={quranWirdPlan}
+                  quranWirdDailyGoals={quranWirdDailyGoals}
+                  mosquePrayerGoal={mosquePrayerGoal}
+                  dailyPathStartDayKey={dailyPathStartDayKey}
                 />
               )}
               {(view === "category" || view === "reader") && routeContentLoading && (

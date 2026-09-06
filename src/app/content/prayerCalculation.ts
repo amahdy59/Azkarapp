@@ -61,91 +61,35 @@ export const DEFAULT_LOCATION: LocationSettings = {
   adjustments: { fajr: 0, dhuhr: 0, asr: 0, maghrib: 0, isha: 0 },
 };
 
-const CACHE_KEY_PREFIX = "azkarapp.prayer_times_cache.";
-const TIME_ZONE_CACHE_KEY_PREFIX = "azkarapp.prayer_time_zone.";
 const PRAYER_NAMES: PrayerName[] = ["fajr", "dhuhr", "asr", "maghrib", "isha"];
-const TIME_PATTERN = /^([01]\d|2[0-3]):([0-5]\d)$/;
-
-function dateKey(date: Date): string {
-  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-}
-
-function getCacheKey(date: Date, lat: number, lng: number, method: number): string {
-  return `${CACHE_KEY_PREFIX}${dateKey(date)}_${lat.toFixed(3)}_${lng.toFixed(3)}_${method}`;
-}
-
-function getTimeZoneCacheKey(lat: number, lng: number): string {
-  return `${TIME_ZONE_CACHE_KEY_PREFIX}${lat.toFixed(3)}_${lng.toFixed(3)}`;
-}
-
-function isPrayerTimes(value: unknown): value is PrayerTimes {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<Record<PrayerName, unknown>>;
-  return PRAYER_NAMES.every((prayer) => typeof candidate[prayer] === "string" && TIME_PATTERN.test(candidate[prayer]));
-}
-
-function getCachedPrayerTimes(date: Date, lat: number, lng: number, method: number): PrayerTimes | null {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = window.localStorage.getItem(getCacheKey(date, lat, lng, method));
-    if (!raw) return null;
-    const parsed: unknown = JSON.parse(raw);
-    return isPrayerTimes(parsed) ? parsed : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Days either side of the requested date whose cached times stay useful. */
-const CACHE_RETENTION_DAYS = 2;
 
 /**
- * The cache is keyed per date (and per location and method), so it grew by a
- * fresh key every day and nothing ever removed the old ones. Only dates near
- * the one being read are ever useful, so pruning on write keeps the cache
- * bounded without a separate cleanup pass.
+ * The prefixes the old network path wrote under.
+ *
+ * Taken from the keys it actually used, not from what they might sensibly have
+ * been called: a cleanup keyed on a guessed prefix removes nothing at all, and
+ * says it succeeded.
  */
-export function pruneExpiredPrayerTimes(reference: Date): void {
-  const oldest = dateKey(new Date(reference.getTime() - CACHE_RETENTION_DAYS * 86_400_000));
-  const newest = dateKey(new Date(reference.getTime() + CACHE_RETENTION_DAYS * 86_400_000));
+const LEGACY_CACHE_PREFIXES = ["azkarapp.prayer_times_cache.", "azkarapp.prayer_time_zone."];
+
+/**
+ * Clears what the old network path left on the device.
+ *
+ * Prayer times were fetched from a third party and cached here, keyed by the
+ * reader's coordinates. Nothing writes that cache now — the times are
+ * calculated on the device — so what remains is a residue of a service the app
+ * no longer uses, holding a record of where someone was. It is removed on
+ * startup rather than left to expire, because the point of dropping the
+ * network path was that those coordinates should not be sitting anywhere.
+ */
+export function pruneExpiredPrayerTimes(_reference: Date): void {
   try {
     for (let index = window.localStorage.length - 1; index >= 0; index -= 1) {
       const key = window.localStorage.key(index);
-      if (!key?.startsWith(CACHE_KEY_PREFIX)) continue;
-      // `YYYY-MM-DD` sorts lexicographically, so a string compare is the range check.
-      const cachedDate = key.slice(CACHE_KEY_PREFIX.length).split("_")[0];
-      if (cachedDate && (cachedDate < oldest || cachedDate > newest)) window.localStorage.removeItem(key);
+      if (key && LEGACY_CACHE_PREFIXES.some((prefix) => key.startsWith(prefix))) window.localStorage.removeItem(key);
     }
   } catch {
-    // An unpruned cache is only wasted space; prayer times are unaffected.
-  }
-}
-
-function setCachedPrayerTimes(date: Date, lat: number, lng: number, method: number, times: PrayerTimes): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(getCacheKey(date, lat, lng, method), JSON.stringify(times));
-  } catch {
-    // Prayer times still work through the in-memory offline calculation.
-  }
-  pruneExpiredPrayerTimes(date);
-}
-
-function getCachedTimeZone(lat: number, lng: number): string | undefined {
-  if (typeof window === "undefined") return undefined;
-  try {
-    return window.localStorage.getItem(getTimeZoneCacheKey(lat, lng)) || undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-function setCachedTimeZone(lat: number, lng: number, timeZone: string): void {
-  if (typeof window === "undefined") return;
-  try {
-    window.localStorage.setItem(getTimeZoneCacheKey(lat, lng), timeZone);
-  } catch {
-    // The browser/device timezone remains available as an offline fallback.
+    // Leftover cache is wasted space, not a fault; prayer times are unaffected.
   }
 }
 
@@ -337,117 +281,23 @@ export function calculateOfflinePrayerTimes(
   };
 }
 
-function parseApiTime(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const match = value.match(/\b([01]\d|2[0-3]):([0-5]\d)\b/);
-  return match ? `${match[1]}:${match[2]}` : null;
-}
-
-export function parseAladhanPrayerTimes(payload: unknown): PrayerTimes | null {
-  return parseAladhanPrayerData(payload)?.times ?? null;
-}
-
 export interface AladhanPrayerData {
   times: PrayerTimes;
   timeZone?: string;
-}
-
-export function parseAladhanPrayerData(payload: unknown): AladhanPrayerData | null {
-  if (!payload || typeof payload !== "object") return null;
-  const data = (payload as { data?: unknown }).data;
-  if (!data || typeof data !== "object") return null;
-  const timings = (data as { timings?: unknown }).timings;
-  if (!timings || typeof timings !== "object") return null;
-  const source = timings as Record<string, unknown>;
-  const parsed = {
-    fajr: parseApiTime(source.Fajr),
-    dhuhr: parseApiTime(source.Dhuhr),
-    asr: parseApiTime(source.Asr),
-    maghrib: parseApiTime(source.Maghrib),
-    isha: parseApiTime(source.Isha),
-  };
-  if (!Object.values(parsed).every(Boolean)) return null;
-  const meta = (data as { meta?: unknown }).meta;
-  const timeZone =
-    meta && typeof meta === "object" && typeof (meta as { timezone?: unknown }).timezone === "string"
-      ? (meta as { timezone: string }).timezone
-      : undefined;
-  return { times: parsed as PrayerTimes, timeZone };
-}
-
-export async function fetchAladhanPrayerData(
-  date: Date = new Date(),
-  latitude: number = DEFAULT_LOCATION.latitude ?? 30.0444,
-  longitude: number = DEFAULT_LOCATION.longitude ?? 31.2357,
-  methodId: number = DEFAULT_LOCATION.calculationMethod,
-): Promise<AladhanPrayerData | null> {
-  const cached = getCachedPrayerTimes(date, latitude, longitude, methodId);
-  if (cached) return { times: cached, timeZone: getCachedTimeZone(latitude, longitude) };
-
-  const apiDate = `${String(date.getDate()).padStart(2, "0")}-${String(date.getMonth() + 1).padStart(2, "0")}-${date.getFullYear()}`;
-  const query = new URLSearchParams({
-    latitude: String(latitude),
-    longitude: String(longitude),
-    method: String(methodId),
-  });
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-  try {
-    const response = await fetch(`https://api.aladhan.com/v1/timings/${apiDate}?${query}`, {
-      signal: controller.signal,
-    });
-    if (!response.ok) return null;
-    const prayerData = parseAladhanPrayerData(await response.json());
-    if (prayerData) {
-      setCachedPrayerTimes(date, latitude, longitude, methodId, prayerData.times);
-      if (prayerData.timeZone) setCachedTimeZone(latitude, longitude, prayerData.timeZone);
-    }
-    return prayerData;
-  } catch {
-    return null;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-export async function fetchAladhanPrayerTimes(
-  date: Date = new Date(),
-  latitude: number = DEFAULT_LOCATION.latitude ?? 30.0444,
-  longitude: number = DEFAULT_LOCATION.longitude ?? 31.2357,
-  methodId: number = DEFAULT_LOCATION.calculationMethod,
-): Promise<PrayerTimes | null> {
-  return (await fetchAladhanPrayerData(date, latitude, longitude, methodId))?.times ?? null;
 }
 
 export function getPrayerTimes(date: Date = new Date(), location?: LocationSettings): PrayerTimes {
   const latitude = location?.latitude ?? DEFAULT_LOCATION.latitude ?? 30.0444;
   const longitude = location?.longitude ?? DEFAULT_LOCATION.longitude ?? 31.2357;
   const method = location?.calculationMethod ?? DEFAULT_LOCATION.calculationMethod;
-  const cached = getCachedPrayerTimes(date, latitude, longitude, method);
-  const baseTimes =
-    cached ??
-    calculateOfflinePrayerTimes(
-      date,
-      latitude,
-      longitude,
-      method,
-      location?.timeZone ?? getCachedTimeZone(latitude, longitude) ?? DEFAULT_LOCATION.timeZone,
-    );
+  const baseTimes = calculateOfflinePrayerTimes(
+    date,
+    latitude,
+    longitude,
+    method,
+    location?.timeZone ?? DEFAULT_LOCATION.timeZone,
+  );
   return applyPrayerAdjustments(baseTimes, location?.adjustments);
-}
-
-export function triggerBackgroundPrayerTimesRefresh(
-  date: Date = new Date(),
-  location?: LocationSettings,
-  onUpdated?: (times: PrayerTimes) => void,
-): void {
-  const latitude = location?.latitude ?? DEFAULT_LOCATION.latitude ?? 30.0444;
-  const longitude = location?.longitude ?? DEFAULT_LOCATION.longitude ?? 31.2357;
-  const method = location?.calculationMethod ?? DEFAULT_LOCATION.calculationMethod;
-  void fetchAladhanPrayerTimes(date, latitude, longitude, method).then((times) => {
-    if (times) onUpdated?.(applyPrayerAdjustments(times, location?.adjustments));
-  });
 }
 
 export type CoordinateDetectionResult =

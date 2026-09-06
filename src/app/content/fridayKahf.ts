@@ -841,6 +841,8 @@ const FRIDAY_KAHF_DRAFT: ZikrDraft[] = [
        Fridays" narration is graded by later scholars rather than by Muslim, so the
        stronger chain is the one shown. */
     hadithText: "«مَنْ حَفِظَ عَشْرَ آيَاتٍ مِنْ أَوَّلِ سُورَةِ الْكَهْفِ عُصِمَ مِنَ الدَّجَّالِ»",
+    hadithTextEnglish:
+      "“Whoever memorises ten verses from the beginning of Surat al-Kahf is protected from the Dajjal.”",
     authenticityNote: "صحيح مسلم ٨٠٩.",
     sourceReference: "Qur'an 18:1-110.",
     sourceReferenceArabic: "القرآن الكريم، سورة الكهف (١٨:١-١١٠).",

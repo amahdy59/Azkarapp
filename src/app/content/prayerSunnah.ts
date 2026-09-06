@@ -29,6 +29,8 @@ export type SunnahRank = "confirmed" | "optional";
 export interface SunnahEvidence {
   /** Narration text, as transmitted. Never paraphrased. */
   textArabic: string;
+  /** The same narration in English. Falls back to the Arabic until supplied. */
+  textEnglish?: string;
   /** Collection and number, e.g. "صحيح مسلم ٧٢٥". */
   referenceArabic: string;
   referenceEnglish: string;
@@ -50,12 +52,14 @@ const TWELVE_RAKAHS: SunnahEvidence = {
     "«مَنْ صَلَّى اثْنَتَيْ عَشْرَةَ رَكْعَةً فِي يَوْمٍ وَلَيْلَةٍ بُنِيَ لَهُ بِهِنَّ بَيْتٌ فِي الْجَنَّةِ»",
   referenceArabic: "صحيح مسلم ٧٢٨",
   referenceEnglish: "Sahih Muslim 728",
+  textEnglish: "“Whoever prays twelve rakʿahs in a day and a night, a house will be built for him in Paradise.”",
 };
 
 const FAJR_PAIR: SunnahEvidence = {
   textArabic: "«رَكْعَتَا الْفَجْرِ خَيْرٌ مِنَ الدُّنْيَا وَمَا فِيهَا»",
   referenceArabic: "صحيح مسلم ٧٢٥",
   referenceEnglish: "Sahih Muslim 725",
+  textEnglish: "“The two rakʿahs of Fajr are better than the world and all it contains.”",
 };
 
 const DHUHR_FOUR: SunnahEvidence = {
@@ -63,6 +67,7 @@ const DHUHR_FOUR: SunnahEvidence = {
     "«مَنْ حَافَظَ عَلَى أَرْبَعِ رَكَعَاتٍ قَبْلَ الظُّهْرِ وَأَرْبَعٍ بَعْدَهَا حَرَّمَهُ اللَّهُ عَلَى النَّارِ»",
   referenceArabic: "سنن أبي داود ١٢٦٩، وسنن الترمذي ٤٢٨",
   referenceEnglish: "Sunan Abi Dawud 1269; Jami' at-Tirmidhi 428",
+  textEnglish: "“Whoever keeps to four rakʿahs before Dhuhr and four after it, Allah forbids him to the Fire.”",
   gradingArabic: "صححه الألباني",
   gradingEnglish: "Graded sahih by al-Albani",
 };
@@ -72,6 +77,7 @@ const ASR_FOUR: SunnahEvidence = {
   textArabic: "«رَحِمَ اللَّهُ امْرَأً صَلَّى قَبْلَ الْعَصْرِ أَرْبَعًا»",
   referenceArabic: "سنن أبي داود ١٢٧١، وسنن الترمذي ٤٣٠",
   referenceEnglish: "Sunan Abi Dawud 1271; Jami' at-Tirmidhi 430",
+  textEnglish: "“May Allah have mercy on a man who prays four before Asr.”",
   gradingArabic: "حسّنه الألباني",
   gradingEnglish: "Graded hasan by al-Albani",
 };
@@ -80,6 +86,7 @@ const MAGHRIB_PAIR: SunnahEvidence = {
   textArabic: "«صَلُّوا قَبْلَ صَلَاةِ الْمَغْرِبِ رَكْعَتَيْنِ» ثُمَّ قَالَ فِي الثَّالِثَةِ: «لِمَنْ شَاءَ»",
   referenceArabic: "صحيح البخاري ١١٨٣",
   referenceEnglish: "Sahih al-Bukhari 1183",
+  textEnglish: "“Pray two rakʿahs before the Maghrib prayer,” then he said the third time: “for whoever wishes.”",
 };
 
 /**

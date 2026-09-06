@@ -8,7 +8,6 @@ import {
   CALCULATION_METHODS,
   DEFAULT_LOCATION,
   detectUserCoordinates,
-  fetchAladhanPrayerData,
   formatUtcOffset,
   getTimeZoneStatus,
 } from "../../content/prayerCalculation";
@@ -168,21 +167,12 @@ export function NotificationsPanel({
       };
       onLocationChange(detectedLocation);
 
-      const prayerData = await fetchAladhanPrayerData(
-        new Date(),
-        result.latitude,
-        result.longitude,
-        detectedLocation.calculationMethod,
-      );
-      if (prayerData && requestId === locationRequestId.current) {
-        onLocationChange({
-          ...detectedLocation,
-          timeZone: prayerData.timeZone ?? detectedLocation.timeZone,
-        });
-      }
-      setLocationStatus(
-        t(language, prayerData ? "notifications.locationUpdated" : "notifications.prayerRefreshDeferred"),
-      );
+      /* The time zone came back from the prayer-times API's metadata, which
+         meant sending the reader's coordinates to a third party to learn
+         something the device already knows: `detectUserCoordinates` reads it
+         from `Intl.DateTimeFormat`. Times are calculated here, so there is
+         nothing left to wait for and nothing deferred to report. */
+      setLocationStatus(t(language, "notifications.locationUpdated"));
     } else {
       const reasonKey =
         result.ok || result.reason === "unknown"
@@ -199,7 +189,8 @@ export function NotificationsPanel({
 
   const handleMethodChange = async (methodId: number) => {
     if (!onLocationChange) return;
-    const requestId = ++locationRequestId.current;
+    // The request counter guarded an async response; the method now applies
+    // locally, so there is no later answer to race.
     setIsDetectingLocation(false);
 
     const updatedLocation = {
@@ -208,23 +199,8 @@ export function NotificationsPanel({
     };
     onLocationChange(updatedLocation);
 
-    const prayerData = await fetchAladhanPrayerData(
-      new Date(),
-      updatedLocation.latitude ?? DEFAULT_LOCATION.latitude,
-      updatedLocation.longitude ?? DEFAULT_LOCATION.longitude,
-      methodId,
-    );
-    if (prayerData && requestId === locationRequestId.current) {
-      onLocationChange({
-        ...updatedLocation,
-        timeZone: prayerData.timeZone ?? updatedLocation.timeZone,
-      });
-      setLocationStatus(t(language, "notifications.locationUpdated"));
-      setLocationStatusIsError(false);
-    } else if (requestId === locationRequestId.current) {
-      setLocationStatus(t(language, "notifications.prayerRefreshDeferred"));
-      setLocationStatusIsError(false);
-    }
+    /* Changing the method used to refetch. The calculation is local, so the
+       new method applies to the next render without a request. */
   };
 
   const handleManualLocationSave = () => {

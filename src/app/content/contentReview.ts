@@ -185,6 +185,8 @@ const QURAN_RELIANCE_CORRECTION: Partial<Zikr> = {
   hadithText:
     "قَالَ اللَّهُ تَعَالَى: ﴿حَسْبِيَ اللَّهُ لَا إِلَهَ إِلَّا هُوَ عَلَيْهِ تَوَكَّلْتُ وَهُوَ رَبُّ الْعَرْشِ الْعَظِيمِ﴾.",
   authenticityNote: "Qur’an 9:129; Abu Dawud 5081 is graded fabricated by al-Albani and is not used.",
+  hadithTextEnglish:
+    "Allah, exalted is He, said: “Allah is sufficient for me; there is no god but He. On Him I rely, and He is the Lord of the Mighty Throne.”",
   sourceUrl: "https://sunnah.com/abudawud%3A5081",
 };
 
@@ -254,6 +256,8 @@ const TEXT_OVERRIDES: Readonly<Record<string, Partial<Zikr>>> = {
     hadithText:
       "قَالَ رَسُولُ اللَّهِ ﷺ: «الشَّمْسُ وَالْقَمَرُ لَا يَخْسِفَانِ لِمَوْتِ أَحَدٍ وَلَا لِحَيَاتِهِ، فَإِذَا رَأَيْتُمْ ذَلِكَ فَادْعُوا اللَّهَ عَزَّ وَجَلَّ، وَكَبِّرُوا، وَتَصَدَّقُوا».",
     authenticityNote: "Sahih (al-Albani); also established in Sahih al-Bukhari and Sahih Muslim.",
+    hadithTextEnglish:
+      "The Messenger of Allah ﷺ said: “The sun and the moon are not eclipsed for the death of anyone nor for his life. When you see that, call upon Allah, magnify Him, and give charity.”",
     sourceUrl: "https://sunnah.com/abudawud%3A1191",
   },
   "s-hm-110a": {

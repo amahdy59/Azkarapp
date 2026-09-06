@@ -7,23 +7,31 @@ import { reportError } from "../../lib/observability";
 /**
  * Clears every local trace of the user's data.
  *
+ * The reader's data is in three places, not one. `clearStoredAppData()` empties
+ * localStorage; the Cache API holds downloaded audio and the downloaded mushaf
+ * — its page images and QCF fonts — which can run to hundreds of megabytes.
+ * Clearing storage alone left all of it on the device, so someone who asked the
+ * app to erase their data kept most of it.
+ *
  * Downloaded audio lives in two places that have to go together: the Cache API
  * bucket holding the bytes, and `azkar.audio-downloads.v1`, which is the only
  * index of which URLs are in that bucket. `removeDownloadedAudio()` removes
- * both, so it runs first — clearing storage on its own would strand the cached
- * bytes with nothing able to find or delete them.
+ * both, so it runs before storage is cleared — clearing storage first would
+ * strand the cached bytes with nothing able to find or delete them.
  *
- * The audio module is imported dynamically, as `main.tsx` already does, so the
- * Cache API paths and the audio catalogue stay out of the settings bundle.
+ * Each removal is attempted independently: one unavailable Cache API bucket
+ * must not stop the others, or a reader on a browser that blocks one of them
+ * can clear nothing at all.
+ *
+ * Both modules are imported dynamically, as `main.tsx` already does, so the
+ * Cache API paths, the audio catalogue and the mushaf page list stay out of the
+ * settings bundle.
  */
 export async function clearAllLocalData() {
-  try {
-    const { removeDownloadedAudio } = await import("../audio/audioOfflineCache");
-    await removeDownloadedAudio();
-  } catch {
-    // Offline audio is unsupported, blocked, or already gone. Local data still
-    // clears — a failure here must not leave the user unable to clear anything.
-  }
+  await Promise.allSettled([
+    import("../audio/audioOfflineCache").then(({ removeDownloadedAudio }) => removeDownloadedAudio()),
+    import("../content/mushafOfflineCache").then(({ removeDownloadedMushaf }) => removeDownloadedMushaf()),
+  ]);
   clearStoredAppData();
 }
 

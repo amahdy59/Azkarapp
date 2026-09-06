@@ -1,11 +1,11 @@
 /* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ArrowLeft, ArrowRight, Zap } from "../components/icons";
 import { TasbeehCounterButton } from "../components/TasbeehCounterButton";
 import { PalmTreeMark, TodayRoutineGarden } from "../components/RoutineGarden";
 import { ProductImage } from "../components/ProductImage";
 import { TranquilityCompletionCard } from "../components/TranquilityCompletionCard";
-import { getDailyEvidence } from "../dailyEvidence";
+import { getContextualEvidence, getReminderContexts } from "../dailyEvidence";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
@@ -28,7 +28,6 @@ import {
   timeToMinutes,
   type PrayerName,
 } from "../content/prayerTimes";
-import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
 import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
@@ -315,28 +314,43 @@ export function HomeScreen({
   const [hasScrolledHomeContent, setHasScrolledHomeContent] = useState(false);
   const isArabic = language === "ar";
   const now = useNow();
-  const [, setPrayerTimesRevision] = useState(0);
   const [savedOpenState, setSavedOpenState] = useState<{
     loadingId: string | null;
     errorId: string | null;
   }>({ loadingId: null, errorId: null });
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
 
-  const prayerDateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-
-  useEffect(() => {
-    let active = true;
-    triggerBackgroundPrayerTimesRefresh(new Date(), locationSettings, () => {
-      if (active) setPrayerTimesRevision((revision) => revision + 1);
-    });
-    return () => {
-      active = false;
-    };
-  }, [locationSettings, prayerDateKey]);
+  /* How each day is judged. Days before the reader's daily path started keep
+     the verdict they were lived under — see dailyPath.ts — so this is one
+     function for both eras rather than a flag the callers have to remember. */
+  const judgeDay = useCallback(
+    (dayKey: string) => {
+      const status = getDailyPathStatus({
+        dayKey,
+        dailyCompletions,
+        wirdHistory: wirdHistory ?? {},
+        quranWirdPlan,
+        quranWirdDailyGoals,
+        prayerTracking,
+        mosquePrayerGoal,
+        dailyPathStartDayKey,
+      });
+      return { palm: status.palmEarned, qualifies: status.streakQualified };
+    },
+    [
+      dailyCompletions,
+      dailyPathStartDayKey,
+      mosquePrayerGoal,
+      prayerTracking,
+      quranWirdDailyGoals,
+      quranWirdPlan,
+      wirdHistory,
+    ],
+  );
 
   const gardenSummary = useMemo(
-    () => getGardenSummary(dailyCompletions, now, progressDayStartHour),
-    [dailyCompletions, now, progressDayStartHour],
+    () => getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay),
+    [dailyCompletions, judgeDay, now, progressDayStartHour],
   );
   const currentPrayerPeriod = getCurrentPrayerPeriod(now, locationSettings);
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
@@ -388,13 +402,28 @@ export function HomeScreen({
   const todayKey = getProgressDayKey(now, progressDayStartHour);
   // Keyed to the progress day, so the narration turns over on the same boundary
   // the routines do rather than at civil midnight.
-  const dailyEvidence = useMemo(() => getDailyEvidence(todayKey, language), [todayKey, language]);
 
   const reminderInfo = useMemo(
     () => getTimeOfDayZikr(now, language, locationSettings),
     [now, language, locationSettings],
   );
   const reminderCategory = CATEGORIES.find((c) => c.id === reminderInfo.categoryId)!;
+
+  /* One reviewed reminder chosen for the moment rather than for the date.
+     The contexts come from what the app already knows — which prayer's window
+     is open, which timed collection the hour belongs to, whether the prayer has
+     been recorded and its adhkar are what follows — so this adds no second
+     clock and no second content library. Stable for the day within a context,
+     so returning to Home does not re-roll it. */
+  const contextualEvidence = useMemo(() => {
+    const contexts = getReminderContexts({
+      afterPrayer: leadingPrayer?.phase === "recorded" && !leadingPrayer.adhkarDone,
+      activePrayer: leadingPrayer ? "after_prayer" : undefined,
+      timedCollection: reminderInfo.categoryId,
+    });
+    return getContextualEvidence(todayKey, language, contexts);
+  }, [language, leadingPrayer, reminderInfo.categoryId, todayKey]);
+  const dailyEvidence = contextualEvidence?.evidence ?? null;
   const isLastThirdDua = reminderInfo.categoryId === "comprehensive_duas";
   const doneSet = completed[reminderInfo.categoryId] ?? new Set<string>();
 

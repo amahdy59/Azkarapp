@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-06.2",
+  "release": "2026-09-06.3",
   "ar": [
-    "صار الضغط على ⚡ و🌴 في أعلى الرئيسية يفتح «طريق اليوم»: الأذكار وورد القرآن والصلاة في جماعة، وما اكتمل منها وما بقي.",
-    "تستطيع اختيار كم صلاة من الخمس تنوي أداءها في جماعة، من داخل «طريق اليوم» نفسه. وإن لم تختر شيئاً فلن يُطلب منك — الجزء ببساطة ليس جزءاً من طريقك.",
-    "صُحّح مؤشّرا ⚡ و🌴: كانا يظهران كأنهما قابلان للضغط ولا يستجيبان للمس، وكانا أصغر من الحد الأدنى لمساحة اللمس."
+    "لم يعد التطبيق يرسل موقعك إلى أي جهة. كانت مواقيت الصلاة تُجلب من خدمة خارجية بإحداثياتك؛ صارت تُحسب على جهازك، وحُذف ما كان محفوظاً من تلك الخدمة عند أول تشغيل.",
+    "«مسح البيانات المحلية» صار يمسحها فعلاً: كان يترك صفحات المصحف والخطوط المحمّلة — وهي مئات الميغابايت — على الجهاز.",
+    "صارت ⚡ و🌴 تُحسبان من طريق اليوم: الأذكار وورد القرآن والصلاة في جماعة. أيامك السابقة تحتفظ بنخيلها كما كانت تماماً؛ القاعدة الجديدة تسري من اليوم فصاعداً.",
+    "صار «تذكير لك الآن» يختار ما يناسب وقتك من الأذكار المراجَعة، ويقرأ الأحاديث بالإنجليزية في النسخة الإنجليزية كلما توفّرت الترجمة."
   ],
   "en": [
-    "Pressing ⚡ or 🌴 at the top of Home now opens Today's Path: your dhikr, your Qur'an wird and prayers in congregation, with what is complete and what is still open.",
-    "You can choose how many of the five prayers you mean to pray in congregation, from inside Today's Path itself. Leave it unset and nothing is asked of you — that part simply is not on your path.",
-    "The ⚡ and 🌴 indicators are fixed. They looked pressable but did not answer a tap, and they were smaller than the minimum touch target."
+    "The app no longer sends your location anywhere. Prayer times used to be fetched from an outside service using your coordinates; they are calculated on your device now, and whatever that service left stored is deleted on first launch.",
+    "“Erase local data” now actually erases it. It used to leave your downloaded mushaf pages and fonts — hundreds of megabytes — on the device.",
+    "⚡ and 🌴 are now counted from today's path: your dhikr, your Qur'an wird and prayers in congregation. Your past days keep exactly the palms they already had; the new rule applies from today onward.",
+    "“Relevant now” picks a reviewed reminder that suits the time of day, and the English app reads its narrations in English wherever a translation is ready."
   ]
 }

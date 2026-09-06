@@ -418,8 +418,17 @@ export function PrayerMomentPanel({
             <p className="text-subtitle font-black text-primary" dir="auto">
               {sunnahDetail}
             </p>
-            <p className="zikr-text text-base font-bold leading-loose text-foreground" dir="rtl" lang="ar">
-              {sunnah.evidence.textArabic}
+            {/* The narration in the reader's language where one is reviewed,
+                with lang and dir describing the text drawn rather than the
+                interface around it. */}
+            <p
+              className={`text-base font-bold leading-loose text-foreground ${
+                isArabic || !sunnah.evidence.textEnglish ? "zikr-text" : ""
+              }`}
+              dir={isArabic || !sunnah.evidence.textEnglish ? "rtl" : "ltr"}
+              lang={isArabic || !sunnah.evidence.textEnglish ? "ar" : "en"}
+            >
+              {isArabic ? sunnah.evidence.textArabic : (sunnah.evidence.textEnglish ?? sunnah.evidence.textArabic)}
             </p>
             <p className="text-label font-semibold text-muted-foreground" dir="auto">
               {isArabic ? sunnah.evidence.referenceArabic : sunnah.evidence.referenceEnglish}

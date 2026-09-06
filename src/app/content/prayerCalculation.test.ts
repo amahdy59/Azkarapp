@@ -9,8 +9,6 @@ import {
   getPrayerTimes,
   getTimeZoneOffsetHours,
   getTimeZoneStatus,
-  parseAladhanPrayerData,
-  parseAladhanPrayerTimes,
   pruneExpiredPrayerTimes,
 } from "./prayerCalculation";
 
@@ -108,56 +106,26 @@ describe("prayerCalculation", () => {
     expect(times.isha).toBeDefined();
   });
 
-  it("keeps only prayer-time cache entries near the requested date", () => {
+  it("clears what the old network path left behind, and nothing else", () => {
+    /* Prayer times were fetched from a third party and cached under the
+       reader's coordinates. Nothing writes that cache now, so what remains is a
+       record of where someone was, kept for a service the app no longer uses. */
     const key = (date: string) => `azkarapp.prayer_times_cache.${date}_30.044_31.236_5`;
-    // The cache gained one key per day and never dropped any, so an install
-    // running for a year carried a year of dead entries.
-    for (const date of ["2026-01-10", "2026-01-12", "2026-01-15", "2026-01-17", "2026-01-20"]) {
-      window.localStorage.setItem(key(date), "{}");
-    }
+    window.localStorage.setItem(key("2026-01-10"), "{}");
+    window.localStorage.setItem(key("2026-01-15"), "{}");
     window.localStorage.setItem("azkarapp.prayer_time_zone.30.044_31.236", "Africa/Cairo");
+    window.localStorage.setItem("azkarapp.state.v1", "keep");
     window.localStorage.setItem("unrelated.product.key", "keep");
 
     pruneExpiredPrayerTimes(new Date(2026, 0, 15, 10, 0));
 
-    // Retention is ±2 days around Jan 15, so Jan 13–17 survives and the rest goes.
+    // All of it goes, near dates included: none of it is used any more.
     expect(window.localStorage.getItem(key("2026-01-10"))).toBeNull();
-    expect(window.localStorage.getItem(key("2026-01-12"))).toBeNull();
-    expect(window.localStorage.getItem(key("2026-01-20"))).toBeNull();
-    expect(window.localStorage.getItem(key("2026-01-15"))).toBe("{}");
-    expect(window.localStorage.getItem(key("2026-01-17"))).toBe("{}");
-    // The timezone cache is keyed by location only, so it is already bounded.
-    expect(window.localStorage.getItem("azkarapp.prayer_time_zone.30.044_31.236")).toBe("Africa/Cairo");
+    expect(window.localStorage.getItem(key("2026-01-15"))).toBeNull();
+    expect(window.localStorage.getItem("azkarapp.prayer_time_zone.30.044_31.236")).toBeNull();
+    // The reader's own data is not this function's business.
+    expect(window.localStorage.getItem("azkarapp.state.v1")).toBe("keep");
     expect(window.localStorage.getItem("unrelated.product.key")).toBe("keep");
-  });
-
-  it("parses Aladhan timing values while removing timezone suffixes", () => {
-    const payload = {
-      data: {
-        timings: {
-          Fajr: "04:31 (EEST)",
-          Dhuhr: "13:01 (EEST)",
-          Asr: "16:38 (EEST)",
-          Maghrib: "19:50 (EEST)",
-          Isha: "21:20 (EEST)",
-        },
-        meta: { timezone: "Africa/Cairo" },
-      },
-    };
-    const expectedTimes = {
-      fajr: "04:31",
-      dhuhr: "13:01",
-      asr: "16:38",
-      maghrib: "19:50",
-      isha: "21:20",
-    };
-
-    expect(parseAladhanPrayerTimes(payload)).toEqual(expectedTimes);
-    expect(parseAladhanPrayerData(payload)).toEqual({
-      times: expectedTimes,
-      timeZone: "Africa/Cairo",
-    });
-    expect(parseAladhanPrayerTimes({ data: { timings: { Fajr: "invalid" } } })).toBeNull();
   });
 
   it("applies per-prayer minute adjustments across midnight safely", () => {

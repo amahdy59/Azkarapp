@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import { Header } from "../components/LayoutShells";
 import { TodayRoutineGarden } from "../components/RoutineGarden";
 import { ScreenContainer } from "../components/ScreenContainer";
 import { t } from "../i18n";
+import { getDailyPathStatus } from "../dailyPath";
 import { getGardenSummary, getProgressDayKey } from "../progress";
 
 import { TabList } from "../components/Tabs";
@@ -12,7 +13,6 @@ import { getGardenDateLabel } from "../components/gardenDateLabel";
 import { PrayerTrackerCards, type PrayerTrackingField } from "../components/PrayerTrackerCards";
 import { useNow } from "../hooks/useNow";
 import { buildPrayerCardModels } from "../prayerCardModels";
-import { triggerBackgroundPrayerTimesRefresh } from "../content/prayerCalculation";
 import { FridayProgressCard } from "../components/FridayProgressCard";
 import { PrayerTrackerStats } from "../components/PrayerTrackerStats";
 import { FridayProgressStats } from "../components/FridayProgressStats";
@@ -25,6 +25,7 @@ import type {
   LocationSettings,
   PrayerName,
   PrayerTrackingRecord,
+  QuranWirdPlan,
 } from "../types";
 
 /** The wird is the three time-of-day routines. After-prayer adhkar are tracked
@@ -41,6 +42,11 @@ export function ProgressScreen({
   onSelectCategory,
   locationSettings,
   prayerTracking = [],
+  wirdHistory,
+  quranWirdPlan,
+  quranWirdDailyGoals,
+  mosquePrayerGoal,
+  dailyPathStartDayKey,
   onTogglePrayerTracking,
   onPrayerResume,
   onOpenFriday,
@@ -54,6 +60,11 @@ export function ProgressScreen({
   onSelectCategory?: (categoryId: CategoryId) => void;
   locationSettings?: LocationSettings;
   prayerTracking?: readonly PrayerTrackingRecord[];
+  wirdHistory?: Record<string, number[]>;
+  quranWirdPlan?: QuranWirdPlan;
+  quranWirdDailyGoals?: Record<string, number>;
+  mosquePrayerGoal?: number;
+  dailyPathStartDayKey?: string;
   onTogglePrayerTracking?: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onPrayerResume?: (prayer: PrayerName) => void;
   onOpenFriday?: () => void;
@@ -66,17 +77,6 @@ export function ProgressScreen({
      offline calculation covers the new day on its own, so nothing is ever
      blank; this only replaces it with the fetched times, the same way Home
      does — Progress used to depend on Home having been opened first. */
-  const [, setPrayerTimesRevision] = useState(0);
-  const prayerDateKey = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-  useEffect(() => {
-    let active = true;
-    triggerBackgroundPrayerTimesRefresh(new Date(), locationSettings, () => {
-      if (active) setPrayerTimesRevision((revision) => revision + 1);
-    });
-    return () => {
-      active = false;
-    };
-  }, [locationSettings, prayerDateKey]);
 
   const [activeTab, setActiveTab] = useState<"day" | "week" | "month" | "year">("day");
   const [offset, setOffset] = useState(0);
@@ -91,6 +91,33 @@ export function ProgressScreen({
   };
 
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
+
+  /* The same verdict Home uses. Two screens deriving palms by different rules
+     would disagree about the same day, which is worse than either rule. */
+  const judgeDay = useCallback(
+    (dayKey: string) => {
+      const status = getDailyPathStatus({
+        dayKey,
+        dailyCompletions,
+        wirdHistory: wirdHistory ?? {},
+        quranWirdPlan,
+        quranWirdDailyGoals,
+        prayerTracking,
+        mosquePrayerGoal,
+        dailyPathStartDayKey,
+      });
+      return { palm: status.palmEarned, qualifies: status.streakQualified };
+    },
+    [
+      dailyCompletions,
+      dailyPathStartDayKey,
+      mosquePrayerGoal,
+      prayerTracking,
+      quranWirdDailyGoals,
+      quranWirdPlan,
+      wirdHistory,
+    ],
+  );
   const fridaySummary = getFridaySummary();
   return (
     <ScreenContainer
@@ -177,8 +204,8 @@ export function ProgressScreen({
         <TodayRoutineGarden
           summary={
             offset === 0 && activeTab === "day"
-              ? getGardenSummary(dailyCompletions, now, progressDayStartHour)
-              : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour)
+              ? getGardenSummary(dailyCompletions, now, progressDayStartHour, judgeDay)
+              : getGardenSummary(dailyCompletions, displayDate, progressDayStartHour, judgeDay)
           }
           language={language}
           hideTabs={true}
