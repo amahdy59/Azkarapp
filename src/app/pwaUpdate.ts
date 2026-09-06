@@ -23,6 +23,20 @@ export interface UpdateDeps {
   /** vite-plugin-pwa's updater: messages the waiting worker and reloads. */
   updateServiceWorker: (reloadPage?: boolean) => Promise<void>;
   reload: () => void;
+  /**
+   * Resolves true when the new worker actually took control, false if it did
+   * not within a grace period.
+   *
+   * This exists because `updateServiceWorker(true)` resolves either way. It
+   * reloads when `controllerchange` fires, and when that never fires it still
+   * resolves normally — so the caller cannot tell a handover from nothing at
+   * all. Nothing then reloaded, nothing threw, and the timeout guarding this
+   * only ever guarded a rejection: the reader was left on "Applying the
+   * update…" with both buttons disabled, indefinitely. That is the state an
+   * end-to-end test finally reproduced, and it is the whole reason this
+   * dependency exists.
+   */
+  awaitHandover?: () => Promise<boolean>;
 }
 
 /**
@@ -50,6 +64,7 @@ export async function applyServiceWorkerUpdate({
   getRegistration,
   updateServiceWorker,
   reload,
+  awaitHandover,
 }: UpdateDeps): Promise<void> {
   const registration = await getRegistration();
 
@@ -71,6 +86,23 @@ export async function applyServiceWorkerUpdate({
 
     if (registration.waiting) {
       await updateServiceWorker(true);
+
+      /* Then reload — whether or not the handover reported success.
+         `updateServiceWorker(true)` is documented as reloading once the new
+         worker takes control, and an end-to-end test of an actual deployment
+         showed the controller changing while the page stayed exactly where it
+         was. That leaves the reader in the worst state of the three: the new
+         worker has activated and dropped the old precache, so the document
+         still on screen can no longer fetch its own lazily-loaded chunks —
+         they 404, because publishing deleted them — and the spinner never
+         ends.
+
+         Waiting for the handover first is still worth doing: it means the
+         reload lands on the new worker rather than racing it. But the reload
+         itself is not conditional on it. A second reload, if the updater does
+         perform one, costs nothing — the page is already navigating. */
+      await awaitHandover?.();
+      reload();
       return;
     }
   }

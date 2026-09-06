@@ -3280,3 +3280,40 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
 - **Tests/evidence required:** `pnpm check` green; the full Playwright suite
   green with the policy in place, including the offline and PWA-update specs;
   no CSP violation in the console against the built output.
+
+## DEC-157 — the update button now lands the reader on the new build
+
+- **Decision:** `applyServiceWorkerUpdate` reloads after handing over to a
+  waiting worker, instead of trusting the updater to do it; an end-to-end test
+  publishes one build over another and drives the real button.
+- **The bug, finally observed rather than reasoned about.** Pressing update
+  handed over correctly — the new worker activated and took control — and the
+  page then stayed exactly where it was. The new worker had already dropped the
+  old precache, so the document still on screen could no longer fetch its own
+  lazily-loaded chunks: publishing had deleted them, and they came back 404.
+  The reader was left on a half-broken page with "Applying the update…" and both
+  buttons disabled, indefinitely. Nothing threw, so the fifteen-second timeout
+  never fired — it only ever guarded a rejection.
+- **The old test asserted the mistake.** "hands over to a worker that is already
+  waiting" required that reload was _not_ called, reasoning that the updater
+  reloads on `controllerchange` and a second reload would race it. The first
+  half is what the documentation says; the second is what made the failure
+  invisible. It now asserts the reload happens, with the reason kept.
+- **Waiting first, then reloading unconditionally.** `awaitHandover` bounds the
+  wait so the reload lands on the new worker rather than racing it, but the
+  reload does not depend on the result. A first attempt made it conditional on
+  the handover _failing_, which fixed nothing, because the handover succeeds.
+- **Three wrong diagnoses preceded this**, all plausible and all disproved
+  against the live site: the ten-minute `max-age` on `sw.js` (the main script
+  bypasses the HTTP cache), stale release notes (already `no-store` and not
+  precached), and deploys not running. The difference was a reproduction.
+- **The harness had to be corrected too.** Its first version served
+  `index.html` for any missing path, so a client asking for a deleted chunk got
+  HTML with a 200 and refused it on MIME grounds — a failure the app would never
+  see on a real host. It 404s now, and the assertion about missing chunks is
+  scoped to the settled page: some 404s during a changeover are inherent to
+  publishing over a running client, and no update mechanism can do more than
+  shorten that window.
+- **Tests/evidence required:** the end-to-end spec red before the change and
+  green after; twelve unit tests including both handover outcomes; `pnpm check`
+  green; the full suite green.

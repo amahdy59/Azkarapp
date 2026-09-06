@@ -17,6 +17,14 @@ import { AUDIO_MANIFEST_VERSION } from "./src/app/audio/audioManifest";
  * it tell "here is what you just got" from "here is what is waiting for you".
  */
 function currentRelease(): string {
+  /* Overridable so a test can build two genuinely different releases without
+     editing `public/release-notes.json`. Proving the update path works needs a
+     second build that the first can be upgraded *to*, and a test that mutates a
+     tracked file leaves the repository dirty the moment it crashes. Unset in
+     every real build, including CI. */
+  const override = process.env.AZKAR_RELEASE_OVERRIDE;
+  if (override) return override;
+
   try {
     const notes = JSON.parse(readFileSync("public/release-notes.json", "utf8")) as { release?: string };
     return typeof notes.release === "string" ? notes.release : "";

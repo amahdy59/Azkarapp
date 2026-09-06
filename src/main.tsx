@@ -104,6 +104,22 @@ window.addEventListener("azkar-apply-update", () => {
       getRegistration: () => navigator.serviceWorker.getRegistration(),
       updateServiceWorker,
       reload: () => window.location.reload(),
+      /* Four seconds is a handover, not a download: the new worker has already
+         installed and precached by this point, and all that remains is for it
+         to take control. If that has not happened by now it is not going to,
+         and reloading is better than a spinner with no end. */
+      awaitHandover: () =>
+        new Promise<boolean>((resolve) => {
+          const timer = window.setTimeout(() => {
+            navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+            resolve(false);
+          }, 4000);
+          function onControllerChange() {
+            window.clearTimeout(timer);
+            resolve(true);
+          }
+          navigator.serviceWorker.addEventListener("controllerchange", onControllerChange, { once: true });
+        }),
     }),
     timeout,
   ])

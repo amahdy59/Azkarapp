@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.7",
+  "release": "2026-09-06.8",
   "ar": [
-    "اسم التطبيق بالإنجليزية صار «wa-zaker»، وهو الآن موحّد في كل موضع: تبويب المتصفح، واسم التطبيق بعد تثبيته، وشاشة البداية. الاسم العربي «وَذَكِّرْ» كما هو بتشكيله.",
-    "أضفنا سياسة أمان للمحتوى (CSP) تحدّ ما يمكن للصفحة تحميله أو الاتصال به: ملفات التطبيق نفسه، وخطوط المصحف، وخدمة الحساب عند تفعيلها — ولا شيء غير ذلك.",
-    "تحققنا من أن العمل دون اتصال وتحديث التطبيق ما زالا يعملان تحت هذه السياسة قبل شحنها. سياسة تكسر العمل دون اتصال أسوأ من عدم وجود سياسة أصلاً."
+    "زر التحديث صار ينقلك فعلاً إلى النسخة الجديدة. كانت النسخة الجديدة تتولى العمل في الخلفية بينما تبقى الصفحة التي أمامك على القديمة.",
+    "لم تعد رسالة «جارٍ تطبيق التحديث…» تتوقف بلا نهاية. إن لم يكتمل الانتقال خلال ثوانٍ، يُعاد تحميل التطبيق بدل الانتظار إلى ما لا نهاية.",
+    "وإن كانت أجزاء من التطبيق تتوقف عن التحميل بعد التحديث مباشرة، فقد عولج ذلك أيضاً: لم يعد التطبيق يواصل العمل معتمداً على ملفات استبدلها التحديث."
   ],
   "en": [
-    "The app's English name is now “wa-zaker”, and it is consistent everywhere for the first time: the browser tab, the name under the icon once installed, and the opening screen. The Arabic name “وَذَكِّرْ” is unchanged, tashkeel included.",
-    "Added a Content-Security-Policy that limits what the page may load or contact: the app's own files, the Mushaf fonts, and the account service when it is enabled — nothing else.",
-    "Verified that offline use and app updates still work under that policy before shipping it. A policy that breaks offline would be worse than no policy at all."
+    "The update button now actually takes you to the new version. The new version had been taking over in the background while the page in front of you stayed on the old one.",
+    "“Applying the update…” no longer gets stuck. If the changeover does not complete within a few seconds, the app reloads instead of waiting indefinitely.",
+    "And if parts of the app stopped loading just after an update, that is fixed too: it no longer keeps running on files the update has already replaced."
   ]
 }

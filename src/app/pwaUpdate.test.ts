@@ -40,9 +40,49 @@ describe("applying a service worker update", () => {
     await applyServiceWorkerUpdate(args);
 
     expect(updateServiceWorker).toHaveBeenCalledWith(true);
-    // The updater reloads once the new worker takes over; reloading here too
-    // would race it.
-    expect(reload).not.toHaveBeenCalled();
+    /* This used to assert the opposite, on the reasoning that the updater
+       reloads once the new worker takes over and a reload here would race it.
+       An end-to-end test of a real deployment showed the controller changing
+       while the page stayed put, which is the worst of the three outcomes: the
+       new worker drops the old precache, and the document still on screen can
+       no longer load its own lazy chunks. */
+    expect(reload).toHaveBeenCalled();
+  });
+
+  it("reloads when the handover is asked for but never happens", async () => {
+    /* The bug an end-to-end test finally caught: `updateServiceWorker(true)`
+       resolves whether or not the new worker takes control, so a handover that
+       silently did nothing looked exactly like success. Nothing reloaded and
+       nothing threw, and the reader sat on "Applying the update…" with both
+       buttons disabled until they gave up. */
+    const { args, updateServiceWorker, reload } = deps({
+      update: vi.fn(async () => undefined),
+      waiting: {} as ServiceWorker,
+    });
+
+    await applyServiceWorkerUpdate({ ...args, awaitHandover: async () => false });
+
+    expect(updateServiceWorker).toHaveBeenCalledWith(true);
+    expect(reload).toHaveBeenCalled();
+  });
+
+  it("waits for the handover before reloading, so the reload lands on the new worker", async () => {
+    const order: string[] = [];
+    const { args, reload } = deps({
+      update: vi.fn(async () => undefined),
+      waiting: {} as ServiceWorker,
+    });
+    reload.mockImplementation(() => order.push("reload"));
+
+    await applyServiceWorkerUpdate({
+      ...args,
+      awaitHandover: async () => {
+        order.push("handover");
+        return true;
+      },
+    });
+
+    expect(order).toEqual(["handover", "reload"]);
   });
 
   it("waits for an installing worker instead of returning without doing anything", async () => {

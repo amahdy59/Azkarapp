@@ -7,6 +7,9 @@ coverage/
 playwright-report/
 test-results/
 .playwright-dist/
+# Two whole builds, written by the update-flow spec so it can publish one over
+# the other. It removes them when it finishes; a run that crashes does not.
+.playwright-update/
 *.log
 
 # Throwaway PNGs only. This used to be a blanket `*.png`, which silently
