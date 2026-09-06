@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.6",
+  "release": "2026-09-06.7",
   "ar": [
-    "أضفنا سياسة أمان للمحتوى (CSP) تحدّ ما يمكن للصفحة تحميله أو الاتصال به: ملفات التطبيق نفسه، وخطوط المصحف، وخدمة الحساب عند تفعيلها — ولا شيء غير ذلك. فإن حاول شيء لم يكن في الحسبان الاتصال بجهة خارجية، يمنعه المتصفح.",
-    "تحققنا من أن العمل دون اتصال وتحديث التطبيق ما زالا يعملان تحت هذه السياسة قبل شحنها. سياسة تكسر العمل دون اتصال أسوأ من عدم وجود سياسة أصلاً.",
-    "صُحّح توثيق مواقيت الصلاة: كان ما زال يصف طلباً شبكياً إلى خدمة خارجية أُزيل فعلاً. المواقيت تُحسب فلكياً على جهازك، بلا شبكة وبلا تخزين مؤقت، وهذا ما صار التوثيق يقوله."
+    "اسم التطبيق بالإنجليزية صار «wa-zaker»، وهو الآن موحّد في كل موضع: تبويب المتصفح، واسم التطبيق بعد تثبيته، وشاشة البداية. الاسم العربي «وَذَكِّرْ» كما هو بتشكيله.",
+    "أضفنا سياسة أمان للمحتوى (CSP) تحدّ ما يمكن للصفحة تحميله أو الاتصال به: ملفات التطبيق نفسه، وخطوط المصحف، وخدمة الحساب عند تفعيلها — ولا شيء غير ذلك.",
+    "تحققنا من أن العمل دون اتصال وتحديث التطبيق ما زالا يعملان تحت هذه السياسة قبل شحنها. سياسة تكسر العمل دون اتصال أسوأ من عدم وجود سياسة أصلاً."
   ],
   "en": [
-    "Added a Content-Security-Policy that limits what the page may load or contact: the app's own files, the Mushaf fonts, and the account service when it is enabled — nothing else. If anything unexpected ever tries to reach a third party, the browser now stops it.",
-    "Verified that offline use and app updates still work under that policy before shipping it. A policy that breaks offline would be worse than no policy at all.",
-    "Corrected the prayer-times documentation, which still described a network request to an outside service that had already been removed. Times are calculated astronomically on your device, with no network and no cache — and the documentation now says so."
+    "The app's English name is now “wa-zaker”, and it is consistent everywhere for the first time: the browser tab, the name under the icon once installed, and the opening screen. The Arabic name “وَذَكِّرْ” is unchanged, tashkeel included.",
+    "Added a Content-Security-Policy that limits what the page may load or contact: the app's own files, the Mushaf fonts, and the account service when it is enabled — nothing else.",
+    "Verified that offline use and app updates still work under that policy before shipping it. A policy that breaks offline would be worse than no policy at all."
   ]
 }

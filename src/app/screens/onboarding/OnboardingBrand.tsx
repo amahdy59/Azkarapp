@@ -11,7 +11,7 @@ export function BrandCrescent({ size = 96 }: { size?: number }) {
 
 export function BrandLockup({ compact = false }: { compact?: boolean }) {
   return (
-    <div className="flex flex-col items-center text-primary" role="img" aria-label="wa-ziker">
+    <div className="flex flex-col items-center text-primary" role="img" aria-label="wa-zaker">
       <BrandCrescent size={compact ? 44 : 96} />
       <p
         className={`arabic-ui ${
@@ -29,7 +29,7 @@ export function BrandLockup({ compact = false }: { compact?: boolean }) {
             : "text-title font-bold tracking-[1.4px] text-foreground"
         }
       >
-        {compact ? "WA-ZIKER" : "wa-ziker"}
+        {compact ? "WA-ZAKER" : "wa-zaker"}
       </p>
     </div>
   );
@@ -53,7 +53,7 @@ export function WelcomeArtwork({ arabic = false }: { arabic?: boolean }) {
         <p className="arabic-ui text-[2.375rem] font-bold leading-[44px]" lang="ar">
           وَذَكِّرْ
         </p>
-        <p className="text-micro font-bold tracking-[1.2px]">WA-ZIKER</p>
+        <p className="text-micro font-bold tracking-[1.2px]">WA-ZAKER</p>
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ const en = {
     loading: "Loading",
     dismiss: "Dismiss",
     skipToMain: "Skip to main content",
-    appName: "wa-ziker",
+    appName: "wa-zaker",
     appTagline: "Daily Fortress",
     theme: "Theme",
     networkError: "Connection problem",
@@ -522,7 +522,7 @@ const en = {
   appearance: {
     title: "Appearance",
     chooseTheme: "Choose a color theme",
-    intro: "Pick the palette that feels most comfortable. Your choice applies everywhere in wa-ziker.",
+    intro: "Pick the palette that feels most comfortable. Your choice applies everywhere in wa-zaker.",
     midnightDescription: "Deep navy for a calm, low-light experience.",
     lightDescription: "Warm, bright surfaces for daylight reading.",
     darkDescription: "Neutral near-black with reduced color cast.",
