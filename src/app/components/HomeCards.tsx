@@ -421,11 +421,15 @@ export function DailyEvidenceCard({
         </h2>
       </div>
 
-      {/* The narration leads, in the language it was said in. */}
+      {/* The narration leads, in the reader's language where one was reviewed.
+          This card had been showing the Arabic to an English reader under an
+          English heading — the reference sheet's own defect, one screen over.
+          `lang` and `dir` follow the text that is actually rendered, and the
+          Arabic face is only applied when the text is Arabic. */}
       <blockquote
-        className="zikr-text text-title font-medium leading-[2] text-foreground"
-        dir="rtl"
-        lang="ar"
+        className={`text-title font-medium leading-[2] text-foreground ${evidence.hadithInArabic ? "zikr-text" : ""}`}
+        dir={evidence.hadithInArabic ? "rtl" : "ltr"}
+        lang={evidence.hadithInArabic ? "ar" : "en"}
         data-testid="daily-evidence-hadith"
       >
         {evidence.hadith}

@@ -44,11 +44,16 @@ describe("the daily narration", () => {
     }
   });
 
-  it("prefers Arabic where the corpus has it", () => {
+  it("picks the same narration for both languages, and renders each in its own", () => {
+    /* This asserted that `hadith` was identical in both languages, which was
+       true only while the Arabic was all there was. What it was really
+       protecting is that the choice of narration does not depend on the
+       reader's language — that still holds, and is asserted. The rendering is
+       now expected to differ, which is the point. */
     const arabic = getDailyEvidence("2026-09-02", "ar");
     const english = getDailyEvidence("2026-09-02", "en");
     expect(arabic?.zikrId).toBe(english?.zikrId);
-    expect(arabic?.hadith).toBe(english?.hadith);
+    expect(arabic?.hadith).not.toBe(english?.hadith);
   });
 
   it("gives an Arabic reader an Arabic card, attribution included", () => {
@@ -69,5 +74,25 @@ describe("the daily narration", () => {
     // The reviewed English stays the authority; only the reader's language
     // decides which rendering is shown.
     expect(/[؀-ۿ]/.test(card.authenticity)).toBe(false);
+  });
+
+  it("reads the narration itself in English, not only its grading", () => {
+    /* This assertion is the one that was missing. The grading was checked and
+       the narration was not, so `hadith` went on being the Arabic for an
+       English reader long after every narration had a reviewed English
+       rendering — under an English heading, on the app's first screen. */
+    const arabicScript = /[؀-ۿ]/;
+    for (const dayKey of ["2026-09-02", "2026-05-14", "2027-02-08", "2026-11-30", "2026-01-03"]) {
+      const card = getDailyEvidence(dayKey, "en")!;
+      expect(arabicScript.test(card.hadith), dayKey).toBe(false);
+      expect(card.hadithInArabic, dayKey).toBe(false);
+    }
+  });
+
+  it("still marks the text Arabic when it is Arabic", () => {
+    // The flag describes what is rendered, so the card can set `lang` and `dir`
+    // to match it rather than to match the interface.
+    const card = getDailyEvidence("2026-09-02", "ar")!;
+    expect(card.hadithInArabic).toBe(true);
   });
 });

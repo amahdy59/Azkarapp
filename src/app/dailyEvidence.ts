@@ -14,8 +14,16 @@ import type { AppLanguage, CategoryId, Zikr } from "./types";
  */
 export interface DailyEvidence {
   zikrId: string;
-  /** The narration, in Arabic. */
+  /** The narration, in the reader's language where a rendering exists. */
   hadith: string;
+  /**
+   * Whether {@link hadith} is the Arabic.
+   *
+   * The card has to know, because `lang` and `dir` describe the text on screen
+   * rather than the interface around it — marking English prose `lang="ar"` had
+   * screen readers pronouncing it with an Arabic voice.
+   */
+  hadithInArabic: boolean;
   /** Its grading and where it is recorded. */
   authenticity: string;
   /** What the practice is for, in the reader's language where available. */
@@ -61,9 +69,15 @@ export function getDailyEvidence(dayKey: string, language: AppLanguage): DailyEv
 
 /** One zikr's reviewed evidence, in the reader's language where it exists. */
 function shapeEvidence(zikr: Zikr, language: AppLanguage): DailyEvidence {
+  /* Every narration now has a reviewed English rendering, but the fallback
+     stays: it is what makes adding one more a content change rather than a
+     code change, and the card must not go blank if an entry arrives without
+     one. */
+  const inArabic = language === "ar" || !zikr.hadithTextEnglish;
   return {
     zikrId: zikr.id,
-    hadith: zikr.hadithText!,
+    hadith: inArabic ? zikr.hadithText! : zikr.hadithTextEnglish!,
+    hadithInArabic: inArabic,
     // The gradings and most benefits were authored in English only, so an
     // Arabic reader met an Arabic narration under an English citation. The
     // lookup falls back to the reviewed English wherever no rendering exists.

@@ -1,7 +1,19 @@
 import { useEffect, useRef } from "react";
+import { t } from "../i18n";
 
 /**
  * Sets the document title for the current screen.
+ *
+ * The app's name is read from the reader's language rather than hardcoded. It
+ * had been left as "Azkar" by the rename, so every tab and every bookmark still
+ * said the old name — the one place a reader sees the app named that no screen
+ * renders.
+ *
+ * The language comes from `documentElement.lang`, which the app already sets,
+ * rather than from a prop: this hook is used through `ScreenContainer`, which
+ * is generic and has no language of its own, and threading one through every
+ * screen for a single string would be the worse trade. The hook already owns
+ * document-level state.
  *
  * Focus movement deliberately does NOT live here. Screens are lazily mounted,
  * so every navigation mounts a fresh instance of this hook — a per-instance
@@ -12,7 +24,8 @@ import { useEffect, useRef } from "react";
 export function useScreenFocus(screenName?: string) {
   useEffect(() => {
     if (screenName) {
-      document.title = `${screenName} - Azkar`;
+      const language = document.documentElement.lang === "ar" ? "ar" : "en";
+      document.title = `${screenName} - ${t(language, "common.appName")}`;
     }
   }, [screenName]);
 }

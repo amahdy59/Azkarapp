@@ -3162,3 +3162,38 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
 - **Tests/evidence required:** `pnpm report:english-coverage` at 211/211;
   `pnpm check` green including the raised baseline; the full Playwright suite
   green with the two rewritten assertions.
+
+## DEC-154 — the Home card reads in English too, and the tab says the app's name
+
+- **Decision:** the reminder card on Home renders the narration in the reader's
+  language rather than always in Arabic, and the document title uses the app's
+  localised name instead of the hardcoded "Azkar".
+- **The English work stopped one screen short.** DEC-153 gave all 211 narrations
+  an English rendering and wired it into the reference sheet. `shapeEvidence`
+  was never touched, so it went on returning `hadithText` — the Arabic —
+  whatever the language, and the card rendered it with a hardcoded `lang="ar"`,
+  `dir="rtl"` and the Arabic face. An English reader met an Arabic paragraph
+  under an English heading on the app's first screen: exactly the defect that
+  had just been fixed next door, in the one place it is most visible.
+- **A test named for it did not check it.** "leaves the English card in English"
+  asserted the grading was not Arabic and said nothing about the narration,
+  which is how this survived. It now checks the narration across five days, and
+  a second test holds the Arabic side.
+- **One test had to be inverted, not deleted.** "prefers Arabic where the corpus
+  has it" asserted the narration was byte-identical in both languages — true
+  only while the Arabic was all there was. What it was really protecting is that
+  the choice of narration does not depend on the reader's language; that is kept
+  and asserted, and the renderings are now expected to differ.
+- **The rename missed the browser tab.** `useScreenFocus` built the title as
+  "screen - Azkar", so every tab, bookmark and history entry still carried the
+  old name after DEC-151 renamed the app. It reads the name from the reader's
+  language now. The language comes from the root element's lang attribute, which
+  the app already sets: this hook is reached through ScreenContainer, which is
+  generic and has no language of its own, and threading one through every screen
+  for a single string would be the worse trade.
+- **The verse generator formats its own output.** Generated TypeScript that is
+  not Prettier-shaped fails the format stage of the gate, which is a trap for
+  whoever regenerates it next. It runs Prettier before writing.
+- **Tests/evidence required:** `pnpm check` green; the narration verified in the
+  browser as lang="en" with the Arabic face dropped, and the Arabic app verified
+  unchanged; the title checked in both languages.
