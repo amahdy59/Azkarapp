@@ -138,7 +138,7 @@ export function QuranWirdScreen({
     : 0;
   const monthStartedAt = plan.startedDayKey ? new Date(`${plan.startedDayKey}T12:00:00`) : now;
   const currentPlanMonth = planCalendar ? monthLabel(monthStartedAt, planCalendar, language) : "";
-  const week = useMemo(() => currentSaturdayWeekKeys(now), [now]);
+  const week = useMemo(() => currentSaturdayWeekKeys(now, progressDayStartHour), [now, progressDayStartHour]);
   const firstPlan =
     !plan.startedDayKey && position.page === 1 && Object.values(wirdHistory).every((pages) => !pages.length);
   const [isDrafting, setIsDrafting] = useState(firstPlan);

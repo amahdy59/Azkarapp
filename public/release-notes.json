@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.10",
+  "release": "2026-09-06.11",
   "ar": [
-    "بطاقة الصلاة صارت تسأل سؤالاً واحداً: هل صليتها في جماعة؟ كان عليك أن تختار بين «المسجد» و«المنزل»، وتسجيل «المنزل» لم يكن يغيّر شيئاً — النخلة وطريق اليوم يحسبان الجماعة وحدها.",
-    "لم تعد أذكار ما بعد الصلاة مقفلة حتى تسجّل صلاتك. من صلّى وحده كان يبقى محروماً منها، وقراءة الأذكار ليست شيئاً يُستحق.",
-    "خطوات ما بعد الصلاة صارت بطاقة واحدة مرقّمة بدل ثلاث بطاقات متجاورة، وبطاقة الصلاة صارت تجلس على صورة الصفحة بدل أن ترسم سماءها الخاصة — صورتان خلف النص نفسه كانتا تتنازعان."
+    "تظهر نافذة صلاة الضحى الآن في وقتها الفعلي بناءً على أوقات الفجر والظهر في منطقتك، بدلاً من استخدام ساعات ثابتة قد لا تتناسب مع فصول السنة المختلفة.",
+    "تم إصلاح مشكلة في تقدم الورد القرآني الأسبوعي حيث لم يكن التطبيق يحترم بداية اليوم المخصصة لك، مما كان يسبب ظهور تقدمك في اليوم الخطأ في بعض الحالات.",
+    "تم تحسين شاشة البداية لتكون أكثر استجابة في الأجهزة ذات الشاشات الصغيرة، وتم دمج واجهات ما بعد الصلاة لتجربة قراءة أسهل وأكثر سلاسة."
   ],
   "en": [
-    "The prayer card now asks one question: was it prayed in congregation? You used to choose between “mosque” and “home”, and recording “home” changed nothing — the palm and today's path both count congregation only.",
-    "The after-prayer adhkar are no longer locked until you record the prayer. Anyone who prayed alone stayed shut out of them, and reading adhkar was never something to earn.",
-    "The steps after the prayer are one numbered card instead of three side-by-side cards, and the prayer card now sits on the page's photograph rather than painting its own sky — two images behind the same text were competing."
+    "The forenoon (Duha) window now opens dynamically based on your local Fajr and Dhuhr times, ensuring the reminder stays accurate across different seasons and latitudes rather than relying on a fixed clock.",
+    "Weekly Quran progress now correctly respects your custom day-start boundary, fixing an issue where the week calendar would incorrectly roll over at midnight instead of your chosen hour.",
+    "The home screen layout has been refined for narrow devices so the date is no longer clipped, and post-prayer reading is now consolidated into a single smoother surface."
   ]
 }
