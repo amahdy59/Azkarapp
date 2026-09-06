@@ -3317,3 +3317,35 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
 - **Tests/evidence required:** the end-to-end spec red before the change and
   green after; twelve unit tests including both handover outcomes; `pnpm check`
   green; the full suite green.
+
+## DEC-158 — the legal pages are published, not drafted
+
+- **Decision:** `privacy.html`, `terms.html` and `account-deletion.html` carry
+  the owner's actual details — Ahmed Mahdy as controller, amahdy59@yahoo.com as
+  the contact, and the law of the Arab Republic of Egypt as governing — the
+  draft banners are gone, and a locked-out user now has a deletion route.
+- **This was blocked on three values, and only on them.** Every visitor was
+  served bracketed placeholders under a banner announcing the page was
+  unfinished, which fails GDPR Art. 13(1)(a)–(b) and would be refused by store
+  review. The values had in fact been answered inline in the audit checklist
+  months earlier for two of the three; the jurisdiction had not, and nothing
+  could ship without it.
+- **The in-app notice was addressed to the wrong person.** `legal.reviewNotice`
+  told whoever was building the app to publish counsel-reviewed documents before
+  enabling sign-in, and every reader was shown it instead. It is removed from
+  both bundles and from `LegalPanel`, and its caution is recorded here, where
+  the person it is for will read it: **these pages are owner-supplied and have
+  not been reviewed by a lawyer.** Sign-in is still disabled, and whether to
+  have them reviewed before enabling it is the owner's call, not this file's.
+- **Deletion now works for someone who cannot sign in.** The page described only
+  the in-app route, which needs an account you can still reach — so a locked-out
+  user had no route at all, and a working address is the minimum store policy
+  accepts. It names the address, the expectation of a reply within 30 days, and
+  keeps the in-app route as the first option.
+- **The old name went too.** All three pages still said "Azkar" in their titles,
+  headings and body text, which the rename never reached.
+- **Tests/evidence required:** a spec that fetches all three pages and fails on
+  any bracketed placeholder, on the draft-banner string, on a missing contact
+  address, on a missing controller or governing law, and on the absence of the
+  signed-out deletion route — the audit's stated acceptance criteria, as a test
+  rather than a checklist item.

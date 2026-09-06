@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.8",
+  "release": "2026-09-06.9",
   "ar": [
-    "زر التحديث صار ينقلك فعلاً إلى النسخة الجديدة. كانت النسخة الجديدة تتولى العمل في الخلفية بينما تبقى الصفحة التي أمامك على القديمة.",
-    "لم تعد رسالة «جارٍ تطبيق التحديث…» تتوقف بلا نهاية. إن لم يكتمل الانتقال خلال ثوانٍ، يُعاد تحميل التطبيق بدل الانتظار إلى ما لا نهاية.",
-    "وإن كانت أجزاء من التطبيق تتوقف عن التحميل بعد التحديث مباشرة، فقد عولج ذلك أيضاً: لم يعد التطبيق يواصل العمل معتمداً على ملفات استبدلها التحديث."
+    "صفحات الخصوصية والشروط وحذف الحساب صارت منشورة فعلاً بدل أن تكون مسودة. كانت تعرض على كل زائر عبارات بديلة بين أقواس تحت لافتة تقول إنها غير مكتملة.",
+    "صار بإمكانك طلب حذف حسابك حتى إن تعذّر عليك تسجيل الدخول: الصفحة تذكر عنوان بريد للتواصل، بعد أن كان الطريق الوحيد يمرّ عبر حساب تستطيع الوصول إليه أصلاً.",
+    "اختفت اللافتة التي كانت تظهر داخل التطبيق في قسم «قانوني». كانت موجّهة إلى من يبني التطبيق لا إلى من يقرأه، ومع ذلك كانت تُعرض على القرّاء."
   ],
   "en": [
-    "The update button now actually takes you to the new version. The new version had been taking over in the background while the page in front of you stayed on the old one.",
-    "“Applying the update…” no longer gets stuck. If the changeover does not complete within a few seconds, the app reloads instead of waiting indefinitely.",
-    "And if parts of the app stopped loading just after an update, that is fixed too: it no longer keeps running on files the update has already replaced."
+    "The privacy, terms and account-deletion pages are now published rather than drafted. Every visitor had been shown bracketed placeholders under a banner saying the page was unfinished.",
+    "You can now request account deletion even if you cannot sign in. The page gives a contact address; before, the only route ran through an account you could still reach.",
+    "The notice inside the app's Legal section is gone. It was addressed to whoever was building the app rather than to the person reading it, and readers were shown it anyway."
   ]
 }

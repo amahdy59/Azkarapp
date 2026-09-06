@@ -619,8 +619,6 @@ const en = {
     changesTitle: "Changes",
     changesBody:
       "Material policy changes should be reviewed and published before account sign-in is enabled for production.",
-    reviewNotice:
-      "These in-app summaries explain current product behavior. Publish counsel-reviewed legal documents before enabling production sign-in.",
   },
   sources: {
     title: "Content sources & corrections",

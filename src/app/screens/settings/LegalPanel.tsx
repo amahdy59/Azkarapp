@@ -82,10 +82,6 @@ export function LegalPanel({ language, onBack }: { language: AppLanguage; onBack
             />
           </div>
         </div>
-
-        <aside className="mt-4 rounded-3xl border border-primary/50 bg-primary/10 p-4.5 text-label leading-5 text-foreground backdrop-blur-md">
-          {t(language, "legal.reviewNotice")}
-        </aside>
       </div>
     </div>
   );
