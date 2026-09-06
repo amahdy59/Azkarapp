@@ -175,6 +175,8 @@ export function buildRemoteSettingsJson(state: AppStateSnapshot): RemoteSettings
     colorBlindSupport: state.settings.colorBlindSupport,
     reminders: state.settings.reminders,
     weeklyGoalDays: state.settings.weeklyGoalDays,
+    mosquePrayerGoal: state.settings.mosquePrayerGoal,
+    dailyPathStartDayKey: state.settings.dailyPathStartDayKey,
     quietProgressEnabled: state.settings.quietProgressEnabled,
     progressDayStartHour: state.settings.progressDayStartHour,
     routineModes: state.settings.routineModes,
@@ -396,6 +398,9 @@ export async function loadRemoteState(
           colorBlindSupport: settings?.settings_json?.colorBlindSupport ?? localState.settings.colorBlindSupport,
           reminders: settings?.settings_json?.reminders ?? localState.settings.reminders,
           weeklyGoalDays: settings?.settings_json?.weeklyGoalDays ?? localState.settings.weeklyGoalDays,
+          mosquePrayerGoal: settings?.settings_json?.mosquePrayerGoal ?? localState.settings.mosquePrayerGoal,
+          dailyPathStartDayKey:
+            settings?.settings_json?.dailyPathStartDayKey ?? localState.settings.dailyPathStartDayKey,
           quietProgressEnabled:
             settings?.settings_json?.quietProgressEnabled ?? localState.settings.quietProgressEnabled,
           progressDayStartHour:

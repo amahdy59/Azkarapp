@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.1",
+  "release": "2026-09-06.2",
   "ar": [
-    "صار تتبّع الصلاة وورد القرآن ينتقلان بين أجهزتك عند تسجيل الدخول. كانا محفوظين على الجهاز نفسه فقط، فتسجيل صلاة الفجر في المسجد على الهاتف لا يظهر على الحاسوب — وصارا الآن يُدمجان: ما سُجِّل على أيّ جهاز يبقى، ولا يُلغى شيء سجّلته.",
-    "إن صحّحت مكان صلاة على جهاز — من المسجد إلى المنزل مثلاً — صار التصحيح هو ما يبقى بعد المزامنة بدل أن يعود القديم.",
-    "صار اسم التطبيق «وَذَكِّرْ»، و«wa-ziker» في الواجهة الإنجليزية، والنسخة الإنجليزية تقرأ الأحاديث بالإنجليزية بدل عرضها بالعربية تحت عنوان إنجليزي."
+    "صار الضغط على ⚡ و🌴 في أعلى الرئيسية يفتح «طريق اليوم»: الأذكار وورد القرآن والصلاة في جماعة، وما اكتمل منها وما بقي.",
+    "تستطيع اختيار كم صلاة من الخمس تنوي أداءها في جماعة، من داخل «طريق اليوم» نفسه. وإن لم تختر شيئاً فلن يُطلب منك — الجزء ببساطة ليس جزءاً من طريقك.",
+    "صُحّح مؤشّرا ⚡ و🌴: كانا يظهران كأنهما قابلان للضغط ولا يستجيبان للمس، وكانا أصغر من الحد الأدنى لمساحة اللمس."
   ],
   "en": [
-    "Prayer tracking and your Qur'an wird now travel between your devices when you sign in. They were saved only on the device that recorded them, so marking Fajr at the mosque on your phone never reached your laptop. They are merged rather than replaced: whatever either device recorded is kept, and nothing you recorded is dropped.",
-    "If you correct where a prayer was prayed on one device — from the mosque to at home, say — the correction is what survives the sync, instead of the older answer coming back.",
-    "The app is now called wa-ziker, and وَذَكِّرْ in Arabic, and the English app reads its narrations in English instead of showing Arabic under an English heading."
+    "Pressing ⚡ or 🌴 at the top of Home now opens Today's Path: your dhikr, your Qur'an wird and prayers in congregation, with what is complete and what is still open.",
+    "You can choose how many of the five prayers you mean to pray in congregation, from inside Today's Path itself. Leave it unset and nothing is asked of you — that part simply is not on your path.",
+    "The ⚡ and 🌴 indicators are fixed. They looked pressable but did not answer a tap, and they were smaller than the minimum touch target."
   ]
 }

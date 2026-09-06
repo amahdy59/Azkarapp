@@ -23,6 +23,7 @@ import {
   getProgressDayKey,
   mergeDailyCompletions,
   normalizeDailyCompletions,
+  isProgressDayKey,
 } from "./progress";
 import { ALL_AZKAR, getAzkarByCategory } from "./content/azkar";
 import { CALCULATION_METHODS, DEFAULT_LOCATION } from "./content/prayerCalculation";
@@ -103,6 +104,10 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
       onlyWhenIncomplete: true,
     },
     weeklyGoalDays: 4,
+    // Deliberately unset: a goal nobody chose is not a goal.
+    mosquePrayerGoal: undefined,
+    // Stamped on first launch; absent means every day is a legacy day.
+    dailyPathStartDayKey: undefined,
     quietProgressEnabled: true,
     progressDayStartHour: DEFAULT_PROGRESS_DAY_START_HOUR,
     calendarType: "hijri",
@@ -337,6 +342,18 @@ function isZikrFont(value: string): value is NonNullable<AppStateSnapshot["setti
 
 function isWeeklyGoalDays(value: unknown): value is number {
   return typeof value === "number" && [3, 4, 5, 7].includes(value);
+}
+
+/** The earlier of two day keys, or whichever one exists. */
+function earliestDayKey(a: string | undefined, b: string | undefined): string | undefined {
+  if (!a) return b;
+  if (!b) return a;
+  return a <= b ? a : b;
+}
+
+/** 1-5, or nothing. Anything else is a value this app did not write. */
+function isMosquePrayerGoal(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 1 && value <= 5;
 }
 
 function isProgressDayStartHour(value: unknown): value is number {
@@ -706,6 +723,10 @@ export function normalizeAppState(value: unknown, fallbackSavedZikrIds: string[]
       weeklyGoalDays: isWeeklyGoalDays(settings?.weeklyGoalDays)
         ? settings.weeklyGoalDays
         : DEFAULT_APP_STATE.settings.weeklyGoalDays,
+      mosquePrayerGoal: isMosquePrayerGoal(settings?.mosquePrayerGoal) ? settings.mosquePrayerGoal : undefined,
+      dailyPathStartDayKey: isProgressDayKey(settings?.dailyPathStartDayKey)
+        ? settings?.dailyPathStartDayKey
+        : undefined,
       quietProgressEnabled:
         typeof settings?.quietProgressEnabled === "boolean"
           ? settings.quietProgressEnabled
@@ -1015,6 +1036,15 @@ export function mergeAppStates(base: AppStateSnapshot, incoming: Partial<AppStat
       weeklyGoalDays: isWeeklyGoalDays(incoming.settings?.weeklyGoalDays)
         ? incoming.settings.weeklyGoalDays
         : safeBase.settings.weeklyGoalDays,
+      mosquePrayerGoal: isMosquePrayerGoal(incoming.settings?.mosquePrayerGoal)
+        ? incoming.settings.mosquePrayerGoal
+        : safeBase.settings.mosquePrayerGoal,
+      /* The earlier of the two, so a day cannot be judged by one set of rules
+         on this device and another set on the one that activated later. */
+      dailyPathStartDayKey: earliestDayKey(
+        safeBase.settings.dailyPathStartDayKey,
+        isProgressDayKey(incoming.settings?.dailyPathStartDayKey) ? incoming.settings?.dailyPathStartDayKey : undefined,
+      ),
       quietProgressEnabled:
         typeof incoming.settings?.quietProgressEnabled === "boolean"
           ? incoming.settings.quietProgressEnabled

@@ -9,6 +9,8 @@ import { getDailyEvidence } from "../dailyEvidence";
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
+import { TodaysPathSheet } from "../components/TodaysPathSheet";
+import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
 import {
   ALL_AZKAR,
@@ -246,6 +248,9 @@ export function HomeScreen({
   onResume,
   onPrayerResume,
   onOpenPrayerAdhkar,
+  mosquePrayerGoal,
+  dailyPathStartDayKey,
+  onMosquePrayerGoalChange,
   onOpenFridayMode,
   onOpenProgress: _onOpenProgress,
   routineModes,
@@ -261,6 +266,7 @@ export function HomeScreen({
   quranReadingPosition,
   quranWirdPlan,
   wirdHistory,
+  quranWirdDailyGoals,
   prayerTracking = [],
   onTogglePrayerTracking,
 }: {
@@ -269,6 +275,8 @@ export function HomeScreen({
   quranReadingPosition?: QuranReadingPosition;
   quranWirdPlan?: QuranWirdPlan;
   wirdHistory?: Record<string, number[]>;
+  /** What the wird goal was on a given day, so a past day keeps its own. */
+  quranWirdDailyGoals?: Record<string, number>;
   onContinueKhatmah?: () => void;
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -280,6 +288,9 @@ export function HomeScreen({
   onPrayerResume?: (prayer: PrayerName) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
+  mosquePrayerGoal?: number;
+  dailyPathStartDayKey?: string;
+  onMosquePrayerGoalChange?: (goal: number | undefined) => void;
   onOpenFridayMode: () => void;
   onOpenProgress?: () => void;
   routineModes: Record<RoutineCategoryId, RoutineMode>;
@@ -331,6 +342,34 @@ export function HomeScreen({
   const activePrayerIndex = AFTER_PRAYER_TRACKER_ORDER.indexOf(currentPrayerPeriod.currentPrayer);
 
   const prayerCardModels = buildPrayerCardModels(now, language, locationSettings);
+
+  const [pathSheetOpen, setPathSheetOpen] = useState(false);
+  /* Derived, not stored: every fact here is already a completion, a page or a
+     prayer someone recorded. */
+  const dailyPath = useMemo(
+    () =>
+      getDailyPathStatus({
+        dayKey: getProgressDayKey(now, progressDayStartHour),
+        dailyCompletions,
+        wirdHistory: wirdHistory ?? {},
+        quranWirdPlan,
+        quranWirdDailyGoals,
+        prayerTracking,
+        mosquePrayerGoal,
+        dailyPathStartDayKey,
+      }),
+    [
+      dailyCompletions,
+      dailyPathStartDayKey,
+      mosquePrayerGoal,
+      now,
+      prayerTracking,
+      progressDayStartHour,
+      quranWirdDailyGoals,
+      quranWirdPlan,
+      wirdHistory,
+    ],
+  );
 
   /* The prayer worth leading with, if any. Home shows the whole card while one
      is live so that recording a prayer happening right now costs no
@@ -505,9 +544,27 @@ export function HomeScreen({
                 {formatDisplayDate(now, language, calendarType)}
               </time>
             </div>
-            <div
+            {/* One control, not two: the streak and the palm are two readings of
+                the same day, and they open the same surface. A button rather
+                than a decorated span, so it is reachable by keyboard and
+                announces what it opens.
+
+                `pointer-events-auto` because the header is a zero-height
+                overlay that deliberately lets pointers through to the content
+                beneath it. Without opting back in, this button is visible,
+                focusable and operable by keyboard while a tap on it lands on
+                the hero behind — which is the worst of both.
+
+                `min-h-11` because it is a touch target now. It was a pair of
+                decorated spans at the header's own type size, and promoting it
+                to a control without giving it a control's size made it the one
+                thing on the core flow too small to hit. */}
+            <button
+              type="button"
               data-testid="home-header-routine-summary"
-              className="flex shrink-0 items-center gap-2 text-label font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-subtitle"
+              onClick={() => setPathSheetOpen(true)}
+              aria-label={t(language, "dailyPath.title")}
+              className="pointer-events-auto flex min-h-11 shrink-0 items-center gap-2 rounded-full px-2 text-label font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] transition-colors hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-subtitle"
             >
               <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
                 <Zap className="size-4 sm:size-[1.125rem]" strokeWidth={2.5} aria-hidden="true" />
@@ -522,7 +579,7 @@ export function HomeScreen({
                 <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
                 <span>{t(language, "progress.palmsUnit")}</span>
               </span>
-            </div>
+            </button>
           </header>
         </div>
         <div className="mx-auto flex w-full max-w-[80rem] flex-col gap-4 lg:gap-5">
@@ -602,6 +659,16 @@ export function HomeScreen({
               </div>
             )}
           </div>
+
+          <TodaysPathSheet
+            open={pathSheetOpen}
+            status={dailyPath}
+            language={language}
+            direction={direction}
+            mosquePrayerGoal={mosquePrayerGoal}
+            onMosquePrayerGoalChange={(goal) => onMosquePrayerGoalChange?.(goal)}
+            onClose={() => setPathSheetOpen(false)}
+          />
 
           {/* The prayer at hand, in full, while it is live. Same component as
               the prayer screen, so the two cannot drift; the screen keeps the

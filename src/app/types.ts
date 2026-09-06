@@ -233,6 +233,24 @@ export interface UserSettingsState {
   colorBlindSupport: ColorBlindSupport;
   reminders: ReminderSettings;
   weeklyGoalDays: number;
+  /**
+   * How many of the five to pray in congregation, 1-5.
+   *
+   * Absent means the reader has not chosen one, which is not the same as
+   * zero: the pillar then asks nothing of the day rather than failing it
+   * every day. Five is not assumed — that would be a target nobody set.
+   */
+  mosquePrayerGoal?: number;
+  /**
+   * The first day judged by the daily path, set once on first launch.
+   *
+   * Everything before it keeps the verdict it was lived under. It syncs,
+   * and two devices merge to the earlier of their two values: if one
+   * activated on Monday and the other on Friday, a Wednesday has to be
+   * judged the same way on both, or the same day earns a palm on one
+   * device and not the other forever.
+   */
+  dailyPathStartDayKey?: string;
   quietProgressEnabled: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";

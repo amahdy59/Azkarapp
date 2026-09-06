@@ -270,6 +270,8 @@ function AppContent({
     setReminders((current) => getLocationBasedReminders(current, location));
   }, []);
   const [weeklyGoalDays, setWeeklyGoalDays] = useState(initialState.settings.weeklyGoalDays);
+  const [mosquePrayerGoal, setMosquePrayerGoal] = useState(initialState.settings.mosquePrayerGoal);
+  const [dailyPathStartDayKey, setDailyPathStartDayKey] = useState(initialState.settings.dailyPathStartDayKey);
   const [quietProgressEnabled, setQuietProgressEnabled] = useState(initialState.settings.quietProgressEnabled);
   const [progressDayStartHour, setProgressDayStartHour] = useState(initialState.settings.progressDayStartHour);
   const activeProgressDayRef = useRef(getProgressDayKey(new Date(), progressDayStartHour));
@@ -347,6 +349,23 @@ function AppContent({
    * to; nothing here consults the clock, which keeps tracking independent of
    * which prayer happens to be current when the tick is made.
    */
+  /**
+   * Stamps the day the daily path starts counting, once.
+   *
+   * Everything before it keeps the verdict it was lived under, which is the
+   * whole of the migration: the new rules read Qur'an and prayer records that
+   * did not sync until recently and may be absent for a past day entirely, so
+   * judging history by them would delete palms people earned.
+   *
+   * Written on first launch rather than baked in as a date, because a reader
+   * who installs next month should not have last month judged by rules their
+   * device never applied. It syncs, and merges to the earlier of two values.
+   */
+  useEffect(() => {
+    if (dailyPathStartDayKey) return;
+    setDailyPathStartDayKey(getProgressDayKey(new Date(), progressDayStartHour));
+  }, [dailyPathStartDayKey, progressDayStartHour]);
+
   const handleTogglePrayerTracking = useCallback(
     (prayer: PrayerName, field: PrayerTrackingWrite, next: boolean | "mosque" | "home" | null) => {
       const dayKey = getProgressDayKey(new Date(), progressDayStartHour);
@@ -547,6 +566,8 @@ function AppContent({
         reminders,
         location: locationSettings,
         weeklyGoalDays,
+        mosquePrayerGoal,
+        dailyPathStartDayKey,
         quietProgressEnabled,
         progressDayStartHour,
         calendarType,
@@ -595,6 +616,8 @@ function AppContent({
       reminders,
       locationSettings,
       weeklyGoalDays,
+      mosquePrayerGoal,
+      dailyPathStartDayKey,
       quietProgressEnabled,
       progressDayStartHour,
       routineModes,
@@ -744,6 +767,8 @@ function AppContent({
     setReminders(state.settings.reminders);
     setLocationSettings(state.settings.location ?? DEFAULT_LOCATION);
     setWeeklyGoalDays(state.settings.weeklyGoalDays);
+    setMosquePrayerGoal(state.settings.mosquePrayerGoal);
+    setDailyPathStartDayKey(state.settings.dailyPathStartDayKey);
     setQuietProgressEnabled(state.settings.quietProgressEnabled);
     setProgressDayStartHour(state.settings.progressDayStartHour);
     setRoutineModes(state.settings.routineModes);
@@ -1228,6 +1253,10 @@ function AppContent({
                   }}
                   onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
+                  mosquePrayerGoal={mosquePrayerGoal}
+                  dailyPathStartDayKey={dailyPathStartDayKey}
+                  onMosquePrayerGoalChange={setMosquePrayerGoal}
+                  quranWirdDailyGoals={quranWirdDailyGoals}
                   onOpenFridayMode={() => {
                     ensureCurrentFridayWeek();
                     push("friday");

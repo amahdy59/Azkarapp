@@ -171,6 +171,23 @@ const en = {
     fridayContinue: "Continue Friday companion",
     fridayReview: "Review Friday companion",
   },
+  dailyPath: {
+    title: "Today's path",
+    dhikr: "Dhikr",
+    quran: "Qur'an wird",
+    mosque: "Prayers in congregation",
+    ofThree: "{done} of 3 complete",
+    pages: "{read} of {goal} pages",
+    prayers: "{done} of {goal} prayers",
+    noGoalYet: "No goal set yet",
+    mosqueGoal: "Prayers in congregation each day",
+    mosqueGoalHint:
+      "Choose how many of the five you mean to pray in congregation. Leave it unset and it simply is not part of your path.",
+    streakSecured: "Your consistency is secured for today.",
+    streakPending: "Complete two parts of today's path to secure your consistency.",
+    palmEarned: "Today's palm is complete.",
+    palmProgress: "{done} of {total} parts complete.",
+  },
   prayerMoment: {
     statusNow: "Prayer time",
     statusApproaching: "Prayer time is near",
