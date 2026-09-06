@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { TrackingCheckMark } from "./PrayerTrackerCards";
 import { PrayerSceneArt } from "./PrayerSceneArt";
-import { Building, Clock, CloudSun, Home, Info, Lock, MoonStar, Sun, Sunrise, Sunset, Translate } from "./icons";
+import { CloudSun, Info, MoonStar, Sun, Sunrise, Sunset, Translate } from "./icons";
 import { t } from "../i18n";
 import { formatPrayerTimeLabel } from "../content/prayerTimes";
 import { formatNumerals } from "../formatting";
@@ -20,101 +20,6 @@ export const PRAYER_ICON: Record<PrayerName, typeof Sunrise> = {
 };
 
 /** One shape for the three cards that record something. */
-const ACTION_CARD =
-  "relative flex items-start gap-3 rounded-2xl border p-3.5 text-start transition-colors duration-fast focus-within:ring-[3px] focus-within:ring-ring";
-
-function CardIcon({ children, active }: { children: React.ReactNode; active: boolean }) {
-  return (
-    <span
-      aria-hidden="true"
-      className={`flex size-11 shrink-0 items-center justify-center rounded-full border ${
-        active ? "border-primary/50 bg-primary/15 text-primary" : "border-border bg-muted/40 text-muted-foreground"
-      }`}
-    >
-      {children}
-    </span>
-  );
-}
-
-/**
- * A card that records one thing about this prayer.
- *
- * The input covers the whole card rather than sitting in a corner of it, so
- * the target is the card and the focus ring is drawn around what the eye is
- * aiming at — the same technique the tracking rows on Home use, at card scale.
- */
-function ActionCard({
-  id,
-  title,
-  detail,
-  checked,
-  disabled,
-  onChange,
-  icon,
-  footer,
-  headerAction,
-  emphasis = false,
-}: {
-  id: string;
-  title: string;
-  detail: string;
-  checked: boolean;
-  disabled?: boolean;
-  onChange: (next: boolean) => void;
-  icon: React.ReactNode;
-  footer?: React.ReactNode;
-  /**
-   * A secondary control, placed in the top row rather than under the text.
-   *
-   * The card's own checkbox covers its whole surface, so anything inside it
-   * that must stay clickable has to sit above that input — and a control in the
-   * footer of a short card lands almost exactly on the card's centre, which is
-   * the one point a reader aims at to tick it. `elementFromPoint` at the middle
-   * of the rawatib card returned the evidence button, not the checkbox: the
-   * card could not be ticked by clicking the middle of itself.
-   */
-  headerAction?: React.ReactNode;
-  emphasis?: boolean;
-}) {
-  return (
-    <div
-      className={`${ACTION_CARD} ${
-        emphasis ? "border-primary/60 bg-primary/[0.06]" : "border-border bg-card"
-      } ${disabled ? "opacity-60" : ""}`}
-      data-testid={`prayer-action-${id}`}
-    >
-      {/* The input is the card: it covers it, so the target and the focus ring
-          are the card itself. It takes its name from the title already on
-          screen rather than from a screen-reader-only copy of it, which was
-          announcing the card twice. */}
-      <input
-        id={id}
-        type="checkbox"
-        checked={checked}
-        disabled={disabled}
-        onChange={(event) => onChange(event.currentTarget.checked)}
-        aria-labelledby={`${id}-title`}
-        aria-describedby={`${id}-detail`}
-        className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
-      />
-      <TrackingCheckMark checked={checked} />
-      <span className="pointer-events-none min-w-0 flex-1">
-        <span id={`${id}-title`} className="block truncate text-subtitle font-black text-foreground">
-          {title}
-        </span>
-        <span id={`${id}-detail`} className="mt-0.5 block text-label font-semibold text-muted-foreground">
-          {detail}
-        </span>
-        {footer}
-      </span>
-      <span className="flex shrink-0 items-center gap-1.5">
-        {headerAction}
-        <CardIcon active={checked || emphasis}>{icon}</CardIcon>
-      </span>
-    </div>
-  );
-}
-
 /**
  * The prayer at hand: the sky it is called in, why it is worth walking to, and
  * the three things a reader records about it.
@@ -140,6 +45,7 @@ export function PrayerMomentPanel({
   now = new Date(),
   onToggle,
   onOpenAdhkar,
+  onGlass = false,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -154,6 +60,17 @@ export function PrayerMomentPanel({
     field: "location" | "adhkar" | "sunnah",
     value: boolean | "mosque" | "home" | null,
   ) => void;
+  /**
+   * Rendered over the Home hero's photograph rather than on the page ground.
+   *
+   * The card carries its own `PrayerSceneArt` everywhere else, which is right
+   * on its own screen and wrong on Home: two illustrations, the page's
+   * photograph and the card's sky, competing for the same focal point behind
+   * the same text. On glass the card drops its scene and lets the photograph be
+   * the single ground, which is what `hero-glass` and the `on-media` tokens
+   * were built for.
+   */
+  onGlass?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
 }) {
   const moment: PrayerMoment = useMemo(
@@ -171,6 +88,17 @@ export function PrayerMomentPanel({
   /* The prayer leads from twenty minutes before its adhan until the next one,
      and the moment it is recorded. Everywhere else this is a reference for a
      prayer that is not the one at hand. */
+  /* On the hero photograph the ground is an image, so the text has to come
+     from the on-media tokens, which are light in every theme. Declared here
+     rather than inline: this is the pairing that fails silently when one class
+     string is left behind. */
+  const titleText = onGlass ? "text-on-media" : "text-foreground";
+  const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";
+  const hairline = onGlass ? "border-white/20" : "border-border/60";
+  const iconButton = onGlass
+    ? "border-white/30 text-on-media-muted hover:bg-white/10"
+    : "border-border text-muted-foreground hover:bg-muted";
+
   const isLive = moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded";
 
   /* Only while the prayer is still ahead. Once it is in, "in 0 min" is worse
@@ -224,10 +152,12 @@ export function PrayerMomentPanel({
            text sits on: the analyser read it as white on the light theme's
            page colour at 1.08:1, and it was right to — one failed paint and
            that is what a reader would get. */
-        className="relative isolate min-h-[11rem] overflow-hidden rounded-2xl border border-border bg-on-media-surface"
+        className={`relative isolate min-h-[11rem] overflow-hidden rounded-2xl ${
+          onGlass ? "hero-glass" : "border border-border bg-on-media-surface"
+        }`}
         data-testid="prayer-moment-hero"
       >
-        <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10 h-full w-full" />
+        {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10 h-full w-full" />}
         {/* Fixed light-on-dark, because the scene is its own ground in every
             theme — the same rule the Home hero follows over its photograph. */}
         <div className="flex h-full flex-col justify-between gap-3 p-4 text-white">
@@ -296,13 +226,15 @@ export function PrayerMomentPanel({
           still be an invitation rather than a reward for one. */}
       {virtue && isLive && (
         <section
-          className="flex flex-col justify-center rounded-2xl border border-border bg-card p-4 text-center"
+          className={`flex flex-col justify-center rounded-2xl p-4 text-center ${
+            onGlass ? "hero-glass" : "border border-border bg-card"
+          }`}
           data-testid="prayer-moment-virtue"
         >
           <h3 className="text-subtitle font-black text-primary" dir="auto">
             {t(language, "prayerMoment.virtueTitle", { prayer: name })}
           </h3>
-          <p className="mt-2 text-xs font-bold text-muted-foreground" dir="auto">
+          <p className={`mt-2 text-xs font-bold ${bodyText}`} dir="auto">
             {t(language, "prayerMoment.virtueAttribution")}
           </p>
           {/* The narration itself, in the reader's language where a reviewed
@@ -328,130 +260,149 @@ export function PrayerMomentPanel({
           has no rawatib after it, Asr none before — so the row fits as many
           columns as 15rem allows and never reserves one for a card that is not
           there. */}
-      <div className="grid grid-cols-[repeat(auto-fit,minmax(15rem,1fr))] gap-3 md:col-span-2">
-        {/* Where it was prayed. Two choices rather than one tick, so "at home"
-            is a recorded answer instead of the absence of one. */}
-        <div
-          className={`${ACTION_CARD} flex-col ${
-            moment.location ? "border-primary/60 bg-primary/[0.06]" : "border-border bg-card"
-          }`}
-          data-testid="prayer-action-location"
-        >
-          <div className="flex w-full items-start gap-3">
-            <TrackingCheckMark checked={moment.location !== null} />
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-subtitle font-black text-foreground">
-                {t(language, "prayerMoment.locationTitle")}
-              </p>
-              <p className="mt-0.5 text-label font-semibold text-muted-foreground">
-                {t(language, "prayerMoment.locationDetail")}
-              </p>
-            </div>
-            <CardIcon active={moment.location !== null}>
-              <Building size={20} aria-hidden="true" />
-            </CardIcon>
-          </div>
-
-          <div
-            className="mt-3 flex w-full gap-2"
-            role="radiogroup"
-            aria-label={t(language, "prayerMoment.locationTitle")}
-          >
-            {(["mosque", "home"] as const).map((place) => {
-              const selected = moment.location === place;
-              const PlaceIcon = place === "mosque" ? Building : Home;
-              return (
-                <button
-                  key={place}
-                  type="button"
-                  role="radio"
-                  aria-checked={selected}
-                  data-testid={`prayer-location-${place}`}
-                  onClick={() => onToggle(prayer, "location", selected ? null : place)}
-                  className={`flex min-h-11 flex-1 items-center justify-center gap-2 rounded-full border px-3 text-label font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected
-                      ? "border-primary bg-primary/15 text-primary"
-                      : "border-border text-foreground hover:bg-muted"
-                  }`}
-                >
-                  <PlaceIcon size={17} aria-hidden="true" />
-                  {t(language, `prayerMoment.${place}`)}
-                </button>
-              );
-            })}
-          </div>
+      {/* One card, three numbered steps.
+          This was three separately bordered cards sitting in a row inside the
+          panel — a box inside a box inside a box — which read as three
+          unrelated things rather than as one sequence with an order to it. The
+          steps are numbered now and divided by hairlines, on a single surface,
+          with one primary action at the end instead of a control tucked into
+          each card. Every control and every test id is the one that was here
+          before: this is the same behaviour, arranged. */}
+      <section
+        className={`rounded-2xl p-4 md:col-span-2 ${onGlass ? "hero-glass" : "border border-border bg-card"}`}
+        data-testid="prayer-journey"
+        aria-labelledby="prayer-journey-title"
+      >
+        <div className="min-w-0">
+          <h3 id="prayer-journey-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
+            {t(language, "prayerMoment.journeyTitle")}
+          </h3>
+          <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
+            {t(language, "prayerMoment.journeySubtitle")}
+          </p>
         </div>
 
-        {/* The adhkar that follow the prayer. Offered once the prayer itself is
-            recorded — the reader's own answer, not the clock's guess — and
-            never the only way to reach them: the collection stays where it has
-            always been in the Azkar library. */}
-        <ActionCard
-          id="prayer-adhkar"
-          title={t(language, "prayerMoment.adhkarTitle")}
-          detail={t(language, "prayerMoment.adhkarDetail")}
-          checked={moment.adhkarDone}
-          onChange={(next) => onToggle(prayer, "adhkar", next)}
-          icon={<Translate size={20} aria-hidden="true" />}
-          footer={
-            <span className="mt-2 flex items-center gap-1.5 text-xs font-bold text-muted-foreground">
-              {moment.location ? (
-                <button
-                  type="button"
-                  onClick={() => onOpenAdhkar(prayer)}
-                  data-testid="prayer-open-adhkar"
-                  className="pointer-events-auto relative z-10 flex min-h-11 items-center gap-1.5 rounded-full border border-border px-3 transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
-                >
-                  {t(language, "prayerMoment.adhkarOpen")}
-                </button>
-              ) : (
-                <span className="flex items-center gap-1.5" data-testid="prayer-adhkar-hint">
-                  <Lock size={14} aria-hidden="true" />
-                  {t(language, "prayerMoment.adhkarHint")}
-                </span>
-              )}
-            </span>
-          }
-        />
+        <ol className="mt-3 flex flex-col">
+          {/* Where it was prayed. Two choices rather than one tick, so "at
+              home" is a recorded answer instead of the absence of one. */}
+          <li
+            className={`relative flex items-start gap-3 border-t py-3.5 first:border-t-0 first:pt-0 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+            data-testid="prayer-action-location"
+          >
+            {/* One answer, not a choice of two places. Whether the prayer was
+                prayed at all is the reader's business; whether it was prayed in
+                congregation is what the day's path counts, so that is what is
+                asked. Recording "at home" changed no outcome anywhere — it was
+                a question asked for the app's benefit rather than the
+                reader's. */}
+            <input
+              id="prayer-mosque"
+              type="checkbox"
+              checked={moment.location === "mosque"}
+              onChange={(event) => onToggle(prayer, "location", event.currentTarget.checked ? "mosque" : null)}
+              aria-labelledby="prayer-mosque-title"
+              className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+            />
+            <TrackingCheckMark checked={moment.location === "mosque"} />
+            <div className="min-w-0 flex-1">
+              <p id="prayer-mosque-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
+                <span className={bodyText}>{formatNumerals(1, language)}. </span>
+                {t(language, "prayerTracking.mosque")}
+              </p>
+              <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
+                {moment.location === "mosque"
+                  ? t(language, "prayerMoment.mosqueRecorded")
+                  : t(language, "prayerMoment.mosquePrompt")}
+              </p>
+            </div>
+          </li>
 
-        {/* The rawātib. Absent for a prayer that has none rather than shown
-            empty, and it names the rak'ahs that are due now — the ones before
-            the fard while it is still ahead, the ones after it once it is
-            in. */}
-        {sunnah && moment.sunnahFocus && (
-          <ActionCard
-            id="prayer-sunnah"
-            /* The rank is on the card, not implied by its position: the four
-               before Asr are encouraged without being among the twelve, and a
-               layout that cannot tell the two apart tells the reader something
-               untrue. */
-            title={t(
-              language,
-              sunnah.rank === "confirmed" ? "prayerMoment.sunnahTitle" : "prayerMoment.sunnahTitleOptional",
-            )}
-            detail={sunnahDetail}
-            checked={moment.sunnahDone}
-            onChange={(next) => onToggle(prayer, "sunnah", next)}
-            icon={<Clock size={20} aria-hidden="true" />}
-            headerAction={
-              /* Above the input that covers the card, so the narration can be
-                 read without recording a prayer nobody has prayed. An icon in
-                 the top row rather than a pill under the text: it is what was
-                 asked for, it keeps the card's middle belonging to the card,
-                 and it costs a line of height on every one of these cards. */
+          {/* The adhkar that follow the prayer. */}
+          <li
+            className={`relative flex items-start gap-3 border-t py-3.5 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+            data-testid="prayer-action-prayer-adhkar"
+          >
+            <input
+              id="prayer-adhkar"
+              type="checkbox"
+              checked={moment.adhkarDone}
+              onChange={(event) => onToggle(prayer, "adhkar", event.currentTarget.checked)}
+              aria-labelledby="prayer-adhkar-title"
+              className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+            />
+            <TrackingCheckMark checked={moment.adhkarDone} />
+            <div className="min-w-0 flex-1">
+              <p id="prayer-adhkar-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
+                <span className={bodyText}>{formatNumerals(2, language)}. </span>
+                {t(language, "prayerMoment.journeyStepAdhkar")}
+              </p>
+              <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
+                {t(language, "prayerMoment.journeyStepAdhkarDetail")}
+              </p>
+            </div>
+          </li>
+
+          {/* The rawātib. Absent for a prayer that has none rather than shown
+              empty, and it names the rak'ahs that are due now — the ones before
+              the fard while it is still ahead, the ones after it once it is
+              in. */}
+          {sunnah && moment.sunnahFocus && (
+            <li
+              className={`relative flex items-start gap-3 border-t py-3.5 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+              data-testid="prayer-action-prayer-sunnah"
+            >
+              <input
+                id="prayer-sunnah"
+                type="checkbox"
+                checked={moment.sunnahDone}
+                onChange={(event) => onToggle(prayer, "sunnah", event.currentTarget.checked)}
+                aria-labelledby="prayer-sunnah-title"
+                className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+              />
+              <TrackingCheckMark checked={moment.sunnahDone} />
+              <div className="min-w-0 flex-1">
+                <p id="prayer-sunnah-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
+                  <span className={bodyText}>{formatNumerals(3, language)}. </span>
+                  {/* The rank is named, not implied by position: the four
+                      before Asr are encouraged without being among the twelve,
+                      and a layout that cannot tell the two apart tells the
+                      reader something untrue. */}
+                  {t(
+                    language,
+                    sunnah.rank === "confirmed" ? "prayerMoment.sunnahTitle" : "prayerMoment.sunnahTitleOptional",
+                  )}
+                </p>
+                <p className={`mt-0.5 text-label font-semibold ${bodyText}`} dir="auto">
+                  {sunnahDetail}
+                </p>
+              </div>
               <button
                 type="button"
                 onClick={() => setEvidenceOpen(true)}
                 data-testid="prayer-sunnah-evidence"
                 aria-label={t(language, "prayerMoment.evidenceOpen")}
-                className="pointer-events-auto relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={`relative z-10 flex size-11 shrink-0 items-center justify-center rounded-full border transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${iconButton}`}
               >
                 <Info size={17} aria-hidden="true" />
               </button>
-            }
-          />
-        )}
-      </div>
+            </li>
+          )}
+        </ol>
+
+        {/* One primary action for the whole card, rather than a control inside
+            each step. It stays locked until the prayer itself is recorded —
+            the reader's own answer, not the clock's guess — and it is never the
+            only way in: the collection keeps its place in the Azkar library. */}
+        <button
+          type="button"
+          onClick={() => onOpenAdhkar(prayer)}
+          data-testid="prayer-open-adhkar"
+          className="mt-3 flex min-h-12 w-full items-center justify-center gap-2 rounded-full bg-primary px-4 text-subtitle font-black text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        >
+          <Translate size={18} aria-hidden="true" />
+          {t(language, "prayerMoment.journeyOpenAdhkar")}
+        </button>
+      </section>
 
       {/* The narration this sunnah rests on, one press from the card that asks
           for it — so a reader can check the claim rather than take the app's

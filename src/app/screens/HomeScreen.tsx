@@ -772,6 +772,30 @@ export function HomeScreen({
                     )}
                   </div>
                 )}
+                {leadingPrayer && (
+                  <section
+                    data-testid="home-prayer-moment"
+                    data-prayer={leadingPrayer.prayer}
+                    dir={direction}
+                    aria-label={t(language, "prayerMoment.homeTitle")}
+                    className="grid gap-3 md:grid-cols-2 md:gap-4 lg:col-span-2"
+                  >
+                    <PrayerMomentPanel
+                      prayer={leadingPrayer.prayer}
+                      language={language}
+                      direction={direction}
+                      records={prayerTracking}
+                      dayKey={getProgressDayKey(now, progressDayStartHour)}
+                      locationSettings={locationSettings}
+                      now={now}
+                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                      onOpenAdhkar={(prayer) =>
+                        onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                      }
+                      onGlass
+                    />
+                  </section>
+                )}
               </div>
             )}
           </div>
@@ -785,35 +809,6 @@ export function HomeScreen({
             onMosquePrayerGoalChange={(goal) => onMosquePrayerGoalChange?.(goal)}
             onClose={() => setPathSheetOpen(false)}
           />
-
-          {/* The prayer at hand, in full, while it is live. Same component as
-              the prayer screen, so the two cannot drift; the screen keeps the
-              day strip because Home already has the tracker cards below. */}
-          {leadingPrayer && (
-            <div className="px-page">
-              <section
-                data-testid="home-prayer-moment"
-                data-prayer={leadingPrayer.prayer}
-                dir={direction}
-                aria-label={t(language, "prayerMoment.homeTitle")}
-                className="grid gap-3 md:grid-cols-2 md:gap-4"
-              >
-                <PrayerMomentPanel
-                  prayer={leadingPrayer.prayer}
-                  language={language}
-                  direction={direction}
-                  records={prayerTracking}
-                  dayKey={getProgressDayKey(now, progressDayStartHour)}
-                  locationSettings={locationSettings}
-                  now={now}
-                  onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                  onOpenAdhkar={(prayer) =>
-                    onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                  }
-                />
-              </section>
-            </div>
-          )}
 
           <div className="px-page">
             <section

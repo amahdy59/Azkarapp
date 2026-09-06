@@ -67,34 +67,32 @@ describe("the prayer as one surface", () => {
     expect(screen.queryByTestId("prayer-moment-virtue")).toBeNull();
   });
 
-  it("records where the prayer was prayed rather than only whether it was at the mosque", () => {
+  it("asks whether the prayer was in congregation, not where it was prayed", () => {
+    /* This used to offer two places, mosque and home, and record whichever was
+       pressed. Recording "at home" changed no outcome anywhere — the palm and
+       the day's path both count congregation — so it was a decision asked of
+       the reader for the app's benefit rather than theirs. One answer now. */
     const { onToggle } = renderScreen();
-    fireEvent.click(screen.getByTestId("prayer-location-home"));
-    expect(onToggle).toHaveBeenCalledWith("isha", "location", "home");
+    fireEvent.click(screen.getByTestId("prayer-action-location").querySelector("input")!);
+    expect(onToggle).toHaveBeenCalledWith("isha", "location", "mosque");
   });
 
-  it("clears the answer when the same place is pressed again", () => {
+  it("clears the answer when it is pressed again", () => {
     const records: PrayerTrackingRecord[] = [
       { dayKey: DAY, prayer: "isha", mosque: true, adhkar: false, location: "mosque" },
     ];
     const { onToggle } = renderScreen({ records });
-    fireEvent.click(screen.getByTestId("prayer-location-mosque"));
+    fireEvent.click(screen.getByTestId("prayer-action-location").querySelector("input")!);
     expect(onToggle).toHaveBeenCalledWith("isha", "location", null);
   });
 
-  it("waits for the prayer to be recorded before offering its adhkar", () => {
-    // The gate is the reader's own answer, never the clock: someone may pray
-    // Isha at eleven, and no timer can know that.
-    renderScreen();
-    expect(screen.getByTestId("prayer-adhkar-hint")).toBeInTheDocument();
-    expect(screen.queryByTestId("prayer-open-adhkar")).toBeNull();
-  });
-
-  it("opens the adhkar once it is", () => {
-    const records: PrayerTrackingRecord[] = [
-      { dayKey: DAY, prayer: "isha", mosque: false, adhkar: false, location: "home" },
-    ];
-    const { onOpenAdhkar } = renderScreen({ records });
+  it("offers the adhkar whether or not the prayer was in congregation", () => {
+    /* They were gated on "where did you pray", which with a single
+       congregation answer would lock the collection for everyone who prayed
+       alone. Reading adhkar was never something to earn, and the library has
+       always offered them regardless — the gate only made Home disagree. */
+    const { onOpenAdhkar } = renderScreen();
+    expect(screen.queryByTestId("prayer-adhkar-hint")).toBeNull();
     fireEvent.click(screen.getByTestId("prayer-open-adhkar"));
     expect(onOpenAdhkar).toHaveBeenCalledWith("isha");
   });

@@ -3349,3 +3349,73 @@ surface and 44px items` failed at 43.99998474121094 against a floor of 44 —
   address, on a missing controller or governing law, and on the absence of the
   signed-out deletion route — the audit's stated acceptance criteria, as a test
   rather than a checklist item.
+
+## DEC-159 — the prayer's three steps are one card, not three
+
+- **Decision:** the location, adhkar and rawatib controls become one numbered
+  card — "your journey after the prayer" — with hairline dividers and a single
+  primary action, replacing three separately bordered cards laid side by side.
+- **The complaint was accurate.** The panel rendered a scene card, a virtue
+  card, and three bordered action cards inside a grid: boxes inside a box inside
+  a box, reading as unrelated things rather than as one sequence with an order.
+  The reference design numbers the steps and separates them with hairlines on a
+  single surface, which is what this now does.
+- **Every control and every test id survived the rearrangement**, which is the
+  claim worth checking rather than taking on trust: twelve specs across
+  home-prayer-moment, prayer-tracking and the new-surface axe sweeps pass
+  unchanged, including the geometry test that each control owns its own centre.
+- **Lint proved the old machinery was really gone.** `ActionCard`,
+  `ACTION_CARD`, `CardIcon` and the `Clock` import all became unreachable and
+  are deleted. A restructure that leaves the thing it replaced behind is a
+  restructure that did not happen.
+- **The rearrangement dropped a 44px target and the suite caught it.** Wrapping
+  the checkbox around the 24px checkmark instead of the whole row left a 24×24
+  input where the product standard is 44. The old card had the input cover its
+  entire surface; the arrangement changed and that detail did not come with it.
+  The row is the target again.
+- **What is not done yet:** the prayer card still paints its own
+  `PrayerSceneArt`, so the page photograph and the card illustration are two
+  images competing for the same focal point. Making it a glass panel over the
+  hero — as the reminder card now is — is the remaining half of this direction.
+- **Tests/evidence required:** `pnpm check` green; the prayer-component specs
+  green before and after; the 44px sweep green on all three device projects;
+  the card verified in Arabic against the reference.
+
+## DEC-160 — the prayer is recorded as congregational or not, and the reminder sits on the photograph
+
+- **Decision:** "prayed at home" is removed; the first step of the journey asks
+  once whether the prayer was in congregation. The adhkar are no longer gated
+  on that answer. The prayer card renders as glass on the Home hero rather than
+  painting its own sky. The times strip added a day earlier is removed again.
+- **The second place bought nothing.** Recording "at home" changed no outcome
+  anywhere in the app: the palm counts congregation, and the day's path counts
+  congregation. It was a decision asked of the reader for the app's benefit
+  rather than theirs, and the owner asked for it to go.
+- **Removing it forced a second decision, and this is the one to check.** The
+  adhkar were unlocked by "where did you pray". With a single congregational
+  answer that lock would have held shut for everyone who prayed alone — the
+  people most likely to be reading adhkar on their own. They are ungated.
+  Reading them was never something to earn, and the Azkar library has always
+  offered the collection regardless; the gate only made Home disagree with it.
+- **Legacy records still parse.** `location` keeps its `"mosque" | "home" |
+null` shape, so a record written before this change still loads and still
+  reads as recorded. Nothing writes `"home"` any more.
+- **The card stops competing with the hero.** On Home it drops `PrayerSceneArt`
+  and takes `hero-glass`: the page photograph is the ground, rather than a
+  photograph and an illustration behind the same text. Its text moves to the
+  `on-media` tokens with it, declared once as `titleText`/`bodyText`/`hairline`
+  rather than threaded through twenty class strings — a single missed one is a
+  contrast failure, not a cosmetic slip.
+- **The times strip was mine and it was wrong.** It put the same five prayers
+  on Home twice: the tracker section directly below already lists them with
+  their state and their controls. The reference design carries a strip because
+  it has no tracker; this app has one. Removed and the component deleted rather
+  than left orphaned.
+- **Four tests encoded the old behaviour and were rewritten, not deleted** —
+  including one named "records where the prayer was prayed rather than only
+  whether it was at the mosque", which now asserts the opposite with the reason
+  attached.
+- **Tests/evidence required:** `pnpm check` green; the full Playwright suite
+  green (361); the prayer specs green after the rewrite; lint confirming
+  `Building`, `Home`, `Lock` and `chipIdle` became unreachable, which is the
+  evidence the option is genuinely gone rather than merely hidden.

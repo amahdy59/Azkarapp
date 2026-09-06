@@ -38,16 +38,21 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   await expect(card.getByTestId("prayer-action-location")).toBeVisible();
 });
 
-test("recording where the prayer was prayed works without leaving Home", async ({ page }) => {
+test("recording the prayer as congregational works without leaving Home", async ({ page }) => {
+  /* This pressed one of two places, mosque or home. Recording "at home"
+     changed no outcome — the palm and the day's path both count congregation —
+     so the question is now the one that matters, asked once. */
   await openHomeAt(page, "2026-09-05T13:30:00");
   const card = page.getByTestId("home-prayer-moment");
-  const mosque = card.getByTestId("prayer-location-mosque");
-  await expect(mosque).toHaveAttribute("aria-checked", "false");
+  const mosque = card.getByTestId("prayer-action-location").locator("input[type=checkbox]");
+  await expect(mosque).not.toBeChecked();
 
-  await mosque.click();
+  await mosque.check();
 
-  await expect(mosque).toHaveAttribute("aria-checked", "true");
-  // The adhkar the prayer unlocks are offered on the spot, not behind a screen.
+  await expect(mosque).toBeChecked();
+  await expect(card.getByTestId("prayer-location-home")).toHaveCount(0);
+  // Offered on the spot, and no longer only once something has been recorded:
+  // reading the adhkar was never something to earn.
   await expect(card.getByTestId("prayer-open-adhkar")).toBeVisible();
   await expect(page).toHaveURL(/\/?$/);
 });
