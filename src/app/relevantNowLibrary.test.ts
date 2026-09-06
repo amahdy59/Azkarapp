@@ -79,10 +79,12 @@ describe("the reviewed source library", () => {
   });
 
   it("can reach every source from some context", () => {
-    // Guards the gap that put H09 out of reach: it was curated for `dhuha`
-    // alone, and `dhuha` is not derived, so nothing could ever select it.
+    /* Guards the gap that had put H09 out of reach: it was curated for the
+       forenoon alone while the forenoon was not derived, so nothing could ever
+       select it. The window is derived now, and this stands as the guard for
+       the next context that is declared before it can fire. */
+    const underived = new Set<string>();
     const reachable = new Set(RELEVANT_NOW_LIBRARY.flatMap((source) => source.contexts));
-    const underived = new Set(["dhuha"]);
     for (const source of RELEVANT_NOW_LIBRARY) {
       const live = source.contexts.filter((context) => !underived.has(context));
       expect(live.length, `${source.id} is only reachable through an underived context`).toBeGreaterThan(0);

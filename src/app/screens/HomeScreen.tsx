@@ -96,6 +96,31 @@ export function isLastThirdOfNight(now: Date = new Date(), location?: LocationSe
   return now.getTime() >= lastThirdStartsAt && now.getTime() < nightEnd.getTime();
 }
 
+/**
+ * The forenoon, when the Duha prayer is preferred.
+ *
+ * Derived from the day's own times rather than from a clock: the window is the
+ * late part of the stretch between Fajr and Dhuhr, which lands around half past
+ * nine to half eleven for a typical day and stays right in a season or a
+ * latitude where those hours would not be. A fixed 09:30–11:30 would drift into
+ * the wrong part of the morning every time the sun did.
+ *
+ * The classical window opens shortly after sunrise, but sunrise is computed
+ * inside the prayer maths and never reported, and the preferred time is the
+ * later portion in any case — which is what a reminder should aim at.
+ */
+export function isDhuhaWindow(now: Date = new Date(), location?: LocationSettings): boolean {
+  const times = getEstimatedPrayerTimes(now, location);
+  const fajr = timeToMinutes(times.fajr);
+  const dhuhr = timeToMinutes(times.dhuhr);
+  if (dhuhr <= fajr) return false;
+
+  const start = fajr + (dhuhr - fajr) * 0.6;
+  const end = dhuhr - 30;
+  const current = now.getHours() * 60 + now.getMinutes();
+  return current >= start && current < end;
+}
+
 export function getTimeOfDayZikr(now: Date = new Date(), language: AppLanguage = "ar", location?: LocationSettings) {
   if (isLastThirdOfNight(now, location)) {
     return {
@@ -426,7 +451,10 @@ export function HomeScreen({
         ? "last_third"
         : leadingPrayer?.prayer === "fajr" && leadingPrayer.phase === "approaching"
           ? "before_fajr"
-          : leadingPrayer?.prayer;
+          : /* The forenoon only counts when no prayer is close enough to lead:
+               a reader inside Dhuhr's approach is being called to Dhuhr, not to
+               the Duha they could have prayed an hour ago. */
+            (leadingPrayer?.prayer ?? (isDhuhaWindow(now, locationSettings) ? "dhuha" : undefined));
 
     return getReminderContexts({
       afterPrayer: leadingPrayer?.phase === "recorded" && !leadingPrayer.adhkarDone,
@@ -435,7 +463,7 @@ export function HomeScreen({
       prayerMoment,
       dayMoments,
     });
-  }, [leadingPrayer, now, reminderInfo.categoryId]);
+  }, [leadingPrayer, locationSettings, now, reminderInfo.categoryId]);
 
   const contextualEvidence = useMemo(
     () => getContextualEvidence(todayKey, language, reminderContexts),

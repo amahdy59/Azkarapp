@@ -257,7 +257,7 @@ export const RELEVANT_NOW_LIBRARY: readonly RelevantNowSource[] = [
   {
     id: "H09",
     type: "hadith",
-    contexts: ["dhuha", "morning"],
+    contexts: ["dhuha"],
     reference: "Sahih Muslim 720",
     referenceArabic: "صحيح مسلم ٧٢٠",
     arabic:

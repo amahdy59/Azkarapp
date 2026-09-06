@@ -4,6 +4,7 @@ import {
   getHomeBackgroundCategoryId,
   getTimeOfDayZikr,
   isFridayFeatureWindow,
+  isDhuhaWindow,
   isLastThirdOfNight,
 } from "./HomeScreen";
 import { CATEGORY_IDS } from "../progress";
@@ -101,5 +102,41 @@ describe("getHomeAction", () => {
     expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib, -1), cairo)).toBe(true);
     expect(isFridayFeatureWindow(atTime(friday, fridayMaghrib), cairo)).toBe(false);
     expect(isFridayFeatureWindow(new Date(2026, 7, 8, 12), cairo)).toBe(false);
+  });
+});
+
+describe("the forenoon window", () => {
+  /* Derived from the day's own Fajr and Dhuhr rather than from a clock. The
+     owner described it as roughly half past nine to half eleven, which is what
+     this produces for Cairo — but a fixed pair of hours would drift into the
+     wrong part of the morning in another season or another latitude, and the
+     Duha prayer follows the sun, not the timetable. */
+  const times = getEstimatedPrayerTimes(new Date(2026, 8, 6), cairo);
+  const fajr = timeToMinutes(times.fajr);
+  const dhuhr = timeToMinutes(times.dhuhr);
+  const at = (minutes: number) => {
+    const date = new Date(2026, 8, 6);
+    date.setHours(Math.floor(minutes / 60), Math.round(minutes % 60), 0, 0);
+    return date;
+  };
+
+  it("opens in the later part of the morning, not at first light", () => {
+    expect(isDhuhaWindow(at(fajr + 10), cairo)).toBe(false);
+    expect(isDhuhaWindow(at(fajr + (dhuhr - fajr) * 0.3), cairo)).toBe(false);
+  });
+
+  it("is open through the middle of the forenoon", () => {
+    expect(isDhuhaWindow(at(fajr + (dhuhr - fajr) * 0.75), cairo)).toBe(true);
+  });
+
+  it("closes before Dhuhr, so it never competes with the prayer being called", () => {
+    expect(isDhuhaWindow(at(dhuhr - 10), cairo)).toBe(false);
+    expect(isDhuhaWindow(at(dhuhr + 30), cairo)).toBe(false);
+  });
+
+  it("lands near the hours the owner asked for", () => {
+    // Cairo in September: the window should cover mid-morning.
+    expect(isDhuhaWindow(at(10 * 60), cairo)).toBe(true);
+    expect(isDhuhaWindow(at(7 * 60), cairo)).toBe(false);
   });
 });
