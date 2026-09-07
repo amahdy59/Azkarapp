@@ -58,3 +58,25 @@
     radial-gradient(120% 140% at 50% 10%, color-mix(in srgb, var(--primary) 18%, transparent), transparent 60%),
     linear-gradient(180deg, color-mix(in srgb, var(--brand-hero) 92%, #000000), var(--brand-hero));
 }
+
+@keyframes azkar-hero-breathe {
+  0%,
+  100% {
+    transform: scale(1) translateZ(0);
+  }
+  50% {
+    transform: scale(1.03) translateZ(0);
+  }
+}
+
+.azkar-hero__media img {
+  will-change: transform;
+  animation: azkar-hero-breathe 45s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .azkar-hero__media img {
+    animation: none;
+    transition: none;
+  }
+}

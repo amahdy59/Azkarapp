@@ -503,3 +503,18 @@ button.ui-icon-button:not(:disabled):not(.no-press):active,
     background-color: var(--on-media-surface) !important;
   }
 }
+
+/* Semantic surfaces extracted from PrayerTrackerCards for consistency */
+.surface-active-card {
+  border-color: var(--primary);
+  background-image: linear-gradient(to bottom, color-mix(in srgb, var(--primary) 12%, transparent), transparent);
+  box-shadow:
+    0 0 0 1px var(--primary),
+    0 12px 32px -12px var(--primary);
+}
+
+.surface-upcoming-card {
+  border-color: var(--border);
+  background-image: linear-gradient(to bottom, var(--card), color-mix(in srgb, var(--muted) 30%, transparent));
+  box-shadow: var(--shadow-raised);
+}

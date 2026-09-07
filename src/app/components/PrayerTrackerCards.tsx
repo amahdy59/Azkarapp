@@ -207,12 +207,10 @@ function PrayerCard({
         onGlass
           ? `hero-glass ${isCurrent ? "ring-2 ring-primary border-transparent" : "border-transparent"}`
           : isCurrent
-            ? "border-primary bg-gradient-to-b from-primary/12 to-transparent shadow-[0_0_0_1px_var(--primary),0_12px_32px_-12px_var(--primary)]"
+            ? "surface-active-card"
             : state === "past"
-              ? onGlass
-                ? "border-white/10 bg-white/5"
-                : "border-border/60 bg-muted/40"
-              : "border-border bg-gradient-to-b from-card to-muted/30 shadow-raised"
+              ? "border-border/60 bg-muted/40"
+              : "surface-upcoming-card"
       }`}
     >
       {/* Section 1 — identity and timing, and the way into this prayer's

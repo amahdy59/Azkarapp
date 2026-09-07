@@ -70,9 +70,9 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    const input = screen.getByRole("textbox", { name: "Search adhkar and duas" }) as HTMLInputElement;
+    const input = screen.getByRole("textbox", { name: "Search azkar and duas" }) as HTMLInputElement;
     expect(input.labels?.[0]).toBeVisible();
-    expect(input.labels?.[0]).toHaveTextContent("Search adhkar and duas");
+    expect(input.labels?.[0]).toHaveTextContent("Search azkar and duas");
 
     expect(screen.getByRole("button", { name: /^Morning Azkar/ })).toBeInTheDocument();
 
@@ -101,7 +101,7 @@ describe("AzkarLibraryScreen", () => {
       />,
     );
 
-    const input = screen.getByRole("textbox", { name: "Search adhkar and duas" }) as HTMLInputElement;
+    const input = screen.getByRole("textbox", { name: "Search azkar and duas" }) as HTMLInputElement;
 
     fireEvent.change(input, { target: { value: " " } });
     fireEvent.submit(input.closest("form")!);

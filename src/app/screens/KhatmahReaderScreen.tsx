@@ -576,17 +576,16 @@ export function KhatmahReaderScreen({
         return;
       }
 
-      if (!isFocusMode || clientX === null || clientY === null) return;
+      if (clientX === null || clientY === null) return;
       const moved = Math.hypot(clientX - startX, clientY - startY);
       const heldFor = performance.now() - startedAt;
       if (moved > TAP_SLOP || heldFor > TAP_MS) return;
       if (target instanceof Element && target.closest("button, a, [role='button'], [role='switch']")) return;
       // A deliberate tap on the paper — not a swipe, not a scroll, and not on a
-      // word or an ayah marker, which have their own answer — brings the tools
-      // back.
-      setIsFocusMode(false);
+      // word or an ayah marker, which have their own answer — toggles the tools.
+      setIsFocusMode((prev) => !prev);
     },
-    [isFocusMode, paginate],
+    [paginate],
   );
 
   const onPointerDown = (event: React.PointerEvent<HTMLDivElement>) => {

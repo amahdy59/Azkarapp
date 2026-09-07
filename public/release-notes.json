@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-07.3",
+  "release": "2026-09-07.4",
   "ar": [
-    "تحسين واجهة الأذكار المحفوظة بإضافة رسالة تشجيعية جميلة عندما لا يكون هناك أذكار محفوظة.",
-    "إضافة ظل وتأثير عمق أفضل لبطاقات الصلوات على الشاشة الرئيسية (تأثير الزجاج).",
-    "تحسينات عامة على تجربة المستخدم والأداء."
+    "وضع القراءة المريح: يمكنك الآن النقر مرة واحدة في شاشة قراءة المصحف لإخفاء القوائم والتركيز على القراءة.",
+    "حركة هادئة: أضفنا حركة تنفس بطيئة وجميلة لصور الخلفية في الشاشة الرئيسية (يتم إيقافها تلقائياً إذا كنت تفضل تقليل الحركة).",
+    "توحيد المصطلحات: تم توحيد كتابة كلمة 'Azkar' في النسخة الإنجليزية من التطبيق."
   ],
   "en": [
-    "Enhanced the Saved Zikr section with a beautiful, encouraging empty state when you haven't saved any items yet.",
-    "Added subtle drop shadows and inner borders to the Home screen glass cards to improve visual depth.",
-    "General UX and performance improvements across the app."
+    "Immersive Reading: You can now single-tap the screen while reading the Quran to hide all menus and focus on the text.",
+    "Calm Motion: Added a subtle, slow breathing animation to the Home screen background photography (respects reduced motion settings).",
+    "Terminology: Standardized the spelling to 'Azkar' across the English version of the app."
   ]
 }

@@ -14,11 +14,11 @@ describe("SearchScreen", () => {
       />,
     );
 
-    const input = screen.getByRole("textbox", { name: "Search adhkar and duas" }) as HTMLInputElement;
+    const input = screen.getByRole("textbox", { name: "Search azkar and duas" }) as HTMLInputElement;
     expect(input).toHaveValue("query");
     expect(input).toHaveAttribute("dir", "auto");
     expect(input.labels?.[0]).toBeVisible();
-    expect(input.labels?.[0]).toHaveTextContent("Search adhkar and duas");
+    expect(input.labels?.[0]).toHaveTextContent("Search azkar and duas");
   });
 
   it("starts an empty Arabic query in RTL and follows the entered language", () => {
