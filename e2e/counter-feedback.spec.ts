@@ -87,17 +87,18 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
   const wird = page.getByTestId("today-garden-card");
   const evidence = page.getByTestId("home-daily-evidence");
 
-  // Give layout a moment to settle
+  // Wait for the layout to settle
   await expect(wird).toBeVisible();
 
-  const [routineBox, prayerBox, wirdBox, evidenceBox] = await Promise.all([
-    routine.boundingBox(),
-    prayer.boundingBox(),
+  const isPrayerHero = await prayer.isVisible();
+  const hero = isPrayerHero ? prayer : routine;
+
+  const [heroBox, wirdBox, evidenceBox] = await Promise.all([
+    hero.boundingBox(),
     wird.boundingBox(),
     evidence.boundingBox(),
   ]);
 
-  const heroBox = routineBox || prayerBox;
   expect(heroBox).not.toBeNull();
   expect(wirdBox).not.toBeNull();
   if (heroBox && wirdBox) {
