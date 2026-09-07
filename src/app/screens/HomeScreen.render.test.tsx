@@ -87,7 +87,7 @@ describe("HomeScreen quick access", () => {
     expect(onOpenBenefits).toHaveBeenCalledOnce();
   });
 
-  it("leaves the five-prayer rail to Progress and keeps a way into the prayer screen", () => {
+  it("renders the five-prayer rail on Home", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
     const onPrayerResume = vi.fn();
@@ -112,12 +112,7 @@ describe("HomeScreen quick access", () => {
       />,
     );
 
-    /* The rail is not on Home any more. Post-prayer adhkar were offered twice
-       — once by the journey card for the prayer at hand, and again by a rail of
-       all five directly beneath it. The rail keeps its place on Progress, where
-       the whole day belongs, and the prayer screen reaches any single prayer. */
-    expect(screen.queryByTestId("after-prayer-trackers")).toBeNull();
-    expect(screen.queryByTestId("prayer-tracker-cards")).toBeNull();
+    expect(screen.getByTestId("prayer-card-fajr")).toBeInTheDocument();
     expect(screen.getByText(/today.?s wird/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Masbaha" }));

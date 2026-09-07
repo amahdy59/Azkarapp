@@ -232,6 +232,7 @@ const en = {
   prayerTracking: {
     mosque: "Prayed at the mosque",
     adhkar: "Completed the adhkar",
+    sunnah: "Rawatib prayer",
     virtueTitle: "The virtue of {prayer} prayer",
     legend: "{prayer} prayer tracking",
     now: "Now",

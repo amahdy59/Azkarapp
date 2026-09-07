@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-07.1",
+  "release": "2026-09-07.2",
   "ar": [
-    "تم إصلاح مشكلة تداخل العناصر في الشاشة الرئيسية على الشاشات العريضة، حيث تظهر بطاقات الأذكار الآن بشكل متناسق ومقروء.",
-    "تم إصلاح بعض المشاكل التقنية لضمان تحديث التطبيق وعمله بشكل صحيح دون انقطاع.",
-    "تم تحسين مظهر الخلفيات الزجاجية (Glassmorphism) لتكون أكثر توافقًا مع إعدادات الشفافية المختلفة."
+    "أعدنا بطاقات متابعة الصلوات الخمس إلى الشاشة الرئيسية بناءً على طلبك.",
+    "أضفنا خيارًا جديدًا لمتابعة صلاة الرواتب (السنن) بجانب المسجد والأذكار.",
+    "تم تحسين مظهر بطاقات الصلاة باستخدام تأثير الزجاج (Glassmorphism) على الشاشة الرئيسية."
   ],
   "en": [
-    "Fixed a layout issue on the Home screen that caused elements to overlap on wider screens, ensuring all reminder cards display perfectly.",
-    "Resolved internal deployment blockers to ensure new updates are delivered reliably.",
-    "Refined glassmorphism effects on the home screen to respond correctly to transparency settings."
+    "Restored the five-prayer tracking cards to the Home screen based on your feedback.",
+    "Added a new tracking checkbox for Rawatib (Sunnah) prayers alongside Mosque and Adhkar.",
+    "Refined the prayer cards styling to use proper glassmorphism when displayed on the Home hero section."
   ]
 }

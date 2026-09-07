@@ -46,8 +46,8 @@ export interface PrayerCardModel {
   countdown?: string;
 }
 
-/** The two independent booleans a card tracks. */
-export type PrayerTrackingField = "mosque" | "adhkar";
+/** The three independent booleans a card tracks. */
+export type PrayerTrackingField = "mosque" | "adhkar" | "sunnah";
 
 /**
  * Everything the prayer surfaces may record. The cards here still write the
@@ -104,6 +104,7 @@ function TrackingCheckbox({
   checked,
   disabled,
   onChange,
+  onGlass,
 }: {
   id: string;
   label: string;
@@ -112,12 +113,17 @@ function TrackingCheckbox({
   checked: boolean;
   disabled: boolean;
   onChange: (next: boolean) => void;
+  onGlass?: boolean;
 }) {
   return (
     <label
       htmlFor={id}
       className={`relative flex h-11 items-center justify-between gap-2 rounded-xl px-2 transition-colors duration-fast ${
-        disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer hover:bg-muted"
+        disabled
+          ? "cursor-not-allowed opacity-45"
+          : onGlass
+            ? "cursor-pointer hover:bg-white/10 text-on-media"
+            : "cursor-pointer hover:bg-muted"
       }`}
     >
       {/* The input *is* the row: it fills the full 48px rather than being
@@ -135,8 +141,16 @@ function TrackingCheckbox({
         className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
       <span className="pointer-events-none flex min-w-0 flex-col text-start">
-        <span className="truncate text-label font-bold text-foreground">{label}</span>
-        {hint && <span className="truncate text-micro font-semibold text-muted-foreground">{hint}</span>}
+        <span className={`truncate text-label font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}>
+          {label}
+        </span>
+        {hint && (
+          <span
+            className={`truncate text-micro font-semibold ${onGlass ? "text-on-media/70" : "text-muted-foreground"}`}
+          >
+            {hint}
+          </span>
+        )}
       </span>
       {/* No focus ring here: the input covers the row and is the element
           that actually receives focus, so the global :focus-visible outline
@@ -164,10 +178,12 @@ function PrayerCard({
   tracking,
   onToggle,
   onOpen,
+  onGlass,
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
-  tracking: { mosque: boolean; adhkar: boolean; location: "mosque" | "home" | null };
+  tracking: { mosque: boolean; adhkar: boolean; location: "mosque" | "home" | null; sunnah?: boolean };
+  onGlass?: boolean;
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
 }) {
@@ -188,11 +204,15 @@ function PrayerCard({
       data-prayer={prayer}
       data-prayer-state={state}
       className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-4 ${
-        isCurrent
-          ? "border-primary bg-gradient-to-b from-primary/12 to-transparent shadow-[0_0_0_1px_var(--primary),0_12px_32px_-12px_var(--primary)]"
-          : state === "past"
-            ? "border-border/60 bg-muted/40"
-            : "border-border bg-gradient-to-b from-card to-muted/30 shadow-raised"
+        onGlass
+          ? `hero-glass ${isCurrent ? "ring-2 ring-primary border-transparent" : "border-transparent"}`
+          : isCurrent
+            ? "border-primary bg-gradient-to-b from-primary/12 to-transparent shadow-[0_0_0_1px_var(--primary),0_12px_32px_-12px_var(--primary)]"
+            : state === "past"
+              ? onGlass
+                ? "border-white/10 bg-white/5"
+                : "border-border/60 bg-muted/40"
+              : "border-border bg-gradient-to-b from-card to-muted/30 shadow-raised"
       }`}
     >
       {/* Section 1 — identity and timing, and the way into this prayer's
@@ -230,11 +250,20 @@ function PrayerCard({
             of step with the other four, and rather than in the corner, where it
             cost a positioning rule against a CSS cap with 151 bytes to spare. */}
         <span className="mt-1.5 flex items-center gap-1">
-          <h3 id={`prayer-card-heading-${prayer}`} className="text-subtitle font-black text-foreground" dir="auto">
+          <h3
+            id={`prayer-card-heading-${prayer}`}
+            className={`text-subtitle font-black ${onGlass ? "text-on-media" : "text-foreground"}`}
+            dir="auto"
+          >
             {name}
           </h3>
           {onOpen && (
-            <ChevronNext size={14} aria-hidden="true" data-rtl-flip className="shrink-0 text-muted-foreground" />
+            <ChevronNext
+              size={14}
+              aria-hidden="true"
+              data-rtl-flip
+              className={`shrink-0 ${onGlass ? "text-on-media/70" : "text-muted-foreground"}`}
+            />
           )}
         </span>
         {/* The time is the strongest thing in the card: it is what the reader
@@ -243,7 +272,7 @@ function PrayerCard({
           // Home-layout tests measure the next prayer's time; the id follows
           // whichever card is next rather than a fixed prayer.
           data-testid={state === "next" ? "next-prayer-time" : undefined}
-          className="mt-0.5 whitespace-nowrap text-headline font-black leading-none tracking-tight text-foreground"
+          className={`mt-0.5 whitespace-nowrap text-headline font-black leading-none tracking-tight ${onGlass ? "text-on-media" : "text-foreground"}`}
           dir="auto"
         >
           {formatPrayerTimeLabel(time, language === "ar")}
@@ -256,7 +285,11 @@ function PrayerCard({
         <span
           data-testid={`prayer-status-${prayer}`}
           className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-black ${
-            state === "current" || state === "next" ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+            state === "current" || state === "next"
+              ? "bg-primary text-primary-foreground"
+              : onGlass
+                ? "bg-white/10 text-on-media"
+                : "bg-muted text-foreground"
           }`}
         >
           {statusLabel(language, state)}
@@ -294,6 +327,15 @@ function PrayerCard({
           checked={tracking.location !== null}
           disabled={disabled}
           onChange={(next) => onToggle(prayer, "mosque", next)}
+          onGlass={onGlass}
+        />
+        <TrackingCheckbox
+          id={`prayer-${prayer}-sunnah`}
+          label={t(language, "prayerTracking.sunnah")}
+          checked={tracking.sunnah ?? false}
+          disabled={disabled}
+          onChange={(next) => onToggle(prayer, "sunnah", next)}
+          onGlass={onGlass}
         />
         <TrackingCheckbox
           id={`prayer-${prayer}-adhkar`}
@@ -301,6 +343,7 @@ function PrayerCard({
           checked={tracking.adhkar}
           disabled={disabled}
           onChange={(next) => onToggle(prayer, "adhkar", next)}
+          onGlass={onGlass}
         />
       </fieldset>
     </article>
@@ -315,6 +358,7 @@ export function PrayerTrackerCards({
   dayKey,
   onToggle,
   onOpen,
+  onGlass,
 }: {
   models: readonly PrayerCardModel[];
   language: AppLanguage;
@@ -323,6 +367,7 @@ export function PrayerTrackerCards({
   dayKey: string;
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
+  onGlass?: boolean;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
@@ -372,9 +417,11 @@ export function PrayerTrackerCards({
               key={model.prayer}
               model={model}
               language={language}
+              onGlass={onGlass}
               tracking={{
                 mosque: record?.mosque ?? false,
                 adhkar: record?.adhkar ?? false,
+                sunnah: record?.sunnah ?? false,
                 location: trackedLocation(record),
               }}
               onToggle={(prayer, field, next) => {

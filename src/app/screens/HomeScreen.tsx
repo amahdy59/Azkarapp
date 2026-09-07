@@ -24,7 +24,8 @@ import {
 } from "../content/azkar";
 import { CATEGORIES } from "../content/categories";
 import { getEstimatedPrayerTimes, timeToMinutes, type PrayerName } from "../content/prayerTimes";
-import type { PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { PrayerTrackerCards, type PrayerTrackingWrite } from "../components/PrayerTrackerCards";
+import { buildPrayerCardModels } from "../prayerCardModels";
 import { useNow } from "../hooks/useNow";
 import { formatDisplayDate, formatNumerals } from "../formatting";
 import { t } from "../i18n";
@@ -551,6 +552,10 @@ export function HomeScreen({
   const showRoutineCard = !isComplete;
   const showHeroContent = showCompletionCard || showRoutineCard || quietProgressEnabled;
   const estimatedMinutes = useMemo(() => estimateCompletionMinutes(visibleReminderAzkar), [visibleReminderAzkar]);
+  const prayerCardModels = useMemo(
+    () => buildPrayerCardModels(now, language, locationSettings),
+    [now, language, locationSettings],
+  );
 
   const actionKind: "start" | "continue" | "again" = doneCount === 0 ? "start" : isComplete ? "again" : "continue";
 
@@ -828,6 +833,18 @@ export function HomeScreen({
                     )}
                   </section>
                 )}
+                <div className="lg:col-span-2 mt-2 w-full max-w-full overflow-hidden">
+                  <PrayerTrackerCards
+                    models={prayerCardModels}
+                    language={language}
+                    direction={direction}
+                    records={prayerTracking}
+                    dayKey={getProgressDayKey(now, progressDayStartHour)}
+                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                    onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
+                    onGlass
+                  />
+                </div>
               </div>
             )}
           </div>
