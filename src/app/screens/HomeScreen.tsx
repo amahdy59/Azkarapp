@@ -758,7 +758,7 @@ export function HomeScreen({
                           data-prayer={leadingPrayer.prayer}
                           dir={direction}
                           aria-label={t(language, "prayerMoment.homeTitle")}
-                          className="grid h-full gap-3 md:grid-cols-2 md:gap-4"
+                          className="flex h-full flex-col gap-3"
                         >
                           <PrayerMomentPanel
                             prayer={leadingPrayer.prayer}
@@ -779,7 +779,7 @@ export function HomeScreen({
                               type="button"
                               onClick={() => onPrayerResume(leadingPrayer.prayer)}
                               data-testid="home-open-prayer-screen"
-                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:col-span-2"
+                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                             >
                               {t(language, "prayerMoment.dayTitle")}
                             </button>
@@ -817,7 +817,7 @@ export function HomeScreen({
 
                   {/* Today's Wird */}
                   {quietProgressEnabled && (
-                    <div className="flex-1 min-w-[240px] max-w-full h-full">
+                    <div className="flex-1 min-w-[240px] max-w-full">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}
@@ -832,7 +832,7 @@ export function HomeScreen({
                     </div>
                   )}
 
-                  {/* Post-Prayer Journey (Secondary Reminder when Dhikr is Hero) */}
+                  {/* Post-Prayer Journey */}
                   {!isPrayerHero && showJourney && leadingPrayer && (
                     <div className="flex-1 min-w-[240px] max-w-full">
                       <PostPrayerJourneyCard
