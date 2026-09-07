@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-07.4",
+  "release": "2026-09-07.5",
   "ar": [
-    "وضع القراءة المريح: يمكنك الآن النقر مرة واحدة في شاشة قراءة المصحف لإخفاء القوائم والتركيز على القراءة.",
-    "حركة هادئة: أضفنا حركة تنفس بطيئة وجميلة لصور الخلفية في الشاشة الرئيسية (يتم إيقافها تلقائياً إذا كنت تفضل تقليل الحركة).",
-    "توحيد المصطلحات: تم توحيد كتابة كلمة 'Azkar' في النسخة الإنجليزية من التطبيق."
+    "تصميم جديد للرئيسية: تم تحسين تخطيط الشاشة الرئيسية لترتيب وتوضيح البطاقات بشكل أفضل عبر أجهزة سطح المكتب والهواتف.",
+    "رحلتك بعد الصلاة: أضفنا بطاقة جديدة تظهر وقت الصلاة لترشدك خطوة بخطوة (الصلاة، الأذكار، الراتبة).",
+    "بطاقة الأذكار الذكية: تبرز الآن أذكار الصباح والمساء بوضوح أكبر كبطاقة رئيسية عند حلول وقتها."
   ],
   "en": [
-    "Immersive Reading: You can now single-tap the screen while reading the Quran to hide all menus and focus on the text.",
-    "Calm Motion: Added a subtle, slow breathing animation to the Home screen background photography (respects reduced motion settings).",
-    "Terminology: Standardized the spelling to 'Azkar' across the English version of the app."
+    "New Home Layout: Redesigned the Home screen grid for a cleaner, more organized experience across both mobile and desktop.",
+    "Post-Prayer Journey: A new chronological tracker appears around prayer times to guide you through the prayer, adhkar, and sunnah steps.",
+    "Smart Routine Hero: Morning and evening adhkar now prominently take center stage when it's time to read them."
   ]
 }

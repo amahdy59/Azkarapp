@@ -10,6 +10,7 @@ import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
+import { PostPrayerJourneyCard } from "../components/PostPrayerJourneyCard";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
@@ -635,6 +636,16 @@ export function HomeScreen({
     }
   };
 
+  const isPrayerHero = Boolean(
+    leadingPrayer &&
+    (leadingPrayer.phase === "approaching" || leadingPrayer.phase === "now" || leadingPrayer.phase === "recorded"),
+  );
+  const isRoutineHero = !isPrayerHero && showRoutineCard;
+  const showJourney = Boolean(
+    leadingPrayer &&
+    (leadingPrayer.phase === "recorded" || leadingPrayer.phase === "now" || leadingPrayer.phase === "passed"),
+  );
+
   return (
     <ScreenContainer
       dir={direction}
@@ -728,112 +739,125 @@ export function HomeScreen({
             {/* items-stretch, not items-center: the wird card should match the
                 hero's height rather than float centred against it. */}
             {showHeroContent && (
-              <div className="relative z-10 mx-auto flex min-h-[inherit] w-full max-w-[80rem] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:grid lg:grid-cols-2 lg:items-stretch lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
-                {showCompletionCard && (
-                  <div className={quietProgressEnabled ? "h-full" : "h-full lg:col-span-2"}>
-                    <TranquilityCompletionCard
-                      categoryId={reminderInfo.categoryId}
-                      language={language}
-                      isExiting={completionCardState === "exiting"}
-                    />
-                  </div>
-                )}
-                {showRoutineCard && (
-                  <PrayerRoutineCard
-                    language={language}
-                    direction={direction}
-                    categoryName={
-                      isLastThirdDua
-                        ? reminderInfo.title
-                        : isArabic
-                          ? reminderCategory.nameArabic
-                          : reminderCategory.name
-                    }
-                    description={reminderInfo.desc}
-                    mode={reminderMode}
-                    showModeSelector={!isLastThirdDua}
-                    onModeChange={(mode) => {
-                      if (isRoutineCategory(reminderInfo.categoryId)) {
-                        onSetRoutineMode?.(reminderInfo.categoryId, mode);
-                      }
-                    }}
-                    completedCount={doneCount}
-                    totalCount={totalCount}
-                    estimatedMinutes={estimatedMinutes}
-                    showEstimate={!isLastThirdDua}
-                    ctaLabel={ctaLabel}
-                    onOpen={() => onResume(reminderInfo.categoryId)}
-                  />
-                )}
+              <div className="relative z-10 mx-auto flex min-h-[inherit] w-full max-w-[80rem] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:px-8 lg:pb-8 lg:pt-20 lg:gap-5">
+                <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-5 w-full">
+                  {/* Contextual Hero */}
+                  {(isPrayerHero || showCompletionCard || isRoutineHero) && (
+                    <div className="flex-[2_2_0%] min-w-[280px] lg:min-w-[320px] max-w-full">
+                      {showCompletionCard ? (
+                        <div className="h-full">
+                          <TranquilityCompletionCard
+                            categoryId={reminderInfo.categoryId}
+                            language={language}
+                            isExiting={completionCardState === "exiting"}
+                          />
+                        </div>
+                      ) : isPrayerHero && leadingPrayer ? (
+                        <section
+                          data-testid="home-prayer-moment"
+                          data-prayer={leadingPrayer.prayer}
+                          dir={direction}
+                          aria-label={t(language, "prayerMoment.homeTitle")}
+                          className="flex h-full flex-col gap-3"
+                        >
+                          <PrayerMomentPanel
+                            prayer={leadingPrayer.prayer}
+                            language={language}
+                            direction={direction}
+                            records={prayerTracking}
+                            dayKey={getProgressDayKey(now, progressDayStartHour)}
+                            locationSettings={locationSettings}
+                            now={now}
+                            onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                            onOpenAdhkar={(prayer) =>
+                              onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                            }
+                            onGlass
+                          />
+                          {onPrayerResume && (
+                            <button
+                              type="button"
+                              onClick={() => onPrayerResume(leadingPrayer.prayer)}
+                              data-testid="home-open-prayer-screen"
+                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                            >
+                              {t(language, "prayerMoment.dayTitle")}
+                            </button>
+                          )}
+                        </section>
+                      ) : isRoutineHero ? (
+                        <PrayerRoutineCard
+                          language={language}
+                          direction={direction}
+                          categoryName={
+                            isLastThirdDua
+                              ? reminderInfo.title
+                              : isArabic
+                                ? reminderCategory.nameArabic
+                                : reminderCategory.name
+                          }
+                          description={reminderInfo.desc}
+                          mode={reminderMode}
+                          showModeSelector={!isLastThirdDua}
+                          onModeChange={(mode) => {
+                            if (isRoutineCategory(reminderInfo.categoryId)) {
+                              onSetRoutineMode?.(reminderInfo.categoryId, mode);
+                            }
+                          }}
+                          completedCount={doneCount}
+                          totalCount={totalCount}
+                          estimatedMinutes={estimatedMinutes}
+                          showEstimate={!isLastThirdDua}
+                          ctaLabel={ctaLabel}
+                          onOpen={() => onResume(reminderInfo.categoryId)}
+                        />
+                      ) : null}
+                    </div>
+                  )}
 
-                {/* Today's Wird ("وردك اليوم") beside the hero. TodayRoutineGarden already
-              renders exactly this card; a second bespoke one would duplicate it. */}
-                {/* The day's routines and the evidence behind them share the
-                    hero's second column: the checklist says what is left to
-                    read, and the narration underneath says why it is worth
-                    reading. The reminder used to sit far below, under "Your
-                    library", where it read as a fact of the day rather than as
-                    the reason for the list directly above it. */}
-                {quietProgressEnabled && (
-                  <div
-                    className={`flex h-full w-full flex-col gap-4 ${
-                      isComplete && !showCompletionCard ? "lg:col-span-2" : ""
-                    }`}
-                  >
-                    <TodayRoutineGarden
-                      summary={gardenSummary}
-                      language={language}
-                      hideTabs
-                      calendarType={calendarType}
-                      dailyCompletions={dailyCompletions}
-                      onSelectCategory={onResume}
-                      visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
-                      // The hero above is already offering this routine. Marking
-                      // its row keeps the day's checklist complete while stopping
-                      // the two from reading as two separate things to do.
-                      recommendedCategoryId={showRoutineCard ? reminderInfo.categoryId : undefined}
-                      onOpenWirdBenefits={onOpenWirdBenefits}
-                    />
-                    {dailyEvidence && (
+                  {/* Today's Wird */}
+                  {quietProgressEnabled && (
+                    <div className="flex-1 min-w-[240px] max-w-full">
+                      <TodayRoutineGarden
+                        summary={gardenSummary}
+                        language={language}
+                        hideTabs
+                        calendarType={calendarType}
+                        dailyCompletions={dailyCompletions}
+                        onSelectCategory={onResume}
+                        visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
+                        recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
+                        onOpenWirdBenefits={onOpenWirdBenefits}
+                      />
+                    </div>
+                  )}
+
+                  {/* Post-Prayer Journey */}
+                  {showJourney && leadingPrayer && (
+                    <div className="flex-1 min-w-[240px] max-w-full">
+                      <PostPrayerJourneyCard
+                        direction={direction}
+                        prayer={leadingPrayer.prayer}
+                        prayed={leadingPrayer.phase === "recorded"}
+                        adhkarDone={leadingPrayer.adhkarDone}
+                        sunnahDone={leadingPrayer.sunnahDone}
+                        onOpenAdhkar={() =>
+                          onOpenPrayerAdhkar ? onOpenPrayerAdhkar(leadingPrayer.prayer) : onResume("after_prayer")
+                        }
+                        onGlass={true}
+                      />
+                    </div>
+                  )}
+
+                  {/* Daily Evidence */}
+                  {dailyEvidence && (
+                    <div className="flex-1 min-w-[240px] max-w-full">
                       <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} onGlass />
-                    )}
-                  </div>
-                )}
-                {leadingPrayer && (
-                  <section
-                    data-testid="home-prayer-moment"
-                    data-prayer={leadingPrayer.prayer}
-                    dir={direction}
-                    aria-label={t(language, "prayerMoment.homeTitle")}
-                    className="grid gap-3 md:grid-cols-2 md:gap-4 lg:col-span-2"
-                  >
-                    <PrayerMomentPanel
-                      prayer={leadingPrayer.prayer}
-                      language={language}
-                      direction={direction}
-                      records={prayerTracking}
-                      dayKey={getProgressDayKey(now, progressDayStartHour)}
-                      locationSettings={locationSettings}
-                      now={now}
-                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                      onOpenAdhkar={(prayer) =>
-                        onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                      }
-                      onGlass
-                    />
-                    {onPrayerResume && (
-                      <button
-                        type="button"
-                        onClick={() => onPrayerResume(leadingPrayer.prayer)}
-                        data-testid="home-open-prayer-screen"
-                        className="hero-glass flex min-h-12 items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:col-span-2"
-                      >
-                        {t(language, "prayerMoment.dayTitle")}
-                      </button>
-                    )}
-                  </section>
-                )}
-                <div className="lg:col-span-2 mt-2 w-full max-w-full overflow-hidden">
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-2 w-full max-w-full overflow-hidden">
                   <PrayerTrackerCards
                     models={prayerCardModels}
                     language={language}
