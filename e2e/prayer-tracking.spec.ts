@@ -15,7 +15,7 @@ async function openHome(page: Page) {
       }),
     );
   });
-  await page.goto("/#/home");
+  await page.goto("/#/progress");
   await expect(page.getByTestId("prayer-tracker-cards")).toBeVisible();
 }
 

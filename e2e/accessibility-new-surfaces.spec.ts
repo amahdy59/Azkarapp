@@ -71,7 +71,7 @@ test("the interactive word-meaning card is named, reachable, and has no automati
 });
 
 test("the prayer virtue dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  await seed(page, "/#/home");
+  await seed(page, "/#/progress");
   await expect(page.getByTestId("prayer-tracker-cards")).toBeVisible();
 
   const prayer = await page

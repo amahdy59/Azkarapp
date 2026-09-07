@@ -28,7 +28,7 @@ test("core app screens do not overflow a 320px viewport", async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 700 });
   await enterEnglishGuestMode(page);
   await expectNoHorizontalOverflow(page, "Home");
-  for (const testId of ["hijri-date", "next-prayer"]) {
+  for (const testId of ["hijri-date"]) {
     const chip = page.getByTestId(testId);
     await expect(chip).toBeVisible();
     expect(

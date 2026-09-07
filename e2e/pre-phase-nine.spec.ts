@@ -22,6 +22,7 @@ async function openReturningGuest(
   completedComprehensiveDuas: string[] = [],
   language: "ar" | "en" = "en",
 ) {
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
   await page.addInitScript(
     ({ saved, comprehensiveDuas, locale }) => {
       // The progress day starts at midnight (DEC: day boundary moved from 04:00
