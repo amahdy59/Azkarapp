@@ -757,7 +757,7 @@ export function HomeScreen({
                           data-testid="home-prayer-moment"
                           data-prayer={leadingPrayer.prayer}
                           dir={direction}
-                          aria-label={t(language, "prayerMoment.homeTitle" as any)}
+                          aria-label={t(language, "prayerMoment.homeTitle")}
                           className="grid h-full gap-3 md:grid-cols-2 md:gap-4"
                         >
                           <PrayerMomentPanel
@@ -772,7 +772,6 @@ export function HomeScreen({
                             onOpenAdhkar={(prayer) =>
                               onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
                             }
-                            onGlass
                           />
                           {onPrayerResume && (
                             <button
@@ -817,7 +816,7 @@ export function HomeScreen({
 
                   {/* Today's Wird */}
                   {quietProgressEnabled && (
-                    <div className="flex-1 min-w-[240px] max-w-full">
+                    <div className="flex-1 min-w-[240px] max-w-full h-full">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}

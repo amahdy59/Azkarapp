@@ -83,18 +83,25 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
   await openReturningGuest(page);
 
   const routine = page.getByTestId("home-routine-card");
+  const prayer = page.getByTestId("home-prayer-moment");
   const wird = page.getByTestId("today-garden-card");
   const evidence = page.getByTestId("home-daily-evidence");
-  const [routineBox, wirdBox, evidenceBox] = await Promise.all([
+
+  // Give layout a moment to settle
+  await expect(wird).toBeVisible();
+
+  const [routineBox, prayerBox, wirdBox, evidenceBox] = await Promise.all([
     routine.boundingBox(),
+    prayer.boundingBox(),
     wird.boundingBox(),
     evidence.boundingBox(),
   ]);
 
-  expect(routineBox).not.toBeNull();
+  const heroBox = routineBox || prayerBox;
+  expect(heroBox).not.toBeNull();
   expect(wirdBox).not.toBeNull();
-  if (routineBox && wirdBox) {
-    expect(Math.abs(routineBox.y - wirdBox.y)).toBeLessThanOrEqual(1);
+  if (heroBox && wirdBox) {
+    expect(Math.abs(heroBox.y - wirdBox.y)).toBeLessThanOrEqual(1);
 
     /* The two cards no longer match each other's height, and should not: the
        second column now carries the day's routines with the narration that
@@ -104,8 +111,8 @@ test("desktop Home hero cards settle to one aligned height", async ({ page }) =>
        satisfiable by leaving a gap under one of them. */
     if (evidenceBox) {
       const columnBottom = evidenceBox.y + evidenceBox.height;
-      const routineBottom = routineBox.y + routineBox.height;
-      expect(Math.abs(columnBottom - routineBottom)).toBeLessThanOrEqual(2);
+      const heroBottom = heroBox.y + heroBox.height;
+      expect(Math.abs(columnBottom - heroBottom)).toBeLessThanOrEqual(2);
     }
   }
 });

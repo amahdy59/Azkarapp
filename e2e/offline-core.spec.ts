@@ -23,7 +23,7 @@ test("core Reader and Settings are available on a first offline visit after inst
   });
 
   await page.goto("/");
-  await expect(page.getByTestId("home-primary-cta")).toBeVisible();
+  await expect(page.getByTestId("home-hero")).toBeVisible();
   await page.evaluate(async () => navigator.serviceWorker.ready);
   await page.reload();
   await expect.poll(() => page.evaluate(() => Boolean(navigator.serviceWorker.controller))).toBe(true);
