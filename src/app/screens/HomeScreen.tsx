@@ -772,6 +772,7 @@ export function HomeScreen({
                             onOpenAdhkar={(prayer) =>
                               onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
                             }
+                            onGlass
                           />
                           {onPrayerResume && (
                             <button

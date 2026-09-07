@@ -88,12 +88,12 @@ export function PrayerMomentPanel({
   /* The prayer leads from twenty minutes before its adhan until the next one,
      and the moment it is recorded. Everywhere else this is a reference for a
      prayer that is not the one at hand. */
-  /* On the hero photograph the ground is an image, so the text has to come
-     from the on-media tokens, which are light in every theme. Declared here
-     rather than inline: this is the pairing that fails silently when one class
-     string is left behind. */
+  /* The wide band is a fixed navy surface, so its controls take on-media colours
+     rather than theme ones. Declared here rather than inline: this is the
+     pairing that fails silently when one class string is left behind. */
   const titleText = onGlass ? "text-on-media" : "text-foreground";
   const bodyText = onGlass ? "text-on-media-muted" : "text-muted-foreground";
+  const accentText = onGlass ? "text-on-media-accent" : "text-primary";
   const hairline = onGlass ? "border-white/20" : "border-border/60";
   const iconButton = onGlass
     ? "border-white/30 text-on-media-muted hover:bg-white/10"
@@ -165,7 +165,9 @@ export function PrayerMomentPanel({
             <h2 className="text-2xl font-black leading-tight md:text-3xl" dir="auto">
               {name}
             </h2>
-            <span className="flex size-11 shrink-0 items-center justify-center rounded-full border border-primary/70 text-primary">
+            <span
+              className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-[currentColor]/70 ${accentText}`}
+            >
               <Icon size={22} aria-hidden="true" />
             </span>
           </div>
@@ -231,7 +233,7 @@ export function PrayerMomentPanel({
           }`}
           data-testid="prayer-moment-virtue"
         >
-          <h3 className="text-subtitle font-black text-primary" dir="auto">
+          <h3 className={`text-subtitle font-black ${accentText}`} dir="auto">
             {t(language, "prayerMoment.virtueTitle", { prayer: name })}
           </h3>
           <p className={`mt-2 text-xs font-bold ${bodyText}`} dir="auto">
@@ -242,13 +244,13 @@ export function PrayerMomentPanel({
               not the interface around it — English prose marked `lang="ar"` is
               read aloud with an Arabic voice. */}
           <p
-            className={`mt-2 text-title font-bold leading-loose text-foreground ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
+            className={`mt-2 text-title font-bold leading-loose ${titleText} ${isArabic || !virtue.textEnglish ? "zikr-text" : ""}`}
             dir={isArabic || !virtue.textEnglish ? "rtl" : "ltr"}
             lang={isArabic || !virtue.textEnglish ? "ar" : "en"}
           >
             {isArabic ? virtue.textArabic : (virtue.textEnglish ?? virtue.textArabic)}
           </p>
-          <p className="mt-2 text-xs font-semibold text-muted-foreground" dir="auto">
+          <p className={`mt-2 text-xs font-semibold ${bodyText}`} dir="auto">
             {isArabic ? virtue.referenceArabic : virtue.referenceEnglish}
           </p>
         </section>
