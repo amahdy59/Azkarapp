@@ -757,8 +757,8 @@ export function HomeScreen({
                           data-testid="home-prayer-moment"
                           data-prayer={leadingPrayer.prayer}
                           dir={direction}
-                          aria-label={t(language, "prayerMoment.homeTitle")}
-                          className="flex h-full flex-col gap-3"
+                          aria-label={t(language, "prayerMoment.homeTitle" as any)}
+                          className="grid h-full gap-3 md:grid-cols-2 md:gap-4"
                         >
                           <PrayerMomentPanel
                             prayer={leadingPrayer.prayer}
@@ -779,7 +779,7 @@ export function HomeScreen({
                               type="button"
                               onClick={() => onPrayerResume(leadingPrayer.prayer)}
                               data-testid="home-open-prayer-screen"
-                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring md:col-span-2"
                             >
                               {t(language, "prayerMoment.dayTitle")}
                             </button>
@@ -832,8 +832,8 @@ export function HomeScreen({
                     </div>
                   )}
 
-                  {/* Post-Prayer Journey */}
-                  {showJourney && leadingPrayer && (
+                  {/* Post-Prayer Journey (Secondary Reminder when Dhikr is Hero) */}
+                  {!isPrayerHero && showJourney && leadingPrayer && (
                     <div className="flex-1 min-w-[240px] max-w-full">
                       <PostPrayerJourneyCard
                         direction={direction}
