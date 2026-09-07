@@ -3419,3 +3419,19 @@ null` shape, so a record written before this change still loads and still
   green (361); the prayer specs green after the rewrite; lint confirming
   `Building`, `Home`, `Lock` and `chipIdle` became unreachable, which is the
   evidence the option is genuinely gone rather than merely hidden.
+
+### DEC-015 - Target Sizes in Dense UI Contexts
+
+- **Date:** 2026-09-07
+- **Status:** Approved
+- **Owner:** USER
+- **Related phase:** UI Polish / Layout Fixes
+- **Context:** The standard accessibility baseline requires a minimum 44x44px target size for all interactive elements. However, in highly dense reading environments (like the Mushaf view and tightly packed mobile utility screens), strictly enforcing 44px makes the interface visually unappealing and structurally cramped.
+- **Options considered:**
+  1. Enforce 44px universally, even if it requires excessive scrolling and disrupts the visual rhythm of continuous Arabic text.
+  2. Document explicit exceptions for dense text views where inline interactions require tighter sizing to maintain the reading experience.
+- **Decision:** Use option 2. Establish a documented exception to the 44px rule for inline controls, Mushaf reading view elements, and extremely constrained mobile contexts where a larger target would break layout or visual harmony.
+- **Why:** To balance WCAG target sizing guidelines with the need for a comfortable, uninterrupted devotional reading experience, particularly on small mobile screens.
+- **Consequences:** The agent may use targets smaller than 44px in the Mushaf view and dense text areas without violating the baseline contract, provided they remain keyboard-navigable and use standard focus rings.
+- **Files/contracts to update:** AGENTS.md (Already covers "documented inline-text exception").
+- **Tests/evidence required:** Verify that smaller targets remain usable via keyboard navigation and do not introduce severe WCAG overlap violations in automated tests.

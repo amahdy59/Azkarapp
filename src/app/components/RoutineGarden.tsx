@@ -84,7 +84,7 @@ export function TodayRoutineGarden({
     <section
       data-testid="today-garden-card"
       aria-label={t(language, "garden.todayTitle")}
-      className={`w-full transition-colors ${onMedia ? "h-full" : ""}`}
+      className={`w-full transition-colors ${onMedia ? "flex-1 flex flex-col" : ""}`}
     >
       {!hideTabs && (
         <div
@@ -121,7 +121,9 @@ export function TodayRoutineGarden({
 
       <div
         {...(hideTabs ? {} : tabPanelProps("garden", activeTab))}
-        className="outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+        className={`outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+          onMedia ? "flex-1 flex flex-col" : ""
+        }`}
       >
         {/* Home places this card beside the routine card in the hero grid, not
             inside it, so the two are siblings and both take an h2. It had been

@@ -288,7 +288,7 @@ export function ProgressDayView({
     // auto and nothing changes there.
     <div
       className={`mx-auto flex w-full max-w-[44rem] flex-col gap-4 fade-in xl:max-w-[80rem] ${
-        onGlass ? "h-full min-h-[19rem] sm:min-h-[21rem] md:min-h-[22rem]" : ""
+        onGlass ? "flex-1 sm:min-h-[21rem] md:min-h-[22rem]" : ""
       }`}
       dir={isArabic ? "rtl" : "ltr"}
     >

@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-06.11",
+  "release": "2026-09-07.1",
   "ar": [
-    "تظهر نافذة صلاة الضحى الآن في وقتها الفعلي بناءً على أوقات الفجر والظهر في منطقتك، بدلاً من استخدام ساعات ثابتة قد لا تتناسب مع فصول السنة المختلفة.",
-    "تم إصلاح مشكلة في تقدم الورد القرآني الأسبوعي حيث لم يكن التطبيق يحترم بداية اليوم المخصصة لك، مما كان يسبب ظهور تقدمك في اليوم الخطأ في بعض الحالات.",
-    "تم تحسين شاشة البداية لتكون أكثر استجابة في الأجهزة ذات الشاشات الصغيرة، وتم دمج واجهات ما بعد الصلاة لتجربة قراءة أسهل وأكثر سلاسة."
+    "تم إصلاح مشكلة تداخل العناصر في الشاشة الرئيسية على الشاشات العريضة، حيث تظهر بطاقات الأذكار الآن بشكل متناسق ومقروء.",
+    "تم إصلاح بعض المشاكل التقنية لضمان تحديث التطبيق وعمله بشكل صحيح دون انقطاع.",
+    "تم تحسين مظهر الخلفيات الزجاجية (Glassmorphism) لتكون أكثر توافقًا مع إعدادات الشفافية المختلفة."
   ],
   "en": [
-    "The forenoon (Duha) window now opens dynamically based on your local Fajr and Dhuhr times, ensuring the reminder stays accurate across different seasons and latitudes rather than relying on a fixed clock.",
-    "Weekly Quran progress now correctly respects your custom day-start boundary, fixing an issue where the week calendar would incorrectly roll over at midnight instead of your chosen hour.",
-    "The home screen layout has been refined for narrow devices so the date is no longer clipped, and post-prayer reading is now consolidated into a single smoother surface."
+    "Fixed a layout issue on the Home screen that caused elements to overlap on wider screens, ensuring all reminder cards display perfectly.",
+    "Resolved internal deployment blockers to ensure new updates are delivered reliably.",
+    "Refined glassmorphism effects on the home screen to respond correctly to transparency settings."
   ]
 }

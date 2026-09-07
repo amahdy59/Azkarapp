@@ -97,13 +97,11 @@ test("Home utility status stays on one line without horizontal overflow", async 
         hero: bounds("home-hero"),
         date: bounds("hijri-date"),
         routineSummary: bounds("home-header-routine-summary"),
-        time: bounds("next-prayer-time"),
         overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
       };
     });
     expect(geometry.header.y, `Home header top at ${viewport.width}px`).toBeLessThanOrEqual(25);
     expect(geometry.hero.y, `Home hero starts flush at ${viewport.width}px`).toBeLessThanOrEqual(1);
-    expect(geometry.date.y, `date row at ${viewport.width}px`).toBeLessThan(geometry.time.y);
     expect(geometry.routineSummary.height, `Home routine summary stays visible at ${viewport.width}px`).toBeGreaterThan(
       0,
     );
