@@ -6,7 +6,7 @@ import { formatNumerals } from "../formatting";
 import { Card } from "./Card";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles, Heart } from "./icons";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -268,9 +268,14 @@ export function SavedZikrCard({
           })}
         </div>
       ) : (
-        <p className="mt-4 text-start text-label font-semibold leading-6 text-muted-foreground">
-          {t(language, "home.savedEmpty")}
-        </p>
+        <div className="mt-4 flex min-h-[5.5rem] items-center gap-3 rounded-2xl border-2 border-dashed border-border/60 bg-muted/20 px-4 py-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-muted/40 text-muted-foreground">
+            <Heart size={20} />
+          </div>
+          <p className="text-start text-sm font-bold leading-snug text-muted-foreground">
+            {t(language, "home.savedEmpty")}
+          </p>
+        </div>
       )}
 
       {onOpenLibrary && (

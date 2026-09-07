@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-07.2",
+  "release": "2026-09-07.3",
   "ar": [
-    "أعدنا بطاقات متابعة الصلوات الخمس إلى الشاشة الرئيسية بناءً على طلبك.",
-    "أضفنا خيارًا جديدًا لمتابعة صلاة الرواتب (السنن) بجانب المسجد والأذكار.",
-    "تم تحسين مظهر بطاقات الصلاة باستخدام تأثير الزجاج (Glassmorphism) على الشاشة الرئيسية."
+    "تحسين واجهة الأذكار المحفوظة بإضافة رسالة تشجيعية جميلة عندما لا يكون هناك أذكار محفوظة.",
+    "إضافة ظل وتأثير عمق أفضل لبطاقات الصلوات على الشاشة الرئيسية (تأثير الزجاج).",
+    "تحسينات عامة على تجربة المستخدم والأداء."
   ],
   "en": [
-    "Restored the five-prayer tracking cards to the Home screen based on your feedback.",
-    "Added a new tracking checkbox for Rawatib (Sunnah) prayers alongside Mosque and Adhkar.",
-    "Refined the prayer cards styling to use proper glassmorphism when displayed on the Home hero section."
+    "Enhanced the Saved Zikr section with a beautiful, encouraging empty state when you haven't saved any items yet.",
+    "Added subtle drop shadows and inner borders to the Home screen glass cards to improve visual depth.",
+    "General UX and performance improvements across the app."
   ]
 }
