@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-07.5",
+  "release": "2026-09-07.6",
   "ar": [
-    "تصميم جديد للرئيسية: تم تحسين تخطيط الشاشة الرئيسية لترتيب وتوضيح البطاقات بشكل أفضل عبر أجهزة سطح المكتب والهواتف.",
-    "رحلتك بعد الصلاة: أضفنا بطاقة جديدة تظهر وقت الصلاة لترشدك خطوة بخطوة (الصلاة، الأذكار، الراتبة).",
-    "بطاقة الأذكار الذكية: تبرز الآن أذكار الصباح والمساء بوضوح أكبر كبطاقة رئيسية عند حلول وقتها."
+    "تحسينات الشاشة الرئيسية: إصلاح تخطيط البطاقات على الشاشات الكبيرة وتصحيح التكرار في رحلة ما بعد الصلاة.",
+    "مظهر أفضل للألوان: تحسين تباين الألوان في بطاقات الصلاة لضمان سهولة القراءة.",
+    "تأثيرات الزجاج: إصلاح تأثير الزجاج (Glassmorphism) للبطاقات في الشاشة الرئيسية على أجهزة سطح المكتب."
   ],
   "en": [
-    "New Home Layout: Redesigned the Home screen grid for a cleaner, more organized experience across both mobile and desktop.",
-    "Post-Prayer Journey: A new chronological tracker appears around prayer times to guide you through the prayer, adhkar, and sunnah steps.",
-    "Smart Routine Hero: Morning and evening adhkar now prominently take center stage when it's time to read them."
+    "Home Screen Layout: Fixed card grid layout on desktop and removed duplicate post-prayer journey trackers.",
+    "Contrast Improvements: Adjusted text colors inside the prayer moment card for better readability against the background.",
+    "Glassmorphism Fixes: Restored the translucent glass effect on Home screen cards for desktop users."
   ]
 }
