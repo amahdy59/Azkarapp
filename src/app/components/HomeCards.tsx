@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import { t } from "../i18n";
 import type { DailyEvidence } from "../dailyEvidence";
 import type { AppLanguage, RoutineMode } from "../types";
@@ -81,7 +80,6 @@ export function PrayerRoutineCard({
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
       <div className="hero-glass flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
-        
         {/* Header Row: "It is time for" + Mode Selector */}
         <div className="flex w-full items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm font-bold text-on-media-muted" dir="auto">
@@ -95,10 +93,12 @@ export function PrayerRoutineCard({
                 onChange={onModeChange}
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
-                className="flex min-h-[42px] items-center rounded-[20px] border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
+                className="flex min-h-[42px] items-center rounded-3xl border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
                 itemClassName={(selected) =>
                   `flex min-h-[36px] flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-primary text-primary-foreground shadow-sm" : "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
+                    selected
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
                   }`
                 }
                 options={[
