@@ -5,7 +5,11 @@ const originalMatchMedia = window.matchMedia;
 const originalStartViewTransition = document.startViewTransition;
 
 function setMatchMedia(value: typeof window.matchMedia | undefined) {
-  Object.defineProperty(window, "matchMedia", { configurable: true, value });
+  // This suite shares its jsdom registry with the media-query hook suites.
+  // `defineProperty` defaults `writable` to false, so restoring the value
+  // without this flag left `window.matchMedia` read-only for whichever suite
+  // ran next and made the full gate order-dependent.
+  Object.defineProperty(window, "matchMedia", { configurable: true, writable: true, value });
 }
 
 function setStartViewTransition(value: typeof document.startViewTransition | undefined) {

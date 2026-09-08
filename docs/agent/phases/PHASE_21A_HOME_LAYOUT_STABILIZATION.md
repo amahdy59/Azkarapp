@@ -95,4 +95,4 @@ Stabilize the redesigned Home hero composition without removing its intentional 
 
 ## Recommended next step
 
-Continue with the next Home improvement phase: reduce secondary-section density and make continuation points easier to scan without duplicating actions.
+Completed in `PHASE_21B_HOME_DENSITY.md`: the Home prayer row is now a concise summary while focused views retain the recording controls.

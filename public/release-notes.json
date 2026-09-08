@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-08",
+  "release": "2026-09-08.2",
   "ar": [
-    "أصبحت الشاشة الرئيسية أوضح على الشاشات الكبيرة، مع إبراز الورد الأساسي ووضع التذكير اليومي بجانبه بتوازن.",
-    "يظهر وردك اليوم في صف كامل، لتبقى بطاقات الصباح والمساء والنوم مقروءة من دون تداخل.",
-    "تظهر رحلة ما بعد الصلاة مرة واحدة داخل بطاقة الصلاة التفاعلية، من دون تكرار أو إجراءات متنافسة.",
-    "حافظت بطاقات الواجهة على التأثير الزجاجي مع تباين أوضح، وأهداف لمس أكبر، وسطح معتم عند تقليل الشفافية."
+    "أصبح ملخص الصلوات في الرئيسية أقصر وأسهل في المسح، مع بقاء الوقت والحالة ظاهرين لكل صلاة.",
+    "يمكن فتح تفاصيل أي صلاة مباشرة من بطاقتها الواضحة في الرئيسية.",
+    "تبقى إجراءات تسجيل الصلاة والسنن والأذكار في شاشة الصلاة وصفحة التقدم، لتقل الإجراءات المتنافسة في الرئيسية."
   ],
   "en": [
-    "Home is clearer on large screens, with the primary routine emphasized and the daily reminder balanced beside it.",
-    "Today's Wird now has a full row, keeping Morning, Evening, and Sleep cards readable without overlap.",
-    "The post-prayer journey appears once inside the interactive prayer card, without duplicate or competing actions.",
-    "Home cards keep their glass appearance with clearer contrast, larger touch targets, and a solid reduced-transparency fallback."
+    "The prayer summary on Home is shorter and easier to scan while keeping each prayer's time and state visible.",
+    "Each prayer's details remain one clear tap away from its Home card.",
+    "Prayer, sunnah, and adhkar recording stays in the focused prayer and Progress views, reducing competing actions on Home."
   ]
 }

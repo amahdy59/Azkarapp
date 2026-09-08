@@ -179,6 +179,7 @@ function PrayerCard({
   onToggle,
   onOpen,
   onGlass,
+  summaryOnly,
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
@@ -186,6 +187,7 @@ function PrayerCard({
   onGlass?: boolean;
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
+  summaryOnly?: boolean;
 }) {
   const { prayer, time, state, countdown } = model;
   const Icon = PRAYER_ICON[prayer];
@@ -203,6 +205,7 @@ function PrayerCard({
       data-testid={`prayer-card-${prayer}`}
       data-prayer={prayer}
       data-prayer-state={state}
+      data-density={summaryOnly ? "summary" : "full"}
       className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-4 ${
         onGlass
           ? `hero-glass ${isCurrent ? "ring-2 ring-primary border-transparent" : "border-transparent"}`
@@ -299,14 +302,15 @@ function PrayerCard({
         )}
       </div>
 
-      <hr className="mt-1.5 border-t border-border/60" />
+      {!summaryOnly && <hr className="mt-1.5 border-t border-border/60" />}
 
       {/* Section 3 — personal tracking. Its own fieldset so a screen reader
           announces which prayer these two controls belong to; the row of five
           otherwise repeats the same two labels with no context. */}
-      <fieldset className="mt-1.5 flex flex-col border-0 p-0">
-        <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
-        {/* "Prayed", not "prayed at the mosque".
+      {!summaryOnly && (
+        <fieldset className="mt-1.5 flex flex-col border-0 p-0">
+          <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
+          {/* "Prayed", not "prayed at the mosque".
             The prayer screen records where — mosque or home — while this row
             only knew the mosque, so a prayer recorded at home showed here as an
             empty box: the two surfaces disagreed about the same fact, and the
@@ -314,36 +318,37 @@ function PrayerCard({
             model exists to end. This ticks for either answer and names the
             place beside it; ticking it here still means the mosque, because
             that is the only answer a single box can give. */}
-        <TrackingCheckbox
-          id={`prayer-${prayer}-mosque`}
-          label={t(language, "prayerTracking.prayed")}
-          hint={
-            tracking.location
-              ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
-              : undefined
-          }
-          checked={tracking.location !== null}
-          disabled={disabled}
-          onChange={(next) => onToggle(prayer, "mosque", next)}
-          onGlass={onGlass}
-        />
-        <TrackingCheckbox
-          id={`prayer-${prayer}-sunnah`}
-          label={t(language, "prayerTracking.sunnah")}
-          checked={tracking.sunnah ?? false}
-          disabled={disabled}
-          onChange={(next) => onToggle(prayer, "sunnah", next)}
-          onGlass={onGlass}
-        />
-        <TrackingCheckbox
-          id={`prayer-${prayer}-adhkar`}
-          label={t(language, "prayerTracking.adhkar")}
-          checked={tracking.adhkar}
-          disabled={disabled}
-          onChange={(next) => onToggle(prayer, "adhkar", next)}
-          onGlass={onGlass}
-        />
-      </fieldset>
+          <TrackingCheckbox
+            id={`prayer-${prayer}-mosque`}
+            label={t(language, "prayerTracking.prayed")}
+            hint={
+              tracking.location
+                ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
+                : undefined
+            }
+            checked={tracking.location !== null}
+            disabled={disabled}
+            onChange={(next) => onToggle(prayer, "mosque", next)}
+            onGlass={onGlass}
+          />
+          <TrackingCheckbox
+            id={`prayer-${prayer}-sunnah`}
+            label={t(language, "prayerTracking.sunnah")}
+            checked={tracking.sunnah ?? false}
+            disabled={disabled}
+            onChange={(next) => onToggle(prayer, "sunnah", next)}
+            onGlass={onGlass}
+          />
+          <TrackingCheckbox
+            id={`prayer-${prayer}-adhkar`}
+            label={t(language, "prayerTracking.adhkar")}
+            checked={tracking.adhkar}
+            disabled={disabled}
+            onChange={(next) => onToggle(prayer, "adhkar", next)}
+            onGlass={onGlass}
+          />
+        </fieldset>
+      )}
     </article>
   );
 }
@@ -357,6 +362,7 @@ export function PrayerTrackerCards({
   onToggle,
   onOpen,
   onGlass,
+  summaryOnly,
 }: {
   models: readonly PrayerCardModel[];
   language: AppLanguage;
@@ -366,6 +372,8 @@ export function PrayerTrackerCards({
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
   onGlass?: boolean;
+  /** Keep overview surfaces scannable; focused views retain full recording. */
+  summaryOnly?: boolean;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
@@ -427,6 +435,7 @@ export function PrayerTrackerCards({
                 if (field === "mosque" && next) setVirtuePrayer(prayer);
               }}
               onOpen={onOpen}
+              summaryOnly={summaryOnly}
             />
           );
         })}

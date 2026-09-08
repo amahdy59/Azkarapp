@@ -76,10 +76,13 @@ test("desktop Home keeps one aligned contextual row and gives the Wird its own w
   const primaryGlass = primary.locator(".hero-glass").first();
   const companion = page.getByTestId("home-context-companion");
   const wird = page.getByTestId("home-wird-row");
+  const prayerSummary = page.getByTestId("prayer-tracker-cards");
 
   await expect(companion).toBeVisible();
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
+  await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
+  await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
   const [gridBox, primaryBox, primaryGlassBox, companionBox, wirdBox] = await Promise.all(
     [grid, primary, primaryGlass, companion, wird].map((locator) => locator.boundingBox()),

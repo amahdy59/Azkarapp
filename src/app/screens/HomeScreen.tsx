@@ -842,6 +842,7 @@ export function HomeScreen({
                     onToggle={onTogglePrayerTracking ?? (() => undefined)}
                     onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
                     onGlass
+                    summaryOnly
                   />
                 </div>
               </div>

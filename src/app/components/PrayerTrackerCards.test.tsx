@@ -75,6 +75,29 @@ describe("PrayerTrackerCards", () => {
     stubViewport([]);
     expect(renderRow("fajr")).toEqual(["fajr", "dhuhr", "asr", "maghrib", "isha"]);
   });
+
+  it("keeps a summary row navigable without duplicating tracking controls", () => {
+    stubViewport(["(min-width: 1024px)"]);
+    const onOpen = vi.fn();
+    render(
+      <PrayerTrackerCards
+        models={modelsWithCurrent("fajr")}
+        language="en"
+        direction="ltr"
+        records={[]}
+        dayKey="2026-08-19"
+        onToggle={() => undefined}
+        onOpen={onOpen}
+        summaryOnly
+      />,
+    );
+
+    expect(screen.getAllByRole("button")).toHaveLength(5);
+    expect(screen.queryAllByRole("checkbox")).toHaveLength(0);
+    expect(screen.getByTestId("prayer-card-fajr")).toHaveAttribute("data-density", "summary");
+    fireEvent.click(screen.getByRole("button", { name: /Open Fajr/i }));
+    expect(onOpen).toHaveBeenCalledWith("fajr");
+  });
 });
 
 /**
