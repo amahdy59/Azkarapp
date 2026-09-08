@@ -93,9 +93,9 @@ export function PrayerRoutineCard({
                 onChange={onModeChange}
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
-                className="flex min-h-[42px] items-center rounded-3xl border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
+                className="flex items-center rounded-3xl border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
                 itemClassName={(selected) =>
-                  `flex min-h-[36px] flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"

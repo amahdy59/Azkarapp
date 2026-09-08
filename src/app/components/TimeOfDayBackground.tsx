@@ -15,7 +15,11 @@ export function TimeOfDayBackground({ categoryId = "morning" }: { categoryId?: s
   }
 
   return (
-    <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden" aria-hidden="true">
+    <div
+      data-testid="time-of-day-scene-window"
+      className="fixed inset-0 pointer-events-none -z-50 overflow-hidden bg-on-media-surface"
+      aria-hidden="true"
+    >
       <AzkarHeroBackground
         kind={kind}
         priority={true}

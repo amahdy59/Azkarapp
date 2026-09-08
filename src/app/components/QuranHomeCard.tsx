@@ -37,7 +37,7 @@ export function QuranHomeCard({
     // First-time user state
     return (
       <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-        <div className="flex flex-col rounded-2xl bg-card border border-border p-4 shadow-raised">
+        <div className="flex flex-col rounded-2xl bg-card/80 backdrop-blur-md border border-border p-4 shadow-raised">
           <div className="flex items-center gap-3 mb-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <BookOpen size={20} />
@@ -75,7 +75,7 @@ export function QuranHomeCard({
 
   return (
     <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-      <div className="flex flex-col rounded-2xl bg-card border border-border shadow-raised overflow-hidden">
+      <div className="flex flex-col rounded-2xl bg-card/80 backdrop-blur-md border border-border shadow-raised overflow-hidden">
         {/* Main Content Area: Continue Reading */}
         <div className={`flex flex-col items-start p-4 ${textAlignment}`}>
           <div className="flex items-center w-full gap-3 mb-3">

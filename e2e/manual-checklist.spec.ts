@@ -285,7 +285,7 @@ test("time-of-day imagery has no decorative overlay layer", async ({ page }) => 
 
   const hero = page.getByTestId("home-hero");
   const scene = page.getByTestId("time-of-day-scene-window");
-  const image = hero.locator("picture img");
+  const image = scene.locator("picture img");
   await expect(image).toBeVisible();
   await expect(hero.locator(".azkar-hero-particles, .azkar-hero__overlay")).toHaveCount(0);
   await expect(scene).toBeVisible();

@@ -649,10 +649,11 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="px-0 pt-0 relative overflow-hidden flex flex-col"
+      className="!bg-on-media-surface px-0 pt-0 relative overflow-hidden flex flex-col"
       style={{ paddingTop: 0 }}
       screenName={t(language, "home.title")}
     >
+      <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Scrollable Content Area */}
@@ -668,7 +669,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page mx-auto flex w-full max-w-[80rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
+            className={`px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
               hasScrolledHomeContent ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md" : ""
             }`}
             dir="ltr"
@@ -723,24 +724,11 @@ export function HomeScreen({
             </button>
           </header>
         </div>
-        <div className="mx-auto flex w-full max-w-[80rem] flex-col gap-4 lg:gap-5">
-          <div
-            data-testid="home-hero"
-            className="relative isolate min-h-[36rem] w-full overflow-hidden rounded-b-3xl bg-on-media-surface sm:mx-auto sm:min-h-[38rem] sm:max-w-[80rem] sm:rounded-b-3xl sm:shadow-raised lg:min-h-[30rem]"
-          >
-            <div
-              data-testid="time-of-day-scene-window"
-              className="absolute inset-0 -z-10 overflow-hidden"
-              aria-hidden="true"
-            >
-              <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
-            </div>
-
-            {/* items-stretch, not items-center: the wird card should match the
-                hero's height rather than float centred against it. */}
+        <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-4 lg:gap-5">
+          <div data-testid="home-hero" className="relative isolate w-full pt-16 sm:mx-auto sm:max-w-[64rem]">
             {showHeroContent && (
-              <div className="relative z-10 mx-auto flex min-h-[inherit] w-full max-w-[80rem] flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:px-8 lg:pb-8 lg:pt-20 lg:gap-5">
-                <div className="flex flex-col lg:flex-row items-stretch gap-4 lg:gap-5 w-full">
+              <div className="relative z-10 mx-auto flex w-full flex-col items-start justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:px-8 lg:pb-8 lg:pt-20 lg:gap-5">
+                <div className="flex flex-col lg:flex-row lg:flex-wrap items-start gap-4 lg:gap-5 w-full">
                   {/* Contextual Hero */}
                   {(isPrayerHero || showCompletionCard || isRoutineHero) && (
                     <div className="flex-[2_2_0%] min-w-[280px] lg:min-w-[320px] max-w-full">

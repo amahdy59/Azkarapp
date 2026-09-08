@@ -78,46 +78,6 @@ test("the Home masbaha entry fills compact/tablet layouts and is bounded on desk
   }
 });
 
-test("desktop Home hero cards settle to one aligned height", async ({ page }) => {
-  await page.setViewportSize({ width: 1440, height: 900 });
-  await openReturningGuest(page);
-
-  const routine = page.getByTestId("home-routine-card");
-  const prayer = page.getByTestId("home-prayer-moment");
-  const wird = page.getByTestId("today-garden-card");
-  const evidence = page.getByTestId("home-daily-evidence");
-
-  // Wait for the layout to settle
-  await expect(wird).toBeVisible();
-
-  const isPrayerHero = await prayer.isVisible();
-  const hero = isPrayerHero ? prayer : routine;
-
-  const [heroBox, wirdBox, evidenceBox] = await Promise.all([
-    hero.boundingBox(),
-    wird.boundingBox(),
-    evidence.boundingBox(),
-  ]);
-
-  expect(heroBox).not.toBeNull();
-  expect(wirdBox).not.toBeNull();
-  if (heroBox && wirdBox) {
-    expect(Math.abs(heroBox.y - wirdBox.y)).toBeLessThanOrEqual(1);
-
-    /* The two cards no longer match each other's height, and should not: the
-       second column now carries the day's routines with the narration that
-       explains them stacked underneath, so what has to align is the pair of
-       columns, not the pair of cards. Asserted as the column bottom rather
-       than the card bottom — the earlier assertion would now only be
-       satisfiable by leaving a gap under one of them. */
-    if (evidenceBox) {
-      const columnBottom = evidenceBox.y + evidenceBox.height;
-      const heroBottom = heroBox.y + heroBox.height;
-      expect(Math.abs(columnBottom - heroBottom)).toBeLessThanOrEqual(2);
-    }
-  }
-});
-
 test("the OnePlus-class Salawat session keeps its counter controls and hint inside the app canvas", async ({
   page,
 }) => {
