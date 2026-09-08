@@ -9,7 +9,8 @@ import { expect, test, type Page } from "@playwright/test";
  * alone would sit on Home all day.
  */
 async function openHomeAt(page: Page, isoTime: string) {
-  await page.clock.setFixedTime(new Date(isoTime));
+  // Append +03:00 to ensure the time evaluates correctly relative to Africa/Cairo (the playwright timezoneId).
+  await page.clock.setFixedTime(new Date(`${isoTime}+03:00`));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(

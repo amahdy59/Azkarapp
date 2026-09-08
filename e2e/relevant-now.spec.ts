@@ -8,7 +8,7 @@ import { expect, test, type Page } from "@playwright/test";
  * bedtime one on before-sleep, without a second content library to review.
  */
 async function homeAt(page: Page, iso: string) {
-  await page.clock.setFixedTime(new Date(iso));
+  await page.clock.setFixedTime(new Date(`${iso}+03:00`));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
@@ -57,7 +57,7 @@ test("a different hour of the same day can draw on a different collection", asyn
   await homeAt(page, "2026-09-07T08:00:00");
   const morning = await narration(page);
 
-  await page.clock.setFixedTime(new Date("2026-09-07T22:30:00"));
+  await page.clock.setFixedTime(new Date("2026-09-07T22:30:00+03:00"));
   await page.reload();
   await expect(page.getByRole("navigation").first()).toBeVisible();
   const night = await narration(page);

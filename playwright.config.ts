@@ -48,6 +48,7 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     reducedMotion: "reduce",
+    timezoneId: "Africa/Cairo",
   },
   timeout: 90_000,
   /**

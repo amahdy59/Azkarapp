@@ -10,7 +10,7 @@ import { expect, test, type Page } from "@playwright/test";
  * surface rather than from a token.
  */
 async function seed(page: Page, hash: string) {
-  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00"));
+  await page.clock.setFixedTime(new Date("2026-09-05T22:30:00+03:00"));
   await page.addInitScript(() => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
