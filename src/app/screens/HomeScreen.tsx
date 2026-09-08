@@ -787,6 +787,7 @@ export function HomeScreen({
                         </section>
                       ) : isRoutineHero ? (
                         <PrayerRoutineCard
+                          categoryId={reminderInfo.categoryId}
                           language={language}
                           direction={direction}
                           categoryName={

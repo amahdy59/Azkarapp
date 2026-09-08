@@ -6,7 +6,7 @@ import { formatNumerals } from "../formatting";
 import { Card } from "./Card";
 import { ProductImage } from "./ProductImage";
 import { SegmentedControl } from "./SegmentedControl";
-import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles, Heart } from "./icons";
+import { ArrowLeft, ArrowRight, Bookmark, BookOpen, Clock, Sparkles, Heart, Sun, MoonStar, Moon } from "./icons";
 import { HadithWeakChainBadge } from "./ZikrComponents";
 
 export type HomeSavedSource = "main" | "comprehensive" | "friday";
@@ -37,6 +37,7 @@ function DirectionArrow({
 export function PrayerRoutineCard({
   language,
   direction,
+  categoryId,
   categoryName,
   description,
   mode,
@@ -51,6 +52,7 @@ export function PrayerRoutineCard({
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
+  categoryId?: string;
   categoryName: string;
   description: string;
   mode: RoutineMode;
@@ -66,39 +68,37 @@ export function PrayerRoutineCard({
   const progressId = "home-routine-progress";
   const progress = totalCount > 0 ? Math.min(1, Math.max(0, completedCount / totalCount)) : 0;
 
+  // Determine icon based on categoryId
+  let CategoryIcon = Sparkles;
+  if (categoryId === "morning") CategoryIcon = Sun;
+  else if (categoryId === "evening") CategoryIcon = MoonStar;
+  else if (categoryId === "sleep") CategoryIcon = Moon;
+
   return (
     <section
       aria-labelledby="current-zikr-heading"
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
-      <div className="hero-glass flex flex-1 flex-col gap-4 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
-        <div className="flex flex-col gap-4">
-          <div className="flex w-full flex-col items-start gap-3 px-1">
-            <h2
-              id="current-zikr-heading"
-              className="block max-w-full truncate whitespace-nowrap text-[clamp(1.5rem,4.5vw,1.875rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-4xl"
-              dir="auto"
-              style={{ lineHeight: "1.25" }}
-            >
-              {categoryName}
-            </h2>
-            <p className="max-w-[52ch] text-sm font-semibold leading-6 text-on-media-muted" dir="auto">
-              {description}
-            </p>
+      <div className="hero-glass flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
+        
+        {/* Header Row: "It is time for" + Mode Selector */}
+        <div className="flex w-full items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-on-media-muted" dir="auto">
+            <span>{t(language, "home.timeFor")}</span>
+            <CategoryIcon className="size-5 text-on-media-accent" aria-hidden="true" />
           </div>
-
-          {showModeSelector && (
-            <div>
+          <div className="w-fit min-w-[140px]">
+            {showModeSelector && (
               <SegmentedControl
                 value={mode}
                 onChange={onModeChange}
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
-                className="flex min-h-[48px] w-full items-center rounded-2xl border border-on-media/16 bg-black/45 p-1"
+                className="flex min-h-[42px] items-center rounded-[20px] border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
                 itemClassName={(selected) =>
-                  `flex min-h-[44px] flex-1 items-center justify-center rounded-xl px-3 text-sm font-bold transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
-                    selected ? "bg-primary text-primary-foreground shadow-xs" : "text-on-media/95 hover:bg-on-media/8"
+                  `flex min-h-[36px] flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                    selected ? "bg-primary text-primary-foreground shadow-sm" : "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
                   }`
                 }
                 options={[
@@ -106,54 +106,76 @@ export function PrayerRoutineCard({
                   { value: "core", label: t(language, "home.routineAbbreviated") },
                 ]}
               />
-            </div>
-          )}
-
-          {totalCount > 0 && (
-            <div className="flex w-full flex-col gap-2">
-              <div
-                id={progressId}
-                className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-label font-bold text-on-media"
-                dir="auto"
-              >
-                <span>
-                  {formatNumerals(completedCount, language)} {t(language, "home.ofSeparator")}{" "}
-                  {formatNumerals(totalCount, language)}
-                </span>
-                {showEstimate && (
-                  <span className="flex items-center gap-1.5">
-                    <Clock className="size-[14px] text-on-media-accent" aria-hidden="true" />
-                    {t(language, "home.estimatedMinutes", {
-                      count: formatNumerals(estimatedMinutes, language),
-                    })}
-                  </span>
-                )}
-              </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-on-media/20" aria-hidden="true">
-                <div
-                  className={`h-full w-full rounded-full bg-primary transition-[transform] duration-emphasis ease-out ${
-                    direction === "rtl" ? "origin-right" : "origin-left"
-                  }`}
-                  style={{ transform: `scaleX(${progress})` } as CSSProperties}
-                />
-              </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {/* Titles */}
+        <div className="flex w-full flex-col items-start gap-3 px-1 mt-2">
+          <h2
+            id="current-zikr-heading"
+            className="block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,5vw,2.25rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-5xl"
+            dir="auto"
+            style={{ lineHeight: "1.25" }}
+          >
+            {categoryName}
+          </h2>
+          <p className="max-w-[52ch] text-sm font-semibold leading-7 text-on-media-muted" dir="auto">
+            {description}
+          </p>
+        </div>
+
+        <div className="flex-1" />
+
+        {/* Progress & CTA */}
+        {totalCount > 0 && (
+          <div className="flex w-full flex-col gap-3 mt-4">
+            <div
+              id={progressId}
+              className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm font-bold text-on-media"
+              dir="auto"
+            >
+              {showEstimate ? (
+                <span className="flex items-center gap-1.5 text-on-media-muted">
+                  <Clock className="size-[16px] text-on-media-accent" aria-hidden="true" />
+                  {t(language, "home.estimatedMinutes", {
+                    count: formatNumerals(estimatedMinutes, language),
+                  })}
+                </span>
+              ) : (
+                <span />
+              )}
+              <span>
+                {formatNumerals(completedCount, language)} {t(language, "home.ofSeparator")}{" "}
+                {formatNumerals(totalCount, language)}
+              </span>
+            </div>
+
+            <div
+              className="h-2.5 w-full overflow-hidden rounded-full bg-black/40 shadow-inner"
+              role="progressbar"
+              aria-valuenow={completedCount}
+              aria-valuemin={0}
+              aria-valuemax={totalCount}
+              aria-labelledby={progressId}
+            >
+              <div
+                className="h-full rounded-full bg-primary transition-[width] duration-700 ease-out"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
+          </div>
+        )}
 
         <button
           type="button"
           data-testid="home-primary-cta"
           aria-describedby={progressId}
           onClick={onOpen}
-          className="group flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="group mt-3 flex min-h-[54px] w-full items-center justify-center gap-2.5 rounded-2xl bg-primary px-4 text-title font-black text-primary-foreground shadow-raised transition-transform hover:brightness-95 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           <span>{ctaLabel}</span>
-          <DirectionArrow
-            direction={direction}
-            size={20}
-            className="transition-transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1"
-          />
+          <DirectionArrow direction={direction} size={20} className="transition-transform group-hover:scale-110" />
         </button>
       </div>
     </section>

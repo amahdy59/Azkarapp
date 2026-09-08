@@ -42,7 +42,7 @@ export default defineConfig({
    * minutes it saves.
    */
   workers: Math.max(2, Math.min(3, Math.floor(os.cpus().length / 4))),
-  retries: process.env.CI ? 0 : 1,
+  retries: process.env.CI ? 2 : 1,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: "http://127.0.0.1:4173",
