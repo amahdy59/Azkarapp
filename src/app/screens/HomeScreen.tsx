@@ -10,7 +10,6 @@ import type { DayMomentContext, PrayerMomentContext, ReminderContext } from "../
 import { DailyEvidenceCard, FridayHomeCard, PrayerRoutineCard, SavedZikrCard } from "../components/HomeCards";
 import { QuranHomeCard } from "../components/QuranHomeCard";
 import { PrayerMomentPanel } from "../components/PrayerMomentPanel";
-import { PostPrayerJourneyCard } from "../components/PostPrayerJourneyCard";
 import { TodaysPathSheet } from "../components/TodaysPathSheet";
 import { getDailyPathStatus } from "../dailyPath";
 import { getLeadingPrayerMoment } from "../prayerMoment";
@@ -641,10 +640,7 @@ export function HomeScreen({
     (leadingPrayer.phase === "approaching" || leadingPrayer.phase === "now" || leadingPrayer.phase === "recorded"),
   );
   const isRoutineHero = !isPrayerHero && showRoutineCard;
-  const showJourney = Boolean(
-    leadingPrayer &&
-    (leadingPrayer.phase === "recorded" || leadingPrayer.phase === "now" || leadingPrayer.phase === "passed"),
-  );
+  const hasContextCompanion = Boolean(dailyEvidence);
 
   return (
     <ScreenContainer
@@ -727,11 +723,17 @@ export function HomeScreen({
         <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative isolate w-full pt-16 sm:mx-auto sm:max-w-[64rem]">
             {showHeroContent && (
-              <div className="relative z-10 mx-auto flex w-full flex-col items-start justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:px-8 lg:pb-8 lg:pt-20 lg:gap-5">
-                <div className="flex flex-col lg:flex-row lg:flex-wrap items-start gap-4 lg:gap-5 w-full">
+              <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
+                <div
+                  data-testid="home-context-grid"
+                  className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5"
+                >
                   {/* Contextual Hero */}
                   {(isPrayerHero || showCompletionCard || isRoutineHero) && (
-                    <div className="flex-[2_2_0%] min-w-[280px] lg:min-w-[320px] max-w-full">
+                    <div
+                      data-testid="home-primary-card"
+                      className={`grid min-w-0 ${hasContextCompanion ? "lg:col-span-2" : "lg:col-span-3"}`}
+                    >
                       {showCompletionCard ? (
                         <div className="h-full">
                           <TranquilityCompletionCard
@@ -804,9 +806,17 @@ export function HomeScreen({
                     </div>
                   )}
 
-                  {/* Today's Wird */}
+                  {/* One contextual companion keeps the primary action visually dominant. */}
+                  {dailyEvidence ? (
+                    <div data-testid="home-context-companion" className="flex min-w-0 lg:col-span-1">
+                      <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} onGlass />
+                    </div>
+                  ) : null}
+
+                  {/* Today's Wird needs the full row: its three routine tiles must
+                      respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
-                    <div className="flex-1 min-w-[240px] max-w-full">
+                    <div data-testid="home-wird-row" className="min-w-0 lg:col-span-3">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}
@@ -818,30 +828,6 @@ export function HomeScreen({
                         recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
                         onOpenWirdBenefits={onOpenWirdBenefits}
                       />
-                    </div>
-                  )}
-
-                  {/* Post-Prayer Journey */}
-                  {!isPrayerHero && showJourney && leadingPrayer && (
-                    <div className="flex-1 min-w-[240px] max-w-full">
-                      <PostPrayerJourneyCard
-                        direction={direction}
-                        prayer={leadingPrayer.prayer}
-                        prayed={leadingPrayer.phase === "recorded"}
-                        adhkarDone={leadingPrayer.adhkarDone}
-                        sunnahDone={leadingPrayer.sunnahDone}
-                        onOpenAdhkar={() =>
-                          onOpenPrayerAdhkar ? onOpenPrayerAdhkar(leadingPrayer.prayer) : onResume("after_prayer")
-                        }
-                        onGlass={true}
-                      />
-                    </div>
-                  )}
-
-                  {/* Daily Evidence */}
-                  {dailyEvidence && (
-                    <div className="flex-1 min-w-[240px] max-w-full">
-                      <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} onGlass />
                     </div>
                   )}
                 </div>

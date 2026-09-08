@@ -1,5 +1,7 @@
 # Phase Report — Home Layout Redesign (Phase 21)
 
+> Superseded in part by Phase 21A: the proposed `PostPrayerJourneyCard` was unreachable under the existing prayer-moment state machine and duplicated the journey already implemented inside `PrayerMomentPanel`, so it was removed.
+
 ## Objective
 
 Update the `HomeScreen` to accommodate the context-aware layout with a dynamic Contextual Hero, Today's Wird, Post-Prayer Journey, and Relevant Reminder, ensuring strict compliance with RTL layout logic, glassmorphism design, and responsiveness across desktop and mobile.

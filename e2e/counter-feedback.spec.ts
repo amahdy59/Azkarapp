@@ -1,18 +1,27 @@
 import { expect, test, type Page } from "@playwright/test";
 
-async function openReturningGuest(page: Page, language: "ar" | "en" = "en") {
-  await page.addInitScript((selectedLanguage) => {
-    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
-    window.localStorage.setItem(
-      "azkarapp.state.v1",
-      JSON.stringify({
-        settings: { language: selectedLanguage, themeMode: "midnight", reduceMotion: true, hapticFeedback: false },
-        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
-        completed: { morning: [], evening: [], before_sleep: [] },
-        sessions: [],
-      }),
-    );
-  }, language);
+async function openReturningGuest(page: Page, language: "ar" | "en" = "en", settings: Record<string, unknown> = {}) {
+  await page.addInitScript(
+    ({ selectedLanguage, settingOverrides }) => {
+      window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+      window.localStorage.setItem(
+        "azkarapp.state.v1",
+        JSON.stringify({
+          settings: {
+            language: selectedLanguage,
+            themeMode: "midnight",
+            reduceMotion: true,
+            hapticFeedback: false,
+            ...settingOverrides,
+          },
+          profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+          completed: { morning: [], evening: [], before_sleep: [] },
+          sessions: [],
+        }),
+      );
+    },
+    { selectedLanguage: language, settingOverrides: settings },
+  );
   await page.goto("/");
   // No local override: the 10s cap this used to carry was shorter than the
   // project's own 15s expect timeout, so under full-suite load the shell had
@@ -56,6 +65,48 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
     expect(rtlBoxes[0].x).toBeGreaterThan(rtlBoxes[1].x);
     expect(rtlBoxes[1].x).toBeGreaterThan(rtlBoxes[2].x);
   }
+});
+
+test("desktop Home keeps one aligned contextual row and gives the Wird its own width", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await openReturningGuest(page, "ar", { textSize: "large" });
+
+  const grid = page.getByTestId("home-context-grid");
+  const primary = page.getByTestId("home-primary-card");
+  const primaryGlass = primary.locator(".hero-glass").first();
+  const companion = page.getByTestId("home-context-companion");
+  const wird = page.getByTestId("home-wird-row");
+
+  await expect(companion).toBeVisible();
+  await expect(primaryGlass).toBeVisible();
+  await expect(companion.locator(".hero-glass").first()).toBeVisible();
+
+  const [gridBox, primaryBox, primaryGlassBox, companionBox, wirdBox] = await Promise.all(
+    [grid, primary, primaryGlass, companion, wird].map((locator) => locator.boundingBox()),
+  );
+  expect(gridBox && primaryBox && primaryGlassBox && companionBox && wirdBox).toBeTruthy();
+  if (gridBox && primaryBox && primaryGlassBox && companionBox && wirdBox) {
+    expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
+    expect(Math.abs(primaryBox.y + primaryBox.height - (companionBox.y + companionBox.height))).toBeLessThanOrEqual(2);
+    expect(primaryGlassBox.width).toBeGreaterThanOrEqual(primaryBox.width - 2);
+    expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
+    expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
+  }
+
+  const routineTiles = page.getByTestId("today-garden-card").getByRole("button", { name: / - (مكتملة|غير مكتملة)$/ });
+  await expect(routineTiles).toHaveCount(3);
+  const tileBoxes = await Promise.all([0, 1, 2].map((index) => routineTiles.nth(index).boundingBox()));
+  expect(tileBoxes.every(Boolean)).toBe(true);
+  if (tileBoxes[0] && tileBoxes[1] && tileBoxes[2]) {
+    expect(tileBoxes[0].x).toBeGreaterThan(tileBoxes[1].x + tileBoxes[1].width - 1);
+    expect(tileBoxes[1].x).toBeGreaterThan(tileBoxes[2].x + tileBoxes[2].width - 1);
+  }
+
+  const overflow = await grid.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
 });
 
 test("the Home masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {

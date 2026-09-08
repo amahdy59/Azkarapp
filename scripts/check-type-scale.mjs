@@ -1,4 +1,4 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { execSync } from "node:child_process";
 
 /**
@@ -24,7 +24,7 @@ const NOT_A_SCALE_SIZE = /^text-\[(color:|length:|clamp\(|[\d.]+em\])/;
 const files = execSync('git ls-files "src/**/*.tsx" "src/**/*.ts"', { encoding: "utf8" })
   .trim()
   .split("\n")
-  .filter(Boolean);
+  .filter((file) => file && existsSync(file));
 
 const found = new Map();
 
