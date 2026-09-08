@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-07.6",
+  "release": "2026-09-08",
   "ar": [
-    "تحسينات الشاشة الرئيسية: إصلاح تخطيط البطاقات على الشاشات الكبيرة وتصحيح التكرار في رحلة ما بعد الصلاة.",
-    "مظهر أفضل للألوان: تحسين تباين الألوان في بطاقات الصلاة لضمان سهولة القراءة.",
-    "تأثيرات الزجاج: إصلاح تأثير الزجاج (Glassmorphism) للبطاقات في الشاشة الرئيسية على أجهزة سطح المكتب."
+    "أصبحت الشاشة الرئيسية أوضح على الشاشات الكبيرة، مع إبراز الورد الأساسي ووضع التذكير اليومي بجانبه بتوازن.",
+    "يظهر وردك اليوم في صف كامل، لتبقى بطاقات الصباح والمساء والنوم مقروءة من دون تداخل.",
+    "تظهر رحلة ما بعد الصلاة مرة واحدة داخل بطاقة الصلاة التفاعلية، من دون تكرار أو إجراءات متنافسة.",
+    "حافظت بطاقات الواجهة على التأثير الزجاجي مع تباين أوضح، وأهداف لمس أكبر، وسطح معتم عند تقليل الشفافية."
   ],
   "en": [
-    "Home Screen Layout: Fixed card grid layout on desktop and removed duplicate post-prayer journey trackers.",
-    "Contrast Improvements: Adjusted text colors inside the prayer moment card for better readability against the background.",
-    "Glassmorphism Fixes: Restored the translucent glass effect on Home screen cards for desktop users."
+    "Home is clearer on large screens, with the primary routine emphasized and the daily reminder balanced beside it.",
+    "Today's Wird now has a full row, keeping Morning, Evening, and Sleep cards readable without overlap.",
+    "The post-prayer journey appears once inside the interactive prayer card, without duplicate or competing actions.",
+    "Home cards keep their glass appearance with clearer contrast, larger touch targets, and a solid reduced-transparency fallback."
   ]
 }
