@@ -152,8 +152,8 @@ export function PrayerMomentPanel({
            text sits on: the analyser read it as white on the light theme's
            page colour at 1.08:1, and it was right to — one failed paint and
            that is what a reader would get. */
-        className={`relative isolate min-h-[11rem] overflow-hidden rounded-2xl ${
-          onGlass ? "hero-glass" : "border border-border bg-on-media-surface"
+        className={`relative isolate min-h-[11rem] overflow-hidden ${
+          onGlass ? "border-b border-white/10" : "rounded-2xl border border-border bg-on-media-surface"
         }`}
         data-testid="prayer-moment-hero"
       >
@@ -228,8 +228,8 @@ export function PrayerMomentPanel({
           still be an invitation rather than a reward for one. */}
       {virtue && isLive && (
         <section
-          className={`flex flex-col justify-center rounded-2xl p-4 text-center ${
-            onGlass ? "hero-glass" : "border border-border bg-card"
+          className={`flex flex-col justify-center p-4 text-center ${
+            onGlass ? "border-b border-white/10" : "rounded-2xl border border-border bg-card"
           }`}
           data-testid="prayer-moment-virtue"
         >
@@ -271,7 +271,7 @@ export function PrayerMomentPanel({
           each card. Every control and every test id is the one that was here
           before: this is the same behaviour, arranged. */}
       <section
-        className={`rounded-2xl p-4 md:col-span-2 ${onGlass ? "hero-glass" : "border border-border bg-card"}`}
+        className={`p-4 md:col-span-2 ${onGlass ? "" : "rounded-2xl border border-border bg-card"}`}
         data-testid="prayer-journey"
         aria-labelledby="prayer-journey-title"
       >
@@ -288,7 +288,7 @@ export function PrayerMomentPanel({
           {/* Where it was prayed. Two choices rather than one tick, so "at
               home" is a recorded answer instead of the absence of one. */}
           <li
-            className={`relative flex items-start gap-3 border-t py-3.5 first:border-t-0 first:pt-0 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+            className={`relative flex items-start gap-3 border-t py-3.5 first:border-t-0 first:pt-0 ${hairline}`}
             data-testid="prayer-action-location"
           >
             {/* One answer, not a choice of two places. Whether the prayer was
@@ -303,9 +303,8 @@ export function PrayerMomentPanel({
               checked={moment.location === "mosque"}
               onChange={(event) => onToggle(prayer, "location", event.currentTarget.checked ? "mosque" : null)}
               aria-labelledby="prayer-mosque-title"
-              className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+              className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
             />
-            <TrackingCheckMark checked={moment.location === "mosque"} />
             <div className="min-w-0 flex-1">
               <p id="prayer-mosque-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
                 <span className={bodyText}>{formatNumerals(1, language)}. </span>
@@ -317,11 +316,12 @@ export function PrayerMomentPanel({
                   : t(language, "prayerMoment.mosquePrompt")}
               </p>
             </div>
+            <TrackingCheckMark checked={moment.location === "mosque"} />
           </li>
 
           {/* The adhkar that follow the prayer. */}
           <li
-            className={`relative flex items-start gap-3 border-t py-3.5 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+            className={`relative flex items-start gap-3 border-t py-3.5 ${hairline}`}
             data-testid="prayer-action-prayer-adhkar"
           >
             <input
@@ -330,9 +330,8 @@ export function PrayerMomentPanel({
               checked={moment.adhkarDone}
               onChange={(event) => onToggle(prayer, "adhkar", event.currentTarget.checked)}
               aria-labelledby="prayer-adhkar-title"
-              className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+              className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
             />
-            <TrackingCheckMark checked={moment.adhkarDone} />
             <div className="min-w-0 flex-1">
               <p id="prayer-adhkar-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
                 <span className={bodyText}>{formatNumerals(2, language)}. </span>
@@ -342,6 +341,7 @@ export function PrayerMomentPanel({
                 {t(language, "prayerMoment.journeyStepAdhkarDetail")}
               </p>
             </div>
+            <TrackingCheckMark checked={moment.adhkarDone} />
           </li>
 
           {/* The rawātib. Absent for a prayer that has none rather than shown
@@ -350,7 +350,7 @@ export function PrayerMomentPanel({
               in. */}
           {sunnah && moment.sunnahFocus && (
             <li
-              className={`relative flex items-start gap-3 border-t py-3.5 focus-within:ring-[3px] focus-within:ring-ring ${hairline}`}
+              className={`relative flex items-start gap-3 border-t py-3.5 ${hairline}`}
               data-testid="prayer-action-prayer-sunnah"
             >
               <input
@@ -359,9 +359,8 @@ export function PrayerMomentPanel({
                 checked={moment.sunnahDone}
                 onChange={(event) => onToggle(prayer, "sunnah", event.currentTarget.checked)}
                 aria-labelledby="prayer-sunnah-title"
-                className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
+                className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-xl opacity-0"
               />
-              <TrackingCheckMark checked={moment.sunnahDone} />
               <div className="min-w-0 flex-1">
                 <p id="prayer-sunnah-title" className={`text-subtitle font-black ${titleText}`} dir="auto">
                   <span className={bodyText}>{formatNumerals(3, language)}. </span>
@@ -387,6 +386,7 @@ export function PrayerMomentPanel({
               >
                 <Info size={17} aria-hidden="true" />
               </button>
+              <TrackingCheckMark checked={moment.sunnahDone} />
             </li>
           )}
         </ol>

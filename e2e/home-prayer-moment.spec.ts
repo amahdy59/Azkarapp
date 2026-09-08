@@ -8,28 +8,27 @@ import { expect, test, type Page } from "@playwright/test";
  * the next adhan — Fajr is `now` until Dhuhr — so a card keyed on the phase
  * alone would sit on Home all day.
  */
-async function openHomeAt(page: Page, isoTime: string) {
+async function openHomeAt(page: Page, isoTime: string, language: "ar" | "en" = "en") {
   // Append +03:00 to ensure the time evaluates correctly relative to Africa/Cairo (the playwright timezoneId).
   await page.clock.setFixedTime(new Date(`${isoTime}+03:00`));
-  await page.addInitScript(() => {
+  await page.addInitScript((selectedLanguage) => {
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
     window.localStorage.setItem(
       "azkarapp.state.v1",
       JSON.stringify({
-        settings: { language: "en", themeMode: "midnight" },
+        settings: { language: selectedLanguage, themeMode: "midnight" },
         profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
         completed: { morning: [], evening: [], before_sleep: [] },
         sessions: [],
       }),
     );
-  });
+  }, language);
   await page.goto("/");
   await expect(page.getByRole("navigation").first()).toBeVisible({ timeout: 15000 });
 }
 
 test("the prayer card is on Home inside the window, and gone outside it", async ({ page }) => {
-  // Half an hour after the Dhuhr adhan: in the window.
-  await openHomeAt(page, "2026-09-05T13:30:00");
+  await openHomeAt(page, "2026-09-05T13:20:00");
   const card = page.getByTestId("home-prayer-moment");
   await expect(card).toBeVisible();
   await expect(card).toHaveAttribute("data-prayer", "dhuhr");
@@ -37,13 +36,26 @@ test("the prayer card is on Home inside the window, and gone outside it", async 
   // Its parts are the prayer screen's, not a second copy of them.
   await expect(card.getByTestId("prayer-moment-hero")).toBeVisible();
   await expect(card.getByTestId("prayer-action-location")).toBeVisible();
+
+  const strip = page.getByTestId("home-prayer-strip");
+  await expect(strip).toBeVisible();
+  expect(
+    await strip.evaluate((element) => {
+      const contextElement = document.querySelector('[data-testid="home-context-grid"]');
+      return Boolean(
+        contextElement && element.compareDocumentPosition(contextElement) & Node.DOCUMENT_POSITION_FOLLOWING,
+      );
+    }),
+  ).toBe(true);
+  await expect(card).toHaveClass(/hero-glass/);
+  await expect(card.locator(".hero-glass")).toHaveCount(0);
 });
 
 test("recording the prayer as congregational works without leaving Home", async ({ page }) => {
   /* This pressed one of two places, mosque or home. Recording "at home"
      changed no outcome — the palm and the day's path both count congregation —
      so the question is now the one that matters, asked once. */
-  await openHomeAt(page, "2026-09-05T13:30:00");
+  await openHomeAt(page, "2026-09-05T13:20:00");
   const card = page.getByTestId("home-prayer-moment");
   const mosque = card.getByTestId("prayer-action-location").locator("input[type=checkbox]");
   await expect(mosque).not.toBeChecked();
@@ -56,6 +68,17 @@ test("recording the prayer as congregational works without leaving Home", async 
   // reading the adhkar was never something to earn.
   await expect(card.getByTestId("prayer-open-adhkar")).toBeVisible();
   await expect(page).toHaveURL(/\/?$/);
+
+  // A recorded prayer confirms in place, then yields Home to its routine.
+  await page.clock.setFixedTime(new Date("2026-09-05T13:26:00+03:00"));
+  await page.evaluate(() => document.dispatchEvent(new Event("visibilitychange")));
+  await expect(card).toHaveCount(0);
+});
+
+test("the contextual prayer closes thirty minutes after the adhan", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:40:00");
+  await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
+  await expect(page.getByTestId("home-prayer-strip")).toBeVisible();
 });
 
 test("a quiet stretch between prayers keeps Home to the compact five", async ({ page }) => {
@@ -76,7 +99,7 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
  * with the hour it ran. This holds the case at every hour.
  */
 test("each control on the card owns its own centre", async ({ page }) => {
-  await openHomeAt(page, "2026-09-05T13:30:00");
+  await openHomeAt(page, "2026-09-05T13:20:00");
   const card = page.getByTestId("home-prayer-moment");
   await expect(card).toBeVisible();
 
@@ -107,7 +130,7 @@ test("each control on the card owns its own centre", async ({ page }) => {
  * place the app quotes its evidence.
  */
 test("the virtue is in English for an English reader, and marked as English", async ({ page }) => {
-  await openHomeAt(page, "2026-09-05T13:30:00");
+  await openHomeAt(page, "2026-09-05T13:20:00");
   const virtue = page.getByTestId("home-prayer-moment").getByTestId("prayer-moment-virtue");
   await expect(virtue).toBeVisible();
 
@@ -115,4 +138,30 @@ test("the virtue is in English for an English reader, and marked as English", as
   await expect(narration).toHaveAttribute("lang", "en");
   await expect(narration).toHaveAttribute("dir", "ltr");
   await expect(narration).toContainText(/congregation|prayers|mosque|Paradise/i);
+});
+
+test("tracking uses a circular keyboard focus indicator and mirrors in RTL", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:20:00", "ar");
+  const row = page.getByTestId("prayer-action-location");
+  const input = row.locator("input[type=checkbox]");
+  const indicator = row.locator(".tracking-check");
+  const copy = row.locator("div").first();
+
+  await input.click();
+  expect(await input.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
+  await input.click();
+  await expect(indicator).not.toHaveAttribute("data-checked");
+  await page.waitForTimeout(250);
+  expect(await indicator.evaluate((element) => getComputedStyle(element).boxShadow)).toBe("none");
+
+  await page.keyboard.press("Tab");
+  await input.focus();
+  expect(await input.evaluate((element) => getComputedStyle(element).outlineStyle)).toBe("none");
+  expect(await indicator.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe("none");
+
+  const indicatorBox = await indicator.boundingBox();
+  const copyBox = await copy.boundingBox();
+  expect(indicatorBox).not.toBeNull();
+  expect(copyBox).not.toBeNull();
+  expect(indicatorBox!.x).toBeLessThan(copyBox!.x);
 });

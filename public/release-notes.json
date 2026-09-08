@@ -1,13 +1,15 @@
 {
-  "release": "2026-09-08.2",
+  "release": "2026-09-08.3",
   "ar": [
-    "أصبح ملخص الصلوات في الرئيسية أقصر وأسهل في المسح، مع بقاء الوقت والحالة ظاهرين لكل صلاة.",
-    "يمكن فتح تفاصيل أي صلاة مباشرة من بطاقتها الواضحة في الرئيسية.",
-    "تبقى إجراءات تسجيل الصلاة والسنن والأذكار في شاشة الصلاة وصفحة التقدم، لتقل الإجراءات المتنافسة في الرئيسية."
+    "تبقى الصلوات الخمس ظاهرة في أعلى الرئيسية مع الوقت والحالة وإمكانية فتح تفاصيل كل صلاة.",
+    "تظهر رحلة الصلاة الحالية في وقتها، ثم تفسح المجال لذكر الوقت بعد خمس دقائق من التسجيل أو ثلاثين دقيقة من الأذان.",
+    "عادت صورة الوقت خلف بطاقات الرئيسية، وأصبحت تفاصيل الصلاة ضمن سطح زجاجي واحد أكثر هدوءًا.",
+    "أصبح تحديد خطوات الصلاة واضحًا بدائرة تركيز مناسبة، مع محاذاة صحيحة في الواجهة العربية."
   ],
   "en": [
-    "The prayer summary on Home is shorter and easier to scan while keeping each prayer's time and state visible.",
-    "Each prayer's details remain one clear tap away from its Home card.",
-    "Prayer, sunnah, and adhkar recording stays in the focused prayer and Progress views, reducing competing actions on Home."
+    "All five prayers stay visible at the top of Home with their time, state, and a route to each prayer's details.",
+    "The current prayer journey appears when useful, then yields to the timely zikr five minutes after recording or thirty minutes after the adhan.",
+    "The time-of-day photograph is visible behind Home again, with prayer details gathered into one calmer glass surface.",
+    "Prayer-step selection now uses a clear circular focus indicator and mirrors correctly in Arabic."
   ]
 }

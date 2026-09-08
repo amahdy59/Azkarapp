@@ -141,15 +141,13 @@ describe("which prayer leads a screen", () => {
     expect(lead(midMorning)).toBeNull();
   });
 
-  it("keeps an unrecorded prayer ahead of the next one approaching", () => {
-    /* Maghrib and Isha sit close enough that both are live at once: Maghrib is
-       in and unrecorded while Isha is already approaching. The unanswered one
-       comes first — burying it under the next prayer's countdown is how a
-       prayer goes unrecorded. */
+  it("hands the screen to the next prayer once the previous prayer's window has closed", () => {
+    /* Maghrib is still technically the current period, but its focused
+       recording window has closed by the time Isha is approaching. */
     const beforeIsha = at(shift(timeOf("isha"), -10));
     expect(moment("maghrib", beforeIsha).phase).toBe("now");
     expect(moment("isha", beforeIsha).phase).toBe("approaching");
-    expect(lead(beforeIsha)?.prayer).toBe("maghrib");
+    expect(lead(beforeIsha)?.prayer).toBe("isha");
   });
 
   it("hands the screen to the prayer ahead once the current one is recorded", () => {
@@ -164,10 +162,38 @@ describe("which prayer leads a screen", () => {
   it("stays with a prayer just recorded, because its adhkar and rawatib follow", () => {
     const afterIsha = at(shift(timeOf("isha"), 15));
     const records: PrayerTrackingRecord[] = [
-      { dayKey: DAY, prayer: "isha", mosque: true, adhkar: false, location: "mosque" },
+      {
+        dayKey: DAY,
+        prayer: "isha",
+        mosque: true,
+        adhkar: false,
+        location: "mosque",
+        updatedAt: afterIsha.toISOString(),
+      },
     ];
     const led = lead(afterIsha, records);
     expect(led?.prayer).toBe("isha");
     expect(led?.location).toBe("mosque");
+  });
+
+  it("clears a recorded prayer after its five-minute confirmation grace", () => {
+    const afterIsha = at(shift(timeOf("isha"), 15));
+    const recordedAt = new Date(afterIsha.getTime() - 6 * 60_000);
+    const records: PrayerTrackingRecord[] = [
+      {
+        dayKey: DAY,
+        prayer: "isha",
+        mosque: true,
+        adhkar: false,
+        location: "mosque",
+        updatedAt: recordedAt.toISOString(),
+      },
+    ];
+    expect(lead(afterIsha, records)).toBeNull();
+  });
+
+  it("clears an unrecorded prayer thirty minutes after its adhan", () => {
+    const halfHourAfterIsha = at(shift(timeOf("isha"), 30));
+    expect(lead(halfHourAfterIsha)).toBeNull();
   });
 });

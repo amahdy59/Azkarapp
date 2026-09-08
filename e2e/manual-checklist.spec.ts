@@ -407,9 +407,14 @@ test("keyboard: the core flow is reachable with a visible focus indicator and no
       // control, and it is unaffected.
       el.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "instant" });
       const style = getComputedStyle(el);
+      const visualFocusTarget = el.classList.contains("tracking-choice")
+        ? el.parentElement?.querySelector<HTMLElement>(".tracking-check")
+        : null;
+      const visualFocusStyle = visualFocusTarget ? getComputedStyle(visualFocusTarget) : null;
       const rect = el.getBoundingClientRect();
       const hasOutline = style.outlineStyle !== "none" && parseFloat(style.outlineWidth || "0") > 0;
-      const hasShadowRing = style.boxShadow !== "none";
+      const hasShadowRing =
+        style.boxShadow !== "none" || Boolean(visualFocusStyle && visualFocusStyle.boxShadow !== "none");
       return {
         key: `${el.tagName}:${el.getAttribute("data-testid") ?? el.textContent?.trim().slice(0, 24) ?? ""}`,
         visible: hasOutline || hasShadowRing,

@@ -191,11 +191,14 @@ export function getPrayerMoment({
  * The `now` phase cannot answer this on its own: it lasts until the next
  * prayer, so Fajr is `now` for the seven hours until Dhuhr, and a screen led by
  * the phase alone would carry a prayer card all day — which is the opposite of
- * showing it when it matters. Ninety minutes covers praying, the adhkar that
- * follow and the rawatib, and it leaves the gaps between prayers to the compact
- * five.
+ * showing it when it matters. Thirty minutes leaves a calm opportunity to
+ * record the prayer without letting the contextual card occupy Home between
+ * prayer moments.
  */
-export const LEADING_WINDOW_MINUTES = 90;
+export const LEADING_WINDOW_MINUTES = 30;
+
+/** Keep a newly recorded prayer visible long enough to confirm the result. */
+export const RECORDED_GRACE_MINUTES = 5;
 
 export function getLeadingPrayerMoment(input: {
   now: Date;
@@ -204,11 +207,19 @@ export function getLeadingPrayerMoment(input: {
   location?: LocationSettings;
 }): PrayerMoment | null {
   const moments = PRAYER_NAMES.map((prayer) => getPrayerMoment({ ...input, prayer }));
-  const live = moments.filter(
-    (moment) =>
-      (moment.phase === "now" || moment.phase === "approaching" || moment.phase === "recorded") &&
-      moment.minutesUntil > -LEADING_WINDOW_MINUTES,
-  );
+  const live = moments.filter((moment) => {
+    if (moment.phase === "approaching") return true;
+    if (moment.minutesUntil <= -LEADING_WINDOW_MINUTES) return false;
+    if (moment.phase === "now") return true;
+    if (moment.phase !== "recorded") return false;
+
+    const updatedAt = recordFor(input.records, input.dayKey, moment.prayer)?.updatedAt;
+    if (!updatedAt) return false;
+
+    const recordedAt = new Date(updatedAt).getTime();
+    const ageMinutes = (input.now.getTime() - recordedAt) / 60_000;
+    return Number.isFinite(ageMinutes) && ageMinutes >= 0 && ageMinutes < RECORDED_GRACE_MINUTES;
+  });
   if (live.length === 0) return null;
 
   const unanswered = live.find((moment) => moment.phase === "now" && moment.location === null);

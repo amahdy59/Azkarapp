@@ -138,7 +138,7 @@ function TrackingCheckbox({
         checked={checked}
         disabled={disabled}
         onChange={(event) => onChange(event.currentTarget.checked)}
-        className="peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
+        className="tracking-choice peer absolute inset-0 m-0 h-full w-full cursor-pointer appearance-none rounded-2xl opacity-0 disabled:cursor-not-allowed"
       />
       <span className="pointer-events-none flex min-w-0 flex-col text-start">
         <span className={`truncate text-label font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}>
@@ -152,10 +152,9 @@ function TrackingCheckbox({
           </span>
         )}
       </span>
-      {/* No focus ring here: the input covers the row and is the element
-          that actually receives focus, so the global :focus-visible outline
-          already draws one around the whole 48px target. A ring on this
-          circle as well produced two indicators for one control. */}
+      {/* Keyboard focus is drawn on this visible circle. The transparent input
+          still owns the full row-sized pointer target without painting a
+          rectangular outline around an invisible box. */}
       {/* Gold, matching the rest of the theme. The earlier rule reserved gold
           for temporal status and gave completion blue; that is overridden here
           by an explicit product decision. The two never collide in practice —
@@ -296,7 +295,11 @@ function PrayerCard({
           {statusLabel(language, state)}
         </span>
         {countdown && state === "next" && (
-          <span data-testid="next-prayer" className="text-xs font-bold text-primary" dir="auto">
+          <span
+            data-testid="next-prayer"
+            className={`text-xs font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+            dir="auto"
+          >
             {countdown}
           </span>
         )}

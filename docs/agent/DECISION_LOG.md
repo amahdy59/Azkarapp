@@ -3420,6 +3420,39 @@ null` shape, so a record written before this change still loads and still
   `Building`, `Home`, `Lock` and `chipIdle` became unreachable, which is the
   evidence the option is genuinely gone rather than merely hidden.
 
+## DEC-161 — stable prayer navigation above a time-bounded contextual card
+
+- **Decision:** restore the five-prayer summary as the stable first layer of
+  Home, keep the current-prayer journey directly beneath it only while timely,
+  and render that journey as one glass card over the page photograph.
+- **This supersedes DEC-160 only where it removed the times strip.** The user
+  explicitly requires the five prayer items to remain available. The restored
+  component is the existing summary anatomy—time, state, and navigation—not a
+  duplicate set of tracking controls.
+- **The contextual window is deliberate:** it begins in the existing
+  twenty-minute approach, closes thirty minutes after the adhan when
+  unrecorded, and closes five minutes after a congregational record. The short
+  confirmation grace prevents the card vanishing under the reader's pointer;
+  the hard thirty-minute ceiling prevents stale prayer UI occupying the group
+  zikr routine's space.
+- **Glass has one owner.** Home's prayer wrapper carries `hero-glass`; the
+  prayer scene, virtue, journey, and final action are sections separated by
+  hairlines. Nested glass surfaces are prohibited. Reduced transparency keeps
+  the existing opaque fallback.
+- **Focus follows the visible control.** The transparent native checkbox still
+  owns the full row-sized hit target, but keyboard focus is painted on its
+  circular indicator. Pointer selection must not draw a rectangle around the
+  invisible input. In RTL, the copy stays at logical start and the check stays
+  at logical end.
+- **The time-of-day photograph is protected.** It sits at `z-0` inside an
+  isolated Home stacking context, with application content above it. A negative
+  layer behind Home's opaque root is not permitted because it silently hides
+  the image while leaving the image element technically loaded.
+- **Tests/evidence required:** pure timing boundaries; Home DOM order; one
+  glass owner; focus geometry; Arabic trailing check placement; image stacking;
+  reduced-transparency, forced-colors, contrast, responsive, and full release
+  gates.
+
 ### DEC-015 - Target Sizes in Dense UI Contexts
 
 - **Date:** 2026-09-07

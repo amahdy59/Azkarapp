@@ -645,7 +645,7 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="!bg-on-media-surface px-0 pt-0 relative overflow-hidden flex flex-col"
+      className="relative isolate flex flex-col overflow-hidden !bg-on-media-surface px-0 pt-0"
       style={{ paddingTop: 0 }}
       screenName={t(language, "home.title")}
     >
@@ -657,7 +657,7 @@ export function HomeScreen({
         tabIndex={0}
         role="region"
         aria-label={t(language, "home.title")}
-        className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
+        className="relative z-10 min-h-0 flex-1 overflow-y-auto overflow-x-hidden pb-24 pt-0 outline-none focus-visible:ring-1 focus-visible:ring-ring/40"
         onScroll={(event) => setHasScrolledHomeContent(event.currentTarget.scrollTop > 4)}
       >
         {/* Sticky Header Overlay */}
@@ -724,6 +724,23 @@ export function HomeScreen({
           <div data-testid="home-hero" className="relative isolate w-full pt-16 sm:mx-auto sm:max-w-[64rem]">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
+                {/* The five daily prayers are the stable navigation and status
+                    layer. Context below may change with time; this strip does
+                    not move or disappear. */}
+                <div data-testid="home-prayer-strip" className="w-full max-w-full overflow-hidden">
+                  <PrayerTrackerCards
+                    models={prayerCardModels}
+                    language={language}
+                    direction={direction}
+                    records={prayerTracking}
+                    dayKey={getProgressDayKey(now, progressDayStartHour)}
+                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                    onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
+                    onGlass
+                    summaryOnly
+                  />
+                </div>
+
                 <div
                   data-testid="home-context-grid"
                   className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5"
@@ -748,7 +765,7 @@ export function HomeScreen({
                           data-prayer={leadingPrayer.prayer}
                           dir={direction}
                           aria-label={t(language, "prayerMoment.homeTitle")}
-                          className="flex h-full flex-col gap-3"
+                          className="hero-glass flex h-full flex-col overflow-hidden rounded-3xl"
                         >
                           <PrayerMomentPanel
                             prayer={leadingPrayer.prayer}
@@ -769,7 +786,7 @@ export function HomeScreen({
                               type="button"
                               onClick={() => onPrayerResume(leadingPrayer.prayer)}
                               data-testid="home-open-prayer-screen"
-                              className="hero-glass flex min-h-12 w-full items-center justify-center gap-2 rounded-2xl px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                              className="flex min-h-12 w-full items-center justify-center gap-2 border-t border-white/10 px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
                             >
                               {t(language, "prayerMoment.dayTitle")}
                             </button>
@@ -830,20 +847,6 @@ export function HomeScreen({
                       />
                     </div>
                   )}
-                </div>
-
-                <div className="mt-2 w-full max-w-full overflow-hidden">
-                  <PrayerTrackerCards
-                    models={prayerCardModels}
-                    language={language}
-                    direction={direction}
-                    records={prayerTracking}
-                    dayKey={getProgressDayKey(now, progressDayStartHour)}
-                    onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
-                    onGlass
-                    summaryOnly
-                  />
                 </div>
               </div>
             )}
