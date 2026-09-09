@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-09",
+  "release": "2026-09-09.1",
   "ar": [
-    "عاد الشريط الجانبي للظهور دائمًا على الشاشات المكتبية دون أن تغطيه صورة الرئيسية.",
-    "أصبحت بطاقتا السياق في الرئيسية متساويتين على سطح المكتب، مع توزيع مرن يمنع القص أو الفراغ غير المتوازن.",
-    "تظهر الصلوات الخمس في صف كامل بلا تمرير أفقي على سطح المكتب، وتبقى سهلة التصفح على الهاتف والجهاز اللوحي.",
-    "أصبحت جميع بطاقات الرئيسية تستخدم مظهرًا زجاجيًا موحدًا وواضحًا مع دعم تقليل الشفافية."
+    "يظل زر الاستماع إلى سورة الكهف جاهزًا حتى أثناء تهيئة مشغل الصوت على الأجهزة البطيئة.",
+    "أصبحت صفحات المصحف التالية تُحضّر مبكرًا وتنتقل بحركة أقصر وأكثر سلاسة.",
+    "تظهر السور القصيرة بنصها القرآني الواضح بلا إطار زخرفي، وتبدأ معاني الكلمات متوقفة.",
+    "تحسّن انتظام أسطر الصفحات الافتتاحية ومحاذاة نص الآية وأوامرها في العربية والإنجليزية."
   ],
   "en": [
-    "The labeled sidebar now stays visible on desktop without being covered by the Home photograph.",
-    "Home's two contextual cards now share desktop space equally with fluid sizing that prevents clipping and uneven empty space.",
-    "All five prayers fit in one desktop row without horizontal scrolling while remaining easy to browse on phone and tablet.",
-    "Every Home card now uses one consistent, legible glass treatment with reduced-transparency support."
+    "Al-Kahf's listen action now stays ready while the audio player initializes on slower devices.",
+    "Upcoming Mushaf pages now warm earlier and turn with a shorter, crisper transition.",
+    "Short surahs now show clean canonical Quran text without an ornamental frame, with word meanings off initially.",
+    "Opening-page line rhythm and ayah-action alignment are now more consistent in Arabic and English."
   ]
 }

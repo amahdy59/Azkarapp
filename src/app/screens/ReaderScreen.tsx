@@ -255,7 +255,7 @@ export function ReaderScreen({
   }, [onMushafModeChange, showMushaf]);
   const [benefitOpen, setBenefitOpen] = useState(false);
   const [hasOpenedBenefit, setHasOpenedBenefit] = useState(false);
-  const [showDifficultWords, setShowDifficultWords] = useState(true);
+  const [showDifficultWords, setShowDifficultWords] = useState(false);
   const [shareMessage, setShareMessage] = useState("");
   const [isSharing, setIsSharing] = useState(false);
   const [wordMeaningSelection, setWordMeaningSelection] = useState<WordMeaningSelection | null>(null);
@@ -610,13 +610,15 @@ export function ReaderScreen({
     <article
       className={`mt-1 w-full px-4 pb-2 pt-2 flex flex-col items-center justify-center text-center bg-transparent ${longSurah ? "" : "cursor-pointer touch-manipulation transition-colors hover:bg-muted/10 active:bg-muted/20 my-auto"}`}
     >
-      {/* A short surah gets its identity back: which surah, where it was
-          revealed, how many ayat — and the Mushaf's rule around the passage, so
-          it stops reading as a paragraph of dua. Long surahs are excluded
-          because they open the Mushaf view, which has the real page frame. */}
+      {/* Short surahs keep their canonical Quran identity and text, without a
+          decorative card competing with the passage. Long surahs open in the
+          Mushaf view instead. */}
       {showSurahChrome && <QuranSurahHeader zikr={z} language={language} />}
 
-      <div className={showSurahChrome ? "quran-passage w-full" : "contents"}>
+      <div
+        className={showSurahChrome ? "w-full max-w-[42rem]" : "contents"}
+        data-testid={showSurahChrome ? "canonical-surah-passage" : undefined}
+      >
         {z.isSurah && <QuranPrelude zikr={z} className="pointer-events-none mb-4" />}
 
         {wordMeanings.length > 0 ? (

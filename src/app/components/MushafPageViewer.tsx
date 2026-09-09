@@ -1,7 +1,5 @@
 import {
-  lazy,
   memo,
-  Suspense,
   useCallback,
   useEffect,
   useLayoutEffect,
@@ -23,8 +21,6 @@ import { shouldReduceMotion } from "../motionPreferences";
 import { MushafSurahHeaderArt } from "./MushafSurahHeaderArt";
 import { MushafBismillahArt } from "./MushafBismillahArt";
 import { SURAH_PLACEMENTS } from "../content/mushafSurahPlacements";
-
-const MushafOpeningFrameArt = lazy(() => import("./MushafOpeningFrameArt"));
 
 export interface MushafWordToken {
   verseKey: string;
@@ -742,24 +738,14 @@ function MushafPageCanvas({
       data-mushaf-page={pageNumber}
     >
       {isOpening ? (
-        /* The frame and the verses are one object: the wrapper carries the
-           inset both of them measure from, and sits inside the canvas so the
-           container units in it resolve against the page. */
+        /* Opening pages keep their larger canonical line geometry, but the
+           interface decoration stays out of the reading. Equal grid tracks
+           make every line gap deterministic at every viewport ratio. */
         <div className="mushaf-opening absolute inset-0">
-          <Suspense fallback={null}>
-            <MushafOpeningFrameArt
-              pageNumber={pageNumber}
-              className="absolute inset-0 h-full w-full pointer-events-none select-none z-0"
-            />
-          </Suspense>
-          {/* The verses sit inside the panel the frame draws, against the same
-              inset it uses, plus a margin of its own — the old 4%/6% box was a
-              guess at where the drawing ended and crossed the gilt on a narrow
-              page. */}
           <div
-            className="absolute z-10 flex flex-col items-center justify-between text-center"
+            className="mushaf-opening__content absolute inset-0 z-10 flex flex-col items-center text-center"
+            data-testid="mushaf-opening-content"
             style={{
-              inset: "calc(var(--mushaf-opening-inset, 1rem) * 3.1)",
               fontFamily: useQcfGlyphs ? `qcf-v2-page-${pageNumber}, var(--font-mushaf)` : "var(--font-mushaf)",
               // No --mushaf-fit here: the pair shares one size (see useLineFitter).
               fontSize: useQcfGlyphs ? "min(6.1cqi, 6.1cqh)" : "min(5.0cqi, 5.4cqh)",
@@ -774,7 +760,12 @@ function MushafPageCanvas({
               </div>
             )}
             {/* Verses */}
-            <div className="w-full flex-1 flex flex-col justify-evenly items-center min-h-0 py-1">
+            <div
+              className="grid w-full flex-1 items-stretch min-h-0 py-1"
+              style={{
+                gridTemplateRows: `repeat(${lineDetails.filter((line) => line.type === "text").length}, minmax(0, 1fr))`,
+              }}
+            >
               {lineDetails
                 .filter((line): line is { type: "text"; words: MushafWordToken[] } => line.type === "text")
                 .map((line, lineIdx) => (
@@ -996,10 +987,10 @@ export function MushafPageViewer({
     }
     const animation = paper.animate(
       [
-        { opacity: 0.8, transform: `translateX(${pageTransitionDirection === "forward" ? "-22px" : "22px"})` },
+        { opacity: 0.9, transform: `translateX(${pageTransitionDirection === "forward" ? "-6px" : "6px"})` },
         { opacity: 1, transform: "translateX(0)" },
       ],
-      { duration: 180, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" },
+      { duration: 150, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" },
     );
     return () => animation.cancel();
   }, [facingPage?.pageNumber, pageNumber, pageTransitionDirection, paperRef, reduceMotion]);

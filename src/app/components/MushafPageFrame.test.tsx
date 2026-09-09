@@ -5,7 +5,6 @@ const viewer = readFileSync("src/app/components/MushafPageViewer.tsx", "utf8");
 const immersive = readFileSync("src/app/components/MushafImmersiveReader.tsx", "utf8");
 const layout = readFileSync("src/styles/theme/layout.css", "utf8");
 const tokens = readFileSync("src/styles/theme/tokens.css", "utf8");
-const art = readFileSync("src/app/components/MushafOpeningFrameArt.tsx", "utf8");
 
 describe("the Mushaf page frame", () => {
   it("draws no rule around the page — the paper alone marks its edge", () => {
@@ -16,34 +15,21 @@ describe("the Mushaf page frame", () => {
     expect(layout).not.toContain(".mushaf-page-rule");
   });
 
-  it("draws the illuminated opening in the Mushaf gold, not the interface accent", () => {
-    // The opening frame took its gilt from --accent and its second rule from
-    // --secondary, which are interface tokens: gold in one theme, and blue or
-    // violet in the colour-blind ones. Both are Mushaf tokens now, and the
-    // panel is paper rather than --card.
-    expect(tokens).toContain("--mushaf-rule-ink: #d4b47c");
-    expect(layout).toContain("--mushaf-opening-gilt: var(--mushaf-rule-ink, #d4b47c)");
-    const opening = layout.slice(layout.indexOf(".mushaf-opening {"), layout.indexOf(".mushaf-opening-frame__leaf"));
-    expect(opening).toContain("background: var(--mushaf-paper)");
-    expect(opening).not.toContain("var(--accent");
-    expect(opening).not.toContain("var(--secondary");
-    expect(opening).not.toContain("var(--card");
-  });
-
-  it("keeps the opening page-shaped and its ornament square at any ratio", () => {
-    // It was one 1200x1800 drawing stretched with preserveAspectRatio="none",
-    // so at 375x700 the corner leaves flattened by a fifth and the vertical
-    // rules drew thinner than the horizontal ones. The rules are boxes now, and
-    // the panel keeps the page's proportions instead of the viewport's.
+  it("keeps opening pages page-shaped, evenly spaced, and free of ornamental outlines", () => {
     const opening = layout.slice(layout.indexOf(".mushaf-opening {"), layout.indexOf(".mushaf-page-furniture"));
     expect(opening).toContain("aspect-ratio: 2 / 3");
-    expect(opening).toMatch(/\.mushaf-opening-frame__leaf[^}]*width: clamp\([^}]*cqmin/);
-    // The art is drawn by the component rather than fetched and injected, so
-    // the opening never appears unframed while a request is in flight.
-    expect(art).not.toContain("dangerouslySetInnerHTML");
-    expect(art).not.toContain("fetch(");
-    // Four leaves, one per physical corner, each a rotation of one shape.
-    expect((art.match(/rotate: /g) ?? []).length).toBe(4);
+    expect(opening).not.toContain("border:");
+    expect(opening).not.toContain("outline:");
+    expect(layout).not.toContain(".mushaf-opening-frame");
+    expect(viewer).not.toContain("MushafOpeningFrameArt");
+    expect(viewer).toContain("mushaf-opening__content");
+    expect(viewer).toContain("gridTemplateRows:");
+  });
+
+  it("uses the documented crisp page-turn distance and duration", () => {
+    expect(viewer).toContain('"-6px" : "6px"');
+    expect(viewer).toContain("duration: 150");
+    expect(viewer).not.toContain('"-22px" : "22px"');
   });
 
   it("gives the type generous room to sit inside the paper's edge", () => {

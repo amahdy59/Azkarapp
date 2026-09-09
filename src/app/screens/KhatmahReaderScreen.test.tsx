@@ -321,7 +321,7 @@ describe("KhatmahReaderScreen facing pages", () => {
     expect([...canvases].every((canvas) => canvas.classList.contains("mushaf-spread__page"))).toBe(true);
   });
 
-  it("starts both facing-page loads together instead of waiting on one half", async () => {
+  it("starts both facing-page loads and their nearest neighbours together", async () => {
     resize(1440, 900);
     const requested: number[] = [];
     let release!: () => void;
@@ -339,7 +339,7 @@ describe("KhatmahReaderScreen facing pages", () => {
     );
 
     renderReader({ khatmahPage: 101 });
-    await waitFor(() => expect([...requested].sort((a, b) => a - b)).toEqual([101, 102]));
+    await waitFor(() => expect([...requested].sort((a, b) => a - b)).toEqual([100, 101, 102, 103]));
     release();
     await screen.findByRole("article", { name: "صفحتا ١٠١ و١٠٢" });
   });

@@ -90,7 +90,7 @@ export function AyahInteractionSheet({
   }
 
   const actionClass =
-    "flex min-h-14 w-full min-w-0 items-center justify-between gap-4 rounded-2xl px-5 py-3 text-start transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-55";
+    "flex min-h-14 w-full min-w-0 items-center justify-start gap-3 rounded-2xl px-5 py-3 text-start transition-colors hover:bg-secondary/60 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring disabled:cursor-wait disabled:opacity-55";
 
   return (
     <ResponsiveSheet
@@ -123,7 +123,7 @@ export function AyahInteractionSheet({
 
         <div className="mx-5 mb-3 max-h-36 overflow-y-auto rounded-xl bg-muted/55 px-4 py-3">
           {text ? (
-            <p className="zikr-text text-end text-xl leading-9" lang="ar" dir="rtl">
+            <p className="zikr-text text-start text-xl leading-9" lang="ar" dir="rtl" data-testid="ayah-sheet-text">
               {text}
             </p>
           ) : (
@@ -135,7 +135,6 @@ export function AyahInteractionSheet({
 
         <div className="flex flex-col gap-1 px-3">
           <button type="button" onClick={() => void handleCopy()} className={actionClass} disabled={!text}>
-            <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
               {copied ? (
                 <Check size={18} className="text-primary" aria-hidden="true" />
@@ -143,6 +142,7 @@ export function AyahInteractionSheet({
                 <Copy size={18} aria-hidden="true" />
               )}
             </span>
+            <span className="font-semibold">{t(language, "reader.copyAyah")}</span>
           </button>
 
           <button
@@ -156,19 +156,19 @@ export function AyahInteractionSheet({
             }}
             className={actionClass}
           >
-            <span className="font-semibold">
-              {t(language, isBookmarked ? "reader.removeAyahBookmark" : "reader.bookmarkAyah")}
-            </span>
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
               <Bookmark size={18} className={isBookmarked ? "fill-primary text-primary" : ""} aria-hidden="true" />
+            </span>
+            <span className="font-semibold">
+              {t(language, isBookmarked ? "reader.removeAyahBookmark" : "reader.bookmarkAyah")}
             </span>
           </button>
 
           <button type="button" onClick={() => void handleShare()} className={actionClass} disabled={!text}>
-            <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
             <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-secondary text-foreground">
               <Share2 size={18} aria-hidden="true" />
             </span>
+            <span className="font-semibold">{t(language, "reader.shareAyah")}</span>
           </button>
         </div>
 

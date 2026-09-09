@@ -36,3 +36,38 @@ test("Core Reader keeps the same stable zikr identity as its filtered routine", 
   await expect(reader).toHaveAttribute("data-zikr-id", "m-hm-75");
   expect(await page.evaluate(() => (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls)).toBe(0);
 });
+
+test("Al-Kahf queues an intentional listen press while the audio module loads", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "ar", themeMode: "midnight", forceRtl: false, reduceMotion: true },
+        profile: { displayName: "Guest", lastPhoneNumber: "", isGuest: true },
+        completed: { morning: [], evening: [], before_sleep: [], friday_kahf: [] },
+        sessions: [],
+      }),
+    );
+    Object.defineProperty(window, "__audioPlayCalls", { value: 0, writable: true });
+    HTMLMediaElement.prototype.play = function () {
+      (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls += 1;
+      return Promise.resolve();
+    };
+  });
+
+  await page.route("**/assets/audio-*.js", async (route) => {
+    await new Promise((resolve) => setTimeout(resolve, 2_000));
+    await route.continue();
+  });
+  await page.goto("/#/azkar/friday-kahf/1");
+  await expect(page.getByTestId("mushaf-immersive")).toBeVisible();
+
+  const listen = page.getByTestId("mushaf-rail-listen");
+  await expect(listen).toBeEnabled();
+  await listen.click();
+  await expect(listen).toHaveAttribute("aria-busy", "true");
+  await expect
+    .poll(() => page.evaluate(() => (window as unknown as { __audioPlayCalls: number }).__audioPlayCalls))
+    .toBeGreaterThan(0);
+});

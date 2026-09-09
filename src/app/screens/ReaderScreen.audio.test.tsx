@@ -113,6 +113,9 @@ describe("ReaderScreen audio identity", () => {
     // Clear mock to test the next interaction
     onComplete.mockClear();
 
+    const meaningToggle = screen.getByRole("switch", { name: "تظليل الكلمات الغريبة" });
+    expect(meaningToggle).toHaveAttribute("aria-checked", "false");
+    fireEvent.click(meaningToggle);
     const difficultWord = screen.getAllByTestId("quran-word-help")[0]!;
     fireEvent.click(difficultWord);
     // A tap answers in place under the word; the full sheet is one step further.

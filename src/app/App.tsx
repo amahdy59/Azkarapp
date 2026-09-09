@@ -167,11 +167,13 @@ const AudioContentReviewScreen = lazy(() =>
 // ─── Root App ─────────────────────────────────────────────────────────────────
 function AppContent({
   audioController,
+  audioModuleLoading,
   buildPlaybackPlan,
   getAudioCoverage,
 }: {
   /** `null` until the lazily-loaded audio chunk reports its controller. */
   audioController: AudioController | null;
+  audioModuleLoading: boolean;
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
@@ -974,7 +976,18 @@ function AppContent({
     ].includes(view);
   const azkar = activeAzkarList;
   const activeZikr = azkar[activeIdx];
-  const activeZikrHasAudio = activeZikr && getAudioCoverage ? getAudioCoverage([activeZikr]).available === 1 : false;
+  const [queuedAudioZikrId, setQueuedAudioZikrId] = useState<string | null>(null);
+  /**
+   * A reviewed assignment is enough to expose the listen action while the
+   * lazy audio chunk is still arriving. Treating that short interval as
+   * "unavailable" made Al-Kahf's only approved recording look broken on slow
+   * mobile/PWA starts. Once loaded, the manifest remains the source of truth.
+   */
+  const activeZikrHasAudio = activeZikr
+    ? getAudioCoverage
+      ? getAudioCoverage([activeZikr]).available === 1
+      : audioModuleLoading && Boolean(activeZikr.audioAssetId)
+    : false;
 
   /**
    * The active zikr's own playback status, or "idle" when the player is
@@ -983,22 +996,37 @@ function AppContent({
    * player can never disagree about what is playing.
    */
   const activeZikrAudioStatus: AudioStatus = (() => {
+    if (activeZikr && queuedAudioZikrId === activeZikr.id) return "loading";
     if (!audioController || !activeZikr) return "idle";
     const plan = audioController.state.plan;
     const playingZikrId = plan?.entries[audioController.state.entryIndex]?.zikrId;
     return playingZikrId === activeZikr.id ? audioController.state.status : "idle";
   })();
 
-  const startAudio = (items: typeof azkar, source: "single" | "full-session", repeatPrescribed = false) => {
-    if (!audioController || !buildPlaybackPlan) return false;
-    const plan = buildPlaybackPlan({
-      zikrs: items,
-      context: { category: activeCat, routineMode: activeRoutineMode, source },
-      mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
-      preferences: audioController.preferences,
-    });
-    return audioController.startPlan(plan);
-  };
+  const startAudio = useCallback(
+    (items: typeof azkar, source: "single" | "full-session", repeatPrescribed = false) => {
+      if (!audioController || !buildPlaybackPlan) return false;
+      const plan = buildPlaybackPlan({
+        zikrs: items,
+        context: { category: activeCat, routineMode: activeRoutineMode, source },
+        mode: repeatPrescribed ? "repeat-prescribed-count" : "play-once",
+        preferences: audioController.preferences,
+      });
+      return audioController.startPlan(plan);
+    },
+    [activeCat, activeRoutineMode, audioController, buildPlaybackPlan],
+  );
+
+  useEffect(() => {
+    if (!queuedAudioZikrId) return;
+    if (!activeZikr || queuedAudioZikrId !== activeZikr.id) {
+      setQueuedAudioZikrId(null);
+      return;
+    }
+    if (!audioController || !buildPlaybackPlan) return;
+    void startAudio([activeZikr], "single");
+    setQueuedAudioZikrId(null);
+  }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, startAudio]);
 
   /**
    * One control for the whole listen cycle: start the surah the first time,
@@ -1007,7 +1035,11 @@ function AppContent({
    * controller, so either can pick up where the other left off.
    */
   const toggleActiveZikrAudio = () => {
-    if (!activeZikr || !audioController) return;
+    if (!activeZikr || !activeZikrHasAudio) return;
+    if (!audioController || !buildPlaybackPlan) {
+      setQueuedAudioZikrId(activeZikr.id);
+      return;
+    }
     if (activeZikrAudioStatus === "playing" || activeZikrAudioStatus === "buffering") {
       audioController.pause();
       return;
@@ -1929,12 +1961,18 @@ function AppContent({
 export default function App() {
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
+  const [audioModuleLoading, setAudioModuleLoading] = useState(true);
 
   useEffect(() => {
     let cancelled = false;
-    loadAudioModule().then((loaded) => {
-      if (!cancelled) setAudioModule(loaded);
-    });
+    loadAudioModule()
+      .then((loaded) => {
+        if (!cancelled) setAudioModule(loaded);
+      })
+      .catch((error) => reportError(error, "audio-module-load"))
+      .finally(() => {
+        if (!cancelled) setAudioModuleLoading(false);
+      });
     return () => {
       cancelled = true;
     };
@@ -1944,6 +1982,7 @@ export default function App() {
     <>
       <AppContent
         audioController={audioController}
+        audioModuleLoading={audioModuleLoading}
         buildPlaybackPlan={audioModule?.buildPlaybackPlan ?? null}
         getAudioCoverage={audioModule?.getAudioCoverage ?? null}
       />

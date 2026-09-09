@@ -228,15 +228,13 @@ export function injectFontFaceRule(page: number) {
   injectedStyles.add(page);
   const family = getQcfFontFamily(page);
   const primaryUrl = getQcfFontUrl(page);
-  const secondaryUrl = `https://quran.com/fonts/quran/hafs/v2/woff2/p${page}.woff2`;
 
   const style = document.createElement("style");
   style.setAttribute("data-qcf-page", String(page));
   style.textContent = `
     @font-face {
       font-family: '${family}';
-      src: url('${primaryUrl}') format('woff2'),
-           url('${secondaryUrl}') format('woff2');
+      src: url('${primaryUrl}') format('woff2');
       font-display: swap;
     }
   `;
@@ -246,28 +244,16 @@ export function injectFontFaceRule(page: number) {
 async function createFontFace(page: number): Promise<FontFace> {
   const family = getQcfFontFamily(page);
   const primaryUrl = getQcfFontUrl(page);
-  const secondaryUrl = `https://quran.com/fonts/quran/hafs/v2/woff2/p${page}.woff2`;
   const cache = await openFontCache();
 
   if (cache) {
     try {
       let response = await cache.match(primaryUrl);
       if (!response) {
-        response = await cache.match(secondaryUrl);
-      }
-      if (!response) {
-        try {
-          const network = await fetch(primaryUrl);
-          if (network.ok) {
-            await cache.put(primaryUrl, network.clone());
-            response = network;
-          }
-        } catch {
-          const fallbackNet = await fetch(secondaryUrl);
-          if (fallbackNet.ok) {
-            await cache.put(primaryUrl, fallbackNet.clone());
-            response = fallbackNet;
-          }
+        const network = await fetch(primaryUrl);
+        if (network.ok) {
+          await cache.put(primaryUrl, network.clone());
+          response = network;
         }
       }
       if (response) return new FontFace(family, await response.arrayBuffer());
@@ -276,7 +262,7 @@ async function createFontFace(page: number): Promise<FontFace> {
     }
   }
 
-  return new FontFace(family, `url(${primaryUrl}), url(${secondaryUrl})`);
+  return new FontFace(family, `url(${primaryUrl})`);
 }
 
 type FontLoadListener = (page: number) => void;

@@ -32,6 +32,28 @@ describe("AyahInteractionSheet", () => {
     expect(onBookmark).toHaveBeenCalledOnce();
   });
 
+  it("keeps the Arabic ayah and each icon-label pair aligned to logical start", () => {
+    render(
+      <AyahInteractionSheet
+        isOpen
+        onClose={vi.fn()}
+        verseKey="2:255"
+        text="ٱللَّهُ لَآ إِلَـٰهَ إِلَّا هُوَ"
+        language="ar"
+        isBookmarked={false}
+        onBookmark={vi.fn()}
+      />,
+    );
+
+    const ayah = screen.getByTestId("ayah-sheet-text");
+    expect(ayah).toHaveClass("text-start");
+    expect(ayah).not.toHaveClass("text-end");
+
+    const copy = screen.getByRole("button", { name: "نسخ الآية" });
+    expect(copy).toHaveClass("justify-start");
+    expect(copy.firstElementChild).toHaveClass("rounded-full");
+  });
+
   it("disables text actions until canonical text has loaded", () => {
     render(
       <AyahInteractionSheet

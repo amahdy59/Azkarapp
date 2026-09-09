@@ -22,6 +22,7 @@ async function openKahf(page: Page) {
   await page.goto("/#/azkar/friday-kahf/1");
   await expect(page.getByTestId("reader-screen")).toBeVisible();
   await leaveMushaf(page);
+  await page.getByRole("switch", { name: /الكلمات الغريبة/ }).click();
 }
 
 /**

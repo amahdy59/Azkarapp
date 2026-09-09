@@ -355,6 +355,7 @@ test("the full reader canvas counts taps while controls and the reference sheet 
 test("full surahs count only from the counter and expose sourced difficult-word help", async ({ page }) => {
   await openFridayKahf(page);
   await leaveMushaf(page);
+  await page.getByRole("switch", { name: /difficult words/i }).click();
 
   const reader = page.getByTestId("reader-screen");
   const counter = page.getByTestId("counter-surface");
@@ -776,6 +777,7 @@ test("the reader's text-size control resizes the zikr and never goes below the f
 test("a highlighted Qur'an word is the same size as the ayah around it", async ({ page }) => {
   await openFridayKahf(page);
   await leaveMushaf(page);
+  await page.getByRole("switch", { name: /difficult words/i }).click();
 
   const paragraph = page.getByTestId("zikr-text").first();
   await expect(paragraph).toBeVisible();

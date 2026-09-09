@@ -57,6 +57,7 @@ test("the interactive word-meaning card is named, reachable, and has no automati
   else await page.getByTestId("mushaf-immersive-close").click();
   await expect(page.getByTestId("mushaf-immersive")).toHaveCount(0);
 
+  await page.getByRole("switch", { name: /الكلمات الغريبة/ }).click();
   await page.getByTestId("quran-word-help").first().click();
   const card = page.getByTestId("quran-word-popover");
   await expect(card).toBeVisible();

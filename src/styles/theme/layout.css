@@ -353,92 +353,26 @@
 }
 
 /* ---------------------------------------------------------------------------
-   The illuminated opening
+   The opening pages
 
-   Al-Fatihah and the start of Al-Baqarah are the one place in the book where
-   the page carries a drawn panel. The rules are boxes rather than a stretched
-   drawing, so a rule is the same weight on a 320px phone and a 1600px desk,
-   and only the leaves are art — each square, sized against the page's shorter
-   side, so nothing is ever squeezed out of shape.
-
-   `--mushaf-opening-inset` is the one number the panel and the type share: the
-   text block is placed against it in MushafPageViewer, so the type sits inside
-   the gilt with its own margin instead of being positioned at an inset that
-   happens to look close.
+   Al-Fatihah and the start of Al-Baqarah use their canonical larger opening
+   geometry. The app adds no ornamental outline around them: the Quran text is
+   the surface, and equal grid rows keep its vertical rhythm consistent.
 --------------------------------------------------------------------------- */
 .mushaf-opening {
-  --mushaf-opening-inset: clamp(0.5rem, 3.2cqmin, 2rem);
-  --mushaf-opening-gilt: var(--mushaf-rule-ink, #d4b47c);
-
-  /* The illumination is page-shaped, not viewport-shaped.
-     Stretched to the canvas it became a 900x445 letterbox on a landscape
-     screen, with Al-Fatihah's short lines floating in the middle of a panel
-     twice as wide as they were. It keeps the proportions of the page it is
-     printed on and centres itself in whatever is left; on a phone, where the
-     canvas is already taller than it is wide, `max-width` gives it the full
-     screen and nothing is lost. */
+  /* Opening typography stays page-shaped rather than viewport-shaped. */
   aspect-ratio: 2 / 3;
   height: 100%;
   width: auto;
   max-width: 100%;
   margin: auto;
 
-  /* Its own container, so the inset, the leaves and the type all measure the
-     panel rather than the page around it. */
+  /* Its own container keeps padding and type tied to the page itself. */
   container-type: size;
 }
 
-.mushaf-opening-frame > span {
-  position: absolute;
-  border-radius: 0.35rem;
-}
-
-/* The outermost hairline: the edge of the illumination, not of the page. */
-.mushaf-opening-frame__hairline {
-  inset: calc(var(--mushaf-opening-inset) * 0.45);
-  border: 1px solid var(--mushaf-opening-gilt);
-  opacity: 0.4;
-}
-
-/* The gilded band the whole panel is read as. */
-.mushaf-opening-frame__gilt {
-  inset: var(--mushaf-opening-inset);
-  border: clamp(2px, 0.5cqmin, 4px) solid var(--mushaf-opening-gilt);
-}
-
-/* A dashed rule inside the band, in the same gilt at half strength: the old
-   drawing used `--secondary`, which is a teal in one theme and a yellow in
-   another, and disappeared into the paper in both. */
-.mushaf-opening-frame__dash {
-  inset: calc(var(--mushaf-opening-inset) * 1.55);
-  border: 1px dashed var(--mushaf-opening-gilt);
-  opacity: 0.55;
-}
-
-/* The field the verses are set on. */
-.mushaf-opening-frame__panel {
-  inset: calc(var(--mushaf-opening-inset) * 2.1);
-  background: var(--mushaf-paper);
-  border: 1px solid var(--mushaf-opening-gilt);
-  color: var(--mushaf-opening-gilt);
-}
-
-.mushaf-opening-frame__leaf {
-  position: absolute;
-  width: clamp(0.75rem, 4.5cqmin, 2.75rem);
-  height: clamp(0.75rem, 4.5cqmin, 2.75rem);
-  overflow: visible;
-}
-
-/* The leaves are drawn from the panel's corners outward, so the rotation that
-   places each one turns it about its own corner. */
-.mushaf-opening-frame__leaf {
-  transform-origin: center;
-}
-
-.high-contrast .mushaf-opening-frame__dash,
-.theme-oled .mushaf-opening-frame__dash {
-  opacity: 0.8;
+.mushaf-opening__content {
+  padding: clamp(0.85rem, 4.8cqmin, 2.8rem) clamp(0.65rem, 3.8cqmin, 2.25rem);
 }
 
 /* ---------------------------------------------------------------------------
@@ -496,39 +430,6 @@
   .theme-oled .mushaf-page-frame {
     box-shadow: none;
   }
-}
-
-/* A short surah read inside the azkar reader — Al-Ikhlas, Al-Falaq, An-Nas,
-   Al-Kafirun. They were a Basmalah line above a paragraph of Arabic with inline
-   ayah markers: indistinguishable from a dua, when they are Qur'an. This is the
-   Mushaf's two-stroke rule at passage scale, drawn with pseudo-elements so the
-   reading text keeps its own markup.
-   Multi-page surahs do not use this — they open the Mushaf view, whose own
-   page frame is the paper alone (DEC-135). */
-.quran-passage {
-  position: relative;
-  padding: clamp(1rem, 4vw, 1.75rem) clamp(0.9rem, 3.5vw, 1.5rem);
-}
-
-.quran-passage::before,
-.quran-passage::after {
-  content: "";
-  position: absolute;
-  border: 1.5px solid var(--mushaf-rule-ink);
-  border-radius: 0.75rem;
-  opacity: 0.42;
-  pointer-events: none;
-}
-
-.quran-passage::after {
-  inset: clamp(3px, 0.9vw, 7px);
-  border-width: 1px;
-  border-radius: 0.55rem;
-  opacity: 0.26;
-}
-
-.quran-passage::before {
-  inset: 0;
 }
 
 .mushaf-page-furniture {

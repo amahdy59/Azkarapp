@@ -119,6 +119,26 @@ describe("Mushaf page data", () => {
 });
 
 describe("QCF page fonts", () => {
+  it("uses only the CORS-enabled Quran Foundation font host", async () => {
+    const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
+    const sources: string[] = [];
+    class TestFontFace {
+      constructor(_family: string, source: string) {
+        sources.push(source);
+      }
+      load = vi.fn().mockResolvedValue({ family: "qcf-v2-page-603" });
+    }
+
+    vi.stubGlobal("FontFace", TestFontFace);
+    Object.defineProperty(document, "fonts", { configurable: true, value: { add: vi.fn() } });
+
+    await expect(loadQcfFont(603)).resolves.toBe(true);
+    expect(sources).toEqual([`url(${getQcfFontUrl(603)})`]);
+
+    if (originalFonts) Object.defineProperty(document, "fonts", originalFonts);
+    else Reflect.deleteProperty(document, "fonts");
+  });
+
   it("does not report a QCF page font ready until the font has loaded", async () => {
     const originalFonts = Object.getOwnPropertyDescriptor(document, "fonts");
     const add = vi.fn();

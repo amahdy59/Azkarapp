@@ -232,6 +232,16 @@ describe("the Mushaf offers the surah's recitation", () => {
     expect(screen.getByTestId("mushaf-rail-listen")).toHaveAccessibleName("إيقاف التلاوة مؤقتاً");
   });
 
+  it("keeps the approved recitation actionable while its controller is preparing", () => {
+    const onToggle = vi.fn();
+    renderKahf({ surahAudio: audio({ status: "loading", onToggle }) });
+    const listen = screen.getByTestId("mushaf-rail-listen");
+    expect(listen).toBeEnabled();
+    expect(listen).toHaveAttribute("aria-busy", "true");
+    fireEvent.click(listen);
+    expect(onToggle).toHaveBeenCalledOnce();
+  });
+
   it("offers nothing to press on a surah with no reviewed recitation", () => {
     // As-Sajdah and Al-Mulk carry no approved audio asset. A control that
     // looked live and then did nothing would be worse than a plain absence.

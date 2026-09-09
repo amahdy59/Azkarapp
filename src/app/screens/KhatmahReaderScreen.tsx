@@ -428,9 +428,25 @@ export function KhatmahReaderScreen({
     if (newlyRead.length > 0) onRecordPages?.(todayKey, newlyRead, wirdGoal);
   }, [onRecordPages, quranWirdPlan?.kind, todayKey, visiblePages, wirdGoal, wirdHistory]);
 
-  // Prefetching surrounding spreads/pages after the current page settles so
-  // turning to neighbouring pages is an instant cache/memory hit without
-  // competing with the initial page load.
+  // Warm the two most likely next turns immediately. Page JSON is local and
+  // the corresponding QCF fonts are the only cold resource, so waiting for
+  // the current page to settle before starting these requests made quick
+  // mobile turns pause unnecessarily. Save-data users keep the conservative
+  // path.
+  useEffect(() => {
+    const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+    if (connection?.saveData) return;
+    if (spreadRoom && leftNumber !== null) {
+      if (leftNumber + 1 <= LAST_PAGE) prefetchMushafPage(leftNumber + 1);
+      if (rightNumber - 1 >= 1) prefetchMushafPage(rightNumber - 1);
+      return;
+    }
+    if (currentPage + 1 <= LAST_PAGE) prefetchMushafPage(currentPage + 1);
+    if (currentPage - 1 >= 1) prefetchMushafPage(currentPage - 1);
+  }, [currentPage, leftNumber, rightNumber, spreadRoom]);
+
+  // Fill the farther look-ahead only after the visible page settles, so those
+  // lower-probability fonts never compete with first paint.
   useEffect(() => {
     if (!resolved || resolved.page !== currentPage) return;
     const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
@@ -438,12 +454,12 @@ export function KhatmahReaderScreen({
 
     const timer = window.setTimeout(() => {
       if (spreadRoom && leftNumber !== null) {
-        for (let offset = 1; offset <= 4; offset++) {
+        for (let offset = 2; offset <= 4; offset++) {
           if (leftNumber + offset <= LAST_PAGE) prefetchMushafPage(leftNumber + offset);
           if (rightNumber - offset >= 1) prefetchMushafPage(rightNumber - offset);
         }
       } else {
-        for (let offset = 1; offset <= 3; offset++) {
+        for (let offset = 2; offset <= 3; offset++) {
           if (currentPage + offset <= LAST_PAGE) prefetchMushafPage(currentPage + offset);
           if (currentPage - offset >= 1) prefetchMushafPage(currentPage - offset);
         }

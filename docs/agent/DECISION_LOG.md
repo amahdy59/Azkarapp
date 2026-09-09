@@ -3478,3 +3478,33 @@ null` shape, so a record written before this change still loads and still
 - **Consequences:** The agent may use targets smaller than 44px in the Mushaf view and dense text areas without violating the baseline contract, provided they remain keyboard-navigable and use standard focus rings.
 - **Files/contracts to update:** AGENTS.md (Already covers "documented inline-text exception").
 - **Tests/evidence required:** Verify that smaller targets remain usable via keyboard navigation and do not introduce severe WCAG overlap violations in automated tests.
+
+## DEC-163 — Quran reading is text-first, immediately actionable, and warmed ahead
+
+- **Decision:** remove ornamental outlines from the two Mushaf opening pages and
+  short-surah passages, preserve the canonical Quran data and page mapping, and
+  make the reading rhythm carry their identity instead. Opening-page text uses
+  equal grid tracks; short surahs retain their Surah header and canonical
+  Uthmani passage without a surrounding card.
+- **This supersedes DEC-127 only for the two-stroke passage rule.** The Quran
+  identity, Surah name, revelation place, verse count and canonical content
+  remain. Word meanings start off and stay an explicit reader choice.
+- **Kahf audio stays reviewed and user initiated.** A known approved assignment
+  keeps its listen action enabled while the lazy audio controller loads. A
+  press during that interval is queued and starts once the controller is ready;
+  loading the module alone never autoplays.
+- **Performance is anticipatory rather than cosmetic.** The standalone Mushaf
+  immediately warms the nearest forward and backward page and QCF font unless
+  Save Data is enabled, then fills farther look-ahead after the visible page
+  settles. The page-turn animation follows the documented 150ms/6px transform
+  instead of 180ms/22px. The non-CORS `quran.com` font fallback is removed;
+  every browser request now uses the verified CORS-enabled Quran Foundation
+  host instead of attempting a second request that the browser must reject.
+- **Ayah actions stay together.** The Arabic ayah and action rows align to
+  logical start. Each icon sits beside its label rather than at the opposite
+  edge of a full-width row, preserving the same DOM and keyboard order in RTL
+  and LTR.
+- **Tests/evidence required:** delayed-controller playback regression; canonical
+  short-surah and meanings-default regression; opening-page border, spacing and
+  transition contract; RTL ayah-sheet alignment; built mobile screenshots and
+  full release gates.

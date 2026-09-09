@@ -146,13 +146,12 @@ describe("the three surah readings", () => {
     expect(onSurahPageChange).toHaveBeenCalledWith(KAHF.id, KAHF.mushafPages![0].page);
   });
 
-  it("gives a short surah its identity, not just a Basmalah", () => {
-    // Al-Ikhlas rendered as a Basmalah line above a paragraph of Arabic:
-    // indistinguishable from a dua, when it is Qur'an. QuranSurahHeader was
-    // built for exactly this and was imported nowhere.
+  it("shows a short surah as canonical Quran without an ornamental card", () => {
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-99-ikhlas"));
     expect(screen.getByText(/سُورَةُ/)).toBeInTheDocument();
-    expect(document.querySelector(".quran-passage")).not.toBeNull();
+    expect(screen.getByTestId("canonical-surah-passage")).toBeInTheDocument();
+    expect(document.querySelector(".quran-passage")).toBeNull();
+    expect(screen.getByRole("switch", { name: "Highlight difficult words" })).toHaveAttribute("aria-checked", "false");
   });
 
   it("does not frame a surah that opens in the Mushaf instead", () => {
@@ -160,6 +159,7 @@ describe("the three surah readings", () => {
     // around the reader's copy would be two different frames for one surah.
     renderReader("before_sleep", indexOf("before_sleep", "s-hm-110a"));
     expect(document.querySelector(".quran-passage")).toBeNull();
+    expect(screen.queryByTestId("canonical-surah-passage")).toBeNull();
   });
 
   it("offers a phrase to press when the count can only ever be one", () => {
