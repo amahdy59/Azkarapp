@@ -10,6 +10,7 @@ cleaner, and better aligned without changing reviewed Quran or audio content.
 - Hardened the approved Al-Kahf recitation's lazy-controller readiness path.
 - Warmed the nearest Mushaf pages and QCF fonts before a reader turns.
 - Removed the unusable non-CORS legacy font fallback.
+- Aligned the CI browser-test audio origin with the production Pages build.
 - Reduced page-turn travel to the documented crisp transition.
 - Removed ornamental outlines from opening pages and short-surah passages.
 - Made opening-page line spacing deterministic.
@@ -98,6 +99,8 @@ report's local gate is complete.
   evidence uses repository tests and built-app Playwright timing instead.
 - The remote QCF font host still determines the first cold render of a page that
   has never been cached; nearby turns are now warmed earlier.
+- The first GitHub run exposed a missing browser-test audio environment value;
+  the shared action was corrected before the release was redeployed.
 
 ## Out-of-scope findings
 

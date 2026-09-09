@@ -317,7 +317,10 @@ Do not include a trailing file path. Relative manifest paths are appended to thi
 
 For GitHub Pages, create the repository Actions variable `VITE_AUDIO_BASE_URL` under **Settings → Secrets and variables → Actions → Variables**. It is a public URL, not a secret. The variable must be present during both validation and the final Vite build.
 
-Important current repository check: `.github/workflows/quality.yml` passes this variable to `pnpm check`, and the Pages build passes it to `pnpm build:pages`; before the first approved asset, also pass it to the Pages workflow's **Verify quality gates** step because that step runs `pnpm check` separately.
+Important current repository check: the shared setup action passes this variable to
+both `pnpm check` and `pnpm test:e2e`, and the Pages build passes it to
+`pnpm build:pages`. Keep all three aligned so CI validates the same public audio
+configuration that production receives.
 
 ## Add a pending manifest record
 
@@ -521,7 +524,9 @@ Resolve these before the first applicable production release:
 
 1. **Basmalah and seeking-refuge scope:** the UI may render these as separate prelude text while the asset fingerprint currently compares only `zikr.arabicText`. Do not approve a recording containing an audible prelude that is absent from `canonicalArabicText`, and do not omit it from the transcript to force a match. Either export exact-scope bytes or extend the content/manifest model and validator through reviewed code changes.
 2. **Pending non-Qur'an review linkage:** the current review candidate registry models required Qur'anic ranges. Do not place pending du'a mappings in `APPROVED_AUDIO_ASSIGNMENTS`; extend a separate non-production candidate registry before relying on the in-app review screen for du'a intake.
-3. **Pages validation environment:** pass `VITE_AUDIO_BASE_URL` to the Pages workflow's `pnpm check` step as well as its build step once approved assets exist.
+3. **Pages validation environment:** resolved. The shared CI action passes
+   `VITE_AUDIO_BASE_URL` to both quality and browser tests, and the Pages build
+   receives the same repository variable.
 4. **Public credits:** the floating player shows the selected source and attribution. Before a large catalogue launch, add a searchable Audio Credits view if licences or contributor expectations require persistent consolidated credits.
 
 These gates are not reasons to weaken validation. Until resolved, the affected audio remains unavailable.
