@@ -1,18 +1,26 @@
 import { useEffect } from "react";
-import { getEstimatedPrayerTimes, type PrayerTimes } from "../content/prayerTimes";
+import { getEstimatedPrayerTimes, PRAYER_NAMES, type PrayerTimes } from "../content/prayerTimes";
 import { t } from "../i18n";
+import { formatNumerals } from "../formatting";
 import { DEFAULT_PROGRESS_DAY_START_HOUR, getProgressDayKey } from "../progress";
-import type { AppLanguage, CategoryId, DailyCollectionCompletion, LocationSettings, ReminderSettings } from "../types";
+import type {
+  AppLanguage,
+  CategoryId,
+  DailyCollectionCompletion,
+  LocationSettings,
+  PrayerName,
+  ReminderSettings,
+} from "../types";
 
 const REMINDER_HISTORY_KEY = "azkarapp.foreground-reminders.v1";
-const REMINDER_WINDOW_MS = 90_000;
+const REMINDER_WINDOW_MS = 5 * 60_000;
+const MAX_TIMEOUT_MS = 2_147_000_000;
 
-type ReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
+type RoutineReminderKind = "morning" | "evening" | "before_sleep" | "after_prayer";
+type ReminderHistoryKey = RoutineReminderKind | `prayer:${PrayerName}`;
 
-type DueReminder = {
-  kind: ReminderKind;
-  category: CategoryId;
-};
+export type DueReminder =
+  { kind: RoutineReminderKind; category: CategoryId } | { kind: "prayer"; prayer: PrayerName; leadMinutes: 10 | 15 };
 
 export function synchronizeReminderTimes(reminders: ReminderSettings, prayerTimes: PrayerTimes): ReminderSettings {
   return {
@@ -41,12 +49,44 @@ function didCompleteCategoryToday(
   return dailyCompletions.some((completion) => completion.category === category && completion.dayKey === today);
 }
 
-function hasReachedReminderTime(now: Date, time: string) {
+function scheduledTime(now: Date, time: string, dayOffset = 0) {
   const [hours = 0, minutes = 0] = time.split(":").map(Number);
   const scheduled = new Date(now);
+  scheduled.setDate(scheduled.getDate() + dayOffset);
   scheduled.setHours(hours, minutes, 0, 0);
+  return scheduled;
+}
+
+function hasReachedReminderTime(now: Date, time: string) {
+  const scheduled = scheduledTime(now, time);
   const elapsed = now.getTime() - scheduled.getTime();
   return elapsed >= 0 && elapsed < REMINDER_WINDOW_MS;
+}
+
+function reminderHistoryKey(reminder: DueReminder): ReminderHistoryKey {
+  return reminder.kind === "prayer" ? `prayer:${reminder.prayer}` : reminder.kind;
+}
+
+export function getDuePrayerReminder(
+  reminders: ReminderSettings,
+  location: LocationSettings | undefined,
+  now = new Date(),
+  wasAlreadyNotified: (key: ReminderHistoryKey) => boolean = () => false,
+): DueReminder | null {
+  if (!reminders.prayer.enabled) return null;
+
+  const times = getEstimatedPrayerTimes(now, location);
+  for (const prayer of PRAYER_NAMES) {
+    const notificationTime = new Date(
+      scheduledTime(now, times[prayer]).getTime() - reminders.prayer.leadMinutes * 60_000,
+    );
+    const elapsed = now.getTime() - notificationTime.getTime();
+    const key = `prayer:${prayer}` as const;
+    if (elapsed >= 0 && elapsed < REMINDER_WINDOW_MS && !wasAlreadyNotified(key)) {
+      return { kind: "prayer", prayer, leadMinutes: reminders.prayer.leadMinutes };
+    }
+  }
+  return null;
 }
 
 export function getDueReminder(
@@ -54,9 +94,9 @@ export function getDueReminder(
   dailyCompletions: DailyCollectionCompletion[],
   now = new Date(),
   progressDayStartHour = DEFAULT_PROGRESS_DAY_START_HOUR,
-  wasAlreadyNotified: (kind: ReminderKind) => boolean = () => false,
+  wasAlreadyNotified: (kind: RoutineReminderKind) => boolean = () => false,
 ): DueReminder | null {
-  const candidates: Array<{ kind: ReminderKind; category: CategoryId }> = [
+  const candidates: Array<{ kind: RoutineReminderKind; category: CategoryId }> = [
     { kind: "morning", category: "morning" },
     { kind: "evening", category: "evening" },
     { kind: "before_sleep", category: "before_sleep" },
@@ -80,6 +120,34 @@ export function getDueReminder(
   return null;
 }
 
+/** Milliseconds until the next configured reminder; used instead of polling. */
+export function getNextReminderDelay(
+  reminders: ReminderSettings,
+  location: LocationSettings | undefined,
+  now = new Date(),
+): number | null {
+  const candidates: number[] = [];
+  for (const kind of ["morning", "evening", "before_sleep", "after_prayer"] as const) {
+    if (!reminders[kind].enabled) continue;
+    for (const dayOffset of [0, 1]) {
+      const at = scheduledTime(now, reminders[kind].time, dayOffset).getTime();
+      if (at > now.getTime()) candidates.push(at);
+    }
+  }
+  if (reminders.prayer.enabled) {
+    for (const dayOffset of [0, 1]) {
+      const date = new Date(now);
+      date.setDate(date.getDate() + dayOffset);
+      const times = getEstimatedPrayerTimes(date, location);
+      for (const prayer of PRAYER_NAMES) {
+        const at = scheduledTime(now, times[prayer], dayOffset).getTime() - reminders.prayer.leadMinutes * 60_000;
+        if (at > now.getTime()) candidates.push(at);
+      }
+    }
+  }
+  return candidates.length > 0 ? Math.min(...candidates) - now.getTime() : null;
+}
+
 function readReminderHistory() {
   try {
     const parsed = JSON.parse(window.localStorage.getItem(REMINDER_HISTORY_KEY) ?? "{}") as unknown;
@@ -89,13 +157,13 @@ function readReminderHistory() {
   }
 }
 
-function hasAlreadyNotified(kind: ReminderKind, now: Date, progressDayStartHour: number) {
-  return readReminderHistory()[kind] === getProgressDayKey(now, progressDayStartHour);
+function hasAlreadyNotified(key: ReminderHistoryKey, now: Date, progressDayStartHour: number) {
+  return readReminderHistory()[key] === getProgressDayKey(now, progressDayStartHour);
 }
 
-function recordNotification(kind: ReminderKind, now: Date, progressDayStartHour: number) {
+function recordNotification(key: ReminderHistoryKey, now: Date, progressDayStartHour: number) {
   const history = readReminderHistory();
-  history[kind] = getProgressDayKey(now, progressDayStartHour);
+  history[key] = getProgressDayKey(now, progressDayStartHour);
   try {
     window.localStorage.setItem(REMINDER_HISTORY_KEY, JSON.stringify(history));
   } catch {
@@ -103,22 +171,30 @@ function recordNotification(kind: ReminderKind, now: Date, progressDayStartHour:
   }
 }
 
-async function deliverNotification(kind: ReminderKind, language: AppLanguage, dayKey: string) {
+async function deliverNotification(reminder: DueReminder, language: AppLanguage, dayKey: string) {
+  const isPrayer = reminder.kind === "prayer";
+  const prayerName = isPrayer ? t(language, `notifications.${reminder.prayer}`) : "";
   const options: NotificationOptions = {
-    body: t(language, `notifications.${kind}`),
-    tag: `azkar-${kind}-${dayKey}`,
+    body: isPrayer
+      ? t(language, "notifications.prayerReminderBody", {
+          prayer: prayerName,
+          minutes: formatNumerals(reminder.leadMinutes, language),
+        })
+      : t(language, `notifications.${reminder.kind}`),
+    tag: `azkar-${reminderHistoryKey(reminder).replace(":", "-")}-${dayKey}`,
+    lang: language,
+    dir: language === "ar" ? "rtl" : "ltr",
   };
+  const title = isPrayer ? t(language, "notifications.prayerReminderTitle", { prayer: prayerName }) : "Azkar";
 
   try {
     if ("serviceWorker" in navigator) {
-      const registration = await navigator.serviceWorker.getRegistration();
-      if (registration) {
-        await registration.showNotification("Azkar", options);
-        return true;
-      }
+      const registration = await navigator.serviceWorker.ready;
+      await registration.showNotification(title, options);
+      return true;
     }
 
-    new Notification("Azkar", options);
+    new Notification(title, options);
     return true;
   } catch {
     // Some mobile browsers expose Notification but only permit service-worker delivery.
@@ -136,11 +212,13 @@ export function useForegroundReminders({
   dailyCompletions,
   progressDayStartHour,
   language,
+  location,
 }: {
   reminders: ReminderSettings;
   dailyCompletions: DailyCollectionCompletion[];
   progressDayStartHour: number;
   language: AppLanguage;
+  location?: LocationSettings;
 }) {
   useEffect(() => {
     if (!("Notification" in window) || Notification.permission !== "granted") {
@@ -148,28 +226,55 @@ export function useForegroundReminders({
     }
 
     let isDelivering = false;
+    let cancelled = false;
+    let timerId: number | undefined;
+
+    const scheduleNextCheck = () => {
+      if (cancelled) return;
+      if (timerId !== undefined) window.clearTimeout(timerId);
+      const delay = getNextReminderDelay(reminders, location);
+      if (delay === null) return;
+      timerId = window.setTimeout(() => void notifyIfDue(), Math.min(MAX_TIMEOUT_MS, Math.max(1_000, delay + 100)));
+    };
+
     const notifyIfDue = async () => {
-      if (isDelivering) {
+      if (cancelled || isDelivering) {
         return;
       }
       const now = new Date();
-      const due = getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, (kind) =>
-        hasAlreadyNotified(kind, now, progressDayStartHour),
-      );
-      if (!due) {
-        return;
-      }
+      const wasAlreadyNotified = (key: ReminderHistoryKey) => hasAlreadyNotified(key, now, progressDayStartHour);
+      const due =
+        getDuePrayerReminder(reminders, location, now, wasAlreadyNotified) ??
+        getDueReminder(reminders, dailyCompletions, now, progressDayStartHour, wasAlreadyNotified);
+      if (!due) return scheduleNextCheck();
 
       isDelivering = true;
-      const delivered = await deliverNotification(due.kind, language, getProgressDayKey(now, progressDayStartHour));
+      const delivered = await deliverNotification(due, language, getProgressDayKey(now, progressDayStartHour));
       isDelivering = false;
+      if (cancelled) return;
       if (delivered) {
-        recordNotification(due.kind, now, progressDayStartHour);
+        recordNotification(reminderHistoryKey(due), now, progressDayStartHour);
+        // Drain another reminder that shares the same minute before sleeping
+        // until tomorrow (for example Fajr and the Morning collection).
+        timerId = window.setTimeout(() => void notifyIfDue(), 250);
+        return;
       }
+      // A transient service-worker failure should retry inside the delivery
+      // window without returning to the old continuous polling loop.
+      timerId = window.setTimeout(() => void notifyIfDue(), 60_000);
     };
 
     void notifyIfDue();
-    const interval = window.setInterval(() => void notifyIfDue(), 30_000);
-    return () => window.clearInterval(interval);
-  }, [dailyCompletions, language, progressDayStartHour, reminders]);
+    const reconcileWhenVisible = () => {
+      if (document.visibilityState === "visible") void notifyIfDue();
+    };
+    document.addEventListener("visibilitychange", reconcileWhenVisible);
+    window.addEventListener("focus", reconcileWhenVisible);
+    return () => {
+      cancelled = true;
+      if (timerId !== undefined) window.clearTimeout(timerId);
+      document.removeEventListener("visibilitychange", reconcileWhenVisible);
+      window.removeEventListener("focus", reconcileWhenVisible);
+    };
+  }, [dailyCompletions, language, location, progressDayStartHour, reminders]);
 }

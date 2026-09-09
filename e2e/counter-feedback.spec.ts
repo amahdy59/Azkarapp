@@ -143,7 +143,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   }
 
   const glassCards = [
-    page.getByTestId("prayer-tracker-cards").locator("article"),
+    page.getByTestId("prayer-tracker-cards"),
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
     page.getByTestId("home-wird-row").locator(".hero-glass").first(),
@@ -155,6 +155,37 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
   ];
   for (const cards of glassCards) {
     await expect(cards.first()).toHaveClass(/hero-glass/);
+  }
+});
+
+test("Home prayer strip keeps all five prayers legible without page overflow", async ({ page }) => {
+  await openReturningGuest(page, "ar");
+  const strip = page.getByTestId("prayer-tracker-cards");
+  const cards = strip.locator('article[data-density="summary"]');
+  await expect(cards).toHaveCount(5);
+  await expect(strip.locator('article[aria-current="step"]')).toHaveCount(1);
+
+  for (const viewport of [
+    { width: 320, height: 568 },
+    { width: 390, height: 844 },
+    { width: 834, height: 900 },
+    { width: 1440, height: 900 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await expect(cards).toHaveCount(5);
+    const geometry = await strip.evaluate((element) => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      clippedCards: [...element.querySelectorAll("article")].filter((card) => card.scrollWidth > card.clientWidth + 1)
+        .length,
+    }));
+    expect(geometry.scrollWidth).toBeLessThanOrEqual(geometry.clientWidth + 1);
+    expect(geometry.clippedCards).toBe(0);
+    if (viewport.width === 390) {
+      const [fajr, dhuhr] = await Promise.all([cards.nth(0).boundingBox(), cards.nth(1).boundingBox()]);
+      expect(fajr && dhuhr).toBeTruthy();
+      if (fajr && dhuhr) expect(fajr.x).toBeGreaterThan(dhuhr.x);
+    }
   }
 });
 

@@ -8,24 +8,18 @@ Production site: [amahdy59.github.io/Azkarapp](https://amahdy59.github.io/Azkara
 
 - Reviewed azkar collections with Arabic-first reading and optional English translation/transliteration
 - Time-aware Home recommendations, next-prayer countdown, and Hijri date
-- Online Aladhan prayer timings with daily caching and an astronomical offline fallback
-- Automatic geolocation, coordinate-derived IANA timezone detection, DST handling, calculation methods, and manual minute adjustments
-- Local progress, saved zikr, sessions, reminders, accessibility preferences, and theme persistence
+- Private on-device astronomical prayer timings with selectable calculation methods and manual minute adjustments
+- Automatic geolocation, device IANA timezone detection, and DST handling without sending coordinates to a third party
+- Local progress, saved zikr, sessions, configurable prayer/routine reminders, accessibility preferences, and theme persistence
 - Optional Supabase Google, email OTP, and feature-flagged Apple authentication with cross-device synchronization
 - Installable PWA, offline app shell, update prompts, and quick actions
 - Responsive RTL/LTR layouts with WCAG-oriented automated checks
 
 ## Prayer times and daylight saving
 
-Prayer times resolve in this order:
+Prayer times are calculated synchronously on the device from the selected coordinates, calculation method, and the saved IANA timezone. Date-specific timezone rules apply DST automatically, and the user's optional per-prayer minute adjustments are applied last. No coordinate or prayer-time network request is required.
 
-1. Use a valid daily Aladhan response cached for the selected date, coordinates, and calculation method.
-2. Fetch Aladhan timings when online. Its coordinate-derived IANA timezone metadata is saved with the location.
-3. Calculate times locally when the API is unavailable.
-4. Apply the saved IANA timezone rules for the requested date, including DST transitions.
-5. Apply the user's optional per-prayer minute adjustments.
-
-Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Automatic location detection prefers Aladhan's timezone for the detected coordinates and falls back to the browser/device timezone when offline.
+Settings displays the selected timezone, current UTC offset, and whether daylight saving or standard time is active. Users can opt into a reminder 10 or 15 minutes before each calculated prayer. Reminder scheduling uses the next exact due time while the installed app remains open or backgrounded rather than repeatedly polling.
 
 See [docs/PRAYER_TIMES.md](docs/PRAYER_TIMES.md) for formulas, caching, DST detection, failure behavior, and verification procedures.
 
@@ -190,7 +184,7 @@ Row-level security and private ownership rules in the schema are part of the app
 - Keyboard focus and minimum touch targets
 - Settings corruption recovery and persistence
 
-Prayer-domain unit coverage includes Aladhan parsing, coordinate timezone metadata, Cairo standard/DST offsets, offline calculation, manual adjustments, and cache fallback.
+Prayer-domain unit coverage includes calculation-method parsing, IANA timezone metadata, Cairo standard/DST offsets, local astronomical calculation, manual adjustments, and invalid-setting fallback.
 
 The authoritative release checklist is [docs/QUALITY_CHECKLIST.md](docs/QUALITY_CHECKLIST.md).
 
@@ -231,7 +225,7 @@ Documentation sources of truth:
 
 ## Known constraints
 
-- Reliable reminders while the PWA is completely closed require a backend push-scheduling service; current reminders are foreground/browser-capability dependent.
+- Reliable reminders while the PWA is completely closed require a connected push-scheduling service; current reminders work while the app is open or backgrounded, subject to browser power-management behavior.
 - Prayer times are calculated values and may differ by local authority. Users can select an authority method and apply manual minute adjustments.
 - Browser geolocation requires HTTPS (or localhost) and explicit user permission.
-- A device with a manually incorrect timezone can affect the offline fallback. Online automatic detection corrects this with Aladhan's coordinate-derived timezone; Settings shows the effective timezone and UTC offset for review.
+- A device with an incorrect timezone can affect calculated times. Settings shows the effective IANA timezone and UTC offset and allows manual correction.

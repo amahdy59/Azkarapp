@@ -3508,3 +3508,12 @@ null` shape, so a record written before this change still loads and still
   short-surah and meanings-default regression; opening-page border, spacing and
   transition contract; RTL ayah-sheet alignment; built mobile screenshots and
   full release gates.
+
+## DEC-164 — the prayer dashboard is one responsive surface with honest reminders
+
+- **Decision:** Home keeps all five calculated prayers in one responsive strip at every width, with the current prayer visually dominant and the time-bounded prayer journey directly below it. Mobile, tablet and desktop share the same semantic order and component; only spacing and type scale adapt. The header-to-strip gap is one compact spacing step.
+- **Home visual control:** the existing Reduce transparency preference now means no Home photograph and no translucent Home surfaces. When enabled, the image is not mounted and every Home card uses opaque theme tokens. When disabled, the intentionally selected glass material remains, with on-media contrast and reduced-transparency fallbacks.
+- **Reminder model:** users may opt into a notification 10 or 15 minutes before each of the five prayers. Times derive from the same private on-device calculation and saved adjustments as Home. The scheduler sets one timeout for the next exact due instant and reconciles on focus/visibility instead of polling.
+- **Platform boundary:** service-worker notification display improves installed-PWA behavior while the app is running or backgrounded. The product does not claim dependable fully closed delivery without a server-backed Push API subscription and scheduler; Settings and Help disclose that boundary.
+- **Accessibility:** the strip retains buttons, accessible prayer names, `aria-current`, visible keyboard focus, RTL logical order and non-colour status text. Reminder controls use switch/select semantics and stay disabled until opt-in. Automated checks support but do not prove WCAG 2.2 AA.
+- **Tests/evidence required:** unit timing, persistence and corruption repair; permission-gated control tests; 320/390/834/1440 overflow and RTL checks; normal/solid Home screenshots; full local gates, green Quality/Pages workflows and exact production-SHA smoke verification.

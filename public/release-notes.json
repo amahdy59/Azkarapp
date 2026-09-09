@@ -1,15 +1,15 @@
 {
-  "release": "2026-09-09.1",
+  "release": "2026-09-09.2",
   "ar": [
-    "يظل زر الاستماع إلى سورة الكهف جاهزًا حتى أثناء تهيئة مشغل الصوت على الأجهزة البطيئة.",
-    "أصبحت صفحات المصحف التالية تُحضّر مبكرًا وتنتقل بحركة أقصر وأكثر سلاسة.",
-    "تظهر السور القصيرة بنصها القرآني الواضح بلا إطار زخرفي، وتبدأ معاني الكلمات متوقفة.",
-    "تحسّن انتظام أسطر الصفحات الافتتاحية ومحاذاة نص الآية وأوامرها في العربية والإنجليزية."
+    "تعرض الصفحة الرئيسية الصلوات الخمس في شريط واضح ومتجاوب على الهاتف والجهاز اللوحي وسطح المكتب.",
+    "يمكن تفعيل تذكير قبل كل صلاة واختيار التنبيه قبل ١٠ أو ١٥ دقيقة.",
+    "يبدأ محتوى الصلاة أقرب إلى رأس الصفحة مع إبراز الصلاة الحالية ومسار ما بعدها.",
+    "يؤدي تقليل الشفافية الآن إلى إخفاء صورة الصفحة الرئيسية واستخدام بطاقات بلون السمة."
   ],
   "en": [
-    "Al-Kahf's listen action now stays ready while the audio player initializes on slower devices.",
-    "Upcoming Mushaf pages now warm earlier and turn with a shorter, crisper transition.",
-    "Short surahs now show clean canonical Quran text without an ornamental frame, with word meanings off initially.",
-    "Opening-page line rhythm and ayah-action alignment are now more consistent in Arabic and English."
+    "Home now shows all five prayers in one clear responsive strip across phone, tablet, and desktop.",
+    "You can enable a reminder before every prayer and choose a 10- or 15-minute lead time.",
+    "Prayer content starts closer to the header, with the current prayer and its next steps emphasized.",
+    "Reduce transparency now hides the Home photograph and uses solid cards from your selected theme."
   ]
 }

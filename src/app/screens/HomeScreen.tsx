@@ -259,6 +259,7 @@ export function HomeScreen({
   completed,
   dailyCompletions,
   quietProgressEnabled,
+  homeVisualEffects = true,
   progressDayStartHour,
   language,
   direction,
@@ -300,6 +301,8 @@ export function HomeScreen({
   language: AppLanguage;
   direction: "ltr" | "rtl";
   quietProgressEnabled: boolean;
+  /** Photograph and translucent Home surfaces; false uses normal theme cards. */
+  homeVisualEffects?: boolean;
   progressDayStartHour: number;
   calendarType?: "hijri" | "gregorian";
   locationSettings?: LocationSettings;
@@ -645,11 +648,13 @@ export function HomeScreen({
   return (
     <ScreenContainer
       dir={direction}
-      className="relative isolate flex flex-col overflow-hidden !bg-on-media-surface px-0 pt-0"
+      className={`relative isolate flex flex-col overflow-hidden px-0 pt-0 ${
+        homeVisualEffects ? "!bg-on-media-surface" : "!bg-background"
+      }`}
       style={{ paddingTop: 0 }}
       screenName={t(language, "home.title")}
     >
-      <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />
+      {homeVisualEffects && <TimeOfDayBackground categoryId={homeBackgroundCategoryId} />}
       <h1 className="sr-only">{t(language, "home.title")}</h1>
 
       {/* Scrollable Content Area */}
@@ -666,13 +671,19 @@ export function HomeScreen({
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
             className={`px-page mx-auto flex w-full max-w-[90rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
-              hasScrolledHomeContent ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md" : ""
+              homeVisualEffects
+                ? hasScrolledHomeContent
+                  ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md"
+                  : ""
+                : "border-b border-border bg-background/95 shadow-sm"
             }`}
             dir="ltr"
           >
             <div
               data-testid="hijri-date"
-              className="min-w-0 text-label font-bold text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] sm:text-subtitle"
+              className={`min-w-0 text-label font-bold sm:text-subtitle ${
+                homeVisualEffects ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)]" : "text-primary"
+              }`}
             >
               {/* Wraps rather than truncates. At 320px "Sunday, Rabiʻ I 24,
                   1448 AH" was clipped to "…14", which drops the year and reads
@@ -702,7 +713,11 @@ export function HomeScreen({
               data-testid="home-header-routine-summary"
               onClick={() => setPathSheetOpen(true)}
               aria-label={t(language, "dailyPath.title")}
-              className="pointer-events-auto flex min-h-11 shrink-0 items-center gap-2 rounded-full px-2 text-label font-black text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] transition-colors hover:bg-on-media/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-subtitle"
+              className={`pointer-events-auto flex min-h-11 shrink-0 items-center gap-2 rounded-full px-2 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring sm:text-subtitle ${
+                homeVisualEffects
+                  ? "text-on-media-accent drop-shadow-[0_1px_3px_rgba(0,0,0,0.95)] hover:bg-on-media/10"
+                  : "text-primary hover:bg-muted"
+              }`}
             >
               <span className="flex items-center gap-1" title={t(language, "progress.dailyStreak")}>
                 <Zap className="size-4 sm:size-[1.125rem]" strokeWidth={2.5} aria-hidden="true" />
@@ -711,7 +726,7 @@ export function HomeScreen({
                 </bdi>
                 <span>{t(language, "progress.days")}</span>
               </span>
-              <span className="h-4 w-px bg-on-media/45" aria-hidden="true" />
+              <span className={`h-4 w-px ${homeVisualEffects ? "bg-on-media/45" : "bg-border"}`} aria-hidden="true" />
               <span className="flex items-center gap-1" title={t(language, "progress.palmsTitle")}>
                 <PalmTreeMark size={18} filled={gardenSummary.lifetimePalms > 0} aria-hidden="true" />
                 <bdi>{formatNumerals(gardenSummary.lifetimePalms, language)}</bdi>
@@ -723,7 +738,7 @@ export function HomeScreen({
         <div className="mx-auto flex w-full max-w-[90rem] flex-col gap-4 lg:gap-5">
           <div data-testid="home-hero" className="relative isolate w-full pt-16">
             {showHeroContent && (
-              <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
+              <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-3 sm:px-6 sm:pb-6 sm:pt-4 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-5">
                 {/* The five daily prayers are the stable navigation and status
                     layer. Context below may change with time; this strip does
                     not move or disappear. */}
@@ -736,7 +751,7 @@ export function HomeScreen({
                     dayKey={getProgressDayKey(now, progressDayStartHour)}
                     onToggle={onTogglePrayerTracking ?? (() => undefined)}
                     onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
-                    onGlass
+                    onGlass={homeVisualEffects}
                     summaryOnly
                   />
                 </div>
@@ -757,6 +772,7 @@ export function HomeScreen({
                             categoryId={reminderInfo.categoryId}
                             language={language}
                             isExiting={completionCardState === "exiting"}
+                            onGlass={homeVisualEffects}
                           />
                         </div>
                       ) : isPrayerHero && leadingPrayer ? (
@@ -765,7 +781,9 @@ export function HomeScreen({
                           data-prayer={leadingPrayer.prayer}
                           dir={direction}
                           aria-label={t(language, "prayerMoment.homeTitle")}
-                          className="hero-glass flex h-full flex-col overflow-hidden rounded-3xl"
+                          className={`grid h-full grid-cols-1 overflow-hidden rounded-3xl md:grid-cols-2 ${
+                            homeVisualEffects ? "hero-glass" : "border border-border bg-card shadow-raised"
+                          }`}
                         >
                           <PrayerMomentPanel
                             prayer={leadingPrayer.prayer}
@@ -779,14 +797,19 @@ export function HomeScreen({
                             onOpenAdhkar={(prayer) =>
                               onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
                             }
-                            onGlass
+                            onGlass={homeVisualEffects}
+                            unified
                           />
                           {onPrayerResume && (
                             <button
                               type="button"
                               onClick={() => onPrayerResume(leadingPrayer.prayer)}
                               data-testid="home-open-prayer-screen"
-                              className="flex min-h-12 w-full items-center justify-center gap-2 border-t border-white/10 px-4 text-label font-black text-on-media transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring"
+                              className={`flex min-h-12 w-full items-center justify-center gap-2 border-t px-4 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring md:col-span-2 ${
+                                homeVisualEffects
+                                  ? "border-white/10 text-on-media hover:bg-white/10"
+                                  : "border-border text-primary hover:bg-muted"
+                              }`}
                             >
                               {t(language, "prayerMoment.dayTitle")}
                             </button>
@@ -818,6 +841,7 @@ export function HomeScreen({
                           showEstimate={!isLastThirdDua}
                           ctaLabel={ctaLabel}
                           onOpen={() => onResume(reminderInfo.categoryId)}
+                          onGlass={homeVisualEffects}
                         />
                       ) : null}
                     </div>
@@ -826,7 +850,12 @@ export function HomeScreen({
                   {/* One contextual companion keeps the primary action visually dominant. */}
                   {dailyEvidence ? (
                     <div data-testid="home-context-companion" className="flex min-w-0 lg:col-span-1">
-                      <DailyEvidenceCard language={language} direction={direction} evidence={dailyEvidence} onGlass />
+                      <DailyEvidenceCard
+                        language={language}
+                        direction={direction}
+                        evidence={dailyEvidence}
+                        onGlass={homeVisualEffects}
+                      />
                     </div>
                   ) : null}
 
@@ -844,6 +873,7 @@ export function HomeScreen({
                         visibleCategoryIds={HOME_WIRD_CATEGORY_IDS}
                         recommendedCategoryId={isRoutineHero ? reminderInfo.categoryId : undefined}
                         onOpenWirdBenefits={onOpenWirdBenefits}
+                        onMedia={homeVisualEffects}
                       />
                     </div>
                   )}
@@ -864,7 +894,12 @@ export function HomeScreen({
 
           {onOpenCustomCounter && (
             <div className="px-page" data-testid="home-masbaha-entry">
-              <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} onGlass />
+              <TasbeehCounterButton
+                onClick={onOpenCustomCounter}
+                language={language}
+                direction={direction}
+                onGlass={homeVisualEffects}
+              />
             </div>
           )}
 
@@ -878,7 +913,7 @@ export function HomeScreen({
             now={now}
             onContinue={onContinueKhatmah ?? (() => {})}
             onOverview={onOpenKhatmah ?? (() => {})}
-            onGlass
+            onGlass={homeVisualEffects}
           />
 
           <div className="px-page">
@@ -909,25 +944,37 @@ export function HomeScreen({
                 if (item) void openSavedZikr(item);
               }}
               onOpenLibrary={onOpenSavedLibrary}
-              onGlass
+              onGlass={homeVisualEffects}
             />
 
             {onOpenBenefits && (
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group hero-glass home-glass-surface relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl text-start transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className={`interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl text-start transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
+                  homeVisualEffects ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
+                }`}
                 data-testid="home-benefits-card"
               >
-                <div className="absolute inset-0 z-0">
-                  <ProductImage name="benefits_zikr" className="h-full w-full object-cover object-[center_42%]" />
-                </div>
-                <div className="relative z-10 m-3 rounded-2xl border border-white/10 bg-black/45 p-4 shadow-raised backdrop-blur-md sm:m-4 sm:p-5">
+                {homeVisualEffects && (
+                  <div className="absolute inset-0 z-0">
+                    <ProductImage name="benefits_zikr" className="h-full w-full object-cover object-[center_42%]" />
+                  </div>
+                )}
+                <div
+                  className={`relative z-10 m-3 rounded-2xl p-4 sm:m-4 sm:p-5 ${
+                    homeVisualEffects ? "border border-white/10 bg-black/45 shadow-raised backdrop-blur-md" : "bg-card"
+                  }`}
+                >
                   <span className="block">
-                    <span className="block text-xl font-black text-on-media drop-shadow-md">
+                    <span
+                      className={`block text-xl font-black ${homeVisualEffects ? "text-on-media drop-shadow-md" : "text-foreground"}`}
+                    >
                       {t(language, "benefits.title")}
                     </span>
-                    <span className="mt-2 block max-w-[34rem] text-label font-semibold leading-6 text-on-media-muted sm:text-sm">
+                    <span
+                      className={`mt-2 block max-w-[34rem] text-label font-semibold leading-6 sm:text-sm ${homeVisualEffects ? "text-on-media-muted" : "text-muted-foreground"}`}
+                    >
                       {t(language, "benefits.homeDescription")}
                     </span>
                     <span className="mt-4 flex items-center gap-2 text-sm font-black text-primary drop-shadow-sm">
@@ -955,7 +1002,7 @@ export function HomeScreen({
               expanded={fridayInWindow}
               status={fridayStatus}
               onOpen={onOpenFridayMode}
-              onGlass
+              onGlass={homeVisualEffects}
             />
           </div>
         </div>

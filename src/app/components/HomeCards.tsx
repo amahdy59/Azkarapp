@@ -48,6 +48,7 @@ export function PrayerRoutineCard({
   showEstimate = true,
   ctaLabel,
   onOpen,
+  onGlass = true,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -63,6 +64,7 @@ export function PrayerRoutineCard({
   showEstimate?: boolean;
   ctaLabel: string;
   onOpen: () => void;
+  onGlass?: boolean;
 }) {
   const progressId = "home-routine-progress";
   const progress = totalCount > 0 ? Math.min(1, Math.max(0, completedCount / totalCount)) : 0;
@@ -79,12 +81,22 @@ export function PrayerRoutineCard({
       data-testid="home-routine-card"
       className="flex h-full min-w-0 flex-col justify-between transition-colors"
     >
-      <div className="hero-glass flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7">
+      <div
+        className={`flex flex-1 flex-col gap-5 rounded-3xl px-5 py-6 text-start sm:px-6 sm:py-7 md:p-7 ${
+          onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card shadow-raised"
+        }`}
+      >
         {/* Header Row: "It is time for" + Mode Selector */}
         <div className="flex w-full items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-sm font-bold text-on-media-muted" dir="auto">
+          <div
+            className={`flex items-center gap-2 text-sm font-bold ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+            dir="auto"
+          >
             <span>{t(language, "home.timeFor")}</span>
-            <CategoryIcon className="size-5 text-on-media-accent" aria-hidden="true" />
+            <CategoryIcon
+              className={`size-5 ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+              aria-hidden="true"
+            />
           </div>
           <div className="w-fit min-w-[140px]">
             {showModeSelector && (
@@ -93,12 +105,16 @@ export function PrayerRoutineCard({
                 onChange={onModeChange}
                 direction={direction}
                 aria-label={t(language, "home.routineMode")}
-                className="flex items-center rounded-3xl border border-on-media/16 bg-black/35 p-1 backdrop-blur-md"
+                className={`flex items-center rounded-3xl border p-1 ${
+                  onGlass ? "border-on-media/16 bg-black/35 backdrop-blur-md" : "border-border bg-muted"
+                }`}
                 itemClassName={(selected) =>
                   `flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-xs font-bold transition-all focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring ${
                     selected
                       ? "bg-primary text-primary-foreground shadow-sm"
-                      : "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
+                      : onGlass
+                        ? "text-on-media-muted hover:bg-on-media/8 hover:text-on-media"
+                        : "text-muted-foreground hover:bg-card hover:text-foreground"
                   }`
                 }
                 options={[
@@ -114,13 +130,18 @@ export function PrayerRoutineCard({
         <div className="flex w-full flex-col items-start gap-3 px-1 mt-2">
           <h2
             id="current-zikr-heading"
-            className="block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,5vw,2.25rem)] font-black tracking-tight text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] md:text-5xl"
+            className={`block max-w-full truncate whitespace-nowrap text-[clamp(1.75rem,5vw,2.25rem)] font-black tracking-tight md:text-5xl ${
+              onGlass ? "text-on-media-accent drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" : "text-primary"
+            }`}
             dir="auto"
             style={{ lineHeight: "1.25" }}
           >
             {categoryName}
           </h2>
-          <p className="max-w-[52ch] text-sm font-semibold leading-7 text-on-media-muted" dir="auto">
+          <p
+            className={`max-w-[52ch] text-sm font-semibold leading-7 ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+            dir="auto"
+          >
             {description}
           </p>
         </div>
@@ -132,12 +153,17 @@ export function PrayerRoutineCard({
           <div className="flex w-full flex-col gap-3 mt-4">
             <div
               id={progressId}
-              className="flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm font-bold text-on-media"
+              className={`flex w-full flex-wrap items-center justify-between gap-x-4 gap-y-1 text-sm font-bold ${onGlass ? "text-on-media" : "text-foreground"}`}
               dir="auto"
             >
               {showEstimate ? (
-                <span className="flex items-center gap-1.5 text-on-media-muted">
-                  <Clock className="size-[16px] text-on-media-accent" aria-hidden="true" />
+                <span
+                  className={`flex items-center gap-1.5 ${onGlass ? "text-on-media-muted" : "text-muted-foreground"}`}
+                >
+                  <Clock
+                    className={`size-[16px] ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+                    aria-hidden="true"
+                  />
                   {t(language, "home.estimatedMinutes", {
                     count: formatNumerals(estimatedMinutes, language),
                   })}
@@ -152,7 +178,7 @@ export function PrayerRoutineCard({
             </div>
 
             <div
-              className="h-2.5 w-full overflow-hidden rounded-full bg-black/40 shadow-inner"
+              className={`h-2.5 w-full overflow-hidden rounded-full shadow-inner ${onGlass ? "bg-black/40" : "bg-muted"}`}
               role="progressbar"
               aria-valuenow={completedCount}
               aria-valuemin={0}

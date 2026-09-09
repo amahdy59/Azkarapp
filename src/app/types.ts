@@ -123,7 +123,15 @@ export interface ReminderSchedule {
   time: string;
 }
 
+export type PrayerReminderLeadMinutes = 10 | 15;
+
+export interface PrayerReminderSchedule {
+  enabled: boolean;
+  leadMinutes: PrayerReminderLeadMinutes;
+}
+
 export interface ReminderSettings {
+  prayer: PrayerReminderSchedule;
   morning: ReminderSchedule;
   evening: ReminderSchedule;
   before_sleep: ReminderSchedule;

@@ -879,7 +879,13 @@ function AppContent({
     skipInitialHydration: view === "auth-callback",
   });
 
-  useForegroundReminders({ reminders, dailyCompletions, progressDayStartHour, language: selectedLang });
+  useForegroundReminders({
+    reminders,
+    dailyCompletions,
+    progressDayStartHour,
+    language: selectedLang,
+    location: locationSettings,
+  });
 
   const reconcileDailyProgress = useCallback(() => {
     const currentDayKey = getProgressDayKey(new Date(), progressDayStartHour);
@@ -1267,6 +1273,7 @@ function AppContent({
                   completed={completed}
                   dailyCompletions={dailyCompletions}
                   quietProgressEnabled={true}
+                  homeVisualEffects={!reduceTransparency}
                   progressDayStartHour={progressDayStartHour}
                   locationSettings={locationSettings}
                   quranReadingPosition={quranReadingPosition}

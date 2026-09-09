@@ -46,6 +46,7 @@ export function PrayerMomentPanel({
   onToggle,
   onOpenAdhkar,
   onGlass = false,
+  unified = false,
 }: {
   prayer: PrayerName;
   language: AppLanguage;
@@ -71,6 +72,8 @@ export function PrayerMomentPanel({
    * were built for.
    */
   onGlass?: boolean;
+  /** Home owns one outer card; sections divide that card instead of nesting cards. */
+  unified?: boolean;
   onOpenAdhkar: (prayer: PrayerName) => void;
 }) {
   const moment: PrayerMoment = useMemo(
@@ -153,14 +156,18 @@ export function PrayerMomentPanel({
            page colour at 1.08:1, and it was right to — one failed paint and
            that is what a reader would get. */
         className={`relative isolate min-h-[11rem] overflow-hidden ${
-          onGlass ? "border-b border-white/10" : "rounded-2xl border border-border bg-on-media-surface"
+          unified
+            ? `${onGlass ? "border-white/10" : "border-border"} border-b md:border-b-0 md:border-e`
+            : "rounded-2xl border border-border bg-on-media-surface"
         }`}
         data-testid="prayer-moment-hero"
       >
-        {!onGlass && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10 h-full w-full" />}
+        {!onGlass && !unified && <PrayerSceneArt prayer={prayer} className="absolute inset-0 -z-10 h-full w-full" />}
         {/* Fixed light-on-dark, because the scene is its own ground in every
             theme — the same rule the Home hero follows over its photograph. */}
-        <div className="flex h-full flex-col justify-between gap-3 p-4 text-white">
+        <div
+          className={`flex h-full flex-col justify-between gap-3 p-4 ${onGlass || !unified ? "text-white" : "text-foreground"}`}
+        >
           <div className="flex items-start justify-between gap-3">
             <h2 className="text-2xl font-black leading-tight md:text-3xl" dir="auto">
               {name}
@@ -176,7 +183,10 @@ export function PrayerMomentPanel({
                 checking the card actually wants, and the clock time is the
                 detail that answers "when exactly". */}
             {countdown && (
-              <p className="text-label font-bold text-white/85" dir="auto">
+              <p
+                className={`text-label font-bold ${onGlass || !unified ? "text-white/85" : "text-muted-foreground"}`}
+                dir="auto"
+              >
                 {countdown}
               </p>
             )}
@@ -208,7 +218,7 @@ export function PrayerMomentPanel({
                 aria-valuemax={100}
                 aria-valuenow={Math.round(approachFraction * 100)}
                 aria-label={t(language, "prayerMoment.countdownProgress", { prayer: name })}
-                className="h-1.5 w-full overflow-hidden rounded-full bg-white/20"
+                className={`h-1.5 w-full overflow-hidden rounded-full ${onGlass || !unified ? "bg-white/20" : "bg-muted"}`}
               >
                 <div
                   className="h-full rounded-full bg-primary transition-[width] duration-500 motion-reduce:transition-none"
@@ -217,7 +227,9 @@ export function PrayerMomentPanel({
               </div>
             )}
           </div>
-          <p className="flex items-center gap-2 text-label font-bold text-white/80">
+          <p
+            className={`flex items-center gap-2 text-label font-bold ${onGlass || !unified ? "text-white/80" : "text-muted-foreground"}`}
+          >
             <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
             {t(language, statusKey)}
           </p>
@@ -229,7 +241,9 @@ export function PrayerMomentPanel({
       {virtue && isLive && (
         <section
           className={`flex flex-col justify-center p-4 text-center ${
-            onGlass ? "border-b border-white/10" : "rounded-2xl border border-border bg-card"
+            unified
+              ? `${onGlass ? "border-white/10" : "border-border"} border-b`
+              : "rounded-2xl border border-border bg-card"
           }`}
           data-testid="prayer-moment-virtue"
         >
@@ -271,7 +285,7 @@ export function PrayerMomentPanel({
           each card. Every control and every test id is the one that was here
           before: this is the same behaviour, arranged. */}
       <section
-        className={`p-4 md:col-span-2 ${onGlass ? "" : "rounded-2xl border border-border bg-card"}`}
+        className={`p-4 md:col-span-2 ${unified ? "" : "rounded-2xl border border-border bg-card"}`}
         data-testid="prayer-journey"
         aria-labelledby="prayer-journey-title"
       >

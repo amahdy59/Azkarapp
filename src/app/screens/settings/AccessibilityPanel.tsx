@@ -241,6 +241,7 @@ export function AccessibilityPanel({
             iconBg="color-mix(in srgb, var(--primary) 12%, transparent)"
             icon={<Droplets size={20} className="text-primary" />}
             label={t(language, "settings.reduceTransparency")}
+            description={t(language, "settings.reduceTransparencyHint")}
             checked={reduceTransparency}
             onChange={() => onReduceTransparencyChange(!reduceTransparency)}
           />

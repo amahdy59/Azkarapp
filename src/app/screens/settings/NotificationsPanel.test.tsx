@@ -37,6 +37,49 @@ describe("NotificationsPanel", () => {
     expect(onRemindersChange).not.toHaveBeenCalled();
   });
 
+  it("enables prayer reminders only with permission and saves the selected lead time", () => {
+    Object.defineProperty(window, "Notification", {
+      configurable: true,
+      value: { permission: "granted", requestPermission: vi.fn() },
+    });
+    const onRemindersChange = vi.fn();
+    const { rerender } = render(
+      <NotificationsPanel
+        language="en"
+        reminders={DEFAULT_APP_STATE.settings.reminders}
+        locationSettings={DEFAULT_APP_STATE.settings.location}
+        onRemindersChange={onRemindersChange}
+        onLocationChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole("combobox", { name: "Reminder time" })).toBeDisabled();
+    fireEvent.click(screen.getByRole("switch", { name: "Prayer-time reminders" }));
+    expect(onRemindersChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ prayer: { enabled: true, leadMinutes: 15 } }),
+    );
+
+    const enabled = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      prayer: { enabled: true, leadMinutes: 15 as const },
+    };
+    rerender(
+      <NotificationsPanel
+        language="en"
+        reminders={enabled}
+        locationSettings={DEFAULT_APP_STATE.settings.location}
+        onRemindersChange={onRemindersChange}
+        onLocationChange={vi.fn()}
+        onBack={vi.fn()}
+      />,
+    );
+    fireEvent.change(screen.getByRole("combobox", { name: "Reminder time" }), { target: { value: "10" } });
+    expect(onRemindersChange).toHaveBeenLastCalledWith(
+      expect.objectContaining({ prayer: { enabled: true, leadMinutes: 10 } }),
+    );
+  });
+
   it("selects and saves a built-in city without requesting GPS", () => {
     Object.defineProperty(window, "Notification", {
       configurable: true,

@@ -3,6 +3,7 @@ import { FIELD_CONTROL_CLASS, FIELD_LABEL_CLASS, FormField } from "../../compone
 import { Button } from "../../components/ui/button";
 import { Bell, CheckCircle2, Info, MapPin } from "../../components/icons";
 import { t } from "../../i18n";
+import { formatNumerals } from "../../formatting";
 import { InformationCard } from "./InformationCard";
 import {
   CALCULATION_METHODS,
@@ -12,7 +13,7 @@ import {
   getTimeZoneStatus,
 } from "../../content/prayerCalculation";
 import { searchPrayerLocations, type PrayerLocationPreset } from "../../content/prayerLocations";
-import type { AppLanguage, LocationSettings, ReminderSettings } from "../../types";
+import type { AppLanguage, LocationSettings, PrayerReminderLeadMinutes, ReminderSettings } from "../../types";
 import { SubHeader } from "./SettingsPrimitives";
 
 type BrowserNotificationPermission = NotificationPermission | "unsupported";
@@ -300,7 +301,21 @@ export function NotificationsPanel({
     updateSchedule(kind, { enabled: enabling });
   };
 
+  const togglePrayerReminder = async () => {
+    const enabling = !reminders.prayer.enabled;
+    if (enabling && permission === "default") {
+      const next = await requestPermission();
+      if (next !== "granted") return;
+    }
+    if (enabling && permission !== "granted") {
+      setPermissionAttemptBlocked(true);
+      return;
+    }
+    onRemindersChange({ ...reminders, prayer: { ...reminders.prayer, enabled: enabling } });
+  };
+
   const anyReminderEnabled =
+    reminders.prayer.enabled ||
     reminders.morning.enabled ||
     reminders.evening.enabled ||
     reminders.before_sleep.enabled ||
@@ -609,6 +624,74 @@ export function NotificationsPanel({
               {t(language, "notifications.permissionRequired")}
             </p>
           )}
+        </section>
+
+        <section
+          className="rounded-3xl border border-border/40 bg-card p-5 shadow-raised"
+          aria-labelledby="prayer-reminders-title"
+        >
+          <div className="flex items-center gap-3">
+            <span
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary"
+              aria-hidden="true"
+            >
+              <Bell size={21} />
+            </span>
+            <span className="min-w-0 flex-1 text-start">
+              <h2 id="prayer-reminders-title" className="text-title font-bold text-foreground">
+                {t(language, "notifications.prayerReminders")}
+              </h2>
+              <span className="mt-1 block text-label leading-5 text-muted-foreground">
+                {t(language, "notifications.prayerRemindersHint")}
+              </span>
+            </span>
+            <button
+              type="button"
+              role="switch"
+              aria-label={t(language, "notifications.prayerReminders")}
+              aria-checked={reminders.prayer.enabled}
+              onClick={() => void togglePrayerReminder()}
+              className="flex h-11 w-12 shrink-0 items-center justify-center rounded-full focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+            >
+              <span
+                aria-hidden="true"
+                className={`relative h-7 w-12 rounded-full border transition-colors ${reminders.prayer.enabled ? "border-primary bg-primary" : "border-border-control bg-muted"}`}
+              >
+                <span
+                  className={`absolute top-1 size-5 rounded-full shadow-sm transition-[inset] ${reminders.prayer.enabled ? "bg-primary-foreground" : "bg-foreground"}`}
+                  style={{ insetInlineStart: reminders.prayer.enabled ? "1.5rem" : "0.25rem" }}
+                />
+              </span>
+            </button>
+          </div>
+
+          <label
+            className="mt-4 flex flex-col gap-1.5 text-label font-bold text-foreground"
+            htmlFor="prayer-reminder-lead"
+          >
+            <span>{t(language, "notifications.prayerReminderLead")}</span>
+            <select
+              id="prayer-reminder-lead"
+              value={reminders.prayer.leadMinutes}
+              disabled={!reminders.prayer.enabled}
+              onChange={(event) =>
+                onRemindersChange({
+                  ...reminders,
+                  prayer: {
+                    ...reminders.prayer,
+                    leadMinutes: Number(event.target.value) as PrayerReminderLeadMinutes,
+                  },
+                })
+              }
+              className={FIELD_CONTROL_CLASS}
+            >
+              {[10, 15].map((minutes) => (
+                <option key={minutes} value={minutes}>
+                  {t(language, "notifications.minutesBefore", { minutes: formatNumerals(minutes, language) })}
+                </option>
+              ))}
+            </select>
+          </label>
         </section>
 
         <section aria-labelledby="gentle-reminders-title">

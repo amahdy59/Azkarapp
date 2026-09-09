@@ -94,3 +94,26 @@ test("a card over the hero photograph goes opaque, not merely unblurred", async 
   const solid = await glass.evaluate((element) => getComputedStyle(element).backgroundColor);
   expect(solid, "reduced transparency must leave no alpha behind").not.toMatch(/rgba\(.*0?\.\d+\)/);
 });
+
+test("the saved setting removes Home photography and uses theme cards", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
+    window.localStorage.setItem(
+      "azkarapp.state.v1",
+      JSON.stringify({
+        settings: { language: "en", themeMode: "midnight", reduceTransparency: true },
+        profile: { displayName: "Guest", isGuest: true },
+      }),
+    );
+  });
+  await page.goto("/");
+  await page.getByRole("navigation").first().waitFor();
+
+  await expect(page.getByTestId("time-of-day-scene-window")).toHaveCount(0);
+  const prayerStrip = page.getByTestId("prayer-tracker-cards");
+  await expect(prayerStrip).not.toHaveClass(/hero-glass/);
+  await expect(page.getByTestId("home-quran-card")).not.toHaveClass(/hero-glass/);
+  await expect(page.getByTestId("home-saved-section")).not.toHaveClass(/hero-glass/);
+  const surface = await prayerStrip.evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(surface).not.toMatch(/rgba\(.*0?\.\d+\)/);
+});

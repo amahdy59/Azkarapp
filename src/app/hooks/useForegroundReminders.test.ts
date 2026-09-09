@@ -1,10 +1,34 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_APP_STATE } from "../state";
-import { getLocationBasedReminders, getDueReminder, synchronizeReminderTimes } from "./useForegroundReminders";
+import { getEstimatedPrayerTimes } from "../content/prayerTimes";
+import {
+  getLocationBasedReminders,
+  getDuePrayerReminder,
+  getDueReminder,
+  getNextReminderDelay,
+  synchronizeReminderTimes,
+} from "./useForegroundReminders";
 
 const morningTime = new Date(2026, 6, 17, 7, 30, 30);
 
 describe("getDueReminder", () => {
+  it("reminds for each prayer at the selected lead time", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      prayer: { enabled: true, leadMinutes: 15 as const },
+    };
+    const date = new Date(2026, 6, 17, 12);
+    const asr = getEstimatedPrayerTimes(date).asr.split(":").map(Number);
+    date.setHours(asr[0]!, asr[1]! - 15, 30, 0);
+
+    expect(getDuePrayerReminder(reminders, undefined, date)).toEqual({
+      kind: "prayer",
+      prayer: "asr",
+      leadMinutes: 15,
+    });
+    expect(getDuePrayerReminder(reminders, undefined, date, (key) => key === "prayer:asr")).toBeNull();
+  });
+
   it("returns a configured reminder inside its delivery window", () => {
     const reminders = {
       ...DEFAULT_APP_STATE.settings.reminders,
@@ -54,6 +78,32 @@ describe("getDueReminder", () => {
       kind: "evening",
       category: "evening",
     });
+  });
+});
+
+describe("efficient reminder scheduling", () => {
+  it("sleeps until the next configured time instead of polling", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      morning: { enabled: true, time: "07:30" },
+    };
+
+    expect(getNextReminderDelay(reminders, undefined, new Date(2026, 6, 17, 7, 0))).toBe(30 * 60_000);
+  });
+
+  it("schedules directly to the next prayer lead time", () => {
+    const reminders = {
+      ...DEFAULT_APP_STATE.settings.reminders,
+      prayer: { enabled: true, leadMinutes: 15 as const },
+    };
+    const date = new Date(2026, 6, 17, 12);
+    const [hours, minutes] = getEstimatedPrayerTimes(date).asr.split(":").map(Number);
+    const reminderAt = new Date(date);
+    reminderAt.setHours(hours!, minutes!, 0, 0);
+    reminderAt.setMinutes(reminderAt.getMinutes() - 15);
+    const now = new Date(reminderAt.getTime() - 30 * 60_000);
+
+    expect(getNextReminderDelay(reminders, undefined, now)).toBe(30 * 60_000);
   });
 });
 

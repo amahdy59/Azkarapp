@@ -177,6 +177,8 @@ test("launch-critical settings screens are discoverable and accessible", async (
 
   await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
   await expect(page.getByRole("heading", { name: "Location & Prayer Times", exact: true })).toBeVisible();
+  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "false");
+  await expect(page.locator("#prayer-reminder-lead")).toBeDisabled();
   await expect(page.getByTestId("daylight-saving-status")).toContainText("Africa/Cairo");
   await expect(page.getByTestId("daylight-saving-status")).toContainText(/UTC\+0[23]:00/);
   await expectNoWcagViolations(page);
@@ -201,6 +203,42 @@ test("launch-critical settings screens are discoverable and accessible", async (
       await backBtn.click();
     }
   }
+});
+
+test("prayer reminder lead time is configurable and persisted after opt-in", async ({ page }) => {
+  await enterEnglishGuestMode(page);
+  await page.evaluate(() => {
+    const key = "azkarapp.state.v1";
+    const state = JSON.parse(window.localStorage.getItem(key) ?? "{}") as Record<string, unknown> & {
+      settings?: Record<string, unknown> & { reminders?: Record<string, unknown> };
+    };
+    state.settings = {
+      ...state.settings,
+      reminders: {
+        ...state.settings?.reminders,
+        prayer: { enabled: true, leadMinutes: 15 },
+      },
+    };
+    window.localStorage.setItem(key, JSON.stringify(state));
+  });
+  await page.reload();
+  await page.getByRole("navigation").first().waitFor();
+  await openSettings(page);
+  await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
+
+  const reminderSwitch = page.getByRole("switch", { name: "Prayer-time reminders" });
+  await expect(reminderSwitch).toHaveAttribute("aria-checked", "true");
+  const lead = page.locator("#prayer-reminder-lead");
+  await lead.selectOption("10");
+  await expect(lead).toHaveValue("10");
+
+  await page.reload();
+  await page.getByRole("navigation").first().waitFor();
+  await openSettings(page);
+  await page.getByRole("button", { name: /Prayer Times & Reminders/ }).click();
+  await expect(page.getByRole("switch", { name: "Prayer-time reminders" })).toHaveAttribute("aria-checked", "true");
+  await expect(page.locator("#prayer-reminder-lead")).toHaveValue("10");
+  await expectNoWcagViolations(page);
 });
 
 test("malformed legacy preferences recover without a blank screen", async ({ page }) => {

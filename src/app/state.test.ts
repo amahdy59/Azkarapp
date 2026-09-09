@@ -250,7 +250,11 @@ describe("app state persistence", () => {
         settings: {
           themeMode: "sepia",
           textSize: "giant",
-          reminders: { morning: null, evening: { enabled: true, time: "99:72" } },
+          reminders: {
+            morning: null,
+            evening: { enabled: true, time: "99:72" },
+            prayer: { enabled: true, leadMinutes: 42 },
+          },
         },
         sessions: [null, { id: "broken" }],
       }),
@@ -262,6 +266,7 @@ describe("app state persistence", () => {
     expect(state.settings.reminders).toEqual({
       ...DEFAULT_APP_STATE.settings.reminders,
       evening: { enabled: true, time: DEFAULT_APP_STATE.settings.reminders.evening.time },
+      prayer: { enabled: true, leadMinutes: DEFAULT_APP_STATE.settings.reminders.prayer.leadMinutes },
     });
     expect(state.sessions).toEqual([]);
   });

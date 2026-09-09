@@ -43,7 +43,7 @@ Never render untrusted persisted or remote data directly.
 | Remote account synchronization                      | `src/app/hooks/useRemoteAccountSync.ts`                      |
 | Authentication operations                           | `src/app/hooks/useAuthHandlers.ts` and `src/lib/supabase.ts` |
 | Reading-session mutations                           | `src/app/hooks/useSessionHandlers.ts`                        |
-| Prayer calculation and Aladhan boundary             | `src/app/content/prayerCalculation.ts`                       |
+| Private on-device prayer calculation                | `src/app/content/prayerCalculation.ts`                       |
 
 When adding a persisted field:
 
@@ -105,17 +105,15 @@ See `DESIGN_SYSTEM.md` for the authoritative typography, icon, geometry, and mot
 
 ## Local persistence and privacy
 
-The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys, such as the daily prayer-time cache. Local session history retains the newest 500 entries to keep persistence bounded. Failed writes are surfaced in the application with retry and dismiss actions instead of failing silently.
+The versioned local state key is `azkarapp.state.v1`. Additional narrow caches use their own namespaced keys. Local session history retains the newest 500 entries to keep persistence bounded. Failed writes are surfaced in the application with retry and dismiss actions instead of failing silently.
 
-The active practice day has one fixed boundary: local 00:00. `App.tsx` schedules the rollover and reconciles again when a backgrounded app becomes visible. A rollover clears partial and complete state for Morning, Evening, Before Sleep, Waking Up, and After Prayer while retaining immutable daily-completion history, streaks, saved items, sessions, and resumable situational collections. Legacy 02:00/04:00/06:00 preferences normalize to midnight. The shared minute clock advances Home and Progress to the new local date; their date-keyed prayer refresh then resolves the current day's cache or offline calculation before replacing it with fresh Aladhan data when available.
+The active practice day has one fixed boundary: local 00:00. `App.tsx` schedules the rollover and reconciles again when a backgrounded app becomes visible. A rollover clears partial and complete state for Morning, Evening, Before Sleep, Waking Up, and After Prayer while retaining immutable daily-completion history, streaks, saved items, sessions, and resumable situational collections. Legacy 02:00/04:00/06:00 preferences normalize to midnight. The shared minute clock advances Home and Progress to the new local date; prayer times are recalculated synchronously on the device for that date.
 
 Quran persistence deliberately separates the page currently open, one intentional continue-reading bookmark, completed-page history, whole-page bookmarks, and verse bookmarks. A forward reader turn records only newly read visible pages and keeps the last event for spread-aware Undo. Adaptive plans persist their inclusive start/target range, while per-day goal snapshots keep historical weekly comparisons stable. These fields pass through the same local normalization, private-data clearing, and deterministic remote merge boundaries as other account-owned progress; reusable Mushaf components receive callbacks and never write storage directly.
 
 Private-data clearing preserves device preferences while removing account-owned profile, saved, session, and completion data. Any new account-owned field must participate in `clearPrivateAppData()`.
 
-Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to
-Supabase, and are sent to Aladhan only to retrieve prayer timings. No service-role Supabase credential belongs in the
-browser.
+Geolocation is requested only after a user action. Precise coordinates remain device-local, are never synchronized to Supabase, and are not sent to a prayer-time service. No service-role Supabase credential belongs in the browser.
 
 ## Remote synchronization
 
@@ -174,11 +172,13 @@ Database schema changes require an ordered migration and corresponding applicati
 
 ## Offline and PWA behavior
 
-The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections. When a waiting service worker is detected, the running client fetches `public/release-notes.json` without cache and shows its 3–4 validated highlights in the selected language. This deployed manifest is necessary because the update prompt runs in the older client bundle; unavailable notes fall back to the generic localized update message, and applying the update remains the user's choice. A manifest that is served but malformed also falls back, and additionally reports to observability — that failure is invisible to every reader, so nothing else would surface it.
+The production service worker precaches the core application shell. Larger optional screen and content chunks are cached at runtime after first use, which keeps installation lean while preserving repeat offline access. The app exposes install/update UI and quick actions for common collections. Opt-in routine and prayer reminders use one timer for the next exact due instant and reconcile again on focus or visibility, avoiding continuous polling. The active service worker displays notifications where supported. This local scheduler can operate while the PWA is open or backgrounded; reliable delivery after the PWA is fully closed requires a future server-backed Push API boundary and is disclosed in Settings.
+
+When a waiting service worker is detected, the running client fetches `public/release-notes.json` without cache and shows its 3–4 validated highlights in the selected language. This deployed manifest is necessary because the update prompt runs in the older client bundle; unavailable notes fall back to the generic localized update message, and applying the update remains the user's choice. A manifest that is served but malformed also falls back, and additionally reports to observability — that failure is invisible to every reader, so nothing else would surface it.
 
 The manifest carries a `release` stamp, and the app records the last stamp it showed. Because applying an update reloads the app, notes shown before an update are otherwise lost to anyone who did not read them in the moment; on startup the client compares the deployed stamp with the recorded one and recaps the notes when they differ. Applying the update from the prompt records the stamp immediately, so notes just read are not repeated, and a first run records it silently rather than greeting a new reader with a changelog. Settings › About › What's new reads the same manifest on demand, which is the only place these notes are readable after the update. `scripts/check-release-notes.mjs` keeps the manifest describing the release being shipped: it fails the pre-push gate when user-facing commits have landed since the notes last changed, when the stamp was not bumped alongside rewritten notes, or when the shape would silently fall back. Applying an update is awaited with a bounded timeout and an actionable failure state; the app does not reload on a blind timer.
 
-Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, OAuth, or fresh Aladhan values—must fail safely and retain local behavior.
+Core reading, counting, local progress, settings, and astronomical prayer-time calculation must work without a network. Features that require remote services—account sync, email OTP, or OAuth—must fail safely and retain local behavior.
 
 ## System-state and recovery boundaries
 

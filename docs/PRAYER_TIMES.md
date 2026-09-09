@@ -13,8 +13,11 @@ The Home prayer header displays the next prayer and a live countdown. Settings â
 - Search and select a built-in city without sharing GPS data; the preset coordinates and IANA timezone remain available offline
 - Enter a manual city, timezone, latitude, and longitude when the built-in list does not include the required location
 - Apply a minute adjustment to each prayer
+- Enable one reminder before every daily prayer and choose a 10- or 15-minute lead time
 
 The five calculated prayers are Fajr, Dhuhr, Asr, Maghrib, and Isha.
+
+Prayer reminders are opt-in and use the same locally calculated times and adjustments shown on Home. While the PWA is open or backgrounded, one timer sleeps until the next due reminder and the app reconciles on focus/visibility; it does not poll continuously. The active service worker displays the notification where supported. Browser suspension means reliable delivery after the PWA is completely closed still requires a connected server Push API service, so Settings states this limitation rather than promising closed-app alarms.
 
 Home also uses the same calculated boundaries for its featured collection: Morning from Fajr to Asr, Evening from Asr to Isha, and Before Sleep from Isha to the following Fajr. The preferred Evening reading window is communicated as after Asr until Maghrib.
 
@@ -125,6 +128,7 @@ The API timeout is bounded. Geolocation is user-initiated and requires HTTPS or 
 | `src/app/content/prayerTimes.ts`                  | Current/next prayer selection and countdown formatting             |
 | `src/app/screens/HomeScreen.tsx`                  | Immediate fallback rendering and background refresh                |
 | `src/app/screens/settings/NotificationsPanel.tsx` | Location, timezone status, methods, and adjustments UI             |
+| `src/app/hooks/useForegroundReminders.ts`         | Exact next-due routine/prayer scheduling and notification delivery |
 | `src/app/types.ts`                                | `LocationSettings` persistence contract                            |
 | `src/app/state.ts`                                | Defaults, validation, merge, and persistence                       |
 | `src/app/content/prayerCalculation.test.ts`       | Parser, timezone/DST, offline, adjustment, and fallback unit tests |
@@ -152,5 +156,6 @@ For a manual location verification:
 6. Compare the five times with a trusted local authority using the same calculation method.
 7. Disable the network, reload, and confirm the countdown is unchanged â€” it never depended on the network.
 8. Test a date on each side of a known DST transition through unit tests rather than changing the device clock.
+9. Enable prayer reminders, select 10 or 15 minutes, reload Settings, and confirm the choice persists.
 
 When local authorities differ by a few minutes, confirm the selected calculation method first, then use manual adjustments only when required.

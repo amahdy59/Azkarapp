@@ -97,6 +97,7 @@ export const DEFAULT_APP_STATE: AppStateSnapshot = {
     forceRtl: false,
     colorBlindSupport: "none",
     reminders: {
+      prayer: { enabled: false, leadMinutes: 15 },
       morning: { enabled: false, time: "07:30" },
       evening: { enabled: false, time: "18:30" },
       before_sleep: { enabled: false, time: "22:00" },
@@ -471,6 +472,13 @@ function normalizeReminders(
 ): ReminderSettings {
   const candidate = value as Partial<ReminderSettings> | undefined;
   const defaultReminders = DEFAULT_APP_STATE.settings.reminders;
+  const prayerFallback = {
+    enabled: typeof fallback?.prayer?.enabled === "boolean" ? fallback.prayer.enabled : defaultReminders.prayer.enabled,
+    leadMinutes:
+      fallback?.prayer?.leadMinutes === 10 || fallback?.prayer?.leadMinutes === 15
+        ? fallback.prayer.leadMinutes
+        : defaultReminders.prayer.leadMinutes,
+  };
   const morningFallback = {
     enabled:
       typeof fallback?.morning?.enabled === "boolean" ? fallback.morning.enabled : defaultReminders.morning.enabled,
@@ -496,6 +504,13 @@ function normalizeReminders(
     time: isTime(fallback?.after_prayer?.time) ? fallback.after_prayer.time : defaultReminders.after_prayer.time,
   };
   return {
+    prayer: {
+      enabled: typeof candidate?.prayer?.enabled === "boolean" ? candidate.prayer.enabled : prayerFallback.enabled,
+      leadMinutes:
+        candidate?.prayer?.leadMinutes === 10 || candidate?.prayer?.leadMinutes === 15
+          ? candidate.prayer.leadMinutes
+          : prayerFallback.leadMinutes,
+    },
     morning: {
       enabled: typeof candidate?.morning?.enabled === "boolean" ? candidate.morning.enabled : morningFallback.enabled,
       time: isTime(candidate?.morning?.time) ? candidate.morning.time : morningFallback.time,

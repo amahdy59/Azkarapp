@@ -438,7 +438,7 @@ const en = {
     title: "Notifications",
     availability: "Reminder availability",
     availabilityBody:
-      "Choose your reminder times below. A reminder is shown only while this app is open; reliable background reminders need a connected push service.",
+      "Reminders work while Azkar is open or running in the background. Delivery after the app is fully closed requires a connected push service.",
     permission: "Browser permission",
     permissionGranted: "Browser permission is granted.",
     permissionDenied: "Browser permission is blocked. Change it in your browser or device settings.",
@@ -466,7 +466,13 @@ const en = {
     disabled: "Off",
     onlyIfIncomplete: "Only when unfinished",
     onlyIfIncompleteHint: "Avoid a reminder after you have completed that collection today.",
-    activeNotice: "This browser will show reminders while Azkar is open.",
+    activeNotice: "This browser will show reminders while Azkar is open or running in the background.",
+    prayerReminders: "Prayer-time reminders",
+    prayerRemindersHint: "Remind me before each of the five daily prayers.",
+    prayerReminderLead: "Reminder time",
+    minutesBefore: "{minutes} minutes before prayer",
+    prayerReminderTitle: "{prayer} prayer",
+    prayerReminderBody: "{prayer} prayer is in {minutes} minutes.",
   },
   downloads: {
     downloadedAudio: "Downloaded audio",
@@ -585,7 +591,7 @@ const en = {
     savedA: "Open Azkar from the bottom navigation, then choose the Saved tab.",
     remindersQ: "Why did a reminder not appear?",
     remindersA:
-      "Browser permission must be enabled. Current reminders work while Azkar is open; closed-app delivery needs a future push service.",
+      "Browser permission must be enabled. Reminders work while Azkar is open or backgrounded; reliable closed-app delivery needs a connected push service.",
     offlineQ: "Can I use Azkar offline?",
     offlineA:
       "Core content is bundled with the app. After the production app has been cached, supported browsers can reload it offline.",
@@ -1418,6 +1424,7 @@ const en = {
     colorBlindTritanopia: "Tritanopia",
     reduceMotion: "Reduce motion",
     reduceTransparency: "Reduce transparency",
+    reduceTransparencyHint: "Use solid theme cards and hide the Home background image.",
     hapticFeedback: "Haptic feedback",
     rtlLayout: "Right-to-left layout",
     screenReader: "Screen-reader support",

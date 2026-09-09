@@ -196,6 +196,78 @@ function PrayerCard({
   const disabled = state === "upcoming" || state === "next";
   const isCurrent = state === "current";
 
+  if (summaryOnly) {
+    return (
+      <article
+        aria-labelledby={`prayer-card-heading-${prayer}`}
+        data-testid={`prayer-card-${prayer}`}
+        data-prayer={prayer}
+        data-prayer-state={state}
+        data-density="summary"
+        aria-current={isCurrent ? "step" : undefined}
+        className={`flex min-w-0 flex-col rounded-3xl border text-center transition-[background-color,border-color,box-shadow,transform] duration-standard ease-standard ${
+          isCurrent
+            ? "border-primary bg-primary/10 shadow-[inset_0_0_0_1px_var(--primary)]"
+            : "border-transparent bg-transparent"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={() => onOpen?.(prayer)}
+          disabled={!onOpen}
+          aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
+          className="flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1.5 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+        >
+          {isCurrent && (
+            <span className="mb-1 rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
+              {t(language, "prayerMoment.badgeNow")}
+            </span>
+          )}
+          <span
+            aria-hidden="true"
+            className={`prayer-chip flex size-9 items-center justify-center rounded-full border sm:size-10 ${isCurrent ? "text-primary" : ""}`}
+          >
+            <Icon size={19} />
+          </span>
+          <h3
+            id={`prayer-card-heading-${prayer}`}
+            className={`mt-1 min-w-0 max-w-full truncate text-label font-black sm:text-subtitle ${
+              onGlass
+                ? isCurrent
+                  ? "text-on-media-accent"
+                  : "text-on-media"
+                : isCurrent
+                  ? "text-primary"
+                  : "text-foreground"
+            }`}
+            dir="auto"
+          >
+            {name}
+          </h3>
+          <p
+            data-testid={state === "next" ? "next-prayer-time" : undefined}
+            className={`mt-0.5 whitespace-nowrap text-xs font-bold tabular-nums sm:text-label ${
+              onGlass ? (isCurrent ? "text-on-media-accent" : "text-on-media-muted") : "text-muted-foreground"
+            }`}
+            dir="auto"
+          >
+            {formatPrayerTimeLabel(time, language === "ar")}
+          </p>
+          {countdown && state === "next" && (
+            <span
+              data-testid="next-prayer"
+              className={`mt-1 text-micro font-bold ${onGlass ? "text-on-media-accent" : "text-primary"}`}
+              dir="auto"
+            >
+              {countdown}
+            </span>
+          )}
+          <span className="sr-only">{statusLabel(language, state)}</span>
+        </button>
+      </article>
+    );
+  }
+
   return (
     <article
       // Five unnamed articles announce as "article, article, article…". Naming
@@ -204,10 +276,9 @@ function PrayerCard({
       data-testid={`prayer-card-${prayer}`}
       data-prayer={prayer}
       data-prayer-state={state}
-      data-density={summaryOnly ? "summary" : "full"}
-      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:p-4 ${
-        summaryOnly ? "sm:w-[46%] sm:min-w-[46%] lg:w-full lg:min-w-0" : "sm:w-full sm:min-w-0"
-      } ${
+      data-density="full"
+      aria-current={isCurrent ? "step" : undefined}
+      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-4 ${
         onGlass
           ? `hero-glass ${isCurrent ? "ring-2 ring-primary border-transparent" : "border-transparent"}`
           : isCurrent
@@ -307,15 +378,14 @@ function PrayerCard({
         )}
       </div>
 
-      {!summaryOnly && <hr className="mt-1.5 border-t border-border/60" />}
+      <hr className="mt-1.5 border-t border-border/60" />
 
       {/* Section 3 — personal tracking. Its own fieldset so a screen reader
           announces which prayer these two controls belong to; the row of five
           otherwise repeats the same two labels with no context. */}
-      {!summaryOnly && (
-        <fieldset className="mt-1.5 flex flex-col border-0 p-0">
-          <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
-          {/* "Prayed", not "prayed at the mosque".
+      <fieldset className="mt-1.5 flex flex-col border-0 p-0">
+        <legend className="sr-only">{t(language, "prayerTracking.legend", { prayer: name })}</legend>
+        {/* "Prayed", not "prayed at the mosque".
             The prayer screen records where — mosque or home — while this row
             only knew the mosque, so a prayer recorded at home showed here as an
             empty box: the two surfaces disagreed about the same fact, and the
@@ -323,37 +393,36 @@ function PrayerCard({
             model exists to end. This ticks for either answer and names the
             place beside it; ticking it here still means the mosque, because
             that is the only answer a single box can give. */}
-          <TrackingCheckbox
-            id={`prayer-${prayer}-mosque`}
-            label={t(language, "prayerTracking.prayed")}
-            hint={
-              tracking.location
-                ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
-                : undefined
-            }
-            checked={tracking.location !== null}
-            disabled={disabled}
-            onChange={(next) => onToggle(prayer, "mosque", next)}
-            onGlass={onGlass}
-          />
-          <TrackingCheckbox
-            id={`prayer-${prayer}-sunnah`}
-            label={t(language, "prayerTracking.sunnah")}
-            checked={tracking.sunnah ?? false}
-            disabled={disabled}
-            onChange={(next) => onToggle(prayer, "sunnah", next)}
-            onGlass={onGlass}
-          />
-          <TrackingCheckbox
-            id={`prayer-${prayer}-adhkar`}
-            label={t(language, "prayerTracking.adhkar")}
-            checked={tracking.adhkar}
-            disabled={disabled}
-            onChange={(next) => onToggle(prayer, "adhkar", next)}
-            onGlass={onGlass}
-          />
-        </fieldset>
-      )}
+        <TrackingCheckbox
+          id={`prayer-${prayer}-mosque`}
+          label={t(language, "prayerTracking.prayed")}
+          hint={
+            tracking.location
+              ? t(language, tracking.location === "mosque" ? "prayerTracking.atMosque" : "prayerTracking.atHome")
+              : undefined
+          }
+          checked={tracking.location !== null}
+          disabled={disabled}
+          onChange={(next) => onToggle(prayer, "mosque", next)}
+          onGlass={onGlass}
+        />
+        <TrackingCheckbox
+          id={`prayer-${prayer}-sunnah`}
+          label={t(language, "prayerTracking.sunnah")}
+          checked={tracking.sunnah ?? false}
+          disabled={disabled}
+          onChange={(next) => onToggle(prayer, "sunnah", next)}
+          onGlass={onGlass}
+        />
+        <TrackingCheckbox
+          id={`prayer-${prayer}-adhkar`}
+          label={t(language, "prayerTracking.adhkar")}
+          checked={tracking.adhkar}
+          disabled={disabled}
+          onChange={(next) => onToggle(prayer, "adhkar", next)}
+          onGlass={onGlass}
+        />
+      </fieldset>
     </article>
   );
 }
@@ -418,10 +487,10 @@ export function PrayerTrackerCards({
         ref={scrollRef}
         dir={direction}
         data-testid="prayer-tracker-cards"
-        className={`stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+        className={`stagger-in ${
           summaryOnly
-            ? "sm:px-6 lg:grid lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:overflow-visible lg:px-8 lg:pb-0"
-            : "sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8"
+            ? `grid grid-cols-5 gap-1 overflow-visible rounded-3xl border p-1.5 sm:gap-2 sm:p-2 ${onGlass ? "hero-glass" : "border-border bg-card shadow-raised"}`
+            : "flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8 [&::-webkit-scrollbar]:hidden"
         }`}
         style={{ ["--prayer-columns" as string]: "5" }}
       >
