@@ -665,7 +665,7 @@ export function HomeScreen({
           <header
             data-testid="home-utility-header"
             data-scrolled={hasScrolledHomeContent || undefined}
-            className={`px-page mx-auto flex w-full max-w-[64rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
+            className={`px-page mx-auto flex w-full max-w-[90rem] items-center justify-between gap-3 pt-[max(1rem,env(safe-area-inset-top))] pb-3 transition-[background-color,backdrop-filter,box-shadow] duration-standard sm:pt-5 ${
               hasScrolledHomeContent ? "border-b border-white/10 bg-on-media-surface/95 shadow-sm backdrop-blur-md" : ""
             }`}
             dir="ltr"
@@ -720,8 +720,8 @@ export function HomeScreen({
             </button>
           </header>
         </div>
-        <div className="mx-auto flex w-full max-w-[64rem] flex-col gap-4 lg:gap-5">
-          <div data-testid="home-hero" className="relative isolate w-full pt-16 sm:mx-auto sm:max-w-[64rem]">
+        <div className="mx-auto flex w-full max-w-[90rem] flex-col gap-4 lg:gap-5">
+          <div data-testid="home-hero" className="relative isolate w-full pt-16">
             {showHeroContent && (
               <div className="relative z-10 mx-auto flex w-full flex-col items-stretch justify-end gap-4 px-4 pb-5 pt-24 sm:px-6 sm:pb-6 sm:pt-28 md:px-8 lg:gap-5 lg:px-8 lg:pb-8 lg:pt-20">
                 {/* The five daily prayers are the stable navigation and status
@@ -743,13 +743,13 @@ export function HomeScreen({
 
                 <div
                   data-testid="home-context-grid"
-                  className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-3 lg:gap-5"
+                  className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-2 lg:gap-5"
                 >
                   {/* Contextual Hero */}
                   {(isPrayerHero || showCompletionCard || isRoutineHero) && (
                     <div
                       data-testid="home-primary-card"
-                      className={`grid min-w-0 ${hasContextCompanion ? "lg:col-span-2" : "lg:col-span-3"}`}
+                      className={`grid min-w-0 ${hasContextCompanion ? "lg:col-span-1" : "lg:col-span-2"}`}
                     >
                       {showCompletionCard ? (
                         <div className="h-full">
@@ -833,7 +833,7 @@ export function HomeScreen({
                   {/* Today's Wird needs the full row: its three routine tiles must
                       respond to their own available width, not the viewport. */}
                   {quietProgressEnabled && (
-                    <div data-testid="home-wird-row" className="min-w-0 lg:col-span-3">
+                    <div data-testid="home-wird-row" className="min-w-0 lg:col-span-2">
                       <TodayRoutineGarden
                         summary={gardenSummary}
                         language={language}
@@ -864,7 +864,7 @@ export function HomeScreen({
 
           {onOpenCustomCounter && (
             <div className="px-page" data-testid="home-masbaha-entry">
-              <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} />
+              <TasbeehCounterButton onClick={onOpenCustomCounter} language={language} direction={direction} onGlass />
             </div>
           )}
 
@@ -878,6 +878,7 @@ export function HomeScreen({
             now={now}
             onContinue={onContinueKhatmah ?? (() => {})}
             onOverview={onOpenKhatmah ?? (() => {})}
+            onGlass
           />
 
           <div className="px-page">
@@ -908,19 +909,20 @@ export function HomeScreen({
                 if (item) void openSavedZikr(item);
               }}
               onOpenLibrary={onOpenSavedLibrary}
+              onGlass
             />
 
             {onOpenBenefits && (
               <button
                 type="button"
                 onClick={onOpenBenefits}
-                className="interactive-elem group relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl border border-primary/20 bg-card text-start shadow-sm transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
+                className="interactive-elem group hero-glass home-glass-surface relative flex min-h-[16rem] w-full flex-col justify-end overflow-hidden rounded-3xl text-start transition-[transform,box-shadow] hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-ring"
                 data-testid="home-benefits-card"
               >
                 <div className="absolute inset-0 z-0">
                   <ProductImage name="benefits_zikr" className="h-full w-full object-cover object-[center_42%]" />
                 </div>
-                <div className="relative z-10 m-3 rounded-2xl bg-on-media-surface/90 p-4 shadow-raised sm:m-4 sm:p-5">
+                <div className="relative z-10 m-3 rounded-2xl border border-white/10 bg-black/45 p-4 shadow-raised backdrop-blur-md sm:m-4 sm:p-5">
                   <span className="block">
                     <span className="block text-xl font-black text-on-media drop-shadow-md">
                       {t(language, "benefits.title")}
@@ -953,6 +955,7 @@ export function HomeScreen({
               expanded={fridayInWindow}
               status={fridayStatus}
               onOpen={onOpenFridayMode}
+              onGlass
             />
           </div>
         </div>

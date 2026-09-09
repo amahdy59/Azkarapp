@@ -96,6 +96,23 @@ describe("HomeCards", () => {
     expect(onOpenLibrary).toHaveBeenCalledOnce();
   });
 
+  it("opts Home library surfaces into the shared on-media glass contract", () => {
+    render(
+      <SavedZikrCard
+        language="en"
+        direction="ltr"
+        count={0}
+        items={[]}
+        loadingId={null}
+        errorId={null}
+        onOpenItem={() => undefined}
+        onGlass
+      />,
+    );
+
+    expect(screen.getByTestId("home-saved-section")).toHaveClass("hero-glass", "home-glass-surface");
+  });
+
   it("keeps Friday compact by default and removes the mobile virtues disclosure", () => {
     const { rerender } = render(
       <FridayHomeCard language="en" direction="ltr" expanded={false} status="start" onOpen={() => undefined} />,

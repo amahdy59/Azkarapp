@@ -27,6 +27,8 @@ describe("AzkarHeroBackground", () => {
 
     expect(container.firstElementChild).toHaveAttribute("aria-hidden", "true");
     expect(container.firstElementChild).toHaveClass("z-0");
+    expect(container.firstElementChild).toHaveClass("absolute");
+    expect(container.firstElementChild).not.toHaveClass("fixed");
     expect(container.firstElementChild).not.toHaveClass("-z-50");
     expect(container.querySelector("picture")).toBeInTheDocument();
     expect(container.querySelectorAll(".azkar-hero-particles, .azkar-hero__overlay")).toHaveLength(0);

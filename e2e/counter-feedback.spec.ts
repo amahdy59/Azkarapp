@@ -92,6 +92,7 @@ test("desktop Home keeps one aligned contextual row and gives the Wird its own w
     expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
     expect(Math.abs(primaryBox.y + primaryBox.height - (companionBox.y + companionBox.height))).toBeLessThanOrEqual(2);
     expect(primaryGlassBox.width).toBeGreaterThanOrEqual(primaryBox.width - 2);
+    expect(Math.abs(primaryBox.width - companionBox.width)).toBeLessThanOrEqual(2);
     expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
     expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
   }
@@ -110,6 +111,51 @@ test("desktop Home keeps one aligned contextual row and gives the Wird its own w
     scrollWidth: element.scrollWidth,
   }));
   expect(overflow.scrollWidth).toBeLessThanOrEqual(overflow.clientWidth + 1);
+
+  const prayerOverflow = await prayerSummary.evaluate((element) => ({
+    clientWidth: element.clientWidth,
+    scrollWidth: element.scrollWidth,
+  }));
+  expect(prayerOverflow.scrollWidth).toBeLessThanOrEqual(prayerOverflow.clientWidth + 1);
+});
+
+test("wide Home keeps navigation exposed, contains its scene, and uses glass for every card", async ({ page }) => {
+  await page.setViewportSize({ width: 1885, height: 982 });
+  await openReturningGuest(page, "ar");
+
+  const navigation = page.locator(".app-sidebar");
+  const main = page.locator(".app-main");
+  const scene = page.getByTestId("time-of-day-scene-window");
+  await expect(navigation).toBeVisible();
+
+  const [navigationBox, mainBox, sceneBox] = await Promise.all([
+    navigation.boundingBox(),
+    main.boundingBox(),
+    scene.boundingBox(),
+  ]);
+  expect(navigationBox && mainBox && sceneBox).toBeTruthy();
+  if (navigationBox && mainBox && sceneBox) {
+    expect(sceneBox.x).toBeCloseTo(mainBox.x, 0);
+    expect(sceneBox.width).toBeCloseTo(mainBox.width, 0);
+    const separated =
+      sceneBox.x + sceneBox.width <= navigationBox.x + 1 || navigationBox.x + navigationBox.width <= sceneBox.x + 1;
+    expect(separated).toBe(true);
+  }
+
+  const glassCards = [
+    page.getByTestId("prayer-tracker-cards").locator("article"),
+    page.getByTestId("home-primary-card").locator(".hero-glass").first(),
+    page.getByTestId("home-context-companion").locator(".hero-glass").first(),
+    page.getByTestId("home-wird-row").locator(".hero-glass").first(),
+    page.getByTestId("home-glass-masbaha"),
+    page.getByTestId("home-quran-card"),
+    page.getByTestId("home-saved-section"),
+    page.getByTestId("home-benefits-card"),
+    page.getByTestId("home-friday-card"),
+  ];
+  for (const cards of glassCards) {
+    await expect(cards.first()).toHaveClass(/hero-glass/);
+  }
 });
 
 test("the Home masbaha entry fills compact/tablet layouts and is bounded on desktop", async ({ page }) => {

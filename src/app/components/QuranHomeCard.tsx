@@ -16,6 +16,7 @@ export function QuranHomeCard({
   now,
   onContinue,
   onOverview,
+  onGlass = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -26,6 +27,7 @@ export function QuranHomeCard({
   now: Date;
   onContinue: () => void;
   onOverview: () => void;
+  onGlass?: boolean;
 }) {
   const surahName = getSurahDisplayName(position?.surahNumber ?? 1, language);
   const pageNumber = position?.page ?? 1;
@@ -37,7 +39,10 @@ export function QuranHomeCard({
     // First-time user state
     return (
       <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-        <div className="flex flex-col rounded-2xl bg-card/80 backdrop-blur-md border border-border p-4 shadow-raised">
+        <div
+          data-testid="home-quran-card"
+          className={`flex flex-col rounded-2xl p-4 ${onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card/80 shadow-raised backdrop-blur-md"}`}
+        >
           <div className="flex items-center gap-3 mb-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
               <BookOpen size={20} />
@@ -75,7 +80,10 @@ export function QuranHomeCard({
 
   return (
     <div className={`px-page mt-2 mb-2 ${textAlignment}`} dir={direction}>
-      <div className="flex flex-col rounded-2xl bg-card/80 backdrop-blur-md border border-border shadow-raised overflow-hidden">
+      <div
+        data-testid="home-quran-card"
+        className={`flex flex-col overflow-hidden rounded-2xl ${onGlass ? "hero-glass home-glass-surface" : "border border-border bg-card/80 shadow-raised backdrop-blur-md"}`}
+      >
         {/* Main Content Area: Continue Reading */}
         <div className={`flex flex-col items-start p-4 ${textAlignment}`}>
           <div className="flex items-center w-full gap-3 mb-3">

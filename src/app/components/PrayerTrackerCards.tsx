@@ -205,7 +205,9 @@ function PrayerCard({
       data-prayer={prayer}
       data-prayer-state={state}
       data-density={summaryOnly ? "summary" : "full"}
-      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:w-full sm:min-w-0 sm:p-4 ${
+      className={`group/card flex w-[78%] min-w-[78%] shrink-0 snap-center flex-col rounded-[var(--ds-radius-card-large)] border p-3 text-center transition-[background-color,border-color,box-shadow] duration-standard ease-standard sm:p-4 ${
+        summaryOnly ? "sm:w-[46%] sm:min-w-[46%] lg:w-full lg:min-w-0" : "sm:w-full sm:min-w-0"
+      } ${
         onGlass
           ? `hero-glass ${isCurrent ? "ring-2 ring-primary border-transparent" : "border-transparent"}`
           : isCurrent
@@ -416,7 +418,11 @@ export function PrayerTrackerCards({
         ref={scrollRef}
         dir={direction}
         data-testid="prayer-tracker-cards"
-        className="stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8"
+        className={`stagger-in flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden ${
+          summaryOnly
+            ? "sm:px-6 lg:grid lg:grid-cols-[repeat(var(--prayer-columns),minmax(0,1fr))] lg:overflow-visible lg:px-8 lg:pb-0"
+            : "sm:grid sm:grid-cols-[repeat(var(--prayer-columns),minmax(9rem,1fr))] sm:px-6 sm:pb-0 lg:grid-cols-[repeat(var(--prayer-columns),minmax(11rem,1fr))] lg:overflow-x-auto lg:px-8"
+        }`}
         style={{ ["--prayer-columns" as string]: "5" }}
       >
         {ordered.map((model) => {

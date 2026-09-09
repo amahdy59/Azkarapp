@@ -3453,6 +3453,16 @@ null` shape, so a record written before this change still loads and still
   reduced-transparency, forced-colors, contrast, responsive, and full release
   gates.
 
+## DEC-162 — Home owns its photograph, uses equal desktop cards, and has one glass language
+
+- **Decision:** contain the photograph inside Home's main-content surface, use two equal fluid columns for the contextual desktop row, and apply the shared functional-glass contract to every top-level Home card.
+- **The hidden sidebar was a stacking defect, not a navigation-state defect.** `TimeOfDayBackground` was fixed to the browser viewport and Home's main layer paints after the navigation sibling. The photograph could therefore cover the rail/sidebar even though the correct navigation component was mounted. The scene is now absolute to the isolated Home surface and browser coverage verifies that its bounds equal `.app-main` without intersecting `.app-sidebar`.
+- **Fifty percent means half of usable row space.** At 1024px and above the grid has two `minmax(0, 1fr)` tracks, so each card receives `(row width - one gap) / 2`. This is more robust than literal `50%` widths, whose two halves plus a gap overflow their container. A lone primary card spans both tracks and Today's Wird keeps both tracks.
+- **The prayer row no longer brings desktop carousel mechanics with it.** Below 1024px it remains a snap carousel: one card plus a meaningful next-card preview on phone, and roughly two cards on tablet. At and above 1024px it becomes five equal `minmax(0, 1fr)` columns with no fixed minimum and no horizontal overflow.
+- **Glass is a material contract, not a one-off colour.** Prayer, routine, evidence, Wird, Masbaha, Quran, Saved, Benefits and Friday top-level Home surfaces all use `hero-glass`. Components whose anatomy uses theme tokens also use `home-glass-surface`, remapping foreground, muted copy, borders and nested controls to the measured on-media palette. The existing reduced-transparency fallback remains authoritative.
+- **The dashboard can use the desktop it is given.** Home's header, prayer strip and card composition now share the 90rem dashboard measure instead of a private 64rem cap. Page gutters and the navigation column still bound that measure at every viewport.
+- **Tests/evidence required:** exact 1885×982 sidebar/scene geometry, 50/50 contextual width, five-column overflow protection, RTL ordering, all top-level glass owners, reduced transparency and the complete release gates; screenshots at 1885×982, 834×900 and 390×844.
+
 ### DEC-015 - Target Sizes in Dense UI Contexts
 
 - **Date:** 2026-09-07

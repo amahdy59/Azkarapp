@@ -203,6 +203,7 @@ export function SavedZikrCard({
   errorId,
   onOpenItem,
   onOpenLibrary,
+  onGlass = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
@@ -212,13 +213,14 @@ export function SavedZikrCard({
   errorId: string | null;
   onOpenItem: (id: string) => void;
   onOpenLibrary?: () => void;
+  onGlass?: boolean;
 }) {
   return (
     <Card
       as="section"
       elevation="flat"
       aria-labelledby="home-saved-heading"
-      className="flex h-full flex-col"
+      className={`flex h-full flex-col ${onGlass ? "hero-glass home-glass-surface" : ""}`}
       data-testid="home-saved-section"
     >
       <div className="flex items-start justify-between gap-3">
@@ -321,12 +323,14 @@ export function FridayHomeCard({
   expanded,
   status,
   onOpen,
+  onGlass = false,
 }: {
   language: AppLanguage;
   direction: "ltr" | "rtl";
   expanded: boolean;
   status: "start" | "continue" | "review";
   onOpen?: () => void;
+  onGlass?: boolean;
 }) {
   const actionLabel = t(language, `home.friday${status[0]!.toUpperCase()}${status.slice(1)}`);
 
@@ -334,9 +338,10 @@ export function FridayHomeCard({
     return (
       <Card
         as="section"
+        data-testid="home-friday-card"
         aria-labelledby="friday-card-heading"
         elevation="flat"
-        className="flex flex-col gap-4 sm:flex-row sm:items-center"
+        className={`flex flex-col gap-4 sm:flex-row sm:items-center ${onGlass ? "hero-glass home-glass-surface" : ""}`}
       >
         <span className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary">
           <ProductImage name="mosque_prophet" className="h-full w-full object-cover" />
@@ -366,7 +371,12 @@ export function FridayHomeCard({
   }
 
   return (
-    <Card as="section" aria-labelledby="friday-card-heading" className="overflow-hidden p-0">
+    <Card
+      as="section"
+      data-testid="home-friday-card"
+      aria-labelledby="friday-card-heading"
+      className={`overflow-hidden p-0 ${onGlass ? "hero-glass home-glass-surface" : ""}`}
+    >
       <div className="grid gap-5 p-5 sm:p-6 xl:grid-cols-[14rem_minmax(0,1fr)_19rem] xl:items-center">
         <div className="relative flex h-44 w-full items-center justify-center self-center overflow-hidden rounded-2xl border border-primary/20 bg-primary/10 text-primary sm:h-52 xl:h-48">
           <ProductImage name="mosque_prophet" className="absolute inset-0 h-full w-full object-cover" />

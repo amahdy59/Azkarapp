@@ -5,6 +5,23 @@ import { QuranHomeCard } from "./QuranHomeCard";
 const now = new Date(2026, 7, 24, 12);
 
 describe("QuranHomeCard", () => {
+  it("uses the shared glass surface when rendered on Home photography", () => {
+    render(
+      <QuranHomeCard
+        language="en"
+        direction="ltr"
+        wirdHistory={{}}
+        progressDayStartHour={0}
+        now={now}
+        onContinue={vi.fn()}
+        onOverview={vi.fn()}
+        onGlass
+      />,
+    );
+
+    expect(screen.getByTestId("home-quran-card")).toHaveClass("hero-glass", "home-glass-surface");
+  });
+
   it("offers plan setup for a genuinely first Quran reading", () => {
     const onOverview = vi.fn();
     render(

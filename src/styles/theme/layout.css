@@ -260,6 +260,18 @@
   box-shadow: var(--ds-shadow-overlay);
 }
 
+/* Home is a photographic canvas. Components that normally consume theme
+   surface tokens opt into this companion class when they sit on that canvas,
+   keeping their existing anatomy while moving copy and nested controls onto
+   the measured on-media palette. */
+.home-glass-surface {
+  --foreground: var(--on-media);
+  --muted-foreground: var(--on-media-muted);
+  --border: rgb(255 255 255 / 0.16);
+  --muted: rgb(255 255 255 / 0.12);
+  color: var(--on-media);
+}
+
 /* Glassmorphic Card Backdrop & Styling — opt-in only (DEC-003: functional/
    devotional content uses stable opaque surfaces). .bg-card itself stays
    opaque; reach for .glass-card/.wird-card explicitly on decorative,
