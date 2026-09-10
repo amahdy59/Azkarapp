@@ -63,6 +63,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 19    | `phases/PHASE_19_TOKEN_DISCIPLINE.md`          | Colour, radius and spacing back on scale, with lint enforcement       |
 | 20    | `phases/PHASE_20_MOTION_AND_STRUCTURE.md`      | Real motion system and navigable stylesheets                          |
 | 23    | `phases/PHASE_23_PRAYER_HOME_AND_REMINDERS.md` | Responsive prayer dashboard and efficient opt-in reminders            |
+| 24    | `phases/PHASE_24_KAHF_AUDIO_AND_PRAYER_NAV.md` | Recoverable Al-Kahf playback and prayer-detail navigation             |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

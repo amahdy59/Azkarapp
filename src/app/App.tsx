@@ -168,12 +168,14 @@ const AudioContentReviewScreen = lazy(() =>
 function AppContent({
   audioController,
   audioModuleLoading,
+  requestAudioModule,
   buildPlaybackPlan,
   getAudioCoverage,
 }: {
   /** `null` until the lazily-loaded audio chunk reports its controller. */
   audioController: AudioController | null;
   audioModuleLoading: boolean;
+  requestAudioModule: () => void;
   buildPlaybackPlan: AudioModule["buildPlaybackPlan"] | null;
   getAudioCoverage: AudioModule["getAudioCoverage"] | null;
 }) {
@@ -992,7 +994,7 @@ function AppContent({
   const activeZikrHasAudio = activeZikr
     ? getAudioCoverage
       ? getAudioCoverage([activeZikr]).available === 1
-      : audioModuleLoading && Boolean(activeZikr.audioAssetId)
+      : Boolean(activeZikr.audioAssetId)
     : false;
 
   /**
@@ -1034,6 +1036,12 @@ function AppContent({
     setQueuedAudioZikrId(null);
   }, [activeZikr, audioController, buildPlaybackPlan, queuedAudioZikrId, startAudio]);
 
+  useEffect(() => {
+    if (queuedAudioZikrId && !audioModuleLoading && !audioController && !buildPlaybackPlan) {
+      setQueuedAudioZikrId(null);
+    }
+  }, [audioController, audioModuleLoading, buildPlaybackPlan, queuedAudioZikrId]);
+
   /**
    * One control for the whole listen cycle: start the surah the first time,
    * then pause and resume the same playback rather than restarting it from
@@ -1044,6 +1052,7 @@ function AppContent({
     if (!activeZikr || !activeZikrHasAudio) return;
     if (!audioController || !buildPlaybackPlan) {
       setQueuedAudioZikrId(activeZikr.id);
+      requestAudioModule();
       return;
     }
     if (activeZikrAudioStatus === "playing" || activeZikrAudioStatus === "buffering") {
@@ -1969,6 +1978,7 @@ export default function App() {
   const [audioModule, setAudioModule] = useState<AudioModule | null>(null);
   const [audioController, setAudioController] = useState<AudioController | null>(null);
   const [audioModuleLoading, setAudioModuleLoading] = useState(true);
+  const [audioLoadAttempt, setAudioLoadAttempt] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -1983,13 +1993,20 @@ export default function App() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [audioLoadAttempt]);
+
+  const requestAudioModule = useCallback(() => {
+    if (audioModule || audioModuleLoading) return;
+    setAudioModuleLoading(true);
+    setAudioLoadAttempt((attempt) => attempt + 1);
+  }, [audioModule, audioModuleLoading]);
 
   return (
     <>
       <AppContent
         audioController={audioController}
         audioModuleLoading={audioModuleLoading}
+        requestAudioModule={requestAudioModule}
         buildPlaybackPlan={audioModule?.buildPlaybackPlan ?? null}
         getAudioCoverage={audioModule?.getAudioCoverage ?? null}
       />

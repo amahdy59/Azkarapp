@@ -3517,3 +3517,10 @@ null` shape, so a record written before this change still loads and still
 - **Platform boundary:** service-worker notification display improves installed-PWA behavior while the app is running or backgrounded. The product does not claim dependable fully closed delivery without a server-backed Push API subscription and scheduler; Settings and Help disclose that boundary.
 - **Accessibility:** the strip retains buttons, accessible prayer names, `aria-current`, visible keyboard focus, RTL logical order and non-colour status text. Reminder controls use switch/select semantics and stay disabled until opt-in. Automated checks support but do not prove WCAG 2.2 AA.
 - **Tests/evidence required:** unit timing, persistence and corruption repair; permission-gated control tests; 320/390/834/1440 overflow and RTL checks; normal/solid Home screenshots; full local gates, green Quality/Pages workflows and exact production-SHA smoke verification.
+
+## DEC-165 — approved recitation recovers in place and prayer summaries open prayer detail
+
+- **Decision:** an explicitly approved audio assignment remains an enabled action even if the lazy audio controller failed to load once. Pressing Play retries that controller and preserves user initiation; no retry autoplays without the press.
+- **Prayer navigation:** every item in Home's stable five-prayer strip opens the selected prayer's focused screen, which contains its time, virtue, congregation record, rawatib, and after-prayer adhkar. The strip no longer bypasses those properties by opening adhkar directly.
+- **Visual state:** available Al-Kahf Play controls use the primary selected-action treatment before playback, and switch to the filled primary state while playing. Unassigned recitations remain disabled and honestly labelled unavailable.
+- **Tests/evidence required:** failed-first-load audio retry, delayed-controller playback, selected-prayer route/content, focused browser coverage, full release gates, and production playback verification.

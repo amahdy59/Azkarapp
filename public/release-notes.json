@@ -1,15 +1,13 @@
 {
-  "release": "2026-09-09.2",
+  "release": "2026-09-10.1",
   "ar": [
-    "تعرض الصفحة الرئيسية الصلوات الخمس في شريط واضح ومتجاوب على الهاتف والجهاز اللوحي وسطح المكتب.",
-    "يمكن تفعيل تذكير قبل كل صلاة واختيار التنبيه قبل ١٠ أو ١٥ دقيقة.",
-    "يبدأ محتوى الصلاة أقرب إلى رأس الصفحة مع إبراز الصلاة الحالية ومسار ما بعدها.",
-    "يؤدي تقليل الشفافية الآن إلى إخفاء صورة الصفحة الرئيسية واستخدام بطاقات بلون السمة."
+    "يمكن الآن تشغيل تلاوة سورة الكهف حتى بعد تعذر تهيئة الصوت مؤقتاً.",
+    "أصبح زر الاستماع إلى سورة الكهف واضحاً ومتاحاً قبل بدء التلاوة.",
+    "يفتح الضغط على أي صلاة في الصفحة الرئيسية تفاصيل وقتها وفضلها ومسار إتمامها."
   ],
   "en": [
-    "Home now shows all five prayers in one clear responsive strip across phone, tablet, and desktop.",
-    "You can enable a reminder before every prayer and choose a 10- or 15-minute lead time.",
-    "Prayer content starts closer to the header, with the current prayer and its next steps emphasized.",
-    "Reduce transparency now hides the Home photograph and uses solid cards from your selected theme."
+    "Surah Al-Kahf playback now recovers after a temporary audio initialization failure.",
+    "The Al-Kahf listen action is clearer and remains available before recitation begins.",
+    "Tapping any prayer on Home now opens its time, virtue, and completion journey."
   ]
 }

@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import App from "./App";
 
+const loadAudioModuleMock = vi.hoisted(() => vi.fn());
+
 // Mock matchMedia because jsdom does not implement it
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -46,11 +48,7 @@ vi.mock("./audio/lazyAudio", async (importOriginal) => {
   const actual = await importOriginal<typeof import("./audio/lazyAudio")>();
   return {
     ...actual,
-    loadAudioModule: vi.fn(async () => ({
-      AudioProvider: ({ children }: { children: React.ReactNode }) => children,
-      buildPlaybackPlan: () => null,
-      getAudioCoverage: () => actual.EMPTY_AUDIO_COVERAGE,
-    })),
+    loadAudioModule: loadAudioModuleMock,
   };
 });
 
@@ -82,6 +80,17 @@ vi.mock("./screens/ProgressScreen", () => ({
 describe("App Composition and Routing", () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    loadAudioModuleMock.mockResolvedValue({
+      AudioProvider: ({ children }: { children: React.ReactNode }) => children,
+      buildPlaybackPlan: () => null,
+      getAudioCoverage: (items: Array<{ id: string }>) => ({
+        total: items.length,
+        available: items.length,
+        unavailable: 0,
+        availableZikrIds: items.map((item) => item.id),
+        unavailableZikrIds: [],
+      }),
+    });
     window.history.replaceState(null, "", "/");
     window.localStorage.setItem("azkarapp.onboarding-complete.v1", "true");
   });
@@ -110,6 +119,22 @@ describe("App Composition and Routing", () => {
       name: /settings/i,
     });
     expect(settingsTab).toHaveAttribute("aria-current", "page");
+  });
+
+  it("keeps approved Al-Kahf audio actionable and retries audio initialization", async () => {
+    loadAudioModuleMock.mockRejectedValueOnce(new Error("audio chunk unavailable"));
+    window.history.replaceState(null, "", "/#/azkar/friday-kahf/1");
+
+    const user = userEvent.setup();
+    render(<App />);
+
+    const listen = await screen.findByTestId("mushaf-rail-listen", {}, { timeout: 5000 });
+    expect(listen).toBeEnabled();
+    await waitFor(() => expect(loadAudioModuleMock).toHaveBeenCalledTimes(1));
+
+    await user.click(listen);
+    await waitFor(() => expect(loadAudioModuleMock).toHaveBeenCalledTimes(2));
+    expect(listen).toBeEnabled();
   });
 
   it("updates URL and view when navigating via keyboard shortcuts", async () => {

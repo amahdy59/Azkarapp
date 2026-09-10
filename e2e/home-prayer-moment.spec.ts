@@ -87,6 +87,16 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
 });
 
+test("each Home prayer opens its focused prayer properties", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:20:00");
+  await page.getByRole("button", { name: /Open Maghrib/i }).click();
+
+  await expect(page).toHaveURL(/#\/prayer\/maghrib$/);
+  await expect(page.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
+  await expect(page.getByTestId("prayer-moment-hero")).toBeVisible();
+  await expect(page.getByTestId("prayer-action-location")).toBeVisible();
+});
+
 /**
  * Every control on the card owns the point a reader aims at.
  *

@@ -531,7 +531,11 @@ export function MushafImmersiveReader({
                   : "mushaf.listenSurah",
             )}
             className={`${footerActionClass} ${
-              isRecitationPlaying ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card"
+              isRecitationPlaying
+                ? "border-primary bg-primary text-primary-foreground"
+                : surahAudio.available
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card"
             }`}
           >
             {isRecitationPlaying ? <Pause size={18} aria-hidden="true" /> : <Play size={18} aria-hidden="true" />}

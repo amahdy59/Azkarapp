@@ -750,7 +750,13 @@ export function HomeScreen({
                     records={prayerTracking}
                     dayKey={getProgressDayKey(now, progressDayStartHour)}
                     onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={(prayer) => (onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer"))}
+                    onOpen={(prayer) =>
+                      onPrayerResume
+                        ? onPrayerResume(prayer)
+                        : onOpenPrayerAdhkar
+                          ? onOpenPrayerAdhkar(prayer)
+                          : onResume("after_prayer")
+                    }
                     onGlass={homeVisualEffects}
                     summaryOnly
                   />

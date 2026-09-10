@@ -416,7 +416,7 @@ export function MushafToolRail({
           <div className="mx-1 my-1 h-px flex-none bg-current/15" aria-hidden="true" />
           <div className="flex flex-col gap-0.5" role="group" aria-label={group.label}>
             {group.actions.map((action) => (
-              <RailButton key={action.id} action={action} />
+              <RailButton key={action.id} action={action} highlight={action.id === "listen" && !action.disabled} />
             ))}
           </div>
         </div>
