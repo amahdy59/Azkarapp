@@ -67,11 +67,14 @@ test("the Home Wird keeps semantic order while mirroring Arabic placement and ex
   }
 });
 
-test("desktop Home keeps one aligned contextual row and gives the Wird its own width", async ({ page }) => {
+test("desktop Home gives the expanded prayer, companion, and Wird the available width", async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar", { textSize: "large" });
+  await page.getByTestId("prayer-card-asr").getByRole("button").click();
 
   const grid = page.getByTestId("home-context-grid");
+  const prayerDetail = page.getByTestId("home-prayer-moment");
   const primary = page.getByTestId("home-primary-card");
   const primaryGlass = primary.locator(".hero-glass").first();
   const companion = page.getByTestId("home-context-companion");
@@ -79,20 +82,21 @@ test("desktop Home keeps one aligned contextual row and gives the Wird its own w
   const prayerSummary = page.getByTestId("prayer-tracker-cards");
 
   await expect(companion).toBeVisible();
+  await expect(prayerDetail).toHaveClass(/hero-glass/);
   await expect(primaryGlass).toBeVisible();
   await expect(companion.locator(".hero-glass").first()).toBeVisible();
   await expect(prayerSummary.locator('article[data-density="summary"]')).toHaveCount(5);
   await expect(prayerSummary.getByRole("checkbox")).toHaveCount(0);
 
-  const [gridBox, primaryBox, primaryGlassBox, companionBox, wirdBox] = await Promise.all(
-    [grid, primary, primaryGlass, companion, wird].map((locator) => locator.boundingBox()),
+  const [gridBox, prayerDetailBox, primaryBox, companionBox, wirdBox] = await Promise.all(
+    [grid, prayerDetail, primary, companion, wird].map((locator) => locator.boundingBox()),
   );
-  expect(gridBox && primaryBox && primaryGlassBox && companionBox && wirdBox).toBeTruthy();
-  if (gridBox && primaryBox && primaryGlassBox && companionBox && wirdBox) {
-    expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
-    expect(Math.abs(primaryBox.y + primaryBox.height - (companionBox.y + companionBox.height))).toBeLessThanOrEqual(2);
-    expect(primaryGlassBox.width).toBeGreaterThanOrEqual(primaryBox.width - 2);
+  expect(gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox).toBeTruthy();
+  if (gridBox && prayerDetailBox && primaryBox && companionBox && wirdBox) {
+    expect(prayerDetailBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
+    expect(primaryBox.y).toBeGreaterThanOrEqual(prayerDetailBox.y + prayerDetailBox.height + 12);
     expect(Math.abs(primaryBox.width - companionBox.width)).toBeLessThanOrEqual(2);
+    expect(Math.abs(primaryBox.y - companionBox.y)).toBeLessThanOrEqual(2);
     expect(wirdBox.y).toBeGreaterThanOrEqual(primaryBox.y + primaryBox.height + 12);
     expect(wirdBox.width).toBeGreaterThanOrEqual(gridBox.width - 2);
   }
@@ -121,7 +125,9 @@ test("desktop Home keeps one aligned contextual row and gives the Wird its own w
 
 test("wide Home keeps navigation exposed, contains its scene, and uses glass for every card", async ({ page }) => {
   await page.setViewportSize({ width: 1885, height: 982 });
+  await page.clock.setFixedTime(new Date("2026-09-05T14:00:00+03:00"));
   await openReturningGuest(page, "ar");
+  await page.getByTestId("prayer-card-asr").getByRole("button").click();
 
   const navigation = page.locator(".app-sidebar");
   const main = page.locator(".app-main");
@@ -144,6 +150,7 @@ test("wide Home keeps navigation exposed, contains its scene, and uses glass for
 
   const glassCards = [
     page.getByTestId("prayer-tracker-cards"),
+    page.getByTestId("home-prayer-moment"),
     page.getByTestId("home-primary-card").locator(".hero-glass").first(),
     page.getByTestId("home-context-companion").locator(".hero-glass").first(),
     page.getByTestId("home-wird-row").locator(".hero-glass").first(),

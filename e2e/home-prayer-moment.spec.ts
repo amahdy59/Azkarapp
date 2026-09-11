@@ -87,14 +87,35 @@ test("a quiet stretch between prayers keeps Home to the compact five", async ({ 
   await expect(page.getByTestId("home-prayer-moment")).toHaveCount(0);
 });
 
-test("each Home prayer opens its focused prayer properties", async ({ page }) => {
+test("each Home prayer expands its shared properties under an aligned notch", async ({ page }) => {
   await openHomeAt(page, "2026-09-05T13:20:00");
   await page.getByRole("button", { name: /Open Maghrib/i }).click();
 
-  await expect(page).toHaveURL(/#\/prayer\/maghrib$/);
-  await expect(page.getByTestId("prayer-moment-screen")).toHaveAttribute("data-prayer", "maghrib");
-  await expect(page.getByTestId("prayer-moment-hero")).toBeVisible();
-  await expect(page.getByTestId("prayer-action-location")).toBeVisible();
+  await expect(page).toHaveURL(/\/?$/);
+  const expanded = page.getByTestId("home-prayer-moment");
+  await expect(expanded).toHaveAttribute("data-prayer", "maghrib");
+  await expect(expanded.getByTestId("prayer-moment-hero")).toBeVisible();
+  await expect(expanded.getByTestId("prayer-action-location")).toBeVisible();
+
+  const selected = page.getByTestId("prayer-card-maghrib");
+  await expect(selected.getByRole("button")).toHaveAttribute("aria-expanded", "true");
+  const notch = page.getByTestId("home-prayer-notch");
+  await expect(notch).toHaveAttribute("data-prayer", "maghrib");
+  const [selectedBox, notchBox] = await Promise.all([selected.boundingBox(), notch.boundingBox()]);
+  expect(selectedBox).not.toBeNull();
+  expect(notchBox).not.toBeNull();
+  expect(Math.abs(selectedBox!.x + selectedBox!.width / 2 - (notchBox!.x + notchBox!.width / 2))).toBeLessThan(2);
+});
+
+test("the selected prayer notch follows the RTL visual order", async ({ page }) => {
+  await openHomeAt(page, "2026-09-05T13:20:00", "ar");
+  await page.getByTestId("prayer-card-fajr").getByRole("button").click();
+
+  const selectedBox = await page.getByTestId("prayer-card-fajr").boundingBox();
+  const notchBox = await page.getByTestId("home-prayer-notch").boundingBox();
+  expect(selectedBox).not.toBeNull();
+  expect(notchBox).not.toBeNull();
+  expect(Math.abs(selectedBox!.x + selectedBox!.width / 2 - (notchBox!.x + notchBox!.width / 2))).toBeLessThan(2);
 });
 
 /**

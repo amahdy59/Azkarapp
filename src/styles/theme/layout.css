@@ -260,6 +260,23 @@
   box-shadow: var(--ds-shadow-overlay);
 }
 
+/* The selected prayer joins the stable five-prayer strip to its expanded
+   detail without cutting or masking either interactive surface. The notch is
+   anchored to the selected card itself, so it follows responsive grid sizing
+   and RTL visual order without coordinate calculations. */
+.home-prayer-notch {
+  position: absolute;
+  left: 50%;
+  inset-block-end: -1.25rem;
+  z-index: 0;
+  width: min(calc(100% - 0.5rem), 10rem);
+  height: 1.5rem;
+  transform: translateX(-50%);
+  border-block-start: 0;
+  border-radius: 0 0 9999px 9999px;
+  pointer-events: none;
+}
+
 /* Home is a photographic canvas. Components that normally consume theme
    surface tokens opt into this companion class when they sit on that canvas,
    keeping their existing anatomy while moving copy and nested controls onto

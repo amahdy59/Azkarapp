@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-10.1",
+  "release": "2026-09-11",
   "ar": [
-    "يمكن الآن تشغيل تلاوة سورة الكهف حتى بعد تعذر تهيئة الصوت مؤقتاً.",
-    "أصبح زر الاستماع إلى سورة الكهف واضحاً ومتاحاً قبل بدء التلاوة.",
-    "يفتح الضغط على أي صلاة في الصفحة الرئيسية تفاصيل وقتها وفضلها ومسار إتمامها."
+    "يتحقق التطبيق المثبّت من التحديثات فور تشغيله لتصل إصلاحات التلاوة بسرعة أكبر.",
+    "يعرض الضغط على أي صلاة تفاصيل وقتها وفضلها ومسار إتمامها داخل الصفحة الرئيسية.",
+    "يربط شق بصري الصلاة المختارة بتفاصيلها بدقة على الهاتف والجهاز اللوحي وسطح المكتب."
   ],
   "en": [
-    "Surah Al-Kahf playback now recovers after a temporary audio initialization failure.",
-    "The Al-Kahf listen action is clearer and remains available before recitation begins.",
-    "Tapping any prayer on Home now opens its time, virtue, and completion journey."
+    "The installed app now checks for updates at startup so recitation fixes arrive sooner.",
+    "Tapping any prayer now reveals its time, virtue, and completion journey directly on Home.",
+    "A responsive notch precisely connects the selected prayer to its details on phone, tablet, and desktop."
   ]
 }

@@ -410,23 +410,6 @@ function AppContent({
     },
     [progressDayStartHour],
   );
-  /**
-   * Opens the prayer itself rather than its adhkar.
-   *
-   * Tapping a prayer used to jump straight into the after-prayer collection,
-   * which answered one of the four things someone does at a prayer and left
-   * the rest — where they prayed it, its rawātib, why it is worth walking to —
-   * to a checkbox row on Home. The collection is one press further in, from a
-   * screen that holds all of them.
-   */
-  const openPrayerMoment = useCallback(
-    (prayer: PrayerName) => {
-      setActivePrayer(prayer);
-      push("prayer");
-    },
-    [push, setActivePrayer],
-  );
-
   const [lastGrowthEvent, setLastGrowthEvent] = useState<GrowthEvent | null>(null);
   const [completed, setCompleted] = useState<Record<CategoryId, Set<string>>>(() =>
     resetStaleCompletedCollections(
@@ -1300,7 +1283,6 @@ function AppContent({
                     }
                   }}
                   onOpenPrayerAdhkar={(prayer) => resumeCategory("after_prayer", prayer)}
-                  onPrayerResume={(prayer) => openPrayerMoment(prayer)}
                   mosquePrayerGoal={mosquePrayerGoal}
                   dailyPathStartDayKey={dailyPathStartDayKey}
                   onMosquePrayerGoalChange={setMosquePrayerGoal}

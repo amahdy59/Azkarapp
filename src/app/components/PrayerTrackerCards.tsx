@@ -179,6 +179,7 @@ function PrayerCard({
   onOpen,
   onGlass,
   summaryOnly,
+  selected,
 }: {
   model: PrayerCardModel;
   language: AppLanguage;
@@ -187,6 +188,7 @@ function PrayerCard({
   onToggle: (prayer: PrayerName, field: PrayerTrackingField, next: boolean) => void;
   onOpen?: (prayer: PrayerName) => void;
   summaryOnly?: boolean;
+  selected?: boolean;
 }) {
   const { prayer, time, state, countdown } = model;
   const Icon = PRAYER_ICON[prayer];
@@ -205,8 +207,9 @@ function PrayerCard({
         data-prayer-state={state}
         data-density="summary"
         aria-current={isCurrent ? "step" : undefined}
-        className={`flex min-w-0 flex-col rounded-3xl border text-center transition-[background-color,border-color,box-shadow,transform] duration-standard ease-standard ${
-          isCurrent
+        data-selected={selected || undefined}
+        className={`relative flex min-w-0 flex-col rounded-3xl border text-center transition-[background-color,border-color,box-shadow,transform] duration-standard ease-standard ${
+          selected
             ? "border-primary bg-primary/10 shadow-[inset_0_0_0_1px_var(--primary)]"
             : "border-transparent bg-transparent"
         }`}
@@ -215,8 +218,10 @@ function PrayerCard({
           type="button"
           onClick={() => onOpen?.(prayer)}
           disabled={!onOpen}
+          aria-expanded={selected}
+          aria-controls="home-expanded-prayer"
           aria-label={t(language, "prayerTracking.openPrayer", { prayer: name })}
-          className="flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1.5 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
+          className="relative z-10 flex min-h-[7.5rem] min-w-0 flex-col items-center justify-center rounded-3xl px-1.5 py-2 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring sm:min-h-[8.5rem] sm:px-3 sm:py-3"
         >
           {isCurrent && (
             <span className="mb-1 rounded-full bg-primary px-2.5 py-0.5 text-micro font-black text-primary-foreground sm:text-xs">
@@ -264,6 +269,14 @@ function PrayerCard({
           )}
           <span className="sr-only">{statusLabel(language, state)}</span>
         </button>
+        {selected && (
+          <span
+            aria-hidden="true"
+            data-testid="home-prayer-notch"
+            data-prayer={prayer}
+            className={`home-prayer-notch ${onGlass ? "hero-glass" : "border border-border bg-card shadow-raised"}`}
+          />
+        )}
       </article>
     );
   }
@@ -437,6 +450,7 @@ export function PrayerTrackerCards({
   onOpen,
   onGlass,
   summaryOnly,
+  selectedPrayer,
 }: {
   models: readonly PrayerCardModel[];
   language: AppLanguage;
@@ -448,6 +462,8 @@ export function PrayerTrackerCards({
   onGlass?: boolean;
   /** Keep overview surfaces scannable; focused views retain full recording. */
   summaryOnly?: boolean;
+  /** The Home summary whose shared detail panel is expanded below the strip. */
+  selectedPrayer?: PrayerName | null;
 }) {
   const byPrayer = new Map(records.filter((record) => record.dayKey === dayKey).map((r) => [r.prayer, r]));
   const [virtuePrayer, setVirtuePrayer] = useState<PrayerName | null>(null);
@@ -514,6 +530,7 @@ export function PrayerTrackerCards({
               }}
               onOpen={onOpen}
               summaryOnly={summaryOnly}
+              selected={summaryOnly && model.prayer === selectedPrayer}
             />
           );
         })}

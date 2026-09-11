@@ -267,7 +267,6 @@ export function HomeScreen({
   locationSettings,
   onResume,
   onOpenPrayerAdhkar,
-  onPrayerResume,
   mosquePrayerGoal,
   dailyPathStartDayKey,
   onMosquePrayerGoalChange,
@@ -309,8 +308,6 @@ export function HomeScreen({
   onResume: (category: CategoryId) => void;
   /** Opens that prayer's own adhkar, as the prayer screen's card does. */
   onOpenPrayerAdhkar?: (prayer: PrayerName) => void;
-  /** Opens the prayer screen, which is where the whole day is tracked. */
-  onPrayerResume?: (prayer: PrayerName) => void;
   mosquePrayerGoal?: number;
   dailyPathStartDayKey?: string;
   onMosquePrayerGoalChange?: (goal: number | undefined) => void;
@@ -343,6 +340,7 @@ export function HomeScreen({
     errorId: string | null;
   }>({ loadingId: null, errorId: null });
   const [fridayKahfStarted] = useState(hasStartedFridayKahf);
+  const [selectedPrayer, setSelectedPrayer] = useState<PrayerName | null>(null);
 
   /* How each day is judged. Days before the reader's daily path started keep
      the verdict they were lived under — see dailyPath.ts — so this is one
@@ -643,6 +641,8 @@ export function HomeScreen({
     (leadingPrayer.phase === "approaching" || leadingPrayer.phase === "now" || leadingPrayer.phase === "recorded"),
   );
   const isRoutineHero = !isPrayerHero && showRoutineCard;
+  const expandedPrayer = selectedPrayer ?? (isPrayerHero ? leadingPrayer?.prayer : null);
+  const hasPrimaryContext = showCompletionCard || isRoutineHero;
   const hasContextCompanion = Boolean(dailyEvidence);
 
   return (
@@ -742,7 +742,7 @@ export function HomeScreen({
                 {/* The five daily prayers are the stable navigation and status
                     layer. Context below may change with time; this strip does
                     not move or disappear. */}
-                <div data-testid="home-prayer-strip" className="w-full max-w-full overflow-hidden">
+                <div data-testid="home-prayer-strip" className="relative z-10 w-full max-w-full overflow-visible">
                   <PrayerTrackerCards
                     models={prayerCardModels}
                     language={language}
@@ -750,24 +750,48 @@ export function HomeScreen({
                     records={prayerTracking}
                     dayKey={getProgressDayKey(now, progressDayStartHour)}
                     onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                    onOpen={(prayer) =>
-                      onPrayerResume
-                        ? onPrayerResume(prayer)
-                        : onOpenPrayerAdhkar
-                          ? onOpenPrayerAdhkar(prayer)
-                          : onResume("after_prayer")
-                    }
+                    onOpen={setSelectedPrayer}
                     onGlass={homeVisualEffects}
                     summaryOnly
+                    selectedPrayer={expandedPrayer}
                   />
                 </div>
+
+                {expandedPrayer && (
+                  <section
+                    id="home-expanded-prayer"
+                    data-testid="home-prayer-moment"
+                    data-prayer={expandedPrayer}
+                    dir={direction}
+                    aria-label={t(language, "prayerMoment.homeTitle")}
+                    className={`grid w-full grid-cols-1 overflow-hidden rounded-3xl md:grid-cols-2 ${
+                      homeVisualEffects ? "hero-glass" : "border border-border bg-card shadow-raised"
+                    }`}
+                  >
+                    <PrayerMomentPanel
+                      prayer={expandedPrayer}
+                      language={language}
+                      direction={direction}
+                      records={prayerTracking}
+                      dayKey={getProgressDayKey(now, progressDayStartHour)}
+                      locationSettings={locationSettings}
+                      now={now}
+                      onToggle={onTogglePrayerTracking ?? (() => undefined)}
+                      onOpenAdhkar={(prayer) =>
+                        onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
+                      }
+                      onGlass={homeVisualEffects}
+                      unified
+                    />
+                  </section>
+                )}
 
                 <div
                   data-testid="home-context-grid"
                   className="grid w-full grid-cols-1 items-stretch gap-4 lg:grid-cols-2 lg:gap-5"
                 >
                   {/* Contextual Hero */}
-                  {(isPrayerHero || showCompletionCard || isRoutineHero) && (
+                  {hasPrimaryContext && (
                     <div
                       data-testid="home-primary-card"
                       className={`grid min-w-0 ${hasContextCompanion ? "lg:col-span-1" : "lg:col-span-2"}`}
@@ -781,46 +805,6 @@ export function HomeScreen({
                             onGlass={homeVisualEffects}
                           />
                         </div>
-                      ) : isPrayerHero && leadingPrayer ? (
-                        <section
-                          data-testid="home-prayer-moment"
-                          data-prayer={leadingPrayer.prayer}
-                          dir={direction}
-                          aria-label={t(language, "prayerMoment.homeTitle")}
-                          className={`grid h-full grid-cols-1 overflow-hidden rounded-3xl md:grid-cols-2 ${
-                            homeVisualEffects ? "hero-glass" : "border border-border bg-card shadow-raised"
-                          }`}
-                        >
-                          <PrayerMomentPanel
-                            prayer={leadingPrayer.prayer}
-                            language={language}
-                            direction={direction}
-                            records={prayerTracking}
-                            dayKey={getProgressDayKey(now, progressDayStartHour)}
-                            locationSettings={locationSettings}
-                            now={now}
-                            onToggle={onTogglePrayerTracking ?? (() => undefined)}
-                            onOpenAdhkar={(prayer) =>
-                              onOpenPrayerAdhkar ? onOpenPrayerAdhkar(prayer) : onResume("after_prayer")
-                            }
-                            onGlass={homeVisualEffects}
-                            unified
-                          />
-                          {onPrayerResume && (
-                            <button
-                              type="button"
-                              onClick={() => onPrayerResume(leadingPrayer.prayer)}
-                              data-testid="home-open-prayer-screen"
-                              className={`flex min-h-12 w-full items-center justify-center gap-2 border-t px-4 text-label font-black transition-colors focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-inset focus-visible:ring-ring md:col-span-2 ${
-                                homeVisualEffects
-                                  ? "border-white/10 text-on-media hover:bg-white/10"
-                                  : "border-border text-primary hover:bg-muted"
-                              }`}
-                            >
-                              {t(language, "prayerMoment.dayTitle")}
-                            </button>
-                          )}
-                        </section>
                       ) : isRoutineHero ? (
                         <PrayerRoutineCard
                           categoryId={reminderInfo.categoryId}
@@ -855,7 +839,10 @@ export function HomeScreen({
 
                   {/* One contextual companion keeps the primary action visually dominant. */}
                   {dailyEvidence ? (
-                    <div data-testid="home-context-companion" className="flex min-w-0 lg:col-span-1">
+                    <div
+                      data-testid="home-context-companion"
+                      className={`flex min-w-0 ${hasPrimaryContext ? "lg:col-span-1" : "lg:col-span-2"}`}
+                    >
                       <DailyEvidenceCard
                         language={language}
                         direction={direction}

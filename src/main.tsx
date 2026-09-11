@@ -83,6 +83,7 @@ const updateServiceWorker = registerSW({
     });
     window.addEventListener("online", checkForUpdate);
     window.setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
+    checkForUpdate();
   },
 });
 

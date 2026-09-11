@@ -3524,3 +3524,12 @@ null` shape, so a record written before this change still loads and still
 - **Prayer navigation:** every item in Home's stable five-prayer strip opens the selected prayer's focused screen, which contains its time, virtue, congregation record, rawatib, and after-prayer adhkar. The strip no longer bypasses those properties by opening adhkar directly.
 - **Visual state:** available Al-Kahf Play controls use the primary selected-action treatment before playback, and switch to the filled primary state while playing. Unassigned recitations remain disabled and honestly labelled unavailable.
 - **Tests/evidence required:** failed-first-load audio retry, delayed-controller playback, selected-prayer route/content, focused browser coverage, full release gates, and production playback verification.
+
+## DEC-166 — Home prayer summaries disclose one responsive prayer surface
+
+- **Decision:** supersede DEC-165's Home navigation detail only. Selecting any of the stable five prayer summaries keeps the reader on Home and expands the existing shared prayer panel immediately below the strip. Focused prayer routes remain available from Progress and direct links.
+- **Selection and timing:** the live time-bounded prayer is expanded by default. An explicit prayer selection takes precedence and remains under user control. Existing thirty-minute and post-recording grace rules continue to govern only the automatic prayer moment; prayer calculations and stored tracking data do not change.
+- **Notch geometry:** the visual connector belongs to the selected grid card and is centred locally. It therefore follows the actual responsive track width, gap, padding and RTL placement without viewport percentage calculations.
+- **Accessibility:** each native prayer button exposes `aria-expanded` and identifies the shared detail region with `aria-controls`. Selection has text and structural state in addition to colour, keyboard focus remains on the real button, and the decorative notch is hidden from assistive technology.
+- **Installed update recovery:** service-worker registration performs an immediate update check on startup as well as the existing visibility, online and hourly checks. A waiting update still requires the reader's explicit refresh action and never takes over a reading session automatically.
+- **Tests/evidence required:** in-place selection, shared prayer content, exact notch/card centre alignment in LTR and RTL, audio retry and deployed-origin playback, full release gates, green Pages workflows and exact production-SHA verification.

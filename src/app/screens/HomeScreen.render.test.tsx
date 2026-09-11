@@ -89,7 +89,6 @@ describe("HomeScreen quick access", () => {
   it("renders the five-prayer rail on Home", () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date(2026, 7, 10, 15, 45));
-    const onPrayerResume = vi.fn();
     const onOpenCustomCounter = vi.fn();
 
     render(
@@ -101,7 +100,6 @@ describe("HomeScreen quick access", () => {
         language="en"
         direction="ltr"
         onResume={() => undefined}
-        onPrayerResume={onPrayerResume}
         routineModes={routineModes}
         savedZikrIds={new Set()}
         onOpenSavedZikr={() => undefined}
