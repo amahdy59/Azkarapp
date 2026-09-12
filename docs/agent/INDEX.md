@@ -68,6 +68,7 @@ Run the phase files in numerical order unless the decision log explicitly record
 | 25A   | `phases/PHASE_25A_PUSH_SECURITY_FOUNDATION.md`         | Reproducible RLS baseline before server-backed push subscriptions       |
 | 26    | `phases/PHASE_26_HOME_PRAYER_COMPOSITION.md`           | Focused Home IA and one integrated prayer-detail surface                |
 | 27    | `phases/PHASE_27_PRODUCTION_VISUAL_AUDIT.md`           | Fresh production visual audit across responsive matrix                  |
+| 28    | `phases/PHASE_28_BEFORE_SLEEP_AUDIO.md`                | Verified owner-supplied audio for exact before-sleep content            |
 
 Phases 15–20 derive from `docs/audits/DESIGN_CONSISTENCY_AUDIT.md` (2026-08-15) and are
 recorded in `DECISION_LOG.md` as DEC-064. Phase 15 is upstream of 16, 17 and 19 — its root

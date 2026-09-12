@@ -3,6 +3,7 @@ import { ALL_AZKAR, getAzkarForMode } from "../content/azkar";
 import type { Zikr } from "../types";
 import { createArabicTextFingerprint, normalizeArabicForAudioMatching } from "./arabicMatching";
 import { buildPlaybackPlan, getAudioCoverage } from "./buildPlaybackPlan";
+import { APPROVED_AUDIO_ASSIGNMENTS } from "./audioAssignments";
 import { QURAN_AUDIO_REVIEW_CANDIDATES, REJECTED_LEGACY_AUDIO_MATCHES } from "./audioReviewCandidates";
 import { resolveAudioAsset } from "./resolveAudioAsset";
 import type { AudioAsset, AudioCatalog } from "./audioTypes";
@@ -65,6 +66,28 @@ function catalogFor(zikrs: readonly Zikr[], voices = ["voice-a"]): { catalog: Au
 }
 
 describe("explicit audio content architecture", () => {
+  it("links only the eleven reviewed before-sleep recordings", () => {
+    const expectedAssignments = [
+      "s-hm-102",
+      "s-hm-104",
+      "s-hm-105",
+      "s-hm-106-alhamdulillah",
+      "s-hm-106-allahu-akbar",
+      "s-hm-106-subhanallah",
+      "s-hm-107",
+      "s-hm-108",
+      "s-hm-109a",
+      "s-hm-110b",
+      "s-hm-111",
+    ];
+    const assignedBeforeSleepIds = getAzkarForMode("before_sleep", "complete")
+      .map((zikr) => zikr.id)
+      .filter((id) => APPROVED_AUDIO_ASSIGNMENTS[id]);
+
+    expect(assignedBeforeSleepIds.toSorted()).toEqual(expectedAssignments.toSorted());
+    expect(assignedBeforeSleepIds.every((id) => APPROVED_AUDIO_ASSIGNMENTS[id] === id)).toBe(true);
+  });
+
   it("normalizes formatting without merging different Arabic letters", () => {
     expect(normalizeArabicForAudioMatching("قُـلْ  هُوَ ﴿١﴾")).toBe("قل هو");
     expect(createArabicTextFingerprint("أَمْسَيْنَا")).not.toBe(createArabicTextFingerprint("أَصْبَحْنَا"));

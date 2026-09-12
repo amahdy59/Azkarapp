@@ -251,25 +251,17 @@ curl.exe -sS -D - -o NUL -H 'Origin: https://amahdy59.github.io' -H 'Range: byte
 
 Do not use expiring signed URLs in the static manifest. Do not compress MP3 responses again at the CDN. If a Content Security Policy is introduced, permit the audio origin in both `media-src` and `connect-src`; offline download uses `fetch()`.
 
-### Supabase Storage as the audio host
+### Cloudflare R2 as the audio host
 
-Google Drive is suitable for private master-file backup or reviewer handoff, but it is not the production audio origin. Drive sharing links are document/download flows rather than one stable public asset base with controlled object paths, response metadata, CORS, cache headers, and unauthenticated browser range requests. Keep WAV masters in Drive if useful; publish the reviewed MP3 delivery files to the project's Supabase Storage bucket.
+Google Drive is suitable for private master-file backup or reviewer handoff, but it is not the production audio origin. Drive sharing links are document/download flows rather than one stable public asset base with controlled object paths, response metadata, CORS, cache headers, and unauthenticated browser range requests. Keep WAV masters in Drive if useful; publish reviewed delivery files to the public `azkar-audio` Cloudflare R2 bucket.
 
-Supabase is the chosen host for this project. It satisfies the requirements above
-without a separate CDN, and it survives the eventual Flutter/Play Store port
-because the files are served over plain public HTTPS rather than through any
-web-only mechanism.
-
-Create one **public** bucket named `audio`. Public matters: the manifest is
-static and must not carry expiring signed URLs, so the objects have to be
-readable without a token. Nothing private belongs in this bucket.
-
-Supabase serves public objects from a fixed prefix. The project reference is
-recorded in [docs/SUPABASE_SETUP.md](../SUPABASE_SETUP.md), so the base URL is:
+The currently configured public base URL is:
 
 ```text
-VITE_AUDIO_BASE_URL=https://vanjwanmnusgnavzzzpz.supabase.co/storage/v1/object/public/audio
+VITE_AUDIO_BASE_URL=https://pub-6e537fd865454e599c23a2bcfc22136e.r2.dev
 ```
+
+The manifest is static and must not carry expiring signed URLs, so its objects have to be publicly readable without a token. Nothing private belongs in this bucket.
 
 Object keys inside the bucket are exactly the `relativePath` values in the
 manifest, so the layout mirrors the naming scheme in _File naming and immutable
@@ -285,20 +277,15 @@ quran/ayat-al-kursi/muhammad-moataz/v1/ayat-al-kursi.m4a
 (`abdullah-muhammad`, `muhammad-alshara`, `muhammad-moataz`) — never the display
 name, which is localized and may be re-worded.
 
-Set the object metadata on upload; Supabase does not infer a usable
-`Cache-Control` on its own. Because every path carries an immutable `v<n>`,
-long-lived caching is safe:
+Upload the frozen delivery bytes through the R2 dashboard or an authenticated Wrangler session. Set the exact MIME type and cache metadata when the upload path supports it. Because every path carries an immutable `v<n>`, long-lived caching is safe:
 
 ```bash
-supabase storage cp ./morning-asbahna.m4a   ss:///audio/dua/morning-asbahna/muhammad-moataz/v1/morning-asbahna.m4a   --content-type audio/mp4   --cache-control "public, max-age=31536000, immutable"
+npx wrangler r2 object put azkar-audio/dua/morning-asbahna/muhammad-moataz/v1/morning-asbahna.mp3 --file ./morning-asbahna.mp3 --content-type audio/mpeg --cache-control "public, max-age=31536000, immutable" --remote
 ```
 
-Supabase Storage already returns `Accept-Ranges: bytes`, answers `Range` probes
-with `206`, and sends `Access-Control-Allow-Origin: *` for public buckets, so
-the verification commands in the previous section apply unchanged. Run them
-against a real uploaded object before marking anything `approved` — the
-manifest validator fetches each variant and compares byte size, checksum, and
-`Content-Type` against the record.
+Keep the R2 CORS policy aligned with the app origins. At minimum, preserve local development and permit production `GET` and `HEAD` requests with the `Range` header. Run the verification commands in the previous section against a real uploaded object before marking anything `approved`, then download the full public object and compare its byte size and SHA-256 checksum with the reviewed local file.
+
+The current `r2.dev` origin is Cloudflare's rate-limited public development URL. Migrate `VITE_AUDIO_BASE_URL` to an R2 custom domain before traffic requires production-grade caching and rate limits; do not change object keys during that migration.
 
 Note on format: recordings delivered as `.mp4`/`.m4a` are AAC and must be
 declared `audio/mp4`, which `AudioVariant["mimeType"]` accepts alongside

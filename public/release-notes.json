@@ -1,13 +1,13 @@
 {
-  "release": "2026-09-12-home-spacing",
+  "release": "2026-09-13-before-sleep-audio",
   "en": [
-    "Desktop Home cards now size themselves to their own content.",
-    "The daily reminder stays compact beside the main routine card.",
-    "Reduced empty space makes the desktop Home easier to scan without changing its navigation."
+    "Eleven before-sleep azkar now include recitation by Abdullah Muhammad.",
+    "Each recording is linked only to its exact matching supplication or surah.",
+    "Items without a verified recording remain available to read without misleading audio."
   ],
   "ar": [
-    "تأخذ بطاقات الصفحة الرئيسية على سطح المكتب ارتفاع محتواها الطبيعي.",
-    "تبقى بطاقة التذكير اليومي مدمجة بجانب بطاقة الورد الرئيسية.",
-    "تقل المساحات الفارغة لتصبح الصفحة الرئيسية أوضح وأسهل في التصفح دون تغيير التنقل."
+    "أصبحت إحدى عشرة فقرة من أذكار النوم متاحة بصوت عبد الله محمد.",
+    "رُبط كل تسجيل بالدعاء أو السورة المطابقة له بدقة فقط.",
+    "تبقى الفقرات التي لا تملك تسجيلاً موثقاً متاحة للقراءة دون صوت مضلل."
   ]
 }

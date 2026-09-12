@@ -1,14 +1,14 @@
 # Generated audio mapping report
 
-Generated: 2026-08-26T09:47:53.775Z
+Generated: 2026-09-12T21:48:21.500Z
 
 | Metric                    | Count |
 | ------------------------- | ----: |
 | Zikr instances            |   194 |
 | Total canonical zikrs     |   147 |
-| Approved audio mappings   |     0 |
+| Approved audio mappings   |    34 |
 | Pending assets            |     0 |
-| Unmatched zikrs           |   194 |
+| Unmatched zikrs           |   160 |
 | Duplicate asset paths     |     0 |
 | Shared canonical groups   |    27 |
 | Qur'anic range errors     |     0 |
@@ -227,48 +227,14 @@ Record one file per canonical row, not one file per screen instance. The filenam
 - `m-hm-96` — `zikr:astaghfirullah-wa-atubu-ilayh`
 - `m-hm-98` — `zikr:salawat-short`
 - `m-hm-97` — `zikr:perfect-words-refuge`
-- `e-hm-75a` — `zikr:collection-opening`
 - `e-hm-75` — `quran-002-255`
-- `e-hm-76a` — `quran-112`
-- `e-hm-76b` — `quran-113`
-- `e-hm-76c` — `quran-114`
-- `e-hm-77e` — `zikr:e-hm-77e`
-- `e-hm-78e` — `zikr:e-hm-78e`
-- `e-hm-79` — `zikr:sayyid-al-istighfar`
-- `e-hm-80e` — `zikr:e-hm-80e`
-- `e-hm-81e` — `zikr:e-hm-81e`
-- `e-hm-82` — `zikr:daily-wellbeing`
-- `e-hm-83` — `quran-009-129-excerpt`
-- `e-hm-84` — `zikr:pardon-and-wellbeing`
-- `e-hm-85` — `zikr:refuge-from-self-and-shaytan`
-- `e-hm-86` — `zikr:bismillah-no-harm`
-- `e-hm-87` — `zikr:contentment-with-faith`
-- `e-hm-88` — `zikr:ya-hayyu-ya-qayyum`
-- `e-hm-89e` — `zikr:e-hm-89e`
-- `e-hm-90e` — `zikr:e-hm-90e`
-- `e-hm-91` — `zikr:subhanallah-wa-bihamdih`
-- `e-hm-92` — `zikr:tahlil-complete`
-- `e-hm-96` — `zikr:astaghfirullah-wa-atubu-ilayh`
-- `e-hm-97` — `zikr:perfect-words-refuge`
-- `e-hm-98` — `zikr:salawat-short`
 - `s-hm-99-ikhlas` — `quran-112`
 - `s-hm-99-falaq` — `quran-113`
 - `s-hm-99-nas` — `quran-114`
 - `s-hm-100` — `quran-002-255`
 - `s-hm-101` — `quran-002-285-286`
-- `s-hm-109a` — `quran-109`
 - `s-hm-110a` — `quran-032`
-- `s-hm-110b` — `quran-067`
-- `s-hm-106-subhanallah` — `zikr:subhanallah`
-- `s-hm-106-alhamdulillah` — `zikr:alhamdulillah`
-- `s-hm-106-allahu-akbar` — `zikr:allahu-akbar`
-- `s-hm-102` — `zikr:s-hm-102`
-- `s-hm-105` — `zikr:s-hm-105`
-- `s-hm-104` — `zikr:s-hm-104`
-- `s-hm-108` — `zikr:s-hm-108`
-- `s-hm-107` — `zikr:s-hm-107`
 - `s-hm-109` — `zikr:refuge-from-self-and-shaytan`
-- `s-hm-111` — `zikr:s-hm-111`
 - `wu-hm-1` — `zikr:wu-hm-1`
 - `wu-hm-2` — `zikr:wu-hm-2`
 - `home-hm-15` — `zikr:home-hm-15`

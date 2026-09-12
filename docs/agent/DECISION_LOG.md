@@ -3551,3 +3551,11 @@ null` shape, so a record written before this change still loads and still
 - **User control and truthfulness:** the automatically expanded prayer can be dismissed. A prayer may be previewed during the approach window, but recording controls remain disabled until the prayer is recordable. The focused prayer route retains its prayer-specific drawn sky.
 - **Navigation:** retain the existing four labeled destinations. Secondary content moves within the Azkar library, so no extra tab, hidden label, or ambiguous icon-only destination is introduced.
 - **Tests/evidence required:** one-card containment, dismiss/reopen behavior, early-recording guard, Library destination coverage, responsive LTR/RTL notch alignment, full local gates, and production verification.
+
+## DEC-169 — before-sleep audio uses exact owner-approved assignments
+
+- **Decision:** publish the eleven owner-supplied revised MP3 files that exactly match complete before-sleep entries, credit the reciter as Abdullah Muhammad, and map each recording only to its matching `Zikr.id`. Keep the two supplied recordings with no exact before-sleep match outside the production manifest, and leave the seven before-sleep entries without supplied recordings unassigned.
+- **Storage:** preserve the approved bytes under `azkar/before_sleep/abdullah-muhammad/v1/` in the existing `azkar-audio` Cloudflare R2 bucket. A changed recording requires a new immutable version.
+- **Integrity:** manifest metadata records exact byte size, duration, SHA-256, transcript fingerprint, source, and review state. Public downloads must byte-match the reviewed local files; range probes must return `206` with `audio/mpeg` and the correct total size.
+- **User experience:** an audio action appears only where an approved exact assignment resolves. Reading, counting, and completion remain available for unassigned entries.
+- **Tests/evidence required:** exact before-sleep assignment regression, manifest validation, generated coverage report, full release gates, green Pages workflows, and production-origin playback verification.
