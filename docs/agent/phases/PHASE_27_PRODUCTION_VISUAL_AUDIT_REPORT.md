@@ -51,16 +51,20 @@ Make Phase 27 evidence accurately distinguish local and production verification,
 | `pnpm check`                     | Passed, including 955 unit tests                                |
 | `pnpm test:e2e`                  | Passed: 385 passed, 1 skipped                                   |
 | `pnpm build:pages`               | Passed; 1,954 modules transformed and 163 PWA entries precached |
+| Production evidence suite        | Passed: 24 cases against the deployed URL                       |
 
 ## Screenshots/evidence produced
 
-- Local capture coverage passed. These captures validate the test and layout changes but are not represented as production evidence.
-- Production screenshots and deployed-commit verification remain pending until this remediation commit is deployed.
+- Commit `a3e65b158a6cbce6249af18bfe1059282b59b2bc` deployed successfully to `https://amahdy59.github.io/Azkarapp/`.
+- GitHub Actions run `34705114598` completed `Quality / verify` successfully.
+- GitHub Actions run `34705114594` completed `Deploy GitHub Pages / build`, `deploy`, and `verify-production` successfully.
+- The production suite produced 28 screenshots: the twelve responsive, theme, and core-screen captures plus sixteen expanded-prayer captures.
+- Visual inspection of Arabic Dhuhr desktop, Arabic Isha compact, and English Dhuhr light desktop confirmed one-card containment, embedded virtue, compact timing, text-only Azkar action, RTL/LTR composition, and the selected-prayer relationship.
+- The parallel production run passed 22 cases; two transient initial-load timeouts passed immediately when rerun serially, with all UI assertions satisfied.
 
 ## Remaining risks or known limitations
 
-- The four manual-only accessibility checklist rows remain pending as documented in `docs/QUALITY_CHECKLIST.md`.
-- Production verification must be completed against the deployed URL before this phase is closed.
+- Automated screenshots cannot replace the four manual-only accessibility rows documented in `docs/QUALITY_CHECKLIST.md`.
 
 ## Documentation updated
 
@@ -69,4 +73,4 @@ Make Phase 27 evidence accurately distinguish local and production verification,
 
 ## Recommended next phase
 
-Deploy this remediation, capture the production matrix, visually inspect representative results, record the deployed commit, and then close Phase 27.
+Close Phase 27. The next evidence-focused phase should complete the pending real-device screen-reader, safe-area, performance, and media-access checks before another Home or navigation redesign.
